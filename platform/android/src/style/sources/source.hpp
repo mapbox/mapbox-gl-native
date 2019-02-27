@@ -12,8 +12,10 @@
 namespace mbgl {
 namespace android {
 
-class Source : private mbgl::util::noncopyable {
+class Source : public std::enable_shared_from_this<Source> {
 public:
+    Source(const Source&) = delete;
+    Source& operator=(const Source&) = delete;
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/Source"; };
 

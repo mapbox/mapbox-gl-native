@@ -34,17 +34,17 @@
 namespace mbgl {
 namespace android {
 
-    static std::unique_ptr<Source> createSourcePeer(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
+    static std::shared_ptr<Source> createSourcePeer(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
         if (coreSource.is<mbgl::style::VectorSource>()) {
-            return std::make_unique<VectorSource>(env, *coreSource.as<mbgl::style::VectorSource>(), frontend);
+            return std::shared_ptr<Source>(new VectorSource(env, *coreSource.as<mbgl::style::VectorSource>(), frontend));
         } else if (coreSource.is<mbgl::style::RasterSource>()) {
-            return std::make_unique<RasterSource>(env, *coreSource.as<mbgl::style::RasterSource>(), frontend);
+            return std::shared_ptr<Source>(new RasterSource(env, *coreSource.as<mbgl::style::RasterSource>(), frontend));
         } else if (coreSource.is<mbgl::style::GeoJSONSource>()) {
-            return std::make_unique<GeoJSONSource>(env, *coreSource.as<mbgl::style::GeoJSONSource>(), frontend);
+            return std::shared_ptr<Source>(new GeoJSONSource(env, *coreSource.as<mbgl::style::GeoJSONSource>(), frontend));
         } else if (coreSource.is<mbgl::style::ImageSource>()) {
-            return std::make_unique<ImageSource>(env, *coreSource.as<mbgl::style::ImageSource>(), frontend);
+            return std::shared_ptr<Source>(new ImageSource(env, *coreSource.as<mbgl::style::ImageSource>(), frontend));
         } else {
-            return std::make_unique<UnknownSource>(env, coreSource, frontend);
+            return std::shared_ptr<Source>(new UnknownSource(env, coreSource, frontend));
         }
     }
 
@@ -52,7 +52,7 @@ namespace android {
         if (!coreSource.peer.has_value()) {
             coreSource.peer = createSourcePeer(env, coreSource, frontend);
         }
-        return coreSource.peer.get<std::unique_ptr<Source>>()->javaPeer;
+        return coreSource.peer.get<std::shared_ptr<Source>>()->javaPeer;
     }
 
     Source::Source(jni::JNIEnv& env, mbgl::style::Source& coreSource, const jni::Object<Source>& obj, AndroidRendererFrontend& frontend)
@@ -103,7 +103,7 @@ namespace android {
         map.getStyle().addSource(std::move(ownedSource));
 
         // Add peer to core source
-        source.peer = std::unique_ptr<Source>(this);
+        source.peer = shared_from_this();
 
         // Add strong reference to java source
         javaPeer = jni::NewGlobal(env, obj);
@@ -132,7 +132,7 @@ namespace android {
 
         // Release the peer relationships. These will be re-established when the source is added to a map
         assert(ownedSource->peer.has_value());
-        ownedSource->peer.get<std::unique_ptr<Source>>().release();
+        ownedSource->peer.get<std::shared_ptr<Source>>().reset();
         ownedSource->peer.reset();
 
         // Release the strong reference to the java peer
