@@ -1,5 +1,4 @@
 #import "MGLNetworkConfiguration.h"
-@protocol MGLMapboxEventsDelegate;
 
 NS_ASSUME_NONNULL_BEGIN
 
