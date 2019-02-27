@@ -182,6 +182,7 @@ public:
 
     double pitch() const;
     void setPitch(double pitch);
+    void pitchBy(double pitch);
 
     NorthOrientation northOrientation() const;
     void setNorthOrientation(NorthOrientation);

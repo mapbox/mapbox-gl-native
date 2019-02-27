@@ -437,7 +437,7 @@ void MapWindow::mouseMoveEvent(QMouseEvent *ev)
 
     if (!delta.isNull()) {
         if (ev->buttons() == Qt::LeftButton && ev->modifiers() & Qt::ShiftModifier) {
-            m_map->setPitch(m_map->pitch() - delta.y());
+            m_map->pitchBy(delta.y());
         } else if (ev->buttons() == Qt::LeftButton) {
             m_map->moveBy(delta);
         } else if (ev->buttons() == Qt::RightButton) {

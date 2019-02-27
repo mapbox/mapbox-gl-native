@@ -553,7 +553,7 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     } else if (view->pitching) {
         const double dy = y - view->lastY;
         if (dy) {
-            view->map->setPitch(view->map->getPitch() - dy / 2);
+            view->map->pitchBy(dy / 2);
         }
     }
     view->lastX = x;
