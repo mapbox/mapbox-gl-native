@@ -885,6 +885,11 @@ void QMapboxGL::setPitch(double pitch_)
     d_ptr->mapObj->setPitch(pitch_);
 }
 
+void QMapboxGL::pitchBy(double pitch_)
+{
+    d_ptr->mapObj->pitchBy(pitch_);
+}
+
 /*!
     Returns the north orientation mode.
 */

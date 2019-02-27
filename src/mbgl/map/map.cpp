@@ -317,6 +317,12 @@ void Map::resetZoom() {
     setZoom(0);
 }
 
+#pragma mark - Pitch
+
+void Map::pitchBy(double pitch, const AnimationOptions& animation) {
+    easeTo(CameraOptions().withPitch((impl->transform.getPitch() * util::RAD2DEG) - pitch), animation);
+}
+
 #pragma mark - Bounds
 
 optional<LatLngBounds> Map::getLatLngBounds() const {

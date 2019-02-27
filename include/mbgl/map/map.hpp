@@ -90,6 +90,9 @@ public:
     void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
     void resetZoom();
 
+    // Pitch
+    void pitchBy(double pitch, const AnimationOptions& animation = {});
+
     // Bounds
     void setLatLngBounds(optional<LatLngBounds>);
     optional<LatLngBounds> getLatLngBounds() const;
