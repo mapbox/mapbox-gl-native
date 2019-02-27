@@ -1,6 +1,5 @@
 #import "MGLNetworkConfiguration_Private.h"
-#import "MGLMapboxEventsDelegate.h"
-
+#import "MGLEventsManager_Private.h"
 
 NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 static NSString * const MGLStartTime = @"start_time";
@@ -73,11 +72,8 @@ static NSString * const MGLResourceType = @"resource_type";
 - (void)sendEventForURL:(NSString *)urlString withAction:(NSString *)action
 {
     if (urlString && [self.events objectForKey:urlString]) {
-        if ([self.eventsDelegate shouldReceiveEvents])
-        {
-            NSDictionary *eventAttributes = [self eventAttributesForURL:urlString withAction:action];
-            [self.eventsDelegate didReceiveEvent:kMGLDownloadPerformanceEvent withAttributes:eventAttributes];
-        }
+        NSDictionary *eventAttributes = [self eventAttributesForURL:urlString withAction:action];
+        [[MGLEventsManager sharedManager] handleEvent:kMGLDownloadPerformanceEvent withAttributes:eventAttributes];
         [self.events removeObjectForKey:urlString];
     }
 }

@@ -2,8 +2,6 @@
 
 #import "MGLFoundation.h"
 
-@protocol MGLMapboxEventsDelegate;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -33,8 +31,6 @@ MGL_EXPORT
  
  */
 @property (atomic, strong, null_resettable) NSURLSessionConfiguration *sessionConfiguration;
-
-@property (nonatomic, weak, nullable) id<MGLMapboxEventsDelegate> eventsDelegate;
 
 @end
 
