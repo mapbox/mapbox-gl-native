@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/extension.hpp>
 #include <mbgl/gl/defines.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 
 namespace mbgl {
 namespace gl {

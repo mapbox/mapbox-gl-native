@@ -46,7 +46,7 @@ public:
         for (const auto& layer : layers) {
             const typename B::PossiblyEvaluatedPaintProperties evaluatedProps = static_cast<const PatternLayer*>(layer)->evaluated;
             const auto patternProperty = evaluatedProps.template get<typename PatternLayer::PatternProperty>();
-            const auto constantPattern = patternProperty.constantOr(Faded<std::basic_string<char> >{ "", ""});
+            const auto constantPattern = patternProperty.constantOr({ "", "" });
             // determine if layer group has any layers that use *-pattern property and add
             // constant pattern dependencies.
             if (!patternProperty.isConstant()) {

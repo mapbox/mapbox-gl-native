@@ -25,7 +25,7 @@ class UnwrappedTileID;
 
 namespace gl {
 class Context;
-}
+} // namespace gl
 
 class PaintParameters {
 public:

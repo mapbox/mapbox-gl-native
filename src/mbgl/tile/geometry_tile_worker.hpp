@@ -10,9 +10,6 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/renderer/buckets/fill_bucket.hpp>
-#include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
-#include <mbgl/renderer/buckets/line_bucket.hpp>
 
 #include <atomic>
 #include <memory>
