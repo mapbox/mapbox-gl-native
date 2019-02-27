@@ -107,11 +107,6 @@ public:
     void resetNorth(const AnimationOptions& = {{mbgl::Milliseconds(500)}});
     void resetNorth(const EdgeInsets&, const AnimationOptions& = {{mbgl::Milliseconds(500)}});
 
-    // Pitch
-    void setPitch(double pitch, const AnimationOptions& = {});
-    void setPitch(double pitch, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    double getPitch() const;
-
     // North Orientation
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;

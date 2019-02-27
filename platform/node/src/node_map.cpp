@@ -993,7 +993,7 @@ void NodeMap::SetPitch(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->setPitch(info[0]->NumberValue());
+        nodeMap->map->jumpTo(mbgl::CameraOptions().withPitch(info[0]->NumberValue()));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
