@@ -17,13 +17,7 @@ using CollisionBoxLayoutAttributes = gl::Attributes<
     attributes::a_anchor_pos,
     attributes::a_extrude>;
 
-struct CollisionBoxDynamicAttributes : gl::Attributes<attributes::a_placed> {
-    static Vertex vertex(bool placed, bool notUsed) {
-        return Vertex {
-            {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }}
-        };
-    }
-};
+using CollisionBoxDynamicAttributes = gl::Attributes<attributes::a_placed>;
 
 class CollisionBoxProgram : public Program<
     shaders::collision_box,
@@ -38,8 +32,8 @@ class CollisionBoxProgram : public Program<
 public:
     using Program::Program;
 
-    static CollisionBoxLayoutAttributes::Vertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
-        return CollisionBoxLayoutAttributes::Vertex {
+    static CollisionBoxLayoutAttributes::Vertex layoutVertex(Point<float> a, Point<float> anchor, Point<float> o) {
+        return {
             {{
                 static_cast<int16_t>(a.x),
                 static_cast<int16_t>(a.y)
@@ -52,6 +46,12 @@ public:
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
             }}
+        };
+    }
+
+    static CollisionBoxDynamicAttributes::Vertex dynamicVertex(bool placed, bool notUsed) {
+        return {
+            {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }}
         };
     }
 
@@ -120,7 +120,7 @@ public:
     using Program::Program;
 
     static CollisionBoxLayoutAttributes::Vertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
-        return CollisionBoxLayoutAttributes::Vertex {
+        return {
             {{
                 static_cast<int16_t>(a.x),
                 static_cast<int16_t>(a.y)

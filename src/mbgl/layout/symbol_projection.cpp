@@ -123,7 +123,7 @@ namespace mbgl {
 
     void addDynamicAttributes(const Point<float>& anchorPoint, const float angle,
             gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
-        auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, angle);
+        auto dynamicVertex = SymbolSDFIconProgram::dynamicLayoutVertex(anchorPoint, angle);
         dynamicVertexArray.emplace_back(dynamicVertex);
         dynamicVertexArray.emplace_back(dynamicVertex);
         dynamicVertexArray.emplace_back(dynamicVertex);

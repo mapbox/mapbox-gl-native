@@ -46,53 +46,13 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_symbol);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 } // namespace uniforms
 
-struct SymbolLayoutAttributes : gl::Attributes<
+using SymbolLayoutAttributes = gl::Attributes<
     attributes::a_pos_offset,
-    attributes::a_data<uint16_t, 4>>
-{
-    static Vertex vertex(Point<float> labelAnchor,
-                         Point<float> o,
-                         float glyphOffsetY,
-                         uint16_t tx,
-                         uint16_t ty,
-                         const Range<float>& sizeData) {
-        return Vertex {
-            // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
-            {{
-                static_cast<int16_t>(labelAnchor.x),
-                static_cast<int16_t>(labelAnchor.y),
-                static_cast<int16_t>(::round(o.x * 32)),  // use 1/32 pixels for placement
-                static_cast<int16_t>(::round((o.y + glyphOffsetY) * 32))
-            }},
-            {{
-                tx,
-                ty,
-                static_cast<uint16_t>(sizeData.min * 256),
-                static_cast<uint16_t>(sizeData.max * 256)
-            }}
-        };
-    }
-};
+    attributes::a_data<uint16_t, 4>>;
 
-struct SymbolDynamicLayoutAttributes : gl::Attributes<attributes::a_projected_pos> {
-    static Vertex vertex(Point<float> anchorPoint, float labelAngle) {
-        return Vertex {
-            {{
-                 anchorPoint.x,
-                 anchorPoint.y,
-                 labelAngle
-             }}
-        };
-    }
-};
+using SymbolDynamicLayoutAttributes = gl::Attributes<attributes::a_projected_pos>;
 
-struct SymbolOpacityAttributes : gl::Attributes<attributes::a_fade_opacity> {
-    static Vertex vertex(bool placed, float opacity) {
-        return Vertex {
-            {{ static_cast<uint8_t>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(placed)) }}
-        };
-    }
-};
+using SymbolOpacityAttributes = gl::Attributes<attributes::a_fade_opacity>;
 
 struct ZoomEvaluatedSize {
     bool isZoomConstant;
@@ -242,13 +202,54 @@ public:
     Range<float> coveringZoomStops;
 };
 
+class SymbolProgramBase {
+public:
+    static SymbolLayoutAttributes::Vertex layoutVertex(Point<float> labelAnchor,
+                         Point<float> o,
+                         float glyphOffsetY,
+                         uint16_t tx,
+                         uint16_t ty,
+                         const Range<float>& sizeData) {
+        return {
+            // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
+            {{
+                static_cast<int16_t>(labelAnchor.x),
+                static_cast<int16_t>(labelAnchor.y),
+                static_cast<int16_t>(::round(o.x * 32)),  // use 1/32 pixels for placement
+                static_cast<int16_t>(::round((o.y + glyphOffsetY) * 32))
+            }},
+            {{
+                tx,
+                ty,
+                static_cast<uint16_t>(sizeData.min * 256),
+                static_cast<uint16_t>(sizeData.max * 256)
+            }}
+        };
+    }
+
+    static SymbolDynamicLayoutAttributes::Vertex dynamicLayoutVertex(Point<float> anchorPoint, float labelAngle) {
+        return {
+            {{
+                 anchorPoint.x,
+                 anchorPoint.y,
+                 labelAngle
+             }}
+        };
+    }
+
+    static SymbolOpacityAttributes::Vertex opacityVertex(bool placed, float opacity) {
+        return {
+            {{ static_cast<uint8_t>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(placed)) }}
+        };
+    }
+};
 
 template <class Shaders,
           class Primitive,
           class LayoutAttrs,
           class UniformTypeList,
           class PaintProps>
-class SymbolProgram {
+class SymbolProgram : public SymbolProgramBase {
 public:
     using LayoutAttributes = LayoutAttrs;
     using LayoutVertex = typename LayoutAttributes::Vertex;

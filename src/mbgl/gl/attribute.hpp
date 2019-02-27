@@ -214,7 +214,7 @@ void bindAttributeLocation(Context&, ProgramID, AttributeLocation, const char * 
 std::set<std::string> getActiveAttributes(ProgramID);
 
 template <class... As>
-class Attributes {
+class Attributes final {
 public:
     using Types = TypeList<As...>;
     using Locations = IndexedTuple<

@@ -52,7 +52,7 @@ public:
 UniformLocation uniformLocation(ProgramID, const char * name);
 
 template <class... Us>
-class Uniforms {
+class Uniforms final {
 public:
     using Types = TypeList<Us...>;
     using State = IndexedTuple<TypeList<Us...>, TypeList<UniformState<typename Us::Value>...>>;

@@ -338,7 +338,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
 
         if (symbolInstance.hasText) {
-            auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.text.placed, opacityState.text.opacity);
+            auto opacityVertex = SymbolSDFTextProgram::opacityVertex(opacityState.text.placed, opacityState.text.opacity);
             for (size_t i = 0; i < symbolInstance.horizontalGlyphQuads.size() * 4; i++) {
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
@@ -353,7 +353,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
             }
         }
         if (symbolInstance.hasIcon) {
-            auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.icon.placed, opacityState.icon.opacity);
+            auto opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
             if (symbolInstance.iconQuad) {
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
@@ -369,7 +369,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
             if (feature.alongLine) {
                 return;
             }
-            auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
+            auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false);
             for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
                 bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
             }
@@ -380,7 +380,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
                 return;
             }
             for (const CollisionBox& box : feature.boxes) {
-                auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
+                auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.used);
                 bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
                 bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
                 bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
