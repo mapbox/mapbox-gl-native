@@ -257,8 +257,8 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     
     self.row = [self preferredRow];
 
-    CGSize size = self.intrinsicContentSize;
-    self.bounds = CGRectMake(0, 0, size.width, size.height);
+    [self invalidateIntrinsicContentSize];
+    [self setNeedsLayout];
 }
 
 - (void)updateVisibility {
@@ -397,7 +397,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)layoutBars {
-    CGFloat barWidth = round((CGRectGetWidth(self.bounds) - self.borderWidth * 2.0f) / self.bars.count);
+    CGFloat barWidth = round((self.intrinsicContentSize.width - self.borderWidth * 2.0f) / self.bars.count);
     
     NSUInteger i = 0;
     for (UIView *bar in self.bars) {
@@ -408,7 +408,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     }
     
     self.containerView.frame = CGRectMake(CGRectGetMinX(self.bars.firstObject.frame),
-                                          CGRectGetMaxY(self.bounds)-MGLBarHeight,
+                                          self.intrinsicContentSize.height-MGLBarHeight,
                                           self.actualWidth,
                                           MGLBarHeight+self.borderWidth*2);
     
@@ -425,7 +425,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     NSUInteger i = RTL ? self.bars.count : 0;
     for (UIView *label in self.labelViews) {
         CGFloat xPosition = round(barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth);
-        CGFloat yPosition = round(0.5 * (CGRectGetMaxY(self.bounds) - MGLBarHeight));
+        CGFloat yPosition = round(0.5 * (self.intrinsicContentSize.height - MGLBarHeight));
 
         CGRect frame = label.frame;
         frame.origin.x = xPosition;
