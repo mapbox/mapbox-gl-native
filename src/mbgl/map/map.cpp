@@ -330,8 +330,8 @@ double Map::getMaxZoom() const {
 
 void Map::setMinPitch(double minPitch) {
     impl->transform.setMinPitch(minPitch * util::DEG2RAD);
-    if (getPitch() < minPitch) {
-        setPitch(minPitch);
+    if (impl->transform.getPitch() < minPitch) {
+        jumpTo(CameraOptions().withPitch(minPitch));
     }
 }
 
@@ -341,8 +341,8 @@ double Map::getMinPitch() const {
 
 void Map::setMaxPitch(double maxPitch) {
     impl->transform.setMaxPitch(maxPitch * util::DEG2RAD);
-    if (getPitch() > maxPitch) {
-        setPitch(maxPitch);
+    if (impl->transform.getPitch() > maxPitch) {
+        jumpTo(CameraOptions().withPitch(maxPitch));
     }
 }
 
@@ -387,20 +387,6 @@ double Map::getBearing() const {
 
 void Map::resetNorth(const AnimationOptions& animation) {
     easeTo(CameraOptions().withAngle(0.0), animation);
-}
-
-#pragma mark - Pitch
-
-void Map::setPitch(double pitch, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withPitch(pitch), animation);
-}
-
-void Map::setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withPitch(pitch).withAnchor(anchor), animation);
-}
-
-double Map::getPitch() const {
-    return impl->transform.getPitch() * util::RAD2DEG;
 }
 
 #pragma mark - North Orientation

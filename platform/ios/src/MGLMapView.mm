@@ -2076,7 +2076,7 @@ public:
     
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
-        initialPitch = self.mbglMap.getPitch();
+        initialPitch = *self.mbglMap.getCameraOptions().pitch;
         [self trackGestureEvent:MMEEventGesturePitchStart forRecognizer:twoFingerDrag];
         [self notifyGestureDidBegin];
     }
@@ -2095,7 +2095,9 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-            self.mbglMap.setPitch(pitchNew, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+            self.mbglMap.jumpTo(mbgl::CameraOptions()
+                                    .withPitch(pitchNew)
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
         }
 
         [self cameraIsChanging];
@@ -3784,10 +3786,11 @@ public:
         return nil;
     }
 
+    mbgl::CameraOptions mapCamera = self.mbglMap.getCameraOptions();
     CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : self.mbglMap.getLatLng());
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
     CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(*cameraOptions.angle, 0., 360.) : self.direction;
-    CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : self.mbglMap.getPitch();
+    CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : *mapCamera.pitch;
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch, centerCoordinate.latitude, self.frame.size);
     return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate altitude:altitude pitch:pitch heading:direction];
 }

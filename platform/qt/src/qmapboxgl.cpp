@@ -879,12 +879,12 @@ void QMapboxGL::setBearing(double degrees, const QPointF &center)
 */
 double QMapboxGL::pitch() const
 {
-    return d_ptr->mapObj->getPitch();
+    return *d_ptr->mapObj->getCameraOptions().pitch;
 }
 
 void QMapboxGL::setPitch(double pitch_)
 {
-    d_ptr->mapObj->setPitch(pitch_);
+    d_ptr->mapObj->jumpTo(mbgl::CameraOptions().withPitch(pitch_));
 }
 
 void QMapboxGL::pitchBy(double pitch_)
