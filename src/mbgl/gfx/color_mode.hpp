@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gfx/types.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/color.hpp>
 
@@ -8,53 +9,29 @@ namespace gfx {
 
 class ColorMode {
 public:
-    enum class BlendEquation {
-        Add,
-        Subtract,
-        ReverseSubtract
-    };
-
-    enum class BlendFactor {
-        Zero,
-        One,
-        SrcColor,
-        OneMinusSrcColor,
-        SrcAlpha,
-        OneMinusSrcAlpha,
-        DstAlpha,
-        OneMinusDstAlpha,
-        DstColor,
-        OneMinusDstColor,
-        SrcAlphaSaturate,
-        ConstantColor,
-        OneMinusConstantColor,
-        ConstantAlpha,
-        OneMinusConstantAlpha
-    };
-
-    template <BlendEquation E>
+    template <ColorBlendEquationType E>
     struct ConstantBlend {
-        static constexpr BlendEquation equation = E;
-        static constexpr BlendFactor srcFactor = BlendFactor::One;
-        static constexpr BlendFactor dstFactor = BlendFactor::One;
+        static constexpr ColorBlendEquationType equation = E;
+        static constexpr ColorBlendFactorType srcFactor = ColorBlendFactorType::One;
+        static constexpr ColorBlendFactorType dstFactor = ColorBlendFactorType::One;
     };
 
-    template <BlendEquation E>
+    template <ColorBlendEquationType E>
     struct LinearBlend {
-        static constexpr BlendEquation equation = E;
-        BlendFactor srcFactor;
-        BlendFactor dstFactor;
+        static constexpr ColorBlendEquationType equation = E;
+        ColorBlendFactorType srcFactor;
+        ColorBlendFactorType dstFactor;
     };
 
     struct Replace {
-        static constexpr BlendEquation equation = BlendEquation::Add;
-        static constexpr BlendFactor srcFactor = BlendFactor::One;
-        static constexpr BlendFactor dstFactor = BlendFactor::Zero;
+        static constexpr ColorBlendEquationType equation = ColorBlendEquationType::Add;
+        static constexpr ColorBlendFactorType srcFactor = ColorBlendFactorType::One;
+        static constexpr ColorBlendFactorType dstFactor = ColorBlendFactorType::Zero;
     };
 
-    using Add              = LinearBlend<BlendEquation::Add>;
-    using Subtract         = LinearBlend<BlendEquation::Subtract>;
-    using ReverseSubtract  = LinearBlend<BlendEquation::ReverseSubtract>;
+    using Add              = LinearBlend<ColorBlendEquationType::Add>;
+    using Subtract         = LinearBlend<ColorBlendEquationType::Subtract>;
+    using ReverseSubtract  = LinearBlend<ColorBlendEquationType::ReverseSubtract>;
 
     using BlendFunction = variant<
         Replace,
@@ -83,11 +60,11 @@ public:
     }
 
     static ColorMode alphaBlended() {
-        return { Add{ BlendFactor::One, BlendFactor::OneMinusSrcAlpha }, {}, { true, true, true, true } };
+        return { Add{ ColorBlendFactorType::One, ColorBlendFactorType::OneMinusSrcAlpha }, {}, { true, true, true, true } };
     }
 
     static ColorMode additive() {
-        return { Add{ BlendFactor::One, BlendFactor::One }, {}, { true, true, true, true } };
+        return { Add{ ColorBlendFactorType::One, ColorBlendFactorType::One }, {}, { true, true, true, true } };
     }
 };
 

@@ -84,8 +84,8 @@ gfx::ColorMode PaintParameters::colorModeForRenderPass() const {
         const float overdraw = 1.0f / 8.0f;
         return gfx::ColorMode {
             gfx::ColorMode::Add {
-                gfx::ColorMode::BlendFactor::ConstantColor,
-                gfx::ColorMode::BlendFactor::One
+                gfx::ColorBlendFactorType::ConstantColor,
+                gfx::ColorBlendFactorType::One
             },
             Color { overdraw, overdraw, overdraw, 0.0f },
             gfx::ColorMode::Mask { true, true, true, true }
