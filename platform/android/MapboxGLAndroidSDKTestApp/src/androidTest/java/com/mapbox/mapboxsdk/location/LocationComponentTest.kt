@@ -153,7 +153,10 @@ class LocationComponentTest : EspressoTest() {
         val locationEngine = component.locationEngine
         val componentOptions = component.locationComponentOptions
 
-        assertThat(locationEngine, nullValue())
+        // notNullValue() used for LocationEngine because
+        // com.mapbox.android.core.location.LocationEngineProxy
+        // should be returned, rather than `null`
+        assertThat(locationEngine, notNullValue())
         assertThat(componentOptions, notNullValue())
 
         TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)

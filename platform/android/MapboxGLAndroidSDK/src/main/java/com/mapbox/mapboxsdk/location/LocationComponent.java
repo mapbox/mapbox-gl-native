@@ -481,10 +481,12 @@ public final class LocationComponent {
     LocationEngine locationEngine = activationOptions.locationEngine();
     if (locationEngine != null) {
       setLocationEngine(locationEngine);
-    } else if (activationOptions.useDefaultLocationEngine()) {
-      initializeLocationEngine(activationOptions.context());
     } else {
-      setLocationEngine(null);
+      if (activationOptions.useDefaultLocationEngine()) {
+        initializeLocationEngine(activationOptions.context());
+      } else {
+        setLocationEngine(null);
+      }
     }
   }
 
