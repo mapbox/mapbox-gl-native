@@ -1673,7 +1673,7 @@ public:
     {
         [self trackGestureEvent:MMEEventGesturePinchStart forRecognizer:pinch];
 
-        self.scale = powf(2, self.mbglMap.getZoom());
+        self.scale = powf(2, [self zoomLevel]);
 
         [self notifyGestureDidBegin];
     }
@@ -1688,7 +1688,8 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-            self.mbglMap.setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+            self.mbglMap.jumpTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+
             // The gesture recognizer only reports the gesture’s current center
             // point, so use the previous center point to anchor the transition.
             // If the number of touches has changed, the remembered center point is
@@ -1747,7 +1748,7 @@ public:
         {
             if (drift)
             {
-                self.mbglMap.setZoom(zoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationFromTimeInterval(duration));
+                self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(zoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }), MGLDurationFromTimeInterval(duration));
             }
         }
 
@@ -1968,7 +1969,7 @@ public:
         [self trackGestureEvent:MMEEventGestureDoubleTap forRecognizer:doubleTap];
 
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        self.mbglMap.setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
+        self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(center), MGLDurationFromTimeInterval(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
@@ -1989,7 +1990,7 @@ public:
 
     if ( ! self.isZoomEnabled) return;
 
-    if (self.mbglMap.getZoom() == self.mbglMap.getMinZoom()) return;
+    if ([self zoomLevel] == self.mbglMap.getMinZoom()) return;
 
     [self cancelTransitions];
 
@@ -2008,7 +2009,7 @@ public:
         [self trackGestureEvent:MMEEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
 
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        self.mbglMap.setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
+        self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(center), MGLDurationFromTimeInterval(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
@@ -2031,7 +2032,7 @@ public:
     {
         [self trackGestureEvent:MMEEventGestureQuickZoom forRecognizer:quickZoom];
 
-        self.scale = powf(2, self.mbglMap.getZoom());
+        self.scale = powf(2, [self zoomLevel]);
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
 
@@ -2043,7 +2044,7 @@ public:
 
         CGFloat newZoom = MAX(log2f(self.scale) + (distance / 75), self.mbglMap.getMinZoom());
 
-        if (self.mbglMap.getZoom() == newZoom) return;
+        if ([self zoomLevel] == newZoom) return;
 
         CGPoint centerPoint = [self anchorPointForGesture:quickZoom];
         
@@ -2052,7 +2053,7 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-            self.mbglMap.setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+            self.mbglMap.jumpTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
         }
 
         [self cameraIsChanging];
@@ -3141,7 +3142,7 @@ public:
         centerPoint = self.userLocationAnnotationViewCenter;
     }
     double newZoom = round(self.zoomLevel) + log2(scaleFactor);
-    self.mbglMap.setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+    self.mbglMap.jumpTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
     [self unrotateIfNeededForGesture];
 
     _accessibilityValueAnnouncementIsPending = YES;
@@ -3274,7 +3275,8 @@ public:
 
 - (double)zoomLevel
 {
-    return self.mbglMap.getZoom();
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    return *self.mbglMap.getCameraOptions(padding).zoom;
 }
 
 - (void)setZoomLevel:(double)zoomLevel
@@ -3293,9 +3295,10 @@ public:
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
-    self.mbglMap.setZoom(zoomLevel,
-                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
-                         MGLDurationFromTimeInterval(duration));
+    self.mbglMap.easeTo(mbgl::CameraOptions()
+                            .withZoom(zoomLevel)
+                            .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)),
+                        MGLDurationFromTimeInterval(duration));
 }
 
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel

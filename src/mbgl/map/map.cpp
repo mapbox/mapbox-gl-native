@@ -188,32 +188,8 @@ void Map::resetPosition(const EdgeInsets& padding) {
 #pragma mark - Zoom
 
 void Map::scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    double zoom = getZoom() + impl->transform.getState().scaleZoom(scale);
+    const double zoom = impl->transform.getZoom() + impl->transform.getState().scaleZoom(scale);
     easeTo(CameraOptions().withZoom(zoom).withAnchor(anchor), animation);
-}
-
-void Map::setZoom(double zoom, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withZoom(zoom), animation);
-}
-
-void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withZoom(zoom).withAnchor(anchor), animation);
-}
-
-void Map::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withZoom(zoom).withPadding(padding), animation);
-}
-
-double Map::getZoom() const {
-    return impl->transform.getZoom();
-}
-
-void Map::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withCenter(latLng).withZoom(zoom), animation);
-}
-
-void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withCenter(latLng).withZoom(zoom).withPadding(padding), animation);
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
@@ -312,11 +288,6 @@ LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
     );
 }
 
-void Map::resetZoom() {
-    impl->cameraMutated = true;
-    setZoom(0);
-}
-
 #pragma mark - Pitch
 
 void Map::pitchBy(double pitch, const AnimationOptions& animation) {
@@ -337,8 +308,8 @@ void Map::setLatLngBounds(optional<LatLngBounds> bounds) {
 
 void Map::setMinZoom(const double minZoom) {
     impl->transform.setMinZoom(minZoom);
-    if (getZoom() < minZoom) {
-        setZoom(minZoom);
+    if (impl->transform.getZoom() < minZoom) {
+        jumpTo(CameraOptions().withZoom(minZoom));
     }
 }
 
@@ -348,8 +319,8 @@ double Map::getMinZoom() const {
 
 void Map::setMaxZoom(const double maxZoom) {
     impl->transform.setMaxZoom(maxZoom);
-    if (getZoom() > maxZoom) {
-        setZoom(maxZoom);
+    if (impl->transform.getZoom() > maxZoom) {
+        jumpTo(CameraOptions().withZoom(maxZoom));
     }
 }
 

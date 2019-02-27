@@ -91,9 +91,11 @@ int main(int argc, char *argv[]) {
     }
 
     map.getStyle().loadURL(style);
-    map.setLatLngZoom({ lat, lon }, zoom);
-    map.setBearing(bearing);
-    map.setPitch(pitch);
+    map.jumpTo(CameraOptions()
+                   .withCenter(LatLng { lat, lon })
+                   .withZoom(zoom)
+                   .withAngle(bearing)
+                   .withPitch(pitch));
 
     if (debug) {
         map.setDebug(debug ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus : mbgl::MapDebugOptions::NoDebug);

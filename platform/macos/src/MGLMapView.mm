@@ -1047,7 +1047,8 @@ public:
 }
 
 - (double)zoomLevel {
-    return _mbglMap->getZoom();
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    return *_mbglMap->getCameraOptions(padding).zoom;
 }
 
 - (void)setZoomLevel:(double)zoomLevel {
@@ -1058,9 +1059,10 @@ public:
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated {
     MGLLogDebug(@"Setting zoomLevel: %f animated: %@", zoomLevel, MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"zoomLevel"];
-    _mbglMap->setZoom(zoomLevel,
-                      MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                      MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->easeTo(mbgl::CameraOptions()
+                         .withZoom(zoomLevel)
+                         .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets)),
+                     MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
 }
 
@@ -1069,7 +1071,10 @@ public:
     [self willChangeValueForKey:@"zoomLevel"];
     MGLMapCamera *oldCamera = self.camera;
     mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
-    _mbglMap->setZoom(zoomLevel, center, MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->easeTo(mbgl::CameraOptions()
+                         .withZoom(zoomLevel)
+                         .withAnchor(center),
+                     MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
         && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
         self.camera = oldCamera;
@@ -1461,7 +1466,7 @@ public:
         _mbglMap->cancelTransitions();
 
         if (gestureRecognizer.state == NSGestureRecognizerStateBegan) {
-            _zoomAtBeginningOfGesture = _mbglMap->getZoom();
+            _zoomAtBeginningOfGesture = [self zoomLevel];
         } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
             CGFloat newZoomLevel = _zoomAtBeginningOfGesture - delta.y / 75;
             [self setZoomLevel:newZoomLevel atPoint:startPoint animated:NO];
@@ -1525,7 +1530,7 @@ public:
 
     if (gestureRecognizer.state == NSGestureRecognizerStateBegan) {
         _mbglMap->setGestureInProgress(true);
-        _zoomAtBeginningOfGesture = _mbglMap->getZoom();
+        _zoomAtBeginningOfGesture = [self zoomLevel];
     } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
         NSPoint zoomInPoint = [gestureRecognizer locationInView:self];
         mbgl::ScreenCoordinate center(zoomInPoint.x, self.bounds.size.height - zoomInPoint.y);
@@ -1533,7 +1538,9 @@ public:
             [self willChangeValueForKey:@"zoomLevel"];
             [self willChangeValueForKey:@"centerCoordinate"];
             MGLMapCamera *oldCamera = self.camera;
-            _mbglMap->setZoom(_zoomAtBeginningOfGesture + log2(1 + gestureRecognizer.magnification), center);
+            _mbglMap->jumpTo(mbgl::CameraOptions()
+                                 .withZoom(_zoomAtBeginningOfGesture + log2(1 + gestureRecognizer.magnification))
+                                 .withAnchor(center));
             if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
                 && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
                 self.camera = oldCamera;

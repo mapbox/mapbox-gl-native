@@ -117,9 +117,11 @@ int main(int argc, char *argv[]) {
         style = std::string("file://") + style;
     }
 
-    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
-    map.setBearing(settings.bearing);
-    map.setPitch(settings.pitch);
+    map.jumpTo(mbgl::CameraOptions()
+                   .withCenter(mbgl::LatLng {settings.latitude, settings.longitude})
+                   .withZoom(settings.zoom)
+                   .withAngle(settings.bearing)
+                   .withPitch(settings.pitch));
     map.setDebug(mbgl::MapDebugOptions(settings.debug));
 
     view->setOnlineStatusCallback([&settings, &fileSource]() {
@@ -172,12 +174,12 @@ int main(int argc, char *argv[]) {
     view->run();
 
     // Save settings
-    mbgl::LatLng latLng = map.getLatLng();
-    settings.latitude = latLng.latitude();
-    settings.longitude = latLng.longitude();
-    settings.zoom = map.getZoom();
-    settings.bearing = map.getBearing();
-    settings.pitch = map.getPitch();
+    mbgl::CameraOptions camera = map.getCameraOptions();
+    settings.latitude = camera.center->latitude();
+    settings.longitude = camera.center->longitude();
+    settings.zoom = *camera.zoom;
+    settings.bearing = *camera.angle;
+    settings.pitch = *camera.pitch;
     settings.debug = mbgl::EnumType(map.getDebug());
     settings.save();
     mbgl::Log::Info(mbgl::Event::General,

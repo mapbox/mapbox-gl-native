@@ -64,9 +64,7 @@ TEST(Map, RendererState) {
     double bearingInDegrees = 30.0;
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
-    test.map.setLatLngZoom(coordinate, zoom);
-    test.map.setPitch(pitchInDegrees);
-    test.map.setBearing(bearingInDegrees);
+    test.map.jumpTo(CameraOptions().withCenter(coordinate).withZoom(zoom).withPitch(pitchInDegrees).withAngle(bearingInDegrees));
 
     test.runLoop.runOnce();
     test.frontend.render(test.map);
@@ -128,7 +126,7 @@ TEST(Map, RendererState) {
 TEST(Map, LatLngBehavior) {
     MapTest<> test;
 
-    test.map.setLatLngZoom({ 1, 1 }, 0);
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 1.0, 1.0 }).withZoom(0.0));
     auto latLng1 = test.map.getLatLng();
 
     test.map.setLatLng({ 1, 1 });
@@ -141,7 +139,7 @@ TEST(Map, LatLngBehavior) {
 TEST(Map, LatLngBoundsToCamera) {
     MapTest<> test;
 
-    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 40.712730, -74.005953 }).withZoom(16.0));
 
     LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
 
@@ -153,7 +151,7 @@ TEST(Map, LatLngBoundsToCamera) {
 TEST(Map, LatLngBoundsToCameraWithAngle) {
     MapTest<> test;
 
-    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 40.712730, -74.005953 }).withZoom(16.0));
 
     LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
 
@@ -166,7 +164,7 @@ TEST(Map, LatLngBoundsToCameraWithAngle) {
 TEST(Map, LatLngBoundsToCameraWithAngleAndPitch) {
     MapTest<> test;
     
-    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 40.712730, -74.005953 }).withZoom(16.0));
     
     LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
     
@@ -206,13 +204,13 @@ TEST(Map, LatLngsToCameraWithAngleAndPitch) {
 TEST(Map, CameraToLatLngBounds) {
     MapTest<> test;
 
-    test.map.setLatLngZoom({ 45, 90 }, 16);
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 45, 90 }).withZoom(16.0));
 
     LatLngBounds bounds = LatLngBounds::hull(
             test.map.latLngForPixel({}),
             test.map.latLngForPixel({ double(test.map.getSize().width), double(test.map.getSize().height) }));
 
-    CameraOptions camera = test.map.getCameraOptions({});
+    CameraOptions camera = test.map.getCameraOptions();
 
     ASSERT_EQ(bounds, test.map.latLngBoundsForCamera(camera));
 
@@ -255,16 +253,19 @@ TEST(Map, Offline) {
 TEST(Map, SetStyleDefaultCamera) {
     MapTest<> test;
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
-    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
-    EXPECT_DOUBLE_EQ(test.map.getPitch(), 0.0);
-    EXPECT_DOUBLE_EQ(test.map.getBearing(), 0.0);
-    EXPECT_EQ(test.map.getLatLng(), LatLng {});
+    CameraOptions camera = test.map.getCameraOptions();
+    EXPECT_DOUBLE_EQ(*camera.zoom, 0.0);
+    EXPECT_DOUBLE_EQ(*camera.pitch, 0.0);
+    EXPECT_DOUBLE_EQ(*camera.angle, 0.0);
+    EXPECT_EQ(*camera.center, LatLng {});
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty-zoomed.json"));
-    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
+    camera = test.map.getCameraOptions();
+    EXPECT_DOUBLE_EQ(*camera.zoom, 0.0);
 
     test.map.jumpTo(test.map.getStyle().getDefaultCamera());
-    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.5);
+    camera = test.map.getCameraOptions();
+    EXPECT_DOUBLE_EQ(*camera.zoom, 0.5);
 }
 
 TEST(Map, SetStyleInvalidJSON) {
@@ -561,7 +562,7 @@ TEST(Map, DisabledSources) {
         return {};
     };
 
-    test.map.setZoom(1);
+    test.map.jumpTo(CameraOptions().withZoom(1.0));
 
     // This stylesheet has two raster layers, one that starts at zoom 1, the other at zoom 0.
     // We first render a map at zoom level 1, which should show both layers (both are "visible" due
@@ -603,7 +604,7 @@ TEST(Map, DisabledSources) {
 )STYLE");
 
     test::checkImage("test/fixtures/map/disabled_layers/first", test.frontend.render(test.map));
-    test.map.setZoom(0.5);
+    test.map.jumpTo(CameraOptions().withZoom(0.5));
     test::checkImage("test/fixtures/map/disabled_layers/second", test.frontend.render(test.map));
 }
 
@@ -648,7 +649,7 @@ TEST(Map, DontLoadUnneededTiles) {
         // Note: using z += 0.1 in the loop doesn't produce accurate floating point numbers.
         const double z = double(zoom) / 10;
         tiles.clear();
-        test.map.setZoom(z);
+        test.map.jumpTo(CameraOptions().withZoom(z));
         test.frontend.render(test.map);
         EXPECT_EQ(referenceTiles[z], tiles) << "zoom level " << z;
     }

@@ -726,12 +726,12 @@ void QMapboxGL::setLongitude(double longitude_)
 */
 double QMapboxGL::scale() const
 {
-    return std::pow(2.0, d_ptr->mapObj->getZoom());
+    return std::pow(2.0, zoom());
 }
 
 void QMapboxGL::setScale(double scale_, const QPointF &center)
 {
-    d_ptr->mapObj->setZoom(::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
+    d_ptr->mapObj->jumpTo(mbgl::CameraOptions().withZoom(::log2(scale_)).withAnchor(mbgl::ScreenCoordinate { center.x(), center.y() }));
 }
 
 /*!
@@ -746,12 +746,12 @@ void QMapboxGL::setScale(double scale_, const QPointF &center)
 */
 double QMapboxGL::zoom() const
 {
-    return d_ptr->mapObj->getZoom();
+    return *d_ptr->mapObj->getCameraOptions().zoom;
 }
 
 void QMapboxGL::setZoom(double zoom_)
 {
-    d_ptr->mapObj->setZoom(zoom_, d_ptr->margins);
+    d_ptr->mapObj->jumpTo(mbgl::CameraOptions().withZoom(zoom_).withPadding(d_ptr->margins));
 }
 
 /*!
@@ -806,8 +806,10 @@ void QMapboxGL::setCoordinate(const QMapbox::Coordinate &coordinate_)
 */
 void QMapboxGL::setCoordinateZoom(const QMapbox::Coordinate &coordinate_, double zoom_)
 {
-    d_ptr->mapObj->setLatLngZoom(
-            mbgl::LatLng { coordinate_.first, coordinate_.second }, zoom_, d_ptr->margins);
+    d_ptr->mapObj->jumpTo(mbgl::CameraOptions()
+                              .withCenter(mbgl::LatLng { coordinate_.first, coordinate_.second })
+                              .withZoom(zoom_)
+                              .withPadding(d_ptr->margins));
 }
 
 /*!
