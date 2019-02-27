@@ -25,7 +25,7 @@ namespace mbgl {
    being zoomed.
 */
 template <class A>
-using ZoomInterpolatedAttributeType = gl::AttributeType<typename A::ValueType, A::Dimensions * 2>;
+using ZoomInterpolatedAttributeType = gl::Attribute<typename A::ValueType, A::Dimensions * 2>;
 
 inline std::array<float, 1> attributeValue(float v) {
     return {{ v }};
