@@ -207,6 +207,10 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH)
 
+ifneq ($(CI),)
+	IOS_XCODEBUILD_SIM += -xcconfig platform/ios/ci.xcconfig
+endif
+
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
 	mkdir -p $(IOS_OUTPUT_PATH)
 	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
