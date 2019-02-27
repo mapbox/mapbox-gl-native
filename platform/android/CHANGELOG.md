@@ -9,9 +9,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ### Bugs
 - fix surface creation after app backgrounding for surfaceview[#13976](https://github.com/mapbox/mapbox-gl-native/pull/13976)
 
-### Features
-- make ReLinker default library loader[#13974](https://github.com/mapbox/mapbox-gl-native/pull/13974)
-
 ## 7.2.0-beta.1 - February 21, 2019
 
 ### Bugs
