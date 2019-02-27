@@ -26,7 +26,7 @@ TEST(CustomGeometrySource, Grid) {
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
             *threadPool, MapMode::Static);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
-    map.setLatLngZoom({ 37.8, -122.5 }, 10);
+    map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));
 
     CustomGeometrySource::Options options;
     options.fetchTileFunction = [&map](const mbgl::CanonicalTileID& tileID) {

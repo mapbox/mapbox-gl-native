@@ -23,7 +23,7 @@ public:
         fileSource.setAccessToken("foobar");
 
         map.getStyle().loadJSON(util::read_file("benchmark/fixtures/api/style.json"));
-        map.setLatLngZoom({ 40.726989, -73.992857 }, 15); // Manhattan
+        map.jumpTo(CameraOptions().withCenter(LatLng { 40.726989, -73.992857 }).withZoom(15.0)); // Manhattan
         map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
             decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png")), 1.0));
 

@@ -959,7 +959,7 @@ void NodeMap::SetZoom(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->setZoom(info[0]->NumberValue());
+        nodeMap->map->jumpTo(mbgl::CameraOptions().withZoom(info[0]->NumberValue()));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }

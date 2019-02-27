@@ -59,7 +59,7 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
     clusterLayer->setIconImage("test-icon"s);
     clusterLayer->setIconSize(12.0f);
 
-    test.map.setLatLngZoom(coordinate, 0);
+    test.map.jumpTo(CameraOptions().withCenter(coordinate).withZoom(0.0));
     test.map.getStyle().addSource(std::move(source));
     test.map.getStyle().addLayer(std::move(clusterLayer));
     test.loop.runOnce();

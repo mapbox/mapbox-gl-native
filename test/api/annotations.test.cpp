@@ -53,7 +53,7 @@ TEST(Annotations, SymbolAnnotation) {
 //    auto size = test.frontend.getSize();
 //    auto screenBox = ScreenBox { {}, { double(size.width), double(size.height) } };
 //    for (uint8_t zoom = test.map.getMinZoom(); zoom <= test.map.getMaxZoom(); ++zoom) {
-//        test.map.setZoom(zoom);
+//        test.map.jumpTo(CameraOptions().withZoom(zoom));
 //        test.checkRendering("point_annotation");
 //        EXPECT_EQ(test.map.queryPointAnnotations(screenBox).size(), 1u);
 //    }
@@ -67,7 +67,7 @@ TEST(Annotations, SymbolAnnotationTileBoundary) {
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double>(0.000000000000001, 0.00000000000001), "default_marker" });
-    test.map.setZoom(10);
+    test.map.jumpTo(CameraOptions().withZoom(10));
     test.checkRendering("point_annotation");
 }
 
@@ -83,7 +83,7 @@ TEST(Annotations, LineAnnotation) {
     test.map.addAnnotation(annotation);
     test.checkRendering("line_annotation");
 
-    test.map.setZoom(test.map.getMaxZoom());
+    test.map.jumpTo(CameraOptions().withZoom(test.map.getMaxZoom()));
     test.checkRendering("line_annotation_max_zoom");
 }
 
@@ -98,7 +98,7 @@ TEST(Annotations, FillAnnotation) {
     test.map.addAnnotation(annotation);
     test.checkRendering("fill_annotation");
 
-    test.map.setZoom(test.map.getMaxZoom());
+    test.map.jumpTo(CameraOptions().withZoom(test.map.getMaxZoom()));
     test.checkRendering("fill_annotation_max_zoom");
 }
 
@@ -106,7 +106,7 @@ TEST(Annotations, AntimeridianAnnotationSmall) {
     AnnotationTest test;
 
     double antimeridian = 180;
-    test.map.setLatLngZoom(mbgl::LatLng(0, antimeridian), 0);
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 0, antimeridian }).withZoom(0.0));
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
 
     LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
@@ -127,7 +127,7 @@ TEST(Annotations, AntimeridianAnnotationLarge) {
     AnnotationTest test;
 
     double antimeridian = 180;
-    test.map.setLatLngZoom(mbgl::LatLng(0, antimeridian), 0);
+    test.map.jumpTo(CameraOptions().withCenter(mbgl::LatLng(0.0, antimeridian)).withZoom(0.0));
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
 
     LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
@@ -384,9 +384,9 @@ TEST(Annotations, QueryFractionalZoomLevels) {
         }
     }
 
-    test.map.setLatLngZoom({ 5, 5 }, 0);
+    test.map.jumpTo(CameraOptions().withCenter(mbgl::LatLng(5.0, 5.0)).withZoom(0.0));
     for (uint16_t zoomSteps = 10; zoomSteps <= 20; ++zoomSteps) {
-        test.map.setZoom(zoomSteps / 10.0);
+        test.map.jumpTo(CameraOptions().withZoom(zoomSteps / 10.0));
         test.frontend.render(test.map);
         auto features = test.frontend.getRenderer()->queryRenderedFeatures(box);
 
@@ -408,7 +408,7 @@ TEST(Annotations, VisibleFeatures) {
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
-    test.map.setLatLngZoom({ 5, 5 }, 3);
+    test.map.jumpTo(CameraOptions().withCenter(mbgl::LatLng(5.0, 5.0)).withZoom(3.0));
 
     std::vector<mbgl::AnnotationID> ids;
     for (int longitude = 0; longitude < 10; longitude += 2) {
@@ -428,8 +428,7 @@ TEST(Annotations, VisibleFeatures) {
     features.erase(std::unique(features.begin(), features.end(), sameID), features.end());
     EXPECT_EQ(features.size(), ids.size());
 
-    test.map.setBearing(0);
-    test.map.setZoom(4);
+    test.map.jumpTo(CameraOptions().withZoom(4.0).withAngle(0.0));
     test.frontend.render(test.map);
     features = test.frontend.getRenderer()->queryRenderedFeatures(box);
     std::sort(features.begin(), features.end(), sortID);
@@ -452,7 +451,7 @@ TEST(Annotations, DebugEmpty) {
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.setDebug(MapDebugOptions::TileBorders);
-    test.map.setZoom(1);
+    test.map.jumpTo(CameraOptions().withZoom(1.0));
 
     test.checkRendering("debug_empty");
 }
@@ -465,7 +464,7 @@ TEST(Annotations, DebugSparse) {
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.setDebug(MapDebugOptions::TileBorders);
-    test.map.setZoom(1);
+    test.map.jumpTo(CameraOptions().withZoom(1.0));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double>(10, 10), "default_marker" });
 
@@ -484,7 +483,7 @@ TEST(Annotations, ChangeMaxZoom) {
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
     test.map.setMaxZoom(14);
-    test.map.setZoom(test.map.getMaxZoom());
+    test.map.jumpTo(CameraOptions().withZoom(test.map.getMaxZoom()));
     test.checkRendering("line_annotation_max_zoom");
 }
 

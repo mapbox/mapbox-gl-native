@@ -58,7 +58,7 @@ TEST(Map, PrefetchTiles) {
         // Force tile reloading.
         map.getStyle().loadJSON(util::read_file("test/fixtures/map/prefetch/empty.json"));
         map.getStyle().loadJSON(util::read_file("test/fixtures/map/prefetch/style.json"));
-        map.setLatLngZoom({ 40.726989, -73.992857 }, zoom); // Manhattan
+        map.jumpTo(CameraOptions().withCenter(LatLng { 40.726989, -73.992857 }).withZoom(zoom)); // Manhattan
         runLoop.run();
 
         ASSERT_EQ(tiles.size(), expected.size());
