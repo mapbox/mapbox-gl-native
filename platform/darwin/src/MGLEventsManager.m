@@ -1,5 +1,5 @@
 #import "MGLEventsManager_Private.h"
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
 #import "MGLMapboxEvents.h"
 #endif
 
@@ -16,7 +16,7 @@
 }
 
 - (void)handleEvent:(NSString *)eventName withAttributes:(NSDictionary *)attributes {
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#if TARGET_OS_IOS
     [MGLMapboxEvents pushEvent:eventName withAttributes:attributes];
 #endif
     if (self.shouldHandleEvents && self.handler) {
