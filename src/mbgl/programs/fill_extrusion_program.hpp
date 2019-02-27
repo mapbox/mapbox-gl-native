@@ -29,10 +29,9 @@ MBGL_DEFINE_UNIFORM_SCALAR(float,    u_lightintensity);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
 } // namespace uniforms
 
-struct FillExtrusionLayoutAttributes : gl::Attributes<
+using FillExtrusionLayoutAttributes = gl::Attributes<
     attributes::a_pos,
-    attributes::a_normal_ed>
-{};
+    attributes::a_normal_ed>;
 
 using FillExtrusionUniforms = TypeList<
     uniforms::u_matrix,

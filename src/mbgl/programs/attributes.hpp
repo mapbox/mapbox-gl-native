@@ -159,8 +159,6 @@ struct a_pattern_from {
 
 } // namespace attributes
 
-struct PositionOnlyLayoutAttributes : gl::Attributes<
-    attributes::a_pos>
-{};
+using PositionOnlyLayoutAttributes = gl::Attributes<attributes::a_pos>;
 
 } // namespace mbgl
