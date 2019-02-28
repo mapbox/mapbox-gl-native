@@ -39,7 +39,7 @@ using FillPatternUniforms = TypeList<
 
 class FillProgram : public Program<
     shaders::fill,
-    gl::Triangle,
+    gfx::Triangle,
     FillLayoutAttributes,
     FillUniforms,
     style::FillPaintProperties>
@@ -59,7 +59,7 @@ public:
 
 class FillPatternProgram : public Program<
     shaders::fill_pattern,
-    gl::Triangle,
+    gfx::Triangle,
     FillLayoutAttributes,
     FillPatternUniforms,
     style::FillPaintProperties>
@@ -78,7 +78,7 @@ public:
 
 class FillOutlineProgram : public Program<
     shaders::fill_outline,
-    gl::Line,
+    gfx::Line,
     FillLayoutAttributes,
     FillUniforms,
     style::FillPaintProperties>
@@ -89,7 +89,7 @@ public:
 
 class FillOutlinePatternProgram : public Program<
     shaders::fill_outline_pattern,
-    gl::Line,
+    gfx::Line,
     FillLayoutAttributes,
     FillPatternUniforms,
     style::FillPaintProperties>

@@ -30,11 +30,11 @@ public:
     bool supportsLayer(const style::Layer::Impl&) const override;
 
     gl::VertexVector<HeatmapLayoutVertex> vertices;
-    gl::IndexVector<gl::Triangles> triangles;
+    gl::IndexVector<gfx::Triangles> triangles;
     SegmentVector<HeatmapAttributes> segments;
 
     optional<gl::VertexBuffer<HeatmapLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
 
     std::map<std::string, HeatmapProgram::Binders> paintPropertyBinders;
 

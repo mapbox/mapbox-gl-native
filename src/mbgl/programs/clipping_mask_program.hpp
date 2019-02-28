@@ -10,7 +10,7 @@ namespace mbgl {
 
 class ClippingMaskProgram : public Program<
     shaders::clipping_mask,
-    gl::Triangle,
+    gfx::Triangle,
     PositionOnlyLayoutAttributes,
     TypeList<
         uniforms::u_matrix>,

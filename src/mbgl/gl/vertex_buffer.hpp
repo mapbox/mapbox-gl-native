@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/gl/object.hpp>
-#include <mbgl/gl/primitives.hpp>
-#include <mbgl/gl/draw_mode.hpp>
+#include <mbgl/gfx/primitives.hpp>
+#include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/util/ignore.hpp>
 
 #include <vector>

@@ -12,15 +12,15 @@ static gl::VertexVector<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertices(
     return result;
 }
 
-static gl::IndexVector<gl::Triangles> quadTriangleIndices() {
-    gl::IndexVector<gl::Triangles> result;
+static gl::IndexVector<gfx::Triangles> quadTriangleIndices() {
+    gl::IndexVector<gfx::Triangles> result;
     result.emplace_back(0, 1, 2);
     result.emplace_back(1, 2, 3);
     return result;
 }
 
-static gl::IndexVector<gl::LineStrip> tileLineStripIndices() {
-    gl::IndexVector<gl::LineStrip> result;
+static gl::IndexVector<gfx::LineStrip> tileLineStripIndices() {
+    gl::IndexVector<gfx::LineStrip> result;
     result.emplace_back(0);
     result.emplace_back(1);
     result.emplace_back(3);

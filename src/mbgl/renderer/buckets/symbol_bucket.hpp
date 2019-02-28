@@ -91,14 +91,14 @@ public:
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>> dynamicVertices;
         gl::VertexVector<gfx::Vertex<SymbolOpacityAttributes>> opacityVertices;
-        gl::IndexVector<gl::Triangles> triangles;
+        gl::IndexVector<gfx::Triangles> triangles;
         SegmentVector<SymbolTextAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
-        optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+        optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
     } text;
 
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
@@ -107,7 +107,7 @@ public:
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>> dynamicVertices;
         gl::VertexVector<gfx::Vertex<SymbolOpacityAttributes>> opacityVertices;
-        gl::IndexVector<gl::Triangles> triangles;
+        gl::IndexVector<gfx::Triangles> triangles;
         SegmentVector<SymbolIconAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
         PremultipliedImage atlasImage;
@@ -115,7 +115,7 @@ public:
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
-        optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+        optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
     } icon;
 
     struct CollisionBuffer {
@@ -128,13 +128,13 @@ public:
     };
 
     struct CollisionBoxBuffer : public CollisionBuffer {
-        gl::IndexVector<gl::Lines> lines;
-        optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
+        gl::IndexVector<gfx::Lines> lines;
+        optional<gl::IndexBuffer<gfx::Lines>> indexBuffer;
     } collisionBox;
 
     struct CollisionCircleBuffer : public CollisionBuffer {
-        gl::IndexVector<gl::Triangles> triangles;
-        optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+        gl::IndexVector<gfx::Triangles> triangles;
+        optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
     } collisionCircle;
 
     uint32_t bucketInstanceId = 0;

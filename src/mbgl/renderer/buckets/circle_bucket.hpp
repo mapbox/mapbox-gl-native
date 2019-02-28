@@ -31,11 +31,11 @@ public:
     bool supportsLayer(const style::Layer::Impl&) const override;
 
     gl::VertexVector<CircleLayoutVertex> vertices;
-    gl::IndexVector<gl::Triangles> triangles;
+    gl::IndexVector<gfx::Triangles> triangles;
     SegmentVector<CircleAttributes> segments;
 
     optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
 
     std::map<std::string, CircleProgram::Binders> paintPropertyBinders;
 

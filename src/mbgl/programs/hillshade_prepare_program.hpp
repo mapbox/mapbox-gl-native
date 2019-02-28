@@ -15,7 +15,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
 
 class HillshadePrepareProgram : public Program<
     shaders::hillshade_prepare,
-    gl::Triangle,
+    gfx::Triangle,
     TypeList<
         attributes::a_pos,
         attributes::a_texture_pos>,
