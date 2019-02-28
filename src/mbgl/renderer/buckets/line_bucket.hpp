@@ -44,11 +44,11 @@ public:
     PossiblyEvaluatedLayoutProperties layout;
 
     gl::VertexVector<LineLayoutVertex> vertices;
-    gl::IndexVector<gl::Triangles> triangles;
+    gl::IndexVector<gfx::Triangles> triangles;
     SegmentVector<LineAttributes> segments;
 
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
 
     std::map<std::string, LineProgram::Binders> paintPropertyBinders;
 

@@ -54,7 +54,7 @@ using FillExtrusionPatternUniforms = TypeList<
 
 class FillExtrusionProgram : public Program<
     shaders::fill_extrusion,
-    gl::Triangle,
+    gfx::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionUniforms,
     style::FillExtrusionPaintProperties>
@@ -90,7 +90,7 @@ public:
 
 class FillExtrusionPatternProgram : public Program<
     shaders::fill_extrusion_pattern,
-    gl::Triangle,
+    gfx::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionPatternUniforms,
     style::FillExtrusionPaintProperties>

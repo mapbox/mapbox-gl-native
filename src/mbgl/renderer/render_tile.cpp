@@ -95,7 +95,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
 
         program.draw(
             parameters.context,
-            gl::Lines { 4.0f * parameters.pixelRatio },
+            gfx::Lines { 4.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
@@ -117,7 +117,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
 
         program.draw(
             parameters.context,
-            gl::Lines { 2.0f * parameters.pixelRatio },
+            gfx::Lines { 2.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
@@ -141,7 +141,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
     if (parameters.debugOptions & MapDebugOptions::TileBorders) {
         parameters.programs.debug.draw(
             parameters.context,
-            gl::LineStrip { 4.0f * parameters.pixelRatio },
+            gfx::LineStrip { 4.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),

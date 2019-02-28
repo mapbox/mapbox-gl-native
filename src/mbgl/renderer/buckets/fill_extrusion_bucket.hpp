@@ -40,11 +40,11 @@ public:
     float getQueryRadius(const RenderLayer&) const override;
 
     gl::VertexVector<FillExtrusionLayoutVertex> vertices;
-    gl::IndexVector<gl::Triangles> triangles;
+    gl::IndexVector<gfx::Triangles> triangles;
     SegmentVector<FillExtrusionAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
     
     std::unordered_map<std::string, FillExtrusionProgram::Binders> paintPropertyBinders;
 };

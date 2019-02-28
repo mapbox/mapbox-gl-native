@@ -442,7 +442,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             program.draw(
                 parameters.context,
-                gl::Triangles(),
+                gfx::Triangles(),
                 gl::DepthMode::disabled(),
                 gl::StencilMode {
                     gl::StencilMode::Always(),

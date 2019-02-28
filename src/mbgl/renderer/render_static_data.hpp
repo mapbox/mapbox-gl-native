@@ -20,8 +20,8 @@ public:
     gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
     gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
 
-    gl::IndexBuffer<gl::Triangles> quadTriangleIndexBuffer;
-    gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
+    gl::IndexBuffer<gfx::Triangles> quadTriangleIndexBuffer;
+    gl::IndexBuffer<gfx::LineStrip> tileBorderIndexBuffer;
 
     SegmentVector<BackgroundAttributes> tileTriangleSegments;
     SegmentVector<DebugAttributes> tileBorderSegments;

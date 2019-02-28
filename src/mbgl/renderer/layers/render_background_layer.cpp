@@ -67,7 +67,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
 
         program.draw(
             parameters.context,
-            gl::Triangles(),
+            gfx::Triangles(),
             parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
             gl::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),

@@ -10,7 +10,7 @@ namespace mbgl {
 
 class DebugProgram : public Program<
     shaders::debug,
-    gl::Line,
+    gfx::Line,
     TypeList<
         attributes::a_pos>,
     TypeList<

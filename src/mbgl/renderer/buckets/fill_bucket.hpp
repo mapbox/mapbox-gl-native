@@ -41,14 +41,14 @@ public:
     bool supportsLayer(const style::Layer::Impl&) const override;
 
     gl::VertexVector<FillLayoutVertex> vertices;
-    gl::IndexVector<gl::Lines> lines;
-    gl::IndexVector<gl::Triangles> triangles;
+    gl::IndexVector<gfx::Lines> lines;
+    gl::IndexVector<gfx::Triangles> triangles;
     SegmentVector<FillAttributes> lineSegments;
     SegmentVector<FillAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gl::Lines>> lineIndexBuffer;
-    optional<gl::IndexBuffer<gl::Triangles>> triangleIndexBuffer;
+    optional<gl::IndexBuffer<gfx::Lines>> lineIndexBuffer;
+    optional<gl::IndexBuffer<gfx::Triangles>> triangleIndexBuffer;
 
     std::map<std::string, FillProgram::Binders> paintPropertyBinders;
 };

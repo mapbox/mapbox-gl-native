@@ -110,7 +110,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
 
         programInstance.draw(
             parameters.context,
-            gl::Triangles(),
+            gfx::Triangles(),
             parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
             gl::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),

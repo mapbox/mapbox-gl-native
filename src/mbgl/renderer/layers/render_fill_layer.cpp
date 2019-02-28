@@ -119,7 +119,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             if ((evaluated.get<FillColor>().constantOr(Color()).a >= 1.0f
               && evaluated.get<FillOpacity>().constantOr(0) >= 1.0f) == (parameters.pass == RenderPass::Opaque)) {
                 draw(parameters.programs.getFillLayerPrograms().fill,
-                     gl::Triangles(),
+                     gfx::Triangles(),
                      parameters.depthModeForSublayer(1, parameters.pass == RenderPass::Opaque
                         ? gl::DepthMode::ReadWrite
                         : gl::DepthMode::ReadOnly),
@@ -129,7 +129,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (evaluated.get<FillAntialias>() && parameters.pass == RenderPass::Translucent) {
                 draw(parameters.programs.getFillLayerPrograms().fillOutline,
-                     gl::Lines{ 2.0f },
+                     gfx::Lines{ 2.0f },
                      parameters.depthModeForSublayer(
                          unevaluated.get<FillOutlineColor>().isUndefined() ? 2 : 0,
                          gl::DepthMode::ReadOnly),
@@ -205,14 +205,14 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             };
 
             draw(parameters.programs.getFillLayerPrograms().fillPattern,
-                 gl::Triangles(),
+                 gfx::Triangles(),
                  parameters.depthModeForSublayer(1, gl::DepthMode::ReadWrite),
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments);
 
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
                 draw(parameters.programs.getFillLayerPrograms().fillOutlinePattern,
-                     gl::Lines { 2.0f },
+                     gfx::Lines { 2.0f },
                      parameters.depthModeForSublayer(2, gl::DepthMode::ReadOnly),
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments);

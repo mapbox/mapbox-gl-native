@@ -341,7 +341,7 @@ public:
 
 class SymbolIconProgram : public SymbolProgram<
     shaders::symbol_icon,
-    gl::Triangle,
+    gfx::Triangle,
     SymbolLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -380,7 +380,7 @@ enum class SymbolSDFPart {
 template <class PaintProperties>
 class SymbolSDFProgram : public SymbolProgram<
     shaders::symbol_sdf,
-    gl::Triangle,
+    gfx::Triangle,
     SymbolLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -402,7 +402,7 @@ class SymbolSDFProgram : public SymbolProgram<
 {
 public:
     using BaseProgram = SymbolProgram<shaders::symbol_sdf,
-        gl::Triangle,
+        gfx::Triangle,
         SymbolLayoutAttributes,
         TypeList<
             uniforms::u_matrix,

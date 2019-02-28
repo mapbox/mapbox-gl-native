@@ -11,7 +11,7 @@
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
-#include <mbgl/gl/draw_mode.hpp>
+#include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gl/color_mode.hpp>
@@ -164,18 +164,18 @@ public:
                optional<float> depth,
                optional<int32_t> stencil);
 
-    void setDrawMode(const Points&);
-    void setDrawMode(const Lines&);
-    void setDrawMode(const LineStrip&);
-    void setDrawMode(const Triangles&);
-    void setDrawMode(const TriangleStrip&);
+    void setDrawMode(const gfx::Points&);
+    void setDrawMode(const gfx::Lines&);
+    void setDrawMode(const gfx::LineStrip&);
+    void setDrawMode(const gfx::Triangles&);
+    void setDrawMode(const gfx::TriangleStrip&);
 
     void setDepthMode(const DepthMode&);
     void setStencilMode(const StencilMode&);
     void setColorMode(const ColorMode&);
     void setCullFaceMode(const CullFaceMode&);
 
-    void draw(PrimitiveType,
+    void draw(gfx::PrimitiveType,
               std::size_t indexOffset,
               std::size_t indexLength);
 

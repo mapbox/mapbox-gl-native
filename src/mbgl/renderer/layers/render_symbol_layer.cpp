@@ -116,7 +116,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             programInstance.draw(
                 parameters.context,
-                gl::Triangles(),
+                gfx::Triangles(),
                 values_.pitchAlignment == AlignmentType::Map
                     ? parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly)
                     : gl::DepthMode::disabled(),
@@ -251,7 +251,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 }};
             parameters.programs.getSymbolLayerPrograms().collisionBox.draw(
                 parameters.context,
-                gl::Lines { 1.0f },
+                gfx::Lines { 1.0f },
                 gl::DepthMode::disabled(),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
@@ -286,7 +286,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             parameters.programs.getSymbolLayerPrograms().collisionCircle.draw(
                 parameters.context,
-                gl::Triangles(),
+                gfx::Triangles(),
                 gl::DepthMode::disabled(),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),

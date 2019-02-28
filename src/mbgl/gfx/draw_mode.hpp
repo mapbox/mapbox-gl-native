@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/gl/types.hpp>
-#include <mbgl/gl/primitives.hpp>
+#include <mbgl/gfx/types.hpp>
+#include <mbgl/gfx/primitives.hpp>
 
 #include <cassert>
 
 namespace mbgl {
-namespace gl {
+namespace gfx {
 
 class Points {
 public:
@@ -68,5 +68,5 @@ public:
     static constexpr PrimitiveType primitiveType = PrimitiveType::TriangleStrip;
 };
 
-} // namespace gl
+} // namespace gfx
 } // namespace mbgl

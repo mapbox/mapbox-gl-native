@@ -40,15 +40,6 @@ static_assert(underlying_type(RenderbufferType::DepthComponent) == GL_DEPTH_COMP
 static_assert(underlying_type(RenderbufferType::DepthComponent) == GL_DEPTH_COMPONENT16, "OpenGL type mismatch");
 #endif // MBGL_USE_GLES2
 
-
-static_assert(underlying_type(PrimitiveType::Points) == GL_POINTS, "OpenGL type mismatch");
-static_assert(underlying_type(PrimitiveType::Lines) == GL_LINES, "OpenGL type mismatch");
-static_assert(underlying_type(PrimitiveType::LineLoop) == GL_LINE_LOOP, "OpenGL type mismatch");
-static_assert(underlying_type(PrimitiveType::LineStrip) == GL_LINE_STRIP, "OpenGL type mismatch");
-static_assert(underlying_type(PrimitiveType::Triangles) == GL_TRIANGLES, "OpenGL type mismatch");
-static_assert(underlying_type(PrimitiveType::TriangleStrip) == GL_TRIANGLE_STRIP, "OpenGL type mismatch");
-static_assert(underlying_type(PrimitiveType::TriangleFan) == GL_TRIANGLE_FAN, "OpenGL type mismatch");
-
 static_assert(std::is_same<ProgramID, GLuint>::value, "OpenGL type mismatch");
 static_assert(std::is_same<ShaderID, GLuint>::value, "OpenGL type mismatch");
 static_assert(std::is_same<BufferID, GLuint>::value, "OpenGL type mismatch");
@@ -684,26 +675,26 @@ void Context::setCullFaceMode(const CullFaceMode& mode) {
 }
 
 #if not MBGL_USE_GLES2
-void Context::setDrawMode(const Points& points) {
+void Context::setDrawMode(const gfx::Points& points) {
     pointSize = points.pointSize;
 }
 #else
-void Context::setDrawMode(const Points&) {
+void Context::setDrawMode(const gfx::Points&) {
 }
 #endif // MBGL_USE_GLES2
 
-void Context::setDrawMode(const Lines& lines) {
+void Context::setDrawMode(const gfx::Lines& lines) {
     lineWidth = lines.lineWidth;
 }
 
-void Context::setDrawMode(const LineStrip& lineStrip) {
+void Context::setDrawMode(const gfx::LineStrip& lineStrip) {
     lineWidth = lineStrip.lineWidth;
 }
 
-void Context::setDrawMode(const Triangles&) {
+void Context::setDrawMode(const gfx::Triangles&) {
 }
 
-void Context::setDrawMode(const TriangleStrip&) {
+void Context::setDrawMode(const gfx::TriangleStrip&) {
 }
 
 void Context::setDepthMode(const DepthMode& depth) {
@@ -752,11 +743,24 @@ void Context::setColorMode(const ColorMode& color) {
     colorMask = color.mask;
 }
 
-void Context::draw(PrimitiveType primitiveType,
+GLenum toGLenum(const gfx::PrimitiveType primitiveType) {
+    switch (primitiveType) {
+        case gfx::PrimitiveType::Points: return GL_POINTS;
+        case gfx::PrimitiveType::Lines: return GL_LINES;
+        case gfx::PrimitiveType::LineLoop: return GL_LINE_LOOP;
+        case gfx::PrimitiveType::LineStrip: return GL_LINE_STRIP;
+        case gfx::PrimitiveType::Triangles: return GL_TRIANGLES;
+        case gfx::PrimitiveType::TriangleStrip: return GL_TRIANGLE_STRIP;
+        case gfx::PrimitiveType::TriangleFan: return GL_TRIANGLE_FAN;
+    }
+    return GL_INVALID_ENUM;
+}
+
+void Context::draw(gfx::PrimitiveType primitiveType,
                    std::size_t indexOffset,
                    std::size_t indexLength) {
     MBGL_CHECK_ERROR(glDrawElements(
-        static_cast<GLenum>(primitiveType),
+        toGLenum(primitiveType),
         static_cast<GLsizei>(indexLength),
         GL_UNSIGNED_SHORT,
         reinterpret_cast<GLvoid*>(sizeof(uint16_t) * indexOffset)));
