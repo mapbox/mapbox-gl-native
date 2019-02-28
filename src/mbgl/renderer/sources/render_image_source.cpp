@@ -67,7 +67,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             gfx::DepthMode::disabled(),
             gfx::StencilMode::disabled(),
             gfx::ColorMode::unblended(),
-            gl::CullFaceMode::disabled(),
+            gfx::CullFaceMode::disabled(),
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
             programInstance.computeAllUniformValues(

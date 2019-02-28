@@ -183,5 +183,43 @@ platform::GLenum Enum<gfx::StencilOpType>::to(const gfx::StencilOpType value) {
     return GL_INVALID_ENUM;
 }
 
+template <>
+gfx::CullFaceSideType Enum<gfx::CullFaceSideType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_FRONT: return gfx::CullFaceSideType::Front;
+        case GL_BACK: return gfx::CullFaceSideType::Back;
+        case GL_FRONT_AND_BACK: return gfx::CullFaceSideType::FrontAndBack;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::CullFaceSideType>::to(const gfx::CullFaceSideType value) {
+    switch (value) {
+        case gfx::CullFaceSideType::Front: return GL_FRONT;
+        case gfx::CullFaceSideType::Back: return GL_BACK;
+        case gfx::CullFaceSideType::FrontAndBack: return GL_FRONT_AND_BACK;
+    }
+    return GL_INVALID_ENUM;
+}
+
+template <>
+gfx::CullFaceWindingType Enum<gfx::CullFaceWindingType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_CW: return gfx::CullFaceWindingType::Clockwise;
+        case GL_CCW: return gfx::CullFaceWindingType::CounterClockwise;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::CullFaceWindingType>::to(const gfx::CullFaceWindingType value) {
+    switch (value) {
+        case gfx::CullFaceWindingType::Clockwise: return GL_CW;
+        case gfx::CullFaceWindingType::CounterClockwise: return GL_CCW;
+    }
+    return GL_INVALID_ENUM;
+}
+
 } // namespace gl
 } // namespace mbgl

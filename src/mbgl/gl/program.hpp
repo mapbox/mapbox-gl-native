@@ -118,7 +118,7 @@ public:
               gfx::DepthMode depthMode,
               gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
-              CullFaceMode cullFaceMode,
+              gfx::CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
               VertexArray& vertexArray,
               const AttributeBindings& attributeBindings,

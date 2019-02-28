@@ -65,7 +65,7 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
     glContext.setDepthMode(paintParameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly));
     glContext.setStencilMode(gfx::StencilMode::disabled());
     glContext.setColorMode(paintParameters.colorModeForRenderPass());
-    glContext.setCullFaceMode(gl::CullFaceMode::disabled());
+    glContext.setCullFaceMode(gfx::CullFaceMode::disabled());
 
     CustomLayerRenderParameters parameters;
 
