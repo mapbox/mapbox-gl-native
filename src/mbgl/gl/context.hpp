@@ -173,7 +173,7 @@ public:
     void setDepthMode(const gfx::DepthMode&);
     void setStencilMode(const gfx::StencilMode&);
     void setColorMode(const gfx::ColorMode&);
-    void setCullFaceMode(const CullFaceMode&);
+    void setCullFaceMode(const gfx::CullFaceMode&);
 
     void draw(gfx::PrimitiveType,
               std::size_t indexOffset,
@@ -267,7 +267,7 @@ private:
     State<value::BindRenderbuffer> bindRenderbuffer;
     State<value::CullFace> cullFace;
     State<value::CullFaceSide> cullFaceSide;
-    State<value::FrontFace> frontFace;
+    State<value::CullFaceWinding> cullFaceWinding;
 #if not MBGL_USE_GLES2
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2

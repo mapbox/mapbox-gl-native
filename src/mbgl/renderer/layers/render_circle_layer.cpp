@@ -102,7 +102,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
                 ? parameters.stencilModeForClipping(tile.clip)
                 : gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
-            gl::CullFaceMode::disabled(),
+            gfx::CullFaceMode::disabled(),
             *bucket.indexBuffer,
             bucket.segments,
             allUniformValues,

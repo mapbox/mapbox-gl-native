@@ -74,7 +74,7 @@ public:
               gfx::DepthMode depthMode,
               gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
-              gl::CullFaceMode cullFaceMode,
+              gfx::CullFaceMode cullFaceMode,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
               const typename AllUniforms::Values& allUniformValues,

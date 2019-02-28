@@ -85,7 +85,7 @@ ColorMask::Type ColorMask::Get() {
 const constexpr StencilFunc::Type StencilFunc::Default;
 
 void StencilFunc::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glStencilFunc(static_cast<GLenum>(value.func), value.ref, value.mask));
+    MBGL_CHECK_ERROR(glStencilFunc(Enum<gfx::StencilFunctionType>::to(value.func), value.ref, value.mask));
 }
 
 StencilFunc::Type StencilFunc::Get() {
@@ -153,13 +153,13 @@ DepthTest::Type DepthTest::Get() {
 const constexpr DepthFunc::Type DepthFunc::Default;
 
 void DepthFunc::Set(const DepthFunc::Type& value) {
-    MBGL_CHECK_ERROR(glDepthFunc(static_cast<GLenum>(value)));
+    MBGL_CHECK_ERROR(glDepthFunc(Enum<gfx::DepthFunctionType>::to(value)));
 }
 
 DepthFunc::Type DepthFunc::Get() {
     GLint depthFunc;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_DEPTH_FUNC, &depthFunc));
-    return static_cast<Type>(depthFunc);
+    return Enum<gfx::DepthFunctionType>::from(depthFunc);
 }
 
 const constexpr Blend::Type Blend::Default;
@@ -301,37 +301,37 @@ BindRenderbuffer::Type BindRenderbuffer::Get() {
 const constexpr CullFace::Type CullFace::Default;
 
 void CullFace::Set(const Type& value) {
-    MBGL_CHECK_ERROR(value == CullFaceMode::Enable ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE));
+    MBGL_CHECK_ERROR(value ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE));
 }
 
 CullFace::Type CullFace::Get() {
     GLboolean cullFace;
     MBGL_CHECK_ERROR(cullFace = glIsEnabled(GL_CULL_FACE));
-    return cullFace ? CullFaceMode::Enable : CullFaceMode::Disable;
+    return cullFace;
 }
 
 const constexpr CullFaceSide::Type CullFaceSide::Default;
 
 void CullFaceSide::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glCullFace(static_cast<GLenum>(value)));
+    MBGL_CHECK_ERROR(glCullFace(Enum<gfx::CullFaceSideType>::to(value)));
 }
 
 CullFaceSide::Type CullFaceSide::Get() {
     GLint cullFaceMode;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_CULL_FACE_MODE, &cullFaceMode));
-    return static_cast<Type>(cullFaceMode);
+    return Enum<gfx::CullFaceSideType>::from(cullFaceMode);
 }
 
-const constexpr FrontFace::Type FrontFace::Default;
+const constexpr CullFaceWinding::Type CullFaceWinding::Default;
 
-void FrontFace::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glFrontFace(static_cast<GLenum>(value)));
+void CullFaceWinding::Set(const Type& value) {
+    MBGL_CHECK_ERROR(glFrontFace(Enum<gfx::CullFaceWindingType>::to(value)));
 }
 
-FrontFace::Type FrontFace::Get() {
+CullFaceWinding::Type CullFaceWinding::Get() {
     GLint frontFace;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_FRONT_FACE, &frontFace));
-    return static_cast<Type>(frontFace);
+    return Enum<gfx::CullFaceWindingType>::from(frontFace);
 }
 
 const constexpr BindTexture::Type BindTexture::Default;

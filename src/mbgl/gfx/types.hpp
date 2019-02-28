@@ -77,5 +77,16 @@ enum class StencilOpType : uint8_t {
     DecrementWrap,
 };
 
+enum CullFaceSideType : uint8_t {
+    Front,
+    Back,
+    FrontAndBack,
+};
+
+enum CullFaceWindingType : uint8_t {
+    Clockwise,
+    CounterClockwise,
+};
+
 } // namespace gfx
 } // namespace mbgl

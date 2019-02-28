@@ -618,7 +618,7 @@ void Context::setDirtyState() {
     clearStencil.setDirty();
     cullFace.setDirty();
     cullFaceSide.setDirty();
-    frontFace.setDirty();
+    cullFaceWinding.setDirty();
     program.setDirty();
     lineWidth.setDirty();
     activeTextureUnit.setDirty();
@@ -665,14 +665,14 @@ void Context::clear(optional<mbgl::Color> color,
     MBGL_CHECK_ERROR(glClear(mask));
 }
 
-void Context::setCullFaceMode(const CullFaceMode& mode) {
-    cullFace = mode.cullFace;
+void Context::setCullFaceMode(const gfx::CullFaceMode& mode) {
+    cullFace = mode.enabled;
 
     // These shouldn't need to be updated when face culling is disabled, but we
     // might end up having the same isssues with Adreno 2xx GPUs as noted in
     // Context::setDepthMode.
     cullFaceSide = mode.side;
-    frontFace = mode.frontFace;
+    cullFaceWinding = mode.winding;
 }
 
 #if not MBGL_USE_GLES2
