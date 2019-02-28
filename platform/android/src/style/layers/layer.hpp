@@ -35,6 +35,10 @@ public:
 
     style::Layer& get();
 
+    void setDetached(jni::JNIEnv&);
+
+    jboolean isDetached(jni::JNIEnv&);
+
     void setLayoutProperty(jni::JNIEnv&, const jni::String&, const jni::Object<>& value);
 
     void setPaintProperty(jni::JNIEnv&, const jni::String&, const jni::Object<>& value);
@@ -90,6 +94,9 @@ protected:
 
     // Map is set when the layer is retrieved or after adding to the map
     mbgl::Map* map;
+
+    // new style has started loading, making this layer invalid
+    bool detached;
 };
 
 /**

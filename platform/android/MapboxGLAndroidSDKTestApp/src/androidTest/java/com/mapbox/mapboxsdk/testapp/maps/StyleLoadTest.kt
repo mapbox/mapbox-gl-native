@@ -7,10 +7,11 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction
+import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
 import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils
+import junit.framework.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +30,7 @@ class StyleLoadTest : EspressoTest() {
     @Test
     fun updateSourceAfterStyleLoad() {
         validateTestSetup()
-        MapboxMapAction.invoke(mapboxMap) { uiController: UiController, mapboxMap: MapboxMap ->
+        invoke(mapboxMap) { uiController: UiController, mapboxMap: MapboxMap ->
             val source = GeoJsonSource("id")
             val layer = SymbolLayer("id", "id")
             mapboxMap.setStyle(Style.Builder().withSource(source).withLayer(layer))
@@ -37,6 +38,28 @@ class StyleLoadTest : EspressoTest() {
             mapboxMap.setStyle(Style.Builder().fromUrl(Style.MAPBOX_STREETS))
             TestingAsyncUtils.waitForLayer(uiController, mapView)
             source.setGeoJson("{}")
+        }
+    }
+
+    @Test
+    fun loadingNewStyle_sourcesDetached() {
+        invoke(mapboxMap) { _: UiController, mapboxMap: MapboxMap ->
+            val sources = mapboxMap.style!!.sources
+            mapboxMap.setStyle(Style.DARK)
+            for (source in sources) {
+                Assert.assertTrue(source.nativeIsDetached())
+            }
+        }
+    }
+
+    @Test
+    fun loadingNewStyle_layersDetached() {
+        invoke(mapboxMap) { _: UiController, mapboxMap: MapboxMap ->
+            val layers = mapboxMap.style!!.layers
+            mapboxMap.setStyle(Style.DARK)
+            for (layer in layers) {
+                Assert.assertTrue(layer.nativeIsDetached())
+            }
         }
     }
 }

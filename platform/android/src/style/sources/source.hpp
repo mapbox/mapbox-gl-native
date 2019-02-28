@@ -43,6 +43,10 @@ public:
 
     jni::Local<jni::String> getAttribution(jni::JNIEnv&);
 
+    void setDetached(jni::JNIEnv&);
+
+    jboolean isDetached(jni::JNIEnv&);
+
 protected:
     // Set on newly created sources until added to the map.
     std::unique_ptr<mbgl::style::Source> ownedSource;
@@ -55,6 +59,9 @@ protected:
 
     // RendererFrontend pointer is valid only when added to the map.
     AndroidRendererFrontend* rendererFrontend { nullptr };
+
+    // new style has started loading, making this source invalid
+    bool detached;
 };
 
 } // namespace android

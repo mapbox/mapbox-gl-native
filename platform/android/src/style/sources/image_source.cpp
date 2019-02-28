@@ -32,6 +32,9 @@ namespace android {
     ImageSource::~ImageSource() = default;
 
     void ImageSource::setURL(jni::JNIEnv& env, const jni::String& url) {
+        if (detached) {
+            return;
+        }
         // Update the core source
         source.as<mbgl::style::ImageSource>()->ImageSource::setURL(jni::Make<std::string>(env, url));
     }
@@ -42,10 +45,16 @@ namespace android {
     }
 
     void ImageSource::setImage(jni::JNIEnv& env, const jni::Object<Bitmap>& bitmap) {
+        if (detached) {
+            return;
+        }
         source.as<mbgl::style::ImageSource>()->setImage(Bitmap::GetImage(env, bitmap));
     }
 
     void ImageSource::setCoordinates(jni::JNIEnv& env, const jni::Object<LatLngQuad>& coordinatesObject) {
+        if (detached) {
+            return;
+        }
         source.as<mbgl::style::ImageSource>()->setCoordinates(
                 LatLngQuad::getLatLngArray(env, coordinatesObject));
     }

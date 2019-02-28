@@ -142,6 +142,14 @@ namespace android {
         rendererFrontend = nullptr;
     }
 
+    void Source::setDetached(jni::JNIEnv&) {
+        detached = true;
+    }
+
+    jboolean Source::isDetached(jni::JNIEnv&) {
+        return detached ? jni::jni_true : jni::jni_false;
+    }
+
     void Source::registerNative(jni::JNIEnv& env) {
         // Lookup the class
         static auto& javaClass = jni::Class<Source>::Singleton(env);
@@ -151,7 +159,9 @@ namespace android {
         // Register the peer
         jni::RegisterNativePeer<Source>(env, javaClass, "nativePtr",
             METHOD(&Source::getId, "nativeGetId"),
-            METHOD(&Source::getAttribution, "nativeGetAttribution")
+            METHOD(&Source::getAttribution, "nativeGetAttribution"),
+            METHOD(&Source::setDetached, "nativeSetDetached"),
+            METHOD(&Source::isDetached, "nativeIsDetached")
         );
 
         // Register subclasses

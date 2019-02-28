@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -14,8 +13,6 @@ public abstract class Source {
 
   @Keep
   private long nativePtr;
-
-  protected boolean detached;
 
   static {
     LibraryLoader.load();
@@ -85,7 +82,9 @@ public abstract class Source {
   @Keep
   protected native String nativeGetAttribution();
 
-  public void setDetached() {
-    detached = true;
-  }
+  @Keep
+  public native void nativeSetDetached();
+
+  @Keep
+  public native boolean nativeIsDetached();
 }

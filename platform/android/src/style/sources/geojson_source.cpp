@@ -177,6 +177,9 @@ namespace android {
     }
 
     void GeoJSONSource::setAsync(Update::Converter converterFn) {
+        if (detached) {
+            return;
+        }
         awaitingUpdate = std::make_unique<Update>(
                 std::move(converterFn),
                 std::make_unique<Actor<Callback>>(
