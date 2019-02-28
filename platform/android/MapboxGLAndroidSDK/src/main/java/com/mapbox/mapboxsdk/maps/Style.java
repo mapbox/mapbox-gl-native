@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -21,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -608,6 +610,18 @@ public class Style {
     }
 
     /**
+     * Will add the sources when map style has loaded.
+     *
+     * @param sources the sources to add
+     * @return this
+     */
+    @NonNull
+    public Builder withSources(@NonNull Source... sources) {
+      this.sources.addAll(Arrays.asList(sources));
+      return this;
+    }
+
+    /**
      * Will add the layer when the style has loaded.
      *
      * @param layer the layer to be added
@@ -616,6 +630,20 @@ public class Style {
     @NonNull
     public Builder withLayer(@NonNull Layer layer) {
       layers.add(new LayerWrapper(layer));
+      return this;
+    }
+
+    /**
+     * Will add the layers when the style has loaded.
+     *
+     * @param layers the layers to be added
+     * @return this
+     */
+    @NonNull
+    public Builder withLayers(@NonNull Layer... layers) {
+      for (Layer layer : layers) {
+        this.layers.add(new LayerWrapper(layer));
+      }
       return this;
     }
 
@@ -684,6 +712,17 @@ public class Style {
     }
 
     /**
+     * Will add the drawables as images when the map style has loaded.
+     *
+     * @param values pairs, where first is the id for te image and second is the drawable
+     * @return this
+     */
+    @NonNull
+    public Builder withDrawableImages(@NonNull Pair<String, Drawable>... values) {
+      return this.withDrawableImages(false, values);
+    }
+
+    /**
      * Will add the image when the map style has loaded.
      *
      * @param id    the id for the image
@@ -693,6 +732,20 @@ public class Style {
     @NonNull
     public Builder withImage(@NonNull String id, @NonNull Bitmap image) {
       return this.withImage(id, image, false);
+    }
+
+    /**
+     * Will add the images when the map style has loaded.
+     *
+     * @param values pairs, where first is the id for te image and second is the bitmap
+     * @return this
+     */
+    @NonNull
+    public Builder withBitmapImages(@NonNull Pair<String, Bitmap>... values) {
+      for (Pair<String, Bitmap> value : values) {
+        this.withImage(value.first, value.second, false);
+      }
+      return this;
     }
 
     /**
@@ -713,6 +766,25 @@ public class Style {
     }
 
     /**
+     * Will add the drawables as images when the map style has loaded.
+     *
+     * @param sdf    the flag indicating image is an SDF or template image
+     * @param values pairs, where first is the id for te image and second is the drawable
+     * @return this
+     */
+    @NonNull
+    public Builder withDrawableImages(boolean sdf, @NonNull Pair<String, Drawable>... values) {
+      for (Pair<String, Drawable> value : values) {
+        Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(value.second);
+        if (bitmap == null) {
+          throw new IllegalArgumentException("Provided drawable couldn't be converted to a Bitmap.");
+        }
+        this.withImage(value.first, bitmap, sdf);
+      }
+      return this;
+    }
+
+    /**
      * Will add the image when the map style has loaded.
      *
      * @param id    the id for the image
@@ -723,6 +795,21 @@ public class Style {
     @NonNull
     public Builder withImage(@NonNull String id, @NonNull Bitmap image, boolean sdf) {
       images.add(new ImageWrapper(id, image, sdf));
+      return this;
+    }
+
+    /**
+     * Will add the images when the map style has loaded.
+     *
+     * @param sdf    the flag indicating image is an SDF or template image
+     * @param values pairs, where first is the id for te image and second is the bitmap
+     * @return this
+     */
+    @NonNull
+    public Builder withBitmapImages(boolean sdf, @NonNull Pair<String, Bitmap>... values) {
+      for (Pair<String, Bitmap> value : values) {
+        this.withImage(value.first, value.second, sdf);
+      }
       return this;
     }
 
