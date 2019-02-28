@@ -1246,21 +1246,8 @@ QMapbox::CoordinateZoom QMapboxGL::coordinateZoomForBounds(const QMapbox::Coordi
     double newBearing, double newPitch)
 
 {
-    // FIXME: mbgl::Map::cameraForLatLngBounds should
-    // take bearing and pitch as input too, so this
-    // hack won't be needed.
-    double currentBearing = bearing();
-    double currentPitch = pitch();
-
-    setBearing(newBearing);
-    setPitch(newPitch);
-
     auto bounds = mbgl::LatLngBounds::hull(mbgl::LatLng { sw.first, sw.second }, mbgl::LatLng { ne.first, ne.second });
-    mbgl::CameraOptions camera = d_ptr->mapObj->cameraForLatLngBounds(bounds, d_ptr->margins);
-
-    setBearing(currentBearing);
-    setPitch(currentPitch);
-
+    mbgl::CameraOptions camera = d_ptr->mapObj->cameraForLatLngBounds(bounds, d_ptr->margins, newBearing, newPitch);
     return {{ (*camera.center).latitude(), (*camera.center).longitude() }, *camera.zoom };
 }
 
