@@ -418,7 +418,7 @@ TEST(Annotations, VisibleFeatures) {
     }
 
     // Change bearing *after* adding annotations causes them to be reordered.
-    test.map.setBearing(45);
+    test.map.jumpTo(CameraOptions().withAngle(45.0));
     test.frontend.render(test.map);
 
     auto features = test.frontend.getRenderer()->queryRenderedFeatures(box, {});

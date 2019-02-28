@@ -1124,7 +1124,7 @@ public:
 }
 
 - (CLLocationDirection)direction {
-    return mbgl::util::wrap(_mbglMap->getBearing(), 0., 360.);
+    return *_mbglMap->getCameraOptions().angle;
 }
 
 - (void)setDirection:(CLLocationDirection)direction {
@@ -1135,14 +1135,15 @@ public:
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated {
     MGLLogDebug(@"Setting direction: %f animated: %@", direction, MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"direction"];
-    _mbglMap->setBearing(direction,
-                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                         MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->easeTo(mbgl::CameraOptions()
+                         .withAngle(direction)
+                         .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets)),
+                     MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
 }
 
 - (void)offsetDirectionBy:(CLLocationDegrees)delta animated:(BOOL)animated {
-    [self setDirection:_mbglMap->getBearing() + delta animated:animated];
+    [self setDirection:*_mbglMap->getCameraOptions().angle + delta animated:animated];
 }
 
 + (NSSet<NSString *> *)keyPathsForValuesAffectingCamera {
@@ -1486,7 +1487,7 @@ public:
             if (self.rotateEnabled) {
                 CLLocationDirection newDirection = _directionAtBeginningOfGesture - delta.x / 10;
                 [self willChangeValueForKey:@"direction"];
-                _mbglMap->setBearing(newDirection, center);
+                _mbglMap->jumpTo(mbgl::CameraOptions().withAngle(newDirection).withAnchor(center));
                 didChangeCamera = YES;
                 [self didChangeValueForKey:@"direction"];
             }
@@ -1623,8 +1624,10 @@ public:
         MGLMapCamera *oldCamera = self.camera;
         
         NSPoint rotationPoint = [gestureRecognizer locationInView:self];
-        mbgl::ScreenCoordinate center(rotationPoint.x, self.bounds.size.height - rotationPoint.y);
-        _mbglMap->setBearing(_directionAtBeginningOfGesture + gestureRecognizer.rotationInDegrees, center);
+        mbgl::ScreenCoordinate anchor(rotationPoint.x, self.bounds.size.height - rotationPoint.y);
+        _mbglMap->jumpTo(mbgl::CameraOptions()
+                             .withAngle(_directionAtBeginningOfGesture + gestureRecognizer.rotationInDegrees)
+                             .withAnchor(anchor));
         
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
             && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {

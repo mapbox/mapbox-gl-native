@@ -976,7 +976,7 @@ void NodeMap::SetBearing(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->setBearing(info[0]->NumberValue());
+        nodeMap->map->jumpTo(mbgl::CameraOptions().withAngle(info[0]->NumberValue()));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
