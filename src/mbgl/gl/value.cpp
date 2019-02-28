@@ -93,7 +93,7 @@ StencilFunc::Type StencilFunc::Get() {
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_FUNC, &func));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_REF, &ref));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_VALUE_MASK, &mask));
-    return { static_cast<uint32_t>(func), ref, static_cast<uint32_t>(mask) };
+    return { Enum<gfx::StencilFunctionType>::from(func), ref, static_cast<uint32_t>(mask) };
 }
 
 const constexpr StencilTest::Type StencilTest::Default;
@@ -111,9 +111,9 @@ StencilTest::Type StencilTest::Get() {
 const constexpr StencilOp::Type StencilOp::Default;
 
 void StencilOp::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glStencilOp(static_cast<GLenum>(value.sfail),
-                                 static_cast<GLenum>(value.dpfail),
-                                 static_cast<GLenum>(value.dppass)));
+    MBGL_CHECK_ERROR(glStencilOp(Enum<gfx::StencilOpType>::to(value.sfail),
+                                 Enum<gfx::StencilOpType>::to(value.dpfail),
+                                 Enum<gfx::StencilOpType>::to(value.dppass)));
 }
 
 StencilOp::Type StencilOp::Get() {
@@ -121,8 +121,9 @@ StencilOp::Type StencilOp::Get() {
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_FAIL, &sfail));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &dpfail));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &dppass));
-    return { static_cast<StencilMode::Op>(sfail), static_cast<StencilMode::Op>(dpfail),
-             static_cast<StencilMode::Op>(dppass) };
+    return { Enum<gfx::StencilOpType>::from(sfail),
+             Enum<gfx::StencilOpType>::from(dpfail),
+             Enum<gfx::StencilOpType>::from(dppass) };
 }
 
 const constexpr DepthRange::Type DepthRange::Default;

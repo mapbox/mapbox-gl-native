@@ -68,7 +68,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         // Flag the depth buffer as no longer needing to be cleared for the remainder of this pass.
         parameters.staticData.depthRenderbuffer->shouldClear(false);
 
-        parameters.context.setStencilMode(gl::StencilMode::disabled());
+        parameters.context.setStencilMode(gfx::StencilMode::disabled());
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
 
         auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
@@ -94,7 +94,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 parameters.context,
                 gfx::Triangles(),
                 parameters.depthModeFor3D(gfx::DepthMaskType::ReadWrite),
-                gl::StencilMode::disabled(),
+                gfx::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gl::CullFaceMode::backCCW(),
                 *tileBucket.indexBuffer,
@@ -195,7 +195,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             parameters.context,
             gfx::Triangles(),
             gfx::DepthMode::disabled(),
-            gl::StencilMode::disabled(),
+            gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gl::CullFaceMode::disabled(),
             parameters.staticData.quadTriangleIndexBuffer,

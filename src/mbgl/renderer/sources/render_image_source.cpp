@@ -65,7 +65,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             parameters.context,
             gfx::LineStrip { 4.0f * parameters.pixelRatio },
             gfx::DepthMode::disabled(),
-            gl::StencilMode::disabled(),
+            gfx::StencilMode::disabled(),
             gfx::ColorMode::unblended(),
             gl::CullFaceMode::disabled(),
             parameters.staticData.tileBorderIndexBuffer,

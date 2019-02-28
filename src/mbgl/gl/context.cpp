@@ -716,8 +716,8 @@ void Context::setDepthMode(const gfx::DepthMode& depth) {
     }
 }
 
-void Context::setStencilMode(const StencilMode& stencil) {
-    if (stencil.test.is<StencilMode::Always>() && !stencil.mask) {
+void Context::setStencilMode(const gfx::StencilMode& stencil) {
+    if (stencil.test.is<gfx::StencilMode::Always>() && !stencil.mask) {
         stencilTest = false;
     } else {
         stencilTest = true;

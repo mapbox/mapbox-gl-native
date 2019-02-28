@@ -55,5 +55,27 @@ enum class DepthMaskType : bool {
     ReadWrite = true,
 };
 
+enum class StencilFunctionType : uint8_t {
+    Never,
+    Less,
+    Equal,
+    LessEqual,
+    Greater,
+    NotEqual,
+    GreaterEqual,
+    Always,
+};
+
+enum class StencilOpType : uint8_t {
+    Zero,
+    Keep,
+    Replace,
+    Increment,
+    Decrement,
+    Invert,
+    IncrementWrap,
+    DecrementWrap,
+};
+
 } // namespace gfx
 } // namespace mbgl

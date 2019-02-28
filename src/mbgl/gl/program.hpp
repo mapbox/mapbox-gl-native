@@ -116,7 +116,7 @@ public:
     void draw(Context& context,
               DrawMode drawMode,
               gfx::DepthMode depthMode,
-              StencilMode stencilMode,
+              gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
