@@ -14,7 +14,7 @@
 #include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
-#include <mbgl/gl/color_mode.hpp>
+#include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -172,7 +172,7 @@ public:
 
     void setDepthMode(const DepthMode&);
     void setStencilMode(const StencilMode&);
-    void setColorMode(const ColorMode&);
+    void setColorMode(const gfx::ColorMode&);
     void setCullFaceMode(const CullFaceMode&);
 
     void draw(gfx::PrimitiveType,

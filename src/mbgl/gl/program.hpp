@@ -117,7 +117,7 @@ public:
               DrawMode drawMode,
               DepthMode depthMode,
               StencilMode stencilMode,
-              ColorMode colorMode,
+              gfx::ColorMode colorMode,
               CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
               VertexArray& vertexArray,

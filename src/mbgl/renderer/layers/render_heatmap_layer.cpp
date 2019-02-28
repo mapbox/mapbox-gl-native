@@ -122,7 +122,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 gfx::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 stencilMode,
-                gl::ColorMode::additive(),
+                gfx::ColorMode::additive(),
                 gl::CullFaceMode::disabled(),
                 *bucket.indexBuffer,
                 bucket.segments,

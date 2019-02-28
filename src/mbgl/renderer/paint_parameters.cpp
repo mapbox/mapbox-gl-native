@@ -79,21 +79,21 @@ gl::StencilMode PaintParameters::stencilModeForClipping(const ClipID& id) const 
     };
 }
 
-gl::ColorMode PaintParameters::colorModeForRenderPass() const {
+gfx::ColorMode PaintParameters::colorModeForRenderPass() const {
     if (debugOptions & MapDebugOptions::Overdraw) {
         const float overdraw = 1.0f / 8.0f;
-        return gl::ColorMode {
-            gl::ColorMode::Add {
-                gl::ColorMode::ConstantColor,
-                gl::ColorMode::One
+        return gfx::ColorMode {
+            gfx::ColorMode::Add {
+                gfx::ColorMode::BlendFactor::ConstantColor,
+                gfx::ColorMode::BlendFactor::One
             },
             Color { overdraw, overdraw, overdraw, 0.0f },
-            gl::ColorMode::Mask { true, true, true, true }
+            gfx::ColorMode::Mask { true, true, true, true }
         };
     } else if (pass == RenderPass::Translucent) {
-        return gl::ColorMode::alphaBlended();
+        return gfx::ColorMode::alphaBlended();
     } else {
-        return gl::ColorMode::unblended();
+        return gfx::ColorMode::unblended();
     }
 }
 

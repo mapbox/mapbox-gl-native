@@ -66,7 +66,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             gfx::LineStrip { 4.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             gl::StencilMode::disabled(),
-            gl::ColorMode::unblended(),
+            gfx::ColorMode::unblended(),
             gl::CullFaceMode::disabled(),
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,

@@ -3,7 +3,7 @@
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
-#include <mbgl/gl/color_mode.hpp>
+#include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/gl/cull_face_mode.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/platform/gl_functions.hpp>
@@ -54,7 +54,7 @@ struct DepthMask {
 };
 
 struct ColorMask {
-    using Type = ColorMode::Mask;
+    using Type = gfx::ColorMode::Mask;
     static const constexpr Type Default = { true, true, true, true };
     static void Set(const Type&);
     static Type Get();
@@ -126,18 +126,18 @@ struct Blend {
 };
 
 struct BlendEquation {
-    using Type = ColorMode::BlendEquation;
-    static const constexpr Type Default = ColorMode::BlendEquation::Add;
+    using Type = gfx::ColorMode::BlendEquation;
+    static const constexpr Type Default = gfx::ColorMode::BlendEquation::Add;
     static void Set(const Type&);
     static Type Get();
 };
 
 struct BlendFunc {
     struct Type {
-        ColorMode::BlendFactor sfactor;
-        ColorMode::BlendFactor dfactor;
+        gfx::ColorMode::BlendFactor sfactor;
+        gfx::ColorMode::BlendFactor dfactor;
     };
-    static const constexpr Type Default = { ColorMode::One, ColorMode::Zero };
+    static const constexpr Type Default = { gfx::ColorMode::BlendFactor::One, gfx::ColorMode::BlendFactor::Zero };
     static void Set(const Type&);
     static Type Get();
 };

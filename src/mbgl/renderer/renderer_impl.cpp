@@ -452,7 +452,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     gl::StencilMode::Keep,
                     gl::StencilMode::Replace
                 },
-                gl::ColorMode::disabled(),
+                gfx::ColorMode::disabled(),
                 gl::CullFaceMode::disabled(),
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
@@ -479,7 +479,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (parameters.debugOptions & MapDebugOptions::StencilClip) {
         parameters.context.setStencilMode(gl::StencilMode::disabled());
         parameters.context.setDepthMode(gl::DepthMode::disabled());
-        parameters.context.setColorMode(gl::ColorMode::unblended());
+        parameters.context.setColorMode(gfx::ColorMode::unblended());
         parameters.context.program = 0;
 
         // Reset the value in case someone else changed it, or it's dirty.
@@ -562,7 +562,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (parameters.debugOptions & MapDebugOptions::DepthBuffer) {
         parameters.context.setStencilMode(gl::StencilMode::disabled());
         parameters.context.setDepthMode(gl::DepthMode::disabled());
-        parameters.context.setColorMode(gl::ColorMode::unblended());
+        parameters.context.setColorMode(gfx::ColorMode::unblended());
         parameters.context.program = 0;
 
         // Scales the values in the depth buffer so that they cover the entire grayscale range. This

@@ -8,6 +8,9 @@ namespace value {
 
 using namespace platform;
 
+template <class T>
+T fromGLenum(const GLint);
+
 const constexpr ClearDepth::Type ClearDepth::Default;
 
 void ClearDepth::Set(const Type& value) {
@@ -174,29 +177,91 @@ Blend::Type Blend::Get() {
 
 const constexpr BlendEquation::Type BlendEquation::Default;
 
+GLenum toGLenum(const gfx::ColorMode::BlendEquation blendEquation) {
+    switch (blendEquation) {
+        case gfx::ColorMode::BlendEquation::Add: return GL_FUNC_ADD;
+        case gfx::ColorMode::BlendEquation::Subtract: return GL_FUNC_SUBTRACT;
+        case gfx::ColorMode::BlendEquation::ReverseSubtract: return GL_FUNC_REVERSE_SUBTRACT;
+    }
+    return GL_INVALID_ENUM;
+}
+
 void BlendEquation::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glBlendEquation(static_cast<GLenum>(value)));
+    MBGL_CHECK_ERROR(glBlendEquation(toGLenum(value)));
+}
+
+template <>
+gfx::ColorMode::BlendEquation fromGLenum<gfx::ColorMode::BlendEquation>(const GLint blendEquation) {
+    switch (blendEquation) {
+        case GL_FUNC_ADD: return gfx::ColorMode::BlendEquation::Add;
+        case GL_FUNC_SUBTRACT: return gfx::ColorMode::BlendEquation::Subtract;
+        case GL_FUNC_REVERSE_SUBTRACT: return gfx::ColorMode::BlendEquation::ReverseSubtract;
+    }
+    return {};
 }
 
 BlendEquation::Type BlendEquation::Get() {
     GLint blend;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_BLEND_EQUATION_RGB, &blend));
-    return static_cast<Type>(blend);
+    return fromGLenum<gfx::ColorMode::BlendEquation>(blend);
 }
 
 const constexpr BlendFunc::Type BlendFunc::Default;
 
+GLenum toGLenum(const gfx::ColorMode::BlendFactor blendFactor) {
+    switch (blendFactor) {
+        case gfx::ColorMode::BlendFactor::Zero: return GL_ZERO;
+        case gfx::ColorMode::BlendFactor::One: return GL_ONE;
+        case gfx::ColorMode::BlendFactor::SrcColor: return GL_SRC_COLOR;
+        case gfx::ColorMode::BlendFactor::OneMinusSrcColor: return GL_ONE_MINUS_SRC_COLOR;
+        case gfx::ColorMode::BlendFactor::DstColor: return GL_DST_COLOR;
+        case gfx::ColorMode::BlendFactor::OneMinusDstColor: return GL_ONE_MINUS_DST_COLOR;
+        case gfx::ColorMode::BlendFactor::SrcAlpha: return GL_SRC_ALPHA;
+        case gfx::ColorMode::BlendFactor::OneMinusSrcAlpha: return GL_ONE_MINUS_SRC_ALPHA;
+        case gfx::ColorMode::BlendFactor::DstAlpha: return GL_DST_ALPHA;
+        case gfx::ColorMode::BlendFactor::OneMinusDstAlpha: return GL_ONE_MINUS_DST_ALPHA;
+        case gfx::ColorMode::BlendFactor::ConstantColor: return GL_CONSTANT_COLOR;
+        case gfx::ColorMode::BlendFactor::OneMinusConstantColor: return GL_ONE_MINUS_CONSTANT_COLOR;
+        case gfx::ColorMode::BlendFactor::ConstantAlpha: return GL_CONSTANT_ALPHA;
+        case gfx::ColorMode::BlendFactor::OneMinusConstantAlpha: return GL_ONE_MINUS_CONSTANT_ALPHA;
+        case gfx::ColorMode::BlendFactor::SrcAlphaSaturate: return GL_SRC_ALPHA_SATURATE;
+    }
+    return GL_INVALID_ENUM;
+}
+
 void BlendFunc::Set(const Type& value) {
     MBGL_CHECK_ERROR(
-        glBlendFunc(static_cast<GLenum>(value.sfactor), static_cast<GLenum>(value.dfactor)));
+        glBlendFunc(toGLenum(value.sfactor), toGLenum(value.dfactor)));
+}
+
+template <>
+gfx::ColorMode::BlendFactor fromGLenum<gfx::ColorMode::BlendFactor>(const GLint blendFactor) {
+    switch (blendFactor) {
+        case GL_ZERO: return gfx::ColorMode::BlendFactor::Zero;
+        case GL_ONE: return gfx::ColorMode::BlendFactor::One;
+        case GL_SRC_COLOR: return gfx::ColorMode::BlendFactor::SrcColor;
+        case GL_ONE_MINUS_SRC_COLOR: return gfx::ColorMode::BlendFactor::OneMinusSrcColor;
+        case GL_DST_COLOR: return gfx::ColorMode::BlendFactor::DstColor;
+        case GL_ONE_MINUS_DST_COLOR: return gfx::ColorMode::BlendFactor::OneMinusDstColor;
+        case GL_SRC_ALPHA: return gfx::ColorMode::BlendFactor::SrcAlpha;
+        case GL_ONE_MINUS_SRC_ALPHA: return gfx::ColorMode::BlendFactor::OneMinusSrcAlpha;
+        case GL_DST_ALPHA: return gfx::ColorMode::BlendFactor::DstAlpha;
+        case GL_ONE_MINUS_DST_ALPHA: return gfx::ColorMode::BlendFactor::OneMinusDstAlpha;
+        case GL_CONSTANT_COLOR: return gfx::ColorMode::BlendFactor::ConstantColor;
+        case GL_ONE_MINUS_CONSTANT_COLOR: return gfx::ColorMode::BlendFactor::OneMinusConstantColor;
+        case GL_CONSTANT_ALPHA: return gfx::ColorMode::BlendFactor::ConstantAlpha;
+        case GL_ONE_MINUS_CONSTANT_ALPHA: return gfx::ColorMode::BlendFactor::OneMinusConstantAlpha;
+        case GL_SRC_ALPHA_SATURATE: return gfx::ColorMode::BlendFactor::SrcAlphaSaturate;
+    }
+    return {};
 }
 
 BlendFunc::Type BlendFunc::Get() {
     GLint sfactor, dfactor;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_BLEND_SRC_ALPHA, &sfactor));
     MBGL_CHECK_ERROR(glGetIntegerv(GL_BLEND_DST_ALPHA, &dfactor));
-    return { static_cast<ColorMode::BlendFactor>(sfactor),
-             static_cast<ColorMode::BlendFactor>(dfactor) };
+    return { fromGLenum<gfx::ColorMode::BlendFactor>(sfactor),
+             fromGLenum<gfx::ColorMode::BlendFactor>(dfactor) };
 }
 
 const BlendColor::Type BlendColor::Default { 0, 0, 0, 0 };
