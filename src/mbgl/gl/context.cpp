@@ -728,14 +728,14 @@ void Context::setStencilMode(const StencilMode& stencil) {
     }
 }
 
-void Context::setColorMode(const ColorMode& color) {
-    if (color.blendFunction.is<ColorMode::Replace>()) {
+void Context::setColorMode(const gfx::ColorMode& color) {
+    if (color.blendFunction.is<gfx::ColorMode::Replace>()) {
         blend = false;
     } else {
         blend = true;
         blendColor = color.blendColor;
         apply_visitor([&] (const auto& blendFunction) {
-            blendEquation = ColorMode::BlendEquation(blendFunction.equation);
+            blendEquation = gfx::ColorMode::BlendEquation(blendFunction.equation);
             blendFunc = { blendFunction.srcFactor, blendFunction.dstFactor };
         }, color.blendFunction);
     }

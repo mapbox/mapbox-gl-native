@@ -73,7 +73,7 @@ public:
               DrawMode drawMode,
               gl::DepthMode depthMode,
               gl::StencilMode stencilMode,
-              gl::ColorMode colorMode,
+              gfx::ColorMode colorMode,
               gl::CullFaceMode cullFaceMode,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,

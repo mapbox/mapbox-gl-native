@@ -4,39 +4,39 @@
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
-namespace gl {
+namespace gfx {
 
 class ColorMode {
 public:
     enum class BlendEquation {
-        Add                   = 0x8006,
-        Subtract              = 0x800A,
-        ReverseSubtract       = 0x800B
+        Add,
+        Subtract,
+        ReverseSubtract
     };
 
-    enum BlendFactor {
-        Zero                  = 0x0000,
-        One                   = 0x0001,
-        SrcColor              = 0x0300,
-        OneMinusSrcColor      = 0x0301,
-        SrcAlpha              = 0x0302,
-        OneMinusSrcAlpha      = 0x0303,
-        DstAlpha              = 0x0304,
-        OneMinusDstAlpha      = 0x0305,
-        DstColor              = 0x0306,
-        OneMinusDstColor      = 0x0307,
-        SrcAlphaSaturate      = 0x0308,
-        ConstantColor         = 0x8001,
-        OneMinusConstantColor = 0x8002,
-        ConstantAlpha         = 0x8003,
-        OneMinusConstantAlpha = 0x8004
+    enum class BlendFactor {
+        Zero,
+        One,
+        SrcColor,
+        OneMinusSrcColor,
+        SrcAlpha,
+        OneMinusSrcAlpha,
+        DstAlpha,
+        OneMinusDstAlpha,
+        DstColor,
+        OneMinusDstColor,
+        SrcAlphaSaturate,
+        ConstantColor,
+        OneMinusConstantColor,
+        ConstantAlpha,
+        OneMinusConstantAlpha
     };
 
     template <BlendEquation E>
     struct ConstantBlend {
         static constexpr BlendEquation equation = E;
-        static constexpr BlendFactor srcFactor = One;
-        static constexpr BlendFactor dstFactor = One;
+        static constexpr BlendFactor srcFactor = BlendFactor::One;
+        static constexpr BlendFactor dstFactor = BlendFactor::One;
     };
 
     template <BlendEquation E>
@@ -48,8 +48,8 @@ public:
 
     struct Replace {
         static constexpr BlendEquation equation = BlendEquation::Add;
-        static constexpr BlendFactor srcFactor = One;
-        static constexpr BlendFactor dstFactor = Zero;
+        static constexpr BlendFactor srcFactor = BlendFactor::One;
+        static constexpr BlendFactor dstFactor = BlendFactor::Zero;
     };
 
     using Add              = LinearBlend<BlendEquation::Add>;
@@ -75,19 +75,19 @@ public:
     Mask mask;
 
     static ColorMode disabled() {
-       return ColorMode { Replace(), {}, { false, false, false, false } };
+       return { Replace{}, {}, { false, false, false, false } };
     }
 
     static ColorMode unblended() {
-       return ColorMode { Replace(), {}, { true, true, true, true } };
+       return { Replace{}, {}, { true, true, true, true } };
     }
 
     static ColorMode alphaBlended() {
-        return ColorMode { Add { One, OneMinusSrcAlpha }, {}, { true, true, true, true } };
+        return { Add{ BlendFactor::One, BlendFactor::OneMinusSrcAlpha }, {}, { true, true, true, true } };
     }
 
     static ColorMode additive() {
-        return ColorMode { Add { One, One }, {}, { true, true, true, true } };
+        return { Add{ BlendFactor::One, BlendFactor::One }, {}, { true, true, true, true } };
     }
 };
 
@@ -95,5 +95,5 @@ constexpr bool operator!=(const ColorMode::Mask& a, const ColorMode::Mask& b) {
     return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
 }
 
-} // namespace gl
+} // namespace gfx
 } // namespace mbgl

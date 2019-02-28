@@ -6,7 +6,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
-#include <mbgl/gl/color_mode.hpp>
+#include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 
@@ -64,7 +64,7 @@ public:
     gl::DepthMode depthModeForSublayer(uint8_t n, gl::DepthMode::Mask) const;
     gl::DepthMode depthModeFor3D(gl::DepthMode::Mask) const;
     gl::StencilMode stencilModeForClipping(const ClipID&) const;
-    gl::ColorMode colorModeForRenderPass() const;
+    gfx::ColorMode colorModeForRenderPass() const;
 
     mat4 matrixForTile(const UnwrappedTileID&, bool aligned = false) const;
 
