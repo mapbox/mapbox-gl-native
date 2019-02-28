@@ -12,7 +12,7 @@
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gfx/draw_mode.hpp>
-#include <mbgl/gl/depth_mode.hpp>
+#include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/platform/gl_functions.hpp>
@@ -170,7 +170,7 @@ public:
     void setDrawMode(const gfx::Triangles&);
     void setDrawMode(const gfx::TriangleStrip&);
 
-    void setDepthMode(const DepthMode&);
+    void setDepthMode(const gfx::DepthMode&);
     void setStencilMode(const StencilMode&);
     void setColorMode(const gfx::ColorMode&);
     void setCullFaceMode(const CullFaceMode&);

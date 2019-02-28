@@ -698,8 +698,8 @@ void Context::setDrawMode(const gfx::Triangles&) {
 void Context::setDrawMode(const gfx::TriangleStrip&) {
 }
 
-void Context::setDepthMode(const DepthMode& depth) {
-    if (depth.func == DepthMode::Always && !depth.mask) {
+void Context::setDepthMode(const gfx::DepthMode& depth) {
+    if (depth.func == gfx::DepthFunctionType::Always && depth.mask != gfx::DepthMaskType::ReadWrite) {
         depthTest = false;
 
         // Workaround for rendering errors on Adreno 2xx GPUs. Depth-related state should

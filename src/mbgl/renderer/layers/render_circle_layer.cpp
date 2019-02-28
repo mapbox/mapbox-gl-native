@@ -97,7 +97,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
         programInstance.draw(
             parameters.context,
             gfx::Triangles(),
-            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
             parameters.mapMode != MapMode::Continuous
                 ? parameters.stencilModeForClipping(tile.clip)
                 : gl::StencilMode::disabled(),

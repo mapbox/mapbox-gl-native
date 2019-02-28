@@ -120,7 +120,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             programInstance.draw(
                 parameters.context,
                 gfx::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
                 stencilMode,
                 gfx::ColorMode::additive(),
                 gl::CullFaceMode::disabled(),
@@ -168,7 +168,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         programInstance.draw(
             parameters.context,
             gfx::Triangles(),
-            gl::DepthMode::disabled(),
+            gfx::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gl::CullFaceMode::disabled(),

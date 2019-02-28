@@ -64,7 +64,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
         programInstance.draw(
             parameters.context,
             gfx::LineStrip { 4.0f * parameters.pixelRatio },
-            gl::DepthMode::disabled(),
+            gfx::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             gfx::ColorMode::unblended(),
             gl::CullFaceMode::disabled(),

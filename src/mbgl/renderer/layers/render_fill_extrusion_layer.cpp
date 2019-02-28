@@ -93,7 +93,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             programInstance.draw(
                 parameters.context,
                 gfx::Triangles(),
-                parameters.depthModeFor3D(gl::DepthMode::ReadWrite),
+                parameters.depthModeFor3D(gfx::DepthMaskType::ReadWrite),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gl::CullFaceMode::backCCW(),
@@ -194,7 +194,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         programInstance.draw(
             parameters.context,
             gfx::Triangles(),
-            gl::DepthMode::disabled(),
+            gfx::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gl::CullFaceMode::disabled(),

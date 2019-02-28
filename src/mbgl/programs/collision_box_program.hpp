@@ -58,7 +58,7 @@ public:
 	template <class DrawMode>
     void draw(gl::Context& context,
               DrawMode drawMode,
-              gl::DepthMode depthMode,
+              gfx::DepthMode depthMode,
               gl::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gl::CullFaceMode cullFaceMode,
@@ -139,7 +139,7 @@ public:
     template <class DrawMode>
     void draw(gl::Context& context,
               DrawMode drawMode,
-              gl::DepthMode depthMode,
+              gfx::DepthMode depthMode,
               gl::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gl::CullFaceMode cullFaceMode,

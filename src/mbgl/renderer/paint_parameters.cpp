@@ -58,14 +58,14 @@ mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID, bool aligned)
     return matrix;
 }
 
-gl::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gl::DepthMode::Mask mask) const {
+gfx::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gfx::DepthMaskType mask) const {
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;
-    return gl::DepthMode { gl::DepthMode::LessEqual, mask, { nearDepth, farDepth } };
+    return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { nearDepth, farDepth } };
 }
 
-gl::DepthMode PaintParameters::depthModeFor3D(gl::DepthMode::Mask mask) const {
-    return gl::DepthMode { gl::DepthMode::LessEqual, mask, { 0.0, 1.0 } };
+gfx::DepthMode PaintParameters::depthModeFor3D(gfx::DepthMaskType mask) const {
+    return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { 0.0, 1.0 } };
 }
 
 gl::StencilMode PaintParameters::stencilModeForClipping(const ClipID& id) const {

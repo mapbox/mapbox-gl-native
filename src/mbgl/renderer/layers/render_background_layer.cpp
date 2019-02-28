@@ -68,7 +68,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         program.draw(
             parameters.context,
             gfx::Triangles(),
-            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
             gl::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gl::CullFaceMode::disabled(),

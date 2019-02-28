@@ -97,7 +97,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
         programInstance.draw(
             parameters.context,
             gfx::Triangles(),
-            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
             gl::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gl::CullFaceMode::disabled(),
@@ -158,7 +158,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             programInstance.draw(
                 parameters.context,
                 gfx::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gl::CullFaceMode::disabled(),

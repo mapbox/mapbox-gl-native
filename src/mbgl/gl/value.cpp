@@ -60,13 +60,13 @@ StencilMask::Type StencilMask::Get() {
 const constexpr DepthMask::Type DepthMask::Default;
 
 void DepthMask::Set(const Type& value) {
-    MBGL_CHECK_ERROR(glDepthMask(value));
+    MBGL_CHECK_ERROR(glDepthMask(Enum<gfx::DepthMaskType>::to(value)));
 }
 
 DepthMask::Type DepthMask::Get() {
     GLboolean depthMask;
     MBGL_CHECK_ERROR(glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask));
-    return depthMask;
+    return Enum<gfx::DepthMaskType>::from(depthMask);
 }
 
 const constexpr ColorMask::Type ColorMask::Default;

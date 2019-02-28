@@ -443,7 +443,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             program.draw(
                 parameters.context,
                 gfx::Triangles(),
-                gl::DepthMode::disabled(),
+                gfx::DepthMode::disabled(),
                 gl::StencilMode {
                     gl::StencilMode::Always(),
                     static_cast<int32_t>(clipID.second.reference.to_ulong()),
@@ -478,7 +478,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Render tile clip boundaries, using stencil buffer to calculate fill color.
     if (parameters.debugOptions & MapDebugOptions::StencilClip) {
         parameters.context.setStencilMode(gl::StencilMode::disabled());
-        parameters.context.setDepthMode(gl::DepthMode::disabled());
+        parameters.context.setDepthMode(gfx::DepthMode::disabled());
         parameters.context.setColorMode(gfx::ColorMode::unblended());
         parameters.context.program = 0;
 
@@ -561,7 +561,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Render the depth buffer.
     if (parameters.debugOptions & MapDebugOptions::DepthBuffer) {
         parameters.context.setStencilMode(gl::StencilMode::disabled());
-        parameters.context.setDepthMode(gl::DepthMode::disabled());
+        parameters.context.setDepthMode(gfx::DepthMode::disabled());
         parameters.context.setColorMode(gfx::ColorMode::unblended());
         parameters.context.program = 0;
 

@@ -121,8 +121,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 draw(parameters.programs.getFillLayerPrograms().fill,
                      gfx::Triangles(),
                      parameters.depthModeForSublayer(1, parameters.pass == RenderPass::Opaque
-                        ? gl::DepthMode::ReadWrite
-                        : gl::DepthMode::ReadOnly),
+                        ? gfx::DepthMaskType::ReadWrite
+                        : gfx::DepthMaskType::ReadOnly),
                      *bucket.triangleIndexBuffer,
                      bucket.triangleSegments);
             }
@@ -132,7 +132,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                      gfx::Lines{ 2.0f },
                      parameters.depthModeForSublayer(
                          unevaluated.get<FillOutlineColor>().isUndefined() ? 2 : 0,
-                         gl::DepthMode::ReadOnly),
+                         gfx::DepthMaskType::ReadOnly),
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments);
             }
@@ -206,14 +206,14 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
             draw(parameters.programs.getFillLayerPrograms().fillPattern,
                  gfx::Triangles(),
-                 parameters.depthModeForSublayer(1, gl::DepthMode::ReadWrite),
+                 parameters.depthModeForSublayer(1, gfx::DepthMaskType::ReadWrite),
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments);
 
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
                 draw(parameters.programs.getFillLayerPrograms().fillOutlinePattern,
                      gfx::Lines { 2.0f },
-                     parameters.depthModeForSublayer(2, gl::DepthMode::ReadOnly),
+                     parameters.depthModeForSublayer(2, gfx::DepthMaskType::ReadOnly),
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments);
             }
