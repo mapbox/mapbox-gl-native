@@ -439,20 +439,20 @@ void NativeMapView::rotateBy(jni::JNIEnv&, jni::jdouble sx, jni::jdouble sy, jni
 }
 
 void NativeMapView::setBearing(jni::JNIEnv&, jni::jdouble degrees, jni::jlong duration) {
-    map->setBearing(degrees, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+    map->easeTo(mbgl::CameraOptions().withAngle(degrees), mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 void NativeMapView::setBearingXY(jni::JNIEnv&, jni::jdouble degrees, jni::jdouble cx, jni::jdouble cy, jni::jlong duration) {
-    mbgl::ScreenCoordinate center(cx, cy);
-    map->setBearing(degrees, center, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+    mbgl::ScreenCoordinate anchor(cx, cy);
+    map->easeTo(mbgl::CameraOptions().withAngle(degrees).withAnchor(anchor), mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jni::jdouble NativeMapView::getBearing(jni::JNIEnv&) {
-    return map->getBearing();
+    return *map->getCameraOptions().angle;
 }
 
 void NativeMapView::resetNorth(jni::JNIEnv&) {
-    map->resetNorth();
+    map->easeTo(mbgl::CameraOptions().withAngle(0.0), mbgl::AnimationOptions {{mbgl::Milliseconds(500)}});
 }
 
 void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni::Object<LatLng>>& coordinates, const jni::Object<RectF>& padding, jdouble direction, jni::jlong duration) {

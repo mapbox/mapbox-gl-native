@@ -1775,7 +1775,7 @@ public:
     {
         [self trackGestureEvent:MMEEventGestureRotateStart forRecognizer:rotate];
 
-        self.angle = MGLRadiansFromDegrees(self.mbglMap.getBearing()) * -1;
+        self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().angle) * -1;
 
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
@@ -1802,7 +1802,9 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-           self.mbglMap.setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+           self.mbglMap.jumpTo(mbgl::CameraOptions()
+                                   .withAngle(newDegrees)
+                                   .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
         }
 
         [self cameraIsChanging];
@@ -1837,8 +1839,11 @@ public:
 
             if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
             {
-                self.mbglMap.setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationFromTimeInterval(decelerationRate));
-                
+                self.mbglMap.easeTo(mbgl::CameraOptions()
+                                       .withAngle(newDegrees)
+                                       .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
+                                    MGLDurationFromTimeInterval(decelerationRate));
+
                 [self notifyGestureDidEndWithDrift:YES];
                 
                 __weak MGLMapView *weakSelf = self;
@@ -3486,7 +3491,7 @@ public:
 
 - (CLLocationDirection)direction
 {
-    return mbgl::util::wrap(self.mbglMap.getBearing(), 0., 360.);
+    return *self.mbglMap.getCameraOptions().angle;
 }
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated
@@ -3518,15 +3523,18 @@ public:
 
     if (self.userTrackingMode == MGLUserTrackingModeNone)
     {
-        self.mbglMap.setBearing(direction,
-                             MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
-                             MGLDurationFromTimeInterval(duration));
+        self.mbglMap.easeTo(mbgl::CameraOptions()
+                                .withAngle(direction)
+                                .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)),
+                            MGLDurationFromTimeInterval(duration));
     }
     else
     {
-        CGPoint centerPoint = self.userLocationAnnotationViewCenter;
-        self.mbglMap.setBearing(direction, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y },
-                             MGLDurationFromTimeInterval(duration));
+        CGPoint anchor = self.userLocationAnnotationViewCenter;
+        self.mbglMap.easeTo(mbgl::CameraOptions()
+                                .withAngle(direction)
+                                .withAnchor(mbgl::ScreenCoordinate { anchor.x, anchor.y }),
+                            MGLDurationFromTimeInterval(duration));
     }
 }
 

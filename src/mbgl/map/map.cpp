@@ -369,26 +369,6 @@ void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second
     impl->onUpdate();
 }
 
-void Map::setBearing(double degrees, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withAngle(degrees), animation);
-}
-
-void Map::setBearing(double degrees, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    return easeTo(CameraOptions().withAngle(degrees).withAnchor(anchor), animation);
-}
-
-void Map::setBearing(double degrees, const EdgeInsets& padding, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withAngle(degrees).withPadding(padding), animation);
-}
-
-double Map::getBearing() const {
-    return -impl->transform.getAngle() * util::RAD2DEG;
-}
-
-void Map::resetNorth(const AnimationOptions& animation) {
-    easeTo(CameraOptions().withAngle(0.0), animation);
-}
-
 #pragma mark - North Orientation
 
 void Map::setNorthOrientation(NorthOrientation orientation) {

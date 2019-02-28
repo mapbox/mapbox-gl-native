@@ -100,12 +100,6 @@ public:
 
     // Rotation
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
-    void setBearing(double degrees, const AnimationOptions& = {});
-    void setBearing(double degrees, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setBearing(double degrees, const EdgeInsets&, const AnimationOptions& = {});
-    double getBearing() const;
-    void resetNorth(const AnimationOptions& = {{mbgl::Milliseconds(500)}});
-    void resetNorth(const EdgeInsets&, const AnimationOptions& = {{mbgl::Milliseconds(500)}});
 
     // North Orientation
     void setNorthOrientation(NorthOrientation);

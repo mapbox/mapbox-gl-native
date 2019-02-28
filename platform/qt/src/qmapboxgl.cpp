@@ -855,17 +855,21 @@ void QMapboxGL::jumpTo(const QMapboxGLCameraOptions& camera)
 */
 double QMapboxGL::bearing() const
 {
-    return d_ptr->mapObj->getBearing();
+    return *d_ptr->mapObj->getCameraOptions().angle;
 }
 
 void QMapboxGL::setBearing(double degrees)
 {
-    d_ptr->mapObj->setBearing(degrees, d_ptr->margins);
+    d_ptr->mapObj->jumpTo(mbgl::CameraOptions()
+                              .withAngle(degrees)
+                              .withPadding(d_ptr->margins));
 }
 
 void QMapboxGL::setBearing(double degrees, const QPointF &center)
 {
-    d_ptr->mapObj->setBearing(degrees, mbgl::ScreenCoordinate { center.x(), center.y() });
+    d_ptr->mapObj->jumpTo(mbgl::CameraOptions()
+                              .withAngle(degrees)
+                              .withAnchor(mbgl::ScreenCoordinate { center.x(), center.y() }));
 }
 
 /*!
