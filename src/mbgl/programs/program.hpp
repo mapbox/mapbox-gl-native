@@ -7,6 +7,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/renderer/paint_property_binder.hpp>
 #include <mbgl/shaders/shaders.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -16,22 +17,22 @@ namespace mbgl {
 
 template <class Shaders,
           class Primitive,
-          class LayoutAttrs,
-          class UniformTypeList,
+          class LayoutAttributeList,
+          class UniformList,
           class PaintProps>
 class Program {
 public:
-    using LayoutAttributes = LayoutAttrs;
-    using LayoutVertex = typename LayoutAttributes::Vertex;
+    using LayoutAttributes = gl::Attributes<LayoutAttributeList>;
+    using LayoutVertex = gfx::Vertex<LayoutAttributeList>;
 
     using PaintProperties = PaintProps;
-    using PaintPropertyBinders = typename PaintProperties::Binders;
-    using PaintAttributes = typename PaintPropertyBinders::Attributes;
-    using Attributes = gl::ConcatenateAttributes<LayoutAttributes, PaintAttributes>;
+    using Binders = PaintPropertyBinders<typename PaintProperties::DataDrivenProperties>;
+    using PaintAttributeList = typename Binders::AttributeList;
+    using Attributes = gl::Attributes<TypeListConcat<LayoutAttributeList, PaintAttributeList>>;
 
-    using UniformValues = gfx::UniformValues<UniformTypeList>;
-    using PaintUniformTypeList = typename PaintPropertyBinders::UniformTypeList;
-    using AllUniforms = typename TypeListConcat<UniformTypeList, PaintUniformTypeList>::template ExpandInto<gl::Uniforms>;
+    using UniformValues = gfx::UniformValues<UniformList>;
+    using PaintUniformList = typename Binders::UniformList;
+    using AllUniforms = gl::Uniforms<TypeListConcat<UniformList, PaintUniformList>>;
 
     using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
 
@@ -48,7 +49,7 @@ public:
 
     static typename AllUniforms::Values computeAllUniformValues(
         const UniformValues& uniformValues,
-        const PaintPropertyBinders& paintPropertyBinders,
+        const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties,
         float currentZoom) {
         return uniformValues
@@ -57,7 +58,7 @@ public:
 
     static typename Attributes::Bindings computeAllAttributeBindings(
         const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
-        const PaintPropertyBinders& paintPropertyBinders,
+        const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
         return LayoutAttributes::bindings(layoutVertexBuffer)
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
@@ -107,8 +108,8 @@ template <class Program>
 class ProgramMap {
 public:
     using PaintProperties = typename Program::PaintProperties;
-    using PaintPropertyBinders = typename Program::PaintPropertyBinders;
-    using Bitset = typename PaintPropertyBinders::Bitset;
+    using Binders = typename Program::Binders;
+    using Bitset = typename Binders::Bitset;
 
     ProgramMap(gl::Context& context_, ProgramParameters parameters_)
         : context(context_),
@@ -116,7 +117,7 @@ public:
     }
 
     Program& get(const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        Bitset bits = PaintPropertyBinders::constants(currentProperties);
+        Bitset bits = Binders::constants(currentProperties);
         auto it = programs.find(bits);
         if (it != programs.end()) {
             return it->second;
@@ -124,7 +125,7 @@ public:
         return programs.emplace(std::piecewise_construct,
                                 std::forward_as_tuple(bits),
                                 std::forward_as_tuple(context,
-                                    parameters.withAdditionalDefines(PaintPropertyBinders::defines(currentProperties)))).first->second;
+                                    parameters.withAdditionalDefines(Binders::defines(currentProperties)))).first->second;
     }
 
 private:

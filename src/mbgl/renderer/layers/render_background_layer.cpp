@@ -8,6 +8,7 @@
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
@@ -47,7 +48,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     // glClear rather than this method.
 
     const Properties<>::PossiblyEvaluated properties;
-    const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    const BackgroundProgram::Binders paintAttributeData(properties, 0);
 
     auto draw = [&](auto& program, auto&& uniformValues) {
         const auto allUniformValues = program.computeAllUniformValues(

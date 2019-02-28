@@ -3,6 +3,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {

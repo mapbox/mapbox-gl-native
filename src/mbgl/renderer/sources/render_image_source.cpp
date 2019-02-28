@@ -56,7 +56,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
     }
 
     static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    static const DebugProgram::Binders paintAttributeData(properties, 0);
 
     auto& programInstance = parameters.programs.debug;
 

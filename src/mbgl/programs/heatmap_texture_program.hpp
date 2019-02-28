@@ -16,7 +16,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_color_ramp);
 class HeatmapTextureProgram : public Program<
     shaders::heatmap_texture,
     gl::Triangle,
-    gl::Attributes<attributes::a_pos>,
+    TypeList<attributes::a_pos>,
     TypeList<
         uniforms::u_matrix,
         uniforms::u_world,

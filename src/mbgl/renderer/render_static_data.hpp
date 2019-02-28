@@ -16,7 +16,7 @@ class RenderStaticData {
 public:
     RenderStaticData(gl::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
 
-    gl::VertexBuffer<PositionOnlyLayoutAttributes::Vertex> tileVertexBuffer;
+    gl::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertexBuffer;
     gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
     gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
 

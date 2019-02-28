@@ -142,7 +142,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
         const Properties<>::PossiblyEvaluated properties;
-        const HeatmapTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
+        const HeatmapTextureProgram::Binders paintAttributeData{ properties, 0 };
 
         auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmapTexture;
 

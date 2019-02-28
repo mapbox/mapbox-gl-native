@@ -528,7 +528,7 @@ bool LineBucket::supportsLayer(const style::Layer::Impl& impl) const {
 }
 
 template <class Property>
-static float get(const RenderLineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
+static float get(const RenderLineLayer& layer, const std::map<std::string, LineProgram::Binders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(layer.getID());
     if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
         return layer.evaluated.get<Property>().constantOr(Property::defaultValue());

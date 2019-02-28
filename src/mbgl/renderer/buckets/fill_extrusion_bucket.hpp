@@ -46,7 +46,7 @@ public:
     optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     
-    std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::unordered_map<std::string, FillExtrusionProgram::Binders> paintPropertyBinders;
 };
 
 } // namespace mbgl

@@ -80,8 +80,8 @@ public:
 
     struct PaintProperties {
         style::SymbolPaintProperties::PossiblyEvaluated evaluated;
-        SymbolIconProgram::PaintPropertyBinders iconBinders;
-        SymbolSDFTextProgram::PaintPropertyBinders textBinders;
+        SymbolIconProgram::Binders iconBinders;
+        SymbolSDFTextProgram::Binders textBinders;
     };
     std::map<std::string, PaintProperties> paintProperties;
 
@@ -89,15 +89,15 @@ public:
 
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
-        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
-        gl::VertexVector<SymbolOpacityAttributes::Vertex> opacityVertices;
+        gl::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>> dynamicVertices;
+        gl::VertexVector<gfx::Vertex<SymbolOpacityAttributes>> opacityVertices;
         gl::IndexVector<gl::Triangles> triangles;
         SegmentVector<SymbolTextAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
-        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
-        optional<gl::VertexBuffer<SymbolOpacityAttributes::Vertex>> opacityVertexBuffer;
+        optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
+        optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
 
@@ -105,26 +105,26 @@ public:
 
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
-        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
-        gl::VertexVector<SymbolOpacityAttributes::Vertex> opacityVertices;
+        gl::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>> dynamicVertices;
+        gl::VertexVector<gfx::Vertex<SymbolOpacityAttributes>> opacityVertices;
         gl::IndexVector<gl::Triangles> triangles;
         SegmentVector<SymbolIconAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
         PremultipliedImage atlasImage;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
-        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
-        optional<gl::VertexBuffer<SymbolOpacityAttributes::Vertex>> opacityVertexBuffer;
+        optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
+        optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } icon;
 
     struct CollisionBuffer {
-        gl::VertexVector<CollisionBoxLayoutAttributes::Vertex> vertices;
-        gl::VertexVector<CollisionBoxDynamicAttributes::Vertex> dynamicVertices;
+        gl::VertexVector<gfx::Vertex<CollisionBoxLayoutAttributes>> vertices;
+        gl::VertexVector<gfx::Vertex<CollisionBoxDynamicAttributes>> dynamicVertices;
         SegmentVector<CollisionBoxProgram::Attributes> segments;
 
-        optional<gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>> vertexBuffer;
-        optional<gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>> dynamicVertexBuffer;
+        optional<gl::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>> vertexBuffer;
+        optional<gl::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>> dynamicVertexBuffer;
     };
 
     struct CollisionBoxBuffer : public CollisionBuffer {

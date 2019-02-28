@@ -56,7 +56,7 @@ struct LineGapWidth : DataDrivenPaintProperty<float, attributes::a_gapwidth, uni
     static float defaultValue() { return 0; }
 };
 
-struct LineOffset : DataDrivenPaintProperty<float, attributes::a_offset<1>, uniforms::u_offset> {
+struct LineOffset : DataDrivenPaintProperty<float, attributes::a_offset, uniforms::u_offset> {
     static float defaultValue() { return 0; }
 };
 

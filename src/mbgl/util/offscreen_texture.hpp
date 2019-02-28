@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/gl/types.hpp>
+#include <mbgl/gl/renderbuffer.hpp>
 #include <mbgl/util/image.hpp>
 
 namespace mbgl {

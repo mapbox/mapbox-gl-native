@@ -50,7 +50,7 @@ public:
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
-    std::map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::map<std::string, LineProgram::Binders> paintPropertyBinders;
 
 private:
     void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&);

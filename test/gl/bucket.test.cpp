@@ -22,7 +22,7 @@ bool operator==(const Segment<Attributes>& lhs, const Segment<Attributes>& rhs) 
            std::tie(rhs.vertexOffset, rhs.indexOffset, rhs.vertexLength, rhs.indexLength);
 }
 
-namespace gl {
+namespace gfx {
 namespace detail {
 
 template <class A1, class A2>
@@ -31,7 +31,7 @@ bool operator==(const Vertex<A1, A2>& lhs, const Vertex<A1, A2>& rhs) {
 }
 
 } // namespace detail
-} // namespace gl
+} // namespace gfx
 } // namespace mbgl
 
 using namespace mbgl;

@@ -46,13 +46,13 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_symbol);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 } // namespace uniforms
 
-using SymbolLayoutAttributes = gl::Attributes<
+using SymbolLayoutAttributes = TypeList<
     attributes::a_pos_offset,
     attributes::a_data<uint16_t, 4>>;
 
-using SymbolDynamicLayoutAttributes = gl::Attributes<attributes::a_projected_pos>;
+using SymbolDynamicLayoutAttributes = TypeList<attributes::a_projected_pos>;
 
-using SymbolOpacityAttributes = gl::Attributes<attributes::a_fade_opacity>;
+using SymbolOpacityAttributes = TypeList<attributes::a_fade_opacity>;
 
 struct ZoomEvaluatedSize {
     bool isZoomConstant;
@@ -69,12 +69,12 @@ class SymbolSizeBinder {
 public:
     virtual ~SymbolSizeBinder() = default;
 
-    using UniformTypeList = TypeList<
+    using UniformList = TypeList<
         uniforms::u_is_size_zoom_constant,
         uniforms::u_is_size_feature_constant,
         uniforms::u_size_t,
         uniforms::u_size>;
-    using UniformValues = gfx::UniformValues<UniformTypeList>;
+    using UniformValues = gfx::UniformValues<UniformList>;
 
     static std::unique_ptr<SymbolSizeBinder> create(const float tileZoom,
                                                     const style::PropertyValue<float>& sizeProperty,
@@ -146,10 +146,6 @@ public:
 
 class SourceFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
-    using Vertex = gl::detail::Vertex<gl::Attribute<uint16_t, 1>>;
-    using VertexVector = gl::VertexVector<Vertex>;
-    using VertexBuffer = gl::VertexBuffer<Vertex>;
-
     SourceFunctionSymbolSizeBinder(const float /*tileZoom*/, style::PropertyExpression<float> expression_, const float defaultValue_)
         : expression(std::move(expression_)),
           defaultValue(defaultValue_) {
@@ -204,7 +200,7 @@ public:
 
 class SymbolProgramBase {
 public:
-    static SymbolLayoutAttributes::Vertex layoutVertex(Point<float> labelAnchor,
+    static gfx::Vertex<SymbolLayoutAttributes> layoutVertex(Point<float> labelAnchor,
                          Point<float> o,
                          float glyphOffsetY,
                          uint16_t tx,
@@ -227,7 +223,7 @@ public:
         };
     }
 
-    static SymbolDynamicLayoutAttributes::Vertex dynamicLayoutVertex(Point<float> anchorPoint, float labelAngle) {
+    static gfx::Vertex<SymbolDynamicLayoutAttributes> dynamicLayoutVertex(Point<float> anchorPoint, float labelAngle) {
         return {
             {{
                  anchorPoint.x,
@@ -237,7 +233,7 @@ public:
         };
     }
 
-    static SymbolOpacityAttributes::Vertex opacityVertex(bool placed, float opacity) {
+    static gfx::Vertex<SymbolOpacityAttributes> opacityVertex(bool placed, float opacity) {
         return {
             {{ static_cast<uint8_t>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(placed)) }}
         };
@@ -246,25 +242,25 @@ public:
 
 template <class Shaders,
           class Primitive,
-          class LayoutAttrs,
-          class UniformTypeList,
+          class LayoutAttributeList,
+          class UniformList,
           class PaintProps>
 class SymbolProgram : public SymbolProgramBase {
 public:
-    using LayoutAttributes = LayoutAttrs;
-    using LayoutVertex = typename LayoutAttributes::Vertex;
+    using LayoutAttributes = gl::Attributes<LayoutAttributeList>;
+    using LayoutVertex = gfx::Vertex<LayoutAttributeList>;
 
-    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, SymbolDynamicLayoutAttributes, SymbolOpacityAttributes>;
+    using LayoutAndSizeAttributeList = TypeListConcat<LayoutAttributeList, SymbolDynamicLayoutAttributes, SymbolOpacityAttributes>;
 
     using PaintProperties = PaintProps;
-    using PaintPropertyBinders = typename PaintProperties::Binders;
-    using PaintAttributes = typename PaintPropertyBinders::Attributes;
-    using Attributes = gl::ConcatenateAttributes<LayoutAndSizeAttributes, PaintAttributes>;
+    using Binders = PaintPropertyBinders<typename PaintProperties::DataDrivenProperties>;
+    using PaintAttributeList = typename Binders::AttributeList;
+    using Attributes = gl::Attributes<TypeListConcat<LayoutAndSizeAttributeList, PaintAttributeList>>;
 
-    using UniformValues = gfx::UniformValues<UniformTypeList>;
-    using SizeUniformTypeList = typename SymbolSizeBinder::UniformTypeList;
-    using PaintUniformTypeList = typename PaintPropertyBinders::UniformTypeList;
-    using AllUniforms = typename TypeListConcat<UniformTypeList, SizeUniformTypeList, PaintUniformTypeList>::template ExpandInto<gl::Uniforms>;
+    using UniformValues = gfx::UniformValues<UniformList>;
+    using SizeUniformList = typename SymbolSizeBinder::UniformList;
+    using PaintUniformList = typename Binders::UniformList;
+    using AllUniforms = gl::Uniforms<TypeListConcat<UniformList, SizeUniformList, PaintUniformList>>;
 
     using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
 
@@ -282,7 +278,7 @@ public:
     static typename AllUniforms::Values computeAllUniformValues(
         const UniformValues& uniformValues,
         const SymbolSizeBinder& symbolSizeBinder,
-        const PaintPropertyBinders& paintPropertyBinders,
+        const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties,
         float currentZoom) {
         return uniformValues.concat(symbolSizeBinder.uniformValues(currentZoom))
@@ -291,15 +287,15 @@ public:
 
     static typename Attributes::Bindings computeAllAttributeBindings(
         const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
-        const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
-        const gl::VertexBuffer<SymbolOpacityAttributes::Vertex>& opacityVertexBuffer,
-        const PaintPropertyBinders& paintPropertyBinders,
+        const gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicLayoutVertexBuffer,
+        const gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>& opacityVertexBuffer,
+        const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
         assert(layoutVertexBuffer.vertexCount == dynamicLayoutVertexBuffer.vertexCount &&
                layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
-        return LayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
-            .concat(SymbolOpacityAttributes::bindings(opacityVertexBuffer))
+        return gl::Attributes<LayoutAttributeList>::bindings(layoutVertexBuffer)
+            .concat(gl::Attributes<SymbolDynamicLayoutAttributes>::bindings(dynamicLayoutVertexBuffer))
+            .concat(gl::Attributes<SymbolOpacityAttributes>::bindings(opacityVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
 
@@ -446,7 +442,7 @@ public:
 using SymbolSDFIconProgram = SymbolSDFProgram<style::IconPaintProperties>;
 using SymbolSDFTextProgram = SymbolSDFProgram<style::TextPaintProperties>;
 
-using SymbolLayoutVertex = SymbolLayoutAttributes::Vertex;
+using SymbolLayoutVertex = gfx::Vertex<SymbolLayoutAttributes>;
 using SymbolIconAttributes = SymbolIconProgram::Attributes;
 using SymbolTextAttributes = SymbolSDFTextProgram::Attributes;
 
