@@ -6,6 +6,7 @@
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/mat4.hpp>
 
 namespace mbgl {

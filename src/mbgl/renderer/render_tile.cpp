@@ -72,7 +72,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
         return;
 
     static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    static const DebugProgram::Binders paintAttributeData(properties, 0);
 
     auto& program = parameters.programs.debug;
 

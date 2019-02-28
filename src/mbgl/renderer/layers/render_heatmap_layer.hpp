@@ -3,6 +3,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
+#include <mbgl/gl/texture.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 

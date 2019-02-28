@@ -37,7 +37,7 @@ public:
     optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
-    std::map<std::string, CircleProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::map<std::string, CircleProgram::Binders> paintPropertyBinders;
 
     const MapMode mode;
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/util/ignore.hpp>
@@ -45,176 +46,41 @@ public:
 
 using AttributeBindingArray = std::vector<optional<AttributeBinding>>;
 
-/*
-    gl::Attribute<T,N> manages the binding of a vertex buffer to a GL program attribute.
-      - T is the underlying primitive type (exposed as Attribute<T,N>::ValueType)
-      - N is the number of components in the attribute declared in the shader (exposed as Attribute<T,N>::Dimensions)
-*/
-template <class T, std::size_t N>
-class Attribute {
-public:
-    using ValueType = T;
-    static constexpr size_t Dimensions = N;
-    using Value = std::array<T, N>;
-
     /*
         Create a binding for this attribute.  The `attributeSize` parameter may be used to
         override the number of components available in the buffer for each vertex.  Thus,
         a buffer with only one float for each vertex can be bound to a `vec2` attribute
     */
-    template <class Vertex>
-    static AttributeBinding binding(const VertexBuffer<Vertex>& buffer,
-                                    std::size_t attributeIndex,
-                                    std::size_t attributeSize = N) {
-        static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
-        assert(attributeSize >= 1);
-        assert(attributeSize <= 4);
-        assert(Vertex::attributeOffsets[attributeIndex] <= std::numeric_limits<uint32_t>::max());
-        static_assert(sizeof(Vertex) <= std::numeric_limits<uint32_t>::max(), "vertex too large");
-        return AttributeBinding {
-            DataTypeOf<T>::value,
-            static_cast<uint8_t>(attributeSize),
-            static_cast<uint32_t>(Vertex::attributeOffsets[attributeIndex]),
-            buffer.buffer,
-            static_cast<uint32_t>(sizeof(Vertex)),
-            0,
-        };
-    }
+template <class AttributeType, class Vertex>
+AttributeBinding attributeBinding(const VertexBuffer<Vertex>& buffer,
+                                std::size_t attributeIndex,
+                                std::size_t attributeSize = AttributeType::Dimensions) {
+    static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
+    assert(attributeSize >= 1);
+    assert(attributeSize <= 4);
+    assert(Vertex::attributeOffsets[attributeIndex] <= std::numeric_limits<uint32_t>::max());
+    static_assert(sizeof(Vertex) <= std::numeric_limits<uint32_t>::max(), "vertex too large");
+    return AttributeBinding {
+        DataTypeOf<typename AttributeType::ValueType>::value,
+        static_cast<uint8_t>(attributeSize),
+        static_cast<uint32_t>(Vertex::attributeOffsets[attributeIndex]),
+        buffer.buffer,
+        static_cast<uint32_t>(sizeof(Vertex)),
+        0,
+    };
+}
 
-    static optional<AttributeBinding> offsetBinding(const optional<AttributeBinding>& binding, std::size_t vertexOffset) {
-        assert(vertexOffset <= std::numeric_limits<uint32_t>::max());
-        if (binding) {
-            AttributeBinding result = *binding;
-            result.vertexOffset = static_cast<uint32_t>(vertexOffset);
-            return result;
-        } else {
-            return binding;
-        }
-    }
-};
-
-#define MBGL_DEFINE_ATTRIBUTE(type_, n_, name_)        \
-    struct name_ {                                     \
-        static auto name() { return #name_; }          \
-        using Type = ::mbgl::gl::Attribute<type_, n_>; \
-    }
-
-namespace detail {
-
-// Attribute binding requires member offsets. The only standard way to
-// obtain an offset is the offsetof macro. The offsetof macro has defined
-// behavior only for standard layout types. That rules out std::tuple and
-// any other solution that relies on chained inheritance. Manually implemented
-// variadic specialization looks like the only solution. Fortunately, we
-// only use a maximum of five attributes.
-
-template <class... As>
-class Vertex;
-
-template <>
-class Vertex<> {
-public:
-    using VertexType = Vertex<>;
-};
-
-template <class A1>
-class Vertex<A1> {
-public:
-    typename A1::Value a1;
-
-    using VertexType = Vertex<A1>;
-    static const std::size_t attributeOffsets[1];
-};
-
-template <class A1, class A2>
-class Vertex<A1, A2> {
-public:
-    typename A1::Value a1;
-    typename A2::Value a2;
-
-    using VertexType = Vertex<A1, A2>;
-    static const std::size_t attributeOffsets[2];
-};
-
-template <class A1, class A2, class A3>
-class Vertex<A1, A2, A3> {
-public:
-    typename A1::Value a1;
-    typename A2::Value a2;
-    typename A3::Value a3;
-
-    using VertexType = Vertex<A1, A2, A3>;
-    static const std::size_t attributeOffsets[3];
-};
-
-template <class A1, class A2, class A3, class A4>
-class Vertex<A1, A2, A3, A4> {
-public:
-    typename A1::Value a1;
-    typename A2::Value a2;
-    typename A3::Value a3;
-    typename A4::Value a4;
-
-    using VertexType = Vertex<A1, A2, A3, A4>;
-    static const std::size_t attributeOffsets[4];
-};
-
-template <class A1, class A2, class A3, class A4, class A5>
-class Vertex<A1, A2, A3, A4, A5> {
-public:
-    typename A1::Value a1;
-    typename A2::Value a2;
-    typename A3::Value a3;
-    typename A4::Value a4;
-    typename A5::Value a5;
-
-    using VertexType = Vertex<A1, A2, A3, A4, A5>;
-    static const std::size_t attributeOffsets[5];
-};
-
-template <class A1>
-const std::size_t Vertex<A1>::attributeOffsets[1] = {
-    offsetof(VertexType, a1)
-};
-
-template <class A1, class A2>
-const std::size_t Vertex<A1, A2>::attributeOffsets[2] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2)
-};
-
-template <class A1, class A2, class A3>
-const std::size_t Vertex<A1, A2, A3>::attributeOffsets[3] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2),
-    offsetof(VertexType, a3)
-};
-
-template <class A1, class A2, class A3, class A4>
-const std::size_t Vertex<A1, A2, A3, A4>::attributeOffsets[4] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2),
-    offsetof(VertexType, a3),
-    offsetof(VertexType, a4)
-};
-
-template <class A1, class A2, class A3, class A4, class A5>
-const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2),
-    offsetof(VertexType, a3),
-    offsetof(VertexType, a4),
-    offsetof(VertexType, a5)
-};
-
-} // namespace detail
+optional<AttributeBinding> offsetAttributeBinding(const optional<AttributeBinding>& binding, std::size_t vertexOffset);
 
 class Context;
 void bindAttributeLocation(Context&, ProgramID, AttributeLocation, const char * name);
 std::set<std::string> getActiveAttributes(ProgramID);
 
+template <class>
+class Attributes;
+
 template <class... As>
-class Attributes final {
+class Attributes<TypeList<As...>> final {
 public:
     using Types = TypeList<As...>;
     using Locations = IndexedTuple<
@@ -224,8 +90,6 @@ public:
         TypeList<As...>,
         TypeList<ExpandToType<As, optional<AttributeBinding>>...>>;
     using NamedLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
-
-    using Vertex = detail::Vertex<typename As::Type...>;
 
     static Locations bindLocations(Context& context, const ProgramID& id) {
         std::set<std::string> activeAttributes = getActiveAttributes(id);
@@ -262,12 +126,12 @@ public:
         return result;
     }
 
-    static Bindings bindings(const VertexBuffer<Vertex>& buffer) {
-        return Bindings { As::Type::binding(buffer, TypeIndex<As, As...>::value)... };
+    static Bindings bindings(const VertexBuffer<gfx::Vertex<Types>>& buffer) {
+        return Bindings { attributeBinding<typename As::Type>(buffer, TypeIndex<As, As...>::value)... };
     }
 
     static Bindings offsetBindings(const Bindings& bindings, std::size_t vertexOffset) {
-        return Bindings { As::Type::offsetBinding(bindings.template get<As>(), vertexOffset)... };
+        return Bindings { offsetAttributeBinding(bindings.template get<As>(), vertexOffset)... };
     }
 
     static AttributeBindingArray toBindingArray(const Locations& locations, const Bindings& bindings) {
@@ -292,9 +156,6 @@ public:
         return result;
     }
 };
-
-template <class... As>
-using ConcatenateAttributes = typename TypeListConcat<typename As::Types...>::template ExpandInto<Attributes>;
 
 } // namespace gl
 } // namespace mbgl

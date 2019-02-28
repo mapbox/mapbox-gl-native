@@ -16,7 +16,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_scale_with_map);
 class CircleProgram : public Program<
     shaders::circle,
     gl::Triangle,
-    gl::Attributes<
+    TypeList<
         attributes::a_pos>,
     TypeList<
         uniforms::u_matrix,

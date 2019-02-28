@@ -13,6 +13,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
@@ -168,7 +169,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
         const Properties<>::PossiblyEvaluated properties;
-        const ExtrusionTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
+        const ExtrusionTextureProgram::Binders paintAttributeData{ properties, 0 };
         
         auto& programInstance = parameters.programs.getFillExtrusionLayerPrograms().extrusionTexture;
 

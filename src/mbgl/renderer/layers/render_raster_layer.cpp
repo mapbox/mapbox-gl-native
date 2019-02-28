@@ -72,7 +72,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
     if (parameters.pass != RenderPass::Translucent)
         return;
 
-    RasterProgram::PaintPropertyBinders paintAttributeData{ evaluated, 0 };
+    RasterProgram::Binders paintAttributeData{ evaluated, 0 };
 
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,

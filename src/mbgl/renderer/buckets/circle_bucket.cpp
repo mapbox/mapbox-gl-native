@@ -99,7 +99,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
 }
 
 template <class Property>
-static float get(const RenderCircleLayer& layer, const std::map<std::string, CircleProgram::PaintPropertyBinders>& paintPropertyBinders) {
+static float get(const RenderCircleLayer& layer, const std::map<std::string, CircleProgram::Binders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(layer.getID());
     if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
         return layer.evaluated.get<Property>().constantOr(Property::defaultValue());

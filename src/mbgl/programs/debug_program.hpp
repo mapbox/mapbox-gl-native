@@ -11,7 +11,7 @@ namespace mbgl {
 class DebugProgram : public Program<
     shaders::debug,
     gl::Line,
-    gl::Attributes<
+    TypeList<
         attributes::a_pos>,
     TypeList<
         uniforms::u_matrix,

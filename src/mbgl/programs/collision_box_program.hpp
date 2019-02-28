@@ -12,17 +12,17 @@
 
 namespace mbgl {
 
-using CollisionBoxLayoutAttributes = gl::Attributes<
+using CollisionBoxLayoutAttributes = TypeList<
     attributes::a_pos,
     attributes::a_anchor_pos,
     attributes::a_extrude>;
 
-using CollisionBoxDynamicAttributes = gl::Attributes<attributes::a_placed>;
+using CollisionBoxDynamicAttributes = TypeList<attributes::a_placed>;
 
 class CollisionBoxProgram : public Program<
     shaders::collision_box,
     gl::Line,
-    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
+    TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
@@ -32,7 +32,7 @@ class CollisionBoxProgram : public Program<
 public:
     using Program::Program;
 
-    static CollisionBoxLayoutAttributes::Vertex layoutVertex(Point<float> a, Point<float> anchor, Point<float> o) {
+    static gfx::Vertex<CollisionBoxLayoutAttributes> layoutVertex(Point<float> a, Point<float> anchor, Point<float> o) {
         return {
             {{
                 static_cast<int16_t>(a.x),
@@ -49,7 +49,7 @@ public:
         };
     }
 
-    static CollisionBoxDynamicAttributes::Vertex dynamicVertex(bool placed, bool notUsed) {
+    static gfx::Vertex<CollisionBoxDynamicAttributes> dynamicVertex(bool placed, bool notUsed) {
         return {
             {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }}
         };
@@ -63,19 +63,19 @@ public:
               gl::ColorMode colorMode,
               gl::CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
-              const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
-              const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
+              const gl::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
+              const gl::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
+              const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
               float currentZoom,
               const std::string& layerID) {
         typename AllUniforms::Values allUniformValues = uniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-        typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
+        typename Attributes::Bindings allAttributeBindings = gl::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
+            .concat(gl::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         assert(layoutVertexBuffer.vertexCount == dynamicVertexBuffer.vertexCount);
@@ -108,7 +108,7 @@ public:
 class CollisionCircleProgram : public Program<
     shaders::collision_circle,
     gl::Triangle,
-    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
+    TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
@@ -119,7 +119,7 @@ class CollisionCircleProgram : public Program<
 public:
     using Program::Program;
 
-    static CollisionBoxLayoutAttributes::Vertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
+    static gfx::Vertex<CollisionBoxLayoutAttributes> vertex(Point<float> a, Point<float> anchor, Point<float> o) {
         return {
             {{
                 static_cast<int16_t>(a.x),
@@ -144,19 +144,19 @@ public:
               gl::ColorMode colorMode,
               gl::CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
-              const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
-              const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
+              const gl::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
+              const gl::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
+              const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
               float currentZoom,
               const std::string& layerID) {
         typename AllUniforms::Values allUniformValues = uniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-        typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
+        typename Attributes::Bindings allAttributeBindings = gl::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
+            .concat(gl::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         for (auto& segment : segments) {

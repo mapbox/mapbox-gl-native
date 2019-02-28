@@ -29,7 +29,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_b);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_gl_units_to_pixels);
 } // namespace uniforms
 
-using LineLayoutAttributes = gl::Attributes<
+using LineLayoutAttributes = TypeList<
     attributes::a_pos_normal,
     attributes::a_data<uint8_t, 4>>;
 

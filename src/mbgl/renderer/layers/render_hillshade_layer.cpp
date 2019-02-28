@@ -70,7 +70,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                      const UnwrappedTileID& id) {
         auto& programInstance = parameters.programs.getHillshadeLayerPrograms().hillshade;
 
-        const HillshadeProgram::PaintPropertyBinders paintAttributeData{ evaluated, 0 };
+        const HillshadeProgram::Binders paintAttributeData{ evaluated, 0 };
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HillshadeProgram::UniformValues {
@@ -131,7 +131,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             
             parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Nearest, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
             const Properties<>::PossiblyEvaluated properties;
-            const HillshadePrepareProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
+            const HillshadePrepareProgram::Binders paintAttributeData{ properties, 0 };
             
             auto& programInstance = parameters.programs.getHillshadeLayerPrograms().hillshadePrepare;
 

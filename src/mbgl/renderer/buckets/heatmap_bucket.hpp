@@ -36,7 +36,7 @@ public:
     optional<gl::VertexBuffer<HeatmapLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
-    std::map<std::string, HeatmapProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::map<std::string, HeatmapProgram::Binders> paintPropertyBinders;
 
     const MapMode mode;
 };

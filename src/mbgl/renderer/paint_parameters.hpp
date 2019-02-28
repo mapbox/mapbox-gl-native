@@ -23,6 +23,10 @@ class ImageManager;
 class LineAtlas;
 class UnwrappedTileID;
 
+namespace gl {
+class Context;
+}
+
 class PaintParameters {
 public:
     PaintParameters(gl::Context&,

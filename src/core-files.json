@@ -498,6 +498,7 @@
         "mbgl/geometry/dem_data.hpp": "src/mbgl/geometry/dem_data.hpp",
         "mbgl/geometry/feature_index.hpp": "src/mbgl/geometry/feature_index.hpp",
         "mbgl/geometry/line_atlas.hpp": "src/mbgl/geometry/line_atlas.hpp",
+        "mbgl/gfx/attribute.hpp": "src/mbgl/gfx/attribute.hpp",
         "mbgl/gfx/uniform.hpp": "src/mbgl/gfx/uniform.hpp",
         "mbgl/gl/attribute.hpp": "src/mbgl/gl/attribute.hpp",
         "mbgl/gl/color_mode.hpp": "src/mbgl/gl/color_mode.hpp",
