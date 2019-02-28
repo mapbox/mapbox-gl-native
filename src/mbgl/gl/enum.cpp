@@ -5,16 +5,6 @@
 namespace mbgl {
 namespace gl {
 
-// template <>
-// gfx::PrimitiveType Enum::from(const platform::GLint value) {
-
-// }
-
-// template <>
-// platform::GLenum Enum::to(const gfx::PrimitiveType value) {
-
-// }
-
 template <>
 platform::GLenum Enum<gfx::PrimitiveType>::to(const gfx::PrimitiveType value) {
     switch (value) {
@@ -50,8 +40,8 @@ platform::GLenum Enum<gfx::ColorBlendEquationType>::to(const gfx::ColorBlendEqua
 }
 
 template <>
-gfx::ColorBlendFactorType Enum<gfx::ColorBlendFactorType>::from(const platform::GLint blendFactor) {
-    switch (blendFactor) {
+gfx::ColorBlendFactorType Enum<gfx::ColorBlendFactorType>::from(const platform::GLint value) {
+    switch (value) {
         case GL_ZERO: return gfx::ColorBlendFactorType::Zero;
         case GL_ONE: return gfx::ColorBlendFactorType::One;
         case GL_SRC_COLOR: return gfx::ColorBlendFactorType::SrcColor;
@@ -91,6 +81,46 @@ platform::GLenum Enum<gfx::ColorBlendFactorType>::to(const gfx::ColorBlendFactor
         case gfx::ColorBlendFactorType::SrcAlphaSaturate: return GL_SRC_ALPHA_SATURATE;
     }
     return GL_INVALID_ENUM;
+}
+
+template <>
+gfx::DepthFunctionType Enum<gfx::DepthFunctionType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_NEVER: return gfx::DepthFunctionType::Never;
+        case GL_LESS: return gfx::DepthFunctionType::Less;
+        case GL_EQUAL: return gfx::DepthFunctionType::Equal;
+        case GL_LEQUAL: return gfx::DepthFunctionType::LessEqual;
+        case GL_GREATER: return gfx::DepthFunctionType::Greater;
+        case GL_NOTEQUAL: return gfx::DepthFunctionType::NotEqual;
+        case GL_GEQUAL: return gfx::DepthFunctionType::GreaterEqual;
+        case GL_ALWAYS: return gfx::DepthFunctionType::Always;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::DepthFunctionType>::to(const gfx::DepthFunctionType value) {
+    switch (value) {
+        case gfx::DepthFunctionType::Never: return GL_NEVER;
+        case gfx::DepthFunctionType::Less: return GL_LESS;
+        case gfx::DepthFunctionType::Equal: return GL_EQUAL;
+        case gfx::DepthFunctionType::LessEqual: return GL_LEQUAL;
+        case gfx::DepthFunctionType::Greater: return GL_GREATER;
+        case gfx::DepthFunctionType::NotEqual: return GL_NOTEQUAL;
+        case gfx::DepthFunctionType::GreaterEqual: return GL_GEQUAL;
+        case gfx::DepthFunctionType::Always: return GL_ALWAYS;
+    }
+    return GL_INVALID_ENUM;
+}
+
+template <>
+gfx::DepthMaskType Enum<gfx::DepthMaskType>::from(const platform::GLboolean value) {
+    return value ? gfx::DepthMaskType::ReadWrite : gfx::DepthMaskType::ReadOnly;
+}
+
+template <>
+platform::GLboolean Enum<gfx::DepthMaskType>::to(const gfx::DepthMaskType value) {
+    return value == gfx::DepthMaskType::ReadWrite ? GL_TRUE : GL_FALSE;
 }
 
 } // namespace gl

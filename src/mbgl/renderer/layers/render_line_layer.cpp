@@ -88,7 +88,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             programInstance.draw(
                 parameters.context,
                 gfx::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
                 parameters.stencilModeForClipping(tile.clip),
                 parameters.colorModeForRenderPass(),
                 gl::CullFaceMode::disabled(),

@@ -115,7 +115,7 @@ public:
     template <class DrawMode>
     void draw(Context& context,
               DrawMode drawMode,
-              DepthMode depthMode,
+              gfx::DepthMode depthMode,
               StencilMode stencilMode,
               gfx::ColorMode colorMode,
               CullFaceMode cullFaceMode,

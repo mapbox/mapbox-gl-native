@@ -4,7 +4,7 @@
 #include <mbgl/renderer/render_light.hpp>
 #include <mbgl/renderer/mode.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/gl/depth_mode.hpp>
+#include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -61,8 +61,8 @@ public:
 
     Programs& programs;
 
-    gl::DepthMode depthModeForSublayer(uint8_t n, gl::DepthMode::Mask) const;
-    gl::DepthMode depthModeFor3D(gl::DepthMode::Mask) const;
+    gfx::DepthMode depthModeForSublayer(uint8_t n, gfx::DepthMaskType) const;
+    gfx::DepthMode depthModeFor3D(gfx::DepthMaskType) const;
     gl::StencilMode stencilModeForClipping(const ClipID&) const;
     gfx::ColorMode colorModeForRenderPass() const;
 

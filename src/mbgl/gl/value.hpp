@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/gl/types.hpp>
-#include <mbgl/gl/depth_mode.hpp>
+#include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/gl/cull_face_mode.hpp>
@@ -47,8 +47,8 @@ struct StencilMask {
 };
 
 struct DepthMask {
-    using Type = bool;
-    static const constexpr Type Default = true;
+    using Type = gfx::DepthMaskType;
+    static const constexpr Type Default = gfx::DepthMaskType::ReadWrite;
     static void Set(const Type&);
     static Type Get();
 };
@@ -112,8 +112,8 @@ struct DepthTest {
 };
 
 struct DepthFunc {
-    using Type = DepthMode::Function;
-    static const constexpr Type Default = DepthMode::Less;
+    using Type = gfx::DepthFunctionType;
+    static const constexpr Type Default = gfx::DepthFunctionType::Less;
     static void Set(const Type&);
     static Type Get();
 };

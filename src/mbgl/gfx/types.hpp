@@ -12,13 +12,13 @@ enum class PrimitiveType : uint8_t {
     LineStrip,
     Triangles,
     TriangleStrip,
-    TriangleFan
+    TriangleFan,
 };
 
 enum class ColorBlendEquationType : uint8_t {
     Add,
     Subtract,
-    ReverseSubtract
+    ReverseSubtract,
 };
 
 enum class ColorBlendFactorType : uint8_t {
@@ -36,7 +36,23 @@ enum class ColorBlendFactorType : uint8_t {
     ConstantColor,
     OneMinusConstantColor,
     ConstantAlpha,
-    OneMinusConstantAlpha
+    OneMinusConstantAlpha,
+};
+
+enum class DepthFunctionType : uint8_t {
+    Never,
+    Less,
+    Equal,
+    LessEqual,
+    Greater,
+    NotEqual,
+    GreaterEqual,
+    Always,
+};
+
+enum class DepthMaskType : bool {
+    ReadOnly = false,
+    ReadWrite = true,
 };
 
 } // namespace gfx
