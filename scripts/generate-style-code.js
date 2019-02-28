@@ -76,7 +76,7 @@ function attributeUniformType(property, type) {
        [ property.name.replace(type + '-', '').replace(/-/g, '_') ];
 
     return names.map(name => {
-      return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`
+      return `attributes::a_${name}, uniforms::u_${name}`
     }).join(', ');
 }
 
