@@ -12,7 +12,9 @@ public:
     peer() noexcept : storage(nullptr, noop_deleter) {}
 
     template <class T>
-    peer(T&& value) noexcept : storage(new std::decay_t<T>(std::forward<T>(value)), cast_deleter<std::decay_t<T>>) {}
+    peer(T&& value) noexcept : storage(new std::decay_t<T>(std::forward<T>(value)), cast_deleter<std::decay_t<T>>) {
+        static_assert(!std::is_same<peer, std::decay_t<T>>::value, "Peer must not wrap itself.");
+    }
 
     bool has_value() const noexcept { return static_cast<bool>(storage); }
 
