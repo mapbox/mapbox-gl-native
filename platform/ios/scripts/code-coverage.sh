@@ -10,7 +10,7 @@ set -o pipefail
 # echo build/Logs/Test/*.xcresult
 # result=
 # echo ${result}*_Test/*.xccovreport
-cov_result=build/ios/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
+cov_result=build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
 echo $cov_result
 xcrun xccov view $cov_result --json > output.json
 
