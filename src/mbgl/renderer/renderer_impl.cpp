@@ -444,13 +444,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 parameters.context,
                 gfx::Triangles(),
                 gfx::DepthMode::disabled(),
-                gl::StencilMode {
-                    gl::StencilMode::Always(),
+                gfx::StencilMode {
+                    gfx::StencilMode::Always(),
                     static_cast<int32_t>(clipID.second.reference.to_ulong()),
                     0b11111111,
-                    gl::StencilMode::Keep,
-                    gl::StencilMode::Keep,
-                    gl::StencilMode::Replace
+                    gfx::StencilOpType::Keep,
+                    gfx::StencilOpType::Keep,
+                    gfx::StencilOpType::Replace
                 },
                 gfx::ColorMode::disabled(),
                 gl::CullFaceMode::disabled(),
@@ -477,7 +477,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     // Render tile clip boundaries, using stencil buffer to calculate fill color.
     if (parameters.debugOptions & MapDebugOptions::StencilClip) {
-        parameters.context.setStencilMode(gl::StencilMode::disabled());
+        parameters.context.setStencilMode(gfx::StencilMode::disabled());
         parameters.context.setDepthMode(gfx::DepthMode::disabled());
         parameters.context.setColorMode(gfx::ColorMode::unblended());
         parameters.context.program = 0;
@@ -560,7 +560,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     // Render the depth buffer.
     if (parameters.debugOptions & MapDebugOptions::DepthBuffer) {
-        parameters.context.setStencilMode(gl::StencilMode::disabled());
+        parameters.context.setStencilMode(gfx::StencilMode::disabled());
         parameters.context.setDepthMode(gfx::DepthMode::disabled());
         parameters.context.setColorMode(gfx::ColorMode::unblended());
         parameters.context.program = 0;

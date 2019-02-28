@@ -307,7 +307,7 @@ public:
     void draw(gl::Context& context,
               DrawMode drawMode,
               gfx::DepthMode depthMode,
-              gl::StencilMode stencilMode,
+              gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gl::CullFaceMode cullFaceMode,
               const gl::IndexBuffer<DrawMode>& indexBuffer,

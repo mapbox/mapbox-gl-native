@@ -93,7 +93,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
             const auto stencilMode = parameters.mapMode != MapMode::Continuous
                 ? parameters.stencilModeForClipping(tile.clip)
-                : gl::StencilMode::disabled();
+                : gfx::StencilMode::disabled();
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
@@ -169,7 +169,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.context,
             gfx::Triangles(),
             gfx::DepthMode::disabled(),
-            gl::StencilMode::disabled(),
+            gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gl::CullFaceMode::disabled(),
             parameters.staticData.quadTriangleIndexBuffer,

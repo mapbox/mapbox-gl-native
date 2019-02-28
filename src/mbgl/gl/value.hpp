@@ -2,7 +2,7 @@
 
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
-#include <mbgl/gl/stencil_mode.hpp>
+#include <mbgl/gfx/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/gl/cull_face_mode.hpp>
 #include <mbgl/gl/attribute.hpp>
@@ -62,11 +62,11 @@ struct ColorMask {
 
 struct StencilFunc {
     struct Type {
-        uint32_t func;
+        gfx::StencilFunctionType func;
         int32_t ref;
         uint32_t mask;
     };
-    static const constexpr Type Default = { StencilMode::Always::func, 0, ~0u };
+    static const constexpr Type Default = { gfx::StencilMode::Always::func, 0, ~0u };
     static void Set(const Type&);
     static Type Get();
 };
@@ -84,11 +84,11 @@ struct StencilTest {
 
 struct StencilOp {
     struct Type {
-        StencilMode::Op sfail;
-        StencilMode::Op dpfail;
-        StencilMode::Op dppass;
+        gfx::StencilOpType sfail;
+        gfx::StencilOpType dpfail;
+        gfx::StencilOpType dppass;
     };
-    static const constexpr Type Default = { StencilMode::Keep, StencilMode::Keep, StencilMode::Keep };
+    static const constexpr Type Default = { gfx::StencilOpType::Keep, gfx::StencilOpType::Keep, gfx::StencilOpType::Keep };
     static void Set(const Type&);
     static Type Get();
 };

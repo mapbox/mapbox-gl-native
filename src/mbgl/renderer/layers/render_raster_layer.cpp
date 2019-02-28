@@ -112,7 +112,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             parameters.context,
             gfx::Triangles(),
             parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
-            gl::StencilMode::disabled(),
+            gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gl::CullFaceMode::disabled(),
             indexBuffer,

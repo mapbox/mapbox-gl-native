@@ -68,14 +68,14 @@ gfx::DepthMode PaintParameters::depthModeFor3D(gfx::DepthMaskType mask) const {
     return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { 0.0, 1.0 } };
 }
 
-gl::StencilMode PaintParameters::stencilModeForClipping(const ClipID& id) const {
-    return gl::StencilMode {
-        gl::StencilMode::Equal { static_cast<uint32_t>(id.mask.to_ulong()) },
+gfx::StencilMode PaintParameters::stencilModeForClipping(const ClipID& id) const {
+    return gfx::StencilMode {
+        gfx::StencilMode::Equal { static_cast<uint32_t>(id.mask.to_ulong()) },
         static_cast<int32_t>(id.reference.to_ulong()),
         0,
-        gl::StencilMode::Keep,
-        gl::StencilMode::Keep,
-        gl::StencilMode::Replace
+        gfx::StencilOpType::Keep,
+        gfx::StencilOpType::Keep,
+        gfx::StencilOpType::Replace
     };
 }
 

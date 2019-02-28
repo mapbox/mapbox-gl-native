@@ -13,7 +13,7 @@
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
-#include <mbgl/gl/stencil_mode.hpp>
+#include <mbgl/gfx/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -171,7 +171,7 @@ public:
     void setDrawMode(const gfx::TriangleStrip&);
 
     void setDepthMode(const gfx::DepthMode&);
-    void setStencilMode(const StencilMode&);
+    void setStencilMode(const gfx::StencilMode&);
     void setColorMode(const gfx::ColorMode&);
     void setCullFaceMode(const CullFaceMode&);
 

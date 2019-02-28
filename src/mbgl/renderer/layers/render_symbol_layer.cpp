@@ -120,7 +120,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 values_.pitchAlignment == AlignmentType::Map
                     ? parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly)
                     : gfx::DepthMode::disabled(),
-                gl::StencilMode::disabled(),
+                gfx::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gl::CullFaceMode::disabled(),
                 *buffers.indexBuffer,
@@ -253,7 +253,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.context,
                 gfx::Lines { 1.0f },
                 gfx::DepthMode::disabled(),
-                gl::StencilMode::disabled(),
+                gfx::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gl::CullFaceMode::disabled(),
                 CollisionBoxProgram::UniformValues {
@@ -288,7 +288,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.context,
                 gfx::Triangles(),
                 gfx::DepthMode::disabled(),
-                gl::StencilMode::disabled(),
+                gfx::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gl::CullFaceMode::disabled(),
                 CollisionCircleProgram::UniformValues {

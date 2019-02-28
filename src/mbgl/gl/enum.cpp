@@ -123,5 +123,65 @@ platform::GLboolean Enum<gfx::DepthMaskType>::to(const gfx::DepthMaskType value)
     return value == gfx::DepthMaskType::ReadWrite ? GL_TRUE : GL_FALSE;
 }
 
+template <>
+gfx::StencilFunctionType Enum<gfx::StencilFunctionType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_NEVER: return gfx::StencilFunctionType::Never;
+        case GL_LESS: return gfx::StencilFunctionType::Less;
+        case GL_EQUAL: return gfx::StencilFunctionType::Equal;
+        case GL_LEQUAL: return gfx::StencilFunctionType::LessEqual;
+        case GL_GREATER: return gfx::StencilFunctionType::Greater;
+        case GL_NOTEQUAL: return gfx::StencilFunctionType::NotEqual;
+        case GL_GEQUAL: return gfx::StencilFunctionType::GreaterEqual;
+        case GL_ALWAYS: return gfx::StencilFunctionType::Always;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::StencilFunctionType>::to(const gfx::StencilFunctionType value) {
+    switch (value) {
+        case gfx::StencilFunctionType::Never: return GL_NEVER;
+        case gfx::StencilFunctionType::Less: return GL_LESS;
+        case gfx::StencilFunctionType::Equal: return GL_EQUAL;
+        case gfx::StencilFunctionType::LessEqual: return GL_LEQUAL;
+        case gfx::StencilFunctionType::Greater: return GL_GREATER;
+        case gfx::StencilFunctionType::NotEqual: return GL_NOTEQUAL;
+        case gfx::StencilFunctionType::GreaterEqual: return GL_GEQUAL;
+        case gfx::StencilFunctionType::Always: return GL_ALWAYS;
+    }
+    return GL_INVALID_ENUM;
+}
+
+template <>
+gfx::StencilOpType Enum<gfx::StencilOpType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_KEEP: return gfx::StencilOpType::Keep;
+        case GL_ZERO: return gfx::StencilOpType::Zero;
+        case GL_REPLACE: return gfx::StencilOpType::Replace;
+        case GL_INCR: return gfx::StencilOpType::Increment;
+        case GL_INCR_WRAP: return gfx::StencilOpType::IncrementWrap;
+        case GL_DECR: return gfx::StencilOpType::Decrement;
+        case GL_DECR_WRAP: return gfx::StencilOpType::DecrementWrap;
+        case GL_INVERT: return gfx::StencilOpType::Invert;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::StencilOpType>::to(const gfx::StencilOpType value) {
+    switch (value) {
+        case gfx::StencilOpType::Keep: return GL_KEEP;
+        case gfx::StencilOpType::Zero: return GL_ZERO;
+        case gfx::StencilOpType::Replace: return GL_REPLACE;
+        case gfx::StencilOpType::Increment: return GL_INCR;
+        case gfx::StencilOpType::IncrementWrap: return GL_INCR_WRAP;
+        case gfx::StencilOpType::Decrement: return GL_DECR;
+        case gfx::StencilOpType::DecrementWrap: return GL_DECR_WRAP;
+        case gfx::StencilOpType::Invert: return GL_INVERT;
+    }
+    return GL_INVALID_ENUM;
+}
+
 } // namespace gl
 } // namespace mbgl
