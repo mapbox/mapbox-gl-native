@@ -75,10 +75,6 @@ public:
 
     // Position
     void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const AnimationOptions& = {});
-    LatLng getLatLng(const EdgeInsets& = {}) const;
-    void resetPosition(const EdgeInsets& = {});
 
     // Zoom
     void scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation = {});

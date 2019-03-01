@@ -127,10 +127,10 @@ TEST(Map, LatLngBehavior) {
     MapTest<> test;
 
     test.map.jumpTo(CameraOptions().withCenter(LatLng { 1.0, 1.0 }).withZoom(0.0));
-    auto latLng1 = test.map.getLatLng();
+    auto latLng1 = *test.map.getCameraOptions().center;
 
-    test.map.setLatLng({ 1, 1 });
-    auto latLng2 = test.map.getLatLng();
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 1.0, 1.0 }));
+    auto latLng2 = *test.map.getCameraOptions().center;
 
     ASSERT_DOUBLE_EQ(latLng1.latitude(), latLng2.latitude());
     ASSERT_DOUBLE_EQ(latLng1.longitude(), latLng2.longitude());

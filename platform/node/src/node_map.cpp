@@ -942,7 +942,7 @@ void NodeMap::SetCenter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (center->Length() > 1) { latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
 
     try {
-        nodeMap->map->setLatLng(mbgl::LatLng { latitude, longitude });
+        nodeMap->map->jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng { latitude, longitude }));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }

@@ -167,24 +167,6 @@ void Map::moveBy(const ScreenCoordinate& point, const AnimationOptions& animatio
     impl->onUpdate();
 }
 
-void Map::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withCenter(latLng), animation);
-}
-
-void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withCenter(latLng).withPadding(padding), animation);
-}
-
-LatLng Map::getLatLng(const EdgeInsets& padding) const {
-    return impl->transform.getLatLng(padding);
-}
-
-void Map::resetPosition(const EdgeInsets& padding) {
-    impl->cameraMutated = true;
-    impl->transform.jumpTo(CameraOptions().withCenter(LatLng()).withPadding(padding).withZoom(0.0).withBearing(0.0).withPitch(0.0));
-    impl->onUpdate();
-}
-
 #pragma mark - Zoom
 
 void Map::scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
@@ -438,7 +420,7 @@ ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
     // antimeridian, we unwrap the point longitude so it would be seen if
     // e.g. the next antimeridian side is visible.
     LatLng unwrappedLatLng = latLng.wrapped();
-    unwrappedLatLng.unwrapForShortestPath(getLatLng());
+    unwrappedLatLng.unwrapForShortestPath(impl->transform.getLatLng());
     return impl->transform.latLngToScreenCoordinate(unwrappedLatLng);
 }
 

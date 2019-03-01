@@ -184,7 +184,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_X:
             if (!mods)
-                view->map->resetPosition();
+                view->map->jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng {}).withZoom(0.0).withBearing(0.0).withPitch(0.0));
             break;
         case GLFW_KEY_O:
             view->onlineStatusCallback();
