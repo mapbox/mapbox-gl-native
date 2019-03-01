@@ -18,13 +18,10 @@ cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 #
 file_name="ios-coverage-$(TZ=UTC date +"%Y-%m-%d-$CIRCLE_SHA1")"
 cat <<EOF > $file_name.json
-{ "current-coverage" : $cov }
+    { "current-coverage" : $cov }
 EOF
 echo $cov
 echo $file_name
-# Clean up files.
-rm -rf build/ios/ios/Logs/Test/*.xcresult/
-rm -f output.json
 
 #
 # upload to AWS
