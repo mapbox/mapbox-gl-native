@@ -30,4 +30,4 @@ rm -f output.json
 # upload to AWS
 # 
 
-aws s3 cp coverage.json s3://mapbox-loading-dock/raw/ios-maps-metrics/ --acl public-read
+aws s3 cp coverage.json s3://mapbox-loading-dock/raw/mobile.coverage/ --acl public-read
