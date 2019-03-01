@@ -180,6 +180,22 @@
                         }
                     },
                     {
+                      "PolicyName": "mobile.coverage",
+                      "PolicyDocument": {
+                        "Statement": [
+                          {
+                            "Action": [
+                              "s3:PutObject",
+                              "s3:GetObject",
+                              "s3:GetObjectAcl"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": ["arn:aws:s3:::mapbox-loading-dock/raw/mobile.coverage/*"]
+                          }
+                        ]
+                      }
+                    },
+                    {
                         "PolicyName": "cloudwatch-metrics",
                         "PolicyDocument": {
                             "Statement": [
