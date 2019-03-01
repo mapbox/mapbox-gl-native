@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
     map.jumpTo(mbgl::CameraOptions()
                    .withCenter(mbgl::LatLng {settings.latitude, settings.longitude})
                    .withZoom(settings.zoom)
-                   .withAngle(settings.bearing)
+                   .withBearing(settings.bearing)
                    .withPitch(settings.pitch));
     map.setDebug(mbgl::MapDebugOptions(settings.debug));
 
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
     settings.latitude = camera.center->latitude();
     settings.longitude = camera.center->longitude();
     settings.zoom = *camera.zoom;
-    settings.bearing = *camera.angle;
+    settings.bearing = *camera.bearing;
     settings.pitch = *camera.pitch;
     settings.debug = mbgl::EnumType(map.getDebug());
     settings.save();

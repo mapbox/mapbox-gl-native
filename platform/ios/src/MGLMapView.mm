@@ -1775,7 +1775,7 @@ public:
     {
         [self trackGestureEvent:MMEEventGestureRotateStart forRecognizer:rotate];
 
-        self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().angle) * -1;
+        self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
 
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
@@ -1803,7 +1803,7 @@ public:
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
            self.mbglMap.jumpTo(mbgl::CameraOptions()
-                                   .withAngle(newDegrees)
+                                   .withBearing(newDegrees)
                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
         }
 
@@ -1840,7 +1840,7 @@ public:
             if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
             {
                 self.mbglMap.easeTo(mbgl::CameraOptions()
-                                       .withAngle(newDegrees)
+                                       .withBearing(newDegrees)
                                        .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
                                     MGLDurationFromTimeInterval(decelerationRate));
 
@@ -2149,7 +2149,7 @@ public:
     MGLMapCamera *camera;
     
     mbgl::ScreenCoordinate anchor = mbgl::ScreenCoordinate { anchorPoint.x, anchorPoint.y };
-    currentCameraOptions.angle = degrees;
+    currentCameraOptions.bearing = degrees;
     currentCameraOptions.anchor = anchor;
     camera = [self cameraForCameraOptions:currentCameraOptions];
     
@@ -2577,7 +2577,7 @@ public:
     MGLLogInfo(@"Resetting the map to the current style’s default viewport.");
     auto camera = self.mbglMap.getStyle().getDefaultCamera();
     CGFloat pitch = *camera.pitch;
-    CLLocationDirection heading = mbgl::util::wrap(*camera.angle, 0., 360.);
+    CLLocationDirection heading = mbgl::util::wrap(*camera.bearing, 0., 360.);
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
     self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(*camera.center)
                                                        altitude:altitude
@@ -3235,7 +3235,7 @@ public:
     cameraOptions.zoom = zoomLevel;
     if (direction >= 0)
     {
-        cameraOptions.angle = direction;
+        cameraOptions.bearing = direction;
     }
 
     mbgl::AnimationOptions animationOptions;
@@ -3491,7 +3491,7 @@ public:
 
 - (CLLocationDirection)direction
 {
-    return *self.mbglMap.getCameraOptions().angle;
+    return *self.mbglMap.getCameraOptions().bearing;
 }
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated
@@ -3524,7 +3524,7 @@ public:
     if (self.userTrackingMode == MGLUserTrackingModeNone)
     {
         self.mbglMap.easeTo(mbgl::CameraOptions()
-                                .withAngle(direction)
+                                .withBearing(direction)
                                 .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)),
                             MGLDurationFromTimeInterval(duration));
     }
@@ -3532,7 +3532,7 @@ public:
     {
         CGPoint anchor = self.userLocationAnnotationViewCenter;
         self.mbglMap.easeTo(mbgl::CameraOptions()
-                                .withAngle(direction)
+                                .withBearing(direction)
                                 .withAnchor(mbgl::ScreenCoordinate { anchor.x, anchor.y }),
                             MGLDurationFromTimeInterval(duration));
     }
@@ -3797,7 +3797,7 @@ public:
     mbgl::CameraOptions mapCamera = self.mbglMap.getCameraOptions();
     CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : self.mbglMap.getLatLng());
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
-    CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(*cameraOptions.angle, 0., 360.) : self.direction;
+    CLLocationDirection direction = cameraOptions.bearing ? mbgl::util::wrap(*cameraOptions.bearing, 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : *mapCamera.pitch;
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch, centerCoordinate.latitude, self.frame.size);
     return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate altitude:altitude pitch:pitch heading:direction];
@@ -3818,7 +3818,7 @@ public:
                                            self.frame.size);
     if (camera.heading >= 0)
     {
-        options.angle = camera.heading;
+        options.bearing = camera.heading;
     }
     if (camera.pitch >= 0)
     {

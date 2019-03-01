@@ -207,7 +207,7 @@ bool RenderLineLayer::queryIntersectsFeature(
             queryGeometry,
             evaluated.get<style::LineTranslate>(),
             evaluated.get<style::LineTranslateAnchor>(),
-            transformState.getAngle(),
+            transformState.getBearing(),
             pixelsToTileUnits);
 
     // Evaluate function

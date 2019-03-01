@@ -35,7 +35,7 @@ TEST(TileCover, Pitch) {
     transform.resize({ 512, 512 });
     // slightly offset center so that tile order is better defined
 
-    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.1, -0.1, }).withZoom(2.0).withAngle(5.0).withPitch(40.0));
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.1, -0.1, }).withZoom(2.0).withBearing(5.0).withPitch(40.0));
 
     EXPECT_EQ((std::vector<UnwrappedTileID>{
         { 2, 1, 1 }, { 2, 2, 1 }, { 2, 1, 2 }, { 2, 2, 2 }

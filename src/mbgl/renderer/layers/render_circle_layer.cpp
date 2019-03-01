@@ -142,7 +142,7 @@ bool RenderCircleLayer::queryIntersectsFeature(
             queryGeometry,
             evaluated.get<style::CircleTranslate>(),
             evaluated.get<style::CircleTranslateAnchor>(),
-            transformState.getAngle(),
+            transformState.getBearing(),
             pixelsToTileUnits).value_or(queryGeometry);
 
     // Evaluate functions

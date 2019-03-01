@@ -305,10 +305,10 @@ void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy, jni::
     map->moveBy({dx, dy}, animationOptions);
 }
 
-void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom) {
+void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom) {
     mbgl::CameraOptions options;
-    if (angle != -1) {
-        options.angle = angle;
+    if (bearing != -1) {
+        options.bearing = bearing;
     }
     options.center = mbgl::LatLng(latitude, longitude);
     options.padding = insets;
@@ -322,10 +322,10 @@ void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitu
     map->jumpTo(options);
 }
 
-void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom, jni::jboolean easing) {
+void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom, jni::jboolean easing) {
     mbgl::CameraOptions cameraOptions;
-    if (angle != -1) {
-        cameraOptions.angle = angle;
+    if (bearing != -1) {
+        cameraOptions.bearing = bearing;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = insets;
@@ -346,10 +346,10 @@ void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitu
     map->easeTo(cameraOptions, animationOptions);
 }
 
-void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom) {
+void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom) {
     mbgl::CameraOptions cameraOptions;
-    if (angle != -1) {
-        cameraOptions.angle = angle;
+    if (bearing != -1) {
+        cameraOptions.bearing = bearing;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
     cameraOptions.padding = insets;
@@ -439,20 +439,20 @@ void NativeMapView::rotateBy(jni::JNIEnv&, jni::jdouble sx, jni::jdouble sy, jni
 }
 
 void NativeMapView::setBearing(jni::JNIEnv&, jni::jdouble degrees, jni::jlong duration) {
-    map->easeTo(mbgl::CameraOptions().withAngle(degrees), mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+    map->easeTo(mbgl::CameraOptions().withBearing(degrees), mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 void NativeMapView::setBearingXY(jni::JNIEnv&, jni::jdouble degrees, jni::jdouble cx, jni::jdouble cy, jni::jlong duration) {
     mbgl::ScreenCoordinate anchor(cx, cy);
-    map->easeTo(mbgl::CameraOptions().withAngle(degrees).withAnchor(anchor), mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+    map->easeTo(mbgl::CameraOptions().withBearing(degrees).withAnchor(anchor), mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jni::jdouble NativeMapView::getBearing(jni::JNIEnv&) {
-    return *map->getCameraOptions().angle;
+    return *map->getCameraOptions().bearing;
 }
 
 void NativeMapView::resetNorth(jni::JNIEnv&) {
-    map->easeTo(mbgl::CameraOptions().withAngle(0.0), mbgl::AnimationOptions {{mbgl::Milliseconds(500)}});
+    map->easeTo(mbgl::CameraOptions().withBearing(0.0), mbgl::AnimationOptions {{mbgl::Milliseconds(500)}});
 }
 
 void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni::Object<LatLng>>& coordinates, const jni::Object<RectF>& padding, jdouble direction, jni::jlong duration) {
@@ -469,7 +469,7 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
     mbgl::EdgeInsets mbglInsets = { RectF::getTop(env, padding), RectF::getLeft(env, padding), RectF::getBottom(env, padding), RectF::getRight(env, padding) };
     mbgl::CameraOptions cameraOptions = map->cameraForLatLngs(latLngs, mbglInsets);
     if (direction >= 0) {
-        cameraOptions.angle = direction;
+        cameraOptions.bearing = direction;
     }
 
     mbgl::AnimationOptions animationOptions;

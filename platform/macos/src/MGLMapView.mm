@@ -1124,7 +1124,7 @@ public:
 }
 
 - (CLLocationDirection)direction {
-    return *_mbglMap->getCameraOptions().angle;
+    return *_mbglMap->getCameraOptions().bearing;
 }
 
 - (void)setDirection:(CLLocationDirection)direction {
@@ -1136,14 +1136,14 @@ public:
     MGLLogDebug(@"Setting direction: %f animated: %@", direction, MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"direction"];
     _mbglMap->easeTo(mbgl::CameraOptions()
-                         .withAngle(direction)
+                         .withBearing(direction)
                          .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets)),
                      MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
 }
 
 - (void)offsetDirectionBy:(CLLocationDegrees)delta animated:(BOOL)animated {
-    [self setDirection:*_mbglMap->getCameraOptions().angle + delta animated:animated];
+    [self setDirection:*_mbglMap->getCameraOptions().bearing + delta animated:animated];
 }
 
 + (NSSet<NSString *> *)keyPathsForValuesAffectingCamera {
@@ -1262,7 +1262,7 @@ public:
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
     if (camera.heading >= 0) {
-        options.angle = camera.heading;
+        options.bearing = camera.heading;
     }
     if (camera.pitch >= 0) {
         options.pitch = camera.pitch;
@@ -1361,7 +1361,7 @@ public:
     mbgl::CameraOptions mapCamera = _mbglMap->getCameraOptions();
     CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : _mbglMap->getLatLng());
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
-    CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(*cameraOptions.angle, 0., 360.) : self.direction;
+    CLLocationDirection direction = cameraOptions.bearing ? mbgl::util::wrap(*cameraOptions.bearing, 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : *mapCamera.pitch;
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch,
                                                           centerCoordinate.latitude,
@@ -1487,7 +1487,7 @@ public:
             if (self.rotateEnabled) {
                 CLLocationDirection newDirection = _directionAtBeginningOfGesture - delta.x / 10;
                 [self willChangeValueForKey:@"direction"];
-                _mbglMap->jumpTo(mbgl::CameraOptions().withAngle(newDirection).withAnchor(center));
+                _mbglMap->jumpTo(mbgl::CameraOptions().withBearing(newDirection).withAnchor(center));
                 didChangeCamera = YES;
                 [self didChangeValueForKey:@"direction"];
             }
@@ -1626,7 +1626,7 @@ public:
         NSPoint rotationPoint = [gestureRecognizer locationInView:self];
         mbgl::ScreenCoordinate anchor(rotationPoint.x, self.bounds.size.height - rotationPoint.y);
         _mbglMap->jumpTo(mbgl::CameraOptions()
-                             .withAngle(_directionAtBeginningOfGesture + gestureRecognizer.rotationInDegrees)
+                             .withBearing(_directionAtBeginningOfGesture + gestureRecognizer.rotationInDegrees)
                              .withAnchor(anchor));
         
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]

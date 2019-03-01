@@ -443,7 +443,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
     mbgl::CameraOptions camera;
     camera.center = mbgl::LatLng { options.latitude, options.longitude };
     camera.zoom = options.zoom;
-    camera.angle = options.bearing;
+    camera.bearing = options.bearing;
     camera.pitch = options.pitch;
 
     if (map->getAxonometric() != options.axonometric) {
@@ -976,7 +976,7 @@ void NodeMap::SetBearing(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->jumpTo(mbgl::CameraOptions().withAngle(info[0]->NumberValue()));
+        nodeMap->map->jumpTo(mbgl::CameraOptions().withBearing(info[0]->NumberValue()));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }

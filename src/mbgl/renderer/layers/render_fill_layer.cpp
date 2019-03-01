@@ -233,7 +233,7 @@ bool RenderFillLayer::queryIntersectsFeature(
             queryGeometry,
             evaluated.get<style::FillTranslate>(),
             evaluated.get<style::FillTranslateAnchor>(),
-            transformState.getAngle(),
+            transformState.getBearing(),
             pixelsToTileUnits);
 
     return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries());

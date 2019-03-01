@@ -14,7 +14,7 @@ jni::Local<jni::Object<CameraPosition>> CameraPosition::New(jni::JNIEnv &env, mb
 
     // convert bearing, measured in radians counterclockwise from true north.
     // Wrapped to [−π rad, π rad). Android binding from 0 to 360 degrees
-    double bearing_degrees = options.angle.value_or(0);
+    double bearing_degrees = options.bearing.value_or(0);
     while (bearing_degrees > 360) {
         bearing_degrees -= 360;
     }

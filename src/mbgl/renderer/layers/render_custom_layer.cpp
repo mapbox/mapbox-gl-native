@@ -74,7 +74,7 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
     parameters.latitude = state.getLatLng().latitude();
     parameters.longitude = state.getLatLng().longitude();
     parameters.zoom = state.getZoom();
-    parameters.bearing = -state.getAngle() * util::RAD2DEG;
+    parameters.bearing = -state.getBearing() * util::RAD2DEG;
     parameters.pitch = state.getPitch();
     parameters.fieldOfView = state.getFieldOfView();
     mat4 projMatrix;

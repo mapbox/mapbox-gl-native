@@ -62,13 +62,10 @@ public:
     /** Returns the zoom level. */
     double getZoom() const;
 
-    // Angle
+    // Bearing
 
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
-    /** Returns the angle of rotation.
-        @return The angle of rotation, measured in radians counterclockwise from
-            true north. */
-    double getAngle() const;
+    double getBearing() const;
 
     // Pitch
 

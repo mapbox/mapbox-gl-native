@@ -61,19 +61,19 @@ TEST(Transform, InvalidBearing) {
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(0, transform.getZoom());
 
-    transform.jumpTo(CameraOptions().withZoom(1.0).withAngle(2.0));
+    transform.jumpTo(CameraOptions().withZoom(1.0).withBearing(2.0));
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
-    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getAngle(), 1e-15);
+    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getBearing(), 1e-15);
 
     const double invalid = NAN;
 
-    transform.jumpTo(CameraOptions().withAngle(invalid));
+    transform.jumpTo(CameraOptions().withBearing(invalid));
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
-    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getAngle(), 1e-15);
+    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getBearing(), 1e-15);
 }
 
 TEST(Transform, IntegerZoom) {
@@ -196,7 +196,7 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
-    ASSERT_DOUBLE_EQ(0, transform.getAngle());
+    ASSERT_DOUBLE_EQ(0, transform.getBearing());
 
     const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
     ASSERT_NE(latLng.latitude(), anchorLatLng.latitude());
@@ -247,18 +247,18 @@ TEST(Transform, Anchor) {
     ASSERT_NE(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_NE(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(10.0).withAngle(-45.0));
-    ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
+    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(10.0).withBearing(-45.0));
+    ASSERT_NEAR(M_PI_4, transform.getBearing(), 0.000001);
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.jumpTo(CameraOptions().withAngle(0.0));
-    ASSERT_DOUBLE_EQ(0, transform.getAngle());
+    transform.jumpTo(CameraOptions().withBearing(0.0));
+    ASSERT_DOUBLE_EQ(0, transform.getBearing());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.jumpTo(CameraOptions().withAngle(45.0).withAnchor(anchorPoint));
-    ASSERT_NEAR(-45.0 * util::DEG2RAD, transform.getAngle(), 0.000001);
+    transform.jumpTo(CameraOptions().withBearing(45.0).withAnchor(anchorPoint));
+    ASSERT_NEAR(-45.0 * util::DEG2RAD, transform.getBearing(), 0.000001);
     ASSERT_NEAR(anchorLatLng.latitude(), transform.getLatLng().latitude(), 1);
     ASSERT_NEAR(anchorLatLng.longitude(), transform.getLatLng().longitude(), 1);
 

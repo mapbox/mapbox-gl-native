@@ -22,7 +22,7 @@ static void TileCoverPitchedViewport(benchmark::State& state) {
     Transform transform;
     transform.resize({ 512, 512 });
     // slightly offset center so that tile order is better defined
-    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.1, -0.1 }).withZoom(8.0).withAngle(5.0).withPitch(40.0));
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.1, -0.1 }).withZoom(8.0).withBearing(5.0).withPitch(40.0));
 
     std::size_t length = 0;
     while (state.KeepRunning()) {

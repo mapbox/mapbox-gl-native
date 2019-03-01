@@ -21,7 +21,7 @@ std::array<float, 3> lightPosition(const EvaluatedLight& light, const TransformS
     mat3 lightMat;
     matrix::identity(lightMat);
     if (light.get<LightAnchor>() == LightAnchorType::Viewport) {
-        matrix::rotate(lightMat, lightMat, -state.getAngle());
+        matrix::rotate(lightMat, lightMat, -state.getBearing());
     }
     matrix::transformMat3f(lightPos, lightPos, lightMat);
     return lightPos;

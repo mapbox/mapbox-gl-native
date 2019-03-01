@@ -181,7 +181,7 @@ LatLng Map::getLatLng(const EdgeInsets& padding) const {
 
 void Map::resetPosition(const EdgeInsets& padding) {
     impl->cameraMutated = true;
-    impl->transform.jumpTo(CameraOptions().withCenter(LatLng()).withPadding(padding).withZoom(0.0).withAngle(0.0).withPitch(0.0));
+    impl->transform.jumpTo(CameraOptions().withCenter(LatLng()).withPadding(padding).withZoom(0.0).withBearing(0.0).withPitch(0.0));
     impl->onUpdate();
 }
 
@@ -260,11 +260,11 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     Transform transform(impl->transform.getState());
 
     if (bearing || pitch) {
-        transform.jumpTo(CameraOptions().withAngle(bearing).withPitch(pitch));
+        transform.jumpTo(CameraOptions().withBearing(bearing).withPitch(pitch));
     }
 
     return mbgl::cameraForLatLngs(latLngs, transform, padding)
-        .withAngle(-transform.getAngle() * util::RAD2DEG)
+        .withBearing(-transform.getBearing() * util::RAD2DEG)
         .withPitch(transform.getPitch() * util::RAD2DEG);
 }
 
