@@ -26,7 +26,7 @@ echo $file_name
 #
 # upload to AWS
 # 
-if [ -z `which aws` ]; then
-    brew install awscli
-fi
-aws s3 cp $file_name.json s3://mapbox-loading-dock/raw/mobile.coverage/
+# if [ -z `which aws` ]; then
+#     brew install awscli
+# fi
+aws s3 cp $file_name.json https://s3.amazonaws.com/mapbox-loading-dock/raw/mobile.coverage/
