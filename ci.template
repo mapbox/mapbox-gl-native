@@ -180,7 +180,7 @@
                         }
                     },
                     {
-                      "PolicyName": "mobile.coverage",
+                      "PolicyName": "publish-code-coverage",
                       "PolicyDocument": {
                         "Statement": [
                           {

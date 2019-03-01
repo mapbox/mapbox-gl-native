@@ -32,4 +32,4 @@ rm -f output.json
 if [ -z `which aws` ]; then
     brew install awscli
 fi
-# aws s3 cp coverage.json s3://mapbox-loading-dock/raw/mobile.coverage/ --acl public-read
+aws s3 cp coverage.json s3://mapbox-loading-dock/raw/mobile.coverage/ --acl public-read
