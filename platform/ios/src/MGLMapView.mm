@@ -1162,10 +1162,14 @@ public:
 
 #pragma mark - Life Cycle -
 
-- (void)updateFromDisplayLink
+- (void)updateFromDisplayLink:(CADisplayLink *)displayLink
 {
     MGLAssertIsMainThread();
 
+    if (displayLink && displayLink != _displayLink) {
+        return;
+    }
+    
     if (_needsDisplayRefresh)
     {
         _needsDisplayRefresh = NO;
@@ -1231,11 +1235,11 @@ public:
             self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
         }
 
-        _displayLink = [self.window.screen displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
+        _displayLink = [self.window.screen displayLinkWithTarget:self selector:@selector(updateFromDisplayLink:)];
         [self updateDisplayLinkPreferredFramesPerSecond];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
         _needsDisplayRefresh = YES;
-        [self updateFromDisplayLink];
+        [self updateFromDisplayLink:_displayLink];
     }
     else if ( ! isVisible && _displayLink)
     {

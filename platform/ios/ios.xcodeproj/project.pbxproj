@@ -484,6 +484,8 @@
 		CA65C4F821E9BB080068B0D4 /* MGLCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = CA65C4F721E9BB080068B0D4 /* MGLCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA65C4F921E9BB080068B0D4 /* MGLCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = CA65C4F721E9BB080068B0D4 /* MGLCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */; };
+		CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848451CBAFB9800AB86E3 /* MGLCompactCalloutView.m */; };
+		CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */; };
 		CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */; };
 		CA8FBC0921A47BB100D1203C /* MGLRendererConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
@@ -3050,10 +3052,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */,
+				CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */,
 				CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */,
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
 				CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */,
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
+				CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */,
 				CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */,
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
 				077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */,
