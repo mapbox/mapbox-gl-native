@@ -98,7 +98,7 @@ public:
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
-        optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
+        optional<gl::IndexBuffer> indexBuffer;
     } text;
 
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
@@ -115,7 +115,7 @@ public:
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
-        optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
+        optional<gl::IndexBuffer> indexBuffer;
     } icon;
 
     struct CollisionBuffer {
@@ -129,12 +129,12 @@ public:
 
     struct CollisionBoxBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Lines> lines;
-        optional<gl::IndexBuffer<gfx::Lines>> indexBuffer;
+        optional<gl::IndexBuffer> indexBuffer;
     } collisionBox;
 
     struct CollisionCircleBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Triangles> triangles;
-        optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
+        optional<gl::IndexBuffer> indexBuffer;
     } collisionCircle;
 
     uint32_t bucketInstanceId = 0;

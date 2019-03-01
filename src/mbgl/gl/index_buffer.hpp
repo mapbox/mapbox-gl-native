@@ -5,7 +5,6 @@
 namespace mbgl {
 namespace gl {
 
-template <class DrawMode>
 class IndexBuffer {
 public:
     std::size_t indexCount;

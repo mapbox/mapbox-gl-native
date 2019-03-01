@@ -44,7 +44,7 @@ public:
     SegmentVector<FillExtrusionAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer> indexBuffer;
     
     std::unordered_map<std::string, FillExtrusionProgram::Binders> paintPropertyBinders;
 };

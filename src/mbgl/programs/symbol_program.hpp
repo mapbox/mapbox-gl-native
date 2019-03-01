@@ -310,7 +310,7 @@ public:
               gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
-              const gl::IndexBuffer<DrawMode>& indexBuffer,
+              const gl::IndexBuffer& indexBuffer,
               const SegmentVector<Attributes>& segments,
               const typename AllUniforms::Values& allUniformValues,
               const typename Attributes::Bindings& allAttributeBindings,

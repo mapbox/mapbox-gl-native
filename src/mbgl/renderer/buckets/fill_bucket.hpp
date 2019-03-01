@@ -47,8 +47,8 @@ public:
     SegmentVector<FillAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gfx::Lines>> lineIndexBuffer;
-    optional<gl::IndexBuffer<gfx::Triangles>> triangleIndexBuffer;
+    optional<gl::IndexBuffer> lineIndexBuffer;
+    optional<gl::IndexBuffer> triangleIndexBuffer;
 
     std::map<std::string, FillProgram::Binders> paintPropertyBinders;
 };

@@ -122,7 +122,7 @@ public:
               const UniformValues& uniformValues,
               VertexArray& vertexArray,
               const AttributeBindings& attributeBindings,
-              const IndexBuffer<DrawMode>& indexBuffer,
+              const IndexBuffer& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");

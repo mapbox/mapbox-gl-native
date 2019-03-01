@@ -80,15 +80,15 @@ public:
     }
 
     template <class DrawMode>
-    IndexBuffer<DrawMode> createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
-        return IndexBuffer<DrawMode> {
+    IndexBuffer createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+        return IndexBuffer {
             v.indexSize(),
             createIndexBuffer(v.data(), v.byteSize(), usage)
         };
     }
     
     template <class DrawMode>
-    void updateIndexBuffer(IndexBuffer<DrawMode>& buffer, gfx::IndexVector<DrawMode>&& v) {
+    void updateIndexBuffer(IndexBuffer& buffer, gfx::IndexVector<DrawMode>&& v) {
         assert(v.indexSize() == buffer.indexCount);
         updateIndexBuffer(buffer.buffer, v.data(), v.byteSize());
     }

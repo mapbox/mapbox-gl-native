@@ -35,7 +35,7 @@ public:
 
     SegmentVector<DebugAttributes> segments;
     optional<gl::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gfx::Lines>> indexBuffer;
+    optional<gl::IndexBuffer> indexBuffer;
 };
 
 } // namespace mbgl
