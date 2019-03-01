@@ -2,7 +2,6 @@
 
 set -e
 set -o pipefail
-set -u
 
 # Get code coverage, then convert it to JSON.
 cov_result=build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
@@ -29,5 +28,7 @@ rm -f output.json
 #
 # upload to AWS
 # 
-
+if [ -z `which aws` ]; then
+    brew install awscli
+fi
 aws s3 cp coverage.json s3://mapbox-loading-dock/raw/mobile.coverage/ --acl public-read
