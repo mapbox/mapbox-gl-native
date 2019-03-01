@@ -416,6 +416,7 @@ class LocationComponentTest : EspressoTest() {
 
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
+                .locationEngine(null)
                 .locationComponentOptions(
                         LocationComponentOptions.builder(context)
                                 .staleStateTimeout(200)
