@@ -17,7 +17,7 @@ cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 # Create a formatted JSON file with the current coverage. 
 #
 fileName="ios-coverage-$(TZ=UTC date +"%m-%d-%Y-%H%M")"
-cat <<EOF > $fileName.JSON
+cat <<EOF > $fileName.json
 { "current-coverage" : $cov }
 EOF
 echo $cov
@@ -32,4 +32,4 @@ rm -f output.json
 if [ -z `which aws` ]; then
     brew install awscli
 fi
-aws s3 cp coverage.json s3://mapbox-loading-dock/raw/mobile.coverage/ --acl public-read
+aws s3 cp $fileName.json s3://mapbox-loading-dock/raw/mobile.coverage/ --acl public-read
