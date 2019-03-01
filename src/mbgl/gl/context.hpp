@@ -11,6 +11,8 @@
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
+#include <mbgl/gfx/vertex_vector.hpp>
+#include <mbgl/gfx/index_vector.hpp>
 #include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gfx/stencil_mode.hpp>
@@ -64,7 +66,7 @@ public:
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex>
-    VertexBuffer<Vertex> createVertexBuffer(VertexVector<Vertex>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+    VertexBuffer<Vertex> createVertexBuffer(gfx::VertexVector<Vertex>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return VertexBuffer<Vertex> {
             v.vertexSize(),
             createVertexBuffer(v.data(), v.byteSize(), usage)
@@ -72,13 +74,13 @@ public:
     }
 
     template <class Vertex>
-    void updateVertexBuffer(VertexBuffer<Vertex>& buffer, VertexVector<Vertex>&& v) {
+    void updateVertexBuffer(VertexBuffer<Vertex>& buffer, gfx::VertexVector<Vertex>&& v) {
         assert(v.vertexSize() == buffer.vertexCount);
         updateVertexBuffer(buffer.buffer, v.data(), v.byteSize());
     }
 
     template <class DrawMode>
-    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+    IndexBuffer<DrawMode> createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return IndexBuffer<DrawMode> {
             v.indexSize(),
             createIndexBuffer(v.data(), v.byteSize(), usage)
@@ -86,7 +88,7 @@ public:
     }
     
     template <class DrawMode>
-    void updateIndexBuffer(IndexBuffer<DrawMode>& buffer, IndexVector<DrawMode>&& v) {
+    void updateIndexBuffer(IndexBuffer<DrawMode>& buffer, gfx::IndexVector<DrawMode>&& v) {
         assert(v.indexSize() == buffer.indexCount);
         updateIndexBuffer(buffer.buffer, v.data(), v.byteSize());
     }

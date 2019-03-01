@@ -29,8 +29,8 @@ public:
     float getQueryRadius(const RenderLayer&) const override;
     bool supportsLayer(const style::Layer::Impl&) const override;
 
-    gl::VertexVector<HeatmapLayoutVertex> vertices;
-    gl::IndexVector<gfx::Triangles> triangles;
+    gfx::VertexVector<HeatmapLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<HeatmapAttributes> segments;
 
     optional<gl::VertexBuffer<HeatmapLayoutVertex>> vertexBuffer;

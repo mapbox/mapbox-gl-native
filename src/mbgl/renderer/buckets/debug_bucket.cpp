@@ -23,8 +23,8 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       expires(std::move(expires_)),
       debugMode(debugMode_) {
 
-    gl::VertexVector<FillLayoutVertex> vertices;
-    gl::IndexVector<gfx::Lines> indices;
+    gfx::VertexVector<FillLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Lines> indices;
 
     auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
         for (uint8_t c : text) {

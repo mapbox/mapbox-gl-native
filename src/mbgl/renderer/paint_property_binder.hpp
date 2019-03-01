@@ -221,7 +221,7 @@ public:
 private:
     style::PropertyExpression<T> expression;
     T defaultValue;
-    gl::VertexVector<BaseVertex> vertexVector;
+    gfx::VertexVector<BaseVertex> vertexVector;
     optional<gl::VertexBuffer<BaseVertex>> vertexBuffer;
 };
 
@@ -284,7 +284,7 @@ private:
     style::PropertyExpression<T> expression;
     T defaultValue;
     Range<float> zoomRange;
-    gl::VertexVector<Vertex> vertexVector;
+    gfx::VertexVector<Vertex> vertexVector;
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
 };
 
@@ -375,9 +375,9 @@ private:
     style::PropertyExpression<T> expression;
     T defaultValue;
     Range<float> zoomRange;
-    gl::VertexVector<Vertex> patternToVertexVector;
-    gl::VertexVector<Vertex2> zoomInVertexVector;
-    gl::VertexVector<Vertex2> zoomOutVertexVector;
+    gfx::VertexVector<Vertex> patternToVertexVector;
+    gfx::VertexVector<Vertex2> zoomInVertexVector;
+    gfx::VertexVector<Vertex2> zoomOutVertexVector;
     optional<gl::VertexBuffer<Vertex>> patternToVertexBuffer;
     optional<gl::VertexBuffer<Vertex2>> zoomInVertexBuffer;
     optional<gl::VertexBuffer<Vertex2>> zoomOutVertexBuffer;

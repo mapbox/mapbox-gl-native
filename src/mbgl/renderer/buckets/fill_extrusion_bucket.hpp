@@ -39,8 +39,8 @@ public:
 
     float getQueryRadius(const RenderLayer&) const override;
 
-    gl::VertexVector<FillExtrusionLayoutVertex> vertices;
-    gl::IndexVector<gfx::Triangles> triangles;
+    gfx::VertexVector<FillExtrusionLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<FillExtrusionAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillExtrusionLayoutVertex>> vertexBuffer;
