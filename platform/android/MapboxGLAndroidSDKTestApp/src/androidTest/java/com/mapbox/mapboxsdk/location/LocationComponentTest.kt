@@ -230,7 +230,8 @@ class LocationComponentTest : EspressoTest() {
 
         locationComponentActivationOptions = LocationComponentActivationOptions
                   .builder(context, style)
-                  .locationComponentOptions(
+                .locationEngine(null)
+                .locationComponentOptions(
                           LocationComponentOptions.builder(context)
                                   .staleStateTimeout(200)
                                   .enableStaleState(false)
@@ -264,6 +265,7 @@ class LocationComponentTest : EspressoTest() {
 
           locationComponentActivationOptions = LocationComponentActivationOptions
                   .builder(context, style)
+                  .locationEngine(null)
                   .locationComponentOptions(
                           LocationComponentOptions.builder(context)
                                   .foregroundName("custom-foreground-bitmap")
@@ -311,6 +313,7 @@ class LocationComponentTest : EspressoTest() {
 
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
+                .locationEngine(null)
                 .locationComponentOptions(
                         LocationComponentOptions.builder(context)
                                 .foregroundName("custom-foreground-bitmap")
@@ -347,6 +350,7 @@ class LocationComponentTest : EspressoTest() {
 
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
+                .locationEngine(null)
                 .locationComponentOptions(
                         LocationComponentOptions.builder(context)
                                 .foregroundName("custom-foreground-bitmap")
@@ -382,6 +386,7 @@ class LocationComponentTest : EspressoTest() {
 
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
+                .locationEngine(null)
                 .locationComponentOptions(
                         LocationComponentOptions.builder(context)
                                 .gpsName("custom-gps-bitmap")
@@ -485,6 +490,7 @@ class LocationComponentTest : EspressoTest() {
 
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
+                .locationEngine(null)
                 .locationComponentOptions(
                         LocationComponentOptions.builder(context)
                                 .accuracyColor(color)
