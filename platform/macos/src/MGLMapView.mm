@@ -996,7 +996,7 @@ public:
 
 - (CLLocationCoordinate2D)centerCoordinate {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
-    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng(padding));
+    return MGLLocationCoordinate2DFromLatLng(*_mbglMap->getCameraOptions(padding).center);
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate {
@@ -1007,9 +1007,10 @@ public:
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
     MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", MGLStringFromCLLocationCoordinate2D(centerCoordinate), MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"centerCoordinate"];
-    _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
-                        MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
-                        MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
+    _mbglMap->easeTo(mbgl::CameraOptions()
+                         .withCenter(MGLLatLngFromLocationCoordinate2D(centerCoordinate))
+                         .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets)),
+                     MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
 }
 
@@ -1359,7 +1360,7 @@ public:
 
 - (MGLMapCamera *)cameraForCameraOptions:(const mbgl::CameraOptions &)cameraOptions {
     mbgl::CameraOptions mapCamera = _mbglMap->getCameraOptions();
-    CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : _mbglMap->getLatLng());
+    CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : *mapCamera.center);
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
     CLLocationDirection direction = cameraOptions.bearing ? mbgl::util::wrap(*cameraOptions.bearing, 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : *mapCamera.pitch;

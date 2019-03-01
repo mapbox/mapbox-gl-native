@@ -1697,8 +1697,10 @@ public:
             if (self.userTrackingMode == MGLUserTrackingModeNone && pinch.numberOfTouches == _previousPinchNumberOfTouches)
             {
                 CLLocationCoordinate2D centerCoordinate = _previousPinchCenterCoordinate;
-                self.mbglMap.setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
-                                    mbgl::EdgeInsets { centerPoint.y, centerPoint.x, self.size.height - centerPoint.y, self.size.width - centerPoint.x });
+                mbgl::EdgeInsets padding { centerPoint.y, centerPoint.x, self.size.height - centerPoint.y, self.size.width - centerPoint.x };
+                self.mbglMap.jumpTo(mbgl::CameraOptions()
+                                        .withCenter(MGLLatLngFromLocationCoordinate2D(centerCoordinate))
+                                        .withPadding(padding));
             }
         }
         [self cameraIsChanging];
@@ -3177,7 +3179,7 @@ public:
 - (CLLocationCoordinate2D)centerCoordinate
 {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    return MGLLocationCoordinate2DFromLatLng(self.mbglMap.getLatLng(padding));
+    return MGLLocationCoordinate2DFromLatLng(*self.mbglMap.getCameraOptions(padding).center);
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
@@ -3795,7 +3797,7 @@ public:
     }
 
     mbgl::CameraOptions mapCamera = self.mbglMap.getCameraOptions();
-    CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : self.mbglMap.getLatLng());
+    CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : *mapCamera.center);
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
     CLLocationDirection direction = cameraOptions.bearing ? mbgl::util::wrap(*cameraOptions.bearing, 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : *mapCamera.pitch;

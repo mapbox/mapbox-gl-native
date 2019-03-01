@@ -366,11 +366,12 @@ void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latit
 }
 
 jni::Local<jni::Object<LatLng>> NativeMapView::getLatLng(JNIEnv& env) {
-    return LatLng::New(env, map->getLatLng(insets));
+    return LatLng::New(env, *map->getCameraOptions(insets).center);
 }
 
 void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration) {
-    map->setLatLng(mbgl::LatLng(latitude, longitude), insets, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+    map->easeTo(mbgl::CameraOptions().withCenter(mbgl::LatLng(latitude, longitude)).withPadding(insets),
+                mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jni::Local<jni::Object<CameraPosition>> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& jBounds, double top, double left, double bottom, double right, double bearing, double tilt) {
@@ -391,7 +392,7 @@ void NativeMapView::setReachability(jni::JNIEnv&, jni::jboolean reachable) {
 }
 
 void NativeMapView::resetPosition(jni::JNIEnv&) {
-    map->resetPosition();
+    map->jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng {}).withZoom(0.0).withBearing(0.0).withPitch(0.0));
 }
 
 jni::jdouble NativeMapView::getPitch(jni::JNIEnv&) {

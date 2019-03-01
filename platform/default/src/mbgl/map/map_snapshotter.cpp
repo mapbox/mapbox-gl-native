@@ -82,7 +82,7 @@ void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback)
         // and can be used to translate for geographic to screen
         // coordinates
         assert (frontend.getTransformState());
-        PointForFn pointForFn { [=, center=map.getLatLng(), transformState = *frontend.getTransformState()] (const LatLng& latLng) {
+        PointForFn pointForFn { [=, center = *map.getCameraOptions().center, transformState = *frontend.getTransformState()] (const LatLng& latLng) {
             LatLng unwrappedLatLng = latLng.wrapped();
             unwrappedLatLng.unwrapForShortestPath(center);
             Transform transform { transformState };
