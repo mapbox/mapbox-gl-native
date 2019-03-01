@@ -46,8 +46,8 @@ public:
     }
 
     // Raster-DEM Tile Sources use the default buffers from Painter
-    gl::VertexVector<HillshadeLayoutVertex> vertices;
-    gl::IndexVector<gfx::Triangles> indices;
+    gfx::VertexVector<HillshadeLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Triangles> indices;
     SegmentVector<HillshadeAttributes> segments;
 
     optional<gl::VertexBuffer<HillshadeLayoutVertex>> vertexBuffer;

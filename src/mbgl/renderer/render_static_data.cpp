@@ -3,8 +3,8 @@
 
 namespace mbgl {
 
-static gl::VertexVector<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertices() {
-    gl::VertexVector<gfx::Vertex<PositionOnlyLayoutAttributes>> result;
+static gfx::VertexVector<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertices() {
+    gfx::VertexVector<gfx::Vertex<PositionOnlyLayoutAttributes>> result;
     result.emplace_back(gfx::Vertex<PositionOnlyLayoutAttributes>({{{ 0,            0 }}}));
     result.emplace_back(gfx::Vertex<PositionOnlyLayoutAttributes>({{{ util::EXTENT, 0 }}}));
     result.emplace_back(gfx::Vertex<PositionOnlyLayoutAttributes>({{{ 0, util::EXTENT }}}));
@@ -12,15 +12,15 @@ static gl::VertexVector<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertices(
     return result;
 }
 
-static gl::IndexVector<gfx::Triangles> quadTriangleIndices() {
-    gl::IndexVector<gfx::Triangles> result;
+static gfx::IndexVector<gfx::Triangles> quadTriangleIndices() {
+    gfx::IndexVector<gfx::Triangles> result;
     result.emplace_back(0, 1, 2);
     result.emplace_back(1, 2, 3);
     return result;
 }
 
-static gl::IndexVector<gfx::LineStrip> tileLineStripIndices() {
-    gl::IndexVector<gfx::LineStrip> result;
+static gfx::IndexVector<gfx::LineStrip> tileLineStripIndices() {
+    gfx::IndexVector<gfx::LineStrip> result;
     result.emplace_back(0);
     result.emplace_back(1);
     result.emplace_back(3);
@@ -29,8 +29,8 @@ static gl::IndexVector<gfx::LineStrip> tileLineStripIndices() {
     return result;
 }
 
-static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
-    gl::VertexVector<RasterLayoutVertex> result;
+static gfx::VertexVector<RasterLayoutVertex> rasterVertices() {
+    gfx::VertexVector<RasterLayoutVertex> result;
     result.emplace_back(RasterProgram::layoutVertex({ 0, 0 }, { 0, 0 }));
     result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, 0 }, { util::EXTENT, 0 }));
     result.emplace_back(RasterProgram::layoutVertex({ 0, util::EXTENT }, { 0, util::EXTENT }));
@@ -38,8 +38,8 @@ static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     return result;
 }
 
-static gl::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices() {
-    gl::VertexVector<ExtrusionTextureLayoutVertex> result;
+static gfx::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices() {
+    gfx::VertexVector<ExtrusionTextureLayoutVertex> result;
     result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 0 }));
     result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 0 }));
     result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 1 }));

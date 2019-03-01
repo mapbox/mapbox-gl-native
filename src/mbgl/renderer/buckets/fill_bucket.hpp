@@ -40,9 +40,9 @@ public:
     float getQueryRadius(const RenderLayer&) const override;
     bool supportsLayer(const style::Layer::Impl&) const override;
 
-    gl::VertexVector<FillLayoutVertex> vertices;
-    gl::IndexVector<gfx::Lines> lines;
-    gl::IndexVector<gfx::Triangles> triangles;
+    gfx::VertexVector<FillLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Lines> lines;
+    gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<FillAttributes> lineSegments;
     SegmentVector<FillAttributes> triangleSegments;
 

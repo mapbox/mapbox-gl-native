@@ -30,8 +30,8 @@ public:
     float getQueryRadius(const RenderLayer&) const override;
     bool supportsLayer(const style::Layer::Impl&) const override;
 
-    gl::VertexVector<CircleLayoutVertex> vertices;
-    gl::IndexVector<gfx::Triangles> triangles;
+    gfx::VertexVector<CircleLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<CircleAttributes> segments;
 
     optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;

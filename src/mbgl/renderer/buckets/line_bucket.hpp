@@ -43,8 +43,8 @@ public:
 
     PossiblyEvaluatedLayoutProperties layout;
 
-    gl::VertexVector<LineLayoutVertex> vertices;
-    gl::IndexVector<gfx::Triangles> triangles;
+    gfx::VertexVector<LineLayoutVertex> vertices;
+    gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<LineAttributes> segments;
 
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;

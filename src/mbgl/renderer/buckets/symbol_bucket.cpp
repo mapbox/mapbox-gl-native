@@ -152,7 +152,7 @@ void SymbolBucket::updateOpacity() {
     uploaded = false;
 }
 
-void addPlacedSymbol(gl::IndexVector<gfx::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
+void addPlacedSymbol(gfx::IndexVector<gfx::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
     auto endIndex = placedSymbol.vertexStartIndex + placedSymbol.glyphOffsets.size() * 4;
     for (auto vertexIndex = placedSymbol.vertexStartIndex; vertexIndex < endIndex; vertexIndex += 4) {
         triangles.emplace_back(vertexIndex + 0, vertexIndex + 1, vertexIndex + 2);
