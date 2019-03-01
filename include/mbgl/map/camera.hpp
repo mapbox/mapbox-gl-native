@@ -19,7 +19,7 @@ struct CameraOptions {
     CameraOptions& withPadding(const EdgeInsets& p) { padding = p; return *this; }
     CameraOptions& withAnchor(const optional<ScreenCoordinate>& o) { anchor = o; return *this; }
     CameraOptions& withZoom(const optional<double>& o) { zoom = o; return *this; }
-    CameraOptions& withAngle(const optional<double>& o) { angle = o; return *this; }
+    CameraOptions& withBearing(const optional<double>& o) { bearing = o; return *this; }
     CameraOptions& withPitch(const optional<double>& o) { pitch = o; return *this; }
 
     /** Coordinate at the center of the map. */
@@ -38,7 +38,7 @@ struct CameraOptions {
     optional<double> zoom;
 
     /** Bearing, measured in degrees from true north. Wrapped to [0, 360). */
-    optional<double> angle;
+    optional<double> bearing;
 
     /** Pitch toward the horizon measured in degrees , with 0 deg resulting in a
         two-dimensional map. */
@@ -50,7 +50,7 @@ constexpr bool operator==(const CameraOptions& a, const CameraOptions& b) {
         && a.padding == b.padding
         && a.anchor == b.anchor
         && a.zoom == b.zoom
-        && a.angle == b.angle
+        && a.bearing == b.bearing
         && a.pitch == b.pitch;
 }
 

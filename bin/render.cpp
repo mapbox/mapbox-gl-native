@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     map.jumpTo(CameraOptions()
                    .withCenter(LatLng { lat, lon })
                    .withZoom(zoom)
-                   .withAngle(bearing)
+                   .withBearing(bearing)
                    .withPitch(pitch));
 
     if (debug) {

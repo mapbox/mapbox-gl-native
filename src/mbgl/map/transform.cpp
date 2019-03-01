@@ -87,10 +87,10 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const LatLng& unwrappedLatLng = camera.center.value_or(startLatLng);
     const LatLng& latLng = state.bounds ? unwrappedLatLng : unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
-    double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
+    double bearing = camera.bearing ? -*camera.bearing * util::DEG2RAD : getBearing();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
-    if (std::isnan(zoom) || std::isnan(angle) || std::isnan(pitch)) {
+    if (std::isnan(zoom) || std::isnan(bearing) || std::isnan(pitch)) {
         return;
     }
 
@@ -119,17 +119,17 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     pitch = util::clamp(pitch, state.min_pitch, state.max_pitch);
 
     // Minimize rotation by taking the shorter path around the circle.
-    angle = _normalizeAngle(angle, state.angle);
-    state.angle = _normalizeAngle(state.angle, angle);
+    bearing = _normalizeAngle(bearing, state.bearing);
+    state.bearing = _normalizeAngle(state.bearing, bearing);
 
     Duration duration = animation.duration ? *animation.duration : Duration::zero();
 
     const double startScale = state.scale;
-    const double startAngle = state.angle;
+    const double startBearing = state.bearing;
     const double startPitch = state.pitch;
     state.panning = unwrappedLatLng != startLatLng;
     state.scaling = scale != startScale;
-    state.rotating = angle != startAngle;
+    state.rotating = bearing != startBearing;
 
     startTransition(camera, animation, [=](double t) {
         Point<double> framePoint = util::interpolate(startPoint, endPoint, t);
@@ -137,8 +137,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         double frameScale = util::interpolate(startScale, scale, t);
         state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
 
-        if (angle != startAngle) {
-            state.angle = util::wrap(util::interpolate(startAngle, angle, t), -M_PI, M_PI);
+        if (bearing != startBearing) {
+            state.bearing = util::wrap(util::interpolate(startBearing, bearing, t), -M_PI, M_PI);
         }
         if (pitch != startPitch) {
             state.pitch = util::interpolate(startPitch, pitch, t);
@@ -162,10 +162,10 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     const EdgeInsets& padding = camera.padding;
     const LatLng& latLng = camera.center.value_or(getLatLng(padding, LatLng::Unwrapped)).wrapped();
     double zoom = camera.zoom.value_or(getZoom());
-    double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
+    double bearing = camera.bearing ? -*camera.bearing * util::DEG2RAD : getBearing();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
-    if (std::isnan(zoom) || std::isnan(angle) || std::isnan(pitch) || state.size.isEmpty()) {
+    if (std::isnan(zoom) || std::isnan(bearing) || std::isnan(pitch) || state.size.isEmpty()) {
         return;
     }
 
@@ -184,11 +184,11 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     pitch = util::clamp(pitch, state.min_pitch, state.max_pitch);
 
     // Minimize rotation by taking the shorter path around the circle.
-    angle = _normalizeAngle(angle, state.angle);
-    state.angle = _normalizeAngle(state.angle, angle);
+    bearing = _normalizeAngle(bearing, state.bearing);
+    state.bearing = _normalizeAngle(state.bearing, bearing);
 
     const double startZoom = state.scaleZoom(state.scale);
-    const double startAngle = state.angle;
+    const double startBearing = state.bearing;
     const double startPitch = state.pitch;
 
     /// w₀: Initial visible span, measured in pixels at the initial scale.
@@ -277,7 +277,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     const double startScale = state.scale;
     state.panning = true;
     state.scaling = true;
-    state.rotating = angle != startAngle;
+    state.rotating = bearing != startBearing;
 
     startTransition(camera, animation, [=](double k) {
         /// s: The distance traveled along the flight path, measured in
@@ -298,8 +298,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         LatLng frameLatLng = Projection::unproject(framePoint, startScale);
         state.setLatLngZoom(frameLatLng, frameZoom);
 
-        if (angle != startAngle) {
-            state.angle = util::wrap(util::interpolate(startAngle, angle, k), -M_PI, M_PI);
+        if (bearing != startBearing) {
+            state.bearing = util::wrap(util::interpolate(startBearing, bearing, k), -M_PI, M_PI);
         }
         if (pitch != startPitch) {
             state.pitch = util::interpolate(startPitch, pitch, k);
@@ -371,7 +371,7 @@ void Transform::setMaxPitch(double maxPitch) {
     state.setMaxPitch(maxPitch);
 }
 
-#pragma mark - Angle
+#pragma mark - Bearing
 
 void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second,  const AnimationOptions& animation) {
     ScreenCoordinate center = getScreenCoordinate();
@@ -382,17 +382,17 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
     // in the direction of the click.
     if (distance < 200) {
         const double heightOffset = -200;
-        const double rotateAngle = std::atan2(offset.y, offset.x);
-        center.x = first.x + std::cos(rotateAngle) * heightOffset;
-        center.y = first.y + std::sin(rotateAngle) * heightOffset;
+        const double rotateBearing = std::atan2(offset.y, offset.x);
+        center.x = first.x + std::cos(rotateBearing) * heightOffset;
+        center.y = first.y + std::sin(rotateBearing) * heightOffset;
     }
 
-    const double angle = -(state.angle + util::angle_between(first - center, second - center)) * util::RAD2DEG;
-    easeTo(CameraOptions().withAngle(angle), animation);
+    const double bearing = -(state.bearing + util::angle_between(first - center, second - center)) * util::RAD2DEG;
+    easeTo(CameraOptions().withBearing(bearing), animation);
 }
 
-double Transform::getAngle() const {
-    return state.angle;
+double Transform::getBearing() const {
+    return state.bearing;
 }
 
 #pragma mark - Pitch

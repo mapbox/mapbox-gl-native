@@ -418,7 +418,7 @@ TEST(Annotations, VisibleFeatures) {
     }
 
     // Change bearing *after* adding annotations causes them to be reordered.
-    test.map.jumpTo(CameraOptions().withAngle(45.0));
+    test.map.jumpTo(CameraOptions().withBearing(45.0));
     test.frontend.render(test.map);
 
     auto features = test.frontend.getRenderer()->queryRenderedFeatures(box, {});
@@ -428,7 +428,7 @@ TEST(Annotations, VisibleFeatures) {
     features.erase(std::unique(features.begin(), features.end(), sameID), features.end());
     EXPECT_EQ(features.size(), ids.size());
 
-    test.map.jumpTo(CameraOptions().withZoom(4.0).withAngle(0.0));
+    test.map.jumpTo(CameraOptions().withZoom(4.0).withBearing(0.0));
     test.frontend.render(test.map);
     features = test.frontend.getRenderer()->queryRenderedFeatures(box);
     std::sort(features.begin(), features.end(), sortID);

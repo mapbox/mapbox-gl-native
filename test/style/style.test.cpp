@@ -33,7 +33,7 @@ TEST(Style, Properties) {
     style.loadJSON(R"STYLE({"bearing": 24})STYLE");
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(LatLng {}, *style.getDefaultCamera().center);
-    ASSERT_EQ(24, *style.getDefaultCamera().angle);
+    ASSERT_EQ(24, *style.getDefaultCamera().bearing);
 
     style.loadJSON(R"STYLE({"zoom": 13.3})STYLE");
     ASSERT_EQ("", style.getName());
@@ -55,7 +55,7 @@ TEST(Style, Properties) {
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(LatLng {}, *style.getDefaultCamera().center);
     ASSERT_EQ(0, *style.getDefaultCamera().zoom);
-    ASSERT_EQ(0, *style.getDefaultCamera().angle);
+    ASSERT_EQ(0, *style.getDefaultCamera().bearing);
     ASSERT_EQ(0, *style.getDefaultCamera().pitch);
 }
 

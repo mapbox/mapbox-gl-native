@@ -62,7 +62,7 @@ namespace mbgl {
         if (pitchWithMap) {
             matrix::scale(m, m, 1 / pixelsToTileUnits, 1 / pixelsToTileUnits, 1);
             if (!rotateWithMap) {
-                matrix::rotate_z(m, m, state.getAngle());
+                matrix::rotate_z(m, m, state.getBearing());
             }
         } else {
             matrix::scale(m, m, state.getSize().width / 2.0, -(state.getSize().height / 2.0), 1.0);
@@ -82,7 +82,7 @@ namespace mbgl {
             matrix::multiply(m, m, posMatrix);
             matrix::scale(m, m, pixelsToTileUnits, pixelsToTileUnits, 1);
             if (!rotateWithMap) {
-                matrix::rotate_z(m, m, -state.getAngle());
+                matrix::rotate_z(m, m, -state.getBearing());
             }
         } else {
             matrix::scale(m, m, 1, -1, 1);

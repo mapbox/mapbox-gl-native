@@ -209,7 +209,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
 #endif // MBGL_USE_GLES2
         case GLFW_KEY_N:
             if (!mods)
-                view->map->easeTo(mbgl::CameraOptions().withAngle(0.0), mbgl::AnimationOptions {{mbgl::Milliseconds(500)}});
+                view->map->easeTo(mbgl::CameraOptions().withBearing(0.0), mbgl::AnimationOptions {{mbgl::Milliseconds(500)}});
             break;
         case GLFW_KEY_Z:
             view->nextOrientation();
@@ -273,10 +273,10 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 const mbgl::LatLng center { point.y, point.x };
                 auto latLng = *camera.center;
                 double bearing = ruler.bearing({ latLng.longitude(), latLng.latitude() }, point);
-                double easing = bearing - *camera.angle;
+                double easing = bearing - *camera.bearing;
                 easing += easing > 180.0 ? -360.0 : easing < -180 ? 360.0 : 0;
-                bearing = *camera.angle + (easing / 20);
-                routeMap->jumpTo(mbgl::CameraOptions().withCenter(center).withZoom(18.0).withAngle(bearing).withPitch(60.0));
+                bearing = *camera.bearing + (easing / 20);
+                routeMap->jumpTo(mbgl::CameraOptions().withCenter(center).withZoom(18.0).withBearing(bearing).withPitch(60.0));
             };
             view->animateRouteCallback(view->map);
         } break;

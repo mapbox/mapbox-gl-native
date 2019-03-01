@@ -379,8 +379,8 @@ void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
         Point<float> pa(a.get().id.canonical.x, a.get().id.canonical.y);
         Point<float> pb(b.get().id.canonical.x, b.get().id.canonical.y);
 
-        auto par = util::rotate(pa, state.getAngle());
-        auto pbr = util::rotate(pb, state.getAngle());
+        auto par = util::rotate(pa, state.getBearing());
+        auto pbr = util::rotate(pb, state.getBearing());
 
         return std::tie(b.get().id.canonical.z, par.y, par.x) < std::tie(a.get().id.canonical.z, pbr.y, pbr.x);
     });

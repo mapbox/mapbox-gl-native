@@ -23,8 +23,8 @@ mat4 RenderTile::translateVtxMatrix(const mat4& tileMatrix,
     mat4 vtxMatrix;
 
     const float angle = inViewportPixelUnits ?
-        (anchor == TranslateAnchorType::Map ? state.getAngle() : 0) :
-        (anchor == TranslateAnchorType::Viewport ? -state.getAngle() : 0);
+        (anchor == TranslateAnchorType::Map ? state.getBearing() : 0) :
+        (anchor == TranslateAnchorType::Viewport ? -state.getBearing() : 0);
 
     Point<float> translate = util::rotate(Point<float>{ translation[0], translation[1] }, angle);
 
