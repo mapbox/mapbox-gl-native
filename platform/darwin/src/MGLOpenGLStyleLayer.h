@@ -27,11 +27,14 @@ MGL_EXPORT
 
 @property (nonatomic, weak, readonly) MGLStyle *style;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #if TARGET_OS_IPHONE
 @property (nonatomic, readonly) EAGLContext *context;
 #else
 @property (nonatomic, readonly) CGLContextObj context;
 #endif
+#pragma clang diagnostic pop
 
 - (instancetype)initWithIdentifier:(NSString *)identifier;
 
