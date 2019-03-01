@@ -48,7 +48,7 @@ public:
     SegmentVector<LineAttributes> segments;
 
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer> indexBuffer;
 
     std::map<std::string, LineProgram::Binders> paintPropertyBinders;
 

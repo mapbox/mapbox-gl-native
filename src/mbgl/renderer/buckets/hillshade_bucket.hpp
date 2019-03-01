@@ -51,7 +51,7 @@ public:
     SegmentVector<HillshadeAttributes> segments;
 
     optional<gl::VertexBuffer<HillshadeLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer> indexBuffer;
 private: 
     DEMData demdata;
     bool prepared = false;

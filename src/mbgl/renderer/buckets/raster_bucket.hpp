@@ -37,7 +37,7 @@ public:
     SegmentVector<RasterAttributes> segments;
 
     optional<gl::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer<gfx::Triangles>> indexBuffer;
+    optional<gl::IndexBuffer> indexBuffer;
 };
 
 } // namespace mbgl
