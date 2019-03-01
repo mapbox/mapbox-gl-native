@@ -68,19 +68,14 @@ public:
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&, const AnimationOptions&);
     void flyTo(const CameraOptions&, const AnimationOptions&);
+    void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
+    void scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation = {});
+    void pitchBy(double pitch, const AnimationOptions& animation = {});
+    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
     CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
     CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
     CameraOptions cameraForGeometry(const Geometry<double>&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
-
-    // Position
-    void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
-
-    // Zoom
-    void scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation = {});
-
-    // Pitch
-    void pitchBy(double pitch, const AnimationOptions& animation = {});
 
     // Bounds
     void setLatLngBounds(optional<LatLngBounds>);
@@ -93,9 +88,6 @@ public:
     double getMinPitch() const;
     void setMaxPitch(double);
     double getMaxPitch() const;
-
-    // Rotation
-    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
 
     // North Orientation
     void setNorthOrientation(NorthOrientation);

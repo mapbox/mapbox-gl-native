@@ -159,19 +159,25 @@ void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) 
     impl->onUpdate();
 }
 
-#pragma mark - Position
-
 void Map::moveBy(const ScreenCoordinate& point, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.moveBy(point, animation);
     impl->onUpdate();
 }
 
-#pragma mark - Zoom
+void Map::pitchBy(double pitch, const AnimationOptions& animation) {
+    easeTo(CameraOptions().withPitch((impl->transform.getPitch() * util::RAD2DEG) - pitch), animation);
+}
 
 void Map::scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     const double zoom = impl->transform.getZoom() + impl->transform.getState().scaleZoom(scale);
     easeTo(CameraOptions().withZoom(zoom).withAnchor(anchor), animation);
+}
+
+void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& animation) {
+    impl->cameraMutated = true;
+    impl->transform.rotateBy(first, second, animation);
+    impl->onUpdate();
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
@@ -270,12 +276,6 @@ LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
     );
 }
 
-#pragma mark - Pitch
-
-void Map::pitchBy(double pitch, const AnimationOptions& animation) {
-    easeTo(CameraOptions().withPitch((impl->transform.getPitch() * util::RAD2DEG) - pitch), animation);
-}
-
 #pragma mark - Bounds
 
 optional<LatLngBounds> Map::getLatLngBounds() const {
@@ -341,14 +341,6 @@ void Map::setSize(const Size size) {
 
 Size Map::getSize() const {
     return impl->transform.getState().getSize();
-}
-
-#pragma mark - Rotation
-
-void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.rotateBy(first, second, animation);
-    impl->onUpdate();
 }
 
 #pragma mark - North Orientation
