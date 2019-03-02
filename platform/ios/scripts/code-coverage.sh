@@ -26,4 +26,8 @@ echo $file_name
 #
 # upload to AWS
 # 
+# for ios-debug
+if [ -z `which aws` ]; then
+    brew install awscli
+fi
 aws s3 cp $file_name.json s3://mapbox-loading-dock/raw/mobile.coverage/

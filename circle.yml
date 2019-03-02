@@ -875,6 +875,10 @@ jobs:
       - install-macos-dependencies
       - install-dependencies
       - build-ios-test
+      - run:
+          name: Get iOS code coverage
+          command: |
+              platform/ios/scripts/code-coverage.sh
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
@@ -972,10 +976,6 @@ jobs:
             if [[ $CIRCLE_BRANCH == master ]]; then
               platform/ios/scripts/deploy-snapshot.sh
             fi
-      - run:
-          name: Get iOS code coverage
-          command: |
-              platform/ios/scripts/code-coverage.sh
       - run:
           name: Record size
           command: platform/ios/scripts/metrics.sh
