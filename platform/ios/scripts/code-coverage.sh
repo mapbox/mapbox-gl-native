@@ -25,12 +25,10 @@ cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 #
 # Create a formatted JSON file with the current coverage. 
 #
-file_name="ios-coverage-$(TZ=UTC date +"%Y-%m-%d")"
+file_name="ios-coverage-$(TZ=UTC date +"%Y-%m-%d-$CIRCLE_SHA1")"
 cat <<EOF > $file_name.json
     { "current-coverage" : $cov }
 EOF
-echo $cov
-echo $file_name
 
 gzip -f $file_name.json
 #
