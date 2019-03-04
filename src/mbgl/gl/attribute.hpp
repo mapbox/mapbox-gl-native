@@ -18,29 +18,17 @@
 namespace mbgl {
 namespace gl {
 
-template <class> struct DataTypeOf;
-template <> struct DataTypeOf< int8_t>  : std::integral_constant<DataType, DataType::Byte> {};
-template <> struct DataTypeOf<uint8_t>  : std::integral_constant<DataType, DataType::UnsignedByte> {};
-template <> struct DataTypeOf< int16_t> : std::integral_constant<DataType, DataType::Short> {};
-template <> struct DataTypeOf<uint16_t> : std::integral_constant<DataType, DataType::UnsignedShort> {};
-template <> struct DataTypeOf< int32_t> : std::integral_constant<DataType, DataType::Integer> {};
-template <> struct DataTypeOf<uint32_t> : std::integral_constant<DataType, DataType::UnsignedInteger> {};
-template <> struct DataTypeOf<float>    : std::integral_constant<DataType, DataType::Float> {};
-
 class AttributeBinding {
 public:
-    DataType attributeType;
-    uint8_t attributeSize;
-    uint32_t attributeOffset;
-
+    gfx::AttributeDescriptor attribute;
+    uint8_t vertexStride;
     BufferID vertexBuffer;
-    uint32_t vertexSize;
     uint32_t vertexOffset;
 
     friend bool operator==(const AttributeBinding& lhs,
                            const AttributeBinding& rhs) {
-        return std::tie(lhs.attributeType, lhs.attributeSize, lhs.attributeOffset, lhs.vertexBuffer, lhs.vertexSize, lhs.vertexOffset)
-            == std::tie(rhs.attributeType, rhs.attributeSize, rhs.attributeOffset, rhs.vertexBuffer, rhs.vertexSize, rhs.vertexOffset);
+        return std::tie(lhs.attribute, lhs.vertexStride, lhs.vertexBuffer, lhs.vertexOffset)
+            == std::tie(rhs.attribute, rhs.vertexStride, rhs.vertexBuffer, rhs.vertexOffset);
     }
 };
 
@@ -51,21 +39,13 @@ using AttributeBindingArray = std::vector<optional<AttributeBinding>>;
         override the number of components available in the buffer for each vertex.  Thus,
         a buffer with only one float for each vertex can be bound to a `vec2` attribute
     */
-template <class AttributeType, class Vertex>
-AttributeBinding attributeBinding(const VertexBuffer<Vertex>& buffer,
-                                std::size_t attributeIndex,
-                                std::size_t attributeSize = AttributeType::Dimensions) {
-    static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
-    assert(attributeSize >= 1);
-    assert(attributeSize <= 4);
-    assert(Vertex::attributeOffsets[attributeIndex] <= std::numeric_limits<uint32_t>::max());
-    static_assert(sizeof(Vertex) <= std::numeric_limits<uint32_t>::max(), "vertex too large");
-    return AttributeBinding {
-        DataTypeOf<typename AttributeType::ValueType>::value,
-        static_cast<uint8_t>(attributeSize),
-        static_cast<uint32_t>(Vertex::attributeOffsets[attributeIndex]),
+template <std::size_t I, typename Vertex>
+AttributeBinding attributeBinding(const VertexBuffer<Vertex>& buffer) {
+    static_assert(I < gfx::VertexDescriptorOf<Vertex>::data.count, "vertex attribute index out of range");
+    return {
+        gfx::VertexDescriptorOf<Vertex>::data.attributes[I],
+        gfx::VertexDescriptorOf<Vertex>::data.stride,
         buffer.buffer,
-        static_cast<uint32_t>(sizeof(Vertex)),
         0,
     };
 }
@@ -127,7 +107,7 @@ public:
     }
 
     static Bindings bindings(const VertexBuffer<gfx::Vertex<Types>>& buffer) {
-        return Bindings { attributeBinding<typename As::Type>(buffer, TypeIndex<As, As...>::value)... };
+        return Bindings { attributeBinding<TypeIndex<As, As...>::value>(buffer)... };
     }
 
     static Bindings offsetBindings(const Bindings& bindings, std::size_t vertexOffset) {

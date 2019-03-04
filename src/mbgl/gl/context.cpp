@@ -17,14 +17,6 @@ using namespace platform;
 static_assert(underlying_type(ShaderType::Vertex) == GL_VERTEX_SHADER, "OpenGL type mismatch");
 static_assert(underlying_type(ShaderType::Fragment) == GL_FRAGMENT_SHADER, "OpenGL type mismatch");
 
-static_assert(underlying_type(DataType::Byte) == GL_BYTE, "OpenGL type mismatch");
-static_assert(underlying_type(DataType::UnsignedByte) == GL_UNSIGNED_BYTE, "OpenGL type mismatch");
-static_assert(underlying_type(DataType::Short) == GL_SHORT, "OpenGL type mismatch");
-static_assert(underlying_type(DataType::UnsignedShort) == GL_UNSIGNED_SHORT, "OpenGL type mismatch");
-static_assert(underlying_type(DataType::Integer) == GL_INT, "OpenGL type mismatch");
-static_assert(underlying_type(DataType::UnsignedInteger) == GL_UNSIGNED_INT, "OpenGL type mismatch");
-static_assert(underlying_type(DataType::Float) == GL_FLOAT, "OpenGL type mismatch");
-
 #if not MBGL_USE_GLES2
 static_assert(underlying_type(RenderbufferType::RGBA) == GL_RGBA8, "OpenGL type mismatch");
 #else

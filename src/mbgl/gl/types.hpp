@@ -32,16 +32,6 @@ enum class ShaderType : uint32_t {
     Fragment = 0x8B30
 };
 
-enum class DataType : uint16_t {
-    Byte = 0x1400,
-    UnsignedByte = 0x1401,
-    Short = 0x1402,
-    UnsignedShort = 0x1403,
-    Integer = 0x1404,
-    UnsignedInteger = 0x1405,
-    Float = 0x1406
-};
-
 enum class RenderbufferType : uint32_t {
     RGBA = 0x8058,
     DepthStencil = 0x88F0,

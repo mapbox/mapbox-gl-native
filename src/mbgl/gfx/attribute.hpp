@@ -1,9 +1,11 @@
 #pragma once
 
+#include <mbgl/gfx/types.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 
 #include <array>
+#include <type_traits>
 #include <cstddef>
 
 #define MBGL_DEFINE_ATTRIBUTE(type_, n_, name_)                                                    \
@@ -14,15 +16,67 @@
         }                                                                                          \
     }
 
+#define MBGL_VERTEX_ALIGN __attribute__((aligned(4)))
+
 namespace mbgl {
 namespace gfx {
+
+namespace {
+
+template <typename, std::size_t> struct AttributeDataTypeOf;
+template <> struct AttributeDataTypeOf<int8_t, 1> : std::integral_constant<AttributeDataType, AttributeDataType::Byte> {};
+template <> struct AttributeDataTypeOf<int8_t, 2> : std::integral_constant<AttributeDataType, AttributeDataType::Byte2> {};
+template <> struct AttributeDataTypeOf<int8_t, 3> : std::integral_constant<AttributeDataType, AttributeDataType::Byte3> {};
+template <> struct AttributeDataTypeOf<int8_t, 4> : std::integral_constant<AttributeDataType, AttributeDataType::Byte4> {};
+template <> struct AttributeDataTypeOf<uint8_t, 1> : std::integral_constant<AttributeDataType, AttributeDataType::UByte> {};
+template <> struct AttributeDataTypeOf<uint8_t, 2> : std::integral_constant<AttributeDataType, AttributeDataType::UByte2> {};
+template <> struct AttributeDataTypeOf<uint8_t, 3> : std::integral_constant<AttributeDataType, AttributeDataType::UByte3> {};
+template <> struct AttributeDataTypeOf<uint8_t, 4> : std::integral_constant<AttributeDataType, AttributeDataType::UByte4> {};
+template <> struct AttributeDataTypeOf<int16_t, 1> : std::integral_constant<AttributeDataType, AttributeDataType::Short> {};
+template <> struct AttributeDataTypeOf<int16_t, 2> : std::integral_constant<AttributeDataType, AttributeDataType::Short2> {};
+template <> struct AttributeDataTypeOf<int16_t, 3> : std::integral_constant<AttributeDataType, AttributeDataType::Short3> {};
+template <> struct AttributeDataTypeOf<int16_t, 4> : std::integral_constant<AttributeDataType, AttributeDataType::Short4> {};
+template <> struct AttributeDataTypeOf<uint16_t, 1> : std::integral_constant<AttributeDataType, AttributeDataType::UShort> {};
+template <> struct AttributeDataTypeOf<uint16_t, 2> : std::integral_constant<AttributeDataType, AttributeDataType::UShort2> {};
+template <> struct AttributeDataTypeOf<uint16_t, 3> : std::integral_constant<AttributeDataType, AttributeDataType::UShort3> {};
+template <> struct AttributeDataTypeOf<uint16_t, 4> : std::integral_constant<AttributeDataType, AttributeDataType::UShort4> {};
+template <> struct AttributeDataTypeOf<int32_t, 1> : std::integral_constant<AttributeDataType, AttributeDataType::Int> {};
+template <> struct AttributeDataTypeOf<int32_t, 2> : std::integral_constant<AttributeDataType, AttributeDataType::Int2> {};
+template <> struct AttributeDataTypeOf<int32_t, 3> : std::integral_constant<AttributeDataType, AttributeDataType::Int3> {};
+template <> struct AttributeDataTypeOf<int32_t, 4> : std::integral_constant<AttributeDataType, AttributeDataType::Int4> {};
+template <> struct AttributeDataTypeOf<uint32_t, 1> : std::integral_constant<AttributeDataType, AttributeDataType::UInt> {};
+template <> struct AttributeDataTypeOf<uint32_t, 2> : std::integral_constant<AttributeDataType, AttributeDataType::UInt2> {};
+template <> struct AttributeDataTypeOf<uint32_t, 3> : std::integral_constant<AttributeDataType, AttributeDataType::UInt3> {};
+template <> struct AttributeDataTypeOf<uint32_t, 4> : std::integral_constant<AttributeDataType, AttributeDataType::UInt4> {};
+template <> struct AttributeDataTypeOf<float, 1> : std::integral_constant<AttributeDataType, AttributeDataType::Float> {};
+template <> struct AttributeDataTypeOf<float, 2> : std::integral_constant<AttributeDataType, AttributeDataType::Float2> {};
+template <> struct AttributeDataTypeOf<float, 3> : std::integral_constant<AttributeDataType, AttributeDataType::Float3> {};
+template <> struct AttributeDataTypeOf<float, 4> : std::integral_constant<AttributeDataType, AttributeDataType::Float4> {};
+
+} // namespace
 
 template <typename T, std::size_t N>
 class AttributeType {
 public:
-    using ValueType = T;
+    using ElementType = T;
+    static constexpr AttributeDataType DataType = AttributeDataTypeOf<T, N>::value;
     static constexpr size_t Dimensions = N;
     using Value = std::array<T, N>;
+};
+
+struct AttributeDescriptor {
+    AttributeDataType dataType;
+    uint8_t offset;
+};
+
+inline bool operator==(const AttributeDescriptor& lhs, const AttributeDescriptor& rhs) {
+    return lhs.dataType == rhs.dataType && lhs.offset == rhs.offset;
+}
+
+struct VertexDescriptor {
+    uint8_t stride;
+    uint8_t count;
+    AttributeDescriptor attributes[5];
 };
 
 // Attribute binding requires member offsets. The only standard way to
@@ -35,114 +89,138 @@ public:
 namespace detail {
 
 template <class...>
-class Vertex;
+struct Vertex;
 
-template <>
-class Vertex<> {
-public:
-    using VertexType = Vertex<>;
+template <class A1>
+struct Vertex<A1> {
+    using Type = Vertex<A1>;
+    typename A1::Value a1;
+} MBGL_VERTEX_ALIGN;
+
+template <class A1, class A2>
+struct Vertex<A1, A2> {
+    using Type = Vertex<A1, A2>;
+    typename A1::Value a1;
+    typename A2::Value a2;
+} MBGL_VERTEX_ALIGN;
+
+template <class A1, class A2, class A3>
+struct Vertex<A1, A2, A3> {
+    using Type = Vertex<A1, A2, A3>;
+    typename A1::Value a1;
+    typename A2::Value a2;
+    typename A3::Value a3;
+} MBGL_VERTEX_ALIGN;
+
+template <class A1, class A2, class A3, class A4>
+struct Vertex<A1, A2, A3, A4> {
+    using Type = Vertex<A1, A2, A3, A4>;
+    typename A1::Value a1;
+    typename A2::Value a2;
+    typename A3::Value a3;
+    typename A4::Value a4;
+} MBGL_VERTEX_ALIGN;
+
+template <class A1, class A2, class A3, class A4, class A5>
+struct Vertex<A1, A2, A3, A4, A5> {
+    using Type = Vertex<A1, A2, A3, A4, A5>;
+    typename A1::Value a1;
+    typename A2::Value a2;
+    typename A3::Value a3;
+    typename A4::Value a4;
+    typename A5::Value a5;
+} MBGL_VERTEX_ALIGN;
+
+template <class>
+struct Descriptor;
+
+template <class A1>
+struct Descriptor<Vertex<A1>> {
+    using Type = Vertex<A1>;
+    static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
+    static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
+    static constexpr const VertexDescriptor data = { sizeof(Type), 1, {
+        { A1::DataType, offsetof(Type, a1) },
+    }};
 };
 
 template <class A1>
-class Vertex<A1> {
-public:
-    A1 a1;
+constexpr const VertexDescriptor Descriptor<Vertex<A1>>::data;
 
-    using VertexType = Vertex<A1>;
-    static const std::size_t attributeOffsets[1];
+template <class A1, class A2>
+struct Descriptor<Vertex<A1, A2>> {
+    using Type = Vertex<A1, A2>;
+    static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
+    static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
+    static constexpr const VertexDescriptor data = { sizeof(Type), 2, {
+       { A1::DataType, offsetof(Type, a1) },
+       { A2::DataType, offsetof(Type, a2) },
+    }};
 };
 
 template <class A1, class A2>
-class Vertex<A1, A2> {
-public:
-    A1 a1;
-    A2 a2;
+constexpr const VertexDescriptor Descriptor<Vertex<A1, A2>>::data;
 
-    using VertexType = Vertex<A1, A2>;
-    static const std::size_t attributeOffsets[2];
+template <class A1, class A2, class A3>
+struct Descriptor<Vertex<A1, A2, A3>> {
+    using Type = Vertex<A1, A2, A3>;
+    static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
+    static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
+    static constexpr const VertexDescriptor data = { sizeof(Type), 3, {
+        { A1::DataType, offsetof(Type, a1) },
+        { A2::DataType, offsetof(Type, a2) },
+        { A3::DataType, offsetof(Type, a3) },
+    }};
 };
 
 template <class A1, class A2, class A3>
-class Vertex<A1, A2, A3> {
-public:
-    A1 a1;
-    A2 a2;
-    A3 a3;
+constexpr const VertexDescriptor Descriptor<Vertex<A1, A2, A3>>::data;
 
-    using VertexType = Vertex<A1, A2, A3>;
-    static const std::size_t attributeOffsets[3];
+template <class A1, class A2, class A3, class A4>
+struct Descriptor<Vertex<A1, A2, A3, A4>> {
+    using Type = Vertex<A1, A2, A3, A4>;
+    static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
+    static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
+    static constexpr const VertexDescriptor data = { sizeof(Type), 4, {
+        { A1::DataType, offsetof(Type, a1) },
+        { A2::DataType, offsetof(Type, a2) },
+        { A3::DataType, offsetof(Type, a3) },
+        { A4::DataType, offsetof(Type, a4) },
+    }};
 };
 
 template <class A1, class A2, class A3, class A4>
-class Vertex<A1, A2, A3, A4> {
-public:
-    A1 a1;
-    A2 a2;
-    A3 a3;
-    A4 a4;
+constexpr const VertexDescriptor Descriptor<Vertex<A1, A2, A3, A4>>::data;
 
-    using VertexType = Vertex<A1, A2, A3, A4>;
-    static const std::size_t attributeOffsets[4];
+template <class A1, class A2, class A3, class A4, class A5>
+struct Descriptor<Vertex<A1, A2, A3, A4, A5>> {
+    using Type = Vertex<A1, A2, A3, A4, A5>;
+    static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
+    static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
+    static constexpr const VertexDescriptor data = { sizeof(Type), 5, {
+        { A1::DataType, offsetof(Type, a1) },
+        { A2::DataType, offsetof(Type, a2) },
+        { A3::DataType, offsetof(Type, a3) },
+        { A4::DataType, offsetof(Type, a4) },
+        { A5::DataType, offsetof(Type, a5) },
+    }};
 };
 
 template <class A1, class A2, class A3, class A4, class A5>
-class Vertex<A1, A2, A3, A4, A5> {
-public:
-    A1 a1;
-    A2 a2;
-    A3 a3;
-    A4 a4;
-    A5 a5;
-
-    using VertexType = Vertex<A1, A2, A3, A4, A5>;
-    static const std::size_t attributeOffsets[5];
-};
-
-template <class A1>
-const std::size_t Vertex<A1>::attributeOffsets[1] = {
-    offsetof(VertexType, a1)
-};
-
-template <class A1, class A2>
-const std::size_t Vertex<A1, A2>::attributeOffsets[2] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2)
-};
-
-template <class A1, class A2, class A3>
-const std::size_t Vertex<A1, A2, A3>::attributeOffsets[3] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2),
-    offsetof(VertexType, a3)
-};
-
-template <class A1, class A2, class A3, class A4>
-const std::size_t Vertex<A1, A2, A3, A4>::attributeOffsets[4] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2),
-    offsetof(VertexType, a3),
-    offsetof(VertexType, a4)
-};
-
-template <class A1, class A2, class A3, class A4, class A5>
-const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
-    offsetof(VertexType, a1),
-    offsetof(VertexType, a2),
-    offsetof(VertexType, a3),
-    offsetof(VertexType, a4),
-    offsetof(VertexType, a5)
-};
+constexpr const VertexDescriptor Descriptor<Vertex<A1, A2, A3, A4, A5>>::data;
 
 template <class... As>
-class Vertex<TypeList<As...>> {
-public:
-    using VertexType = Vertex<typename As::Type::Value...>;
+struct Vertex<TypeList<As...>> {
+    using Type = Vertex<typename As::Type...>;
 };
 
 } // namespace detail
 
 template <class A>
-using Vertex = typename detail::Vertex<A>::VertexType;
+using Vertex = typename detail::Vertex<A>::Type;
+
+template <class V>
+using VertexDescriptorOf = detail::Descriptor<V>;
 
 } // namespace gfx
 } // namespace mbgl
