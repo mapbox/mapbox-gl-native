@@ -8,9 +8,8 @@
 
 namespace mbgl {
 
-TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewportMode_)
-    : constrainMode(constrainMode_)
-    , viewportMode(viewportMode_)
+TransformState::TransformState(ViewportMode viewportMode_)
+    : viewportMode(viewportMode_)
 {
 }
 
@@ -118,12 +117,6 @@ double TransformState::getNorthOrientationAngle() const {
     return angleOrientation;
 }
 
-#pragma mark - Constrain mode
-
-ConstrainMode TransformState::getConstrainMode() const {
-    return constrainMode;
-}
-
 #pragma mark - ViewportMode
 
 ViewportMode TransformState::getViewportMode() const {
@@ -204,9 +197,8 @@ void TransformState::setMinZoom(const double minZoom) {
 
 double TransformState::getMinZoom() const {
     double test_scale = min_scale;
-    double unused_x = x;
     double unused_y = y;
-    constrain(test_scale, unused_x, unused_y);
+    constrain(test_scale, unused_y);
 
     return scaleZoom(test_scale);
 }
@@ -370,11 +362,7 @@ bool TransformState::rotatedNorth() const {
     return (orientation == NO::Leftwards || orientation == NO::Rightwards);
 }
 
-void TransformState::constrain(double& scale_, double& x_, double& y_) const {
-    if (constrainMode == ConstrainMode::None) {
-        return;
-    }
-
+void TransformState::constrain(double& scale_, double& y_) const {
     // Constrain scale to avoid zooming out far enough to show off-world areas on the Y axis.
     const double ratioY = (rotatedNorth() ? size.width : size.height) / util::tileSize;
     scale_ = util::max(scale_, ratioY);
@@ -382,12 +370,6 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     // Constrain min/max pan to avoid showing off-world areas on the Y axis.
     double max_y = (scale_ * util::tileSize - (rotatedNorth() ? size.width : size.height)) / 2;
     y_ = std::max(-max_y, std::min(y_, max_y));
-
-    if (constrainMode == ConstrainMode::WidthAndHeight) {
-        // Constrain min/max pan to avoid showing off-world areas on the X axis.
-        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? size.height : size.width)) / 2;
-        x_ = std::max(-max_x, std::min(x_, max_x));
-    }
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {
@@ -421,7 +403,7 @@ void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
 void TransformState::setScalePoint(const double newScale, const ScreenCoordinate &point) {
     double constrainedScale = newScale;
     ScreenCoordinate constrainedPoint = point;
-    constrain(constrainedScale, constrainedPoint.x, constrainedPoint.y);
+    constrain(constrainedScale, constrainedPoint.y);
 
     scale = constrainedScale;
     x = constrainedPoint.x;

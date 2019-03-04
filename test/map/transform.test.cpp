@@ -159,32 +159,6 @@ TEST(Transform, UnwrappedLatLng) {
     ASSERT_NEAR(wrappedLeftwards.longitude(), -77.0, 1e-8);
 }
 
-TEST(Transform, ConstrainHeightOnly) {
-    Transform transform(MapObserver::nullObserver(), ConstrainMode::HeightOnly);
-    transform.resize({ 2, 2 });
-
-    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().southwest()).withZoom(util::MAX_ZOOM));
-    ASSERT_NEAR(-util::LATITUDE_MAX, transform.getLatLng().latitude(), 1e-7);
-    ASSERT_NEAR(-util::LONGITUDE_MAX, transform.getLatLng().longitude(), 1e-7);
-
-    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().northeast()));
-    ASSERT_NEAR(util::LATITUDE_MAX, transform.getLatLng().latitude(), 1e-7);
-    ASSERT_NEAR(-util::LONGITUDE_MAX, transform.getLatLng().longitude(), 1e-7);
-}
-
-TEST(Transform, ConstrainWidthAndHeight) {
-    Transform transform(MapObserver::nullObserver(), ConstrainMode::WidthAndHeight);
-    transform.resize({ 2, 2 });
-
-    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().southwest()).withZoom(util::MAX_ZOOM));
-    ASSERT_NEAR(-util::LATITUDE_MAX, transform.getLatLng().latitude(), 1e-7);
-    ASSERT_NEAR(-util::LONGITUDE_MAX, transform.getLatLng().longitude(), 1e-6);
-
-    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().northeast()));
-    ASSERT_NEAR(util::LATITUDE_MAX, transform.getLatLng().latitude(), 1e-7);
-    ASSERT_NEAR(-util::LONGITUDE_MAX, transform.getLatLng().longitude(), 1e-6);
-}
-
 TEST(Transform, Anchor) {
     Transform transform;
     transform.resize({ 1000, 1000 });

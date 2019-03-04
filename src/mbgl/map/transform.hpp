@@ -19,10 +19,9 @@ namespace mbgl {
 class Transform : private util::noncopyable {
 public:
     Transform(MapObserver& = MapObserver::nullObserver(),
-              ConstrainMode = ConstrainMode::HeightOnly,
               ViewportMode = ViewportMode::Default);
 
-    Transform(const TransformState &state_) : observer(MapObserver::nullObserver()), state(state_) {}
+    Transform(TransformState state_) : observer(MapObserver::nullObserver()), state(std::move(state_)) {}
 
     // Map view
     void resize(Size size);
@@ -75,10 +74,6 @@ public:
     // North Orientation
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
-
-    // Constrain mode
-    void setConstrainMode(ConstrainMode);
-    ConstrainMode getConstrainMode() const;
 
     // Viewport mode
     void setViewportMode(ViewportMode);

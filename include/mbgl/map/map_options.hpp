@@ -36,23 +36,6 @@ public:
     MapMode mapMode() const;
 
     /**
-     * @brief Sets the map constrain mode. This can be used to limit the map
-     * to wrap around the globe horizontally. By default, it is set to
-     * HeightOnly.
-     *
-     * @param mode Map constrain mode.
-     * @return reference to MapOptions for chaining options together.
-     */
-    MapOptions& withConstrainMode(ConstrainMode mode);
-
-    /**
-     * @brief Gets the previously set (or default) constrain mode.
-     *
-     * @return constrain mode.
-     */
-    ConstrainMode constrainMode() const;
-
-    /**
      * @brief Sets the viewport mode. This can be used to flip the vertical
      * orientation of the map as some devices may use inverted orientation.
      *

@@ -34,7 +34,6 @@ public:
          float pixelRatio,
 
          MapMode,
-         ConstrainMode,
          ViewportMode,
          bool crossSourceCollisions);
 

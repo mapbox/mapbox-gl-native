@@ -90,10 +90,6 @@ public:
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
 
-    // Constrain mode
-    void setConstrainMode(ConstrainMode);
-    ConstrainMode getConstrainMode() const;
-
     // Viewport mode
     void setViewportMode(ViewportMode);
     ViewportMode getViewportMode() const;

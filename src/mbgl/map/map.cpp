@@ -39,7 +39,6 @@ Map::Map(RendererFrontend& rendererFrontend,
                                   size,
                                   pixelRatio,
                                   options.mapMode(),
-                                  options.constrainMode(),
                                   options.viewportMode(),
                                   options.crossSourceCollisions())) {}
 
@@ -346,17 +345,6 @@ void Map::setNorthOrientation(NorthOrientation orientation) {
 
 NorthOrientation Map::getNorthOrientation() const {
     return impl->transform.getNorthOrientation();
-}
-
-#pragma mark - Constrain mode
-
-void Map::setConstrainMode(mbgl::ConstrainMode mode) {
-    impl->transform.setConstrainMode(mode);
-    impl->onUpdate();
-}
-
-ConstrainMode Map::getConstrainMode() const {
-    return impl->transform.getConstrainMode();
 }
 
 #pragma mark - Viewport mode

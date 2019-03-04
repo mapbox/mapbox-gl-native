@@ -81,7 +81,6 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
     // Create Map options
     MapOptions options;
     options.withMapMode(MapMode::Continuous)
-           .withConstrainMode(ConstrainMode::HeightOnly)
            .withViewportMode(ViewportMode::Default)
            .withCrossSourceCollisions(_crossSourceCollisions);
 

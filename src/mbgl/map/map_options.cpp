@@ -8,7 +8,6 @@ namespace mbgl {
 class MapOptions::Impl {
 public:
     MapMode mapMode = MapMode::Continuous;
-    ConstrainMode constrainMode = ConstrainMode::HeightOnly;
     ViewportMode viewportMode = ViewportMode::Default;
     std::string cachePath;
     std::string assetRoot;
@@ -26,15 +25,6 @@ MapOptions& MapOptions::withMapMode(MapMode mode) {
 
 MapMode MapOptions::mapMode() const {
     return impl_->mapMode;
-}
-
-MapOptions& MapOptions::withConstrainMode(ConstrainMode mode) {
-    impl_->constrainMode = mode;
-    return *this;
-}
-
-ConstrainMode MapOptions::constrainMode() const {
-    return impl_->constrainMode;
 }
 
 MapOptions& MapOptions::withViewportMode(ViewportMode mode) {

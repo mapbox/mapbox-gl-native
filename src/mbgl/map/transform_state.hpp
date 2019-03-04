@@ -23,7 +23,7 @@ class TransformState {
     friend class RendererState;
 
 public:
-    TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
+    TransformState(ViewportMode = ViewportMode::Default);
 
     // Matrix
     void matrixFor(mat4&, const UnwrappedTileID&) const;
@@ -35,9 +35,6 @@ public:
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
-
-    // Constrain mode
-    ConstrainMode getConstrainMode() const;
 
     // Viewport mode
     ViewportMode getViewportMode() const;
@@ -95,7 +92,7 @@ public:
 
 private:
     bool rotatedNorth() const;
-    void constrain(double& scale, double& x, double& y) const;
+    void constrain(double& scale, double& y) const;
 
     optional<LatLngBounds> bounds;
 
@@ -120,7 +117,6 @@ private:
     void setScalePoint(const double scale, const ScreenCoordinate& point);
 
 private:
-    ConstrainMode constrainMode;
     ViewportMode viewportMode;
 
     // animation state

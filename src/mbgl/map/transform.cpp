@@ -37,9 +37,8 @@ static double _normalizeAngle(double angle, double anchorAngle)
 }
 
 Transform::Transform(MapObserver& observer_,
-                     ConstrainMode constrainMode,
                      ViewportMode viewportMode)
-    : observer(observer_), state(constrainMode, viewportMode) {
+    : observer(observer_), state(viewportMode) {
 }
 
 #pragma mark - Map View
@@ -56,7 +55,7 @@ void Transform::resize(const Size size) {
     observer.onCameraWillChange(MapObserver::CameraChangeMode::Immediate);
 
     state.size = size;
-    state.constrain(state.scale, state.x, state.y);
+    state.constrain(state.scale, state.y);
 
     observer.onCameraDidChange(MapObserver::CameraChangeMode::Immediate);
 }
@@ -405,22 +404,11 @@ double Transform::getPitch() const {
 
 void Transform::setNorthOrientation(NorthOrientation orientation) {
     state.orientation = orientation;
-    state.constrain(state.scale, state.x, state.y);
+    state.constrain(state.scale, state.y);
 }
 
 NorthOrientation Transform::getNorthOrientation() const {
     return state.getNorthOrientation();
-}
-
-#pragma mark - Constrain mode
-
-void Transform::setConstrainMode(mbgl::ConstrainMode mode) {
-    state.constrainMode = mode;
-    state.constrain(state.scale, state.x, state.y);
-}
-
-ConstrainMode Transform::getConstrainMode() const {
-    return state.getConstrainMode();
 }
 
 #pragma mark - Viewport mode

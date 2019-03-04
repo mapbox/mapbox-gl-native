@@ -618,7 +618,6 @@ void NodeMap::cancel() {
     frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, *this);
     mbgl::MapOptions options;
     options.withMapMode(mode)
-           .withConstrainMode(mbgl::ConstrainMode::HeightOnly)
            .withViewportMode(mbgl::ViewportMode::Default)
            .withCrossSourceCollisions(crossSourceCollisions);
     map = std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio,
@@ -1207,7 +1206,6 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
                                       pixelRatio,
                                       *this,
                                       mbgl::MapOptions().withMapMode(mode)
-                                                        .withConstrainMode(mbgl::ConstrainMode::HeightOnly)
                                                         .withViewportMode(mbgl::ViewportMode::Default)
                                                         .withCrossSourceCollisions(crossSourceCollisions))),
       async(new uv_async_t) {

@@ -15,14 +15,6 @@ enum class MapMode : EnumType {
     Tile // a once-off still image of a single tile
 };
 
-// We can choose to constrain the map both horizontally or vertically, or only
-// vertically e.g. while panning.
-enum class ConstrainMode : EnumType {
-    None,
-    HeightOnly,
-    WidthAndHeight,
-};
-
 // Satisfies embedding platforms that requires the viewport coordinate systems
 // to be set according to its standards.
 enum class ViewportMode : EnumType {
