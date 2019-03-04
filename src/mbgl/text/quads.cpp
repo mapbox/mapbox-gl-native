@@ -172,7 +172,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
             br = util::matrixMultiply(matrix, br);
         }
 
-        quads.emplace_back(tl, tr, bl, br, rect, shapedText.writingMode, glyphOffset);
+        quads.emplace_back(tl, tr, bl, br, rect, shapedText.writingMode, glyphOffset, positionedGlyph.sectionIndex);
     }
 
     return quads;

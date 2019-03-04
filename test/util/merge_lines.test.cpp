@@ -25,7 +25,7 @@ public:
         SymbolFeature(std::make_unique<StubGeometryTileFeature>(std::move(id_), type_, std::move(geometry_), std::move(properties_)))
     {
         if (text_) {
-            formattedText = TaggedString(*text_, SectionOptions(1.0, 0));
+            formattedText = TaggedString(*text_, SectionOptions(1.0, {}));
         }
         icon = std::move(icon_);
         index = index_;

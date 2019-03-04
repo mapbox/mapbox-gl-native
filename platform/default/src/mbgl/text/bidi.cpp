@@ -148,7 +148,7 @@ std::vector<StyledText> BiDi::processStyledText(const StyledText& input, std::se
                 // Each time we see a change in style, render a reversed chunk
                 // of everything since the last change
                 std::size_t styleRunStart = logicalEnd;
-                uint8_t currentStyleIndex = styleIndices.at(styleRunStart - 1);
+                std::size_t currentStyleIndex = styleIndices.at(styleRunStart - 1);
                 for (std::size_t i = logicalEnd - 1; i >= logicalStart; i--) {
                     if (currentStyleIndex != styleIndices.at(i) || i == logicalStart) {
                         std::size_t styleRunEnd = i == logicalStart ? i : i + 1;
