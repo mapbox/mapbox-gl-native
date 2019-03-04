@@ -83,7 +83,6 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
     options.withMapMode(MapMode::Continuous)
            .withSize(mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) })
            .withPixelRatio(pixelRatio)
-           .withConstrainMode(ConstrainMode::HeightOnly)
            .withViewportMode(ViewportMode::Default)
            .withCrossSourceCollisions(_crossSourceCollisions);
 

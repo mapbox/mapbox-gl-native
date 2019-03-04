@@ -486,7 +486,6 @@ public:
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
               .withSize(self.size)
               .withPixelRatio(config.scaleFactor)
-              .withConstrainMode(mbgl::ConstrainMode::None)
               .withViewportMode(mbgl::ViewportMode::Default)
               .withCrossSourceCollisions(enableCrossSourceCollisions);
 
@@ -1220,11 +1219,6 @@ public:
     BOOL isVisible = self.superview && self.window;
     if (isVisible && ! _displayLink)
     {
-        if (_mbglMap && self.mbglMap.getMapOptions().constrainMode() == mbgl::ConstrainMode::None)
-        {
-            self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
-        }
-
         _displayLink = [self.window.screen displayLinkWithTarget:self selector:@selector(updateFromDisplayLink:)];
         [self updateDisplayLinkPreferredFramesPerSecond];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];

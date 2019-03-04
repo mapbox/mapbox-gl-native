@@ -294,7 +294,6 @@ public:
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
               .withSize(self.size)
               .withPixelRatio(config.scaleFactor)
-              .withConstrainMode(mbgl::ConstrainMode::None)
               .withViewportMode(mbgl::ViewportMode::Default)
               .withCrossSourceCollisions(enableCrossSourceCollisions);
 
@@ -695,10 +694,6 @@ public:
     NSWindow *window = self.window;
     if (self.dormant && window) {
         self.dormant = NO;
-    }
-
-    if (window && _mbglMap->getMapOptions().constrainMode() == mbgl::ConstrainMode::None) {
-        _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
     }
 
     [window addObserver:self

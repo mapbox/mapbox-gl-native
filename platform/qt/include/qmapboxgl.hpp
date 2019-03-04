@@ -31,12 +31,6 @@ public:
         Static
     };
 
-    enum ConstrainMode {
-        NoConstrain = 0,
-        ConstrainHeightOnly,
-        ConstrainWidthAndHeight
-    };
-
     enum ViewportMode {
         DefaultViewport = 0,
         FlippedYViewport
@@ -47,9 +41,6 @@ public:
 
     MapMode mapMode() const;
     void setMapMode(MapMode);
-
-    ConstrainMode constrainMode() const;
-    void setConstrainMode(ConstrainMode);
 
     ViewportMode viewportMode() const;
     void setViewportMode(ViewportMode);
@@ -78,7 +69,6 @@ public:
 private:
     GLContextMode m_contextMode;
     MapMode m_mapMode;
-    ConstrainMode m_constrainMode;
     ViewportMode m_viewportMode;
 
     unsigned m_cacheMaximumSize;

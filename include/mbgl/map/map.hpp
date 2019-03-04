@@ -87,7 +87,6 @@ public:
 
     // Map Options
     void setNorthOrientation(NorthOrientation);
-    void setConstrainMode(ConstrainMode);
     void setViewportMode(ViewportMode);
     void setSize(Size);
     MapOptions getMapOptions() const;

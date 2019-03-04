@@ -319,11 +319,6 @@ void Map::setNorthOrientation(NorthOrientation orientation) {
     impl->onUpdate();
 }
 
-void Map::setConstrainMode(mbgl::ConstrainMode mode) {
-    impl->transform.setConstrainMode(mode);
-    impl->onUpdate();
-}
-
 void Map::setViewportMode(mbgl::ViewportMode mode) {
     impl->transform.setViewportMode(mode);
     impl->onUpdate();
@@ -332,7 +327,6 @@ void Map::setViewportMode(mbgl::ViewportMode mode) {
 MapOptions Map::getMapOptions() const {
     return std::move(MapOptions()
         .withMapMode(impl->mode)
-        .withConstrainMode(impl->transform.getConstrainMode())
         .withViewportMode(impl->transform.getViewportMode())
         .withCrossSourceCollisions(impl->crossSourceCollisions)
         .withNorthOrientation(impl->transform.getNorthOrientation())
