@@ -125,13 +125,13 @@ TEST(PropertyExpression, Issue8460) {
 TEST(PropertyExpression, TextSection) {
     expression::Value formattedSection1 = 42.0;
     PropertyExpression<double> ts1(textSection());
-    EXPECT_DOUBLE_EQ(42.0, ts1.evaluate(expression::EvaluationContext().withFormattedSection(&formattedSection1)));
+    EXPECT_DOUBLE_EQ(42.0, ts1.evaluate(expression::EvaluationContext().withFormattedSectionID(&formattedSection1)));
 
     expression::Value formattedSection2{"header"s};
     PropertyExpression<std::string> ts2(textSection());
-    EXPECT_EQ("header"s, ts2.evaluate(expression::EvaluationContext().withFormattedSection(&formattedSection2)));
+    EXPECT_EQ("header"s, ts2.evaluate(expression::EvaluationContext().withFormattedSectionID(&formattedSection2)));
 
     // Evaluates to default, T().
     PropertyExpression<Color> ts3(textSection());
-    EXPECT_EQ(Color(), ts3.evaluate(expression::EvaluationContext().withFormattedSection(&formattedSection1)));
+    EXPECT_EQ(Color(), ts3.evaluate(expression::EvaluationContext().withFormattedSectionID(&formattedSection1)));
 }

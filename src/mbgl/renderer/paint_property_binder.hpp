@@ -187,9 +187,9 @@ public:
           defaultValue(std::move(defaultValue_)) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
-    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
+    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSectionID) override {
         using style::expression::EvaluationContext;
-        auto evaluated = expression.evaluate(EvaluationContext(&feature).withFormattedSection(&formattedSection), defaultValue);
+        auto evaluated = expression.evaluate(EvaluationContext(&feature).withFormattedSectionID(&formattedSectionID), defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
         for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
@@ -243,11 +243,11 @@ public:
           zoomRange({zoom, zoom + 1}) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
-    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
+    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSectionID) override {
         using style::expression::EvaluationContext;
         Range<T> range = {
-                expression.evaluate(EvaluationContext(zoomRange.min, &feature).withFormattedSection(&formattedSection), defaultValue),
-                expression.evaluate(EvaluationContext(zoomRange.max, &feature).withFormattedSection(&formattedSection), defaultValue),
+                expression.evaluate(EvaluationContext(zoomRange.min, &feature).withFormattedSectionID(&formattedSectionID), defaultValue),
+                expression.evaluate(EvaluationContext(zoomRange.max, &feature).withFormattedSectionID(&formattedSectionID), defaultValue),
         };
         this->statistics.add(range.min);
         this->statistics.add(range.max);
@@ -483,9 +483,9 @@ public:
     PaintPropertyBinders(PaintPropertyBinders&&) = default;
     PaintPropertyBinders(const PaintPropertyBinders&) = delete;
 
-    void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies, const style::expression::Value& formattedSection = {}) {
+    void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies, const style::expression::Value& formattedSectionID = {}) {
         util::ignore({
-            (binders.template get<Ps>()->populateVertexVector(feature, length, patternPositions, patternDependencies, formattedSection), 0)...
+            (binders.template get<Ps>()->populateVertexVector(feature, length, patternPositions, patternDependencies, formattedSectionID), 0)...
         });
     }
 

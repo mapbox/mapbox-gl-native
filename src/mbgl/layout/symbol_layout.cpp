@@ -33,7 +33,7 @@ expression::Value sectionOptionsToValue(const SectionOptions& options) {
         return (*options.id).match(
             [] (double t) -> expression::Value { return t; },
             [] (const std::string& t) -> expression::Value { return t; },
-            [] (auto&) -> expression::Value { return {}; });
+            [] (const auto&) -> expression::Value { return {}; });
     }
     return {};
 }

@@ -23,7 +23,7 @@ optional<FormattedSectionID> toFormattedSectionID(const Variant& variant) {
     return variant.match(
             [] (double t) -> FormattedSectionID { return t; },
             [] (const std::string& t) -> FormattedSectionID { return t;},
-            [] (auto&) -> optional<FormattedSectionID> { return nullopt; });
+            [] (const auto&) -> optional<FormattedSectionID> { return nullopt; });
 }
 
 struct FormattedSection {

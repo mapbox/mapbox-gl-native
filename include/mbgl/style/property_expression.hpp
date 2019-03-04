@@ -34,7 +34,7 @@ template <class T>
 class PropertyExpression final : public PropertyExpressionBase {
 public:
     // Second parameter to be used only for conversions from legacy functions.
-    PropertyExpression(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_ = {})
+    PropertyExpression(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_ = nullopt)
         : PropertyExpressionBase(std::move(expression_)),
           defaultValue(std::move(defaultValue_)) {
     }

@@ -24,7 +24,7 @@ bool isFeatureConstant(const Expression& expression) {
             name == "text-section"
         ) {
             return false;
-        } else if (0 == name.rfind(filter, 0)) {
+        } else if (0u == name.rfind(filter, 0u)) {
             // Legacy filters begin with "filter-" and are never constant.
             return false;
         }

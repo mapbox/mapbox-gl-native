@@ -9,7 +9,7 @@ namespace mbgl {
 using style::expression::FormattedSectionID;
 
 struct SectionOptions {
-    SectionOptions(double scale_, FontStack fontStack_, const optional<FormattedSectionID>& id_ = {})
+    SectionOptions(double scale_, FontStack fontStack_, const optional<FormattedSectionID>& id_ = nullopt)
         : scale(scale_), fontStackHash(FontStackHasher()(fontStack_)), fontStack(std::move(fontStack_)), id(std::move(id_))
     {}
     

@@ -35,15 +35,16 @@ public:
         zoom(std::move(zoom_)), feature(feature_), colorRampParameter(std::move(colorRampParameter_))
     {}
 
-    EvaluationContext& withFormattedSection(const Value* formattedSection_) noexcept {
-        formattedSection = formattedSection_;
+    EvaluationContext& withFormattedSectionID(const Value* formattedSectionID_) noexcept {
+        formattedSectionID = formattedSectionID_;
         return *this;
     };
 
     optional<float> zoom;
     GeometryTileFeature const * feature = nullptr;
     optional<double> colorRampParameter;
-    const Value* formattedSection = nullptr;
+    // Contains formatted section ID (double | std::string)
+    const Value* formattedSectionID = nullptr;
 };
 
 template <typename T>

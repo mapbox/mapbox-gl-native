@@ -664,10 +664,10 @@ const auto& errorCompoundExpression() {
 
 const auto& textSectionCompoundExpression() {
     static auto signature = detail::makeSignature("text-section", [](const EvaluationContext& params) -> Result<Value> {
-        if (!params.formattedSection) {
+        if (!params.formattedSectionID) {
             return EvaluationError {"Formatted section is unavailable in the current evaluation context."};
         }
-        return *params.formattedSection;
+        return *params.formattedSectionID;
     });
     return signature;
 }
