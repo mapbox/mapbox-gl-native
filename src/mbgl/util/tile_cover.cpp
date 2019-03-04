@@ -4,6 +4,7 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/tile_cover_impl.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/math/floor.hpp>
 #include <mbgl/math/log2.hpp>
 
 #include <functional>
@@ -35,8 +36,8 @@ struct edge {
 
 // scan-line conversion
 static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
-    double y0 = ::fmax(ymin, std::floor(e1.y0));
-    double y1 = ::fmin(ymax, std::ceil(e1.y1));
+    double y0 = util::max(double(ymin), util::floor(e1.y0));
+    double y1 = util::min(double(ymax), std::ceil(e1.y1));
 
     // sort edges by x-coordinate
     if ((e0.x0 == e1.x0 && e0.y0 == e1.y0) ?
@@ -51,9 +52,9 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
     double d0 = e0.dx > 0; // use y + 1 to compute x0
     double d1 = e1.dx < 0; // use y + 1 to compute x1
     for (int32_t y = y0; y < y1; y++) {
-        double x0 = m0 * ::fmax(0, ::fmin(e0.dy, y + d0 - e0.y0)) + e0.x0;
-        double x1 = m1 * ::fmax(0, ::fmin(e1.dy, y + d1 - e1.y0)) + e1.x0;
-        scanLine(std::floor(x1), std::ceil(x0), y);
+        double x0 = m0 * util::max(0.0, util::min(e0.dy, y + d0 - e0.y0)) + e0.x0;
+        double x1 = m1 * util::max(0.0, util::min(e1.dy, y + d1 - e1.y0)) + e1.x0;
+        scanLine(util::floor(x1), std::ceil(x0), y);
     }
 }
 
