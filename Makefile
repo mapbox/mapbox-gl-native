@@ -68,9 +68,13 @@ MACOS_USER_DATA_PATH = $(MACOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 MACOS_COMPDB_PATH = $(MACOS_OUTPUT_PATH)/compdb/$(BUILDTYPE)
 
 MACOS_XCODEBUILD = xcodebuild \
-	  -derivedDataPath $(MACOS_OUTPUT_PATH) \
-	  -configuration $(BUILDTYPE) \
-	  -workspace $(MACOS_WORK_PATH)
+	-derivedDataPath $(MACOS_OUTPUT_PATH) \
+	-configuration $(BUILDTYPE) \
+	-workspace $(MACOS_WORK_PATH)
+
+ifneq ($(CI),)
+	MACOS_XCODEBUILD += -xcconfig platform/darwin/ci.xcconfig
+endif
 
 $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings
 	mkdir -p $(MACOS_OUTPUT_PATH)
@@ -201,11 +205,15 @@ IOS_WORK_PATH = platform/ios/ios.xcworkspace
 IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 IOS_XCODEBUILD_SIM = xcodebuild \
-	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
-	  -derivedDataPath $(IOS_OUTPUT_PATH) \
-	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
-	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -workspace $(IOS_WORK_PATH)
+	ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
+	-derivedDataPath $(IOS_OUTPUT_PATH) \
+	-configuration $(BUILDTYPE) -sdk iphonesimulator \
+	-destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
+	-workspace $(IOS_WORK_PATH)
+
+ifneq ($(CI),)
+	IOS_XCODEBUILD_SIM += -xcconfig platform/darwin/ci.xcconfig
+endif
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
 	mkdir -p $(IOS_OUTPUT_PATH)

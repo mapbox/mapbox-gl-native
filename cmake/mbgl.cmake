@@ -218,6 +218,10 @@ function(initialize_xcode_cxx_build_settings target)
 
     # Make all build configurations debuggable — except Release.
     set_xcode_property(${target} GCC_GENERATE_DEBUGGING_SYMBOLS $<$<NOT:$<CONFIG:Release>>:YES>)
+
+    if (DEFINED ENV{CI})
+        set_xcode_property(${target} COMPILER_INDEX_STORE_ENABLE NO)
+    endif()
 endfunction()
 
 # CMake 3.1 does not have this yet.

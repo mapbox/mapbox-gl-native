@@ -24,12 +24,20 @@ PROJ_VERSION=$(git rev-list --count HEAD)
 SEM_VERSION=$( git describe --tags --match=macos-v*.*.* --abbrev=0 | sed 's/^macos-v//' )
 SHORT_VERSION=${SEM_VERSION%-*}
 
+CI_XCCONFIG=''
+if [[ ! -z "${CI:=}" ]]; then
+    xcconfig='platform/darwin/ci.xcconfig'
+    echo "CI environment, using ${xcconfig}"
+    CI_XCCONFIG="-xcconfig ./${xcconfig}"
+fi
+
 step "Building dynamic framework (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
 xcodebuild \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
     CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
     CURRENT_COMMIT_HASH=${HASH} \
+    ${CI_XCCONFIG} \
     -derivedDataPath ${DERIVED_DATA} \
     -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
     -workspace ./platform/macos/macos.xcworkspace \
@@ -53,6 +61,7 @@ if [[ ${BUILDTYPE} == Release ]]; then
         CURRENT_SHORT_VERSION=${SHORT_VERSION} \
         CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
         CURRENT_COMMIT_HASH=${HASH} \
+        ${CI_XCCONFIG} \
         -derivedDataPath ${DERIVED_DATA} \
         -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
         -workspace ./platform/macos/macos.xcworkspace \
@@ -89,6 +98,7 @@ if [[ ${BUILDTYPE} == Release ]]; then
     
     step "Exporting Mapbox GL.app"
     xcodebuild \
+        ${CI_XCCONFIG} \
         -exportArchive \
         -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
         -exportPath "${APP_OUTPUT}" \
