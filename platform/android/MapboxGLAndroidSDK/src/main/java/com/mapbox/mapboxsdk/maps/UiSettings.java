@@ -939,6 +939,18 @@ public final class UiSettings {
     setQuickZoomGesturesEnabled(enabled);
   }
 
+  /**
+   * <p>
+   * Retrieves the current status of whether all gestures are enabled.
+   * </p>
+   *
+   * @return If true, all gestures are enabled.
+   */
+  public boolean areAllGesturesEnabled() {
+    return rotateGesturesEnabled && tiltGesturesEnabled && zoomGesturesEnabled
+        && scrollGesturesEnabled && doubleTapGesturesEnabled && quickZoomGesturesEnabled;
+  }
+
   private void saveFocalPoint(Bundle outState) {
     outState.putParcelable(MapboxConstants.STATE_USER_FOCAL_POINT, getFocalPoint());
   }
