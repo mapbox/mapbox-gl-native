@@ -398,17 +398,102 @@ BindVertexArray::Type BindVertexArray::Get(const Context& context) {
 
 const optional<AttributeBinding> VertexAttribute::Default {};
 
+namespace {
+
+GLenum vertexType(const gfx::AttributeDataType type) {
+    switch (type) {
+        case gfx::AttributeDataType::Byte:
+        case gfx::AttributeDataType::Byte2:
+        case gfx::AttributeDataType::Byte3:
+        case gfx::AttributeDataType::Byte4:
+            return GL_BYTE;
+        case gfx::AttributeDataType::UByte:
+        case gfx::AttributeDataType::UByte2:
+        case gfx::AttributeDataType::UByte3:
+        case gfx::AttributeDataType::UByte4:
+            return GL_UNSIGNED_BYTE;
+        case gfx::AttributeDataType::Short:
+        case gfx::AttributeDataType::Short2:
+        case gfx::AttributeDataType::Short3:
+        case gfx::AttributeDataType::Short4:
+            return GL_SHORT;
+        case gfx::AttributeDataType::UShort:
+        case gfx::AttributeDataType::UShort2:
+        case gfx::AttributeDataType::UShort3:
+        case gfx::AttributeDataType::UShort4:
+            return GL_UNSIGNED_SHORT;
+        case gfx::AttributeDataType::Int:
+        case gfx::AttributeDataType::Int2:
+        case gfx::AttributeDataType::Int3:
+        case gfx::AttributeDataType::Int4:
+            return GL_INT;
+        case gfx::AttributeDataType::UInt:
+        case gfx::AttributeDataType::UInt2:
+        case gfx::AttributeDataType::UInt3:
+        case gfx::AttributeDataType::UInt4:
+            return GL_UNSIGNED_INT;
+        case gfx::AttributeDataType::Float:
+        case gfx::AttributeDataType::Float2:
+        case gfx::AttributeDataType::Float3:
+        case gfx::AttributeDataType::Float4:
+            return GL_FLOAT;
+        default:
+            return GL_FLOAT;
+    }
+}
+
+GLint components(const gfx::AttributeDataType type) {
+    switch (type) {
+        case gfx::AttributeDataType::Byte:
+        case gfx::AttributeDataType::UByte:
+        case gfx::AttributeDataType::Short:
+        case gfx::AttributeDataType::UShort:
+        case gfx::AttributeDataType::Int:
+        case gfx::AttributeDataType::UInt:
+        case gfx::AttributeDataType::Float:
+            return 1;
+        case gfx::AttributeDataType::Byte2:
+        case gfx::AttributeDataType::UByte2:
+        case gfx::AttributeDataType::Short2:
+        case gfx::AttributeDataType::UShort2:
+        case gfx::AttributeDataType::Int2:
+        case gfx::AttributeDataType::UInt2:
+        case gfx::AttributeDataType::Float2:
+            return 2;
+        case gfx::AttributeDataType::Byte3:
+        case gfx::AttributeDataType::UByte3:
+        case gfx::AttributeDataType::Short3:
+        case gfx::AttributeDataType::UShort3:
+        case gfx::AttributeDataType::Int3:
+        case gfx::AttributeDataType::UInt3:
+        case gfx::AttributeDataType::Float3:
+            return 3;
+        case gfx::AttributeDataType::Byte4:
+        case gfx::AttributeDataType::UByte4:
+        case gfx::AttributeDataType::Short4:
+        case gfx::AttributeDataType::UShort4:
+        case gfx::AttributeDataType::Int4:
+        case gfx::AttributeDataType::UInt4:
+        case gfx::AttributeDataType::Float4:
+            return 4;
+        default:
+            return 0;
+    }
+}
+
+} // namespace
+
 void VertexAttribute::Set(const optional<AttributeBinding>& binding, Context& context, AttributeLocation location) {
     if (binding) {
         context.vertexBuffer = binding->vertexBuffer;
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
         MBGL_CHECK_ERROR(glVertexAttribPointer(
             location,
-            static_cast<GLint>(binding->attributeSize),
-            static_cast<GLenum>(binding->attributeType),
+            components(binding->attribute.dataType),
+            vertexType(binding->attribute.dataType),
             static_cast<GLboolean>(false),
-            static_cast<GLsizei>(binding->vertexSize),
-            reinterpret_cast<GLvoid*>(binding->attributeOffset + (binding->vertexSize * binding->vertexOffset))));
+            static_cast<GLsizei>(binding->vertexStride),
+            reinterpret_cast<GLvoid*>(binding->attribute.offset + (binding->vertexStride * binding->vertexOffset))));
     } else {
         MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
     }
