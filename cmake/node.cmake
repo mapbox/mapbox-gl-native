@@ -41,8 +41,6 @@ target_sources(mbgl-node INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/node_request.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/node_feature.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/node_feature.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/node_thread_pool.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/node_thread_pool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/node_expression.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/node_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/platform/node/src/util/async_queue.hpp
