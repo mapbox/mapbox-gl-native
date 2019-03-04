@@ -121,3 +121,17 @@ TEST(PropertyExpression, Issue8460) {
     EXPECT_NEAR(600.0f, fn2.evaluate(18.0f, oneInteger, -1.0f), 0.00);
     EXPECT_NEAR(600.0f, fn2.evaluate(19.0f, oneInteger, -1.0f), 0.00);
 }
+
+TEST(PropertyExpression, TextSection) {
+    expression::Value formattedSection1 = 42.0;
+    PropertyExpression<double> ts1(textSection());
+    EXPECT_DOUBLE_EQ(42.0, ts1.evaluate(expression::EvaluationContext().withFormattedSection(&formattedSection1)));
+
+    expression::Value formattedSection2{"header"s};
+    PropertyExpression<std::string> ts2(textSection());
+    EXPECT_EQ("header"s, ts2.evaluate(expression::EvaluationContext().withFormattedSection(&formattedSection2)));
+
+    // Evaluates to default, T().
+    PropertyExpression<Color> ts3(textSection());
+    EXPECT_EQ(Color(), ts3.evaluate(expression::EvaluationContext().withFormattedSection(&formattedSection1)));
+}
