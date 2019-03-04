@@ -97,6 +97,7 @@ std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(const QMapboxGL
 
     const std::string cachePath = settings.cacheDatabasePath().toStdString();
     const std::string accessToken = settings.accessToken().toStdString();
+    const std::string apiBaseUrl = settings.apiBaseUrl().toStdString();
 
     std::lock_guard<std::mutex> lock(mutex);
 
@@ -109,7 +110,7 @@ std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(const QMapboxGL
         }
     }
 
-    const auto key = cachePath + "|" + accessToken;
+    const auto key = cachePath + "|" + accessToken + "|" + apiBaseUrl;
 
     // Return an existing FileSource if available.
     auto sharedFileSource = fileSources.find(key);
@@ -123,7 +124,7 @@ std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(const QMapboxGL
 
     // Setup the FileSource
     newFileSource->setAccessToken(accessToken);
-    newFileSource->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+    newFileSource->setAPIBaseURL(apiBaseUrl);
 
     fileSources[key] = newFileSource;
 
