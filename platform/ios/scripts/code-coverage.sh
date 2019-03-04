@@ -25,18 +25,15 @@ cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 #
 # Create a formatted JSON file with the current coverage. 
 #
-current_date=$(TZ=UTC date +"%Y-%m-%d")
-if [ ! -d "%Y-%m-%d" ]; then 
-    mkdir -p $current_date;
-fi
 
-cat <<EOF > $current_date/ios-coverage.json
+
+cat <<EOF > ios-coverage.json
     { "current-coverage" : $cov }
 EOF
 
-gzip -f $current_date/ios-coverage.json
+gzip -f ios-coverage.json
 #
 # upload to AWS
 # 
-
-aws s3 cp $current_date/ios-coverage.json.gz s3://mapbox-loading-dock/raw/mobile.coverage/
+current_date=$(TZ=UTC date +"%Y-%m-%d")
+aws s3 cp ios-coverage.json.gz s3://mapbox-loading-dock/raw/mobile.coverage/$current_date/
