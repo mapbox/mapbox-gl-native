@@ -38,6 +38,7 @@ include(cmake/mbgl.cmake)
 include(cmake/vendor.cmake)
 include(cmake/mason.cmake)
 include(cmake/xcode.cmake)
+include(cmake/doxygen.cmake)
 
 if(WITH_CXX11ABI)
     set(MASON_CXXABI_SUFFIX -cxx11abi)
