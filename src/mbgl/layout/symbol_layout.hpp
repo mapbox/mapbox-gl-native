@@ -65,6 +65,20 @@ private:
                      const Anchor& labelAnchor,
                      PlacedSymbol& placedSymbol);
 
+    // Adds symbol quads to bucket and returns formatted section index of last
+    // added quad.
+    std::size_t addSymbolGlyphQuads(SymbolBucket&,
+                                    SymbolInstance&,
+                                    const SymbolFeature&,
+                                    WritingModeType,
+                                    optional<size_t>& placedIndex,
+                                    const SymbolQuads&,
+                                    optional<std::size_t> lastAddedSection = nullopt);
+
+    void updatePaintPropertiesForSection(SymbolBucket&,
+                                         const SymbolFeature&,
+                                         std::size_t sectionIndex);
+
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
