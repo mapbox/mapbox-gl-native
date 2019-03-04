@@ -72,7 +72,7 @@ fi
 
 CI_XCCONFIG=''
 if [[ ! -z "${CI:=}" ]]; then
-    xcconfig='platform/ios/ci.xcconfig'
+    xcconfig='platform/darwin/ci.xcconfig'
     echo "CI environment, using ${xcconfig}"
     CI_XCCONFIG="-xcconfig ./${xcconfig}"
 fi
