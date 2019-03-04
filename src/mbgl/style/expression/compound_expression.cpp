@@ -662,6 +662,16 @@ const auto& errorCompoundExpression() {
     return signature;
 }
 
+const auto& textSectionCompoundExpression() {
+    static auto signature = detail::makeSignature("text-section", [](const EvaluationContext& params) -> Result<Value> {
+        if (!params.formattedSection) {
+            return EvaluationError {"Formatted section is unavailable in the current evaluation context."};
+        }
+        return *params.formattedSection;
+    });
+    return signature;
+}
+
 // Legacy Filters
 const auto& filterEqualsCompoundExpression() {
     static auto signature = detail::makeSignature("filter-==", [](const EvaluationContext& params, const std::string& key, const Value &lhs) -> Result<bool> {
@@ -907,6 +917,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto compoundExpressionRegistry = mapbox::eternal
     { "concat", concatCompoundExpression },
     { "resolved-locale", resolvedLocaleCompoundExpression },
     { "error", errorCompoundExpression },
+    { "text-section", textSectionCompoundExpression },
     // Legacy Filters
     { "filter-==", filterEqualsCompoundExpression },
     { "filter-id-==", filterIdEqualsCompoundExpression },

@@ -82,6 +82,7 @@ std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inpu
     
 std::unique_ptr<Expression> format(const char* value);
 std::unique_ptr<Expression> format(std::unique_ptr<Expression>);
+std::unique_ptr<Expression> textSection();
 
 } // namespace dsl
 } // namespace expression

@@ -12,15 +12,33 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
+extern const char* const kFormattedSectionFontScale;
+extern const char* const kFormattedSectionTextFont;
+extern const char* const kFormattedSectionID;
+
+using FormattedSectionID = variant<double, std::string>;
+
+template<class Variant>
+optional<FormattedSectionID> toFormattedSectionID(const Variant& variant) {
+    return variant.match(
+            [] (double t) -> FormattedSectionID { return t; },
+            [] (const std::string& t) -> FormattedSectionID { return t;},
+            [] (auto&) -> optional<FormattedSectionID> { return nullopt; });
+}
+
 struct FormattedSection {
-    FormattedSection(std::string text_, optional<double> fontScale_, optional<FontStack> fontStack_)
+    FormattedSection(std::string text_, optional<double> fontScale_,
+                     optional<FontStack> fontStack_, optional<FormattedSectionID> id_)
         : text(std::move(text_))
         , fontScale(std::move(fontScale_))
         , fontStack(std::move(fontStack_))
+        , id(std::move(id_))
     {}
+
     std::string text;
     optional<double> fontScale;
     optional<FontStack> fontStack;
+    optional<FormattedSectionID> id;
 };
 
 class Formatted {
@@ -28,7 +46,7 @@ public:
     Formatted() = default;
     
     Formatted(const char* plainU8String) {
-        sections.emplace_back(std::string(plainU8String), nullopt, nullopt);
+        sections.emplace_back(std::string(plainU8String), nullopt, nullopt, nullopt);
     }
     
     Formatted(std::vector<FormattedSection> sections_)

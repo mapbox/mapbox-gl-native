@@ -25,18 +25,25 @@ public:
 
 class EvaluationContext {
 public:
-    EvaluationContext(float zoom_) : zoom(zoom_), feature(nullptr) {}
-    EvaluationContext(GeometryTileFeature const * feature_) : zoom(optional<float>()), feature(feature_) {}
+    EvaluationContext() = default;
+    explicit EvaluationContext(float zoom_) : zoom(zoom_) {}
+    EvaluationContext(GeometryTileFeature const * feature_) : feature(feature_) {}
     EvaluationContext(float zoom_, GeometryTileFeature const * feature_) :
         zoom(zoom_), feature(feature_)
     {}
     EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> colorRampParameter_) :
         zoom(std::move(zoom_)), feature(feature_), colorRampParameter(std::move(colorRampParameter_))
     {}
-    
+
+    EvaluationContext& withFormattedSection(const Value* formattedSection_) noexcept {
+        formattedSection = formattedSection_;
+        return *this;
+    };
+
     optional<float> zoom;
-    GeometryTileFeature const * feature;
+    GeometryTileFeature const * feature = nullptr;
     optional<double> colorRampParameter;
+    const Value* formattedSection = nullptr;
 };
 
 template <typename T>

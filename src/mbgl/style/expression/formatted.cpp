@@ -1,17 +1,14 @@
 #include <mbgl/style/expression/formatted.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/style/expression/is_constant.hpp>
-#include <mbgl/style/expression/is_expression.hpp>
-#include <mbgl/style/expression/literal.hpp>
-#include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/type.hpp>
-#include <mbgl/style/expression/compound_expression.hpp>
-#include <mbgl/style/expression/boolean_operator.hpp>
+#include <mbgl/style/conversion/constant.hpp>
 
 namespace mbgl {
 namespace style {
-    
 namespace expression {
+
+const char* const kFormattedSectionFontScale = "font-scale";
+const char* const kFormattedSectionTextFont = "text-font";
+const char* const kFormattedSectionID = "id";
 
 bool Formatted::operator==(const Formatted& other) const {
     if (other.sections.size() != sections.size()) {
@@ -22,14 +19,14 @@ bool Formatted::operator==(const Formatted& other) const {
         const auto& otherSection = other.sections.at(i);
         if (thisSection.text != otherSection.text ||
             thisSection.fontScale != otherSection.fontScale ||
-            thisSection.fontStack != otherSection.fontStack) {
+            thisSection.fontStack != otherSection.fontStack ||
+            thisSection.id != otherSection.id) {
             return false;
         }
     }
     return true;
 }
-    
-    
+
 std::string Formatted::toString() const {
     std::string result;
     for (const auto& section : sections) {
@@ -37,7 +34,7 @@ std::string Formatted::toString() const {
     }
     return result;
 }
-    
+
 } // namespace expression
 
 namespace conversion {
@@ -65,6 +62,7 @@ optional<Formatted> Converter<Formatted>::operator()(const Convertible& value, E
 
             optional<double> fontScale;
             optional<FontStack> textFont;
+            optional<FormattedSectionID> id;
             if (sectionLength > 1) {
                 Convertible sectionParams = arrayMember(section, 1);
                 if (!isObject(sectionParams)) {
@@ -72,12 +70,12 @@ optional<Formatted> Converter<Formatted>::operator()(const Convertible& value, E
                     return nullopt;
                 }
 
-                optional<Convertible> fontScaleMember = objectMember(sectionParams, "font-scale");
+                optional<Convertible> fontScaleMember = objectMember(sectionParams, kFormattedSectionFontScale);
                 if (fontScaleMember) {
                     fontScale = toDouble(*fontScaleMember);
                 }
 
-                optional<Convertible> textFontMember = objectMember(sectionParams, "text-font");
+                optional<Convertible> textFontMember = objectMember(sectionParams, kFormattedSectionTextFont);
                 if (textFontMember) {
                     if (isArray(*textFontMember)) {
                         std::vector<std::string> fontsVector;
@@ -96,9 +94,23 @@ optional<Formatted> Converter<Formatted>::operator()(const Convertible& value, E
                         return nullopt;
                     }
                 }
+
+                optional<Convertible> sectionIDMember = objectMember(sectionParams, kFormattedSectionID);
+                if (sectionIDMember) {
+                    auto result = toValue(*sectionIDMember);
+                    if (!result) {
+                        return nullopt;
+                    }
+
+                    id = toFormattedSectionID(*result);
+                    if (!id) {
+                        error.message = "Section id has to be a string or a number.";
+                        return nullopt;
+                    }
+                }
             }
 
-            sections.push_back(FormattedSection(*sectionText, fontScale, textFont));
+            sections.push_back(FormattedSection(*sectionText, fontScale, textFont, id));
         }
         return Formatted(sections);
     } else if (optional<std::string> result = toString(value)) {
