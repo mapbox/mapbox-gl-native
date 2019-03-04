@@ -11,7 +11,7 @@ if(DOXYGEN_FOUND)
     )
 
     add_custom_target(doxygen_coverage
-        COMMAND ${CMAKE_SOURCE_DIR}/scripts/doxy-coverage.py --noerror "${CMAKE_BINARY_DIR}/docs/xml"
+        COMMAND ${CMAKE_SOURCE_DIR}/scripts/doxy-coverage.py --quiet --noerror --json="${CMAKE_BINARY_DIR}/doxygen-coverage.json" "${CMAKE_BINARY_DIR}/docs/xml"
         COMMENT "Checking documentation coverage"
         DEPENDS generate_xml_doxygen
     )

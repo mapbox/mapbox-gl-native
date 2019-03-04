@@ -39,6 +39,7 @@ workflows:
       - linux-gcc49-debug:
           name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
+      - linux-doxygen
       - ios-debug
       - ios-release-template:
           name: ios-release
@@ -863,6 +864,31 @@ jobs:
             curl -sSfL -o codecov https://codecov.io/bash
             chmod +x codecov
             ./codecov -c
+
+# ------------------------------------------------------------------------------
+  linux-doxygen:
+    docker:
+      - image: mbgl/linux-gcc-5:54f59e3ac5
+    resource_class: large
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
+      BUILDTYPE: Debug
+      WITH_EGL: 1
+      WITH_COVERAGE: 1
+    steps:
+      - install-dependencies
+      - run:
+          name: Install doxygen
+          command: apt update && apt install -y doxygen
+      - build-linux
+      - save-dependencies
+      - run:
+          name: Check documentation coverage
+          command: |
+              platform/linux/ninja -C "build/linux-$(uname -m)/Debug" doxygen_coverage
+              scripts/publish_doxygen_coverage.js "build/linux-$(uname -m)/Debug/doxygen-coverage.json"
 
 # ------------------------------------------------------------------------------
   ios-debug:
