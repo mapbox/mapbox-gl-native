@@ -297,6 +297,7 @@
         "src/mbgl/util/rapidjson.cpp",
         "src/mbgl/util/stopwatch.cpp",
         "src/mbgl/util/string.cpp",
+        "src/mbgl/util/thread_pool.cpp",
         "src/mbgl/util/tile_cover.cpp",
         "src/mbgl/util/tile_cover_impl.cpp",
         "src/mbgl/util/tiny_sdf.cpp",

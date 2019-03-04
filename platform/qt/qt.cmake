@@ -17,9 +17,6 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/default/include/mbgl/gl/headless_backend.hpp
     PRIVATE platform/qt/src/headless_backend_qt.cpp
 
-    # Thread pool
-    PRIVATE platform/default/src/mbgl/platform/thread_pool.cpp
-
     # Thread
     PRIVATE platform/qt/src/thread_local.cpp
 

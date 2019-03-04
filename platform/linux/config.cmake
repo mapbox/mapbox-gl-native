@@ -72,9 +72,6 @@ macro(mbgl_platform_core)
         # Snapshotting
         PRIVATE platform/default/src/mbgl/map/map_snapshotter.cpp
         PRIVATE platform/default/include/mbgl/map/map_snapshotter.hpp
-
-        # Thread pool
-        PRIVATE platform/default/src/mbgl/platform/thread_pool.cpp
     )
 
     target_include_directories(mbgl-core
