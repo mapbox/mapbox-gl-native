@@ -137,6 +137,7 @@ class LocationComponentTest : EspressoTest() {
           locationComponentActivationOptions = LocationComponentActivationOptions
                   .builder(context, style)
                   .locationEngine(null)
+                  .useDefaultLocationEngine(false)
                   .locationComponentOptions(
                           LocationComponentOptions.builder(context)
                                   .staleStateTimeout(200)
@@ -153,10 +154,7 @@ class LocationComponentTest : EspressoTest() {
         val locationEngine = component.locationEngine
         val componentOptions = component.locationComponentOptions
 
-        // notNullValue() used for LocationEngine because
-        // com.mapbox.android.core.location.LocationEngineProxy
-        // should be returned, rather than `null`
-        assertThat(locationEngine, notNullValue())
+        assertThat(locationEngine, nullValue())
         assertThat(componentOptions, notNullValue())
 
         TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)

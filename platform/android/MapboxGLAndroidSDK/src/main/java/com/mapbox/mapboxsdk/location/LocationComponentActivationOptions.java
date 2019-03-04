@@ -23,11 +23,11 @@ public class LocationComponentActivationOptions {
   private final boolean useDefaultLocationEngine;
 
   private LocationComponentActivationOptions(@NonNull Context context, @NonNull Style style,
-                                     @Nullable LocationEngine locationEngine,
-                                     @Nullable LocationEngineRequest locationEngineRequest,
-                                     @Nullable LocationComponentOptions locationComponentOptions,
-                                     int styleRes,
-                                     boolean useDefaultLocationEngine) {
+                                             @Nullable LocationEngine locationEngine,
+                                             @Nullable LocationEngineRequest locationEngineRequest,
+                                             @Nullable LocationComponentOptions locationComponentOptions,
+                                             int styleRes,
+                                             boolean useDefaultLocationEngine) {
     this.context = context;
     this.style = style;
     this.locationEngine = locationEngine;
@@ -70,7 +70,7 @@ public class LocationComponentActivationOptions {
   /**
    * The {@link LocationEngine} which the {@link LocationComponent} should use
    *
-   * @return the engine, or null if you'd like to only force location updates
+   * @return the engine
    */
   @Nullable
   public LocationEngine locationEngine() {
@@ -79,6 +79,7 @@ public class LocationComponentActivationOptions {
 
   /**
    * The location request which the {@link LocationComponent} should use
+   *
    * @return the LocationEngineRequest object
    */
   @Nullable
@@ -88,6 +89,7 @@ public class LocationComponentActivationOptions {
 
   /**
    * A built {@link LocationComponentOptions} object, which holds the various {@link LocationComponent} styling options
+   *
    * @return the options for styling the actual LocationComponent
    */
   @Nullable
@@ -96,7 +98,7 @@ public class LocationComponentActivationOptions {
   }
 
   /**
-   * the LocationComponent style resource (e.g. R.style.style_name)
+   * The LocationComponent style resource (e.g. R.style.style_name)
    *
    * @return the style resource.
    */
@@ -107,6 +109,7 @@ public class LocationComponentActivationOptions {
   /**
    * True if you want to initialize and use the built-in location engine or false if there should be no
    * location engine initialized
+   *
    * @return whether the default LocationEngine is used
    */
   public boolean useDefaultLocationEngine() {
@@ -117,19 +120,19 @@ public class LocationComponentActivationOptions {
    * Builder class for constructing a new instance of {@link LocationComponentActivationOptions}.
    */
   public static class Builder {
-    private Context context;
-    private Style style;
+    private final Context context;
+    private final Style style;
     private LocationEngine locationEngine;
     private LocationEngineRequest locationEngineRequest;
     private LocationComponentOptions locationComponentOptions;
     private int styleRes;
 
     /**
-     *  Set to true as the default in case a true/false value isn't declared via the builder's
-     *  {@link LocationComponentActivationOptions#useDefaultLocationEngine()} method.
-     *
-     *  Please be aware that this activation boolean is ignored when a non-null
-     *  {@link LocationEngine} is set via the builder's `locationEngine()` method.
+     * Set to true as the default in case a true/false value isn't declared via the builder's
+     * {@link LocationComponentActivationOptions#useDefaultLocationEngine()} method.
+     * <p>
+     * Please be aware that this activation boolean is ignored when a non-null
+     * {@link LocationEngine} is set via the builder's `locationEngine()` method.
      */
     private boolean useDefaultLocationEngine = true;
 
@@ -146,64 +149,93 @@ public class LocationComponentActivationOptions {
 
     /**
      * Deliver your own {@link LocationEngine} to the LocationComponent.
-     *
+     * <p>
      * The true/false
      * {@link LocationComponentActivationOptions#builder(Context, Style)#useDefaultLocationEngine}
      * activation option is ignored when a non-null {@link LocationEngine} is set via
      * this `locationEngine()` method.
      *
      * @param locationEngine a {@link LocationEngine} object
-     *
-     * @return The {@link Builder} class with a set LocationEngine.
+     * @return the {@link Builder} object being constructed
      */
-    public Builder locationEngine(LocationEngine locationEngine) {
+    @NonNull
+    public Builder locationEngine(@Nullable LocationEngine locationEngine) {
       this.locationEngine = locationEngine;
       return this;
     }
 
+    /**
+     * @param locationEngineRequest the location request which the
+     *                              {@link LocationComponent} should use
+     * @return the {@link Builder} object being constructed
+     */
     public Builder locationEngineRequest(LocationEngineRequest locationEngineRequest) {
       this.locationEngineRequest = locationEngineRequest;
       return this;
     }
 
+    /**
+     * @param locationComponentOptions a built {@link LocationComponentOptions} object,
+     *                                 which holds the various {@link LocationComponent}
+     *                                 styling options
+     * @return the {@link Builder} object being constructed
+     */
     public Builder locationComponentOptions(LocationComponentOptions locationComponentOptions) {
       this.locationComponentOptions = locationComponentOptions;
       return this;
     }
 
+    /**
+     * @param styleRes the LocationComponent style resource (e.g. R.style.style_name)
+     * @return the {@link Builder} object being constructed
+     */
     public Builder styleRes(int styleRes) {
       this.styleRes = styleRes;
       return this;
     }
 
+    /**
+     * @param useDefaultLocationEngine true if you want to initialize and use the
+     *                                 built-in location engine or false if there
+     *                                 should be no location engine initialized
+     * @return the {@link Builder} object being constructed
+     */
     public Builder useDefaultLocationEngine(boolean useDefaultLocationEngine) {
       this.useDefaultLocationEngine = useDefaultLocationEngine;
       return this;
     }
 
+    /**
+     * Method which actually builds the {@link LocationComponentActivationOptions} object while
+     * taking the various options into account.
+     *
+     * @return a built {@link LocationComponentActivationOptions} object
+     */
     public LocationComponentActivationOptions build() {
       if (styleRes != 0 && locationComponentOptions != null) {
         throw new IllegalArgumentException(
-          "You've provided both a style resource and a LocationComponentOptions object to the "
-            + "LocationComponentActivationOptions builder. You can't use both and "
-            + "you must choose one of the two to style the LocationComponent.");
+            "You've provided both a style resource and a LocationComponentOptions object to the "
+                + "LocationComponentActivationOptions builder. You can't use both and "
+                + "you must choose one of the two to style the LocationComponent.");
       }
       if (context == null) {
         throw new NullPointerException(
-          "Context in LocationComponentActivationOptions is null.");
+            "Context in LocationComponentActivationOptions is null.");
       }
       if (style == null) {
         throw new NullPointerException(
-          "Style in LocationComponentActivationOptions is null. Make sure the Style object isn't null."
-            + " Wait for the map to fully load before passing the Style object to LocationComponentActivationOptions.");
+            "Style in LocationComponentActivationOptions is null. Make sure the "
+                + "Style object isn't null. Wait for the map to fully load before passing "
+                + "the Style object to LocationComponentActivationOptions.");
       }
       if (!style.isFullyLoaded()) {
         throw new IllegalArgumentException(
-          "Style in LocationComponentActivationOptions isn't fully loaded. Wait for the map to fully load before "
-            + "passing the Style object to LocationComponentActivationOptions.");
+            "Style in LocationComponentActivationOptions isn't fully loaded. Wait for the "
+                + "map to fully load before passing the Style object to "
+                + "LocationComponentActivationOptions.");
       }
-      return new LocationComponentActivationOptions(context, style, locationEngine, locationEngineRequest,
-        locationComponentOptions, styleRes, useDefaultLocationEngine);
+      return new LocationComponentActivationOptions(context, style, locationEngine,
+          locationEngineRequest, locationComponentOptions, styleRes, useDefaultLocationEngine);
     }
   }
 }

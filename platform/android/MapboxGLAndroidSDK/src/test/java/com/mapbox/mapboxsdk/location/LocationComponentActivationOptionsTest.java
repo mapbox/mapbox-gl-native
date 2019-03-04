@@ -113,4 +113,23 @@ public class LocationComponentActivationOptionsTest {
     LocationComponentActivationOptions.builder(context, null)
       .build();
   }
+
+  @Test
+  public void locationComponent_exceptionThrownWithDefaultLocationEngineButNotFullyLoadedStyle() throws Exception {
+
+    when(style.isFullyLoaded()).thenReturn(false);
+
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("Style in LocationComponentActivationOptions isn't fully loaded. Wait for the "
+        + "map to fully load before passing the Style object to "
+        + "LocationComponentActivationOptions.");
+
+    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
+        .accuracyAlpha(0.5f)
+        .build();
+    assertNotNull(locationComponentOptions);
+
+    LocationComponentActivationOptions.builder(context, style)
+        .build();
+  }
 }
