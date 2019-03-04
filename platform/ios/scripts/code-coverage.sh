@@ -4,7 +4,16 @@ set -e
 set -o pipefail
 
 # Get code coverage, then convert it to JSON.
-cov_result=build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
+cov_result="";
+if [ -f build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport ]; then 
+    cov_result=build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
+elif [ -f build/ios/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport ]; then
+    cov_result=build/ios/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
+else
+    echo "Coverage file does not exist"
+    exit 1
+fi
+
 xcrun xccov view $cov_result --json > output.json
 
 #
@@ -16,13 +25,14 @@ cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 #
 # Create a formatted JSON file with the current coverage. 
 #
-file_name="ios-coverage-$(TZ=UTC date +"%Y-%m-%d-$CIRCLE_SHA1")"
+file_name="ios-coverage-$(TZ=UTC date +"%Y-%m-%d")"
 cat <<EOF > $file_name.json
     { "current-coverage" : $cov }
 EOF
 echo $cov
 echo $file_name
 
+gzip -f $file_name.json
 #
 # upload to AWS
 # 
@@ -30,4 +40,4 @@ echo $file_name
 if [ -z `which aws` ]; then
     brew install awscli
 fi
-aws s3 cp $file_name.json s3://mapbox-loading-dock/raw/mobile.coverage/
+aws s3 cp $file_name.json.gz s3://mapbox-loading-dock/raw/mobile.coverage/
