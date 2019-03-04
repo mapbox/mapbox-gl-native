@@ -26,7 +26,7 @@ cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 # Create a formatted JSON file with the current coverage. 
 #
 current_date=$(TZ=UTC date +"%Y-%m-%d")
-if [ ! -d "%Y-%m-%d"]; then 
+if [ ! -d "%Y-%m-%d" ]; then 
     mkdir -p $current_date;
 fi
 
