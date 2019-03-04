@@ -384,4 +384,19 @@ public class UiSettingsTest {
     assertEquals("Zoom gesture should be disabled", false, uiSettings.isZoomGesturesEnabled());
     assertEquals("Scroll gesture should be disabled", false, uiSettings.isScrollGesturesEnabled());
   }
+
+  @Test
+  public void testAreAllGesturesEnabled() {
+    uiSettings.setAllGesturesEnabled(true);
+    assertEquals("All gestures check should return true", true,
+        uiSettings.areAllGesturesEnabled());
+  }
+
+  @Test
+  public void testAreAllGesturesEnabledWithOneGestureDisabled() {
+    uiSettings.setAllGesturesEnabled(true);
+    uiSettings.setScrollGesturesEnabled(false);
+    assertEquals("All gestures check should return false", false,
+        uiSettings.areAllGesturesEnabled());
+  }
 }
