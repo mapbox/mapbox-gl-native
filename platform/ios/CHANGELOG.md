@@ -10,7 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### User interaction
 
-* Added options to customize position of scale bar, compass, logo and attribution. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
+* Added `MGLOrnamentPosition` enum and offset methods to customize MGLMapView's scale bar, compass, logo and attribution position. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
 
 ## 4.9.0 - February 27, 2019
 

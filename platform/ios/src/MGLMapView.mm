@@ -831,7 +831,7 @@ public:
 }
 
 - (void)setScaleBarOffset:(CGPoint)scaleBarOffset {
-    NSAssert(scaleBarOffset.x >= 0 && scaleBarOffset.y >= 0, @"The position offset of the scale bar should not be negative.");
+    NSAssert(CGRectContainsPoint(self.bounds, scaleBarOffset), @"The position offset of the scale bar should within the mapview boundaries");
     MGLLogDebug(@"Setting scaleBarOffset: (x:%f, y:%f)", scaleBarOffset.x, scaleBarOffset.y);
     _scaleBarOffset = scaleBarOffset;
     [self installScaleBarConstraints];
@@ -844,7 +844,7 @@ public:
 }
 
 - (void)setCompassViewOffset:(CGPoint)compassViewOffset {
-    NSAssert(compassViewOffset.x >= 0 && compassViewOffset.y >= 0, @"The position offset of the compass should not be negative.");
+    NSAssert(CGRectContainsPoint(self.bounds, compassViewOffset), @"The position offset of the compass should within the mapview boundaries");
     MGLLogDebug(@"Setting compassViewOffset: (x:%f, y:%f)", compassViewOffset.x, compassViewOffset.y);
     _compassViewOffset = compassViewOffset;
     [self installCompassViewConstraints];
@@ -857,7 +857,7 @@ public:
 }
 
 - (void)setLogoViewOffset:(CGPoint)logoViewOffset {
-    NSAssert(logoViewOffset.x >= 0 && logoViewOffset.y >= 0, @"The position offset of the logo should not be negative.");
+    NSAssert(CGRectContainsPoint(self.bounds, logoViewOffset), @"The position offset of the logo should within the mapview boundaries.");
     MGLLogDebug(@"Setting logoViewOffset: (x:%f, y:%f)", logoViewOffset.x, logoViewOffset.y);
     _logoViewOffset = logoViewOffset;
     [self installLogoViewConstraints];
@@ -870,7 +870,7 @@ public:
 }
 
 - (void)setAttributionButtonOffset:(CGPoint)attributionButtonOffset {
-    NSAssert(attributionButtonOffset.x >= 0 && attributionButtonOffset.y >= 0, @"The position offset of the attribution should not be negative.");
+    NSAssert(CGRectContainsPoint(self.bounds, attributionButtonOffset), @"The position offset of the attribution should within the mapview boundaries.");
     MGLLogDebug(@"Setting attributionButtonOffset: (x:%f, y:%f)", attributionButtonOffset.x, attributionButtonOffset.y);
     _attributionButtonOffset = attributionButtonOffset;
     [self installAttributionButtonConstraints];
