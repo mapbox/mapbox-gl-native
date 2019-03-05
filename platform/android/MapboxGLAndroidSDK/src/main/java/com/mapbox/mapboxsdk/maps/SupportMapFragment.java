@@ -187,12 +187,20 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
   }
 
   /**
-   * Called when the fragment is view hiearchy is being destroyed.
+   * Called when the fragment is view hierarchy is being destroyed.
    */
   @Override
   public void onDestroyView() {
     super.onDestroyView();
     map.onDestroy();
+  }
+
+  /**
+   * Called when the fragment is destroyed.
+   */
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
     mapReadyCallbackList.clear();
   }
 

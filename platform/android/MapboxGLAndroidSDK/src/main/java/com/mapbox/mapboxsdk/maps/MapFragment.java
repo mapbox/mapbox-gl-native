@@ -198,6 +198,14 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
   public void onDestroyView() {
     super.onDestroyView();
     map.onDestroy();
+  }
+
+  /**
+   * Called when the fragment is destroyed.
+   */
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
     mapReadyCallbackList.clear();
   }
 

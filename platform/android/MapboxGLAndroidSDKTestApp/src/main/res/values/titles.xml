@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="activity_map_fragment_suport">Support Map Fragment</string>
+    <string name="activity_map_fragment_support">Support Map Fragment</string>
     <string name="activity_map_fragment">Map Fragment</string>
+    <string name="activity_map_fragment_backstack">Backstack Map Fragment</string>
     <string name="activity_multimap">Multiple Maps on Screen</string>
     <string name="activity_add_bulk_markers">Add Markers In Bulk</string>
     <string name="activity_animated_symbollayer">Animated SymbolLayer</string>

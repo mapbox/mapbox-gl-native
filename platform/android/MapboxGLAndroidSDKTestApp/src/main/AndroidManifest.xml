@@ -162,13 +162,24 @@
         <activity
             android:name=".activity.fragment.SupportMapFragmentActivity"
             android:description="@string/description_map_fragment_support"
-            android:label="@string/activity_map_fragment_suport">
+            android:label="@string/activity_map_fragment_support">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_fragment" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
+                android:name=".activity.fragment.FragmentBackStackActivity"
+                android:description="@string/description_map_fragment_backstack"
+                android:label="@string/activity_map_fragment_backstack">
+            <meta-data
+                    android:name="@string/category"
+                    android:value="@string/category_fragment" />
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
             android:name=".activity.fragment.MultiMapActivity"
@@ -884,9 +895,6 @@
                     android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <!-- For Instrumentation tests -->
-        <activity
-            android:name=".activity.style.RuntimeStyleTestActivity"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.style.RuntimeStyleTimingTestActivity"
             android:screenOrientation="portrait" />
