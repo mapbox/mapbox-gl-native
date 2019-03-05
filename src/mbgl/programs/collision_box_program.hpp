@@ -78,7 +78,7 @@ public:
             .concat(gl::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
-        assert(layoutVertexBuffer.vertexCount == dynamicVertexBuffer.vertexCount);
+        assert(layoutVertexBuffer.elements == dynamicVertexBuffer.elements);
 
         for (auto& segment : segments) {
             auto vertexArrayIt = segment.vertexArrays.find(layerID);

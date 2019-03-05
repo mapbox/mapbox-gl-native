@@ -84,7 +84,7 @@ void HillshadeBucket::setMask(TileMask&& mask_) {
 
         if (segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
             // Move to a new segments because the old one can't hold the geometry.
-            segments.emplace_back(vertices.vertexSize(), indices.indexSize());
+            segments.emplace_back(vertices.elements(), indices.elements());
         }
 
         vertices.emplace_back(

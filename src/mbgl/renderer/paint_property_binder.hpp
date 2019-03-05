@@ -187,7 +187,7 @@ public:
         auto evaluated = expression.evaluate(feature, defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
-        for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
+        for (std::size_t i = vertexVector.elements(); i < length; ++i) {
             vertexVector.emplace_back(BaseVertex { value });
         }
     }
@@ -247,7 +247,7 @@ public:
         AttributeValue value = zoomInterpolatedAttributeValue(
             attributeValue(range.min),
             attributeValue(range.max));
-        for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
+        for (std::size_t i = vertexVector.elements(); i < length; ++i) {
             vertexVector.emplace_back(Vertex { value });
         }
     }
@@ -319,7 +319,7 @@ public:
             // Unlike other propperties with expressions that evaluate to null, the default value for `*-pattern` properties is an empty
             // string and will not have a valid entry in patternPositions. We still need to populate the attribute buffers to avoid crashes
             // when we try to draw the layer because we don't know at draw time if all features were evaluated to valid pattern dependencies.
-            for (std::size_t i = zoomInVertexVector.vertexSize(); i < length; ++i) {
+            for (std::size_t i = zoomInVertexVector.elements(); i < length; ++i) {
                 patternToVertexVector.emplace_back(Vertex { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
                 zoomInVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} } );
                 zoomOutVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
@@ -336,7 +336,7 @@ public:
             const ImagePosition imageMid = mid->second;
             const ImagePosition imageMax = max->second;
 
-            for (std::size_t i = zoomInVertexVector.vertexSize(); i < length; ++i) {
+            for (std::size_t i = zoomInVertexVector.elements(); i < length; ++i) {
                 patternToVertexVector.emplace_back(Vertex { imageMid.tlbr() });
                 zoomInVertexVector.emplace_back(Vertex2 { imageMin.tlbr() });
                 zoomOutVertexVector.emplace_back(Vertex2 { imageMax.tlbr() });

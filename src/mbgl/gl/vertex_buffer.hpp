@@ -8,7 +8,7 @@ namespace gl {
 template <class V>
 class VertexBuffer {
 public:
-    std::size_t vertexCount;
+    std::size_t elements;
     UniqueBuffer buffer;
 };
 

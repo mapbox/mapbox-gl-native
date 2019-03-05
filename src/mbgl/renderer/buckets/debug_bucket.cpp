@@ -46,8 +46,8 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                     vertices.emplace_back(FillProgram::layoutVertex(p));
 
                     if (prev) {
-                        indices.emplace_back(vertices.vertexSize() - 2,
-                                             vertices.vertexSize() - 1);
+                        indices.emplace_back(vertices.elements() - 2,
+                                             vertices.elements() - 1);
                     }
 
                     prev = p;
@@ -74,7 +74,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
         addText(expiresText, 50, baseline + 200, 5);
     }
 
-    segments.emplace_back(0, 0, vertices.vertexSize(), indices.indexSize());
+    segments.emplace_back(0, 0, vertices.elements(), indices.elements());
 
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     indexBuffer = context.createIndexBuffer(std::move(indices));
