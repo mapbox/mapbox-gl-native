@@ -4,7 +4,7 @@
 #include <mbgl/gl/object.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
@@ -120,9 +120,9 @@ public:
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
-              VertexArray& vertexArray,
+              gl::VertexArray& vertexArray,
               const AttributeBindings& attributeBindings,
-              const IndexBuffer& indexBuffer,
+              const gfx::IndexBuffer& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
@@ -138,7 +138,7 @@ public:
         Uniforms::bind(uniformsState, uniformValues);
 
         vertexArray.bind(context,
-                        indexBuffer.buffer,
+                        indexBuffer,
                         Attributes::toBindingArray(attributeLocations, attributeBindings));
 
         context.draw(drawMode.primitiveType,

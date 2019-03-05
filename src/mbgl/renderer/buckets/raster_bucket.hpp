@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/programs/raster_program.hpp>
@@ -37,7 +37,7 @@ public:
     SegmentVector<RasterAttributes> segments;
 
     optional<gl::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer> indexBuffer;
+    optional<gfx::IndexBuffer> indexBuffer;
 };
 
 } // namespace mbgl

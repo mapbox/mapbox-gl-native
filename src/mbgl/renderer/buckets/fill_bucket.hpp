@@ -3,7 +3,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/style/layers/fill_layer_properties.hpp>
@@ -47,8 +47,8 @@ public:
     SegmentVector<FillAttributes> triangleSegments;
 
     optional<gl::VertexBuffer<FillLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer> lineIndexBuffer;
-    optional<gl::IndexBuffer> triangleIndexBuffer;
+    optional<gfx::IndexBuffer> lineIndexBuffer;
+    optional<gfx::IndexBuffer> triangleIndexBuffer;
 
     std::map<std::string, FillProgram::Binders> paintPropertyBinders;
 };

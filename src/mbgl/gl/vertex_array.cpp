@@ -1,12 +1,15 @@
 #include <mbgl/gl/vertex_array.hpp>
+#include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 namespace gl {
 
-void VertexArray::bind(Context& context, BufferID indexBuffer, const AttributeBindingArray& bindings) {
+void VertexArray::bind(Context& context,
+                       const gfx::IndexBuffer& indexBuffer,
+                       const AttributeBindingArray& bindings) {
     context.bindVertexArray = state->vertexArray;
-    state->indexBuffer = indexBuffer;
+    state->indexBuffer = reinterpret_cast<const gl::IndexBufferResource&>(*indexBuffer.resource).buffer;
 
     state->bindings.reserve(bindings.size());
     for (AttributeLocation location = 0; location < bindings.size(); ++location) {

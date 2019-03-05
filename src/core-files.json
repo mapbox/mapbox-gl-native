@@ -500,6 +500,7 @@
         "mbgl/gfx/cull_face_mode.hpp": "src/mbgl/gfx/cull_face_mode.hpp",
         "mbgl/gfx/depth_mode.hpp": "src/mbgl/gfx/depth_mode.hpp",
         "mbgl/gfx/draw_mode.hpp": "src/mbgl/gfx/draw_mode.hpp",
+        "mbgl/gfx/index_buffer.hpp": "src/mbgl/gfx/index_buffer.hpp",
         "mbgl/gfx/index_vector.hpp": "src/mbgl/gfx/index_vector.hpp",
         "mbgl/gfx/primitives.hpp": "src/mbgl/gfx/primitives.hpp",
         "mbgl/gfx/stencil_mode.hpp": "src/mbgl/gfx/stencil_mode.hpp",

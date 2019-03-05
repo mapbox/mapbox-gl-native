@@ -3,7 +3,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
@@ -98,7 +98,7 @@ public:
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
-        optional<gl::IndexBuffer> indexBuffer;
+        optional<gfx::IndexBuffer> indexBuffer;
     } text;
 
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
@@ -115,7 +115,7 @@ public:
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
         optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
-        optional<gl::IndexBuffer> indexBuffer;
+        optional<gfx::IndexBuffer> indexBuffer;
     } icon;
 
     struct CollisionBuffer {
@@ -129,12 +129,12 @@ public:
 
     struct CollisionBoxBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Lines> lines;
-        optional<gl::IndexBuffer> indexBuffer;
+        optional<gfx::IndexBuffer> indexBuffer;
     } collisionBox;
 
     struct CollisionCircleBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Triangles> triangles;
-        optional<gl::IndexBuffer> indexBuffer;
+        optional<gfx::IndexBuffer> indexBuffer;
     } collisionCircle;
 
     uint32_t bucketInstanceId = 0;

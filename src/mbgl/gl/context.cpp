@@ -1,5 +1,6 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/enum.hpp>
+#include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
@@ -261,21 +262,22 @@ void Context::updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::si
     MBGL_CHECK_ERROR(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
 }
 
-UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
+std::unique_ptr<const gfx::IndexBufferResource>
+Context::createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
     bindVertexArray = 0;
     globalVertexArrayState.indexBuffer = result;
     MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage)));
-    return result;
+    return std::make_unique<gl::IndexBufferResource>(std::move(result));
 }
 
-void Context::updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size) {
+void Context::updateIndexBuffer(const gfx::IndexBufferResource& resource, const void* data, std::size_t size) {
     // Be sure to unbind any existing vertex array object before binding the index buffer
     // so that we don't mess up another VAO
     bindVertexArray = 0;
-    globalVertexArrayState.indexBuffer = buffer;
+    globalVertexArrayState.indexBuffer = reinterpret_cast<const gl::IndexBufferResource&>(resource).buffer;
     MBGL_CHECK_ERROR(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, data));
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/programs/hillshade_program.hpp>
@@ -51,7 +51,7 @@ public:
     SegmentVector<HillshadeAttributes> segments;
 
     optional<gl::VertexBuffer<HillshadeLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer> indexBuffer;
+    optional<gfx::IndexBuffer> indexBuffer;
 private: 
     DEMData demdata;
     bool prepared = false;

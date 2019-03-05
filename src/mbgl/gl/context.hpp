@@ -8,7 +8,7 @@
 #include <mbgl/gl/renderbuffer.hpp>
 #include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gfx/vertex_vector.hpp>
@@ -80,17 +80,17 @@ public:
     }
 
     template <class DrawMode>
-    IndexBuffer createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
-        return IndexBuffer {
+    gfx::IndexBuffer createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+        return {
             v.elements(),
             createIndexBuffer(v.data(), v.bytes(), usage)
         };
     }
     
     template <class DrawMode>
-    void updateIndexBuffer(IndexBuffer& buffer, gfx::IndexVector<DrawMode>&& v) {
+    void updateIndexBuffer(gfx::IndexBuffer& buffer, gfx::IndexVector<DrawMode>&& v) {
         assert(v.elements() == buffer.elements);
-        updateIndexBuffer(buffer.buffer, v.data(), v.bytes());
+        updateIndexBuffer(*buffer.resource, v.data(), v.bytes());
     }
 
     template <RenderbufferType type>
@@ -276,8 +276,8 @@ private:
 
     UniqueBuffer createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage);
     void updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
-    UniqueBuffer createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
-    void updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
+    std::unique_ptr<const gfx::IndexBufferResource> createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
+    void updateIndexBuffer(const gfx::IndexBufferResource&, const void* data, std::size_t size);
     UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit, TextureType);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit, TextureType);
     UniqueFramebuffer createFramebuffer();
