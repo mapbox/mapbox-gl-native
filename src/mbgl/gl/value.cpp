@@ -1,6 +1,6 @@
 #include <mbgl/gl/value.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gl/vertex_buffer_resource.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/enum.hpp>
 

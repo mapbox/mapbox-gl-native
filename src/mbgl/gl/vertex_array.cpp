@@ -1,5 +1,5 @@
 #include <mbgl/gl/vertex_array.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/context.hpp>
 
 namespace mbgl {

@@ -1,7 +1,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/enum.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_buffer_resource.hpp>
+#include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
