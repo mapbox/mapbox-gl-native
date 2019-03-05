@@ -21,7 +21,7 @@ public:
     Transform(MapObserver& = MapObserver::nullObserver(),
               ViewportMode = ViewportMode::Default);
 
-    Transform(const TransformState &state_) : observer(MapObserver::nullObserver()), state(state_) {}
+    Transform(TransformState state_) : observer(MapObserver::nullObserver()), state(std::move(state_)) {}
 
     // Map view
     void resize(Size size);
