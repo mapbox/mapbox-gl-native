@@ -18,11 +18,11 @@ public:
         util::ignore({ (v.emplace_back(std::forward<Args>(args)), 0)... });
     }
 
-    std::size_t vertexSize() const {
+    std::size_t elements() const {
         return v.size();
     }
 
-    std::size_t byteSize() const {
+    std::size_t bytes() const {
         return v.size() * sizeof(Vertex);
     }
 

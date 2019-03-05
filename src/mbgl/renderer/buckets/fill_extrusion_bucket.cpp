@@ -71,12 +71,12 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         std::vector<uint32_t> flatIndices;
         flatIndices.reserve(totalVertices);
 
-        std::size_t startVertices = vertices.vertexSize();
+        std::size_t startVertices = vertices.elements();
 
         if (triangleSegments.empty() ||
             triangleSegments.back().vertexLength + (5 * (totalVertices - 1) + 1) >
                 std::numeric_limits<uint16_t>::max()) {
-            triangleSegments.emplace_back(startVertices, triangles.indexSize());
+            triangleSegments.emplace_back(startVertices, triangles.elements());
         }
 
         auto& triangleSegment = triangleSegments.back();
@@ -158,9 +158,9 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
     for (auto& pair : paintPropertyBinders) {
         const auto it = patternDependencies.find(pair.first);
         if (it != patternDependencies.end()){
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, it->second);
+            pair.second.populateVertexVectors(feature, vertices.elements(), patternPositions, it->second);
         } else {
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, {});
+            pair.second.populateVertexVectors(feature, vertices.elements(), patternPositions, {});
         }
     }
 }

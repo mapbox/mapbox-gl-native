@@ -291,8 +291,8 @@ public:
         const gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>& opacityVertexBuffer,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        assert(layoutVertexBuffer.vertexCount == dynamicLayoutVertexBuffer.vertexCount &&
-               layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
+        assert(layoutVertexBuffer.elements == dynamicLayoutVertexBuffer.elements &&
+               layoutVertexBuffer.elements == opacityVertexBuffer.elements);
         return gl::Attributes<LayoutAttributeList>::bindings(layoutVertexBuffer)
             .concat(gl::Attributes<SymbolDynamicLayoutAttributes>::bindings(dynamicLayoutVertexBuffer))
             .concat(gl::Attributes<SymbolOpacityAttributes>::bindings(opacityVertexBuffer))

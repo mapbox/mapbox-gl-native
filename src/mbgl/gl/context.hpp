@@ -68,29 +68,29 @@ public:
     template <class Vertex>
     VertexBuffer<Vertex> createVertexBuffer(gfx::VertexVector<Vertex>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return VertexBuffer<Vertex> {
-            v.vertexSize(),
-            createVertexBuffer(v.data(), v.byteSize(), usage)
+            v.elements(),
+            createVertexBuffer(v.data(), v.bytes(), usage)
         };
     }
 
     template <class Vertex>
     void updateVertexBuffer(VertexBuffer<Vertex>& buffer, gfx::VertexVector<Vertex>&& v) {
-        assert(v.vertexSize() == buffer.vertexCount);
-        updateVertexBuffer(buffer.buffer, v.data(), v.byteSize());
+        assert(v.elements() == buffer.elements);
+        updateVertexBuffer(buffer.buffer, v.data(), v.bytes());
     }
 
     template <class DrawMode>
     IndexBuffer createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return IndexBuffer {
-            v.indexSize(),
-            createIndexBuffer(v.data(), v.byteSize(), usage)
+            v.elements(),
+            createIndexBuffer(v.data(), v.bytes(), usage)
         };
     }
     
     template <class DrawMode>
     void updateIndexBuffer(IndexBuffer& buffer, gfx::IndexVector<DrawMode>&& v) {
-        assert(v.indexSize() == buffer.indexCount);
-        updateIndexBuffer(buffer.buffer, v.data(), v.byteSize());
+        assert(v.elements() == buffer.elements);
+        updateIndexBuffer(buffer.buffer, v.data(), v.bytes());
     }
 
     template <RenderbufferType type>

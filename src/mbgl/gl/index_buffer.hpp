@@ -7,7 +7,7 @@ namespace gl {
 
 class IndexBuffer {
 public:
-    std::size_t indexCount;
+    std::size_t elements;
     UniqueBuffer buffer;
 };
 

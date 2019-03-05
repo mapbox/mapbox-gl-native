@@ -470,8 +470,8 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
         }
 
         for (auto& pair : bucket->paintProperties) {
-            pair.second.iconBinders.populateVertexVectors(feature, bucket->icon.vertices.vertexSize(), {}, {});
-            pair.second.textBinders.populateVertexVectors(feature, bucket->text.vertices.vertexSize(), {}, {});
+            pair.second.iconBinders.populateVertexVectors(feature, bucket->icon.vertices.elements(), {}, {});
+            pair.second.textBinders.populateVertexVectors(feature, bucket->text.vertices.elements(), {}, {});
         }
     }
 
@@ -504,7 +504,7 @@ size_t SymbolLayout::addSymbol(Buffer& buffer,
     const auto &tex = symbol.tex;
 
     if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-        buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());
+        buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements());
     }
 
     // We're generating triangle fans, so we always start with the first
@@ -568,8 +568,8 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 const std::size_t indexLength = feature.alongLine ? 6 : 8;
 
                 if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-                    collisionBuffer.segments.emplace_back(collisionBuffer.vertices.vertexSize(),
-                      feature.alongLine? bucket.collisionCircle.triangles.indexSize() : bucket.collisionBox.lines.indexSize());
+                    collisionBuffer.segments.emplace_back(collisionBuffer.vertices.elements(),
+                      feature.alongLine? bucket.collisionCircle.triangles.elements() : bucket.collisionBox.lines.elements());
                 }
 
                 auto& segment = collisionBuffer.segments.back();

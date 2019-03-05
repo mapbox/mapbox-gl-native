@@ -60,7 +60,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
                 throw GeometryTooLongException();
         }
 
-        std::size_t startVertices = vertices.vertexSize();
+        std::size_t startVertices = vertices.elements();
 
         for (const auto& ring : polygon) {
             std::size_t nVertices = ring.size();
@@ -69,7 +69,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
                 continue;
 
             if (lineSegments.empty() || lineSegments.back().vertexLength + nVertices > std::numeric_limits<uint16_t>::max()) {
-                lineSegments.emplace_back(vertices.vertexSize(), lines.indexSize());
+                lineSegments.emplace_back(vertices.elements(), lines.elements());
             }
 
             auto& lineSegment = lineSegments.back();
@@ -94,7 +94,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
         assert(nIndicies % 3 == 0);
 
         if (triangleSegments.empty() || triangleSegments.back().vertexLength + totalVertices > std::numeric_limits<uint16_t>::max()) {
-            triangleSegments.emplace_back(startVertices, triangles.indexSize());
+            triangleSegments.emplace_back(startVertices, triangles.elements());
         }
 
         auto& triangleSegment = triangleSegments.back();
@@ -114,9 +114,9 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
     for (auto& pair : paintPropertyBinders) {
         const auto it = patternDependencies.find(pair.first);
         if (it != patternDependencies.end()){
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, it->second);
+            pair.second.populateVertexVectors(feature, vertices.elements(), patternPositions, it->second);
         } else {
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, {});
+            pair.second.populateVertexVectors(feature, vertices.elements(), patternPositions, {});
         }
     }
 }
