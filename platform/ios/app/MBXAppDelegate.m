@@ -4,6 +4,10 @@
 
 NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
 
+@interface MBXAppDelegate() <MGLMetricsDelegate>
+
+@end
+
 @implementation MBXAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -24,6 +28,7 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
 #ifndef MGL_DISABLE_LOGGING
         [MGLLoggingConfiguration sharedConfiguration].loggingLevel = MGLLoggingLevelFault;
 #endif
+        [MGLMetricsManager sharedManager].delegate = self;
     }
 
     return YES;
@@ -45,6 +50,14 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
     }
 
     return NO;
+}
+
+- (BOOL)shouldHandleMetric:(MGLMetricType)metricType {
+    return YES;
+}
+
+- (void)didCollectMetric:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes {
+    [[MGLMetricsManager sharedManager] pushMetric:metricType withAttributes:attributes];
 }
 
 @end

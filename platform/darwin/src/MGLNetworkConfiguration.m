@@ -1,5 +1,5 @@
 #import "MGLNetworkConfiguration_Private.h"
-#import "MGLEventsManager_Private.h"
+#import "MGLMetricsManager_Private.h"
 
 NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 static NSString * const MGLStartTime = @"start_time";
@@ -73,7 +73,7 @@ static NSString * const MGLResourceType = @"resource_type";
 {
     if (urlString && [self.events objectForKey:urlString]) {
         NSDictionary *eventAttributes = [self eventAttributesForURL:urlString withAction:action];
-        [[MGLEventsManager sharedManager] handleEvent:kMGLDownloadPerformanceEvent withAttributes:eventAttributes];
+        [[MGLMetricsManager sharedManager] handleMetricEvent:MGLMetricTypePerformance withAttributes:eventAttributes];
         [self.events removeObjectForKey:urlString];
     }
 }
@@ -96,7 +96,7 @@ static NSString * const MGLResourceType = @"resource_type";
     }
     
     return @{
-             @"event" : kMGLDownloadPerformanceEvent,
+             @"event" : kMGLPerformanceMetric,
              @"created" : createdDate,
              @"sessionId" : [NSUUID UUID].UUIDString,
              @"counters" : @[ @{ @"name" : @"elapsed_time" , @"value" : @(elapsedTime) } ],
