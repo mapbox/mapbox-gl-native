@@ -2631,7 +2631,7 @@ public:
 }
 
 - (void)setPrefetchesTiles:(BOOL)prefetchesTiles{
-    if(prefetchesTiles)
+    if(!prefetchesTiles)
     {
         _mbglMap->setPrefetchZoomDelta(0);
     }
