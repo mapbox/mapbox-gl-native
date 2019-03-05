@@ -2,6 +2,8 @@
 
 const jwt = require('jsonwebtoken');
 const github = require('@octokit/rest')();
+const zlib = require('zlib');
+const AWS = require('aws-sdk');
 const fs = require('fs');
 
 const SIZE_CHECK_APP_ID = 14028;
@@ -46,8 +48,9 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
         github.authenticate({type: 'token', token: data.token});
         const percentage = coverage.documented * 100 / coverage.total;
         const title = `${percentage.toFixed(2)}%`;
+        const date = new Date().toISOString().substring(0, 19);
 
-        return github.checks.create({
+        var promises = [github.checks.create({
             owner: 'mapbox',
             repo: 'mapbox-gl-native',
             name: 'Doxygen coverage',
@@ -60,5 +63,28 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
                 title,
                 summary: `There is doxygen documentation for ${percentage}% of the public symbols (${coverage.documented} out of ${coverage.total})`
             }
+        })];
+
+        if (process.env['CIRCLE_BRANCH'] === 'master') {
+            promises.push(new AWS.S3({region: 'us-east-1'}).putObject({
+                Body: zlib.gzipSync(JSON.stringify({
+                    'created_at': date,
+                    'documented': coverage.documented,
+                    'total': coverage.total,
+                    'commit': process.env['CIRCLE_SHA1']
+                })),
+                Bucket: 'mapbox-loading-dock',
+                Key: `raw/mobile_staging.docs_coverage/${date.substring(0,10)}/${process.env['CIRCLE_SHA1']}.json.gz`,
+                CacheControl: 'max-age=300',
+                ContentEncoding: 'gzip',
+                ContentType: 'application/json'
+            }).promise());
+        }
+
+        return Promise.all(promises).then(data => {
+            return console.log('Succesfully uploaded doxygen coverage metrics');
+        }).catch(err => {
+            console.log('Error uploading doxygen coverage metrics: ' + err.message);
+            return err;
         });
     });
