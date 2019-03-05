@@ -57,7 +57,7 @@ public:
     }
 
     static typename Attributes::Bindings computeAllAttributeBindings(
-        const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
+        const gfx::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
         return LayoutAttributes::bindings(layoutVertexBuffer)

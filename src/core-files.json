@@ -506,6 +506,7 @@
         "mbgl/gfx/stencil_mode.hpp": "src/mbgl/gfx/stencil_mode.hpp",
         "mbgl/gfx/types.hpp": "src/mbgl/gfx/types.hpp",
         "mbgl/gfx/uniform.hpp": "src/mbgl/gfx/uniform.hpp",
+        "mbgl/gfx/vertex_buffer.hpp": "src/mbgl/gfx/vertex_buffer.hpp",
         "mbgl/gfx/vertex_vector.hpp": "src/mbgl/gfx/vertex_vector.hpp",
         "mbgl/gl/attribute.hpp": "src/mbgl/gl/attribute.hpp",
         "mbgl/gl/context.hpp": "src/mbgl/gl/context.hpp",

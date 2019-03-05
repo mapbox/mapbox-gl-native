@@ -7,7 +7,7 @@
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/renderbuffer.hpp>
 #include <mbgl/gl/framebuffer.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
@@ -66,17 +66,17 @@ public:
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex>
-    VertexBuffer<Vertex> createVertexBuffer(gfx::VertexVector<Vertex>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
-        return VertexBuffer<Vertex> {
+    gfx::VertexBuffer<Vertex> createVertexBuffer(gfx::VertexVector<Vertex>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+        return {
             v.elements(),
             createVertexBuffer(v.data(), v.bytes(), usage)
         };
     }
 
     template <class Vertex>
-    void updateVertexBuffer(VertexBuffer<Vertex>& buffer, gfx::VertexVector<Vertex>&& v) {
+    void updateVertexBuffer(gfx::VertexBuffer<Vertex>& buffer, gfx::VertexVector<Vertex>&& v) {
         assert(v.elements() == buffer.elements);
-        updateVertexBuffer(buffer.buffer, v.data(), v.bytes());
+        updateVertexBuffer(*buffer.resource, v.data(), v.bytes());
     }
 
     template <class DrawMode>
@@ -274,8 +274,8 @@ private:
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
 
-    UniqueBuffer createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage);
-    void updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
+    std::unique_ptr<const gfx::VertexBufferResource> createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage);
+    void updateVertexBuffer(const gfx::VertexBufferResource&, const void* data, std::size_t size);
     std::unique_ptr<const gfx::IndexBufferResource> createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
     void updateIndexBuffer(const gfx::IndexBufferResource&, const void* data, std::size_t size);
     UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit, TextureType);

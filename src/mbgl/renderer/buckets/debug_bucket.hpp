@@ -5,7 +5,7 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/debug_program.hpp>
 
@@ -34,7 +34,7 @@ public:
     const MapDebugOptions debugMode;
 
     SegmentVector<DebugAttributes> segments;
-    optional<gl::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
+    optional<gfx::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> indexBuffer;
 };
 

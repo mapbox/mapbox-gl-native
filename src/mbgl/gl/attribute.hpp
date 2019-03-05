@@ -2,7 +2,7 @@
 
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gl/types.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/optional.hpp>
@@ -22,13 +22,14 @@ class AttributeBinding {
 public:
     gfx::AttributeDescriptor attribute;
     uint8_t vertexStride;
-    BufferID vertexBuffer;
+    const gfx::VertexBufferResource* vertexBufferResource;
     uint32_t vertexOffset;
 
-    friend bool operator==(const AttributeBinding& lhs,
-                           const AttributeBinding& rhs) {
-        return std::tie(lhs.attribute, lhs.vertexStride, lhs.vertexBuffer, lhs.vertexOffset)
-            == std::tie(rhs.attribute, rhs.vertexStride, rhs.vertexBuffer, rhs.vertexOffset);
+    friend bool operator==(const AttributeBinding& lhs, const AttributeBinding& rhs) {
+        return lhs.attribute == rhs.attribute &&
+               lhs.vertexStride == rhs.vertexStride &&
+               lhs.vertexBufferResource == rhs.vertexBufferResource &&
+               lhs.vertexOffset == rhs.vertexOffset;
     }
 };
 
@@ -40,12 +41,12 @@ using AttributeBindingArray = std::vector<optional<AttributeBinding>>;
         a buffer with only one float for each vertex can be bound to a `vec2` attribute
     */
 template <std::size_t I, typename Vertex>
-AttributeBinding attributeBinding(const VertexBuffer<Vertex>& buffer) {
+AttributeBinding attributeBinding(const gfx::VertexBuffer<Vertex>& buffer) {
     static_assert(I < gfx::VertexDescriptorOf<Vertex>::data.count, "vertex attribute index out of range");
     return {
         gfx::VertexDescriptorOf<Vertex>::data.attributes[I],
         gfx::VertexDescriptorOf<Vertex>::data.stride,
-        buffer.buffer,
+        buffer.resource.get(),
         0,
     };
 }
@@ -106,7 +107,7 @@ public:
         return result;
     }
 
-    static Bindings bindings(const VertexBuffer<gfx::Vertex<Types>>& buffer) {
+    static Bindings bindings(const gfx::VertexBuffer<gfx::Vertex<Types>>& buffer) {
         return Bindings { attributeBinding<TypeIndex<As, As...>::value>(buffer)... };
     }
 

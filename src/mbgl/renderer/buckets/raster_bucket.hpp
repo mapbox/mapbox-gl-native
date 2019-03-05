@@ -2,7 +2,7 @@
 
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/texture.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/tile_mask.hpp>
@@ -36,7 +36,7 @@ public:
     gfx::IndexVector<gfx::Triangles> indices;
     SegmentVector<RasterAttributes> segments;
 
-    optional<gl::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
+    optional<gfx::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> indexBuffer;
 };
 

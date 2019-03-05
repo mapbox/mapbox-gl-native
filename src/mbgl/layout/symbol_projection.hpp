@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/programs/symbol_program.hpp>
 
 namespace mbgl {

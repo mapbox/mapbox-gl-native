@@ -223,7 +223,7 @@ private:
     style::PropertyExpression<T> expression;
     T defaultValue;
     gfx::VertexVector<BaseVertex> vertexVector;
-    optional<gl::VertexBuffer<BaseVertex>> vertexBuffer;
+    optional<gfx::VertexBuffer<BaseVertex>> vertexBuffer;
 };
 
 template <class T, class A>
@@ -288,7 +288,7 @@ private:
     T defaultValue;
     Range<float> zoomRange;
     gfx::VertexVector<Vertex> vertexVector;
-    optional<gl::VertexBuffer<Vertex>> vertexBuffer;
+    optional<gfx::VertexBuffer<Vertex>> vertexBuffer;
 };
 
 template <class T, class A1, class A2>
@@ -377,9 +377,9 @@ private:
     gfx::VertexVector<Vertex> patternToVertexVector;
     gfx::VertexVector<Vertex2> zoomInVertexVector;
     gfx::VertexVector<Vertex2> zoomOutVertexVector;
-    optional<gl::VertexBuffer<Vertex>> patternToVertexBuffer;
-    optional<gl::VertexBuffer<Vertex2>> zoomInVertexBuffer;
-    optional<gl::VertexBuffer<Vertex2>> zoomOutVertexBuffer;
+    optional<gfx::VertexBuffer<Vertex>> patternToVertexBuffer;
+    optional<gfx::VertexBuffer<Vertex2>> zoomInVertexBuffer;
+    optional<gfx::VertexBuffer<Vertex2>> zoomOutVertexBuffer;
     CrossfadeParameters crossfade;
 };
 
