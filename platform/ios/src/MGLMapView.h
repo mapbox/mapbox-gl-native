@@ -352,6 +352,15 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic, assign) MGLMapViewPreferredFramesPerSecond preferredFramesPerSecond;
 
+/**
+ A Boolean value indicating whether the map should prefetch tiles.
+ 
+ Loads tiles at a lower zoom-level to pre-render a low resolution preview while more detailed tiles are loaded.
+ 
+ Default is YES.
+ */
+@property (nonatomic, assign) BOOL prefetchesTiles;
+
 @property (nonatomic) NSArray<NSString *> *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
 
 - (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
