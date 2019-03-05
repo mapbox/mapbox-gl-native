@@ -52,14 +52,13 @@ public class MapInDialogActivity extends AppCompatActivity {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       return inflater.inflate(R.layout.fragment_dialog_map, container);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
       super.onViewCreated(view, savedInstanceState);
-
       mapView = view.findViewById(R.id.mapView);
       mapView.onCreate(savedInstanceState);
       mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Style.OUTDOORS));
@@ -75,6 +74,7 @@ public class MapInDialogActivity extends AppCompatActivity {
             mapView.onPause();
             mapView.onStop();
             mapView.onDestroy();
+            mapView = null;
           }
           super.dismiss();
         }
@@ -96,31 +96,41 @@ public class MapInDialogActivity extends AppCompatActivity {
     @Override
     public void onPause() {
       super.onPause();
-      mapView.onPause();
+      if (mapView != null) {
+        mapView.onPause();
+      }
     }
 
     @Override
     public void onStop() {
       super.onStop();
-      mapView.onStop();
+      if (mapView != null) {
+        mapView.onStop();
+      }
     }
 
     @Override
     public void onDestroyView() {
       super.onDestroyView();
-      mapView.onDestroy();
+      if (mapView != null) {
+        mapView.onDestroy();
+      }
     }
 
     @Override
     public void onLowMemory() {
       super.onLowMemory();
-      mapView.onLowMemory();
+      if (mapView != null) {
+        mapView.onLowMemory();
+      }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
       super.onSaveInstanceState(outState);
-      mapView.onSaveInstanceState(outState);
+      if (mapView != null) {
+        mapView.onSaveInstanceState(outState);
+      }
     }
   }
 }
