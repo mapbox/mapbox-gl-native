@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Improved tilt gesture performance. ([#13902](https://github.com/mapbox/mapbox-gl-native/pull/13902))
 * Fixed a bug where `layoutSubviews` was always called on device rotation, regardless of the application's or top-most view controller's supported orientations. ([#13900](https://github.com/mapbox/mapbox-gl-native/pull/13900))
 * Added `MGLNetworkConfiguration` class to customize the SDK's `NSURLSessionConfiguration` object. ([#11447](https://github.com/mapbox/mapbox-gl-native/pull/13886))
+* Added an MGLMapView.prefetchesTiles property that you can disable if you don’t want to prefetch simplified tiles as a performance optimization. ([#14031](https://github.com/mapbox/mapbox-gl-native/pull/14031))
 
 ## 4.8.0 - January 30, 2019
 
