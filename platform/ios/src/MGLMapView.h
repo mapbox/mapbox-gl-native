@@ -355,7 +355,10 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A Boolean value indicating whether the map should prefetch tiles.
  
- When this property is set to YES, the map view prefetches loads tiles designed for a low zoom level and displays them until receiving more detailed tiles for the current zoom level. The prefetched tiles typically contain simplified versions of each shape, improving the map view’s perceived performance.
+ When this property is set to YES, the map view prefetches loads tiles designed for a
+ low zoom level and displays them until receiving more detailed tiles for the current
+ zoom level. The prefetched tiles typically contain simplified versions of each shape,
+ improving the map view’s perceived performance.
  
  The default value of this property is YES.
  */
