@@ -43,4 +43,4 @@ gzip -f $file_name
 if [ -z `which aws` ]; then	
     brew install awscli	
 fi
-aws s3 cp $file_name.gz s3://mapbox-loading-dock/raw/mobile.coverage/$current_date/
+aws s3 cp $file_name.gz s3://mapbox-loading-dock/raw/mobile.code_coverage/$current_date/
