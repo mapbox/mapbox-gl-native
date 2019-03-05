@@ -74,7 +74,6 @@ publish() {
     fi
 }
 
-export TRAVIS_REPO_SLUG=mapbox-gl-native
 export GITHUB_USER=mapbox
 export GITHUB_REPO=mapbox-gl-native
 export BUILDTYPE=Release

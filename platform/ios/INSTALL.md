@@ -73,9 +73,9 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 (The last step, courtesy of [Realm](https://github.com/realm/realm-cocoa/), is required for working around an [iOS App Store bug](http://www.openradar.me/radar?id=6409498411401216) when archiving universal binaries.)
 
-##### Nightly builds
+##### Snapshot builds
 
-A nightly build of the dynamic framework, based on the master branch, is available for download [here](https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-nightly-dynamic.zip).
+A snapshot build of the dynamic framework, based on the latest commit to the master branch, is available for download [here](https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-snapshot-dynamic.zip).
 
 #### Static framework
 
@@ -114,12 +114,12 @@ To test pre-releases of the dynamic framework, directly specify the version in y
 pod 'Mapbox-iOS-SDK', '~> x.x.x-alpha.1'
 ```
 
-##### Testing nightly releases with CocoaPods
+##### Testing snapshot releases with CocoaPods
 
-To test a nightly dynamic framework build, update your app’s `Podfile` to point to:
+To test a snapshot dynamic framework build, update your app’s `Podfile` to point to:
 
 ```rb
-pod 'Mapbox-iOS-SDK-nightly-dynamic', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/ios/Mapbox-iOS-SDK-nightly-dynamic.podspec'
+pod 'Mapbox-iOS-SDK-snapshot-dynamic', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/ios/Mapbox-iOS-SDK-snapshot-dynamic.podspec'
 ```
 
 ##### Using your own build with CocoaPods
@@ -148,7 +148,7 @@ Note that these builds lack some debugging information, which could make develop
 
 #### Carthage
 
-For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with Carthage, see [our website](https://www.mapbox.com/install/ios/carthage/). If you require a build with debug symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-stripped.json) with Carthage.
+For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with Carthage, see [our website](https://www.mapbox.com/install/ios/carthage/).
 
 ##### Testing pre-releases with Carthage
 
@@ -158,9 +158,17 @@ To test pre-releases of the dynamic framework, directly specify the version in y
 binary "https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK.json" ~> x.x.x-alpha.1
 ```
 
+##### Testing snapshot releases with Carthage
+
+This project does not currently support using snapshot releases via Carthage.
+
 ##### Using your own build with Carthage
 
 This project does not support being compiled as a local repository by Carthage.
+
+##### Using pre-stripped releases with Carthage
+
+If you require a build with debug symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-stripped.json) with Carthage.
 
 ### Configuration
 

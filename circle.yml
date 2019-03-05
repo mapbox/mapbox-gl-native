@@ -449,7 +449,7 @@ commands:
         name: Send a Slack notification on nightly failure
         when: on_fail
         command: |
-          if [[ -z $CIRCLE_COMPARE_URL && $CIRCLE_BRANCH == master ]]; then
+          if [[ $CIRCLE_BRANCH == master ]]; then
             export SLACK_MESSAGE="Nightly build of \`$CIRCLE_JOB\` <$CIRCLE_BUILD_URL|failed>."
             export SLACK_COLOR="danger"
             scripts/notify-slack.sh
@@ -957,10 +957,10 @@ jobs:
           command: make iframework
           no_output_timeout: 5m
       - deploy:
-          name: Upload nightly build to s3
+          name: Upload snapshot build to s3
           command: |
-            if [[ -z $CIRCLE_COMPARE_URL && $CIRCLE_BRANCH == master ]]; then
-              platform/ios/scripts/deploy-nightly.sh
+            if [[ $CIRCLE_BRANCH == master ]]; then
+              platform/ios/scripts/deploy-snapshot.sh
             fi
       - run:
           name: Record size
