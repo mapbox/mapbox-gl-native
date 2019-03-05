@@ -5,6 +5,7 @@
     <string name="description_cameraposition">CameraPosition capabilities</string>
     <string name="description_map_fragment">Showcase MapFragment</string>
     <string name="description_map_fragment_support">Showcase SupportMapFragment</string>
+    <string name="description_map_fragment_backstack">Showcase using a Map Fragment with a fragment backstack</string>
     <string name="description_multimap">Activity with multiple maps on screen</string>
     <string name="description_press_for_marker">Add marker to map on long press</string>
     <string name="description_camera_zoom">Different types of zoom methods</string>

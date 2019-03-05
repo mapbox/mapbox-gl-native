@@ -45,5 +45,6 @@
   "RuntimeStyleActivity",
   "GridSourceActivity",
   "AnimatedImageSourceActivity",
-  "EspressoTestActivity"
+  "EspressoTestActivity",
+  "FragmentBackStackActivity"
 ]
