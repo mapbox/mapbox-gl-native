@@ -77,7 +77,6 @@ public class LocationComponentActivationOptionsTest {
     LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
       .accuracyAlpha(0.5f)
       .build();
-    assertNotNull(locationComponentOptions);
 
     LocationComponentActivationOptions.builder(context, style)
       .locationComponentOptions(locationComponentOptions)
@@ -90,11 +89,6 @@ public class LocationComponentActivationOptionsTest {
     thrown.expect(NullPointerException.class);
     thrown.expectMessage("Context in LocationComponentActivationOptions is null.");
 
-    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
-      .accuracyAlpha(0.5f)
-      .build();
-    assertNotNull(locationComponentOptions);
-
     LocationComponentActivationOptions.builder(null, style)
       .build();
   }
@@ -104,11 +98,6 @@ public class LocationComponentActivationOptionsTest {
     thrown.expect(NullPointerException.class);
     thrown.expectMessage("Style in LocationComponentActivationOptions is null. Make sure the Style object isn't null."
       + " Wait for the map to fully load before passing the Style object to LocationComponentActivationOptions.");
-
-    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
-      .accuracyAlpha(0.5f)
-      .build();
-    assertNotNull(locationComponentOptions);
 
     LocationComponentActivationOptions.builder(context, null)
       .build();
@@ -123,11 +112,6 @@ public class LocationComponentActivationOptionsTest {
     thrown.expectMessage("Style in LocationComponentActivationOptions isn't fully loaded. Wait for the "
         + "map to fully load before passing the Style object to "
         + "LocationComponentActivationOptions.");
-
-    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
-        .accuracyAlpha(0.5f)
-        .build();
-    assertNotNull(locationComponentOptions);
 
     LocationComponentActivationOptions.builder(context, style)
         .build();

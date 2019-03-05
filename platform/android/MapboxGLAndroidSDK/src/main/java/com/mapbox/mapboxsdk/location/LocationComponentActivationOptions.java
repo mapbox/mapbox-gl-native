@@ -198,6 +198,9 @@ public class LocationComponentActivationOptions {
      * @param useDefaultLocationEngine true if you want to initialize and use the
      *                                 built-in location engine or false if there
      *                                 should be no location engine initialized
+     *                                 This is ignored when null is set as the parameter
+     *                                 for {@link LocationComponentActivationOptions#builder
+     *                                 (Context, Style)#locationEngine()}.
      * @return the {@link Builder} object being constructed
      */
     public Builder useDefaultLocationEngine(boolean useDefaultLocationEngine) {
