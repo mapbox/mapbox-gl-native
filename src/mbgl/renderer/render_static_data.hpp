@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/programs/extrusion_texture_program.hpp>
@@ -16,9 +16,9 @@ class RenderStaticData {
 public:
     RenderStaticData(gl::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
 
-    gl::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertexBuffer;
-    gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
-    gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
+    gfx::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertexBuffer;
+    gfx::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
+    gfx::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
 
     gfx::IndexBuffer quadTriangleIndexBuffer;
     gfx::IndexBuffer tileBorderIndexBuffer;

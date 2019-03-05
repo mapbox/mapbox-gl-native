@@ -2,7 +2,7 @@
 
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/texture.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/programs/hillshade_program.hpp>
 #include <mbgl/programs/hillshade_prepare_program.hpp>
 #include <mbgl/renderer/bucket.hpp>
@@ -50,7 +50,7 @@ public:
     gfx::IndexVector<gfx::Triangles> indices;
     SegmentVector<HillshadeAttributes> segments;
 
-    optional<gl::VertexBuffer<HillshadeLayoutVertex>> vertexBuffer;
+    optional<gfx::VertexBuffer<HillshadeLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> indexBuffer;
 private: 
     DEMData demdata;

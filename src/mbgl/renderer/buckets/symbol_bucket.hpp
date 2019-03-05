@@ -2,7 +2,7 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/symbol_program.hpp>
@@ -95,9 +95,9 @@ public:
         SegmentVector<SymbolTextAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
 
-        optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
-        optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
-        optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
+        optional<gfx::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
+        optional<gfx::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
+        optional<gfx::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
         optional<gfx::IndexBuffer> indexBuffer;
     } text;
 
@@ -112,9 +112,9 @@ public:
         std::vector<PlacedSymbol> placedSymbols;
         PremultipliedImage atlasImage;
 
-        optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
-        optional<gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
-        optional<gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
+        optional<gfx::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
+        optional<gfx::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
+        optional<gfx::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
         optional<gfx::IndexBuffer> indexBuffer;
     } icon;
 
@@ -123,8 +123,8 @@ public:
         gfx::VertexVector<gfx::Vertex<CollisionBoxDynamicAttributes>> dynamicVertices;
         SegmentVector<CollisionBoxProgram::Attributes> segments;
 
-        optional<gl::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>> vertexBuffer;
-        optional<gl::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>> dynamicVertexBuffer;
+        optional<gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>> vertexBuffer;
+        optional<gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>> dynamicVertexBuffer;
     };
 
     struct CollisionBoxBuffer : public CollisionBuffer {

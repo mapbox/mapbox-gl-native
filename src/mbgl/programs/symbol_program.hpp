@@ -286,9 +286,9 @@ public:
     }
 
     static typename Attributes::Bindings computeAllAttributeBindings(
-        const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
-        const gl::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicLayoutVertexBuffer,
-        const gl::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>& opacityVertexBuffer,
+        const gfx::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
+        const gfx::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicLayoutVertexBuffer,
+        const gfx::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>& opacityVertexBuffer,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
         assert(layoutVertexBuffer.elements == dynamicLayoutVertexBuffer.elements &&

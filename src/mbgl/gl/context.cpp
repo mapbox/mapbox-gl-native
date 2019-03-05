@@ -1,5 +1,6 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/enum.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
@@ -248,17 +249,18 @@ void Context::verifyProgramLinkage(ProgramID program_) {
     throw std::runtime_error("program failed to link");
 }
 
-UniqueBuffer Context::createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
+std::unique_ptr<const gfx::VertexBufferResource>
+Context::createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
     vertexBuffer = result;
     MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage)));
-    return result;
+    return std::make_unique<gl::VertexBufferResource>(std::move(result));
 }
 
-void Context::updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size) {
-    vertexBuffer = buffer;
+void Context::updateVertexBuffer(const gfx::VertexBufferResource& resource, const void* data, std::size_t size) {
+    vertexBuffer = reinterpret_cast<const gl::VertexBufferResource&>(resource).buffer;
     MBGL_CHECK_ERROR(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
 }
 

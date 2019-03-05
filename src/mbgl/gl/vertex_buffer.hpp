@@ -1,14 +1,16 @@
 #pragma once
 
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gl/object.hpp>
 
 namespace mbgl {
 namespace gl {
 
-template <class V>
-class VertexBuffer {
+class VertexBufferResource : public gfx::VertexBufferResource {
 public:
-    std::size_t elements;
+    VertexBufferResource(UniqueBuffer&& buffer_) : buffer(std::move(buffer_)) {
+    }
+
     UniqueBuffer buffer;
 };
 

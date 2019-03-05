@@ -1,5 +1,6 @@
 #include <mbgl/gl/value.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/enum.hpp>
 
@@ -485,7 +486,7 @@ GLint components(const gfx::AttributeDataType type) {
 
 void VertexAttribute::Set(const optional<AttributeBinding>& binding, Context& context, AttributeLocation location) {
     if (binding) {
-        context.vertexBuffer = binding->vertexBuffer;
+        context.vertexBuffer = reinterpret_cast<const gl::VertexBufferResource&>(*binding->vertexBufferResource).buffer;
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
         MBGL_CHECK_ERROR(glVertexAttribPointer(
             location,

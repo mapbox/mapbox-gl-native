@@ -1,7 +1,7 @@
 #pragma once
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/line_program.hpp>
@@ -47,7 +47,7 @@ public:
     gfx::IndexVector<gfx::Triangles> triangles;
     SegmentVector<LineAttributes> segments;
 
-    optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
+    optional<gfx::VertexBuffer<LineLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> indexBuffer;
 
     std::map<std::string, LineProgram::Binders> paintPropertyBinders;

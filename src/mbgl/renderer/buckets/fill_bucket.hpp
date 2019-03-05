@@ -2,7 +2,7 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/fill_program.hpp>
@@ -46,7 +46,7 @@ public:
     SegmentVector<FillAttributes> lineSegments;
     SegmentVector<FillAttributes> triangleSegments;
 
-    optional<gl::VertexBuffer<FillLayoutVertex>> vertexBuffer;
+    optional<gfx::VertexBuffer<FillLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> lineIndexBuffer;
     optional<gfx::IndexBuffer> triangleIndexBuffer;
 
