@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.testapp.activity.location;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -11,6 +11,8 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.LocationComponentOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -20,7 +22,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
 
-public class LocationMapChangeActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class LocationComponentActivationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -29,16 +31,9 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_location_layer_map_change);
+    setContentView(R.layout.activity_location_layer_activation_builder);
 
     mapView = findViewById(R.id.mapView);
-    FloatingActionButton stylesFab = findViewById(R.id.fabStyles);
-
-    stylesFab.setOnClickListener(v -> {
-      if (mapboxMap != null) {
-        mapboxMap.setStyle(new Style.Builder().fromUrl(Utils.getNextStyle()));
-      }
-    });
 
     mapView.onCreate(savedInstanceState);
 
@@ -48,14 +43,14 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
       permissionsManager = new PermissionsManager(new PermissionsListener() {
         @Override
         public void onExplanationNeeded(List<String> permissionsToExplain) {
-          Toast.makeText(LocationMapChangeActivity.this, "You need to accept location permissions.",
+          Toast.makeText(LocationComponentActivationActivity.this, "You need to accept location permissions.",
             Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onPermissionResult(boolean granted) {
           if (granted) {
-            mapView.getMapAsync(LocationMapChangeActivity.this);
+            mapView.getMapAsync(LocationComponentActivationActivity.this);
           } else {
             finish();
           }
@@ -74,7 +69,7 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    mapboxMap.setStyle(new Style.Builder().fromUrl(Utils.getNextStyle()),
+    mapboxMap.setStyle(Style.DARK,
       style -> activateLocationComponent(style));
   }
 
@@ -82,20 +77,23 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   private void activateLocationComponent(@NonNull Style style) {
     LocationComponent locationComponent = mapboxMap.getLocationComponent();
 
-    locationComponent.activateLocationComponent(
-      LocationComponentActivationOptions
-        .builder(this, style)
-        .useDefaultLocationEngine(true)
-        .build());
+    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(this)
+      .elevation(5)
+      .accuracyAlpha(.6f)
+      .accuracyColor(Color.GREEN)
+      .foregroundDrawable(R.drawable.mapbox_logo_helmet)
+      .build();
 
+    LocationComponentActivationOptions locationComponentActivationOptions = LocationComponentActivationOptions
+      .builder(this, style)
+      .locationComponentOptions(locationComponentOptions)
+      .useDefaultLocationEngine(true)
+      .build();
+
+    locationComponent.activateLocationComponent(locationComponentActivationOptions);
     locationComponent.setLocationComponentEnabled(true);
-    locationComponent.setRenderMode(RenderMode.COMPASS);
-
-    locationComponent.addOnLocationClickListener(
-      () -> Toast.makeText(this, "Location clicked", Toast.LENGTH_SHORT).show());
-
-    locationComponent.addOnLocationLongClickListener(
-      () -> Toast.makeText(this, "Location long clicked", Toast.LENGTH_SHORT).show());
+    locationComponent.setRenderMode(RenderMode.NORMAL);
+    locationComponent.setCameraMode(CameraMode.TRACKING);
   }
 
   @Override

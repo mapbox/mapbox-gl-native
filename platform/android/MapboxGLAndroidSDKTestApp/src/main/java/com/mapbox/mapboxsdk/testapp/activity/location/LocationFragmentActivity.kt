@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.location
 
 import android.annotation.SuppressLint
 import android.app.Fragment
-import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
@@ -10,21 +9,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
-import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.location.LocationComponent
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_location_layer_fragment.*
-import java.lang.Exception
 
 class LocationFragmentActivity : AppCompatActivity() {
   private lateinit var permissionsManager: PermissionsManager
@@ -105,10 +101,15 @@ class LocationFragmentActivity : AppCompatActivity() {
       mapView.getMapAsync {
         mapboxMap = it
         it.setStyle(Style.MAPBOX_STREETS) { style ->
-            val component = mapboxMap.locationComponent
-            component.activateLocationComponent(activity, style)
-            component.isLocationComponentEnabled = true
-            component.locationEngine?.getLastLocation(this)
+          val component = mapboxMap.locationComponent
+
+          component.activateLocationComponent(LocationComponentActivationOptions
+                  .builder(activity, style)
+                  .useDefaultLocationEngine(true)
+                  .build())
+
+          component.isLocationComponentEnabled = true
+          component.locationEngine?.getLastLocation(this)
         }
       }
     }

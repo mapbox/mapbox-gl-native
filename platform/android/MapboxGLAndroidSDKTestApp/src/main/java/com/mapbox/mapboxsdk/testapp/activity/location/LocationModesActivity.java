@@ -18,6 +18,7 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
 import com.mapbox.mapboxsdk.location.OnCameraTrackingChangedListener;
 import com.mapbox.mapboxsdk.location.OnLocationCameraTransitionListener;
@@ -126,12 +127,16 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
 
     mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
       locationComponent = mapboxMap.getLocationComponent();
-      locationComponent.activateLocationComponent(this, style, true,
-        new LocationEngineRequest.Builder(750)
-          .setFastestInterval(750)
-          .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-          .build()
-      );
+      locationComponent.activateLocationComponent(
+        LocationComponentActivationOptions
+          .builder(this, style)
+          .useDefaultLocationEngine(true)
+          .locationEngineRequest(new LocationEngineRequest.Builder(750)
+            .setFastestInterval(750)
+            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+            .build())
+          .build());
+
       toggleStyle();
       locationComponent.setLocationComponentEnabled(true);
       locationComponent.addOnLocationClickListener(this);
