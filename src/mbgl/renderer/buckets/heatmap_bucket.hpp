@@ -4,7 +4,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/heatmap_program.hpp>
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
@@ -34,7 +34,7 @@ public:
     SegmentVector<HeatmapAttributes> segments;
 
     optional<gl::VertexBuffer<HeatmapLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer> indexBuffer;
+    optional<gfx::IndexBuffer> indexBuffer;
 
     std::map<std::string, HeatmapProgram::Binders> paintPropertyBinders;
 

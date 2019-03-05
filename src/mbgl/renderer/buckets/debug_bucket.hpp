@@ -6,7 +6,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/programs/debug_program.hpp>
 
 namespace mbgl {
@@ -35,7 +35,7 @@ public:
 
     SegmentVector<DebugAttributes> segments;
     optional<gl::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
-    optional<gl::IndexBuffer> indexBuffer;
+    optional<gfx::IndexBuffer> indexBuffer;
 };
 
 } // namespace mbgl

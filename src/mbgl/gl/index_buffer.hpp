@@ -1,13 +1,16 @@
 #pragma once
 
+#include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/object.hpp>
 
 namespace mbgl {
 namespace gl {
 
-class IndexBuffer {
+class IndexBufferResource : public gfx::IndexBufferResource {
 public:
-    std::size_t elements;
+    IndexBufferResource(UniqueBuffer&& buffer_) : buffer(std::move(buffer_)) {
+    }
+
     UniqueBuffer buffer;
 };
 

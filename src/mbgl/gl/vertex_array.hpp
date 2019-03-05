@@ -9,6 +9,11 @@
 #include <memory>
 
 namespace mbgl {
+
+namespace gfx {
+class IndexBuffer;
+} // namespace gfx
+
 namespace gl {
 
 class Context;
@@ -56,7 +61,7 @@ public:
         : state(std::move(state_)) {
     }
 
-    void bind(Context&, BufferID indexBuffer, const AttributeBindingArray&);
+    void bind(Context&, const gfx::IndexBuffer&, const AttributeBindingArray&);
 
 private:
     UniqueVertexArrayState state;
