@@ -2,8 +2,8 @@ Pod::Spec.new do |m|
 
   version = '4.9.0'
 
-  m.name    = 'Mapbox-iOS-SDK-nightly-dynamic'
-  m.version = "#{version}-nightly"
+  m.name    = 'Mapbox-iOS-SDK-snapshot-dynamic'
+  m.version = "#{version}-snapshot"
 
   m.summary           = 'Open source vector map solution for iOS with full styling capabilities.'
   m.description       = 'Open source, OpenGL-based vector map solution for iOS with full styling capabilities and Cocoa Touch APIs.'
@@ -15,7 +15,7 @@ Pod::Spec.new do |m|
   m.documentation_url = 'https://docs.mapbox.com/ios/api/maps/'
 
   m.source = {
-    :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-nightly-dynamic.zip",
+    :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-snapshot-dynamic.zip",
     :flatten => true
   }
 
