@@ -2,6 +2,7 @@
 #include <mbgl/gl/enum.hpp>
 #include <mbgl/gl/vertex_buffer_resource.hpp>
 #include <mbgl/gl/index_buffer_resource.hpp>
+#include <mbgl/gl/texture_resource.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
@@ -266,7 +267,7 @@ void Context::updateIndexBufferResource(const gfx::IndexBufferResource& resource
 }
 
 
-UniqueTexture Context::createTexture() {
+UniqueTexture Context::createUniqueTexture() {
     if (pooledTextures.empty()) {
         pooledTextures.resize(TextureMax);
         MBGL_CHECK_ERROR(glGenTextures(TextureMax, pooledTextures.data()));
@@ -468,83 +469,91 @@ Framebuffer Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA
 }
 
 Framebuffer
-Context::createFramebuffer(const Texture& color,
+Context::createFramebuffer(const gfx::Texture& color,
                            const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
     if (color.size != depthStencil.size) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                            color.texture, 0));
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+        reinterpret_cast<const gl::TextureResource&>(*color.resource).texture, 0));
     bindDepthStencilRenderbuffer(depthStencil);
     checkFramebuffer();
     return { color.size, std::move(fbo) };
 }
 
-Framebuffer Context::createFramebuffer(const Texture& color) {
+Framebuffer Context::createFramebuffer(const gfx::Texture& color) {
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                            color.texture, 0));
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+        reinterpret_cast<const gl::TextureResource&>(*color.resource).texture, 0));
     checkFramebuffer();
     return { color.size, std::move(fbo) };
 }
 
 Framebuffer
-Context::createFramebuffer(const Texture& color,
+Context::createFramebuffer(const gfx::Texture& color,
                            const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget) {
     if (color.size != depthTarget.size) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color.texture, 0));
-    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTarget.renderbuffer));
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+        reinterpret_cast<const gl::TextureResource&>(*color.resource).texture, 0));
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
+                                               depthTarget.renderbuffer));
     checkFramebuffer();
     return { depthTarget.size, std::move(fbo) };
 }
 
-UniqueTexture Context::createTexture(const Size size,
-                                     const void* data,
-                                     gfx::TexturePixelType format,
-                                     TextureUnit unit,
-                                     gfx::TextureChannelDataType type) {
-    auto obj = createTexture();
+std::unique_ptr<const gfx::TextureResource>
+Context::createTextureResource(const Size size,
+                               const void* data,
+                               gfx::TexturePixelType format,
+                               uint8_t unit,
+                               gfx::TextureChannelDataType type) {
+    auto obj = createUniqueTexture();
+    std::unique_ptr<const gfx::TextureResource> resource = std::make_unique<gl::TextureResource>(std::move(obj));
     pixelStoreUnpack = { 1 };
-    updateTexture(obj, size, data, format, unit, type);
+    updateTextureResource(*resource, size, data, format, unit, type);
     // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
     // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    return obj;
+    return resource;
 }
 
-void Context::updateTexture(TextureID id,
-                            const Size size,
-                            const void* data,
-                            gfx::TexturePixelType format,
-                            TextureUnit unit,
-                            gfx::TextureChannelDataType type) {
+void Context::updateTextureResource(const gfx::TextureResource& resource,
+                                    const Size size,
+                                    const void* data,
+                                    gfx::TexturePixelType format,
+                                    uint8_t unit,
+                                    gfx::TextureChannelDataType type) {
     activeTextureUnit = unit;
-    texture[unit] = id;
+    texture[unit] = reinterpret_cast<const gl::TextureResource&>(resource).texture;
     MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, Enum<gfx::TexturePixelType>::to(format),
                                   size.width, size.height, 0,
                                   Enum<gfx::TexturePixelType>::to(format),
                                   Enum<gfx::TextureChannelDataType>::to(type), data));
 }
 
-void Context::bindTexture(Texture& obj,
-                          TextureUnit unit,
+void Context::bindTexture(gfx::Texture& obj,
+                          uint8_t unit,
                           gfx::TextureFilterType filter,
                           gfx::TextureMipMapType mipmap,
                           gfx::TextureWrapType wrapX,
                           gfx::TextureWrapType wrapY) {
+    TextureID id = reinterpret_cast<const gl::TextureResource&>(*obj.resource).texture;
     if (filter != obj.filter || mipmap != obj.mipmap || wrapX != obj.wrapX || wrapY != obj.wrapY) {
         activeTextureUnit = unit;
-        texture[unit] = obj.texture;
+        texture[unit] = id;
 
         if (filter != obj.filter || mipmap != obj.mipmap) {
             MBGL_CHECK_ERROR(glTexParameteri(
@@ -571,11 +580,11 @@ void Context::bindTexture(Texture& obj,
                                 wrapY == gfx::TextureWrapType::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
             obj.wrapY = wrapY;
         }
-    } else if (texture[unit] != obj.texture) {
+    } else if (texture[unit] != id) {
         // We are checking first to avoid setting the active texture without a subsequent
         // texture bind.
         activeTextureUnit = unit;
-        texture[unit] = obj.texture;
+        texture[unit] = id;
     }
 }
 

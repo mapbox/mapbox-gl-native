@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/gfx/index_buffer.hpp>
-#include <mbgl/gl/texture.hpp>
+#include <mbgl/gfx/texture.hpp>
 #include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/programs/hillshade_program.hpp>
 #include <mbgl/programs/hillshade_prepare_program.hpp>
@@ -29,8 +29,8 @@ public:
     void clear();
     void setMask(TileMask&&);
 
-    optional<gl::Texture> dem;
-    optional<gl::Texture> texture;
+    optional<gfx::Texture> dem;
+    optional<gfx::Texture> texture;
 
     TileMask mask{ { 0, 0, 0 } };
 

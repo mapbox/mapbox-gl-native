@@ -168,7 +168,7 @@ struct LineWidth {
 };
 
 struct ActiveTextureUnit {
-    using Type = TextureUnit;
+    using Type = uint8_t;
     static const constexpr Type Default = 0;
     static void Set(const Type&);
     static Type Get();

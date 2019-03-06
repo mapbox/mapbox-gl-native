@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/gfx/index_buffer.hpp>
-#include <mbgl/gl/texture.hpp>
+#include <mbgl/gfx/texture.hpp>
 #include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/renderer/bucket.hpp>
@@ -27,7 +27,7 @@ public:
     void setMask(TileMask&&);
 
     std::shared_ptr<PremultipliedImage> image;
-    optional<gl::Texture> texture;
+    optional<gfx::Texture> texture;
     TileMask mask{ { 0, 0, 0 } };
 
     // Bucket specific vertices are used for Image Sources only

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/texture.hpp>
+#include <mbgl/gfx/texture.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
@@ -33,11 +33,11 @@ public:
     ~LineAtlas();
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(gl::Context&, gl::TextureUnit unit);
+    void bind(gl::Context&, uint8_t unit);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::Context&, gl::TextureUnit unit);
+    void upload(gl::Context&, uint8_t unit);
 
     LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
     LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);
@@ -47,7 +47,7 @@ public:
 private:
     const AlphaImage image;
     bool dirty;
-    mbgl::optional<gl::Texture> texture;
+    mbgl::optional<gfx::Texture> texture;
     uint32_t nextRow = 0;
     std::unordered_map<size_t, LinePatternPos> positions;
 };

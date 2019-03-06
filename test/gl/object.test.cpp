@@ -51,7 +51,7 @@ TEST(GLObject, Store) {
     gl::Context context;
     EXPECT_TRUE(context.empty());
 
-    gl::UniqueTexture texture = context.createTexture();
+    gl::UniqueTexture texture = context.createUniqueTexture();
     EXPECT_NE(texture.get(), 0u);
     texture.reset();
     EXPECT_FALSE(context.empty());

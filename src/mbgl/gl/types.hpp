@@ -25,8 +25,6 @@ using AttributeLocation = uint32_t;
 // "silently ignored".
 using UniformLocation = int32_t;
 
-using TextureUnit = uint8_t;
-
 enum class ShaderType : uint32_t {
     Vertex = 0x8B31,
     Fragment = 0x8B30
