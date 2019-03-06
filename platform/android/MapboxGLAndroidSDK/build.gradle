@@ -1,9 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: "com.jaredsburrows.license"
 apply plugin: 'kotlin-android'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'maven-publish'
-apply plugin: 'com.github.dcendents.android-maven'
 
 dependencies {
     lintChecks project(":MapboxGLAndroidSDKLint")
@@ -168,7 +165,6 @@ configurations {
 }
 
 apply from: "${rootDir}/gradle/gradle-javadoc.gradle"
-apply from: "${rootDir}/gradle/gradle-publish.gradle"
 apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
 apply from: "${rootDir}/gradle/gradle-dependencies-graph.gradle"
 apply from: "${rootDir}/gradle/gradle-update-vendor-modules.gradle"

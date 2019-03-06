@@ -626,13 +626,10 @@ jobs:
       - run:
           name: Generate Maven credentials
           command: |
-            if [ -n "${PUBLISH_NEXUS_USERNAME}" ]; then
-              aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg
-              echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
-              NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
-              signing.keyId=$SIGNING_KEYID
-              signing.password=$SIGNING_PASSWORD
-              signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
+            if [ -n "${BINTRAY_USER}" ]; then
+              echo "BINTRAY_USER=$BINTRAY_USER
+              BINTRAY_API_KEY=$BINTRAY_API_KEY
+              GPG_PASSPHRASE=$GPG_PASSPHRASE"
             fi
       - run:
           name: Update version name

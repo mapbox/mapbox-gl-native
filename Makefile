@@ -702,16 +702,6 @@ apackage: platform/android/gradle/configuration.gradle
 android-ui-test: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
-# Uploads the compiled Android SDK to Maven
-.PHONY: run-android-upload-archives
-run-android-upload-archives: platform/android/gradle/configuration.gradle
-	cd platform/android && export IS_LOCAL_DEVELOPMENT=false && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
-
-# Uploads the compiled Android SDK to ~/.m2/repository/com/mapbox/mapboxsdk
-.PHONY: run-android-upload-archives-local
-run-android-upload-archives-local: platform/android/gradle/configuration.gradle
-	cd platform/android && export IS_LOCAL_DEVELOPMENT=true && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
-
 # Uploads the compiled Android SDK to Bintray
 .PHONY: run-android-upload-to-bintray
 run-android-upload-to-bintray: platform/android/gradle/configuration.gradle
