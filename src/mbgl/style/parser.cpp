@@ -29,7 +29,7 @@ StyleParseResult Parser::parse(const std::string& json) {
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
-        return std::make_exception_ptr(std::runtime_error(formatJSONParseError(document)));
+        return std::make_exception_ptr(std::runtime_error(formatJSONParseError(json, document)));
     }
 
     if (!document.IsObject()) {

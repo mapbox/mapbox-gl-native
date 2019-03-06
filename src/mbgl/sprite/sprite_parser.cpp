@@ -90,7 +90,7 @@ std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encode
     JSDocument doc;
     doc.Parse<0>(json.c_str());
     if (doc.HasParseError()) {
-        throw std::runtime_error("Failed to parse JSON: " + formatJSONParseError(doc));
+        throw std::runtime_error("Failed to parse JSON " + formatJSONParseError(json, doc));
     } else if (!doc.IsObject()) {
         throw std::runtime_error("Sprite JSON root must be an object");
     } else {

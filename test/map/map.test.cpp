@@ -373,7 +373,7 @@ TEST(Map, SetStyleInvalidJSON) {
     auto observer = Log::removeObserver();
     auto flo = static_cast<FixtureLogObserver*>(observer.get());
     EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::ParseStyle, -1,
-        "Failed to parse style: Invalid value. at offset 0" }));
+        "Failed to parse style on line 1 col 0: Invalid value." }));
     auto unchecked = flo->unchecked();
     EXPECT_TRUE(unchecked.empty()) << unchecked;
 }

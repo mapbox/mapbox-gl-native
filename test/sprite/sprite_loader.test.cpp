@@ -140,7 +140,7 @@ TEST(SpriteLoader, JSONLoadingCorrupted) {
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
-        EXPECT_EQ("Failed to parse JSON: Invalid value. at offset 0", util::toString(error));
+        EXPECT_EQ("Failed to parse JSON on line 1 col 0: Invalid value.", util::toString(error));
         test.end();
     };
 

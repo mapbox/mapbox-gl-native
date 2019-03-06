@@ -15,7 +15,7 @@ optional<T> convertJSON(const std::string& json, Error& error, Args&&...args) {
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
-        error = { formatJSONParseError(document) };
+        error = { formatJSONParseError(json, document) };
         return {};
     }
 

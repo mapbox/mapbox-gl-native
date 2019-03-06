@@ -289,7 +289,7 @@ TEST(Sprite, SpriteParsingInvalidJSON) {
         FAIL() << "Expected exception";
     } catch (std::runtime_error& err) {
         EXPECT_STREQ(
-            "Failed to parse JSON: Missing a closing quotation mark in string. at offset 14",
+            "Failed to parse JSON on line 1 col 14: Missing a closing quotation mark in string.",
             err.what());
     }
 }

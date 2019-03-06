@@ -77,7 +77,7 @@ void Style::Impl::parse(const std::string& json_) {
     Parser parser;
 
     if (auto error = parser.parse(json_)) {
-        std::string message = "Failed to parse style: " + util::toString(error);
+        std::string message = "Failed to parse style " + util::toString(error);
         Log::Error(Event::ParseStyle, message.c_str());
         observer->onStyleError(std::make_exception_ptr(util::StyleParseException(message)));
         observer->onResourceError(error);
