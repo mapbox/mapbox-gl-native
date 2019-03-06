@@ -268,6 +268,17 @@ TEST(Map, SetStyleDefaultCamera) {
     EXPECT_DOUBLE_EQ(*camera.zoom, 0.5);
 }
 
+TEST(Map, ProjectionMode) {
+    MapTest<> test;
+
+    test.map.setProjectionMode(ProjectionMode().withAxonometric(true).withXSkew(1.0).withYSkew(0.0));
+    auto options = test.map.getProjectionMode();
+
+    EXPECT_TRUE(*options.axonometric);
+    EXPECT_EQ(*options.xSkew, 1.0);
+    EXPECT_EQ(*options.ySkew, 0.0);
+}
+
 TEST(Map, SetStyleInvalidJSON) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
