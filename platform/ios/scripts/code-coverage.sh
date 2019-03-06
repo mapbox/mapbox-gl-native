@@ -32,7 +32,7 @@ cat <<EOF > $file_name
       "platform" : "ios",
       "sdk" : "maps",
       "scheme" : "CI",
-      "created_at" : "$current_coverage"
+      "created_at" : "$current_date"
    }
 EOF
 
