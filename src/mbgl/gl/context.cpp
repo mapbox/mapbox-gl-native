@@ -246,7 +246,7 @@ void Context::verifyProgramLinkage(ProgramID program_) {
 }
 
 std::unique_ptr<const gfx::VertexBufferResource>
-Context::createVertexBuffer(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
+Context::createVertexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
@@ -255,13 +255,13 @@ Context::createVertexBuffer(const void* data, std::size_t size, const gfx::Buffe
     return std::make_unique<gl::VertexBufferResource>(std::move(result));
 }
 
-void Context::updateVertexBuffer(const gfx::VertexBufferResource& resource, const void* data, std::size_t size) {
+void Context::updateVertexBufferResource(const gfx::VertexBufferResource& resource, const void* data, std::size_t size) {
     vertexBuffer = reinterpret_cast<const gl::VertexBufferResource&>(resource).buffer;
     MBGL_CHECK_ERROR(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
 }
 
 std::unique_ptr<const gfx::IndexBufferResource>
-Context::createIndexBuffer(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
+Context::createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
@@ -271,7 +271,7 @@ Context::createIndexBuffer(const void* data, std::size_t size, const gfx::Buffer
     return std::make_unique<gl::IndexBufferResource>(std::move(result));
 }
 
-void Context::updateIndexBuffer(const gfx::IndexBufferResource& resource, const void* data, std::size_t size) {
+void Context::updateIndexBufferResource(const gfx::IndexBufferResource& resource, const void* data, std::size_t size) {
     // Be sure to unbind any existing vertex array object before binding the index buffer
     // so that we don't mess up another VAO
     bindVertexArray = 0;

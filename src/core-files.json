@@ -497,6 +497,7 @@
         "mbgl/geometry/line_atlas.hpp": "src/mbgl/geometry/line_atlas.hpp",
         "mbgl/gfx/attribute.hpp": "src/mbgl/gfx/attribute.hpp",
         "mbgl/gfx/color_mode.hpp": "src/mbgl/gfx/color_mode.hpp",
+        "mbgl/gfx/context.hpp": "src/mbgl/gfx/context.hpp",
         "mbgl/gfx/cull_face_mode.hpp": "src/mbgl/gfx/cull_face_mode.hpp",
         "mbgl/gfx/depth_mode.hpp": "src/mbgl/gfx/depth_mode.hpp",
         "mbgl/gfx/draw_mode.hpp": "src/mbgl/gfx/draw_mode.hpp",

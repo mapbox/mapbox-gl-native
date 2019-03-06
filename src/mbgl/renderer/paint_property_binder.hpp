@@ -1,10 +1,10 @@
 #pragma once
 
+#include <mbgl/gfx/context.hpp>
 #include <mbgl/gfx/uniform.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
@@ -96,7 +96,7 @@ public:
     virtual ~PaintPropertyBinder() = default;
 
     virtual void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&) = 0;
-    virtual void upload(gl::Context& context) = 0;
+    virtual void upload(gfx::Context& context) = 0;
     virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) = 0;
     virtual std::tuple<ExpandToType<As, optional<gl::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
     virtual std::tuple<ExpandToType<As, float>...> interpolationFactor(float currentZoom) const = 0;
@@ -115,7 +115,7 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&) override {}
-    void upload(gl::Context&) override {}
+    void upload(gfx::Context&) override {}
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
 
     std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
@@ -142,7 +142,7 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&) override {}
-    void upload(gl::Context&) override {}
+    void upload(gfx::Context&) override {}
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters&) override {
         if (!posA && !posB) {
@@ -192,7 +192,7 @@ public:
         }
     }
 
-    void upload(gl::Context& context) override {
+    void upload(gfx::Context& context) override {
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
@@ -252,7 +252,7 @@ public:
         }
     }
 
-    void upload(gl::Context& context) override {
+    void upload(gfx::Context& context) override {
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
@@ -344,7 +344,7 @@ public:
         }
     }
 
-    void upload(gl::Context& context) override {
+    void upload(gfx::Context& context) override {
         patternToVertexBuffer = context.createVertexBuffer(std::move(patternToVertexVector));
         zoomInVertexBuffer = context.createVertexBuffer(std::move(zoomInVertexVector));
         zoomOutVertexBuffer = context.createVertexBuffer(std::move(zoomOutVertexVector));
@@ -486,7 +486,7 @@ public:
         });
     }
 
-    void upload(gl::Context& context) {
+    void upload(gfx::Context& context) {
         util::ignore({
             (binders.template get<Ps>()->upload(context), 0)...
         });
