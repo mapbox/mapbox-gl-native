@@ -7,10 +7,13 @@ typedef NS_ENUM(NSUInteger, MGLMetricType) {
     MGLMetricTypePerformance = 0,
 };
 
+FOUNDATION_EXTERN MGL_EXPORT NSString* MGLStringFromMetricType(MGLMetricType metricType);
+
+@class MGLMetricsManager;
 @protocol MGLMetricsDelegate <NSObject>
 
 - (BOOL)shouldHandleMetric:(MGLMetricType)metricType;
-- (void)didCollectMetric:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes;
+- (void)metricsManager:(MGLMetricsManager *)metricsManager didCollectMetric:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes;
 
 @end
 

@@ -5,6 +5,10 @@
 
 NSString * const kMGLPerformanceMetric = @"mobile.performance_trace";
 
+NSString* MGLStringFromMetricType(MGLMetricType metricType) {
+    return [@[kMGLPerformanceMetric] objectAtIndex:metricType];
+}
+
 @implementation MGLMetricsManager
 
 + (instancetype)sharedManager
@@ -17,9 +21,9 @@ NSString * const kMGLPerformanceMetric = @"mobile.performance_trace";
     return sharedConfiguration;
 }
 
-- (void)handleMetricEvent:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes {
+- (void)handleMetricsEvent:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes {
     if ([self.delegate shouldHandleMetric:metricType]) {
-        [self.delegate didCollectMetric:metricType withAttributes:attributes];
+        [self.delegate metricsManager:self didCollectMetric:metricType withAttributes:attributes];
     }
 }
 

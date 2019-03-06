@@ -2,11 +2,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *const kMGLPerformanceMetric;
+FOUNDATION_EXTERN MGL_EXPORT NSString *const kMGLPerformanceMetric;
 
 @interface MGLMetricsManager (Private)
 
-- (void)handleMetricEvent:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes;
+- (void)handleMetricsEvent:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes;
 
 @end
 

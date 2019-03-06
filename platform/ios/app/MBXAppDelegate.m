@@ -56,7 +56,7 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
     return YES;
 }
 
-- (void)didCollectMetric:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes {
+- (void)metricsManager:(MGLMetricsManager *)metricsManager didCollectMetric:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes {
     [[MGLMetricsManager sharedManager] pushMetric:metricType withAttributes:attributes];
 }
 
