@@ -1,22 +1,20 @@
 ext {
-    mapboxArtifactDeveloperName = 'Mapbox'
     mapboxArtifactGroupId = 'com.mapbox.mapboxsdk'
-    mapboxArtifactUrl = 'https://github.com/mapbox/mapbox-gl-native'
-    mapboxArtifactVcsUrl = 'https://github.com/mapbox/mapbox-gl-native.git'
-    mapboxArtifactTrackerUrl = 'https://github.com/mapbox/mapbox-gl-native/issues'
-    mapboxArtifactScmUrl = 'scm:git@github.com:mapbox/mapbox-gl-native.git'
-    mapboxArtifactGitUrl = 'https://github.com/mapbox/mapbox-gl-native'
-    mapboxLicenseName = 'BSD'
-    mapboxLicenseUrl = 'https://opensource.org/licenses/BSD-2-Clause'
-    mapboxArtifactInceptionYear = '2014'
-    versionName = project.hasProperty('versionName') ? project.property('versionName') : System.getenv('VERSION_NAME')
-
-    mapboxBintrayUserOrg = 'mapbox'
-    mapboxBintrayRepoName = 'mapbox'
-
-    // mapboxBintrayArtifactId is the same as mapboxArtifactGroup because of a weird bug
-    // https://github.com/bintray/gradle-bintray-plugin/issues/88
     mapboxArtifactId = 'mapbox-android-sdk'
     mapboxArtifactTitle = 'Mapbox Maps SDK for Android'
     mapboxArtifactDescription = 'Mapbox Maps SDK for Android'
+    mapboxDeveloperName = 'Mapbox'
+    mapboxDeveloperId = 'mapbox'
+    mapboxArtifactUrl = 'https://github.com/mapbox/mapbox-gl-native'
+    mapboxArtifactVcsUrl = 'https://github.com/mapbox/mapbox-gl-native.git'
+    mapboxArtifactScmUrl = 'scm:git@github.com:mapbox/mapbox-gl-native.git'
+    mapboxArtifactLicenseName = 'BSD'
+    mapboxArtifactLicenseUrl = 'https://opensource.org/licenses/BSD-2-Clause'
+    versionName = project.hasProperty('VERSION_NAME') ? project.property('VERSION_NAME') : System.getenv('VERSION_NAME')
+
+    mapboxBintrayUserOrg = 'mapbox'
+    mapboxBintrayRepoName = 'mapbox'
+    mapboxBintrayUser = project.hasProperty('BINTRAY_USER') ? project.property('BINTRAY_USER') : System.getenv('BINTRAY_USER')
+    mapboxBintrayApiKey = project.hasProperty('BINTRAY_API_KEY') ? project.property('BINTRAY_API_KEY') : System.getenv('BINTRAY_API_KEY')
+    mapboxGpgPassphrase = project.hasProperty('GPG_PASSPHRASE') ? project.property('GPG_PASSPHRASE') : System.getenv('GPG_PASSPHRASE')
 }

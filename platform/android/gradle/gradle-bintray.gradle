@@ -1,123 +1,106 @@
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'digital.wup.android-maven-publish'
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 apply from: file('../gradle/artifact-settings.gradle')
 
-
+version = project.ext.versionName
 group = project.ext.mapboxArtifactGroupId
-project.archivesBaseName = project.ext.mapboxArtifactId
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-
-            // Make sure that artifactId and name are the same String values!
-            // https://github.com/bintray/gradle-bintray-plugin/issues/81#issuecomment-149632738
-
-            name project.ext.mapboxArtifactId
-            println 'name = ' + name
-
-            description project.ext.mapboxArtifactDescription
-            println 'description = ' + description
-            url project.ext.mapboxArtifactGitUrl
-            inceptionYear project.ext.mapboxArtifactInceptionYear
-
-            packaging 'aar'
-            groupId project.ext.mapboxArtifactGroupId
-            artifactId project.ext.mapboxArtifactId
-            version project.ext.versionName
-            println 'version = ' + version
-
-            scm {
-                connection project.ext.mapboxArtifactVcsUrl
-                url project.ext.mapboxArtifactScmUrl
-            }
-
-            developers {
-                developer {
-                    name project.ext.mapboxArtifactDeveloperName
-                }
-            }
-
-            licenses {
-                license {
-                    name project.ext.mapboxLicenseName
-                    url project.ext.mapboxLicenseUrl
-                    distribution 'repo'
-                }
-            }
-        }
-    }
-}
 
 publishing {
     publications {
         MapboxMapsSdkPublication(MavenPublication) {
+            from components.android
+            groupId this.group
+            artifactId project.ext.mapboxArtifactId
+            version this.version
 
-            artifact("$buildDir/outputs/aar/mapbox-android-sdk-release.aar")
-
-            // TODO: Uncomment these and use exisiting Gradle tasks in `gradle-publish.gradle` ?
-            // TODO: https://github.com/search?q=%22artifact%28sourcesJar%29+++++++++++++artifact%28javadocJar%29%22&type=Code
-            /*artifact(sourcesJar)
-            artifact(javadocJar)
-*/
-            // For some reason, uncommented the following 3 declarations throws an error:
-            /*
-            groupId 'com.mapbox.mapboxsdk'
-            artifactId = 'mapbox-android-sdk'
-            version project.ext.versionName
-            */
+            afterEvaluate {
+                artifact("$buildDir/outputs/aar/mapbox-android-sdk-release.aar")
+                artifact(androidSourcesJar)
+                artifact(androidJavadocsJar)
+            }
 
             pom.withXml {
-                def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
+                final mainNode = asNode()
+                mainNode.appendNode('name', project.ext.mapboxArtifactTitle)
+                mainNode.appendNode('description', project.ext.mapboxArtifactTitle)
+                mainNode.appendNode('url', project.ext.mapboxArtifactUrl)
 
-                // Iterate over the implementation dependencies (we don't want the test ones), adding a <dependency> node for each
-                configurations.implementation.allDependencies.each {
-                    // Ensure dependencies such as fileTree are not included.
-                    if (it.name != 'unspecified') {
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
-                    }
-                }
+                final licenseNode = mainNode.appendNode('licenses').appendNode('license')
+                licenseNode.appendNode('name', project.ext.mapboxArtifactLicenseName)
+                licenseNode.appendNode('url', project.ext.mapboxArtifactLicenseUrl)
+                licenseNode.appendNode('distribution', "repo")
+
+                final developerNode = mainNode.appendNode('developers').appendNode('developer')
+                developerNode.appendNode('id', project.ext.mapboxDeveloperId)
+                developerNode.appendNode('name', project.ext.mapboxDeveloperName)
+
+                final scmNode = mainNode.appendNode("scm")
+                scmNode.appendNode("connection", project.ext.mapboxArtifactScmUrl)
+                scmNode.appendNode("developerConnection", project.ext.mapboxArtifactScmUrl)
+                scmNode.appendNode("url", project.ext.mapboxArtifactUrl)
             }
         }
     }
 }
 
 bintray {
-
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
-
+    user = mapboxBintrayUser
+    key = mapboxBintrayApiKey
     publications = ['MapboxMapsSdkPublication']
     pkg {
-
         repo = project.ext.mapboxBintrayRepoName
-        println 'pkg repo = ' + repo
-
         name = project.ext.mapboxArtifactId
-        println 'pkg name = ' + name
-
         userOrg = project.ext.mapboxBintrayUserOrg
-        println 'pkg userOrg = ' + userOrg
-
-        licenses = [project.ext.mapboxLicenseName]
+        licenses = [project.ext.mapboxArtifactLicenseName]
         vcsUrl = project.ext.mapboxArtifactVcsUrl
+        publish = false
         version {
             name = project.ext.versionName
-            desc = 'Mapbox Maps SDK for Android'
+            desc = project.ext.mapboxArtifactDescription
             released = new Date()
-            println 'version released = ' + released
-
             gpg {
                 sign = true
-                passphrase = project.hasProperty('gpgPassphrase') ? project.property('gpgPassphrase') : System.getenv('GPG_PASSPHRASE')
+                passphrase = mapboxGpgPassphrase
             }
             mavenCentralSync {
                 sync = false
             }
+        }
+    }
+}
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.sourceFiles
+    classpath = files(android.bootClasspath)
+    failOnError = false
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('docencoding', 'UTF-8')
+    options.addStringOption('charset', 'UTF-8')
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+}
+
+afterEvaluate { project ->
+    android.libraryVariants.all { variant ->
+        tasks.androidJavadocs.doFirst {
+            classpath += files(variant.javaCompile.classpath.files)
         }
     }
 }
