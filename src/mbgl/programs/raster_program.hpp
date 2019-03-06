@@ -43,6 +43,7 @@ class RasterProgram : public Program<
         uniforms::u_buffer_scale,
         uniforms::u_scale_parent,
         uniforms::u_tl_parent>,
+    TypeList<>,
     style::RasterPaintProperties>
 {
 public:

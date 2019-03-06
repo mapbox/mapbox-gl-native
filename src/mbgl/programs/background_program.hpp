@@ -49,6 +49,7 @@ class BackgroundProgram : public Program<
     gfx::Triangle,
     BackgroundLayoutAttributes,
     BackgroundUniforms,
+    TypeList<>,
     style::Properties<>>
 {
 public:
@@ -60,6 +61,7 @@ class BackgroundPatternProgram : public Program<
     gfx::Triangle,
     BackgroundLayoutAttributes,
     BackgroundPatternUniforms,
+    TypeList<>,
     style::Properties<>>
 {
 public:

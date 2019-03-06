@@ -244,6 +244,7 @@ template <class Shaders,
           class Primitive,
           class LayoutAttributeList,
           class UniformList,
+          class TextureList,
           class PaintProps>
 class SymbolProgram : public SymbolProgramBase {
 public:
@@ -357,6 +358,7 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_pitch_with_map,
         uniforms::u_rotate_symbol,
         uniforms::u_aspect_ratio>,
+    TypeList<>,
     style::IconPaintProperties>
 {
 public:
@@ -398,6 +400,7 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_aspect_ratio,
         uniforms::u_gamma_scale,
         uniforms::u_is_halo>,
+    TypeList<>,
     PaintProperties>
 {
 public:
@@ -420,6 +423,7 @@ public:
             uniforms::u_aspect_ratio,
             uniforms::u_gamma_scale,
             uniforms::u_is_halo>,
+        TypeList<>,
         PaintProperties>;
 
     using UniformValues = typename BaseProgram::UniformValues;

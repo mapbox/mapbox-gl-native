@@ -42,6 +42,7 @@ class FillProgram : public Program<
     gfx::Triangle,
     FillLayoutAttributes,
     FillUniforms,
+    TypeList<>,
     style::FillPaintProperties>
 {
 public:
@@ -62,6 +63,7 @@ class FillPatternProgram : public Program<
     gfx::Triangle,
     FillLayoutAttributes,
     FillPatternUniforms,
+    TypeList<>,
     style::FillPaintProperties>
 {
 public:
@@ -81,6 +83,7 @@ class FillOutlineProgram : public Program<
     gfx::Line,
     FillLayoutAttributes,
     FillUniforms,
+    TypeList<>,
     style::FillPaintProperties>
 {
 public:
@@ -92,6 +95,7 @@ class FillOutlinePatternProgram : public Program<
     gfx::Line,
     FillLayoutAttributes,
     FillPatternUniforms,
+    TypeList<>,
     style::FillPaintProperties>
 {
 public:

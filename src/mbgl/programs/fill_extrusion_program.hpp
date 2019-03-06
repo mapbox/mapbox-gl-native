@@ -57,6 +57,7 @@ class FillExtrusionProgram : public Program<
     gfx::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionUniforms,
+    TypeList<>,
     style::FillExtrusionPaintProperties>
 {
 public:
@@ -93,6 +94,7 @@ class FillExtrusionPatternProgram : public Program<
     gfx::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionPatternUniforms,
+    TypeList<>,
     style::FillExtrusionPaintProperties>
 {
 public:
