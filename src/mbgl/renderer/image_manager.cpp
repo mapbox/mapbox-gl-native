@@ -179,7 +179,7 @@ void ImageManager::upload(gl::Context& context, gl::TextureUnit unit) {
 
 void ImageManager::bind(gl::Context& context, gl::TextureUnit unit) {
     upload(context, unit);
-    context.bindTexture(*atlasTexture, unit, gl::TextureFilter::Linear);
+    context.bindTexture(*atlasTexture, unit, gfx::TextureFilterType::Linear);
 }
 
 } // namespace mbgl

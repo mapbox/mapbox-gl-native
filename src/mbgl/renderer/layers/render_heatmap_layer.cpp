@@ -56,7 +56,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (!renderTexture || renderTexture->getSize() != size) {
             if (parameters.context.supportsHalfFloatTextures) {
-                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::HalfFloat);
+                renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::HalfFloat);
 
                 try {
                     renderTexture->bind();
@@ -68,7 +68,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             }
 
             if (!parameters.context.supportsHalfFloatTextures || !renderTexture) {
-                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::UnsignedByte);
+                renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::UnsignedByte);
                 renderTexture->bind();
             }
 
@@ -77,7 +77,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (!colorRampTexture) {
-            colorRampTexture = parameters.context.createTexture(colorRamp, 1, gl::TextureType::UnsignedByte);
+            colorRampTexture = parameters.context.createTexture(colorRamp, 1, gfx::TextureChannelDataType::UnsignedByte);
         }
 
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
@@ -133,8 +133,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
     } else if (parameters.pass == RenderPass::Translucent) {
-        parameters.context.bindTexture(renderTexture->getTexture(), 0, gl::TextureFilter::Linear);
-        parameters.context.bindTexture(*colorRampTexture, 1, gl::TextureFilter::Linear);
+        parameters.context.bindTexture(renderTexture->getTexture(), 0, gfx::TextureFilterType::Linear);
+        parameters.context.bindTexture(*colorRampTexture, 1, gfx::TextureFilterType::Linear);
 
         const auto& size = parameters.staticData.backendSize;
 

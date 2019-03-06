@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gfx/types.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/util/size.hpp>
 
@@ -9,10 +10,10 @@ namespace gl {
 class Texture {
 public:
     Texture(Size size_, UniqueTexture texture_,
-            TextureFilter filter_ = TextureFilter::Nearest,
-            TextureMipMap mipmap_ = TextureMipMap::No,
-            TextureWrap wrapX_ = TextureWrap::Clamp,
-            TextureWrap wrapY_ = TextureWrap::Clamp)
+            gfx::TextureFilterType filter_ = gfx::TextureFilterType::Nearest,
+            gfx::TextureMipMapType mipmap_ = gfx::TextureMipMapType::No,
+            gfx::TextureWrapType wrapX_ = gfx::TextureWrapType::Clamp,
+            gfx::TextureWrapType wrapY_ = gfx::TextureWrapType::Clamp)
         : size(std::move(size_)),
           texture(std::move(texture_)),
           filter(filter_),
@@ -22,10 +23,10 @@ public:
 
     Size size;
     UniqueTexture texture;
-    TextureFilter filter;
-    TextureMipMap mipmap;
-    TextureWrap wrapX;
-    TextureWrap wrapY;
+    gfx::TextureFilterType filter;
+    gfx::TextureMipMapType mipmap;
+    gfx::TextureWrapType wrapX;
+    gfx::TextureWrapType wrapY;
 };
 
 } // namespace gl

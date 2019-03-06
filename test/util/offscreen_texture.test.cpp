@@ -158,7 +158,7 @@ void main() {
     test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);
 
     // Now, composite the Framebuffer texture we've rendered to onto the main FBO.
-    context.bindTexture(texture.getTexture(), 0, gl::TextureFilter::Linear);
+    context.bindTexture(texture.getTexture(), 0, gfx::TextureFilterType::Linear);
     MBGL_CHECK_ERROR(glUseProgram(compositeShader.program));
     MBGL_CHECK_ERROR(glUniform1i(u_texture, 0));
     MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, viewportBuffer.buffer));

@@ -43,20 +43,6 @@ static_assert(std::is_same<VertexArrayID, GLuint>::value, "OpenGL type mismatch"
 static_assert(std::is_same<FramebufferID, GLuint>::value, "OpenGL type mismatch");
 static_assert(std::is_same<RenderbufferID, GLuint>::value, "OpenGL type mismatch");
 
-static_assert(std::is_same<std::underlying_type_t<TextureFormat>, GLenum>::value, "OpenGL type mismatch");
-static_assert(underlying_type(TextureFormat::RGBA) == GL_RGBA, "OpenGL type mismatch");
-static_assert(underlying_type(TextureFormat::Alpha) == GL_ALPHA, "OpenGL type mismatch");
-
-static_assert(std::is_same<std::underlying_type_t<TextureType>, GLenum>::value, "OpenGL type mismatch");
-static_assert(underlying_type(TextureType::UnsignedByte) == GL_UNSIGNED_BYTE, "OpenGL type mismatch");
-
-#if MBGL_USE_GLES2 && GL_HALF_FLOAT_OES
-static_assert(underlying_type(TextureType::HalfFloat) == GL_HALF_FLOAT_OES, "OpenGL type mismatch");
-#endif
-#if !MBGL_USE_GLES2 && GL_HALF_FLOAT_ARB
-static_assert(underlying_type(TextureType::HalfFloat) == GL_HALF_FLOAT_ARB, "OpenGL type mismatch");
-#endif
-
 static_assert(underlying_type(UniformDataType::Float) == GL_FLOAT, "OpenGL type mismatch");
 static_assert(underlying_type(UniformDataType::FloatVec2) == GL_FLOAT_VEC2, "OpenGL type mismatch");
 static_assert(underlying_type(UniformDataType::FloatVec3) == GL_FLOAT_VEC3, "OpenGL type mismatch");
@@ -374,16 +360,17 @@ UniqueRenderbuffer Context::createRenderbuffer(const RenderbufferType type, cons
     return renderbuffer;
 }
 
-std::unique_ptr<uint8_t[]> Context::readFramebuffer(const Size size, const TextureFormat format, const bool flip) {
-    const size_t stride = size.width * (format == TextureFormat::RGBA ? 4 : 1);
+std::unique_ptr<uint8_t[]> Context::readFramebuffer(const Size size, const gfx::TexturePixelType format, const bool flip) {
+    const size_t stride = size.width * (format == gfx::TexturePixelType::RGBA ? 4 : 1);
     auto data = std::make_unique<uint8_t[]>(stride * size.height);
 
     // When reading data from the framebuffer, make sure that we are storing the values
     // tightly packed into the buffer to avoid buffer overruns.
     pixelStorePack = { 1 };
 
-    MBGL_CHECK_ERROR(glReadPixels(0, 0, size.width, size.height, static_cast<GLenum>(format),
-                                  GL_UNSIGNED_BYTE, data.get()));
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, size.width, size.height,
+                                  Enum<gfx::TexturePixelType>::to(format), GL_UNSIGNED_BYTE,
+                                  data.get()));
 
     if (flip) {
         auto tmp = std::make_unique<uint8_t[]>(stride);
@@ -399,12 +386,13 @@ std::unique_ptr<uint8_t[]> Context::readFramebuffer(const Size size, const Textu
 }
 
 #if not MBGL_USE_GLES2
-void Context::drawPixels(const Size size, const void* data, TextureFormat format) {
+void Context::drawPixels(const Size size, const void* data, gfx::TexturePixelType format) {
     pixelStoreUnpack = { 1 };
-    if (format != TextureFormat::RGBA) {
-        format = static_cast<TextureFormat>(GL_LUMINANCE);
+    // TODO
+    if (format != gfx::TexturePixelType::RGBA) {
+        format = gfx::TexturePixelType::Luminance;
     }
-    MBGL_CHECK_ERROR(glDrawPixels(size.width, size.height, static_cast<GLenum>(format),
+    MBGL_CHECK_ERROR(glDrawPixels(size.width, size.height, Enum<gfx::TexturePixelType>::to(format),
                                   GL_UNSIGNED_BYTE, data));
 }
 #endif // MBGL_USE_GLES2
@@ -517,8 +505,11 @@ Context::createFramebuffer(const Texture& color,
     return { depthTarget.size, std::move(fbo) };
 }
 
-UniqueTexture
-Context::createTexture(const Size size, const void* data, TextureFormat format, TextureUnit unit, TextureType type) {
+UniqueTexture Context::createTexture(const Size size,
+                                     const void* data,
+                                     gfx::TexturePixelType format,
+                                     TextureUnit unit,
+                                     gfx::TextureChannelDataType type) {
     auto obj = createTexture();
     pixelStoreUnpack = { 1 };
     updateTexture(obj, size, data, format, unit, type);
@@ -531,21 +522,26 @@ Context::createTexture(const Size size, const void* data, TextureFormat format, 
     return obj;
 }
 
-void Context::updateTexture(
-    TextureID id, const Size size, const void* data, TextureFormat format, TextureUnit unit, TextureType type) {
+void Context::updateTexture(TextureID id,
+                            const Size size,
+                            const void* data,
+                            gfx::TexturePixelType format,
+                            TextureUnit unit,
+                            gfx::TextureChannelDataType type) {
     activeTextureUnit = unit;
     texture[unit] = id;
-    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(format), size.width,
-                                  size.height, 0, static_cast<GLenum>(format), static_cast<GLenum>(type),
-                                  data));
+    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, Enum<gfx::TexturePixelType>::to(format),
+                                  size.width, size.height, 0,
+                                  Enum<gfx::TexturePixelType>::to(format),
+                                  Enum<gfx::TextureChannelDataType>::to(type), data));
 }
 
 void Context::bindTexture(Texture& obj,
                           TextureUnit unit,
-                          TextureFilter filter,
-                          TextureMipMap mipmap,
-                          TextureWrap wrapX,
-                          TextureWrap wrapY) {
+                          gfx::TextureFilterType filter,
+                          gfx::TextureMipMapType mipmap,
+                          gfx::TextureWrapType wrapX,
+                          gfx::TextureWrapType wrapY) {
     if (filter != obj.filter || mipmap != obj.mipmap || wrapX != obj.wrapX || wrapY != obj.wrapY) {
         activeTextureUnit = unit;
         texture[unit] = obj.texture;
@@ -553,12 +549,12 @@ void Context::bindTexture(Texture& obj,
         if (filter != obj.filter || mipmap != obj.mipmap) {
             MBGL_CHECK_ERROR(glTexParameteri(
                 GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                filter == TextureFilter::Linear
-                    ? (mipmap == TextureMipMap::Yes ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR)
-                    : (mipmap == TextureMipMap::Yes ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)));
+                filter == gfx::TextureFilterType::Linear
+                    ? (mipmap == gfx::TextureMipMapType::Yes ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR)
+                    : (mipmap == gfx::TextureMipMapType::Yes ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)));
             MBGL_CHECK_ERROR(
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST));
+                                filter == gfx::TextureFilterType::Linear ? GL_LINEAR : GL_NEAREST));
             obj.filter = filter;
             obj.mipmap = mipmap;
         }
@@ -566,13 +562,13 @@ void Context::bindTexture(Texture& obj,
 
             MBGL_CHECK_ERROR(
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                                wrapX == TextureWrap::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
+                                wrapX == gfx::TextureWrapType::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
             obj.wrapX = wrapX;
         }
         if (wrapY != obj.wrapY) {
             MBGL_CHECK_ERROR(
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                                wrapY == TextureWrap::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
+                                wrapY == gfx::TextureWrapType::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
             obj.wrapY = wrapY;
         }
     } else if (texture[unit] != obj.texture) {

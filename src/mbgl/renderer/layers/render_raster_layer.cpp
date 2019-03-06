@@ -123,7 +123,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
         );
     };
 
-    const gl::TextureFilter filter = evaluated.get<RasterResampling>() == RasterResamplingType::Nearest ? gl::TextureFilter::Nearest : gl::TextureFilter::Linear;
+    const gfx::TextureFilterType filter = evaluated.get<RasterResampling>() == RasterResamplingType::Nearest ? gfx::TextureFilterType::Nearest : gfx::TextureFilterType::Linear;
 
     if (RenderImageSource* imageSource = source->as<RenderImageSource>()) {
         if (imageSource->isEnabled() && imageSource->isLoaded() && !imageSource->bucket->needsUpload()) {
