@@ -6,7 +6,7 @@
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/layout/pattern_layout.hpp>
-#include <mbgl/gl/texture.hpp>
+#include <mbgl/gfx/texture.hpp>
 
 namespace mbgl {
 
@@ -53,7 +53,7 @@ private:
     void updateColorRamp();
     CrossfadeParameters crossfade;
     PremultipliedImage colorRamp;
-    optional<gl::Texture> colorRampTexture;
+    optional<gfx::Texture> colorRampTexture;
 };
 
 inline const RenderLineLayer* toRenderLineLayer(const RenderLayer* layer) {

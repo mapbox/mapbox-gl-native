@@ -5,7 +5,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/gl/texture.hpp>
+#include <mbgl/gfx/texture.hpp>
 
 #include <mapbox/shelf-pack.hpp>
 
@@ -65,8 +65,8 @@ private:
 public:
     optional<ImagePosition> getPattern(const std::string& name);
 
-    void bind(gl::Context&, gl::TextureUnit unit);
-    void upload(gl::Context&, gl::TextureUnit unit);
+    void bind(gl::Context&, uint8_t unit);
+    void upload(gl::Context&, uint8_t unit);
 
     Size getPixelSize() const;
 
@@ -84,7 +84,7 @@ private:
     mapbox::ShelfPack shelfPack;
     std::unordered_map<std::string, Pattern> patterns;
     PremultipliedImage atlasImage;
-    mbgl::optional<gl::Texture> atlasTexture;
+    mbgl::optional<gfx::Texture> atlasTexture;
     bool dirty = true;
 };
 

@@ -132,8 +132,8 @@ private:
 
     FadeState fadeState = FadeState::Loaded;
 public:
-    optional<gl::Texture> glyphAtlasTexture;
-    optional<gl::Texture> iconAtlasTexture;
+    optional<gfx::Texture> glyphAtlasTexture;
+    optional<gfx::Texture> iconAtlasTexture;
 };
 
 } // namespace mbgl

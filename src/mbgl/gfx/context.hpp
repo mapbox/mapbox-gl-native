@@ -4,6 +4,7 @@
 #include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_vector.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
+#include <mbgl/gfx/texture.hpp>
 #include <mbgl/gfx/types.hpp>
 
 namespace mbgl {
@@ -56,6 +57,48 @@ protected:
     createIndexBufferResource(const void* data, std::size_t size, const BufferUsageType) = 0;
     virtual void
     updateIndexBufferResource(const IndexBufferResource&, const void* data, std::size_t size) = 0;
+
+public:
+    // Create a texture from an image with data.
+    template <typename Image>
+    Texture createTexture(const Image& image,
+                          uint8_t unit = 0,
+                          TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
+        auto format = image.channels == 4 ? TexturePixelType::RGBA : TexturePixelType::Alpha;
+        return { image.size,
+                 createTextureResource(image.size, image.data.get(), format, unit, type) };
+    }
+
+    // Creates an empty texture with the specified dimensions.
+    Texture createTexture(const Size size,
+                          TexturePixelType format = TexturePixelType::RGBA,
+                          uint8_t unit = 0,
+                          TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
+        return { size, createTextureResource(size, nullptr, format, unit, type) };
+    }
+
+    template <typename Image>
+    void updateTexture(Texture& texture,
+                       const Image& image,
+                       uint8_t unit = 0,
+                       TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
+        auto format = image.channels == 4 ? TexturePixelType::RGBA : TexturePixelType::Alpha;
+        updateTextureResource(*texture.resource, image.size, image.data.get(), format, unit, type);
+        texture.size = image.size;
+    }
+
+    virtual void bindTexture(Texture&,
+                             uint8_t unit = 0,
+                             TextureFilterType = TextureFilterType::Nearest,
+                             TextureMipMapType = TextureMipMapType::No,
+                             TextureWrapType wrapX = TextureWrapType::Clamp,
+                             TextureWrapType wrapY = TextureWrapType::Clamp) = 0;
+
+protected:
+    virtual std::unique_ptr<const TextureResource> createTextureResource(
+        Size, const void* data, TexturePixelType, uint8_t unit, TextureChannelDataType) = 0;
+    virtual void updateTextureResource(const TextureResource&, Size, const void* data,
+        TexturePixelType, uint8_t unit, TextureChannelDataType) = 0;
 };
 
 } // namespace gfx

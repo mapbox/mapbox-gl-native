@@ -126,7 +126,7 @@ Size LineAtlas::getSize() const {
     return image.size;
 }
 
-void LineAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
+void LineAtlas::upload(gl::Context& context, uint8_t unit) {
     if (!texture) {
         texture = context.createTexture(image, unit);
     } else if (dirty) {
@@ -136,7 +136,7 @@ void LineAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
     dirty = false;
 }
 
-void LineAtlas::bind(gl::Context& context, gl::TextureUnit unit) {
+void LineAtlas::bind(gl::Context& context, uint8_t unit) {
     upload(context, unit);
     context.bindTexture(*texture, unit, gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
                         gfx::TextureWrapType::Repeat, gfx::TextureWrapType::Clamp);

@@ -3,7 +3,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
-#include <mbgl/gl/texture.hpp>
+#include <mbgl/gfx/texture.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 
@@ -37,7 +37,7 @@ public:
 
     PremultipliedImage colorRamp;
     optional<OffscreenTexture> renderTexture;
-    optional<gl::Texture> colorRampTexture;
+    optional<gfx::Texture> colorRampTexture;
 
 private:
     void updateColorRamp();

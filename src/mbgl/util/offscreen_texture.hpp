@@ -8,8 +8,11 @@ namespace mbgl {
 
 namespace gl {
 class Context;
-class Texture;
 } // namespace gl
+
+namespace gfx {
+class Texture;
+} // namespace gfx
 
 class OffscreenTexture {
 public:
@@ -28,7 +31,7 @@ public:
 
     PremultipliedImage readStillImage();
 
-    gl::Texture& getTexture();
+    gfx::Texture& getTexture();
 
     const Size& getSize() const;
 

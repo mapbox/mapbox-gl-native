@@ -44,7 +44,7 @@ public:
         return context.readFramebuffer<PremultipliedImage>(size);
     }
 
-    gl::Texture& getTexture() {
+    gfx::Texture& getTexture() {
         assert(texture);
         return *texture;
     }
@@ -57,7 +57,7 @@ private:
     gl::Context& context;
     const Size size;
     optional<gl::Framebuffer> framebuffer;
-    optional<gl::Texture> texture;
+    optional<gfx::Texture> texture;
     gl::Renderbuffer<gl::RenderbufferType::DepthComponent>* depth = nullptr;
     const gfx::TextureChannelDataType type;
 };
@@ -87,7 +87,7 @@ PremultipliedImage OffscreenTexture::readStillImage() {
     return impl->readStillImage();
 }
 
-gl::Texture& OffscreenTexture::getTexture() {
+gfx::Texture& OffscreenTexture::getTexture() {
     return impl->getTexture();
 }
 
