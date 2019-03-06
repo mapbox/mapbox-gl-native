@@ -2630,6 +2630,14 @@ public:
     }
 }
 
+- (void)setPrefetchesTiles:(BOOL)prefetchesTiles{
+    _mbglMap->setPrefetchZoomDelta(prefetchesTiles ? mbgl::util::DEFAULT_PREFETCH_ZOOM_DELTA : 0);
+}
+
+- (BOOL)prefetchesTiles{
+    return _mbglMap->getPrefetchZoomDelta() > 0 ? YES : NO;
+}
+
 #pragma mark - Accessibility -
 
 - (NSString *)accessibilityValue
