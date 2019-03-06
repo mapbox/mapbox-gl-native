@@ -3,6 +3,7 @@
 #include "node_feature.hpp"
 #include "node_conversion.hpp"
 
+#include <mbgl/map/projection_mode.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
@@ -446,17 +447,12 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
     camera.bearing = options.bearing;
     camera.pitch = options.pitch;
 
-    if (map->getAxonometric() != options.axonometric) {
-        map->setAxonometric(options.axonometric);
-    }
+    auto projectionOptions = mbgl::ProjectionMode()
+        .withAxonometric(options.axonometric)
+        .withXSkew(options.xSkew)
+        .withYSkew(options.ySkew);
 
-    if (map->getXSkew() != options.xSkew) {
-        map->setXSkew(options.xSkew);
-    }
-
-    if (map->getYSkew() != options.ySkew) {
-        map->setYSkew(options.ySkew);
-    }
+    map->setProjectionMode(projectionOptions);
 
     map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr eptr) {
         if (eptr) {
@@ -1035,7 +1031,8 @@ void NodeMap::SetAxonometric(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->setAxonometric(info[0]->BooleanValue());
+        nodeMap->map->setProjectionMode(mbgl::ProjectionMode()
+                                        .withAxonometric(info[0]->BooleanValue()));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
@@ -1052,7 +1049,8 @@ void NodeMap::SetXSkew(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->setXSkew(info[0]->NumberValue());
+        nodeMap->map->setProjectionMode(mbgl::ProjectionMode()
+                                        .withXSkew(info[0]->NumberValue()));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
@@ -1069,7 +1067,8 @@ void NodeMap::SetYSkew(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->setYSkew(info[0]->NumberValue());
+        nodeMap->map->setProjectionMode(mbgl::ProjectionMode()
+                                        .withYSkew(info[0]->NumberValue()));
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }

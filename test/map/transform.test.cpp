@@ -472,6 +472,17 @@ TEST(Transform, Camera) {
     ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 0);
 }
 
+TEST(Transform, ProjectionMode) {
+    Transform transform;
+
+    transform.setProjectionMode(ProjectionMode().withAxonometric(true).withXSkew(1.0).withYSkew(0.0));
+    auto options = transform.getProjectionMode();
+
+    EXPECT_TRUE(*options.axonometric);
+    EXPECT_EQ(*options.xSkew, 1.0);
+    EXPECT_EQ(*options.ySkew, 0.0);
+}
+
 TEST(Transform, IsPanning)
 {
     Transform transform;

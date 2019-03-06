@@ -330,6 +330,7 @@
         "mbgl/map/map.hpp": "include/mbgl/map/map.hpp",
         "mbgl/map/map_observer.hpp": "include/mbgl/map/map_observer.hpp",
         "mbgl/map/mode.hpp": "include/mbgl/map/mode.hpp",
+        "mbgl/map/projection_mode.hpp": "include/mbgl/map/projection_mode.hpp",
         "mbgl/math/clamp.hpp": "include/mbgl/math/clamp.hpp",
         "mbgl/math/log2.hpp": "include/mbgl/math/log2.hpp",
         "mbgl/math/minmax.hpp": "include/mbgl/math/minmax.hpp",

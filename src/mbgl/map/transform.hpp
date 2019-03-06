@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/projection_mode.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -84,12 +85,8 @@ public:
     ViewportMode getViewportMode() const;
 
     // Projection mode
-    void setAxonometric(bool);
-    bool getAxonometric() const;
-    void setXSkew(double xSkew);
-    double getXSkew() const;
-    void setYSkew(double ySkew);
-    double getYSkew() const;
+    void setProjectionMode(const ProjectionMode&);
+    ProjectionMode getProjectionMode() const;
 
     // Transitions
     bool inTransition() const;
