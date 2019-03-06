@@ -66,7 +66,7 @@ public:
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex>
-    gfx::VertexBuffer<Vertex> createVertexBuffer(gfx::VertexVector<Vertex>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+    gfx::VertexBuffer<Vertex> createVertexBuffer(gfx::VertexVector<Vertex>&& v, const gfx::BufferUsageType usage = gfx::BufferUsageType::StaticDraw) {
         return {
             v.elements(),
             createVertexBuffer(v.data(), v.bytes(), usage)
@@ -80,7 +80,7 @@ public:
     }
 
     template <class DrawMode>
-    gfx::IndexBuffer createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+    gfx::IndexBuffer createIndexBuffer(gfx::IndexVector<DrawMode>&& v, const gfx::BufferUsageType usage = gfx::BufferUsageType::StaticDraw) {
         return {
             v.elements(),
             createIndexBuffer(v.data(), v.bytes(), usage)
@@ -274,9 +274,9 @@ private:
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
 
-    std::unique_ptr<const gfx::VertexBufferResource> createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage);
+    std::unique_ptr<const gfx::VertexBufferResource> createVertexBuffer(const void* data, std::size_t size, const gfx::BufferUsageType usage);
     void updateVertexBuffer(const gfx::VertexBufferResource&, const void* data, std::size_t size);
-    std::unique_ptr<const gfx::IndexBufferResource> createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
+    std::unique_ptr<const gfx::IndexBufferResource> createIndexBuffer(const void* data, std::size_t size, const gfx::BufferUsageType usage);
     void updateIndexBuffer(const gfx::IndexBufferResource&, const void* data, std::size_t size);
     UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit, TextureType);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit, TextureType);

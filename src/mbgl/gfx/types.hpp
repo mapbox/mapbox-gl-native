@@ -127,5 +127,11 @@ enum CullFaceWindingType : uint8_t {
     CounterClockwise,
 };
 
+enum class BufferUsageType : uint8_t {
+    StreamDraw,
+    StaticDraw,
+    DynamicDraw,
+};
+
 } // namespace gfx
 } // namespace mbgl

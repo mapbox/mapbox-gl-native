@@ -75,10 +75,6 @@ static_assert(underlying_type(UniformDataType::FloatMat4) == GL_FLOAT_MAT4, "Ope
 static_assert(underlying_type(UniformDataType::Sampler2D) == GL_SAMPLER_2D, "OpenGL type mismatch");
 static_assert(underlying_type(UniformDataType::SamplerCube) == GL_SAMPLER_CUBE, "OpenGL type mismatch");
 
-static_assert(underlying_type(BufferUsage::StreamDraw) == GL_STREAM_DRAW, "OpenGL type mismatch");
-static_assert(underlying_type(BufferUsage::StaticDraw) == GL_STATIC_DRAW, "OpenGL type mismatch");
-static_assert(underlying_type(BufferUsage::DynamicDraw) == GL_DYNAMIC_DRAW, "OpenGL type mismatch");
-
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
 Context::Context()
@@ -250,12 +246,12 @@ void Context::verifyProgramLinkage(ProgramID program_) {
 }
 
 std::unique_ptr<const gfx::VertexBufferResource>
-Context::createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
+Context::createVertexBuffer(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
     vertexBuffer = result;
-    MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage)));
+    MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, size, data, Enum<gfx::BufferUsageType>::to(usage)));
     return std::make_unique<gl::VertexBufferResource>(std::move(result));
 }
 
@@ -265,13 +261,13 @@ void Context::updateVertexBuffer(const gfx::VertexBufferResource& resource, cons
 }
 
 std::unique_ptr<const gfx::IndexBufferResource>
-Context::createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
+Context::createIndexBuffer(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
     bindVertexArray = 0;
     globalVertexArrayState.indexBuffer = result;
-    MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage)));
+    MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, Enum<gfx::BufferUsageType>::to(usage)));
     return std::make_unique<gl::IndexBufferResource>(std::move(result));
 }
 

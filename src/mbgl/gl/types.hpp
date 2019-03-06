@@ -93,11 +93,5 @@ enum class UniformDataType : uint32_t {
     SamplerCube = 0x8B60,
 };
 
-enum class BufferUsage : uint32_t {
-    StreamDraw = 0x88E0,
-    StaticDraw = 0x88E4,
-    DynamicDraw = 0x88E8,
-};
-
 } // namespace gl
 } // namespace mbgl

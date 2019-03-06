@@ -221,5 +221,25 @@ platform::GLenum Enum<gfx::CullFaceWindingType>::to(const gfx::CullFaceWindingTy
     return GL_INVALID_ENUM;
 }
 
+template <>
+gfx::BufferUsageType Enum<gfx::BufferUsageType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_STREAM_DRAW: return gfx::BufferUsageType::StreamDraw;
+        case GL_STATIC_DRAW: return gfx::BufferUsageType::StaticDraw;
+        case GL_DYNAMIC_DRAW: return gfx::BufferUsageType::DynamicDraw;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::BufferUsageType>::to(const gfx::BufferUsageType value) {
+    switch (value) {
+        case gfx::BufferUsageType::StreamDraw: return GL_STREAM_DRAW;
+        case gfx::BufferUsageType::StaticDraw: return GL_STATIC_DRAW;
+        case gfx::BufferUsageType::DynamicDraw: return GL_DYNAMIC_DRAW;
+    }
+    return GL_INVALID_ENUM;
+}
+
 } // namespace gl
 } // namespace mbgl
