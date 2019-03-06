@@ -20,6 +20,7 @@ MBGL_DEFINE_ATTRIBUTE(uint8_t, 1, a_fade_opacity);
 MBGL_DEFINE_ATTRIBUTE(uint8_t, 2, a_placed);
 MBGL_DEFINE_ATTRIBUTE(uint16_t, 3, a_size);
 MBGL_DEFINE_ATTRIBUTE(float, 1, a_offset);
+MBGL_DEFINE_ATTRIBUTE(float, 2, a_shift);
 
 template <typename T, std::size_t N>
 struct a_data {

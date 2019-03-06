@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* debug::name = "debug";
-const char* debug::vertexSource = source() + 12417;
-const char* debug::fragmentSource = source() + 12513;
+const char* debug::vertexSource = source() + 12450;
+const char* debug::fragmentSource = source() + 12546;
 
 // Uncompressed source of debug.vertex.glsl:
 /*

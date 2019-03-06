@@ -8,7 +8,7 @@ namespace shaders {
 
 const char* collision_box::name = "collision_box";
 const char* collision_box::vertexSource = source() + 9956;
-const char* collision_box::fragmentSource = source() + 10602;
+const char* collision_box::fragmentSource = source() + 10635;
 
 // Uncompressed source of collision_box.vertex.glsl:
 /*
@@ -16,6 +16,7 @@ attribute vec2 a_pos;
 attribute vec2 a_anchor_pos;
 attribute vec2 a_extrude;
 attribute vec2 a_placed;
+attribute vec2 a_shift;
 
 uniform mat4 u_matrix;
 uniform vec2 u_extrude_scale;
@@ -33,7 +34,7 @@ void main() {
         4.0);
 
     gl_Position = u_matrix * vec4(a_pos, 0.0, 1.0);
-    gl_Position.xy += a_extrude * u_extrude_scale * gl_Position.w * collision_perspective_ratio;
+    gl_Position.xy += (a_extrude + a_shift) * u_extrude_scale * gl_Position.w * collision_perspective_ratio;
 
     v_placed = a_placed.x;
     v_notUsed = a_placed.y;

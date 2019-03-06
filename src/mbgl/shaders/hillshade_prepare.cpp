@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* hillshade_prepare::name = "hillshade_prepare";
-const char* hillshade_prepare::vertexSource = source() + 27892;
-const char* hillshade_prepare::fragmentSource = source() + 28185;
+const char* hillshade_prepare::vertexSource = source() + 27925;
+const char* hillshade_prepare::fragmentSource = source() + 28218;
 
 // Uncompressed source of hillshade_prepare.vertex.glsl:
 /*

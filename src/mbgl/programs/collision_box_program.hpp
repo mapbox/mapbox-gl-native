@@ -15,7 +15,8 @@ namespace mbgl {
 using CollisionBoxLayoutAttributes = TypeList<
     attributes::a_pos,
     attributes::a_anchor_pos,
-    attributes::a_extrude>;
+    attributes::a_extrude,
+    attributes::a_shift>;
 
 using CollisionBoxDynamicAttributes = TypeList<attributes::a_placed>;
 
@@ -45,6 +46,10 @@ public:
             {{
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
+            }},
+            {{
+                0.0f,
+                0.0f
             }}
         };
     }
@@ -132,6 +137,10 @@ public:
             {{
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
+            }},
+            {{
+                0.0f,
+                0.0f
             }}
         };
     }
