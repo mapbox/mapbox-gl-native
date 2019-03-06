@@ -158,7 +158,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
                 bucket.sdfIcons || parameters.state.isChanging() || iconScaled || iconTransformed
-                    ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
+                    ? gfx::TextureFilterType::Linear : gfx::TextureFilterType::Nearest);
 
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
@@ -194,7 +194,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (bucket.hasTextData()) {
-            parameters.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gfx::TextureFilterType::Linear);
 
             auto values = textPropertyValues(evaluated_, layout);
             const auto& paintPropertyValues = textPaintProperties(evaluated_);

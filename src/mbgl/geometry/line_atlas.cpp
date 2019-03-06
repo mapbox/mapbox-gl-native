@@ -138,8 +138,8 @@ void LineAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
 
 void LineAtlas::bind(gl::Context& context, gl::TextureUnit unit) {
     upload(context, unit);
-    context.bindTexture(*texture, unit, gl::TextureFilter::Linear, gl::TextureMipMap::No,
-                        gl::TextureWrap::Repeat, gl::TextureWrap::Clamp);
+    context.bindTexture(*texture, unit, gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
+                        gfx::TextureWrapType::Repeat, gfx::TextureWrapType::Clamp);
 }
 
 } // namespace mbgl

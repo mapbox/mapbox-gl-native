@@ -241,5 +241,47 @@ platform::GLenum Enum<gfx::BufferUsageType>::to(const gfx::BufferUsageType value
     return GL_INVALID_ENUM;
 }
 
+template <>
+gfx::TexturePixelType Enum<gfx::TexturePixelType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_RGBA: return gfx::TexturePixelType::RGBA;
+        case GL_ALPHA: return gfx::TexturePixelType::Alpha;
+        case GL_STENCIL_INDEX: return gfx::TexturePixelType::Stencil;
+        case GL_DEPTH_COMPONENT: return gfx::TexturePixelType::Depth;
+        case GL_LUMINANCE: return gfx::TexturePixelType::Luminance;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::TexturePixelType>::to(const gfx::TexturePixelType value) {
+    switch (value) {
+        case gfx::TexturePixelType::RGBA: return GL_RGBA;
+        case gfx::TexturePixelType::Alpha: return GL_ALPHA;
+        case gfx::TexturePixelType::Stencil: return GL_STENCIL_INDEX;
+        case gfx::TexturePixelType::Depth: return GL_DEPTH_COMPONENT;
+        case gfx::TexturePixelType::Luminance: return GL_LUMINANCE;
+    }
+    return GL_INVALID_ENUM;
+}
+
+template <>
+gfx::TextureChannelDataType Enum<gfx::TextureChannelDataType>::from(const platform::GLint value) {
+    switch (value) {
+        case GL_UNSIGNED_BYTE: return gfx::TextureChannelDataType::UnsignedByte;
+        case GL_HALF_FLOAT: return gfx::TextureChannelDataType::HalfFloat;
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::TextureChannelDataType>::to(const gfx::TextureChannelDataType value) {
+    switch (value) {
+        case gfx::TextureChannelDataType::UnsignedByte: return GL_UNSIGNED_BYTE;
+        case gfx::TextureChannelDataType::HalfFloat: return GL_HALF_FLOAT;
+    }
+    return GL_INVALID_ENUM;
+}
+
 } // namespace gl
 } // namespace mbgl

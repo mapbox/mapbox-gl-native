@@ -487,7 +487,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         // Read the stencil buffer
         const auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Stencil>(viewport.size, false);
+        auto image = parameters.context.readFramebuffer<AlphaImage, gfx::TexturePixelType::Stencil>(viewport.size, false);
 
         // Scale the Stencil buffer to cover the entire color space.
         auto it = image.data.get();
@@ -572,7 +572,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         // Read the stencil buffer
         auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Depth>(viewport.size, false);
+        auto image = parameters.context.readFramebuffer<AlphaImage, gfx::TexturePixelType::Depth>(viewport.size, false);
 
         parameters.context.pixelZoom = { 1, 1 };
         parameters.context.rasterPos = { -1, -1, 0, 1 };

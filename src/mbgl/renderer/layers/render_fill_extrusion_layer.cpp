@@ -136,7 +136,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
                 optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
                 optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
-                parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gl::TextureFilter::Linear);
+                parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gfx::TextureFilterType::Linear);
                 FillExtrusionBucket& bucket = *bucket_;
 
                 draw(

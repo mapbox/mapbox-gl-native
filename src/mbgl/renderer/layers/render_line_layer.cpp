@@ -124,7 +124,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
             assert(dynamic_cast<GeometryTile*>(&tile.tile));
             GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
-            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gfx::TextureFilterType::Linear);
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
@@ -145,7 +145,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             if (!colorRampTexture) {
                 colorRampTexture = parameters.context.createTexture(colorRamp);
             }
-            parameters.context.bindTexture(*colorRampTexture, 0, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*colorRampTexture, 0, gfx::TextureFilterType::Linear);
 
             draw(parameters.programs.getLineLayerPrograms().lineGradient,
                  LineGradientProgram::uniformValues(

@@ -15,11 +15,11 @@ class OffscreenTexture {
 public:
     OffscreenTexture(gl::Context&,
                      Size size = { 256, 256 },
-                     gl::TextureType type = gl::TextureType::UnsignedByte);
+                     gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
     OffscreenTexture(gl::Context&,
                      Size size,
                      gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&,
-                     gl::TextureType type = gl::TextureType::UnsignedByte);
+                     gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
     ~OffscreenTexture();
     OffscreenTexture(OffscreenTexture&&);
     OffscreenTexture& operator=(OffscreenTexture&&);

@@ -81,10 +81,10 @@ public:
                                   const Renderbuffer<RenderbufferType::DepthComponent>&);
 
     template <typename Image,
-              TextureFormat format = Image::channels == 4 ? TextureFormat::RGBA
-                                                          : TextureFormat::Alpha>
+              gfx::TexturePixelType format = Image::channels == 4 ? gfx::TexturePixelType::RGBA
+                                                          : gfx::TexturePixelType::Alpha>
     Image readFramebuffer(const Size size, bool flip = true) {
-        static_assert(Image::channels == (format == TextureFormat::RGBA ? 4 : 1),
+        static_assert(Image::channels == (format == gfx::TexturePixelType::RGBA ? 4 : 1),
                       "image format mismatch");
         return { size, readFramebuffer(size, format, flip) };
     }
@@ -92,7 +92,7 @@ public:
 #if not MBGL_USE_GLES2
     template <typename Image>
     void drawPixels(const Image& image) {
-        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+        auto format = image.channels == 4 ? gfx::TexturePixelType::RGBA : gfx::TexturePixelType::Alpha;
         drawPixels(image.size, image.data.get(), format);
     }
 #endif // MBGL_USE_GLES2
@@ -101,8 +101,8 @@ public:
     template <typename Image>
     Texture createTexture(const Image& image,
                           TextureUnit unit = 0,
-                          TextureType type = TextureType::UnsignedByte) {
-        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+                          gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte) {
+        auto format = image.channels == 4 ? gfx::TexturePixelType::RGBA : gfx::TexturePixelType::Alpha;
         return { image.size, createTexture(image.size, image.data.get(), format, unit, type) };
     }
 
@@ -110,26 +110,26 @@ public:
     void updateTexture(Texture& obj,
                        const Image& image,
                        TextureUnit unit = 0,
-                       TextureType type = TextureType::UnsignedByte) {
-        auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
+                       gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte) {
+        auto format = image.channels == 4 ? gfx::TexturePixelType::RGBA : gfx::TexturePixelType::Alpha;
         updateTexture(obj.texture.get(), image.size, image.data.get(), format, unit, type);
         obj.size = image.size;
     }
 
     // Creates an empty texture with the specified dimensions.
     Texture createTexture(const Size size,
-                          TextureFormat format = TextureFormat::RGBA,
+                          gfx::TexturePixelType format = gfx::TexturePixelType::RGBA,
                           TextureUnit unit = 0,
-                          TextureType type = TextureType::UnsignedByte) {
+                          gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte) {
         return { size, createTexture(size, nullptr, format, unit, type) };
     }
 
     void bindTexture(Texture&,
                      TextureUnit = 0,
-                     TextureFilter = TextureFilter::Nearest,
-                     TextureMipMap = TextureMipMap::No,
-                     TextureWrap wrapX = TextureWrap::Clamp,
-                     TextureWrap wrapY = TextureWrap::Clamp);
+                     gfx::TextureFilterType = gfx::TextureFilterType::Nearest,
+                     gfx::TextureMipMapType = gfx::TextureMipMapType::No,
+                     gfx::TextureWrapType wrapX = gfx::TextureWrapType::Clamp,
+                     gfx::TextureWrapType wrapY = gfx::TextureWrapType::Clamp);
 
     void clear(optional<mbgl::Color> color,
                optional<float> depth,
@@ -248,13 +248,13 @@ private:
     std::unique_ptr<const gfx::IndexBufferResource> createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
     void updateIndexBufferResource(const gfx::IndexBufferResource&, const void* data, std::size_t size) override;
 
-    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit, TextureType);
-    void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit, TextureType);
+    UniqueTexture createTexture(Size size, const void* data, gfx::TexturePixelType, TextureUnit, gfx::TextureChannelDataType);
+    void updateTexture(TextureID, Size size, const void* data, gfx::TexturePixelType, TextureUnit, gfx::TextureChannelDataType);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
-    std::unique_ptr<uint8_t[]> readFramebuffer(Size, TextureFormat, bool flip);
+    std::unique_ptr<uint8_t[]> readFramebuffer(Size, gfx::TexturePixelType, bool flip);
 #if not MBGL_USE_GLES2
-    void drawPixels(Size size, const void* data, TextureFormat);
+    void drawPixels(Size size, const void* data, gfx::TexturePixelType);
 #endif // MBGL_USE_GLES2
 
     bool supportsVertexArrays() const;
