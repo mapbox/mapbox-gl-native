@@ -16,7 +16,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_,
                          MapDebugOptions debugMode_,
-                         gl::Context& context)
+                         gfx::Context& context)
     : renderable(renderable_),
       complete(complete_),
       modified(std::move(modified_)),

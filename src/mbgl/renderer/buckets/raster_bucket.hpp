@@ -18,7 +18,7 @@ public:
     RasterBucket(std::shared_ptr<PremultipliedImage>);
     ~RasterBucket() override;
 
-    void upload(gl::Context&) override;
+    void upload(gfx::Context&) override;
     bool hasData() const override;
     bool supportsLayer(const style::Layer::Impl&) const override;
 

@@ -17,7 +17,7 @@ RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_)
 
 RasterBucket::~RasterBucket() = default;
 
-void RasterBucket::upload(gl::Context& context) {
+void RasterBucket::upload(gfx::Context& context) {
     if (!hasData()) {
         return;
     }

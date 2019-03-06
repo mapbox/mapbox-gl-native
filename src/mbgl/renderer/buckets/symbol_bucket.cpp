@@ -41,7 +41,7 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
 
 SymbolBucket::~SymbolBucket() = default;
 
-void SymbolBucket::upload(gl::Context& context) {
+void SymbolBucket::upload(gfx::Context& context) {
     if (hasTextData()) {
         if (!staticUploaded) {
             text.indexBuffer = context.createIndexBuffer(std::move(text.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw : gfx::BufferUsageType::StaticDraw);

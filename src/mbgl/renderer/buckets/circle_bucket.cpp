@@ -24,7 +24,7 @@ CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector
 
 CircleBucket::~CircleBucket() = default;
 
-void CircleBucket::upload(gl::Context& context) {
+void CircleBucket::upload(gfx::Context& context) {
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     indexBuffer = context.createIndexBuffer(std::move(triangles));
 

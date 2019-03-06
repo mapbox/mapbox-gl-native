@@ -26,7 +26,7 @@ DEMData& HillshadeBucket::getDEMData() {
     return demdata;
 }
 
-void HillshadeBucket::upload(gl::Context& context) {
+void HillshadeBucket::upload(gfx::Context& context) {
     if (!hasData()) {
         return;
     }

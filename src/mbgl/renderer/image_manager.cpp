@@ -1,6 +1,6 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/context.hpp>
 
 namespace mbgl {
 
@@ -167,7 +167,7 @@ Size ImageManager::getPixelSize() const {
     };
 }
 
-void ImageManager::upload(gl::Context& context, uint8_t unit) {
+void ImageManager::upload(gfx::Context& context, uint8_t unit) {
     if (!atlasTexture) {
         atlasTexture = context.createTexture(atlasImage, unit);
     } else if (dirty) {
@@ -177,7 +177,7 @@ void ImageManager::upload(gl::Context& context, uint8_t unit) {
     dirty = false;
 }
 
-void ImageManager::bind(gl::Context& context, uint8_t unit) {
+void ImageManager::bind(gfx::Context& context, uint8_t unit) {
     upload(context, unit);
     context.bindTexture(*atlasTexture, unit, gfx::TextureFilterType::Linear);
 }

@@ -58,7 +58,7 @@ void RasterTile::onError(std::exception_ptr err, const uint64_t resultCorrelatio
     observer->onTileError(*this, err);
 }
 
-void RasterTile::upload(gl::Context& context) {
+void RasterTile::upload(gfx::Context& context) {
     if (bucket) {
         bucket->upload(context);
     }
