@@ -1,13 +1,14 @@
 #import "MGLNetworkConfiguration_Private.h"
-#import "MGLMetricsManager_Private.h"
 
 static NSString * const MGLStartTime = @"start_time";
 static NSString * const MGLResourceType = @"resource_type";
+NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 
 @interface MGLNetworkConfiguration ()
 
 @property (strong) NSURLSessionConfiguration *sessionConfig;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSDictionary*> *events;
+@property (nonatomic, weak) id<MGLNetworkConfigurationMetricsDelegate> metricsDelegate;
 
 @end
 
@@ -72,7 +73,7 @@ static NSString * const MGLResourceType = @"resource_type";
 {
     if (urlString && [self.events objectForKey:urlString]) {
         NSDictionary *eventAttributes = [self eventAttributesForURL:urlString withAction:action];
-        [[MGLMetricsManager sharedManager] handleMetricsEvent:MGLMetricTypePerformance withAttributes:eventAttributes];
+        [self.metricsDelegate networkConfiguration:self didGenerateMetricEvent:eventAttributes];
         [self.events removeObjectForKey:urlString];
     }
 }
@@ -93,9 +94,9 @@ static NSString * const MGLResourceType = @"resource_type";
     if (action) {
         [attributes addObject:@{ @"name" : @"action" , @"value" : action }];
     }
-    NSString *event = MGLStringFromMetricType(MGLMetricTypePerformance);
+
     return @{
-             @"event" : event,
+             @"event" : kMGLDownloadPerformanceEvent,
              @"created" : createdDate,
              @"sessionId" : [NSUUID UUID].UUIDString,
              @"counters" : @[ @{ @"name" : @"elapsed_time" , @"value" : @(elapsedTime) } ],

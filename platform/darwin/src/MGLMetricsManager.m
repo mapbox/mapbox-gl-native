@@ -1,13 +1,16 @@
 #import "MGLMetricsManager_Private.h"
+#import "MGLNetworkConfiguration_Private.h"
 #if TARGET_OS_IOS
 #import "MGLMapboxEvents.h"
 #endif
 
-NSString * const kMGLPerformanceMetric = @"mobile.performance_trace";
-
 NSString* MGLStringFromMetricType(MGLMetricType metricType) {
-    return [@[kMGLPerformanceMetric] objectAtIndex:metricType];
+    return [@[kMGLDownloadPerformanceEvent] objectAtIndex:metricType];
 }
+
+@interface MGLMetricsManager() <MGLNetworkConfigurationMetricsDelegate>
+
+@end
 
 @implementation MGLMetricsManager
 
@@ -17,6 +20,7 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
     static id sharedConfiguration;
     dispatch_once(&once, ^{
         sharedConfiguration = [[self alloc] init];
+        [MGLNetworkConfiguration sharedManager].metricsDelegate = sharedConfiguration;
     });
     return sharedConfiguration;
 }
@@ -34,7 +38,7 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
     
     switch (metricType) {
         case MGLMetricTypePerformance:
-            eventName = kMGLPerformanceMetric;
+            eventName = kMGLDownloadPerformanceEvent;
             break;
             
         default:
@@ -45,5 +49,9 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
 
 }
 #endif
+
+- (void)networkConfiguration:(MGLNetworkConfiguration *)networkConfiguration didGenerateMetricEvent:(NSDictionary *)metricEvent {
+    [self handleMetricsEvent:MGLMetricTypePerformance withAttributes:metricEvent];
+}
 
 @end
