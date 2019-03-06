@@ -41,6 +41,7 @@ class LineProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels>,
+    TypeList<>,
     RenderLinePaintProperties>
 {
 public:
@@ -109,6 +110,7 @@ class LinePatternProgram : public Program<
         uniforms::u_texsize,
         uniforms::u_fade,
         uniforms::u_image>,
+    TypeList<>,
     RenderLinePaintProperties>
 {
 public:
@@ -138,6 +140,7 @@ class LineSDFProgram : public Program<
         uniforms::u_mix,
         uniforms::u_sdfgamma,
         uniforms::u_image>,
+    TypeList<>,
     RenderLinePaintProperties>
 {
 public:
@@ -163,6 +166,7 @@ class LineGradientProgram : public Program<
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
         uniforms::u_image>,
+    TypeList<>,
     RenderLinePaintProperties>
 {
 public:

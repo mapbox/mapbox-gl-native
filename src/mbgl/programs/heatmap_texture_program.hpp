@@ -23,6 +23,7 @@ class HeatmapTextureProgram : public Program<
         uniforms::u_image,
         uniforms::u_color_ramp,
         uniforms::u_opacity>,
+    TypeList<>,
     style::Properties<>> {
 public:
     using Program::Program;

@@ -19,6 +19,7 @@ template <class Shaders,
           class Primitive,
           class LayoutAttributeList,
           class UniformList,
+          class TextureList,
           class PaintProps>
 class Program {
 public:

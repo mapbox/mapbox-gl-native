@@ -28,6 +28,7 @@ class CollisionBoxProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_camera_to_center_distance>,
+    TypeList<>,
     style::Properties<>>
 {
 public:
@@ -119,6 +120,7 @@ class CollisionCircleProgram : public Program<
         uniforms::u_extrude_scale,
         uniforms::u_overscale_factor,
         uniforms::u_camera_to_center_distance>,
+    TypeList<>,
     style::Properties<>>
 {
 public:

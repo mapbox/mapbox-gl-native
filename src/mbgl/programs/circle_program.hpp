@@ -24,6 +24,7 @@ class CircleProgram : public Program<
         uniforms::u_extrude_scale,
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch_with_map>,
+    TypeList<>,
     style::CirclePaintProperties>
 {
 public:

@@ -14,6 +14,7 @@ class ClippingMaskProgram : public Program<
     PositionOnlyLayoutAttributes,
     TypeList<
         uniforms::u_matrix>,
+    TypeList<>,
     style::Properties<>>
 {
 public:
