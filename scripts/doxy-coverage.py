@@ -62,7 +62,8 @@ def parse_file(fullpath):
 
 	for definition in tree.findall("./compounddef//memberdef"):
 		# Should it be documented
-		if (definition.get('kind') == 'function' and
+		if definition.get('prot') == 'private' or (
+			definition.get('kind') == 'function' and
 			definition.get('static') == 'yes'):
 			continue
 
