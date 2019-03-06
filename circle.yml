@@ -668,7 +668,7 @@ jobs:
       - deploy:
           name: Publish to Bintray
           command: |
-            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
+            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_BRANCH == lp-bintray-test ]] || [[ $CIRCLE_TAG == android-v* ]]; then
               make run-android-upload-to-bintray
             fi
 # ------------------------------------------------------------------------------
