@@ -165,7 +165,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
     }
 }
 
-void FillExtrusionBucket::upload(gl::Context& context) {
+void FillExtrusionBucket::upload(gfx::Context& context) {
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     indexBuffer = context.createIndexBuffer(std::move(triangles));
 

@@ -69,7 +69,7 @@ void RasterDEMTile::onError(std::exception_ptr err, const uint64_t resultCorrela
     observer->onTileError(*this, err);
 }
 
-void RasterDEMTile::upload(gl::Context& context) {
+void RasterDEMTile::upload(gfx::Context& context) {
     if (bucket) {
         bucket->upload(context);
     }

@@ -121,7 +121,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
     }
 }
 
-void FillBucket::upload(gl::Context& context) {
+void FillBucket::upload(gfx::Context& context) {
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     lineIndexBuffer = context.createIndexBuffer(std::move(lines));
     triangleIndexBuffer = context.createIndexBuffer(std::move(triangles));

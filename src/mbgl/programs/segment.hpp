@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 
 #include <cstddef>

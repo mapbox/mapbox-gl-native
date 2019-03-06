@@ -14,9 +14,9 @@
 
 namespace mbgl {
 
-namespace gl {
+namespace gfx {
 class Context;
-} // namespace gl
+} // namespace gfx
 
 class ImageRequestor {
 public:
@@ -65,8 +65,8 @@ private:
 public:
     optional<ImagePosition> getPattern(const std::string& name);
 
-    void bind(gl::Context&, uint8_t unit);
-    void upload(gl::Context&, uint8_t unit);
+    void bind(gfx::Context&, uint8_t unit);
+    void upload(gfx::Context&, uint8_t unit);
 
     Size getPixelSize() const;
 

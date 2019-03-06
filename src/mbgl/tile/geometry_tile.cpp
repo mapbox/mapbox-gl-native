@@ -173,7 +173,7 @@ const optional<ImagePosition> GeometryTile::getPattern(const std::string& patter
     return {};
 }
 
-void GeometryTile::upload(gl::Context& context) {
+void GeometryTile::upload(gfx::Context& context) {
     auto uploadFn = [&] (Bucket& bucket) {
         if (bucket.needsUpload()) {
             bucket.upload(context);

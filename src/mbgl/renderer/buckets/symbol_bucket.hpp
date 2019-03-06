@@ -51,7 +51,7 @@ public:
                  const std::vector<SymbolInstance>&&);
     ~SymbolBucket() override;
 
-    void upload(gl::Context&) override;
+    void upload(gfx::Context&) override;
     bool hasData() const override;
     bool supportsLayer(const style::Layer::Impl&) const override;
     bool hasTextData() const;
