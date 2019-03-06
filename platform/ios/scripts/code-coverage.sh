@@ -28,7 +28,8 @@ cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 current_date=$(TZ=UTC date +"%Y-%m-%d")
 file_name=ios_coverage.json
 cat <<EOF > $file_name
-    { "current_coverage": $cov,
+    { 
+      "current_coverage": $cov,
       "platform": "ios",
       "sdk": "maps",
       "scheme": "CI",
