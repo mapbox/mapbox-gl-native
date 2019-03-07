@@ -153,7 +153,11 @@ global.defaultValue = function (property) {
 
   switch (property.type) {
   case 'number':
+  if (property.default === undefined) {
+    return 0;
+  } else {
     return property.default;
+  }
   case 'formatted':
   case 'string':
     return JSON.stringify(property.default || "");
