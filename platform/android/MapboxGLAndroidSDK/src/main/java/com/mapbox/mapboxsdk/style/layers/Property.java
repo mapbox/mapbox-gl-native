@@ -323,6 +323,10 @@ public final class Property {
   // TEXT_JUSTIFY: Text justification options.
 
   /**
+   * The text is aligned towards the anchor position.
+   */
+  public static final String TEXT_JUSTIFY_AUTO = "auto";
+  /**
    * The text is aligned to the left.
    */
   public static final String TEXT_JUSTIFY_LEFT = "left";
@@ -339,6 +343,7 @@ public final class Property {
    * Text justification options.
    */
   @StringDef({
+      TEXT_JUSTIFY_AUTO,
       TEXT_JUSTIFY_LEFT,
       TEXT_JUSTIFY_CENTER,
       TEXT_JUSTIFY_RIGHT,
