@@ -51,7 +51,7 @@ optional<std::string> ImageSource::getURL() const {
     return url;
 }
 
-void ImageSource::loadDescription(FileSource& fileSource) {
+void ImageSource::loadDescription(std::shared_ptr<FileSource> fileSource) {
     if (!url) {
         loaded = true;
     }
@@ -61,7 +61,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
     }
     const Resource imageResource { Resource::Image, *url, {} };
 
-    req = fileSource.request(imageResource, [this](Response res) {
+    req = fileSource->request(imageResource, [this](Response res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

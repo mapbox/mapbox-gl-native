@@ -5,7 +5,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/event.hpp>
 #include <mbgl/map/transform.hpp>
@@ -14,8 +13,7 @@ namespace mbgl {
 
 class MapSnapshotter::Impl {
 public:
-    Impl(FileSource*,
-         const std::pair<bool, std::string> style,
+    Impl(const std::pair<bool, std::string> style,
          const Size&,
          const float pixelRatio,
          const optional<CameraOptions> cameraOptions,
@@ -45,7 +43,7 @@ private:
     Map map;
 };
 
-MapSnapshotter::Impl::Impl(FileSource* fileSource,
+MapSnapshotter::Impl::Impl(
            const std::pair<bool, std::string> style,
            const Size& size,
            const float pixelRatio,
@@ -53,8 +51,8 @@ MapSnapshotter::Impl::Impl(FileSource* fileSource,
            const optional<LatLngBounds> region,
            const optional<std::string> programCacheDir,
            const optional<std::string> localFontFamily)
-    , frontend(size, pixelRatio, programCacheDir, GLContextMode::Unique, localFontFamily)
-    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *fileSource, MapOptions().withMapMode(MapMode::Static)) {
+    : frontend(size, pixelRatio, FileSourceOptions(), programCacheDir, GLContextMode::Unique, localFontFamily)
+    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, MapOptions().withMapMode(MapMode::Static), FileSourceOptions()) {
 
     if (style.first) {
         map.getStyle().loadJSON(style.second);
@@ -160,15 +158,14 @@ LatLngBounds MapSnapshotter::Impl::getRegion() const {
     return map.latLngBoundsForCamera(getCameraOptions());
 }
 
-MapSnapshotter::MapSnapshotter(FileSource* fileSource,
-                               const std::pair<bool, std::string> style,
+MapSnapshotter::MapSnapshotter(const std::pair<bool, std::string> style,
                                const Size& size,
                                const float pixelRatio,
                                const optional<CameraOptions> cameraOptions,
                                const optional<LatLngBounds> region,
                                const optional<std::string> programCacheDir,
                                const optional<std::string> localFontFamily)
-   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, style, size, pixelRatio, cameraOptions, region, programCacheDir, localFontFamily)) {
+   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", style, size, pixelRatio, cameraOptions, region, programCacheDir, localFontFamily)) {
 }
 
 MapSnapshotter::~MapSnapshotter() = default;

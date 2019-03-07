@@ -50,7 +50,7 @@ private:
     T& tile;
     TileNecessity necessity;
     Resource resource;
-    FileSource& fileSource;
+    std::shared_ptr<FileSource> fileSource;
     std::unique_ptr<AsyncRequest> request;
 };
 

@@ -12,6 +12,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/platform/factory.hpp>
 
 #include <cassert>
 
@@ -33,14 +34,15 @@ struct SpriteLoader::Loader {
     Actor<SpriteLoaderWorker> worker;
 };
 
-SpriteLoader::SpriteLoader(float pixelRatio_)
+SpriteLoader::SpriteLoader(float pixelRatio_, const FileSourceOptions& fileSourceOptions)
         : pixelRatio(pixelRatio_)
+        , fileSource(platform::Factory::sharedFileSource(fileSourceOptions))
         , observer(&nullObserver) {
 }
 
 SpriteLoader::~SpriteLoader() = default;
 
-void SpriteLoader::load(const std::string& url, FileSource& fileSource) {
+void SpriteLoader::load(const std::string& url) {
     if (url.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         observer->onSpriteLoaded({});
@@ -49,7 +51,7 @@ void SpriteLoader::load(const std::string& url, FileSource& fileSource) {
 
     loader = std::make_unique<Loader>(*this);
 
-    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
+    loader->jsonRequest = fileSource->request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
@@ -64,7 +66,7 @@ void SpriteLoader::load(const std::string& url, FileSource& fileSource) {
         }
     });
 
-    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+    loader->spriteRequest = fileSource->request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

@@ -40,7 +40,7 @@ optional<std::string> GeoJSONSource::getURL() const {
     return url;
 }
 
-void GeoJSONSource::loadDescription(FileSource& fileSource) {
+void GeoJSONSource::loadDescription(std::shared_ptr<FileSource> fileSource) {
     if (!url) {
         loaded = true;
         return;
@@ -50,7 +50,7 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
         return;
     }
 
-    req = fileSource.request(Resource::source(*url), [this](Response res) {
+    req = fileSource->request(Resource::source(*url), [this](Response res) {
         if (res.error) {
             observer->onSourceError(
                 *this, std::make_exception_ptr(std::runtime_error(res.error->message)));

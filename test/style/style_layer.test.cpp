@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_layer_observer.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
@@ -272,8 +273,10 @@ TEST(Layer, DuplicateLayer) {
     util::RunLoop loop;
 
     // Setup style
-    StubFileSource fileSource;
-    Style::Impl style { fileSource, 1.0 };
+    FileSourceOptions stubFileSourceOptions;
+    std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(
+        stubFileSourceOptions, std::make_shared<StubFileSource>());
+    Style::Impl style { 1.0, stubFileSourceOptions };
     style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
     // Add initial layer

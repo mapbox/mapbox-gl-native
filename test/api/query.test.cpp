@@ -1,6 +1,7 @@
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/map_options.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
@@ -32,15 +33,17 @@ public:
     }
 
     util::RunLoop loop;
-    StubFileSource fileSource;
+    FileSourceOptions stubFileSourceOptions;
+    std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(stubFileSourceOptions, std::make_shared<StubFileSource>());
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource };
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              MapOptions().withMapMode(MapMode::Static)};
+    HeadlessFrontend frontend { pixelRatio, stubFileSourceOptions };
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
+              MapOptions().withMapMode(MapMode::Static), stubFileSourceOptions };
 };
 
 std::vector<Feature> getTopClusterFeature(QueryTest& test) {
-    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("http://url"s, resource.url);
         Response response;
         response.data = std::make_unique<std::string>(util::read_file("test/fixtures/supercluster/places.json"s));
@@ -52,7 +55,7 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
     options.cluster = true;
     auto source = std::make_unique<GeoJSONSource>("cluster_source"s, options);
     source->setURL("http://url"s);
-    source->loadDescription(test.fileSource);
+    source->loadDescription(stubFileSource);
 
     auto clusterLayer = std::make_unique<SymbolLayer>("cluster_layer"s, "cluster_source"s);
     clusterLayer->setIconImage("test-icon"s);

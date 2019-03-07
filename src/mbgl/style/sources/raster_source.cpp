@@ -11,8 +11,8 @@ namespace mbgl {
 namespace style {
 
 RasterSource::RasterSource(std::string id, variant<std::string, Tileset> urlOrTileset_, uint16_t tileSize, SourceType sourceType)
-    : Source(makeMutable<Impl>(sourceType, std::move(id), tileSize)),
-      urlOrTileset(std::move(urlOrTileset_)) {
+    : Source(makeMutable<Impl>(sourceType, std::move(id), tileSize))
+    , urlOrTileset(std::move(urlOrTileset_)) {
 }
 
 RasterSource::~RasterSource() = default;
@@ -37,7 +37,7 @@ uint16_t RasterSource::getTileSize() const {
     return impl().getTileSize();
 }
 
-void RasterSource::loadDescription(FileSource& fileSource) {
+void RasterSource::loadDescription(std::shared_ptr<FileSource> fileSource) {
     if (urlOrTileset.is<Tileset>()) {
         baseImpl = makeMutable<Impl>(impl(), urlOrTileset.get<Tileset>());
         loaded = true;
@@ -49,7 +49,7 @@ void RasterSource::loadDescription(FileSource& fileSource) {
     }
 
     const std::string& url = urlOrTileset.get<std::string>();
-    req = fileSource.request(Resource::source(url), [this, url](Response res) {
+    req = fileSource->request(Resource::source(url), [this, url](Response res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

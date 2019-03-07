@@ -22,7 +22,7 @@ const CustomGeometrySource::Impl& CustomGeometrySource::impl() const {
     return static_cast<const CustomGeometrySource::Impl&>(*baseImpl);
 }
 
-void CustomGeometrySource::loadDescription(FileSource&) {
+void CustomGeometrySource::loadDescription(std::shared_ptr<FileSource>) {
     baseImpl = makeMutable<CustomGeometrySource::Impl>(impl(), loader->self());
     loaded = true;
 }

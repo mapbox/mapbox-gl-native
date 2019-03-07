@@ -12,6 +12,7 @@ class OverscaledTileID;
 class CanonicalTileID;
 template <class T>
 class Actor;
+class FileSource;
 
 namespace style {
 
@@ -38,7 +39,7 @@ public:
 public:
     CustomGeometrySource(std::string id, CustomGeometrySource::Options options);
     ~CustomGeometrySource() final;
-    void loadDescription(FileSource&) final;
+    void loadDescription(std::shared_ptr<FileSource>) final;
     void setTileData(const CanonicalTileID&, const GeoJSON&);
     void invalidateTile(const CanonicalTileID&);
     void invalidateRegion(const LatLngBounds&);

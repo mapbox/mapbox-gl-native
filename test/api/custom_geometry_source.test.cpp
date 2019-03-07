@@ -2,6 +2,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
@@ -15,15 +16,17 @@
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace mbgl::platform;
 
 TEST(CustomGeometrySource, Grid) {
     util::RunLoop loop;
 
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+    auto fileSourceOptions = FileSourceOptions().withCachePath(":memory:").withAssetRoot("test/fixtures/api/assets");
+
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource };
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-            MapOptions().withMapMode(MapMode::Static));
+    HeadlessFrontend frontend { pixelRatio, fileSourceOptions };
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
+            MapOptions().withMapMode(MapMode::Static), fileSourceOptions);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));
 

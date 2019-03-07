@@ -9,9 +9,6 @@
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
@@ -30,17 +27,17 @@ Map::Map(RendererFrontend& rendererFrontend,
          MapObserver& mapObserver,
          const Size size,
          const float pixelRatio,
-         FileSource& fileSource,
-         const MapOptions& options)
+         const MapOptions& options,
+         const FileSourceOptions& fileSourceOptions)
     : impl(std::make_unique<Impl>(*this,
                                   rendererFrontend,
                                   mapObserver,
-                                  fileSource,
                                   size,
                                   pixelRatio,
                                   options.mapMode(),
                                   options.viewportMode(),
-                                  options.crossSourceCollisions())) {}
+                                  options.crossSourceCollisions(),
+                                  fileSourceOptions)) {}
 
 Map::~Map() = default;
 

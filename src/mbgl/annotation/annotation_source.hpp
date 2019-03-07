@@ -3,7 +3,11 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/source_impl.hpp>
 
+#include <memory>
+
 namespace mbgl {
+
+class FileSource;
 
 class AnnotationSource : public style::Source {
 public:
@@ -13,7 +17,7 @@ public:
     const Impl& impl() const;
 
 private:
-    void loadDescription(FileSource&) final;
+    void loadDescription(std::shared_ptr<FileSource>) final;
 
     Mutable<Impl> mutableImpl() const;
 };

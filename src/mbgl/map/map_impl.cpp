@@ -8,21 +8,21 @@ namespace mbgl {
 Map::Impl::Impl(Map& map_,
                 RendererFrontend& frontend,
                 MapObserver& mapObserver,
-                FileSource& fileSource_,
                 Size size_,
                 float pixelRatio_,
                 MapMode mode_,
                 ViewportMode viewportMode_,
-                bool crossSourceCollisions_)
+                bool crossSourceCollisions_,
+                const FileSourceOptions& fileSourceOptions)
     : map(map_),
       observer(mapObserver),
       rendererFrontend(frontend),
-      fileSource(fileSource_),
+      fileSource(platform::Factory::sharedFileSource(fileSourceOptions)),
       transform(observer, viewportMode_),
       mode(mode_),
       pixelRatio(pixelRatio_),
       crossSourceCollisions(crossSourceCollisions_),
-      style(std::make_unique<style::Style>(fileSource, pixelRatio)),
+      style(std::make_unique<style::Style>(pixelRatio, fileSourceOptions)),
       annotationManager(*style) {
 
     style->impl->setObserver(this);

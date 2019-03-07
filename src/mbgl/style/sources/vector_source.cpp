@@ -12,8 +12,8 @@ namespace mbgl {
 namespace style {
 
 VectorSource::VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset_)
-    : Source(makeMutable<Impl>(std::move(id))),
-      urlOrTileset(std::move(urlOrTileset_)) {
+    : Source(makeMutable<Impl>(std::move(id)))
+    , urlOrTileset(std::move(urlOrTileset_)) {
 }
 
 VectorSource::~VectorSource() = default;
@@ -34,7 +34,7 @@ optional<std::string> VectorSource::getURL() const {
     return urlOrTileset.get<std::string>();
 }
 
-void VectorSource::loadDescription(FileSource& fileSource) {
+void VectorSource::loadDescription(std::shared_ptr<FileSource> fileSource) {
     if (urlOrTileset.is<Tileset>()) {
         baseImpl = makeMutable<Impl>(impl(), urlOrTileset.get<Tileset>());
         loaded = true;
@@ -46,7 +46,7 @@ void VectorSource::loadDescription(FileSource& fileSource) {
     }
 
     const std::string& url = urlOrTileset.get<std::string>();
-    req = fileSource.request(Resource::source(url), [this, url](Response res) {
+    req = fileSource->request(Resource::source(url), [this, url](Response res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

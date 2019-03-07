@@ -3,6 +3,7 @@
     "sources": [
         "platform/default/src/mbgl/storage/asset_file_source.cpp",
         "platform/default/src/mbgl/storage/default_file_source.cpp",
+        "platform/default/src/mbgl/storage/file_source_options.cpp",
         "platform/default/src/mbgl/storage/file_source_request.cpp",
         "platform/default/src/mbgl/storage/local_file_request.cpp",
         "platform/default/src/mbgl/storage/local_file_source.cpp",

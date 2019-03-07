@@ -13,7 +13,7 @@ AnnotationSource::Impl::Impl()
     : Source::Impl(SourceType::Annotations, AnnotationManager::SourceID) {
 }
 
-void AnnotationSource::loadDescription(FileSource&) {
+void AnnotationSource::loadDescription(std::shared_ptr<FileSource>) {
     loaded = true;
 }
 

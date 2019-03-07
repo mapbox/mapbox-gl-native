@@ -1,3 +1,4 @@
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_impl.hpp>
@@ -27,9 +28,9 @@ namespace style {
 
 static Observer nullObserver;
 
-Style::Impl::Impl(FileSource& fileSource_, float pixelRatio)
-    : fileSource(fileSource_),
-      spriteLoader(std::make_unique<SpriteLoader>(pixelRatio)),
+Style::Impl::Impl(float pixelRatio, const FileSourceOptions& fileSourceOptions)
+    : fileSource(platform::Factory::sharedFileSource(fileSourceOptions)),
+      spriteLoader(std::make_unique<SpriteLoader>(pixelRatio, fileSourceOptions)),
       light(std::make_unique<Light>()),
       observer(&nullObserver) {
     spriteLoader->setObserver(this);
@@ -53,7 +54,7 @@ void Style::Impl::loadURL(const std::string& url_) {
     loaded = false;
     url = url_;
 
-    styleRequest = fileSource.request(Resource::style(url), [this](Response res) {
+    styleRequest = fileSource->request(Resource::style(url), [this](Response res) {
         // Don't allow a loaded, mutated style to be overwritten with a new version.
         if (mutated && loaded) {
             return;
@@ -110,7 +111,7 @@ void Style::Impl::parse(const std::string& json_) {
     setLight(std::make_unique<Light>(parser.light));
 
     spriteLoaded = false;
-    spriteLoader->load(parser.spriteURL, fileSource);
+    spriteLoader->load(parser.spriteURL);
     glyphURL = parser.glyphURL;
 
     loaded = true;

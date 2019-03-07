@@ -11,6 +11,7 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/map/projection_mode.hpp>
+#include <mbgl/storage/file_source_options.hpp>
 
 #include <cstdint>
 #include <string>
@@ -20,7 +21,6 @@
 
 namespace mbgl {
 
-class FileSource;
 class RendererFrontend;
 
 namespace style {
@@ -34,8 +34,8 @@ public:
                  MapObserver&,
                  Size size,
                  float pixelRatio,
-                 FileSource&,
-                 const MapOptions&);
+                 const MapOptions&,
+                 const FileSourceOptions&);
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have

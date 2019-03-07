@@ -9,12 +9,12 @@ namespace mbgl {
 
 Renderer::Renderer(RendererBackend& backend,
                    float pixelRatio_,
-                   FileSource& fileSource_,
+                   const FileSourceOptions& fileSourceOptions,
                    GLContextMode contextMode_,
                    const optional<std::string> programCacheDir_,
                    const optional<std::string> localFontFamily_)
-        : impl(std::make_unique<Impl>(backend, pixelRatio_, fileSource_,
-                                      contextMode_, std::move(programCacheDir_), std::move(localFontFamily_))) {
+        : impl(std::make_unique<Impl>(backend, pixelRatio_,
+                                      contextMode_, std::move(programCacheDir_), std::move(localFontFamily_), fileSourceOptions)) {
 }
 
 Renderer::~Renderer() {

@@ -8,6 +8,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/platform/factory.hpp>
 
 #include <args/args.hxx>
 
@@ -92,22 +93,25 @@ int main(int argc, char *argv[]) {
     GLFWView backend(fullscreen, benchmark);
     view = &backend;
 
-    mbgl::DefaultFileSource fileSource(cacheDB, ".");
-    if (!settings.online) {
-        fileSource.setOnlineStatus(false);
-        mbgl::Log::Warning(mbgl::Event::Setup, "Application is offline. Press `O` to toggle online status.");
-    }
-
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
     if (token == nullptr) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
-    } else {
-        fileSource.setAccessToken(std::string(token));
     }
 
-    GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(backend, view->getPixelRatio(), fileSource), backend };
-    mbgl::Map map(rendererFrontend, backend, view->getSize(), view->getPixelRatio(), fileSource, mbgl::MapOptions());
+    auto fileSourceOptions = mbgl::FileSourceOptions().withCachePath(cacheDB).withAccessToken(std::string(token));
+
+    GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(backend, view->getPixelRatio(), fileSourceOptions), backend };
+    mbgl::Map map(rendererFrontend, backend, view->getSize(), view->getPixelRatio(),
+                  mbgl::MapOptions(), fileSourceOptions);
+
+    auto fileSource = std::static_pointer_cast<mbgl::DefaultFileSource>(mbgl::platform::Factory::sharedFileSource(fileSourceOptions));
+    printf("accessToken: %s\n", fileSource->getAccessToken().c_str());
+
+    if (!settings.online) {
+        fileSource->setOnlineStatus(false);
+        mbgl::Log::Warning(mbgl::Event::Setup, "Application is offline. Press `O` to toggle online status.");
+    }
 
     backend.setMap(&map);
 
@@ -122,9 +126,9 @@ int main(int argc, char *argv[]) {
                    .withPitch(settings.pitch));
     map.setDebug(mbgl::MapDebugOptions(settings.debug));
 
-    view->setOnlineStatusCallback([&settings, &fileSource]() {
+    view->setOnlineStatusCallback([&settings, fileSource]() {
         settings.online = !settings.online;
-        fileSource.setOnlineStatus(settings.online);
+        fileSource->setOnlineStatus(settings.online);
         mbgl::Log::Info(mbgl::Event::Setup, "Application is %s. Press `O` to toggle online status.", settings.online ? "online" : "offline");
     });
 
@@ -142,13 +146,13 @@ int main(int argc, char *argv[]) {
         mbgl::Log::Info(mbgl::Event::Setup, "Changed style to: %s", newStyle.name);
     });
 
-    view->setPauseResumeCallback([&fileSource] () {
+    view->setPauseResumeCallback([fileSource] () {
         static bool isPaused = false;
 
         if (isPaused) {
-            fileSource.resume();
+            fileSource->resume();
         } else {
-            fileSource.pause();
+            fileSource->pause();
         }
 
         isPaused = !isPaused;

@@ -1,5 +1,6 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/layermanager/layer_manager.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
@@ -37,17 +38,17 @@ static RendererObserver& nullObserver() {
 
 Renderer::Impl::Impl(RendererBackend& backend_,
                      float pixelRatio_,
-                     FileSource& fileSource_,
                      GLContextMode contextMode_,
                      const optional<std::string> programCacheDir_,
-                     const optional<std::string> localFontFamily_)
+                     const optional<std::string> localFontFamily_,
+                     const FileSourceOptions& fileSourceOptions)
     : backend(backend_)
-    , fileSource(fileSource_)
     , observer(&nullObserver())
     , contextMode(contextMode_)
     , pixelRatio(pixelRatio_)
     , programCacheDir(programCacheDir_)
-    , glyphManager(std::make_unique<GlyphManager>(fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily_)))
+    , fileSource(platform::Factory::sharedFileSource(fileSourceOptions))
+    , glyphManager(std::make_unique<GlyphManager>(fileSourceOptions, std::make_unique<LocalGlyphRasterizer>(localFontFamily_)))
     , imageManager(std::make_unique<ImageManager>())
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
@@ -107,9 +108,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     const TileParameters tileParameters {
         updateParameters.pixelRatio,
+        fileSource,
         updateParameters.debugOptions,
         updateParameters.transformState,
-        fileSource,
         updateParameters.mode,
         updateParameters.annotationManager,
         *imageManager,

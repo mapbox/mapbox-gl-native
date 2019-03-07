@@ -1,9 +1,10 @@
 #pragma once
 
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/tile/tile_loader.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/util/tileset.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 
 #include <cassert>
 
@@ -27,7 +28,7 @@ TileLoader<T>::TileLoader(T& tile_,
         Resource::LoadingMethod::CacheOnly)),
       fileSource(parameters.fileSource) {
     assert(!request);
-    if (fileSource.supportsCacheOnlyRequests()) {
+    if (std::static_pointer_cast<DefaultFileSource>(fileSource)->supportsCacheOnlyRequests()) {
         // When supported, the first request is always optional, even if the TileLoader
         // is marked as required. That way, we can let the first optional request continue
         // to load when the TileLoader is later changed from required to optional. If we
@@ -52,7 +53,7 @@ void TileLoader<T>::loadFromCache() {
     assert(!request);
 
     resource.loadingMethod = Resource::LoadingMethod::CacheOnly;
-    request = fileSource.request(resource, [this](Response res) {
+    request = fileSource->request(resource, [this](Response res) {
         request.reset();
 
         tile.setTriedCache();
@@ -118,7 +119,7 @@ void TileLoader<T>::loadFromNetwork() {
     // Instead of using Resource::LoadingMethod::All, we're first doing a CacheOnly, and then a
     // NetworkOnly request.
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
-    request = fileSource.request(resource, [this](Response res) { loadedData(res); });
+    request = fileSource->request(resource, [this](Response res) { loadedData(res); });
 }
 
 } // namespace mbgl

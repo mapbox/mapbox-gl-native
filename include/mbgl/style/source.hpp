@@ -69,7 +69,7 @@ public:
     void setObserver(SourceObserver*);
     SourceObserver* observer = nullptr;
 
-    virtual void loadDescription(FileSource&) = 0;
+    virtual void loadDescription(std::shared_ptr<FileSource>) = 0;
     void dumpDebugLogs() const;
 
     bool loaded = false;

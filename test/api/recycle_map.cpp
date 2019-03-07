@@ -4,6 +4,7 @@
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -23,13 +24,13 @@ using namespace mbgl::style;
 TEST(API, RecycleMapUpdateImages) {
     util::RunLoop loop;
 
-    StubFileSource fileSource;
+    auto fileSource = platform::Factory::sharedFileSource({}, std::make_shared<StubFileSource>());
     float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, fileSource };
-    auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(),
-                                     pixelRatio, fileSource,
-                                     MapOptions().withMapMode(MapMode::Static));
+    FileSourceOptions stubFileSourceOptions;
+    HeadlessFrontend frontend { pixelRatio, stubFileSourceOptions };
+    auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
+                                     MapOptions().withMapMode(MapMode::Static), stubFileSourceOptions );
 
     EXPECT_TRUE(map);
 

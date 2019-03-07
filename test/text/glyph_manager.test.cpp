@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -65,10 +66,12 @@ public:
 class GlyphManagerTest {
 public:
     util::RunLoop loop;
-    StubFileSource fileSource;
+    FileSourceOptions stubFileSourceOptions;
+    std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(
+        stubFileSourceOptions, std::make_shared<StubFileSource>());
     StubGlyphManagerObserver observer;
     StubGlyphRequestor requestor;
-    GlyphManager glyphManager{ fileSource, std::make_unique<StubLocalGlyphRasterizer>() };
+    GlyphManager glyphManager{ stubFileSourceOptions, std::make_unique<StubLocalGlyphRasterizer>() };
 
     void run(const std::string& url, GlyphDependencies dependencies) {
         // Squelch logging.
@@ -89,7 +92,8 @@ public:
 TEST(GlyphManager, LoadingSuccess) {
     GlyphManagerTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
@@ -128,7 +132,8 @@ TEST(GlyphManager, LoadingSuccess) {
 TEST(GlyphManager, LoadingFail) {
     GlyphManagerTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->glyphsResponse = [&] (const Resource&) {
         Response response;
         response.error = std::make_unique<Response::Error>(
             Response::Error::Reason::Other,
@@ -161,7 +166,8 @@ TEST(GlyphManager, LoadingFail) {
 TEST(GlyphManager, LoadingCorrupted) {
     GlyphManagerTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->glyphsResponse = [&] (const Resource&) {
         Response response;
         response.data = std::make_unique<std::string>("CORRUPTED");
         return response;
@@ -192,7 +198,8 @@ TEST(GlyphManager, LoadingCorrupted) {
 TEST(GlyphManager, LoadingCancel) {
     GlyphManagerTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->glyphsResponse = [&] (const Resource&) {
         test.end();
         return optional<Response>();
     };
@@ -212,7 +219,8 @@ TEST(GlyphManager, LoadLocalCJKGlyph) {
     GlyphManagerTest test;
     int glyphResponses = 0;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->glyphsResponse = [&] (const Resource&) {
         glyphResponses++;
         return optional<Response>();
     };
@@ -257,7 +265,8 @@ TEST(GlyphManager, LoadLocalCJKGlyph) {
 TEST(GlyphManager, LoadingInvalid) {
     GlyphManagerTest test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/fake_glyphs-0-255.pbf"));
@@ -295,10 +304,12 @@ TEST(GlyphManager, ImmediateFileSource) {
     class GlyphManagerTestSynchronous {
     public:
         util::RunLoop loop;
-        StubFileSource fileSource = { StubFileSource::ResponseType::Synchronous };
+        FileSourceOptions stubFileSourceOptions;
+        std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(
+            stubFileSourceOptions, std::make_shared<StubFileSource>(StubFileSource::ResponseType::Synchronous));
         StubGlyphManagerObserver observer;
         StubGlyphRequestor requestor;
-        GlyphManager glyphManager { fileSource };
+        GlyphManager glyphManager { stubFileSourceOptions };
 
         void run(const std::string& url, GlyphDependencies dependencies) {
             // Squelch logging.
@@ -318,7 +329,8 @@ TEST(GlyphManager, ImmediateFileSource) {
 
     GlyphManagerTestSynchronous test;
 
-    test.fileSource.glyphsResponse = [&] (const Resource&) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->glyphsResponse = [&] (const Resource&) {
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
         return response;

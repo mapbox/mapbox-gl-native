@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/platform/gl_functions.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
@@ -85,13 +86,14 @@ struct Buffer {
 TEST(GLContextMode, Shared) {
     util::RunLoop loop;
 
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, fileSource, {}, GLContextMode::Shared };
+    auto fileSourceOptions = FileSourceOptions().withCachePath(":memory:").withAssetRoot("test/fixtures/api/assets");
+
+    HeadlessFrontend frontend { pixelRatio, fileSourceOptions, {}, GLContextMode::Shared };
 
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
-            fileSource, MapOptions().withMapMode(MapMode::Static));
+            MapOptions().withMapMode(MapMode::Static), fileSourceOptions);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));
 

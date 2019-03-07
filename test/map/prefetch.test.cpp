@@ -4,6 +4,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
@@ -22,7 +23,9 @@ using namespace std::chrono_literals;
 
 TEST(Map, PrefetchTiles) {
     util::RunLoop runLoop;
-    StubFileSource fileSource;
+
+    FileSourceOptions stubFileSourceOptions;
+    auto fileSource = platform::Factory::sharedFileSource(stubFileSourceOptions, std::make_shared<StubFileSource>());
 
     util::Timer emergencyShutoff;
     emergencyShutoff.start(10s, 0s, [&] {
@@ -35,13 +38,14 @@ TEST(Map, PrefetchTiles) {
         runLoop.stop();
     };
 
-    HeadlessFrontend frontend { { 512, 512 }, 1, fileSource };
-    Map map(frontend, observer, frontend.getSize(), 1, fileSource,
-            MapOptions().withMapMode(MapMode::Continuous));
+    HeadlessFrontend frontend { { 512, 512 }, 1, stubFileSourceOptions };
+    Map map(frontend, observer, frontend.getSize(), 1,
+            MapOptions().withMapMode(MapMode::Continuous), stubFileSourceOptions);
 
     std::vector<int> tiles;
 
-    fileSource.response = [&] (const Resource& res) -> optional<Response> {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(fileSource);
+    stubFileSource->response = [&] (const Resource& res) -> optional<Response> {
         static std::string tile = util::read_file("test/fixtures/map/prefetch/tile.png");
 
         auto zoom = std::stoi(res.url);

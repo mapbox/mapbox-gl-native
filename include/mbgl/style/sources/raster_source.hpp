@@ -7,6 +7,7 @@
 namespace mbgl {
 
 class AsyncRequest;
+class FileSource;
 
 namespace style {
 
@@ -23,7 +24,7 @@ public:
     class Impl;
     const Impl& impl() const;
 
-    void loadDescription(FileSource&) final;
+    void loadDescription(std::shared_ptr<FileSource>) final;
 
 private:
     const variant<std::string, Tileset> urlOrTileset;

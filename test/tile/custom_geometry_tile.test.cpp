@@ -13,6 +13,7 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
+#include <mbgl/platform/factory.hpp>
 
 #include <memory>
 
@@ -21,19 +22,21 @@ using namespace mbgl::style;
 
 class CustomTileTest {
 public:
-    FakeFileSource fileSource;
+    FileSourceOptions fakeFileSourceOptions;
+    std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(
+        fakeFileSourceOptions, std::make_shared<FakeFileSource>());
     TransformState transformState;
     util::RunLoop loop;
-    style::Style style { fileSource, 1 };
+    style::Style style { 1.0, fakeFileSourceOptions };
     AnnotationManager annotationManager { style };
     ImageManager imageManager;
-    GlyphManager glyphManager { fileSource };
+    GlyphManager glyphManager { fakeFileSourceOptions };
 
     TileParameters tileParameters {
         1.0,
+        fileSource,
         MapDebugOptions(),
         transformState,
-        fileSource,
         MapMode::Continuous,
         annotationManager,
         imageManager,

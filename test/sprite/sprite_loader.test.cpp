@@ -2,6 +2,7 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/sprite/sprite_loader_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
@@ -34,16 +35,17 @@ public:
     SpriteLoaderTest() = default;
 
     util::RunLoop loop;
-    StubFileSource fileSource;
+    FileSourceOptions stubFileSourceOptions;
+    std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(stubFileSourceOptions, std::make_shared<StubFileSource>());
     StubSpriteLoaderObserver observer;
-    SpriteLoader spriteLoader{ 1 };
+    SpriteLoader spriteLoader{ 1.0, stubFileSourceOptions };
 
     void run() {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
         spriteLoader.setObserver(&observer);
-        spriteLoader.load("test/fixtures/resources/sprite", fileSource);
+        spriteLoader.load("test/fixtures/resources/sprite");
 
         loop.run();
     }
@@ -84,8 +86,9 @@ Response corruptSpriteResponse(const Resource&) {
 TEST(SpriteLoader, LoadingSuccess) {
     SpriteLoaderTest test;
 
-    test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
-    test.fileSource.spriteJSONResponse = successfulSpriteJSONResponse;
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->spriteImageResponse = successfulSpriteImageResponse;
+    stubFileSource->spriteJSONResponse = successfulSpriteJSONResponse;
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         FAIL() << util::toString(error);
@@ -103,8 +106,9 @@ TEST(SpriteLoader, LoadingSuccess) {
 TEST(SpriteLoader, JSONLoadingFail) {
     SpriteLoaderTest test;
 
-    test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
-    test.fileSource.spriteJSONResponse = failedSpriteResponse;
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->spriteImageResponse = successfulSpriteImageResponse;
+    stubFileSource->spriteJSONResponse = failedSpriteResponse;
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
@@ -118,8 +122,9 @@ TEST(SpriteLoader, JSONLoadingFail) {
 TEST(SpriteLoader, ImageLoadingFail) {
     SpriteLoaderTest test;
 
-    test.fileSource.spriteImageResponse = failedSpriteResponse;
-    test.fileSource.spriteJSONResponse = successfulSpriteJSONResponse;
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->spriteImageResponse = failedSpriteResponse;
+    stubFileSource->spriteJSONResponse = successfulSpriteJSONResponse;
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
@@ -133,8 +138,9 @@ TEST(SpriteLoader, ImageLoadingFail) {
 TEST(SpriteLoader, JSONLoadingCorrupted) {
     SpriteLoaderTest test;
 
-    test.fileSource.spriteImageResponse = successfulSpriteImageResponse;
-    test.fileSource.spriteJSONResponse = corruptSpriteResponse;
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->spriteImageResponse = successfulSpriteImageResponse;
+    stubFileSource->spriteJSONResponse = corruptSpriteResponse;
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
@@ -148,8 +154,9 @@ TEST(SpriteLoader, JSONLoadingCorrupted) {
 TEST(SpriteLoader, ImageLoadingCorrupted) {
     SpriteLoaderTest test;
 
-    test.fileSource.spriteImageResponse = corruptSpriteResponse;
-    test.fileSource.spriteJSONResponse = successfulSpriteJSONResponse;
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->spriteImageResponse = corruptSpriteResponse;
+    stubFileSource->spriteJSONResponse = successfulSpriteJSONResponse;
 
     test.observer.spriteError = [&] (std::exception_ptr error) {
         EXPECT_TRUE(error != nullptr);
@@ -163,8 +170,9 @@ TEST(SpriteLoader, ImageLoadingCorrupted) {
 TEST(SpriteLoader, LoadingCancel) {
     SpriteLoaderTest test;
 
-    test.fileSource.spriteImageResponse =
-    test.fileSource.spriteJSONResponse = [&] (const Resource&) {
+    auto stubFileSource = std::static_pointer_cast<StubFileSource>(test.fileSource);
+    stubFileSource->spriteImageResponse =
+    stubFileSource->spriteJSONResponse = [&] (const Resource&) {
         test.end();
         return optional<Response>();
     };

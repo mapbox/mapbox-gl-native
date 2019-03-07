@@ -13,7 +13,7 @@
 
 namespace mbgl {
 
-class FileSource;
+class FileSourceOptions;
 class RendererBackend;
 class RendererObserver;
 class RenderedQueryOptions;
@@ -22,7 +22,8 @@ class UpdateParameters;
 
 class Renderer {
 public:
-    Renderer(RendererBackend&, float pixelRatio_, FileSource&,
+    Renderer(RendererBackend&, float pixelRatio_,
+             const FileSourceOptions&,
              GLContextMode = GLContextMode::Unique,
              const optional<std::string> programCacheDir = {},
              const optional<std::string> localFontFamily = {});

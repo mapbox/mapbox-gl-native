@@ -13,14 +13,16 @@
 namespace mbgl {
 
 class FileSource;
+class FileSourceOptions;
+
 class SpriteLoaderObserver;
 
 class SpriteLoader : public util::noncopyable {
 public:
-    SpriteLoader(float pixelRatio);
+    SpriteLoader(float pixelRatio, const FileSourceOptions&);
     ~SpriteLoader();
 
-    void load(const std::string& url, FileSource&);
+    void load(const std::string& url);
 
     void setObserver(SpriteLoaderObserver*);
 
@@ -36,6 +38,7 @@ private:
 
     struct Loader;
     std::unique_ptr<Loader> loader;
+    std::shared_ptr<FileSource> fileSource;
 
     SpriteLoaderObserver* observer = nullptr;
 };

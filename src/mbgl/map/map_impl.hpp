@@ -5,9 +5,9 @@
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/style.hpp>
@@ -28,14 +28,15 @@ public:
     Impl(Map&,
          RendererFrontend&,
          MapObserver&,
-         FileSource&,
 
          Size size,
          float pixelRatio,
 
          MapMode,
          ViewportMode,
-         bool crossSourceCollisions);
+         bool crossSourceCollisions,
+
+         const FileSourceOptions& fileSourceOptions);
 
     ~Impl() final;
 
@@ -57,7 +58,9 @@ public:
     Map& map;
     MapObserver& observer;
     RendererFrontend& rendererFrontend;
-    FileSource& fileSource;
+
+    // Keeps a reference to the initialized file source.
+    std::shared_ptr<FileSource> fileSource;
 
     Transform transform;
 

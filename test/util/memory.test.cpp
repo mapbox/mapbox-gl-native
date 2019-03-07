@@ -4,6 +4,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -25,16 +26,19 @@ using namespace std::literals::string_literals;
 class MemoryTest {
 public:
     MemoryTest() {
-        fileSource.styleResponse = [&](const Resource& res) { return response("style_" + getType(res) + ".json");};
-        fileSource.tileResponse = [&](const Resource& res) { return response(getType(res) + ".tile"); };
-        fileSource.sourceResponse = [&](const Resource& res) { return response("source_" + getType(res) + ".json"); };
-        fileSource.glyphsResponse = [&](const Resource&) { return response("glyphs.pbf"); };
-        fileSource.spriteJSONResponse = [&](const Resource&) { return response("sprite.json"); };
-        fileSource.spriteImageResponse = [&](const Resource&) { return response("sprite.png"); };
+        auto stubFileSource = std::static_pointer_cast<StubFileSource>(fileSource);
+        stubFileSource->styleResponse = [&](const Resource& res) { return response("style_" + getType(res) + ".json");};
+        stubFileSource->tileResponse = [&](const Resource& res) { return response(getType(res) + ".tile"); };
+        stubFileSource->sourceResponse = [&](const Resource& res) { return response("source_" + getType(res) + ".json"); };
+        stubFileSource->glyphsResponse = [&](const Resource&) { return response("glyphs.pbf"); };
+        stubFileSource->spriteJSONResponse = [&](const Resource&) { return response("sprite.json"); };
+        stubFileSource->spriteImageResponse = [&](const Resource&) { return response("sprite.png"); };
     }
 
     util::RunLoop runLoop;
-    StubFileSource fileSource;
+    FileSourceOptions stubFileSourceOptions;
+    std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(
+        stubFileSourceOptions, std::make_shared<StubFileSource>());
 
 private:
     Response response(const std::string& path) {
@@ -69,9 +73,9 @@ TEST(Memory, Vector) {
     MemoryTest test;
     float ratio { 2 };
 
-    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource };
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-            MapOptions().withMapMode(MapMode::Static));
+    HeadlessFrontend frontend { { 256, 256 }, ratio, test.stubFileSourceOptions };
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio,
+            MapOptions().withMapMode(MapMode::Static), test.stubFileSourceOptions);
     map.jumpTo(CameraOptions().withZoom(16));
     map.getStyle().loadURL("mapbox://streets");
 
@@ -82,9 +86,9 @@ TEST(Memory, Raster) {
     MemoryTest test;
     float ratio { 2 };
 
-    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource };
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-            MapOptions().withMapMode(MapMode::Static));
+    HeadlessFrontend frontend { { 256, 256 }, ratio, test.stubFileSourceOptions };
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio,
+            MapOptions().withMapMode(MapMode::Static), test.stubFileSourceOptions);
     map.getStyle().loadURL("mapbox://satellite");
 
     frontend.render(map);
@@ -119,10 +123,10 @@ TEST(Memory, Footprint) {
 
     class FrontendAndMap {
     public:
-        FrontendAndMap(MemoryTest& test_, const char* style)
-            : frontend(Size{ 256, 256 }, 2, test_.fileSource)
-            , map(frontend, MapObserver::nullObserver(), frontend.getSize(), 2, test_.fileSource,
-                  MapOptions().withMapMode(MapMode::Static)) {
+        FrontendAndMap(const FileSourceOptions& fileSourceOptions, const char* style)
+            : frontend(Size{ 256, 256 }, 2, fileSourceOptions)
+            , map(frontend, MapObserver::nullObserver(), frontend.getSize(), 2,
+                  MapOptions().withMapMode(MapMode::Static), fileSourceOptions) {
             map.jumpTo(CameraOptions().withZoom(16));
             map.getStyle().loadURL(style);
             frontend.render(map);
@@ -134,8 +138,8 @@ TEST(Memory, Footprint) {
 
     // Warm up buffers and cache.
     for (unsigned i = 0; i < 10; ++i) {
-        FrontendAndMap(test, "mapbox://streets");
-        FrontendAndMap(test, "mapbox://satellite");
+        FrontendAndMap(test.stubFileSourceOptions, "mapbox://streets");
+        FrontendAndMap(test.stubFileSourceOptions, "mapbox://satellite");
     }
 
     // Process close callbacks, mostly needed by
@@ -147,14 +151,14 @@ TEST(Memory, Footprint) {
 
     long vectorInitialRSS = mbgl::test::getCurrentRSS();
     for (unsigned i = 0; i < runs; ++i) {
-        maps.emplace_back(std::make_unique<FrontendAndMap>(test, "mapbox://streets"));
+        maps.emplace_back(std::make_unique<FrontendAndMap>(test.stubFileSourceOptions, "mapbox://streets"));
     }
 
     double vectorFootprint = (mbgl::test::getCurrentRSS() - vectorInitialRSS) / double(runs);
 
     long rasterInitialRSS = mbgl::test::getCurrentRSS();
     for (unsigned i = 0; i < runs; ++i) {
-        maps.emplace_back(std::make_unique<FrontendAndMap>(test, "mapbox://satellite"));
+        maps.emplace_back(std::make_unique<FrontendAndMap>(test.stubFileSourceOptions, "mapbox://satellite"));
     }
 
     double rasterFootprint = (mbgl::test::getCurrentRSS() - rasterInitialRSS) / double(runs);

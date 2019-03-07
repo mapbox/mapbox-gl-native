@@ -4,6 +4,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/storage/online_file_source.hpp>
@@ -21,13 +22,15 @@ TEST(API, RenderWithoutCallback) {
 
     util::RunLoop loop;
 
-    StubFileSource fileSource;
+    FileSourceOptions stubFileSourceOptions;
+    auto fileSource = platform::Factory::sharedFileSource(stubFileSourceOptions, std::make_shared<StubFileSource>());
+
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource };
+
+    HeadlessFrontend frontend { pixelRatio, stubFileSourceOptions };
 
     auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(),
-                                     pixelRatio, fileSource,
-                                     MapOptions().withMapMode(MapMode::Static));
+                                     pixelRatio, MapOptions().withMapMode(MapMode::Static), stubFileSourceOptions);
     map->renderStill(nullptr);
 
     // Force Map thread to join.

@@ -4,9 +4,12 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
 
+#include <memory>
+
 namespace mbgl {
 class LatLng;
 class AsyncRequest;
+class FileSource;
 
 namespace style {
 
@@ -26,7 +29,7 @@ public:
     class Impl;
     const Impl& impl() const;
 
-    void loadDescription(FileSource&) final;
+    void loadDescription(std::shared_ptr<FileSource>) final;
 private:
     optional<std::string> url;
     std::unique_ptr<AsyncRequest> req;

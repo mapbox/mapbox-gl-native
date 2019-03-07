@@ -6,6 +6,7 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
@@ -27,12 +28,15 @@ std::unique_ptr<style::Image> namedMarker(const std::string& name) {
 class AnnotationTest {
 public:
     util::RunLoop loop;
-    StubFileSource fileSource;
+    FileSourceOptions stubFileSourceOptions;
+    std::shared_ptr<FileSource> fileSource = platform::Factory::sharedFileSource(
+        stubFileSourceOptions, std::make_shared<StubFileSource>());
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource };
 
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              MapOptions().withMapMode(MapMode::Static)};
+    HeadlessFrontend frontend { pixelRatio, stubFileSourceOptions };
+
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
+              MapOptions().withMapMode(MapMode::Static), stubFileSourceOptions };
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,

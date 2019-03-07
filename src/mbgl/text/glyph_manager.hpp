@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/storage/file_source_options.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/text/glyph_range.hpp>
@@ -8,6 +9,7 @@
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/immutable.hpp>
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -25,7 +27,7 @@ public:
 
 class GlyphManager : public util::noncopyable {
 public:
-    GlyphManager(FileSource&, std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>(optional<std::string>()));
+    GlyphManager(const FileSourceOptions&, std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>(optional<std::string>()));
     ~GlyphManager();
 
     // Workers send a `getGlyphs` message to the main thread once they have determined
@@ -48,7 +50,7 @@ public:
 private:
     Glyph generateLocalSDF(const FontStack& fontStack, GlyphID glyphID);
 
-    FileSource& fileSource;
+    std::shared_ptr<FileSource> fileSource;
     std::string glyphURL;
 
     struct GlyphRequest {

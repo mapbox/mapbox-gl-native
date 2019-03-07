@@ -5,9 +5,12 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/constants.hpp>
 
+#include <memory>
+
 namespace mbgl {
 
 class AsyncRequest;
+class FileSource;
 
 namespace style {
 
@@ -39,7 +42,7 @@ public:
     class Impl;
     const Impl& impl() const;
 
-    void loadDescription(FileSource&) final;
+    void loadDescription(std::shared_ptr<FileSource>) final;
 
 private:
     optional<std::string> url;

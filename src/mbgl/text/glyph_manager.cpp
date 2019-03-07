@@ -1,7 +1,8 @@
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/tiny_sdf.hpp>
@@ -11,8 +12,8 @@ namespace mbgl {
 
 static GlyphManagerObserver nullObserver;
 
-GlyphManager::GlyphManager(FileSource& fileSource_, std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
-    : fileSource(fileSource_),
+GlyphManager::GlyphManager(const FileSourceOptions& options, std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
+    : fileSource(platform::Factory::sharedFileSource(options)),
       observer(&nullObserver),
       localGlyphRasterizer(std::move(localGlyphRasterizer_)) {
 }
@@ -70,7 +71,7 @@ void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStac
         return;
     }
 
-    request.req = fileSource.request(Resource::glyphs(glyphURL, fontStack, range), [this, fontStack, range](Response res) {
+    request.req = static_cast<DefaultFileSource*>(fileSource.get())->request(Resource::glyphs(glyphURL, fontStack, range), [this, fontStack, range](Response res) {
         processResponse(res, fontStack, range);
     });
 }
