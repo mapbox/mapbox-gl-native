@@ -128,6 +128,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.segments,
                 allUniformValues,
                 allAttributeBindings,
+                HeatmapProgram::TextureBindings{},
                 getID()
             );
         }
@@ -176,6 +177,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.staticData.extrusionTextureSegments,
             allUniformValues,
             allAttributeBindings,
+            HeatmapProgram::TextureBindings{},
             getID()
         );
     }

@@ -469,6 +469,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     paintAttributeData,
                     properties
                 ),
+                ClippingMaskProgram::TextureBindings{},
                 "clipping"
             );
         }

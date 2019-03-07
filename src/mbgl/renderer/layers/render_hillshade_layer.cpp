@@ -105,6 +105,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             segments,
             allUniformValues,
             allAttributeBindings,
+            HillshadeProgram::TextureBindings{},
             getID()
         );
     };
@@ -167,6 +168,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 parameters.staticData.rasterSegments,
                 allUniformValues,
                 allAttributeBindings,
+                HillshadePrepareProgram::TextureBindings{},
                 getID()
             );
             bucket.texture = std::move(view.getTexture());

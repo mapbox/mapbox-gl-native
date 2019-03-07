@@ -73,7 +73,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                              const auto& drawMode,
                              const auto& depthMode,
                              const auto& indexBuffer,
-                             const auto& segments) {
+                             const auto& segments,
+                             auto&& textureBindings) {
                 auto& programInstance = program.get(evaluated);
 
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
@@ -110,6 +111,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     segments,
                     allUniformValues,
                     allAttributeBindings,
+                    std::move(textureBindings),
                     getID()
                 );
             };
@@ -124,7 +126,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                         ? gfx::DepthMaskType::ReadWrite
                         : gfx::DepthMaskType::ReadOnly),
                      *bucket.triangleIndexBuffer,
-                     bucket.triangleSegments);
+                     bucket.triangleSegments,
+                     FillProgram::TextureBindings{});
             }
 
             if (evaluated.get<FillAntialias>() && parameters.pass == RenderPass::Translucent) {
@@ -134,7 +137,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                          unevaluated.get<FillOutlineColor>().isUndefined() ? 2 : 0,
                          gfx::DepthMaskType::ReadOnly),
                      *bucket.lineIndexBuffer,
-                     bucket.lineSegments);
+                     bucket.lineSegments,
+                     FillOutlineProgram::TextureBindings{});
             }
         }
     } else {
@@ -159,7 +163,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                              const auto& drawMode,
                              const auto& depthMode,
                              const auto& indexBuffer,
-                             const auto& segments) {
+                             const auto& segments,
+                             auto&& textureBindings) {
                 auto& programInstance = program.get(evaluated);
 
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
@@ -200,6 +205,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     segments,
                     allUniformValues,
                     allAttributeBindings,
+                    std::move(textureBindings),
                     getID()
                 );
             };
@@ -208,14 +214,16 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                  gfx::Triangles(),
                  parameters.depthModeForSublayer(1, gfx::DepthMaskType::ReadWrite),
                  *bucket.triangleIndexBuffer,
-                 bucket.triangleSegments);
+                 bucket.triangleSegments,
+                 FillProgram::TextureBindings{});
 
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
                 draw(parameters.programs.getFillLayerPrograms().fillOutlinePattern,
                      gfx::Lines { 2.0f },
                      parameters.depthModeForSublayer(2, gfx::DepthMaskType::ReadOnly),
                      *bucket.lineIndexBuffer,
-                     bucket.lineSegments);
+                     bucket.lineSegments,
+                     FillOutlineProgram::TextureBindings{});
             }
         }
     }

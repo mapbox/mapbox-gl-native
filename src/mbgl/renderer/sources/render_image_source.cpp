@@ -84,6 +84,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
                 paintAttributeData,
                 properties
             ),
+            DebugProgram::TextureBindings{},
             "image"
         );
     }

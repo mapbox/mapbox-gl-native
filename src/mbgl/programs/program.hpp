@@ -35,7 +35,9 @@ public:
     using PaintUniformList = typename Binders::UniformList;
     using AllUniforms = gl::Uniforms<TypeListConcat<UniformList, PaintUniformList>>;
 
-    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
+    using TextureBindings = gfx::TextureBindings<TextureList>;
+
+    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureBindings>;
 
     ProgramType program;
 
@@ -80,6 +82,7 @@ public:
               const SegmentVector<Attributes>& segments,
               const typename AllUniforms::Values& allUniformValues,
               const typename Attributes::Bindings& allAttributeBindings,
+              const TextureBindings& textureBindings,
               const std::string& layerID) {
         for (auto& segment : segments) {
             auto vertexArrayIt = segment.vertexArrays.find(layerID);
@@ -98,6 +101,7 @@ public:
                 allUniformValues,
                 vertexArrayIt->second,
                 Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                textureBindings,
                 indexBuffer,
                 segment.indexOffset,
                 segment.indexLength);

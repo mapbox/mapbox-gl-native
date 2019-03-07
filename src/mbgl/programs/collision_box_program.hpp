@@ -75,6 +75,7 @@ public:
               const SegmentVector<Attributes>& segments,
               const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
+              const TextureBindings& textureBindings,
               float currentZoom,
               const std::string& layerID) {
         typename AllUniforms::Values allUniformValues = uniformValues
@@ -103,6 +104,7 @@ public:
                     allUniformValues,
                     vertexArrayIt->second,
                     Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    textureBindings,
                     indexBuffer,
                     segment.indexOffset,
                     segment.indexLength);
@@ -161,6 +163,7 @@ public:
               const SegmentVector<Attributes>& segments,
               const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
+              const TextureBindings& textureBindings,
               float currentZoom,
               const std::string& layerID) {
         typename AllUniforms::Values allUniformValues = uniformValues
@@ -187,6 +190,7 @@ public:
                     allUniformValues,
                     vertexArrayIt->second,
                     Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    textureBindings,
                     indexBuffer,
                     segment.indexOffset,
                     segment.indexLength);

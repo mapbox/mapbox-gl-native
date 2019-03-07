@@ -107,6 +107,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
             bucket.segments,
             allUniformValues,
             allAttributeBindings,
+            CircleProgram::TextureBindings{},
             getID()
         );
     }
