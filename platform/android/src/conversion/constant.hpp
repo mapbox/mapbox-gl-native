@@ -88,6 +88,17 @@ struct Converter<jni::Local<jni::Object<>>, T, typename std::enable_if_t<std::is
     }
 };
 
+template <class T>
+struct Converter<jni::Local<jni::Object<>>, std::vector<T>, typename std::enable_if_t<std::is_enum<T>::value>> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::vector<T>& value) const {
+        auto result = jni::Array<jni::String>::New(env, value.size());
+        for (std::size_t i = 0; i < value.size(); ++i) {
+            result.Set(env, i, jni::Make<jni::String>(env, Enum<T>::toString(value.at(i))));
+        }
+        return result;
+    }
+};
+
 } // namespace conversion
 } // namespace android
 } // namespace mbgl

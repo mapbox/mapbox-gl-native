@@ -136,6 +136,8 @@ template optional<PropertyExpression<std::vector<std::string>>>
     convertFunctionToExpression<std::vector<std::string>>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<SymbolAnchorType>>
     convertFunctionToExpression<SymbolAnchorType>(const Convertible&, Error&, bool);
+template optional<PropertyExpression<std::vector<TextVariableAnchorType>>>
+    convertFunctionToExpression<std::vector<TextVariableAnchorType>>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<SymbolPlacementType>>
     convertFunctionToExpression<SymbolPlacementType>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<SymbolZOrderType>>
