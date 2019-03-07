@@ -972,11 +972,11 @@ jobs:
       - run:
           name: Trigger metrics
           command: |
-            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-              if [[ $CIRCLE_BRANCH == master ]]; then
+              if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
                 curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=ios-maps-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/maps-ios-setup
+              else 
+                echo "MOBILE_METRICS_TOKEN not 
               fi
-            fi
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
