@@ -579,6 +579,19 @@ public class SymbolLayerTest extends BaseLayerTest {
 
   @Test
   @UiThreadTest
+  public void testTextRadialOffsetAsConstant() {
+    Timber.i("text-radial-offset");
+    assertNotNull(layer);
+    assertNull(layer.getTextRadialOffset().getValue());
+
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(textRadialOffset(propertyValue));
+    assertEquals(layer.getTextRadialOffset().getValue(), propertyValue);
+  }
+
+  @Test
+  @UiThreadTest
   public void testTextVariableAnchorAsConstant() {
     Timber.i("text-variable-anchor");
     assertNotNull(layer);

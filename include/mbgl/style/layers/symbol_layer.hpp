@@ -134,6 +134,10 @@ public:
     PropertyValue<TextJustifyType> getTextJustify() const;
     void setTextJustify(PropertyValue<TextJustifyType>);
 
+    static PropertyValue<float> getDefaultTextRadialOffset();
+    PropertyValue<float> getTextRadialOffset() const;
+    void setTextRadialOffset(PropertyValue<float>);
+
     static PropertyValue<std::vector<TextVariableAnchorType>> getDefaultTextVariableAnchor();
     PropertyValue<std::vector<TextVariableAnchorType>> getTextVariableAnchor() const;
     void setTextVariableAnchor(PropertyValue<std::vector<TextVariableAnchorType>>);
