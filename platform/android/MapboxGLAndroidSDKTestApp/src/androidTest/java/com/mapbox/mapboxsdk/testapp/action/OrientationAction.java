@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.action;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -11,30 +10,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import org.hamcrest.Matcher;
 
+import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 
-public class OrientationChangeAction implements ViewAction {
+public class OrientationAction implements ViewAction {
 
   private final int orientation;
 
-  private OrientationChangeAction(int orientation) {
+  private OrientationAction(int orientation) {
     this.orientation = orientation;
   }
 
   public static ViewAction orientationLandscape() {
-    return new OrientationChangeAction(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    return new OrientationAction(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
   }
 
   public static ViewAction orientationPortrait() {
-    return new OrientationChangeAction(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    return new OrientationAction(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
   }
 
   public static ViewAction orientationLandscapeReverse() {
-    return new OrientationChangeAction(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    return new OrientationAction(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
   }
 
   public static ViewAction orientationPortraitReverse() {
-    return new OrientationChangeAction(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+    return new OrientationAction(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
   }
 
   @Override
@@ -59,6 +59,10 @@ public class OrientationChangeAction implements ViewAction {
       }
     }
     activity.setRequestedOrientation(orientation);
+  }
+
+  public static void invoke(ViewAction action) {
+    onView(isRoot()).perform(action);
   }
 
   private Activity getActivity(Context context) {

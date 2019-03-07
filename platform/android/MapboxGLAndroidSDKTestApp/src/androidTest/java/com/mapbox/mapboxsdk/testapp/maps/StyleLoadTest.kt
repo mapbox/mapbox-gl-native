@@ -18,14 +18,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class StyleLoadTest : EspressoTest() {
 
-    private lateinit var mapView: MapView
-
-    @Before
-    override fun beforeTest() {
-        super.beforeTest()
-        mapView = (rule.activity as EspressoTestActivity).mapView
-    }
-
     @Test
     fun updateSourceAfterStyleLoad() {
         validateTestSetup()

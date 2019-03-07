@@ -4,10 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
-
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;

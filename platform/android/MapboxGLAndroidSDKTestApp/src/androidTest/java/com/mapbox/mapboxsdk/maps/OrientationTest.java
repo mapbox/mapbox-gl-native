@@ -1,36 +1,36 @@
 package com.mapbox.mapboxsdk.maps;
 
+import com.mapbox.mapboxsdk.testapp.action.OrientationAction;
+import com.mapbox.mapboxsdk.testapp.action.WaitAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseTest;
 import com.mapbox.mapboxsdk.testapp.activity.camera.CameraAnimationTypeActivity;
 import org.junit.Test;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
-import static com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationLandscape;
-import static com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationLandscapeReverse;
-import static com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationPortrait;
-import static com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationPortraitReverse;
+import static com.mapbox.mapboxsdk.testapp.action.OrientationAction.orientationLandscape;
+import static com.mapbox.mapboxsdk.testapp.action.OrientationAction.orientationLandscapeReverse;
+import static com.mapbox.mapboxsdk.testapp.action.OrientationAction.orientationPortrait;
+import static com.mapbox.mapboxsdk.testapp.action.OrientationAction.orientationPortraitReverse;
 
 public class OrientationTest extends BaseTest {
 
   @Test
   public void testChangeDeviceOrientation() {
-    onView(isRoot()).perform(orientationLandscape());
-    waitAction(2200);
-    onView(isRoot()).perform(orientationPortrait());
-    waitAction(2500);
-    onView(isRoot()).perform(orientationLandscapeReverse());
-    waitAction(500);
-    onView(isRoot()).perform(orientationPortraitReverse());
-    waitAction(1250);
-    onView(isRoot()).perform(orientationLandscape());
-    waitAction(750);
-    onView(isRoot()).perform(orientationPortrait());
-    waitAction(950);
-    onView(isRoot()).perform(orientationLandscapeReverse());
-    onView(isRoot()).perform(orientationPortraitReverse());
-    onView(isRoot()).perform(orientationLandscape());
-    onView(isRoot()).perform(orientationPortrait());
+    OrientationAction.invoke(orientationLandscape());
+    WaitAction.invoke(2200);
+    OrientationAction.invoke(orientationPortrait());
+    WaitAction.invoke(2500);
+    OrientationAction.invoke(orientationLandscapeReverse());
+    WaitAction.invoke(500);
+    OrientationAction.invoke(orientationPortraitReverse());
+    WaitAction.invoke(1250);
+    OrientationAction.invoke(orientationLandscape());
+    WaitAction.invoke(750);
+    OrientationAction.invoke(orientationPortrait());
+    WaitAction.invoke(950);
+    OrientationAction.invoke(orientationLandscapeReverse());
+    OrientationAction.invoke(orientationPortraitReverse());
+    OrientationAction.invoke(orientationLandscape());
+    OrientationAction.invoke(orientationPortrait());
   }
 
   @Override
