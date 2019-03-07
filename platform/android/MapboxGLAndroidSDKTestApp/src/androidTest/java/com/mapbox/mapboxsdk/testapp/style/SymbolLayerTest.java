@@ -559,7 +559,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getTextJustify().getValue());
 
     // Set and Get
-    String propertyValue = TEXT_JUSTIFY_LEFT;
+    String propertyValue = TEXT_JUSTIFY_AUTO;
     layer.setProperties(textJustify(propertyValue));
     assertEquals(layer.getTextJustify().getValue(), propertyValue);
   }

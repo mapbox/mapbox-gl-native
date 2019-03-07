@@ -83,6 +83,7 @@ MBGL_DEFINE_ENUM(SymbolZOrderType, {
 });
 
 MBGL_DEFINE_ENUM(TextJustifyType, {
+    { TextJustifyType::Auto, "auto" },
     { TextJustifyType::Center, "center" },
     { TextJustifyType::Left, "left" },
     { TextJustifyType::Right, "right" },
