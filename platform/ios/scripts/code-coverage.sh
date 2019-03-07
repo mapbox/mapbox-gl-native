@@ -3,17 +3,19 @@
 set -e
 set -o pipefail
 
+#
 # Get code coverage report, then convert it to JSON.
 # The coverage reports end up in different locations based on whether coverage
 # is generated via CI or locally.
 #
+
 cov_result="";
 if [ -f build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport ]; then 
     cov_result=build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
 elif [ -f build/ios/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport ]; then
     cov_result=build/ios/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
 else
-    echo "Coverage file does not exist"
+    echo "Coverage file does not exist. Please run tests before executing"
     exit 1
 fi
 
@@ -26,20 +28,5 @@ xcrun xccov view $cov_result --json > output.json
 percentage=`node -e "console.log(require('./output.json').lineCoverage)"`
 cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 
-#
-# Create a formatted JSON file with the current coverage. 
-#
-current_date=$(TZ=UTC date +"%Y-%m-%d")
-file_name=ios_coverage.json
-cat <<EOF > $file_name
-    {"code_coverage":$cov,"platform":"ios","sdk":"maps","scheme":"CI","created_at":"$current_date"}
-EOF
-
-gzip -f $file_name
-#
-# upload to AWS
-# 
-if [ -z `which aws` ]; then	
-    brew install awscli	
-fi
-aws s3 cp $file_name.gz s3://mapbox-loading-dock/raw/mobile.codecoverage/$current_date/
+# Generate a formatted JSON file and upload it to S3.
+./././scripts/code-coverage.sh $cov "ios" "$1"
