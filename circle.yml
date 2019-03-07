@@ -969,6 +969,16 @@ jobs:
       - run:
           name: Record size
           command: platform/ios/scripts/metrics.sh
+      - run:
+          name: Trigger metrics
+          command: |
+            if [[ $CIRCLE_BRANCH == master ]]; then 
+              if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
+                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=ios-maps-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+              else 
+                echo "MOBILE_METRICS_TOKEN not provided"
+              fi
+            fi
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
