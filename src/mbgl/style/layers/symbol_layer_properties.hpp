@@ -147,6 +147,11 @@ struct TextJustify : DataDrivenLayoutProperty<TextJustifyType> {
     static TextJustifyType defaultValue() { return TextJustifyType::Center; }
 };
 
+struct TextRadialOffset : DataDrivenLayoutProperty<float> {
+    static constexpr const char *name() { return "text-radial-offset"; }
+    static float defaultValue() { return 0; }
+};
+
 struct TextVariableAnchor : LayoutProperty<std::vector<TextVariableAnchorType>> {
     static constexpr const char *name() { return "text-variable-anchor"; }
     static std::vector<TextVariableAnchorType> defaultValue() { return {  }; }
@@ -289,6 +294,7 @@ class SymbolLayoutProperties : public Properties<
     TextLineHeight,
     TextLetterSpacing,
     TextJustify,
+    TextRadialOffset,
     TextVariableAnchor,
     TextAnchor,
     TextMaxAngle,

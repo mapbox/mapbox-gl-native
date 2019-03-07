@@ -176,6 +176,11 @@ namespace android {
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextJustify()));
     }
 
+    jni::Local<jni::Object<>> SymbolLayer::getTextRadialOffset(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextRadialOffset()));
+    }
+
     jni::Local<jni::Object<>> SymbolLayer::getTextVariableAnchor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextVariableAnchor()));
@@ -519,6 +524,7 @@ namespace android {
             METHOD(&SymbolLayer::getTextLineHeight, "nativeGetTextLineHeight"),
             METHOD(&SymbolLayer::getTextLetterSpacing, "nativeGetTextLetterSpacing"),
             METHOD(&SymbolLayer::getTextJustify, "nativeGetTextJustify"),
+            METHOD(&SymbolLayer::getTextRadialOffset, "nativeGetTextRadialOffset"),
             METHOD(&SymbolLayer::getTextVariableAnchor, "nativeGetTextVariableAnchor"),
             METHOD(&SymbolLayer::getTextAnchor, "nativeGetTextAnchor"),
             METHOD(&SymbolLayer::getTextMaxAngle, "nativeGetTextMaxAngle"),
