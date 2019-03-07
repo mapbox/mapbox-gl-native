@@ -7,8 +7,8 @@ set -o pipefail
 # Check whether the script input values are valid.
 #
 # Check that platform is "ios" or "android".
-if [[ ! $2 = "ios" && ! $2 = "android" ]]; then
-    echo "$2 does not match either 'ios' or 'android'. Platform must be specified for coverage report."
+if [[ ! $2 = "iOS" && ! $2 = "Android" ]]; then
+    echo "$2 does not match either 'iOS' or 'Android'. Platform must be specified for coverage report."
     exit 1
 fi
 
@@ -29,7 +29,7 @@ fi
 current_date=$(TZ=UTC date +"%Y-%m-%d")
 file_name=$2_coverage.json
 cat <<EOF > $file_name
-    {"code_coverage":$1,"platform":"$2","sdk":"maps","scheme":"$scheme","created_at":"$current_date"}
+    {"code_coverage":$1,"platform":"$2","sdk":"Maps","scheme":"$scheme","created_at":"$current_date"}
 EOF
 echo $file_name
 gzip -f $file_name

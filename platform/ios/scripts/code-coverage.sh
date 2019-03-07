@@ -8,7 +8,6 @@ set -o pipefail
 # The coverage reports end up in different locations based on whether coverage
 # is generated via CI or locally.
 #
-
 cov_result="";
 if [ -f build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport ]; then 
     cov_result=build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
@@ -29,4 +28,4 @@ percentage=`node -e "console.log(require('./output.json').lineCoverage)"`
 cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 
 # Generate a formatted JSON file and upload it to S3.
-./././scripts/code-coverage.sh $cov "ios" "$1"
+./././scripts/code-coverage.sh $cov "iOS" "$1"
