@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
@@ -42,7 +43,7 @@ public:
     float pixelRatio { 1 };
     HeadlessFrontend frontend;
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapMode::Static};
+              threadPool, MapOptions().withMapMode(MapMode::Static)};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,

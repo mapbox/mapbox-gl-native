@@ -3,6 +3,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/map/map_observer.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/size.hpp>
@@ -36,10 +37,7 @@ public:
                  float pixelRatio,
                  FileSource&,
                  Scheduler&,
-                 MapMode mapMode = MapMode::Continuous,
-                 ConstrainMode constrainMode = ConstrainMode::HeightOnly,
-                 ViewportMode viewportMode = ViewportMode::Default,
-                 bool crossSourceCollisions = true);
+                 const MapOptions&);
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have

@@ -1,4 +1,5 @@
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/default_styles.hpp>
@@ -84,7 +85,8 @@ int main(int argc, char *argv[]) {
 
     ThreadPool threadPool(4);
     HeadlessFrontend frontend({ width, height }, pixelRatio, fileSource, threadPool);
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Static);
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
+            fileSource, threadPool, MapOptions().withMapMode(MapMode::Static));
 
     if (style.find("://") == std::string::npos) {
         style = std::string("file://") + style;

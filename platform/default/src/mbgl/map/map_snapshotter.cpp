@@ -3,6 +3,7 @@
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style.hpp>
@@ -57,7 +58,7 @@ MapSnapshotter::Impl::Impl(FileSource* fileSource,
            const optional<std::string> localFontFamily)
     : scheduler(std::move(scheduler_))
     , frontend(size, pixelRatio, *fileSource, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
-    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *fileSource, *scheduler, MapMode::Static) {
+    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *fileSource, *scheduler, MapOptions().withMapMode(MapMode::Static)) {
 
     if (style.first) {
         map.getStyle().loadJSON(style.second);
