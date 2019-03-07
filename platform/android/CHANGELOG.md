@@ -4,6 +4,25 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.3.0-alpha.1 - March 7, 2019
+
+### Features
+- Make ReLinker default library loader [#13974](https://github.com/mapbox/mapbox-gl-native/pull/13974)
+- Add plural style builder methods [#14012](https://github.com/mapbox/mapbox-gl-native/pull/14012)
+- Adding areAllGesturesEnabled() boolean retreival method to UiSettings class [#14022](https://github.com/mapbox/mapbox-gl-native/pull/14022)
+- Adding builder pattern for LocationComponent activation [#13941](https://github.com/mapbox/mapbox-gl-native/pull/13941)
+- Get vector drawables using AppCompatResources and set them programmatically [#14058](https://github.com/mapbox/mapbox-gl-native/pull/14058)
+
+### Bugs
+- LatLngBounds: Fix constrain when crossing antimeridian [#13958](https://github.com/mapbox/mapbox-gl-native/pull/13958)
+- Verify no native method is called when saving state [#13980](https://github.com/mapbox/mapbox-gl-native/pull/13980)
+- Clear fragment's onMapReady callbacks as part of OnDestroy, not OnDestroyView [#14035](https://github.com/mapbox/mapbox-gl-native/pull/14035)
+- Fix dialog fragment setup, add regression test [#14036](https://github.com/mapbox/mapbox-gl-native/pull/14036)
+- Remove unused dem memory [#13550](https://github.com/mapbox/mapbox-gl-native/pull/13550)
+
+### Build
+- Adding Bintray Gradle plugin for artifact publishing [#13999](https://github.com/mapbox/mapbox-gl-native/pull/13999)
+
 ## 7.2.0 - February 27, 2019
 
 ### Bugs
