@@ -9,10 +9,10 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v4.content.ContextCompat;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.geometry.LatLngQuad;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.net.URL;
 
@@ -115,7 +115,7 @@ public class ImageSource extends Source {
   public void setImage(@DrawableRes int resourceId) throws IllegalArgumentException {
     checkThread();
     Context context = Mapbox.getApplicationContext();
-    Drawable drawable = ContextCompat.getDrawable(context, resourceId);
+    Drawable drawable = BitmapUtils.getDrawableFromRes(context, resourceId);
     if (drawable instanceof BitmapDrawable) {
       BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
       nativeSetImage(bitmapDrawable.getBitmap());

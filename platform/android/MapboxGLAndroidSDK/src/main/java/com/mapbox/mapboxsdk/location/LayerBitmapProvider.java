@@ -6,13 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import static com.mapbox.mapboxsdk.location.Utils.generateShadow;
-import static com.mapbox.mapboxsdk.location.Utils.getBitmapFromDrawable;
-import static com.mapbox.mapboxsdk.location.Utils.getDrawable;
 
 class LayerBitmapProvider {
 
@@ -23,12 +21,12 @@ class LayerBitmapProvider {
   }
 
   Bitmap generateBitmap(@DrawableRes int drawableRes, @ColorInt Integer tintColor) {
-    Drawable drawable = getDrawable(context, drawableRes, tintColor);
-    return getBitmapFromDrawable(drawable);
+    Drawable drawable = BitmapUtils.getDrawableFromRes(context, drawableRes, tintColor);
+    return BitmapUtils.getBitmapFromDrawable(drawable);
   }
 
   Bitmap generateShadowBitmap(@NonNull LocationComponentOptions options) {
-    Drawable shadowDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_shadow);
+    Drawable shadowDrawable = BitmapUtils.getDrawableFromRes(context, R.drawable.mapbox_user_icon_shadow);
     return generateShadow(shadowDrawable, options.elevation());
   }
 }

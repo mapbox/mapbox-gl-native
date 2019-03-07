@@ -9,13 +9,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.TooManyIconsException;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,7 +30,7 @@ import java.io.InputStream;
  *
  * @deprecated As of 7.0.0,
  * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
- *   Mapbox Annotation Plugin</a> instead
+ * Mapbox Annotation Plugin</a> instead
  */
 @Deprecated
 public final class IconFactory {
@@ -100,7 +100,7 @@ public final class IconFactory {
    * @return The icon that was loaded from the asset or {@code null} if failed to load.
    */
   public Icon fromResource(@DrawableRes int resourceId) {
-    Drawable drawable = ContextCompat.getDrawable(context, resourceId);
+    Drawable drawable = BitmapUtils.getDrawableFromRes(context, resourceId);
     if (drawable instanceof BitmapDrawable) {
       BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
       return fromBitmap(bitmapDrawable.getBitmap());

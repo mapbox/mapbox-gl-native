@@ -13,7 +13,6 @@ import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.GrantPermissionRule
 import android.support.test.runner.AndroidJUnit4
-import android.support.v4.content.ContextCompat
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -28,6 +27,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
 import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.mapbox.mapboxsdk.utils.ColorUtils
 import org.hamcrest.CoreMatchers.*
 import org.junit.*
@@ -277,7 +277,7 @@ class LocationComponentTest : EspressoTest() {
 
         component.isLocationComponentEnabled = true
 
-        val foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.ic_media_play)
+        val foregroundDrawable = BitmapUtils.getDrawableFromRes(context, R.drawable.ic_media_play)
         foregroundDrawable?.let {
           mapboxMap.addImageFromDrawable("custom-foreground-bitmap", it)
           mapboxMap.addImageFromDrawable("custom-background-bitmap", it)
@@ -324,7 +324,7 @@ class LocationComponentTest : EspressoTest() {
 
         component.renderMode = RenderMode.GPS
         component.forceLocationUpdate(location)
-        val foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.ic_media_play)
+        val foregroundDrawable = BitmapUtils.getDrawableFromRes(context, R.drawable.ic_media_play)
         foregroundDrawable?.let {
           mapboxMap.addImageFromDrawable("custom-foreground-bitmap", it)
           mapboxMap.addImageFromDrawable("custom-gps-bitmap", it)
