@@ -93,7 +93,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& symbolSizeBinder,
                          const SymbolPropertyValues& values_,
                          const auto& binders,
-                         const auto& paintProperties)
+                         const auto& paintProperties,
+                         auto&& textureBindings)
         {
             auto& programInstance = program.get(paintProperties);
 
@@ -127,6 +128,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 buffers.segments,
                 allUniformValues,
                 allAttributeBindings,
+                std::move(textureBindings),
                 getID()
             );
         };
@@ -170,7 +172,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.iconSizeBinder,
                          values,
                          bucketPaintProperties.iconBinders,
-                         paintPropertyValues);
+                         paintPropertyValues,
+                         SymbolSDFIconProgram::TextureBindings{});
                 }
 
                 if (values.hasFill) {
@@ -180,7 +183,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.iconSizeBinder,
                          values,
                          bucketPaintProperties.iconBinders,
-                         paintPropertyValues);
+                         paintPropertyValues,
+                         SymbolSDFIconProgram::TextureBindings{});
                 }
             } else {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
@@ -189,7 +193,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.iconSizeBinder,
                      values,
                      bucketPaintProperties.iconBinders,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     SymbolIconProgram::TextureBindings{});
             }
         }
 
@@ -223,7 +228,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.textSizeBinder,
                      values,
                      bucketPaintProperties.textBinders,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     SymbolSDFTextProgram::TextureBindings{});
             }
 
             if (values.hasFill) {
@@ -233,7 +239,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.textSizeBinder,
                      values,
                      bucketPaintProperties.textBinders,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     SymbolSDFTextProgram::TextureBindings{});
             }
         }
 
@@ -267,6 +274,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.collisionBox.segments,
                 paintAttributeData,
                 properties,
+                CollisionBoxProgram::TextureBindings{},
                 parameters.state.getZoom(),
                 getID()
             );
@@ -303,6 +311,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.collisionCircle.segments,
                 paintAttributeData,
                 properties,
+                CollisionCircleProgram::TextureBindings{},
                 parameters.state.getZoom(),
                 getID()
             );

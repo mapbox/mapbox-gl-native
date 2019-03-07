@@ -119,6 +119,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             segments,
             allUniformValues,
             allAttributeBindings,
+            RasterProgram::TextureBindings{},
             getID()
         );
     };

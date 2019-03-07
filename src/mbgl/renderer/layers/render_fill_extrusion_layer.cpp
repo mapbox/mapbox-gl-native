@@ -72,7 +72,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
 
         auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
-                        const optional<ImagePosition>& patternPositionA, const optional<ImagePosition>& patternPositionB) {
+                        const optional<ImagePosition>& patternPositionA,
+                        const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
             const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(getID());
             paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
 
@@ -101,6 +102,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 tileBucket.triangleSegments,
                 allUniformValues,
                 allAttributeBindings,
+                std::move(textureBindings),
                 getID());
         };
 
@@ -122,7 +124,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                         parameters.state,
                         parameters.evaluatedLight
                     ),
-                    {}, {}
+                    {},
+                    {},
+                    FillExtrusionProgram::TextureBindings{}
                 );
             }
         } else {
@@ -155,7 +159,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                         parameters.evaluatedLight
                     ),
                     patternPosA,
-                    patternPosB
+                    patternPosB,
+                    FillExtrusionPatternProgram::TextureBindings{}
                 );
             }
         }
@@ -202,6 +207,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             parameters.staticData.extrusionTextureSegments,
             allUniformValues,
             allAttributeBindings,
+            ExtrusionTextureProgram::TextureBindings{},
             getID());
     }
 }

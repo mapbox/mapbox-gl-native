@@ -64,7 +64,9 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         LineBucket& bucket = *bucket_;
 
-        auto draw = [&] (auto& program, auto&& uniformValues, const optional<ImagePosition>& patternPositionA, const optional<ImagePosition>& patternPositionB) {
+        auto draw = [&](auto& program, auto&& uniformValues,
+                        const optional<ImagePosition>& patternPositionA,
+                        const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
             auto& programInstance = program.get(evaluated);
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
@@ -96,6 +98,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.segments,
                 allUniformValues,
                 allAttributeBindings,
+                std::move(textureBindings),
                 getID()
             );
         };
@@ -118,7 +121,10 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      posA,
                      posB,
                      crossfade,
-                     parameters.lineAtlas.getSize().width), {}, {});
+                     parameters.lineAtlas.getSize().width),
+                     {},
+                     {},
+                     LineSDFProgram::TextureBindings{});
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
@@ -140,7 +146,8 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      crossfade,
                      parameters.pixelRatio),
                      *posA,
-                     *posB);
+                     *posB,
+                     LinePatternProgram::TextureBindings{});
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             if (!colorRampTexture) {
                 colorRampTexture = parameters.context.createTexture(colorRamp);
@@ -152,14 +159,20 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     evaluated,
                     tile,
                     parameters.state,
-                    parameters.pixelsToGLUnits), {}, {});
+                    parameters.pixelsToGLUnits),
+                    {},
+                    {},
+                    LineGradientProgram::TextureBindings{});
         } else {
             draw(parameters.programs.getLineLayerPrograms().line,
                  LineProgram::uniformValues(
                      evaluated,
                      tile,
                      parameters.state,
-                     parameters.pixelsToGLUnits), {}, {});
+                     parameters.pixelsToGLUnits),
+                 {},
+                 {},
+                 LineProgram::TextureBindings{});
         }
     }
 }

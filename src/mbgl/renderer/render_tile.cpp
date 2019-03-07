@@ -112,6 +112,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 parameters.state.getZoom()
             ),
             allAttributeBindings,
+            DebugProgram::TextureBindings{},
             "debug"
         );
 
@@ -134,6 +135,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 parameters.state.getZoom()
             ),
             allAttributeBindings,
+            DebugProgram::TextureBindings{},
             "debug"
         );
     }
@@ -162,6 +164,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 paintAttributeData,
                 properties
             ),
+            DebugProgram::TextureBindings{},
             "debug"
         );
     }

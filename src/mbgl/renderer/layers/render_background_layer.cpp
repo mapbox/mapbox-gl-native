@@ -50,7 +50,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     const Properties<>::PossiblyEvaluated properties;
     const BackgroundProgram::Binders paintAttributeData(properties, 0);
 
-    auto draw = [&](auto& program, auto&& uniformValues) {
+    auto draw = [&](auto& program, auto&& uniformValues, auto&& textureBindings) {
         const auto allUniformValues = program.computeAllUniformValues(
             std::move(uniformValues),
             paintAttributeData,
@@ -76,6 +76,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.staticData.tileTriangleSegments,
             allUniformValues,
             allAttributeBindings,
+            std::move(textureBindings),
             getID()
         );
     };
@@ -101,7 +102,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                     crossfade,
                     tileID,
                     parameters.state
-                )
+                ),
+                BackgroundPatternProgram::TextureBindings{}
             );
         }
     } else {
@@ -112,7 +114,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                     uniforms::u_matrix::Value( parameters.matrixForTile(tileID) ),
                     uniforms::u_color::Value( evaluated.get<BackgroundColor>() ),
                     uniforms::u_opacity::Value( evaluated.get<BackgroundOpacity>() ),
-                }
+                },
+                BackgroundProgram::TextureBindings{}
             );
         }
     }

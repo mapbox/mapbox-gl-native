@@ -20,7 +20,7 @@
 namespace mbgl {
 namespace gl {
 
-template <class P, class As, class Us>
+template <class P, class As, class Us, class TBs>
 class Program {
 public:
     using Primitive = P;
@@ -29,6 +29,7 @@ public:
 
     using UniformValues = typename Uniforms::Values;
     using AttributeBindings = typename Attributes::Bindings;
+    using TextureBindings = TBs;
 
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : program(
@@ -122,10 +123,13 @@ public:
               const UniformValues& uniformValues,
               gl::VertexArray& vertexArray,
               const AttributeBindings& attributeBindings,
+              const TextureBindings& textureBindings,
               const gfx::IndexBuffer& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
+
+        (void)textureBindings;
 
         context.setDrawMode(drawMode);
         context.setDepthMode(depthMode);
