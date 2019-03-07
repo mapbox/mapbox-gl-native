@@ -160,7 +160,7 @@
                             "Effect": "Allow",
                             "Resource": [
                               "arn:aws:s3:::mapbox-loading-dock/raw/mobile.binarysize/*",
-                              "arn:aws:s3:::mapbox-loading-dock/raw/mobile.coverage/*"
+                              "arn:aws:s3:::mapbox-loading-dock/raw/mobile.codecoverage/*"
                             ]
                           }
                         ]
