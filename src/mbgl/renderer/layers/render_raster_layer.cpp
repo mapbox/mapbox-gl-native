@@ -77,14 +77,13 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,
                      const auto& indexBuffer,
-                     const auto& segments) {
+                     const auto& segments,
+                     const auto& textureBindings) {
         auto& programInstance = parameters.programs.getRasterLayerPrograms().raster;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             RasterProgram::UniformValues {
                 uniforms::u_matrix::Value( matrix ),
-                uniforms::u_image0::Value( 0 ),
-                uniforms::u_image1::Value( 1 ),
                 uniforms::u_opacity::Value( evaluated.get<RasterOpacity>() ),
                 uniforms::u_fade_t::Value( 1 ),
                 uniforms::u_brightness_low::Value( evaluated.get<RasterBrightnessMin>() ),
@@ -119,7 +118,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             segments,
             allUniformValues,
             allAttributeBindings,
-            RasterProgram::TextureBindings{},
+            textureBindings,
             getID()
         );
     };
@@ -129,16 +128,17 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
     if (RenderImageSource* imageSource = source->as<RenderImageSource>()) {
         if (imageSource->isEnabled() && imageSource->isLoaded() && !imageSource->bucket->needsUpload()) {
             RasterBucket& bucket = *imageSource->bucket;
-
             assert(bucket.texture);
-            parameters.context.bindTexture(*bucket.texture, 0, filter);
-            parameters.context.bindTexture(*bucket.texture, 1, filter);
 
             for (auto matrix_ : imageSource->matrices) {
                 draw(matrix_,
                      *bucket.vertexBuffer,
                      *bucket.indexBuffer,
-                     bucket.segments);
+                     bucket.segments,
+                     RasterProgram::TextureBindings{
+                         textures::u_image0::Value{ *bucket.texture->resource, filter },
+                         textures::u_image1::Value{ *bucket.texture->resource, filter },
+                     });
             }
         }
     } else {
@@ -153,21 +153,26 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                 continue;
 
             assert(bucket.texture);
-            parameters.context.bindTexture(*bucket.texture, 0, filter);
-            parameters.context.bindTexture(*bucket.texture, 1, filter);
-
             if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
                 // Draw only the parts of the tile that aren't drawn by another tile in the layer.
                 draw(parameters.matrixForTile(tile.id, true),
                      *bucket.vertexBuffer,
                      *bucket.indexBuffer,
-                     bucket.segments);
+                     bucket.segments,
+                     RasterProgram::TextureBindings{
+                         textures::u_image0::Value{ *bucket.texture->resource, filter },
+                         textures::u_image1::Value{ *bucket.texture->resource, filter },
+                     });
             } else {
                 // Draw the full tile.
                 draw(parameters.matrixForTile(tile.id, true),
                      parameters.staticData.rasterVertexBuffer,
                      parameters.staticData.quadTriangleIndexBuffer,
-                     parameters.staticData.rasterSegments);
+                     parameters.staticData.rasterSegments,
+                     RasterProgram::TextureBindings{
+                         textures::u_image0::Value{ *bucket.texture->resource, filter },
+                         textures::u_image1::Value{ *bucket.texture->resource, filter },
+                     });
             }
         }
     }

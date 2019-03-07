@@ -37,7 +37,7 @@ public:
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureBindings>;
+    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureList>;
 
     ProgramType program;
 

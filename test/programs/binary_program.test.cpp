@@ -9,7 +9,8 @@ TEST(BinaryProgram, ObtainValues) {
                                        "binary code",
                                        "identifier",
                                        { { "a_pos", 1 }, { "a_data", 4 } },
-                                       { { "u_world", 1 }, { "u_ratio", 3 } } };
+                                       { { "u_world", 1 }, { "u_ratio", 3 } },
+                                       { { "u_image", 0 } } };
 
     EXPECT_EQ(42u, binaryProgram.format());
     EXPECT_EQ("binary code", binaryProgram.code());
@@ -20,6 +21,8 @@ TEST(BinaryProgram, ObtainValues) {
     EXPECT_EQ(1, binaryProgram.uniformLocation("u_world"));
     EXPECT_EQ(3, binaryProgram.uniformLocation("u_ratio"));
     EXPECT_EQ(-1, binaryProgram.uniformLocation("a_data"));
+    EXPECT_EQ(0, binaryProgram.textureLocation("u_image"));
+    EXPECT_EQ(-1, binaryProgram.textureLocation("u_image2"));
 
     auto serialized = binaryProgram.serialize();
 
@@ -34,6 +37,8 @@ TEST(BinaryProgram, ObtainValues) {
     EXPECT_EQ(1, binaryProgram2.uniformLocation("u_world"));
     EXPECT_EQ(3, binaryProgram2.uniformLocation("u_ratio"));
     EXPECT_EQ(-1, binaryProgram2.uniformLocation("a_data"));
+    EXPECT_EQ(0, binaryProgram.textureLocation("u_image"));
+    EXPECT_EQ(-1, binaryProgram.textureLocation("u_image2"));
 
     EXPECT_THROW(BinaryProgram(""), std::runtime_error);
 }

@@ -65,8 +65,8 @@ private:
 public:
     optional<ImagePosition> getPattern(const std::string& name);
 
-    void bind(gfx::Context&, uint8_t unit);
-    void upload(gfx::Context&, uint8_t unit);
+    gfx::TextureBinding textureBinding(gfx::Context&);
+    void upload(gfx::Context&);
 
     Size getPixelSize() const;
 

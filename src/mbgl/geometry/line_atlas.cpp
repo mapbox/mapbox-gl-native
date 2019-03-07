@@ -126,20 +126,20 @@ Size LineAtlas::getSize() const {
     return image.size;
 }
 
-void LineAtlas::upload(gfx::Context& context, uint8_t unit) {
+void LineAtlas::upload(gfx::Context& context) {
     if (!texture) {
-        texture = context.createTexture(image, unit);
+        texture = context.createTexture(image);
     } else if (dirty) {
-        context.updateTexture(*texture, image, unit);
+        context.updateTexture(*texture, image);
     }
 
     dirty = false;
 }
 
-void LineAtlas::bind(gfx::Context& context, uint8_t unit) {
-    upload(context, unit);
-    context.bindTexture(*texture, unit, gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
-                        gfx::TextureWrapType::Repeat, gfx::TextureWrapType::Clamp);
+gfx::TextureBinding LineAtlas::textureBinding(gfx::Context& context) {
+    upload(context);
+    return { *texture->resource, gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
+             gfx::TextureWrapType::Repeat, gfx::TextureWrapType::Clamp };
 }
 
 } // namespace mbgl

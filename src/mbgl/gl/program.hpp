@@ -8,6 +8,7 @@
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
+#include <mbgl/gl/texture.hpp>
 
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/logging.hpp>
@@ -20,7 +21,7 @@
 namespace mbgl {
 namespace gl {
 
-template <class P, class As, class Us, class TBs>
+template <class P, class As, class Us, class TextureList>
 class Program {
 public:
     using Primitive = P;
@@ -29,7 +30,7 @@ public:
 
     using UniformValues = typename Uniforms::Values;
     using AttributeBindings = typename Attributes::Bindings;
-    using TextureBindings = TBs;
+    using TextureBindings = gfx::TextureBindings<TextureList>;
 
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : program(
@@ -37,13 +38,15 @@ public:
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
           uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
           attributeLocations(Attributes::bindLocations(context, program)) {
-
         // Re-link program after manually binding only active attributes in Attributes::bindLocations
         context.linkProgram(program);
 
         // We have to re-initialize the uniforms state from the bindings as the uniform locations
         // get shifted on some implementations
         uniformsState = Uniforms::bindLocations(program);
+
+        // Texture units are specified via uniforms as well, so we need query their locations
+        textures.queryLocations(program);
     }
 
     template <class BinaryProgram>
@@ -51,6 +54,7 @@ public:
         : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
           uniformsState(Uniforms::loadNamedLocations(binaryProgram)),
           attributeLocations(Attributes::loadNamedLocations(binaryProgram)) {
+        textures.loadNamedLocations(binaryProgram);
     }
     
     static Program createProgram(gl::Context& context,
@@ -108,7 +112,8 @@ public:
         if (auto binaryProgram = context.getBinaryProgram(program)) {
             return BinaryProgram{ binaryProgram->first, std::move(binaryProgram->second),
                                   identifier, Attributes::getNamedLocations(attributeLocations),
-                                  Uniforms::getNamedLocations(uniformsState) };
+                                  Uniforms::getNamedLocations(uniformsState),
+                                  textures.getNamedLocations() };
         }
         return {};
     }
@@ -129,8 +134,6 @@ public:
               std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
 
-        (void)textureBindings;
-
         context.setDrawMode(drawMode);
         context.setDepthMode(depthMode);
         context.setStencilMode(stencilMode);
@@ -140,6 +143,8 @@ public:
         context.program = program;
 
         Uniforms::bind(uniformsState, uniformValues);
+
+        textures.bind(context, textureBindings);
 
         vertexArray.bind(context,
                         indexBuffer,
@@ -155,6 +160,7 @@ private:
 
     typename Uniforms::State uniformsState;
     typename Attributes::Locations attributeLocations;
+    gl::Textures<TextureList> textures;
 };
 
 } // namespace gl

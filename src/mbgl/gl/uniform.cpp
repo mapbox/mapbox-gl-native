@@ -68,6 +68,11 @@ void bindUniform<uint32_t>(UniformLocation location, const uint32_t& t) {
 }
 
 template <>
+void bindUniform<uint8_t>(UniformLocation location, const uint8_t& t) {
+    bindUniform(location, int32_t(t));
+}
+
+template <>
 void bindUniform<Color>(UniformLocation location, const Color& t) {
     bindUniform(location, std::array<float, 4> {{ t.r, t.g, t.b, t.a }});
 }

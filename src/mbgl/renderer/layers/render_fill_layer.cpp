@@ -152,7 +152,6 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
             optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
 
-            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gfx::TextureFilterType::Linear);
             auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
             if (!bucket_) {
                 continue;
@@ -215,7 +214,9 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                  parameters.depthModeForSublayer(1, gfx::DepthMaskType::ReadWrite),
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments,
-                 FillProgram::TextureBindings{});
+                 FillPatternProgram::TextureBindings{
+                     textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                 });
 
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
                 draw(parameters.programs.getFillLayerPrograms().fillOutlinePattern,
@@ -223,7 +224,9 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                      parameters.depthModeForSublayer(2, gfx::DepthMaskType::ReadOnly),
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments,
-                     FillOutlineProgram::TextureBindings{});
+                     FillOutlinePatternProgram::TextureBindings{
+                         textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                     });
             }
         }
     }

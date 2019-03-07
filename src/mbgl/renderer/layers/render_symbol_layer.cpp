@@ -158,9 +158,12 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
             const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
-            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
-                bucket.sdfIcons || parameters.state.isChanging() || iconScaled || iconTransformed
-                    ? gfx::TextureFilterType::Linear : gfx::TextureFilterType::Nearest);
+            const gfx::TextureBinding textureBinding{ *geometryTile.iconAtlasTexture->resource,
+                                                      bucket.sdfIcons ||
+                                                              parameters.state.isChanging() ||
+                                                              iconScaled || iconTransformed
+                                                          ? gfx::TextureFilterType::Linear
+                                                          : gfx::TextureFilterType::Nearest };
 
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
@@ -173,7 +176,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          values,
                          bucketPaintProperties.iconBinders,
                          paintPropertyValues,
-                         SymbolSDFIconProgram::TextureBindings{});
+                         SymbolSDFIconProgram::TextureBindings{
+                             textureBinding,
+                         });
                 }
 
                 if (values.hasFill) {
@@ -184,7 +189,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          values,
                          bucketPaintProperties.iconBinders,
                          paintPropertyValues,
-                         SymbolSDFIconProgram::TextureBindings{});
+                         SymbolSDFIconProgram::TextureBindings{
+                             textureBinding,
+                         });
                 }
             } else {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
@@ -194,12 +201,15 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      values,
                      bucketPaintProperties.iconBinders,
                      paintPropertyValues,
-                     SymbolIconProgram::TextureBindings{});
+                     SymbolIconProgram::TextureBindings{
+                         textureBinding,
+                     });
             }
         }
 
         if (bucket.hasTextData()) {
-            parameters.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gfx::TextureFilterType::Linear);
+            const gfx::TextureBinding textureBinding{ *geometryTile.glyphAtlasTexture->resource,
+                                                      gfx::TextureFilterType::Linear };
 
             auto values = textPropertyValues(evaluated_, layout);
             const auto& paintPropertyValues = textPaintProperties(evaluated_);
@@ -229,7 +239,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      values,
                      bucketPaintProperties.textBinders,
                      paintPropertyValues,
-                     SymbolSDFTextProgram::TextureBindings{});
+                     SymbolSDFTextProgram::TextureBindings{
+                         textureBinding,
+                     });
             }
 
             if (values.hasFill) {
@@ -240,7 +252,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      values,
                      bucketPaintProperties.textBinders,
                      paintPropertyValues,
-                     SymbolSDFTextProgram::TextureBindings{});
+                     SymbolSDFTextProgram::TextureBindings{
+                         textureBinding,
+                     });
             }
         }
 

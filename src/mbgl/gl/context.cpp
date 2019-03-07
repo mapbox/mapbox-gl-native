@@ -3,6 +3,7 @@
 #include <mbgl/gl/vertex_buffer_resource.hpp>
 #include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/texture_resource.hpp>
+#include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
@@ -511,16 +512,15 @@ Context::createFramebuffer(const gfx::Texture& color,
     return { depthTarget.size, std::move(fbo) };
 }
 
-std::unique_ptr<const gfx::TextureResource>
+std::unique_ptr<gfx::TextureResource>
 Context::createTextureResource(const Size size,
                                const void* data,
                                gfx::TexturePixelType format,
-                               uint8_t unit,
                                gfx::TextureChannelDataType type) {
     auto obj = createUniqueTexture();
-    std::unique_ptr<const gfx::TextureResource> resource = std::make_unique<gl::TextureResource>(std::move(obj));
+    std::unique_ptr<gfx::TextureResource> resource = std::make_unique<gl::TextureResource>(std::move(obj));
     pixelStoreUnpack = { 1 };
-    updateTextureResource(*resource, size, data, format, unit, type);
+    updateTextureResource(*resource, size, data, format, type);
     // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
     // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -534,58 +534,14 @@ void Context::updateTextureResource(const gfx::TextureResource& resource,
                                     const Size size,
                                     const void* data,
                                     gfx::TexturePixelType format,
-                                    uint8_t unit,
                                     gfx::TextureChannelDataType type) {
-    activeTextureUnit = unit;
-    texture[unit] = reinterpret_cast<const gl::TextureResource&>(resource).texture;
+    // Always use texture unit 0 for manipulating it.
+    activeTextureUnit = 0;
+    texture[0] = reinterpret_cast<const gl::TextureResource&>(resource).texture;
     MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, Enum<gfx::TexturePixelType>::to(format),
                                   size.width, size.height, 0,
                                   Enum<gfx::TexturePixelType>::to(format),
                                   Enum<gfx::TextureChannelDataType>::to(type), data));
-}
-
-void Context::bindTexture(gfx::Texture& obj,
-                          uint8_t unit,
-                          gfx::TextureFilterType filter,
-                          gfx::TextureMipMapType mipmap,
-                          gfx::TextureWrapType wrapX,
-                          gfx::TextureWrapType wrapY) {
-    TextureID id = reinterpret_cast<const gl::TextureResource&>(*obj.resource).texture;
-    if (filter != obj.filter || mipmap != obj.mipmap || wrapX != obj.wrapX || wrapY != obj.wrapY) {
-        activeTextureUnit = unit;
-        texture[unit] = id;
-
-        if (filter != obj.filter || mipmap != obj.mipmap) {
-            MBGL_CHECK_ERROR(glTexParameteri(
-                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                filter == gfx::TextureFilterType::Linear
-                    ? (mipmap == gfx::TextureMipMapType::Yes ? GL_LINEAR_MIPMAP_NEAREST : GL_LINEAR)
-                    : (mipmap == gfx::TextureMipMapType::Yes ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)));
-            MBGL_CHECK_ERROR(
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                filter == gfx::TextureFilterType::Linear ? GL_LINEAR : GL_NEAREST));
-            obj.filter = filter;
-            obj.mipmap = mipmap;
-        }
-        if (wrapX != obj.wrapX) {
-
-            MBGL_CHECK_ERROR(
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                                wrapX == gfx::TextureWrapType::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
-            obj.wrapX = wrapX;
-        }
-        if (wrapY != obj.wrapY) {
-            MBGL_CHECK_ERROR(
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                                wrapY == gfx::TextureWrapType::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT));
-            obj.wrapY = wrapY;
-        }
-    } else if (texture[unit] != id) {
-        // We are checking first to avoid setting the active texture without a subsequent
-        // texture bind.
-        activeTextureUnit = unit;
-        texture[unit] = id;
-    }
 }
 
 void Context::reset() {

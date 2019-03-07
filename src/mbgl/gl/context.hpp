@@ -88,13 +88,6 @@ public:
         return { size, readFramebuffer(size, format, flip) };
     }
 
-    void bindTexture(gfx::Texture&,
-                     uint8_t unit = 0,
-                     gfx::TextureFilterType = gfx::TextureFilterType::Nearest,
-                     gfx::TextureMipMapType = gfx::TextureMipMapType::No,
-                     gfx::TextureWrapType wrapX = gfx::TextureWrapType::Clamp,
-                     gfx::TextureWrapType wrapY = gfx::TextureWrapType::Clamp) override;
-
 #if not MBGL_USE_GLES2
     template <typename Image>
     void drawPixels(const Image& image) {
@@ -220,8 +213,8 @@ private:
     std::unique_ptr<const gfx::IndexBufferResource> createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
     void updateIndexBufferResource(const gfx::IndexBufferResource&, const void* data, std::size_t size) override;
 
-    std::unique_ptr<const gfx::TextureResource> createTextureResource(Size, const void* data, gfx::TexturePixelType, uint8_t, gfx::TextureChannelDataType) override;
-    void updateTextureResource(const gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, uint8_t, gfx::TextureChannelDataType) override;
+    std::unique_ptr<gfx::TextureResource> createTextureResource(Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
+    void updateTextureResource(const gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);

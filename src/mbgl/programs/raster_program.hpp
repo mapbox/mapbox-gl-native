@@ -3,6 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/raster.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/raster_layer_properties.hpp>
@@ -10,8 +11,6 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_image0);
-MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_image1);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_fade_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_buffer_scale);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_brightness_low);
@@ -31,8 +30,6 @@ class RasterProgram : public Program<
         attributes::a_texture_pos>,
     TypeList<
         uniforms::u_matrix,
-        uniforms::u_image0,
-        uniforms::u_image1,
         uniforms::u_opacity,
         uniforms::u_fade_t,
         uniforms::u_brightness_low,
@@ -43,7 +40,9 @@ class RasterProgram : public Program<
         uniforms::u_buffer_scale,
         uniforms::u_scale_parent,
         uniforms::u_tl_parent>,
-    TypeList<>,
+    TypeList<
+        textures::u_image0,
+        textures::u_image1>,
     style::RasterPaintProperties>
 {
 public:

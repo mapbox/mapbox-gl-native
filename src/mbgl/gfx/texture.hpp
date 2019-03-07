@@ -7,6 +7,14 @@
 
 #include <memory>
 
+#define MBGL_DEFINE_TEXTURE(name_)                                                                 \
+    struct name_ {                                                                                 \
+        using Value = ::mbgl::gfx::TextureBinding;                                                 \
+        static constexpr auto name() {                                                             \
+            return #name_;                                                                         \
+        }                                                                                          \
+    }
+
 namespace mbgl {
 namespace gfx {
 
@@ -19,21 +27,17 @@ public:
 
 class Texture {
 public:
-    Texture(Size size_, std::unique_ptr<const TextureResource>&& resource_)
+    Texture(Size size_, std::unique_ptr<TextureResource>&& resource_)
         : size(std::move(size_)), resource(std::move(resource_)) {
     }
 
     Size size;
-    TextureFilterType filter = TextureFilterType::Nearest;
-    TextureMipMapType mipmap = TextureMipMapType::No;
-    TextureWrapType wrapX = TextureWrapType::Clamp;
-    TextureWrapType wrapY = TextureWrapType::Clamp;
-    std::unique_ptr<const TextureResource> resource;
+    std::unique_ptr<TextureResource> resource;
 };
 
 class TextureBinding {
 public:
-    TextureBinding(const TextureResource& resource_,
+    TextureBinding(TextureResource& resource_,
                    TextureFilterType filter_ = TextureFilterType::Nearest,
                    TextureMipMapType mipmap_ = TextureMipMapType::No,
                    TextureWrapType wrapX_ = TextureWrapType::Clamp,
@@ -41,7 +45,7 @@ public:
         : resource(&resource_), filter(filter_), mipmap(mipmap_), wrapX(wrapX_), wrapY(wrapY_) {
     }
 
-    const TextureResource* resource;
+    TextureResource* resource;
     TextureFilterType filter;
     TextureMipMapType mipmap;
     TextureWrapType wrapX;

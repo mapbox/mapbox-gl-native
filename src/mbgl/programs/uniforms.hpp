@@ -60,8 +60,6 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_upper);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_pixel_coord_lower);
 
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_mix);
-MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_image);
-MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_fadetexture);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_tile_units_to_pixels);

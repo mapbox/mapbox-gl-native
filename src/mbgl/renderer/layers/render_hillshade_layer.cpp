@@ -67,7 +67,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                      const auto& vertexBuffer,
                      const auto& indexBuffer,
                      const auto& segments,
-                     const UnwrappedTileID& id) {
+                     const UnwrappedTileID& id,
+                     const auto& textureBindings) {
         auto& programInstance = parameters.programs.getHillshadeLayerPrograms().hillshade;
 
         const HillshadeProgram::Binders paintAttributeData{ evaluated, 0 };
@@ -75,7 +76,6 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HillshadeProgram::UniformValues {
                 uniforms::u_matrix::Value( matrix ),
-                uniforms::u_image::Value( 0 ),
                 uniforms::u_highlight::Value( evaluated.get<HillshadeHighlightColor>() ),
                 uniforms::u_shadow::Value( evaluated.get<HillshadeShadowColor>() ),
                 uniforms::u_accent::Value( evaluated.get<HillshadeAccentColor>() ),
@@ -105,7 +105,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             segments,
             allUniformValues,
             allAttributeBindings,
-            HillshadeProgram::TextureBindings{},
+            textureBindings,
             getID()
         );
     };
@@ -126,12 +126,12 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
         }
 
         if (!bucket.isPrepared() && parameters.pass == RenderPass::Pass3D) {
+            assert(bucket.dem);
             const uint16_t stride = bucket.getDEMData().stride;
             const uint16_t tilesize = bucket.getDEMData().dim;
             OffscreenTexture view(parameters.context, { tilesize, tilesize });
             view.bind();
-            
-            parameters.context.bindTexture(*bucket.dem, 0, gfx::TextureFilterType::Nearest, gfx::TextureMipMapType::No, gfx::TextureWrapType::Clamp, gfx::TextureWrapType::Clamp);
+
             const Properties<>::PossiblyEvaluated properties;
             const HillshadePrepareProgram::Binders paintAttributeData{ properties, 0 };
             
@@ -143,7 +143,6 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                     uniforms::u_dimension::Value( {{stride, stride}} ),
                     uniforms::u_zoom::Value( float(tile.id.canonical.z) ),
                     uniforms::u_maxzoom::Value( float(maxzoom) ),
-                    uniforms::u_image::Value( 0 )
                 },
                 paintAttributeData,
                 properties,
@@ -168,14 +167,15 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 parameters.staticData.rasterSegments,
                 allUniformValues,
                 allAttributeBindings,
-                HillshadePrepareProgram::TextureBindings{},
+                HillshadePrepareProgram::TextureBindings{
+                    textures::u_image::Value{ *bucket.dem->resource },
+                },
                 getID()
             );
             bucket.texture = std::move(view.getTexture());
             bucket.setPrepared(true);
         } else if (parameters.pass == RenderPass::Translucent) {
             assert(bucket.texture);
-            parameters.context.bindTexture(*bucket.texture, 0, gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No, gfx::TextureWrapType::Clamp, gfx::TextureWrapType::Clamp);
 
             if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
                 // Draw only the parts of the tile that aren't drawn by another tile in the layer.
@@ -183,14 +183,20 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                      *bucket.vertexBuffer,
                      *bucket.indexBuffer,
                      bucket.segments,
-                     tile.id);
+                     tile.id,
+                     HillshadeProgram::TextureBindings{
+                         textures::u_image::Value{ *bucket.texture->resource,  gfx::TextureFilterType::Linear },
+                     });
             } else {
                 // Draw the full tile.
                 draw(parameters.matrixForTile(tile.id, true),
                      parameters.staticData.rasterVertexBuffer,
                      parameters.staticData.quadTriangleIndexBuffer,
                      parameters.staticData.rasterSegments,
-                     tile.id);
+                     tile.id,
+                     HillshadeProgram::TextureBindings{
+                         textures::u_image::Value{ *bucket.texture->resource,  gfx::TextureFilterType::Linear },
+                     });
             }
         }
         

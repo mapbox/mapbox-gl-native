@@ -12,6 +12,10 @@ public:
     }
 
     UniqueTexture texture;
+    gfx::TextureFilterType filter = gfx::TextureFilterType::Nearest;
+    gfx::TextureMipMapType mipmap = gfx::TextureMipMapType::No;
+    gfx::TextureWrapType wrapX = gfx::TextureWrapType::Clamp;
+    gfx::TextureWrapType wrapY = gfx::TextureWrapType::Clamp;
 };
 
 } // namespace gl

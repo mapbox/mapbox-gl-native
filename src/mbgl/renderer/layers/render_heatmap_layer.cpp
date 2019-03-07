@@ -77,7 +77,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (!colorRampTexture) {
-            colorRampTexture = parameters.context.createTexture(colorRamp, 1, gfx::TextureChannelDataType::UnsignedByte);
+            colorRampTexture = parameters.context.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
         }
 
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
@@ -134,9 +134,6 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
     } else if (parameters.pass == RenderPass::Translucent) {
-        parameters.context.bindTexture(renderTexture->getTexture(), 0, gfx::TextureFilterType::Linear);
-        parameters.context.bindTexture(*colorRampTexture, 1, gfx::TextureFilterType::Linear);
-
         const auto& size = parameters.staticData.backendSize;
 
         mat4 viewportMat;
@@ -150,8 +147,6 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HeatmapTextureProgram::UniformValues{
                 uniforms::u_matrix::Value( viewportMat ), uniforms::u_world::Value( size ),
-                uniforms::u_image::Value( 0 ),
-                uniforms::u_color_ramp::Value( 1 ),
                 uniforms::u_opacity::Value( evaluated.get<HeatmapOpacity>() )
             },
             paintAttributeData,
@@ -177,7 +172,10 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.staticData.extrusionTextureSegments,
             allUniformValues,
             allAttributeBindings,
-            HeatmapProgram::TextureBindings{},
+            HeatmapTextureProgram::TextureBindings{
+                textures::u_image::Value{ *renderTexture->getTexture().resource, gfx::TextureFilterType::Linear },
+                textures::u_color_ramp::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+            },
             getID()
         );
     }

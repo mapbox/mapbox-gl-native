@@ -185,12 +185,12 @@ void GeometryTile::upload(gfx::Context& context) {
     }
 
     if (glyphAtlasImage) {
-        glyphAtlasTexture = context.createTexture(*glyphAtlasImage, 0);
+        glyphAtlasTexture = context.createTexture(*glyphAtlasImage);
         glyphAtlasImage = {};
     }
 
     if (iconAtlas.image.valid()) {
-        iconAtlasTexture = context.createTexture(iconAtlas.image, 0);
+        iconAtlasTexture = context.createTexture(iconAtlas.image);
         iconAtlas.image = {};
     }
 }
