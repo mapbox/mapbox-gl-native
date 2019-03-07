@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.geometry;
 
+import android.support.test.annotation.UiThreadTest;
 import com.google.gson.JsonArray;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -13,11 +14,13 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.GeometryTileProvider;
+import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils;
-
 import org.junit.Test;
 
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static com.mapbox.geojson.Feature.fromGeometry;
 import static com.mapbox.geojson.FeatureCollection.fromFeatures;
 import static com.mapbox.geojson.GeometryCollection.fromGeometries;
@@ -35,101 +38,94 @@ public class GeoJsonConversionTest extends EspressoTest {
 
   // Regression test for #12343
   @Test
+  @UiThreadTest
   public void testEmptyFeatureCollection() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      mapboxMap.getStyle().addSource(
-        new CustomGeometrySource("test-id",
-          new CustomProvider(fromFeatures(singletonList(fromGeometry(fromGeometries(emptyList())))))
-        )
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
-    }));
+    mapboxMap.getStyle().addSource(
+      new CustomGeometrySource("test-id",
+        new CustomProvider(fromFeatures(singletonList(fromGeometry(fromGeometries(emptyList())))))
+      )
+    );
+    mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
   }
 
   @Test
+  @UiThreadTest
   public void testPointFeatureCollection() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      mapboxMap.getStyle().addSource(
-        new CustomGeometrySource("test-id",
-          new CustomProvider(fromFeatures(singletonList(fromGeometry(Point.fromLngLat(0.0, 0.0)))))
-        )
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
-    }));
+    mapboxMap.getStyle().addSource(
+      new CustomGeometrySource("test-id",
+        new CustomProvider(fromFeatures(singletonList(fromGeometry(Point.fromLngLat(0.0, 0.0)))))
+      )
+    );
+    mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
   }
 
   @Test
+  @UiThreadTest
   public void testMultiPointFeatureCollection() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      mapboxMap.getStyle().addSource(
-        new CustomGeometrySource("test-id",
-          new CustomProvider(fromFeatures(singletonList(fromGeometry(fromLngLats(emptyList())))))
-        )
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
-    }));
+    mapboxMap.getStyle().addSource(
+      new CustomGeometrySource("test-id",
+        new CustomProvider(fromFeatures(singletonList(fromGeometry(fromLngLats(emptyList())))))
+      )
+    );
+    mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
   }
 
-
   @Test
+  @UiThreadTest
   public void testPolygonFeatureCollection() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      mapboxMap.getStyle().addSource(
-        new CustomGeometrySource("test-id",
-          new CustomProvider(fromFeatures(singletonList(fromGeometry(Polygon.fromLngLats(emptyList())))))
-        )
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
-    }));
+    mapboxMap.getStyle().addSource(
+      new CustomGeometrySource("test-id",
+        new CustomProvider(fromFeatures(singletonList(fromGeometry(Polygon.fromLngLats(emptyList())))))
+      )
+    );
+    mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
   }
 
   @Test
+  @UiThreadTest
   public void testMultiPolygonFeatureCollection() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      mapboxMap.getStyle().addSource(
-        new CustomGeometrySource("test-id",
-          new CustomProvider(fromFeatures(singletonList(fromGeometry(fromPolygon(Polygon.fromLngLats(emptyList()))))))
-        )
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
-    }));
+    mapboxMap.getStyle().addSource(
+      new CustomGeometrySource("test-id",
+        new CustomProvider(fromFeatures(singletonList(fromGeometry(fromPolygon(Polygon.fromLngLats(emptyList()))))))
+      )
+    );
+    mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
   }
 
   @Test
+  @UiThreadTest
   public void testLineStringFeatureCollection() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      mapboxMap.getStyle().addSource(
-        new CustomGeometrySource("test-id",
-          new CustomProvider(fromFeatures(singletonList(fromGeometry(fromLngLats(emptyList())))))
-        )
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
-    }));
+    mapboxMap.getStyle().addSource(
+      new CustomGeometrySource("test-id",
+        new CustomProvider(fromFeatures(singletonList(fromGeometry(fromLngLats(emptyList())))))
+      )
+    );
+    mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
   }
 
   @Test
+  @UiThreadTest
   public void testMultiLineStringFeatureCollection() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      mapboxMap.getStyle().addSource(
-        new CustomGeometrySource("test-id",
-          new CustomProvider(fromFeatures(singletonList(fromGeometry(fromLineString(fromLngLats(emptyList()))))))
-        )
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
-    }));
+    mapboxMap.getStyle().addSource(
+      new CustomGeometrySource("test-id",
+        new CustomProvider(fromFeatures(singletonList(fromGeometry(fromLineString(fromLngLats(emptyList()))))))
+      )
+    );
+    mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
   }
+
 
   @Test
   public void testNegativeNumberPropertyConversion() {
     validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
+    onView(isRoot()).perform(new MapboxMapAction((uiController, mapboxMap) -> {
       LatLng latLng = new LatLng();
       Feature feature = Feature.fromGeometry(Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()));
 
@@ -148,10 +144,10 @@ public class GeoJsonConversionTest extends EspressoTest {
         );
       mapboxMap.getStyle().addLayer(layer);
 
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng)).isEmpty());
-    }));
+    }, mapboxMap));
   }
 
   class CustomProvider implements GeometryTileProvider {

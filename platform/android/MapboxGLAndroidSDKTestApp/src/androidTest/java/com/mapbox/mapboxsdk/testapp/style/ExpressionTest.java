@@ -252,7 +252,7 @@ public class ExpressionTest extends EspressoTest {
           )
         ));
       mapboxMap.getStyle().addLayer(layer);
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
 
@@ -262,7 +262,7 @@ public class ExpressionTest extends EspressoTest {
           literal(ColorUtils.colorToRgbaString(Color.RED))
         )
       ));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
 
@@ -272,7 +272,7 @@ public class ExpressionTest extends EspressoTest {
           literal(ColorUtils.colorToRgbaString(Color.RED))
         )
       ));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
     });
@@ -292,7 +292,7 @@ public class ExpressionTest extends EspressoTest {
         formatEntry("test")
       );
       layer.setProperties(textField(expression));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
@@ -315,7 +315,7 @@ public class ExpressionTest extends EspressoTest {
         formatEntry("test", formatFontScale(1.75))
       );
       layer.setProperties(textField(expression));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
@@ -341,7 +341,7 @@ public class ExpressionTest extends EspressoTest {
         )
       );
       layer.setProperties(textField(expression));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(
         mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
@@ -371,7 +371,7 @@ public class ExpressionTest extends EspressoTest {
         )
       );
       layer.setProperties(textField(expression));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(
         mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
@@ -402,7 +402,7 @@ public class ExpressionTest extends EspressoTest {
         )
       );
       layer.setProperties(textField(expression));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(
         mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
@@ -436,7 +436,7 @@ public class ExpressionTest extends EspressoTest {
         formatEntry("\ntest2", formatFontScale(2), formatTextColor(Color.BLUE))
       );
       layer.setProperties(textField(expression));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(
         mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
@@ -472,7 +472,7 @@ public class ExpressionTest extends EspressoTest {
         )
       );
       layer.setProperties(textField(expression));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
@@ -504,7 +504,7 @@ public class ExpressionTest extends EspressoTest {
         formatEntry("\ntest2", formatFontScale(2))
       );
       layer.setProperties(textField(expression), textColor("rgba(128, 0, 0, 1)"));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
@@ -524,7 +524,7 @@ public class ExpressionTest extends EspressoTest {
       mapboxMap.getStyle().addLayer(layer);
 
       layer.setProperties(textField("test"));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
@@ -550,7 +550,7 @@ public class ExpressionTest extends EspressoTest {
         new FormattedSection("test", null, null, "rgba(0, 255, 0, 1)")
       );
       layer.setProperties(textField(formatted), textColor("rgba(128, 0, 0, 1)"));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());

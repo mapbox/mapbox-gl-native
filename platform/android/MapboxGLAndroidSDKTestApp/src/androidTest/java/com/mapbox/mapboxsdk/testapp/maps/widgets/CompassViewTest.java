@@ -4,6 +4,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.action.WaitAction;
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 import org.junit.Ignore;
@@ -55,7 +56,7 @@ public class CompassViewTest extends EspressoTest {
         .build()
     )));
     onView(withId(R.id.compassView)).perform(click());
-    waitAction();
+    WaitAction.invoke(500);
     onView(withId(R.id.compassView)).check(matches(not(isDisplayed())));
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       CameraPosition cameraPosition = mapboxMap.getCameraPosition();

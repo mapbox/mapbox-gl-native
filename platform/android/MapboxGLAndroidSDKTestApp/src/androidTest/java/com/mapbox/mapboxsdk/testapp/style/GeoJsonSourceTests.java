@@ -94,7 +94,7 @@ public class GeoJsonSourceTests extends EspressoTest {
       }
 
       source.setGeoJson(Point.fromLngLat(20, 55));
-      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
       assertEquals(1, mapboxMap.queryRenderedFeatures(
         mapboxMap.getProjection().toScreenLocation(
           new LatLng(55, 20)), "layer").size());

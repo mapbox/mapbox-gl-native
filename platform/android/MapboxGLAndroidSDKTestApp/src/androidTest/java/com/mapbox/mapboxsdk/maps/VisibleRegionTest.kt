@@ -1,26 +1,16 @@
-package com.mapbox.mapboxsdk.testapp.maps
+package com.mapbox.mapboxsdk.maps
 
 import android.graphics.PointF
 import android.support.test.espresso.UiController
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class VisibleRegionTest : EspressoTest() {
-
-  private lateinit var mapView: MapView
-
-  override fun beforeTest() {
-    super.beforeTest()
-    mapView = (rule.activity as EspressoTestActivity).mapView
-  }
 
   @Test
   fun visibleRegionTest() {
