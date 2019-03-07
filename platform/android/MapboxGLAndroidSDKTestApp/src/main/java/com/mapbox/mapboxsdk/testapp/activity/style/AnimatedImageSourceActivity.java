@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.Mapbox;
@@ -20,6 +19,7 @@ import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 import com.mapbox.mapboxsdk.style.sources.ImageSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 /**
  * Test activity showing how to use a series of images to create an animation
@@ -112,7 +112,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
 
     Bitmap getBitmap(int resourceId) {
       Context context = Mapbox.getApplicationContext();
-      Drawable drawable = ContextCompat.getDrawable(context, resourceId);
+      Drawable drawable = BitmapUtils.getDrawableFromRes(context, resourceId);
       if (drawable instanceof BitmapDrawable) {
         BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
         return bitmapDrawable.getBitmap();

@@ -4,11 +4,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.support.v7.content.res.AppCompatResources;
 import android.view.View;
 
 import java.io.ByteArrayOutputStream;
@@ -124,6 +129,45 @@ public class BitmapUtils {
     return new BitmapDrawable(context.getResources(), compass);
   }
 
+  /**
+   * Get a drawable from a resource.
+   *
+   * @param context     Context to obtain {@link android.content.res.Resources}
+   * @param drawableRes Drawable resource
+   * @return The drawable created from the resource
+   */
+  @Nullable
+  public static Drawable getDrawableFromRes(@NonNull Context context, @DrawableRes int drawableRes) {
+    return getDrawableFromRes(context, drawableRes, null);
+  }
+
+  /**
+   * Get a tinted drawable from a resource.
+   *
+   * @param context     Context to obtain {@link android.content.res.Resources}
+   * @param drawableRes Drawable resource
+   * @param tintColor   Tint color
+   * @return The drawable created from the resource
+   */
+  @Nullable
+  public static Drawable getDrawableFromRes(@NonNull Context context, @DrawableRes int drawableRes,
+                                            @Nullable @ColorInt Integer tintColor) {
+    Drawable drawable = AppCompatResources.getDrawable(context, drawableRes);
+    if (drawable == null) {
+      return null;
+    }
+
+    if (tintColor == null) {
+      return drawable;
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      drawable.setTint(tintColor);
+    } else {
+      drawable.mutate().setColorFilter(tintColor, PorterDuff.Mode.SRC_IN);
+    }
+    return drawable;
+  }
 
   /**
    * Validates if the bytes of a bitmap matches another

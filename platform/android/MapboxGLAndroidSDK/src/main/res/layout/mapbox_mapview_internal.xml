@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.mapbox.mapboxsdk.maps.widgets.CompassView
         android:id="@+id/compassView"
@@ -12,8 +12,7 @@
         android:id="@+id/logoView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@null"
-        app:srcCompat="@drawable/mapbox_logo_icon"/>
+        android:contentDescription="@null"/>
 
     <android.support.v7.widget.AppCompatImageView
         android:visibility="gone"
@@ -23,7 +22,6 @@
         android:adjustViewBounds="true"
         android:clickable="true"
         android:focusable="true"
-        android:contentDescription="@string/mapbox_attributionsIconContentDescription"
-        app:srcCompat="@drawable/mapbox_info_bg_selector"/>
+        android:contentDescription="@string/mapbox_attributionsIconContentDescription"/>
 
 </merge>
