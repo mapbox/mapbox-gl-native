@@ -83,10 +83,6 @@ public:
     double getMinZoom() const;
     void setMaxZoom(double);
     double getMaxZoom() const;
-    void setMinPitch(double);
-    double getMinPitch() const;
-    void setMaxPitch(double);
-    double getMaxPitch() const;
 
     // North Orientation
     void setNorthOrientation(NorthOrientation);

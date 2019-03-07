@@ -55,8 +55,6 @@ public:
     void setLatLngBounds(optional<LatLngBounds>);
     void setMinZoom(double);
     void setMaxZoom(double);
-    void setMinPitch(double);
-    void setMaxPitch(double);
 
     // Zoom
 

@@ -221,26 +221,6 @@ double TransformState::getMaxZoom() const {
     return scaleZoom(max_scale);
 }
 
-void TransformState::setMinPitch(double minPitch) {
-    if (minPitch <= getMaxPitch()) {
-        min_pitch = minPitch;
-    }
-}
-
-double TransformState::getMinPitch() const {
-    return min_pitch;
-}
-
-void TransformState::setMaxPitch(double maxPitch) {
-    if (maxPitch >= getMinPitch()) {
-        max_pitch = maxPitch;
-    }
-}
-
-double TransformState::getMaxPitch() const {
-    return max_pitch;
-}
-
 #pragma mark - Rotation
 
 float TransformState::getBearing() const {

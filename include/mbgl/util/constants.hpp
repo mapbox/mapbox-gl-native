@@ -33,6 +33,7 @@ constexpr double EARTH_RADIUS_M = 6378137;
 constexpr double LATITUDE_MAX = 85.051128779806604;
 constexpr double LONGITUDE_MAX = 180;
 constexpr double DEGREES_MAX = 360;
+constexpr double PITCH_MIN = 0.0;
 constexpr double PITCH_MAX = M_PI / 3;
 constexpr double MIN_ZOOM = 0.0;
 constexpr double MAX_ZOOM = 25.5;

@@ -116,7 +116,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
     const double scale = state.zoomScale(zoom);
-    pitch = util::clamp(pitch, state.min_pitch, state.max_pitch);
+    pitch = util::clamp(pitch, util::PITCH_MIN, util::PITCH_MAX);
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.bearing);
@@ -181,7 +181,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-    pitch = util::clamp(pitch, state.min_pitch, state.max_pitch);
+    pitch = util::clamp(pitch, util::PITCH_MIN, util::PITCH_MAX);
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.bearing);
@@ -359,16 +359,6 @@ void Transform::setMinZoom(const double minZoom) {
 void Transform::setMaxZoom(const double maxZoom) {
     if (std::isnan(maxZoom)) return;
     state.setMaxZoom(maxZoom);
-}
-
-void Transform::setMinPitch(double minPitch) {
-    if (std::isnan(minPitch)) return;
-    state.setMinPitch(minPitch);
-}
-
-void Transform::setMaxPitch(double maxPitch) {
-    if (std::isnan(maxPitch)) return;
-    state.setMaxPitch(maxPitch);
 }
 
 #pragma mark - Bearing

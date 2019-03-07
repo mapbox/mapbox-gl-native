@@ -761,22 +761,3 @@ TEST(Transform, LatLngBounds) {
     transform.moveBy(ScreenCoordinate { 500, 0 });
     ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 120.0);
 }
-
-TEST(Transform, PitchBounds) {
-    Transform transform;
-    transform.resize({ 1000, 1000 });
-
-    transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(transform.getState().getMaxZoom()));
-
-    ASSERT_DOUBLE_EQ(transform.getState().getPitch() * util::RAD2DEG, 0.0);
-    ASSERT_DOUBLE_EQ(transform.getState().getMinPitch() * util::RAD2DEG, 0.0);
-    ASSERT_DOUBLE_EQ(transform.getState().getMaxPitch() * util::RAD2DEG, 60.0);
-
-    transform.setMinPitch(45.0 * util::DEG2RAD);
-    transform.jumpTo(CameraOptions().withPitch(0));
-    ASSERT_NEAR(transform.getState().getPitch() * util::RAD2DEG, 45.0, 1e-5);
-
-    transform.setMaxPitch(55.0 * util::DEG2RAD);
-    transform.jumpTo(CameraOptions().withPitch(60.0));
-    ASSERT_NEAR(transform.getState().getPitch() * util::RAD2DEG, 55.0, 1e-5);
-}
