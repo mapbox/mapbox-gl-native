@@ -492,6 +492,22 @@ void SymbolLayer::setTextJustify(PropertyValue<TextJustifyType> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+PropertyValue<std::vector<TextVariableAnchorType>> SymbolLayer::getDefaultTextVariableAnchor() {
+    return TextVariableAnchor::defaultValue();
+}
+
+PropertyValue<std::vector<TextVariableAnchorType>> SymbolLayer::getTextVariableAnchor() const {
+    return impl().layout.get<TextVariableAnchor>();
+}
+
+void SymbolLayer::setTextVariableAnchor(PropertyValue<std::vector<TextVariableAnchorType>> value) {
+    if (value == getTextVariableAnchor())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<TextVariableAnchor>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 PropertyValue<SymbolAnchorType> SymbolLayer::getDefaultTextAnchor() {
     return TextAnchor::defaultValue();
 }
@@ -1325,6 +1341,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         TextLineHeight,
         TextLetterSpacing,
         TextJustify,
+        TextVariableAnchor,
         TextAnchor,
         TextMaxAngle,
         TextRotate,
@@ -1364,6 +1381,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         { "text-line-height", static_cast<uint8_t>(Property::TextLineHeight) },
         { "text-letter-spacing", static_cast<uint8_t>(Property::TextLetterSpacing) },
         { "text-justify", static_cast<uint8_t>(Property::TextJustify) },
+        { "text-variable-anchor", static_cast<uint8_t>(Property::TextVariableAnchor) },
         { "text-anchor", static_cast<uint8_t>(Property::TextAnchor) },
         { "text-max-angle", static_cast<uint8_t>(Property::TextMaxAngle) },
         { "text-rotate", static_cast<uint8_t>(Property::TextRotate) },
@@ -1670,6 +1688,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         }
         
         setTextJustify(*typedValue);
+        return nullopt;
+        
+    }
+    
+    if (property == Property::TextVariableAnchor) {
+        Error error;
+        optional<PropertyValue<std::vector<TextVariableAnchorType>>> typedValue = convert<PropertyValue<std::vector<TextVariableAnchorType>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setTextVariableAnchor(*typedValue);
         return nullopt;
         
     }
