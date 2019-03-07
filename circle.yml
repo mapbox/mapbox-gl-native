@@ -669,7 +669,10 @@ jobs:
           name: Publish to Bintray
           command: |
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
-              make run-android-upload-to-bintray
+              version=$(cat platform/android/MapboxGLAndroidSDK/gradle.properties | grep "VERSION_NAME")
+              if [[ $version != *"SNAPSHOT"* ]]; then
+                make run-android-upload-to-bintray
+              fi
             fi
 # ------------------------------------------------------------------------------
   android-debug-arm-v7-buck:
