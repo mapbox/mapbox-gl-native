@@ -98,6 +98,8 @@ enum class SymbolAnchorType : uint8_t {
     BottomRight
 };
 
+using TextVariableAnchorType = SymbolAnchorType;
+
 enum class TextTransformType : uint8_t {
     None,
     Uppercase,

@@ -73,6 +73,7 @@ template optional<PropertyValue<LineJoinType>> Converter<PropertyValue<LineJoinT
 template optional<PropertyValue<Position>> Converter<PropertyValue<Position>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<RasterResamplingType>> Converter<PropertyValue<RasterResamplingType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<SymbolAnchorType>> Converter<PropertyValue<SymbolAnchorType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
+template optional<PropertyValue<std::vector<TextVariableAnchorType>>> Converter<PropertyValue<std::vector<TextVariableAnchorType>>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<SymbolPlacementType>> Converter<PropertyValue<SymbolPlacementType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<SymbolZOrderType>> Converter<PropertyValue<SymbolZOrderType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<TextJustifyType>> Converter<PropertyValue<TextJustifyType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;

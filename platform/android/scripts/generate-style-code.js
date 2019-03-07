@@ -197,6 +197,7 @@ global.defaultValueJava = function(property) {
       case 'array':
              switch (property.value) {
               case 'string':
+              case 'enum':
                 return '[' + property['default'] + "]";
               case 'number':
                 var result ='new Float[] {';

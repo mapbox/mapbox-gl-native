@@ -2276,6 +2276,26 @@ public class PropertyFactory {
   }
 
   /**
+   * To increase the chance of placing high-priority labels on the map, you can provide an array of {@link Property.TEXT_ANCHOR} locations: the render will attempt to place the label at each location, in order, before moving onto the next label. Use `text-justify: auto` to choose justification based on anchor position. To apply an offset, use the `text-radial-offset` instead of the two-dimensional {@link PropertyFactory#textOffset}.
+   *
+   * @param value a String[] value
+   * @return property wrapper around String[]
+   */
+  public static PropertyValue<String[]> textVariableAnchor(String[] value) {
+    return new LayoutPropertyValue<>("text-variable-anchor", value);
+  }
+
+  /**
+   * To increase the chance of placing high-priority labels on the map, you can provide an array of {@link Property.TEXT_ANCHOR} locations: the render will attempt to place the label at each location, in order, before moving onto the next label. Use `text-justify: auto` to choose justification based on anchor position. To apply an offset, use the `text-radial-offset` instead of the two-dimensional {@link PropertyFactory#textOffset}.
+   *
+   * @param value a String[] value
+   * @return property wrapper around String[]
+   */
+  public static PropertyValue<Expression> textVariableAnchor(Expression value) {
+    return new LayoutPropertyValue<>("text-variable-anchor", value);
+  }
+
+  /**
    * Part of the text placed closest to the anchor.
    *
    * @param value a String value

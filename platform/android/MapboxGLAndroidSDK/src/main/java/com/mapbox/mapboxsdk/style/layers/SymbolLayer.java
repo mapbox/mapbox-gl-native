@@ -470,6 +470,18 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the TextVariableAnchor property
+   *
+   * @return property wrapper value around String[]
+   */
+  @NonNull
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String[]> getTextVariableAnchor() {
+    checkThread();
+    return (PropertyValue<String[]>) new PropertyValue("text-variable-anchor", nativeGetTextVariableAnchor());
+  }
+
+  /**
    * Get the TextAnchor property
    *
    * @return property wrapper value around String
@@ -1184,6 +1196,10 @@ public class SymbolLayer extends Layer {
   @NonNull
   @Keep
   private native Object nativeGetTextJustify();
+
+  @NonNull
+  @Keep
+  private native Object nativeGetTextVariableAnchor();
 
   @NonNull
   @Keep
