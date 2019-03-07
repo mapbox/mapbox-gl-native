@@ -81,6 +81,7 @@ enum class AlignmentType : uint8_t {
 };
 
 enum class TextJustifyType : uint8_t {
+    Auto,
     Center,
     Left,
     Right
