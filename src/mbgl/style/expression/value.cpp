@@ -329,6 +329,9 @@ template struct ValueConverter<std::vector<float>>;
 template type::Type valueTypeToExpressionType<std::vector<std::string>>();
 template struct ValueConverter<std::vector<std::string>>;
 
+template type::Type valueTypeToExpressionType<std::vector<TextVariableAnchorType>>();
+template struct ValueConverter<std::vector<TextVariableAnchorType>>;
+
 template type::Type valueTypeToExpressionType<AlignmentType>();
 template struct ValueConverter<AlignmentType>;
 

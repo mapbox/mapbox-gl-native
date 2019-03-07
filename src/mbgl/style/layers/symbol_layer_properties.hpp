@@ -147,6 +147,11 @@ struct TextJustify : DataDrivenLayoutProperty<TextJustifyType> {
     static TextJustifyType defaultValue() { return TextJustifyType::Center; }
 };
 
+struct TextVariableAnchor : LayoutProperty<std::vector<TextVariableAnchorType>> {
+    static constexpr const char *name() { return "text-variable-anchor"; }
+    static std::vector<TextVariableAnchorType> defaultValue() { return {  }; }
+};
+
 struct TextAnchor : DataDrivenLayoutProperty<SymbolAnchorType> {
     static constexpr const char *name() { return "text-anchor"; }
     static SymbolAnchorType defaultValue() { return SymbolAnchorType::Center; }
@@ -284,6 +289,7 @@ class SymbolLayoutProperties : public Properties<
     TextLineHeight,
     TextLetterSpacing,
     TextJustify,
+    TextVariableAnchor,
     TextAnchor,
     TextMaxAngle,
     TextRotate,

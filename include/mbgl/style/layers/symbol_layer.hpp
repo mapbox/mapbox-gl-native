@@ -134,6 +134,10 @@ public:
     PropertyValue<TextJustifyType> getTextJustify() const;
     void setTextJustify(PropertyValue<TextJustifyType>);
 
+    static PropertyValue<std::vector<TextVariableAnchorType>> getDefaultTextVariableAnchor();
+    PropertyValue<std::vector<TextVariableAnchorType>> getTextVariableAnchor() const;
+    void setTextVariableAnchor(PropertyValue<std::vector<TextVariableAnchorType>>);
+
     static PropertyValue<SymbolAnchorType> getDefaultTextAnchor();
     PropertyValue<SymbolAnchorType> getTextAnchor() const;
     void setTextAnchor(PropertyValue<SymbolAnchorType>);

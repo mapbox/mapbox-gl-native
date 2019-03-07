@@ -579,6 +579,19 @@ public class SymbolLayerTest extends BaseLayerTest {
 
   @Test
   @UiThreadTest
+  public void testTextVariableAnchorAsConstant() {
+    Timber.i("text-variable-anchor");
+    assertNotNull(layer);
+    assertNull(layer.getTextVariableAnchor().getValue());
+
+    // Set and Get
+    String[] propertyValue = [undefined];
+    layer.setProperties(textVariableAnchor(propertyValue));
+    assertEquals(layer.getTextVariableAnchor().getValue(), propertyValue);
+  }
+
+  @Test
+  @UiThreadTest
   public void testTextAnchorAsConstant() {
     Timber.i("text-anchor");
     assertNotNull(layer);
