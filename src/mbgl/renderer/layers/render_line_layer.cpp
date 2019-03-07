@@ -109,8 +109,6 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
             LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
 
-            parameters.lineAtlas.bind(parameters.context, 0);
-
             draw(parameters.programs.getLineLayerPrograms().lineSDF,
                  LineSDFProgram::uniformValues(
                      evaluated,
@@ -124,13 +122,14 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      parameters.lineAtlas.getSize().width),
                      {},
                      {},
-                     LineSDFProgram::TextureBindings{});
+                     LineSDFProgram::TextureBindings{
+                         parameters.lineAtlas.textureBinding(parameters.context),
+                     });
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
             assert(dynamic_cast<GeometryTile*>(&tile.tile));
-            GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
-            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gfx::TextureFilterType::Linear);
+            GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);            
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
@@ -147,12 +146,13 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      parameters.pixelRatio),
                      *posA,
                      *posB,
-                     LinePatternProgram::TextureBindings{});
+                     LinePatternProgram::TextureBindings{
+                         textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                     });
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             if (!colorRampTexture) {
                 colorRampTexture = parameters.context.createTexture(colorRamp);
             }
-            parameters.context.bindTexture(*colorRampTexture, 0, gfx::TextureFilterType::Linear);
 
             draw(parameters.programs.getLineLayerPrograms().lineGradient,
                  LineGradientProgram::uniformValues(
@@ -162,7 +162,9 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     parameters.pixelsToGLUnits),
                     {},
                     {},
-                    LineGradientProgram::TextureBindings{});
+                    LineGradientProgram::TextureBindings{
+                        textures::u_image::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+                    });
         } else {
             draw(parameters.programs.getLineLayerPrograms().line,
                  LineProgram::uniformValues(

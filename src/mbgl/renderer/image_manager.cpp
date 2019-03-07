@@ -167,19 +167,19 @@ Size ImageManager::getPixelSize() const {
     };
 }
 
-void ImageManager::upload(gfx::Context& context, uint8_t unit) {
+void ImageManager::upload(gfx::Context& context) {
     if (!atlasTexture) {
-        atlasTexture = context.createTexture(atlasImage, unit);
+        atlasTexture = context.createTexture(atlasImage);
     } else if (dirty) {
-        context.updateTexture(*atlasTexture, atlasImage, unit);
+        context.updateTexture(*atlasTexture, atlasImage);
     }
 
     dirty = false;
 }
 
-void ImageManager::bind(gfx::Context& context, uint8_t unit) {
-    upload(context, unit);
-    context.bindTexture(*atlasTexture, unit, gfx::TextureFilterType::Linear);
+gfx::TextureBinding ImageManager::textureBinding(gfx::Context& context) {
+    upload(context);
+    return { *atlasTexture->resource, gfx::TextureFilterType::Linear };
 }
 
 } // namespace mbgl

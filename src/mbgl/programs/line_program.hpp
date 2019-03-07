@@ -3,6 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/line.hpp>
 #include <mbgl/shaders/line_gradient.hpp>
 #include <mbgl/shaders/line_pattern.hpp>
@@ -108,9 +109,9 @@ class LinePatternProgram : public Program<
         uniforms::u_gl_units_to_pixels,
         uniforms::u_scale,
         uniforms::u_texsize,
-        uniforms::u_fade,
-        uniforms::u_image>,
-    TypeList<>,
+        uniforms::u_fade>,
+    TypeList<
+        textures::u_image>,
     RenderLinePaintProperties>
 {
 public:
@@ -138,9 +139,9 @@ class LineSDFProgram : public Program<
         uniforms::u_tex_y_a,
         uniforms::u_tex_y_b,
         uniforms::u_mix,
-        uniforms::u_sdfgamma,
-        uniforms::u_image>,
-    TypeList<>,
+        uniforms::u_sdfgamma>,
+    TypeList<
+        textures::u_image>,
     RenderLinePaintProperties>
 {
 public:
@@ -164,9 +165,9 @@ class LineGradientProgram : public Program<
     TypeList<
         uniforms::u_matrix,
         uniforms::u_ratio,
-        uniforms::u_gl_units_to_pixels,
-        uniforms::u_image>,
-    TypeList<>,
+        uniforms::u_gl_units_to_pixels>,
+    TypeList<
+        textures::u_image>,
     RenderLinePaintProperties>
 {
 public:

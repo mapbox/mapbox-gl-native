@@ -8,6 +8,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/shaders/symbol_icon.hpp>
 #include <mbgl/shaders/symbol_sdf.hpp>
@@ -33,7 +34,6 @@ class TransformState;
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_gl_coord_matrix);
 MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_label_plane_matrix);
-MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_texture);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
 
@@ -265,7 +265,7 @@ public:
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureBindings>;
+    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureList>;
 
     ProgramType program;
 
@@ -354,7 +354,6 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_gl_coord_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
-        uniforms::u_texture,
         uniforms::u_fade_change,
         uniforms::u_is_text,
         uniforms::u_camera_to_center_distance,
@@ -362,7 +361,8 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_pitch_with_map,
         uniforms::u_rotate_symbol,
         uniforms::u_aspect_ratio>,
-    TypeList<>,
+    TypeList<
+        textures::u_texture>,
     style::IconPaintProperties>
 {
 public:
@@ -394,7 +394,6 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_gl_coord_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
-        uniforms::u_texture,
         uniforms::u_fade_change,
         uniforms::u_is_text,
         uniforms::u_camera_to_center_distance,
@@ -404,7 +403,8 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_aspect_ratio,
         uniforms::u_gamma_scale,
         uniforms::u_is_halo>,
-    TypeList<>,
+    TypeList<
+        textures::u_texture>,
     PaintProperties>
 {
 public:
@@ -417,7 +417,6 @@ public:
             uniforms::u_gl_coord_matrix,
             uniforms::u_extrude_scale,
             uniforms::u_texsize,
-            uniforms::u_texture,
             uniforms::u_fade_change,
             uniforms::u_is_text,
             uniforms::u_camera_to_center_distance,
@@ -427,7 +426,8 @@ public:
             uniforms::u_aspect_ratio,
             uniforms::u_gamma_scale,
             uniforms::u_is_halo>,
-        TypeList<>,
+        TypeList<
+            textures::u_texture>,
         PaintProperties>;
 
     using UniformValues = typename BaseProgram::UniformValues;

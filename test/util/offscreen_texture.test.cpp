@@ -2,6 +2,7 @@
 
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -158,7 +159,7 @@ void main() {
     test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);
 
     // Now, composite the Framebuffer texture we've rendered to onto the main FBO.
-    context.bindTexture(texture.getTexture(), 0, gfx::TextureFilterType::Linear);
+    gl::bindTexture(context, 0, { *texture.getTexture().resource, gfx::TextureFilterType::Linear });
     MBGL_CHECK_ERROR(glUseProgram(compositeShader.program));
     MBGL_CHECK_ERROR(glUniform1i(u_texture, 0));
     MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, viewportBuffer.buffer));

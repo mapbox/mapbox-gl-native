@@ -32,11 +32,11 @@ public:
     ~LineAtlas();
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(gfx::Context&, uint8_t unit);
+    gfx::TextureBinding textureBinding(gfx::Context&);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gfx::Context&, uint8_t unit);
+    void upload(gfx::Context&);
 
     LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
     LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);

@@ -50,7 +50,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     const Properties<>::PossiblyEvaluated properties;
     const BackgroundProgram::Binders paintAttributeData(properties, 0);
 
-    auto draw = [&](auto& program, auto&& uniformValues, auto&& textureBindings) {
+    auto draw = [&](auto& program, auto&& uniformValues, const auto& textureBindings) {
         const auto allUniformValues = program.computeAllUniformValues(
             std::move(uniformValues),
             paintAttributeData,
@@ -76,7 +76,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.staticData.tileTriangleSegments,
             allUniformValues,
             allAttributeBindings,
-            std::move(textureBindings),
+            textureBindings,
             getID()
         );
     };
@@ -87,8 +87,6 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (!imagePosA || !imagePosB)
             return;
-
-        parameters.imageManager.bind(parameters.context, 0);
 
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
@@ -103,7 +101,9 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                     tileID,
                     parameters.state
                 ),
-                BackgroundPatternProgram::TextureBindings{}
+                BackgroundPatternProgram::TextureBindings{
+                    textures::u_image::Value{ parameters.imageManager.textureBinding(parameters.context) },
+                }
             );
         }
     } else {

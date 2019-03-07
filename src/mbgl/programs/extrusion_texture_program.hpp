@@ -3,6 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/extrusion_texture.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -16,9 +17,9 @@ class ExtrusionTextureProgram : public Program<
     TypeList<
         uniforms::u_matrix,
         uniforms::u_world,
-        uniforms::u_image,
         uniforms::u_opacity>,
-    TypeList<>,
+    TypeList<
+        textures::u_image>,
     style::Properties<>> {
 public:
     using Program::Program;

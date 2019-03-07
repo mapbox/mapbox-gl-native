@@ -17,6 +17,7 @@ public:
                   std::string&& binaryCode,
                   std::string binaryIdentifier,
                   std::vector<std::pair<const std::string, gl::AttributeLocation>>&&,
+                  std::vector<std::pair<const std::string, gl::UniformLocation>>&&,
                   std::vector<std::pair<const std::string, gl::UniformLocation>>&&);
 
     std::string serialize() const;
@@ -33,6 +34,7 @@ public:
 
     optional<gl::AttributeLocation> attributeLocation(const std::string& name) const;
     gl::UniformLocation uniformLocation(const std::string& name) const;
+    gl::UniformLocation textureLocation(const std::string& name) const;
 
 private:
     gl::BinaryProgramFormat binaryFormat = 0;
@@ -40,6 +42,7 @@ private:
     std::string binaryIdentifier;
     std::vector<std::pair<const std::string, gl::AttributeLocation>> attributes;
     std::vector<std::pair<const std::string, gl::UniformLocation>> uniforms;
+    std::vector<std::pair<const std::string, gl::UniformLocation>> textures;
 };
 
 } // namespace mbgl

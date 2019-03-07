@@ -25,7 +25,7 @@ public:
 
     void bind() {
         if (!framebuffer) {
-            texture = context.createTexture(size, gfx::TexturePixelType::RGBA, 0, type);
+            texture = context.createTexture(size, gfx::TexturePixelType::RGBA, type);
             if (depth) {
                 framebuffer = context.createFramebuffer(*texture, *depth);
             } else {

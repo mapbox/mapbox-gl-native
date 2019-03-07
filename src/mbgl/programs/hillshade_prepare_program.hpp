@@ -3,6 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/hillshade_prepare.hpp>
 #include <mbgl/util/geometry.hpp>
 
@@ -23,9 +24,9 @@ class HillshadePrepareProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_dimension,
         uniforms::u_zoom,
-        uniforms::u_maxzoom,
-        uniforms::u_image>,
-    TypeList<>,
+        uniforms::u_maxzoom>,
+    TypeList<
+        textures::u_image>,
     style::Properties<>> {
 public:
     using Program::Program;

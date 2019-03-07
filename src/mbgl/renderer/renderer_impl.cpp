@@ -375,8 +375,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "upload");
 
-        parameters.imageManager.upload(parameters.context, 0);
-        parameters.lineAtlas.upload(parameters.context, 0);
+        parameters.imageManager.upload(parameters.context);
+        parameters.lineAtlas.upload(parameters.context);
         
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {

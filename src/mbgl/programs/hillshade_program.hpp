@@ -4,6 +4,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/hillshade_prepare_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/hillshade.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/hillshade_layer_properties.hpp>
@@ -26,13 +27,13 @@ class HillshadeProgram : public Program<
         attributes::a_texture_pos>,
     TypeList<
         uniforms::u_matrix,
-        uniforms::u_image,
         uniforms::u_highlight,
         uniforms::u_shadow,
         uniforms::u_accent,
         uniforms::u_light,
         uniforms::u_latrange>,
-    TypeList<>,
+    TypeList<
+        textures::u_image>,
     style::HillshadePaintProperties>{
 public:
     using Program::Program;

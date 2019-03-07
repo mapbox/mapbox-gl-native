@@ -4,6 +4,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/fill_extrusion.hpp>
 #include <mbgl/shaders/fill_extrusion_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -44,7 +45,6 @@ using FillExtrusionPatternUniforms = TypeList<
     uniforms::u_scale,
     uniforms::u_texsize,
     uniforms::u_fade,
-    uniforms::u_image,
     uniforms::u_pixel_coord_upper,
     uniforms::u_pixel_coord_lower,
     uniforms::u_height_factor,
@@ -94,7 +94,8 @@ class FillExtrusionPatternProgram : public Program<
     gfx::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionPatternUniforms,
-    TypeList<>,
+    TypeList<
+        textures::u_image>,
     style::FillExtrusionPaintProperties>
 {
 public:

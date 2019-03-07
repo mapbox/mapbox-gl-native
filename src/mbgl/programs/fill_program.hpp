@@ -3,6 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/fill.hpp>
 #include <mbgl/shaders/fill_pattern.hpp>
 #include <mbgl/shaders/fill_outline.hpp>
@@ -33,7 +34,6 @@ using FillPatternUniforms = TypeList<
     uniforms::u_texsize,
     uniforms::u_scale,
     uniforms::u_fade,
-    uniforms::u_image,
     uniforms::u_pixel_coord_upper,
     uniforms::u_pixel_coord_lower>;
 
@@ -63,7 +63,8 @@ class FillPatternProgram : public Program<
     gfx::Triangle,
     FillLayoutAttributes,
     FillPatternUniforms,
-    TypeList<>,
+    TypeList<
+        textures::u_image>,
     style::FillPaintProperties>
 {
 public:
@@ -95,7 +96,8 @@ class FillOutlinePatternProgram : public Program<
     gfx::Line,
     FillLayoutAttributes,
     FillPatternUniforms,
-    TypeList<>,
+    TypeList<
+        textures::u_image>,
     style::FillPaintProperties>
 {
 public:

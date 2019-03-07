@@ -140,7 +140,6 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
                 optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
                 optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
-                parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gfx::TextureFilterType::Linear);
                 FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
@@ -160,14 +159,14 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     ),
                     patternPosA,
                     patternPosB,
-                    FillExtrusionPatternProgram::TextureBindings{}
+                    FillExtrusionPatternProgram::TextureBindings{
+                        textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                    }
                 );
             }
         }
 
     } else if (parameters.pass == RenderPass::Translucent) {
-        parameters.context.bindTexture(renderTexture->getTexture());
-
         const auto& size = parameters.staticData.backendSize;
 
         mat4 viewportMat;
@@ -180,8 +179,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::UniformValues{
-                uniforms::u_matrix::Value( viewportMat ), uniforms::u_world::Value( size ),
-                uniforms::u_image::Value( 0 ),
+                uniforms::u_matrix::Value( viewportMat ),
+                uniforms::u_world::Value( size ),
                 uniforms::u_opacity::Value( evaluated.get<FillExtrusionOpacity>() )
             },
             paintAttributeData,
@@ -207,7 +206,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             parameters.staticData.extrusionTextureSegments,
             allUniformValues,
             allAttributeBindings,
-            ExtrusionTextureProgram::TextureBindings{},
+            ExtrusionTextureProgram::TextureBindings{
+                textures::u_image::Value{ *renderTexture->getTexture().resource },
+            },
             getID());
     }
 }
