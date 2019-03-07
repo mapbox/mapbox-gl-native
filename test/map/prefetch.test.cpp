@@ -3,6 +3,7 @@
 #include <mbgl/test/stub_map_observer.hpp>
 
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
@@ -37,7 +38,8 @@ TEST(Map, PrefetchTiles) {
     };
 
     HeadlessFrontend frontend { { 512, 512 }, 1, fileSource, threadPool };
-    Map map(frontend, observer, frontend.getSize(), 1, fileSource, threadPool, MapMode::Continuous);
+    Map map(frontend, observer, frontend.getSize(), 1, fileSource, threadPool,
+            MapOptions().withMapMode(MapMode::Continuous));
 
     std::vector<int> tiles;
 

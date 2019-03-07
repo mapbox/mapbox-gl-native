@@ -6,6 +6,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
@@ -31,8 +32,9 @@ public:
     ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
     HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapMode::Static};
+              threadPool, MapOptions().withMapMode(MapMode::Static)};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,

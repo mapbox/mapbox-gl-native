@@ -13,6 +13,7 @@
 
 #include <jni/jni.hpp>
 
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/event.hpp>
@@ -79,12 +80,18 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
     // Create a renderer frontend
     rendererFrontend = std::make_unique<AndroidRendererFrontend>(mapRenderer);
 
+    // Create Map options
+    MapOptions options;
+    options.withMapMode(MapMode::Continuous)
+           .withConstrainMode(ConstrainMode::HeightOnly)
+           .withViewportMode(ViewportMode::Default)
+           .withCrossSourceCollisions(_crossSourceCollisions);
+
     // Create the core map
     map = std::make_unique<mbgl::Map>(*rendererFrontend, *this,
                                       mbgl::Size{ static_cast<uint32_t>(width),
                                                   static_cast<uint32_t>(height) }, pixelRatio,
-                                      fileSource, *threadPool, MapMode::Continuous,
-                                      ConstrainMode::HeightOnly, ViewportMode::Default, _crossSourceCollisions);
+                                      fileSource, *threadPool, options);
 }
 
 /**

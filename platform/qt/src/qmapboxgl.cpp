@@ -1767,15 +1767,18 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     connect(m_mapObserver.get(), SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)), q, SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)));
     connect(m_mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q, SIGNAL(copyrightsChanged(QString)));
 
+    mbgl::MapOptions options;
+    options.withMapMode(static_cast<mbgl::MapMode>(settings.mapMode()))
+           .withConstrainMode(static_cast<mbgl::ConstrainMode>(settings.constrainMode()))
+           .withViewportMode(static_cast<mbgl::ViewportMode>(settings.viewportMode()));
+
     // Setup the Map object
     mapObj = std::make_unique<mbgl::Map>(
             *this, // RendererFrontend
             *m_mapObserver,
             sanitizedSize(size),
             m_pixelRatio, *m_fileSourceObj, *m_threadPool,
-            static_cast<mbgl::MapMode>(settings.mapMode()),
-            static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
-            static_cast<mbgl::ViewportMode>(settings.viewportMode()));
+            options);
 
     // Needs to be Queued to give time to discard redundant draw calls via the `renderQueued` flag.
     connect(this, SIGNAL(needsRendering()), q, SIGNAL(needsRendering()), Qt::QueuedConnection);

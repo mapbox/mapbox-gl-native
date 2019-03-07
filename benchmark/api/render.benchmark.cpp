@@ -2,6 +2,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/renderer/renderer.hpp>
@@ -41,7 +42,8 @@ static void prepare(Map& map, optional<std::string> json = {}) {
 static void API_renderStill_reuse_map(::benchmark::State& state) {
     RenderBenchmark bench;
     HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.fileSource, bench.threadPool };
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Static};
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
+              bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
     prepare(map);
 
     while (state.KeepRunning()) {
@@ -52,7 +54,8 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
 static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
     RenderBenchmark bench;
     HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.fileSource, bench.threadPool };
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Static};
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
+              bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
     
     while (state.KeepRunning()) {
         prepare(map, { "{}" });
@@ -67,7 +70,8 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
     
     while (state.KeepRunning()) {
         HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.fileSource, bench.threadPool };
-        Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Static};
+        Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
+                  bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
         prepare(map);
         frontend.render(map);
     }

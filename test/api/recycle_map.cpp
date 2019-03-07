@@ -3,6 +3,7 @@
 
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -29,7 +30,8 @@ TEST(API, RecycleMapUpdateImages) {
 
     HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
     auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(),
-                                     pixelRatio, fileSource, threadPool, MapMode::Static);
+                                     pixelRatio, fileSource, threadPool,
+                                     MapOptions().withMapMode(MapMode::Static));
 
     EXPECT_TRUE(map);
 

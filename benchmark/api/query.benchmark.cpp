@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/renderer/renderer.hpp>
@@ -34,7 +35,8 @@ public:
     DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4 };
     HeadlessFrontend frontend { { 1000, 1000 }, 1, fileSource, threadPool };
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, fileSource, threadPool, MapMode::Static};
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
+              fileSource, threadPool, MapOptions().withMapMode(MapMode::Static) };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };
 

@@ -3,6 +3,7 @@
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/gl/defines.hpp>
@@ -91,7 +92,8 @@ TEST(GLContextMode, Shared) {
 
     HeadlessFrontend frontend { pixelRatio, fileSource, threadPool, {}, GLContextMode::Shared };
 
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Static);
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
+            fileSource, threadPool, MapOptions().withMapMode(MapMode::Static));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));
 
