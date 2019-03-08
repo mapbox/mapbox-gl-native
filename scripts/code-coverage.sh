@@ -3,7 +3,14 @@
 set -e
 set -o pipefail
 
-# Check that input values are valid.
+#
+# This script takes three values: $1 should be a decimal value reflecting the 
+# percentage of lines covered, with a maximum value of 100.0, $2 is
+# the platform the percentage pertains to (iOS or Android), and $3 is the
+# test scheme being run (on iOS, this is currently CI).
+#
+
+# Check that platform input values are valid.
 
 if [[ ! $2 = "iOS" && ! $2 = "Android" ]]; then
     echo "$2 does not match either 'iOS' or 'Android'. Platform must be specified for coverage report."
