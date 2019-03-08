@@ -1,8 +1,8 @@
 'use strict';
 
-var mockfs = require('./../mockfs');
-var mbgl = require('../../index');
-var test = require('tape');
+import mockfs from './../mockfs';
+import mbgl from '../../index';
+import test from'tape';
 
 var options = {
     request: function(req, callback) {

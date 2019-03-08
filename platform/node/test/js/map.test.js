@@ -1,10 +1,10 @@
 'use strict';
 
-var test = require('tape');
-var mbgl = require('../../index');
-var fs = require('fs');
-var path = require('path');
-var style = require('../fixtures/style.json');
+import test from 'tape';
+import mbgl from '../../index';
+import fs from 'fs';
+import path from 'path';
+import style from '../fixtures/style.json';
 
 test('Map', function(t) {
     // This test is skipped because of the req.respond shim in index.js
