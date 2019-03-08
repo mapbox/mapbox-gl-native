@@ -765,7 +765,7 @@ void QMapboxGL::setZoom(double zoom_)
 */
 double QMapboxGL::minimumZoom() const
 {
-    return d_ptr->mapObj->getMinZoom();
+    return *d_ptr->mapObj->getBounds().minZoom;
 }
 
 /*!
@@ -775,7 +775,7 @@ double QMapboxGL::minimumZoom() const
 */
 double QMapboxGL::maximumZoom() const
 {
-    return d_ptr->mapObj->getMaxZoom();
+    return *d_ptr->mapObj->getBounds().maxZoom;
 }
 
 /*!

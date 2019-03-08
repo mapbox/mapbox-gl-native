@@ -1661,7 +1661,7 @@ public:
             newScale += scale / (velocity * duration) * 0.1;
         }
 
-        if (newScale <= 0 || log2(newScale) < self.mbglMap.getMinZoom())
+        if (newScale <= 0 || log2(newScale) < *self.mbglMap.getBounds().minZoom)
         {
             velocity = 0;
         }
@@ -1927,7 +1927,7 @@ public:
 
     if ( ! self.isZoomEnabled) return;
 
-    if ([self zoomLevel] == self.mbglMap.getMinZoom()) return;
+    if ([self zoomLevel] == *self.mbglMap.getBounds().minZoom) return;
 
     [self cancelTransitions];
 
@@ -1979,7 +1979,7 @@ public:
     {
         CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart;
 
-        CGFloat newZoom = MAX(log2f(self.scale) + (distance / 75), self.mbglMap.getMinZoom());
+        CGFloat newZoom = MAX(log2f(self.scale) + (distance / 75), *self.mbglMap.getBounds().minZoom);
 
         if ([self zoomLevel] == newZoom) return;
 
@@ -3251,23 +3251,23 @@ public:
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
 {
     MGLLogDebug(@"Setting minimumZoomLevel: %f", minimumZoomLevel);
-    self.mbglMap.setMinZoom(minimumZoomLevel);
+    self.mbglMap.setBounds(mbgl::BoundOptions().withMinZoom(minimumZoomLevel));
 }
 
 - (double)minimumZoomLevel
 {
-    return self.mbglMap.getMinZoom();
+    return *self.mbglMap.getBounds().minZoom;
 }
 
 - (void)setMaximumZoomLevel:(double)maximumZoomLevel
 {
     MGLLogDebug(@"Setting maximumZoomLevel: %f", maximumZoomLevel);
-    self.mbglMap.setMaxZoom(maximumZoomLevel);
+    self.mbglMap.setBounds(mbgl::BoundOptions().withMaxZoom(maximumZoomLevel));
 }
 
 - (double)maximumZoomLevel
 {
-    return self.mbglMap.getMaxZoom();
+    return *self.mbglMap.getBounds().maxZoom;
 }
 
 - (MGLCoordinateBounds)visibleCoordinateBounds
@@ -5847,7 +5847,7 @@ public:
 
 - (CGFloat)currentMinimumZoom
 {
-    return fmaxf(self.mbglMap.getMinZoom(), MGLMinimumZoom);
+    return fmaxf(*self.mbglMap.getBounds().minZoom, MGLMinimumZoom);
 }
 
 - (BOOL)isRotationAllowed
