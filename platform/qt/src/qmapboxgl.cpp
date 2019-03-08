@@ -103,7 +103,7 @@ std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(const QMapboxGL
 
     // Purge entries no longer in use.
     for (auto it = fileSources.begin(); it != fileSources.end();) {
-        if (!it->second.lock()) {
+        if (it->second.expired()) {
             it = fileSources.erase(it);
         } else {
             ++it;
@@ -115,7 +115,10 @@ std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(const QMapboxGL
     // Return an existing FileSource if available.
     auto sharedFileSource = fileSources.find(key);
     if (sharedFileSource != fileSources.end()) {
-        return sharedFileSource->second.lock();
+        auto lockedSharedFileSource = sharedFileSource->second.lock();
+        if (lockedSharedFileSource) {
+            return lockedSharedFileSource;
+        }
     }
 
     // New path, create a new FileSource.
