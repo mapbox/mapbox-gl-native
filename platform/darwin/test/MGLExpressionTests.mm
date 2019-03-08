@@ -1002,6 +1002,23 @@ using namespace std::string_literals;
         XCTAssertThrowsSpecificNamed([expression expressionValueWithObject:nil context:nil], NSException, NSInvalidArgumentException);
     }
     {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('format', 'foo', %@, '\r', %@, 'biz', %@, 'bar', %@)", @{@"font-scale": @1.2}, @{}, @{@"font-scale": @1.0}, @{@"font-scale": @0.8}];
+        NSArray *jsonExpression = @[@"format", @"foo", @{@"font-scale": @1.2}, @"\r", @{}, @"biz", @{@"font-scale": @1.0}, @"bar", @{@"font-scale": @0.8}];
+
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        
+        NSExpression *encodedExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+
+        // Expressions encoded from a json create a different constant abstract type
+        // thus even tho knowing that the constant values are the same, the base
+        // class is not. This compares the resulting array which is type agnostic encoding.
+        for (NSUInteger index = 0; index < jsonExpression.count; index++) {
+            NSExpression *left = encodedExpression.mgl_jsonExpressionObject[index];
+            NSExpression *right = expression.mgl_jsonExpressionObject[index];
+            XCTAssertEqualObjects(left.mgl_jsonExpressionObject, right.mgl_jsonExpressionObject);
+        }
+    }
+    {
         NSArray *arguments = @[
             MGLConstantExpression(@"one"), MGLConstantExpression(@1),
             [NSExpression expressionForVariable:@"one"],
