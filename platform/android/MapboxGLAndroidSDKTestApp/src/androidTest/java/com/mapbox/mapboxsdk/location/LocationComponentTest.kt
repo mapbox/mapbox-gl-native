@@ -594,15 +594,20 @@ class LocationComponentTest : EspressoTest() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                              style: Style, uiController: UiController, context: Context) {
-        assertThat(component.isLocationComponentEnabled, `is`(false))
+
         component.onStop()
         component.onStart()
-        assertThat(component.isLocationComponentEnabled, `is`(false))
 
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
                 .build())
+
+        assertThat(component.isLocationComponentEnabled, `is`(false))
+        component.onStop()
+        component.onStart()
+        assertThat(component.isLocationComponentEnabled, `is`(false))
+
         component.isLocationComponentEnabled = true
         assertThat(component.isLocationComponentEnabled, `is`(true))
       }
