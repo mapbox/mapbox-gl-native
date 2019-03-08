@@ -875,10 +875,6 @@ jobs:
       - install-macos-dependencies
       - install-dependencies
       - build-ios-test
-      - run:
-          name: Get iOS code coverage
-          command: |
-              platform/ios/scripts/ios-code-coverage.sh CI
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
