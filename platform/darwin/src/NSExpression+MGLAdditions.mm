@@ -1126,7 +1126,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 if (firstOp.expressionType == NSConstantValueExpressionType
                     && [firstOp.constantValue isEqualToString:@"format"]) {
                     // Avoid wrapping format options object in literal expression.
-                    return @[@"format", self.arguments[1].mgl_jsonExpressionObject, self.arguments[2].constantValue];
+                    NSMutableArray *expressionObject = [NSMutableArray array];
+                    [expressionObject addObject:@"format"];
+                    
+                    for (NSUInteger index = 1; index < self.arguments.count; index++) {
+                        if (index % 2 == 1) {
+                            [expressionObject addObject:self.arguments[index].mgl_jsonExpressionObject];
+                        } else {
+                            [expressionObject addObject:self.arguments[index].constantValue];
+                        }
+                        
+                    }
+                    
+                    return expressionObject;
                 }
                 return self.arguments.mgl_jsonExpressionObject;
             } else if (op == [MGLColor class] && [function isEqualToString:@"colorWithRed:green:blue:alpha:"]) {
