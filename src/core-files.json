@@ -328,6 +328,7 @@
         "mbgl/layermanager/line_layer_factory.hpp": "include/mbgl/layermanager/line_layer_factory.hpp",
         "mbgl/layermanager/raster_layer_factory.hpp": "include/mbgl/layermanager/raster_layer_factory.hpp",
         "mbgl/layermanager/symbol_layer_factory.hpp": "include/mbgl/layermanager/symbol_layer_factory.hpp",
+        "mbgl/map/bound_options.hpp": "include/mbgl/map/bound_options.hpp",
         "mbgl/map/camera.hpp": "include/mbgl/map/camera.hpp",
         "mbgl/map/change.hpp": "include/mbgl/map/change.hpp",
         "mbgl/map/map.hpp": "include/mbgl/map/map.hpp",

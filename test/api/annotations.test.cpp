@@ -85,7 +85,7 @@ TEST(Annotations, LineAnnotation) {
     test.map.addAnnotation(annotation);
     test.checkRendering("line_annotation");
 
-    test.map.jumpTo(CameraOptions().withZoom(test.map.getMaxZoom()));
+    test.map.jumpTo(CameraOptions().withZoom(*test.map.getBounds().maxZoom));
     test.checkRendering("line_annotation_max_zoom");
 }
 
@@ -100,7 +100,7 @@ TEST(Annotations, FillAnnotation) {
     test.map.addAnnotation(annotation);
     test.checkRendering("fill_annotation");
 
-    test.map.jumpTo(CameraOptions().withZoom(test.map.getMaxZoom()));
+    test.map.jumpTo(CameraOptions().withZoom(*test.map.getBounds().maxZoom));
     test.checkRendering("fill_annotation_max_zoom");
 }
 
@@ -481,11 +481,11 @@ TEST(Annotations, ChangeMaxZoom) {
     annotation.color = Color::red();
     annotation.width = { 5 };
 
-    test.map.setMaxZoom(6);
+    test.map.setBounds(BoundOptions().withMaxZoom(6));
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
-    test.map.setMaxZoom(14);
-    test.map.jumpTo(CameraOptions().withZoom(test.map.getMaxZoom()));
+    test.map.setBounds(BoundOptions().withMaxZoom(14));
+    test.map.jumpTo(CameraOptions().withZoom(*test.map.getBounds().maxZoom));
     test.checkRendering("line_annotation_max_zoom");
 }
 

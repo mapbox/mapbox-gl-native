@@ -275,36 +275,41 @@ LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
 
 #pragma mark - Bounds
 
-LatLngBounds Map::getLatLngBounds() const {
-    return impl->transform.getState().getLatLngBounds();
-}
+void Map::setBounds(const BoundOptions& options) {
+    bool changeCamera = false;
+    CameraOptions cameraOptions;
 
-void Map::setLatLngBounds(LatLngBounds bounds) {
-    impl->cameraMutated = true;
-    impl->transform.setLatLngBounds(std::move(bounds));
-    impl->onUpdate();
-}
+    if (options.bounds) {
+        changeCamera = true;
+        impl->transform.setLatLngBounds(*options.bounds);
+    }
 
-void Map::setMinZoom(const double minZoom) {
-    impl->transform.setMinZoom(minZoom);
-    if (impl->transform.getZoom() < minZoom) {
-        jumpTo(CameraOptions().withZoom(minZoom));
+    if (options.minZoom) {
+        impl->transform.setMinZoom(*options.minZoom);
+        if (impl->transform.getZoom() < *options.minZoom) {
+            changeCamera = true;
+            cameraOptions.withZoom(*options.minZoom);
+        }
+    }
+
+    if (options.maxZoom) {
+        impl->transform.setMaxZoom(*options.maxZoom);
+        if (impl->transform.getZoom() > *options.maxZoom) {
+            changeCamera = true;
+            cameraOptions.withZoom(*options.maxZoom);
+        }
+    }
+
+    if (changeCamera) {
+        jumpTo(cameraOptions);
     }
 }
 
-double Map::getMinZoom() const {
-    return impl->transform.getState().getMinZoom();
-}
-
-void Map::setMaxZoom(const double maxZoom) {
-    impl->transform.setMaxZoom(maxZoom);
-    if (impl->transform.getZoom() > maxZoom) {
-        jumpTo(CameraOptions().withZoom(maxZoom));
-    }
-}
-
-double Map::getMaxZoom() const {
-    return impl->transform.getState().getMaxZoom();
+BoundOptions Map::getBounds() const {
+    return BoundOptions()
+        .withLatLngBounds(impl->transform.getState().getLatLngBounds())
+        .withMinZoom(impl->transform.getState().getMinZoom())
+        .withMaxZoom(impl->transform.getState().getMaxZoom());
 }
 
 #pragma mark - Size

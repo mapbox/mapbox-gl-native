@@ -296,7 +296,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             mbgl::LatLngBounds bound = bounds[nextBound++];
             nextBound = nextBound % bounds.size();
 
-            view->map->setLatLngBounds(bound);
+            view->map->setBounds(mbgl::BoundOptions().withLatLngBounds(bound));
 
             if (bound == mbgl::LatLngBounds::unbounded()) {
                 view->map->removeAnnotation(boundAnnotationID);

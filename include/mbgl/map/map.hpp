@@ -2,6 +2,7 @@
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/bound_options.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/map/mode.hpp>
@@ -76,13 +77,15 @@ public:
     CameraOptions cameraForGeometry(const Geometry<double>&, const EdgeInsets&, optional<double> bearing = {}, optional<double> pitch = {}) const;
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
 
-    // Bounds
-    void setLatLngBounds(LatLngBounds);
-    LatLngBounds getLatLngBounds() const;
-    void setMinZoom(double);
-    double getMinZoom() const;
-    void setMaxZoom(double);
-    double getMaxZoom() const;
+    /// @name Bounds
+    /// @{
+
+    void setBounds(const BoundOptions& options);
+
+    /// Returns the current map bound options. All optional fields in BoundOptions are set.
+    BoundOptions getBounds() const;
+
+    /// @}
 
     // North Orientation
     void setNorthOrientation(NorthOrientation);

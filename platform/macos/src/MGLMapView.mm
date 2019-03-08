@@ -328,7 +328,7 @@ public:
     mbgl::CameraOptions options;
     options.center = mbgl::LatLng(0, 0);
     options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
-    options.zoom = _mbglMap->getMinZoom();
+    options.zoom = *_mbglMap->getBounds().minZoom;
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
@@ -1094,21 +1094,21 @@ public:
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
 {
     MGLLogDebug(@"Setting minimumZoomLevel: %f", minimumZoomLevel);
-    _mbglMap->setMinZoom(minimumZoomLevel);
+    _mbglMap->setBounds(mbgl::BoundOptions().withMinZoom(minimumZoomLevel));
 }
 
 - (void)setMaximumZoomLevel:(double)maximumZoomLevel
 {
     MGLLogDebug(@"Setting maximumZoomLevel: %f", maximumZoomLevel);
-    _mbglMap->setMaxZoom(maximumZoomLevel);
+    _mbglMap->setBounds(mbgl::BoundOptions().withMaxZoom(maximumZoomLevel));
 }
 
 - (double)maximumZoomLevel {
-    return _mbglMap->getMaxZoom();
+    return *_mbglMap->getBounds().maxZoom;
 }
 
 - (double)minimumZoomLevel {
-    return _mbglMap->getMinZoom();
+    return *_mbglMap->getBounds().minZoom;
 }
 
 /// Respond to a click on the zoom control.
