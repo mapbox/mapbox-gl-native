@@ -30,9 +30,6 @@ if [ -z `which aws` ]; then
     brew install awscli	
 fi
 
-# If this is being executed by CI, upload the file to AWS.
-if [ ! -z $CIRCLE_SHA]; then
-    aws s3 cp $file_name.gz s3://mapbox-loading-dock/raw/mobile.codecoverage/$current_date/
-    echo $
-fi
+aws s3 cp $file_name.gz s3://mapbox-loading-dock/raw/mobile.codecoverage/$current_date/
+echo $
 
