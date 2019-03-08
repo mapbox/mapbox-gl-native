@@ -85,7 +85,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const EdgeInsets& padding = camera.padding;
     LatLng startLatLng = getLatLng(padding, LatLng::Unwrapped);
     const LatLng& unwrappedLatLng = camera.center.value_or(startLatLng);
-    const LatLng& latLng = state.bounds ? unwrappedLatLng : unwrappedLatLng.wrapped();
+    const LatLng& latLng = state.bounds != LatLngBounds::unbounded() ? unwrappedLatLng : unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
     double bearing = camera.bearing ? -*camera.bearing * util::DEG2RAD : getBearing();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
@@ -94,7 +94,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         return;
     }
 
-    if (!state.bounds) {
+    if (state.bounds == LatLngBounds::unbounded()) {
         if (isGestureInProgress()) {
             // If gesture in progress, we transfer the wrap rounds from the end longitude into
             // start, so the "scroll effect" of rounding the world is the same while assuring the
@@ -344,11 +344,11 @@ double Transform::getZoom() const {
 
 #pragma mark - Bounds
 
-void Transform::setLatLngBounds(optional<LatLngBounds> bounds) {
-    if (bounds && !bounds->valid()) {
+void Transform::setLatLngBounds(LatLngBounds bounds) {
+    if (!bounds.valid()) {
         throw std::runtime_error("failed to set bounds: bounds are invalid");
     }
-    state.setLatLngBounds(bounds);
+    state.setLatLngBounds(std::move(bounds));
 }
 
 void Transform::setMinZoom(const double minZoom) {

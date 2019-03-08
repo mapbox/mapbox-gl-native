@@ -52,7 +52,7 @@ public:
 
     // Bounds
 
-    void setLatLngBounds(optional<LatLngBounds>);
+    void setLatLngBounds(LatLngBounds);
     void setMinZoom(double);
     void setMaxZoom(double);
 

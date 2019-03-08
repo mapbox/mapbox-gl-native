@@ -77,8 +77,8 @@ public:
     LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
 
     // Bounds
-    void setLatLngBounds(optional<LatLngBounds>);
-    optional<LatLngBounds> getLatLngBounds() const;
+    void setLatLngBounds(LatLngBounds);
+    LatLngBounds getLatLngBounds() const;
     void setMinZoom(double);
     double getMinZoom() const;
     void setMaxZoom(double);

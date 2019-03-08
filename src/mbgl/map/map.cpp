@@ -275,13 +275,13 @@ LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
 
 #pragma mark - Bounds
 
-optional<LatLngBounds> Map::getLatLngBounds() const {
+LatLngBounds Map::getLatLngBounds() const {
     return impl->transform.getState().getLatLngBounds();
 }
 
-void Map::setLatLngBounds(optional<LatLngBounds> bounds) {
+void Map::setLatLngBounds(LatLngBounds bounds) {
     impl->cameraMutated = true;
-    impl->transform.setLatLngBounds(bounds);
+    impl->transform.setLatLngBounds(std::move(bounds));
     impl->onUpdate();
 }
 

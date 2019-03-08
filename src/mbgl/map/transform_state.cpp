@@ -9,7 +9,8 @@
 namespace mbgl {
 
 TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewportMode_)
-    : constrainMode(constrainMode_)
+    : bounds(LatLngBounds::unbounded())
+    , constrainMode(constrainMode_)
     , viewportMode(viewportMode_)
 {
 }
@@ -185,14 +186,14 @@ double TransformState::getZoomFraction() const {
 
 #pragma mark - Bounds
 
-void TransformState::setLatLngBounds(optional<LatLngBounds> bounds_) {
+void TransformState::setLatLngBounds(LatLngBounds bounds_) {
     if (bounds_ != bounds) {
         bounds = bounds_;
         setLatLngZoom(getLatLng(LatLng::Unwrapped), getZoom());
     }
 }
 
-optional<LatLngBounds> TransformState::getLatLngBounds() const {
+LatLngBounds TransformState::getLatLngBounds() const {
     return bounds;
 }
 
@@ -379,9 +380,7 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
 
 void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
     LatLng constrained = latLng;
-    if (bounds) {
-        constrained = bounds->constrain(latLng);
-    }
+    constrained = bounds.constrain(latLng);
 
     double newScale = util::clamp(zoomScale(zoom), min_scale, max_scale);
     const double newWorldSize = newScale * util::tileSize;
