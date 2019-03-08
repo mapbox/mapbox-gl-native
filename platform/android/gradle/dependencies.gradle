@@ -27,6 +27,7 @@ ext {
             bintray         : '1.8.4',
             artifactory     : '4.9.3',
             androidPublish  : '3.6.2',
+            jacoco          : '0.13.0',
             lint            : '26.1.4',
             gms             : '16.0.0',
             reLinker        : '1.3.1'
@@ -72,6 +73,7 @@ ext {
             bintrayPlugin          : "com.jfrog.bintray.gradle:gradle-bintray-plugin:${versions.bintray}",
             artifactoryPlugin      : "org.jfrog.buildinfo:build-info-extractor-gradle:${versions.artifactory}",
             androidPublishPlugin   : "digital.wup:android-maven-publish:${versions.androidPublish}",
+            jacocoPlugin           : "com.vanniktech:gradle-android-junit-jacoco-plugin:${versions.jacoco}",
 
             lint                   : "com.android.tools.lint:lint:${versions.lint}",
             lintApi                : "com.android.tools.lint:lint-api:${versions.lint}",

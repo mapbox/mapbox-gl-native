@@ -12,6 +12,7 @@ buildscript {
         classpath dependenciesList.bintrayPlugin
         classpath dependenciesList.artifactoryPlugin
         classpath dependenciesList.androidPublishPlugin
+        classpath dependenciesList.jacocoPlugin
     }
 }
 

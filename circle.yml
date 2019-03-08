@@ -643,6 +643,12 @@ jobs:
       - run:
           name: Build release Test App
           command: make android
+      - run:
+          name: Build unit test code coverage reports for MapboxGLAndroidSDK module
+          command: make android-unit-test-code-coverage
+      - run:
+          name: Convert code coverage report to raw text file
+          command: make android-code-coverage-report-to-text-file
       - save-dependencies: { gradle: true }
       - run:
           name: gzip debugable .so files
@@ -665,6 +671,10 @@ jobs:
       - run:
           name: Record size
           command: platform/android/scripts/metrics.sh
+      - run:
+          name: Report Android code coverage
+          command: |
+              platform/android/scripts/android-code-coverage.sh CI
       - deploy:
           name: Publish to Bintray
           command: |

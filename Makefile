@@ -731,6 +731,16 @@ android-check : android-checkstyle android-lint-sdk android-lint-test-app
 android-checkstyle: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:checkstyle :MapboxGLAndroidSDKTestApp:checkstyle
 
+# Runs unit test code coverage on the Android code
+.PHONY: android-unit-test-code-coverage
+android-unit-test-code-coverage: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all clean :MapboxGLAndroidSDK:jacocoTestReportDebug
+
+# Runs unit test code coverage on the Android code
+.PHONY: android-code-coverage-report-to-text-file
+android-code-coverage-report-to-text-file: platform/android/gradle/configuration.gradle
+	textutil -convert txt platform/android/MapboxGLAndroidSDK/build/reports/jacoco/debug/index.html
+
 # Runs lint on the Android SDK code
 .PHONY: android-lint-sdk
 android-lint-sdk: platform/android/gradle/configuration.gradle
