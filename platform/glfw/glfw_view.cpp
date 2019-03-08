@@ -288,7 +288,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -170.0 }, mbgl::LatLng { 45.0, 170.0 }),  // inside
                 mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -200.0 }, mbgl::LatLng { 45.0, -160.0 }), // left IDL
                 mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, 160.0 }, mbgl::LatLng { 45.0, 200.0 }),   // right IDL
-                mbgl::LatLngBounds::world()
+                mbgl::LatLngBounds::unbounded()
             };
             static size_t nextBound = 0u;
             static mbgl::AnnotationID boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
@@ -296,29 +296,27 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             mbgl::LatLngBounds bound = bounds[nextBound++];
             nextBound = nextBound % bounds.size();
 
-            if (bound == mbgl::LatLngBounds::world()) {
-                view->map->setLatLngBounds({});
+            view->map->setLatLngBounds(bound);
+
+            if (bound == mbgl::LatLngBounds::unbounded()) {
                 view->map->removeAnnotation(boundAnnotationID);
                 boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
-                break;
             } else {
-                view->map->setLatLngBounds(bound);
-            }
+                mbgl::Polygon<double> rect;
+                rect.push_back({
+                    mbgl::Point<double>{ bound.west(), bound.north() },
+                    mbgl::Point<double>{ bound.east(), bound.north() },
+                    mbgl::Point<double>{ bound.east(), bound.south() },
+                    mbgl::Point<double>{ bound.west(), bound.south() },
+                });
 
-            mbgl::Polygon<double> rect;
-            rect.push_back({
-                mbgl::Point<double>{ bound.west(), bound.north() },
-                mbgl::Point<double>{ bound.east(), bound.north() },
-                mbgl::Point<double>{ bound.east(), bound.south() },
-                mbgl::Point<double>{ bound.west(), bound.south() },
-            });
+                auto boundAnnotation = mbgl::FillAnnotation { rect, 0.5f, { view->makeRandomColor() }, { view->makeRandomColor() } };
 
-            auto boundAnnotation = mbgl::FillAnnotation { rect, 0.5f, { view->makeRandomColor() }, { view->makeRandomColor() } };
-
-            if (boundAnnotationID == std::numeric_limits<mbgl::AnnotationID>::max()) {
-                boundAnnotationID = view->map->addAnnotation(boundAnnotation);
-            } else {
-                view->map->updateAnnotation(boundAnnotationID, boundAnnotation);
+                if (boundAnnotationID == std::numeric_limits<mbgl::AnnotationID>::max()) {
+                    boundAnnotationID = view->map->addAnnotation(boundAnnotation);
+                } else {
+                    view->map->updateAnnotation(boundAnnotationID, boundAnnotation);
+                }
             }
         } break;
         }

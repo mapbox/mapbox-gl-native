@@ -92,6 +92,10 @@ bool LatLngBounds::intersects(const LatLngBounds area, LatLng::WrapMode wrap /*=
 }
 
 LatLng LatLngBounds::constrain(const LatLng& p) const {
+    if (!bounded) {
+        return p;
+    }
+
     double lat = p.latitude();
     double lng = p.longitude();
 

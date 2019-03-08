@@ -583,7 +583,7 @@ TEST(Transform, LatLngBounds) {
     transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(transform.getState().getMaxZoom()));
 
     // Default bounds.
-    ASSERT_EQ(transform.getState().getLatLngBounds(), optional<LatLngBounds> {});
+    ASSERT_EQ(transform.getState().getLatLngBounds(), LatLngBounds::unbounded());
     ASSERT_EQ(transform.getLatLng(), nullIsland);
 
     // Invalid bounds.
@@ -591,7 +591,7 @@ TEST(Transform, LatLngBounds) {
         transform.setLatLngBounds(LatLngBounds::empty());
         ASSERT_TRUE(false) << "Should throw";
     } catch (...) {
-        ASSERT_EQ(transform.getState().getLatLngBounds(), optional<LatLngBounds> {});
+        ASSERT_EQ(transform.getState().getLatLngBounds(), LatLngBounds::unbounded());
     }
 
     transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
