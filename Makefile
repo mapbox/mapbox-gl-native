@@ -707,6 +707,11 @@ android-ui-test: platform/android/gradle/configuration.gradle
 run-android-upload-to-bintray: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:bintrayUpload
 
+# Uploads the compiled Android SDK SNAPSHOT to oss.jfrog.org
+.PHONY: run-android-upload-to-artifactory
+run-android-upload-to-artifactory: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:artifactoryPublish
+
 # Dump system graphics information for the test app
 .PHONY: android-gfxinfo
 android-gfxinfo:

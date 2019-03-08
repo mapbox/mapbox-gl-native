@@ -672,6 +672,8 @@ jobs:
               version=$(cat platform/android/MapboxGLAndroidSDK/gradle.properties | grep "VERSION_NAME")
               if [[ $version != *"SNAPSHOT"* ]]; then
                 make run-android-upload-to-bintray
+              else
+                make run-android-upload-to-artifactory
               fi
             fi
 # ------------------------------------------------------------------------------

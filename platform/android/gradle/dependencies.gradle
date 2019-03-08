@@ -25,6 +25,7 @@ ext {
             kotlin          : '1.3.11',
             licenses        : '0.8.42',
             bintray         : '1.8.4',
+            artifactory     : '4.9.3',
             androidPublish  : '3.6.2',
             lint            : '26.1.4',
             gms             : '16.0.0',
@@ -69,6 +70,7 @@ ext {
             kotlinPlugin           : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
             licensesPlugin         : "com.jaredsburrows:gradle-license-plugin:${versions.licenses}",
             bintrayPlugin          : "com.jfrog.bintray.gradle:gradle-bintray-plugin:${versions.bintray}",
+            artifactoryPlugin      : "org.jfrog.buildinfo:build-info-extractor-gradle:${versions.artifactory}",
             androidPublishPlugin   : "digital.wup:android-maven-publish:${versions.androidPublish}",
 
             lint                   : "com.android.tools.lint:lint:${versions.lint}",
