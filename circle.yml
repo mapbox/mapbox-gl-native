@@ -878,7 +878,7 @@ jobs:
       - run:
           name: Get iOS code coverage
           command: |
-              platform/ios/scripts/code-coverage.sh CI
+              platform/ios/scripts/ios-code-coverage.sh CI
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
@@ -910,7 +910,7 @@ jobs:
       - run:
           name: Get iOS code coverage
           command: |
-              platform/ios/scripts/code-coverage.sh CI
+              platform/ios/scripts/ios-code-coverage.sh CI
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
