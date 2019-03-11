@@ -58,6 +58,10 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
     bool hasCollisionCircleData() const;
+    bool hasFormatSectionOverrides();
+    void updatePaintProperties(const std::string& layerID,
+                               style::SymbolPaintProperties::PossiblyEvaluated);
+    void setPaintPropertyOverrides(style::SymbolPaintProperties::PossiblyEvaluated&);
 
     void updateOpacity();
     void sortFeatures(const float angle);
@@ -87,7 +91,7 @@ public:
 
     std::unique_ptr<SymbolSizeBinder> textSizeBinder;
 
-    struct TextBuffer {
+    struct Buffer {
         gfx::VertexVector<SymbolLayoutVertex> vertices;
         gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>> dynamicVertices;
         gfx::VertexVector<gfx::Vertex<SymbolOpacityAttributes>> opacityVertices;
@@ -103,19 +107,8 @@ public:
 
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
 
-    struct IconBuffer {
-        gfx::VertexVector<SymbolLayoutVertex> vertices;
-        gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>> dynamicVertices;
-        gfx::VertexVector<gfx::Vertex<SymbolOpacityAttributes>> opacityVertices;
-        gfx::IndexVector<gfx::Triangles> triangles;
-        SegmentVector<SymbolIconAttributes> segments;
-        std::vector<PlacedSymbol> placedSymbols;
+    struct IconBuffer : public Buffer {
         PremultipliedImage atlasImage;
-
-        optional<gfx::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
-        optional<gfx::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>> dynamicVertexBuffer;
-        optional<gfx::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>> opacityVertexBuffer;
-        optional<gfx::IndexBuffer> indexBuffer;
     } icon;
 
     struct CollisionBuffer {
@@ -139,6 +132,7 @@ public:
 
     uint32_t bucketInstanceId = 0;
     bool justReloaded = false;
+    optional<bool> hasFormatSectionOverrides_;
 
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };

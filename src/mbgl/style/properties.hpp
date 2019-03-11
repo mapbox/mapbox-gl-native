@@ -99,6 +99,9 @@ public:
 template <class P>
 struct IsDataDriven : std::integral_constant<bool, P::IsDataDriven> {};
 
+template <class P>
+struct IsOverridable : std::integral_constant<bool, P::IsOverridable> {};
+
 template <class... Ps>
 class Properties {
 public:
@@ -122,6 +125,7 @@ public:
     using         EvaluatedTypes = TypeList<typename Ps::Type...>;
 
     using DataDrivenProperties = FilteredTypeList<PropertyTypes, IsDataDriven>;
+    using OverridableProperties = FilteredTypeList<PropertyTypes, IsOverridable>;
 
     template <class TypeList>
     using Tuple = IndexedTuple<PropertyTypes, TypeList>;

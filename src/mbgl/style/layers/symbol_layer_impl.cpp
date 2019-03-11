@@ -1,9 +1,15 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace style {
+
+bool SymbolLayer::Impl::hasFormatSectionOverrides() const {
+    if (!hasFormatSectionOverrides_) {
+        hasFormatSectionOverrides_ = SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
+    }
+    return *hasFormatSectionOverrides_;
+}
 
 bool SymbolLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
     assert(other.getTypeInfo() == getTypeInfo());
@@ -11,7 +17,8 @@ bool SymbolLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
     return filter     != impl.filter ||
            visibility != impl.visibility ||
            layout     != impl.layout ||
-           paint.hasDataDrivenPropertyDifference(impl.paint);
+           paint.hasDataDrivenPropertyDifference(impl.paint) ||
+           (hasFormatSectionOverrides() && SymbolLayerPaintPropertyOverrides::hasPaintPropertyDifference(paint, impl.paint));
 }
 
 void SymbolLayer::Impl::populateFontStack(std::set<FontStack>& fontStack) const {
@@ -20,10 +27,10 @@ void SymbolLayer::Impl::populateFontStack(std::set<FontStack>& fontStack) const 
     }
 
     layout.get<TextFont>().match(
-        [&] (Undefined) {
+        [&fontStack] (Undefined) {
             fontStack.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
         },
-        [&] (const FontStack& constant) {
+        [&fontStack] (const FontStack& constant) {
             fontStack.insert(constant);
         },
         [&] (const auto& function) {

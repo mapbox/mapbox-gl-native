@@ -28,13 +28,17 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
 
     for (const auto& pair : paintProperties_) {
+        auto layerPaintProperties = pair.second;
+        if (hasFormatSectionOverrides()) {
+            setPaintPropertyOverrides(layerPaintProperties);
+        }
         paintProperties.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(PaintProperties {
-                pair.second,
-                { RenderSymbolLayer::iconPaintProperties(pair.second), zoom },
-                { RenderSymbolLayer::textPaintProperties(pair.second), zoom }
+                layerPaintProperties,
+                { RenderSymbolLayer::iconPaintProperties(layerPaintProperties), zoom },
+                { RenderSymbolLayer::textPaintProperties(layerPaintProperties), zoom }
             }));
     }
 }
@@ -224,6 +228,25 @@ void SymbolBucket::sortFeatures(const float angle) {
             addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
         }
     }
+}
+
+void SymbolBucket::updatePaintProperties(const std::string& layerID,
+                                         style::SymbolPaintProperties::PossiblyEvaluated updated) {
+    if (hasFormatSectionOverrides()) {
+        SymbolLayerPaintPropertyOverrides::updateOverrides(paintProperties.at(layerID).evaluated, updated);
+    }
+    paintProperties.at(layerID).evaluated = updated;
+}
+
+void SymbolBucket::setPaintPropertyOverrides(style::SymbolPaintProperties::PossiblyEvaluated& paint) {
+    SymbolLayerPaintPropertyOverrides::setOverrides(layout, paint);
+}
+
+bool SymbolBucket::hasFormatSectionOverrides() {
+    if (!hasFormatSectionOverrides_) {
+        hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
+    }
+    return *hasFormatSectionOverrides_;
 }
 
 } // namespace mbgl

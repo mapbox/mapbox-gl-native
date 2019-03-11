@@ -189,13 +189,13 @@ std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inpu
 std::unique_ptr<Expression> format(const char* value) {
     return std::make_unique<Literal>(Formatted(value));
 }
-    
+
 std::unique_ptr<Expression> format(std::unique_ptr<Expression> input) {
     std::vector<FormatExpressionSection> sections;
-    sections.emplace_back(std::move(input), nullopt, nullopt);
+    sections.emplace_back(std::move(input), nullopt, nullopt, nullopt);
     return std::make_unique<FormatExpression>(sections);
 }
-    
+
 } // namespace dsl
 } // namespace expression
 } // namespace style

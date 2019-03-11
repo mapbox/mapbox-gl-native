@@ -411,7 +411,7 @@ void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
 
 void RenderSymbolLayer::updateBucketPaintProperties(Bucket* bucket) const {
     assert(bucket->supportsLayer(*baseImpl));
-    static_cast<SymbolBucket*>(bucket)->paintProperties.at(getID()).evaluated = evaluated;
+    static_cast<SymbolBucket*>(bucket)->updatePaintProperties(getID(), evaluated);
 }
 
 } // namespace mbgl
