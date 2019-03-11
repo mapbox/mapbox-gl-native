@@ -48,4 +48,4 @@ var Map = function(options) {
 Map.prototype = mbgl.Map.prototype;
 Map.prototype.constructor = Map;
 
-export default Object.assign(mbgl, { Map: Map });
+module.exports = Object.assign(mbgl, { Map: Map });
