@@ -525,7 +525,7 @@ public:
     [self addSubview:_logoView];
     _logoViewConstraints = [NSMutableArray array];
     _logoViewPosition = MGLOrnamentPositionBottomLeft;
-    _logoViewOffset = MGLOrnamentDefaultPositionOffset;
+    _logoViewMargins = MGLOrnamentDefaultPositionOffset;
 
     // setup attribution
     //
@@ -541,7 +541,7 @@ public:
     UILongPressGestureRecognizer *attributionLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(showAttribution:)];
     [_attributionButton addGestureRecognizer:attributionLongPress];
     _attributionButtonPosition = MGLOrnamentPositionBottomRight;
-    _attributionButtonOffset = MGLOrnamentDefaultPositionOffset;
+    _attributionButtonMargins = MGLOrnamentDefaultPositionOffset;
 
     // setup compass
     //
@@ -556,7 +556,7 @@ public:
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
     _compassViewPosition = MGLOrnamentPositionTopRight;
-    _compassViewOffset = MGLOrnamentDefaultPositionOffset;
+    _compassViewMargins = MGLOrnamentDefaultPositionOffset;
     
     // setup scale control
     //
@@ -565,7 +565,7 @@ public:
     [self addSubview:_scaleBar];
     _scaleBarConstraints = [NSMutableArray array];
     _scaleBarPosition = MGLOrnamentPositionTopLeft;
-    _scaleBarOffset = MGLOrnamentDefaultPositionOffset;
+    _scaleBarMargins = MGLOrnamentDefaultPositionOffset;
 
     [self installConstraints];
 
@@ -830,10 +830,9 @@ public:
     [self installScaleBarConstraints];
 }
 
-- (void)setScaleBarOffset:(CGPoint)scaleBarOffset {
-    NSAssert(CGRectContainsPoint(self.bounds, scaleBarOffset), @"The position offset of the scale bar should within the mapview boundaries");
-    MGLLogDebug(@"Setting scaleBarOffset: (x:%f, y:%f)", scaleBarOffset.x, scaleBarOffset.y);
-    _scaleBarOffset = scaleBarOffset;
+- (void)setScaleBarMargins:(CGPoint)scaleBarMargins {
+    MGLLogDebug(@"Setting scaleBarMargins: (x:%f, y:%f)", scaleBarMargins.x, scaleBarMargins.y);
+    _scaleBarMargins = scaleBarMargins;
     [self installScaleBarConstraints];
 }
 
@@ -843,10 +842,9 @@ public:
     [self installCompassViewConstraints];
 }
 
-- (void)setCompassViewOffset:(CGPoint)compassViewOffset {
-    NSAssert(CGRectContainsPoint(self.bounds, compassViewOffset), @"The position offset of the compass should within the mapview boundaries");
-    MGLLogDebug(@"Setting compassViewOffset: (x:%f, y:%f)", compassViewOffset.x, compassViewOffset.y);
-    _compassViewOffset = compassViewOffset;
+- (void)setCompassViewMargins:(CGPoint)compassViewMargins {
+    MGLLogDebug(@"Setting compassViewOffset: (x:%f, y:%f)", compassViewMargins.x, compassViewMargins.y);
+    _compassViewMargins = compassViewMargins;
     [self installCompassViewConstraints];
 }
 
@@ -856,10 +854,9 @@ public:
     [self installLogoViewConstraints];
 }
 
-- (void)setLogoViewOffset:(CGPoint)logoViewOffset {
-    NSAssert(CGRectContainsPoint(self.bounds, logoViewOffset), @"The position offset of the logo should within the mapview boundaries.");
-    MGLLogDebug(@"Setting logoViewOffset: (x:%f, y:%f)", logoViewOffset.x, logoViewOffset.y);
-    _logoViewOffset = logoViewOffset;
+- (void)setLogoViewMargins:(CGPoint)logoViewMargins {
+    MGLLogDebug(@"Setting logoViewMargins: (x:%f, y:%f)", logoViewMargins.x, logoViewMargins.y);
+    _logoViewMargins = logoViewMargins;
     [self installLogoViewConstraints];
 }
 
@@ -869,38 +866,35 @@ public:
     [self installAttributionButtonConstraints];
 }
 
-- (void)setAttributionButtonOffset:(CGPoint)attributionButtonOffset {
-    NSAssert(CGRectContainsPoint(self.bounds, attributionButtonOffset), @"The position offset of the attribution should within the mapview boundaries.");
-    MGLLogDebug(@"Setting attributionButtonOffset: (x:%f, y:%f)", attributionButtonOffset.x, attributionButtonOffset.y);
-    _attributionButtonOffset = attributionButtonOffset;
+- (void)setAttributionButtonMargins:(CGPoint)attributionButtonMargins {
+    MGLLogDebug(@"Setting attributionButtonMargins: (x:%f, y:%f)", attributionButtonMargins.x, attributionButtonMargins.y);
+    _attributionButtonMargins = attributionButtonMargins;
     [self installAttributionButtonConstraints];
 }
 
 - (void)updateConstraintsForOrnament:(UIView *)view
-                       constraints:(NSMutableArray *)constraints
-                          position:(MGLOrnamentPosition)position
-                              size:(CGSize)size
-                            offset:(CGPoint)offset {
+                         constraints:(NSMutableArray *)constraints
+                            position:(MGLOrnamentPosition)position
+                                size:(CGSize)size
+                             margins:(CGPoint)margins {
     NSMutableArray *updatedConstraints = [NSMutableArray array];
     
     switch (position) {
         case MGLOrnamentPositionTopLeft:
-            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:offset.y]];
-            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:offset.x]];
+            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y]];
+            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x]];
             break;
         case MGLOrnamentPositionTopRight:
-            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:offset.y]];
-            [updatedConstraints addObject:[self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:offset.x]];
+            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y]];
+            [updatedConstraints addObject:[self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x]];
             break;
         case MGLOrnamentPositionBottomLeft:
-            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:offset.y]];
-            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:offset.x]];
+            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y]];
+            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x]];
             break;
         case MGLOrnamentPositionBottomRight:
-            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:offset.y]];
-            [updatedConstraints addObject: [self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:offset.x]];
-            break;
-        default:
+            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y]];
+            [updatedConstraints addObject: [self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x]];
             break;
     }
 
@@ -924,37 +918,37 @@ public:
 - (void)installCompassViewConstraints {
     // compass view
     [self updateConstraintsForOrnament:self.compassView
-                         constraints:self.compassViewConstraints
-                            position:self.compassViewPosition
-                                size:self.compassView.bounds.size
-                              offset:self.compassViewOffset];
+                           constraints:self.compassViewConstraints
+                              position:self.compassViewPosition
+                                  size:self.compassView.bounds.size
+                               margins:self.compassViewMargins];
 }
 
 - (void)installScaleBarConstraints {
     // scale bar view
     [self updateConstraintsForOrnament:self.scaleBar
-                         constraints:self.scaleBarConstraints
-                            position:self.scaleBarPosition
-                                size:self.scaleBar.intrinsicContentSize
-                              offset:self.scaleBarOffset];
+                           constraints:self.scaleBarConstraints
+                              position:self.scaleBarPosition
+                                  size:self.scaleBar.intrinsicContentSize
+                               margins:self.scaleBarMargins];
 }
 
 - (void)installLogoViewConstraints {
     // logo view
     [self updateConstraintsForOrnament:self.logoView
-                         constraints:self.logoViewConstraints
-                            position:self.logoViewPosition
-                                size:self.logoView.bounds.size
-                              offset:self.logoViewOffset];
+                           constraints:self.logoViewConstraints
+                              position:self.logoViewPosition
+                                  size:self.logoView.bounds.size
+                               margins:self.logoViewMargins];
 }
 
 - (void)installAttributionButtonConstraints {
     // attribution button
     [self updateConstraintsForOrnament:self.attributionButton
-                         constraints:self.attributionButtonConstraints
-                            position:self.attributionButtonPosition
-                                size:self.attributionButton.bounds.size
-                              offset:self.attributionButtonOffset];
+                           constraints:self.attributionButtonConstraints
+                              position:self.attributionButtonPosition
+                                  size:self.attributionButton.bounds.size
+                               margins:self.attributionButtonMargins];
 }
 
 - (BOOL)isOpaque

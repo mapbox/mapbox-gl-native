@@ -312,7 +312,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A `CGPoint` indicating the position offset of the scale bar.
  */
-@property (nonatomic, assign) CGPoint scaleBarOffset;
+@property (nonatomic, assign) CGPoint scaleBarMargins;
 
 /**
  A control indicating the map’s direction and allowing the user to manipulate
@@ -328,7 +328,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A `CGPoint` indicating the position offset of the compass.
  */
-@property (nonatomic, assign) CGPoint compassViewOffset;
+@property (nonatomic, assign) CGPoint compassViewMargins;
 
 /**
  The Mapbox logo, positioned in the lower-left corner.
@@ -349,7 +349,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A `CGPoint` indicating the position offset of the logo.
  */
-@property (nonatomic, assign) CGPoint logoViewOffset;
+@property (nonatomic, assign) CGPoint logoViewMargins;
 
 
 /**
@@ -385,7 +385,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A `CGPoint` indicating the position offset of the attribution.
  */
-@property (nonatomic, assign) CGPoint attributionButtonOffset;
+@property (nonatomic, assign) CGPoint attributionButtonMargins;
 
 /**
  Show the attribution and telemetry action sheet.

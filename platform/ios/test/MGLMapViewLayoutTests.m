@@ -129,21 +129,21 @@
 }
 
 - (void)testOrnamentPlacementInvalidArgument {
-    XCTAssertThrows([self.mapView setCompassViewOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setCompassViewOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setCompassViewOffset:CGPointMake(0, -4)]);
+    XCTAssertThrows([self.mapView setCompassViewMargins:CGPointMake(-4, -4)]);
+    XCTAssertThrows([self.mapView setCompassViewMargins:CGPointMake(-4, 0)]);
+    XCTAssertThrows([self.mapView setCompassViewMargins:CGPointMake(0, -4)]);
 
-    XCTAssertThrows([self.mapView setScaleBarOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setScaleBarOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setScaleBarOffset:CGPointMake(0, -4)]);
+    XCTAssertThrows([self.mapView setScaleBarMargins:CGPointMake(-4, -4)]);
+    XCTAssertThrows([self.mapView setScaleBarMargins:CGPointMake(-4, 0)]);
+    XCTAssertThrows([self.mapView setScaleBarMargins:CGPointMake(0, -4)]);
 
-    XCTAssertThrows([self.mapView setAttributionButtonOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setAttributionButtonOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setAttributionButtonOffset:CGPointMake(0, -4)]);
+    XCTAssertThrows([self.mapView setAttributionButtonMargins:CGPointMake(-4, -4)]);
+    XCTAssertThrows([self.mapView setAttributionButtonMargins:CGPointMake(-4, 0)]);
+    XCTAssertThrows([self.mapView setAttributionButtonMargins:CGPointMake(0, -4)]);
 
-    XCTAssertThrows([self.mapView setLogoViewOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setLogoViewOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setLogoViewOffset:CGPointMake(0, -4)]);
+    XCTAssertThrows([self.mapView setLogoViewMargins:CGPointMake(-4, -4)]);
+    XCTAssertThrows([self.mapView setLogoViewMargins:CGPointMake(-4, 0)]);
+    XCTAssertThrows([self.mapView setLogoViewMargins:CGPointMake(0, -4)]);
 }
 
 - (NSArray *)makeTestDataListWithView:(UIView *)view margin:(CGFloat)margin {
@@ -154,18 +154,18 @@
 
     return @[
              [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionTopLeft
-                                             offset:CGPointMake(margin, margin)
-                                     expectedOrigin:CGPointMake(margin, margin)],
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(margin, margin)],
              [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionTopRight
-                                             offset:CGPointMake(margin, margin)
-                                     expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame), 4)],
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame), 4)],
              [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionBottomLeft
-                                             offset:CGPointMake(margin, margin)
-                                     expectedOrigin:CGPointMake(margin,  CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))],
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(margin,  CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))],
              [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionBottomRight
-                                             offset:CGPointMake(margin, margin)
-                                     expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame),
-                                                                CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))]
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame),
+                                                                 CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))]
              ];
 }
 
@@ -178,7 +178,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.compassViewPosition = testData.position;
-        self.mapView.compassViewOffset = testData.offset;
+        self.mapView.compassViewMargins = testData.offset;
 
         //invoke layout
         [self.superView setNeedsLayout];
@@ -198,7 +198,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.scaleBarPosition = testData.position;
-        self.mapView.scaleBarOffset = testData.offset;
+        self.mapView.scaleBarMargins = testData.offset;
 
         //invoke layout
         [self.superView setNeedsLayout];
@@ -218,7 +218,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.attributionButtonPosition = testData.position;
-        self.mapView.attributionButtonOffset = testData.offset;
+        self.mapView.attributionButtonMargins = testData.offset;
 
         //invoke layout
         [self.superView setNeedsLayout];
@@ -238,7 +238,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.logoViewPosition = testData.position;
-        self.mapView.logoViewOffset = testData.offset;
+        self.mapView.logoViewMargins = testData.offset;
 
         //invoke layout
         [self.superView setNeedsLayout];
