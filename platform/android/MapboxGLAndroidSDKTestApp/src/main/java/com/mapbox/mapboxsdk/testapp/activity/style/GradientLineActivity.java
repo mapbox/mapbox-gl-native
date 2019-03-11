@@ -53,7 +53,6 @@ public class GradientLineActivity extends AppCompatActivity implements OnMapRead
     try {
       String geoJson = ResourceUtils.readRawResource(GradientLineActivity.this, R.raw.test_line_gradient_feature);
       mapboxMap.setStyle(new Style.Builder()
-        .fromJson(geoJson)
         .withSource(new GeoJsonSource(LINE_SOURCE, geoJson, new GeoJsonOptions().withLineMetrics(true)))
         .withLayer(new LineLayer("gradient", LINE_SOURCE)
           .withProperties(
