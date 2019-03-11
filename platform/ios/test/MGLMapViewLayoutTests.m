@@ -4,6 +4,27 @@
 #import "MGLAccountManager.h"
 
 
+@interface MGLOrnamentTestData : NSObject
+
+@property (nonatomic) MGLOrnamentPosition position;
+@property (nonatomic) CGPoint offset;
+@property (nonatomic) CGPoint expectedOrigin;
+
+@end
+
+@implementation MGLOrnamentTestData
+
++ (instancetype)createWithPosition:(MGLOrnamentPosition)position offset:(CGPoint)offset expectedOrigin:(CGPoint)expectedOrigin {
+    MGLOrnamentTestData *data = [[MGLOrnamentTestData alloc] init];
+    data.position = position;
+    data.offset = offset;
+    data.expectedOrigin = expectedOrigin;
+    return data;
+}
+
+@end
+
+
 @interface MGLMapViewLayoutTests : XCTestCase<MGLMapViewDelegate>
 
 @property (nonatomic) UIView *superView;
@@ -105,6 +126,109 @@
 
     XCTAssertEqualWithAccuracy(CGRectGetMinX(logoView.frame), expectedLogoOriginX, accuracy);
     XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.frame), expectedLogoOriginY, accuracy);
+}
+
+- (NSArray *)makeTestDataListWithView:(UIView *)view margin:(CGFloat)margin {
+    CGFloat bottomSafeAreaInset = 0.0;
+    if (@available(iOS 11.0, *)) {
+        bottomSafeAreaInset = self.mapView.safeAreaInsets.bottom;
+    }
+
+    return @[
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionTopLeft
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(margin, margin)],
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionTopRight
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame), 4)],
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionBottomLeft
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(margin,  CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))],
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionBottomRight
+                                              offset:CGPointMake(margin, margin)
+                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame),
+                                                                 CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))]
+             ];
+}
+
+- (void)testCompassPlacement {
+    double accuracy = 0.01;
+    CGFloat margin = 4.0;
+
+    UIView *compassView = self.mapView.compassView;
+    NSArray *testDataList = [self makeTestDataListWithView:compassView margin:margin];
+
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.compassViewPosition = testData.position;
+        self.mapView.compassViewMargins = testData.offset;
+
+        //invoke layout
+        [self.superView setNeedsLayout];
+        [self.superView layoutIfNeeded];
+
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(compassView.frame), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(compassView.frame), testData.expectedOrigin.y, accuracy);
+    }
+}
+
+- (void)testScalebarPlacement {
+    double accuracy = 0.01;
+    CGFloat margin = 4.0;
+
+    UIView *scaleBar = self.mapView.scaleBar;
+    NSArray *testDataList = [self makeTestDataListWithView:scaleBar margin:margin];
+
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.scaleBarPosition = testData.position;
+        self.mapView.scaleBarMargins = testData.offset;
+
+        //invoke layout
+        [self.superView setNeedsLayout];
+        [self.superView layoutIfNeeded];
+
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(scaleBar.frame), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(scaleBar.frame), testData.expectedOrigin.y, accuracy);
+    }
+}
+
+- (void)testAttributionButtonPlacement {
+    double accuracy = 0.01;
+    CGFloat margin = 4.0;
+
+    UIView *attributionButton = self.mapView.attributionButton;
+    NSArray *testDataList = [self makeTestDataListWithView:attributionButton margin:margin];
+
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.attributionButtonPosition = testData.position;
+        self.mapView.attributionButtonMargins = testData.offset;
+
+        //invoke layout
+        [self.superView setNeedsLayout];
+        [self.superView layoutIfNeeded];
+
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(attributionButton.frame), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(attributionButton.frame), testData.expectedOrigin.y, accuracy);
+    }
+}
+
+- (void)testLogoPlacement {
+    double accuracy = 0.01;
+    CGFloat margin = 4.0;
+
+    UIView *logoView = self.mapView.logoView;
+    NSArray *testDataList = [self makeTestDataListWithView:logoView margin:margin];
+
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.logoViewPosition = testData.position;
+        self.mapView.logoViewMargins = testData.offset;
+
+        //invoke layout
+        [self.superView setNeedsLayout];
+        [self.superView layoutIfNeeded];
+
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(logoView.frame), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.frame), testData.expectedOrigin.y, accuracy);
+    }
 }
 
 @end

@@ -49,6 +49,24 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
 };
 
 /**
+ The position of scale bar, compass, logo and attribution in a map view. Used with
+ `MGLMapView.scaleBarPosition`,
+ `MGLMapView.compassViewPosition`,
+ `MGLMapView.logoViewPosition`,
+ `MGLMapView.attributionButtonPosition`.
+ */
+typedef NS_ENUM(NSUInteger, MGLOrnamentPosition) {
+    /** Place the ornament in the top left of the map view. */
+    MGLOrnamentPositionTopLeft = 0,
+    /** Place the ornament in the top right of the map view. */
+    MGLOrnamentPositionTopRight,
+    /** Place the ornament in the bottom left of the map view. */
+    MGLOrnamentPositionBottomLeft,
+    /** Place the ornament in the bottom right of the map view. */
+    MGLOrnamentPositionBottomRight,
+};
+
+/**
  The mode used to track the user location on the map. Used with
  `MGLMapView.userTrackingMode`.
 
@@ -287,10 +305,30 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIView *scaleBar;
 
 /**
+ The position of the scale bar. The default value is `MGLOrnamentPositionTopLeft`.
+ */
+@property (nonatomic, assign) MGLOrnamentPosition scaleBarPosition;
+
+/**
+ A `CGPoint` indicating the position offset of the scale bar.
+ */
+@property (nonatomic, assign) CGPoint scaleBarMargins;
+
+/**
  A control indicating the map’s direction and allowing the user to manipulate
  the direction, positioned in the upper-right corner.
  */
 @property (nonatomic, readonly) UIImageView *compassView;
+
+/**
+ The position of the compass view. The default value is `MGLOrnamentPositionTopRight`.
+ */
+@property (nonatomic, assign) MGLOrnamentPosition compassViewPosition;
+
+/**
+ A `CGPoint` indicating the position offset of the compass.
+ */
+@property (nonatomic, assign) CGPoint compassViewMargins;
 
 /**
  The Mapbox logo, positioned in the lower-left corner.
@@ -302,6 +340,17 @@ MGL_EXPORT IB_DESIGNABLE
     hide this view or change its contents.
  */
 @property (nonatomic, readonly) UIImageView *logoView;
+
+/**
+ The position of the logo view. The default value is `MGLOrnamentPositionBottomLeft`.
+ */
+@property (nonatomic, assign) MGLOrnamentPosition logoViewPosition;
+
+/**
+ A `CGPoint` indicating the position offset of the logo.
+ */
+@property (nonatomic, assign) CGPoint logoViewMargins;
+
 
 /**
  A view showing legally required copyright notices and telemetry settings,
@@ -327,6 +376,16 @@ MGL_EXPORT IB_DESIGNABLE
     implementation help.
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
+
+/**
+ The position of the attribution button. The default value is `MGLOrnamentPositionBottomRight`.
+ */
+@property (nonatomic, assign) MGLOrnamentPosition attributionButtonPosition;
+
+/**
+ A `CGPoint` indicating the position offset of the attribution.
+ */
+@property (nonatomic, assign) CGPoint attributionButtonMargins;
 
 /**
  Show the attribution and telemetry action sheet.

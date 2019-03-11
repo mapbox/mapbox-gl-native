@@ -8,6 +8,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added an MGLMapView.prefetchesTiles property that you can disable if you don’t want to prefetch simplified tiles as a performance optimization. ([#14031](https://github.com/mapbox/mapbox-gl-native/pull/14031))
 * Fixed an issue that caused `MGL_FUNCTION` to ignore multiple formatting parameters when passed a `format` function as parameter. ([#14064](https://github.com/mapbox/mapbox-gl-native/pull/14064))
 
+### User interaction
+
+* Added `MGLOrnamentPosition` enum and margins methods to customize MGLMapView's scale bar, compass, logo and attribution position. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
+
 ## 4.9.0 - February 27, 2019
 
 * Fixed a bug where setting `MGLMapView.userTrackingMode` to `MGLUserTrackingModeFollowWithHeading` or `MGLUserTrackingModeFollowWithCourse` would be ignored if the user’s location was not already available. ([#13849](https://github.com/mapbox/mapbox-gl-native/pull/13849))
