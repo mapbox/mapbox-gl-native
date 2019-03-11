@@ -3649,8 +3649,13 @@ public:
     [self cancelTransitions];
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
-
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:edgePadding];
+    
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(edgePadding);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera
+                                                                          edgePadding:NSEdgeInsetsFromMGLEdgeInsets(padding)];
+    
     self.mbglMap.easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }

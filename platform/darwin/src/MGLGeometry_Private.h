@@ -100,6 +100,9 @@ NS_INLINE BOOL MGLLocationCoordinate2DIsValid(CLLocationCoordinate2D coordinate)
 NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(UIEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };
 }
+NS_INLINE UIEdgeInsets NSEdgeInsetsFromMGLEdgeInsets(mbgl::EdgeInsets insets) {
+    return UIEdgeInsetsMake(insets.top(), insets.left(), insets.bottom(), insets.right());
+}
 #else
 NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };
