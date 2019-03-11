@@ -1,8 +1,6 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
-#include <mbgl/style/expression/literal.hpp>
-#include <mbgl/util/font_stack.hpp>
-#include <mbgl/util/string.hpp>
+#include <mbgl/style/expression/formatted.hpp>
 
 namespace mbgl {
 namespace style {
@@ -10,14 +8,20 @@ namespace expression {
 
 FormatExpressionSection::FormatExpressionSection(std::unique_ptr<Expression> text_,
                                                  optional<std::unique_ptr<Expression>> fontScale_,
-                                                 optional<std::unique_ptr<Expression>> textFont_)
+                                                 optional<std::unique_ptr<Expression>> textFont_,
+                                                 optional<std::unique_ptr<Expression>> textColor_)
     : text(std::move(text_))
 {
     if (fontScale_) {
         fontScale = std::shared_ptr<Expression>(std::move(*fontScale_));
     }
+
     if (textFont_) {
         textFont = std::shared_ptr<Expression>(std::move(*textFont_));
+    }
+
+    if (textColor_) {
+        textColor = std::shared_ptr<Expression>(std::move(*textColor_));
     }
 }
 
@@ -53,7 +57,7 @@ ParseResult FormatExpression::parse(const Convertible& value, ParsingContext& ct
             return ParseResult();
         }
         
-        const optional<Convertible> fontScaleOption = objectMember(options, "font-scale");
+        const optional<Convertible> fontScaleOption = objectMember(options, kFormattedSectionFontScale);
         ParseResult fontScale;
         if (fontScaleOption) {
             fontScale = ctx.parse(*fontScaleOption, 1, {type::Number});
@@ -62,7 +66,7 @@ ParseResult FormatExpression::parse(const Convertible& value, ParsingContext& ct
             }
         }
         
-        const optional<Convertible> textFontOption = objectMember(options, "text-font");
+        const optional<Convertible> textFontOption = objectMember(options, kFormattedSectionTextFont);
         ParseResult textFont;
         if (textFontOption) {
             textFont = ctx.parse(*textFontOption, 1, {type::Array(type::String)});
@@ -70,7 +74,20 @@ ParseResult FormatExpression::parse(const Convertible& value, ParsingContext& ct
                 return ParseResult();
             }
         }
-        sections.emplace_back(std::move(*text), std::move(fontScale), std::move(textFont));
+
+        const optional<Convertible> textColorOption = objectMember(options, kFormattedSectionTextColor);
+        ParseResult textColor;
+        if (textColorOption) {
+            textColor = ctx.parse(*textColorOption, 1, {type::Color});
+            if (!textColor) {
+                return ParseResult();
+            }
+        }
+
+        sections.emplace_back(std::move(*text),
+                              std::move(fontScale),
+                              std::move(textFont),
+                              std::move(textColor));
     }
     
     return ParseResult(std::make_unique<FormatExpression>(std::move(sections)));
@@ -84,6 +101,9 @@ void FormatExpression::eachChild(const std::function<void(const Expression&)>& f
         }
         if (section.textFont) {
             fn(**section.textFont);
+        }
+        if (section.textColor) {
+            fn(**section.textColor);
         }
     }
 }
@@ -108,6 +128,10 @@ bool FormatExpression::operator==(const Expression& e) const {
                 (!lhsSection.textFont && rhsSection.textFont)) {
                 return false;
             }
+            if ((lhsSection.textColor && (!rhsSection.textColor || **lhsSection.textColor != **rhsSection.textColor)) ||
+                (!lhsSection.textColor && rhsSection.textColor)) {
+                return false;
+            }
         }
         return true;
     }
@@ -115,15 +139,18 @@ bool FormatExpression::operator==(const Expression& e) const {
 }
 
 mbgl::Value FormatExpression::serialize() const {
-    std::vector<mbgl::Value> serialized{{ std::string("format") }};
+    std::vector<mbgl::Value> serialized{{ getOperator() }};
     for (const auto& section : sections) {
         serialized.push_back(section.text->serialize());
         std::unordered_map<std::string, mbgl::Value> options;
         if (section.fontScale) {
-            options.emplace("font-scale", (*section.fontScale)->serialize());
+            options.emplace(kFormattedSectionFontScale, (*section.fontScale)->serialize());
         }
         if (section.textFont) {
-            options.emplace("text-font", (*section.textFont)->serialize());
+            options.emplace(kFormattedSectionTextFont, (*section.textFont)->serialize());
+        }
+        if (section.textColor) {
+            options.emplace(kFormattedSectionTextColor, (*section.textColor)->serialize());
         }
         serialized.push_back(options);
     }
@@ -164,7 +191,20 @@ EvaluationResult FormatExpression::evaluate(const EvaluationContext& params) con
             }
             evaluatedTextFont = *textFontValue;
         }
-        evaluatedSections.emplace_back(*evaluatedText, evaluatedFontScale, evaluatedTextFont);
+
+        optional<Color> evaluatedTextColor;
+        if (section.textColor) {
+            auto textColorResult = (*section.textColor)->evaluate(params);
+            if (!textColorResult) {
+                return textColorResult.error();
+            }
+
+            evaluatedTextColor = fromExpressionValue<Color>(*textColorResult);
+            if (!evaluatedTextColor) {
+                return EvaluationError { "Format text-color option must evaluate to Color" };
+            }
+        }
+        evaluatedSections.emplace_back(*evaluatedText, evaluatedFontScale, evaluatedTextFont, evaluatedTextColor);
     }
     return Formatted(evaluatedSections);
 }

@@ -5,9 +5,11 @@
 #include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/format_section_override.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace mbgl::style::expression;
 using namespace mbgl::style::expression::dsl;
 
 using namespace std::string_literals;
@@ -24,8 +26,21 @@ static StubGeometryTileFeature oneString {
     PropertyMap {{ "property", "1"s }}
 };
 
+static StubGeometryTileFeature oneColor {
+    PropertyMap {{ "color", "red"s }}
+};
+
 float evaluate(PropertyValue<float> value, float zoom) {
     return value.evaluate(PropertyEvaluator<float>(PropertyEvaluationParameters(zoom), 0));
+}
+
+template<typename T>
+auto createOverride(expression::type::Type exprType,
+                    PossiblyEvaluatedPropertyValue<T> propValue,
+                    std::string propName) {
+    return std::make_unique<FormatSectionOverride<T>>(std::move(exprType),
+                                                      std::move(propValue),
+                                                      std::move(propName));
 }
 
 TEST(PropertyExpression, Constant) {
@@ -120,4 +135,39 @@ TEST(PropertyExpression, Issue8460) {
     EXPECT_NEAR(385.71f, fn2.evaluate(16.0f, oneInteger, -1.0f), 0.01);
     EXPECT_NEAR(600.0f, fn2.evaluate(18.0f, oneInteger, -1.0f), 0.00);
     EXPECT_NEAR(600.0f, fn2.evaluate(19.0f, oneInteger, -1.0f), 0.00);
+}
+
+TEST(PropertyExpression, FormatSectionOverride) {
+    using Value = expression::Value;
+    Value formattedSection =
+            std::unordered_map<std::string, Value>{ {"text-color", Value{Color::blue()}} };
+    auto ctx = expression::EvaluationContext(&oneDouble).withFormattedSection(&formattedSection);
+    PossiblyEvaluatedPropertyValue<Color> constantValueRed(Color::red());
+    PossiblyEvaluatedPropertyValue<Color> constantValueGreen(Color::green());
+    PossiblyEvaluatedPropertyValue<Color> ddsValueRed(toColor(string(get("color"))));
+
+    // Evaluation test
+    {
+        auto override1 = createOverride(expression::type::Color, constantValueGreen, "text-color");
+        PropertyExpression<Color> propExpr(std::move(override1));
+        EXPECT_EQ(Color::green(), propExpr.evaluate(15.0f, oneDouble, Color()));
+        EXPECT_EQ(Color::green(), propExpr.evaluate(oneDouble, Color()));
+        EXPECT_EQ(Color::blue(), propExpr.evaluate(ctx));
+
+        auto override2 = createOverride(expression::type::Color, ddsValueRed, "text-color");
+        PropertyExpression<Color> propExprDDS(std::move(override2));
+        EXPECT_EQ(Color::red(), propExprDDS.evaluate(oneColor, Color()));
+        EXPECT_EQ(Color::blue(), propExprDDS.evaluate(ctx));
+    }
+
+    // Equality test
+    {
+        auto override1 = createOverride(expression::type::Color, constantValueRed, "text-color");
+        auto override2 = createOverride(expression::type::Color, constantValueGreen, "text-color");
+        auto override3 = createOverride(expression::type::Color, constantValueGreen, "text-halo-color");
+        auto override4 = createOverride(expression::type::Color, ddsValueRed, "text-color");
+        EXPECT_TRUE(*override1 != *override2);
+        EXPECT_TRUE(*override2 != *override3);
+        EXPECT_TRUE(*override1 != *override4);
+    }
 }

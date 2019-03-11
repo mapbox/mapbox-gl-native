@@ -21,9 +21,10 @@ public:
     using PossiblyEvaluatedType = T;
     using Type = T;
     static constexpr bool IsDataDriven = false;
+    static constexpr bool IsOverridable = false;
 };
 
-template <class T, class A, class U>
+template <class T, class A, class U, bool isOverridable = false>
 class DataDrivenPaintProperty {
 public:
     using TransitionableType = Transitionable<PropertyValue<T>>;
@@ -32,6 +33,7 @@ public:
     using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;
     using Type = T;
     static constexpr bool IsDataDriven = true;
+    static constexpr bool IsOverridable = isOverridable;
 
     using Attribute = A;
     using AttributeList = TypeList<A>;
@@ -48,6 +50,7 @@ public:
     using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<Faded<T>>;
     using Type = T;
     static constexpr bool IsDataDriven = true;
+    static constexpr bool IsOverridable = false;
 
     using Attribute = A1;
     using AttributeList = TypeList<A1, A2>;
@@ -64,6 +67,7 @@ public:
     using PossiblyEvaluatedType = Faded<T>;
     using Type = T;
     static constexpr bool IsDataDriven = false;
+    static constexpr bool IsOverridable = false;
 };
 
 /*
@@ -84,6 +88,7 @@ public:
     using PossiblyEvaluatedType = Color;
     using Type = Color;
     static constexpr bool IsDataDriven = false;
+    static constexpr bool IsOverridable = false;
 
     static Color defaultValue() { return {}; }
 };

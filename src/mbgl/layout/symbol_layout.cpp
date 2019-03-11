@@ -1,25 +1,16 @@
-#include <mbgl/layout/layout.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/clip_lines.hpp>
-#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/text/shaping.hpp>
-#include <mbgl/util/constants.hpp>
 #include <mbgl/util/utf.hpp>
-#include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/i18n.hpp>
-#include <mbgl/math/clamp.hpp>
-#include <mbgl/math/minmax.hpp>
-#include <mbgl/math/log2.hpp>
 #include <mbgl/util/platform.hpp>
-#include <mbgl/util/logging.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <mapbox/polylabel.hpp>
@@ -31,10 +22,26 @@ using namespace style;
 template <class Property>
 static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) {
     return layout.get<Property>().match(
-        [&] (const typename Property::Type& t) { return !t.empty(); },
-        [&] (const auto&) { return true; }
+        [] (const typename Property::Type& t) { return !t.empty(); },
+        [] (const auto&) { return true; }
     );
 }
+
+namespace {
+expression::Value sectionOptionsToValue(const SectionOptions& options) {
+    std::unordered_map<std::string, expression::Value> result;
+    // TODO: Data driven properties that can be overridden on per section basis.
+    // TextOpacity
+    // TextHaloColor
+    // TextHaloWidth
+    // TextHaloBlur
+    if (options.textColor) {
+        result.emplace(expression::kFormattedSectionTextColor, *options.textColor);
+    }
+    return result;
+}
+} // namespace
+
 
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<const RenderLayer*>& layers,
@@ -108,7 +115,6 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             auto formatted = layout.evaluate<TextField>(zoom, ft);
             auto textTransform = layout.evaluate<TextTransform>(zoom, ft);
             FontStack baseFontStack = layout.evaluate<TextFont>(zoom, ft);
-            FontStackHash baseFontStackHash = FontStackHasher()(baseFontStack);
 
             ft.formattedText = TaggedString();
             for (std::size_t j = 0; j < formatted.sections.size(); j++) {
@@ -122,8 +128,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
                 ft.formattedText->addSection(applyArabicShaping(util::convertUTF8ToUTF16(u8string)),
                                              section.fontScale ? *section.fontScale : 1.0,
-                                             section.fontStack ? FontStackHasher()(*section.fontStack) : baseFontStackHash);
-
+                                             section.fontStack ? *section.fontStack : baseFontStack,
+                                             section.textColor);
             }
 
 
@@ -273,6 +279,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                                                   : layout.get<SymbolPlacement>();
 
     const float textRepeatDistance = symbolSpacing / 2;
+    const auto evaluatedLayoutProperties = layout.evaluate(zoom, feature);
     IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketLeaderID, symbolInstances.size());
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
@@ -285,7 +292,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             //  (1) render symbols that overlap into this tile
             //  (2) approximate collision detection effects from neighboring symbols
             symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
-                    layout.evaluate(zoom, feature), layoutTextSize,
+                    evaluatedLayoutProperties, layoutTextSize,
                     textBoxScale, textPadding, textPlacement, textOffset,
                     iconBoxScale, iconPadding, iconOffset,
                     glyphPositions, indexedFeature, layoutFeatureIndex, feature.index,
@@ -418,43 +425,14 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
-        if (hasText) {
-            const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
-            bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                    symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
-            symbolInstance.placedTextIndex = bucket->text.placedSymbols.size() - 1;
-            PlacedSymbol& horizontalSymbol = bucket->text.placedSymbols.back();
-
-            bool firstHorizontal = true;
-            for (const auto& symbol : symbolInstance.horizontalGlyphQuads) {
-                size_t index = addSymbol(
-                    bucket->text, sizeData, symbol,
-                    symbolInstance.anchor, horizontalSymbol);
-                if (firstHorizontal) {
-                    horizontalSymbol.vertexStartIndex = index;
-                    firstHorizontal = false;
-                }
-            }
+        if (hasText && feature.formattedText) {
+            std::size_t index = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedTextIndex, symbolInstance.horizontalGlyphQuads);
 
             if (symbolInstance.writingModes & WritingModeType::Vertical) {
-                bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                        symbolInstance.textOffset, WritingModeType::Vertical, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
-                symbolInstance.placedVerticalTextIndex = bucket->text.placedSymbols.size() - 1;
-
-                PlacedSymbol& verticalSymbol = bucket->text.placedSymbols.back();
-                bool firstVertical = true;
-
-                for (const auto& symbol : symbolInstance.verticalGlyphQuads) {
-                    size_t index = addSymbol(
-                        bucket->text, sizeData, symbol,
-                        symbolInstance.anchor, verticalSymbol);
-
-                    if (firstVertical) {
-                        verticalSymbol.vertexStartIndex = index;
-                        firstVertical = false;
-                    }
-                }
+                index = addSymbolGlyphQuads(*bucket, symbolInstance, feature, WritingModeType::Vertical, symbolInstance.placedVerticalTextIndex, symbolInstance.verticalGlyphQuads, index);
             }
+
+            updatePaintPropertiesForSection(*bucket, feature, index);
         }
 
         if (hasIcon) {
@@ -466,12 +444,11 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
                 PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
                 iconSymbol.vertexStartIndex = addSymbol(bucket->icon, sizeData, *symbolInstance.iconQuad,
                                                         symbolInstance.anchor, iconSymbol);
-            }
-        }
 
-        for (auto& pair : bucket->paintProperties) {
-            pair.second.iconBinders.populateVertexVectors(feature, bucket->icon.vertices.elements(), {}, {});
-            pair.second.textBinders.populateVertexVectors(feature, bucket->text.vertices.elements(), {}, {});
+                for (auto& pair : bucket->paintProperties) {
+                    pair.second.iconBinders.populateVertexVectors(feature, bucket->icon.vertices.elements(), {}, {});
+                }
+            }
         }
     }
 
@@ -489,12 +466,53 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
 
 }
 
-template <typename Buffer>
-size_t SymbolLayout::addSymbol(Buffer& buffer,
-                             const Range<float> sizeData,
-                             const SymbolQuad& symbol,
-                             const Anchor& labelAnchor,
-                             PlacedSymbol& placedSymbol) {
+void SymbolLayout::updatePaintPropertiesForSection(SymbolBucket& bucket,
+                                                   const SymbolFeature& feature,
+                                                   std::size_t sectionIndex) {
+    const auto& formattedSection = sectionOptionsToValue((*feature.formattedText).sectionAt(sectionIndex));
+    for (auto& pair : bucket.paintProperties) {
+        pair.second.textBinders.populateVertexVectors(feature, bucket.text.vertices.elements(), {}, {}, formattedSection);
+    }
+}
+
+std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
+                                              SymbolInstance& symbolInstance,
+                                              const SymbolFeature& feature,
+                                              WritingModeType writingMode,
+                                              optional<size_t>& placedIndex,
+                                              const SymbolQuads& glyphQuads,
+                                              optional<std::size_t> lastAddedSection) {
+    const Range<float> sizeData = bucket.textSizeBinder->getVertexSizeData(feature);
+    const bool hasFormatSectionOverrides = bucket.hasFormatSectionOverrides();
+
+    bucket.text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+            symbolInstance.textOffset, writingMode, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
+    placedIndex = bucket.text.placedSymbols.size() - 1;
+    PlacedSymbol& placedSymbol = bucket.text.placedSymbols.back();
+
+    bool firstSymbol = true;
+    for (const auto& symbolQuad : glyphQuads) {
+        if (hasFormatSectionOverrides) {
+            if (lastAddedSection && *lastAddedSection != symbolQuad.sectionIndex) {
+                updatePaintPropertiesForSection(bucket, feature, *lastAddedSection);
+            }
+            lastAddedSection = symbolQuad.sectionIndex;
+        }
+        size_t index = addSymbol(bucket.text, sizeData, symbolQuad, symbolInstance.anchor, placedSymbol);
+        if (firstSymbol) {
+            placedSymbol.vertexStartIndex = index;
+            firstSymbol = false;
+        }
+    }
+
+    return lastAddedSection ? *lastAddedSection : 0u;
+}
+
+size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
+                               const Range<float> sizeData,
+                               const SymbolQuad& symbol,
+                               const Anchor& labelAnchor,
+                               PlacedSymbol& placedSymbol) {
     constexpr const uint16_t vertexLength = 4;
 
     const auto &tl = symbol.tl;

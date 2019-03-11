@@ -16,6 +16,7 @@ public:
     using PossiblyEvaluatedType = T;
     using Type = T;
     static constexpr bool IsDataDriven = false;
+    static constexpr bool IsOverridable = false;
 };
 
 template <class T>
@@ -27,6 +28,7 @@ public:
     using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;
     using Type = T;
     static constexpr bool IsDataDriven = true;
+    static constexpr bool IsOverridable = false;
 };
 
 } // namespace style
