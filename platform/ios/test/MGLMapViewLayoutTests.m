@@ -128,24 +128,6 @@
     XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.frame), expectedLogoOriginY, accuracy);
 }
 
-- (void)testOrnamentPlacementInvalidArgument {
-    XCTAssertThrows([self.mapView setCompassViewMargins:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setCompassViewMargins:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setCompassViewMargins:CGPointMake(0, -4)]);
-
-    XCTAssertThrows([self.mapView setScaleBarMargins:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setScaleBarMargins:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setScaleBarMargins:CGPointMake(0, -4)]);
-
-    XCTAssertThrows([self.mapView setAttributionButtonMargins:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setAttributionButtonMargins:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setAttributionButtonMargins:CGPointMake(0, -4)]);
-
-    XCTAssertThrows([self.mapView setLogoViewMargins:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setLogoViewMargins:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setLogoViewMargins:CGPointMake(0, -4)]);
-}
-
 - (NSArray *)makeTestDataListWithView:(UIView *)view margin:(CGFloat)margin {
     CGFloat bottomSafeAreaInset = 0.0;
     if (@available(iOS 11.0, *)) {
