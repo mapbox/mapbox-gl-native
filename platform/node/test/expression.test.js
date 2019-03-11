@@ -1,6 +1,6 @@
-import {run} from '../../../mapbox-gl-js/test/integration/lib/expression';
-import mbgl from '../index';
-import ignores from './ignores.json';
+const {run} = require('../../../mapbox-gl-js/test/integration/lib/expression');
+const mbgl = require('../index');
+const ignores = require('./ignores.json');
 
 let tests;
 
