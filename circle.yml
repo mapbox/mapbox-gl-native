@@ -10,12 +10,15 @@ workflows:
             branches:
               ignore: master
       - android-debug-arm-v7-buck
-      - android-arm-v7-template:
-          name: android-debug-arm-v7
-      - android-arm-v7-template:
+      - android-arm-template:
+          name: android-debug-arm-v8
+      - android-arm-template:
           name: android-gnustl-arm-v7
           stl: gnustl_shared
+          firebase_device_id: "m0"
+          firebase_device_os: "18"
           image: android-ndk-r17c:1d5db0eb34
+          abi: arm-v7
       - android-release:
           filters:
             tags:
@@ -313,19 +316,6 @@ commands:
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             rm secret.json
           fi
-  run-android-instrumentation-tests:
-    steps:
-    - run:
-        name: Run instrumentation tests on Firebase
-        no_output_timeout: 20m
-        command: |
-          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-            gcloud firebase test android models list
-            gcloud firebase test android run --type instrumentation \
-              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
-              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-              --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m
-          fi
 
 
   install-ios-packaging-dependencies:
@@ -515,7 +505,7 @@ jobs:
       - save-dependencies: { ccache: false }
 
 # ------------------------------------------------------------------------------
-  android-arm-v7-template:
+  android-arm-template:
     parameters:
       stl:
         type: string
@@ -523,6 +513,15 @@ jobs:
       image:
         type: string
         default: android-ndk-r19:8e91a7ebab
+      firebase_device_id:
+        type: string
+        default: sailfish
+      firebase_device_os:
+        type: string
+        default: "26"
+      abi:
+        type: string
+        default: "arm-v8"
     docker:
       - image: mbgl/<< parameters.image >>
     resource_class: xlarge
@@ -548,11 +547,8 @@ jobs:
           name: Run Android unit tests
           command: make run-android-unit-test
       - run:
-          name: Build libmapbox-gl.so for arm-v7
-          command: make android-lib-arm-v7
-      - run:
-          name: Compile Core tests for arm-v7
-          command: make android-test-lib-arm-v7
+          name: Build libmapbox-gl.so for << parameters.abi >>
+          command: make android-lib-<< parameters.abi >>
       - run:
           name: Generate Espresso sanity tests
           command: make test-code-android
@@ -561,18 +557,22 @@ jobs:
           command: |
             if [ -n "${MAPBOX_DEVELOPER_CONFIG_XML}" ]; then
               echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
-              make android-ui-test-arm-v7
+              make android-ui-test-<< parameters.abi >>
             fi
       - save-dependencies: { gradle: true }
       - conditionally-skip-firebase
       - login-google-cloud-platform
-      - run-android-instrumentation-tests
       - run:
-          name: gzip debugable .so files
+          name: Run instrumentation tests on Firebase
+          no_output_timeout: 20m
           command: |
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so.gz
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              gcloud firebase test android models list
+              gcloud firebase test android run --type instrumentation \
+                --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
+                --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
+                --device-ids  << parameters.firebase_device_id >> --os-version-ids << parameters.firebase_device_os >> --locales en --orientations portrait --timeout 20m
+            fi
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
