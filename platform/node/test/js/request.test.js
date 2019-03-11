@@ -1,8 +1,8 @@
 'use strict';
 
-import mockfs from '../mockfs';
-import mbgl from '../../index';
-import test from 'tape';
+var mockfs = require('../mockfs');
+var mbgl = require('../../index');
+var test = require('tape');
 
 [ 'sprite_png', 'sprite_json', 'source_vector', 'glyph' ].forEach(function (resource) {
     test(`render reports an error when the request function responds with an error (${resource})`, function(t) {
