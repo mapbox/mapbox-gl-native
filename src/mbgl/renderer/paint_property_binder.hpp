@@ -122,7 +122,7 @@ public:
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
 
     std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
-        return std::tuple<optional<gl::AttributeBinding>> {};
+        return {};
     }
 
     std::tuple<float> interpolationFactor(float) const override {
@@ -157,7 +157,7 @@ public:
 
     std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>>
     attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>&) const override {
-        return std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>> {};
+        return {};
     }
 
     std::tuple<float, float> interpolationFactor(float) const override {
@@ -204,7 +204,7 @@ public:
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gl::AttributeBinding>>{
+            return std::tuple<optional<gfx::AttributeBinding>>{
                 gl::attributeBinding<0>(*vertexBuffer)
             };
         }
@@ -268,7 +268,7 @@ public:
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gl::AttributeBinding>>{
+            return std::tuple<optional<gfx::AttributeBinding>>{
                 gl::attributeBinding<0>(*vertexBuffer)
             };
         }
@@ -362,7 +362,7 @@ public:
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>>{
+            return std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>{
                 gl::attributeBinding<0>(*patternToVertexBuffer),
                 gl::attributeBinding<0>(crossfade.fromScale == 2 ? *zoomInVertexBuffer : *zoomOutVertexBuffer)
             };
