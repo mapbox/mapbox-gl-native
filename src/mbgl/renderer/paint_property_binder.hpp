@@ -2,8 +2,8 @@
 
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/gfx/uniform.hpp>
+#include <mbgl/gfx/attribute.hpp>
 #include <mbgl/programs/attributes.hpp>
-#include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
@@ -205,7 +205,7 @@ public:
             return {};
         } else {
             return std::tuple<optional<gfx::AttributeBinding>>{
-                gl::attributeBinding<0>(*vertexBuffer)
+                gfx::attributeBinding(*vertexBuffer)
             };
         }
     }
@@ -269,7 +269,7 @@ public:
             return {};
         } else {
             return std::tuple<optional<gfx::AttributeBinding>>{
-                gl::attributeBinding<0>(*vertexBuffer)
+                gfx::attributeBinding(*vertexBuffer)
             };
         }
     }
@@ -363,8 +363,8 @@ public:
             return {};
         } else {
             return std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>{
-                gl::attributeBinding<0>(*patternToVertexBuffer),
-                gl::attributeBinding<0>(crossfade.fromScale == 2 ? *zoomInVertexBuffer : *zoomOutVertexBuffer)
+                gfx::attributeBinding(*patternToVertexBuffer),
+                gfx::attributeBinding(crossfade.fromScale == 2 ? *zoomInVertexBuffer : *zoomOutVertexBuffer)
             };
         }
     }

@@ -20,23 +20,6 @@ namespace gl {
 
 using AttributeBindingArray = std::vector<optional<gfx::AttributeBinding>>;
 
-
-    /*
-        Create a binding for this attribute.  The `attributeSize` parameter may be used to
-        override the number of components available in the buffer for each vertex.  Thus,
-        a buffer with only one float for each vertex can be bound to a `vec2` attribute
-    */
-template <std::size_t I, typename Vertex>
-gfx::AttributeBinding attributeBinding(const gfx::VertexBuffer<Vertex>& buffer) {
-    static_assert(I < gfx::VertexDescriptorOf<Vertex>::data.count, "vertex attribute index out of range");
-    return {
-        gfx::VertexDescriptorOf<Vertex>::data.attributes[I],
-        gfx::VertexDescriptorOf<Vertex>::data.stride,
-        buffer.resource.get(),
-        0,
-    };
-}
-
 optional<gfx::AttributeBinding> offsetAttributeBinding(const optional<gfx::AttributeBinding>& binding, std::size_t vertexOffset);
 
 class Context;
@@ -92,7 +75,7 @@ public:
     }
 
     static Bindings bindings(const gfx::VertexBuffer<gfx::Vertex<Types>>& buffer) {
-        return Bindings { attributeBinding<TypeIndex<As, As...>::value>(buffer)... };
+        return Bindings { gfx::attributeBinding<TypeIndex<As, As...>::value>(buffer)... };
     }
 
     static Bindings offsetBindings(const Bindings& bindings, std::size_t vertexOffset) {
