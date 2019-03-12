@@ -100,7 +100,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap.get(evaluated);
        
             const auto allUniformValues = programInstance.computeAllUniformValues(
-                HeatmapProgram::UniformValues {
+                HeatmapProgram::LayoutUniformValues {
                     uniforms::u_intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
                     uniforms::u_matrix::Value( tile.matrix ),
                     uniforms::heatmap::u_extrude_scale::Value( extrudeScale )
@@ -145,8 +145,9 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmapTexture;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
-            HeatmapTextureProgram::UniformValues{
-                uniforms::u_matrix::Value( viewportMat ), uniforms::u_world::Value( size ),
+            HeatmapTextureProgram::LayoutUniformValues{
+                uniforms::u_matrix::Value( viewportMat ),
+                uniforms::u_world::Value( size ),
                 uniforms::u_opacity::Value( evaluated.get<HeatmapOpacity>() )
             },
             paintAttributeData,

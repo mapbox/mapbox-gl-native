@@ -10,16 +10,15 @@ using namespace style;
 
 static_assert(sizeof(BackgroundLayoutVertex) == 4, "expected BackgroundLayoutVertex size");
 
-BackgroundPatternProgram::UniformValues
-BackgroundPatternProgram::uniformValues(mat4 matrix,
-                                  float opacity,
-                                  Size atlasSize,
-                                  const ImagePosition& a,
-                                  const ImagePosition& b,
-                                  const CrossfadeParameters& fading,
-                                  const UnwrappedTileID& tileID,
-                                  const TransformState& state)
-{
+BackgroundPatternProgram::LayoutUniformValues
+BackgroundPatternProgram::layoutUniformValues(mat4 matrix,
+                                              float opacity,
+                                              Size atlasSize,
+                                              const ImagePosition& a,
+                                              const ImagePosition& b,
+                                              const CrossfadeParameters& fading,
+                                              const UnwrappedTileID& tileID,
+                                              const TransformState& state) {
     int32_t tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
     int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;

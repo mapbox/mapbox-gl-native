@@ -67,7 +67,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
         auto& programInstance = parameters.programs.getCircleLayerPrograms().circle.get(evaluated);
    
         const auto allUniformValues = programInstance.computeAllUniformValues(
-            CircleProgram::UniformValues {
+            CircleProgram::LayoutUniformValues {
                 uniforms::u_matrix::Value(
                     tile.translatedMatrix(evaluated.get<CircleTranslate>(),
                                           evaluated.get<CircleTranslateAnchor>(),

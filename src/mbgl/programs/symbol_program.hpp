@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/context.hpp>
 #include <mbgl/gl/program.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/interpolate.hpp>
@@ -243,7 +242,7 @@ public:
 template <class Shaders,
           class Primitive,
           class LayoutAttributeList,
-          class UniformList,
+          class LayoutUniformList,
           class TextureList,
           class PaintProps>
 class SymbolProgram : public SymbolProgramBase {
@@ -254,18 +253,20 @@ public:
 
     using PaintProperties = PaintProps;
     using Binders = PaintPropertyBinders<typename PaintProperties::DataDrivenProperties>;
+
     using PaintAttributeList = typename Binders::AttributeList;
     using AttributeList = TypeListConcat<LayoutAndSizeAttributeList, PaintAttributeList>;
     using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
 
-    using UniformValues = gfx::UniformValues<UniformList>;
+    using LayoutUniformValues = gfx::UniformValues<LayoutUniformList>;
     using SizeUniformList = typename SymbolSizeBinder::UniformList;
     using PaintUniformList = typename Binders::UniformList;
-    using AllUniforms = gl::Uniforms<TypeListConcat<UniformList, SizeUniformList, PaintUniformList>>;
+    using UniformList = TypeListConcat<LayoutUniformList, SizeUniformList, PaintUniformList>;
+    using UniformValues = gfx::UniformValues<UniformList>;
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, AttributeList, AllUniforms, TextureList>;
+    using ProgramType = gl::Program<Primitive, AttributeList, UniformList, TextureList>;
 
     ProgramType program;
 
@@ -278,13 +279,13 @@ public:
             Shaders::fragmentSource)) {
     }
 
-    static typename AllUniforms::Values computeAllUniformValues(
-        const UniformValues& uniformValues,
+    static UniformValues computeAllUniformValues(
+        const LayoutUniformValues& layoutUniformValues,
         const SymbolSizeBinder& symbolSizeBinder,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties,
         float currentZoom) {
-        return uniformValues.concat(symbolSizeBinder.uniformValues(currentZoom))
+        return layoutUniformValues.concat(symbolSizeBinder.uniformValues(currentZoom))
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
@@ -315,7 +316,7 @@ public:
               gfx::CullFaceMode cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
               const SegmentVector<AttributeList>& segments,
-              const typename AllUniforms::Values& allUniformValues,
+              const UniformValues& uniformValues,
               const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
@@ -333,7 +334,7 @@ public:
                 std::move(stencilMode),
                 std::move(colorMode),
                 std::move(cullFaceMode),
-                allUniformValues,
+                uniformValues,
                 drawScopeIt->second,
                 gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                 textureBindings,
@@ -368,14 +369,14 @@ class SymbolIconProgram : public SymbolProgram<
 public:
     using SymbolProgram::SymbolProgram;
 
-    static UniformValues uniformValues(const bool isText,
-                                       const style::SymbolPropertyValues&,
-                                       const Size& texsize,
-                                       const std::array<float, 2>& pixelsToGLUnits,
-                                       const bool alongLine,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const float symbolFadeChange);
+    static LayoutUniformValues layoutUniformValues(const bool isText,
+                                                   const style::SymbolPropertyValues&,
+                                                   const Size& texsize,
+                                                   const std::array<float, 2>& pixelsToGLUnits,
+                                                   const bool alongLine,
+                                                   const RenderTile&,
+                                                   const TransformState&,
+                                                   const float symbolFadeChange);
 };
 
 enum class SymbolSDFPart {
@@ -430,21 +431,21 @@ public:
             textures::u_texture>,
         PaintProperties>;
 
-    using UniformValues = typename BaseProgram::UniformValues;
+    using LayoutUniformValues = typename BaseProgram::LayoutUniformValues;
 
 
 
     using BaseProgram::BaseProgram;
 
-    static UniformValues uniformValues(const bool isText,
-                                       const style::SymbolPropertyValues&,
-                                       const Size& texsize,
-                                       const std::array<float, 2>& pixelsToGLUnits,
-                                       const bool alongLine,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const float SymbolFadeChange,
-                                       const SymbolSDFPart);
+    static LayoutUniformValues layoutUniformValues(const bool isText,
+                                                   const style::SymbolPropertyValues&,
+                                                   const Size& texsize,
+                                                   const std::array<float, 2>& pixelsToGLUnits,
+                                                   const bool alongLine,
+                                                   const RenderTile&,
+                                                   const TransformState&,
+                                                   const float SymbolFadeChange,
+                                                   const SymbolSDFPart);
 };
 
 using SymbolSDFIconProgram = SymbolSDFProgram<style::IconPaintProperties>;

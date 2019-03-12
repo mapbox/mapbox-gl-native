@@ -68,14 +68,14 @@ class BackgroundPatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(mat4 matrix,
-                                       float opacity,
-                                       Size atlasSize,
-                                       const ImagePosition&,
-                                       const ImagePosition&,
-                                       const CrossfadeParameters&,
-                                       const UnwrappedTileID&,
-                                       const TransformState&);
+    static LayoutUniformValues layoutUniformValues(mat4 matrix,
+                                                   float opacity,
+                                                   Size atlasSize,
+                                                   const ImagePosition&,
+                                                   const ImagePosition&,
+                                                   const CrossfadeParameters&,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&);
 };
 
 using BackgroundLayoutVertex = BackgroundProgram::LayoutVertex;

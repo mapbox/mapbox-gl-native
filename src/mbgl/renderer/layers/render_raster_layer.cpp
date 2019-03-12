@@ -82,7 +82,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
         auto& programInstance = parameters.programs.getRasterLayerPrograms().raster;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
-            RasterProgram::UniformValues {
+            RasterProgram::LayoutUniformValues {
                 uniforms::u_matrix::Value( matrix ),
                 uniforms::u_opacity::Value( evaluated.get<RasterOpacity>() ),
                 uniforms::u_fade_t::Value( 1 ),

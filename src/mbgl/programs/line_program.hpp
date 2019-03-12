@@ -93,10 +93,11 @@ public:
      */
     static const int8_t extrudeScale = 63;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits);
 };
 
 class LinePatternProgram : public Program<
@@ -117,13 +118,14 @@ class LinePatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits,
-                                       Size atlasSize,
-                                       const CrossfadeParameters& crossfade,
-                                       const float pixelRatio);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits,
+                        Size atlasSize,
+                        const CrossfadeParameters& crossfade,
+                        const float pixelRatio);
 };
 
 class LineSDFProgram : public Program<
@@ -147,15 +149,16 @@ class LineSDFProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       float pixelRatio,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits,
-                                       const LinePatternPos& posA,
-                                       const LinePatternPos& posB,
-                                       const CrossfadeParameters& crossfade,
-                                       float atlasWidth);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        float pixelRatio,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits,
+                        const LinePatternPos& posA,
+                        const LinePatternPos& posB,
+                        const CrossfadeParameters& crossfade,
+                        float atlasWidth);
 };
 
 class LineGradientProgram : public Program<
@@ -173,10 +176,11 @@ class LineGradientProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits);
 };
 
 using LineLayoutVertex = LineProgram::LayoutVertex;

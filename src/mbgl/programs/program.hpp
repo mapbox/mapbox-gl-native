@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mbgl/gfx/attribute.hpp>
+#include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gl/program.hpp>
-#include <mbgl/gl/features.hpp>
 #include <mbgl/programs/segment.hpp>
-#include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/style/paint_property.hpp>
@@ -18,7 +18,7 @@ namespace mbgl {
 template <class Shaders,
           class Primitive,
           class LayoutAttributeList,
-          class UniformList,
+          class LayoutUniformList,
           class TextureList,
           class PaintProps>
 class Program {
@@ -27,17 +27,19 @@ public:
 
     using PaintProperties = PaintProps;
     using Binders = PaintPropertyBinders<typename PaintProperties::DataDrivenProperties>;
+
     using PaintAttributeList = typename Binders::AttributeList;
     using AttributeList = TypeListConcat<LayoutAttributeList, PaintAttributeList>;
     using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
 
-    using UniformValues = gfx::UniformValues<UniformList>;
     using PaintUniformList = typename Binders::UniformList;
-    using AllUniforms = gl::Uniforms<TypeListConcat<UniformList, PaintUniformList>>;
+    using UniformList = TypeListConcat<LayoutUniformList, PaintUniformList>;
+    using LayoutUniformValues = gfx::UniformValues<LayoutUniformList>;
+    using UniformValues = gfx::UniformValues<UniformList>;
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, AttributeList, AllUniforms, TextureList>;
+    using ProgramType = gl::Program<Primitive, AttributeList, UniformList, TextureList>;
 
     ProgramType program;
 
@@ -50,12 +52,12 @@ public:
             Shaders::fragmentSource)) {
     }
 
-    static typename AllUniforms::Values computeAllUniformValues(
-        const UniformValues& uniformValues,
+    static UniformValues computeAllUniformValues(
+        const LayoutUniformValues& layoutUniformValues,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties,
         float currentZoom) {
-        return uniformValues
+        return layoutUniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
@@ -80,7 +82,7 @@ public:
               gfx::CullFaceMode cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
               const SegmentVector<AttributeList>& segments,
-              const typename AllUniforms::Values& allUniformValues,
+              const UniformValues& uniformValues,
               const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
@@ -98,7 +100,7 @@ public:
                 std::move(stencilMode),
                 std::move(colorMode),
                 std::move(cullFaceMode),
-                allUniformValues,
+                uniformValues,
                 drawScopeIt->second,
                 gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                 textureBindings,

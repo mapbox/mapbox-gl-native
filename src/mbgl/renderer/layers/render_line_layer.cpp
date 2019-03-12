@@ -110,7 +110,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
 
             draw(parameters.programs.getLineLayerPrograms().lineSDF,
-                 LineSDFProgram::uniformValues(
+                 LineSDFProgram::layoutUniformValues(
                      evaluated,
                      parameters.pixelRatio,
                      tile,
@@ -135,7 +135,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             optional<ImagePosition> posB = geometryTile.getPattern(linePatternValue.to);
 
             draw(parameters.programs.getLineLayerPrograms().linePattern,
-                 LinePatternProgram::uniformValues(
+                 LinePatternProgram::layoutUniformValues(
                      evaluated,
                      tile,
                      parameters.state,
@@ -154,7 +154,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             }
 
             draw(parameters.programs.getLineLayerPrograms().lineGradient,
-                 LineGradientProgram::uniformValues(
+                 LineGradientProgram::layoutUniformValues(
                     evaluated,
                     tile,
                     parameters.state,
@@ -166,7 +166,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     });
         } else {
             draw(parameters.programs.getLineLayerPrograms().line,
-                 LineProgram::uniformValues(
+                 LineProgram::layoutUniformValues(
                      evaluated,
                      tile,
                      parameters.state,

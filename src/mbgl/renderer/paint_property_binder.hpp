@@ -4,7 +4,6 @@
 #include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/programs/attributes.hpp>
-#include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
@@ -517,7 +516,6 @@ public:
 
     using UniformList = TypeListConcat<InterpolationUniformList<Ps>..., typename Ps::UniformList...>;
     using UniformValues = gfx::UniformValues<UniformList>;
-    using Uniforms = gl::Uniforms<UniformList>;
 
     template <class EvaluatedProperties>
     UniformValues uniformValues(float currentZoom, EvaluatedProperties& currentProperties) const {

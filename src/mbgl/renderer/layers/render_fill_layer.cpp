@@ -80,7 +80,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
-                    FillProgram::UniformValues {
+                    FillProgram::LayoutUniformValues {
                         uniforms::u_matrix::Value(
                             tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                                   evaluated.get<FillTranslateAnchor>(),
@@ -169,7 +169,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 paintPropertyBinders.setPatternParameters(patternPosA, patternPosB, crossfade);
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
-                    FillPatternProgram::uniformValues(
+                    FillPatternProgram::layoutUniformValues(
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),

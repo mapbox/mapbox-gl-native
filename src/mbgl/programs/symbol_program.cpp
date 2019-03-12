@@ -99,17 +99,16 @@ Values makeValues(const bool isText,
     };
 }
 
-SymbolIconProgram::UniformValues
-SymbolIconProgram::uniformValues(const bool isText,
-                                 const style::SymbolPropertyValues& values,
-                                 const Size& texsize,
-                                 const std::array<float, 2>& pixelsToGLUnits,
-                                 const bool alongLine,
-                                 const RenderTile& tile,
-                                 const TransformState& state,
-                                 const float symbolFadeChange)
-{
-    return makeValues<SymbolIconProgram::UniformValues>(
+SymbolIconProgram::LayoutUniformValues
+SymbolIconProgram::layoutUniformValues(const bool isText,
+                                       const style::SymbolPropertyValues& values,
+                                       const Size& texsize,
+                                       const std::array<float, 2>& pixelsToGLUnits,
+                                       const bool alongLine,
+                                       const RenderTile& tile,
+                                       const TransformState& state,
+                                       const float symbolFadeChange) {
+    return makeValues<SymbolIconProgram::LayoutUniformValues>(
         isText,
         values,
         texsize,
@@ -122,22 +121,21 @@ SymbolIconProgram::uniformValues(const bool isText,
 }
 
 template <class PaintProperties>
-typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<PaintProperties>::uniformValues(
-      const bool isText,
-      const style::SymbolPropertyValues& values,
-      const Size& texsize,
-      const std::array<float, 2>& pixelsToGLUnits,
-      const bool alongLine,
-      const RenderTile& tile,
-      const TransformState& state,
-      const float symbolFadeChange,
-      const SymbolSDFPart part)
-{
+typename SymbolSDFProgram<PaintProperties>::LayoutUniformValues
+SymbolSDFProgram<PaintProperties>::layoutUniformValues(const bool isText,
+                                                       const style::SymbolPropertyValues& values,
+                                                       const Size& texsize,
+                                                       const std::array<float, 2>& pixelsToGLUnits,
+                                                       const bool alongLine,
+                                                       const RenderTile& tile,
+                                                       const TransformState& state,
+                                                       const float symbolFadeChange,
+                                                       const SymbolSDFPart part) {
     const float gammaScale = (values.pitchAlignment == AlignmentType::Map
                               ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
                               : 1.0);
 
-    return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
+    return makeValues<SymbolSDFProgram<PaintProperties>::LayoutUniformValues>(
         isText,
         values,
         texsize,
