@@ -30,7 +30,7 @@
 		1F9EF4061FBA1B0E0063FBB0 /* mapbox_helmet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 1F9EF4051FBA1B0D0063FBB0 /* mapbox_helmet.pdf */; };
 		1FC481852098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FC481842098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h */; };
 		1FF4858D2237235300F19727 /* MGLAttributedExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FF4858B2237235200F19727 /* MGLAttributedExpression.m */; };
-		1FF4858E2237235300F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF4858C2237235200F19727 /* MGLAttributedExpression.h */; };
+		1FF4858E2237235300F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF4858C2237235200F19727 /* MGLAttributedExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */; };
 		3526EABD1DF9B19800006B43 /* MGLCodingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3526EABC1DF9B19800006B43 /* MGLCodingTests.mm */; };

@@ -7,6 +7,7 @@ typedef NSString * MGLAttributedExpressionKey NS_EXTENSIBLE_STRING_ENUM;
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontNamesAttribute;
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontSizeAttribute;
 
+MGL_EXPORT
 @interface MGLAttributedExpression : NSObject
 
 @property (strong, nonatomic) NSExpression *expression;

@@ -1,8 +1,8 @@
 #import "MGLAttributedExpression.h"
 #import "MGLLoggingConfiguration_Private.h"
 
-const MGLAttributedExpressionKey MGLFontNamesAttribute = @"";
-const MGLAttributedExpressionKey MGLFontSizeAttribute = @"";
+const MGLAttributedExpressionKey MGLFontNamesAttribute = @"text-font";
+const MGLAttributedExpressionKey MGLFontSizeAttribute = @"font-scale";
 
 @implementation MGLAttributedExpression
 
@@ -38,6 +38,18 @@ const MGLAttributedExpressionKey MGLFontSizeAttribute = @"";
         MGLLogInfo(@"Finalizing %@ initialization.", NSStringFromClass([self class]));
     }
     return self;
+}
+
+- (BOOL)isEqual:(id)object {
+    BOOL result = NO;
+    
+    if ([object isKindOfClass:[self class]]) {
+        MGLAttributedExpression *otherObject = object;
+        result = [self.expression isEqual:otherObject.expression] &&
+        [_attributes isEqual:otherObject.attributes];
+    }
+    
+    return result;
 }
 
 @end

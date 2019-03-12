@@ -57,8 +57,8 @@
 		1FCAE2A520B872A400C577DD /* MGLLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCAE2A120B872A400C577DD /* MGLLocationManager.m */; };
 		1FCAE2A820B88B3800C577DD /* MGLLocationManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FCAE2A620B88B3800C577DD /* MGLLocationManager_Private.h */; };
 		1FCAE2A920B88B3800C577DD /* MGLLocationManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FCAE2A620B88B3800C577DD /* MGLLocationManager_Private.h */; };
-		1FF48587223710BE00F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF48585223710BE00F19727 /* MGLAttributedExpression.h */; };
-		1FF48588223710BE00F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF48585223710BE00F19727 /* MGLAttributedExpression.h */; };
+		1FF48587223710BE00F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF48585223710BE00F19727 /* MGLAttributedExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1FF48588223710BE00F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF48585223710BE00F19727 /* MGLAttributedExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1FF48589223710BE00F19727 /* MGLAttributedExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FF48586223710BE00F19727 /* MGLAttributedExpression.m */; };
 		1FF4858A223710BE00F19727 /* MGLAttributedExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FF48586223710BE00F19727 /* MGLAttributedExpression.m */; };
 		30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
