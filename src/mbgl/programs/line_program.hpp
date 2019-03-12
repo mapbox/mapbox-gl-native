@@ -180,7 +180,7 @@ public:
 };
 
 using LineLayoutVertex = LineProgram::LayoutVertex;
-using LineAttributes = LineProgram::Attributes;
+using LineAttributes = LineProgram::AttributeList;
 
 class LineLayerPrograms final : public LayerTypePrograms {
 public:

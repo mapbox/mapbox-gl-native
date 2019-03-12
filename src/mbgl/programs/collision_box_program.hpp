@@ -72,7 +72,7 @@ public:
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,
               const gfx::IndexBuffer& indexBuffer,
-              const SegmentVector<Attributes>& segments,
+              const SegmentVector<AttributeList>& segments,
               const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
               const TextureBindings& textureBindings,
@@ -81,8 +81,8 @@ public:
         typename AllUniforms::Values allUniformValues = uniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-        typename Attributes::Bindings allAttributeBindings = gl::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
-            .concat(gl::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
+        AttributeBindings allAttributeBindings = gfx::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
+            .concat(gfx::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         assert(layoutVertexBuffer.elements == dynamicVertexBuffer.elements);
@@ -103,7 +103,7 @@ public:
                     std::move(cullFaceMode),
                     allUniformValues,
                     vertexArrayIt->second,
-                    Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                     textureBindings,
                     indexBuffer,
                     segment.indexOffset,
@@ -160,7 +160,7 @@ public:
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,
               const gfx::IndexBuffer& indexBuffer,
-              const SegmentVector<Attributes>& segments,
+              const SegmentVector<AttributeList>& segments,
               const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
               const TextureBindings& textureBindings,
@@ -169,8 +169,8 @@ public:
         typename AllUniforms::Values allUniformValues = uniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-        typename Attributes::Bindings allAttributeBindings = gl::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
-            .concat(gl::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
+        AttributeBindings allAttributeBindings = gfx::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
+            .concat(gfx::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         for (auto& segment : segments) {
@@ -189,7 +189,7 @@ public:
                     std::move(cullFaceMode),
                     allUniformValues,
                     vertexArrayIt->second,
-                    Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                     textureBindings,
                     indexBuffer,
                     segment.indexOffset,

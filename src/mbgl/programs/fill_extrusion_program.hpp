@@ -112,7 +112,7 @@ public:
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;
-using FillExtrusionAttributes = FillExtrusionProgram::Attributes;
+using FillExtrusionAttributes = FillExtrusionProgram::AttributeList;
 
 
 class FillExtrusionLayerPrograms final : public LayerTypePrograms {

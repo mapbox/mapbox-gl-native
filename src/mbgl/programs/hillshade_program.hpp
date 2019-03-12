@@ -53,7 +53,7 @@ public:
 };
 
 using HillshadeLayoutVertex = HillshadeProgram::LayoutVertex;
-using HillshadeAttributes = HillshadeProgram::Attributes;
+using HillshadeAttributes = HillshadeProgram::AttributeList;
 
 class HillshadeLayerPrograms final : public LayerTypePrograms  {
 public:

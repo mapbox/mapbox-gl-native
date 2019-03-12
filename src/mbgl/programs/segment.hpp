@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-template <class Attributes>
+template <class AttributeList>
 class Segment {
 public:
     Segment(std::size_t vertexOffset_,
@@ -38,7 +38,7 @@ public:
     mutable std::map<std::string, gl::VertexArray> vertexArrays;
 };
 
-template <class Attributes>
-using SegmentVector = std::vector<Segment<Attributes>>;
+template <class AttributeList>
+using SegmentVector = std::vector<Segment<AttributeList>>;
 
 } // namespace mbgl

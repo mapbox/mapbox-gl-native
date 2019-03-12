@@ -506,7 +506,7 @@ public:
     using InterpolationUniformList = typename Property<P>::InterpolationUniformList;
 
     using AttributeList = TypeListConcat<ZoomInterpolatedAttributeList<Ps>...>;
-    using AttributeBindings = gfx::AttributeBindings<AttributeList>;
+    using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
 
     template <class EvaluatedProperties>
     AttributeBindings attributeBindings(const EvaluatedProperties& currentProperties) const {

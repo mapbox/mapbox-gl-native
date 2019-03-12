@@ -22,6 +22,6 @@ public:
 };
 
 using ClippingMaskLayoutVertex = ClippingMaskProgram::LayoutVertex;
-using ClippingMaskAttributes = ClippingMaskProgram::Attributes;
+using ClippingMaskAttributes = ClippingMaskProgram::AttributeList;
 
 } // namespace mbgl

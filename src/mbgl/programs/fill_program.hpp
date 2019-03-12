@@ -105,7 +105,7 @@ public:
 };
 
 using FillLayoutVertex = FillProgram::LayoutVertex;
-using FillAttributes = FillProgram::Attributes;
+using FillAttributes = FillProgram::AttributeList;
 
 class FillLayerPrograms final : public LayerTypePrograms {
 public:

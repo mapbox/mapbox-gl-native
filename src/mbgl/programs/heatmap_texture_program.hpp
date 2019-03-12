@@ -36,6 +36,6 @@ public:
 };
 
 using HeatmapTextureLayoutVertex = HeatmapTextureProgram::LayoutVertex;
-using HeatmapTextureAttributes = HeatmapTextureProgram::Attributes;
+using HeatmapTextureAttributes = HeatmapTextureProgram::AttributeList;
 
 } // namespace mbgl

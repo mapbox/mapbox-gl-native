@@ -79,7 +79,7 @@ public:
 };
 
 using BackgroundLayoutVertex = BackgroundProgram::LayoutVertex;
-using BackgroundAttributes = BackgroundProgram::Attributes;
+using BackgroundAttributes = BackgroundProgram::AttributeList;
 
 class BackgroundLayerPrograms final : public LayerTypePrograms  {
 public:

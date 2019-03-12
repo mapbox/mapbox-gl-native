@@ -63,7 +63,7 @@ public:
 };
 
 using RasterLayoutVertex = RasterProgram::LayoutVertex;
-using RasterAttributes = RasterProgram::Attributes;
+using RasterAttributes = RasterProgram::AttributeList;
 
 class RasterLayerPrograms final : public LayerTypePrograms {
 public:

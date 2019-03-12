@@ -16,6 +16,7 @@
         "src/mbgl/geometry/dem_data.cpp",
         "src/mbgl/geometry/feature_index.cpp",
         "src/mbgl/geometry/line_atlas.cpp",
+        "src/mbgl/gfx/attribute.cpp",
         "src/mbgl/gl/attribute.cpp",
         "src/mbgl/gl/context.cpp",
         "src/mbgl/gl/debugging.cpp",
