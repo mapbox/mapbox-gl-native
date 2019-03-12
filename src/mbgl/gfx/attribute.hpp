@@ -234,6 +234,15 @@ struct Vertex<TypeList<As...>> {
     using Type = VertexType<typename As::Type...>;
 };
 
+template <class>
+class AttributeBindings;
+
+template <class... Ts>
+class AttributeBindings<TypeList<Ts...>> {
+public:
+    using Type = IndexedTuple<TypeList<Ts...>, TypeList<ExpandToType<Ts, optional<AttributeBinding>>...>>;
+};
+
 } // namespace detail
 
 template <class A>
@@ -243,6 +252,9 @@ template <class V>
 using VertexDescriptorOf = detail::Descriptor<V>;
 template <class T>
 using VertexType = typename detail::VertexType<T>;
+
+template <class AttributeTypeList>
+using AttributeBindings = typename detail::AttributeBindings<AttributeTypeList>::Type;
 
 } // namespace gfx
 } // namespace mbgl
