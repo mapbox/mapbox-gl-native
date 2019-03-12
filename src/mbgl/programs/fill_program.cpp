@@ -10,15 +10,14 @@ using namespace style;
 
 static_assert(sizeof(FillLayoutVertex) == 4, "expected FillLayoutVertex size");
 
-FillPatternProgram::UniformValues
-FillPatternProgram::uniformValues(mat4 matrix,
-                            Size framebufferSize,
-                            Size atlasSize,
-                            const CrossfadeParameters& crossfade,
-                            const UnwrappedTileID& tileID,
-                            const TransformState& state,
-                            const float pixelRatio)
-{
+FillPatternProgram::LayoutUniformValues
+FillPatternProgram::layoutUniformValues(mat4 matrix,
+                                        Size framebufferSize,
+                                        Size atlasSize,
+                                        const CrossfadeParameters& crossfade,
+                                        const UnwrappedTileID& tileID,
+                                        const TransformState& state,
+                                        const float pixelRatio) {
     const auto tileRatio = 1 / tileID.pixelsToTileUnits(1, state.getIntegerZoom());
     int32_t tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
     int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));

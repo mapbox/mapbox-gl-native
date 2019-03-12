@@ -31,10 +31,8 @@ float lightIntensity(const EvaluatedLight& light) {
     return light.get<LightIntensity>();
 }
 
-FillExtrusionProgram::UniformValues
-FillExtrusionProgram::uniformValues(mat4 matrix,
-                                    const TransformState& state,
-                                    const EvaluatedLight& light) {
+FillExtrusionProgram::LayoutUniformValues FillExtrusionProgram::layoutUniformValues(
+    mat4 matrix, const TransformState& state, const EvaluatedLight& light) {
     return {
         uniforms::u_matrix::Value( matrix ),
         uniforms::u_lightcolor::Value( lightColor(light) ),
@@ -43,8 +41,8 @@ FillExtrusionProgram::uniformValues(mat4 matrix,
     };
 }
 
-FillExtrusionPatternProgram::UniformValues
-FillExtrusionPatternProgram::uniformValues(mat4 matrix,
+FillExtrusionPatternProgram::LayoutUniformValues
+FillExtrusionPatternProgram::layoutUniformValues(mat4 matrix,
                                            Size atlasSize,
                                            const CrossfadeParameters& crossfade,
                                            const UnwrappedTileID& tileID,

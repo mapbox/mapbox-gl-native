@@ -70,13 +70,13 @@ class FillPatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(mat4 matrix,
-                                       Size framebufferSize,
-                                       Size atlasSize,
-                                       const CrossfadeParameters& crossfade,
-                                       const UnwrappedTileID&,
-                                       const TransformState&,
-                                       const float pixelRatio);
+    static LayoutUniformValues layoutUniformValues(mat4 matrix,
+                                                   Size framebufferSize,
+                                                   Size atlasSize,
+                                                   const CrossfadeParameters& crossfade,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&,
+                                                   const float pixelRatio);
 };
 
 class FillOutlineProgram : public Program<

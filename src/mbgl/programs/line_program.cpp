@@ -31,12 +31,12 @@ Values makeValues(const RenderLinePaintProperties::PossiblyEvaluated& properties
     };
 }
 
-LineProgram::UniformValues
-LineProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                           const RenderTile& tile,
-                           const TransformState& state,
-                           const std::array<float, 2>& pixelsToGLUnits) {
-    return makeValues<LineProgram::UniformValues>(
+LineProgram::LayoutUniformValues
+LineProgram::layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+                                 const RenderTile& tile,
+                                 const TransformState& state,
+                                 const std::array<float, 2>& pixelsToGLUnits) {
+    return makeValues<LineProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
@@ -44,16 +44,16 @@ LineProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& p
     );
 }
 
-LineSDFProgram::UniformValues
-LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                              float pixelRatio,
-                              const RenderTile& tile,
-                              const TransformState& state,
-                              const std::array<float, 2>& pixelsToGLUnits,
-                              const LinePatternPos& posA,
-                              const LinePatternPos& posB,
-                              const CrossfadeParameters& crossfade,
-                              float atlasWidth) {
+LineSDFProgram::LayoutUniformValues
+LineSDFProgram::layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+                                    float pixelRatio,
+                                    const RenderTile& tile,
+                                    const TransformState& state,
+                                    const std::array<float, 2>& pixelsToGLUnits,
+                                    const LinePatternPos& posA,
+                                    const LinePatternPos& posB,
+                                    const CrossfadeParameters& crossfade,
+                                    float atlasWidth) {
     const float widthA = posA.width * crossfade.fromScale;
     const float widthB = posB.width * crossfade.toScale;
 
@@ -67,7 +67,7 @@ LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated
         -posB.height / 2.0f
     }};
 
-    return makeValues<LineSDFProgram::UniformValues>(
+    return makeValues<LineSDFProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
@@ -81,18 +81,18 @@ LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated
     );
 }
 
-LinePatternProgram::UniformValues
-LinePatternProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                                  const RenderTile& tile,
-                                  const TransformState& state,
-                                  const std::array<float, 2>& pixelsToGLUnits,
-                                  const Size atlasSize,
-                                  const CrossfadeParameters& crossfade,
-                                  const float pixelRatio) {
-    
+LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
+    const RenderLinePaintProperties::PossiblyEvaluated& properties,
+    const RenderTile& tile,
+    const TransformState& state,
+    const std::array<float, 2>& pixelsToGLUnits,
+    const Size atlasSize,
+    const CrossfadeParameters& crossfade,
+    const float pixelRatio) {
+
     const auto tileRatio = 1 / tile.id.pixelsToTileUnits(1, state.getIntegerZoom());
 
-    return makeValues<LinePatternProgram::UniformValues>(
+    return makeValues<LinePatternProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
@@ -103,12 +103,12 @@ LinePatternProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvalu
     );
 }
 
-LineGradientProgram::UniformValues
-LineGradientProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
-                           const RenderTile& tile,
-                           const TransformState& state,
-                           const std::array<float, 2>& pixelsToGLUnits) {
-    return makeValues<LineGradientProgram::UniformValues>(
+LineGradientProgram::LayoutUniformValues LineGradientProgram::layoutUniformValues(
+    const RenderLinePaintProperties::PossiblyEvaluated& properties,
+    const RenderTile& tile,
+    const TransformState& state,
+    const std::array<float, 2>& pixelsToGLUnits) {
+    return makeValues<LineGradientProgram::LayoutUniformValues>(
         properties,
         tile,
         state,

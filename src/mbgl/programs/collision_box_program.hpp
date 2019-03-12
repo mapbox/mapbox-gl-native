@@ -68,7 +68,7 @@ public:
               gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
-              const UniformValues& uniformValues,
+              const LayoutUniformValues& layoutUniformValues,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,
               const gfx::IndexBuffer& indexBuffer,
@@ -78,7 +78,7 @@ public:
               const TextureBindings& textureBindings,
               float currentZoom,
               const std::string& layerID) {
-        typename AllUniforms::Values allUniformValues = uniformValues
+        UniformValues uniformValues = layoutUniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
         AttributeBindings allAttributeBindings = gfx::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
@@ -101,7 +101,7 @@ public:
                     std::move(stencilMode),
                     std::move(colorMode),
                     std::move(cullFaceMode),
-                    allUniformValues,
+                    uniformValues,
                     drawScopeIt->second,
                     gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                     textureBindings,
@@ -156,7 +156,7 @@ public:
               gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
-              const UniformValues& uniformValues,
+              const LayoutUniformValues& layoutUniformValues,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,
               const gfx::IndexBuffer& indexBuffer,
@@ -166,7 +166,7 @@ public:
               const TextureBindings& textureBindings,
               float currentZoom,
               const std::string& layerID) {
-        typename AllUniforms::Values allUniformValues = uniformValues
+        UniformValues uniformValues = layoutUniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
         AttributeBindings allAttributeBindings = gfx::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
@@ -187,7 +187,7 @@ public:
                     std::move(stencilMode),
                     std::move(colorMode),
                     std::move(cullFaceMode),
-                    allUniformValues,
+                    uniformValues,
                     drawScopeIt->second,
                     gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                     textureBindings,

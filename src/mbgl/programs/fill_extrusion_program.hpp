@@ -83,10 +83,8 @@ public:
         };
     }
 
-    static UniformValues uniformValues(mat4,
-                                       const TransformState&,
-                                       const EvaluatedLight&);
-
+    static LayoutUniformValues
+    layoutUniformValues(mat4, const TransformState&, const EvaluatedLight&);
 };
 
 class FillExtrusionPatternProgram : public Program<
@@ -101,14 +99,14 @@ class FillExtrusionPatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(mat4,
-                                       Size atlasSize,
-                                       const CrossfadeParameters&,
-                                       const UnwrappedTileID&,
-                                       const TransformState&,
-                                       const float heightFactor,
-                                       const float pixelRatio,
-                                       const EvaluatedLight&);
+    static LayoutUniformValues layoutUniformValues(mat4,
+                                                   Size atlasSize,
+                                                   const CrossfadeParameters&,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&,
+                                                   const float heightFactor,
+                                                   const float pixelRatio,
+                                                   const EvaluatedLight&);
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;
