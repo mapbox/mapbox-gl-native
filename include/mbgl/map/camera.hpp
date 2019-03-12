@@ -37,7 +37,7 @@ struct CameraOptions {
         levels. */
     optional<double> zoom;
 
-    /** Bearing, measured in degrees from true north. Wrapped to [0, 360). */
+    /** Bearing, measured in degrees from true north. Wrapped to [0, 360]. */
     optional<double> bearing;
 
     /** Pitch toward the horizon measured in degrees , with 0 deg resulting in a
