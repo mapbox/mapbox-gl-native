@@ -177,7 +177,7 @@ template <class T, class A>
 class SourceFunctionPaintPropertyBinder final : public PaintPropertyBinder<T, T, PossiblyEvaluatedPropertyValue<T>, A> {
 public:
     using BaseAttributeType = A;
-    using BaseVertex = gfx::Vertex<BaseAttributeType>;
+    using BaseVertex = gfx::VertexType<BaseAttributeType>;
 
     using AttributeType = ZoomInterpolatedAttributeType<A>;
 
@@ -236,7 +236,7 @@ public:
 
     using AttributeType = ZoomInterpolatedAttributeType<A>;
     using AttributeValue = typename AttributeType::Value;
-    using Vertex = gfx::Vertex<AttributeType>;
+    using Vertex = gfx::VertexType<AttributeType>;
 
     CompositeFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
         : expression(std::move(expression_)),
@@ -308,8 +308,8 @@ public:
     using BaseAttributeType = A1;
     using BaseAttributeType2 = A2;
 
-    using Vertex = gfx::Vertex<BaseAttributeType>;
-    using Vertex2 = gfx::Vertex<BaseAttributeType2>;
+    using Vertex = gfx::VertexType<BaseAttributeType>;
+    using Vertex2 = gfx::VertexType<BaseAttributeType2>;
 
     CompositeCrossFadedPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
         : expression(std::move(expression_)),

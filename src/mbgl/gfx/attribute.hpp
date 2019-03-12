@@ -89,32 +89,32 @@ struct VertexDescriptor {
 namespace detail {
 
 template <class...>
-struct Vertex;
+struct VertexType;
 
 template <class A1>
-struct Vertex<A1> {
-    using Type = Vertex<A1>;
+struct VertexType<A1> {
+    using Type = VertexType<A1>;
     typename A1::Value a1;
 } MBGL_VERTEX_ALIGN;
 
 template <class A1, class A2>
-struct Vertex<A1, A2> {
-    using Type = Vertex<A1, A2>;
+struct VertexType<A1, A2> {
+    using Type = VertexType<A1, A2>;
     typename A1::Value a1;
     typename A2::Value a2;
 } MBGL_VERTEX_ALIGN;
 
 template <class A1, class A2, class A3>
-struct Vertex<A1, A2, A3> {
-    using Type = Vertex<A1, A2, A3>;
+struct VertexType<A1, A2, A3> {
+    using Type = VertexType<A1, A2, A3>;
     typename A1::Value a1;
     typename A2::Value a2;
     typename A3::Value a3;
 } MBGL_VERTEX_ALIGN;
 
 template <class A1, class A2, class A3, class A4>
-struct Vertex<A1, A2, A3, A4> {
-    using Type = Vertex<A1, A2, A3, A4>;
+struct VertexType<A1, A2, A3, A4> {
+    using Type = VertexType<A1, A2, A3, A4>;
     typename A1::Value a1;
     typename A2::Value a2;
     typename A3::Value a3;
@@ -122,8 +122,8 @@ struct Vertex<A1, A2, A3, A4> {
 } MBGL_VERTEX_ALIGN;
 
 template <class A1, class A2, class A3, class A4, class A5>
-struct Vertex<A1, A2, A3, A4, A5> {
-    using Type = Vertex<A1, A2, A3, A4, A5>;
+struct VertexType<A1, A2, A3, A4, A5> {
+    using Type = VertexType<A1, A2, A3, A4, A5>;
     typename A1::Value a1;
     typename A2::Value a2;
     typename A3::Value a3;
@@ -135,8 +135,8 @@ template <class>
 struct Descriptor;
 
 template <class A1>
-struct Descriptor<Vertex<A1>> {
-    using Type = Vertex<A1>;
+struct Descriptor<VertexType<A1>> {
+    using Type = VertexType<A1>;
     static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
     static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
     static constexpr const VertexDescriptor data = { sizeof(Type), 1, {
@@ -145,11 +145,11 @@ struct Descriptor<Vertex<A1>> {
 };
 
 template <class A1>
-constexpr const VertexDescriptor Descriptor<Vertex<A1>>::data;
+constexpr const VertexDescriptor Descriptor<VertexType<A1>>::data;
 
 template <class A1, class A2>
-struct Descriptor<Vertex<A1, A2>> {
-    using Type = Vertex<A1, A2>;
+struct Descriptor<VertexType<A1, A2>> {
+    using Type = VertexType<A1, A2>;
     static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
     static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
     static constexpr const VertexDescriptor data = { sizeof(Type), 2, {
@@ -159,11 +159,11 @@ struct Descriptor<Vertex<A1, A2>> {
 };
 
 template <class A1, class A2>
-constexpr const VertexDescriptor Descriptor<Vertex<A1, A2>>::data;
+constexpr const VertexDescriptor Descriptor<VertexType<A1, A2>>::data;
 
 template <class A1, class A2, class A3>
-struct Descriptor<Vertex<A1, A2, A3>> {
-    using Type = Vertex<A1, A2, A3>;
+struct Descriptor<VertexType<A1, A2, A3>> {
+    using Type = VertexType<A1, A2, A3>;
     static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
     static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
     static constexpr const VertexDescriptor data = { sizeof(Type), 3, {
@@ -174,11 +174,11 @@ struct Descriptor<Vertex<A1, A2, A3>> {
 };
 
 template <class A1, class A2, class A3>
-constexpr const VertexDescriptor Descriptor<Vertex<A1, A2, A3>>::data;
+constexpr const VertexDescriptor Descriptor<VertexType<A1, A2, A3>>::data;
 
 template <class A1, class A2, class A3, class A4>
-struct Descriptor<Vertex<A1, A2, A3, A4>> {
-    using Type = Vertex<A1, A2, A3, A4>;
+struct Descriptor<VertexType<A1, A2, A3, A4>> {
+    using Type = VertexType<A1, A2, A3, A4>;
     static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
     static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
     static constexpr const VertexDescriptor data = { sizeof(Type), 4, {
@@ -190,11 +190,11 @@ struct Descriptor<Vertex<A1, A2, A3, A4>> {
 };
 
 template <class A1, class A2, class A3, class A4>
-constexpr const VertexDescriptor Descriptor<Vertex<A1, A2, A3, A4>>::data;
+constexpr const VertexDescriptor Descriptor<VertexType<A1, A2, A3, A4>>::data;
 
 template <class A1, class A2, class A3, class A4, class A5>
-struct Descriptor<Vertex<A1, A2, A3, A4, A5>> {
-    using Type = Vertex<A1, A2, A3, A4, A5>;
+struct Descriptor<VertexType<A1, A2, A3, A4, A5>> {
+    using Type = VertexType<A1, A2, A3, A4, A5>;
     static_assert(sizeof(Type) < 256, "vertex type must be smaller than 256 bytes");
     static_assert(std::is_standard_layout<Type>::value, "vertex type must use standard layout");
     static constexpr const VertexDescriptor data = { sizeof(Type), 5, {
@@ -207,11 +207,14 @@ struct Descriptor<Vertex<A1, A2, A3, A4, A5>> {
 };
 
 template <class A1, class A2, class A3, class A4, class A5>
-constexpr const VertexDescriptor Descriptor<Vertex<A1, A2, A3, A4, A5>>::data;
+constexpr const VertexDescriptor Descriptor<VertexType<A1, A2, A3, A4, A5>>::data;
+
+template <class>
+struct Vertex;
 
 template <class... As>
 struct Vertex<TypeList<As...>> {
-    using Type = Vertex<typename As::Type...>;
+    using Type = VertexType<typename As::Type...>;
 };
 
 } // namespace detail
@@ -221,6 +224,8 @@ using Vertex = typename detail::Vertex<A>::Type;
 
 template <class V>
 using VertexDescriptorOf = detail::Descriptor<V>;
+template <class T>
+using VertexType = typename detail::VertexType<T>;
 
 } // namespace gfx
 } // namespace mbgl
