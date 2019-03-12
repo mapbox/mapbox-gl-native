@@ -7,6 +7,8 @@
 
 #import "MGLTypes.h"
 
+@class MGLAttributedExpression;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString *MGLExpressionInterpolationMode NS_TYPED_ENUM;
