@@ -52,7 +52,6 @@ public:
     void verifyProgramLinkage(ProgramID);
     void linkProgram(ProgramID);
     UniqueTexture createUniqueTexture();
-    VertexArray createVertexArray();
 
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
@@ -216,6 +215,8 @@ private:
     std::unique_ptr<gfx::TextureResource> createTextureResource(Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
     void updateTextureResource(const gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
+    std::unique_ptr<gfx::DrawScopeResource> createDrawScopeResource() override;
+
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
     std::unique_ptr<uint8_t[]> readFramebuffer(Size, gfx::TexturePixelType, bool flip);
@@ -223,6 +224,7 @@ private:
     void drawPixels(Size size, const void* data, gfx::TexturePixelType);
 #endif // MBGL_USE_GLES2
 
+    VertexArray createVertexArray();
     bool supportsVertexArrays() const;
 
     friend detail::ProgramDeleter;

@@ -5,6 +5,7 @@
 #include <mbgl/gfx/index_vector.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gfx/texture.hpp>
+#include <mbgl/gfx/draw_scope.hpp>
 #include <mbgl/gfx/types.hpp>
 
 namespace mbgl {
@@ -89,6 +90,14 @@ protected:
         Size, const void* data, TexturePixelType, TextureChannelDataType) = 0;
     virtual void updateTextureResource(const TextureResource&, Size, const void* data,
         TexturePixelType, TextureChannelDataType) = 0;
+
+public:
+    DrawScope createDrawScope() {
+        return { createDrawScopeResource() };
+    }
+
+protected:
+    virtual std::unique_ptr<DrawScopeResource> createDrawScopeResource() = 0;
 };
 
 } // namespace gfx

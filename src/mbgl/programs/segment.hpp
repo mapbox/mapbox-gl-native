@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/vertex_array.hpp>
+#include <mbgl/gfx/draw_scope.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -28,14 +28,14 @@ public:
     std::size_t vertexLength;
     std::size_t indexLength;
 
-    // One VertexArray per layer ID. This minimizes rebinding in cases where
+    // One DrawScope per layer ID. This minimizes rebinding in cases where
     // several layers share buckets but have different sets of active attributes.
     // This can happen:
     //   * when two layers have the same layout properties, but differing
     //     data-driven paint properties
     //   * when two fill layers have the same layout properties, but one
     //     uses fill-color and the other uses fill-pattern
-    mutable std::map<std::string, gl::VertexArray> vertexArrays;
+    mutable std::map<std::string, gfx::DrawScope> drawScopes;
 };
 
 template <class AttributeList>

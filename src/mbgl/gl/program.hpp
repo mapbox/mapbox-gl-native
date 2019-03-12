@@ -3,6 +3,7 @@
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
@@ -118,20 +119,21 @@ public:
     }
 
     template <class DrawMode>
-    void draw(Context& context,
+    void draw(gfx::Context& genericContext,
               DrawMode drawMode,
               gfx::DepthMode depthMode,
               gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
-              gl::VertexArray& vertexArray,
+              gfx::DrawScope& drawScope,
               const AttributeBindings& attributeBindings,
               const TextureBindings& textureBindings,
               const gfx::IndexBuffer& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
+        auto& context = reinterpret_cast<gl::Context&>(genericContext);
 
         context.setDrawMode(drawMode);
         context.setDepthMode(depthMode);
@@ -145,6 +147,7 @@ public:
 
         textures.bind(context, textureBindings);
 
+        auto& vertexArray = reinterpret_cast<gl::DrawScopeResource&>(*drawScope.resource).vertexArray;
         vertexArray.bind(context,
                         indexBuffer,
                         gl::Attributes<AttributeList>::toBindingArray(attributeLocations, attributeBindings));

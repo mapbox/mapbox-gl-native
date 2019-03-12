@@ -3,6 +3,7 @@
 #include <mbgl/gl/vertex_buffer_resource.hpp>
 #include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/texture_resource.hpp>
+#include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
@@ -542,6 +543,10 @@ void Context::updateTextureResource(const gfx::TextureResource& resource,
                                   size.width, size.height, 0,
                                   Enum<gfx::TexturePixelType>::to(format),
                                   Enum<gfx::TextureChannelDataType>::to(type), data));
+}
+
+std::unique_ptr<gfx::DrawScopeResource> Context::createDrawScopeResource() {
+    return std::make_unique<gl::DrawScopeResource>(createVertexArray());
 }
 
 void Context::reset() {
