@@ -78,6 +78,9 @@ final class MapGestureDetector {
 
   private AndroidGesturesManager gesturesManager;
 
+  // Manages when to ignore double-tap event because we've started the quick-zoom. See #14013.
+  private boolean executeDoubleTap;
+
   private Animator scaleAnimator;
   private Animator rotateAnimator;
   private final List<Animator> scheduledAnimators = new ArrayList<>();
@@ -353,7 +356,11 @@ final class MapGestureDetector {
     public boolean onDoubleTapEvent(MotionEvent motionEvent) {
       int action = motionEvent.getActionMasked();
       if (action == MotionEvent.ACTION_DOWN) {
-        if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled()) {
+        executeDoubleTap = true;
+      }
+
+      if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+        if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled() || !executeDoubleTap) {
           return false;
         }
 
@@ -368,9 +375,7 @@ final class MapGestureDetector {
         }
 
         zoomInAnimated(zoomFocalPoint, false);
-      }
 
-      if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
         sendTelemetryEvent(TelemetryConstants.DOUBLE_TAP, new PointF(motionEvent.getX(), motionEvent.getY()));
         return true;
       }
@@ -474,15 +479,24 @@ final class MapGestureDetector {
 
     @Override
     public boolean onScaleBegin(@NonNull StandardScaleGestureDetector detector) {
+      quickZoom = detector.getPointersCount() == 1;
+      if (quickZoom) {
+        // Unfortunately, the double-tap event is returned by the framework when the second `ACTION_DOWN` event
+        // is registered in the right interval, regardless of the following `ACTION_MOVE` events.
+        // That's why, the quick-zoom gives us a handy reference when we've exceeded the movement threshold
+        // and we should ignore the double-tap.
+        executeDoubleTap = false;
+      }
+
       if (!uiSettings.isZoomGesturesEnabled()) {
         return false;
       }
 
-      quickZoom = detector.getPointersCount() == 1;
       if (quickZoom) {
         if (!uiSettings.isQuickZoomGesturesEnabled()) {
           return false;
         }
+        // when quickzoom, disable move gesture
         gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
 
