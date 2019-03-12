@@ -94,7 +94,6 @@ git checkout ${VERSION_TAG}
 
 step "Deploying version ${PUBLISH_VERSION}…"
 
-make clean && make distclean
 npm install --ignore-scripts
 mkdir -p ${BINARY_DIRECTORY}
 
