@@ -875,6 +875,12 @@ jobs:
             curl -sSfL -o codecov https://codecov.io/bash
             chmod +x codecov
             ./codecov -c
+      - run:
+          name: Upload coverage metrics to s3
+          command: |
+            if [[ $CIRCLE_BRANCH == master ]]; then
+                scripts/publish_core_codecoverage.js -p Linux -s Core
+            fi
 
 # ------------------------------------------------------------------------------
   linux-doxygen:
