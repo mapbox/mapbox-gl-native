@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -827,10 +826,8 @@ public final class MapboxMap {
     } else if (!TextUtils.isEmpty(builder.getJson())) {
       nativeMapView.setStyleJson(builder.getJson());
     } else {
-      // user didn't provide a `from` component,
-      // flag the style as loaded,
-      // add components defined added using the `with` prefix.
-      notifyStyleLoadedDelayed();
+      // user didn't provide a `from` component, load a blank style instead
+      nativeMapView.setStyleJson("{}");
     }
   }
 
@@ -849,15 +846,6 @@ public final class MapboxMap {
       MapStrictMode.strictModeViolation("No style to provide.");
     }
     styleLoadedCallbacks.clear();
-  }
-
-  private void notifyStyleLoadedDelayed() {
-    new Handler().post(new Runnable() {
-      @Override
-      public void run() {
-        notifyStyleLoaded();
-      }
-    });
   }
 
   //
