@@ -72,7 +72,7 @@ public:
     }
 
     template <class DrawMode>
-    void draw(gl::Context& context,
+    void draw(gfx::Context& context,
               DrawMode drawMode,
               gfx::DepthMode depthMode,
               gfx::StencilMode stencilMode,
@@ -85,10 +85,10 @@ public:
               const TextureBindings& textureBindings,
               const std::string& layerID) {
         for (auto& segment : segments) {
-            auto vertexArrayIt = segment.vertexArrays.find(layerID);
+            auto drawScopeIt = segment.drawScopes.find(layerID);
 
-            if (vertexArrayIt == segment.vertexArrays.end()) {
-                vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
+            if (drawScopeIt == segment.drawScopes.end()) {
+                drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
             program.draw(
@@ -99,7 +99,7 @@ public:
                 std::move(colorMode),
                 std::move(cullFaceMode),
                 allUniformValues,
-                vertexArrayIt->second,
+                drawScopeIt->second,
                 gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                 textureBindings,
                 indexBuffer,
