@@ -25,10 +25,21 @@ class NodeMapObserver : public mbgl::MapObserver {
     void onDidFailLoadingMap(std::exception_ptr) override;
 };
 
+class NodeMap;
+
+class NodeFileSource : public mbgl::FileSource {
+public:
+    NodeFileSource(NodeMap*);
+
+    std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback) final;
+
+private:
+    NodeMap* nodeMap;
+};
+
 class RenderRequest;
 
-class NodeMap : public Nan::ObjectWrap,
-                public mbgl::FileSource {
+class NodeMap : public Nan::ObjectWrap {
 public:
     struct RenderOptions;
     class RenderWorker;
@@ -78,13 +89,12 @@ public:
 
     static RenderOptions ParseOptions(v8::Local<v8::Object>);
 
-    std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
-
     const float pixelRatio;
     mbgl::MapMode mode;
     bool crossSourceCollisions;
     NodeThreadPool threadpool;
     NodeMapObserver mapObserver;
+    NodeFileSource fileSource;
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;
     std::unique_ptr<mbgl::Map> map;
 
@@ -98,4 +108,4 @@ public:
     bool loaded = false;
 };
 
-}
+} // namespace node_mbgl
