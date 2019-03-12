@@ -458,6 +458,7 @@
 		96E516FC20005A4400A02306 /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		96E516FF20005A4F00A02306 /* MGLMapboxEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */; };
 		96E5170420005A6B00A02306 /* SMCalloutView.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848891CBB037E00AB86E3 /* SMCalloutView.h */; };
+		96ED34DE22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */; };
 		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		AC1B0916221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
 		AC1B0917221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
@@ -1141,6 +1142,7 @@
 		96E0272C1E57C7E5004B8E66 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E0272D1E57C7E6004B8E66 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E0272E1E57C7E7004B8E66 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapViewDirectionTests.mm; sourceTree = "<group>"; };
 		96F017292118FBAE00892778 /* MGLMapView_Experimental.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Experimental.h; sourceTree = "<group>"; };
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLLocationManager+MMEMobileEvents.h"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.h"; sourceTree = "<group>"; };
@@ -2025,6 +2027,7 @@
 				DA5DB1291FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m */,
 				DA695425215B1E75002041A4 /* MGLMapCameraTests.m */,
 				076171C22139C70900668A35 /* MGLMapViewTests.m */,
+				96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */,
 				16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */,
 				9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */,
 				35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */,
@@ -3152,6 +3155,7 @@
 				07D8C6FF1F67562C00381808 /* MGLComputedShapeSourceTests.m in Sources */,
 				920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */,
 				DA5DB12A1FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m in Sources */,
+				96ED34DE22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm in Sources */,
 				FAE1CDCB1E9D79CB00C40B5B /* MGLFillExtrusionStyleLayerTests.mm in Sources */,
 				DA35A2AA1CCA058D00E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
 				357579831D502AE6000B822E /* MGLRasterStyleLayerTests.mm in Sources */,

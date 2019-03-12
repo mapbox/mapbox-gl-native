@@ -4,20 +4,27 @@
 static MGLMapView *mapView;
 
 @interface MGLMapViewTests : XCTestCase
-
 @end
 
 @implementation MGLMapViewTests
 
-+ (void)setUp {
+- (void)setUp {
     [super setUp];
     
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 64, 64) styleURL:MGLStyle.streetsStyleURL];
-    [mapView setCenterCoordinate:CLLocationCoordinate2DMake(33, 179)];
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 64, 64) styleURL:styleURL];
+}
+
+- (void)tearDown {
+    mapView = nil;
+    [MGLAccountManager setAccessToken:nil];
+    [super tearDown];
 }
 
 - (void)testCoordinateBoundsConversion {
+    [mapView setCenterCoordinate:CLLocationCoordinate2DMake(33, 179)];
+
     MGLCoordinateBounds leftAntimeridianBounds = MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(-75, 175), CLLocationCoordinate2DMake(75, 180));
     CGRect leftAntimeridianBoundsRect = [mapView convertCoordinateBounds:leftAntimeridianBounds toRectToView:mapView];
     
@@ -30,14 +37,8 @@ static MGLMapView *mapView;
     // If the resulting CGRect from -convertCoordinateBounds:toRectToView:
     // intersects the set of bounds to the left and right of the
     // antimeridian, then we know that the CGRect spans across the antimeridian
-    XCTAssertTrue(CGRectIntersectsRect(spanningBoundsRect, leftAntimeridianBoundsRect), @"Resulting ");
+    XCTAssertTrue(CGRectIntersectsRect(spanningBoundsRect, leftAntimeridianBoundsRect), @"Resulting");
     XCTAssertTrue(CGRectIntersectsRect(spanningBoundsRect, rightAntimeridianBoundsRect), @"Something");
-}
-
-+ (void)tearDown {
-    mapView = nil;
-    [MGLAccountManager setAccessToken:nil];
-    [super tearDown];
 }
 
 @end

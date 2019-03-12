@@ -1132,7 +1132,7 @@ public:
 }
 
 - (CLLocationDirection)direction {
-    return *_mbglMap->getCameraOptions().bearing;
+    return mbgl::util::wrap(*_mbglMap->getCameraOptions().bearing, 0., 360.);
 }
 
 - (void)setDirection:(CLLocationDirection)direction {

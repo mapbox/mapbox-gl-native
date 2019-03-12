@@ -3431,7 +3431,7 @@ public:
 
 - (CLLocationDirection)direction
 {
-    return *self.mbglMap.getCameraOptions().bearing;
+    return mbgl::util::wrap(*self.mbglMap.getCameraOptions().bearing, 0., 360.);
 }
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated
