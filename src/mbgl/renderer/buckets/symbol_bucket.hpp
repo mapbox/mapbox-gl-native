@@ -114,7 +114,7 @@ public:
     struct CollisionBuffer {
         gfx::VertexVector<gfx::Vertex<CollisionBoxLayoutAttributes>> vertices;
         gfx::VertexVector<gfx::Vertex<CollisionBoxDynamicAttributes>> dynamicVertices;
-        SegmentVector<CollisionBoxProgram::Attributes> segments;
+        SegmentVector<CollisionBoxProgram::AttributeList> segments;
 
         optional<gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>> vertexBuffer;
         optional<gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>> dynamicVertexBuffer;

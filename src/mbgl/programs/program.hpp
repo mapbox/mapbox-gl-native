@@ -23,13 +23,13 @@ template <class Shaders,
           class PaintProps>
 class Program {
 public:
-    using LayoutAttributes = gl::Attributes<LayoutAttributeList>;
     using LayoutVertex = gfx::Vertex<LayoutAttributeList>;
 
     using PaintProperties = PaintProps;
     using Binders = PaintPropertyBinders<typename PaintProperties::DataDrivenProperties>;
     using PaintAttributeList = typename Binders::AttributeList;
-    using Attributes = gl::Attributes<TypeListConcat<LayoutAttributeList, PaintAttributeList>>;
+    using AttributeList = TypeListConcat<LayoutAttributeList, PaintAttributeList>;
+    using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
 
     using UniformValues = gfx::UniformValues<UniformList>;
     using PaintUniformList = typename Binders::UniformList;
@@ -37,7 +37,7 @@ public:
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureList>;
+    using ProgramType = gl::Program<Primitive, AttributeList, AllUniforms, TextureList>;
 
     ProgramType program;
 
@@ -59,16 +59,16 @@ public:
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
-    static typename Attributes::Bindings computeAllAttributeBindings(
+    static AttributeBindings computeAllAttributeBindings(
         const gfx::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        return LayoutAttributes::bindings(layoutVertexBuffer)
+        return gfx::Attributes<LayoutAttributeList>::bindings(layoutVertexBuffer)
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
 
-    static uint32_t activeBindingCount(const typename Attributes::Bindings& allAttributeBindings) {
-        return Attributes::activeBindingCount(allAttributeBindings);
+    static uint32_t activeBindingCount(const AttributeBindings& allAttributeBindings) {
+        return gfx::Attributes<AttributeList>::activeBindingCount(allAttributeBindings);
     }
 
     template <class DrawMode>
@@ -79,9 +79,9 @@ public:
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
-              const SegmentVector<Attributes>& segments,
+              const SegmentVector<AttributeList>& segments,
               const typename AllUniforms::Values& allUniformValues,
-              const typename Attributes::Bindings& allAttributeBindings,
+              const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
         for (auto& segment : segments) {
@@ -100,7 +100,7 @@ public:
                 std::move(cullFaceMode),
                 allUniformValues,
                 vertexArrayIt->second,
-                Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                 textureBindings,
                 indexBuffer,
                 segment.indexOffset,

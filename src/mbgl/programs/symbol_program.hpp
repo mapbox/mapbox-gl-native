@@ -248,7 +248,6 @@ template <class Shaders,
           class PaintProps>
 class SymbolProgram : public SymbolProgramBase {
 public:
-    using LayoutAttributes = gl::Attributes<LayoutAttributeList>;
     using LayoutVertex = gfx::Vertex<LayoutAttributeList>;
 
     using LayoutAndSizeAttributeList = TypeListConcat<LayoutAttributeList, SymbolDynamicLayoutAttributes, SymbolOpacityAttributes>;
@@ -256,7 +255,8 @@ public:
     using PaintProperties = PaintProps;
     using Binders = PaintPropertyBinders<typename PaintProperties::DataDrivenProperties>;
     using PaintAttributeList = typename Binders::AttributeList;
-    using Attributes = gl::Attributes<TypeListConcat<LayoutAndSizeAttributeList, PaintAttributeList>>;
+    using AttributeList = TypeListConcat<LayoutAndSizeAttributeList, PaintAttributeList>;
+    using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
 
     using UniformValues = gfx::UniformValues<UniformList>;
     using SizeUniformList = typename SymbolSizeBinder::UniformList;
@@ -265,7 +265,7 @@ public:
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureList>;
+    using ProgramType = gl::Program<Primitive, AttributeList, AllUniforms, TextureList>;
 
     ProgramType program;
 
@@ -288,7 +288,7 @@ public:
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
-    static typename Attributes::Bindings computeAllAttributeBindings(
+    static AttributeBindings computeAllAttributeBindings(
         const gfx::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
         const gfx::VertexBuffer<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicLayoutVertexBuffer,
         const gfx::VertexBuffer<gfx::Vertex<SymbolOpacityAttributes>>& opacityVertexBuffer,
@@ -296,14 +296,14 @@ public:
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
         assert(layoutVertexBuffer.elements == dynamicLayoutVertexBuffer.elements &&
                layoutVertexBuffer.elements == opacityVertexBuffer.elements);
-        return gl::Attributes<LayoutAttributeList>::bindings(layoutVertexBuffer)
-            .concat(gl::Attributes<SymbolDynamicLayoutAttributes>::bindings(dynamicLayoutVertexBuffer))
-            .concat(gl::Attributes<SymbolOpacityAttributes>::bindings(opacityVertexBuffer))
+        return gfx::Attributes<LayoutAttributeList>::bindings(layoutVertexBuffer)
+            .concat(gfx::Attributes<SymbolDynamicLayoutAttributes>::bindings(dynamicLayoutVertexBuffer))
+            .concat(gfx::Attributes<SymbolOpacityAttributes>::bindings(opacityVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
 
-    static uint32_t activeBindingCount(const typename Attributes::Bindings& allAttributeBindings) {
-        return Attributes::activeBindingCount(allAttributeBindings);
+    static uint32_t activeBindingCount(const AttributeBindings& allAttributeBindings) {
+        return gfx::Attributes<AttributeList>::activeBindingCount(allAttributeBindings);
     }
 
     template <class DrawMode>
@@ -314,9 +314,9 @@ public:
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
-              const SegmentVector<Attributes>& segments,
+              const SegmentVector<AttributeList>& segments,
               const typename AllUniforms::Values& allUniformValues,
-              const typename Attributes::Bindings& allAttributeBindings,
+              const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
         for (auto& segment : segments) {
@@ -335,7 +335,7 @@ public:
                 std::move(cullFaceMode),
                 allUniformValues,
                 vertexArrayIt->second,
-                Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
                 textureBindings,
                 indexBuffer,
                 segment.indexOffset,
@@ -451,8 +451,8 @@ using SymbolSDFIconProgram = SymbolSDFProgram<style::IconPaintProperties>;
 using SymbolSDFTextProgram = SymbolSDFProgram<style::TextPaintProperties>;
 
 using SymbolLayoutVertex = gfx::Vertex<SymbolLayoutAttributes>;
-using SymbolIconAttributes = SymbolIconProgram::Attributes;
-using SymbolTextAttributes = SymbolSDFTextProgram::Attributes;
+using SymbolIconAttributes = SymbolIconProgram::AttributeList;
+using SymbolTextAttributes = SymbolSDFTextProgram::AttributeList;
 
 class SymbolLayerPrograms final : public LayerTypePrograms {
 public:

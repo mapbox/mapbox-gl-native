@@ -4,6 +4,7 @@
 #include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
+#include <mbgl/util/ignore.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <array>
@@ -234,15 +235,6 @@ struct Vertex<TypeList<As...>> {
     using Type = VertexType<typename As::Type...>;
 };
 
-template <class>
-class AttributeBindings;
-
-template <class... Ts>
-class AttributeBindings<TypeList<Ts...>> {
-public:
-    using Type = IndexedTuple<TypeList<Ts...>, TypeList<ExpandToType<Ts, optional<AttributeBinding>>...>>;
-};
-
 } // namespace detail
 
 template <class A>
@@ -250,9 +242,6 @@ using Vertex = typename detail::Vertex<A>::Type;
 
 template <class T>
 using VertexType = typename detail::VertexType<T>;
-
-template <class AttributeTypeList>
-using AttributeBindings = typename detail::AttributeBindings<AttributeTypeList>::Type;
 
 template <size_t I = 0, class... As>
 AttributeBinding attributeBinding(const VertexBuffer<detail::VertexType<As...>>& buffer) {
@@ -265,6 +254,31 @@ AttributeBinding attributeBinding(const VertexBuffer<detail::VertexType<As...>>&
         0,
     };
 }
+
+optional<gfx::AttributeBinding> offsetAttributeBinding(const optional<gfx::AttributeBinding>& binding, std::size_t vertexOffset);
+
+template <class>
+class Attributes;
+
+template <class... As>
+class Attributes<TypeList<As...>> final {
+public:
+    using Bindings = IndexedTuple<TypeList<As...>, TypeList<ExpandToType<As, optional<AttributeBinding>>...>>;
+
+    static Bindings bindings(const VertexBuffer<Vertex<TypeList<As...>>>& buffer) {
+        return Bindings { attributeBinding<TypeIndex<As, As...>::value>(buffer)... };
+    }
+
+    static Bindings offsetBindings(const Bindings& bindings, const std::size_t vertexOffset) {
+        return Bindings { offsetAttributeBinding(bindings.template get<As>(), vertexOffset)... };
+    }
+
+    static uint32_t activeBindingCount(const Bindings& bindings) {
+        uint32_t result = 0;
+        util::ignore({ ((result += bool(bindings.template get<As>())), 0)... });
+        return result;
+    }
+};
 
 } // namespace gfx
 } // namespace mbgl

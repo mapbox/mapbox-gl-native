@@ -24,6 +24,6 @@ public:
 };
 
 using DebugLayoutVertex = DebugProgram::LayoutVertex;
-using DebugAttributes = DebugProgram::Attributes;
+using DebugAttributes = DebugProgram::AttributeList;
 
 } // namespace mbgl

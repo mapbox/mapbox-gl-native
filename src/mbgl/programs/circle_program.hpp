@@ -47,7 +47,7 @@ public:
 };
 
 using CircleLayoutVertex = CircleProgram::LayoutVertex;
-using CircleAttributes = CircleProgram::Attributes;
+using CircleAttributes = CircleProgram::AttributeList;
 
 class CircleLayerPrograms final : public LayerTypePrograms  {
 public:

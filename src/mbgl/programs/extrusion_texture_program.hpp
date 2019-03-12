@@ -35,6 +35,6 @@ public:
 };
 
 using ExtrusionTextureLayoutVertex = ExtrusionTextureProgram::LayoutVertex;
-using ExtrusionTextureAttributes = ExtrusionTextureProgram::Attributes;
+using ExtrusionTextureAttributes = ExtrusionTextureProgram::AttributeList;
 
 } // namespace mbgl

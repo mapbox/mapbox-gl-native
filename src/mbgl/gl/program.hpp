@@ -21,15 +21,14 @@
 namespace mbgl {
 namespace gl {
 
-template <class P, class As, class Us, class TextureList>
+template <class P, class AttributeList, class Us, class TextureList>
 class Program {
 public:
     using Primitive = P;
-    using Attributes = As;
     using Uniforms = Us;
 
     using UniformValues = typename Uniforms::Values;
-    using AttributeBindings = typename Attributes::Bindings;
+    using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
@@ -37,7 +36,7 @@ public:
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
           uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
-          attributeLocations(Attributes::bindLocations(context, program)) {
+          attributeLocations(gl::Attributes<AttributeList>::bindLocations(context, program)) {
         // Re-link program after manually binding only active attributes in Attributes::bindLocations
         context.linkProgram(program);
 
@@ -53,7 +52,7 @@ public:
     Program(Context& context, const BinaryProgram& binaryProgram)
         : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
           uniformsState(Uniforms::loadNamedLocations(binaryProgram)),
-          attributeLocations(Attributes::loadNamedLocations(binaryProgram)) {
+          attributeLocations(gl::Attributes<AttributeList>::loadNamedLocations(binaryProgram)) {
         textures.loadNamedLocations(binaryProgram);
     }
     
@@ -111,7 +110,7 @@ public:
     optional<BinaryProgram> get(Context& context, const std::string& identifier) const {
         if (auto binaryProgram = context.getBinaryProgram(program)) {
             return BinaryProgram{ binaryProgram->first, std::move(binaryProgram->second),
-                                  identifier, Attributes::getNamedLocations(attributeLocations),
+                                  identifier, gl::Attributes<AttributeList>::getNamedLocations(attributeLocations),
                                   Uniforms::getNamedLocations(uniformsState),
                                   textures.getNamedLocations() };
         }
@@ -148,7 +147,7 @@ public:
 
         vertexArray.bind(context,
                         indexBuffer,
-                        Attributes::toBindingArray(attributeLocations, attributeBindings));
+                        gl::Attributes<AttributeList>::toBindingArray(attributeLocations, attributeBindings));
 
         context.draw(drawMode.primitiveType,
                      indexOffset,
@@ -159,7 +158,7 @@ private:
     UniqueProgram program;
 
     typename Uniforms::State uniformsState;
-    typename Attributes::Locations attributeLocations;
+    typename gl::Attributes<AttributeList>::Locations attributeLocations;
     gl::Textures<TextureList> textures;
 };
 

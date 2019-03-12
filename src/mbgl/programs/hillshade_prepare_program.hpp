@@ -46,6 +46,6 @@ public:
 };
 
 using HillshadePrepareLayoutVertex = HillshadePrepareProgram::LayoutVertex;
-using HillshadePrepareAttributes = HillshadePrepareProgram::Attributes;
+using HillshadePrepareAttributes = HillshadePrepareProgram::AttributeList;
 
 } // namespace mbgl

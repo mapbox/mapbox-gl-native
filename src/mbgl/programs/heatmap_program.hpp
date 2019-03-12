@@ -46,7 +46,7 @@ public:
 };
 
 using HeatmapLayoutVertex = HeatmapProgram::LayoutVertex;
-using HeatmapAttributes = HeatmapProgram::Attributes;
+using HeatmapAttributes = HeatmapProgram::AttributeList;
 
 class HeatmapLayerPrograms final : public LayerTypePrograms  {
 public:
