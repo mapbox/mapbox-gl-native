@@ -53,9 +53,7 @@ public:
     using Locations = IndexedTuple<
         TypeList<As...>,
         TypeList<ExpandToType<As, optional<AttributeLocation>>...>>;
-    using Bindings = IndexedTuple<
-        TypeList<As...>,
-        TypeList<ExpandToType<As, optional<gfx::AttributeBinding>>...>>;
+    using Bindings = gfx::AttributeBindings<TypeList<As...>>;
     using NamedLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
     static Locations bindLocations(Context& context, const ProgramID& id) {
