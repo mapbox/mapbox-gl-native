@@ -248,13 +248,23 @@ public:
 template <class A>
 using Vertex = typename detail::Vertex<A>::Type;
 
-template <class V>
-using VertexDescriptorOf = detail::Descriptor<V>;
 template <class T>
 using VertexType = typename detail::VertexType<T>;
 
 template <class AttributeTypeList>
 using AttributeBindings = typename detail::AttributeBindings<AttributeTypeList>::Type;
+
+template <size_t I = 0, class... As>
+AttributeBinding attributeBinding(const VertexBuffer<detail::VertexType<As...>>& buffer) {
+    using Descriptor = detail::Descriptor<detail::VertexType<As...>>;
+    static_assert(I < Descriptor::data.count, "attribute index must be in range");
+    return {
+        Descriptor::data.attributes[I],
+        Descriptor::data.stride,
+        buffer.resource.get(),
+        0,
+    };
+}
 
 } // namespace gfx
 } // namespace mbgl
