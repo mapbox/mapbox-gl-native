@@ -1,8 +1,10 @@
 #pragma once
 
 #include <mbgl/gfx/types.hpp>
+#include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <array>
 #include <type_traits>
@@ -77,6 +79,21 @@ struct VertexDescriptor {
     uint8_t stride;
     uint8_t count;
     AttributeDescriptor attributes[5];
+};
+
+class AttributeBinding {
+public:
+    AttributeDescriptor attribute;
+    uint8_t vertexStride;
+    const VertexBufferResource* vertexBufferResource;
+    uint32_t vertexOffset;
+
+    friend bool operator==(const AttributeBinding& lhs, const AttributeBinding& rhs) {
+        return lhs.attribute == rhs.attribute &&
+               lhs.vertexStride == rhs.vertexStride &&
+               lhs.vertexBufferResource == rhs.vertexBufferResource &&
+               lhs.vertexOffset == rhs.vertexOffset;
+    }
 };
 
 // Attribute binding requires member offsets. The only standard way to

@@ -101,7 +101,7 @@ public:
                                       const style::expression::Value&) = 0;
     virtual void upload(gfx::Context& context) = 0;
     virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) = 0;
-    virtual std::tuple<ExpandToType<As, optional<gl::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
+    virtual std::tuple<ExpandToType<As, optional<gfx::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
     virtual std::tuple<ExpandToType<As, float>...> interpolationFactor(float currentZoom) const = 0;
     virtual std::tuple<ExpandToType<As, UniformValueType>...> uniformValue(const PossiblyEvaluatedType& currentValue) const = 0;
 
@@ -121,7 +121,7 @@ public:
     void upload(gfx::Context&) override {}
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
 
-    std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
+    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
         return {};
     }
 
@@ -155,7 +155,7 @@ public:
         }
     }
 
-    std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>>
+    std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>
     attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>&) const override {
         return {};
     }
@@ -200,7 +200,7 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
@@ -264,7 +264,7 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
@@ -358,7 +358,7 @@ public:
         zoomOutVertexBuffer = context.createVertexBuffer(std::move(zoomOutVertexVector));
     }
 
-    std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {
+    std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
