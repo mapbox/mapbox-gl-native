@@ -6,6 +6,7 @@
 #import "LimeGreenStyleLayer.h"
 #import "MBXEmbeddedMapViewController.h"
 #import "MBXOrnamentsViewController.h"
+#import "MBXStateManager.h"
 
 #import "MBXFrameTimeGraphView.h"
 
@@ -168,29 +169,21 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 #pragma mark - Setup & Teardown
 
-+ (void)initialize
-{
-    if (self == [MBXViewController class])
-    {
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-            @"MBXUserTrackingMode": @(MGLUserTrackingModeNone),
-            @"MBXShowsUserLocation": @NO,
-            @"MBXDebug": @NO,
-        }];
-    }
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    [[MBXStateManager sharedManager].currentState saveDebugMaskState:NO];
+    [[MBXStateManager sharedManager].currentState saveUserTrackingModeState:MGLUserTrackingModeNone];
+    [[MBXStateManager sharedManager].currentState saveShowsUserLocationState:NO];
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
-    [self restoreState:nil];
+    [self restoreState:[MBXStateManager sharedManager].currentState];
 
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
+
     self.mapView.showsScale = YES;
     self.mapView.showsUserHeadingIndicator = YES;
     self.mapView.experimental_enableFrameRateMeasurement = YES;
@@ -235,45 +228,30 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 - (void)saveState:(__unused NSNotification *)notification
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *archivedCamera = [NSKeyedArchiver archivedDataWithRootObject:self.mapView.camera];
-    [defaults setObject:archivedCamera forKey:@"MBXCamera"];
-    [defaults setInteger:self.mapView.userTrackingMode forKey:@"MBXUserTrackingMode"];
-    [defaults setBool:self.mapView.showsUserLocation forKey:@"MBXShowsUserLocation"];
-    [defaults setInteger:self.mapView.debugMask forKey:@"MBXDebugMask"];
-    [defaults setBool:self.mapInfoHUDEnabled forKey:@"MBXShowsZoomLevelHUD"];
-    [defaults setBool:self.mapInfoHUDEnabled forKey:@"MBXShowsFrameTimeGraph"];
-    [defaults synchronize];
+    MBXState *currentState = [MBXStateManager sharedManager].currentState;
+    [currentState saveMapCameraState:self.mapView.camera];
+    [currentState saveShowsUserLocationState:self.mapView.showsUserLocation];
+    [currentState saveUserTrackingModeState:self.mapView.userTrackingMode];
+    [currentState saveDebugMaskState:self.mapView.debugMask];
+    [currentState saveZoomLevelHUDState:self.mapInfoHUDEnabled];
+    [currentState saveDisplayTimeFrameGraphState:self.frameTimeGraphEnabled];
 }
 
-- (void)restoreState:(__unused NSNotification *)notification
+- (void)restoreState:(MBXState*)state
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *archivedCamera = [defaults objectForKey:@"MBXCamera"];
-    MGLMapCamera *camera = archivedCamera ? [NSKeyedUnarchiver unarchiveObjectWithData:archivedCamera] : nil;
-    if (camera)
+    if (state.camera)
     {
-        self.mapView.camera = camera;
+        self.mapView.camera = state.camera;
     }
-    NSInteger uncheckedTrackingMode = [defaults integerForKey:@"MBXUserTrackingMode"];
-    if (uncheckedTrackingMode >= 0 &&
-        (NSUInteger)uncheckedTrackingMode >= MGLUserTrackingModeNone &&
-        (NSUInteger)uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
-    {
-        self.mapView.userTrackingMode = (MGLUserTrackingMode)uncheckedTrackingMode;
-    }
-    self.mapView.showsUserLocation = [defaults boolForKey:@"MBXShowsUserLocation"];
-    NSInteger uncheckedDebugMask = [defaults integerForKey:@"MBXDebugMask"];
-    if (uncheckedDebugMask >= 0)
-    {
-        self.mapView.debugMask = (MGLMapDebugMaskOptions)uncheckedDebugMask;
-    }
-    if ([defaults boolForKey:@"MBXShowsZoomLevelHUD"])
-    {
-        self.mapInfoHUDEnabled = YES;
-        [self updateHUD];
-    }
-    if ([defaults boolForKey:@"MBXShowsFrameTimeGraph"])
+
+    self.mapView.showsUserLocation = state.showsUserLocation;
+    self.mapView.userTrackingMode = state.userTrackingMode;
+    self.mapView.debugMask = state.debugMask;
+    self.mapInfoHUDEnabled = state.showsZoomLevelHUD;
+
+    [self updateHUD];
+
+    if (state.showsTimeFrameGraph == YES)
     {
         self.frameTimeGraphEnabled = YES;
         self.frameTimeGraphView.hidden = NO;
@@ -295,8 +273,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    [self saveState:nil];
+    [[MBXStateManager sharedManager] resetState];
 }
 
 #pragma mark - Debugging Interface
@@ -429,6 +406,9 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     self.mapInfoHUDEnabled = !self.mapInfoHUDEnabled;
                     self.hudLabel.hidden = !self.mapInfoHUDEnabled;
+
+                    [[MBXStateManager sharedManager].currentState saveZoomLevelHUDState:self.mapInfoHUDEnabled];
+
                     self.reuseQueueStatsEnabled = NO;
                     [self updateHUD];
                     break;
@@ -437,6 +417,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     self.frameTimeGraphEnabled = !self.frameTimeGraphEnabled;
                     self.frameTimeGraphView.hidden = !self.frameTimeGraphEnabled;
+                    [[MBXStateManager sharedManager].currentState saveDisplayTimeFrameGraphState:self.frameTimeGraphEnabled];
                     break;
                 }
                 case MBXSettingsDebugToolsShowReuseQueueStats:
@@ -444,7 +425,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     self.reuseQueueStatsEnabled = !self.reuseQueueStatsEnabled;
                     self.hudLabel.hidden = !self.reuseQueueStatsEnabled;
                     self.mapInfoHUDEnabled = NO;
-                    [self updateHUD];
+                    [[MBXStateManager sharedManager].currentState saveZoomLevelHUDState:self.mapInfoHUDEnabled];
                     break;
                 }
                 default:

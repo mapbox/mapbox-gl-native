@@ -17,6 +17,8 @@
 		077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */; };
 		0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0778DD441F67556C00A73B34 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
+		07AF264822372BDB00FD01DD /* MBXStateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AF264722372BDB00FD01DD /* MBXStateManager.m */; };
+		07AF264B22382E5800FD01DD /* MBXState.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AF264A22382E5800FD01DD /* MBXState.m */; };
 		07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
 		07D8C6FF1F67562C00381808 /* MGLComputedShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */; };
 		07D947531F67488E00E37934 /* MGLComputedShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */; };
@@ -803,6 +805,10 @@
 		077061DB215DA11F000FEF62 /* MGLTestLocationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTestLocationManager.h; sourceTree = "<group>"; };
 		0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource.h; sourceTree = "<group>"; };
 		0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLComputedShapeSource.mm; sourceTree = "<group>"; };
+		07AF264622372BDB00FD01DD /* MBXStateManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXStateManager.h; sourceTree = "<group>"; };
+		07AF264722372BDB00FD01DD /* MBXStateManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXStateManager.m; sourceTree = "<group>"; };
+		07AF264922382E5800FD01DD /* MBXState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXState.h; sourceTree = "<group>"; };
+		07AF264A22382E5800FD01DD /* MBXState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXState.m; sourceTree = "<group>"; };
 		07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLComputedShapeSourceTests.m; path = ../../darwin/test/MGLComputedShapeSourceTests.m; sourceTree = "<group>"; };
 		07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource_Private.h; sourceTree = "<group>"; };
 		16376B071FFD9DAF0000563E /* integration.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = integration.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1825,6 +1831,10 @@
 				076171C62141A91700668A35 /* Settings.bundle */,
 				9604FC341F313A5E003EEA02 /* Fixtures */,
 				DA1DC94D1CB6C1C2006E619F /* Supporting Files */,
+				07AF264622372BDB00FD01DD /* MBXStateManager.h */,
+				07AF264722372BDB00FD01DD /* MBXStateManager.m */,
+				07AF264922382E5800FD01DD /* MBXState.h */,
+				07AF264A22382E5800FD01DD /* MBXState.m */,
 			);
 			name = "Demo App";
 			path = app;
@@ -2962,12 +2972,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA1DC9971CB6E046006E619F /* main.m in Sources */,
+				07AF264822372BDB00FD01DD /* MBXStateManager.m in Sources */,
 				965DF51120F9430500438AAC /* MBXFrameTimeGraphView.m in Sources */,
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
 				6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
+				07AF264B22382E5800FD01DD /* MBXState.m in Sources */,
 				3E6465D62065767A00685536 /* LimeGreenStyleLayer.m in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
 			);
