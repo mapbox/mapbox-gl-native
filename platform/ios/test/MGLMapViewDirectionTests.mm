@@ -33,46 +33,51 @@ static MGLMapView *mapView;
     [super tearDown];
 }
 
-- (void)testDirectionAndRotation {
+- (void)testDirection {
     mapView.zoomLevel = 0;
     mapView.direction = 30;
     XCTAssertEqual(mapView.direction, 0, @"Rotation is not allowed at world-scale zoom levels.");
 
     mapView.zoomLevel = 15;
 
-    mapView.direction = 5;
-    XCTAssertEqual(mapView.direction, 5);
-
-    mapView.direction = -180;
-    XCTAssertEqual(mapView.direction, 180, @"Negative (invalid) direction should be wrapped.");
-
-    mapView.direction = 366;
-    XCTAssertEqualWithAccuracy(mapView.direction, 6, 0.001, @">360° direction should be wrapped.");
+    for (NSNumber *degrees in @[@-999, @-359, @-240, @-180, @-90, @-45, @0, @45, @90, @180, @240, @360, @999]) {
+        double inputDegrees = [degrees doubleValue];
+        double wrappedDegrees = mbgl::util::wrap(inputDegrees, 0., 360.);
+        mapView.direction = inputDegrees;
+        XCTAssertEqualWithAccuracy(mapView.direction, wrappedDegrees, 0.001);
+    }
 
     [mapView resetNorthAnimated:NO];
     XCTAssertEqual(mapView.direction, 0, @"Reset-to-north should set direction to 0°.");
+}
 
-    UIRotationGestureRecognizer *rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:nil action:nil];
-    rotate.state = UIGestureRecognizerStateBegan;
-    rotate.rotation = 0;
-    [mapView handleRotateGesture:rotate];
-    XCTAssertEqual(mapView.direction, rotate.rotation);
+- (void)testRotateGesture {
+    mapView.zoomLevel = 15;
 
-    rotate.state = UIGestureRecognizerStateChanged;
-    rotate.rotation = 0.4;
-    [mapView handleRotateGesture:rotate];
-    XCTAssertEqual(mapView.direction, mbgl::util::wrap(-MGLDegreesFromRadians(rotate.rotation), 0., 360.), @"Map direction should match gesture rotation.");
+    UIRotationGestureRecognizer *gesture = [[UIRotationGestureRecognizer alloc] initWithTarget:nil action:nil];
+    gesture.state = UIGestureRecognizerStateBegan;
+    gesture.rotation = 0;
+    [mapView handleRotateGesture:gesture];
+    XCTAssertEqual(mapView.direction, gesture.rotation);
+
+    for (NSNumber *degrees in @[@-999, @-360, @-240, @-180, @-90, @-45, @0, @45, @90, @180, @240, @359, @999]) {
+        gesture.state = UIGestureRecognizerStateChanged;
+        gesture.rotation = MGLRadiansFromDegrees([degrees doubleValue]);
+        [mapView handleRotateGesture:gesture];
+        CGFloat wrappedRotation = mbgl::util::wrap(-MGLDegreesFromRadians(gesture.rotation), 0., 360.);
+        XCTAssertEqualWithAccuracy(mapView.direction, wrappedRotation, 0.001, @"Map direction should match gesture rotation for input of %@°.", degrees);
+    }
 }
 
 - (void)testCompassRotation {
     mapView.zoomLevel = 15;
 
-    for (NSNumber *degrees in @[@-1, @0, @45, @90, @180, @240, @360, @999]) {
+    for (NSNumber *degrees in @[@-999, @-359, @-240, @-180, @-90, @-45, @0, @45, @90, @180, @240, @360, @999]) {
         mapView.direction = [degrees doubleValue];
         CGFloat wrappedDirection = mbgl::util::wrap(-mapView.direction, 0., 360.);
         CGAffineTransform rotation = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(wrappedDirection));
         XCTAssertTrue(CGAffineTransformEqualToTransform(mapView.compassView.transform, rotation),
-                      @"Compass transform %@ should equal wrapped transform %@.", NSStringFromCGAffineTransform(mapView.compassView.transform), NSStringFromCGAffineTransform(rotation));
+                      @"Compass transform direction %f° should equal wrapped transform direction %f° (~%.f°).", [self degreesFromAffineTransform:mapView.compassView.transform], [self degreesFromAffineTransform:rotation], wrappedDirection);
     }
 }
 
@@ -80,6 +85,11 @@ static MGLMapView *mapView;
     [mapView resetPosition];
     MGLMapCamera *defaultCamera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(0, 0) altitude:mapView.camera.altitude pitch:0 heading:0];
     XCTAssertTrue([mapView.camera isEqualToMapCamera:defaultCamera], @"Map camera %@ should be equal to default camera %@.", mapView.camera, defaultCamera);
+}
+
+- (CGFloat)degreesFromAffineTransform:(CGAffineTransform)transform {
+    CGFloat angle = atan2f(transform.b, transform.a);
+    return MGLDegreesFromRadians(angle);
 }
 
 @end
