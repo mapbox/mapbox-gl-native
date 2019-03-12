@@ -397,7 +397,7 @@ BindVertexArray::Type BindVertexArray::Get(const Context& context) {
     return binding;
 }
 
-const optional<AttributeBinding> VertexAttribute::Default {};
+const VertexAttribute::Type VertexAttribute::Default {};
 
 namespace {
 
@@ -484,7 +484,7 @@ GLint components(const gfx::AttributeDataType type) {
 
 } // namespace
 
-void VertexAttribute::Set(const optional<AttributeBinding>& binding, Context& context, AttributeLocation location) {
+void VertexAttribute::Set(const Type& binding, Context& context, AttributeLocation location) {
     if (binding) {
         context.vertexBuffer = reinterpret_cast<const gl::VertexBufferResource&>(*binding->vertexBufferResource).buffer;
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));

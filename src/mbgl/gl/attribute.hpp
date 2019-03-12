@@ -18,22 +18,8 @@
 namespace mbgl {
 namespace gl {
 
-class AttributeBinding {
-public:
-    gfx::AttributeDescriptor attribute;
-    uint8_t vertexStride;
-    const gfx::VertexBufferResource* vertexBufferResource;
-    uint32_t vertexOffset;
+using AttributeBindingArray = std::vector<optional<gfx::AttributeBinding>>;
 
-    friend bool operator==(const AttributeBinding& lhs, const AttributeBinding& rhs) {
-        return lhs.attribute == rhs.attribute &&
-               lhs.vertexStride == rhs.vertexStride &&
-               lhs.vertexBufferResource == rhs.vertexBufferResource &&
-               lhs.vertexOffset == rhs.vertexOffset;
-    }
-};
-
-using AttributeBindingArray = std::vector<optional<AttributeBinding>>;
 
     /*
         Create a binding for this attribute.  The `attributeSize` parameter may be used to
@@ -41,7 +27,7 @@ using AttributeBindingArray = std::vector<optional<AttributeBinding>>;
         a buffer with only one float for each vertex can be bound to a `vec2` attribute
     */
 template <std::size_t I, typename Vertex>
-AttributeBinding attributeBinding(const gfx::VertexBuffer<Vertex>& buffer) {
+gfx::AttributeBinding attributeBinding(const gfx::VertexBuffer<Vertex>& buffer) {
     static_assert(I < gfx::VertexDescriptorOf<Vertex>::data.count, "vertex attribute index out of range");
     return {
         gfx::VertexDescriptorOf<Vertex>::data.attributes[I],
@@ -51,7 +37,7 @@ AttributeBinding attributeBinding(const gfx::VertexBuffer<Vertex>& buffer) {
     };
 }
 
-optional<AttributeBinding> offsetAttributeBinding(const optional<AttributeBinding>& binding, std::size_t vertexOffset);
+optional<gfx::AttributeBinding> offsetAttributeBinding(const optional<gfx::AttributeBinding>& binding, std::size_t vertexOffset);
 
 class Context;
 void bindAttributeLocation(Context&, ProgramID, AttributeLocation, const char * name);
@@ -69,7 +55,7 @@ public:
         TypeList<ExpandToType<As, optional<AttributeLocation>>...>>;
     using Bindings = IndexedTuple<
         TypeList<As...>,
-        TypeList<ExpandToType<As, optional<AttributeBinding>>...>>;
+        TypeList<ExpandToType<As, optional<gfx::AttributeBinding>>...>>;
     using NamedLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
     static Locations bindLocations(Context& context, const ProgramID& id) {
@@ -120,7 +106,7 @@ public:
         result.resize(sizeof...(As));
 
         auto maybeAddBinding = [&] (const optional<AttributeLocation>& location,
-                                    const optional<AttributeBinding>& binding) {
+                                    const optional<gfx::AttributeBinding>& binding) {
             if (location) {
                 result.at(*location) = binding;
             }
