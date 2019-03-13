@@ -2,6 +2,9 @@ add_executable(mbgl-offline
     bin/offline.cpp
 )
 
+# args requires RTTI
+set_source_files_properties(bin/offline.cpp PROPERTIES COMPILE_OPTIONS "-frtti")
+
 target_sources(mbgl-offline
     PRIVATE platform/default/include/mbgl/util/default_styles.hpp
 )

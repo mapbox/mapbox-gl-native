@@ -2,6 +2,9 @@ add_executable(mbgl-render
     bin/render.cpp
 )
 
+# args requires RTTI
+set_source_files_properties(bin/render.cpp PROPERTIES COMPILE_OPTIONS "-frtti")
+
 target_include_directories(mbgl-render
     PRIVATE platform/default/include
 )

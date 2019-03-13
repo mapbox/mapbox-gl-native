@@ -55,7 +55,7 @@ void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            loader->json = std::make_shared<const std::string>();
+            loader->json = std::make_shared<std::string>();
             emitSpriteLoadedIfComplete();
         } else {
             // Only trigger a sprite loaded event we got new data.
@@ -70,7 +70,7 @@ void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            loader->image = std::make_shared<const std::string>();
+            loader->image = std::make_shared<std::string>();
             emitSpriteLoadedIfComplete();
         } else {
             loader->image = res.data;

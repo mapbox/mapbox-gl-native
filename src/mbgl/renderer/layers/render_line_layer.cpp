@@ -128,7 +128,6 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
-            assert(dynamic_cast<GeometryTile*>(&tile.tile));
             GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);            
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
