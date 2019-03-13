@@ -31,21 +31,20 @@
 
 namespace mbgl {
 namespace gfx {
-namespace detail {
 
 template <class>
 class UniformValues;
 
 template <class... Us>
-class UniformValues<TypeList<Us...>> {
+class UniformValues<TypeList<Us...>> final
+    : public IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>> {
+    using Base = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
+
 public:
-    using Type = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
+    template <class... Args>
+    UniformValues(Args&&... args) : Base(std::forward<Args>(args)...) {
+    }
 };
-
-} // namespace detail
-
-template <class UniformTypeList>
-using UniformValues = typename detail::UniformValues<UniformTypeList>::Type;
 
 } // namespace gfx
 } // namespace mbgl
