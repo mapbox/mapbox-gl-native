@@ -4,8 +4,20 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.3.0-alpha.2 - March 13, 2019
+
 ### Features
+- Option to change path of the resources cache db [#13947](https://github.com/mapbox/mapbox-gl-native/pull/13947)
+- Throw an exception if the component is accessed before the activation [#14068](https://github.com/mapbox/mapbox-gl-native/pull/14068)
 - Add Galician localization [#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095)
+
+### Bugs
+- Set a blank style when an empty builder is provided [#14085](https://github.com/mapbox/mapbox-gl-native/pull/14085)
+- Fix quick-zoom + double-tap gestures combo regression [#14084](https://github.com/mapbox/mapbox-gl-native/pull/14084)
+- Explicitly declare MapboxIssueRegistry's lint version [#14086](https://github.com/mapbox/mapbox-gl-native/pull/14086)
+
+### Build
+- Publish SNAPSHOTs to oss.jfrog.org [#14067](https://github.com/mapbox/mapbox-gl-native/pull/14067)
 
 ## 7.3.0-alpha.1 - March 7, 2019
 
