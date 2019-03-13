@@ -38,7 +38,7 @@ class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{
 public:
     Impl(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&, GLContextMode,
-         const optional<std::string> programCacheDir, const optional<std::string> localFontFamily);
+         const optional<std::string> programCacheDir, const optional<std::string> localFontFamily_);
     ~Impl() final;
 
     void markContextLost() {
@@ -98,6 +98,7 @@ private:
     const GLContextMode contextMode;
     const float pixelRatio;
     const optional<std::string> programCacheDir;
+    const optional<std::string> localFontFamily;
 
     enum class RenderState {
         Never,
