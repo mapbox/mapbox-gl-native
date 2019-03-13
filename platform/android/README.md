@@ -4,21 +4,17 @@
 
 [![](https://www.mapbox.com/android-docs/assets/overview-map-sdk-322-9abe118316efb5910b6101e222a2e57c.png)](https://docs.mapbox.com/android/maps/overview/)
 
-A library based on [Mapbox GL Native](../../README.md) for embedding interactive map views with scalable, customizable vector maps onto Android devices.
+The Mapbox Maps SDK for Android is a library based on [Mapbox GL Native](../../README.md) for embedding interactive map views with scalable, customizable vector maps onto Android devices.
 
 ## Getting Started
 
-Alright. So, actually, you may be in the wrong place. From here on in, this README is going to be for people who are interested in working on and improving the Maps SDK for Android.
+This particular README is for people who are interested in working on and improving the Maps SDK for Android. If you're looking for more general information and instructions on the Maps SDK:
 
 Visit [https://docs.mapbox.com/android/maps/overview](https://docs.mapbox.com/android/maps/overview/) to see current documentation on the Maps SDK for Android.
 
-To view the current API Javadoc files on the Maps SDK for Android, visit [https://docs.mapbox.com/android/maps/overview](https://docs.mapbox.com/android/maps/overview) and click on `API Reference` towards the top of the page
+Visit [https://docs.mapbox.com/android/api/map-sdk](https://docs.mapbox.com/android/api/map-sdk/) to view the Maps SDK's current API reference Javadoc files.
 
-![screen shot 2019-02-26 at 11 21 17 am](https://user-images.githubusercontent.com/4394910/53440121-a9f9d900-39b8-11e9-99c0-93719dae4c18.png)
- 
-
-To install and use the Mapbox Maps SDK for Android in an application, see [the Mapbox website's Android install flow](https://www.mapbox.com/install/android/).
-
+See [the Mapbox website's Android install flow](https://www.mapbox.com/install/android/) to install and use the Mapbox Maps SDK for Android in an application.
 
 ### Setup environment
 
