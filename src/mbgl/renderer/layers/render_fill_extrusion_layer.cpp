@@ -136,7 +136,6 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     continue;
                 }
                 const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
-                assert(dynamic_cast<GeometryTile*>(&tile.tile));
                 GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
                 optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
                 optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
