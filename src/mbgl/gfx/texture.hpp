@@ -52,21 +52,19 @@ public:
     TextureWrapType wrapY;
 };
 
-namespace detail {
-
 template <class>
 class TextureBindings;
 
 template <class... Ts>
-class TextureBindings<TypeList<Ts...>> {
+class TextureBindings<TypeList<Ts...>> final
+    : public IndexedTuple<TypeList<Ts...>, TypeList<ExpandToType<Ts, TextureBinding>...>> {
+    using Base = IndexedTuple<TypeList<Ts...>, TypeList<ExpandToType<Ts, TextureBinding>...>>;
+
 public:
-    using Type = IndexedTuple<TypeList<Ts...>, TypeList<ExpandToType<Ts, TextureBinding>...>>;
+    template <class... Args>
+    TextureBindings(Args&&... args) : Base(std::forward<Args>(args)...) {
+    }
 };
-
-} // namespace detail
-
-template <class TextureTypeList>
-using TextureBindings = typename detail::TextureBindings<TextureTypeList>::Type;
 
 } // namespace gfx
 } // namespace mbgl
