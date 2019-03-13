@@ -174,6 +174,7 @@ namespace android {
         };
 
         setAsync(converterFn);
+        global.release();
     }
 
     void GeoJSONSource::setAsync(Update::Converter converterFn) {
