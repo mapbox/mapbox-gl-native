@@ -20,14 +20,16 @@ public:
                Point<float> br_,
                Rect<uint16_t> tex_,
                WritingModeType writingMode_,
-               Point<float> glyphOffset_)
+               Point<float> glyphOffset_,
+               size_t sectionIndex_ = 0)
         : tl(std::move(tl_)),
         tr(std::move(tr_)),
         bl(std::move(bl_)),
         br(std::move(br_)),
         tex(std::move(tex_)),
         writingMode(writingMode_),
-        glyphOffset(glyphOffset_) {}
+        glyphOffset(glyphOffset_),
+        sectionIndex(sectionIndex_){}
 
     Point<float> tl;
     Point<float> tr;
@@ -36,6 +38,7 @@ public:
     Rect<uint16_t> tex;
     WritingModeType writingMode;
     Point<float> glyphOffset;
+    size_t sectionIndex;
 };
 
 using SymbolQuads = std::vector<SymbolQuad>;

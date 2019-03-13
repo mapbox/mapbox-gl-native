@@ -93,7 +93,7 @@ TEST(CustomLayer, Basic) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+    HeadlessFrontend frontend { pixelRatio, threadPool };
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
             threadPool, MapOptions().withMapMode(MapMode::Static));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));

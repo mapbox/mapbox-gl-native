@@ -28,7 +28,7 @@ public:
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
     void setData(std::shared_ptr<const std::string> data);
 
-    void upload(gl::Context&) override;
+    void upload(gfx::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
 
     void setMask(TileMask&&) override;

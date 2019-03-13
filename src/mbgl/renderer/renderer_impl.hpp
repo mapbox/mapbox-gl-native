@@ -27,7 +27,6 @@ class UpdateParameters;
 class RenderStaticData;
 class RenderedQueryOptions;
 class SourceQueryOptions;
-class FileSource;
 class Scheduler;
 class GlyphManager;
 class ImageManager;
@@ -37,8 +36,8 @@ class CrossTileSymbolIndex;
 class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{
 public:
-    Impl(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&, GLContextMode,
-         const optional<std::string> programCacheDir, const optional<std::string> localFontFamily);
+    Impl(RendererBackend&, float pixelRatio_, Scheduler&, GLContextMode,
+         const optional<std::string> programCacheDir, const optional<std::string> localFontFamily_);
     ~Impl() final;
 
     void markContextLost() {
@@ -91,13 +90,13 @@ private:
 
     RendererBackend& backend;
     Scheduler& scheduler;
-    FileSource& fileSource;
 
     RendererObserver* observer;
 
     const GLContextMode contextMode;
     const float pixelRatio;
     const optional<std::string> programCacheDir;
+    const optional<std::string> localFontFamily;
 
     enum class RenderState {
         Never,

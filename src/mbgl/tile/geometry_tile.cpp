@@ -173,7 +173,7 @@ const optional<ImagePosition> GeometryTile::getPattern(const std::string& patter
     return {};
 }
 
-void GeometryTile::upload(gl::Context& context) {
+void GeometryTile::upload(gfx::Context& context) {
     auto uploadFn = [&] (Bucket& bucket) {
         if (bucket.needsUpload()) {
             bucket.upload(context);
@@ -185,12 +185,12 @@ void GeometryTile::upload(gl::Context& context) {
     }
 
     if (glyphAtlasImage) {
-        glyphAtlasTexture = context.createTexture(*glyphAtlasImage, 0);
+        glyphAtlasTexture = context.createTexture(*glyphAtlasImage);
         glyphAtlasImage = {};
     }
 
     if (iconAtlas.image.valid()) {
-        iconAtlasTexture = context.createTexture(iconAtlas.image, 0);
+        iconAtlasTexture = context.createTexture(iconAtlas.image);
         iconAtlas.image = {};
     }
 }

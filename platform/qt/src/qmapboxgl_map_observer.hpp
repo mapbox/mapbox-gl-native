@@ -26,7 +26,7 @@ public:
     void onCameraDidChange(mbgl::MapObserver::CameraChangeMode) final;
     void onWillStartLoadingMap() final;
     void onDidFinishLoadingMap() final;
-    void onDidFailLoadingMap(std::exception_ptr) final;
+    void onDidFailLoadingMap(mbgl::MapLoadError, const std::string&) final;
     void onWillStartRenderingFrame() final;
     void onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode) final;
     void onWillStartRenderingMap() final;

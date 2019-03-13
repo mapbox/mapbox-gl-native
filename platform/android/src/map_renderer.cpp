@@ -9,20 +9,17 @@
 #include "attach_env.hpp"
 #include "android_renderer_backend.hpp"
 #include "map_renderer_runnable.hpp"
-#include "file_source.hpp"
 
 namespace mbgl {
 namespace android {
 
 MapRenderer::MapRenderer(jni::JNIEnv& _env,
                          const jni::Object<MapRenderer>& obj,
-                         const jni::Object<FileSource>& _fileSource,
                          jni::jfloat pixelRatio_,
                          const jni::String& programCacheDir_,
                          const jni::String& localIdeographFontFamily_)
         : javaPeer(_env, obj)
         , pixelRatio(pixelRatio_)
-        , fileSource(FileSource::getDefaultFileSource(_env, _fileSource))
         , programCacheDir(jni::Make<std::string>(_env, programCacheDir_))
         , localIdeographFontFamily(localIdeographFontFamily_ ? jni::Make<std::string>(_env, localIdeographFontFamily_) : optional<std::string>{})
         , threadPool(sharedThreadPool())
@@ -174,7 +171,7 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
 
     // Create the new backend and renderer
     backend = std::make_unique<AndroidRendererBackend>();
-    renderer = std::make_unique<Renderer>(*backend, pixelRatio, fileSource, *threadPool,
+    renderer = std::make_unique<Renderer>(*backend, pixelRatio, *threadPool,
                                           GLContextMode::Unique, programCacheDir, localIdeographFontFamily);
     rendererRef = std::make_unique<ActorRef<Renderer>>(*renderer, mailbox);
 
@@ -211,7 +208,7 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<MapRenderer>(env, javaClass, "nativePtr",
-                                         jni::MakePeer<MapRenderer, const jni::Object<MapRenderer>&, const jni::Object<FileSource>&, jni::jfloat, const jni::String&, const jni::String&>,
+                                         jni::MakePeer<MapRenderer, const jni::Object<MapRenderer>&, jni::jfloat, const jni::String&, const jni::String&>,
                                          "nativeInitialize", "finalize",
                                          METHOD(&MapRenderer::render, "nativeRender"),
                                          METHOD(&MapRenderer::onSurfaceCreated,

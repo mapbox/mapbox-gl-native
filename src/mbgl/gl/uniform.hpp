@@ -35,7 +35,7 @@ ActiveUniforms activeUniforms(ProgramID);
 template <class Value>
 class UniformState {
 public:
-    UniformState(UniformLocation location_) : location(std::move(location_)) {
+    UniformState(UniformLocation location_ = -1) : location(std::move(location_)) {
     }
 
     void operator=(const Value& value) {

@@ -23,6 +23,7 @@ class HeatmapProgram : public Program<
         uniforms::u_intensity,
         uniforms::u_matrix,
         uniforms::heatmap::u_extrude_scale>,
+    TypeList<>,
     style::HeatmapPaintProperties>
 {
 public:

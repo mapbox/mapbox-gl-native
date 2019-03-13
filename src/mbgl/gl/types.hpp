@@ -25,8 +25,6 @@ using AttributeLocation = uint32_t;
 // "silently ignored".
 using UniformLocation = int32_t;
 
-using TextureUnit = uint8_t;
-
 enum class ShaderType : uint32_t {
     Vertex = 0x8B31,
     Fragment = 0x8B30
@@ -39,27 +37,6 @@ enum class RenderbufferType : uint32_t {
     DepthComponent = 0x1902,     // GL_DEPTH_COMPONENT
 #else
     DepthComponent = 0x81A5,     // GL_DEPTH_COMPONENT16
-#endif // MBGL_USE_GLES2
-};
-
-enum class TextureMipMap : bool { No = false, Yes = true };
-enum class TextureFilter : bool { Nearest = false, Linear = true };
-enum class TextureWrap : bool { Clamp, Repeat };
-enum class TextureFormat : uint32_t {
-    RGBA = 0x1908,
-    Alpha = 0x1906,
-#if not MBGL_USE_GLES2
-    Stencil = 0x1901,
-    Depth = 0x1902,
-#endif // MBGL_USE_GLES2
-};
-
-enum class TextureType : uint32_t {
-    UnsignedByte = 0x1401,
-#if MBGL_USE_GLES2
-    HalfFloat = 0x8D61,
-#else
-    HalfFloat = 0x140B,
 #endif // MBGL_USE_GLES2
 };
 

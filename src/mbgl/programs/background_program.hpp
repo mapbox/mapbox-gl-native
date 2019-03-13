@@ -3,6 +3,7 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/programs/textures.hpp>
 #include <mbgl/shaders/background.hpp>
 #include <mbgl/shaders/background_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -39,7 +40,6 @@ using BackgroundPatternUniforms = TypeList<
     uniforms::u_scale_a,
     uniforms::u_scale_b,
     uniforms::u_mix,
-    uniforms::u_image,
     uniforms::u_pixel_coord_upper,
     uniforms::u_pixel_coord_lower,
     uniforms::u_tile_units_to_pixels>;
@@ -49,6 +49,7 @@ class BackgroundProgram : public Program<
     gfx::Triangle,
     BackgroundLayoutAttributes,
     BackgroundUniforms,
+    TypeList<>,
     style::Properties<>>
 {
 public:
@@ -60,6 +61,8 @@ class BackgroundPatternProgram : public Program<
     gfx::Triangle,
     BackgroundLayoutAttributes,
     BackgroundPatternUniforms,
+    TypeList<
+        textures::u_image>,
     style::Properties<>>
 {
 public:

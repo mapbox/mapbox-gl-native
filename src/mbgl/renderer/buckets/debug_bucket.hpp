@@ -25,7 +25,7 @@ public:
                 optional<Timestamp> modified,
                 optional<Timestamp> expires,
                 MapDebugOptions,
-                gl::Context&);
+                gfx::Context&);
 
     const bool renderable;
     const bool complete;

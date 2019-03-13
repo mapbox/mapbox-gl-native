@@ -37,28 +37,23 @@ static RendererObserver& nullObserver() {
 
 Renderer::Impl::Impl(RendererBackend& backend_,
                      float pixelRatio_,
-                     FileSource& fileSource_,
                      Scheduler& scheduler_,
                      GLContextMode contextMode_,
                      const optional<std::string> programCacheDir_,
                      const optional<std::string> localFontFamily_)
     : backend(backend_)
     , scheduler(scheduler_)
-    , fileSource(fileSource_)
     , observer(&nullObserver())
     , contextMode(contextMode_)
     , pixelRatio(pixelRatio_)
-    , programCacheDir(programCacheDir_)
-    , glyphManager(std::make_unique<GlyphManager>(fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily_)))
-    , imageManager(std::make_unique<ImageManager>())
+    , programCacheDir(std::move(programCacheDir_))
+    , localFontFamily(std::move(localFontFamily_))
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {
-    glyphManager->setObserver(this);
-}
+    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {}
 
 Renderer::Impl::~Impl() {
     assert(BackendScope::exists());
@@ -80,6 +75,15 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
+    if (!glyphManager) {
+        glyphManager = std::make_unique<GlyphManager>(updateParameters.fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily));
+        glyphManager->setObserver(this);
+    }
+
+    if (!imageManager) {
+        imageManager = std::make_unique<ImageManager>();
+    }
+
     if (updateParameters.mode != MapMode::Continuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
@@ -112,7 +116,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         updateParameters.debugOptions,
         updateParameters.transformState,
         scheduler,
-        fileSource,
+        updateParameters.fileSource,
         updateParameters.mode,
         updateParameters.annotationManager,
         *imageManager,
@@ -375,8 +379,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "upload");
 
-        parameters.imageManager.upload(parameters.context, 0);
-        parameters.lineAtlas.upload(parameters.context, 0);
+        parameters.imageManager.upload(parameters.context);
+        parameters.lineAtlas.upload(parameters.context);
         
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
@@ -469,6 +473,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     paintAttributeData,
                     properties
                 ),
+                ClippingMaskProgram::TextureBindings{},
                 "clipping"
             );
         }
@@ -487,7 +492,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         // Read the stencil buffer
         const auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Stencil>(viewport.size, false);
+        auto image = parameters.context.readFramebuffer<AlphaImage, gfx::TexturePixelType::Stencil>(viewport.size, false);
 
         // Scale the Stencil buffer to cover the entire color space.
         auto it = image.data.get();
@@ -572,7 +577,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         // Read the stencil buffer
         auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Depth>(viewport.size, false);
+        auto image = parameters.context.readFramebuffer<AlphaImage, gfx::TexturePixelType::Depth>(viewport.size, false);
 
         parameters.context.pixelZoom = { 1, 1 };
         parameters.context.rasterPos = { -1, -1, 0, 1 };
@@ -747,7 +752,9 @@ void Renderer::Impl::dumDebugLogs() {
         entry.second->dumpDebugLogs();
     }
 
-    imageManager->dumpDebugLogs();
+    if (imageManager) {
+        imageManager->dumpDebugLogs();
+    }
 }
 
 RenderLayer* Renderer::Impl::getRenderLayer(const std::string& id) {
@@ -807,7 +814,7 @@ bool Renderer::Impl::isLoaded() const {
         }
     }
 
-    if (!imageManager->isLoaded()) {
+    if (!imageManager || !imageManager->isLoaded()) {
         return false;
     }
 

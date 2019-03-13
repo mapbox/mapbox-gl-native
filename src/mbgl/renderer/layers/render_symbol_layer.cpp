@@ -93,7 +93,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& symbolSizeBinder,
                          const SymbolPropertyValues& values_,
                          const auto& binders,
-                         const auto& paintProperties)
+                         const auto& paintProperties,
+                         auto&& textureBindings)
         {
             auto& programInstance = program.get(paintProperties);
 
@@ -127,6 +128,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 buffers.segments,
                 allUniformValues,
                 allAttributeBindings,
+                std::move(textureBindings),
                 getID()
             );
         };
@@ -156,9 +158,12 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
             const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
-            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
-                bucket.sdfIcons || parameters.state.isChanging() || iconScaled || iconTransformed
-                    ? gl::TextureFilter::Linear : gl::TextureFilter::Nearest);
+            const gfx::TextureBinding textureBinding{ *geometryTile.iconAtlasTexture->resource,
+                                                      bucket.sdfIcons ||
+                                                              parameters.state.isChanging() ||
+                                                              iconScaled || iconTransformed
+                                                          ? gfx::TextureFilterType::Linear
+                                                          : gfx::TextureFilterType::Nearest };
 
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
@@ -170,7 +175,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.iconSizeBinder,
                          values,
                          bucketPaintProperties.iconBinders,
-                         paintPropertyValues);
+                         paintPropertyValues,
+                         SymbolSDFIconProgram::TextureBindings{
+                             textureBinding,
+                         });
                 }
 
                 if (values.hasFill) {
@@ -180,7 +188,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.iconSizeBinder,
                          values,
                          bucketPaintProperties.iconBinders,
-                         paintPropertyValues);
+                         paintPropertyValues,
+                         SymbolSDFIconProgram::TextureBindings{
+                             textureBinding,
+                         });
                 }
             } else {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
@@ -189,12 +200,16 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.iconSizeBinder,
                      values,
                      bucketPaintProperties.iconBinders,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     SymbolIconProgram::TextureBindings{
+                         textureBinding,
+                     });
             }
         }
 
         if (bucket.hasTextData()) {
-            parameters.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gl::TextureFilter::Linear);
+            const gfx::TextureBinding textureBinding{ *geometryTile.glyphAtlasTexture->resource,
+                                                      gfx::TextureFilterType::Linear };
 
             auto values = textPropertyValues(evaluated_, layout);
             const auto& paintPropertyValues = textPaintProperties(evaluated_);
@@ -223,7 +238,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.textSizeBinder,
                      values,
                      bucketPaintProperties.textBinders,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     SymbolSDFTextProgram::TextureBindings{
+                         textureBinding,
+                     });
             }
 
             if (values.hasFill) {
@@ -233,7 +251,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.textSizeBinder,
                      values,
                      bucketPaintProperties.textBinders,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     SymbolSDFTextProgram::TextureBindings{
+                         textureBinding,
+                     });
             }
         }
 
@@ -267,6 +288,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.collisionBox.segments,
                 paintAttributeData,
                 properties,
+                CollisionBoxProgram::TextureBindings{},
                 parameters.state.getZoom(),
                 getID()
             );
@@ -303,6 +325,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.collisionCircle.segments,
                 paintAttributeData,
                 properties,
+                CollisionCircleProgram::TextureBindings{},
                 parameters.state.getZoom(),
                 getID()
             );
@@ -388,7 +411,7 @@ void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
 
 void RenderSymbolLayer::updateBucketPaintProperties(Bucket* bucket) const {
     assert(bucket->supportsLayer(*baseImpl));
-    static_cast<SymbolBucket*>(bucket)->paintProperties.at(getID()).evaluated = evaluated;
+    static_cast<SymbolBucket*>(bucket)->updatePaintProperties(getID(), evaluated);
 }
 
 } // namespace mbgl

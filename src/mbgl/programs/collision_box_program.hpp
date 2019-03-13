@@ -28,6 +28,7 @@ class CollisionBoxProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_camera_to_center_distance>,
+    TypeList<>,
     style::Properties<>>
 {
 public:
@@ -74,6 +75,7 @@ public:
               const SegmentVector<Attributes>& segments,
               const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
+              const TextureBindings& textureBindings,
               float currentZoom,
               const std::string& layerID) {
         typename AllUniforms::Values allUniformValues = uniformValues
@@ -102,6 +104,7 @@ public:
                     allUniformValues,
                     vertexArrayIt->second,
                     Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    textureBindings,
                     indexBuffer,
                     segment.indexOffset,
                     segment.indexLength);
@@ -119,6 +122,7 @@ class CollisionCircleProgram : public Program<
         uniforms::u_extrude_scale,
         uniforms::u_overscale_factor,
         uniforms::u_camera_to_center_distance>,
+    TypeList<>,
     style::Properties<>>
 {
 public:
@@ -159,6 +163,7 @@ public:
               const SegmentVector<Attributes>& segments,
               const Binders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
+              const TextureBindings& textureBindings,
               float currentZoom,
               const std::string& layerID) {
         typename AllUniforms::Values allUniformValues = uniformValues
@@ -185,6 +190,7 @@ public:
                     allUniformValues,
                     vertexArrayIt->second,
                     Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    textureBindings,
                     indexBuffer,
                     segment.indexOffset,
                     segment.indexLength);

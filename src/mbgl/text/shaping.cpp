@@ -299,7 +299,8 @@ void shapeLines(Shaping& shaping,
         
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
         for (std::size_t i = 0; i < line.length(); i++) {
-            const SectionOptions& section = line.getSection(i);
+            const std::size_t sectionIndex = line.getSectionIndex(i);
+            const SectionOptions& section = line.sectionAt(sectionIndex);
             char16_t codePoint = line.getCharCodeAt(i);
             auto glyphs = glyphMap.find(section.fontStackHash);
             if (glyphs == glyphMap.end()) {
@@ -318,10 +319,10 @@ void shapeLines(Shaping& shaping,
             const Glyph& glyph = **it->second;
             
             if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(codePoint)) {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale);
+                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, baselineOffset, true, section.fontStackHash, section.scale);
+                shaping.positionedGlyphs.emplace_back(codePoint, x, baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
                 x += verticalHeight * section.scale + spacing;
             }
         }

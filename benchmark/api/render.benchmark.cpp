@@ -41,7 +41,7 @@ static void prepare(Map& map, optional<std::string> json = {}) {
 
 static void API_renderStill_reuse_map(::benchmark::State& state) {
     RenderBenchmark bench;
-    HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.fileSource, bench.threadPool };
+    HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.threadPool };
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
               bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
     prepare(map);
@@ -51,9 +51,21 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
     }
 }
 
+static void API_renderStill_reuse_map_formatted_labels(::benchmark::State& state) {
+    RenderBenchmark bench;
+    HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.threadPool };
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
+              bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
+    prepare(map, util::read_file("benchmark/fixtures/api/style_formatted_labels.json"));
+
+    while (state.KeepRunning()) {
+        frontend.render(map);
+    }
+}
+
 static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
     RenderBenchmark bench;
-    HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.fileSource, bench.threadPool };
+    HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.threadPool };
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
               bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
     
@@ -69,7 +81,7 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
     RenderBenchmark bench;
     
     while (state.KeepRunning()) {
-        HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.fileSource, bench.threadPool };
+        HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.threadPool };
         Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
                   bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
         prepare(map);
@@ -78,5 +90,6 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
 }
 
 BENCHMARK(API_renderStill_reuse_map);
+BENCHMARK(API_renderStill_reuse_map_formatted_labels);
 BENCHMARK(API_renderStill_reuse_map_switch_styles);
 BENCHMARK(API_renderStill_recreate_map);

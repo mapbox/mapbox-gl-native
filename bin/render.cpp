@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     }
 
     ThreadPool threadPool(4);
-    HeadlessFrontend frontend({ width, height }, pixelRatio, fileSource, threadPool);
+    HeadlessFrontend frontend({ width, height }, pixelRatio, threadPool);
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
             fileSource, threadPool, MapOptions().withMapMode(MapMode::Static));
 

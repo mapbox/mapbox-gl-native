@@ -24,7 +24,7 @@ HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vect
 
 HeatmapBucket::~HeatmapBucket() = default;
 
-void HeatmapBucket::upload(gl::Context& context) {
+void HeatmapBucket::upload(gfx::Context& context) {
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
     indexBuffer = context.createIndexBuffer(std::move(triangles));
 

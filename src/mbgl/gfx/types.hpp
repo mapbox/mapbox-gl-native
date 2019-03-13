@@ -133,5 +133,33 @@ enum class BufferUsageType : uint8_t {
     DynamicDraw,
 };
 
+enum class TexturePixelType : uint8_t {
+    RGBA,
+    Alpha,
+    Stencil,
+    Depth,
+    Luminance,
+};
+
+enum class TextureChannelDataType : uint8_t {
+    UnsignedByte,
+    HalfFloat,
+};
+
+enum class TextureMipMapType : bool {
+    No,
+    Yes
+};
+
+enum class TextureFilterType : bool {
+    Nearest,
+    Linear,
+};
+
+enum class TextureWrapType : bool {
+    Clamp,
+    Repeat,
+};
+
 } // namespace gfx
 } // namespace mbgl

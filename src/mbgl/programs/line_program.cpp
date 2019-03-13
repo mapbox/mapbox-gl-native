@@ -77,8 +77,7 @@ LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated
         uniforms::u_tex_y_a::Value( posA.y ),
         uniforms::u_tex_y_b::Value( posB.y ),
         uniforms::u_mix::Value( crossfade.t ),
-        uniforms::u_sdfgamma::Value( atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f ),
-        uniforms::u_image::Value( 0 )
+        uniforms::u_sdfgamma::Value( atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f )
     );
 }
 
@@ -100,8 +99,7 @@ LinePatternProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvalu
         pixelsToGLUnits,
         uniforms::u_scale::Value ({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} }),
         uniforms::u_texsize::Value( atlasSize ),
-        uniforms::u_fade::Value( crossfade.t ),
-        uniforms::u_image::Value( 0 )
+        uniforms::u_fade::Value( crossfade.t )
     );
 }
 
@@ -114,8 +112,7 @@ LineGradientProgram::uniformValues(const RenderLinePaintProperties::PossiblyEval
         properties,
         tile,
         state,
-        pixelsToGLUnits,
-        uniforms::u_image::Value{ 0 }
+        pixelsToGLUnits
     );
 }
 

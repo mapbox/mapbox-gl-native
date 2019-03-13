@@ -72,7 +72,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
 
         auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
-                        const optional<ImagePosition>& patternPositionA, const optional<ImagePosition>& patternPositionB) {
+                        const optional<ImagePosition>& patternPositionA,
+                        const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
             const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(getID());
             paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
 
@@ -101,6 +102,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 tileBucket.triangleSegments,
                 allUniformValues,
                 allAttributeBindings,
+                std::move(textureBindings),
                 getID());
         };
 
@@ -122,7 +124,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                         parameters.state,
                         parameters.evaluatedLight
                     ),
-                    {}, {}
+                    {},
+                    {},
+                    FillExtrusionProgram::TextureBindings{}
                 );
             }
         } else {
@@ -136,7 +140,6 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
                 optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
                 optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
-                parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gl::TextureFilter::Linear);
                 FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
@@ -155,14 +158,15 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                         parameters.evaluatedLight
                     ),
                     patternPosA,
-                    patternPosB
+                    patternPosB,
+                    FillExtrusionPatternProgram::TextureBindings{
+                        textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                    }
                 );
             }
         }
 
     } else if (parameters.pass == RenderPass::Translucent) {
-        parameters.context.bindTexture(renderTexture->getTexture());
-
         const auto& size = parameters.staticData.backendSize;
 
         mat4 viewportMat;
@@ -175,8 +179,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::UniformValues{
-                uniforms::u_matrix::Value( viewportMat ), uniforms::u_world::Value( size ),
-                uniforms::u_image::Value( 0 ),
+                uniforms::u_matrix::Value( viewportMat ),
+                uniforms::u_world::Value( size ),
                 uniforms::u_opacity::Value( evaluated.get<FillExtrusionOpacity>() )
             },
             paintAttributeData,
@@ -202,6 +206,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             parameters.staticData.extrusionTextureSegments,
             allUniformValues,
             allAttributeBindings,
+            ExtrusionTextureProgram::TextureBindings{
+                textures::u_image::Value{ *renderTexture->getTexture().resource },
+            },
             getID());
     }
 }

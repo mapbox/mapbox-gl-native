@@ -15,4 +15,5 @@ message binary_program {
     repeated binding attribute = 3;
     repeated binding uniform = 4;
     optional string identifier = 5;
+    repeated binding texture = 6;
 }

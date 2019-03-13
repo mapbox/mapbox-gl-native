@@ -16,6 +16,7 @@ class DebugProgram : public Program<
     TypeList<
         uniforms::u_matrix,
         uniforms::u_color>,
+    TypeList<>,
     style::Properties<>>
 {
 public:

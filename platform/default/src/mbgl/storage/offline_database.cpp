@@ -27,16 +27,7 @@ OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
 }
 
 OfflineDatabase::~OfflineDatabase() {
-    // Deleting these SQLite objects may result in exceptions, but we're in a destructor, so we
-    // can't throw anything.
-    try {
-        statements.clear();
-        db.reset();
-    } catch (const util::IOException& ex) {
-        handleError(ex, "close database");
-    } catch (const mapbox::sqlite::Exception& ex) {
-        handleError(ex, "close database");
-    }
+    cleanup();
 }
 
 void OfflineDatabase::initialize() {
@@ -75,6 +66,25 @@ void OfflineDatabase::initialize() {
         // Downgrade: delete the database and try to reinitialize.
         removeExisting();
         initialize();
+    }
+}
+
+void OfflineDatabase::changePath(const std::string& path_) {
+    Log::Info(Event::Database, "Changing the database path.");
+    cleanup();
+    path = path_;
+    initialize();
+}
+
+void OfflineDatabase::cleanup() {
+    // Deleting these SQLite objects may result in exceptions
+    try {
+        statements.clear();
+        db.reset();
+    } catch (const util::IOException& ex) {
+        handleError(ex, "close database");
+    } catch (const mapbox::sqlite::Exception& ex) {
+        handleError(ex, "close database");
     }
 }
 

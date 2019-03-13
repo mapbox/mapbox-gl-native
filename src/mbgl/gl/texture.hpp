@@ -1,31 +1,51 @@
 #pragma once
 
-#include <mbgl/gl/object.hpp>
-#include <mbgl/util/size.hpp>
+#include <mbgl/gfx/texture.hpp>
+#include <mbgl/gl/uniform.hpp>
+#include <mbgl/util/ignore.hpp>
+
+#include <vector>
+#include <string>
 
 namespace mbgl {
 namespace gl {
 
-class Texture {
-public:
-    Texture(Size size_, UniqueTexture texture_,
-            TextureFilter filter_ = TextureFilter::Nearest,
-            TextureMipMap mipmap_ = TextureMipMap::No,
-            TextureWrap wrapX_ = TextureWrap::Clamp,
-            TextureWrap wrapY_ = TextureWrap::Clamp)
-        : size(std::move(size_)),
-          texture(std::move(texture_)),
-          filter(filter_),
-          mipmap(mipmap_),
-          wrapX(wrapX_),
-          wrapY(wrapY_) {}
+class Context;
 
-    Size size;
-    UniqueTexture texture;
-    TextureFilter filter;
-    TextureMipMap mipmap;
-    TextureWrap wrapX;
-    TextureWrap wrapY;
+void bindTexture(gl::Context&, uint8_t unit, const gfx::TextureBinding&);
+
+template <class>
+class Textures;
+
+template <class... Ts>
+class Textures<TypeList<Ts...>> {
+    using State =
+        IndexedTuple<TypeList<Ts...>, TypeList<ExpandToType<Ts, gl::UniformState<uint8_t>>...>>;
+    using NamedLocations = std::vector<std::pair<const std::string, gl::UniformLocation>>;
+
+public:
+    void queryLocations(const ProgramID& id) {
+        state = State{ gl::uniformLocation(id, Ts::name())... };
+    }
+
+    template <class BinaryProgram>
+    void loadNamedLocations(const BinaryProgram& program) {
+        state = State{ program.textureLocation(Ts::name())... };
+    }
+
+    NamedLocations getNamedLocations() const {
+        return NamedLocations{ { Ts::name(), state.template get<Ts>().location }... };
+    }
+
+    void bind(gl::Context& context, const gfx::TextureBindings<TypeList<Ts...>>& bindings) {
+        util::ignore(
+            { (state.template get<Ts>() = TypeIndex<Ts, Ts...>::value,
+               gl::bindTexture(context, TypeIndex<Ts, Ts...>::value, bindings.template get<Ts>()),
+               0)... });
+    }
+
+private:
+    State state;
 };
 
 } // namespace gl

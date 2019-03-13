@@ -31,12 +31,11 @@ public abstract class MapRenderer implements MapRendererScheduler {
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   public MapRenderer(@NonNull Context context, String localIdeographFontFamily) {
-    FileSource fileSource = FileSource.getInstance(context);
     float pixelRatio = context.getResources().getDisplayMetrics().density;
     String programCacheDir = FileSource.getInternalCachePath(context);
 
     // Initialise native peer
-    nativeInitialize(this, fileSource, pixelRatio, programCacheDir, localIdeographFontFamily);
+    nativeInitialize(this, pixelRatio, programCacheDir, localIdeographFontFamily);
   }
 
   public void onStart() {
@@ -115,7 +114,6 @@ public abstract class MapRenderer implements MapRendererScheduler {
   }
 
   private native void nativeInitialize(MapRenderer self,
-                                       FileSource fileSource,
                                        float pixelRatio,
                                        String programCacheDir,
                                        String localIdeographFontFamily);

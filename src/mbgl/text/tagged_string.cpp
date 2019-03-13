@@ -1,11 +1,12 @@
 #include <mbgl/text/tagged_string.hpp>
+#include <mbgl/math/minmax.hpp>
 #include <mbgl/util/i18n.hpp>
 
 namespace mbgl {
     
-void TaggedString::addSection(const std::u16string& sectionText, double scale, FontStackHash fontStack) {
+void TaggedString::addSection(const std::u16string& sectionText, double scale, FontStack fontStack, optional<Color> textColor) {
     styledText.first += sectionText;
-    sections.emplace_back(scale, fontStack);
+    sections.emplace_back(scale, fontStack, std::move(textColor));
     styledText.second.resize(styledText.first.size(), sections.size() - 1);
 }
 
@@ -26,7 +27,7 @@ void TaggedString::trim() {
 double TaggedString::getMaxScale() const {
     double maxScale = 0.0;
     for (std::size_t i = 0; i < styledText.first.length(); i++) {
-        maxScale = std::max(maxScale, getSection(i).scale);
+        maxScale = util::max(maxScale, getSection(i).scale);
     }
     return maxScale;
 }

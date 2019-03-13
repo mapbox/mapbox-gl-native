@@ -56,7 +56,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (!renderTexture || renderTexture->getSize() != size) {
             if (parameters.context.supportsHalfFloatTextures) {
-                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::HalfFloat);
+                renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::HalfFloat);
 
                 try {
                     renderTexture->bind();
@@ -68,7 +68,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             }
 
             if (!parameters.context.supportsHalfFloatTextures || !renderTexture) {
-                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::UnsignedByte);
+                renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::UnsignedByte);
                 renderTexture->bind();
             }
 
@@ -77,7 +77,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (!colorRampTexture) {
-            colorRampTexture = parameters.context.createTexture(colorRamp, 1, gl::TextureType::UnsignedByte);
+            colorRampTexture = parameters.context.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
         }
 
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
@@ -128,14 +128,12 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.segments,
                 allUniformValues,
                 allAttributeBindings,
+                HeatmapProgram::TextureBindings{},
                 getID()
             );
         }
 
     } else if (parameters.pass == RenderPass::Translucent) {
-        parameters.context.bindTexture(renderTexture->getTexture(), 0, gl::TextureFilter::Linear);
-        parameters.context.bindTexture(*colorRampTexture, 1, gl::TextureFilter::Linear);
-
         const auto& size = parameters.staticData.backendSize;
 
         mat4 viewportMat;
@@ -149,8 +147,6 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HeatmapTextureProgram::UniformValues{
                 uniforms::u_matrix::Value( viewportMat ), uniforms::u_world::Value( size ),
-                uniforms::u_image::Value( 0 ),
-                uniforms::u_color_ramp::Value( 1 ),
                 uniforms::u_opacity::Value( evaluated.get<HeatmapOpacity>() )
             },
             paintAttributeData,
@@ -176,6 +172,10 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.staticData.extrusionTextureSegments,
             allUniformValues,
             allAttributeBindings,
+            HeatmapTextureProgram::TextureBindings{
+                textures::u_image::Value{ *renderTexture->getTexture().resource, gfx::TextureFilterType::Linear },
+                textures::u_color_ramp::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+            },
             getID()
         );
     }

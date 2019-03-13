@@ -9,11 +9,9 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
-import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -136,23 +134,8 @@ public class OfflineManager {
   }
 
   private void deleteAmbientDatabase(final Context context) {
-    // Delete the file in a separate thread to avoid affecting the UI
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          String path = FileSource.getInternalCachePath(context) + File.separator + "mbgl-cache.db";
-          File file = new File(path);
-          if (file.exists()) {
-            file.delete();
-            Logger.d(TAG, String.format("Old ambient cache database deleted to save space: %s", path));
-          }
-        } catch (Exception exception) {
-          Logger.e(TAG, "Failed to delete old ambient cache database: ", exception);
-          MapStrictMode.strictModeViolation(exception);
-        }
-      }
-    }).start();
+    final String path = FileSource.getInternalCachePath(context) + File.separator + "mbgl-cache.db";
+    FileUtils.deleteFile(path);
   }
 
   /**
@@ -469,17 +452,17 @@ public class OfflineManager {
    * resource were requested in the process of map rendering.
    * Use this method to pre-warm the cache with resources you know
    * will be requested.
-   *
+   * <p>
    * This call is asynchronous: the data may not be immediately available
    * for in-progress requests, although subsequent requests should have
    * access to the cached data.
    *
-   * @param url The URL of the resource to insert
-   * @param data Response data to store for this resource. Data is expected to be uncompressed;
-   *             internally, the cache will compress data as necessary.
-   * @param modified Optional "modified" response header, in seconds since 1970, or 0 if not set
-   * @param expires Optional "expires" response header, in seconds since 1970, or 0 if not set
-   * @param etag Optional "entity tag" response header
+   * @param url            The URL of the resource to insert
+   * @param data           Response data to store for this resource. Data is expected to be uncompressed;
+   *                       internally, the cache will compress data as necessary.
+   * @param modified       Optional "modified" response header, in seconds since 1970, or 0 if not set
+   * @param expires        Optional "expires" response header, in seconds since 1970, or 0 if not set
+   * @param etag           Optional "entity tag" response header
    * @param mustRevalidate Indicates whether response can be used after it's stale
    */
   @Keep

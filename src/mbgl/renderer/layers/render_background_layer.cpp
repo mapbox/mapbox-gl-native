@@ -50,7 +50,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     const Properties<>::PossiblyEvaluated properties;
     const BackgroundProgram::Binders paintAttributeData(properties, 0);
 
-    auto draw = [&](auto& program, auto&& uniformValues) {
+    auto draw = [&](auto& program, auto&& uniformValues, const auto& textureBindings) {
         const auto allUniformValues = program.computeAllUniformValues(
             std::move(uniformValues),
             paintAttributeData,
@@ -76,6 +76,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.staticData.tileTriangleSegments,
             allUniformValues,
             allAttributeBindings,
+            textureBindings,
             getID()
         );
     };
@@ -86,8 +87,6 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (!imagePosA || !imagePosB)
             return;
-
-        parameters.imageManager.bind(parameters.context, 0);
 
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
@@ -101,7 +100,10 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                     crossfade,
                     tileID,
                     parameters.state
-                )
+                ),
+                BackgroundPatternProgram::TextureBindings{
+                    textures::u_image::Value{ parameters.imageManager.textureBinding(parameters.context) },
+                }
             );
         }
     } else {
@@ -112,7 +114,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                     uniforms::u_matrix::Value( parameters.matrixForTile(tileID) ),
                     uniforms::u_color::Value( evaluated.get<BackgroundColor>() ),
                     uniforms::u_opacity::Value( evaluated.get<BackgroundOpacity>() ),
-                }
+                },
+                BackgroundProgram::TextureBindings{}
             );
         }
     }

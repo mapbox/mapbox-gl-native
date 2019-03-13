@@ -1,5 +1,5 @@
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/context.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/hash.hpp>
@@ -126,20 +126,20 @@ Size LineAtlas::getSize() const {
     return image.size;
 }
 
-void LineAtlas::upload(gl::Context& context, gl::TextureUnit unit) {
+void LineAtlas::upload(gfx::Context& context) {
     if (!texture) {
-        texture = context.createTexture(image, unit);
+        texture = context.createTexture(image);
     } else if (dirty) {
-        context.updateTexture(*texture, image, unit);
+        context.updateTexture(*texture, image);
     }
 
     dirty = false;
 }
 
-void LineAtlas::bind(gl::Context& context, gl::TextureUnit unit) {
-    upload(context, unit);
-    context.bindTexture(*texture, unit, gl::TextureFilter::Linear, gl::TextureMipMap::No,
-                        gl::TextureWrap::Repeat, gl::TextureWrap::Clamp);
+gfx::TextureBinding LineAtlas::textureBinding(gfx::Context& context) {
+    upload(context);
+    return { *texture->resource, gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
+             gfx::TextureWrapType::Repeat, gfx::TextureWrapType::Clamp };
 }
 
 } // namespace mbgl

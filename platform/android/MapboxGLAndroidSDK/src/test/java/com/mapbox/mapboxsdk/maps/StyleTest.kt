@@ -54,11 +54,19 @@ class StyleTest {
     }
 
     @Test
+    fun testEmptyBuilder() {
+        val builder = Style.Builder()
+        mapboxMap.setStyle(builder)
+        verify(exactly = 1) { nativeMapView.styleJson = "{}" }
+    }
+
+    @Test
     fun testWithLayer() {
         val layer = mockk<SymbolLayer>()
         every { layer.id } returns "1"
         val builder = Style.Builder().withLayer(layer)
         mapboxMap.setStyle(builder)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.addLayerBelow(layer, MapboxConstants.LAYER_ID_ANNOTATIONS) }
     }
 
@@ -68,6 +76,7 @@ class StyleTest {
         every { layer.id } returns "1"
         val builder = Style.Builder().withLayerAbove(layer, "id")
         mapboxMap.setStyle(builder)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.addLayerAbove(layer, "id") }
     }
 
@@ -77,6 +86,7 @@ class StyleTest {
         every { layer.id } returns "1"
         val builder = Style.Builder().withLayerBelow(layer, "id")
         mapboxMap.setStyle(builder)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.addLayerBelow(layer, "id") }
     }
 
@@ -86,6 +96,7 @@ class StyleTest {
         every { layer.id } returns "1"
         val builder = Style.Builder().withLayerAt(layer, 1)
         mapboxMap.setStyle(builder)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.addLayerAt(layer, 1) }
     }
 
@@ -95,6 +106,7 @@ class StyleTest {
         every { source.id } returns "1"
         val builder = Style.Builder().withSource(source)
         mapboxMap.setStyle(builder)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.addSource(source) }
     }
 
@@ -103,6 +115,7 @@ class StyleTest {
         val transitionOptions = TransitionOptions(100, 200)
         val builder = Style.Builder().withTransition(transitionOptions)
         mapboxMap.setStyle(builder)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.transitionOptions = transitionOptions }
     }
 
@@ -190,8 +203,8 @@ class StyleTest {
         every { source.id } returns "1"
         val builder = Style.Builder().withSource(source)
         mapboxMap.setStyle(builder, callback)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.addSource(source) }
-        mapboxMap.notifyStyleLoaded()
         verify(exactly = 1) { callback.onStyleLoaded(any()) }
     }
 
@@ -204,6 +217,7 @@ class StyleTest {
         every { source.id } returns "1"
         val builder = Style.Builder().withSource(source)
         mapboxMap.setStyle(builder)
+        mapboxMap.onFinishLoadingStyle()
         verify(exactly = 1) { nativeMapView.addSource(source) }
         verify(exactly = 1) { callback.onStyleLoaded(any()) }
     }

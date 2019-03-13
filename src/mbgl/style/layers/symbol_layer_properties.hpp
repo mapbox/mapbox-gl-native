@@ -229,8 +229,11 @@ struct TextOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, unifo
     static float defaultValue() { return 1; }
 };
 
-struct TextColor : DataDrivenPaintProperty<Color, attributes::a_fill_color, uniforms::u_fill_color> {
+struct TextColor : DataDrivenPaintProperty<Color, attributes::a_fill_color, uniforms::u_fill_color, true> {
     static Color defaultValue() { return Color::black(); }
+    static constexpr const char *name() { return "text-color"; }
+    static constexpr auto expressionType() { return expression::type::ColorType{}; };
+    template<typename T> static bool hasOverride(const T& t) { return !!t.textColor; };
 };
 
 struct TextHaloColor : DataDrivenPaintProperty<Color, attributes::a_halo_color, uniforms::u_halo_color> {

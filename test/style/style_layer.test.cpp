@@ -1,6 +1,5 @@
-#include <mbgl/test/util.hpp>
-#include <mbgl/test/stub_layer_observer.hpp>
-#include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
@@ -16,6 +15,9 @@
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_layer_observer.hpp>
+#include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -25,6 +27,9 @@
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace expression;
+using namespace expression::dsl;
+using namespace std::literals::string_literals;
 
 namespace {
 
@@ -49,6 +54,10 @@ const auto brightness = 1.0f;
 const auto saturation = 1.0f;
 const auto contrast = 1.0f;
 const auto duration = 1.0f;
+
+class MockLayoutProperties : public Properties<TextField> {};
+class MockPaintProperties : public Properties<TextColor> {};
+using MockOverrides = FormatSectionOverrides<MockPaintProperties::OverridableProperties>;
 
 } // namespace
 
@@ -291,3 +300,75 @@ TEST(Layer, DuplicateLayer) {
     }
 }
 
+namespace {
+
+template<template<typename> class PropertyValueType, typename LayoutType>
+void testHasOverrides(LayoutType& layout) {
+    // Undefined
+    layout.template get<TextField>() = PropertyValueType<Formatted>();
+    EXPECT_FALSE(MockOverrides::hasOverrides(layout.template get<TextField>()));
+
+    // Constant, no overrides.
+    layout.template get<TextField>() = PropertyValueType<Formatted>(Formatted(""));
+    EXPECT_FALSE(MockOverrides::hasOverrides(layout.template get<TextField>()));
+
+    // Constant, overridden text-color.
+    auto formatted = Formatted("");
+    formatted.sections.emplace_back("section text"s, nullopt, nullopt, Color::green());
+    layout.template get<TextField>() = PropertyValueType<Formatted>(std::move(formatted));
+    EXPECT_TRUE(MockOverrides::hasOverrides(layout.template get<TextField>()));
+
+    // Expression, no overrides.
+    auto formatExpr = std::make_unique<FormatExpression>(std::vector<FormatExpressionSection>{});
+    PropertyExpression<Formatted> propExpr(std::move(formatExpr));
+    layout.template get<TextField>() = PropertyValueType<Formatted>(std::move(propExpr));
+    EXPECT_FALSE(MockOverrides::hasOverrides(layout.template get<TextField>()));
+
+    // Expression, overridden text-color.
+    FormatExpressionSection section(literal(""), nullopt, nullopt, toColor(literal("red")));
+    auto formatExprOverride = std::make_unique<FormatExpression>(std::vector<FormatExpressionSection>{section});
+    PropertyExpression<Formatted> propExprOverride(std::move(formatExprOverride));
+    layout.template get<TextField>() = PropertyValueType<Formatted>(std::move(propExprOverride));
+    EXPECT_TRUE(MockOverrides::hasOverrides(layout.template get<TextField>()));
+}
+
+} // namespace
+
+TEST(Layer, SymbolLayerOverrides) {
+
+    // Unevaluated / transitionable.
+    {
+        MockLayoutProperties::Unevaluated layout;
+        testHasOverrides<PropertyValue>(layout);
+
+        MockPaintProperties::Transitionable current;
+        MockPaintProperties::Transitionable updated;
+        current.get<TextColor>() = Transitionable<PropertyValue<Color>>{{Color::green()}, {}};
+        updated.get<TextColor>() = Transitionable<PropertyValue<Color>>{{Color::green()}, {}};
+        EXPECT_FALSE(MockOverrides::hasPaintPropertyDifference(current, updated));
+
+        current.get<TextColor>() = Transitionable<PropertyValue<Color>>{{Color::red()}, {}};
+        EXPECT_TRUE(MockOverrides::hasPaintPropertyDifference(current, updated));
+    }
+
+    // Possibly evaluated.
+    {
+        MockLayoutProperties::PossiblyEvaluated layout;
+        MockPaintProperties::PossiblyEvaluated paint;
+        testHasOverrides<PossiblyEvaluatedPropertyValue>(layout);
+
+        // Constant, overridden text-color.
+        auto formatted = Formatted("");
+        formatted.sections.emplace_back("section text"s, nullopt, nullopt, Color::green());
+        layout.get<TextField>() = PossiblyEvaluatedPropertyValue<Formatted>(std::move(formatted));
+        paint.get<TextColor>() = PossiblyEvaluatedPropertyValue<Color>{Color::red()};
+        EXPECT_TRUE(paint.get<TextColor>().isConstant());
+        MockOverrides::setOverrides(layout, paint);
+        EXPECT_FALSE(paint.get<TextColor>().isConstant());
+
+        MockPaintProperties::PossiblyEvaluated updated;
+        updated.get<TextColor>() = PossiblyEvaluatedPropertyValue<Color>{Color::red()};
+        MockOverrides::updateOverrides(paint, updated);
+        EXPECT_FALSE(updated.get<TextColor>().isConstant());
+    }
+}

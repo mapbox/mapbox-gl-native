@@ -64,7 +64,9 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         LineBucket& bucket = *bucket_;
 
-        auto draw = [&] (auto& program, auto&& uniformValues, const optional<ImagePosition>& patternPositionA, const optional<ImagePosition>& patternPositionB) {
+        auto draw = [&](auto& program, auto&& uniformValues,
+                        const optional<ImagePosition>& patternPositionA,
+                        const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
             auto& programInstance = program.get(evaluated);
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
@@ -96,6 +98,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                 bucket.segments,
                 allUniformValues,
                 allAttributeBindings,
+                std::move(textureBindings),
                 getID()
             );
         };
@@ -105,8 +108,6 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                 ? LinePatternCap::Round : LinePatternCap::Square;
             LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
             LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
-
-            parameters.lineAtlas.bind(parameters.context, 0);
 
             draw(parameters.programs.getLineLayerPrograms().lineSDF,
                  LineSDFProgram::uniformValues(
@@ -118,13 +119,17 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      posA,
                      posB,
                      crossfade,
-                     parameters.lineAtlas.getSize().width), {}, {});
+                     parameters.lineAtlas.getSize().width),
+                     {},
+                     {},
+                     LineSDFProgram::TextureBindings{
+                         parameters.lineAtlas.textureBinding(parameters.context),
+                     });
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
             assert(dynamic_cast<GeometryTile*>(&tile.tile));
-            GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
-            parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0, gl::TextureFilter::Linear);
+            GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);            
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
@@ -140,26 +145,36 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      crossfade,
                      parameters.pixelRatio),
                      *posA,
-                     *posB);
+                     *posB,
+                     LinePatternProgram::TextureBindings{
+                         textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                     });
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             if (!colorRampTexture) {
                 colorRampTexture = parameters.context.createTexture(colorRamp);
             }
-            parameters.context.bindTexture(*colorRampTexture, 0, gl::TextureFilter::Linear);
 
             draw(parameters.programs.getLineLayerPrograms().lineGradient,
                  LineGradientProgram::uniformValues(
                     evaluated,
                     tile,
                     parameters.state,
-                    parameters.pixelsToGLUnits), {}, {});
+                    parameters.pixelsToGLUnits),
+                    {},
+                    {},
+                    LineGradientProgram::TextureBindings{
+                        textures::u_image::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+                    });
         } else {
             draw(parameters.programs.getLineLayerPrograms().line,
                  LineProgram::uniformValues(
                      evaluated,
                      tile,
                      parameters.state,
-                     parameters.pixelsToGLUnits), {}, {});
+                     parameters.pixelsToGLUnits),
+                 {},
+                 {},
+                 LineProgram::TextureBindings{});
         }
     }
 }

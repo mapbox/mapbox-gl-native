@@ -35,7 +35,7 @@ public:
 
     bool supportsLayer(const style::Layer::Impl&) const override;
 
-    void upload(gl::Context&) override;
+    void upload(gfx::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
 

@@ -52,8 +52,13 @@ BinaryProgram::BinaryProgram(std::string&& data) {
             uniforms.emplace_back(parseBinding<gl::UniformLocation>(pbf.get_message()));
             break;
         case 5: // identifier
-        default:
             binaryIdentifier = pbf.get_string();
+            break;
+        case 6: // uniform
+            textures.emplace_back(parseBinding<gl::UniformLocation>(pbf.get_message()));
+            break;
+        default:
+            pbf.skip();
             break;
         }
     }
@@ -68,12 +73,14 @@ BinaryProgram::BinaryProgram(
     std::string&& binaryCode_,
     std::string binaryIdentifier_,
     std::vector<std::pair<const std::string, gl::AttributeLocation>>&& attributes_,
-    std::vector<std::pair<const std::string, gl::UniformLocation>>&& uniforms_)
+    std::vector<std::pair<const std::string, gl::UniformLocation>>&& uniforms_,
+    std::vector<std::pair<const std::string, gl::UniformLocation>>&& textures_)
     : binaryFormat(binaryFormat_),
       binaryCode(std::move(binaryCode_)),
       binaryIdentifier(std::move(binaryIdentifier_)),
       attributes(std::move(attributes_)),
-      uniforms(std::move(uniforms_)) {
+      uniforms(std::move(uniforms_)),
+      textures(std::move(textures_)) {
 }
 
 std::string BinaryProgram::serialize() const {
@@ -89,6 +96,11 @@ std::string BinaryProgram::serialize() const {
     }
     for (const auto& binding : uniforms) {
         protozero::pbf_writer pbf_binding(pbf, 4 /* uniform */);
+        pbf_binding.add_string(1 /* name */, binding.first);
+        pbf_binding.add_uint32(2 /* value */, binding.second);
+    }
+    for (const auto& binding : textures) {
+        protozero::pbf_writer pbf_binding(pbf, 6 /* texture */);
         pbf_binding.add_string(1 /* name */, binding.first);
         pbf_binding.add_uint32(2 /* value */, binding.second);
     }
@@ -109,6 +121,15 @@ optional<gl::AttributeLocation> BinaryProgram::attributeLocation(const std::stri
 
 gl::UniformLocation BinaryProgram::uniformLocation(const std::string& name) const {
     for (const auto& pair : uniforms) {
+        if (pair.first == name) {
+            return pair.second;
+        }
+    }
+    return -1;
+}
+
+gl::UniformLocation BinaryProgram::textureLocation(const std::string& name) const {
+    for (const auto& pair : textures) {
         if (pair.first == name) {
             return pair.second;
         }

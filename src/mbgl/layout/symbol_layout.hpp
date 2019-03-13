@@ -6,18 +6,15 @@
 #include <mbgl/layout/symbol_feature.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/text/bidi.hpp>
-#include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 
 #include <memory>
 #include <map>
-#include <unordered_set>
 #include <vector>
 
 namespace mbgl {
 
 class BucketParameters;
-class SymbolBucket;
 class Anchor;
 class RenderLayer;
 class PlacedSymbol;
@@ -26,7 +23,7 @@ namespace style {
 class Filter;
 } // namespace style
 
-class SymbolLayout : public Layout {
+class SymbolLayout final : public Layout {
 public:
     SymbolLayout(const BucketParameters&,
                  const std::vector<const RenderLayer*>&,
@@ -62,12 +59,25 @@ private:
     void addToDebugBuffers(SymbolBucket&);
 
     // Adds placed items to the buffer.
-    template <typename Buffer>
-    size_t addSymbol(Buffer&,
-                   const Range<float> sizeData,
-                   const SymbolQuad&,
-                   const Anchor& labelAnchor,
-                   PlacedSymbol& placedSymbol);
+    size_t addSymbol(SymbolBucket::Buffer&,
+                     const Range<float> sizeData,
+                     const SymbolQuad&,
+                     const Anchor& labelAnchor,
+                     PlacedSymbol& placedSymbol);
+
+    // Adds symbol quads to bucket and returns formatted section index of last
+    // added quad.
+    std::size_t addSymbolGlyphQuads(SymbolBucket&,
+                                    SymbolInstance&,
+                                    const SymbolFeature&,
+                                    WritingModeType,
+                                    optional<size_t>& placedIndex,
+                                    const SymbolQuads&,
+                                    optional<std::size_t> lastAddedSection = nullopt);
+
+    void updatePaintPropertiesForSection(SymbolBucket&,
+                                         const SymbolFeature&,
+                                         std::size_t sectionIndex);
 
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.
