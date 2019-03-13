@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">Compás do mapa. Actívao para restabelecer a rotación do mapa cara o norte.</string>
+    <string name="mapbox_attributionsIconContentDescription">Icona de atribución. Actívaa para amosar o diálogo de atribución.</string>
+    <string name="mapbox_myLocationViewContentDescription">Vista de ubicación. Amosa a túa ubicación no mapa.</string>
+    <string name="mapbox_mapActionDescription">Estase a amosar un mapa feito co Mapbox. Belisca dous dedos para desprazarte ou belisca para achegar.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Maps SDK para o Android</string>
+    <string name="mapbox_attributionTelemetryTitle">Axúdanos a mellorar os mapas do Mapbox</string>
+    <string name="mapbox_attributionTelemetryMessage">Grazas á túa contribución de datos anónimos de emprego, axudas a mellorar o OpenStreetMap e o Mapbox.</string>
+    <string name="mapbox_attributionTelemetryPositive">Dacordo</string>
+    <string name="mapbox_attributionTelemetryNegative">Rexeitar</string>
+    <string name="mapbox_attributionTelemetryNeutral">Máis información</string>
+    <string name="mapbox_attributionErrorNoBrowser">Non podes abrir a páxina web porque non hai un navegador web no dispositivo.</string>
+    <string name="mapbox_offline_error_region_definition_invalid">O parámetro OfflineRegionDefinition que se ingresou non coincide cos límites mundiais: %s</string>
+    <string name="mapbox_telemetryImproveMap">Mellorar este mapa</string>
+    <string name="mapbox_telemetrySettings">Axustes da telemetría</string>
+    </resources>

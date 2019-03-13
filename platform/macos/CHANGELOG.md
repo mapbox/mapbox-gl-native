@@ -17,7 +17,7 @@
 
 ### Packaging
 
-* Added a Czech localization. ([#13782](https://github.com/mapbox/mapbox-gl-native/pull/13782))
+* Added Czech and Galician localizations. ([#13782](https://github.com/mapbox/mapbox-gl-native/pull/13782), [#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095))
 
 ## 0.13.0 - December 20, 2018
 
