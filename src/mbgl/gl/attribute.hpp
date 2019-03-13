@@ -71,7 +71,7 @@ public:
 
     static AttributeBindingArray
     toBindingArray(const Locations& locations,
-                   const typename gfx::Attributes<TypeList<As...>>::Bindings& bindings) {
+                   const typename gfx::AttributeBindings<TypeList<As...>>& bindings) {
         AttributeBindingArray result;
         result.resize(sizeof...(As));
 

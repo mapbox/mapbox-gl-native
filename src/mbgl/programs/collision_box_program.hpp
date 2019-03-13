@@ -81,8 +81,8 @@ public:
         UniformValues uniformValues = layoutUniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-        AttributeBindings allAttributeBindings = gfx::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
-            .concat(gfx::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
+        AttributeBindings allAttributeBindings = gfx::AttributeBindings<CollisionBoxLayoutAttributes>(layoutVertexBuffer)
+            .concat(gfx::AttributeBindings<CollisionBoxDynamicAttributes>(dynamicVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         assert(layoutVertexBuffer.elements == dynamicVertexBuffer.elements);
@@ -103,7 +103,7 @@ public:
                     std::move(cullFaceMode),
                     uniformValues,
                     drawScopeIt->second,
-                    gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    allAttributeBindings.offset(segment.vertexOffset),
                     textureBindings,
                     indexBuffer,
                     segment.indexOffset,
@@ -169,8 +169,8 @@ public:
         UniformValues uniformValues = layoutUniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-        AttributeBindings allAttributeBindings = gfx::Attributes<CollisionBoxLayoutAttributes>::bindings(layoutVertexBuffer)
-            .concat(gfx::Attributes<CollisionBoxDynamicAttributes>::bindings(dynamicVertexBuffer))
+        AttributeBindings allAttributeBindings = gfx::AttributeBindings<CollisionBoxLayoutAttributes>(layoutVertexBuffer)
+            .concat(gfx::AttributeBindings<CollisionBoxDynamicAttributes>(dynamicVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         for (auto& segment : segments) {
@@ -189,7 +189,7 @@ public:
                     std::move(cullFaceMode),
                     uniformValues,
                     drawScopeIt->second,
-                    gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    allAttributeBindings.offset(segment.vertexOffset),
                     textureBindings,
                     indexBuffer,
                     segment.indexOffset,

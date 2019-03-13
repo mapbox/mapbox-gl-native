@@ -30,7 +30,7 @@ public:
 
     using PaintAttributeList = typename Binders::AttributeList;
     using AttributeList = TypeListConcat<LayoutAttributeList, PaintAttributeList>;
-    using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
+    using AttributeBindings = gfx::AttributeBindings<AttributeList>;
 
     using PaintUniformList = typename Binders::UniformList;
     using UniformList = TypeListConcat<LayoutUniformList, PaintUniformList>;
@@ -65,12 +65,12 @@ public:
         const gfx::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        return gfx::Attributes<LayoutAttributeList>::bindings(layoutVertexBuffer)
+        return gfx::AttributeBindings<LayoutAttributeList>(layoutVertexBuffer)
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
 
     static uint32_t activeBindingCount(const AttributeBindings& allAttributeBindings) {
-        return gfx::Attributes<AttributeList>::activeBindingCount(allAttributeBindings);
+        return allAttributeBindings.activeCount();
     }
 
     template <class DrawMode>
@@ -102,7 +102,7 @@ public:
                 std::move(cullFaceMode),
                 uniformValues,
                 drawScopeIt->second,
-                gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                allAttributeBindings.offset(segment.vertexOffset),
                 textureBindings,
                 indexBuffer,
                 segment.indexOffset,
