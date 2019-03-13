@@ -33,20 +33,17 @@ public:
     using UniformValues = gfx::UniformValues<UniformList>;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using Uniforms = gl::Uniforms<UniformList>;
-
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : program(
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
-          uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
           attributeLocations(context, program) {
-        // Re-link program after manually binding only active attributes in Attributes::bindLocations
+        // Re-link program after manually binding only active attributes in Attributes::queryLocations
         context.linkProgram(program);
 
         // We have to re-initialize the uniforms state from the bindings as the uniform locations
         // get shifted on some implementations
-        uniformsState = Uniforms::bindLocations(program);
+        uniformStates.queryLocations(program);
 
         // Texture units are specified via uniforms as well, so we need query their locations
         textures.queryLocations(program);
@@ -55,11 +52,11 @@ public:
     template <class BinaryProgram>
     Program(Context& context, const BinaryProgram& binaryProgram)
         : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
-          uniformsState(Uniforms::loadNamedLocations(binaryProgram)),
           attributeLocations(binaryProgram) {
+        uniformStates.loadNamedLocations(binaryProgram);
         textures.loadNamedLocations(binaryProgram);
     }
-    
+
     static Program createProgram(gl::Context& context,
                                  const ProgramParameters& programParameters,
                                  const char* name,
@@ -113,9 +110,11 @@ public:
     template <class BinaryProgram>
     optional<BinaryProgram> get(Context& context, const std::string& identifier) const {
         if (auto binaryProgram = context.getBinaryProgram(program)) {
-            return BinaryProgram{ binaryProgram->first, std::move(binaryProgram->second),
-                                  identifier, attributeLocations.getNamedLocations(),
-                                  Uniforms::getNamedLocations(uniformsState),
+            return BinaryProgram{ binaryProgram->first,
+                                  std::move(binaryProgram->second),
+                                  identifier,
+                                  attributeLocations.getNamedLocations(),
+                                  uniformStates.getNamedLocations(),
                                   textures.getNamedLocations() };
         }
         return {};
@@ -146,7 +145,7 @@ public:
 
         context.program = program;
 
-        Uniforms::bind(uniformsState, uniformValues);
+        uniformStates.bind(uniformValues);
 
         textures.bind(context, textureBindings);
 
@@ -163,7 +162,7 @@ public:
 private:
     UniqueProgram program;
 
-    typename Uniforms::State uniformsState;
+    gl::UniformStates<UniformList> uniformStates;
     gl::AttributeLocations<AttributeList> attributeLocations;
     gl::Textures<TextureList> textures;
 };

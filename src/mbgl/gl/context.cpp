@@ -191,6 +191,8 @@ UniqueProgram Context::createProgram(ShaderID vertexShader, ShaderID fragmentSha
     MBGL_CHECK_ERROR(glAttachShader(result, vertexShader));
     MBGL_CHECK_ERROR(glAttachShader(result, fragmentShader));
 
+    linkProgram(result);
+
     return result;
 }
 

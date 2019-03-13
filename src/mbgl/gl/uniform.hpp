@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/ignore.hpp>
@@ -49,23 +50,25 @@ public:
     optional<Value> current = {};
 };
 
-UniformLocation uniformLocation(ProgramID, const char * name);
+UniformLocation uniformLocation(ProgramID, const char* name);
+
+using NamedUniformLocations = std::vector<std::pair<const std::string, UniformLocation>>;
 
 template <class>
-class Uniforms;
+class UniformStates;
 
 template <class... Us>
-class Uniforms<TypeList<Us...>> final {
-public:
-    using Types = TypeList<Us...>;
+class UniformStates<TypeList<Us...>> final {
+private:
     using State = IndexedTuple<TypeList<Us...>, TypeList<UniformState<typename Us::Value>...>>;
-    using Values = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
-    using NamedLocations = std::vector<std::pair<const std::string, UniformLocation>>;
 
-    static State bindLocations(const ProgramID& id) {
+    State state;
+
+public:
+    void queryLocations(const ProgramID& id) {
 #ifndef NDEBUG
         // Verify active uniform types match the enum
-        const auto active = activeUniforms(id);
+        const auto active = gl::activeUniforms(id);
 
         util::ignore(
             { // Some shader programs have uniforms declared, but not used, so they're not active.
@@ -75,19 +78,19 @@ public:
                    : false)... });
 #endif
 
-        return State(uniformLocation(id, Us::name())...);
+        state = State{ gl::uniformLocation(id, Us::name())... };
     }
 
-    template <class Program>
-    static State loadNamedLocations(const Program& program) {
-        return State(UniformState<typename Us::Value>(program.uniformLocation(Us::name()))...);
+    template <class BinaryProgram>
+    void loadNamedLocations(const BinaryProgram& program) {
+        state = State{ UniformState<typename Us::Value>(program.uniformLocation(Us::name()))... };
     }
 
-    static NamedLocations getNamedLocations(const State& state) {
-        return NamedLocations{ { Us::name(), state.template get<Us>().location }... };
+    NamedUniformLocations getNamedLocations() const {
+        return NamedUniformLocations{ { Us::name(), state.template get<Us>().location }... };
     }
 
-    static void bind(State& state, const Values& values) {
+    void bind(const gfx::UniformValues<TypeList<Us...>>& values) {
         util::ignore({ (state.template get<Us>() = values.template get<Us>(), 0)... });
     }
 };
