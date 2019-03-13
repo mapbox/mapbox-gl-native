@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace mbgl {
+namespace gl {
 
 class BinaryProgram {
 public:
@@ -45,4 +46,5 @@ private:
     std::vector<std::pair<const std::string, gl::UniformLocation>> textures;
 };
 
+} // namespace gl
 } // namespace mbgl

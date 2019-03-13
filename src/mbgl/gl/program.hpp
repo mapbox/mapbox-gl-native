@@ -12,10 +12,10 @@
 #include <mbgl/gl/uniform.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/features.hpp>
+#include <mbgl/gl/binary_program.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <mbgl/util/logging.hpp>
-#include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/shaders/shaders.hpp>
 

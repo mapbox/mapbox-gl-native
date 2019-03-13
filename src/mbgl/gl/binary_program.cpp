@@ -1,4 +1,4 @@
-#include <mbgl/programs/binary_program.hpp>
+#include <mbgl/gl/binary_program.hpp>
 
 #include <protozero/pbf_reader.hpp>
 #include <protozero/pbf_writer.hpp>
@@ -31,6 +31,7 @@ static std::pair<const std::string, Binding> parseBinding(protozero::pbf_reader&
 }
 
 namespace mbgl {
+namespace gl {
 
 BinaryProgram::BinaryProgram(std::string&& data) {
     bool hasFormat = false, hasCode = false;
@@ -137,4 +138,5 @@ gl::UniformLocation BinaryProgram::textureLocation(const std::string& name) cons
     return -1;
 }
 
+} // namespace gl
 } // namespace mbgl
