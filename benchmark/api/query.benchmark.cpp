@@ -34,7 +34,7 @@ public:
     util::RunLoop loop;
     DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4 };
-    HeadlessFrontend frontend { { 1000, 1000 }, 1, fileSource, threadPool };
+    HeadlessFrontend frontend { { 1000, 1000 }, 1, threadPool };
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
               fileSource, threadPool, MapOptions().withMapMode(MapMode::Static) };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};

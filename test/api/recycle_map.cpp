@@ -28,7 +28,7 @@ TEST(API, RecycleMapUpdateImages) {
     ThreadPool threadPool(4);
     float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+    HeadlessFrontend frontend { pixelRatio, threadPool };
     auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(),
                                      pixelRatio, fileSource, threadPool,
                                      MapOptions().withMapMode(MapMode::Static));
