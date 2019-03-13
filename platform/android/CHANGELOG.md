@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+### Features
+- Add Galician localization [#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095)
+
 ## 7.3.0-alpha.1 - March 7, 2019
 
 ### Features
