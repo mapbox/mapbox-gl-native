@@ -138,4 +138,10 @@ private:
     CollisionGroups collisionGroups;
 };
 
+Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor,
+                                           float width,
+                                           float height,
+                                           float radialOffset,
+                                           float textBoxScale);
+
 } // namespace mbgl

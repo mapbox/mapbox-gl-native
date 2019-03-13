@@ -9,6 +9,7 @@
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/algorithm/generate_clip_ids.hpp>
+#include <mbgl/text/placement.hpp>
 
 #include <array>
 
@@ -56,6 +57,7 @@ public:
     TimePoint timePoint;
 
     float pixelRatio;
+    std::unordered_map<uint32_t, VariableOffset> variableOffsets;
     std::array<float, 2> pixelsToGLUnits;
     algorithm::ClipIDGenerator clipIDGenerator;
 
