@@ -663,9 +663,6 @@ jobs:
           path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so.gz
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so.gz
-      - run:
-          name: Record size
-          command: platform/android/scripts/metrics.sh
       - deploy:
           name: Publish to Bintray
           command: |
@@ -677,6 +674,9 @@ jobs:
                 make run-android-upload-to-artifactory
               fi
             fi
+      - run:
+          name: Record size
+          command: platform/android/scripts/metrics.sh
 # ------------------------------------------------------------------------------
   android-debug-arm-v7-buck:
     docker:
@@ -1000,10 +1000,10 @@ jobs:
       - run:
           name: Trigger metrics
           command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then 
+            if [[ $CIRCLE_BRANCH == master ]]; then
               if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
                 curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=ios-maps-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
-              else 
+              else
                 echo "MOBILE_METRICS_TOKEN not provided"
               fi
             fi
