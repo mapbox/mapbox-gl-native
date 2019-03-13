@@ -96,18 +96,22 @@ function query(after) {
 
             if (!suite)
                 continue;
-
-            const runs = commit.checkSuites.nodes[0].checkRuns.nodes;
+            const allRuns = commit.checkSuites.nodes[0].checkRuns.nodes;
+            
+            const sizeCheckRuns = allRuns.filter(function (run) {
+              return run.name.match(/Size - (\w+) ([\w-]+)/);
+            });
+            
             const row = [`${commit.oid.slice(0, 7)} - ${commit.messageHeadline}`];
 
             for (let i = 0; i < platforms.length; i++) {
                 const {platform, arch} = platforms[i];
 
-                const run = runs.find((run) => {
+                const run = sizeCheckRuns.find((run) => {
                     const [, p, a] = run.name.match(/Size - (\w+) ([\w-]+)/);
                     return platform === p && arch === a;
                 });
-
+                
                 row[i + 1] = run ? +run.summary.match(/is (\d+) bytes/)[1] : undefined;
             }
             rows.push(row);
