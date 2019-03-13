@@ -37,7 +37,7 @@ TEST(Map, PrefetchTiles) {
         runLoop.stop();
     };
 
-    HeadlessFrontend frontend { { 512, 512 }, 1, fileSource, threadPool };
+    HeadlessFrontend frontend { { 512, 512 }, 1, threadPool };
     Map map(frontend, observer, frontend.getSize(), 1, fileSource, threadPool,
             MapOptions().withMapMode(MapMode::Continuous));
 

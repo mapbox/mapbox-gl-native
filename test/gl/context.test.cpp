@@ -90,7 +90,7 @@ TEST(GLContextMode, Shared) {
     ThreadPool threadPool(4);
     float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool, {}, GLContextMode::Shared };
+    HeadlessFrontend frontend { pixelRatio, threadPool, {}, GLContextMode::Shared };
 
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
             fileSource, threadPool, MapOptions().withMapMode(MapMode::Static));

@@ -14,6 +14,7 @@
 namespace mbgl {
 
 class AnnotationManager;
+class FileSource;
 
 class UpdateParameters {
 public:
@@ -33,6 +34,7 @@ public:
     const Immutable<std::vector<Immutable<style::Layer::Impl>>> layers;
 
     AnnotationManager& annotationManager;
+    FileSource& fileSource;
 
     const uint8_t prefetchZoomDelta;
     

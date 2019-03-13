@@ -23,7 +23,7 @@ TEST(CustomGeometrySource, Grid) {
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     auto threadPool = sharedThreadPool();
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource, *threadPool };
+    HeadlessFrontend frontend { pixelRatio, *threadPool };
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
             *threadPool, MapOptions().withMapMode(MapMode::Static));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));

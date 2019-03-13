@@ -31,7 +31,7 @@ public:
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+    HeadlessFrontend frontend { pixelRatio, threadPool };
 
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
               threadPool, MapOptions().withMapMode(MapMode::Static)};

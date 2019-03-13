@@ -1828,7 +1828,6 @@ void QMapboxGLPrivate::createRenderer()
 
     m_mapRenderer = std::make_unique<QMapboxGLMapRenderer>(
         m_pixelRatio,
-        *m_fileSourceObj,
         *m_threadPool,
         m_mode,
         m_localFontFamily

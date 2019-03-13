@@ -11,7 +11,6 @@
 
 namespace mbgl {
 
-class FileSource;
 class Scheduler;
 class Renderer;
 class RendererBackend;
@@ -20,8 +19,8 @@ class TransformState;
 
 class HeadlessFrontend : public RendererFrontend {
 public:
-    HeadlessFrontend(float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique, const optional<std::string> localFontFamily = {});
-    HeadlessFrontend(Size, float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique, const optional<std::string> localFontFamily = {});
+    HeadlessFrontend(float pixelRatio_, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique, const optional<std::string> localFontFamily = {});
+    HeadlessFrontend(Size, float pixelRatio_, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique, const optional<std::string> localFontFamily = {});
     ~HeadlessFrontend() override;
 
     void reset() override;

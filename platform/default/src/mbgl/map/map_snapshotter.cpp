@@ -57,7 +57,7 @@ MapSnapshotter::Impl::Impl(FileSource* fileSource,
            const optional<std::string> programCacheDir,
            const optional<std::string> localFontFamily)
     : scheduler(std::move(scheduler_))
-    , frontend(size, pixelRatio, *fileSource, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
+    , frontend(size, pixelRatio, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
     , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *fileSource, *scheduler, MapOptions().withMapMode(MapMode::Static)) {
 
     if (style.first) {

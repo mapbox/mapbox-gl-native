@@ -38,7 +38,7 @@ public:
     Map map;
 
     MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
-        : frontend(pixelRatio, fileSource, threadPool)
+        : frontend(pixelRatio, threadPool)
         , map(frontend, observer, frontend.getSize(), pixelRatio,
               fileSource, threadPool, MapOptions().withMapMode(mode)) {
     }
@@ -48,7 +48,7 @@ public:
             float pixelRatio = 1, MapMode mode = MapMode::Static,
             typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
             : fileSource { cachePath, assetRoot }
-            , frontend(pixelRatio, fileSource, threadPool)
+            , frontend(pixelRatio, threadPool)
             , map(frontend, observer, frontend.getSize(), pixelRatio,
                   fileSource, threadPool, MapOptions().withMapMode(mode)) {
     }
@@ -685,7 +685,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
 
     util::Timer timer;
 
-    HeadlessFrontend frontend(pixelRatio, fileSource, threadPool);
+    HeadlessFrontend frontend(pixelRatio, threadPool);
 
     StubMapObserver observer;
     observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderMode) {
