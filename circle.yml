@@ -929,6 +929,10 @@ jobs:
       - run:
           name: Build and run SDK unit tests with thread and undefined behavior sanitizers
           command: make ios-sanitize
+      - run:
+          name: Get iOS code coverage
+          command: |
+              platform/ios/scripts/ios-code-coverage.sh CI
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
