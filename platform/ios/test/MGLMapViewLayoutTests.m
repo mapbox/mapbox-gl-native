@@ -7,7 +7,7 @@
 @interface MGLOrnamentTestData : NSObject
 
 @property (nonatomic) MGLOrnamentPosition position;
-@property (nonatomic) CGPoint offset;
+@property (nonatomic) CGPoint margins;
 @property (nonatomic) CGPoint expectedOrigin;
 
 @end
@@ -17,7 +17,7 @@
 + (instancetype)createWithPostion:(MGLOrnamentPosition)position offset:(CGPoint)offset expectedOrigin:(CGPoint)expectedOrigin {
     MGLOrnamentTestData *data = [[MGLOrnamentTestData alloc] init];
     data.position = position;
-    data.offset = offset;
+    data.margins = offset;
     data.expectedOrigin = expectedOrigin;
     return data;
 }
@@ -127,24 +127,6 @@
     XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.frame), expectedLogoOriginY, accuracy);
 }
 
-- (void)testOrnamentPlacementInvalidArgument {
-    XCTAssertThrows([self.mapView setCompassViewOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setCompassViewOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setCompassViewOffset:CGPointMake(0, -4)]);
-
-    XCTAssertThrows([self.mapView setScaleBarOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setScaleBarOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setScaleBarOffset:CGPointMake(0, -4)]);
-
-    XCTAssertThrows([self.mapView setAttributionButtonOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setAttributionButtonOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setAttributionButtonOffset:CGPointMake(0, -4)]);
-
-    XCTAssertThrows([self.mapView setLogoViewOffset:CGPointMake(-4, -4)]);
-    XCTAssertThrows([self.mapView setLogoViewOffset:CGPointMake(-4, 0)]);
-    XCTAssertThrows([self.mapView setLogoViewOffset:CGPointMake(0, -4)]);
-}
-
 - (NSArray *)makeTestDataListWithView:(UIView *)view margin:(CGFloat)margin {
     CGFloat bottomSafeAreaInset = 0.0;
     if (@available(iOS 11.0, *)) {
@@ -177,7 +159,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.compassViewPosition = testData.position;
-        self.mapView.compassViewOffset = testData.offset;
+        self.mapView.compassViewMargins = testData.margins;
 
         //invoke layout
         [self.superView setNeedsLayout];
@@ -202,7 +184,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.scaleBarPosition = testData.position;
-        self.mapView.scaleBarOffset = testData.offset;
+        self.mapView.scaleBarMargins = testData.margins;
 
         //invoke layout
         [self.superView setNeedsLayout];
@@ -227,7 +209,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.attributionButtonPosition = testData.position;
-        self.mapView.attributionButtonOffset = testData.offset;
+        self.mapView.attributionButtonMargins = testData.margins;
 
         //invoke layout
         [self.superView setNeedsLayout];
@@ -252,7 +234,7 @@
 
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.logoViewPosition = testData.position;
-        self.mapView.logoViewOffset = testData.offset;
+        self.mapView.logoViewMargins = testData.margins;
 
         //invoke layout
         [self.superView setNeedsLayout];
