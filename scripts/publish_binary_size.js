@@ -89,6 +89,7 @@ function query(after) {
     }).then((result) => {
         
         const history = result.data.data.repository.ref.target.history;
+        console.log('HISTORY' + JSON.stringify(history));
 
         for (const edge of history.edges) {
             const commit = edge.node;
@@ -134,6 +135,8 @@ function query(after) {
                   'created_at': date
               }));
           }
+          
+          console.log('SIZECHECKINFO: ' + sizeCheckInfo)
         }
     });
 }
