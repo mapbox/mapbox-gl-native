@@ -1352,3 +1352,11 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithDiskFull)) {
 }
 #endif // __QT__
 
+TEST(OfflineDatabse, ChangePath) {
+    std::string newPath("test/fixtures/offline_database/test.db");
+    OfflineDatabase db(":memory:");
+    db.changePath(newPath);
+    mapbox::sqlite::Database::open(newPath, mapbox::sqlite::ReadOnly);
+    util::deleteFile(newPath);
+}
+

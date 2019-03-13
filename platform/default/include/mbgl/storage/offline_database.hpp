@@ -45,6 +45,8 @@ public:
 
     void changePath(const std::string&);
 
+    void cleanup();
+
     optional<Response> get(const Resource&);
 
     // Return value is (inserted, stored size)
