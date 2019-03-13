@@ -53,7 +53,7 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
 
 static void API_renderStill_reuse_map_formatted_labels(::benchmark::State& state) {
     RenderBenchmark bench;
-    HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.fileSource, bench.threadPool };
+    HeadlessFrontend frontend { { 1000, 1000 }, 1, bench.threadPool };
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
               bench.fileSource, bench.threadPool, MapOptions().withMapMode(MapMode::Static) };
     prepare(map, util::read_file("benchmark/fixtures/api/style_formatted_labels.json"));
