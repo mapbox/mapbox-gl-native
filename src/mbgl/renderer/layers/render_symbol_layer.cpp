@@ -5,6 +5,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/shaping.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/symbol_program.hpp>
 #include <mbgl/programs/collision_box_program.hpp>
@@ -14,6 +15,7 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
+#include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>
@@ -21,6 +23,19 @@
 namespace mbgl {
 
 using namespace style;
+
+namespace {
+Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float width, float height, float radialOffset, float textBoxScale, float renderTextSize) {
+    AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
+    float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
+    float shiftY = -(alignment.verticalAlign - 0.5f) * height;
+    Point<float> offset = SymbolLayout::evaluateRadialOffset(anchor, radialOffset);
+    return Point<float>(
+        (shiftX / textBoxScale + offset.x) * renderTextSize,
+        (shiftY / textBoxScale + offset.y) * renderTextSize
+    );
+}
+} // namespace
 
 RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
     : RenderLayer(std::move(_impl)),
@@ -168,7 +183,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             if (bucket.sdfIcons) {
                 if (values.hasHalo) {
                     draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                         SymbolSDFIconProgram::layoutUniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+                         SymbolSDFIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -181,7 +196,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 if (values.hasFill) {
                     draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                         SymbolSDFIconProgram::layoutUniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+                         SymbolSDFIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -193,7 +208,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 }
             } else {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
-                     SymbolIconProgram::layoutUniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
+                     SymbolIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -211,6 +226,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             auto values = textPropertyValues(evaluated_, layout);
             const auto& paintPropertyValues = textPaintProperties(evaluated_);
+            bool hasVariablePacement = false;
 
             const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
                 layout.get<TextRotationAlignment>() == AlignmentType::Map;
@@ -225,13 +241,79 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+            } else if (!layout.get<TextVariableAnchor>().empty()) {
+                bucket.text.dynamicVertices.clear();
+
+                const auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(parameters.state.getZoom());
+                const float tileScale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
+                const bool rotateWithMap = layout.get<TextRotationAlignment>() == AlignmentType::Map;
+                const bool pitchWithMap = layout.get<TextPitchAlignment>() == AlignmentType::Map;
+                const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, parameters.state.getZoom());
+                const auto labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, parameters.state, pixelsToTileUnits);
+
+                for (const PlacedSymbol& symbol : bucket.text.placedSymbols) {
+                    optional<VariableOffset> variableOffset;
+                    if (!symbol.hidden && symbol.crossTileID != 0u) {
+                        auto it = parameters.variableOffsets.find(symbol.crossTileID);
+                        if (it != parameters.variableOffsets.end()) {
+                            variableOffset = it->second;
+                            hasVariablePacement |= true;
+                        }
+                    }
+
+                    if (!variableOffset) {
+                        // These symbols are from a justification that is not being used, or a label that wasn't placed
+                        // so we don't need to do the extra math to figure out what incremental shift to apply.
+                        hideGlyphs(symbol.glyphOffsets.size(), bucket.text.dynamicVertices);
+                    } else {
+                        const Point<float> tileAnchor = symbol.anchorPoint;
+                        const auto projectedAnchor = project(tileAnchor, pitchWithMap ? tile.matrix : labelPlaneMatrix);
+                        const float perspectiveRatio = 0.5f + 0.5f * (parameters.state.getCameraToCenterDistance() / projectedAnchor.second);
+                        float renderTextSize = evaluateSizeForFeature(partiallyEvaluatedSize, symbol) * perspectiveRatio / util::ONE_EM;
+                        if (pitchWithMap) {
+                            // Go from size in pixels to equivalent size in tile units
+                            renderTextSize *= bucket.tilePixelRatio / tileScale;
+                        }
+
+                        auto shift = calculateVariableRenderShift(
+                                (*variableOffset).anchor,
+                                (*variableOffset).width,
+                                (*variableOffset).height,
+                                (*variableOffset).radialOffset,
+                                (*variableOffset).textBoxScale,
+                                renderTextSize);
+
+                        // Usual case is that we take the projected anchor and add the pixel-based shift
+                        // calculated above. In the (somewhat weird) case of pitch-aligned text, we add an equivalent
+                        // tile-unit based shift to the anchor before projecting to the label plane.
+                        Point<float> shiftedAnchor;
+                        if (pitchWithMap) {
+                            shiftedAnchor = project(Point<float>(tileAnchor.x + shift.x, tileAnchor.y + shift.y),
+                                                    labelPlaneMatrix).first;
+                        } else {
+                            if (rotateWithMap) {
+                                auto rotated = util::rotate(shift, -parameters.state.getPitch());
+                                shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
+                                                             projectedAnchor.first.y + rotated.y);
+                            } else {
+                                 shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
+                                                              projectedAnchor.first.y + shift.y);
+                            }
+                        }
+
+                        for (std::size_t i = 0; i < symbol.glyphOffsets.size(); i++) {
+                            addDynamicAttributes(shiftedAnchor, 0, bucket.text.dynamicVertices);
+                        }
+                    }
+                }
+                parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
             }
 
             const Size texsize = geometryTile.glyphAtlasTexture->size;
 
             if (values.hasHalo) {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-                     SymbolSDFTextProgram::layoutUniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+                     SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -244,7 +326,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (values.hasFill) {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-                     SymbolSDFTextProgram::layoutUniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+                     SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,

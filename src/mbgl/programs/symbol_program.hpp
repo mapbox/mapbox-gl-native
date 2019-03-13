@@ -367,6 +367,7 @@ public:
     using SymbolProgram::SymbolProgram;
 
     static LayoutUniformValues layoutUniformValues(const bool isText,
+                                                   const bool hasVariablePacement,
                                                    const style::SymbolPropertyValues&,
                                                    const Size& texsize,
                                                    const std::array<float, 2>& pixelsToGLUnits,
@@ -436,6 +437,7 @@ public:
     using BaseProgram::BaseProgram;
 
     static LayoutUniformValues layoutUniformValues(const bool isText,
+                                                   const bool hasVariablePacement,
                                                    const style::SymbolPropertyValues&,
                                                    const Size& texsize,
                                                    const std::array<float, 2>& pixelsToGLUnits,
