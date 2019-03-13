@@ -1,72 +1,77 @@
 #pragma once
 
 #include <mbgl/gfx/types.hpp>
-#include <mbgl/gfx/primitives.hpp>
 
 #include <cassert>
 
 namespace mbgl {
 namespace gfx {
 
-class Points {
-public:
-    using Primitive = Point;
-
-    static constexpr std::size_t bufferGroupSize = 1;
-    static constexpr PrimitiveType primitiveType = PrimitiveType::Points;
-
-    explicit Points(float pointSize_) : pointSize(pointSize_) {}
-
-    float pointSize;
-};
-
-class Lines {
-public:
-    using Primitive = Line;
-
-    static constexpr std::size_t bufferGroupSize = 2;
-    static constexpr PrimitiveType primitiveType = PrimitiveType::Lines;
-
-    explicit Lines(float lineWidth_) : lineWidth(lineWidth_) {
-        assert(lineWidth > 0);
+class DrawMode {
+protected:
+    DrawMode(DrawModeType type_, float size_)
+        : type(type_), size(size_) {
     }
 
-    float lineWidth;
+public:
+    const DrawModeType type;
+    const float size;
 };
 
-class LineStrip {
+template <class> struct BufferGroupSizeOf;
+template <class> struct PrimitiveTypeOf;
+
+class Points : public DrawMode {
 public:
-    // LineStrip is a form of "Line" rendering, but the element buffer
-    // cannot be grouped into logical elements beyond a single Point.
-    using Primitive = Line;
-
-    static constexpr std::size_t bufferGroupSize = 1;
-    static constexpr PrimitiveType primitiveType = PrimitiveType::LineStrip;
-
-    explicit LineStrip(float lineWidth_) : lineWidth(lineWidth_) {
-        assert(lineWidth > 0);
+    explicit Points(float pointSize_) : DrawMode(DrawModeType::Points, pointSize_) {
+        assert(size > 0);
     }
-
-    float lineWidth;
 };
 
-class Triangles {
+template <> struct BufferGroupSizeOf<Points> : std::integral_constant<std::size_t, 1> {};
+template <> struct PrimitiveTypeOf<Points> : std::integral_constant<PrimitiveType, PrimitiveType::Point> {};
+
+class Lines : public DrawMode {
 public:
-    using Primitive = Triangle;
-
-    static constexpr std::size_t bufferGroupSize = 3;
-    static constexpr PrimitiveType primitiveType = PrimitiveType::Triangles;
+    explicit Lines(float lineWidth_) : DrawMode(DrawModeType::Lines, lineWidth_) {
+        assert(size > 0);
+    }
 };
 
-class TriangleStrip {
+template <> struct BufferGroupSizeOf<Lines> : std::integral_constant<std::size_t, 2> {};
+template <> struct PrimitiveTypeOf<Lines> : std::integral_constant<PrimitiveType, PrimitiveType::Line> {};
+
+// LineStrip is a form of "Line" rendering, but the element buffer
+// cannot be grouped into logical elements beyond a single Point.
+class LineStrip : public DrawMode {
 public:
-    // TriangleStrip is a form of "Triangle" rendering, but the element buffer
-    // cannot be grouped into logical elements beyond a single Point.
-    using Primitive = Triangle;
-
-    static constexpr std::size_t bufferGroupSize = 1;
-    static constexpr PrimitiveType primitiveType = PrimitiveType::TriangleStrip;
+    explicit LineStrip(float lineWidth_) : DrawMode(DrawModeType::LineStrip, lineWidth_) {
+        assert(size > 0);
+    }
 };
+
+template <> struct BufferGroupSizeOf<LineStrip> : std::integral_constant<std::size_t, 1> {};
+template <> struct PrimitiveTypeOf<LineStrip> : std::integral_constant<PrimitiveType, PrimitiveType::Line> {};
+
+class Triangles : public DrawMode {
+public:
+    explicit Triangles() : DrawMode(DrawModeType::Triangles, 0) {
+    }
+};
+
+template <> struct BufferGroupSizeOf<Triangles> : std::integral_constant<std::size_t, 3> {};
+template <> struct PrimitiveTypeOf<Triangles> : std::integral_constant<PrimitiveType, PrimitiveType::Triangle> {};
+
+// TriangleStrip is a form of "Triangle" rendering, but the element buffer
+// cannot be grouped into logical elements beyond a single Point.
+class TriangleStrip : public DrawMode {
+public:
+    explicit TriangleStrip() : DrawMode(DrawModeType::TriangleStrip, 0) {
+    }
+};
+
+template <> struct BufferGroupSizeOf<TriangleStrip> : std::integral_constant<std::size_t, 1> {};
+template <> struct PrimitiveTypeOf<TriangleStrip> : std::integral_constant<PrimitiveType, PrimitiveType::Triangle> {};
 
 } // namespace gfx
 } // namespace mbgl

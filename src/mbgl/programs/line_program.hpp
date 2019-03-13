@@ -36,7 +36,7 @@ using LineLayoutAttributes = TypeList<
 
 class LineProgram : public Program<
     shaders::line,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -102,7 +102,7 @@ public:
 
 class LinePatternProgram : public Program<
     shaders::line_pattern,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -130,7 +130,7 @@ public:
 
 class LineSDFProgram : public Program<
     shaders::line_sdf,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -163,7 +163,7 @@ public:
 
 class LineGradientProgram : public Program<
     shaders::line_gradient,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,

@@ -99,18 +99,12 @@ public:
                optional<float> depth,
                optional<int32_t> stencil);
 
-    void setDrawMode(const gfx::Points&);
-    void setDrawMode(const gfx::Lines&);
-    void setDrawMode(const gfx::LineStrip&);
-    void setDrawMode(const gfx::Triangles&);
-    void setDrawMode(const gfx::TriangleStrip&);
-
     void setDepthMode(const gfx::DepthMode&);
     void setStencilMode(const gfx::StencilMode&);
     void setColorMode(const gfx::ColorMode&);
     void setCullFaceMode(const gfx::CullFaceMode&);
 
-    void draw(gfx::PrimitiveType,
+    void draw(const gfx::DrawMode&,
               std::size_t indexOffset,
               std::size_t indexLength);
 

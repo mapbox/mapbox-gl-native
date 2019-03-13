@@ -240,7 +240,7 @@ public:
 };
 
 template <class Shaders,
-          class Primitive,
+          gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,
           class TextureList,
@@ -266,7 +266,7 @@ public:
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, AttributeList, UniformList, TextureList>;
+    using ProgramType = gl::Program<AttributeList, UniformList, TextureList>;
 
     ProgramType program;
 
@@ -309,17 +309,18 @@ public:
 
     template <class DrawMode>
     void draw(gfx::Context& context,
-              DrawMode drawMode,
-              gfx::DepthMode depthMode,
-              gfx::StencilMode stencilMode,
-              gfx::ColorMode colorMode,
-              gfx::CullFaceMode cullFaceMode,
+              const DrawMode& drawMode,
+              const gfx::DepthMode& depthMode,
+              const gfx::StencilMode& stencilMode,
+              const gfx::ColorMode& colorMode,
+              const gfx::CullFaceMode& cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
               const SegmentVector<AttributeList>& segments,
               const UniformValues& uniformValues,
               const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
+        static_assert(Primitive == gfx::PrimitiveTypeOf<DrawMode>::value, "incompatible draw mode");
         for (auto& segment : segments) {
             auto drawScopeIt = segment.drawScopes.find(layerID);
 
@@ -329,11 +330,11 @@ public:
 
             program.draw(
                 context,
-                std::move(drawMode),
-                std::move(depthMode),
-                std::move(stencilMode),
-                std::move(colorMode),
-                std::move(cullFaceMode),
+                drawMode,
+                depthMode,
+                stencilMode,
+                colorMode,
+                cullFaceMode,
                 uniformValues,
                 drawScopeIt->second,
                 allAttributeBindings.offset(segment.vertexOffset),
@@ -347,7 +348,7 @@ public:
 
 class SymbolIconProgram : public SymbolProgram<
     shaders::symbol_icon,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -387,7 +388,7 @@ enum class SymbolSDFPart {
 template <class PaintProperties>
 class SymbolSDFProgram : public SymbolProgram<
     shaders::symbol_sdf,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -410,7 +411,7 @@ class SymbolSDFProgram : public SymbolProgram<
 {
 public:
     using BaseProgram = SymbolProgram<shaders::symbol_sdf,
-        gfx::Triangle,
+        gfx::PrimitiveType::Triangle,
         SymbolLayoutAttributes,
         TypeList<
             uniforms::u_matrix,

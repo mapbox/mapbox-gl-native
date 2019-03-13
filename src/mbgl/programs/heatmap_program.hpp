@@ -16,7 +16,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_intensity);
 
 class HeatmapProgram : public Program<
     shaders::heatmap,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     TypeList<
         attributes::a_pos>,
     TypeList<

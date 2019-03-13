@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/util/ignore.hpp>
 
 #include <vector>
@@ -10,7 +11,7 @@ namespace gfx {
 template <class DrawMode>
 class IndexVector {
 public:
-    static constexpr std::size_t groupSize = DrawMode::bufferGroupSize;
+    static constexpr std::size_t groupSize = BufferGroupSizeOf<DrawMode>::value;
 
     template <class... Args>
     void emplace_back(Args&&... args) {

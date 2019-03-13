@@ -21,7 +21,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_latrange);
 
 class HillshadeProgram : public Program<
     shaders::hillshade,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     TypeList<
         attributes::a_pos,
         attributes::a_texture_pos>,

@@ -12,7 +12,7 @@ namespace mbgl {
 
 class ExtrusionTextureProgram : public Program<
     shaders::extrusion_texture,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     TypeList<attributes::a_pos>,
     TypeList<
         uniforms::u_matrix,

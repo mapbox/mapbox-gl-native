@@ -15,13 +15,15 @@ class Context;
 void bindTexture(gl::Context&, uint8_t unit, const gfx::TextureBinding&);
 
 template <class>
-class Textures;
+class TextureStates;
 
 template <class... Ts>
-class Textures<TypeList<Ts...>> {
+class TextureStates<TypeList<Ts...>> {
+private:
     using State =
         IndexedTuple<TypeList<Ts...>, TypeList<ExpandToType<Ts, gl::UniformState<uint8_t>>...>>;
-    using NamedLocations = std::vector<std::pair<const std::string, gl::UniformLocation>>;
+
+    State state;
 
 public:
     void queryLocations(const ProgramID& id) {
@@ -33,8 +35,8 @@ public:
         state = State{ program.textureLocation(Ts::name())... };
     }
 
-    NamedLocations getNamedLocations() const {
-        return NamedLocations{ { Ts::name(), state.template get<Ts>().location }... };
+    NamedUniformLocations getNamedLocations() const {
+        return NamedUniformLocations{ { Ts::name(), state.template get<Ts>().location }... };
     }
 
     void bind(gl::Context& context, const gfx::TextureBindings<TypeList<Ts...>>& bindings) {
@@ -43,9 +45,6 @@ public:
                gl::bindTexture(context, TypeIndex<Ts, Ts...>::value, bindings.template get<Ts>()),
                0)... });
     }
-
-private:
-    State state;
 };
 
 } // namespace gl
