@@ -48,17 +48,14 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , observer(&nullObserver())
     , contextMode(contextMode_)
     , pixelRatio(pixelRatio_)
-    , programCacheDir(programCacheDir_)
-    , glyphManager(std::make_unique<GlyphManager>(fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily_)))
-    , imageManager(std::make_unique<ImageManager>())
+    , programCacheDir(std::move(programCacheDir_))
+    , localFontFamily(std::move(localFontFamily_))
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {
-    glyphManager->setObserver(this);
-}
+    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {}
 
 Renderer::Impl::~Impl() {
     assert(BackendScope::exists());
@@ -80,6 +77,15 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
+    if (!glyphManager) {
+        glyphManager = std::make_unique<GlyphManager>(fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily));
+        glyphManager->setObserver(this);
+    }
+
+    if (!imageManager) {
+        imageManager = std::make_unique<ImageManager>();
+    }
+
     if (updateParameters.mode != MapMode::Continuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
@@ -748,7 +754,9 @@ void Renderer::Impl::dumDebugLogs() {
         entry.second->dumpDebugLogs();
     }
 
-    imageManager->dumpDebugLogs();
+    if (imageManager) {
+        imageManager->dumpDebugLogs();
+    }
 }
 
 RenderLayer* Renderer::Impl::getRenderLayer(const std::string& id) {
@@ -808,7 +816,7 @@ bool Renderer::Impl::isLoaded() const {
         }
     }
 
-    if (!imageManager->isLoaded()) {
+    if (!imageManager || !imageManager->isLoaded()) {
         return false;
     }
 
