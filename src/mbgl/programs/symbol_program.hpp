@@ -256,7 +256,7 @@ public:
 
     using PaintAttributeList = typename Binders::AttributeList;
     using AttributeList = TypeListConcat<LayoutAndSizeAttributeList, PaintAttributeList>;
-    using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
+    using AttributeBindings = gfx::AttributeBindings<AttributeList>;
 
     using LayoutUniformValues = gfx::UniformValues<LayoutUniformList>;
     using SizeUniformList = typename SymbolSizeBinder::UniformList;
@@ -297,14 +297,14 @@ public:
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
         assert(layoutVertexBuffer.elements == dynamicLayoutVertexBuffer.elements &&
                layoutVertexBuffer.elements == opacityVertexBuffer.elements);
-        return gfx::Attributes<LayoutAttributeList>::bindings(layoutVertexBuffer)
-            .concat(gfx::Attributes<SymbolDynamicLayoutAttributes>::bindings(dynamicLayoutVertexBuffer))
-            .concat(gfx::Attributes<SymbolOpacityAttributes>::bindings(opacityVertexBuffer))
+        return gfx::AttributeBindings<LayoutAttributeList>(layoutVertexBuffer)
+            .concat(gfx::AttributeBindings<SymbolDynamicLayoutAttributes>(dynamicLayoutVertexBuffer))
+            .concat(gfx::AttributeBindings<SymbolOpacityAttributes>(opacityVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
 
     static uint32_t activeBindingCount(const AttributeBindings& allAttributeBindings) {
-        return gfx::Attributes<AttributeList>::activeBindingCount(allAttributeBindings);
+        return allAttributeBindings.activeCount();
     }
 
     template <class DrawMode>
@@ -336,7 +336,7 @@ public:
                 std::move(cullFaceMode),
                 uniformValues,
                 drawScopeIt->second,
-                gfx::Attributes<AttributeList>::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                allAttributeBindings.offset(segment.vertexOffset),
                 textureBindings,
                 indexBuffer,
                 segment.indexOffset,

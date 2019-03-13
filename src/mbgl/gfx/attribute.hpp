@@ -258,24 +258,31 @@ AttributeBinding attributeBinding(const VertexBuffer<detail::VertexType<As...>>&
 optional<gfx::AttributeBinding> offsetAttributeBinding(const optional<gfx::AttributeBinding>& binding, std::size_t vertexOffset);
 
 template <class>
-class Attributes;
+class AttributeBindings;
 
 template <class... As>
-class Attributes<TypeList<As...>> final {
+class AttributeBindings<TypeList<As...>> final
+    : public IndexedTuple<TypeList<As...>,
+                          TypeList<ExpandToType<As, optional<AttributeBinding>>...>> {
+    using Base = IndexedTuple<TypeList<As...>,
+                          TypeList<ExpandToType<As, optional<AttributeBinding>>...>>;
+
 public:
-    using Bindings = IndexedTuple<TypeList<As...>, TypeList<ExpandToType<As, optional<AttributeBinding>>...>>;
-
-    static Bindings bindings(const VertexBuffer<Vertex<TypeList<As...>>>& buffer) {
-        return Bindings { attributeBinding<TypeIndex<As, As...>::value>(buffer)... };
+    AttributeBindings(const VertexBuffer<Vertex<TypeList<As...>>>& buffer)
+        : Base{ attributeBinding<TypeIndex<As, As...>::value>(buffer)... } {
     }
 
-    static Bindings offsetBindings(const Bindings& bindings, const std::size_t vertexOffset) {
-        return Bindings { offsetAttributeBinding(bindings.template get<As>(), vertexOffset)... };
+    template <class... Args>
+    AttributeBindings(Args&&... args) : Base(std::forward<Args>(args)...) {
     }
 
-    static uint32_t activeBindingCount(const Bindings& bindings) {
+    AttributeBindings offset(const std::size_t vertexOffset) const {
+        return { offsetAttributeBinding(Base::template get<As>(), vertexOffset)... };
+    }
+
+    uint32_t activeCount() const {
         uint32_t result = 0;
-        util::ignore({ ((result += bool(bindings.template get<As>())), 0)... });
+        util::ignore({ ((result += bool(Base::template get<As>())), 0)... });
         return result;
     }
 };

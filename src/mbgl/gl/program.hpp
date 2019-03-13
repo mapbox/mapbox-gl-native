@@ -29,7 +29,7 @@ class Program {
 public:
     using Primitive = P;
 
-    using AttributeBindings = typename gfx::Attributes<AttributeList>::Bindings;
+    using AttributeBindings = gfx::AttributeBindings<AttributeList>;
     using UniformValues = gfx::UniformValues<UniformList>;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
