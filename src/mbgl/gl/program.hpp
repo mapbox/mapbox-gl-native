@@ -33,7 +33,6 @@ public:
     using UniformValues = gfx::UniformValues<UniformList>;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using Attributes = gl::Attributes<AttributeList>;
     using Uniforms = gl::Uniforms<UniformList>;
 
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
@@ -41,7 +40,7 @@ public:
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
           uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
-          attributeLocations(gl::Attributes<AttributeList>::bindLocations(context, program)) {
+          attributeLocations(context, program) {
         // Re-link program after manually binding only active attributes in Attributes::bindLocations
         context.linkProgram(program);
 
@@ -57,7 +56,7 @@ public:
     Program(Context& context, const BinaryProgram& binaryProgram)
         : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
           uniformsState(Uniforms::loadNamedLocations(binaryProgram)),
-          attributeLocations(Attributes::loadNamedLocations(binaryProgram)) {
+          attributeLocations(binaryProgram) {
         textures.loadNamedLocations(binaryProgram);
     }
     
@@ -115,7 +114,7 @@ public:
     optional<BinaryProgram> get(Context& context, const std::string& identifier) const {
         if (auto binaryProgram = context.getBinaryProgram(program)) {
             return BinaryProgram{ binaryProgram->first, std::move(binaryProgram->second),
-                                  identifier, Attributes::getNamedLocations(attributeLocations),
+                                  identifier, attributeLocations.getNamedLocations(),
                                   Uniforms::getNamedLocations(uniformsState),
                                   textures.getNamedLocations() };
         }
@@ -154,7 +153,7 @@ public:
         auto& vertexArray = reinterpret_cast<gl::DrawScopeResource&>(*drawScope.resource).vertexArray;
         vertexArray.bind(context,
                         indexBuffer,
-                        Attributes::toBindingArray(attributeLocations, attributeBindings));
+                        attributeLocations.toBindingArray(attributeBindings));
 
         context.draw(drawMode.primitiveType,
                      indexOffset,
@@ -165,7 +164,7 @@ private:
     UniqueProgram program;
 
     typename Uniforms::State uniformsState;
-    typename Attributes::Locations attributeLocations;
+    gl::AttributeLocations<AttributeList> attributeLocations;
     gl::Textures<TextureList> textures;
 };
 
