@@ -739,7 +739,7 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
 
                 // Dynamic vertices are initialized so that the vertex count always agrees with
                 // the layout vertex buffer, but they will always be updated before rendering happens
-                auto dynamicVertex = CollisionBoxProgram::dynamicVertex(false, false);
+                auto dynamicVertex = CollisionBoxProgram::dynamicVertex(false, false, {});
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
