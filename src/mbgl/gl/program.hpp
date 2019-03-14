@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gfx/program.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/gl/context.hpp>
@@ -25,7 +26,7 @@ namespace mbgl {
 namespace gl {
 
 template <class AttributeList, class UniformList, class TextureList>
-class Program {
+class Program final : public gfx::Program<AttributeList, UniformList, TextureList> {
 public:
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : program(
@@ -51,11 +52,11 @@ public:
         textureStates.loadNamedLocations(binaryProgram);
     }
 
-    static Program createProgram(gl::Context& context,
-                                 const ProgramParameters& programParameters,
-                                 const char* name,
-                                 const char* vertexSource_,
-                                 const char* fragmentSource_) {
+    static std::unique_ptr<Program> createProgram(gl::Context& context,
+                                                  const ProgramParameters& programParameters,
+                                                  const char* name,
+                                                  const char* vertexSource_,
+                                                  const char* fragmentSource_) {
         const std::string vertexSource = shaders::vertexSource(programParameters, vertexSource_);
         const std::string fragmentSource = shaders::fragmentSource(programParameters, fragmentSource_);
 
@@ -68,7 +69,7 @@ public:
                 if (auto cachedBinaryProgram = util::readFile(*cachePath)) {
                     const BinaryProgram binaryProgram(std::move(*cachedBinaryProgram));
                     if (binaryProgram.identifier() == identifier) {
-                        return Program { context, binaryProgram };
+                        return std::make_unique<Program>(context, binaryProgram);
                     } else {
                         Log::Warning(Event::OpenGL,
                                      "Cached program %s changed. Recompilation required.",
@@ -81,11 +82,11 @@ public:
             }
 
             // Compile the shader
-            Program result{ context, vertexSource, fragmentSource };
+            auto result = std::make_unique<Program>(context, vertexSource, fragmentSource);
 
             try {
                 if (const auto binaryProgram =
-                        result.template get<BinaryProgram>(context, identifier)) {
+                        result->template get<BinaryProgram>(context, identifier)) {
                     util::write_file(*cachePath, binaryProgram->serialize());
                     Log::Warning(Event::OpenGL, "Caching program in: %s", (*cachePath).c_str());
                 }
@@ -98,7 +99,7 @@ public:
 #endif
 
         (void)name;
-        return Program { context, vertexSource, fragmentSource };
+        return std::make_unique<Program>(context, vertexSource, fragmentSource);
     }
 
     template <class BinaryProgram>
@@ -126,7 +127,7 @@ public:
               const gfx::TextureBindings<TextureList>& textureBindings,
               const gfx::IndexBuffer& indexBuffer,
               std::size_t indexOffset,
-              std::size_t indexLength) {
+              std::size_t indexLength) override {
         auto& context = reinterpret_cast<gl::Context&>(genericContext);
 
         context.setDepthMode(depthMode);

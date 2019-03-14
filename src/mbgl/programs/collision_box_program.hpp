@@ -94,7 +94,7 @@ public:
                 drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
-            program.draw(
+            program->draw(
                     context,
                     std::move(drawMode),
                     std::move(depthMode),
@@ -180,7 +180,7 @@ public:
                 drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
-            program.draw(
+            program->draw(
                     context,
                     std::move(drawMode),
                     std::move(depthMode),

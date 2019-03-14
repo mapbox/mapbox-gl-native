@@ -19,7 +19,7 @@ template <class Shaders,
           gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,
-          class TextureList,
+          class Textures,
           class PaintProps>
 class Program {
 public:
@@ -37,11 +37,12 @@ public:
     using LayoutUniformValues = gfx::UniformValues<LayoutUniformList>;
     using UniformValues = gfx::UniformValues<UniformList>;
 
+    using TextureList = Textures;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
     using ProgramType = gl::Program<AttributeList, UniformList, TextureList>;
 
-    ProgramType program;
+    std::unique_ptr<gfx::Program<AttributeList, UniformList, TextureList>> program;
 
     Program(gl::Context& context, const ProgramParameters& programParameters)
         : program(ProgramType::createProgram(
@@ -94,7 +95,7 @@ public:
                 drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
-            program.draw(
+            program->draw(
                 context,
                 drawMode,
                 depthMode,

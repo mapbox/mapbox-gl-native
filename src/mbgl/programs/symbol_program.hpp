@@ -268,7 +268,7 @@ public:
 
     using ProgramType = gl::Program<AttributeList, UniformList, TextureList>;
 
-    ProgramType program;
+    std::unique_ptr<ProgramType> program;
 
     SymbolProgram(gl::Context& context, const ProgramParameters& programParameters)
         : program(ProgramType::createProgram(
@@ -328,7 +328,7 @@ public:
                 drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
-            program.draw(
+            program->draw(
                 context,
                 drawMode,
                 depthMode,
