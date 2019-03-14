@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatFontScale;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextColor;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextFont;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.abs;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.acos;
@@ -1416,12 +1417,17 @@ public class ExpressionTest {
         {
           put("font-scale", 1.5f);
           put("text-font", new Object[] {"literal", new String[] {"awesome"}});
+          put("text-color", new Object[] {"rgb", 255f, 0f, 0f});
         }
       }
     };
     Object[] actual = format(
       formatEntry(
-        literal("test"), formatFontScale(literal(1.5)), formatTextFont(literal(new String[] {"awesome"})))
+        literal("test"),
+        formatFontScale(literal(1.5)),
+        formatTextFont(literal(new String[] {"awesome"})),
+        formatTextColor(rgb(255, 0, 0))
+      )
     ).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
@@ -1450,8 +1456,15 @@ public class ExpressionTest {
       "test4",
       new TestableExpressionHashMap() {
         {
+          put("text-color", new Object[] {"rgb", 255f, 0f, 0f});
+        }
+      },
+      "test5",
+      new TestableExpressionHashMap() {
+        {
           put("font-scale", 1.5f);
           put("text-font", new Object[] {"literal", new String[] {"awesome"}});
+          put("text-color", new Object[] {"rgb", 255f, 0f, 0f});
         }
       }
     };
@@ -1459,8 +1472,13 @@ public class ExpressionTest {
       formatEntry(literal("test"), formatTextFont(new String[] {"awesome"})),
       formatEntry("test2", formatFontScale(1.5)),
       formatEntry(literal("test3")),
+      formatEntry(literal("test4"), formatTextColor(rgb(255, 0, 0))),
       formatEntry(
-        literal("test4"), formatFontScale(literal(1.5)), formatTextFont(new String[] {"awesome"}))
+        literal("test5"),
+        formatFontScale(literal(1.5)),
+        formatTextFont(new String[] {"awesome"}),
+        formatTextColor(rgb(255, 0, 0))
+      )
     ).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
