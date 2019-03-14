@@ -29,6 +29,8 @@ const payload = {
 const token = jwt.sign(payload, key, {algorithm: 'RS256'});
 github.authenticate({type: 'app', token});
 
+console.log("✅ Entered publish_binary_size.sh");
+
 // Must be in sync with the definition in metrics/binary-size/index.html on the gh-pages branch.
 const platforms = [
     { 'platform': 'iOS', 'arch': 'armv7' },
@@ -45,6 +47,7 @@ const rows = [];
 const date = new Date().toISOString().substring(0, 19);
 
 function query(after) {
+    console.log("✅ Running query");
     return github.request({
         method: 'POST',
         url: '/graphql',
@@ -89,7 +92,7 @@ function query(after) {
     }).then((result) => {
         
         const history = result.data.data.repository.ref.target.history;
-        console.log('HISTORY' + JSON.stringify(history));
+        console.log('👉 HISTORY' + JSON.stringify(history));
 
         for (const edge of history.edges) {
             const commit = edge.node;
@@ -136,7 +139,7 @@ function query(after) {
               }));
           }
           
-          console.log('SIZECHECKINFO: ' + sizeCheckInfo)
+          console.log('👉 SIZECHECKINFO: ' + sizeCheckInfo)
         }
     });
 }
@@ -144,6 +147,8 @@ function query(after) {
 github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
     .then(({data}) => {
       github.authenticate({type: 'token', token: data.token});
+      
+      console.log("✅ github app install token created");
 
       return query().then(function() {
         // Uploads to data source used by 
