@@ -13,7 +13,8 @@ PaintParameters::PaintParameters(gl::Context& context_,
                     const EvaluatedLight& evaluatedLight_,
                     RenderStaticData& staticData_,
                     ImageManager& imageManager_,
-                    LineAtlas& lineAtlas_)
+                    LineAtlas& lineAtlas_,
+                    Placement::VariableOffsets variableOffsets_)
     : context(context_),
     backend(backend_),
     state(updateParameters.transformState),
@@ -26,6 +27,7 @@ PaintParameters::PaintParameters(gl::Context& context_,
     contextMode(contextMode_),
     timePoint(updateParameters.timePoint),
     pixelRatio(pixelRatio_),
+    variableOffsets(variableOffsets_),
 #ifndef NDEBUG
     programs((debugOptions & MapDebugOptions::Overdraw) ? staticData_.overdrawPrograms : staticData_.programs)
 #else
