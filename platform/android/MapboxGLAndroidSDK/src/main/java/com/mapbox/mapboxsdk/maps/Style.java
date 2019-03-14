@@ -326,7 +326,7 @@ public class Style {
    */
   public void addImage(@NonNull final String name, @NonNull final Bitmap bitmap, boolean sdf) {
     validateState("addImage");
-    new BitmapImageConversionTask(nativeMap, sdf).execute(new Builder.ImageWrapper(name, bitmap, sdf));
+    new BitmapImageConversionTask(nativeMap).execute(new Builder.ImageWrapper(name, bitmap, sdf));
   }
 
   /**
@@ -346,7 +346,7 @@ public class Style {
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images, boolean sdf) {
     validateState("addImages");
-    new BitmapImageConversionTask(nativeMap, sdf).execute(Builder.ImageWrapper.convertToImageArray(images, sdf));
+    new BitmapImageConversionTask(nativeMap).execute(Builder.ImageWrapper.convertToImageArray(images, sdf));
   }
 
   /**
@@ -905,11 +905,9 @@ public class Style {
   private static class BitmapImageConversionTask extends AsyncTask<Builder.ImageWrapper, Void, List<Image>> {
 
     private WeakReference<NativeMap> nativeMap;
-    private boolean sdf;
 
-    BitmapImageConversionTask(NativeMap nativeMap, boolean sdf) {
+    BitmapImageConversionTask(NativeMap nativeMap) {
       this.nativeMap = new WeakReference<>(nativeMap);
-      this.sdf = sdf;
     }
 
     @NonNull
@@ -919,10 +917,12 @@ public class Style {
       ByteBuffer buffer;
       String name;
       Bitmap bitmap;
+      boolean sdf;
 
       for (Builder.ImageWrapper param : params) {
         name = param.id;
         bitmap = param.bitmap;
+        sdf = param.sdf;
 
         if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
           bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);

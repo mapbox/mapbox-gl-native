@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -26,12 +27,13 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
-import timber.log.Timber;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
+
+import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
@@ -55,6 +57,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
@@ -102,6 +105,12 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
       List<Feature> features = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
       if (!features.isEmpty()) {
         Feature feature = features.get(0);
+        // validate symbol flicker regression for #13407
+        SymbolLayer layer = mapboxMap.getStyle().getLayerAs(LAYER_ID);
+        layer.setProperties(iconOpacity(match(
+          get(FEATURE_ID), literal(1.0f),
+          stop(feature.getStringProperty(FEATURE_ID), 0.3f)
+        )));
         Timber.v("Feature was clicked with data: %s", feature.toJson());
         Toast.makeText(
           SymbolGeneratorActivity.this,
