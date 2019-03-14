@@ -21,8 +21,9 @@ echo "✅ Ready to check binary size..."
 
 echo $CIRCLE_BRANCH
 echo master
+echo $master
 
-if [[ $CIRCLE_BRANCH == nb-binary-size-fix ]]; then
+if [[ $CIRCLE_BRANCH == $master ]]; then
   # Build source data for http://mapbox.github.io/mapbox-gl-native/metrics/binary-size/
   # and log binary sizes to metrics warehouse
   echo "✅ Publishing binary size..."
