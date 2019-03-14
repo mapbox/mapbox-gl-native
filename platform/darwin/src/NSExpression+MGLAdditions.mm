@@ -598,6 +598,10 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
                                      arguments:optionsArray];
 }
 
++ (instancetype)mgl_expressionForAttributedExpressions:(nonnull NSArray<NSExpression *> *)attributedExpressions {
+    return [NSExpression expressionWithFormat:@"mgl_attributed(%@)", attributedExpressions];
+}
+
 - (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression {
     NSExpression *subexpression = [NSExpression expressionForAggregate:@[self, expression]];
     return [NSExpression expressionForFunction:@"mgl_join:" arguments:@[subexpression]];

@@ -152,6 +152,14 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  */
 + (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)inputExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression NS_SWIFT_NAME(init(forMGLMatchingKey:in:default:));
 
+/**
+ Returns an attributed function expression specifying an `MGLAttributedExpression` constant
+ expression array.
+ 
+ @param attributedExpressions The `MGLAttributedExpression` constant expression array.
+ */
++ (instancetype)mgl_expressionForAttributedExpressions:(nonnull NSArray<NSExpression *> *)attributedExpressions NS_SWIFT_NAME(init(forAttributedExpressions:));
+
 #pragma mark Concatenating String Expressions
 
 /**

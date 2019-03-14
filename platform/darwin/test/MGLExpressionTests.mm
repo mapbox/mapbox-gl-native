@@ -1046,6 +1046,27 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
+    {
+        MGLAttributedExpression *attribute1 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.2)];
+        MGLAttributedExpression *attribute2 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"biz"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.0)];
+        MGLAttributedExpression *attribute3 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"bar"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(0.8)];
+        MGLAttributedExpression *attribute4 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"\n"]
+                                                                                  fontNames:@[]
+                                                                                   fontSize:nil];
+        NSExpression *expression = [NSExpression mgl_expressionForAttributedExpressions:@[MGLConstantExpression(attribute1),
+                                                                                          MGLConstantExpression(attribute4),
+                                                                                          MGLConstantExpression(attribute2),
+                                                                                          MGLConstantExpression(attribute3)]];
+        NSArray *jsonExpression = @[@"format", @"foo", @{@"font-scale": @1.2}, @"\n", @{}, @"biz", @{@"font-scale": @1.0}, @"bar", @{@"font-scale": @0.8}];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
 }
 
 - (void)testGenericExpressionObject {

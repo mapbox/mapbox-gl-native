@@ -8,8 +8,8 @@ FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontNamesAttrib
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontSizeAttribute;
 
 /**
- An `NSExpression` that has associated text formatting attibutes (such as font size or
- font names).
+ An `MGLAttributedExpression` object associates text formatting attibutes (such as font size or
+ font names) to an `NSExpression`.
  */
 MGL_EXPORT
 @interface MGLAttributedExpression : NSObject

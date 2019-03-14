@@ -543,10 +543,11 @@ operator in the Mapbox Style Specification.
 <dd><code>mgl_attributed({x, y, z})</code></dd>
 </dl>
 
-Returns formatted text containing annotations for use in mixed-format `text-field`  entries.
+Concatenates and returns the array of `MGLAttributedExpression` objects, for use 
+with the `MGLSymbolStyleLayer.text` property.
 
 This function corresponds to the
-[`mgl_attributed`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-format)
+[`format`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-format)
 operator in the Mapbox Style Specification.
 
 ### `MGL_LET`
