@@ -534,6 +534,21 @@ This function corresponds to the
 [`coalesce`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-coalesce)
 operator in the Mapbox Style Specification.
 
+### `mgl_attributed:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_attributed:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_attributed({x, y, z})</code></dd>
+</dl>
+
+Returns formatted text containing annotations for use in mixed-format `text-field`  entries.
+
+This function corresponds to the
+[`mgl_attributed`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-format)
+operator in the Mapbox Style Specification.
+
 ### `MGL_LET`
 
 <dl>

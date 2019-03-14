@@ -29,7 +29,7 @@ MGL_EXPORT
  */
 - (instancetype)initWithExpression:(NSExpression *)expression;
 
-/**
+/** 
  Returns an `MGLAttributedExpression` object initialized with an expression and text format attributes.
  */
 - (instancetype)initWithExpression:(NSExpression *)expression attributes:(nullable NSDictionary <MGLAttributedExpressionKey, id> *)attrs;
