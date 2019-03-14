@@ -23,6 +23,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_tl_parent);
 } // namespace uniforms
 
 class RasterProgram : public Program<
+    RasterProgram,
     shaders::raster,
     gfx::PrimitiveType::Triangle,
     TypeList<

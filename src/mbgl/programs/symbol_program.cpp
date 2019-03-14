@@ -120,9 +120,9 @@ SymbolIconProgram::layoutUniformValues(const bool isText,
     );
 }
 
-template <class PaintProperties>
-typename SymbolSDFProgram<PaintProperties>::LayoutUniformValues
-SymbolSDFProgram<PaintProperties>::layoutUniformValues(const bool isText,
+template <class Name, class PaintProperties>
+typename SymbolSDFProgram<Name, PaintProperties>::LayoutUniformValues
+SymbolSDFProgram<Name, PaintProperties>::layoutUniformValues(const bool isText,
                                                        const style::SymbolPropertyValues& values,
                                                        const Size& texsize,
                                                        const std::array<float, 2>& pixelsToGLUnits,
@@ -135,7 +135,7 @@ SymbolSDFProgram<PaintProperties>::layoutUniformValues(const bool isText,
                               ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
                               : 1.0);
 
-    return makeValues<SymbolSDFProgram<PaintProperties>::LayoutUniformValues>(
+    return makeValues<SymbolSDFProgram<Name, PaintProperties>::LayoutUniformValues>(
         isText,
         values,
         texsize,
@@ -149,7 +149,7 @@ SymbolSDFProgram<PaintProperties>::layoutUniformValues(const bool isText,
     );
 }
 
-template class SymbolSDFProgram<style::IconPaintProperties>;
-template class SymbolSDFProgram<style::TextPaintProperties>;
+template class SymbolSDFProgram<SymbolSDFIconProgram, style::IconPaintProperties>;
+template class SymbolSDFProgram<SymbolSDFTextProgram, style::TextPaintProperties>;
 
 } // namespace mbgl

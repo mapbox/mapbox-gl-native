@@ -15,7 +15,8 @@
 
 namespace mbgl {
 
-template <class Shaders,
+template <class Name,
+          class Shaders,
           gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,

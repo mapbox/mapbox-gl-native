@@ -15,6 +15,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
 } // namespace uniforms
 
 class HillshadePrepareProgram : public Program<
+    HillshadePrepareProgram,
     shaders::hillshade_prepare,
     gfx::PrimitiveType::Triangle,
     TypeList<

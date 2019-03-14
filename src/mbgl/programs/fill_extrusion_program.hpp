@@ -53,6 +53,7 @@ using FillExtrusionPatternUniforms = TypeList<
     uniforms::u_lightintensity>;
 
 class FillExtrusionProgram : public Program<
+    FillExtrusionProgram,
     shaders::fill_extrusion,
     gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,
@@ -88,6 +89,7 @@ public:
 };
 
 class FillExtrusionPatternProgram : public Program<
+    FillExtrusionPatternProgram,
     shaders::fill_extrusion_pattern,
     gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,

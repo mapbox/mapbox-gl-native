@@ -45,6 +45,7 @@ using BackgroundPatternUniforms = TypeList<
     uniforms::u_tile_units_to_pixels>;
 
 class BackgroundProgram : public Program<
+    BackgroundProgram,
     shaders::background,
     gfx::PrimitiveType::Triangle,
     BackgroundLayoutAttributes,
@@ -57,6 +58,7 @@ public:
 };
 
 class BackgroundPatternProgram : public Program<
+    BackgroundPatternProgram,
     shaders::background_pattern,
     gfx::PrimitiveType::Triangle,
     BackgroundLayoutAttributes,

@@ -20,6 +20,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_latrange);
 } // namespace uniforms
 
 class HillshadeProgram : public Program<
+    HillshadeProgram,
     shaders::hillshade,
     gfx::PrimitiveType::Triangle,
     TypeList<

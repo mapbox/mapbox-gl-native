@@ -21,6 +21,7 @@ using CollisionBoxLayoutAttributes = TypeList<
 using CollisionBoxDynamicAttributes = TypeList<attributes::a_placed>;
 
 class CollisionBoxProgram : public Program<
+    CollisionBoxProgram,
     shaders::collision_box,
     gfx::PrimitiveType::Line,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
@@ -114,6 +115,7 @@ public:
 
 
 class CollisionCircleProgram : public Program<
+    CollisionCircleProgram,
     shaders::collision_circle,
     gfx::PrimitiveType::Triangle,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,

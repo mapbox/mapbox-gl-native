@@ -35,6 +35,7 @@ using LineLayoutAttributes = TypeList<
     attributes::a_data<uint8_t, 4>>;
 
 class LineProgram : public Program<
+    LineProgram,
     shaders::line,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
@@ -101,6 +102,7 @@ public:
 };
 
 class LinePatternProgram : public Program<
+    LinePatternProgram,
     shaders::line_pattern,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
@@ -129,6 +131,7 @@ public:
 };
 
 class LineSDFProgram : public Program<
+    LineSDFProgram,
     shaders::line_sdf,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
@@ -162,6 +165,7 @@ public:
 };
 
 class LineGradientProgram : public Program<
+    LineGradientProgram,
     shaders::line_gradient,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,

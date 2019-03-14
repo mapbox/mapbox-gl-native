@@ -9,6 +9,7 @@
 namespace mbgl {
 
 class DebugProgram : public Program<
+    DebugProgram,
     shaders::debug,
     gfx::PrimitiveType::Line,
     TypeList<

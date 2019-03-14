@@ -239,7 +239,8 @@ public:
     }
 };
 
-template <class Shaders,
+template <class Name,
+          class Shaders,
           gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,
@@ -347,6 +348,7 @@ public:
 };
 
 class SymbolIconProgram : public SymbolProgram<
+    SymbolIconProgram,
     shaders::symbol_icon,
     gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
@@ -385,8 +387,9 @@ enum class SymbolSDFPart {
     Halo = 0
 };
 
-template <class PaintProperties>
+template <class Name, class PaintProperties>
 class SymbolSDFProgram : public SymbolProgram<
+    Name,
     shaders::symbol_sdf,
     gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
@@ -410,7 +413,9 @@ class SymbolSDFProgram : public SymbolProgram<
     PaintProperties>
 {
 public:
-    using BaseProgram = SymbolProgram<shaders::symbol_sdf,
+    using BaseProgram = SymbolProgram<
+        Name,
+        shaders::symbol_sdf,
         gfx::PrimitiveType::Triangle,
         SymbolLayoutAttributes,
         TypeList<
@@ -449,8 +454,15 @@ public:
                                                    const SymbolSDFPart);
 };
 
-using SymbolSDFIconProgram = SymbolSDFProgram<style::IconPaintProperties>;
-using SymbolSDFTextProgram = SymbolSDFProgram<style::TextPaintProperties>;
+class SymbolSDFIconProgram : public SymbolSDFProgram<SymbolSDFIconProgram, style::IconPaintProperties> {
+public:
+    using SymbolSDFProgram::SymbolSDFProgram;
+};
+
+class SymbolSDFTextProgram : public SymbolSDFProgram<SymbolSDFTextProgram, style::TextPaintProperties> {
+public:
+    using SymbolSDFProgram::SymbolSDFProgram;
+};
 
 using SymbolLayoutVertex = gfx::Vertex<SymbolLayoutAttributes>;
 using SymbolIconAttributes = SymbolIconProgram::AttributeList;

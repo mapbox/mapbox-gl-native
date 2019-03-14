@@ -15,6 +15,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_intensity);
 } // namespace uniforms
 
 class HeatmapProgram : public Program<
+    HeatmapProgram,
     shaders::heatmap,
     gfx::PrimitiveType::Triangle,
     TypeList<

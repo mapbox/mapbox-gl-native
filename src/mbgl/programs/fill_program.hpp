@@ -38,6 +38,7 @@ using FillPatternUniforms = TypeList<
     uniforms::u_pixel_coord_lower>;
 
 class FillProgram : public Program<
+    FillProgram,
     shaders::fill,
     gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
@@ -59,6 +60,7 @@ public:
 };
 
 class FillPatternProgram : public Program<
+    FillPatternProgram,
     shaders::fill_pattern,
     gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
@@ -80,6 +82,7 @@ public:
 };
 
 class FillOutlineProgram : public Program<
+    FillOutlineProgram,
     shaders::fill_outline,
     gfx::PrimitiveType::Line,
     FillLayoutAttributes,
@@ -92,6 +95,7 @@ public:
 };
 
 class FillOutlinePatternProgram : public Program<
+    FillOutlinePatternProgram,
     shaders::fill_outline_pattern,
     gfx::PrimitiveType::Line,
     FillLayoutAttributes,

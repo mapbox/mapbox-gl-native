@@ -14,6 +14,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_scale_with_map);
 } // namespace uniforms
 
 class CircleProgram : public Program<
+    CircleProgram,
     shaders::circle,
     gfx::PrimitiveType::Triangle,
     TypeList<
