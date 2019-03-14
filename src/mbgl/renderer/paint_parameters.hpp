@@ -38,7 +38,8 @@ public:
                     const EvaluatedLight&,
                     RenderStaticData&,
                     ImageManager&,
-                    LineAtlas&);
+                    LineAtlas&,
+                    Placement::VariableOffsets);
 
     gfx::Context& context;
     RendererBackend& backend;
@@ -57,7 +58,7 @@ public:
     TimePoint timePoint;
 
     float pixelRatio;
-    std::unordered_map<uint32_t, VariableOffset> variableOffsets;
+    Placement::VariableOffsets variableOffsets;
     std::array<float, 2> pixelsToGLUnits;
     algorithm::ClipIDGenerator clipIDGenerator;
 

@@ -263,7 +263,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderLight.getEvaluated(),
         *staticData,
         *imageManager,
-        *lineAtlas
+        *lineAtlas,
+        placement->getVariableOffsets()
     };
 
     bool loaded = updateParameters.styleLoaded && isLoaded();
@@ -344,26 +345,25 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         bool symbolBucketsChanged = false;
         const bool placementChanged = !placement->stillRecent(parameters.timePoint);
-        std::unique_ptr<Placement> newPlacement;
         std::set<std::string> usedSymbolLayers;
 
         if (placementChanged) {
-            newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode, updateParameters.transitionOptions, updateParameters.crossSourceCollisions);
+            placement = std::make_unique<Placement>(parameters.state, parameters.mapMode, updateParameters.transitionOptions, updateParameters.crossSourceCollisions, std::move(placement));
         }
 
         for (const auto& item : renderItemsWithSymbols) {
             if (crossTileSymbolIndex.addLayer(*item.layer.getSymbolInterface(), parameters.state.getLatLng().longitude())) symbolBucketsChanged = true;
 
-            if (newPlacement) {
+            if (placementChanged) {
                 usedSymbolLayers.insert(item.layer.getID());
-                newPlacement->placeLayer(*item.layer.getSymbolInterface(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+                placement->placeLayer(*item.layer.getSymbolInterface(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
-        if (newPlacement) {
-            newPlacement->commit(*placement, parameters.timePoint);
+        if (placementChanged) {
+            placement->commit(parameters.timePoint);
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-            placement = std::move(newPlacement);
+            parameters.variableOffsets = placement->getVariableOffsets();
             updateFadingTiles();
         } else {
             placement->setStale();

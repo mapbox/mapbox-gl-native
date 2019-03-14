@@ -13,10 +13,9 @@ namespace mbgl {
 using CollisionBoxLayoutAttributes = TypeList<
     attributes::pos,
     attributes::anchor_pos,
-    attributes::extrude,
-    attributes::shift>;
+    attributes::extrude>;
 
-using CollisionBoxDynamicAttributes = TypeList<attributes::placed>;
+using CollisionBoxDynamicAttributes = TypeList<attributes::placed, attributes::shift>;
 
 class CollisionBoxProgram : public Program<
     CollisionBoxProgram,
@@ -45,17 +44,14 @@ public:
             {{
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
-            }},
-            {{
-                0.0f,
-                0.0f
             }}
         };
     }
 
-    static gfx::Vertex<CollisionBoxDynamicAttributes> dynamicVertex(bool placed, bool notUsed) {
+    static gfx::Vertex<CollisionBoxDynamicAttributes> dynamicVertex(bool placed, bool notUsed, Point<float> shift) {
         return {
-            {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }}
+            {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }},
+            {{ shift.x, shift.y }}
         };
     }
 
@@ -139,10 +135,6 @@ public:
             {{
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
-            }},
-            {{
-                0.0f,
-                0.0f
             }}
         };
     }

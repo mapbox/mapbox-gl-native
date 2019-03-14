@@ -254,8 +254,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 for (const PlacedSymbol& symbol : bucket.text.placedSymbols) {
                     optional<VariableOffset> variableOffset;
                     if (!symbol.hidden && symbol.crossTileID != 0u) {
-                        auto it = parameters.variableOffsets.find(symbol.crossTileID);
-                        if (it != parameters.variableOffsets.end()) {
+                        auto it = parameters.variableOffsets.get().find(symbol.crossTileID);
+                        if (it != parameters.variableOffsets.get().end()) {
                             variableOffset = it->second;
                             hasVariablePacement |= true;
                         }
