@@ -879,7 +879,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 
                 MGLAttributedExpression *attributedExpression = [[MGLAttributedExpression alloc] initWithExpression:expression attributes:attrs];
 
-                [attributedExpressions addObject:attributedExpression];
+                [attributedExpressions addObject:[NSExpression expressionForConstantValue:attributedExpression]];
             }
             NSExpression *subexpression = [NSExpression expressionForConstantValue:attributedExpressions];
             return [NSExpression expressionForFunction:@"mgl_attributed:" arguments:@[subexpression]];
@@ -994,6 +994,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     std::array<float, 4> mglValue = boxedValue.mgl_paddingArrayValue;
                     return @[@"literal", @[@(mglValue[0]), @(mglValue[1]), @(mglValue[2]), @(mglValue[3])]];
                 }
+            }
+            if ([constantValue isKindOfClass:[MGLAttributedExpression class]]) {
+                MGLAttributedExpression *attributedExpression = (MGLAttributedExpression *)constantValue;
+                id jsonObject = attributedExpression.expression.mgl_jsonExpressionObject;
+                NSMutableArray *attributes = [NSMutableArray array];
+                if ([jsonObject isKindOfClass:[NSArray class]]) {
+                    [attributes addObjectsFromArray:jsonObject];
+                } else {
+                    [attributes addObject:jsonObject];
+                }
+                [attributes addObject:attributedExpression.attributes];
+                
+                return attributes;
             }
             return self.constantValue;
         }
@@ -1139,9 +1152,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
-            } else if ([function isEqualToString:@"mgl_attributed:"] ||
-                       [function isEqualToString:@"MGL_FORMAT:"] ||
-                       [function isEqualToString:@"MGL_FORMAT"]) {
+            } else if ([function isEqualToString:@"mgl_attributed:"]) {
                 return [self mgl_jsonFormatExpressionObject];
                 
             } else if ([function isEqualToString:@"MGL_FUNCTION"] ||
@@ -1393,26 +1404,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 - (id)mgl_jsonFormatExpressionObject {
-    BOOL isAftermarketFunction = [self.function hasPrefix:@"mgl_attributed:"];
-    NSExpression *formatParameter;
-    NSArray<MGLAttributedExpression *> *attributedExpressions;
+    NSArray<NSExpression *> *attributedExpressions;
+    NSExpression *formatArray = self.arguments.firstObject;
     
-    if (isAftermarketFunction) {
-        formatParameter = self.arguments.firstObject;
+    if ([formatArray respondsToSelector:@selector(constantValue)] && [formatArray.constantValue isKindOfClass:[NSArray class]]) {
+        attributedExpressions = (NSArray *)formatArray.constantValue;
     } else {
-        formatParameter = self.operand;
-    }
-    
-    if ([formatParameter respondsToSelector:@selector(constantValue)] && [formatParameter.constantValue isKindOfClass:[NSArray class]]) {
-        attributedExpressions = (NSArray *)formatParameter.constantValue;
+        attributedExpressions = self.arguments;
     }
     
     NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"format", nil];
     
     for (NSUInteger index = 0; index < attributedExpressions.count; index++) {
-        MGLAttributedExpression *attributedExpression = attributedExpressions[index];
-        [expressionObject addObject:attributedExpression.expression.mgl_jsonExpressionObject];
-        [expressionObject addObject:attributedExpression.attributes];
+        [expressionObject addObjectsFromArray:attributedExpressions[index].mgl_jsonExpressionObject];
     }
     
     return expressionObject;
