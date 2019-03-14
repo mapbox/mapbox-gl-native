@@ -27,7 +27,11 @@ public:
                 return section.at(propertyName);
             }
         }
-        return defaultValue.evaluate(*context.feature, *context.zoom, T());
+
+        return defaultValue.match(
+                [&context] (const style::PropertyExpression<T>& e) { return e.getExpression().evaluate(context); },
+                [] (const T& t) -> EvaluationResult { return t; }
+        );
     }
 
     void eachChild(const std::function<void(const Expression&)>& fn) const final {
