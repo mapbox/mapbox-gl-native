@@ -11,17 +11,17 @@ const MGLAttributedExpressionKey MGLFontSizeAttribute = @"font-scale";
     return self;
 }
 
-+ (instancetype)initWithExpression:(NSExpression *)expression fontNames:(nullable NSArray<NSString *> *)fontNames fontSize:(nullable NSNumber *)fontSize {
++ (instancetype)attributedExpression:(NSExpression *)expression fontNames:(nullable NSArray<NSString *> *)fontNames fontSize:(nullable NSNumber *)fontSize {
     MGLAttributedExpression *attributedExpression;
     
     NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
     
     if (fontNames && fontNames.count > 0) {
-        [attrs setObject:fontNames forKey:MGLFontNamesAttribute];
+        attrs[MGLFontNamesAttribute] = fontNames;
     }
     
     if (fontSize) {
-        [attrs setObject:fontSize forKey:MGLFontSizeAttribute];
+        attrs[MGLFontSizeAttribute] = fontSize;
     }
     
     attributedExpression = [[self alloc] initWithExpression:expression attributes:attrs];
@@ -50,6 +50,10 @@ const MGLAttributedExpressionKey MGLFontSizeAttribute = @"font-scale";
     }
     
     return result;
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"MGLAttributedExpression<Expression: %@ Attributes: %@>", self.expression, self.attributes];
 }
 
 @end
