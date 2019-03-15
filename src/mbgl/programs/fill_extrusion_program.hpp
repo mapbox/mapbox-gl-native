@@ -22,33 +22,33 @@ class TransformState;
 template <class> class Faded;
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightpos);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_lightcolor);
-MBGL_DEFINE_UNIFORM_SCALAR(float,    u_lightintensity);
-MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, lightpos);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, lightcolor);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    lightintensity);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    height_factor);
 } // namespace uniforms
 
 using FillExtrusionLayoutAttributes = TypeList<
-    attributes::a_pos,
-    attributes::a_normal_ed>;
+    attributes::pos,
+    attributes::normal_ed>;
 
 using FillExtrusionUniforms = TypeList<
-    uniforms::u_matrix,
-    uniforms::u_lightcolor,
-    uniforms::u_lightpos,
-    uniforms::u_lightintensity>;
+    uniforms::matrix,
+    uniforms::lightcolor,
+    uniforms::lightpos,
+    uniforms::lightintensity>;
 
 using FillExtrusionPatternUniforms = TypeList<
-    uniforms::u_matrix,
-    uniforms::u_scale,
-    uniforms::u_texsize,
-    uniforms::u_fade,
-    uniforms::u_pixel_coord_upper,
-    uniforms::u_pixel_coord_lower,
-    uniforms::u_height_factor,
-    uniforms::u_lightcolor,
-    uniforms::u_lightpos,
-    uniforms::u_lightintensity>;
+    uniforms::matrix,
+    uniforms::scale,
+    uniforms::texsize,
+    uniforms::fade,
+    uniforms::pixel_coord_upper,
+    uniforms::pixel_coord_lower,
+    uniforms::height_factor,
+    uniforms::lightcolor,
+    uniforms::lightpos,
+    uniforms::lightintensity>;
 
 class FillExtrusionProgram : public Program<
     FillExtrusionProgram,
@@ -91,7 +91,7 @@ class FillExtrusionPatternProgram : public Program<
     FillExtrusionLayoutAttributes,
     FillExtrusionPatternUniforms,
     TypeList<
-        textures::u_image>,
+        textures::image>,
     style::FillExtrusionPaintProperties>
 {
 public:

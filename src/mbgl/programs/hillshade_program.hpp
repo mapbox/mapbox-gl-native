@@ -11,28 +11,28 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(Color, u_shadow);
-MBGL_DEFINE_UNIFORM_SCALAR(Color, u_highlight);
-MBGL_DEFINE_UNIFORM_SCALAR(Color, u_accent);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_light);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_latrange);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, shadow);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, highlight);
+MBGL_DEFINE_UNIFORM_SCALAR(Color, accent);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, light);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, latrange);
 } // namespace uniforms
 
 class HillshadeProgram : public Program<
     HillshadeProgram,
     gfx::PrimitiveType::Triangle,
     TypeList<
-        attributes::a_pos,
-        attributes::a_texture_pos>,
+        attributes::pos,
+        attributes::texture_pos>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_highlight,
-        uniforms::u_shadow,
-        uniforms::u_accent,
-        uniforms::u_light,
-        uniforms::u_latrange>,
+        uniforms::matrix,
+        uniforms::highlight,
+        uniforms::shadow,
+        uniforms::accent,
+        uniforms::light,
+        uniforms::latrange>,
     TypeList<
-        textures::u_image>,
+        textures::image>,
     style::HillshadePaintProperties>{
 public:
     using Program::Program;

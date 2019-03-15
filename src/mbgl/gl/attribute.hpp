@@ -50,13 +50,13 @@ public:
                   }
               };
 
-              return Locations{ maybeBindLocation(As::name())... };
+              return Locations{ maybeBindLocation(As::attributeName())... };
           }()) {
     }
 
     template <class BinaryProgram>
     AttributeLocations(const BinaryProgram& program)
-        : locations{ program.attributeLocation(As::name())... } {
+        : locations{ program.attributeLocation(As::attributeName())... } {
     }
 
     NamedAttributeLocations getNamedLocations() const {
@@ -68,7 +68,7 @@ public:
             }
         };
 
-        util::ignore({ (maybeAddLocation(As::name(), locations.template get<As>()), 0)... });
+        util::ignore({ (maybeAddLocation(As::attributeName(), locations.template get<As>()), 0)... });
 
         return result;
     }

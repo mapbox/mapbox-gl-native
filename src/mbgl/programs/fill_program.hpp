@@ -21,17 +21,17 @@ template <class> class Faded;
 using FillLayoutAttributes = PositionOnlyLayoutAttributes;
 
 using FillUniforms = TypeList<
-    uniforms::u_matrix,
-    uniforms::u_world>;
+    uniforms::matrix,
+    uniforms::world>;
 
 using FillPatternUniforms = TypeList<
-    uniforms::u_matrix,
-    uniforms::u_world,
-    uniforms::u_texsize,
-    uniforms::u_scale,
-    uniforms::u_fade,
-    uniforms::u_pixel_coord_upper,
-    uniforms::u_pixel_coord_lower>;
+    uniforms::matrix,
+    uniforms::world,
+    uniforms::texsize,
+    uniforms::scale,
+    uniforms::fade,
+    uniforms::pixel_coord_upper,
+    uniforms::pixel_coord_lower>;
 
 class FillProgram : public Program<
     FillProgram,
@@ -60,7 +60,7 @@ class FillPatternProgram : public Program<
     FillLayoutAttributes,
     FillPatternUniforms,
     TypeList<
-        textures::u_image>,
+        textures::image>,
     style::FillPaintProperties>
 {
 public:
@@ -93,7 +93,7 @@ class FillOutlinePatternProgram : public Program<
     FillLayoutAttributes,
     FillPatternUniforms,
     TypeList<
-        textures::u_image>,
+        textures::image>,
     style::FillPaintProperties>
 {
 public:

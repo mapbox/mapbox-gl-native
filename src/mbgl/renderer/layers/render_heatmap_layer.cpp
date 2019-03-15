@@ -106,9 +106,9 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
        
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 HeatmapProgram::LayoutUniformValues {
-                    uniforms::u_intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
-                    uniforms::u_matrix::Value( tile.matrix ),
-                    uniforms::heatmap::u_extrude_scale::Value( extrudeScale )
+                    uniforms::intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
+                    uniforms::matrix::Value( tile.matrix ),
+                    uniforms::heatmap::extrude_scale::Value( extrudeScale )
                 },
                 paintPropertyBinders,
                 evaluated,
@@ -151,9 +151,9 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HeatmapTextureProgram::LayoutUniformValues{
-                uniforms::u_matrix::Value( viewportMat ),
-                uniforms::u_world::Value( size ),
-                uniforms::u_opacity::Value( evaluated.get<HeatmapOpacity>() )
+                uniforms::matrix::Value( viewportMat ),
+                uniforms::world::Value( size ),
+                uniforms::opacity::Value( evaluated.get<HeatmapOpacity>() )
             },
             paintAttributeData,
             properties,
@@ -179,8 +179,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             allUniformValues,
             allAttributeBindings,
             HeatmapTextureProgram::TextureBindings{
-                textures::u_image::Value{ *renderTexture->getTexture().resource, gfx::TextureFilterType::Linear },
-                textures::u_color_ramp::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+                textures::image::Value{ *renderTexture->getTexture().resource, gfx::TextureFilterType::Linear },
+                textures::color_ramp::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
             },
             getID()
         );

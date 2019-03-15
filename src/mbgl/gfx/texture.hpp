@@ -10,8 +10,8 @@
 #define MBGL_DEFINE_TEXTURE(name_)                                                                 \
     struct name_ {                                                                                 \
         using Value = ::mbgl::gfx::TextureBinding;                                                 \
-        static constexpr auto name() {                                                             \
-            return #name_;                                                                         \
+        static constexpr auto uniformName() {                                                      \
+            return "u_" #name_;                                                                    \
         }                                                                                          \
     }
 

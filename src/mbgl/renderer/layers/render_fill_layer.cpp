@@ -86,12 +86,12 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillProgram::LayoutUniformValues {
-                        uniforms::u_matrix::Value(
+                        uniforms::matrix::Value(
                             tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                                   evaluated.get<FillTranslateAnchor>(),
                                                   parameters.state)
                         ),
-                        uniforms::u_world::Value( glContext.viewport.getCurrentValue().size ),
+                        uniforms::world::Value( glContext.viewport.getCurrentValue().size ),
                     },
                     paintPropertyBinders,
                     evaluated,
@@ -219,7 +219,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments,
                  FillPatternProgram::TextureBindings{
-                     textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                     textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                  });
 
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
@@ -229,7 +229,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments,
                      FillOutlinePatternProgram::TextureBindings{
-                         textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                         textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                      });
             }
         }

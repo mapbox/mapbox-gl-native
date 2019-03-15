@@ -28,27 +28,27 @@ class RenderTile;
 class TransformState;
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_gl_coord_matrix);
-MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_label_plane_matrix);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
+MBGL_DEFINE_UNIFORM_MATRIX(double, 4, gl_coord_matrix);
+MBGL_DEFINE_UNIFORM_MATRIX(double, 4, label_plane_matrix);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, is_halo);
+MBGL_DEFINE_UNIFORM_SCALAR(float, gamma_scale);
 
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_text);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_zoom_constant);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_feature_constant);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_size_t);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_size);
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_symbol);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, is_text);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, is_size_zoom_constant);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, is_size_feature_constant);
+MBGL_DEFINE_UNIFORM_SCALAR(float, size_t);
+MBGL_DEFINE_UNIFORM_SCALAR(float, size);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, rotate_symbol);
+MBGL_DEFINE_UNIFORM_SCALAR(float, aspect_ratio);
 } // namespace uniforms
 
 using SymbolLayoutAttributes = TypeList<
-    attributes::a_pos_offset,
-    attributes::a_data<uint16_t, 4>>;
+    attributes::pos_offset,
+    attributes::data<uint16_t, 4>>;
 
-using SymbolDynamicLayoutAttributes = TypeList<attributes::a_projected_pos>;
+using SymbolDynamicLayoutAttributes = TypeList<attributes::projected_pos>;
 
-using SymbolOpacityAttributes = TypeList<attributes::a_fade_opacity>;
+using SymbolOpacityAttributes = TypeList<attributes::fade_opacity>;
 
 struct ZoomEvaluatedSize {
     bool isZoomConstant;
@@ -66,10 +66,10 @@ public:
     virtual ~SymbolSizeBinder() = default;
 
     using UniformList = TypeList<
-        uniforms::u_is_size_zoom_constant,
-        uniforms::u_is_size_feature_constant,
-        uniforms::u_size_t,
-        uniforms::u_size>;
+        uniforms::is_size_zoom_constant,
+        uniforms::is_size_feature_constant,
+        uniforms::size_t,
+        uniforms::size>;
     using UniformValues = gfx::UniformValues<UniformList>;
 
     static std::unique_ptr<SymbolSizeBinder> create(const float tileZoom,
@@ -82,10 +82,10 @@ public:
     UniformValues uniformValues(float currentZoom) const {
         const ZoomEvaluatedSize u = evaluateForZoom(currentZoom);
         return UniformValues {
-            uniforms::u_is_size_zoom_constant::Value( u.isZoomConstant ),
-            uniforms::u_is_size_feature_constant::Value( u.isFeatureConstant),
-            uniforms::u_size_t::Value( u.sizeT ),
-            uniforms::u_size::Value( u.size )
+            uniforms::is_size_zoom_constant::Value( u.isZoomConstant ),
+            uniforms::is_size_feature_constant::Value( u.isFeatureConstant),
+            uniforms::size_t::Value( u.sizeT ),
+            uniforms::size::Value( u.size )
         };
     }
 };
@@ -347,20 +347,20 @@ class SymbolIconProgram : public SymbolProgram<
     gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_label_plane_matrix,
-        uniforms::u_gl_coord_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_texsize,
-        uniforms::u_fade_change,
-        uniforms::u_is_text,
-        uniforms::u_camera_to_center_distance,
-        uniforms::u_pitch,
-        uniforms::u_pitch_with_map,
-        uniforms::u_rotate_symbol,
-        uniforms::u_aspect_ratio>,
+        uniforms::matrix,
+        uniforms::label_plane_matrix,
+        uniforms::gl_coord_matrix,
+        uniforms::extrude_scale,
+        uniforms::texsize,
+        uniforms::fade_change,
+        uniforms::is_text,
+        uniforms::camera_to_center_distance,
+        uniforms::pitch,
+        uniforms::pitch_with_map,
+        uniforms::rotate_symbol,
+        uniforms::aspect_ratio>,
     TypeList<
-        textures::u_texture>,
+        textures::texture>,
     style::IconPaintProperties>
 {
 public:
@@ -387,22 +387,22 @@ class SymbolSDFProgram : public SymbolProgram<
     gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_label_plane_matrix,
-        uniforms::u_gl_coord_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_texsize,
-        uniforms::u_fade_change,
-        uniforms::u_is_text,
-        uniforms::u_camera_to_center_distance,
-        uniforms::u_pitch,
-        uniforms::u_pitch_with_map,
-        uniforms::u_rotate_symbol,
-        uniforms::u_aspect_ratio,
-        uniforms::u_gamma_scale,
-        uniforms::u_is_halo>,
+        uniforms::matrix,
+        uniforms::label_plane_matrix,
+        uniforms::gl_coord_matrix,
+        uniforms::extrude_scale,
+        uniforms::texsize,
+        uniforms::fade_change,
+        uniforms::is_text,
+        uniforms::camera_to_center_distance,
+        uniforms::pitch,
+        uniforms::pitch_with_map,
+        uniforms::rotate_symbol,
+        uniforms::aspect_ratio,
+        uniforms::gamma_scale,
+        uniforms::is_halo>,
     TypeList<
-        textures::u_texture>,
+        textures::texture>,
     PaintProperties>
 {
 public:
@@ -411,22 +411,22 @@ public:
         gfx::PrimitiveType::Triangle,
         SymbolLayoutAttributes,
         TypeList<
-            uniforms::u_matrix,
-            uniforms::u_label_plane_matrix,
-            uniforms::u_gl_coord_matrix,
-            uniforms::u_extrude_scale,
-            uniforms::u_texsize,
-            uniforms::u_fade_change,
-            uniforms::u_is_text,
-            uniforms::u_camera_to_center_distance,
-            uniforms::u_pitch,
-            uniforms::u_pitch_with_map,
-            uniforms::u_rotate_symbol,
-            uniforms::u_aspect_ratio,
-            uniforms::u_gamma_scale,
-            uniforms::u_is_halo>,
+            uniforms::matrix,
+            uniforms::label_plane_matrix,
+            uniforms::gl_coord_matrix,
+            uniforms::extrude_scale,
+            uniforms::texsize,
+            uniforms::fade_change,
+            uniforms::is_text,
+            uniforms::camera_to_center_distance,
+            uniforms::pitch,
+            uniforms::pitch_with_map,
+            uniforms::rotate_symbol,
+            uniforms::aspect_ratio,
+            uniforms::gamma_scale,
+            uniforms::is_halo>,
         TypeList<
-            textures::u_texture>,
+            textures::texture>,
         PaintProperties>;
 
     using LayoutUniformValues = typename BaseProgram::LayoutUniformValues;

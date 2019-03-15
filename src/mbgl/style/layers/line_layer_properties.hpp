@@ -32,11 +32,11 @@ struct LineRoundLimit : LayoutProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct LineOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
+struct LineOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct LineColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
+struct LineColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
 };
 
@@ -48,19 +48,19 @@ struct LineTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct LineWidth : DataDrivenPaintProperty<float, attributes::a_width, uniforms::u_width> {
+struct LineWidth : DataDrivenPaintProperty<float, attributes::width, uniforms::width> {
     static float defaultValue() { return 1; }
 };
 
-struct LineGapWidth : DataDrivenPaintProperty<float, attributes::a_gapwidth, uniforms::u_gapwidth> {
+struct LineGapWidth : DataDrivenPaintProperty<float, attributes::gapwidth, uniforms::gapwidth> {
     static float defaultValue() { return 0; }
 };
 
-struct LineOffset : DataDrivenPaintProperty<float, attributes::a_offset, uniforms::u_offset> {
+struct LineOffset : DataDrivenPaintProperty<float, attributes::offset, uniforms::offset> {
     static float defaultValue() { return 0; }
 };
 
-struct LineBlur : DataDrivenPaintProperty<float, attributes::a_blur, uniforms::u_blur> {
+struct LineBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
     static float defaultValue() { return 0; }
 };
 
@@ -68,7 +68,7 @@ struct LineDasharray : CrossFadedPaintProperty<std::vector<float>> {
     static std::vector<float> defaultValue() { return {  }; }
 };
 
-struct LinePattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
+struct LinePattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
     static std::string defaultValue() { return ""; }
 };
 

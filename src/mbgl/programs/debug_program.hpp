@@ -11,10 +11,10 @@ class DebugProgram : public Program<
     DebugProgram,
     gfx::PrimitiveType::Line,
     TypeList<
-        attributes::a_pos>,
+        attributes::pos>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_color>,
+        uniforms::matrix,
+        uniforms::color>,
     TypeList<>,
     style::Properties<>>
 {
