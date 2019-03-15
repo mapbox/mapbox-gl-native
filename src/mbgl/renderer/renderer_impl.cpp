@@ -466,7 +466,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 parameters.staticData.tileTriangleSegments,
                 program.computeAllUniformValues(
                     ClippingMaskProgram::LayoutUniformValues {
-                        uniforms::u_matrix::Value( parameters.matrixForTile(clipID.first) ),
+                        uniforms::matrix::Value( parameters.matrixForTile(clipID.first) ),
                     },
                     paintAttributeData,
                     properties,

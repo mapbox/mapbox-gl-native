@@ -11,21 +11,21 @@
 namespace mbgl {
 
 using CollisionBoxLayoutAttributes = TypeList<
-    attributes::a_pos,
-    attributes::a_anchor_pos,
-    attributes::a_extrude,
-    attributes::a_shift>;
+    attributes::pos,
+    attributes::anchor_pos,
+    attributes::extrude,
+    attributes::shift>;
 
-using CollisionBoxDynamicAttributes = TypeList<attributes::a_placed>;
+using CollisionBoxDynamicAttributes = TypeList<attributes::placed>;
 
 class CollisionBoxProgram : public Program<
     CollisionBoxProgram,
     gfx::PrimitiveType::Line,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_camera_to_center_distance>,
+        uniforms::matrix,
+        uniforms::extrude_scale,
+        uniforms::camera_to_center_distance>,
     TypeList<>,
     style::Properties<>>
 {
@@ -116,10 +116,10 @@ class CollisionCircleProgram : public Program<
     gfx::PrimitiveType::Triangle,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_overscale_factor,
-        uniforms::u_camera_to_center_distance>,
+        uniforms::matrix,
+        uniforms::extrude_scale,
+        uniforms::overscale_factor,
+        uniforms::camera_to_center_distance>,
     TypeList<>,
     style::Properties<>>
 {

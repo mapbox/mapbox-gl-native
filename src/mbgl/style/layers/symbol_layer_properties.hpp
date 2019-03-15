@@ -197,23 +197,23 @@ struct TextOptional : LayoutProperty<bool> {
     static bool defaultValue() { return false; }
 };
 
-struct IconOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
+struct IconOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct IconColor : DataDrivenPaintProperty<Color, attributes::a_fill_color, uniforms::u_fill_color> {
+struct IconColor : DataDrivenPaintProperty<Color, attributes::fill_color, uniforms::fill_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct IconHaloColor : DataDrivenPaintProperty<Color, attributes::a_halo_color, uniforms::u_halo_color> {
+struct IconHaloColor : DataDrivenPaintProperty<Color, attributes::halo_color, uniforms::halo_color> {
     static Color defaultValue() { return {}; }
 };
 
-struct IconHaloWidth : DataDrivenPaintProperty<float, attributes::a_halo_width, uniforms::u_halo_width> {
+struct IconHaloWidth : DataDrivenPaintProperty<float, attributes::halo_width, uniforms::halo_width> {
     static float defaultValue() { return 0; }
 };
 
-struct IconHaloBlur : DataDrivenPaintProperty<float, attributes::a_halo_blur, uniforms::u_halo_blur> {
+struct IconHaloBlur : DataDrivenPaintProperty<float, attributes::halo_blur, uniforms::halo_blur> {
     static float defaultValue() { return 0; }
 };
 
@@ -225,26 +225,26 @@ struct IconTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct TextOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
+struct TextOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct TextColor : DataDrivenPaintProperty<Color, attributes::a_fill_color, uniforms::u_fill_color, true> {
+struct TextColor : DataDrivenPaintProperty<Color, attributes::fill_color, uniforms::fill_color, true> {
     static Color defaultValue() { return Color::black(); }
     static constexpr const char *name() { return "text-color"; }
     static constexpr auto expressionType() { return expression::type::ColorType{}; };
     template<typename T> static bool hasOverride(const T& t) { return !!t.textColor; };
 };
 
-struct TextHaloColor : DataDrivenPaintProperty<Color, attributes::a_halo_color, uniforms::u_halo_color> {
+struct TextHaloColor : DataDrivenPaintProperty<Color, attributes::halo_color, uniforms::halo_color> {
     static Color defaultValue() { return {}; }
 };
 
-struct TextHaloWidth : DataDrivenPaintProperty<float, attributes::a_halo_width, uniforms::u_halo_width> {
+struct TextHaloWidth : DataDrivenPaintProperty<float, attributes::halo_width, uniforms::halo_width> {
     static float defaultValue() { return 0; }
 };
 
-struct TextHaloBlur : DataDrivenPaintProperty<float, attributes::a_halo_blur, uniforms::u_halo_blur> {
+struct TextHaloBlur : DataDrivenPaintProperty<float, attributes::halo_blur, uniforms::halo_blur> {
     static float defaultValue() { return 0; }
 };
 

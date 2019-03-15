@@ -84,17 +84,17 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             RasterProgram::LayoutUniformValues {
-                uniforms::u_matrix::Value( matrix ),
-                uniforms::u_opacity::Value( evaluated.get<RasterOpacity>() ),
-                uniforms::u_fade_t::Value( 1 ),
-                uniforms::u_brightness_low::Value( evaluated.get<RasterBrightnessMin>() ),
-                uniforms::u_brightness_high::Value( evaluated.get<RasterBrightnessMax>() ),
-                uniforms::u_saturation_factor::Value( saturationFactor(evaluated.get<RasterSaturation>()) ),
-                uniforms::u_contrast_factor::Value( contrastFactor(evaluated.get<RasterContrast>()) ),
-                uniforms::u_spin_weights::Value( spinWeights(evaluated.get<RasterHueRotate>()) ),
-                uniforms::u_buffer_scale::Value( 1.0f ),
-                uniforms::u_scale_parent::Value( 1.0f ),
-                uniforms::u_tl_parent::Value( std::array<float, 2> {{ 0.0f, 0.0f }} ),
+                uniforms::matrix::Value( matrix ),
+                uniforms::opacity::Value( evaluated.get<RasterOpacity>() ),
+                uniforms::fade_t::Value( 1 ),
+                uniforms::brightness_low::Value( evaluated.get<RasterBrightnessMin>() ),
+                uniforms::brightness_high::Value( evaluated.get<RasterBrightnessMax>() ),
+                uniforms::saturation_factor::Value( saturationFactor(evaluated.get<RasterSaturation>()) ),
+                uniforms::contrast_factor::Value( contrastFactor(evaluated.get<RasterContrast>()) ),
+                uniforms::spin_weights::Value( spinWeights(evaluated.get<RasterHueRotate>()) ),
+                uniforms::buffer_scale::Value( 1.0f ),
+                uniforms::scale_parent::Value( 1.0f ),
+                uniforms::tl_parent::Value( std::array<float, 2> {{ 0.0f, 0.0f }} ),
             },
             paintAttributeData,
             evaluated,
@@ -137,8 +137,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      *bucket.indexBuffer,
                      bucket.segments,
                      RasterProgram::TextureBindings{
-                         textures::u_image0::Value{ *bucket.texture->resource, filter },
-                         textures::u_image1::Value{ *bucket.texture->resource, filter },
+                         textures::image0::Value{ *bucket.texture->resource, filter },
+                         textures::image1::Value{ *bucket.texture->resource, filter },
                      });
             }
         }
@@ -161,8 +161,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      *bucket.indexBuffer,
                      bucket.segments,
                      RasterProgram::TextureBindings{
-                         textures::u_image0::Value{ *bucket.texture->resource, filter },
-                         textures::u_image1::Value{ *bucket.texture->resource, filter },
+                         textures::image0::Value{ *bucket.texture->resource, filter },
+                         textures::image1::Value{ *bucket.texture->resource, filter },
                      });
             } else {
                 // Draw the full tile.
@@ -171,8 +171,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      parameters.staticData.quadTriangleIndexBuffer,
                      parameters.staticData.rasterSegments,
                      RasterProgram::TextureBindings{
-                         textures::u_image0::Value{ *bucket.texture->resource, filter },
-                         textures::u_image1::Value{ *bucket.texture->resource, filter },
+                         textures::image0::Value{ *bucket.texture->resource, filter },
+                         textures::image1::Value{ *bucket.texture->resource, filter },
                      });
             }
         }

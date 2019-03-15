@@ -163,7 +163,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     patternPosA,
                     patternPosB,
                     FillExtrusionPatternProgram::TextureBindings{
-                        textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                        textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                     }
                 );
             }
@@ -182,9 +182,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::LayoutUniformValues{
-                uniforms::u_matrix::Value( viewportMat ),
-                uniforms::u_world::Value( size ),
-                uniforms::u_opacity::Value( evaluated.get<FillExtrusionOpacity>() )
+                uniforms::matrix::Value( viewportMat ),
+                uniforms::world::Value( size ),
+                uniforms::opacity::Value( evaluated.get<FillExtrusionOpacity>() )
             },
             paintAttributeData,
             properties,
@@ -210,7 +210,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             allUniformValues,
             allAttributeBindings,
             ExtrusionTextureProgram::TextureBindings{
-                textures::u_image::Value{ *renderTexture->getTexture().resource },
+                textures::image::Value{ *renderTexture->getTexture().resource },
             },
             getID());
     }

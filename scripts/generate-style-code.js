@@ -99,7 +99,7 @@ function attributeUniformType(property, type) {
        [ property.name.replace(type + '-', '').replace(/-/g, '_') ];
 
     return names.map(name => {
-      return `attributes::a_${name}, uniforms::u_${name}`
+      return `attributes::${name}, uniforms::${name}`
     }).join(', ');
 }
 

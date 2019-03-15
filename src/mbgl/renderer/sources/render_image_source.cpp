@@ -73,8 +73,8 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileBorderSegments,
             programInstance.computeAllUniformValues(
                 DebugProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( matrix ),
-                    uniforms::u_color::Value( Color::red() )
+                    uniforms::matrix::Value( matrix ),
+                    uniforms::color::Value( Color::red() )
                 },
                 paintAttributeData,
                 properties,

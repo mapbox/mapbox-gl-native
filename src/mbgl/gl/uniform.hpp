@@ -73,21 +73,21 @@ public:
         util::ignore(
             { // Some shader programs have uniforms declared, but not used, so they're not active.
               // Therefore, we'll only verify them when they are indeed active.
-              (active.find(Us::name()) != active.end()
-                   ? verifyUniform<typename Us::Value>(active.at(Us::name()))
+              (active.find(Us::uniformName()) != active.end()
+                   ? verifyUniform<typename Us::Value>(active.at(Us::uniformName()))
                    : false)... });
 #endif
 
-        state = State{ gl::uniformLocation(id, Us::name())... };
+        state = State{ gl::uniformLocation(id, Us::uniformName())... };
     }
 
     template <class BinaryProgram>
     void loadNamedLocations(const BinaryProgram& program) {
-        state = State{ UniformState<typename Us::Value>(program.uniformLocation(Us::name()))... };
+        state = State{ UniformState<typename Us::Value>(program.uniformLocation(Us::uniformName()))... };
     }
 
     NamedUniformLocations getNamedLocations() const {
-        return NamedUniformLocations{ { Us::name(), state.template get<Us>().location }... };
+        return NamedUniformLocations{ { Us::uniformName(), state.template get<Us>().location }... };
     }
 
     void bind(const gfx::UniformValues<TypeList<Us...>>& values) {

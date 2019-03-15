@@ -10,18 +10,18 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_intensity);
+MBGL_DEFINE_UNIFORM_SCALAR(float, intensity);
 } // namespace uniforms
 
 class HeatmapProgram : public Program<
     HeatmapProgram,
     gfx::PrimitiveType::Triangle,
     TypeList<
-        attributes::a_pos>,
+        attributes::pos>,
     TypeList<
-        uniforms::u_intensity,
-        uniforms::u_matrix,
-        uniforms::heatmap::u_extrude_scale>,
+        uniforms::intensity,
+        uniforms::matrix,
+        uniforms::heatmap::extrude_scale>,
     TypeList<>,
     style::HeatmapPaintProperties>
 {

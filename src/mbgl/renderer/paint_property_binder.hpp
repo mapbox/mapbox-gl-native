@@ -432,15 +432,15 @@ PaintPropertyBinder<T, UniformValueType, PossiblyEvaluatedType, As...>::create(c
 
 template <class Attr>
 struct ZoomInterpolatedAttribute {
-    static auto name() { return Attr::name(); }
+    static auto attributeName() { return Attr::attributeName(); }
     using Type = ZoomInterpolatedAttributeType<typename Attr::Type>;
 };
 
 template <class Attr>
 struct InterpolationUniform {
     using Value = float;
-    static auto name() {
-        static const std::string name = Attr::name() + std::string("_t");
+    static auto uniformName() {
+        static const std::string name = Attr::attributeName() + std::string("_t");
         return name.c_str();
     }
 };
@@ -553,7 +553,7 @@ public:
     struct UniformDefines<TypeList<Us...>> {
         static void appendDefines(std::vector<std::string>& defines) {
             util::ignore({
-                (defines.push_back(std::string("#define HAS_UNIFORM_") + Us::name()), 0)...
+                (defines.push_back(std::string("#define HAS_UNIFORM_") + Us::uniformName()), 0)...
             });
         }
     };

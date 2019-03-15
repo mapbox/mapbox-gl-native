@@ -9,20 +9,20 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(bool, u_scale_with_map);
+MBGL_DEFINE_UNIFORM_SCALAR(bool, scale_with_map);
 } // namespace uniforms
 
 class CircleProgram : public Program<
     CircleProgram,
     gfx::PrimitiveType::Triangle,
     TypeList<
-        attributes::a_pos>,
+        attributes::pos>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_scale_with_map,
-        uniforms::u_extrude_scale,
-        uniforms::u_camera_to_center_distance,
-        uniforms::u_pitch_with_map>,
+        uniforms::matrix,
+        uniforms::scale_with_map,
+        uniforms::extrude_scale,
+        uniforms::camera_to_center_distance,
+        uniforms::pitch_with_map>,
     TypeList<>,
     style::CirclePaintProperties>
 {

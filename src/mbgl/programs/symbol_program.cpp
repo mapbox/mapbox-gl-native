@@ -82,24 +82,24 @@ Values makeValues(const bool isText,
     mat4 glCoordMatrix = getGlCoordMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
 
     return Values {
-        uniforms::u_matrix::Value( tile.translatedMatrix(values.translate,
+        uniforms::matrix::Value( tile.translatedMatrix(values.translate,
                                    values.translateAnchor,
                                    state) ),
-        uniforms::u_label_plane_matrix::Value(labelPlaneMatrix),
-        uniforms::u_gl_coord_matrix::Value( tile.translateVtxMatrix(glCoordMatrix,
+        uniforms::label_plane_matrix::Value(labelPlaneMatrix),
+        uniforms::gl_coord_matrix::Value( tile.translateVtxMatrix(glCoordMatrix,
                                             values.translate,
                                             values.translateAnchor,
                                             state,
                                             true) ),
-        uniforms::u_extrude_scale::Value( extrudeScale ),
-        uniforms::u_texsize::Value( texsize ),
-        uniforms::u_fade_change::Value( symbolFadeChange ),
-        uniforms::u_is_text::Value( isText ),
-        uniforms::u_camera_to_center_distance::Value( state.getCameraToCenterDistance() ),
-        uniforms::u_pitch::Value( state.getPitch() ),
-        uniforms::u_pitch_with_map::Value( pitchWithMap ),
-        uniforms::u_rotate_symbol::Value( rotateInShader ),
-        uniforms::u_aspect_ratio::Value( state.getSize().aspectRatio() ),
+        uniforms::extrude_scale::Value( extrudeScale ),
+        uniforms::texsize::Value( texsize ),
+        uniforms::fade_change::Value( symbolFadeChange ),
+        uniforms::is_text::Value( isText ),
+        uniforms::camera_to_center_distance::Value( state.getCameraToCenterDistance() ),
+        uniforms::pitch::Value( state.getPitch() ),
+        uniforms::pitch_with_map::Value( pitchWithMap ),
+        uniforms::rotate_symbol::Value( rotateInShader ),
+        uniforms::aspect_ratio::Value( state.getSize().aspectRatio() ),
         std::forward<Args>(args)...
     };
 }
@@ -149,8 +149,8 @@ SymbolSDFProgram<Name, PaintProperties>::layoutUniformValues(const bool isText,
         tile,
         state,
         symbolFadeChange,
-        uniforms::u_gamma_scale::Value( gammaScale ),
-        uniforms::u_is_halo::Value( part == SymbolSDFPart::Halo )
+        uniforms::gamma_scale::Value( gammaScale ),
+        uniforms::is_halo::Value( part == SymbolSDFPart::Halo )
     );
 }
 
