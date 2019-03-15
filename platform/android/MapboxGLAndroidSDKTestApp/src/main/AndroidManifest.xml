@@ -176,7 +176,7 @@
                 android:label="@string/activity_map_fragment_backstack">
             <meta-data
                     android:name="@string/category"
-                    android:value="@string/category_fragment" />
+                    android:value="@string/category_integration" />
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".activity.FeatureOverviewActivity" />
@@ -399,7 +399,7 @@
             android:label="@string/activity_viewpager">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_fragment" />
+                android:value="@string/category_integration" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
@@ -900,7 +900,7 @@
                 android:label="@string/activity_recyclerview_textureview">
             <meta-data
                     android:name="@string/category"
-                    android:value="@string/category_maplayout" />
+                    android:value="@string/category_integration" />
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".activity.FeatureOverviewActivity" />
@@ -911,7 +911,7 @@
                 android:label="@string/activity_recyclerview_glsurfaceview">
             <meta-data
                     android:name="@string/category"
-                    android:value="@string/category_maplayout" />
+                    android:value="@string/category_integration" />
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".activity.FeatureOverviewActivity" />
@@ -922,7 +922,7 @@
                 android:label="@string/activity_nested_viewpager">
             <meta-data
                     android:name="@string/category"
-                    android:value="@string/category_fragment" />
+                    android:value="@string/category_integration" />
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".activity.FeatureOverviewActivity" />
