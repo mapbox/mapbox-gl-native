@@ -3,7 +3,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/context.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {
@@ -99,25 +99,22 @@ void RenderLayer::checkRenderability(const PaintParameters& parameters,
         return;
     }
 
-    // TODO: remove cast
-    auto& glContext = reinterpret_cast<gl::Context&>(parameters.context);
-
-    if (activeBindingCount > glContext.maximumVertexBindingCount) {
+    if (activeBindingCount > parameters.context.maximumVertexBindingCount) {
         Log::Error(Event::OpenGL,
                    "The layer '%s' uses more data-driven properties than the current device "
                    "supports, and will have rendering errors. To ensure compatibility with this "
                    "device, use %d fewer data driven properties in this layer.",
                    getID().c_str(),
-                   activeBindingCount - glContext.minimumRequiredVertexBindingCount);
+                   activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
-    } else if (activeBindingCount > glContext.minimumRequiredVertexBindingCount) {
+    } else if (activeBindingCount > parameters.context.minimumRequiredVertexBindingCount) {
         Log::Warning(Event::OpenGL,
                    "The layer '%s' uses more data-driven properties than some devices may support. "
                    "Though it will render correctly on this device, it may have rendering errors "
                    "on other devices. To ensure compatibility with all devices, use %d fewer "
                    "data-driven properties in this layer.",
                    getID().c_str(),
-                   activeBindingCount - glContext.minimumRequiredVertexBindingCount);
+                   activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
     }
 }

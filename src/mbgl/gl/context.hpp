@@ -172,9 +172,7 @@ public:
 #endif // MBGL_USE_GLES2
 
     bool supportsHalfFloatTextures = false;
-    const uint32_t maximumVertexBindingCount;
-    static constexpr const uint32_t minimumRequiredVertexBindingCount = 8;
-    
+
 private:
     State<value::StencilFunc> stencilFunc;
     State<value::StencilMask> stencilMask;
