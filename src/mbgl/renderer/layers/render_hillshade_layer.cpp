@@ -10,7 +10,6 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/hillshade_layer_impl.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 

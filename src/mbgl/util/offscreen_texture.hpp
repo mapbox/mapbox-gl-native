@@ -6,20 +6,17 @@
 
 namespace mbgl {
 
-namespace gl {
-class Context;
-} // namespace gl
-
 namespace gfx {
+class Context;
 class Texture;
 } // namespace gfx
 
 class OffscreenTexture {
 public:
-    OffscreenTexture(gl::Context&,
+    OffscreenTexture(gfx::Context&,
                      Size size = { 256, 256 },
                      gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
-    OffscreenTexture(gl::Context&,
+    OffscreenTexture(gfx::Context&,
                      Size size,
                      gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&,
                      gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);

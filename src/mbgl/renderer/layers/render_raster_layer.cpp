@@ -8,7 +8,6 @@
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 
 namespace mbgl {

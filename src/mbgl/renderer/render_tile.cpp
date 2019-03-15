@@ -4,7 +4,7 @@
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
 

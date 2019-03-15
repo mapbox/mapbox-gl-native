@@ -1,5 +1,5 @@
 #include <mbgl/renderer/render_static_data.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/context.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 
 namespace mbgl {
@@ -48,7 +48,7 @@ static gfx::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices(
     return result;
 }
 
-RenderStaticData::RenderStaticData(gl::Context& context, float pixelRatio, const optional<std::string>& programCacheDir)
+RenderStaticData::RenderStaticData(gfx::Context& context, float pixelRatio, const optional<std::string>& programCacheDir)
     : tileVertexBuffer(context.createVertexBuffer(tileVertices())),
       rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
       extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices())),

@@ -63,6 +63,9 @@ bool RenderFillLayer::hasCrossfade() const {
 }
 
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
+    // TODO: remove cast
+    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+
     if (unevaluated.get<FillPattern>().isUndefined()) {
         for (const RenderTile& tile : renderTiles) {
             auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
@@ -88,7 +91,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                                                   evaluated.get<FillTranslateAnchor>(),
                                                   parameters.state)
                         ),
-                        uniforms::u_world::Value( parameters.context.viewport.getCurrentValue().size ),
+                        uniforms::u_world::Value( glContext.viewport.getCurrentValue().size ),
                     },
                     paintPropertyBinders,
                     evaluated,
@@ -175,7 +178,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),
-                        parameters.context.viewport.getCurrentValue().size,
+                        glContext.viewport.getCurrentValue().size,
                         geometryTile.iconAtlasTexture->size,
                         crossfade,
                         tile.id,

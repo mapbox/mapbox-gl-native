@@ -9,8 +9,8 @@ using namespace platform;
 
 #ifndef NDEBUG
 
-DebugGroup::DebugGroup(const Context& context_, const std::string& name) : context(context_) {
-    if (auto debugging = context.getDebuggingExtension()) {
+DebugGroup::DebugGroup(const gfx::Context& context_, const std::string& name) : context(context_) {
+    if (auto debugging = reinterpret_cast<const gl::Context&>(context).getDebuggingExtension()) {
         if (debugging->pushDebugGroup) {
             MBGL_CHECK_ERROR(debugging->pushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, GLsizei(name.size()), name.c_str()));
         } else if (debugging->pushGroupMarkerEXT) {
@@ -20,7 +20,7 @@ DebugGroup::DebugGroup(const Context& context_, const std::string& name) : conte
 }
 
 DebugGroup::~DebugGroup() {
-    if (auto debugging = context.getDebuggingExtension()) {
+    if (auto debugging = reinterpret_cast<const gl::Context&>(context).getDebuggingExtension()) {
         if (debugging->popDebugGroup) {
             MBGL_CHECK_ERROR(debugging->popDebugGroup());
         } else if (debugging->popGroupMarkerEXT) {
