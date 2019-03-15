@@ -17,10 +17,14 @@ namespace gfx {
 
 class Context {
 protected:
-    Context(ContextType type_) : backend(type_) {
+    Context(ContextType type_, uint32_t maximumVertexBindingCount_)
+        : backend(type_), maximumVertexBindingCount(maximumVertexBindingCount_) {
     }
 
+public:
     const ContextType backend;
+    static constexpr const uint32_t minimumRequiredVertexBindingCount = 8;
+    const uint32_t maximumVertexBindingCount;
 
 public:
     Context(Context&&) = delete;
