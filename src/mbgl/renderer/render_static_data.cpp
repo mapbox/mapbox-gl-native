@@ -1,4 +1,5 @@
 #include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 
 namespace mbgl {

@@ -3,8 +3,6 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/collision_box.hpp>
-#include <mbgl/shaders/collision_circle.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
 
@@ -22,7 +20,6 @@ using CollisionBoxDynamicAttributes = TypeList<attributes::a_placed>;
 
 class CollisionBoxProgram : public Program<
     CollisionBoxProgram,
-    shaders::collision_box,
     gfx::PrimitiveType::Line,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
@@ -64,11 +61,11 @@ public:
 
 	template <class DrawMode>
     void draw(gfx::Context& context,
-              DrawMode drawMode,
-              gfx::DepthMode depthMode,
-              gfx::StencilMode stencilMode,
-              gfx::ColorMode colorMode,
-              gfx::CullFaceMode cullFaceMode,
+              const DrawMode& drawMode,
+              const gfx::DepthMode& depthMode,
+              const gfx::StencilMode& stencilMode,
+              const gfx::ColorMode& colorMode,
+              const gfx::CullFaceMode& cullFaceMode,
               const LayoutUniformValues& layoutUniformValues,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,
@@ -116,7 +113,6 @@ public:
 
 class CollisionCircleProgram : public Program<
     CollisionCircleProgram,
-    shaders::collision_circle,
     gfx::PrimitiveType::Triangle,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
@@ -153,11 +149,11 @@ public:
 
     template <class DrawMode>
     void draw(gfx::Context& context,
-              DrawMode drawMode,
-              gfx::DepthMode depthMode,
-              gfx::StencilMode stencilMode,
-              gfx::ColorMode colorMode,
-              gfx::CullFaceMode cullFaceMode,
+              const DrawMode& drawMode,
+              const gfx::DepthMode& depthMode,
+              const gfx::StencilMode& stencilMode,
+              const gfx::ColorMode& colorMode,
+              const gfx::CullFaceMode& cullFaceMode,
               const LayoutUniformValues& layoutUniformValues,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxLayoutAttributes>>& layoutVertexBuffer,
               const gfx::VertexBuffer<gfx::Vertex<CollisionBoxDynamicAttributes>>& dynamicVertexBuffer,

@@ -3,14 +3,12 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/clipping_mask.hpp>
 #include <mbgl/style/properties.hpp>
 
 namespace mbgl {
 
 class ClippingMaskProgram : public Program<
     ClippingMaskProgram,
-    shaders::clipping_mask,
     gfx::PrimitiveType::Triangle,
     PositionOnlyLayoutAttributes,
     TypeList<

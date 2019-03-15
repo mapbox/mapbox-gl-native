@@ -67,7 +67,7 @@ static_assert(underlying_type(UniformDataType::SamplerCube) == GL_SAMPLER_CUBE, 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
 Context::Context()
-    : maximumVertexBindingCount([] {
+    : gfx::Context(gfx::ContextType::OpenGL), maximumVertexBindingCount([] {
           GLint value;
           MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
           return value;

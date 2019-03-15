@@ -4,10 +4,6 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/fill.hpp>
-#include <mbgl/shaders/fill_pattern.hpp>
-#include <mbgl/shaders/fill_outline.hpp>
-#include <mbgl/shaders/fill_outline_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -39,7 +35,6 @@ using FillPatternUniforms = TypeList<
 
 class FillProgram : public Program<
     FillProgram,
-    shaders::fill,
     gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
     FillUniforms,
@@ -61,7 +56,6 @@ public:
 
 class FillPatternProgram : public Program<
     FillPatternProgram,
-    shaders::fill_pattern,
     gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
     FillPatternUniforms,
@@ -83,7 +77,6 @@ public:
 
 class FillOutlineProgram : public Program<
     FillOutlineProgram,
-    shaders::fill_outline,
     gfx::PrimitiveType::Line,
     FillLayoutAttributes,
     FillUniforms,
@@ -96,7 +89,6 @@ public:
 
 class FillOutlinePatternProgram : public Program<
     FillOutlinePatternProgram,
-    shaders::fill_outline_pattern,
     gfx::PrimitiveType::Line,
     FillLayoutAttributes,
     FillPatternUniforms,
@@ -113,7 +105,7 @@ using FillAttributes = FillProgram::AttributeList;
 
 class FillLayerPrograms final : public LayerTypePrograms {
 public:
-    FillLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    FillLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : fill(context, programParameters),
           fillPattern(context, programParameters),
           fillOutline(context, programParameters),

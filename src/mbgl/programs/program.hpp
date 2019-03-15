@@ -2,13 +2,11 @@
 
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gfx/uniform.hpp>
-#include <mbgl/gl/program.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/renderer/paint_property_binder.hpp>
-#include <mbgl/shaders/shaders.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <unordered_map>
@@ -16,7 +14,6 @@
 namespace mbgl {
 
 template <class Name,
-          class Shaders,
           gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,
@@ -41,17 +38,10 @@ public:
     using TextureList = Textures;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<AttributeList, UniformList, TextureList>;
+    std::unique_ptr<gfx::Program<Name>> program;
 
-    std::unique_ptr<gfx::Program<AttributeList, UniformList, TextureList>> program;
-
-    Program(gl::Context& context, const ProgramParameters& programParameters)
-        : program(ProgramType::createProgram(
-            context,
-            programParameters,
-            Shaders::name,
-            Shaders::vertexSource,
-            Shaders::fragmentSource)) {
+    Program(gfx::Context& context, const ProgramParameters& programParameters)
+        : program(context.createProgram<Name>(programParameters)) {
     }
 
     static UniformValues computeAllUniformValues(
@@ -89,6 +79,11 @@ public:
               const TextureBindings& textureBindings,
               const std::string& layerID) {
         static_assert(Primitive == gfx::PrimitiveTypeOf<DrawMode>::value, "incompatible draw mode");
+
+        if (!program) {
+            return;
+        }
+
         for (auto& segment : segments) {
             auto drawScopeIt = segment.drawScopes.find(layerID);
 
@@ -121,7 +116,7 @@ public:
     using Binders = typename Program::Binders;
     using Bitset = typename Binders::Bitset;
 
-    ProgramMap(gl::Context& context_, ProgramParameters parameters_)
+    ProgramMap(gfx::Context& context_, ProgramParameters parameters_)
         : context(context_),
           parameters(std::move(parameters_)) {
     }
@@ -139,7 +134,7 @@ public:
     }
 
 private:
-    gl::Context& context;
+    gfx::Context& context;
     ProgramParameters parameters;
     std::unordered_map<Bitset, Program> programs;
 };

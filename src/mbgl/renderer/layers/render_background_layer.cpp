@@ -8,7 +8,8 @@
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/gfx/context.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 

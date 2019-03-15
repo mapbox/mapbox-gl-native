@@ -9,8 +9,6 @@
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
 #include <mbgl/programs/segment.hpp>
-#include <mbgl/shaders/symbol_icon.hpp>
-#include <mbgl/shaders/symbol_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
@@ -240,11 +238,10 @@ public:
 };
 
 template <class Name,
-          class Shaders,
           gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,
-          class TextureList,
+          class Textures,
           class PaintProps>
 class SymbolProgram : public SymbolProgramBase {
 public:
@@ -265,19 +262,13 @@ public:
     using UniformList = TypeListConcat<LayoutUniformList, SizeUniformList, PaintUniformList>;
     using UniformValues = gfx::UniformValues<UniformList>;
 
+    using TextureList = Textures;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<AttributeList, UniformList, TextureList>;
+    std::unique_ptr<gfx::Program<Name>> program;
 
-    std::unique_ptr<ProgramType> program;
-
-    SymbolProgram(gl::Context& context, const ProgramParameters& programParameters)
-        : program(ProgramType::createProgram(
-            context,
-            programParameters,
-            Shaders::name,
-            Shaders::vertexSource,
-            Shaders::fragmentSource)) {
+    SymbolProgram(gfx::Context& context, const ProgramParameters& programParameters)
+        : program(context.createProgram<Name>(programParameters)) {
     }
 
     static UniformValues computeAllUniformValues(
@@ -322,6 +313,11 @@ public:
               const TextureBindings& textureBindings,
               const std::string& layerID) {
         static_assert(Primitive == gfx::PrimitiveTypeOf<DrawMode>::value, "incompatible draw mode");
+
+        if (!program) {
+            return;
+        }
+
         for (auto& segment : segments) {
             auto drawScopeIt = segment.drawScopes.find(layerID);
 
@@ -349,7 +345,6 @@ public:
 
 class SymbolIconProgram : public SymbolProgram<
     SymbolIconProgram,
-    shaders::symbol_icon,
     gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
@@ -390,7 +385,6 @@ enum class SymbolSDFPart {
 template <class Name, class PaintProperties>
 class SymbolSDFProgram : public SymbolProgram<
     Name,
-    shaders::symbol_sdf,
     gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
@@ -415,7 +409,6 @@ class SymbolSDFProgram : public SymbolProgram<
 public:
     using BaseProgram = SymbolProgram<
         Name,
-        shaders::symbol_sdf,
         gfx::PrimitiveType::Triangle,
         SymbolLayoutAttributes,
         TypeList<
@@ -470,7 +463,7 @@ using SymbolTextAttributes = SymbolSDFTextProgram::AttributeList;
 
 class SymbolLayerPrograms final : public LayerTypePrograms {
 public:
-    SymbolLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    SymbolLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : symbolIcon(context, programParameters),
           symbolIconSDF(context, programParameters),
           symbolGlyph(context, programParameters),

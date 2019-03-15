@@ -3,14 +3,12 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/debug.hpp>
 #include <mbgl/style/properties.hpp>
 
 namespace mbgl {
 
 class DebugProgram : public Program<
     DebugProgram,
-    shaders::debug,
     gfx::PrimitiveType::Line,
     TypeList<
         attributes::a_pos>,

@@ -18,16 +18,20 @@
 
 #include <mbgl/util/logging.hpp>
 #include <mbgl/programs/program_parameters.hpp>
-#include <mbgl/shaders/shaders.hpp>
+#include <mbgl/programs/gl/shaders.hpp>
 
 #include <string>
 
 namespace mbgl {
 namespace gl {
 
-template <class AttributeList, class UniformList, class TextureList>
-class Program final : public gfx::Program<AttributeList, UniformList, TextureList> {
+template <class Name>
+class Program final : public gfx::Program<Name> {
 public:
+    using AttributeList = typename Name::AttributeList;
+    using UniformList = typename Name::UniformList;
+    using TextureList = typename Name::TextureList;
+  
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : program(
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
@@ -57,13 +61,13 @@ public:
                                                   const char* name,
                                                   const char* vertexSource_,
                                                   const char* fragmentSource_) {
-        const std::string vertexSource = shaders::vertexSource(programParameters, vertexSource_);
-        const std::string fragmentSource = shaders::fragmentSource(programParameters, fragmentSource_);
+        const std::string vertexSource = programs::gl::vertexSource(programParameters, vertexSource_);
+        const std::string fragmentSource = programs::gl::fragmentSource(programParameters, fragmentSource_);
 
 #if MBGL_HAS_BINARY_PROGRAMS
         optional<std::string> cachePath = programParameters.cachePath(name);
         if (cachePath && context.supportsProgramBinaries()) {
-            const std::string identifier = shaders::programIdentifier(vertexSource, fragmentSource);
+            const std::string identifier = programs::gl::programIdentifier(vertexSource, fragmentSource);
 
             try {
                 if (auto cachedBinaryProgram = util::readFile(*cachePath)) {

@@ -5,8 +5,6 @@
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/fill_extrusion.hpp>
-#include <mbgl/shaders/fill_extrusion_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -54,7 +52,6 @@ using FillExtrusionPatternUniforms = TypeList<
 
 class FillExtrusionProgram : public Program<
     FillExtrusionProgram,
-    shaders::fill_extrusion,
     gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionUniforms,
@@ -90,7 +87,6 @@ public:
 
 class FillExtrusionPatternProgram : public Program<
     FillExtrusionPatternProgram,
-    shaders::fill_extrusion_pattern,
     gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionPatternUniforms,
@@ -117,7 +113,7 @@ using FillExtrusionAttributes = FillExtrusionProgram::AttributeList;
 
 class FillExtrusionLayerPrograms final : public LayerTypePrograms {
 public:
-    FillExtrusionLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    FillExtrusionLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : fillExtrusion(context, programParameters),
           fillExtrusionPattern(context, programParameters),
           extrusionTexture(context, programParameters) {}

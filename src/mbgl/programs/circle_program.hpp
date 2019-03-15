@@ -3,7 +3,6 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shaders/circle.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/circle_layer_properties.hpp>
 
@@ -15,7 +14,6 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_scale_with_map);
 
 class CircleProgram : public Program<
     CircleProgram,
-    shaders::circle,
     gfx::PrimitiveType::Triangle,
     TypeList<
         attributes::a_pos>,
@@ -52,7 +50,7 @@ using CircleAttributes = CircleProgram::AttributeList;
 
 class CircleLayerPrograms final : public LayerTypePrograms  {
 public:
-    CircleLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    CircleLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : circle(context, programParameters) {}
     ProgramMap<CircleProgram> circle;
 };

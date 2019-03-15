@@ -13,7 +13,8 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/gfx/context.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 

@@ -4,7 +4,6 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/extrusion_texture.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
 
@@ -12,7 +11,6 @@ namespace mbgl {
 
 class ExtrusionTextureProgram : public Program<
     ExtrusionTextureProgram,
-    shaders::extrusion_texture,
     gfx::PrimitiveType::Triangle,
     TypeList<attributes::a_pos>,
     TypeList<

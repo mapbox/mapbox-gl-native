@@ -4,10 +4,6 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/line.hpp>
-#include <mbgl/shaders/line_gradient.hpp>
-#include <mbgl/shaders/line_pattern.hpp>
-#include <mbgl/shaders/line_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
@@ -36,7 +32,6 @@ using LineLayoutAttributes = TypeList<
 
 class LineProgram : public Program<
     LineProgram,
-    shaders::line,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
@@ -103,7 +98,6 @@ public:
 
 class LinePatternProgram : public Program<
     LinePatternProgram,
-    shaders::line_pattern,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
@@ -132,7 +126,6 @@ public:
 
 class LineSDFProgram : public Program<
     LineSDFProgram,
-    shaders::line_sdf,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
@@ -166,7 +159,6 @@ public:
 
 class LineGradientProgram : public Program<
     LineGradientProgram,
-    shaders::line_gradient,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
@@ -192,7 +184,7 @@ using LineAttributes = LineProgram::AttributeList;
 
 class LineLayerPrograms final : public LayerTypePrograms {
 public:
-    LineLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    LineLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : line(context, programParameters),
           lineGradient(context, programParameters),
           lineSDF(context, programParameters),

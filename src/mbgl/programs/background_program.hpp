@@ -4,14 +4,9 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/background.hpp>
-#include <mbgl/shaders/background_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
-#include <mbgl/style/layers/background_layer_properties.hpp>
-
-#include <string>
 
 namespace mbgl {
 
@@ -46,7 +41,6 @@ using BackgroundPatternUniforms = TypeList<
 
 class BackgroundProgram : public Program<
     BackgroundProgram,
-    shaders::background,
     gfx::PrimitiveType::Triangle,
     BackgroundLayoutAttributes,
     BackgroundUniforms,
@@ -59,7 +53,6 @@ public:
 
 class BackgroundPatternProgram : public Program<
     BackgroundPatternProgram,
-    shaders::background_pattern,
     gfx::PrimitiveType::Triangle,
     BackgroundLayoutAttributes,
     BackgroundPatternUniforms,
@@ -85,7 +78,7 @@ using BackgroundAttributes = BackgroundProgram::AttributeList;
 
 class BackgroundLayerPrograms final : public LayerTypePrograms  {
 public:
-    BackgroundLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    BackgroundLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : background(context, programParameters),
           backgroundPattern(context, programParameters) {}
     BackgroundProgram background;

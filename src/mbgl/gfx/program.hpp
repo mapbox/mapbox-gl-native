@@ -17,7 +17,7 @@ template <class> class UniformValues;
 template <class> class AttributeBindings;
 template <class> class TextureBindings;
 
-template <class AttributeList, class UniformList, class TextureList>
+template <class Name>
 class Program {
 protected:
     Program() = default;
@@ -29,6 +29,10 @@ public:
     Program(const Program&) = delete;
     Program& operator=(Program&&) = delete;
     Program& operator=(const Program&) = delete;
+
+    using AttributeList = typename Name::AttributeList;
+    using UniformList = typename Name::UniformList;
+    using TextureList = typename Name::TextureList;
 
     virtual void draw(Context&,
                       const DrawMode&,

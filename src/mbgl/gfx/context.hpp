@@ -6,14 +6,21 @@
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gfx/texture.hpp>
 #include <mbgl/gfx/draw_scope.hpp>
+#include <mbgl/gfx/program.hpp>
 #include <mbgl/gfx/types.hpp>
 
 namespace mbgl {
+
+class ProgramParameters;
+
 namespace gfx {
 
 class Context {
 protected:
-    Context() = default;
+    Context(ContextType type_) : backend(type_) {
+    }
+
+    const ContextType backend;
 
 public:
     Context(Context&&) = delete;
@@ -98,6 +105,14 @@ public:
 
 protected:
     virtual std::unique_ptr<DrawScopeResource> createDrawScopeResource() = 0;
+
+public:
+    template <typename Name>
+    std::unique_ptr<Program<Name>> createProgram(const ProgramParameters&);
+
+private:
+    template <typename Backend, typename Name>
+    std::unique_ptr<Program<Name>> createProgram(const ProgramParameters&);
 };
 
 } // namespace gfx
