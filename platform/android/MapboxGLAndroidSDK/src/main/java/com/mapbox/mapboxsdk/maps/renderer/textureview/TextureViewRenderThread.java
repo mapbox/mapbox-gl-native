@@ -197,7 +197,6 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
             if (destroySurface) {
               eglHolder.destroySurface();
               destroySurface = false;
-              mapRenderer.onSurfaceDestroyed();
               break;
             }
 
