@@ -12,7 +12,7 @@ ignore:
 flags:
   ios:
     paths:
-      - "build/ios/Logs/Test/"
+      - "platform/darwin/" - "platform/ios/"
 coverage:
   status:
     project:

@@ -910,7 +910,7 @@ jobs:
           command: |
             curl -sSfL -o codecov https://codecov.io/bash 
             chmod +x codecov
-            ./codecov -F ios -J 'CI'
+            ./codecov -F ios -J 'CI' -c
       - run:
           name: Generate code coverage reports
           command: |
