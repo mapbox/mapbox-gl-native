@@ -18,26 +18,26 @@ template <class> class Faded;
 using BackgroundLayoutAttributes = PositionOnlyLayoutAttributes;
 
 using BackgroundUniforms = TypeList<
-    uniforms::u_matrix,
-    uniforms::u_color,
-    uniforms::u_opacity>;
+    uniforms::matrix,
+    uniforms::color,
+    uniforms::opacity>;
 
 using BackgroundPatternUniforms = TypeList<
-    uniforms::u_matrix,
-    uniforms::u_opacity,
-    uniforms::u_texsize,
-    uniforms::u_pattern_tl_a,
-    uniforms::u_pattern_br_a,
-    uniforms::u_pattern_tl_b,
-    uniforms::u_pattern_br_b,
-    uniforms::u_pattern_size_a,
-    uniforms::u_pattern_size_b,
-    uniforms::u_scale_a,
-    uniforms::u_scale_b,
-    uniforms::u_mix,
-    uniforms::u_pixel_coord_upper,
-    uniforms::u_pixel_coord_lower,
-    uniforms::u_tile_units_to_pixels>;
+    uniforms::matrix,
+    uniforms::opacity,
+    uniforms::texsize,
+    uniforms::pattern_tl_a,
+    uniforms::pattern_br_a,
+    uniforms::pattern_tl_b,
+    uniforms::pattern_br_b,
+    uniforms::pattern_size_a,
+    uniforms::pattern_size_b,
+    uniforms::scale_a,
+    uniforms::scale_b,
+    uniforms::mix,
+    uniforms::pixel_coord_upper,
+    uniforms::pixel_coord_lower,
+    uniforms::tile_units_to_pixels>;
 
 class BackgroundProgram : public Program<
     BackgroundProgram,
@@ -57,7 +57,7 @@ class BackgroundPatternProgram : public Program<
     BackgroundLayoutAttributes,
     BackgroundPatternUniforms,
     TypeList<
-        textures::u_image>,
+        textures::image>,
     style::Properties<>>
 {
 public:

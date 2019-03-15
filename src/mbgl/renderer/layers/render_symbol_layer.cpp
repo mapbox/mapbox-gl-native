@@ -279,9 +279,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.colorModeForRenderPass(),
                 gfx::CullFaceMode::disabled(),
                 CollisionBoxProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( tile.matrix ),
-                    uniforms::u_extrude_scale::Value( extrudeScale ),
-                    uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
+                    uniforms::matrix::Value( tile.matrix ),
+                    uniforms::extrude_scale::Value( extrudeScale ),
+                    uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
                 },
                 *bucket.collisionBox.vertexBuffer,
                 *bucket.collisionBox.dynamicVertexBuffer,
@@ -315,10 +315,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.colorModeForRenderPass(),
                 gfx::CullFaceMode::disabled(),
                 CollisionCircleProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( tile.matrix ),
-                    uniforms::u_extrude_scale::Value( extrudeScale ),
-                    uniforms::u_overscale_factor::Value( float(tile.tile.id.overscaleFactor()) ),
-                    uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
+                    uniforms::matrix::Value( tile.matrix ),
+                    uniforms::extrude_scale::Value( extrudeScale ),
+                    uniforms::overscale_factor::Value( float(tile.tile.id.overscaleFactor()) ),
+                    uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
                 },
                 *bucket.collisionCircle.vertexBuffer,
                 *bucket.collisionCircle.dynamicVertexBuffer,

@@ -12,11 +12,11 @@
 namespace mbgl {
 namespace style {
 
-struct HeatmapRadius : DataDrivenPaintProperty<float, attributes::a_radius, uniforms::u_radius> {
+struct HeatmapRadius : DataDrivenPaintProperty<float, attributes::radius, uniforms::radius> {
     static float defaultValue() { return 30; }
 };
 
-struct HeatmapWeight : DataDrivenPaintProperty<float, attributes::a_weight, uniforms::u_weight> {
+struct HeatmapWeight : DataDrivenPaintProperty<float, attributes::weight, uniforms::weight> {
     static float defaultValue() { return 1; }
 };
 

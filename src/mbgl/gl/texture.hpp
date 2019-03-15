@@ -27,16 +27,16 @@ private:
 
 public:
     void queryLocations(const ProgramID& id) {
-        state = State{ gl::uniformLocation(id, Ts::name())... };
+        state = State{ gl::uniformLocation(id, Ts::uniformName())... };
     }
 
     template <class BinaryProgram>
     void loadNamedLocations(const BinaryProgram& program) {
-        state = State{ program.textureLocation(Ts::name())... };
+        state = State{ program.textureLocation(Ts::uniformName())... };
     }
 
     NamedUniformLocations getNamedLocations() const {
-        return NamedUniformLocations{ { Ts::name(), state.template get<Ts>().location }... };
+        return NamedUniformLocations{ { Ts::uniformName(), state.template get<Ts>().location }... };
     }
 
     void bind(gl::Context& context, const gfx::TextureBindings<TypeList<Ts...>>& bindings) {

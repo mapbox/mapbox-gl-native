@@ -10,38 +10,38 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_fade_t);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_buffer_scale);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_brightness_low);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_brightness_high);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_saturation_factor);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_contrast_factor);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_scale_parent);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_spin_weights);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_tl_parent);
+MBGL_DEFINE_UNIFORM_SCALAR(float, fade_t);
+MBGL_DEFINE_UNIFORM_SCALAR(float, buffer_scale);
+MBGL_DEFINE_UNIFORM_SCALAR(float, brightness_low);
+MBGL_DEFINE_UNIFORM_SCALAR(float, brightness_high);
+MBGL_DEFINE_UNIFORM_SCALAR(float, saturation_factor);
+MBGL_DEFINE_UNIFORM_SCALAR(float, contrast_factor);
+MBGL_DEFINE_UNIFORM_SCALAR(float, scale_parent);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 3, spin_weights);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, tl_parent);
 } // namespace uniforms
 
 class RasterProgram : public Program<
     RasterProgram,
     gfx::PrimitiveType::Triangle,
     TypeList<
-        attributes::a_pos,
-        attributes::a_texture_pos>,
+        attributes::pos,
+        attributes::texture_pos>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_opacity,
-        uniforms::u_fade_t,
-        uniforms::u_brightness_low,
-        uniforms::u_brightness_high,
-        uniforms::u_saturation_factor,
-        uniforms::u_contrast_factor,
-        uniforms::u_spin_weights,
-        uniforms::u_buffer_scale,
-        uniforms::u_scale_parent,
-        uniforms::u_tl_parent>,
+        uniforms::matrix,
+        uniforms::opacity,
+        uniforms::fade_t,
+        uniforms::brightness_low,
+        uniforms::brightness_high,
+        uniforms::saturation_factor,
+        uniforms::contrast_factor,
+        uniforms::spin_weights,
+        uniforms::buffer_scale,
+        uniforms::scale_parent,
+        uniforms::tl_parent>,
     TypeList<
-        textures::u_image0,
-        textures::u_image1>,
+        textures::image0,
+        textures::image1>,
     style::RasterPaintProperties>
 {
 public:

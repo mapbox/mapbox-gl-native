@@ -26,13 +26,13 @@ Values makeValues(const RenderLinePaintProperties::PossiblyEvaluated& properties
                   Args&&... args) {
 
     return Values {
-        uniforms::u_matrix::Value(
+        uniforms::matrix::Value(
             tile.translatedMatrix(properties.get<LineTranslate>(),
                                   properties.get<LineTranslateAnchor>(),
                                   state)
         ),
-        uniforms::u_ratio::Value( 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) ),
-        uniforms::u_gl_units_to_pixels::Value({ {1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1]} }),
+        uniforms::ratio::Value( 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) ),
+        uniforms::gl_units_to_pixels::Value({ {1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1]} }),
         std::forward<Args>(args)...
     };
 }
@@ -78,12 +78,12 @@ LineSDFProgram::layoutUniformValues(const RenderLinePaintProperties::PossiblyEva
         tile,
         state,
         pixelsToGLUnits,
-        uniforms::u_patternscale_a::Value( scaleA ),
-        uniforms::u_patternscale_b::Value( scaleB ),
-        uniforms::u_tex_y_a::Value( posA.y ),
-        uniforms::u_tex_y_b::Value( posB.y ),
-        uniforms::u_mix::Value( crossfade.t ),
-        uniforms::u_sdfgamma::Value( atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f )
+        uniforms::patternscale_a::Value( scaleA ),
+        uniforms::patternscale_b::Value( scaleB ),
+        uniforms::tex_y_a::Value( posA.y ),
+        uniforms::tex_y_b::Value( posB.y ),
+        uniforms::mix::Value( crossfade.t ),
+        uniforms::sdfgamma::Value( atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f )
     );
 }
 
@@ -103,9 +103,9 @@ LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
         tile,
         state,
         pixelsToGLUnits,
-        uniforms::u_scale::Value ({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} }),
-        uniforms::u_texsize::Value( atlasSize ),
-        uniforms::u_fade::Value( crossfade.t )
+        uniforms::scale::Value ({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} }),
+        uniforms::texsize::Value( atlasSize ),
+        uniforms::fade::Value( crossfade.t )
     );
 }
 
