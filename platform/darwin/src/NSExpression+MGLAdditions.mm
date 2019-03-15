@@ -599,7 +599,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
 }
 
 + (instancetype)mgl_expressionForAttributedExpressions:(nonnull NSArray<NSExpression *> *)attributedExpressions {
-    return [NSExpression expressionWithFormat:@"mgl_attributed(%@)", attributedExpressions];
+    return [NSExpression expressionForFunction:@"mgl_attributed:" arguments:attributedExpressions];
 }
 
 - (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression {
@@ -885,8 +885,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 
                 [attributedExpressions addObject:[NSExpression expressionForConstantValue:attributedExpression]];
             }
-            NSExpression *subexpression = [NSExpression expressionForConstantValue:attributedExpressions];
-            return [NSExpression expressionForFunction:@"mgl_attributed:" arguments:@[subexpression]];
+            return [NSExpression expressionForFunction:@"mgl_attributed:" arguments:attributedExpressions];
             
         } else if ([op isEqualToString:@"coalesce"]) {
             NSMutableArray *expressions = [NSMutableArray array];
@@ -1008,8 +1007,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 } else {
                     [attributes addObject:jsonObject];
                 }
-                [attributes addObject:attributedExpression.attributes];
-                
+                if (attributedExpression.attributes) {
+                    [attributes addObject:attributedExpression.attributes];
+                } else {
+                    [attributes addObject:@{}];
+                }
+ 
                 return attributes;
             }
             return self.constantValue;

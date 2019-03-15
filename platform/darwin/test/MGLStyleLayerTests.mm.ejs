@@ -8,6 +8,9 @@
 
 #import "MGLStyleLayerTests.h"
 #import "../../darwin/src/NSDate+MGLAdditions.h"
+<% if (type === 'symbol') { -%>
+#include "../../darwin/src/MGLAttributedExpression.h"
+<% } -%>
 
 #import "MGLStyleLayer_Private.h"
 
@@ -80,7 +83,13 @@
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, constantExpression,
                               @"<%- objCName(property) %> should round-trip constant value expressions.");
 
+<% if (property.type !== 'formatted') { -%>
         constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, false, 3) %>];
+<% } else { -%>
+        MGLAttributedExpression *attributedConstantExpression = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionWithFormat:<%- objCTestValue(property, 'string', true, 3) %>]
+                                                                                                 attributes:@{}];
+        constantExpression = [NSExpression mgl_expressionForAttributedExpressions:@[[NSExpression expressionForConstantValue:attributedConstantExpression]]];
+<% } -%>
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.<%- objCName(property) %> = functionExpression;
 
@@ -180,7 +189,9 @@
                        @"Setting <%- objCName(property) %> to a constant string with tokens should convert to an expression.");
 
 <% if (property.type === 'formatted') { -%>
-        NSExpression* tokenExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('format', CAST(token, 'NSString'), %@)", @{}];
+        MGLAttributedExpression *tokenAttibutedExpression = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionWithFormat:@"CAST(token, 'NSString')"]
+                                                                                                     attributes:@{}];
+        NSExpression* tokenExpression = [NSExpression mgl_expressionForAttributedExpressions:@[[NSExpression expressionForConstantValue:tokenAttibutedExpression]]];
 <% } else { -%>
         NSExpression* tokenExpression = [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"];
 <% } -%>
