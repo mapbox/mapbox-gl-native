@@ -21,15 +21,6 @@ class FragmentBackStackTest : BaseIntegrationTest() {
 
   @Test
   @LargeTest
-  fun backPressedOnBackStack() {
-    device.waitForIdle()
-    clickReplaceFragmentButton()
-    device.waitForIdle()
-    backPressBackStack()
-  }
-
-  @Test
-  @LargeTest
   fun backPressedOnBackStackResumed(){
     device.waitForIdle()
     clickReplaceFragmentButton()
@@ -37,15 +28,6 @@ class FragmentBackStackTest : BaseIntegrationTest() {
     pressHomeReturnWithRecentApps()
     device.waitForIdle()
     backPressBackStack()
-  }
-
-  @Test
-  @LargeTest
-  fun finishOnBackStack() {
-    device.waitForIdle()
-    clickReplaceFragmentButton()
-    device.waitForIdle()
-    device.findObject(UiSelector().description("Navigate up")).click()
   }
 
   private fun clickReplaceFragmentButton(){
