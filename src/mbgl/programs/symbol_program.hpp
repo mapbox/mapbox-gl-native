@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/gl/program.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/interpolate.hpp>
 

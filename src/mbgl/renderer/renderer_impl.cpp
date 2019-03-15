@@ -16,6 +16,7 @@
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/style/source_impl.hpp>
@@ -278,8 +279,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     backend.updateAssumedState();
 
+    // TODO: remove cast
+    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+
     if (parameters.contextMode == GLContextMode::Shared) {
-        parameters.context.setDirtyState();
+        glContext.setDirtyState();
     }
 
     Color backgroundColor;
@@ -402,7 +406,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (!parameters.staticData.depthRenderbuffer ||
             parameters.staticData.depthRenderbuffer->size != parameters.staticData.backendSize) {
             parameters.staticData.depthRenderbuffer =
-                parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(parameters.staticData.backendSize);
+                glContext.createRenderbuffer<gl::RenderbufferType::DepthComponent>(parameters.staticData.backendSize);
         }
         parameters.staticData.depthRenderbuffer->shouldClear(true);
 
@@ -425,11 +429,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         MBGL_DEBUG_GROUP(parameters.context, "clear");
         parameters.backend.bind();
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
-            parameters.context.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
+            glContext.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
         } else if (parameters.contextMode == GLContextMode::Shared) {
-            parameters.context.clear({}, ClearDepth::Default, ClearStencil::Default);
+            glContext.clear({}, ClearDepth::Default, ClearStencil::Default);
         } else {
-            parameters.context.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default);
+            glContext.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default);
         }
     }
 
@@ -482,17 +486,17 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     // Render tile clip boundaries, using stencil buffer to calculate fill color.
     if (parameters.debugOptions & MapDebugOptions::StencilClip) {
-        parameters.context.setStencilMode(gfx::StencilMode::disabled());
-        parameters.context.setDepthMode(gfx::DepthMode::disabled());
-        parameters.context.setColorMode(gfx::ColorMode::unblended());
-        parameters.context.program = 0;
+        glContext.setStencilMode(gfx::StencilMode::disabled());
+        glContext.setDepthMode(gfx::DepthMode::disabled());
+        glContext.setColorMode(gfx::ColorMode::unblended());
+        glContext.program = 0;
 
         // Reset the value in case someone else changed it, or it's dirty.
-        parameters.context.pixelTransferStencil = gl::value::PixelTransferStencil::Default;
+        glContext.pixelTransferStencil = gl::value::PixelTransferStencil::Default;
 
         // Read the stencil buffer
-        const auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gfx::TexturePixelType::Stencil>(viewport.size, false);
+        const auto viewport = glContext.viewport.getCurrentValue();
+        auto image = glContext.readFramebuffer<AlphaImage, gfx::TexturePixelType::Stencil>(viewport.size, false);
 
         // Scale the Stencil buffer to cover the entire color space.
         auto it = image.data.get();
@@ -502,9 +506,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             *it *= factor;
         }
 
-        parameters.context.pixelZoom = { 1, 1 };
-        parameters.context.rasterPos = { -1, -1, 0, 1 };
-        parameters.context.drawPixels(image);
+        glContext.pixelZoom = { 1, 1 };
+        glContext.rasterPos = { -1, -1, 0, 1 };
+        glContext.drawPixels(image);
 
         return;
     }
@@ -565,23 +569,23 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 #if not MBGL_USE_GLES2 and not defined(NDEBUG)
     // Render the depth buffer.
     if (parameters.debugOptions & MapDebugOptions::DepthBuffer) {
-        parameters.context.setStencilMode(gfx::StencilMode::disabled());
-        parameters.context.setDepthMode(gfx::DepthMode::disabled());
-        parameters.context.setColorMode(gfx::ColorMode::unblended());
-        parameters.context.program = 0;
+        glContext.setStencilMode(gfx::StencilMode::disabled());
+        glContext.setDepthMode(gfx::DepthMode::disabled());
+        glContext.setColorMode(gfx::ColorMode::unblended());
+        glContext.program = 0;
 
         // Scales the values in the depth buffer so that they cover the entire grayscale range. This
         // makes it easier to spot tiny differences.
         const float base = 1.0f / (1.0f - parameters.depthRangeSize);
-        parameters.context.pixelTransferDepth = { base, 1.0f - base };
+        glContext.pixelTransferDepth = { base, 1.0f - base };
 
         // Read the stencil buffer
-        auto viewport = parameters.context.viewport.getCurrentValue();
-        auto image = parameters.context.readFramebuffer<AlphaImage, gfx::TexturePixelType::Depth>(viewport.size, false);
+        auto viewport = glContext.viewport.getCurrentValue();
+        auto image = glContext.readFramebuffer<AlphaImage, gfx::TexturePixelType::Depth>(viewport.size, false);
 
-        parameters.context.pixelZoom = { 1, 1 };
-        parameters.context.rasterPos = { -1, -1, 0, 1 };
-        parameters.context.drawPixels(image);
+        glContext.pixelZoom = { 1, 1 };
+        glContext.rasterPos = { -1, -1, 0, 1 };
+        glContext.drawPixels(image);
     }
 #endif
 
@@ -590,12 +594,12 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "cleanup");
 
-        parameters.context.activeTextureUnit = 1;
-        parameters.context.texture[1] = 0;
-        parameters.context.activeTextureUnit = 0;
-        parameters.context.texture[0] = 0;
+        glContext.activeTextureUnit = 1;
+        glContext.texture[1] = 0;
+        glContext.activeTextureUnit = 0;
+        glContext.texture[0] = 0;
 
-        parameters.context.bindVertexArray = 0;
+        glContext.bindVertexArray = 0;
     }
 
     observer->onDidFinishRenderingFrame(
@@ -611,7 +615,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     // Cleanup only after signaling completion
-    parameters.context.performCleanup();
+    glContext.performCleanup();
 }
 
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {

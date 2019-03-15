@@ -9,7 +9,6 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>

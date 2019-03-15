@@ -62,18 +62,20 @@ private:
     const gfx::TextureChannelDataType type;
 };
 
-OffscreenTexture::OffscreenTexture(gl::Context& context,
+OffscreenTexture::OffscreenTexture(gfx::Context& context,
                                    const Size size,
                                    const gfx::TextureChannelDataType type)
-    : impl(std::make_unique<Impl>(context, std::move(size), type)) {
+    // TODO: remove cast
+    : impl(std::make_unique<Impl>(reinterpret_cast<gl::Context&>(context), std::move(size), type)) {
     assert(!size.isEmpty());
 }
 
-OffscreenTexture::OffscreenTexture(gl::Context& context,
+OffscreenTexture::OffscreenTexture(gfx::Context& context,
                                    const Size size,
                                    gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& renderbuffer,
                                    const gfx::TextureChannelDataType type)
-    : impl(std::make_unique<Impl>(context, std::move(size), renderbuffer, type)) {
+    // TODO: remove cast
+    : impl(std::make_unique<Impl>(reinterpret_cast<gl::Context&>(context), std::move(size), renderbuffer, type)) {
     assert(!size.isEmpty());
 }
 

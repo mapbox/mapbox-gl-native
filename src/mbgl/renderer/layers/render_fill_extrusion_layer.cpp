@@ -51,6 +51,9 @@ bool RenderFillExtrusionLayer::hasCrossfade() const {
 }
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
+    // TODO: remove cast
+    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
@@ -69,8 +72,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         // Flag the depth buffer as no longer needing to be cleared for the remainder of this pass.
         parameters.staticData.depthRenderbuffer->shouldClear(false);
 
-        parameters.context.setStencilMode(gfx::StencilMode::disabled());
-        parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
+        glContext.setStencilMode(gfx::StencilMode::disabled());
+        glContext.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
 
         auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
                         const optional<ImagePosition>& patternPositionA,

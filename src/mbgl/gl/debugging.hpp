@@ -5,19 +5,22 @@
 #include <string>
 
 namespace mbgl {
-namespace gl {
 
+namespace gfx {
 class Context;
+} // namespace gfx
+
+namespace gl {
 
 #ifndef NDEBUG
 
 class DebugGroup : private util::noncopyable {
 public:
-    DebugGroup(const Context&, const std::string&);
+    DebugGroup(const gfx::Context&, const std::string&);
     ~DebugGroup();
 
 private:
-    const Context& context;
+    const gfx::Context& context;
 };
 
 #define __MBGL_DEBUG_GROUP_NAME2(counter) __MBGL_DEBUG_GROUP_##counter

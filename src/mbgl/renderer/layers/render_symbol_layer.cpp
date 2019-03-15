@@ -13,7 +13,6 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
 #include <mbgl/util/math.hpp>
 

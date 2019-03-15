@@ -23,13 +23,13 @@ class ImageManager;
 class LineAtlas;
 class UnwrappedTileID;
 
-namespace gl {
+namespace gfx {
 class Context;
-} // namespace gl
+} // namespace gfx
 
 class PaintParameters {
 public:
-    PaintParameters(gl::Context&,
+    PaintParameters(gfx::Context&,
                     float pixelRatio,
                     GLContextMode,
                     RendererBackend&,
@@ -39,7 +39,7 @@ public:
                     ImageManager&,
                     LineAtlas&);
 
-    gl::Context& context;
+    gfx::Context& context;
     RendererBackend& backend;
 
     const TransformState& state;
