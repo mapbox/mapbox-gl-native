@@ -2,10 +2,8 @@ package com.mapbox.mapboxsdk.maps.renderer.glsurfaceview;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-
 import android.support.annotation.NonNull;
 import android.view.SurfaceHolder;
-
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
 
@@ -25,8 +23,6 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   @NonNull
   private final GLSurfaceView glSurfaceView;
 
-  private boolean requestDestroy;
-
   public GLSurfaceViewMapRenderer(Context context,
                                   GLSurfaceView glSurfaceView,
                                   String localIdeographFontFamily) {
@@ -42,9 +38,13 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
       @Override
       public void surfaceDestroyed(SurfaceHolder holder) {
-        requestDestroy = true;
+        onSurfaceDestroyed();
       }
 
+      @Override
+      public void surfaceCreated(SurfaceHolder holder) {
+        onSurfaceCreated(null, null);
+      }
     });
   }
 
@@ -60,9 +60,6 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
   @Override
   public void onDestroy() {
-    if (requestDestroy) {
-      onSurfaceDestroyed();
-    }
     super.onDestroy();
   }
 
