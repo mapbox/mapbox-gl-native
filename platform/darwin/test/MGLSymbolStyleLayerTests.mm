@@ -3,6 +3,7 @@
 
 #import "MGLStyleLayerTests.h"
 #import "../../darwin/src/NSDate+MGLAdditions.h"
+#include "../../darwin/src/MGLAttributedExpression.h"
 
 #import "MGLStyleLayer_Private.h"
 
@@ -1104,7 +1105,9 @@
         XCTAssertEqualObjects(layer.text, constantExpression,
                               @"text should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('format', 'Text Field', %@)", @{}];
+        MGLAttributedExpression *attributedConstantExpression = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionWithFormat:@"'Text Field'"]
+                                                                                                 attributes:@{}];
+        constantExpression = [NSExpression mgl_expressionForAttributedExpressions:@[[NSExpression expressionForConstantValue:attributedConstantExpression]]];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.text = functionExpression;
 
@@ -1140,7 +1143,9 @@
         XCTAssertEqual(rawLayer->getTextField(), propertyValue,
                        @"Setting text to a constant string with tokens should convert to an expression.");
 
-        NSExpression* tokenExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('format', CAST(token, 'NSString'), %@)", @{}];
+        MGLAttributedExpression *tokenAttibutedExpression = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionWithFormat:@"CAST(token, 'NSString')"]
+                                                                                                     attributes:@{}];
+        NSExpression* tokenExpression = [NSExpression mgl_expressionForAttributedExpressions:@[[NSExpression expressionForConstantValue:tokenAttibutedExpression]]];
         XCTAssertEqualObjects(layer.text, tokenExpression,
                               @"Setting text to a constant string with tokens should convert to an expression.");
     }

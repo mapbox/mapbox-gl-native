@@ -107,7 +107,7 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
             // converts Formatted back to string.
             return layerType === 'string' ?
                 `@"'${_.startCase(propertyName)}'"` :
-                `@"MGL_FUNCTION('format', '${_.startCase(propertyName)}', %@)", @{}`;
+                `@"${_.startCase(propertyName)}"`;
         case 'string':
             return `@"'${_.startCase(propertyName)}'"`;
         case 'enum':

@@ -12,6 +12,7 @@
 #else
 #import "NSColor+MGLAdditions.h"
 #endif
+#import "MGLAttributedExpression.h"
 
 #define MGLAssertEqualValues(actual, expected, ...) \
     XCTAssertTrue(actual.is<__typeof__(expected)>()); \
@@ -990,6 +991,87 @@ using namespace std::string_literals;
     }
 }
 
+- (void)testFormatExpressionObject {
+    {
+        MGLAttributedExpression *attribute1 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.2)];
+        MGLAttributedExpression *attribute2 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"biz"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.0)];
+        MGLAttributedExpression *attribute3 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"bar"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(0.8)];
+        MGLAttributedExpression *attribute4 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"\r"]
+                                                                                  fontNames:@[]
+                                                                                   fontSize:nil];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@, %@, %@, %@)",
+                                    MGLConstantExpression(attribute1),
+                                    MGLConstantExpression(attribute4),
+                                    MGLConstantExpression(attribute2),
+                                    MGLConstantExpression(attribute3)];
+        NSArray *jsonExpression = @[@"format", @"foo", @{@"font-scale": @1.2}, @"\r", @{}, @"biz", @{@"font-scale": @1.0}, @"bar", @{@"font-scale": @0.8}];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        MGLAttributedExpression *attribute1 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.2)];
+        MGLAttributedExpression *attribute2 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"biz"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.0)];
+        MGLAttributedExpression *attribute3 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"bar"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(0.8)];
+        MGLAttributedExpression *attribute4 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"\n"]
+                                                                                  fontNames:@[]
+                                                                                   fontSize:nil];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@, %@, %@, %@)",
+                                    MGLConstantExpression(attribute1),
+                                    MGLConstantExpression(attribute4),
+                                    MGLConstantExpression(attribute2),
+                                    MGLConstantExpression(attribute3)];
+        NSArray *jsonExpression = @[@"format", @"foo", @{@"font-scale": @1.2}, @"\n", @{}, @"biz", @{@"font-scale": @1.0}, @"bar", @{@"font-scale": @0.8}];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        MGLAttributedExpression *attribute1 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.2)];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
+        
+        NSExpression *compatibilityExpression = [NSExpression expressionForFunction:@"mgl_attributed:" arguments:@[MGLConstantExpression(attribute1)]];
+        NSArray *jsonExpression = @[@"format", @"foo", @{@"font-scale": @1.2}];
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, expression.mgl_jsonExpressionObject);
+        XCTAssertEqualObjects(compatibilityExpression, expression);
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        MGLAttributedExpression *attribute1 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.2)];
+        MGLAttributedExpression *attribute2 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"biz"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(1.0)];
+        MGLAttributedExpression *attribute3 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"bar"]
+                                                                                  fontNames:nil
+                                                                                   fontSize:@(0.8)];
+        MGLAttributedExpression *attribute4 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"\n"]
+                                                                                  fontNames:@[]
+                                                                                   fontSize:nil];
+        NSExpression *expression = [NSExpression mgl_expressionForAttributedExpressions:@[MGLConstantExpression(attribute1),
+                                                                                          MGLConstantExpression(attribute4),
+                                                                                          MGLConstantExpression(attribute2),
+                                                                                          MGLConstantExpression(attribute3)]];
+        NSArray *jsonExpression = @[@"format", @"foo", @{@"font-scale": @1.2}, @"\n", @{}, @"biz", @{@"font-scale": @1.0}, @"bar", @{@"font-scale": @0.8}];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+}
+
 - (void)testGenericExpressionObject {
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('random', 1, 2, 3, 4, 5)"];
@@ -1000,23 +1082,6 @@ using namespace std::string_literals;
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('random', 1, 2, 3, 4)"];
         XCTAssertThrowsSpecificNamed([expression expressionValueWithObject:nil context:nil], NSException, NSInvalidArgumentException);
-    }
-    {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('format', 'foo', %@, '\r', %@, 'biz', %@, 'bar', %@)", @{@"font-scale": @1.2}, @{}, @{@"font-scale": @1.0}, @{@"font-scale": @0.8}];
-        NSArray *jsonExpression = @[@"format", @"foo", @{@"font-scale": @1.2}, @"\r", @{}, @"biz", @{@"font-scale": @1.0}, @"bar", @{@"font-scale": @0.8}];
-
-        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        
-        NSExpression *encodedExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
-
-        // Expressions encoded from a json create a different constant abstract type
-        // thus even tho knowing that the constant values are the same, the base
-        // class is not. This compares the resulting array which is type agnostic encoding.
-        for (NSUInteger index = 0; index < jsonExpression.count; index++) {
-            NSExpression *left = encodedExpression.mgl_jsonExpressionObject[index];
-            NSExpression *right = expression.mgl_jsonExpressionObject[index];
-            XCTAssertEqualObjects(left.mgl_jsonExpressionObject, right.mgl_jsonExpressionObject);
-        }
     }
     {
         NSArray *arguments = @[

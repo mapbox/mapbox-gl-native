@@ -7,6 +7,8 @@
 
 #import "MGLTypes.h"
 
+@class MGLAttributedExpression;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString *MGLExpressionInterpolationMode NS_TYPED_ENUM;
@@ -149,6 +151,14 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  @param defaultExpression The defaultValue expression to be used in case there is no match.
  */
 + (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)inputExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression NS_SWIFT_NAME(init(forMGLMatchingKey:in:default:));
+
+/**
+ Returns an attributed function expression specifying an `MGLAttributedExpression` constant
+ expression array.
+ 
+ @param attributedExpressions The `MGLAttributedExpression` constant expression array.
+ */
++ (instancetype)mgl_expressionForAttributedExpressions:(nonnull NSArray<NSExpression *> *)attributedExpressions NS_SWIFT_NAME(init(forAttributedExpressions:));
 
 #pragma mark Concatenating String Expressions
 

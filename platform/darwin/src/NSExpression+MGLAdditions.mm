@@ -11,6 +11,7 @@
 #import "NSPredicate+MGLAdditions.h"
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLVectorTileSource_Private.h"
+#import "MGLAttributedExpression.h"
 
 #import <objc/runtime.h>
 
@@ -75,6 +76,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     INSTALL_METHOD(mgl_atan:);
     INSTALL_METHOD(mgl_tan:);
     INSTALL_METHOD(mgl_log2:);
+    INSTALL_METHOD(mgl_attributed:);
     
     // Install functions that resemble control structures, taking arbitrary
     // numbers of arguments. Vararg aftermarket functions need to be declared
@@ -94,6 +96,12 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
  */
 - (NSString *)mgl_join:(NSArray<NSString *> *)components {
     return [components componentsJoinedByString:@""];
+}
+
+- (NSString *)mgl_attributed:(NSArray<MGLAttributedExpression *> *)attributedExpressions {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Text format expressions lack underlying Objective-C implementations."];
+    return nil;
 }
 
 /**
@@ -228,7 +236,6 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     
     return nil;
 }
-
 
 /**
  A placeholder for a catch-all method that evaluates an arbitrary number of
@@ -591,6 +598,10 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
                                      arguments:optionsArray];
 }
 
++ (instancetype)mgl_expressionForAttributedExpressions:(nonnull NSArray<NSExpression *> *)attributedExpressions {
+    return [NSExpression expressionForFunction:@"mgl_attributed:" arguments:attributedExpressions];
+}
+
 - (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression {
     NSExpression *subexpression = [NSExpression expressionForAggregate:@[self, expression]];
     return [NSExpression expressionForFunction:@"mgl_join:" arguments:@[subexpression]];
@@ -860,6 +871,22 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         
             return [NSExpression expressionForFunction:@"MGL_MATCH"
                                              arguments:optionsArray];
+        } else if ([op isEqualToString:@"format"]) {
+            NSMutableArray *attributedExpressions = [NSMutableArray array];
+            
+            for (NSUInteger index = 0; index < argumentObjects.count; index+=2) {
+                NSExpression *expression = [NSExpression expressionWithMGLJSONObject:argumentObjects[index]];
+                NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
+                if ((index + 1) < argumentObjects.count) {
+                    attrs = argumentObjects[index + 1];
+                }
+                
+                MGLAttributedExpression *attributedExpression = [[MGLAttributedExpression alloc] initWithExpression:expression attributes:attrs];
+
+                [attributedExpressions addObject:[NSExpression expressionForConstantValue:attributedExpression]];
+            }
+            return [NSExpression expressionForFunction:@"mgl_attributed:" arguments:attributedExpressions];
+            
         } else if ([op isEqualToString:@"coalesce"]) {
             NSMutableArray *expressions = [NSMutableArray array];
             for (id operand in argumentObjects) {
@@ -970,6 +997,23 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     std::array<float, 4> mglValue = boxedValue.mgl_paddingArrayValue;
                     return @[@"literal", @[@(mglValue[0]), @(mglValue[1]), @(mglValue[2]), @(mglValue[3])]];
                 }
+            }
+            if ([constantValue isKindOfClass:[MGLAttributedExpression class]]) {
+                MGLAttributedExpression *attributedExpression = (MGLAttributedExpression *)constantValue;
+                id jsonObject = attributedExpression.expression.mgl_jsonExpressionObject;
+                NSMutableArray *attributes = [NSMutableArray array];
+                if ([jsonObject isKindOfClass:[NSArray class]]) {
+                    [attributes addObjectsFromArray:jsonObject];
+                } else {
+                    [attributes addObject:jsonObject];
+                }
+                if (attributedExpression.attributes) {
+                    [attributes addObject:attributedExpression.attributes];
+                } else {
+                    [attributes addObject:@{}];
+                }
+ 
+                return attributes;
             }
             return self.constantValue;
         }
@@ -1115,6 +1159,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
+            } else if ([function isEqualToString:@"mgl_attributed:"]) {
+                return [self mgl_jsonFormatExpressionObject];
+                
             } else if ([function isEqualToString:@"MGL_FUNCTION"] ||
                        [function isEqualToString:@"MGL_FUNCTION:"]) {
                 NSExpression *firstOp = self.arguments.firstObject;
@@ -1360,6 +1407,25 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     if (operand.expressionType != NSEvaluatedObjectExpressionType) {
         [expressionObject addObject:operand.mgl_jsonExpressionObject];
     }
+    return expressionObject;
+}
+
+- (id)mgl_jsonFormatExpressionObject {
+    NSArray<NSExpression *> *attributedExpressions;
+    NSExpression *formatArray = self.arguments.firstObject;
+    
+    if ([formatArray respondsToSelector:@selector(constantValue)] && [formatArray.constantValue isKindOfClass:[NSArray class]]) {
+        attributedExpressions = (NSArray *)formatArray.constantValue;
+    } else {
+        attributedExpressions = self.arguments;
+    }
+    
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"format", nil];
+    
+    for (NSUInteger index = 0; index < attributedExpressions.count; index++) {
+        [expressionObject addObjectsFromArray:attributedExpressions[index].mgl_jsonExpressionObject];
+    }
+    
     return expressionObject;
 }
 

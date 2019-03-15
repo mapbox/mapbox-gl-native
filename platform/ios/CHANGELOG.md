@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added an MGLMapView.prefetchesTiles property that you can disable if you don’t want to prefetch simplified tiles as a performance optimization. ([#14031](https://github.com/mapbox/mapbox-gl-native/pull/14031))
 * Fixed an issue that caused `MGL_FUNCTION` to ignore multiple formatting parameters when passed a `format` function as parameter. ([#14064](https://github.com/mapbox/mapbox-gl-native/pull/14064))
 * Added a Galician localization. ([#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095))
+* Added `mgl_attributed:` expression operator, which concatenate `MGLAttributedExpression` objects for specifying rich text in the `MGLSymbolStyleLayer.text` property. ([#14094](https://github.com/mapbox/mapbox-gl-native/pull/14094))
 
 ### User interaction
 
