@@ -895,9 +895,20 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
-                android:name=".activity.maplayout.RecyclerViewActivity"
-                android:description="@string/description_recyclerview"
-                android:label="@string/activity_recyclerview">
+                android:name=".activity.maplayout.TextureRecyclerViewActivity"
+                android:description="@string/description_recyclerview_textureview"
+                android:label="@string/activity_recyclerview_textureview">
+            <meta-data
+                    android:name="@string/category"
+                    android:value="@string/category_maplayout" />
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
+                android:name=".activity.maplayout.GLSurfaceRecyclerViewActivity"
+                android:description="@string/description_recyclerview_glsurfaceview"
+                android:label="@string/activity_recyclerview_glsurfaceview">
             <meta-data
                     android:name="@string/category"
                     android:value="@string/category_maplayout" />
@@ -907,7 +918,7 @@
         </activity>
         <activity
                 android:name=".activity.fragment.NestedViewPagerActivity"
-                android:description="@string/description_recyclerview"
+                android:description="@string/description_nested_viewpager"
                 android:label="@string/activity_nested_viewpager">
             <meta-data
                     android:name="@string/category"
