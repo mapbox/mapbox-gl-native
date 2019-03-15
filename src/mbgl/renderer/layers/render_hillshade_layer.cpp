@@ -9,6 +9,8 @@
 #include <mbgl/programs/hillshade_prepare_program.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/hillshade_layer_impl.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
 
@@ -74,7 +76,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
         const HillshadeProgram::Binders paintAttributeData{ evaluated, 0 };
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
-            HillshadeProgram::UniformValues {
+            HillshadeProgram::LayoutUniformValues {
                 uniforms::u_matrix::Value( matrix ),
                 uniforms::u_highlight::Value( evaluated.get<HillshadeHighlightColor>() ),
                 uniforms::u_shadow::Value( evaluated.get<HillshadeShadowColor>() ),
@@ -138,7 +140,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             auto& programInstance = parameters.programs.getHillshadeLayerPrograms().hillshadePrepare;
 
             const auto allUniformValues = programInstance.computeAllUniformValues(
-                HillshadePrepareProgram::UniformValues {
+                HillshadePrepareProgram::LayoutUniformValues {
                     uniforms::u_matrix::Value( mat ),
                     uniforms::u_dimension::Value( {{stride, stride}} ),
                     uniforms::u_zoom::Value( float(tile.id.canonical.z) ),

@@ -1,4 +1,5 @@
 #include <mbgl/programs/fill_extrusion_program.hpp>
+#include <mbgl/gfx/context_impl.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <mbgl/tile/tile_id.hpp>
@@ -6,6 +7,9 @@
 #include <mbgl/util/mat3.hpp>
 
 namespace mbgl {
+
+template std::unique_ptr<gfx::Program<FillExtrusionProgram>> gfx::Context::createProgram(const ProgramParameters&);
+template std::unique_ptr<gfx::Program<FillExtrusionPatternProgram>> gfx::Context::createProgram(const ProgramParameters&);
 
 using namespace style;
 
@@ -31,10 +35,8 @@ float lightIntensity(const EvaluatedLight& light) {
     return light.get<LightIntensity>();
 }
 
-FillExtrusionProgram::UniformValues
-FillExtrusionProgram::uniformValues(mat4 matrix,
-                                    const TransformState& state,
-                                    const EvaluatedLight& light) {
+FillExtrusionProgram::LayoutUniformValues FillExtrusionProgram::layoutUniformValues(
+    mat4 matrix, const TransformState& state, const EvaluatedLight& light) {
     return {
         uniforms::u_matrix::Value( matrix ),
         uniforms::u_lightcolor::Value( lightColor(light) ),
@@ -43,8 +45,8 @@ FillExtrusionProgram::uniformValues(mat4 matrix,
     };
 }
 
-FillExtrusionPatternProgram::UniformValues
-FillExtrusionPatternProgram::uniformValues(mat4 matrix,
+FillExtrusionPatternProgram::LayoutUniformValues
+FillExtrusionPatternProgram::layoutUniformValues(mat4 matrix,
                                            Size atlasSize,
                                            const CrossfadeParameters& crossfade,
                                            const UnwrappedTileID& tileID,

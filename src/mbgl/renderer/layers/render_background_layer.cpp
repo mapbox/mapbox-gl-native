@@ -8,6 +8,7 @@
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gl/context.hpp>
 
 namespace mbgl {
@@ -91,7 +92,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
                 parameters.programs.getBackgroundLayerPrograms().backgroundPattern,
-                BackgroundPatternProgram::uniformValues(
+                BackgroundPatternProgram::layoutUniformValues(
                     parameters.matrixForTile(tileID),
                     evaluated.get<BackgroundOpacity>(),
                     parameters.imageManager.getPixelSize(),
@@ -110,7 +111,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
                 parameters.programs.getBackgroundLayerPrograms().background,
-                BackgroundProgram::UniformValues {
+                BackgroundProgram::LayoutUniformValues {
                     uniforms::u_matrix::Value( parameters.matrixForTile(tileID) ),
                     uniforms::u_color::Value( evaluated.get<BackgroundColor>() ),
                     uniforms::u_opacity::Value( evaluated.get<BackgroundOpacity>() ),

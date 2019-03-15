@@ -4,15 +4,14 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/extrusion_texture.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
 
 class ExtrusionTextureProgram : public Program<
-    shaders::extrusion_texture,
-    gfx::Triangle,
+    ExtrusionTextureProgram,
+    gfx::PrimitiveType::Triangle,
     TypeList<attributes::a_pos>,
     TypeList<
         uniforms::u_matrix,
@@ -35,6 +34,6 @@ public:
 };
 
 using ExtrusionTextureLayoutVertex = ExtrusionTextureProgram::LayoutVertex;
-using ExtrusionTextureAttributes = ExtrusionTextureProgram::Attributes;
+using ExtrusionTextureAttributes = ExtrusionTextureProgram::AttributeList;
 
 } // namespace mbgl

@@ -3,7 +3,7 @@
 require('flow-remove-types/register');
 
 const path = require('path');
-const outputPath = 'src/mbgl/shaders';
+const outputPath = 'src/mbgl/programs/gl';
 const zlib = require('zlib');
 
 var shaders = require('../mapbox-gl-js/src/shaders');
@@ -31,52 +31,82 @@ for (const key in shaders) {
     concatenated += basicMinify(shaders[key].fragmentSource);
     concatenated += '\n\0';
 
-    offsets[key] = {vertex, fragment};
+    offsets[key] = {
+        vertex,
+        fragment,
+        originalKey: key,
+        shaderName: key.replace(/[A-Z]+/g, (match) => `_${match.toLowerCase()}`),
+        ShaderName: key.replace(/^[a-z]/g, (match) => match.toUpperCase())
+    };
 }
+
+// Overrides: The symbolSDF shader is used for two underlying programs.
+offsets.symbolSDFIcon = {
+    vertex: offsets.symbolSDF.vertex,
+    fragment: offsets.symbolSDF.fragment,
+    originalKey: 'symbolSDF',
+    shaderName: 'symbol_sdf_icon',
+    ShaderName: 'SymbolSDFIcon',
+};
+
+offsets.symbolSDFText = {
+    vertex: offsets.symbolSDF.vertex,
+    fragment: offsets.symbolSDF.fragment,
+    originalKey: 'symbolSDF',
+    shaderName: 'symbol_sdf_text',
+    ShaderName: 'SymbolSDFText',
+};
+
+delete offsets.symbolSDF;
 
 const compressed = zlib.deflateSync(concatenated, {level: zlib.Z_BEST_COMPRESSION})
     .toString('hex')
-    .match(/.{1,16}/g)
+    .match(/.{1,32}/g)
     .map(line => line.match(/.{1,2}/g).map(n => `0x${n}`).join(', '))
-    .join(',\n        ')
+    .join(',\n    ')
     .trim();
 
 function sourceOffset(key, type) {
-    return `source() + ${offsets[key][type]}`
+    return `programs::gl::shaderSource() + ${offsets[key][type]}`
 }
 
-writeIfModified(path.join(outputPath, 'source.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+writeIfModified(path.join(outputPath, 'shader_source.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #pragma once
 
 namespace mbgl {
-namespace shaders {
+namespace programs {
+namespace gl {
 
-const char* source();
+const char* shaderSource();
 
-} // namespace shaders
+} // namespace gl
+} // namespace programs
 } // namespace mbgl
 `);
 
-writeIfModified(path.join(outputPath, 'source.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+writeIfModified(path.join(outputPath, 'shader_source.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
-#include <mbgl/shaders/source.hpp>
+#include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/util/compression.hpp>
 
 #include <cstdint>
 
 namespace mbgl {
-namespace shaders {
+namespace programs {
+namespace gl {
 
-const char* source() {
-    static const uint8_t compressed[] = {
-        ${compressed}
-    };
-    static std::string decompressed = util::decompress(std::string(reinterpret_cast<const char*>(compressed), sizeof(compressed)));
+constexpr const uint8_t compressedShaderSource[] = {
+    ${compressed}
+};
+
+const char* shaderSource() {
+    static std::string decompressed = util::decompress(std::string(reinterpret_cast<const char*>(compressedShaderSource), sizeof(compressedShaderSource)));
     return decompressed.c_str();
 };
 
-} // namespace shaders
+} // namespace gl
+} // namespace programs
 } // namespace mbgl
 `);
 
@@ -85,77 +115,69 @@ writeIfModified(path.join(outputPath, 'preludes.hpp'), `// NOTE: DO NOT CHANGE T
 #pragma once
 
 namespace mbgl {
-namespace shaders {
+namespace programs {
+namespace gl {
 
-extern const char* vertexPrelude;
-extern const char* fragmentPrelude;
+extern const char* vertexShaderPrelude;
+extern const char* fragmentShaderPrelude;
 
-} // namespace shaders
+} // namespace gl
+} // namespace programs
 } // namespace mbgl
 `);
 
 writeIfModified(path.join(outputPath, 'preludes.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
-#include <mbgl/shaders/preludes.hpp>
-#include <mbgl/shaders/source.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
+#include <mbgl/programs/gl/shader_source.hpp>
 
 namespace mbgl {
-namespace shaders {
+namespace programs {
+namespace gl {
 
-const char* vertexPrelude = ${sourceOffset('prelude', 'vertex')};
-const char* fragmentPrelude = ${sourceOffset('prelude', 'fragment')};
+const char* vertexShaderPrelude = ${sourceOffset('prelude', 'vertex')};
+const char* fragmentShaderPrelude = ${sourceOffset('prelude', 'fragment')};
 
-} // namespace shaders
+} // namespace gl
+} // namespace programs
 } // namespace mbgl
 `);
 
-for (const key in shaders) {
+for (const key in offsets) {
     if (key === 'prelude')
         continue;
 
-    const shaderName = key.replace(/[A-Z]+/g, (match) => `_${match.toLowerCase()}`);
-
-    writeIfModified(path.join(outputPath, `${shaderName}.hpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
-#pragma once
-
-namespace mbgl {
-namespace shaders {
-
-class ${shaderName} {
-public:
-    static const char* name;
-    static const char* vertexSource;
-    static const char* fragmentSource;
-};
-
-} // namespace shaders
-} // namespace mbgl
-`);
+    const { shaderName, ShaderName, originalKey } = offsets[key];
 
     writeIfModified(path.join(outputPath, `${shaderName}.cpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
-#include <mbgl/shaders/${shaderName}.hpp>
-#include <mbgl/shaders/source.hpp>
+#include <mbgl/programs/${shaderName}_program.hpp>
+#include <mbgl/programs/gl/shader_source.hpp>
+#include <mbgl/gl/program.hpp>
 
 namespace mbgl {
-namespace shaders {
+namespace gfx {
 
-const char* ${shaderName}::name = "${shaderName}";
-const char* ${shaderName}::vertexSource = ${sourceOffset(key, 'vertex')};
-const char* ${shaderName}::fragmentSource = ${sourceOffset(key, 'fragment')};
+template <>
+std::unique_ptr<Program<${ShaderName}Program>>
+Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
+    return gl::Program<${ShaderName}Program>::createProgram(
+        reinterpret_cast<gl::Context&>(*this), programParameters, "${shaderName}",
+        ${sourceOffset(key, 'vertex')}, ${sourceOffset(key, 'fragment')});
+}
+
+} // namespace gfx
+} // namespace mbgl
 
 // Uncompressed source of ${shaderName}.vertex.glsl:
 /*
-${shaders[key].vertexSource}
+${shaders[originalKey].vertexSource}
 */
 
 // Uncompressed source of ${shaderName}.fragment.glsl:
 /*
-${shaders[key].fragmentSource}
+${shaders[originalKey].fragmentSource}
 */
 
-} // namespace shaders
-} // namespace mbgl
 `);
 }

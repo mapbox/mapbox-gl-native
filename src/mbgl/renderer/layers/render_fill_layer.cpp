@@ -8,6 +8,8 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
@@ -80,7 +82,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
-                    FillProgram::UniformValues {
+                    FillProgram::LayoutUniformValues {
                         uniforms::u_matrix::Value(
                             tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                                   evaluated.get<FillTranslateAnchor>(),
@@ -169,7 +171,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 paintPropertyBinders.setPatternParameters(patternPosA, patternPosB, crossfade);
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
-                    FillPatternProgram::uniformValues(
+                    FillPatternProgram::layoutUniformValues(
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),

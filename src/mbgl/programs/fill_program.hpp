@@ -4,10 +4,6 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/fill.hpp>
-#include <mbgl/shaders/fill_pattern.hpp>
-#include <mbgl/shaders/fill_outline.hpp>
-#include <mbgl/shaders/fill_outline_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -38,8 +34,8 @@ using FillPatternUniforms = TypeList<
     uniforms::u_pixel_coord_lower>;
 
 class FillProgram : public Program<
-    shaders::fill,
-    gfx::Triangle,
+    FillProgram,
+    gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
     FillUniforms,
     TypeList<>,
@@ -59,8 +55,8 @@ public:
 };
 
 class FillPatternProgram : public Program<
-    shaders::fill_pattern,
-    gfx::Triangle,
+    FillPatternProgram,
+    gfx::PrimitiveType::Triangle,
     FillLayoutAttributes,
     FillPatternUniforms,
     TypeList<
@@ -70,18 +66,18 @@ class FillPatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(mat4 matrix,
-                                       Size framebufferSize,
-                                       Size atlasSize,
-                                       const CrossfadeParameters& crossfade,
-                                       const UnwrappedTileID&,
-                                       const TransformState&,
-                                       const float pixelRatio);
+    static LayoutUniformValues layoutUniformValues(mat4 matrix,
+                                                   Size framebufferSize,
+                                                   Size atlasSize,
+                                                   const CrossfadeParameters& crossfade,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&,
+                                                   const float pixelRatio);
 };
 
 class FillOutlineProgram : public Program<
-    shaders::fill_outline,
-    gfx::Line,
+    FillOutlineProgram,
+    gfx::PrimitiveType::Line,
     FillLayoutAttributes,
     FillUniforms,
     TypeList<>,
@@ -92,8 +88,8 @@ public:
 };
 
 class FillOutlinePatternProgram : public Program<
-    shaders::fill_outline_pattern,
-    gfx::Line,
+    FillOutlinePatternProgram,
+    gfx::PrimitiveType::Line,
     FillLayoutAttributes,
     FillPatternUniforms,
     TypeList<
@@ -105,11 +101,11 @@ public:
 };
 
 using FillLayoutVertex = FillProgram::LayoutVertex;
-using FillAttributes = FillProgram::Attributes;
+using FillAttributes = FillProgram::AttributeList;
 
 class FillLayerPrograms final : public LayerTypePrograms {
 public:
-    FillLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    FillLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : fill(context, programParameters),
           fillPattern(context, programParameters),
           fillOutline(context, programParameters),

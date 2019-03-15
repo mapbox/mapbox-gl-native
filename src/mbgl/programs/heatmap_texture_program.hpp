@@ -4,15 +4,14 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/heatmap_texture.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
 
 class HeatmapTextureProgram : public Program<
-    shaders::heatmap_texture,
-    gfx::Triangle,
+    HeatmapTextureProgram,
+    gfx::PrimitiveType::Triangle,
     TypeList<attributes::a_pos>,
     TypeList<
         uniforms::u_matrix,
@@ -36,6 +35,6 @@ public:
 };
 
 using HeatmapTextureLayoutVertex = HeatmapTextureProgram::LayoutVertex;
-using HeatmapTextureAttributes = HeatmapTextureProgram::Attributes;
+using HeatmapTextureAttributes = HeatmapTextureProgram::AttributeList;
 
 } // namespace mbgl

@@ -12,7 +12,7 @@
 
 namespace mbgl {
 
-Programs::Programs(gl::Context& context_, const ProgramParameters& programParameters_)
+Programs::Programs(gfx::Context& context_, const ProgramParameters& programParameters_)
     : debug(context_, programParameters_),
       clippingMask(context_, programParameters_),
       context(context_),

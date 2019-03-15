@@ -4,7 +4,6 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/raster.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/raster_layer_properties.hpp>
 
@@ -23,8 +22,8 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_tl_parent);
 } // namespace uniforms
 
 class RasterProgram : public Program<
-    shaders::raster,
-    gfx::Triangle,
+    RasterProgram,
+    gfx::PrimitiveType::Triangle,
     TypeList<
         attributes::a_pos,
         attributes::a_texture_pos>,
@@ -63,11 +62,11 @@ public:
 };
 
 using RasterLayoutVertex = RasterProgram::LayoutVertex;
-using RasterAttributes = RasterProgram::Attributes;
+using RasterAttributes = RasterProgram::AttributeList;
 
 class RasterLayerPrograms final : public LayerTypePrograms {
 public:
-    RasterLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    RasterLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : raster(context, programParameters) {}
     RasterProgram raster;
 };

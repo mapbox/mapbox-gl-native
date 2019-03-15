@@ -4,14 +4,9 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/background.hpp>
-#include <mbgl/shaders/background_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
-#include <mbgl/style/layers/background_layer_properties.hpp>
-
-#include <string>
 
 namespace mbgl {
 
@@ -45,8 +40,8 @@ using BackgroundPatternUniforms = TypeList<
     uniforms::u_tile_units_to_pixels>;
 
 class BackgroundProgram : public Program<
-    shaders::background,
-    gfx::Triangle,
+    BackgroundProgram,
+    gfx::PrimitiveType::Triangle,
     BackgroundLayoutAttributes,
     BackgroundUniforms,
     TypeList<>,
@@ -57,8 +52,8 @@ public:
 };
 
 class BackgroundPatternProgram : public Program<
-    shaders::background_pattern,
-    gfx::Triangle,
+    BackgroundPatternProgram,
+    gfx::PrimitiveType::Triangle,
     BackgroundLayoutAttributes,
     BackgroundPatternUniforms,
     TypeList<
@@ -68,22 +63,22 @@ class BackgroundPatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(mat4 matrix,
-                                       float opacity,
-                                       Size atlasSize,
-                                       const ImagePosition&,
-                                       const ImagePosition&,
-                                       const CrossfadeParameters&,
-                                       const UnwrappedTileID&,
-                                       const TransformState&);
+    static LayoutUniformValues layoutUniformValues(mat4 matrix,
+                                                   float opacity,
+                                                   Size atlasSize,
+                                                   const ImagePosition&,
+                                                   const ImagePosition&,
+                                                   const CrossfadeParameters&,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&);
 };
 
 using BackgroundLayoutVertex = BackgroundProgram::LayoutVertex;
-using BackgroundAttributes = BackgroundProgram::Attributes;
+using BackgroundAttributes = BackgroundProgram::AttributeList;
 
 class BackgroundLayerPrograms final : public LayerTypePrograms  {
 public:
-    BackgroundLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    BackgroundLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : background(context, programParameters),
           backgroundPattern(context, programParameters) {}
     BackgroundProgram background;

@@ -2,9 +2,8 @@
 
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/gfx/uniform.hpp>
+#include <mbgl/gfx/attribute.hpp>
 #include <mbgl/programs/attributes.hpp>
-#include <mbgl/gl/attribute.hpp>
-#include <mbgl/gl/uniform.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
@@ -101,7 +100,7 @@ public:
                                       const style::expression::Value&) = 0;
     virtual void upload(gfx::Context& context) = 0;
     virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) = 0;
-    virtual std::tuple<ExpandToType<As, optional<gl::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
+    virtual std::tuple<ExpandToType<As, optional<gfx::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
     virtual std::tuple<ExpandToType<As, float>...> interpolationFactor(float currentZoom) const = 0;
     virtual std::tuple<ExpandToType<As, UniformValueType>...> uniformValue(const PossiblyEvaluatedType& currentValue) const = 0;
 
@@ -121,8 +120,8 @@ public:
     void upload(gfx::Context&) override {}
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
 
-    std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
-        return std::tuple<optional<gl::AttributeBinding>> {};
+    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
+        return {};
     }
 
     std::tuple<float> interpolationFactor(float) const override {
@@ -155,9 +154,9 @@ public:
         }
     }
 
-    std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>>
+    std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>
     attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>&) const override {
-        return std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>> {};
+        return {};
     }
 
     std::tuple<float, float> interpolationFactor(float) const override {
@@ -177,7 +176,7 @@ template <class T, class A>
 class SourceFunctionPaintPropertyBinder final : public PaintPropertyBinder<T, T, PossiblyEvaluatedPropertyValue<T>, A> {
 public:
     using BaseAttributeType = A;
-    using BaseVertex = gfx::Vertex<BaseAttributeType>;
+    using BaseVertex = gfx::VertexType<BaseAttributeType>;
 
     using AttributeType = ZoomInterpolatedAttributeType<A>;
 
@@ -200,12 +199,12 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gl::AttributeBinding>>{
-                gl::attributeBinding<0>(*vertexBuffer)
+            return std::tuple<optional<gfx::AttributeBinding>>{
+                gfx::attributeBinding(*vertexBuffer)
             };
         }
     }
@@ -236,7 +235,7 @@ public:
 
     using AttributeType = ZoomInterpolatedAttributeType<A>;
     using AttributeValue = typename AttributeType::Value;
-    using Vertex = gfx::Vertex<AttributeType>;
+    using Vertex = gfx::VertexType<AttributeType>;
 
     CompositeFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
         : expression(std::move(expression_)),
@@ -264,12 +263,12 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gl::AttributeBinding>>{
-                gl::attributeBinding<0>(*vertexBuffer)
+            return std::tuple<optional<gfx::AttributeBinding>>{
+                gfx::attributeBinding(*vertexBuffer)
             };
         }
     }
@@ -308,8 +307,8 @@ public:
     using BaseAttributeType = A1;
     using BaseAttributeType2 = A2;
 
-    using Vertex = gfx::Vertex<BaseAttributeType>;
-    using Vertex2 = gfx::Vertex<BaseAttributeType2>;
+    using Vertex = gfx::VertexType<BaseAttributeType>;
+    using Vertex2 = gfx::VertexType<BaseAttributeType2>;
 
     CompositeCrossFadedPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
         : expression(std::move(expression_)),
@@ -358,13 +357,13 @@ public:
         zoomOutVertexBuffer = context.createVertexBuffer(std::move(zoomOutVertexVector));
     }
 
-    std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {
+    std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>>{
-                gl::attributeBinding<0>(*patternToVertexBuffer),
-                gl::attributeBinding<0>(crossfade.fromScale == 2 ? *zoomInVertexBuffer : *zoomOutVertexBuffer)
+            return std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>{
+                gfx::attributeBinding(*patternToVertexBuffer),
+                gfx::attributeBinding(crossfade.fromScale == 2 ? *zoomInVertexBuffer : *zoomOutVertexBuffer)
             };
         }
     }
@@ -506,8 +505,7 @@ public:
     using InterpolationUniformList = typename Property<P>::InterpolationUniformList;
 
     using AttributeList = TypeListConcat<ZoomInterpolatedAttributeList<Ps>...>;
-    using Attributes = gl::Attributes<AttributeList>;
-    using AttributeBindings = typename Attributes::Bindings;
+    using AttributeBindings = gfx::AttributeBindings<AttributeList>;
 
     template <class EvaluatedProperties>
     AttributeBindings attributeBindings(const EvaluatedProperties& currentProperties) const {
@@ -518,7 +516,6 @@ public:
 
     using UniformList = TypeListConcat<InterpolationUniformList<Ps>..., typename Ps::UniformList...>;
     using UniformValues = gfx::UniformValues<UniformList>;
-    using Uniforms = gl::Uniforms<UniformList>;
 
     template <class EvaluatedProperties>
     UniformValues uniformValues(float currentZoom, EvaluatedProperties& currentProperties) const {

@@ -4,7 +4,6 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/hillshade_prepare.hpp>
 #include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
@@ -15,8 +14,8 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
 } // namespace uniforms
 
 class HillshadePrepareProgram : public Program<
-    shaders::hillshade_prepare,
-    gfx::Triangle,
+    HillshadePrepareProgram,
+    gfx::PrimitiveType::Triangle,
     TypeList<
         attributes::a_pos,
         attributes::a_texture_pos>,
@@ -46,6 +45,6 @@ public:
 };
 
 using HillshadePrepareLayoutVertex = HillshadePrepareProgram::LayoutVertex;
-using HillshadePrepareAttributes = HillshadePrepareProgram::Attributes;
+using HillshadePrepareAttributes = HillshadePrepareProgram::AttributeList;
 
 } // namespace mbgl

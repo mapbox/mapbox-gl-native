@@ -8,6 +8,8 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
@@ -110,7 +112,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
 
             draw(parameters.programs.getLineLayerPrograms().lineSDF,
-                 LineSDFProgram::uniformValues(
+                 LineSDFProgram::layoutUniformValues(
                      evaluated,
                      parameters.pixelRatio,
                      tile,
@@ -135,7 +137,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             optional<ImagePosition> posB = geometryTile.getPattern(linePatternValue.to);
 
             draw(parameters.programs.getLineLayerPrograms().linePattern,
-                 LinePatternProgram::uniformValues(
+                 LinePatternProgram::layoutUniformValues(
                      evaluated,
                      tile,
                      parameters.state,
@@ -154,7 +156,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             }
 
             draw(parameters.programs.getLineLayerPrograms().lineGradient,
-                 LineGradientProgram::uniformValues(
+                 LineGradientProgram::layoutUniformValues(
                     evaluated,
                     tile,
                     parameters.state,
@@ -166,7 +168,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     });
         } else {
             draw(parameters.programs.getLineLayerPrograms().line,
-                 LineProgram::uniformValues(
+                 LineProgram::layoutUniformValues(
                      evaluated,
                      tile,
                      parameters.state,

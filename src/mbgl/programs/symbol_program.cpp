@@ -1,4 +1,5 @@
 #include <mbgl/programs/symbol_program.hpp>
+#include <mbgl/gfx/context_impl.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -8,6 +9,10 @@
 #include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
+
+template std::unique_ptr<gfx::Program<SymbolIconProgram>> gfx::Context::createProgram(const ProgramParameters&);
+template std::unique_ptr<gfx::Program<SymbolSDFTextProgram>> gfx::Context::createProgram(const ProgramParameters&);
+template std::unique_ptr<gfx::Program<SymbolSDFIconProgram>> gfx::Context::createProgram(const ProgramParameters&);
 
 using namespace style;
 
@@ -99,17 +104,16 @@ Values makeValues(const bool isText,
     };
 }
 
-SymbolIconProgram::UniformValues
-SymbolIconProgram::uniformValues(const bool isText,
-                                 const style::SymbolPropertyValues& values,
-                                 const Size& texsize,
-                                 const std::array<float, 2>& pixelsToGLUnits,
-                                 const bool alongLine,
-                                 const RenderTile& tile,
-                                 const TransformState& state,
-                                 const float symbolFadeChange)
-{
-    return makeValues<SymbolIconProgram::UniformValues>(
+SymbolIconProgram::LayoutUniformValues
+SymbolIconProgram::layoutUniformValues(const bool isText,
+                                       const style::SymbolPropertyValues& values,
+                                       const Size& texsize,
+                                       const std::array<float, 2>& pixelsToGLUnits,
+                                       const bool alongLine,
+                                       const RenderTile& tile,
+                                       const TransformState& state,
+                                       const float symbolFadeChange) {
+    return makeValues<SymbolIconProgram::LayoutUniformValues>(
         isText,
         values,
         texsize,
@@ -121,23 +125,22 @@ SymbolIconProgram::uniformValues(const bool isText,
     );
 }
 
-template <class PaintProperties>
-typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<PaintProperties>::uniformValues(
-      const bool isText,
-      const style::SymbolPropertyValues& values,
-      const Size& texsize,
-      const std::array<float, 2>& pixelsToGLUnits,
-      const bool alongLine,
-      const RenderTile& tile,
-      const TransformState& state,
-      const float symbolFadeChange,
-      const SymbolSDFPart part)
-{
+template <class Name, class PaintProperties>
+typename SymbolSDFProgram<Name, PaintProperties>::LayoutUniformValues
+SymbolSDFProgram<Name, PaintProperties>::layoutUniformValues(const bool isText,
+                                                       const style::SymbolPropertyValues& values,
+                                                       const Size& texsize,
+                                                       const std::array<float, 2>& pixelsToGLUnits,
+                                                       const bool alongLine,
+                                                       const RenderTile& tile,
+                                                       const TransformState& state,
+                                                       const float symbolFadeChange,
+                                                       const SymbolSDFPart part) {
     const float gammaScale = (values.pitchAlignment == AlignmentType::Map
                               ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
                               : 1.0);
 
-    return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
+    return makeValues<SymbolSDFProgram<Name, PaintProperties>::LayoutUniformValues>(
         isText,
         values,
         texsize,
@@ -151,7 +154,7 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
     );
 }
 
-template class SymbolSDFProgram<style::IconPaintProperties>;
-template class SymbolSDFProgram<style::TextPaintProperties>;
+template class SymbolSDFProgram<SymbolSDFIconProgram, style::IconPaintProperties>;
+template class SymbolSDFProgram<SymbolSDFTextProgram, style::TextPaintProperties>;
 
 } // namespace mbgl

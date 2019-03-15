@@ -26,7 +26,7 @@ namespace gfx {
 namespace detail {
 
 template <class A1, class A2>
-bool operator==(const Vertex<A1, A2>& lhs, const Vertex<A1, A2>& rhs) {
+bool operator==(const VertexType<A1, A2>& lhs, const VertexType<A1, A2>& rhs) {
     return std::tie(lhs.a1, lhs.a2) == std::tie(rhs.a1, rhs.a2);
 }
 

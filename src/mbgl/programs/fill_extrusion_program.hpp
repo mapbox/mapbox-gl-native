@@ -5,8 +5,6 @@
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/fill_extrusion.hpp>
-#include <mbgl/shaders/fill_extrusion_pattern.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -53,8 +51,8 @@ using FillExtrusionPatternUniforms = TypeList<
     uniforms::u_lightintensity>;
 
 class FillExtrusionProgram : public Program<
-    shaders::fill_extrusion,
-    gfx::Triangle,
+    FillExtrusionProgram,
+    gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionUniforms,
     TypeList<>,
@@ -83,15 +81,13 @@ public:
         };
     }
 
-    static UniformValues uniformValues(mat4,
-                                       const TransformState&,
-                                       const EvaluatedLight&);
-
+    static LayoutUniformValues
+    layoutUniformValues(mat4, const TransformState&, const EvaluatedLight&);
 };
 
 class FillExtrusionPatternProgram : public Program<
-    shaders::fill_extrusion_pattern,
-    gfx::Triangle,
+    FillExtrusionPatternProgram,
+    gfx::PrimitiveType::Triangle,
     FillExtrusionLayoutAttributes,
     FillExtrusionPatternUniforms,
     TypeList<
@@ -101,23 +97,23 @@ class FillExtrusionPatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(mat4,
-                                       Size atlasSize,
-                                       const CrossfadeParameters&,
-                                       const UnwrappedTileID&,
-                                       const TransformState&,
-                                       const float heightFactor,
-                                       const float pixelRatio,
-                                       const EvaluatedLight&);
+    static LayoutUniformValues layoutUniformValues(mat4,
+                                                   Size atlasSize,
+                                                   const CrossfadeParameters&,
+                                                   const UnwrappedTileID&,
+                                                   const TransformState&,
+                                                   const float heightFactor,
+                                                   const float pixelRatio,
+                                                   const EvaluatedLight&);
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;
-using FillExtrusionAttributes = FillExtrusionProgram::Attributes;
+using FillExtrusionAttributes = FillExtrusionProgram::AttributeList;
 
 
 class FillExtrusionLayerPrograms final : public LayerTypePrograms {
 public:
-    FillExtrusionLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    FillExtrusionLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : fillExtrusion(context, programParameters),
           fillExtrusionPattern(context, programParameters),
           extrusionTexture(context, programParameters) {}

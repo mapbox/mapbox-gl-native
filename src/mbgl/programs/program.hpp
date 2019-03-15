@@ -1,106 +1,106 @@
 #pragma once
 
-#include <mbgl/gl/program.hpp>
-#include <mbgl/gl/features.hpp>
+#include <mbgl/gfx/attribute.hpp>
+#include <mbgl/gfx/uniform.hpp>
 #include <mbgl/programs/segment.hpp>
-#include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/renderer/paint_property_binder.hpp>
-#include <mbgl/shaders/shaders.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <unordered_map>
 
 namespace mbgl {
 
-template <class Shaders,
-          class Primitive,
+template <class Name,
+          gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
-          class UniformList,
-          class TextureList,
+          class LayoutUniformList,
+          class Textures,
           class PaintProps>
 class Program {
 public:
-    using LayoutAttributes = gl::Attributes<LayoutAttributeList>;
     using LayoutVertex = gfx::Vertex<LayoutAttributeList>;
 
     using PaintProperties = PaintProps;
     using Binders = PaintPropertyBinders<typename PaintProperties::DataDrivenProperties>;
+
     using PaintAttributeList = typename Binders::AttributeList;
-    using Attributes = gl::Attributes<TypeListConcat<LayoutAttributeList, PaintAttributeList>>;
+    using AttributeList = TypeListConcat<LayoutAttributeList, PaintAttributeList>;
+    using AttributeBindings = gfx::AttributeBindings<AttributeList>;
 
-    using UniformValues = gfx::UniformValues<UniformList>;
     using PaintUniformList = typename Binders::UniformList;
-    using AllUniforms = gl::Uniforms<TypeListConcat<UniformList, PaintUniformList>>;
+    using UniformList = TypeListConcat<LayoutUniformList, PaintUniformList>;
+    using LayoutUniformValues = gfx::UniformValues<LayoutUniformList>;
+    using UniformValues = gfx::UniformValues<UniformList>;
 
+    using TextureList = Textures;
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, Attributes, AllUniforms, TextureList>;
+    std::unique_ptr<gfx::Program<Name>> program;
 
-    ProgramType program;
-
-    Program(gl::Context& context, const ProgramParameters& programParameters)
-        : program(ProgramType::createProgram(
-            context,
-            programParameters,
-            Shaders::name,
-            Shaders::vertexSource,
-            Shaders::fragmentSource)) {
+    Program(gfx::Context& context, const ProgramParameters& programParameters)
+        : program(context.createProgram<Name>(programParameters)) {
     }
 
-    static typename AllUniforms::Values computeAllUniformValues(
-        const UniformValues& uniformValues,
+    static UniformValues computeAllUniformValues(
+        const LayoutUniformValues& layoutUniformValues,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties,
         float currentZoom) {
-        return uniformValues
+        return layoutUniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
-    static typename Attributes::Bindings computeAllAttributeBindings(
+    static AttributeBindings computeAllAttributeBindings(
         const gfx::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
         const Binders& paintPropertyBinders,
         const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        return LayoutAttributes::bindings(layoutVertexBuffer)
+        return gfx::AttributeBindings<LayoutAttributeList>(layoutVertexBuffer)
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
 
-    static uint32_t activeBindingCount(const typename Attributes::Bindings& allAttributeBindings) {
-        return Attributes::activeBindingCount(allAttributeBindings);
+    static uint32_t activeBindingCount(const AttributeBindings& allAttributeBindings) {
+        return allAttributeBindings.activeCount();
     }
 
     template <class DrawMode>
-    void draw(gl::Context& context,
-              DrawMode drawMode,
-              gfx::DepthMode depthMode,
-              gfx::StencilMode stencilMode,
-              gfx::ColorMode colorMode,
-              gfx::CullFaceMode cullFaceMode,
+    void draw(gfx::Context& context,
+              const DrawMode& drawMode,
+              const gfx::DepthMode& depthMode,
+              const gfx::StencilMode& stencilMode,
+              const gfx::ColorMode& colorMode,
+              const gfx::CullFaceMode& cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
-              const SegmentVector<Attributes>& segments,
-              const typename AllUniforms::Values& allUniformValues,
-              const typename Attributes::Bindings& allAttributeBindings,
+              const SegmentVector<AttributeList>& segments,
+              const UniformValues& uniformValues,
+              const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
-        for (auto& segment : segments) {
-            auto vertexArrayIt = segment.vertexArrays.find(layerID);
+        static_assert(Primitive == gfx::PrimitiveTypeOf<DrawMode>::value, "incompatible draw mode");
 
-            if (vertexArrayIt == segment.vertexArrays.end()) {
-                vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
+        if (!program) {
+            return;
+        }
+
+        for (auto& segment : segments) {
+            auto drawScopeIt = segment.drawScopes.find(layerID);
+
+            if (drawScopeIt == segment.drawScopes.end()) {
+                drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
-            program.draw(
+            program->draw(
                 context,
-                std::move(drawMode),
-                std::move(depthMode),
-                std::move(stencilMode),
-                std::move(colorMode),
-                std::move(cullFaceMode),
-                allUniformValues,
-                vertexArrayIt->second,
-                Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                drawMode,
+                depthMode,
+                stencilMode,
+                colorMode,
+                cullFaceMode,
+                uniformValues,
+                drawScopeIt->second,
+                allAttributeBindings.offset(segment.vertexOffset),
                 textureBindings,
                 indexBuffer,
                 segment.indexOffset,
@@ -116,7 +116,7 @@ public:
     using Binders = typename Program::Binders;
     using Bitset = typename Binders::Bitset;
 
-    ProgramMap(gl::Context& context_, ProgramParameters parameters_)
+    ProgramMap(gfx::Context& context_, ProgramParameters parameters_)
         : context(context_),
           parameters(std::move(parameters_)) {
     }
@@ -134,7 +134,7 @@ public:
     }
 
 private:
-    gl::Context& context;
+    gfx::Context& context;
     ProgramParameters parameters;
     std::unordered_map<Bitset, Program> programs;
 };

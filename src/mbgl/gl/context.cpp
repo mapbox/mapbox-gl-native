@@ -3,6 +3,7 @@
 #include <mbgl/gl/vertex_buffer_resource.hpp>
 #include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/texture_resource.hpp>
+#include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
@@ -66,7 +67,7 @@ static_assert(underlying_type(UniformDataType::SamplerCube) == GL_SAMPLER_CUBE, 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
 Context::Context()
-    : maximumVertexBindingCount([] {
+    : gfx::Context(gfx::ContextType::OpenGL), maximumVertexBindingCount([] {
           GLint value;
           MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
           return value;
@@ -189,6 +190,8 @@ UniqueProgram Context::createProgram(ShaderID vertexShader, ShaderID fragmentSha
 
     MBGL_CHECK_ERROR(glAttachShader(result, vertexShader));
     MBGL_CHECK_ERROR(glAttachShader(result, fragmentShader));
+
+    linkProgram(result);
 
     return result;
 }
@@ -544,6 +547,10 @@ void Context::updateTextureResource(const gfx::TextureResource& resource,
                                   Enum<gfx::TextureChannelDataType>::to(type), data));
 }
 
+std::unique_ptr<gfx::DrawScopeResource> Context::createDrawScopeResource() {
+    return std::make_unique<gl::DrawScopeResource>(createVertexArray());
+}
+
 void Context::reset() {
     std::copy(pooledTextures.begin(), pooledTextures.end(), std::back_inserter(abandonedTextures));
     pooledTextures.resize(0);
@@ -628,29 +635,6 @@ void Context::setCullFaceMode(const gfx::CullFaceMode& mode) {
     cullFaceWinding = mode.winding;
 }
 
-#if not MBGL_USE_GLES2
-void Context::setDrawMode(const gfx::Points& points) {
-    pointSize = points.pointSize;
-}
-#else
-void Context::setDrawMode(const gfx::Points&) {
-}
-#endif // MBGL_USE_GLES2
-
-void Context::setDrawMode(const gfx::Lines& lines) {
-    lineWidth = lines.lineWidth;
-}
-
-void Context::setDrawMode(const gfx::LineStrip& lineStrip) {
-    lineWidth = lineStrip.lineWidth;
-}
-
-void Context::setDrawMode(const gfx::Triangles&) {
-}
-
-void Context::setDrawMode(const gfx::TriangleStrip&) {
-}
-
 void Context::setDepthMode(const gfx::DepthMode& depth) {
     if (depth.func == gfx::DepthFunctionType::Always && depth.mask != gfx::DepthMaskType::ReadWrite) {
         depthTest = false;
@@ -697,11 +681,27 @@ void Context::setColorMode(const gfx::ColorMode& color) {
     colorMask = color.mask;
 }
 
-void Context::draw(gfx::PrimitiveType primitiveType,
+void Context::draw(const gfx::DrawMode& drawMode,
                    std::size_t indexOffset,
                    std::size_t indexLength) {
+    switch (drawMode.type) {
+    case gfx::DrawModeType::Points:
+#if not MBGL_USE_GLES2
+        // In OpenGL ES 2, the point size is set in the vertex shader.
+        pointSize = drawMode.size;
+#endif // MBGL_USE_GLES2
+        break;
+    case gfx::DrawModeType::Lines:
+    case gfx::DrawModeType::LineLoop:
+    case gfx::DrawModeType::LineStrip:
+        lineWidth = drawMode.size;
+        break;
+    default:
+        break;
+    }
+
     MBGL_CHECK_ERROR(glDrawElements(
-        Enum<gfx::PrimitiveType>::to(primitiveType),
+        Enum<gfx::DrawModeType>::to(drawMode.type),
         static_cast<GLsizei>(indexLength),
         GL_UNSIGNED_SHORT,
         reinterpret_cast<GLvoid*>(sizeof(uint16_t) * indexOffset)));

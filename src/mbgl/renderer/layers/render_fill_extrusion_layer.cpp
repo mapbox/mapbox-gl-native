@@ -13,6 +13,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gl/context.hpp>
 
 namespace mbgl {
@@ -117,7 +118,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion.get(evaluated),
                     bucket,
-                    FillExtrusionProgram::uniformValues(
+                    FillExtrusionProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
                                                   parameters.state),
@@ -144,7 +145,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern.get(evaluated),
                     bucket,
-                    FillExtrusionPatternProgram::uniformValues(
+                    FillExtrusionPatternProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
                                                   parameters.state),
@@ -177,7 +178,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         auto& programInstance = parameters.programs.getFillExtrusionLayerPrograms().extrusionTexture;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
-            ExtrusionTextureProgram::UniformValues{
+            ExtrusionTextureProgram::LayoutUniformValues{
                 uniforms::u_matrix::Value( viewportMat ),
                 uniforms::u_world::Value( size ),
                 uniforms::u_opacity::Value( evaluated.get<FillExtrusionOpacity>() )

@@ -4,10 +4,6 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/line.hpp>
-#include <mbgl/shaders/line_gradient.hpp>
-#include <mbgl/shaders/line_pattern.hpp>
-#include <mbgl/shaders/line_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
@@ -35,8 +31,8 @@ using LineLayoutAttributes = TypeList<
     attributes::a_data<uint8_t, 4>>;
 
 class LineProgram : public Program<
-    shaders::line,
-    gfx::Triangle,
+    LineProgram,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -93,15 +89,16 @@ public:
      */
     static const int8_t extrudeScale = 63;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits);
 };
 
 class LinePatternProgram : public Program<
-    shaders::line_pattern,
-    gfx::Triangle,
+    LinePatternProgram,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -117,18 +114,19 @@ class LinePatternProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits,
-                                       Size atlasSize,
-                                       const CrossfadeParameters& crossfade,
-                                       const float pixelRatio);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits,
+                        Size atlasSize,
+                        const CrossfadeParameters& crossfade,
+                        const float pixelRatio);
 };
 
 class LineSDFProgram : public Program<
-    shaders::line_sdf,
-    gfx::Triangle,
+    LineSDFProgram,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -147,20 +145,21 @@ class LineSDFProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       float pixelRatio,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits,
-                                       const LinePatternPos& posA,
-                                       const LinePatternPos& posB,
-                                       const CrossfadeParameters& crossfade,
-                                       float atlasWidth);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        float pixelRatio,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits,
+                        const LinePatternPos& posA,
+                        const LinePatternPos& posB,
+                        const CrossfadeParameters& crossfade,
+                        float atlasWidth);
 };
 
 class LineGradientProgram : public Program<
-    shaders::line_gradient,
-    gfx::Triangle,
+    LineGradientProgram,
+    gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -173,18 +172,19 @@ class LineGradientProgram : public Program<
 public:
     using Program::Program;
 
-    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
-                                       const RenderTile&,
-                                       const TransformState&,
-                                       const std::array<float, 2>& pixelsToGLUnits);
+    static LayoutUniformValues
+    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                        const RenderTile&,
+                        const TransformState&,
+                        const std::array<float, 2>& pixelsToGLUnits);
 };
 
 using LineLayoutVertex = LineProgram::LayoutVertex;
-using LineAttributes = LineProgram::Attributes;
+using LineAttributes = LineProgram::AttributeList;
 
 class LineLayerPrograms final : public LayerTypePrograms {
 public:
-    LineLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    LineLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : line(context, programParameters),
           lineGradient(context, programParameters),
           lineSDF(context, programParameters),

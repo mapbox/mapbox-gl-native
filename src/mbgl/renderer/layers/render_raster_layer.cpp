@@ -7,6 +7,8 @@
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 
 namespace mbgl {
@@ -82,7 +84,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
         auto& programInstance = parameters.programs.getRasterLayerPrograms().raster;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
-            RasterProgram::UniformValues {
+            RasterProgram::LayoutUniformValues {
                 uniforms::u_matrix::Value( matrix ),
                 uniforms::u_opacity::Value( evaluated.get<RasterOpacity>() ),
                 uniforms::u_fade_t::Value( 1 ),

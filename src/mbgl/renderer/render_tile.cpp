@@ -4,6 +4,7 @@
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -103,7 +104,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
             program.computeAllUniformValues(
-                DebugProgram::UniformValues {
+                DebugProgram::LayoutUniformValues {
                     uniforms::u_matrix::Value( matrix ),
                     uniforms::u_color::Value( Color::white() )
                 },
@@ -126,7 +127,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
             program.computeAllUniformValues(
-                DebugProgram::UniformValues {
+                DebugProgram::LayoutUniformValues {
                     uniforms::u_matrix::Value( matrix ),
                     uniforms::u_color::Value( Color::black() )
                 },
@@ -151,7 +152,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
             program.computeAllUniformValues(
-                DebugProgram::UniformValues {
+                DebugProgram::LayoutUniformValues {
                     uniforms::u_matrix::Value( matrix ),
                     uniforms::u_color::Value( Color::red() )
                 },

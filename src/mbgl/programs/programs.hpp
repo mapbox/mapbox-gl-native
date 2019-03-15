@@ -20,7 +20,7 @@ class SymbolLayerPrograms;
 
 class Programs {
 public:
-    Programs(gl::Context&, const ProgramParameters&);
+    Programs(gfx::Context&, const ProgramParameters&);
     ~Programs();
 
     BackgroundLayerPrograms& getBackgroundLayerPrograms() noexcept;
@@ -47,7 +47,7 @@ private:
     std::unique_ptr<LayerTypePrograms> linePrograms;
     std::unique_ptr<LayerTypePrograms> symbolPrograms;
 
-    gl::Context& context;
+    gfx::Context& context;
     ProgramParameters programParameters;
 };
 

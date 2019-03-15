@@ -5,7 +5,17 @@
 namespace mbgl {
 namespace gfx {
 
+enum class ContextType : uint8_t {
+    OpenGL,
+};
+
 enum class PrimitiveType : uint8_t {
+    Point,
+    Line,
+    Triangle,
+};
+
+enum class DrawModeType : uint8_t {
     Points,
     Lines,
     LineLoop,

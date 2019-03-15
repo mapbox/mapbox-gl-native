@@ -7,17 +7,6 @@ namespace gl {
 
 using namespace platform;
 
-optional<AttributeBinding> offsetAttributeBinding(const optional<AttributeBinding>& binding, std::size_t vertexOffset) {
-    assert(vertexOffset <= std::numeric_limits<uint32_t>::max());
-    if (binding) {
-        AttributeBinding result = *binding;
-        result.vertexOffset = static_cast<uint32_t>(vertexOffset);
-        return result;
-    } else {
-        return binding;
-    }
-}
-
 void bindAttributeLocation(Context& context, ProgramID id, AttributeLocation location, const char* name) {
     // We're using sequentially numberered attribute locations starting with 0. Therefore we can use
     // the location as a proxy for the number of attributes.

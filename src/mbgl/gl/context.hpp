@@ -52,7 +52,6 @@ public:
     void verifyProgramLinkage(ProgramID);
     void linkProgram(ProgramID);
     UniqueTexture createUniqueTexture();
-    VertexArray createVertexArray();
 
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
@@ -100,18 +99,12 @@ public:
                optional<float> depth,
                optional<int32_t> stencil);
 
-    void setDrawMode(const gfx::Points&);
-    void setDrawMode(const gfx::Lines&);
-    void setDrawMode(const gfx::LineStrip&);
-    void setDrawMode(const gfx::Triangles&);
-    void setDrawMode(const gfx::TriangleStrip&);
-
     void setDepthMode(const gfx::DepthMode&);
     void setStencilMode(const gfx::StencilMode&);
     void setColorMode(const gfx::ColorMode&);
     void setCullFaceMode(const gfx::CullFaceMode&);
 
-    void draw(gfx::PrimitiveType,
+    void draw(const gfx::DrawMode&,
               std::size_t indexOffset,
               std::size_t indexLength);
 
@@ -216,6 +209,8 @@ private:
     std::unique_ptr<gfx::TextureResource> createTextureResource(Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
     void updateTextureResource(const gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
+    std::unique_ptr<gfx::DrawScopeResource> createDrawScopeResource() override;
+
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
     std::unique_ptr<uint8_t[]> readFramebuffer(Size, gfx::TexturePixelType, bool flip);
@@ -223,6 +218,7 @@ private:
     void drawPixels(Size size, const void* data, gfx::TexturePixelType);
 #endif // MBGL_USE_GLES2
 
+    VertexArray createVertexArray();
     bool supportsVertexArrays() const;
 
     friend detail::ProgramDeleter;

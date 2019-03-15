@@ -2,7 +2,7 @@
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/programs/hillshade_program.hpp>
 #include <mbgl/programs/hillshade_prepare_program.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/context.hpp>
 
 namespace mbgl {
 

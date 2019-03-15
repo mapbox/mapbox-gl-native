@@ -6,15 +6,15 @@ namespace mbgl {
 namespace gl {
 
 template <>
-platform::GLenum Enum<gfx::PrimitiveType>::to(const gfx::PrimitiveType value) {
+platform::GLenum Enum<gfx::DrawModeType>::to(const gfx::DrawModeType value) {
     switch (value) {
-        case gfx::PrimitiveType::Points: return GL_POINTS;
-        case gfx::PrimitiveType::Lines: return GL_LINES;
-        case gfx::PrimitiveType::LineLoop: return GL_LINE_LOOP;
-        case gfx::PrimitiveType::LineStrip: return GL_LINE_STRIP;
-        case gfx::PrimitiveType::Triangles: return GL_TRIANGLES;
-        case gfx::PrimitiveType::TriangleStrip: return GL_TRIANGLE_STRIP;
-        case gfx::PrimitiveType::TriangleFan: return GL_TRIANGLE_FAN;
+        case gfx::DrawModeType::Points: return GL_POINTS;
+        case gfx::DrawModeType::Lines: return GL_LINES;
+        case gfx::DrawModeType::LineLoop: return GL_LINE_LOOP;
+        case gfx::DrawModeType::LineStrip: return GL_LINE_STRIP;
+        case gfx::DrawModeType::Triangles: return GL_TRIANGLES;
+        case gfx::DrawModeType::TriangleStrip: return GL_TRIANGLE_STRIP;
+        case gfx::DrawModeType::TriangleFan: return GL_TRIANGLE_FAN;
     }
     return GL_INVALID_ENUM;
 }

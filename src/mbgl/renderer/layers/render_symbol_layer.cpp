@@ -12,6 +12,8 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -170,7 +172,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             if (bucket.sdfIcons) {
                 if (values.hasHalo) {
                     draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+                         SymbolSDFIconProgram::layoutUniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -183,7 +185,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 if (values.hasFill) {
                     draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+                         SymbolSDFIconProgram::layoutUniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -195,7 +197,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 }
             } else {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
-                     SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
+                     SymbolIconProgram::layoutUniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -233,7 +235,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (values.hasHalo) {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+                     SymbolSDFTextProgram::layoutUniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -246,7 +248,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (values.hasFill) {
                 draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+                     SymbolSDFTextProgram::layoutUniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -277,7 +279,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 gfx::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gfx::CullFaceMode::disabled(),
-                CollisionBoxProgram::UniformValues {
+                CollisionBoxProgram::LayoutUniformValues {
                     uniforms::u_matrix::Value( tile.matrix ),
                     uniforms::u_extrude_scale::Value( extrudeScale ),
                     uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
@@ -313,7 +315,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 gfx::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gfx::CullFaceMode::disabled(),
-                CollisionCircleProgram::UniformValues {
+                CollisionCircleProgram::LayoutUniformValues {
                     uniforms::u_matrix::Value( tile.matrix ),
                     uniforms::u_extrude_scale::Value( extrudeScale ),
                     uniforms::u_overscale_factor::Value( float(tile.tile.id.overscaleFactor()) ),

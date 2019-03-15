@@ -5,7 +5,6 @@
 #include <mbgl/programs/hillshade_prepare_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
-#include <mbgl/shaders/hillshade.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/layers/hillshade_layer_properties.hpp>
 
@@ -20,8 +19,8 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_latrange);
 } // namespace uniforms
 
 class HillshadeProgram : public Program<
-    shaders::hillshade,
-    gfx::Triangle,
+    HillshadeProgram,
+    gfx::PrimitiveType::Triangle,
     TypeList<
         attributes::a_pos,
         attributes::a_texture_pos>,
@@ -53,11 +52,11 @@ public:
 };
 
 using HillshadeLayoutVertex = HillshadeProgram::LayoutVertex;
-using HillshadeAttributes = HillshadeProgram::Attributes;
+using HillshadeAttributes = HillshadeProgram::AttributeList;
 
 class HillshadeLayerPrograms final : public LayerTypePrograms  {
 public:
-    HillshadeLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+    HillshadeLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : hillshade(context, programParameters),
           hillshadePrepare(context, programParameters) {}
     HillshadeProgram hillshade;
