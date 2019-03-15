@@ -78,6 +78,7 @@
     <string name="activity_location_fragment">Location Fragment</string>
     <string name="activity_location_manual">Manual Location updates</string>
     <string name="activity_location_activation_builder">Build Location Activation</string>
-    <string name="activity_recyclerview">RecyclerView</string>
+    <string name="activity_recyclerview_textureview">RecyclerView TextureView</string>
+    <string name="activity_recyclerview_glsurfaceview">RecyclerView GLSurfaceView</string>
     <string name="activity_nested_viewpager">Nested ViewPager</string>
 </resources>
