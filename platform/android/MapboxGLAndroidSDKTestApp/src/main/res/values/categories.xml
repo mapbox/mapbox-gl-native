@@ -15,4 +15,5 @@
     <string name="category_storage">Storage</string>
     <string name="category_textureview">Texture View</string>
     <string name="category_location">Location</string>
+    <string name="category_integration">_Integration</string>
 </resources>
