@@ -74,7 +74,7 @@ private:
         _mbglOfflineRegion = region;
         _state = MGLOfflinePackStateUnknown;
 
-        mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+        auto mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
         mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
     }
     return self;
@@ -115,7 +115,7 @@ private:
 
     self.state = MGLOfflinePackStateActive;
 
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+    auto mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
 }
 
@@ -128,7 +128,7 @@ private:
         _isSuspending = YES;
     }
 
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+    auto mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
 }
 
@@ -137,7 +137,7 @@ private:
     MGLAssert(_state != MGLOfflinePackStateInvalid, @"Cannot invalidate an already invalid offline pack.");
 
     self.state = MGLOfflinePackStateInvalid;
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+    auto mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionObserver(*self.mbglOfflineRegion, nullptr);
     self.mbglOfflineRegion = nil;
 }
@@ -164,8 +164,7 @@ private:
     MGLLogInfo(@"Requesting pack progress.");
     MGLAssertOfflinePackIsValid();
 
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-
+    auto mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     __weak MGLOfflinePack *weakSelf = self;
     mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) {
         if (status) {

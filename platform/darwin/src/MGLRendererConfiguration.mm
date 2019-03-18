@@ -57,10 +57,6 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     return self;
 }
 
-- (mbgl::DefaultFileSource *)fileSource {
-    return [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-}
-
 - (mbgl::GLContextMode)contextMode {
     return mbgl::GLContextMode::Unique;
 }

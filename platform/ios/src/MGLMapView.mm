@@ -484,7 +484,7 @@ public:
               .withCrossSourceCollisions(enableCrossSourceCollisions);
 
     NSAssert(!_mbglMap, @"_mbglMap should be NULL");
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mapOptions);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[[MGLOfflineStorage sharedOfflineStorage] mbglFileSource], *_mbglThreadPool, mapOptions);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
