@@ -11,6 +11,7 @@ PRODUCTS=${DERIVED_DATA}
 LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
+BUILD_DOCS=${BUILD_DOCS:-true}
 SYMBOLS=${SYMBOLS:-YES}
 
 BUILDTYPE=${BUILDTYPE:-Debug}
@@ -270,5 +271,7 @@ sed -i '' \
     "${README}"
 cp ${README} "${OUTPUT}"
 
-step "Generating API documentation…"
-make idocument OUTPUT="${OUTPUT}/documentation"
+if [ ${BUILD_DOCS} == true ]; then
+    step "Generating API documentation for ${BUILDTYPE} Build…"
+    make idocument OUTPUT="${OUTPUT}/documentation"
+fi
