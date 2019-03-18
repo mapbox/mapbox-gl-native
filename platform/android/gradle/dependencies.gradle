@@ -8,7 +8,7 @@ ext {
 
     versions = [
             mapboxServices  : '4.3.0',
-            mapboxTelemetry : '4.2.0',
+            mapboxTelemetry : '4.3.0',
             mapboxGestures  : '0.4.0',
             supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
