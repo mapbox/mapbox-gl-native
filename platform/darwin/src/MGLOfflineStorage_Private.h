@@ -4,6 +4,8 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 
+#include <memory>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLOfflineStorage (Private)
@@ -11,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The shared file source object owned by the shared offline storage object.
  */
-@property (nonatomic) mbgl::DefaultFileSource *mbglFileSource;
+@property (nonatomic) std::shared_ptr<mbgl::DefaultFileSource> mbglFileSource;
 
 @end
 

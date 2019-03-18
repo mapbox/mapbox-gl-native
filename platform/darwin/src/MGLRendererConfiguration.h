@@ -1,7 +1,8 @@
 #import "MGLFoundation.h"
 #import <Foundation/Foundation.h>
-#import <mbgl/storage/default_file_source.hpp>
-#import <mbgl/renderer/mode.hpp>
+
+#include <mbgl/renderer/mode.hpp>
+#include <mbgl/util/optional.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,9 +15,6 @@ MGL_EXPORT
 
 /** Returns an instance of the current renderer configuration. */
 @property (class, nonatomic, readonly) MGLRendererConfiguration *currentConfiguration;
-
-/** The file source to use. Defaults to `mbgl::DefaultFileSource` */
-@property (nonatomic, readonly) mbgl::DefaultFileSource *fileSource;
 
 /** The GL context mode to use. Defaults to `mbgl::GLContextMode::Unique` */
 @property (nonatomic, readonly) mbgl::GLContextMode contextMode;
