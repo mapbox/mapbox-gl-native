@@ -23,7 +23,7 @@ if [[ $CIRCLE_SHA1 ]]; then
 fi
 # Create a formatted JSON file that contains the current coverage. 
 
-current_date=$(TZ=UTC date +"%Y-%m-%d")
+current_date=$(TZ=UTC date +"%F-%T")
 file_name=$2_coverage.json
 cat <<EOF > $file_name
     {"code_coverage":$1,"platform":"$2","sdk":"Maps","scheme":"$3","created_at":"$current_date","sha":"$circle_sha"}
