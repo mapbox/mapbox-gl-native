@@ -1050,6 +1050,43 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                       attributes:@{ MGLFontSizeAttribute: @(1.2),
+                                                                                                     MGLFontColorAttribute: @"yellow"}] ;
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
+        
+        NSExpression *compatibilityExpression = [NSExpression expressionForFunction:@"mgl_attributed:" arguments:@[MGLConstantExpression(attribute1)]];
+        NSArray *jsonExpression = @[ @"format", @"foo", @{ @"font-scale": @1.2, @"text-color": @"yellow" } ];
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, expression.mgl_jsonExpressionObject);
+        XCTAssertEqualObjects(compatibilityExpression, expression);
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                       attributes:@{ MGLFontSizeAttribute: @(1.2),
+                                                                                                     MGLFontColorAttribute: @"yellow",
+                                                                                                     MGLFontNamesAttribute: @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]
+                                                                                                     }] ;
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
+        
+        NSArray *jsonExpression = @[ @"format", @"foo", @{ @"font-scale": @1.2, @"text-color": @"yellow" , @"text-font" : @[ @"literal", @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]]} ];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]
+                                                                                       attributes:@{ MGLFontSizeAttribute: @(1.2),
+                                                                                                     MGLFontColorAttribute: [MGLColor redColor],
+                                                                                                     MGLFontNamesAttribute: @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]
+                                                                                                     }] ;
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
+        
+        NSArray *jsonExpression = @[ @"format", @"foo", @{ @"font-scale": @1.2, @"text-color": @[@"rgb", @255, @0, @0] , @"text-font" : @[ @"literal", @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]]} ];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
         MGLAttributedExpression *attribute1 = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"foo"]
                                                                                   fontNames:nil
                                                                                    fontSize:@(1.2)];

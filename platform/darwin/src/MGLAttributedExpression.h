@@ -6,10 +6,23 @@ typedef NSString * MGLAttributedExpressionKey NS_EXTENSIBLE_STRING_ENUM;
 
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontNamesAttribute;
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontSizeAttribute;
+FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontColorAttribute;
 
 /**
  An `MGLAttributedExpression` object associates text formatting attibutes (such as font size or
  font names) to an `NSExpression`.
+ 
+ ### Example
+ ```swift
+ let expression = NSExpression(forConstantValue: "Foo")
+ let attributes = [.fontNamesAttribute : ["DIN Offc Pro Italic",
+                                          "Arial Unicode MS Regular"],
+                   .fontSizeAttribute: 1.2,
+                   .fontColorAttribute: UIColor.red]
+ let attributedExpression = MGLAttributedExpression(expression, attributes:attributes)
+
+ ```
+ 
  */
 MGL_EXPORT
 @interface MGLAttributedExpression : NSObject
@@ -19,9 +32,21 @@ MGL_EXPORT
  */
 @property (strong, nonatomic) NSExpression *expression;
 
+#if TARGET_OS_IPHONE
 /**
- The formatting attributes.
+ The formatting attributes dictionary.
+ `MGLFontNamesAttribute` : `NSArray<NSString *>*`
+ `MGLFontSizeAttribute` : `NSNumber`
+ `MGLFontColorAttribute` : `UIColor`
  */
+#else
+/**
+ The formatting attributes dictionary.
+ `MGLFontNamesAttribute` : `NSArray<NSString *>*`
+ `MGLFontSizeAttribute` : `NSNumber`
+ `MGLFontColorAttribute` : `NSColor`
+ */
+#endif
 @property (strong, nonatomic, readonly) NSDictionary<MGLAttributedExpressionKey, id> *attributes;
 
 /**
@@ -32,12 +57,17 @@ MGL_EXPORT
 /** 
  Returns an `MGLAttributedExpression` object initialized with an expression and text format attributes.
  */
-- (instancetype)initWithExpression:(NSExpression *)expression attributes:(nullable NSDictionary <MGLAttributedExpressionKey, id> *)attrs;
+- (instancetype)initWithExpression:(NSExpression *)expression attributes:(nonnull NSDictionary <MGLAttributedExpressionKey, id> *)attrs;
 
 /**
  Creates an `MGLAttributedExpression` object initialized with an expression and the format attributes for font names and font size.
  */
 + (instancetype)attributedExpression:(NSExpression *)expression fontNames:(nullable NSArray<NSString*> *)fontNames fontSize:(nullable NSNumber *)fontSize;
+
+/**
+ Creates an `MGLAttributedExpression` object initialized with an expression and the format attributes dictionary.
+ */
++ (instancetype)attributedExpression:(NSExpression *)expression attributes:(nonnull NSDictionary <MGLAttributedExpressionKey, id> *)attrs;
 
 @end
 
