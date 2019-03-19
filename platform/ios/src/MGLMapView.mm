@@ -3272,7 +3272,7 @@ public:
 
 - (MGLCoordinateBounds)visibleCoordinateBounds
 {
-    return [self convertRect:self.bounds.inset(by: self.contentInset) toCoordinateBoundsFromView:self];
+    return [self convertRect:UIEdgeInsetsInsetRect(self.bounds, self.contentInset) toCoordinateBoundsFromView:self];
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds
