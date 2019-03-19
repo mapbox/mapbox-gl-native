@@ -56,7 +56,7 @@ default: test
 BUILD_DEPS += Makefile
 BUILD_DEPS += CMakeLists.txt
 
-SKIP_DOCS := false
+BUILD__DOCS := true
 
 #### macOS targets ##############################################################
 
@@ -275,7 +275,7 @@ ipackage%:
 
 .PHONY: iframework
 iframework: $(IOS_PROJ_PATH)
-	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) SKIP_DOCS=$(SKIP_DOCS) \
+	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) BUILD_DOCS=$(BUILD_DOCS) \
 	./platform/ios/scripts/package.sh
 
 .PHONY: ideploy
