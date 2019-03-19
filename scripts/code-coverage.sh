@@ -17,12 +17,16 @@ if [[ ! $2 = "iOS" && ! $2 = "Android" ]]; then
     exit 1
 fi
 
+circle_sha=""
+if [[ $CIRCLE_SHA1 ]]; then
+    circle_sha="$CIRCLE_SHA1"
+fi
 # Create a formatted JSON file that contains the current coverage. 
 
-current_date=$(TZ=UTC date +"%Y-%m-%d")
+current_date=$(TZ=UTC date +"%F-%T")
 file_name=$2_coverage.json
 cat <<EOF > $file_name
-    {"code_coverage":$1,"platform":"$2","sdk":"Maps","scheme":"$3","created_at":"$current_date"}
+    {"code_coverage":$1,"platform":"$2","sdk":"Maps","scheme":"$3","created_at":"$current_date","sha":"$circle_sha"}
 EOF
 gzip -f $file_name
 
