@@ -6,31 +6,23 @@
 
 namespace mbgl {
 
-Map::Impl::Impl(Map& map_,
-                RendererFrontend& frontend,
-                MapObserver& mapObserver,
+Map::Impl::Impl(RendererFrontend& frontend_,
+                MapObserver& observer_,
                 FileSource& fileSource_,
                 Scheduler& scheduler_,
                 Size size_,
                 float pixelRatio_,
-                MapMode mode_,
-                ConstrainMode constrainMode_,
-                ViewportMode viewportMode_,
-                bool crossSourceCollisions_)
-    : map(map_),
-      observer(mapObserver),
-      rendererFrontend(frontend),
-      fileSource(fileSource_),
-      scheduler(scheduler_),
-      transform(observer,
-                constrainMode_,
-                viewportMode_),
-      mode(mode_),
-      pixelRatio(pixelRatio_),
-      crossSourceCollisions(crossSourceCollisions_),
-      style(std::make_unique<style::Style>(scheduler, fileSource, pixelRatio)),
-      annotationManager(*style) {
-
+                const MapOptions& mapOptions)
+        : observer(observer_),
+          rendererFrontend(frontend_),
+          fileSource(fileSource_),
+          scheduler(scheduler_),
+          transform(observer, mapOptions.constrainMode(), mapOptions.viewportMode()),
+          mode(mapOptions.mapMode()),
+          pixelRatio(pixelRatio_),
+          crossSourceCollisions(mapOptions.crossSourceCollisions()),
+          style(std::make_unique<style::Style>(scheduler, fileSource, pixelRatio)),
+          annotationManager(*style) {
     style->impl->setObserver(this);
     rendererFrontend.setObserver(*this);
     transform.resize(size_);
@@ -90,7 +82,7 @@ void Map::Impl::onStyleLoading() {
 
 void Map::Impl::onStyleLoaded() {
     if (!cameraMutated) {
-        map.jumpTo(style->getDefaultCamera());
+        jumpTo(style->getDefaultCamera());
     }
     if (LayerManager::annotationsEnabled) {
         annotationManager.onStyleLoaded();
@@ -172,5 +164,11 @@ void Map::Impl::onDidFinishRenderingMap() {
         }
     }
 };
+
+void Map::Impl::jumpTo(const CameraOptions& camera) {
+    cameraMutated = true;
+    transform.jumpTo(camera);
+    onUpdate();
+}
 
 } // namespace mbgl

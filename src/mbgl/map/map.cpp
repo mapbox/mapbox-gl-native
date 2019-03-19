@@ -27,24 +27,14 @@ namespace mbgl {
 
 using namespace style;
 
-Map::Map(RendererFrontend& rendererFrontend,
-         MapObserver& mapObserver,
+Map::Map(RendererFrontend& frontend,
+         MapObserver& observer,
          const Size size,
          const float pixelRatio,
          FileSource& fileSource,
          Scheduler& scheduler,
-         const MapOptions& options)
-    : impl(std::make_unique<Impl>(*this,
-                                  rendererFrontend,
-                                  mapObserver,
-                                  fileSource,
-                                  scheduler,
-                                  size,
-                                  pixelRatio,
-                                  options.mapMode(),
-                                  options.constrainMode(),
-                                  options.viewportMode(),
-                                  options.crossSourceCollisions())) {}
+         const MapOptions& mapOptions)
+    : impl(std::make_unique<Impl>(frontend, observer, fileSource, scheduler, size, pixelRatio, mapOptions)) {}
 
 Map::~Map() = default;
 
@@ -139,9 +129,7 @@ CameraOptions Map::getCameraOptions(const EdgeInsets& padding) const {
 }
 
 void Map::jumpTo(const CameraOptions& camera) {
-    impl->cameraMutated = true;
-    impl->transform.jumpTo(camera);
-    impl->onUpdate();
+    impl->jumpTo(camera);
 }
 
 void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
