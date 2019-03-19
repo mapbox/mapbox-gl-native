@@ -744,6 +744,7 @@
         "mbgl/util/i18n.hpp": "src/mbgl/util/i18n.hpp",
         "mbgl/util/intersection_tests.hpp": "src/mbgl/util/intersection_tests.hpp",
         "mbgl/util/io.hpp": "src/mbgl/util/io.hpp",
+        "mbgl/util/literal.hpp": "src/mbgl/util/literal.hpp",
         "mbgl/util/longest_common_subsequence.hpp": "src/mbgl/util/longest_common_subsequence.hpp",
         "mbgl/util/mapbox.hpp": "src/mbgl/util/mapbox.hpp",
         "mbgl/util/mat2.hpp": "src/mbgl/util/mat2.hpp",

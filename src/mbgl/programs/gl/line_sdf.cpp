@@ -55,7 +55,7 @@ varying float v_gamma_scale;
 
 
 #ifndef HAS_UNIFORM_u_color
-uniform lowp float a_color_t;
+uniform lowp float u_color_t;
 attribute highp vec4 a_color;
 varying highp vec4 color;
 #else
@@ -64,7 +64,7 @@ uniform highp vec4 u_color;
 
 
 #ifndef HAS_UNIFORM_u_blur
-uniform lowp float a_blur_t;
+uniform lowp float u_blur_t;
 attribute lowp vec2 a_blur;
 varying lowp float blur;
 #else
@@ -73,7 +73,7 @@ uniform lowp float u_blur;
 
 
 #ifndef HAS_UNIFORM_u_opacity
-uniform lowp float a_opacity_t;
+uniform lowp float u_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 #else
@@ -82,7 +82,7 @@ uniform lowp float u_opacity;
 
 
 #ifndef HAS_UNIFORM_u_gapwidth
-uniform lowp float a_gapwidth_t;
+uniform lowp float u_gapwidth_t;
 attribute mediump vec2 a_gapwidth;
 #else
 uniform mediump float u_gapwidth;
@@ -90,7 +90,7 @@ uniform mediump float u_gapwidth;
 
 
 #ifndef HAS_UNIFORM_u_offset
-uniform lowp float a_offset_t;
+uniform lowp float u_offset_t;
 attribute lowp vec2 a_offset;
 #else
 uniform lowp float u_offset;
@@ -98,7 +98,7 @@ uniform lowp float u_offset;
 
 
 #ifndef HAS_UNIFORM_u_width
-uniform lowp float a_width_t;
+uniform lowp float u_width_t;
 attribute mediump vec2 a_width;
 varying mediump float width;
 #else
@@ -107,7 +107,7 @@ uniform mediump float u_width;
 
 
 #ifndef HAS_UNIFORM_u_floorwidth
-uniform lowp float a_floorwidth_t;
+uniform lowp float u_floorwidth_t;
 attribute lowp vec2 a_floorwidth;
 varying lowp float floorwidth;
 #else
@@ -118,49 +118,49 @@ uniform lowp float u_floorwidth;
 void main() {
     
 #ifndef HAS_UNIFORM_u_color
-    color = unpack_mix_color(a_color, a_color_t);
+    color = unpack_mix_color(a_color, u_color_t);
 #else
     highp vec4 color = u_color;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_blur
-    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    blur = unpack_mix_vec2(a_blur, u_blur_t);
 #else
     lowp float blur = u_blur;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_opacity
-    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, u_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_gapwidth
-    mediump float gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
+    mediump float gapwidth = unpack_mix_vec2(a_gapwidth, u_gapwidth_t);
 #else
     mediump float gapwidth = u_gapwidth;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_offset
-    lowp float offset = unpack_mix_vec2(a_offset, a_offset_t);
+    lowp float offset = unpack_mix_vec2(a_offset, u_offset_t);
 #else
     lowp float offset = u_offset;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_width
-    width = unpack_mix_vec2(a_width, a_width_t);
+    width = unpack_mix_vec2(a_width, u_width_t);
 #else
     mediump float width = u_width;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_floorwidth
-    floorwidth = unpack_mix_vec2(a_floorwidth, a_floorwidth_t);
+    floorwidth = unpack_mix_vec2(a_floorwidth, u_floorwidth_t);
 #else
     lowp float floorwidth = u_floorwidth;
 #endif

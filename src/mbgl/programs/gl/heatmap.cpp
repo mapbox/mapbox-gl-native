@@ -22,7 +22,7 @@ Context::createProgram<gl::Context>(const ProgramParameters& programParameters) 
 /*
 
 #ifndef HAS_UNIFORM_u_weight
-uniform lowp float a_weight_t;
+uniform lowp float u_weight_t;
 attribute highp vec2 a_weight;
 varying highp float weight;
 #else
@@ -31,7 +31,7 @@ uniform highp float u_weight;
 
 
 #ifndef HAS_UNIFORM_u_radius
-uniform lowp float a_radius_t;
+uniform lowp float u_radius_t;
 attribute mediump vec2 a_radius;
 #else
 uniform mediump float u_radius;
@@ -58,14 +58,14 @@ const highp float ZERO = 1.0 / 255.0 / 16.0;
 void main(void) {
     
 #ifndef HAS_UNIFORM_u_weight
-    weight = unpack_mix_vec2(a_weight, a_weight_t);
+    weight = unpack_mix_vec2(a_weight, u_weight_t);
 #else
     highp float weight = u_weight;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_radius
-    mediump float radius = unpack_mix_vec2(a_radius, a_radius_t);
+    mediump float radius = unpack_mix_vec2(a_radius, u_radius_t);
 #else
     mediump float radius = u_radius;
 #endif
