@@ -13,6 +13,7 @@
 
 #include <jni/jni.hpp>
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/constants.hpp>
@@ -74,9 +75,6 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
         return;
     }
 
-    // Get native peer for file source
-    mbgl::FileSource& fileSource = mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource);
-
     // Create a renderer frontend
     rendererFrontend = std::make_unique<AndroidRendererFrontend>(mapRenderer);
 
@@ -88,10 +86,9 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
            .withCrossSourceCollisions(_crossSourceCollisions);
 
     // Create the core map
-    map = std::make_unique<mbgl::Map>(*rendererFrontend, *this,
-                                      mbgl::Size{ static_cast<uint32_t>(width),
-                                                  static_cast<uint32_t>(height) }, pixelRatio,
-                                      fileSource, *threadPool, options);
+    map = std::make_unique<mbgl::Map>(
+        *rendererFrontend, *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
+        pixelRatio, *threadPool, options, mbgl::android::FileSource::getSharedResourceOptions(_env, jFileSource));
 }
 
 /**

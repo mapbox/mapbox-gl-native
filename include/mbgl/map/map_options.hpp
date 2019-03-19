@@ -3,14 +3,13 @@
 #include <mbgl/map/mode.hpp>
 
 #include <memory>
-#include <string>
 
 namespace mbgl {
 
 /**
  * @brief Holds values for Map options.
  */
-class MapOptions {
+class MapOptions final {
 public:
     /**
      * @brief Constructs a MapOptions object with default values.
@@ -67,52 +66,6 @@ public:
      * @return viewport mode.
      */
     ViewportMode viewportMode() const;
-
-    /**
-     * @brief Sets the cache path.
-     *
-     * @param path Cache path.
-     * @return reference to MapOptions for chaining options together.
-     */
-    MapOptions& withCachePath(std::string path);
-
-    /**
-     * @brief Gets the previously set (or default) cache path.
-     *
-     * @return cache path
-     */
-    const std::string& cachePath() const;
-
-    /**
-     * @brief Sets the asset path, which is the root directory from where
-     * the asset:// scheme gets resolved in a style.
-     *
-     * @param path Asset path.
-     * @return reference to MapOptions for chaining options together.
-     */
-    MapOptions& withAssetRoot(std::string path);
-
-    /**
-     * @brief Gets the previously set (or default) asset path.
-     *
-     * @return asset path
-     */
-    const std::string& assetRoot() const;
-
-    /**
-     * @brief Sets the maximum cache size.
-     *
-     * @param size Cache maximum size in bytes.
-     * @return reference to MapOptions for chaining options together.
-     */
-    MapOptions& withMaximumCacheSize(uint64_t size);
-
-    /**
-     * @brief Gets the previously set (or default) maximum allowed cache size.
-     *
-     * @return maximum allowed cache database size in bytes.
-     */
-    uint64_t maximumCacheSize() const;
 
     /**
      * @brief Specify whether to enable cross-source symbol collision detection

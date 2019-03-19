@@ -31,10 +31,13 @@ Map::Map(RendererFrontend& frontend,
          MapObserver& observer,
          const Size size,
          const float pixelRatio,
-         FileSource& fileSource,
          Scheduler& scheduler,
-         const MapOptions& mapOptions)
-    : impl(std::make_unique<Impl>(frontend, observer, fileSource, scheduler, size, pixelRatio, mapOptions)) {}
+         const MapOptions& mapOptions,
+         const ResourceOptions& resourceOptions)
+    : impl(std::make_unique<Impl>(frontend, observer, scheduler, size, pixelRatio,
+                                  FileSource::getSharedFileSource(resourceOptions), mapOptions)) {}
+
+Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {}
 
 Map::~Map() = default;
 

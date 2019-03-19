@@ -13,7 +13,6 @@
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/logging.hpp>

@@ -1,11 +1,11 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/map_adapter.hpp>
 
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -28,13 +28,12 @@ std::unique_ptr<style::Image> namedMarker(const std::string& name) {
 class AnnotationTest {
 public:
     util::RunLoop loop;
-    StubFileSource fileSource;
     ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
     HeadlessFrontend frontend { pixelRatio, threadPool };
 
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapOptions().withMapMode(MapMode::Static)};
+    MapAdapter map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, std::make_shared<StubFileSource>(),
+                  threadPool, MapOptions().withMapMode(MapMode::Static)};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,

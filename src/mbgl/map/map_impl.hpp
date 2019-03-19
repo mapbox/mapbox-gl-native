@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/map.hpp>
@@ -9,13 +10,15 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/size.hpp>
 
 namespace mbgl {
+
+class FileSource;
+class ResourceTransform;
 
 struct StillImageRequest {
     StillImageRequest(Map::StillImageCallback&& callback_)
@@ -27,7 +30,7 @@ struct StillImageRequest {
 
 class Map::Impl : public style::Observer, public RendererObserver {
 public:
-    Impl(RendererFrontend&, MapObserver&, FileSource&, Scheduler&, Size size, float pixelRatio, const MapOptions&);
+    Impl(RendererFrontend&, MapObserver&, Scheduler&, Size size, float pixelRatio, std::shared_ptr<FileSource>, const MapOptions&);
     ~Impl() final;
 
     // StyleObserver
@@ -50,7 +53,6 @@ public:
 
     MapObserver& observer;
     RendererFrontend& rendererFrontend;
-    FileSource& fileSource;
     Scheduler& scheduler;
 
     Transform transform;
@@ -60,6 +62,8 @@ public:
     const bool crossSourceCollisions;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
+
+    std::shared_ptr<FileSource> fileSource;
 
     std::unique_ptr<style::Style> style;
     AnnotationManager annotationManager;

@@ -1,8 +1,8 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/getrss.hpp>
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/map_adapter.hpp>
 
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -16,6 +16,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <memory>
 
 #include <cstdlib>
 #include <unistd.h>
@@ -26,16 +27,16 @@ using namespace std::literals::string_literals;
 class MemoryTest {
 public:
     MemoryTest() {
-        fileSource.styleResponse = [&](const Resource& res) { return response("style_" + getType(res) + ".json");};
-        fileSource.tileResponse = [&](const Resource& res) { return response(getType(res) + ".tile"); };
-        fileSource.sourceResponse = [&](const Resource& res) { return response("source_" + getType(res) + ".json"); };
-        fileSource.glyphsResponse = [&](const Resource&) { return response("glyphs.pbf"); };
-        fileSource.spriteJSONResponse = [&](const Resource&) { return response("sprite.json"); };
-        fileSource.spriteImageResponse = [&](const Resource&) { return response("sprite.png"); };
+        fileSource->styleResponse = [&](const Resource& res) { return response("style_" + getType(res) + ".json");};
+        fileSource->tileResponse = [&](const Resource& res) { return response(getType(res) + ".tile"); };
+        fileSource->sourceResponse = [&](const Resource& res) { return response("source_" + getType(res) + ".json"); };
+        fileSource->glyphsResponse = [&](const Resource&) { return response("glyphs.pbf"); };
+        fileSource->spriteJSONResponse = [&](const Resource&) { return response("sprite.json"); };
+        fileSource->spriteImageResponse = [&](const Resource&) { return response("sprite.png"); };
     }
 
     util::RunLoop runLoop;
-    StubFileSource fileSource;
+    std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
     ThreadPool threadPool { 4 };
 
 private:
@@ -72,8 +73,8 @@ TEST(Memory, Vector) {
     float ratio { 2 };
 
     HeadlessFrontend frontend { { 256, 256 }, ratio, test.threadPool };
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-            test.threadPool, MapOptions().withMapMode(MapMode::Static));
+    MapAdapter map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
+                   test.threadPool, MapOptions().withMapMode(MapMode::Static));
     map.jumpTo(CameraOptions().withZoom(16));
     map.getStyle().loadURL("mapbox://streets");
 
@@ -85,8 +86,8 @@ TEST(Memory, Raster) {
     float ratio { 2 };
 
     HeadlessFrontend frontend { { 256, 256 }, ratio, test.threadPool };
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-            test.threadPool, MapOptions().withMapMode(MapMode::Static));
+    MapAdapter map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
+                   test.threadPool, MapOptions().withMapMode(MapMode::Static));
     map.getStyle().loadURL("mapbox://satellite");
 
     frontend.render(map);
@@ -131,7 +132,7 @@ TEST(Memory, Footprint) {
         }
 
         HeadlessFrontend frontend;
-        Map map;
+        MapAdapter map;
     };
 
     // Warm up buffers and cache.

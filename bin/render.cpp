@@ -6,7 +6,6 @@
 
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
 
 #include <args/args.hxx>
@@ -76,17 +75,12 @@ int main(int argc, char *argv[]) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fileSource(cache_file, asset_root);
-
-    // Set access token if present
-    if (token.size()) {
-        fileSource.setAccessToken(std::string(token));
-    }
 
     ThreadPool threadPool(4);
     HeadlessFrontend frontend({ width, height }, pixelRatio, threadPool);
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
-            fileSource, threadPool, MapOptions().withMapMode(MapMode::Static));
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, threadPool,
+            MapOptions().withMapMode(MapMode::Static),
+            ResourceOptions().withCachePath(cache_file).withAssetPath(asset_root).withAccessToken(std::string(token)));
 
     if (style.find("://") == std::string::npos) {
         style = std::string("file://") + style;

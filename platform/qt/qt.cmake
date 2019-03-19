@@ -50,6 +50,7 @@ set(MBGL_QT_CORE_FILES
 
 set(MBGL_QT_FILESOURCE_FILES
     # File source
+    PRIVATE platform/default/src/mbgl/storage/file_source.cpp
     PRIVATE platform/qt/src/http_file_source.cpp
     PRIVATE platform/qt/src/http_file_source.hpp
     PRIVATE platform/qt/src/http_request.cpp

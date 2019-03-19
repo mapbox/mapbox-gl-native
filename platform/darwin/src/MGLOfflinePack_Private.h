@@ -1,6 +1,6 @@
 #import "MGLOfflinePack.h"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/offline.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 

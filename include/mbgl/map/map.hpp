@@ -12,6 +12,7 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/map/projection_mode.hpp>
+#include <mbgl/storage/resource_options.hpp>
 
 #include <cstdint>
 #include <string>
@@ -21,7 +22,6 @@
 
 namespace mbgl {
 
-class FileSource;
 class Scheduler;
 class RendererFrontend;
 
@@ -36,9 +36,9 @@ public:
                  MapObserver&,
                  Size size,
                  float pixelRatio,
-                 FileSource&,
                  Scheduler&,
-                 const MapOptions&);
+                 const MapOptions&,
+                 const ResourceOptions&);
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have
@@ -137,9 +137,12 @@ public:
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
 
-private:
+protected:
     class Impl;
     const std::unique_ptr<Impl> impl;
+
+    // For testing only.
+    Map(std::unique_ptr<Impl>);
 };
 
 } // namespace mbgl

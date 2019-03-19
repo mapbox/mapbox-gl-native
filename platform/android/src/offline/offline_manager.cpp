@@ -10,20 +10,19 @@ namespace android {
 // OfflineManager //
 
 OfflineManager::OfflineManager(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource)
-    : fileSource(mbgl::android::FileSource::getDefaultFileSource(env, jFileSource)) {
-}
+    : fileSource(std::static_pointer_cast<DefaultFileSource>(mbgl::FileSource::getSharedFileSource(FileSource::getSharedResourceOptions(env, jFileSource)))) {}
 
 OfflineManager::~OfflineManager() {}
 
 void OfflineManager::setOfflineMapboxTileCountLimit(jni::JNIEnv&, jni::jlong limit) {
-    fileSource.setOfflineMapboxTileCountLimit(limit);
+    fileSource->setOfflineMapboxTileCountLimit(limit);
 }
 
 void OfflineManager::listOfflineRegions(jni::JNIEnv& env_, const jni::Object<FileSource>& jFileSource_, const jni::Object<ListOfflineRegionsCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
     auto globalFilesource = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, jFileSource_);
 
-    fileSource.listOfflineRegions([
+    fileSource->listOfflineRegions([
         //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
         callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
         jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
@@ -59,7 +58,7 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
     auto globalFilesource = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, jFileSource_);
 
     // Create region
-    fileSource.createOfflineRegion(definition, metadata, [
+    fileSource->createOfflineRegion(definition, metadata, [
         //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
         callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
         jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
@@ -86,7 +85,7 @@ void OfflineManager::mergeOfflineRegions(jni::JNIEnv& env_, const jni::Object<Fi
     auto globalFilesource = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, jFileSource_);
 
     auto path = jni::Make<std::string>(env_, jString_);
-    fileSource.mergeOfflineRegions(path, [
+    fileSource->mergeOfflineRegions(path, [
         //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
         callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
         jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
@@ -226,7 +225,7 @@ void OfflineManager::putResourceWithUrl(jni::JNIEnv& env,
         response.expires = Timestamp(mbgl::Seconds(expires));
     }
 
-    fileSource.put(resource, response);
+    fileSource->put(resource, response);
 }
 
 } // namespace android
