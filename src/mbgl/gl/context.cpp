@@ -160,12 +160,10 @@ void Context::enableDebugging() {
     MBGL_CHECK_ERROR(debugging->debugMessageCallback(extension::Debugging::DebugCallback, nullptr));
 }
 
-UniqueShader Context::createShader(ShaderType type, const std::string& source) {
+UniqueShader Context::createShader(ShaderType type, const std::initializer_list<const char*>& sources) {
     UniqueShader result { MBGL_CHECK_ERROR(glCreateShader(static_cast<GLenum>(type))), { this } };
 
-    const GLchar* sources = source.data();
-    const auto lengths = static_cast<GLsizei>(source.length());
-    MBGL_CHECK_ERROR(glShaderSource(result, 1, &sources, &lengths));
+    MBGL_CHECK_ERROR(glShaderSource(result, static_cast<GLsizei>(sources.size()), sources.begin(), nullptr));
     MBGL_CHECK_ERROR(glCompileShader(result));
 
     GLint status = 0;

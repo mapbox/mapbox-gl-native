@@ -74,14 +74,12 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             }
             FillBucket& bucket = *bucket_;
 
-            auto draw = [&] (auto& program,
+            auto draw = [&] (auto& programInstance,
                              const auto& drawMode,
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments,
                              auto&& textureBindings) {
-                auto& programInstance = program.get(evaluated);
-
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
@@ -162,14 +160,12 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             }
             FillBucket& bucket = *bucket_;
 
-            auto draw = [&] (auto& program,
+            auto draw = [&] (auto& programInstance,
                              const auto& drawMode,
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments,
                              auto&& textureBindings) {
-                auto& programInstance = program.get(evaluated);
-
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
                 paintPropertyBinders.setPatternParameters(patternPosA, patternPosB, crossfade);
 

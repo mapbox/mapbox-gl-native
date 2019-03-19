@@ -52,7 +52,7 @@ public:
     HeatmapLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters) 
         : heatmap(context, programParameters),
           heatmapTexture(context, programParameters) {}
-    ProgramMap<HeatmapProgram> heatmap;
+    HeatmapProgram heatmap;
     HeatmapTextureProgram heatmapTexture;
 };
 

@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/symbol_sdf_text_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<SymbolSDFTextProgram> {
+    static constexpr const char* name = "symbol_sdf_text";
+    static constexpr const uint8_t hash[8] = { 0x13, 0xfc, 0x05, 0x2a, 0xd1, 0x93, 0xfb, 0x7d };
+    static constexpr const auto vertexOffset = 53059;
+    static constexpr const auto fragmentOffset = 57099;
+};
+
+constexpr const char* ShaderSource<SymbolSDFTextProgram>::name;
+constexpr const uint8_t ShaderSource<SymbolSDFTextProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<SymbolSDFTextProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<SymbolSDFTextProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "symbol_sdf_text",
-        programs::gl::shaderSource() + 53059, programs::gl::shaderSource() + 57099);
+    return std::make_unique<gl::Program<SymbolSDFTextProgram>>(programParameters);
 }
 
 } // namespace gfx

@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/symbol_icon_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<SymbolIconProgram> {
+    static constexpr const char* name = "symbol_icon";
+    static constexpr const uint8_t hash[8] = { 0x96, 0x0c, 0xef, 0xec, 0x37, 0x23, 0xf9, 0xb1 };
+    static constexpr const auto vertexOffset = 50000;
+    static constexpr const auto fragmentOffset = 52654;
+};
+
+constexpr const char* ShaderSource<SymbolIconProgram>::name;
+constexpr const uint8_t ShaderSource<SymbolIconProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<SymbolIconProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<SymbolIconProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "symbol_icon",
-        programs::gl::shaderSource() + 50000, programs::gl::shaderSource() + 52654);
+    return std::make_unique<gl::Program<SymbolIconProgram>>(programParameters);
 }
 
 } // namespace gfx

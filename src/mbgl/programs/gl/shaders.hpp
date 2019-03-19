@@ -9,9 +9,10 @@ class ProgramParameters;
 namespace programs {
 namespace gl {
 
-std::string fragmentSource(const ProgramParameters&, const char* fragmentSource);
-std::string vertexSource(const ProgramParameters&, const char* vertexSource);
-std::string programIdentifier(const std::string& vertexSource, const std::string& fragmentSource);
+std::string programIdentifier(const std::string& defines1,
+                              const std::string& defines2,
+                              const uint8_t hash1[8],
+                              const uint8_t hash2[8]);
 
 } // namespace gl
 } // namespace programs
