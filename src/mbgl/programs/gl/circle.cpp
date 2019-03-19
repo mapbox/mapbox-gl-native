@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/circle_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<CircleProgram> {
+    static constexpr const char* name = "circle";
+    static constexpr const uint8_t hash[8] = { 0xf0, 0x3e, 0x18, 0xb7, 0x75, 0xb2, 0xde, 0xa9 };
+    static constexpr const auto vertexOffset = 2927;
+    static constexpr const auto fragmentOffset = 6093;
+};
+
+constexpr const char* ShaderSource<CircleProgram>::name;
+constexpr const uint8_t ShaderSource<CircleProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<CircleProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<CircleProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "circle",
-        programs::gl::shaderSource() + 2927, programs::gl::shaderSource() + 6093);
+    return std::make_unique<gl::Program<CircleProgram>>(programParameters);
 }
 
 } // namespace gfx

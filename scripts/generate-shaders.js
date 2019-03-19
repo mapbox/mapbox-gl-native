@@ -5,6 +5,7 @@ require('flow-remove-types/register');
 const path = require('path');
 const outputPath = 'src/mbgl/programs/gl';
 const zlib = require('zlib');
+const crypto = require('crypto');
 
 var shaders = require('../mapbox-gl-js/src/shaders');
 
@@ -28,18 +29,23 @@ for (const key in shaders) {
     // https://github.com/mapbox/mapbox-gl-native/issues/13984
     shaders[key].vertexSource = shaders[key].vertexSource.replace(/\ba_(\w+)_t\b/mg, 'u_$1_t');
 
+    const hash = crypto.createHash('sha1');
+
     const vertex = concatenated.length;
-    concatenated += basicMinify(shaders[key].vertexSource);
-    concatenated += '\n\0';
+    const vertexSource = basicMinify(shaders[key].vertexSource) + '\n\0';
+    hash.update(vertexSource);
+    concatenated += vertexSource;
 
     const fragment = concatenated.length;
-    concatenated += basicMinify(shaders[key].fragmentSource);
-    concatenated += '\n\0';
+    const fragmentSource = basicMinify(shaders[key].fragmentSource) + '\n\0';
+    hash.update(fragmentSource);
+    concatenated += fragmentSource;
 
     offsets[key] = {
         vertex,
         fragment,
         originalKey: key,
+        hash: hash.digest('hex').substring(0, 16).match(/.{1,2}/g).map(n => `0x${n}`).join(', '),
         shaderName: key.replace(/[A-Z]+/g, (match) => `_${match.toLowerCase()}`),
         ShaderName: key.replace(/^[a-z]/g, (match) => match.toUpperCase())
     };
@@ -49,6 +55,7 @@ for (const key in shaders) {
 offsets.symbolSDFIcon = {
     vertex: offsets.symbolSDF.vertex,
     fragment: offsets.symbolSDF.fragment,
+    hash: offsets.symbolSDF.hash,
     originalKey: 'symbolSDF',
     shaderName: 'symbol_sdf_icon',
     ShaderName: 'SymbolSDFIcon',
@@ -57,6 +64,7 @@ offsets.symbolSDFIcon = {
 offsets.symbolSDFText = {
     vertex: offsets.symbolSDF.vertex,
     fragment: offsets.symbolSDF.fragment,
+    hash: offsets.symbolSDF.hash,
     originalKey: 'symbolSDF',
     shaderName: 'symbol_sdf_text',
     ShaderName: 'SymbolSDFText',
@@ -71,10 +79,6 @@ const compressed = zlib.deflateSync(concatenated, {level: zlib.Z_BEST_COMPRESSIO
     .join(',\n    ')
     .trim();
 
-function sourceOffset(key, type) {
-    return `programs::gl::shaderSource() + ${offsets[key][type]}`
-}
-
 writeIfModified(path.join(outputPath, 'shader_source.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #pragma once
@@ -84,6 +88,9 @@ namespace programs {
 namespace gl {
 
 const char* shaderSource();
+
+template <typename>
+struct ShaderSource;
 
 } // namespace gl
 } // namespace programs
@@ -119,29 +126,15 @@ writeIfModified(path.join(outputPath, 'preludes.hpp'), `// NOTE: DO NOT CHANGE T
 
 #pragma once
 
-namespace mbgl {
-namespace programs {
-namespace gl {
-
-extern const char* vertexShaderPrelude;
-extern const char* fragmentShaderPrelude;
-
-} // namespace gl
-} // namespace programs
-} // namespace mbgl
-`);
-
-writeIfModified(path.join(outputPath, 'preludes.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
-#include <mbgl/programs/gl/preludes.hpp>
-#include <mbgl/programs/gl/shader_source.hpp>
+#include <cstdint>
 
 namespace mbgl {
 namespace programs {
 namespace gl {
 
-const char* vertexShaderPrelude = ${sourceOffset('prelude', 'vertex')};
-const char* fragmentShaderPrelude = ${sourceOffset('prelude', 'fragment')};
+constexpr const uint8_t preludeHash[8] = { ${offsets['prelude'].hash} };
+constexpr const auto vertexPreludeOffset = ${offsets['prelude'].vertex};
+constexpr const auto fragmentPreludeOffset = ${offsets['prelude'].fragment};
 
 } // namespace gl
 } // namespace programs
@@ -157,18 +150,37 @@ for (const key in offsets) {
     writeIfModified(path.join(outputPath, `${shaderName}.cpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/${shaderName}_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<${ShaderName}Program> {
+    static constexpr const char* name = "${shaderName}";
+    static constexpr const uint8_t hash[8] = { ${offsets[key].hash} };
+    static constexpr const auto vertexOffset = ${offsets[key].vertex};
+    static constexpr const auto fragmentOffset = ${offsets[key].fragment};
+};
+
+constexpr const char* ShaderSource<${ShaderName}Program>::name;
+constexpr const uint8_t ShaderSource<${ShaderName}Program>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<${ShaderName}Program>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<${ShaderName}Program>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "${shaderName}",
-        ${sourceOffset(key, 'vertex')}, ${sourceOffset(key, 'fragment')});
+    return std::make_unique<gl::Program<${ShaderName}Program>>(programParameters);
 }
 
 } // namespace gfx

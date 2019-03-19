@@ -82,7 +82,6 @@
         "src/mbgl/programs/gl/line_gradient.cpp",
         "src/mbgl/programs/gl/line_pattern.cpp",
         "src/mbgl/programs/gl/line_sdf.cpp",
-        "src/mbgl/programs/gl/preludes.cpp",
         "src/mbgl/programs/gl/raster.cpp",
         "src/mbgl/programs/gl/shader_source.cpp",
         "src/mbgl/programs/gl/shaders.cpp",

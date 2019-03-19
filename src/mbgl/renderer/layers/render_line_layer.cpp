@@ -65,11 +65,10 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         LineBucket& bucket = *bucket_;
 
-        auto draw = [&](auto& program, auto&& uniformValues,
+        auto draw = [&](auto& programInstance,
+                        auto&& uniformValues,
                         const optional<ImagePosition>& patternPositionA,
                         const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
-            auto& programInstance = program.get(evaluated);
-
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
             paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);

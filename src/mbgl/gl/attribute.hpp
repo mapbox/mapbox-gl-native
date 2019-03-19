@@ -95,5 +95,36 @@ public:
     }
 };
 
+template <class>
+class AttributeKey;
+
+constexpr auto attributeDefinePrefix() {
+    return "#define HAS_UNIFORM_u_";
+}
+
+template <class... As>
+class AttributeKey<TypeList<As...>> final {
+public:
+    static_assert(sizeof...(As) <= 32, "attribute count exceeds 32");
+
+    static uint32_t compute(const gfx::AttributeBindings<TypeList<As...>>& bindings) {
+        uint32_t value = 0;
+        util::ignore(
+            { (bindings.template get<As>() ? (void)(value |= 1 << TypeIndex<As, As...>::value)
+                                           : (void)0,
+               0)... });
+        return value;
+    }
+
+    static std::string defines(const gfx::AttributeBindings<TypeList<As...>>& bindings) {
+        std::string result;
+        util::ignore({ (!bindings.template get<As>()
+                            ? (void)(result += concat_literals<&attributeDefinePrefix, &As::name, &string_literal<'\n'>::value>::value())
+                            : (void)0,
+                        0)... });
+        return result;
+    }
+};
+
 } // namespace gl
 } // namespace mbgl

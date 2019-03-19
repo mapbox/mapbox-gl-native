@@ -52,7 +52,7 @@ class CircleLayerPrograms final : public LayerTypePrograms  {
 public:
     CircleLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : circle(context, programParameters) {}
-    ProgramMap<CircleProgram> circle;
+    CircleProgram circle;
 };
 
 } // namespace mbgl

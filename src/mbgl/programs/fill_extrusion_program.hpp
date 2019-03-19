@@ -117,8 +117,8 @@ public:
         : fillExtrusion(context, programParameters),
           fillExtrusionPattern(context, programParameters),
           extrusionTexture(context, programParameters) {}
-    ProgramMap<FillExtrusionProgram> fillExtrusion;
-    ProgramMap<FillExtrusionPatternProgram> fillExtrusionPattern;
+    FillExtrusionProgram fillExtrusion;
+    FillExtrusionPatternProgram fillExtrusionPattern;
     ExtrusionTextureProgram extrusionTexture;
 };
 

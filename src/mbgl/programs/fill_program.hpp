@@ -110,10 +110,10 @@ public:
           fillPattern(context, programParameters),
           fillOutline(context, programParameters),
           fillOutlinePattern(context, programParameters) {}
-    ProgramMap<FillProgram> fill;
-    ProgramMap<FillPatternProgram> fillPattern;
-    ProgramMap<FillOutlineProgram> fillOutline;
-    ProgramMap<FillOutlinePatternProgram> fillOutlinePattern;
+    FillProgram fill;
+    FillPatternProgram fillPattern;
+    FillOutlineProgram fillOutline;
+    FillOutlinePatternProgram fillOutlinePattern;
 };
 
 } // namespace mbgl
