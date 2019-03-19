@@ -3,12 +3,13 @@
 #include <mbgl/test/stub_map_observer.hpp>
 #include <mbgl/test/fake_file_source.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
+#include <mbgl/test/map_adapter.hpp>
 
-#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
@@ -31,27 +32,26 @@ template <class FileSource = StubFileSource>
 class MapTest {
 public:
     util::RunLoop runLoop;
-    FileSource fileSource;
+    std::shared_ptr<FileSource> fileSource;
     ThreadPool threadPool { 4 };
     StubMapObserver observer;
     HeadlessFrontend frontend;
-    Map map;
+    MapAdapter map;
 
     MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
-        : frontend(pixelRatio, threadPool)
+        : fileSource(std::make_shared<FileSource>())
+        , frontend(pixelRatio, threadPool)
         , map(frontend, observer, frontend.getSize(), pixelRatio,
-              fileSource, threadPool, MapOptions().withMapMode(mode)) {
-    }
+              fileSource, threadPool, MapOptions().withMapMode(mode)) {}
 
     template <typename T = FileSource>
-    MapTest(const std::string& cachePath, const std::string& assetRoot,
+    MapTest(const std::string& cachePath, const std::string& assetPath,
             float pixelRatio = 1, MapMode mode = MapMode::Static,
             typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
-            : fileSource { cachePath, assetRoot }
+            : fileSource(std::make_shared<T>(cachePath, assetPath))
             , frontend(pixelRatio, threadPool)
             , map(frontend, observer, frontend.getSize(), pixelRatio,
-                  fileSource, threadPool, MapOptions().withMapMode(mode)) {
-    }
+                  fileSource, threadPool, MapOptions().withMapMode(mode)) {}
 };
 
 TEST(Map, RendererState) {
@@ -235,12 +235,12 @@ TEST(Map, Offline) {
     };
 
     const std::string prefix = "http://127.0.0.1:3000/";
-    test.fileSource.put(Resource::style(prefix + "style.json"), expiredItem("style.json"));
-    test.fileSource.put(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
-    test.fileSource.put(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
-    test.fileSource.put(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
-    test.fileSource.put(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), expiredItem("0-0-0.vector.pbf"));
-    test.fileSource.put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
+    test.fileSource->put(Resource::style(prefix + "style.json"), expiredItem("style.json"));
+    test.fileSource->put(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
+    test.fileSource->put(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
+    test.fileSource->put(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
+    test.fileSource->put(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), expiredItem("0-0-0.vector.pbf"));
+    test.fileSource->put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
     test.map.getStyle().loadURL(prefix + "style.json");
@@ -334,7 +334,7 @@ TEST(Map, SetStyleInvalidJSON) {
 TEST(Map, SetStyleInvalidURL) {
     MapTest<> test;
 
-    test.fileSource.styleResponse = [] (const Resource&) {
+    test.fileSource->styleResponse = [] (const Resource&) {
         Response response;
         response.error = std::make_unique<Response::Error>(
             Response::Error::Reason::Other,
@@ -364,14 +364,14 @@ TEST(Map, StyleFresh) {
     MapTest<FakeFileSource> test;
 
     test.map.getStyle().loadURL("mapbox://styles/test");
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = Timestamp::max();
 
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 }
 
 TEST(Map, StyleExpired) {
@@ -382,31 +382,31 @@ TEST(Map, StyleExpired) {
     MapTest<FakeFileSource> test;
 
     test.map.getStyle().loadURL("mapbox://styles/test");
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     // Mutate layer. From now on, sending a response to the style won't overwrite it anymore, but
     // we should continue to wait for a fresh response.
     test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     // Send another expired response, and confirm that we didn't overwrite the style, but continue
     // to wait for a fresh response.
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
 
     // Send a fresh response, and confirm that we didn't overwrite the style, but continue to wait
     // for a fresh response.
     response.expires = util::now() + 1h;
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
 }
 
@@ -418,20 +418,20 @@ TEST(Map, StyleExpiredWithAnnotations) {
     MapTest<FakeFileSource> test;
 
     test.map.getStyle().loadURL("mapbox://styles/test");
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     test.map.addAnnotation(LineAnnotation { LineString<double> {{ { 0, 0 }, { 10, 10 } }} });
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 }
 
 TEST(Map, StyleExpiredWithRender) {
@@ -442,20 +442,20 @@ TEST(Map, StyleExpiredWithRender) {
     MapTest<FakeFileSource> test;
 
     test.map.getStyle().loadURL("mapbox://styles/test");
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
     test.frontend.render(test.map);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 
-    test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    test.fileSource->respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource->requests.size());
 }
 
 TEST(Map, StyleEarlyMutation) {
@@ -468,9 +468,9 @@ TEST(Map, StyleEarlyMutation) {
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
-    test.fileSource.respond(Resource::Style, response);
+    test.fileSource->respond(Resource::Style, response);
 
-    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource->requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("water"));
 }
 
@@ -592,7 +592,7 @@ TEST(Map, DisabledSources) {
     MapTest<> test;
 
     // Always load the same image tile for raster layers.
-    test.fileSource.response = [] (const Resource& res) -> optional<Response> {
+    test.fileSource->response = [] (const Resource& res) -> optional<Response> {
         if (res.url == "asset://tile.png") {
             Response response;
             response.data = std::make_shared<std::string>(
@@ -668,7 +668,7 @@ TEST(Map, DontLoadUnneededTiles) {
     using Tiles = std::unordered_set<std::string>;
     Tiles tiles;
 
-    test.fileSource.tileResponse = [&](const Resource& rsc) {
+    test.fileSource->tileResponse = [&](const Resource& rsc) {
         tiles.emplace(rsc.url);
         Response res;
         res.noContent = true;
@@ -698,7 +698,6 @@ TEST(Map, DontLoadUnneededTiles) {
 TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
     ThreadPool threadPool { 4 };
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     float pixelRatio { 1 };
 
     using namespace std::chrono_literals;
@@ -723,8 +722,9 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
         });
     };
 
-    Map map(frontend, observer, frontend.getSize(), pixelRatio, fileSource,
-            threadPool, MapOptions().withMapMode(MapMode::Continuous));
+    Map map(frontend, observer, frontend.getSize(), pixelRatio, threadPool,
+            MapOptions().withMapMode(MapMode::Continuous),
+            ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 
     runLoop.run();
@@ -739,7 +739,7 @@ TEST(Map, NoContentTiles) {
     Response response;
     response.noContent = true;
     response.expires = util::now() + 1h;
-    test.fileSource.put(Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0,
+    test.fileSource->put(Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0,
                                        Tileset::Scheme::XYZ),
                         response);
 
@@ -776,7 +776,7 @@ TEST(Map, NoContentTiles) {
 TEST(Map, Issue12432) {
     MapTest<> test { 1, MapMode::Continuous };
 
-    test.fileSource.tileResponse = [&](const Resource&) {
+    test.fileSource->tileResponse = [&](const Resource&) {
         Response result;
         result.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/issue12432/0-0-0.mvt"));
         return result;

@@ -15,6 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) std::shared_ptr<mbgl::DefaultFileSource> mbglFileSource;
 
+/**
+ The shared offline cache path.
+ */
+@property (nonatomic) std::string mbglCachePath;
+
 @end
 
 NS_ASSUME_NONNULL_END

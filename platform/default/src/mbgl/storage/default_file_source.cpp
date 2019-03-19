@@ -201,9 +201,9 @@ private:
 };
 
 DefaultFileSource::DefaultFileSource(const std::string& cachePath,
-                                     const std::string& assetRoot,
+                                     const std::string& assetPath,
                                      uint64_t maximumCacheSize)
-    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetRoot), maximumCacheSize) {
+    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetPath), maximumCacheSize) {
 }
 
 DefaultFileSource::DefaultFileSource(const std::string& cachePath,

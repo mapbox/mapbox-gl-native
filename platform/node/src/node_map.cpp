@@ -20,14 +20,24 @@
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/light.hpp>
+#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/premultiply.hpp>
 
 #include <unistd.h>
+
+namespace mbgl {
+
+std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
+    return std::make_shared<node_mbgl::NodeFileSource>(reinterpret_cast<node_mbgl::NodeMap*>(options.platformContext()));
+}
+
+} // namespace mbgl
 
 namespace node_mbgl {
 
@@ -621,13 +631,14 @@ void NodeMap::cancel() {
     });
 
     frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, threadpool);
-    mbgl::MapOptions options;
-    options.withMapMode(mode)
-           .withConstrainMode(mbgl::ConstrainMode::HeightOnly)
-           .withViewportMode(mbgl::ViewportMode::Default)
-           .withCrossSourceCollisions(crossSourceCollisions);
+    auto mapOptions = mbgl::MapOptions()
+        .withMapMode(mode)
+        .withCrossSourceCollisions(crossSourceCollisions);
+
+    auto resourceOptions = mbgl::ResourceOptions().withPlatformContext(reinterpret_cast<void*>(this));
+
     map = std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio,
-                                      fileSource, threadpool, options);
+                                      threadpool, mapOptions, resourceOptions);
 
     // FIXME: Reload the style after recreating the map. We need to find
     // a better way of canceling an ongoing rendering on the core level
@@ -1205,20 +1216,11 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
             : true;
     }())
     , mapObserver(NodeMapObserver())
-    , fileSource(this)
     , frontend(std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size { 256, 256 }, pixelRatio, threadpool))
-    , map(std::make_unique<mbgl::Map>(*frontend,
-                                      mapObserver,
-                                      frontend->getSize(),
-                                      pixelRatio,
-                                      fileSource,
-                                      threadpool,
-                                      mbgl::MapOptions().withMapMode(mode)
-                                                        .withConstrainMode(mbgl::ConstrainMode::HeightOnly)
-                                                        .withViewportMode(mbgl::ViewportMode::Default)
-                                                        .withCrossSourceCollisions(crossSourceCollisions))),
-      async(new uv_async_t) {
-
+    , map(std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio, threadpool,
+                                      mbgl::MapOptions().withMapMode(mode).withCrossSourceCollisions(crossSourceCollisions),
+                                      mbgl::ResourceOptions().withPlatformContext(reinterpret_cast<void*>(this))))
+    , async(new uv_async_t) {
     async->data = this;
     uv_async_init(uv_default_loop(), async, [](uv_async_t* h) {
         reinterpret_cast<NodeMap *>(h->data)->renderFinished();
@@ -1231,8 +1233,6 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
 NodeMap::~NodeMap() {
     if (map) release();
 }
-
-NodeFileSource::NodeFileSource(NodeMap* nodeMap_) : nodeMap(nodeMap_) {}
 
 std::unique_ptr<mbgl::AsyncRequest> NodeFileSource::request(const mbgl::Resource& resource, mbgl::FileSource::Callback callback_) {
     assert(nodeMap);
@@ -1248,15 +1248,15 @@ std::unique_ptr<mbgl::AsyncRequest> NodeFileSource::request(const mbgl::Resource
         Nan::New<v8::External>(&callback_)
     };
 
-    auto instance = Nan::NewInstance(Nan::New(NodeRequest::constructor), 2, argv).ToLocalChecked();
+    auto instance = Nan::NewInstance(Nan::New(node_mbgl::NodeRequest::constructor), 2, argv).ToLocalChecked();
 
     Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
     Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));
 
-    auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(instance);
+    auto request = Nan::ObjectWrap::Unwrap<node_mbgl::NodeRequest>(instance);
     request->Execute();
 
-    return std::make_unique<NodeRequest::NodeAsyncRequest>(request);
+    return std::make_unique<node_mbgl::NodeRequest::NodeAsyncRequest>(request);
 }
 
 } // namespace node_mbgl

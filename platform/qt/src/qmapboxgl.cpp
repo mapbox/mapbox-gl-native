@@ -10,6 +10,7 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/style.hpp>
@@ -33,7 +34,9 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
@@ -90,49 +93,6 @@ static_assert(mbgl::underlying_type(QMapboxGL::NorthLeftwards) == mbgl::underlyi
 namespace {
 
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
-
-std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(const QMapboxGLSettings &settings) {
-    static std::mutex mutex;
-    static std::unordered_map<std::string, std::weak_ptr<mbgl::DefaultFileSource>> fileSources;
-
-    const std::string cachePath = settings.cacheDatabasePath().toStdString();
-    const std::string accessToken = settings.accessToken().toStdString();
-    const std::string apiBaseUrl = settings.apiBaseUrl().toStdString();
-
-    std::lock_guard<std::mutex> lock(mutex);
-
-    // Purge entries no longer in use.
-    for (auto it = fileSources.begin(); it != fileSources.end();) {
-        if (it->second.expired()) {
-            it = fileSources.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    const auto key = cachePath + "|" + accessToken + "|" + apiBaseUrl;
-
-    // Return an existing FileSource if available.
-    auto sharedFileSource = fileSources.find(key);
-    if (sharedFileSource != fileSources.end()) {
-        auto lockedSharedFileSource = sharedFileSource->second.lock();
-        if (lockedSharedFileSource) {
-            return lockedSharedFileSource;
-        }
-    }
-
-    // New path, create a new FileSource.
-    auto newFileSource = std::make_shared<mbgl::DefaultFileSource>(
-        cachePath, settings.assetPath().toStdString(), settings.cacheDatabaseMaximumSize());
-
-    // Setup the FileSource
-    newFileSource->setAccessToken(accessToken);
-    newFileSource->setAPIBaseURL(apiBaseUrl);
-
-    fileSources[key] = newFileSource;
-
-    return newFileSource;
-}
 
 // Conversion helper functions.
 
@@ -1745,22 +1705,29 @@ void QMapboxGL::connectionEstablished()
     \a copyrightsHtml is a string with a HTML snippet.
 */
 
+mbgl::MapOptions mapOptionsFromQMapboxGLSettings(const QMapboxGLSettings &settings) {
+    return mbgl::MapOptions()
+        .withMapMode(static_cast<mbgl::MapMode>(settings.mapMode()))
+        .withConstrainMode(static_cast<mbgl::ConstrainMode>(settings.constrainMode()))
+        .withViewportMode(static_cast<mbgl::ViewportMode>(settings.viewportMode()));
+}
+
+mbgl::ResourceOptions resourceOptionsFromQMapboxGLSettings(const QMapboxGLSettings &settings) {
+    return mbgl::ResourceOptions()
+        .withAccessToken(settings.accessToken().toStdString())
+        .withAssetPath(settings.assetPath().toStdString())
+        .withBaseURL(settings.apiBaseUrl().toStdString())
+        .withCachePath(settings.cacheDatabasePath().toStdString())
+        .withMaximumCacheSize(settings.cacheDatabaseMaximumSize());
+}
+
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio_)
     : QObject(q)
-    , m_fileSourceObj(sharedDefaultFileSource(settings))
     , m_threadPool(mbgl::sharedThreadPool())
     , m_mode(settings.contextMode())
     , m_pixelRatio(pixelRatio_)
     , m_localFontFamily(settings.localFontFamily())
 {
-    if (settings.resourceTransform()) {
-        m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
-            [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
-                return callback(std::move(url_));
-            });
-       m_fileSourceObj->setResourceTransform(m_resourceTransform->self());
-    }
-
     // Setup MapObserver
     m_mapObserver = std::make_unique<QMapboxGLMapObserver>(this);
 
@@ -1770,18 +1737,20 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     connect(m_mapObserver.get(), SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)), q, SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)));
     connect(m_mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q, SIGNAL(copyrightsChanged(QString)));
 
-    mbgl::MapOptions options;
-    options.withMapMode(static_cast<mbgl::MapMode>(settings.mapMode()))
-           .withConstrainMode(static_cast<mbgl::ConstrainMode>(settings.constrainMode()))
-           .withViewportMode(static_cast<mbgl::ViewportMode>(settings.viewportMode()));
+    auto resourceOptions = resourceOptionsFromQMapboxGLSettings(settings);
 
-    // Setup the Map object
-    mapObj = std::make_unique<mbgl::Map>(
-            *this, // RendererFrontend
-            *m_mapObserver,
-            sanitizedSize(size),
-            m_pixelRatio, *m_fileSourceObj, *m_threadPool,
-            options);
+    // Setup the Map object.
+    mapObj = std::make_unique<mbgl::Map>(*this, *m_mapObserver, sanitizedSize(size), m_pixelRatio, *m_threadPool,
+                                         mapOptionsFromQMapboxGLSettings(settings), resourceOptions);
+
+     if (settings.resourceTransform()) {
+         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
+             [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
+                 return callback(std::move(url_));
+             });
+         auto fs = mbgl::FileSource::getSharedFileSource(resourceOptions);
+         std::static_pointer_cast<mbgl::DefaultFileSource>(fs)->setResourceTransform(m_resourceTransform->self());
+     }
 
     // Needs to be Queued to give time to discard redundant draw calls via the `renderQueued` flag.
     connect(this, SIGNAL(needsRendering()), q, SIGNAL(needsRendering()), Qt::QueuedConnection);

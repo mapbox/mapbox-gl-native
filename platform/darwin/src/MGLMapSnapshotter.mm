@@ -3,8 +3,10 @@
 #import <mbgl/actor/actor.hpp>
 #import <mbgl/actor/scheduler.hpp>
 #import <mbgl/util/geo.hpp>
+#import <mbgl/map/map_options.hpp>
 #import <mbgl/map/map_snapshotter.hpp>
 #import <mbgl/map/camera.hpp>
+#import <mbgl/storage/resource_options.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/util/string.hpp>
@@ -587,7 +589,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     
     _cancelled = NO;
     _options = options;
+
     auto mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+
     _mbglThreadPool = mbgl::sharedThreadPool();
     
     std::string styleURL = std::string([options.styleURL.absoluteString UTF8String]);
@@ -619,9 +623,14 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     
     // App-global configuration
     MGLRendererConfiguration* config = [MGLRendererConfiguration currentConfiguration];
-    
+
+    auto resourceOptions = mbgl::ResourceOptions()
+        .withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+        .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+
     // Create the snapshotter
-    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource.get(), _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds, config.cacheDir, config.localFontFamilyName);
+    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(
+        _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds, config.cacheDir, config.localFontFamilyName, resourceOptions);
 }
 
 @end

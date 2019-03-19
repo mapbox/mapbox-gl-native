@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/map/map.hpp>
+#include <mbgl/test/map_adapter.hpp>
+
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -38,12 +39,12 @@ public:
     }
 
     util::RunLoop loop;
-    StubFileSource fileSource;
+    std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
     ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
     HeadlessFrontend frontend;
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapOptions().withMapMode(MapMode::Static)};
+    MapAdapter map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
+                  threadPool, MapOptions().withMapMode(MapMode::Static)};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
@@ -59,7 +60,7 @@ public:
 TEST(LocalGlyphRasterizer, PingFang) {
     LocalGlyphRasterizerTest test(std::string("PingFang"));
 
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
@@ -80,7 +81,7 @@ TEST(LocalGlyphRasterizer, NoLocal) {
     // the output should just contain basic latin characters.
     LocalGlyphRasterizerTest test({});
 
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));

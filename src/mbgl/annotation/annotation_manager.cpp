@@ -10,7 +10,6 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/style/expression/dsl.hpp>
-#include <mbgl/storage/file_source.hpp>
 
 #include <boost/function_output_iterator.hpp>
 

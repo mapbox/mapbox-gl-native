@@ -14,8 +14,8 @@ namespace android {
 // OfflineRegion //
 
 OfflineRegion::OfflineRegion(jni::JNIEnv& env, jni::jlong offlineRegionPtr, const jni::Object<FileSource>& jFileSource)
-    : region(reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr)),
-      fileSource(mbgl::android::FileSource::getDefaultFileSource(env, jFileSource)) {}
+    : region(reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr))
+    , fileSource(std::static_pointer_cast<DefaultFileSource>(mbgl::FileSource::getSharedFileSource(FileSource::getSharedResourceOptions(env, jFileSource)))) {}
 
 OfflineRegion::~OfflineRegion() {}
 
@@ -62,7 +62,7 @@ void OfflineRegion::setOfflineRegionObserver(jni::JNIEnv& env_, const jni::Objec
     };
 
     // Set the observer
-    fileSource.setOfflineRegionObserver(*region, std::make_unique<Observer>(jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback)));
+    fileSource->setOfflineRegionObserver(*region, std::make_unique<Observer>(jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback)));
 }
 
 void OfflineRegion::setOfflineRegionDownloadState(jni::JNIEnv&, jni::jint jState) {
@@ -80,13 +80,13 @@ void OfflineRegion::setOfflineRegionDownloadState(jni::JNIEnv&, jni::jint jState
           return;
     }
 
-    fileSource.setOfflineRegionDownloadState(*region, state);
+    fileSource->setOfflineRegionDownloadState(*region, state);
 }
 
 void OfflineRegion::getOfflineRegionStatus(jni::JNIEnv& env_, const jni::Object<OfflineRegionStatusCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource.getOfflineRegionStatus(*region, [
+    fileSource->getOfflineRegionStatus(*region, [
         //Ensure the object is not gc'd in the meanwhile
         callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
     ](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) mutable {
@@ -104,7 +104,7 @@ void OfflineRegion::getOfflineRegionStatus(jni::JNIEnv& env_, const jni::Object<
 void OfflineRegion::deleteOfflineRegion(jni::JNIEnv& env_, const jni::Object<OfflineRegionDeleteCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource.deleteOfflineRegion(std::move(*region), [
+    fileSource->deleteOfflineRegion(std::move(*region), [
         //Ensure the object is not gc'd in the meanwhile
         callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
     ](std::exception_ptr error) mutable {
@@ -123,7 +123,7 @@ void OfflineRegion::updateOfflineRegionMetadata(jni::JNIEnv& env_, const jni::Ar
     auto metadata = OfflineRegion::metadata(env_, jMetadata);
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource.updateOfflineMetadata(region->getID(), metadata, [
+    fileSource->updateOfflineMetadata(region->getID(), metadata, [
         //Ensure the object is not gc'd in the meanwhile
         callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
     ](mbgl::expected<mbgl::OfflineRegionMetadata, std::exception_ptr> data) mutable {

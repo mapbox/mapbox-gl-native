@@ -3,6 +3,7 @@
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/logging.hpp>
 
@@ -11,6 +12,14 @@
 #include "asset_manager_file_source.hpp"
 
 namespace mbgl {
+
+std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
+    auto* assetFileSource = reinterpret_cast<AssetManagerFileSource*>(options.platformContext());
+    auto fileSource = std::make_shared<DefaultFileSource>(options.cachePath(), std::unique_ptr<AssetManagerFileSource>(assetFileSource));
+    fileSource->setAccessToken(options.accessToken());
+    return fileSource;
+}
+
 namespace android {
 
 // FileSource //
@@ -22,15 +31,13 @@ FileSource::FileSource(jni::JNIEnv& _env,
     std::string path = jni::Make<std::string>(_env, _cachePath);
     mapbox::sqlite::setTempPath(path);
 
-    // Create a core default file source
-    fileSource = std::make_unique<mbgl::DefaultFileSource>(
-        path + DATABASE_FILE,
-        std::make_unique<AssetManagerFileSource>(_env, assetManager));
+    resourceOptions = mbgl::ResourceOptions()
+        .withAccessToken(accessToken ? jni::Make<std::string>(_env, accessToken) : "")
+        .withCachePath(path + DATABASE_FILE)
+        .withPlatformContext(reinterpret_cast<void*>(new AssetManagerFileSource(_env, assetManager)));
 
-    // Set access token
-    if (accessToken) {
-        fileSource->setAccessToken(jni::Make<std::string>(_env, accessToken));
-    }
+    // Create a core default file source
+    fileSource = std::static_pointer_cast<mbgl::DefaultFileSource>(mbgl::FileSource::getSharedFileSource(resourceOptions));
 }
 
 FileSource::~FileSource() {
@@ -110,10 +117,10 @@ FileSource* FileSource::getNativePeer(jni::JNIEnv& env, const jni::Object<FileSo
     return reinterpret_cast<FileSource *>(jFileSource.Get(env, field));
 }
 
-mbgl::DefaultFileSource& FileSource::getDefaultFileSource(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource) {
+mbgl::ResourceOptions FileSource::getSharedResourceOptions(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource) {
     FileSource* fileSource = FileSource::getNativePeer(env, jFileSource);
     assert(fileSource != nullptr);
-    return *fileSource->fileSource;
+    return fileSource->resourceOptions;
 }
 
 void FileSource::registerNative(jni::JNIEnv& env) {
