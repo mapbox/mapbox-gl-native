@@ -1,3 +1,4 @@
+#import "MGLFoundation_Private.h"
 #import "NSExpression+MGLPrivateAdditions.h"
 
 #import "MGLTypes.h"
@@ -882,16 +883,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 
                 if (attrs.count) {
-                    if (attrs[MGLFontNamesAttribute]) {
-                        NSArray *fontNames = (NSArray *)attrs[MGLFontNamesAttribute];
+                    if (NSArray *fontNames = MGL_OBJC_DYNAMIC_CAST(attrs[MGLFontNamesAttribute], NSArray)) {
                         attrs[MGLFontNamesAttribute] = fontNames[1];
                     }
-                    if (attrs[MGLFontColorAttribute] && [attrs[MGLFontColorAttribute] isKindOfClass:[NSArray class]]) {
-                        NSArray *colorArray = attrs[MGLFontColorAttribute];
+                    if (NSArray *colorArray = MGL_OBJC_DYNAMIC_CAST(attrs[MGLFontColorAttribute], NSArray)) {
                         if ([colorArray[0] isEqualToString:@"rgb"] || [colorArray[0] isEqualToString:@"rgba"]) {
                             NSArray *colorArguments = [colorArray subarrayWithRange:NSMakeRange(1, colorArray.count - 1)];
                             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(colorArguments);
-                            UIColor *color = [NSExpression mgl_colorWithRGBComponents:subexpressions];
+                            MGLColor *color = [NSExpression mgl_colorWithRGBComponents:subexpressions];
 
                             attrs[MGLFontColorAttribute] = color;
                         }
@@ -1030,8 +1029,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     }
                     if (attributedDictionary[MGLFontColorAttribute] && [attributedDictionary[MGLFontColorAttribute] isKindOfClass:[MGLColor class]]) {
                         MGLColor *color = attributedDictionary[MGLFontColorAttribute];
-                        NSExpression *colorExpression = [NSExpression expressionForConstantValue:color];
-                        attributedDictionary[MGLFontColorAttribute] = colorExpression.mgl_jsonExpressionObject;
+                        attributedDictionary[MGLFontColorAttribute] = color.mgl_jsonExpressionObject;
                     }
                     [attributes addObject:attributedDictionary];
                 } else {
