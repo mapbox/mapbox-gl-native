@@ -571,7 +571,16 @@ jobs:
               gcloud firebase test android run --type instrumentation \
                 --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
                 --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-                --device-ids  << parameters.firebase_device_id >> --os-version-ids << parameters.firebase_device_os >> --locales en --orientations portrait --timeout 20m
+                --device-ids  << parameters.firebase_device_id >> --os-version-ids << parameters.firebase_device_os >> --locales en --orientations portrait --timeout 20m \
+                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" --directories-to-pull /sdcard --results-dir mapbox-android-sdk-${CIRCLE_BUILD_NUM}
+              coverageFile=`gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/mapbox-android-sdk-${CIRCLE_BUILD_NUM}/**/*.ec | tail -1`
+              gsutil cp $coverageFile $PWD/platform/android/MapboxGLAndroidSDK/build/jacoco | true
+            fi
+      - run:
+          name: Parse and send Jacoco reports
+          command: |
+            if [[ $CIRCLE_BRANCH == master ]]; then
+              make android-create-jacoco-report && make android-parse-and-send-jacoco-report
             fi
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
