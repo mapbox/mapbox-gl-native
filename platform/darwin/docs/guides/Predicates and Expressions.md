@@ -546,6 +546,14 @@ operator in the Mapbox Style Specification.
 Concatenates and returns the array of `MGLAttributedExpression` objects, for use 
 with the `MGLSymbolStyleLayer.text` property.
 
+`MGLAttributedExpression.attributes` valid attributes.
+
+ Key | Value Type
+ --- | ---
+ `MGLFontNamesAttribute` | `NSArray<NSString *>*`
+ `MGLFontSizeAttribute` | `NSNumber`
+ `MGLFontColorAttribute` | `UIColor` or `NSColor` on macos
+
 This function corresponds to the
 [`format`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-format)
 operator in the Mapbox Style Specification.
