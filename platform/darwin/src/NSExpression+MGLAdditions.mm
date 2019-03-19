@@ -1,3 +1,4 @@
+#import "MGLFoundation_Private.h"
 #import "NSExpression+MGLPrivateAdditions.h"
 
 #import "MGLTypes.h"
@@ -878,9 +879,23 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 NSExpression *expression = [NSExpression expressionWithMGLJSONObject:argumentObjects[index]];
                 NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
                 if ((index + 1) < argumentObjects.count) {
-                    attrs = argumentObjects[index + 1];
+                    attrs = [NSMutableDictionary dictionaryWithDictionary:argumentObjects[index + 1]];
                 }
                 
+                if (attrs.count) {
+                    if (NSArray *fontNames = MGL_OBJC_DYNAMIC_CAST(attrs[MGLFontNamesAttribute], NSArray)) {
+                        attrs[MGLFontNamesAttribute] = fontNames[1];
+                    }
+                    if (NSArray *colorArray = MGL_OBJC_DYNAMIC_CAST(attrs[MGLFontColorAttribute], NSArray)) {
+                        if ([colorArray[0] isEqualToString:@"rgb"] || [colorArray[0] isEqualToString:@"rgba"]) {
+                            NSArray *colorArguments = [colorArray subarrayWithRange:NSMakeRange(1, colorArray.count - 1)];
+                            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(colorArguments);
+                            MGLColor *color = [NSExpression mgl_colorWithRGBComponents:subexpressions];
+
+                            attrs[MGLFontColorAttribute] = color;
+                        }
+                    }
+                }
                 MGLAttributedExpression *attributedExpression = [[MGLAttributedExpression alloc] initWithExpression:expression attributes:attrs];
 
                 [attributedExpressions addObject:[NSExpression expressionForConstantValue:attributedExpression]];
@@ -1008,7 +1023,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     [attributes addObject:jsonObject];
                 }
                 if (attributedExpression.attributes) {
-                    [attributes addObject:attributedExpression.attributes];
+                    NSMutableDictionary *attributedDictionary = [NSMutableDictionary dictionaryWithDictionary:attributedExpression.attributes];
+                    if (attributedDictionary[MGLFontNamesAttribute]) {
+                        attributedDictionary[MGLFontNamesAttribute] = @[@"literal", attributedDictionary[MGLFontNamesAttribute]];
+                    }
+                    if (attributedDictionary[MGLFontColorAttribute] && [attributedDictionary[MGLFontColorAttribute] isKindOfClass:[MGLColor class]]) {
+                        MGLColor *color = attributedDictionary[MGLFontColorAttribute];
+                        attributedDictionary[MGLFontColorAttribute] = color.mgl_jsonExpressionObject;
+                    }
+                    [attributes addObject:attributedDictionary];
                 } else {
                     [attributes addObject:@{}];
                 }

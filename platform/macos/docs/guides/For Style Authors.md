@@ -411,5 +411,16 @@ In style JSON             | In the format string
 `["any", f0, …, fn]`      | `p0 OR … OR pn`
 `["none", f0, …, fn]`     | `NOT (p0 OR … OR pn)`
 
+## Specifying the text format
+
+The following format attributes are defined as `NSString` constans that you
+can use to update the formatting of `MGLSymbolStyleLayer.text` property.
+
+In style JSON | In Objective-C        | In Swift
+--------------|-----------------------|---------
+`text-font`      | `MGLFontNamesAttribute` | `.fontNamesAttribute`
+`font-scale`      | `MGLFontSizeAttribute` | `.fontSizeAttribute`
+`text-color`  | `MGLFontColorAttribute` | `.fontColorAttribute`
+
 See the “[Predicates and Expressions](predicates-and-expressions.html)” guide for
 a full description of the supported operators and operand types.
