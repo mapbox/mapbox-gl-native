@@ -56,7 +56,7 @@ default: test
 BUILD_DEPS += Makefile
 BUILD_DEPS += CMakeLists.txt
 
-BUILD__DOCS := true
+BUILD_DOCS ?= true
 
 #### macOS targets ##############################################################
 
