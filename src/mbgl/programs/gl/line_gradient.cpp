@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/line_gradient_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<LineGradientProgram> {
+    static constexpr const char* name = "line_gradient";
+    static constexpr const uint8_t hash[8] = { 0xee, 0xdd, 0x10, 0x3d, 0x1a, 0x21, 0x26, 0x25 };
+    static constexpr const auto vertexOffset = 34335;
+    static constexpr const auto fragmentOffset = 37054;
+};
+
+constexpr const char* ShaderSource<LineGradientProgram>::name;
+constexpr const uint8_t ShaderSource<LineGradientProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<LineGradientProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<LineGradientProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "line_gradient",
-        programs::gl::shaderSource() + 34335, programs::gl::shaderSource() + 37054);
+    return std::make_unique<gl::Program<LineGradientProgram>>(programParameters);
 }
 
 } // namespace gfx

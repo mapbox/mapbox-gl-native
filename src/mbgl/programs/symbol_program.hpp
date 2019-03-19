@@ -468,9 +468,9 @@ public:
           symbolGlyph(context, programParameters),
           collisionBox(context, programParameters),
           collisionCircle(context, programParameters) {}
-    ProgramMap<SymbolIconProgram> symbolIcon;
-    ProgramMap<SymbolSDFIconProgram> symbolIconSDF;
-    ProgramMap<SymbolSDFTextProgram> symbolGlyph;
+    SymbolIconProgram symbolIcon;
+    SymbolSDFIconProgram symbolIconSDF;
+    SymbolSDFTextProgram symbolGlyph;
     CollisionBoxProgram collisionBox;
     CollisionCircleProgram collisionCircle;
 };

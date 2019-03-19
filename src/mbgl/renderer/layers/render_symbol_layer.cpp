@@ -88,17 +88,14 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto& evaluated_ = bucketPaintProperties.evaluated;
         const auto& layout = bucket.layout;
 
-        auto draw = [&] (auto& program,
+        auto draw = [&] (auto& programInstance,
                          auto&& uniformValues,
                          const auto& buffers,
                          const auto& symbolSizeBinder,
                          const SymbolPropertyValues& values_,
                          const auto& binders,
                          const auto& paintProperties,
-                         auto&& textureBindings)
-        {
-            auto& programInstance = program.get(paintProperties);
-
+                         auto&& textureBindings) {
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
                 *symbolSizeBinder,

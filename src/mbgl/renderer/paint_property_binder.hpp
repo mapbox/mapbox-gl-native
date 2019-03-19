@@ -545,33 +545,6 @@ public:
         return result;
     }
 
-    template <class>
-    struct UniformDefines;
-
-    template <class... Us>
-    struct UniformDefines<TypeList<Us...>> {
-        static constexpr auto define() {
-            return "#define HAS_UNIFORM_u_";
-        }
-
-        static void appendDefines(std::vector<std::string>& defines) {
-            util::ignore({
-                (defines.push_back(concat_literals<&define, &Us::name, &string_literal<'\n'>::value>::value()), 0)...
-            });
-        }
-    };
-
-    template <class EvaluatedProperties>
-    static std::vector<std::string> defines(const EvaluatedProperties& currentProperties) {
-        std::vector<std::string> result;
-        util::ignore({
-            (currentProperties.template get<Ps>().isConstant()
-                ? UniformDefines<typename Ps::UniformList>::appendDefines(result)
-                : (void) 0, 0)...
-        });
-        return result;
-    }
-
 private:
     Binders binders;
 };

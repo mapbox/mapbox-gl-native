@@ -189,10 +189,10 @@ public:
           lineGradient(context, programParameters),
           lineSDF(context, programParameters),
           linePattern(context, programParameters) {}
-    ProgramMap<LineProgram> line;
-    ProgramMap<LineGradientProgram> lineGradient;
-    ProgramMap<LineSDFProgram> lineSDF;
-    ProgramMap<LinePatternProgram> linePattern;
+    LineProgram line;
+    LineGradientProgram lineGradient;
+    LineSDFProgram lineSDF;
+    LinePatternProgram linePattern;
 };
 
 } // namespace mbgl

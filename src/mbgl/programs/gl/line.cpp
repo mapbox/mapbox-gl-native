@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/line_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<LineProgram> {
+    static constexpr const char* name = "line";
+    static constexpr const uint8_t hash[8] = { 0x44, 0x46, 0x9e, 0x59, 0x02, 0xbb, 0xaa, 0xae };
+    static constexpr const auto vertexOffset = 30585;
+    static constexpr const auto fragmentOffset = 33509;
+};
+
+constexpr const char* ShaderSource<LineProgram>::name;
+constexpr const uint8_t ShaderSource<LineProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<LineProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<LineProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "line",
-        programs::gl::shaderSource() + 30585, programs::gl::shaderSource() + 33509);
+    return std::make_unique<gl::Program<LineProgram>>(programParameters);
 }
 
 } // namespace gfx

@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/fill_pattern_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<FillPatternProgram> {
+    static constexpr const char* name = "fill_pattern";
+    static constexpr const uint8_t hash[8] = { 0x74, 0xa9, 0x97, 0x01, 0x96, 0xbd, 0x87, 0x36 };
+    static constexpr const auto vertexOffset = 18259;
+    static constexpr const auto fragmentOffset = 20038;
+};
+
+constexpr const char* ShaderSource<FillPatternProgram>::name;
+constexpr const uint8_t ShaderSource<FillPatternProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<FillPatternProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<FillPatternProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "fill_pattern",
-        programs::gl::shaderSource() + 18259, programs::gl::shaderSource() + 20038);
+    return std::make_unique<gl::Program<FillPatternProgram>>(programParameters);
 }
 
 } // namespace gfx

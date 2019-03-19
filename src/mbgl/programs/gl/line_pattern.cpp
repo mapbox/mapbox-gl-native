@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/line_pattern_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<LinePatternProgram> {
+    static constexpr const char* name = "line_pattern";
+    static constexpr const uint8_t hash[8] = { 0x73, 0xa0, 0x59, 0x46, 0x57, 0xa5, 0x60, 0x25 };
+    static constexpr const auto vertexOffset = 37841;
+    static constexpr const auto fragmentOffset = 41162;
+};
+
+constexpr const char* ShaderSource<LinePatternProgram>::name;
+constexpr const uint8_t ShaderSource<LinePatternProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<LinePatternProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<LinePatternProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "line_pattern",
-        programs::gl::shaderSource() + 37841, programs::gl::shaderSource() + 41162);
+    return std::make_unique<gl::Program<LinePatternProgram>>(programParameters);
 }
 
 } // namespace gfx

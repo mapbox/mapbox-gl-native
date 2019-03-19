@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/line_sdf_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<LineSDFProgram> {
+    static constexpr const char* name = "line_sdf";
+    static constexpr const uint8_t hash[8] = { 0x66, 0x20, 0x75, 0x4e, 0xbe, 0x02, 0x9e, 0x67 };
+    static constexpr const auto vertexOffset = 43475;
+    static constexpr const auto fragmentOffset = 47089;
+};
+
+constexpr const char* ShaderSource<LineSDFProgram>::name;
+constexpr const uint8_t ShaderSource<LineSDFProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<LineSDFProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<LineSDFProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "line_sdf",
-        programs::gl::shaderSource() + 43475, programs::gl::shaderSource() + 47089);
+    return std::make_unique<gl::Program<LineSDFProgram>>(programParameters);
 }
 
 } // namespace gfx
