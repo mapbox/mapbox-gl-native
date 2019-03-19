@@ -116,6 +116,11 @@ public:
     // Only call this while the OpenGL context is exclusive to this thread.
     void reset();
 
+    // Flush pending graphics commands. Will block until the pipeline
+    // is empty. Should be used only with a very good reason because
+    // it will have a performance impact.
+    void flush();
+
     bool empty() const {
         return pooledTextures.empty()
             && abandonedPrograms.empty()

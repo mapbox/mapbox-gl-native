@@ -605,6 +605,12 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     parameters.context.performCleanup();
 }
 
+void  Renderer::Impl::flush() {
+    assert(BackendScope::exists());
+
+    backend.getContext().flush();
+}
+
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
     std::vector<const RenderLayer*> layers;
     if (options.layerIDs) {
