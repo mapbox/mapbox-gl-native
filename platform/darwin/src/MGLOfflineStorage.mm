@@ -10,7 +10,6 @@
 #import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
-#import "NSData+MGLAdditions.h"
 #import "MGLLoggingConfiguration_Private.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
