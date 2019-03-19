@@ -15,12 +15,11 @@ FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontColorAttrib
  ### Example
  ```swift
  let expression = NSExpression(forConstantValue: "Foo")
- let attributes = [.fontNamesAttribute : ["DIN Offc Pro Italic",
-                                          "Arial Unicode MS Regular"],
-                   .fontSizeAttribute: 1.2,
-                   .fontColorAttribute: UIColor.red]
+ let attributes: Dictionary<MGLAttributedExpressionKey, Any> = [.fontNamesAttribute : ["DIN Offc Pro Italic",
+                                                                                       "Arial Unicode MS Regular"],
+                                                                .fontSizeAttribute: 1.2,
+                                                                .fontColorAttribute: UIColor.red]
  let attributedExpression = MGLAttributedExpression(expression, attributes:attributes)
-
  ```
  
  */
@@ -35,19 +34,26 @@ MGL_EXPORT
 #if TARGET_OS_IPHONE
 /**
  The formatting attributes dictionary.
- `MGLFontNamesAttribute` : `NSArray<NSString *>*`
- `MGLFontSizeAttribute` : `NSNumber`
- `MGLFontColorAttribute` : `UIColor`
+ Key | Value Type
+ --- | ---
+ `MGLFontNamesAttribute` | `NSArray<NSString *>*`
+ `MGLFontSizeAttribute` | `NSNumber`
+ `MGLFontColorAttribute` | `UIColor`
+
  */
+@property (strong, nonatomic, readonly) NSDictionary<MGLAttributedExpressionKey, id> *attributes;
 #else
 /**
  The formatting attributes dictionary.
- `MGLFontNamesAttribute` : `NSArray<NSString *>*`
- `MGLFontSizeAttribute` : `NSNumber`
- `MGLFontColorAttribute` : `NSColor`
+ Key | Value Type
+ --- | ---
+ `MGLFontNamesAttribute` | `NSArray<NSString *>*`
+ `MGLFontSizeAttribute` | `NSNumber`
+ `MGLFontColorAttribute` | `NSColor`
  */
-#endif
 @property (strong, nonatomic, readonly) NSDictionary<MGLAttributedExpressionKey, id> *attributes;
+#endif
+
 
 /**
  Returns an `MGLAttributedExpression` object initialized with an expression and no attribute information.

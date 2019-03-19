@@ -542,6 +542,19 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         }            
     }
     
+    func testMGLAttributedExpression() {
+        //#-example-code
+        let expression = NSExpression(forConstantValue: "Foo")
+        let attributes: Dictionary<MGLAttributedExpressionKey, Any> = [.fontNamesAttribute : ["DIN Offc Pro Italic",
+                                                                                              "Arial Unicode MS Regular"],
+                                                                       .fontSizeAttribute: 1.2,
+                                                                       .fontColorAttribute: UIColor.red]
+        let attributedExpression = MGLAttributedExpression(expression, attributes:attributes)
+        //#-end-example-code
+        
+        XCTAssertNotNil(attributedExpression)
+    }
+    
     // For testMGLMapView().
     func myCustomFunction() {}
 }
