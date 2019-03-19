@@ -111,7 +111,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const Point<double> endPoint = Projection::project(latLng, state.scale);
 
     ScreenCoordinate center = getScreenCoordinate(padding);
-    center.y = state.size.height - center.y;
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
@@ -177,7 +176,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     const Point<double> endPoint = Projection::project(latLng, state.scale);
 
     ScreenCoordinate center = getScreenCoordinate(padding);
-    center.y = state.size.height - center.y;
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
