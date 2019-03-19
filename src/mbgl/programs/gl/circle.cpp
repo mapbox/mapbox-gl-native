@@ -30,7 +30,7 @@ attribute vec2 a_pos;
 
 
 #ifndef HAS_UNIFORM_u_color
-uniform lowp float a_color_t;
+uniform lowp float u_color_t;
 attribute highp vec4 a_color;
 varying highp vec4 color;
 #else
@@ -39,7 +39,7 @@ uniform highp vec4 u_color;
 
 
 #ifndef HAS_UNIFORM_u_radius
-uniform lowp float a_radius_t;
+uniform lowp float u_radius_t;
 attribute mediump vec2 a_radius;
 varying mediump float radius;
 #else
@@ -48,7 +48,7 @@ uniform mediump float u_radius;
 
 
 #ifndef HAS_UNIFORM_u_blur
-uniform lowp float a_blur_t;
+uniform lowp float u_blur_t;
 attribute lowp vec2 a_blur;
 varying lowp float blur;
 #else
@@ -57,7 +57,7 @@ uniform lowp float u_blur;
 
 
 #ifndef HAS_UNIFORM_u_opacity
-uniform lowp float a_opacity_t;
+uniform lowp float u_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 #else
@@ -66,7 +66,7 @@ uniform lowp float u_opacity;
 
 
 #ifndef HAS_UNIFORM_u_stroke_color
-uniform lowp float a_stroke_color_t;
+uniform lowp float u_stroke_color_t;
 attribute highp vec4 a_stroke_color;
 varying highp vec4 stroke_color;
 #else
@@ -75,7 +75,7 @@ uniform highp vec4 u_stroke_color;
 
 
 #ifndef HAS_UNIFORM_u_stroke_width
-uniform lowp float a_stroke_width_t;
+uniform lowp float u_stroke_width_t;
 attribute mediump vec2 a_stroke_width;
 varying mediump float stroke_width;
 #else
@@ -84,7 +84,7 @@ uniform mediump float u_stroke_width;
 
 
 #ifndef HAS_UNIFORM_u_stroke_opacity
-uniform lowp float a_stroke_opacity_t;
+uniform lowp float u_stroke_opacity_t;
 attribute lowp vec2 a_stroke_opacity;
 varying lowp float stroke_opacity;
 #else
@@ -97,49 +97,49 @@ varying vec3 v_data;
 void main(void) {
     
 #ifndef HAS_UNIFORM_u_color
-    color = unpack_mix_color(a_color, a_color_t);
+    color = unpack_mix_color(a_color, u_color_t);
 #else
     highp vec4 color = u_color;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_radius
-    radius = unpack_mix_vec2(a_radius, a_radius_t);
+    radius = unpack_mix_vec2(a_radius, u_radius_t);
 #else
     mediump float radius = u_radius;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_blur
-    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    blur = unpack_mix_vec2(a_blur, u_blur_t);
 #else
     lowp float blur = u_blur;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_opacity
-    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, u_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_stroke_color
-    stroke_color = unpack_mix_color(a_stroke_color, a_stroke_color_t);
+    stroke_color = unpack_mix_color(a_stroke_color, u_stroke_color_t);
 #else
     highp vec4 stroke_color = u_stroke_color;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_stroke_width
-    stroke_width = unpack_mix_vec2(a_stroke_width, a_stroke_width_t);
+    stroke_width = unpack_mix_vec2(a_stroke_width, u_stroke_width_t);
 #else
     mediump float stroke_width = u_stroke_width;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_stroke_opacity
-    stroke_opacity = unpack_mix_vec2(a_stroke_opacity, a_stroke_opacity_t);
+    stroke_opacity = unpack_mix_vec2(a_stroke_opacity, u_stroke_opacity_t);
 #else
     lowp float stroke_opacity = u_stroke_opacity;
 #endif

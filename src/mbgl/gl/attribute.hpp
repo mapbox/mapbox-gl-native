@@ -3,6 +3,7 @@
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/literal.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -50,13 +51,15 @@ public:
                   }
               };
 
-              return Locations{ maybeBindLocation(As::attributeName())... };
+              return Locations{ maybeBindLocation(
+                  concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... };
           }()) {
     }
 
     template <class BinaryProgram>
     AttributeLocations(const BinaryProgram& program)
-        : locations{ program.attributeLocation(As::attributeName())... } {
+        : locations{ program.attributeLocation(
+              concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... } {
     }
 
     NamedAttributeLocations getNamedLocations() const {
@@ -68,7 +71,9 @@ public:
             }
         };
 
-        util::ignore({ (maybeAddLocation(As::attributeName(), locations.template get<As>()), 0)... });
+        util::ignore({ (maybeAddLocation(concat_literals<&string_literal<'a', '_'>::value, &As::name>::value(),
+                                         locations.template get<As>()),
+                        0)... });
 
         return result;
     }

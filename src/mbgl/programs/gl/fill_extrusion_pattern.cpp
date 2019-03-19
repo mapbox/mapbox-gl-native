@@ -40,7 +40,7 @@ varying vec4 v_lighting;
 
 
 #ifndef HAS_UNIFORM_u_base
-uniform lowp float a_base_t;
+uniform lowp float u_base_t;
 attribute lowp vec2 a_base;
 varying lowp float base;
 #else
@@ -49,7 +49,7 @@ uniform lowp float u_base;
 
 
 #ifndef HAS_UNIFORM_u_height
-uniform lowp float a_height_t;
+uniform lowp float u_height_t;
 attribute lowp vec2 a_height;
 varying lowp float height;
 #else
@@ -58,7 +58,7 @@ uniform lowp float u_height;
 
 
 #ifndef HAS_UNIFORM_u_pattern_from
-uniform lowp float a_pattern_from_t;
+uniform lowp float u_pattern_from_t;
 attribute lowp vec4 a_pattern_from;
 varying lowp vec4 pattern_from;
 #else
@@ -67,7 +67,7 @@ uniform lowp vec4 u_pattern_from;
 
 
 #ifndef HAS_UNIFORM_u_pattern_to
-uniform lowp float a_pattern_to_t;
+uniform lowp float u_pattern_to_t;
 attribute lowp vec4 a_pattern_to;
 varying lowp vec4 pattern_to;
 #else
@@ -78,14 +78,14 @@ uniform lowp vec4 u_pattern_to;
 void main() {
     
 #ifndef HAS_UNIFORM_u_base
-    base = unpack_mix_vec2(a_base, a_base_t);
+    base = unpack_mix_vec2(a_base, u_base_t);
 #else
     lowp float base = u_base;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_height
-    height = unpack_mix_vec2(a_height, a_height_t);
+    height = unpack_mix_vec2(a_height, u_height_t);
 #else
     lowp float height = u_height;
 #endif
