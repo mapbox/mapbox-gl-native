@@ -11,7 +11,7 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/storage/reachability.h>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
@@ -477,14 +477,18 @@ public:
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
 
-    mbgl::MapOptions mapOptions;
-    mapOptions.withMapMode(mbgl::MapMode::Continuous)
-              .withConstrainMode(mbgl::ConstrainMode::None)
-              .withViewportMode(mbgl::ViewportMode::Default)
-              .withCrossSourceCollisions(enableCrossSourceCollisions);
+    auto mapOptions = mbgl::MapOptions()
+        .withMapMode(mbgl::MapMode::Continuous)
+        .withConstrainMode(mbgl::ConstrainMode::None)
+        .withViewportMode(mbgl::ViewportMode::Default)
+        .withCrossSourceCollisions(enableCrossSourceCollisions);
+
+    auto resourceOptions = mbgl::ResourceOptions()
+        .withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+        .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
 
     NSAssert(!_mbglMap, @"_mbglMap should be NULL");
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[[MGLOfflineStorage sharedOfflineStorage] mbglFileSource], *_mbglThreadPool, mapOptions);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {

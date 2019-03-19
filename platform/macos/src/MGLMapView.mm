@@ -36,8 +36,8 @@
 #import <mbgl/renderer/renderer.hpp>
 #import <mbgl/renderer/renderer_backend.hpp>
 #import <mbgl/renderer/backend_scope.hpp>
-#import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
+#import <mbgl/storage/resource_options.hpp>
 #import <mbgl/math/wrap.hpp>
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/chrono.hpp>
@@ -290,12 +290,17 @@ public:
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
 
-    mbgl::MapOptions mapOptions;
-    mapOptions.withMapMode(mbgl::MapMode::Continuous)
-              .withConstrainMode(mbgl::ConstrainMode::None)
-              .withViewportMode(mbgl::ViewportMode::Default)
-              .withCrossSourceCollisions(enableCrossSourceCollisions);
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[[MGLOfflineStorage sharedOfflineStorage] mbglFileSource], *_mbglThreadPool, mapOptions);
+    auto mapOptions = mbgl::MapOptions()
+        .withMapMode(mbgl::MapMode::Continuous)
+        .withConstrainMode(mbgl::ConstrainMode::None)
+        .withViewportMode(mbgl::ViewportMode::Default)
+        .withCrossSourceCollisions(enableCrossSourceCollisions);
+
+    auto resourceOptions = mbgl::ResourceOptions()
+        .withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+        .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.

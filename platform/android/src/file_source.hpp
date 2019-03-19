@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/resource_options.hpp>
 
 #include "asset_manager.hpp"
 
@@ -49,15 +50,16 @@ public:
 
     static FileSource* getNativePeer(jni::JNIEnv&, const jni::Object<FileSource>&);
 
-    static mbgl::DefaultFileSource& getDefaultFileSource(jni::JNIEnv&, const jni::Object<FileSource>&);
+    static mbgl::ResourceOptions getSharedResourceOptions(jni::JNIEnv&, const jni::Object<FileSource>&);
 
     static void registerNative(jni::JNIEnv&);
 
 private:
     const std::string DATABASE_FILE = "/mbgl-offline.db";
     optional<int> activationCounter;
+    mbgl::ResourceOptions resourceOptions;
     std::unique_ptr<Actor<ResourceTransform>> resourceTransform;
-    std::unique_ptr<mbgl::DefaultFileSource> fileSource;
+    std::shared_ptr<mbgl::DefaultFileSource> fileSource;
 };
 
 

@@ -19,6 +19,8 @@
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -44,6 +46,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 @property (nonatomic, strong, readwrite) NSMutableArray<MGLOfflinePack *> *packs;
 @property (nonatomic) std::shared_ptr<mbgl::DefaultFileSource> mbglFileSource;
+@property (nonatomic) std::string mbglCachePath;
 @property (nonatomic, getter=isPaused) BOOL paused;
 
 @end
@@ -222,7 +225,10 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             [[NSFileManager defaultManager] moveItemAtPath:subdirectorylessCacheURL.path toPath:cachePath error:NULL];
         }
 
-        _mbglFileSource = std::make_shared<mbgl::DefaultFileSource>(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
+        _mbglCachePath = cachePath.UTF8String;
+        auto options = mbgl::ResourceOptions().withCachePath(_mbglCachePath)
+                                              .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+        _mbglFileSource = std::static_pointer_cast<mbgl::DefaultFileSource>(mbgl::FileSource::getSharedFileSource(options));
 
         // Observe for changes to the API base URL (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self

@@ -10,7 +10,7 @@ template <typename T> class Thread;
 
 class AssetFileSource : public FileSource {
 public:
-    AssetFileSource(const std::string& assetRoot);
+    AssetFileSource(const std::string& assetPath);
     ~AssetFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;

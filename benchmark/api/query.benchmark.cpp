@@ -7,7 +7,6 @@
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
-#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
@@ -21,7 +20,6 @@ class QueryBenchmark {
 public:
     QueryBenchmark() {
         NetworkStatus::Set(NetworkStatus::Status::Offline);
-        fileSource.setAccessToken("foobar");
 
         map.getStyle().loadJSON(util::read_file("benchmark/fixtures/api/style.json"));
         map.jumpTo(CameraOptions().withCenter(LatLng { 40.726989, -73.992857 }).withZoom(15.0)); // Manhattan
@@ -32,11 +30,11 @@ public:
     }
 
     util::RunLoop loop;
-    DefaultFileSource fileSource{ "benchmark/fixtures/api/cache.db", "." };
     ThreadPool threadPool{ 4 };
     HeadlessFrontend frontend { { 1000, 1000 }, 1, threadPool };
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1,
-              fileSource, threadPool, MapOptions().withMapMode(MapMode::Static) };
+    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, threadPool,
+              MapOptions().withMapMode(MapMode::Static),
+              ResourceOptions().withCachePath("benchmark/fixtures/api/cache.db").withAssetPath(".").withAccessToken("foobar") };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };
 

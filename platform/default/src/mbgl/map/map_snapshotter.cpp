@@ -5,7 +5,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/event.hpp>
 #include <mbgl/map/transform.hpp>
@@ -14,15 +14,15 @@ namespace mbgl {
 
 class MapSnapshotter::Impl {
 public:
-    Impl(FileSource*,
-         std::shared_ptr<Scheduler>,
+    Impl(std::shared_ptr<Scheduler>,
          const std::pair<bool, std::string> style,
          const Size&,
          const float pixelRatio,
          const optional<CameraOptions> cameraOptions,
          const optional<LatLngBounds> region,
          const optional<std::string> programCacheDir,
-         const optional<std::string> localFontFamily = {});
+         const optional<std::string> localFontFamily,
+         const ResourceOptions& resourceOptions);
 
     void setStyleURL(std::string styleURL);
     std::string getStyleURL() const;
@@ -47,19 +47,18 @@ private:
     Map map;
 };
 
-MapSnapshotter::Impl::Impl(FileSource* fileSource,
-           std::shared_ptr<Scheduler> scheduler_,
-           const std::pair<bool, std::string> style,
-           const Size& size,
-           const float pixelRatio,
-           const optional<CameraOptions> cameraOptions,
-           const optional<LatLngBounds> region,
-           const optional<std::string> programCacheDir,
-           const optional<std::string> localFontFamily)
-    : scheduler(std::move(scheduler_))
-    , frontend(size, pixelRatio, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
-    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *fileSource, *scheduler, MapOptions().withMapMode(MapMode::Static)) {
-
+MapSnapshotter::Impl::Impl(std::shared_ptr<Scheduler> scheduler_,
+                           const std::pair<bool, std::string> style,
+                           const Size& size,
+                           const float pixelRatio,
+                           const optional<CameraOptions> cameraOptions,
+                           const optional<LatLngBounds> region,
+                           const optional<std::string> programCacheDir,
+                           const optional<std::string> localFontFamily,
+                           const ResourceOptions& resourceOptions)
+        : scheduler(std::move(scheduler_))
+        , frontend(size, pixelRatio, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
+        , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *scheduler, MapOptions().withMapMode(MapMode::Static), resourceOptions) {
     if (style.first) {
         map.getStyle().loadJSON(style.second);
     } else{
@@ -164,17 +163,18 @@ LatLngBounds MapSnapshotter::Impl::getRegion() const {
     return map.latLngBoundsForCamera(getCameraOptions());
 }
 
-MapSnapshotter::MapSnapshotter(FileSource* fileSource,
-                               std::shared_ptr<Scheduler> scheduler,
+MapSnapshotter::MapSnapshotter(std::shared_ptr<Scheduler> scheduler,
                                const std::pair<bool, std::string> style,
                                const Size& size,
                                const float pixelRatio,
                                const optional<CameraOptions> cameraOptions,
                                const optional<LatLngBounds> region,
                                const optional<std::string> programCacheDir,
-                               const optional<std::string> localFontFamily)
-   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, std::move(scheduler), style, size, pixelRatio, cameraOptions, region, programCacheDir, localFontFamily)) {
-}
+                               const optional<std::string> localFontFamily,
+                               const ResourceOptions& resourceOptions)
+   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>(
+       "Map Snapshotter", std::move(scheduler), style, size, pixelRatio, cameraOptions,
+       region, programCacheDir, localFontFamily, resourceOptions)) {}
 
 MapSnapshotter::~MapSnapshotter() = default;
 
