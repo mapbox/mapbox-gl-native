@@ -39,7 +39,7 @@ uniform float u_fade_change;
 
 
 #ifndef HAS_UNIFORM_u_opacity
-uniform lowp float a_opacity_t;
+uniform lowp float u_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 #else
@@ -62,7 +62,7 @@ varying float v_fade_opacity;
 void main() {
     
 #ifndef HAS_UNIFORM_u_opacity
-    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, u_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif

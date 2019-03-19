@@ -41,7 +41,7 @@ uniform highp float u_size; // used when size is both zoom and feature constant
 
 
 #ifndef HAS_UNIFORM_u_fill_color
-uniform lowp float a_fill_color_t;
+uniform lowp float u_fill_color_t;
 attribute highp vec4 a_fill_color;
 varying highp vec4 fill_color;
 #else
@@ -50,7 +50,7 @@ uniform highp vec4 u_fill_color;
 
 
 #ifndef HAS_UNIFORM_u_halo_color
-uniform lowp float a_halo_color_t;
+uniform lowp float u_halo_color_t;
 attribute highp vec4 a_halo_color;
 varying highp vec4 halo_color;
 #else
@@ -59,7 +59,7 @@ uniform highp vec4 u_halo_color;
 
 
 #ifndef HAS_UNIFORM_u_opacity
-uniform lowp float a_opacity_t;
+uniform lowp float u_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 #else
@@ -68,7 +68,7 @@ uniform lowp float u_opacity;
 
 
 #ifndef HAS_UNIFORM_u_halo_width
-uniform lowp float a_halo_width_t;
+uniform lowp float u_halo_width_t;
 attribute lowp vec2 a_halo_width;
 varying lowp float halo_width;
 #else
@@ -77,7 +77,7 @@ uniform lowp float u_halo_width;
 
 
 #ifndef HAS_UNIFORM_u_halo_blur
-uniform lowp float a_halo_blur_t;
+uniform lowp float u_halo_blur_t;
 attribute lowp vec2 a_halo_blur;
 varying lowp float halo_blur;
 #else
@@ -105,35 +105,35 @@ varying vec3 v_data1;
 void main() {
     
 #ifndef HAS_UNIFORM_u_fill_color
-    fill_color = unpack_mix_color(a_fill_color, a_fill_color_t);
+    fill_color = unpack_mix_color(a_fill_color, u_fill_color_t);
 #else
     highp vec4 fill_color = u_fill_color;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_halo_color
-    halo_color = unpack_mix_color(a_halo_color, a_halo_color_t);
+    halo_color = unpack_mix_color(a_halo_color, u_halo_color_t);
 #else
     highp vec4 halo_color = u_halo_color;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_opacity
-    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, u_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_halo_width
-    halo_width = unpack_mix_vec2(a_halo_width, a_halo_width_t);
+    halo_width = unpack_mix_vec2(a_halo_width, u_halo_width_t);
 #else
     lowp float halo_width = u_halo_width;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_halo_blur
-    halo_blur = unpack_mix_vec2(a_halo_blur, a_halo_blur_t);
+    halo_blur = unpack_mix_vec2(a_halo_blur, u_halo_blur_t);
 #else
     lowp float halo_blur = u_halo_blur;
 #endif

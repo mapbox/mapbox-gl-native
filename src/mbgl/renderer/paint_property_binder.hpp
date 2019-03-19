@@ -4,6 +4,7 @@
 #include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/util/literal.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
@@ -431,17 +432,15 @@ PaintPropertyBinder<T, UniformValueType, PossiblyEvaluatedType, As...>::create(c
 }
 
 template <class Attr>
-struct ZoomInterpolatedAttribute {
-    static auto attributeName() { return Attr::attributeName(); }
+struct ZoomInterpolatedAttribute : public Attr {
     using Type = ZoomInterpolatedAttributeType<typename Attr::Type>;
 };
 
 template <class Attr>
 struct InterpolationUniform {
     using Value = float;
-    static auto uniformName() {
-        static const std::string name = Attr::attributeName() + std::string("_t");
-        return name.c_str();
+    static constexpr auto name() {
+        return concat_literals<&Attr::name, &string_literal<'_', 't'>::value>::value();
     }
 };
 
@@ -551,9 +550,13 @@ public:
 
     template <class... Us>
     struct UniformDefines<TypeList<Us...>> {
+        static constexpr auto define() {
+            return "#define HAS_UNIFORM_u_";
+        }
+
         static void appendDefines(std::vector<std::string>& defines) {
             util::ignore({
-                (defines.push_back(std::string("#define HAS_UNIFORM_") + Us::uniformName()), 0)...
+                (defines.push_back(concat_literals<&define, &Us::name, &string_literal<'\n'>::value>::value()), 0)...
             });
         }
     };

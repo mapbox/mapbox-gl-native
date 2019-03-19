@@ -33,7 +33,7 @@ varying vec4 v_color;
 
 
 #ifndef HAS_UNIFORM_u_base
-uniform lowp float a_base_t;
+uniform lowp float u_base_t;
 attribute highp vec2 a_base;
 #else
 uniform highp float u_base;
@@ -41,7 +41,7 @@ uniform highp float u_base;
 
 
 #ifndef HAS_UNIFORM_u_height
-uniform lowp float a_height_t;
+uniform lowp float u_height_t;
 attribute highp vec2 a_height;
 #else
 uniform highp float u_height;
@@ -50,7 +50,7 @@ uniform highp float u_height;
 
 
 #ifndef HAS_UNIFORM_u_color
-uniform lowp float a_color_t;
+uniform lowp float u_color_t;
 attribute highp vec4 a_color;
 #else
 uniform highp vec4 u_color;
@@ -60,21 +60,21 @@ uniform highp vec4 u_color;
 void main() {
     
 #ifndef HAS_UNIFORM_u_base
-    highp float base = unpack_mix_vec2(a_base, a_base_t);
+    highp float base = unpack_mix_vec2(a_base, u_base_t);
 #else
     highp float base = u_base;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_height
-    highp float height = unpack_mix_vec2(a_height, a_height_t);
+    highp float height = unpack_mix_vec2(a_height, u_height_t);
 #else
     highp float height = u_height;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_color
-    highp vec4 color = unpack_mix_color(a_color, a_color_t);
+    highp vec4 color = unpack_mix_color(a_color, u_color_t);
 #else
     highp vec4 color = u_color;
 #endif

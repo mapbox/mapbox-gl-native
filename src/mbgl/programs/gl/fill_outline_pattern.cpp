@@ -34,7 +34,7 @@ varying vec2 v_pos;
 
 
 #ifndef HAS_UNIFORM_u_opacity
-uniform lowp float a_opacity_t;
+uniform lowp float u_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 #else
@@ -43,7 +43,7 @@ uniform lowp float u_opacity;
 
 
 #ifndef HAS_UNIFORM_u_pattern_from
-uniform lowp float a_pattern_from_t;
+uniform lowp float u_pattern_from_t;
 attribute lowp vec4 a_pattern_from;
 varying lowp vec4 pattern_from;
 #else
@@ -52,7 +52,7 @@ uniform lowp vec4 u_pattern_from;
 
 
 #ifndef HAS_UNIFORM_u_pattern_to
-uniform lowp float a_pattern_to_t;
+uniform lowp float u_pattern_to_t;
 attribute lowp vec4 a_pattern_to;
 varying lowp vec4 pattern_to;
 #else
@@ -63,7 +63,7 @@ uniform lowp vec4 u_pattern_to;
 void main() {
     
 #ifndef HAS_UNIFORM_u_opacity
-    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, u_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
