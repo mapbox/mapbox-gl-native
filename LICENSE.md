@@ -36,7 +36,7 @@ http://www.boost.org/LICENSE_1_0.txt
 Mapbox GL uses portions of Clipper.
 
 Author    :  Angus Johnson
-Version   :  6.1.3a
+Version   :  6.1.3a@
 Date      :  22 January 2014
 Website   :  http://www.angusj.com
 Copyright :  Angus Johnson 2010-2014
