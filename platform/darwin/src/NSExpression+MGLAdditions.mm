@@ -1016,14 +1016,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([constantValue isKindOfClass:[MGLAttributedExpression class]]) {
                 MGLAttributedExpression *attributedExpression = (MGLAttributedExpression *)constantValue;
                 id jsonObject = attributedExpression.expression.mgl_jsonExpressionObject;
-                NSMutableArray *attributes = [NSMutableArray array];
-                if ([jsonObject isKindOfClass:[NSArray class]]) {
-                    [attributes addObjectsFromArray:jsonObject];
-                } else {
-                    [attributes addObject:jsonObject];
-                }
+                NSMutableDictionary *attributedDictionary = [NSMutableDictionary dictionary];
+                
                 if (attributedExpression.attributes) {
-                    NSMutableDictionary *attributedDictionary = [NSMutableDictionary dictionaryWithDictionary:attributedExpression.attributes];
+                    attributedDictionary = [NSMutableDictionary dictionaryWithDictionary:attributedExpression.attributes];
                     if (attributedDictionary[MGLFontNamesAttribute]) {
                         attributedDictionary[MGLFontNamesAttribute] = @[@"literal", attributedDictionary[MGLFontNamesAttribute]];
                     }
@@ -1031,12 +1027,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                         MGLColor *color = attributedDictionary[MGLFontColorAttribute];
                         attributedDictionary[MGLFontColorAttribute] = color.mgl_jsonExpressionObject;
                     }
-                    [attributes addObject:attributedDictionary];
-                } else {
-                    [attributes addObject:@{}];
-                }
- 
-                return attributes;
+                } 
+                return @[jsonObject, attributedDictionary];
             }
             return self.constantValue;
         }

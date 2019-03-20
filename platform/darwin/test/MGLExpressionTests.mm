@@ -1063,6 +1063,14 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]] ;
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
+        
+        NSArray *jsonExpression = @[ @"format", @"foo", @{ } ];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
         MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]
                                                                                        attributes:@{ MGLFontSizeAttribute: @(1.2),
                                                                                                      MGLFontColorAttribute: @"yellow",
@@ -1083,6 +1091,18 @@ using namespace std::string_literals;
         NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
         
         NSArray *jsonExpression = @[ @"format", @"foo", @{ @"font-scale": @1.2, @"text-color": @[@"rgb", @255, @0, @0] , @"text-font" : @[ @"literal", @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]]} ];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionWithFormat:@"CAST(x, 'NSString')"]
+                                                                                       attributes:@{ MGLFontSizeAttribute: @(1.2),
+                                                                                                     MGLFontColorAttribute: [MGLColor redColor],
+                                                                                                     MGLFontNamesAttribute: @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]
+                                                                                                     }] ;
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
+        
+        NSArray *jsonExpression = @[ @"format", @[@"to-string", @[@"get", @"x"]], @{ @"font-scale": @1.2, @"text-color": @[@"rgb", @255, @0, @0] , @"text-font" : @[ @"literal", @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]]} ];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
