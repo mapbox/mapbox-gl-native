@@ -70,7 +70,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         optional<float> depthClearValue = {};
         if (parameters.staticData.depthRenderbuffer->needsClearing()) depthClearValue = 1.0;
         // Flag the depth buffer as no longer needing to be cleared for the remainder of this pass.
-        parameters.staticData.depthRenderbuffer->shouldClear(false);
+        parameters.staticData.depthRenderbuffer->setShouldClear(false);
 
         glContext.setStencilMode(gfx::StencilMode::disabled());
         glContext.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});

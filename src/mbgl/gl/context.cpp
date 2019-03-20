@@ -3,6 +3,7 @@
 #include <mbgl/gl/vertex_buffer_resource.hpp>
 #include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/texture_resource.hpp>
+#include <mbgl/gl/renderbuffer_resource.hpp>
 #include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -336,7 +337,8 @@ UniqueFramebuffer Context::createFramebuffer() {
     return UniqueFramebuffer{ std::move(id), { this } };
 }
 
-UniqueRenderbuffer Context::createRenderbuffer(const gfx::RenderbufferPixelType type, const Size size) {
+std::unique_ptr<gfx::RenderbufferResource>
+Context::createRenderbufferResource(const gfx::RenderbufferPixelType type, const Size size) {
     RenderbufferID id = 0;
     MBGL_CHECK_ERROR(glGenRenderbuffers(1, &id));
     UniqueRenderbuffer renderbuffer{ std::move(id), { this } };
@@ -345,8 +347,9 @@ UniqueRenderbuffer Context::createRenderbuffer(const gfx::RenderbufferPixelType 
     MBGL_CHECK_ERROR(
         glRenderbufferStorage(GL_RENDERBUFFER, Enum<gfx::RenderbufferPixelType>::to(type), size.width, size.height));
     bindRenderbuffer = 0;
-    return renderbuffer;
+    return std::make_unique<gl::RenderbufferResource>(std::move(renderbuffer));
 }
+
 
 std::unique_ptr<uint8_t[]> Context::readFramebuffer(const Size size, const gfx::TexturePixelType format, const bool flip) {
     const size_t stride = size.width * (format == gfx::TexturePixelType::RGBA ? 4 : 1);
@@ -417,48 +420,52 @@ void checkFramebuffer() {
 }
 
 void bindDepthStencilRenderbuffer(
-    const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
+    const gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
+    auto& depthStencilResource = depthStencil.getResource<gl::RenderbufferResource>();
 #ifdef GL_DEPTH_STENCIL_ATTACHMENT
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                                               GL_RENDERBUFFER, depthStencil.renderbuffer));
+                                               GL_RENDERBUFFER, depthStencilResource.renderbuffer));
 #else
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
-                                               depthStencil.renderbuffer));
+                                               depthStencilResource.renderbuffer));
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                                               GL_RENDERBUFFER, depthStencil.renderbuffer));
+                                               GL_RENDERBUFFER, depthStencilResource.renderbuffer));
 #endif
 }
 
 } // namespace
 
 Framebuffer
-Context::createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>& color,
-                           const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
-    if (color.size != depthStencil.size) {
+Context::createFramebuffer(const gfx::Renderbuffer<gfx::RenderbufferPixelType::RGBA>& color,
+                           const gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
+    if (color.getSize() != depthStencil.getSize()) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
+
+    auto& colorResource = color.getResource<gl::RenderbufferResource>();
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                               GL_RENDERBUFFER, color.renderbuffer));
+                                               GL_RENDERBUFFER, colorResource.renderbuffer));
     bindDepthStencilRenderbuffer(depthStencil);
     checkFramebuffer();
-    return { color.size, std::move(fbo) };
+    return { color.getSize(), std::move(fbo) };
 }
 
-Framebuffer Context::createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>& color) {
+Framebuffer Context::createFramebuffer(const gfx::Renderbuffer<gfx::RenderbufferPixelType::RGBA>& color) {
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
+    auto& colorResource = color.getResource<gl::RenderbufferResource>();
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                               GL_RENDERBUFFER, color.renderbuffer));
+                                               GL_RENDERBUFFER, colorResource.renderbuffer));
     checkFramebuffer();
-    return { color.size, std::move(fbo) };
+    return { color.getSize(), std::move(fbo) };
 }
 
 Framebuffer
 Context::createFramebuffer(const gfx::Texture& color,
-                           const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
-    if (color.size != depthStencil.size) {
+                           const gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
+    if (color.size != depthStencil.getSize()) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }
     auto fbo = createFramebuffer();
@@ -483,8 +490,8 @@ Framebuffer Context::createFramebuffer(const gfx::Texture& color) {
 
 Framebuffer
 Context::createFramebuffer(const gfx::Texture& color,
-                           const Renderbuffer<gfx::RenderbufferPixelType::Depth>& depthTarget) {
-    if (color.size != depthTarget.size) {
+                           const gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>& depth) {
+    if (color.size != depth.getSize()) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }
     auto fbo = createFramebuffer();
@@ -492,10 +499,12 @@ Context::createFramebuffer(const gfx::Texture& color,
     MBGL_CHECK_ERROR(glFramebufferTexture2D(
         GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
         reinterpret_cast<const gl::TextureResource&>(*color.resource).texture, 0));
+
+    auto& depthResource = depth.getResource<gl::RenderbufferResource>();
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
-                                               depthTarget.renderbuffer));
+                                               depthResource.renderbuffer));
     checkFramebuffer();
-    return { depthTarget.size, std::move(fbo) };
+    return { depth.getSize(), std::move(fbo) };
 }
 
 std::unique_ptr<gfx::TextureResource>

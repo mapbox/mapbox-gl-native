@@ -5,6 +5,7 @@
 #include <mbgl/gfx/index_vector.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gfx/texture.hpp>
+#include <mbgl/gfx/renderbuffer.hpp>
 #include <mbgl/gfx/draw_scope.hpp>
 #include <mbgl/gfx/program.hpp>
 #include <mbgl/gfx/types.hpp>
@@ -119,6 +120,17 @@ protected:
         TexturePixelType, TextureChannelDataType) = 0;
     virtual void updateTextureResourceSub(const TextureResource&, uint16_t xOffset, uint16_t yOffset, Size, const void* data,
         TexturePixelType, TextureChannelDataType) = 0;
+
+public:
+    template <RenderbufferPixelType pixelType>
+    Renderbuffer<pixelType>
+    createRenderbuffer(const Size size) {
+        return { size, createRenderbufferResource(pixelType, size) };
+    }
+
+protected:
+    virtual std::unique_ptr<RenderbufferResource>
+    createRenderbufferResource(RenderbufferPixelType, Size) = 0;
 
 public:
     DrawScope createDrawScope() {

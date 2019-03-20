@@ -16,8 +16,8 @@ public:
           framebuffer(context.createFramebuffer(color, depthStencil)) {
     }
 
-    gl::Renderbuffer<gfx::RenderbufferPixelType::RGBA> color;
-    gl::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil> depthStencil;
+    gfx::Renderbuffer<gfx::RenderbufferPixelType::RGBA> color;
+    gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil> depthStencil;
     gl::Framebuffer framebuffer;
 };
 
