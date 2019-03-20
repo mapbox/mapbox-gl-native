@@ -34,6 +34,10 @@ public:
     virtual ~Context() = default;
 
 public:
+    // Called at the end of a frame.
+    virtual void performCleanup() = 0;
+
+public:
     template <class Vertex>
     VertexBuffer<Vertex>
     createVertexBuffer(VertexVector<Vertex>&& v,
