@@ -9,7 +9,7 @@ namespace gl {
 using namespace platform;
 
 void bindTexture(gl::Context& context, const uint8_t unit, const gfx::TextureBinding& binding) {
-    auto& resource = reinterpret_cast<gl::TextureResource&>(*binding.resource);
+    auto& resource = static_cast<gl::TextureResource&>(*binding.resource);
     if (binding.filter != resource.filter || binding.mipmap != resource.mipmap ||
         binding.wrapX != resource.wrapX || binding.wrapY != resource.wrapY) {
         context.activeTextureUnit = unit;

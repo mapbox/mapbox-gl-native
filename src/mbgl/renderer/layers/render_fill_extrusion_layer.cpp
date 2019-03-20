@@ -52,7 +52,7 @@ bool RenderFillExtrusionLayer::hasCrossfade() const {
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
     // TODO: remove cast
-    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
 
     if (parameters.pass == RenderPass::Opaque) {
         return;

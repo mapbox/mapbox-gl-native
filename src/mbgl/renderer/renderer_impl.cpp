@@ -311,7 +311,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     backend.updateAssumedState();
 
     // TODO: remove cast
-    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
 
     if (parameters.contextMode == GLContextMode::Shared) {
         glContext.setDirtyState();
