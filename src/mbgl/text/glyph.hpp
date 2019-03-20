@@ -78,15 +78,17 @@ enum class WritingModeType : uint8_t;
 
 class Shaping {
     public:
-    explicit Shaping() = default;
-    explicit Shaping(float x, float y, WritingModeType writingMode_)
-        : top(y), bottom(y), left(x), right(x), writingMode(writingMode_) {}
+    Shaping() = default;
+    explicit Shaping(float x, float y, WritingModeType writingMode_, std::size_t lineCount_)
+        : top(y), bottom(y), left(x), right(x), writingMode(writingMode_), lineCount(lineCount_) {}
     std::vector<PositionedGlyph> positionedGlyphs;
     float top = 0;
     float bottom = 0;
     float left = 0;
     float right = 0;
     WritingModeType writingMode;
+    std::size_t lineCount = 0u;
+    std::string text = {};
 
     explicit operator bool() const { return !positionedGlyphs.empty(); }
 };

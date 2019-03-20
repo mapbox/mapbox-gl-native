@@ -35,6 +35,8 @@ public:
     std::vector<float> glyphOffsets;
     bool hidden;
     size_t vertexStartIndex;
+    // The crossTileID is only filled/used on the foreground for variable text anchors
+    uint32_t crossTileID = 0u;
 };
 
 class SymbolBucket final : public Bucket {
@@ -48,7 +50,8 @@ public:
                  bool iconsNeedLinear,
                  bool sortFeaturesByY,
                  const std::string bucketLeaderID,
-                 const std::vector<SymbolInstance>&&);
+                 const std::vector<SymbolInstance>&&,
+                 const float tilePixelRatio);
     ~SymbolBucket() override;
 
     void upload(gfx::Context&) override;
@@ -130,6 +133,7 @@ public:
         optional<gfx::IndexBuffer> indexBuffer;
     } collisionCircle;
 
+    const float tilePixelRatio;
     uint32_t bucketInstanceId = 0;
     bool justReloaded = false;
     optional<bool> hasFormatSectionOverrides_;

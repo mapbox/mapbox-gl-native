@@ -46,12 +46,15 @@ public:
     const std::string bucketLeaderID;
     std::vector<SymbolInstance> symbolInstances;
 
+    static Point<float> evaluateRadialOffset(style::SymbolAnchorType anchor, float radialOffset);
+
 private:
     void addFeature(const size_t,
                     const SymbolFeature&,
-                    const std::pair<Shaping, Shaping>& shapedTextOrientations,
+                    const ShapedTextOrientations& shapedTextOrientations,
                     optional<PositionedIcon> shapedIcon,
-                    const GlyphPositions&);
+                    const GlyphPositions&,
+                    Point<float> textOffset);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;

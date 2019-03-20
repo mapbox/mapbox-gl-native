@@ -176,8 +176,8 @@ void Placement::placeLayerBucket(
             bool placeIcon = false;
             bool offscreen = true;
 
-            if (symbolInstance.placedTextIndex) {
-                PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*symbolInstance.placedTextIndex);
+            if (symbolInstance.placedRightTextIndex) {
+                PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*symbolInstance.placedRightTextIndex);
                 const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
 
                 auto placed = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
@@ -339,14 +339,15 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
 
         if (symbolInstance.hasText) {
             auto opacityVertex = SymbolSDFTextProgram::opacityVertex(opacityState.text.placed, opacityState.text.opacity);
-            for (size_t i = 0; i < symbolInstance.horizontalGlyphQuads.size() * 4; i++) {
+            for (size_t i = 0; i < symbolInstance.rightJustifiedGlyphQuads.size() * 4; i++) {
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
             for (size_t i = 0; i < symbolInstance.verticalGlyphQuads.size() * 4; i++) {
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
-            if (symbolInstance.placedTextIndex) {
-                bucket.text.placedSymbols[*symbolInstance.placedTextIndex].hidden = opacityState.isHidden();
+            if (symbolInstance.placedRightTextIndex) {
+                PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedRightTextIndex];
+                placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedVerticalTextIndex) {
                 bucket.text.placedSymbols[*symbolInstance.placedVerticalTextIndex].hidden = opacityState.isHidden();
