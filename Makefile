@@ -300,13 +300,6 @@ darwin-update-examples:
 darwin-check-public-symbols:
 	node platform/darwin/scripts/check-public-symbols.js macOS iOS
 
-.PHONY: ios-clean-project
-ios-clean-project:
-	rm -fr $(IOS_PROJ_PATH)
-
-.PHONY: ios-update-project
-ios-update-project: ios-clean-project $(IOS_PROJ_PATH)
-
 endif
 
 #### Linux targets #####################################################
