@@ -17,7 +17,8 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
-                           const std::vector<SymbolInstance>&& symbolInstances_)
+                           const std::vector<SymbolInstance>&& symbolInstances_,
+                           float tilePixelRatio_)
     : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
@@ -25,7 +26,8 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       bucketLeaderID(std::move(bucketName_)),
       symbolInstances(std::move(symbolInstances_)),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
-      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
+      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
+      tilePixelRatio(tilePixelRatio_) {
 
     for (const auto& pair : paintProperties_) {
         auto layerPaintProperties = pair.second;
@@ -218,12 +220,22 @@ void SymbolBucket::sortFeatures(const float angle) {
         const SymbolInstance& symbolInstance = symbolInstances[i];
         featureSortOrder->push_back(symbolInstance.dataFeatureIndex);
 
-        if (symbolInstance.placedTextIndex) {
-            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);
+        if (symbolInstance.placedRightTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedRightTextIndex]);
         }
+
+        if (symbolInstance.placedCenterTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedCenterTextIndex]);
+        }
+
+        if (symbolInstance.placedLeftTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedLeftTextIndex]);
+        }
+
         if (symbolInstance.placedVerticalTextIndex) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedVerticalTextIndex]);
         }
+
         if (symbolInstance.placedIconIndex) {
             addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
         }

@@ -11,11 +11,20 @@ namespace mbgl {
 class Anchor;
 class IndexedSubfeature;
 
+struct ShapedTextOrientations {
+    Shaping horizontal;
+    Shaping vertical;
+    // The following are used with variable text placement on.
+    Shaping& right = horizontal; 
+    Shaping center;
+    Shaping left;
+};
+
 class SymbolInstance {
 public:
     SymbolInstance(Anchor& anchor,
                    GeometryCoordinates line,
-                   const std::pair<Shaping, Shaping>& shapedTextOrientations,
+                   const ShapedTextOrientations& shapedTextOrientations,
                    optional<PositionedIcon> shapedIcon,
                    const style::SymbolLayoutProperties::Evaluated&,
                    const float layoutTextSize,
@@ -32,14 +41,20 @@ public:
                    const std::size_t dataFeatureIndex,
                    const std::u16string& key,
                    const float overscaling,
-                   const float rotate);
+                   const float rotate,
+                   float radialTextOffset);
+
+    optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
 
     Anchor anchor;
     GeometryCoordinates line;
     bool hasText;
     bool hasIcon;
-    SymbolQuads horizontalGlyphQuads;
+    SymbolQuads rightJustifiedGlyphQuads;
+    SymbolQuads centerJustifiedGlyphQuads;
+    SymbolQuads leftJustifiedGlyphQuads;
     SymbolQuads verticalGlyphQuads;
+
     optional<SymbolQuad> iconQuad;
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
@@ -50,9 +65,13 @@ public:
     std::array<float, 2> iconOffset;
     std::u16string key;
     bool isDuplicate;
-    optional<size_t> placedTextIndex;
+    optional<size_t> placedRightTextIndex;
+    optional<size_t> placedCenterTextIndex;
+    optional<size_t> placedLeftTextIndex;
     optional<size_t> placedVerticalTextIndex;
     optional<size_t> placedIconIndex;
+    float textBoxScale;
+    float radialTextOffset;
     uint32_t crossTileID = 0;
 };
 
