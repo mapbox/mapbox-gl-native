@@ -437,10 +437,11 @@ public class Style {
   //
 
   /**
-   * Called when the underlying map will start loading a new style. This method will clean up this style
-   * by setting the java sources and layers in a detached state and removing them from core.
+   * Called when the underlying map will start loading a new style or the map is destroyed.
+   * This method will clean up this style by setting the java sources and layers
+   * in a detached state and removing them from core.
    */
-  void onWillStartLoadingMap() {
+  void clear() {
     fullyLoaded = false;
     for (Source source : sources.values()) {
       if (source != null) {
