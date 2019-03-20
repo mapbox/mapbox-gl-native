@@ -5,6 +5,7 @@
 #include <mbgl/gl/texture_resource.hpp>
 #include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gl/texture.hpp>
+#include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
@@ -706,6 +707,19 @@ void Context::draw(const gfx::DrawMode& drawMode,
 }
 
 void Context::performCleanup() {
+    // TODO: Find a better way to unbind VAOs after we're done with them without introducing
+    // unnecessary bind(0)/bind(N) sequences.
+    {
+        MBGL_DEBUG_GROUP(*this, "cleanup");
+
+        activeTextureUnit = 1;
+        texture[1] = 0;
+        activeTextureUnit = 0;
+        texture[0] = 0;
+
+        bindVertexArray = 0;
+    }
+
     for (auto id : abandonedPrograms) {
         if (program == id) {
             program.setDirty();

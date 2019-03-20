@@ -589,19 +589,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 #endif
 
-    // TODO: Find a better way to unbind VAOs after we're done with them without introducing
-    // unnecessary bind(0)/bind(N) sequences.
-    {
-        MBGL_DEBUG_GROUP(parameters.context, "cleanup");
-
-        glContext.activeTextureUnit = 1;
-        glContext.texture[1] = 0;
-        glContext.activeTextureUnit = 0;
-        glContext.texture[0] = 0;
-
-        glContext.bindVertexArray = 0;
-    }
-
     observer->onDidFinishRenderingFrame(
         loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
         updateParameters.mode == MapMode::Continuous && hasTransitions(parameters.timePoint)
@@ -615,7 +602,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     // Cleanup only after signaling completion
-    glContext.performCleanup();
+    parameters.context.performCleanup();
 }
 
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
