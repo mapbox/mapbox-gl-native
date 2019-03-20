@@ -398,11 +398,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.pass = RenderPass::Pass3D;
 
         if (!parameters.staticData.depthRenderbuffer ||
-            parameters.staticData.depthRenderbuffer->size != parameters.staticData.backendSize) {
+            parameters.staticData.depthRenderbuffer->getSize() != parameters.staticData.backendSize) {
             parameters.staticData.depthRenderbuffer =
-                glContext.createRenderbuffer<gfx::RenderbufferPixelType::Depth>(parameters.staticData.backendSize);
+                parameters.context.createRenderbuffer<gfx::RenderbufferPixelType::Depth>(parameters.staticData.backendSize);
         }
-        parameters.staticData.depthRenderbuffer->shouldClear(true);
+        parameters.staticData.depthRenderbuffer->setShouldClear(true);
 
         uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
         for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {

@@ -5,7 +5,6 @@
 #include <mbgl/gl/object.hpp>
 #include <mbgl/gl/state.hpp>
 #include <mbgl/gl/value.hpp>
-#include <mbgl/gl/renderbuffer.hpp>
 #include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
@@ -60,23 +59,14 @@ public:
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
-    template <gfx::RenderbufferPixelType type>
-    Renderbuffer<type> createRenderbuffer(const Size size) {
-        static_assert(type == gfx::RenderbufferPixelType::RGBA ||
-                      type == gfx::RenderbufferPixelType::DepthStencil ||
-                      type == gfx::RenderbufferPixelType::Depth,
-                      "invalid renderbuffer type");
-        return { size, createRenderbuffer(type, size) };
-    }
-
-    Framebuffer createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>&,
-                                  const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>&);
-    Framebuffer createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>&);
+    Framebuffer createFramebuffer(const gfx::Renderbuffer<gfx::RenderbufferPixelType::RGBA>&,
+                                  const gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>&);
+    Framebuffer createFramebuffer(const gfx::Renderbuffer<gfx::RenderbufferPixelType::RGBA>&);
     Framebuffer createFramebuffer(const gfx::Texture&,
-                                  const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>&);
+                                  const gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>&);
     Framebuffer createFramebuffer(const gfx::Texture&);
     Framebuffer createFramebuffer(const gfx::Texture&,
-                                  const Renderbuffer<gfx::RenderbufferPixelType::Depth>&);
+                                  const gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&);
 
     template <typename Image,
               gfx::TexturePixelType format = Image::channels == 4 ? gfx::TexturePixelType::RGBA
@@ -213,10 +203,11 @@ private:
     void updateTextureResource(const gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
     void updateTextureResourceSub(const gfx::TextureResource&, const uint16_t xOffset, const uint16_t yOffset, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
+    std::unique_ptr<gfx::RenderbufferResource> createRenderbufferResource(gfx::RenderbufferPixelType, Size size) override;
+
     std::unique_ptr<gfx::DrawScopeResource> createDrawScopeResource() override;
 
     UniqueFramebuffer createFramebuffer();
-    UniqueRenderbuffer createRenderbuffer(gfx::RenderbufferPixelType, Size size);
     std::unique_ptr<uint8_t[]> readFramebuffer(Size, gfx::TexturePixelType, bool flip);
 #if not MBGL_USE_GLES2
     void drawPixels(Size size, const void* data, gfx::TexturePixelType);

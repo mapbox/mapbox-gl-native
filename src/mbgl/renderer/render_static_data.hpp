@@ -2,7 +2,7 @@
 
 #include <mbgl/gfx/vertex_buffer.hpp>
 #include <mbgl/gfx/index_buffer.hpp>
-#include <mbgl/gl/renderbuffer.hpp>
+#include <mbgl/gfx/renderbuffer.hpp>
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -32,7 +32,7 @@ public:
     SegmentVector<RasterAttributes> rasterSegments;
     SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
 
-    optional<gl::Renderbuffer<gfx::RenderbufferPixelType::Depth>> depthRenderbuffer;
+    optional<gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>> depthRenderbuffer;
     bool has3D = false;
     Size backendSize;
 
