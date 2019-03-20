@@ -291,9 +291,9 @@ namespace mbgl {
                               gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicVertexArray,
                               const Point<float>& projectedAnchorPoint,
                               const float aspectRatio) {
-        const float fontScale = fontSize / 24.0;
-        const float lineOffsetX = symbol.lineOffset[0] * fontSize;
-        const float lineOffsetY = symbol.lineOffset[1] * fontSize;
+        const float fontScale = fontSize / util::ONE_EM;
+        const float lineOffsetX = symbol.lineOffset[0] * fontScale;
+        const float lineOffsetY = symbol.lineOffset[1] * fontScale;
 
         std::vector<PlacedGlyph> placedGlyphs;
         if (symbol.glyphOffsets.size() > 1) {

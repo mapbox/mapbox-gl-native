@@ -31,6 +31,16 @@ public:
     OpacityState text;
 };
 
+class VariableOffset {
+public:
+    float radialOffset;
+    float width;
+    float height;
+    style::TextVariableAnchorType anchor;
+    float textBoxScale;
+    optional<style::TextVariableAnchorType> prevAnchor;
+};
+
 class JointPlacement {
 public:
     JointPlacement(bool text_, bool icon_, bool skipFade_)
@@ -45,7 +55,7 @@ public:
     // visible right away.
     const bool skipFade;
 };
-    
+  
 struct RetainedQueryData {
     uint32_t bucketInstanceId;
     std::shared_ptr<FeatureIndex> featureIndex;
