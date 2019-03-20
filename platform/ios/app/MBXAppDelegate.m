@@ -4,7 +4,7 @@
 
 NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
 
-@interface MBXAppDelegate() <MGLMetricsDelegate>
+@interface MBXAppDelegate() <MGLMetricsManagerDelegate>
 
 @end
 
@@ -52,7 +52,7 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
     return NO;
 }
 
-- (BOOL)shouldHandleMetric:(MGLMetricType)metricType {
+- (BOOL)metricsManager:(MGLMetricsManager *)metricsManager shouldHandleMetric:(MGLMetricType)metricType {
     return YES;
 }
 

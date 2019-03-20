@@ -5,7 +5,14 @@
 #endif
 
 NSString* MGLStringFromMetricType(MGLMetricType metricType) {
-    return [@[kMGLDownloadPerformanceEvent] objectAtIndex:metricType];
+    NSString *eventName;
+    
+    switch (metricType) {
+        case MGLMetricTypePerformance:
+            eventName = kMGLDownloadPerformanceEvent;
+            break;
+    }
+    return eventName;
 }
 
 @interface MGLMetricsManager() <MGLNetworkConfigurationMetricsDelegate>
@@ -26,27 +33,16 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
 }
 
 - (void)handleMetricsEvent:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes {
-    if ([self.delegate shouldHandleMetric:metricType]) {
+    if ([self.delegate metricsManager:self shouldHandleMetric:metricType]) {
         [self.delegate metricsManager:self didCollectMetric:metricType withAttributes:attributes];
     }
 }
 
 #if TARGET_OS_IOS
 - (void)pushMetric:(MGLMetricType)metricType withAttributes:(NSDictionary *)attributes {
-    
-    NSString *eventName;
-    
-    switch (metricType) {
-        case MGLMetricTypePerformance:
-            eventName = kMGLDownloadPerformanceEvent;
-            break;
-            
-        default:
-            break;
-    }
+    NSString *eventName = MGLStringFromMetricType(metricType);
     
     [MGLMapboxEvents pushEvent:eventName withAttributes:attributes];
-
 }
 #endif
 

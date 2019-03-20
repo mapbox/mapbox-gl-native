@@ -14,13 +14,20 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 
 @implementation MGLNetworkConfiguration
 
+- (instancetype)init {
+    if (self = [super init]) {
+        self.sessionConfiguration = nil;
+        _events = [NSMutableDictionary dictionary];
+    }
+    
+    return self;
+}
+
 + (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     static MGLNetworkConfiguration *_sharedManager;
     dispatch_once(&onceToken, ^{
         _sharedManager = [[self alloc] init];
-        _sharedManager.sessionConfiguration = nil;
-        _sharedManager.events = [NSMutableDictionary dictionary];
     });
 
     return _sharedManager;
