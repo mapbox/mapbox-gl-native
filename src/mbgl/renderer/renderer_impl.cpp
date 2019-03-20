@@ -400,7 +400,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (!parameters.staticData.depthRenderbuffer ||
             parameters.staticData.depthRenderbuffer->size != parameters.staticData.backendSize) {
             parameters.staticData.depthRenderbuffer =
-                glContext.createRenderbuffer<gl::RenderbufferType::DepthComponent>(parameters.staticData.backendSize);
+                glContext.createRenderbuffer<gfx::RenderbufferPixelType::Depth>(parameters.staticData.backendSize);
         }
         parameters.staticData.depthRenderbuffer->shouldClear(true);
 

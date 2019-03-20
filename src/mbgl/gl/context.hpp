@@ -60,23 +60,23 @@ public:
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
-    template <RenderbufferType type>
+    template <gfx::RenderbufferPixelType type>
     Renderbuffer<type> createRenderbuffer(const Size size) {
-        static_assert(type == RenderbufferType::RGBA ||
-                      type == RenderbufferType::DepthStencil ||
-                      type == RenderbufferType::DepthComponent,
+        static_assert(type == gfx::RenderbufferPixelType::RGBA ||
+                      type == gfx::RenderbufferPixelType::DepthStencil ||
+                      type == gfx::RenderbufferPixelType::Depth,
                       "invalid renderbuffer type");
         return { size, createRenderbuffer(type, size) };
     }
 
-    Framebuffer createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>&,
-                                  const Renderbuffer<RenderbufferType::DepthStencil>&);
-    Framebuffer createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>&);
+    Framebuffer createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>&,
+                                  const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>&);
+    Framebuffer createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>&);
     Framebuffer createFramebuffer(const gfx::Texture&,
-                                  const Renderbuffer<RenderbufferType::DepthStencil>&);
+                                  const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>&);
     Framebuffer createFramebuffer(const gfx::Texture&);
     Framebuffer createFramebuffer(const gfx::Texture&,
-                                  const Renderbuffer<RenderbufferType::DepthComponent>&);
+                                  const Renderbuffer<gfx::RenderbufferPixelType::Depth>&);
 
     template <typename Image,
               gfx::TexturePixelType format = Image::channels == 4 ? gfx::TexturePixelType::RGBA
@@ -216,7 +216,7 @@ private:
     std::unique_ptr<gfx::DrawScopeResource> createDrawScopeResource() override;
 
     UniqueFramebuffer createFramebuffer();
-    UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
+    UniqueRenderbuffer createRenderbuffer(gfx::RenderbufferPixelType, Size size);
     std::unique_ptr<uint8_t[]> readFramebuffer(Size, gfx::TexturePixelType, bool flip);
 #if not MBGL_USE_GLES2
     void drawPixels(Size size, const void* data, gfx::TexturePixelType);
