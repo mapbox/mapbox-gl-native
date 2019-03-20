@@ -17,7 +17,7 @@ public:
     }
     Impl(gl::Context& context_,
          const Size size_,
-         gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& depth_,
+         gl::Renderbuffer<gfx::RenderbufferPixelType::Depth>& depth_,
          const gfx::TextureChannelDataType type_)
         : context(context_), size(std::move(size_)), depth(&depth_), type(type_) {
         assert(!size.isEmpty());
@@ -58,7 +58,7 @@ private:
     const Size size;
     optional<gl::Framebuffer> framebuffer;
     optional<gfx::Texture> texture;
-    gl::Renderbuffer<gl::RenderbufferType::DepthComponent>* depth = nullptr;
+    gl::Renderbuffer<gfx::RenderbufferPixelType::Depth>* depth = nullptr;
     const gfx::TextureChannelDataType type;
 };
 
@@ -72,7 +72,7 @@ OffscreenTexture::OffscreenTexture(gfx::Context& context,
 
 OffscreenTexture::OffscreenTexture(gfx::Context& context,
                                    const Size size,
-                                   gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& renderbuffer,
+                                   gl::Renderbuffer<gfx::RenderbufferPixelType::Depth>& renderbuffer,
                                    const gfx::TextureChannelDataType type)
     // TODO: remove cast
     : impl(std::make_unique<Impl>(reinterpret_cast<gl::Context&>(context), std::move(size), renderbuffer, type)) {

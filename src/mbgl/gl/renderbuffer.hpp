@@ -1,19 +1,20 @@
 #pragma once
 
+#include <mbgl/gfx/types.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/util/size.hpp>
 
 namespace mbgl {
 namespace gl {
 
-template <RenderbufferType renderbufferType>
+template <gfx::RenderbufferPixelType renderbufferType>
 class Renderbuffer {
 public:
     Renderbuffer(Size size_, UniqueRenderbuffer renderbuffer_, bool dirty_ = false)
         : size(std::move(size_)), renderbuffer(std::move(renderbuffer_)), dirty(dirty_) {
     }
 
-    using type = std::integral_constant<RenderbufferType, renderbufferType>;
+    using type = std::integral_constant<gfx::RenderbufferPixelType, renderbufferType>;
     Size size;
     UniqueRenderbuffer renderbuffer;
 

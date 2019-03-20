@@ -32,7 +32,7 @@ public:
     SegmentVector<RasterAttributes> rasterSegments;
     SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
 
-    optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depthRenderbuffer;
+    optional<gl::Renderbuffer<gfx::RenderbufferPixelType::Depth>> depthRenderbuffer;
     bool has3D = false;
     Size backendSize;
 

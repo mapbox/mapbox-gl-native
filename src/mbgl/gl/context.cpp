@@ -23,22 +23,6 @@ using namespace platform;
 static_assert(underlying_type(ShaderType::Vertex) == GL_VERTEX_SHADER, "OpenGL type mismatch");
 static_assert(underlying_type(ShaderType::Fragment) == GL_FRAGMENT_SHADER, "OpenGL type mismatch");
 
-#if not MBGL_USE_GLES2
-static_assert(underlying_type(RenderbufferType::RGBA) == GL_RGBA8, "OpenGL type mismatch");
-#else
-static_assert(underlying_type(RenderbufferType::RGBA) == GL_RGBA8_OES, "OpenGL type mismatch");
-#endif // MBGL_USE_GLES2
-#if not MBGL_USE_GLES2
-static_assert(underlying_type(RenderbufferType::DepthStencil) == GL_DEPTH24_STENCIL8, "OpenGL type mismatch");
-#else
-static_assert(underlying_type(RenderbufferType::DepthStencil) == GL_DEPTH24_STENCIL8_OES, "OpenGL type mismatch");
-#endif // MBGL_USE_GLES2
-#if not MBGL_USE_GLES2
-static_assert(underlying_type(RenderbufferType::DepthComponent) == GL_DEPTH_COMPONENT, "OpenGL type mismatch");
-#else
-static_assert(underlying_type(RenderbufferType::DepthComponent) == GL_DEPTH_COMPONENT16, "OpenGL type mismatch");
-#endif // MBGL_USE_GLES2
-
 static_assert(std::is_same<ProgramID, GLuint>::value, "OpenGL type mismatch");
 static_assert(std::is_same<ShaderID, GLuint>::value, "OpenGL type mismatch");
 static_assert(std::is_same<BufferID, GLuint>::value, "OpenGL type mismatch");
@@ -352,14 +336,14 @@ UniqueFramebuffer Context::createFramebuffer() {
     return UniqueFramebuffer{ std::move(id), { this } };
 }
 
-UniqueRenderbuffer Context::createRenderbuffer(const RenderbufferType type, const Size size) {
+UniqueRenderbuffer Context::createRenderbuffer(const gfx::RenderbufferPixelType type, const Size size) {
     RenderbufferID id = 0;
     MBGL_CHECK_ERROR(glGenRenderbuffers(1, &id));
     UniqueRenderbuffer renderbuffer{ std::move(id), { this } };
 
     bindRenderbuffer = renderbuffer;
     MBGL_CHECK_ERROR(
-        glRenderbufferStorage(GL_RENDERBUFFER, static_cast<GLenum>(type), size.width, size.height));
+        glRenderbufferStorage(GL_RENDERBUFFER, Enum<gfx::RenderbufferPixelType>::to(type), size.width, size.height));
     bindRenderbuffer = 0;
     return renderbuffer;
 }
@@ -433,7 +417,7 @@ void checkFramebuffer() {
 }
 
 void bindDepthStencilRenderbuffer(
-    const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
+    const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
 #ifdef GL_DEPTH_STENCIL_ATTACHMENT
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
                                                GL_RENDERBUFFER, depthStencil.renderbuffer));
@@ -448,8 +432,8 @@ void bindDepthStencilRenderbuffer(
 } // namespace
 
 Framebuffer
-Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& color,
-                           const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
+Context::createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>& color,
+                           const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
     if (color.size != depthStencil.size) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }
@@ -462,7 +446,7 @@ Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& color,
     return { color.size, std::move(fbo) };
 }
 
-Framebuffer Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA>& color) {
+Framebuffer Context::createFramebuffer(const Renderbuffer<gfx::RenderbufferPixelType::RGBA>& color) {
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
@@ -473,7 +457,7 @@ Framebuffer Context::createFramebuffer(const Renderbuffer<RenderbufferType::RGBA
 
 Framebuffer
 Context::createFramebuffer(const gfx::Texture& color,
-                           const Renderbuffer<RenderbufferType::DepthStencil>& depthStencil) {
+                           const Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>& depthStencil) {
     if (color.size != depthStencil.size) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }
@@ -499,7 +483,7 @@ Framebuffer Context::createFramebuffer(const gfx::Texture& color) {
 
 Framebuffer
 Context::createFramebuffer(const gfx::Texture& color,
-                           const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget) {
+                           const Renderbuffer<gfx::RenderbufferPixelType::Depth>& depthTarget) {
     if (color.size != depthTarget.size) {
         throw std::runtime_error("Renderbuffer size mismatch");
     }

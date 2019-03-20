@@ -18,7 +18,7 @@ public:
                      gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
     OffscreenTexture(gfx::Context&,
                      Size size,
-                     gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&,
+                     gl::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
                      gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
     ~OffscreenTexture();
     OffscreenTexture(OffscreenTexture&&);
