@@ -53,7 +53,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 
     // TODO: remove cast
-    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
 
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& viewportSize = parameters.staticData.backendSize;

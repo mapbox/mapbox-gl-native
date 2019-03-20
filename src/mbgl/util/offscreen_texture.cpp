@@ -66,7 +66,7 @@ OffscreenTexture::OffscreenTexture(gfx::Context& context,
                                    const Size size,
                                    const gfx::TextureChannelDataType type)
     // TODO: remove cast
-    : impl(std::make_unique<Impl>(reinterpret_cast<gl::Context&>(context), std::move(size), type)) {
+    : impl(std::make_unique<Impl>(static_cast<gl::Context&>(context), std::move(size), type)) {
     assert(!size.isEmpty());
 }
 
@@ -75,7 +75,7 @@ OffscreenTexture::OffscreenTexture(gfx::Context& context,
                                    gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>& renderbuffer,
                                    const gfx::TextureChannelDataType type)
     // TODO: remove cast
-    : impl(std::make_unique<Impl>(reinterpret_cast<gl::Context&>(context), std::move(size), renderbuffer, type)) {
+    : impl(std::make_unique<Impl>(static_cast<gl::Context&>(context), std::move(size), renderbuffer, type)) {
     assert(!size.isEmpty());
 }
 
