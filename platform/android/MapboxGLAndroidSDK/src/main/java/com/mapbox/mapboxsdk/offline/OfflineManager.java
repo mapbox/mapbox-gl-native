@@ -29,7 +29,7 @@ import java.nio.channels.FileChannel;
  * <p>
  * It'll help you list and create offline regions.
  * </p>
- * 
+ *
  * @see <a href="https://docs.mapbox.com/help/troubleshooting/mobile-offline/">Offline Maps Information/</a>
  */
 public class OfflineManager {
