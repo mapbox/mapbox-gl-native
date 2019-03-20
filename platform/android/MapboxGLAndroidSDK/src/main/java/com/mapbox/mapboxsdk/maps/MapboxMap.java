@@ -174,6 +174,9 @@ public final class MapboxMap {
    */
   void onDestroy() {
     locationComponent.onDestroy();
+    if (style != null) {
+      style.clear();
+    }
   }
 
   /**
@@ -813,7 +816,7 @@ public final class MapboxMap {
   public void setStyle(Style.Builder builder, final Style.OnStyleLoaded callback) {
     locationComponent.onStartLoadingMap();
     if (style != null) {
-      style.onWillStartLoadingMap();
+      style.clear();
     }
 
     if (callback != null) {
