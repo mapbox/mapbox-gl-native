@@ -100,8 +100,8 @@ public class Style {
    */
   public void addSource(@NonNull Source source) {
     validateState("addSource");
-    sources.put(source.getId(), source);
     nativeMap.addSource(source);
+    sources.put(source.getId(), source);
   }
 
   /**
@@ -172,8 +172,8 @@ public class Style {
    */
   public void addLayer(@NonNull Layer layer) {
     validateState("addLayer");
-    layers.put(layer.getId(), layer);
     nativeMap.addLayer(layer);
+    layers.put(layer.getId(), layer);
   }
 
   /**
@@ -184,8 +184,8 @@ public class Style {
    */
   public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
     validateState("addLayerBelow");
-    layers.put(layer.getId(), layer);
     nativeMap.addLayerBelow(layer, below);
+    layers.put(layer.getId(), layer);
   }
 
   /**
@@ -196,8 +196,8 @@ public class Style {
    */
   public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
     validateState("addLayerAbove");
-    layers.put(layer.getId(), layer);
     nativeMap.addLayerAbove(layer, above);
+    layers.put(layer.getId(), layer);
   }
 
   /**
@@ -209,8 +209,8 @@ public class Style {
    */
   public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
     validateState("addLayerAbove");
-    layers.put(layer.getId(), layer);
     nativeMap.addLayerAt(layer, index);
+    layers.put(layer.getId(), layer);
   }
 
   /**
