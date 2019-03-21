@@ -10,6 +10,7 @@
 * Added `MGLNetworkConfiguration` class to customize the SDK's `NSURLSessionConfiguration` object. ([#11447](https://github.com/mapbox/mapbox-gl-native/pull/13886))
 * Fixed an issue that caused `MGL_FUNCTION` to ignore multiple formatting parameters when passed a `format` function as parameter. ([#14064](https://github.com/mapbox/mapbox-gl-native/pull/14064))
 * Added `mgl_attributed:` expression operator, which concatenate `MGLAttributedExpression` objects for specifying rich text in the `MGLSymbolStyleLayer.text` property. ([#14094](https://github.com/mapbox/mapbox-gl-native/pull/14094))
+* Fixed an issue that caused conditional expressions to crash when passed nested conditional expressions as parameters. ([#14181](https://github.com/mapbox/mapbox-gl-native/pull/14181))
 
 ### Offline
 

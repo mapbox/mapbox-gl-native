@@ -846,12 +846,9 @@ using namespace std::string_literals;
     }
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"TERNARY(0 = 1, TRUE, TERNARY(1 = 2, TRUE, FALSE))"];
-        NSArray *jsonExpression = @[@"case", @[@"==", @0, @1], @YES, @[@"==", @1, @2], @YES, @NO];
+        NSArray *jsonExpression = @[@"case", @[@"==", @0, @1], @YES, @[@"case", @[@"==", @1, @2], @YES, @NO]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
-        expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, TRUE, %@, TRUE, FALSE)",
-                      MGLConstantExpression([NSPredicate predicateWithFormat:@"0 = 1"]),
-                      MGLConstantExpression([NSPredicate predicateWithFormat:@"1 = 2"])];
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
