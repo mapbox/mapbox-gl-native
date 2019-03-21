@@ -16,13 +16,16 @@ public:
     ResourceOptions();
     ~ResourceOptions();
 
+    ResourceOptions(ResourceOptions&&);
+    explicit ResourceOptions(const ResourceOptions&);
+
     /**
      * @brief Sets the Mapbox access token - see https://docs.mapbox.com/help/how-mapbox-works/access-tokens/ for details.
      *
      * @param token Mapbox access token.
-     * @return reference to ResourceOptions for chaining options together.
+     * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions& withAccessToken(std::string token);
+    ResourceOptions withAccessToken(std::string token);
 
     /**
      * @brief Gets the previously set (or default) Mapbox access token.
@@ -35,9 +38,9 @@ public:
      * @brief Sets the API base URL. Default is https://api.mapbox.com for Mapbox.
      *
      * @param baseURL API base URL.
-     * @return reference to ResourceOptions for chaining options together.
+     * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions& withBaseURL(std::string baseURL);
+    ResourceOptions withBaseURL(std::string baseURL);
 
     /**
      * @brief Gets the previously set (or default) API base URL.
@@ -50,9 +53,9 @@ public:
      * @brief Sets the cache path.
      *
      * @param path Cache path.
-     * @return reference to ResourceOptions for chaining options together.
+     * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions& withCachePath(std::string path);
+    ResourceOptions withCachePath(std::string path);
 
     /**
      * @brief Gets the previously set (or default) cache path.
@@ -66,9 +69,9 @@ public:
      * the asset:// scheme gets resolved in a style.
      *
      * @param path Asset path.
-     * @return reference to ResourceOptions for chaining options together.
+     * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions& withAssetPath(std::string path);
+    ResourceOptions withAssetPath(std::string path);
 
     /**
      * @brief Gets the previously set (or default) asset path.
@@ -83,7 +86,7 @@ public:
      * @param size Cache maximum size in bytes.
      * @return reference to ResourceOptions for chaining options together.
      */
-    ResourceOptions& withMaximumCacheSize(uint64_t size);
+    ResourceOptions withMaximumCacheSize(uint64_t size);
 
     /**
      * @brief Gets the previously set (or default) maximum allowed cache size.
@@ -99,7 +102,7 @@ public:
      * @param context Platform context.
      * @return reference to ResourceOptions for chaining options together.
      */
-    ResourceOptions& withPlatformContext(void* context);
+    ResourceOptions withPlatformContext(void* context);
 
     /**
      * @brief Gets the previously set (or default) platform context.
@@ -110,7 +113,7 @@ public:
 
 private:
     class Impl;
-    std::shared_ptr<Impl> impl_;
+    std::unique_ptr<Impl> impl_;
 };
 
 } // namespace mbgl

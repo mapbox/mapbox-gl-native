@@ -94,12 +94,14 @@ int main(int argc, char *argv[]) {
     view = &backend;
 
     // Set access token if present
-    const char *token = getenv("MAPBOX_ACCESS_TOKEN");
-    if (token == nullptr) {
+    std::string token(getenv("MAPBOX_ACCESS_TOKEN") ?: "");
+    if (token.empty()) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     }
 
-    auto resourceOptions = mbgl::ResourceOptions().withCachePath(cacheDB).withAssetPath(".").withAccessToken(std::string(token));
+    mbgl::ResourceOptions resourceOptions;
+    resourceOptions.withCachePath(cacheDB).withAccessToken(token);
+
     auto fileSource = std::static_pointer_cast<mbgl::DefaultFileSource>(mbgl::FileSource::getSharedFileSource(resourceOptions));
     if (!settings.online) {
         fileSource->setOnlineStatus(false);

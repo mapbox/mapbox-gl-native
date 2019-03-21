@@ -10,39 +10,42 @@ public:
     bool crossSourceCollisions = true;
 };
 
-MapOptions::MapOptions() : impl_(std::make_shared<MapOptions::Impl>()) {}
+// These requires the complete type of Impl.
+MapOptions::MapOptions() : impl_(std::make_unique<Impl>()) {}
 MapOptions::~MapOptions() = default;
+MapOptions::MapOptions(MapOptions&&) = default;
+MapOptions::MapOptions(const MapOptions& other) : impl_(std::make_unique<Impl>(*other.impl_)) {}
 
-MapOptions& MapOptions::withMapMode(MapMode mode) {
+MapOptions MapOptions::withMapMode(MapMode mode) {
     impl_->mapMode = mode;
-    return *this;
+    return std::move(*this);
 }
 
 MapMode MapOptions::mapMode() const {
     return impl_->mapMode;
 }
 
-MapOptions& MapOptions::withConstrainMode(ConstrainMode mode) {
+MapOptions MapOptions::withConstrainMode(ConstrainMode mode) {
     impl_->constrainMode = mode;
-    return *this;
+    return std::move(*this);
 }
 
 ConstrainMode MapOptions::constrainMode() const {
     return impl_->constrainMode;
 }
 
-MapOptions& MapOptions::withViewportMode(ViewportMode mode) {
+MapOptions MapOptions::withViewportMode(ViewportMode mode) {
     impl_->viewportMode = mode;
-    return *this;
+    return std::move(*this);
 }
 
 ViewportMode MapOptions::viewportMode() const {
     return impl_->viewportMode;
 }
 
-MapOptions& MapOptions::withCrossSourceCollisions(bool enableCollisions) {
+MapOptions MapOptions::withCrossSourceCollisions(bool enableCollisions) {
     impl_->crossSourceCollisions = enableCollisions;
-    return *this;
+    return std::move(*this);
 }
 
 bool MapOptions::crossSourceCollisions() const {
