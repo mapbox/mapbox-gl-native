@@ -31,7 +31,7 @@ FileSource::FileSource(jni::JNIEnv& _env,
     std::string path = jni::Make<std::string>(_env, _cachePath);
     mapbox::sqlite::setTempPath(path);
 
-    resourceOptions = mbgl::ResourceOptions()
+    resourceOptions
         .withAccessToken(accessToken ? jni::Make<std::string>(_env, accessToken) : "")
         .withCachePath(path + DATABASE_FILE)
         .withPlatformContext(reinterpret_cast<void*>(new AssetManagerFileSource(_env, assetManager)));
@@ -120,7 +120,7 @@ FileSource* FileSource::getNativePeer(jni::JNIEnv& env, const jni::Object<FileSo
 mbgl::ResourceOptions FileSource::getSharedResourceOptions(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource) {
     FileSource* fileSource = FileSource::getNativePeer(env, jFileSource);
     assert(fileSource != nullptr);
-    return fileSource->resourceOptions;
+    return mbgl::ResourceOptions(fileSource->resourceOptions);
 }
 
 void FileSource::registerNative(jni::JNIEnv& env) {

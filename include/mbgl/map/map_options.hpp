@@ -17,15 +17,18 @@ public:
     MapOptions();
     ~MapOptions();
 
+    MapOptions(MapOptions&&);
+    explicit MapOptions(const MapOptions&);
+
     /**
      * @brief Sets the map rendering mode. By default, it is set to Continuous
      * so the map will render as data arrives from the network and react
      * immediately to state changes.
      *
      * @param mode Map rendering mode.
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
-    MapOptions& withMapMode(MapMode mode);
+    MapOptions withMapMode(MapMode mode);
 
     /**
      * @brief Gets the previously set (or default) map mode.
@@ -40,9 +43,9 @@ public:
      * HeightOnly.
      *
      * @param mode Map constrain mode.
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
-    MapOptions& withConstrainMode(ConstrainMode mode);
+    MapOptions withConstrainMode(ConstrainMode mode);
 
     /**
      * @brief Gets the previously set (or default) constrain mode.
@@ -56,9 +59,9 @@ public:
      * orientation of the map as some devices may use inverted orientation.
      *
      * @param mode Viewport mode.
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
-    MapOptions& withViewportMode(ViewportMode mode);
+    MapOptions withViewportMode(ViewportMode mode);
 
     /**
      * @brief Gets the previously set (or default) viewport mode.
@@ -72,9 +75,9 @@ public:
      * or not. By default, it is set to true.
      *
      * @param enableCollisions true to enable, false to disable
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
-    MapOptions& withCrossSourceCollisions(bool enableCollisions);
+    MapOptions withCrossSourceCollisions(bool enableCollisions);
 
     /**
      * @brief Gets the previously set (or default) crossSourceCollisions value.
@@ -86,7 +89,7 @@ public:
 
 private:
     class Impl;
-    std::shared_ptr<Impl> impl_;
+    std::unique_ptr<Impl> impl_;
 };
 
 }  // namespace mbgl
