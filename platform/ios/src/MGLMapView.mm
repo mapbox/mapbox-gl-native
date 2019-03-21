@@ -2564,11 +2564,13 @@ public:
     }
 }
 
-- (void)setPrefetchesTiles:(BOOL)prefetchesTiles{
+- (void)setPrefetchesTiles:(BOOL)prefetchesTiles
+{
     _mbglMap->setPrefetchZoomDelta(prefetchesTiles ? mbgl::util::DEFAULT_PREFETCH_ZOOM_DELTA : 0);
 }
 
-- (BOOL)prefetchesTiles{
+- (BOOL)prefetchesTiles
+{
     return _mbglMap->getPrefetchZoomDelta() > 0 ? YES : NO;
 }
 
