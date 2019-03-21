@@ -1432,6 +1432,10 @@ public:
         }
 
         NSLog(@"sleepGL - taking snapshot");
+        
+        // $$JR - taking a snapshot calls `glkView:drawInRect:`, so the snapshot
+        // should NOT be called in the background. We should generate the snapshot
+        // when resigning active (rather than did enter background)
         self.glSnapshotView.image = self.glView.snapshot;
         self.glSnapshotView.hidden = NO;
         NSLog(@"sleepGL - snapshot=%p", self.glSnapshotView.image);
