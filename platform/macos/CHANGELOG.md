@@ -13,7 +13,7 @@
 
 ### Offline
 
-* Fixed a bug that caused offline packs created prior to [#11055](https://github.com/mapbox/mapbox-gl-native/pull/11055) to be marked as `MGLOfflinePackStateInactive`. ([#14188](https://github.com/mapbox/mapbox-gl-native/pull/14188))
+* Fixed a bug that caused offline packs created prior to v0.7.0 (introduced in [#11055](https://github.com/mapbox/mapbox-gl-native/pull/11055)) to be marked as `MGLOfflinePackStateInactive`. ([#14188](https://github.com/mapbox/mapbox-gl-native/pull/14188))
 
 ### Annotations
 
