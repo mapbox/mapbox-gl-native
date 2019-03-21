@@ -4,17 +4,25 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 4.10.0
 
+### Styles and rendering
+
 * Client-side text rendering of CJK ideographs is now enabled by default. ([#13988](https://github.com/mapbox/mapbox-gl-native/pull/13988))
-* Added an MGLMapView.prefetchesTiles property that you can disable if you don’t want to prefetch simplified tiles as a performance optimization. ([#14031](https://github.com/mapbox/mapbox-gl-native/pull/14031))
 * Fixed an issue that caused `MGL_FUNCTION` to ignore multiple formatting parameters when passed a `format` function as parameter. ([#14064](https://github.com/mapbox/mapbox-gl-native/pull/14064))
-* Added a Galician localization. ([#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095))
-* Added `mgl_attributed:` expression operator, which concatenate `MGLAttributedExpression` objects for specifying rich text in the `MGLSymbolStyleLayer.text` property. ([#14094](https://github.com/mapbox/mapbox-gl-native/pull/14094))
-* Fixed a bug that caused offline packs created prior to v4.0.0 (introduced in [#11055](https://github.com/mapbox/mapbox-gl-native/pull/11055)) to be marked as `MGLOfflinePackStateInactive`. ([#14188](https://github.com/mapbox/mapbox-gl-native/pull/14188))
+* Added `mgl_attributed:` expression operator, which concatenates `MGLAttributedExpression` objects for specifying rich text in the `MGLSymbolStyleLayer.text` property. ([#14094](https://github.com/mapbox/mapbox-gl-native/pull/14094))
 * Fixed an issue that caused conditional expressions to crash when passed nested conditional expressions as parameters. ([#14181](https://github.com/mapbox/mapbox-gl-native/pull/14181))
 
-### User interaction
+### Packaging
 
-* Added `MGLOrnamentPosition` enum and margins methods to customize MGLMapView's scale bar, compass, logo and attribution position. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
+* Added a Galician localization. ([#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095))
+
+### Offline maps
+
+* Fixed a bug that caused offline packs created prior to v4.0.0 to be marked as `MGLOfflinePackStateInactive`. ([#14188](https://github.com/mapbox/mapbox-gl-native/pull/14188))
+
+### Other changes
+
+* Added `MGLOrnamentPosition` enum and margin properties to customize scale bar, compass, logo, and attribution position within the map view. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
+* Added an `MGLMapView.prefetchesTiles` property to configure lower-resolution tile prefetching behavior. ([#14031](https://github.com/mapbox/mapbox-gl-native/pull/14031))
 
 ## 4.9.0 - February 27, 2019
 
