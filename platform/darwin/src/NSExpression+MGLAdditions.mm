@@ -1230,27 +1230,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         }
             
         case NSConditionalExpressionType: {
-            NSMutableArray *arguments = [NSMutableArray arrayWithObjects:self.predicate.mgl_jsonExpressionObject, nil];
+            NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"case", self.predicate.mgl_jsonExpressionObject, nil];
+            [arguments addObject:self.trueExpression.mgl_jsonExpressionObject];
+            [arguments addObject:self.falseExpression.mgl_jsonExpressionObject];
             
-            if (self.trueExpression.expressionType == NSConditionalExpressionType) {
-                // Fold nested conditionals into a single case expression.
-                NSArray *trueArguments = self.trueExpression.mgl_jsonExpressionObject;
-                trueArguments = [trueArguments subarrayWithRange:NSMakeRange(1, trueArguments.count - 1)];
-                [arguments addObjectsFromArray:trueArguments];
-            } else {
-                [arguments addObject:self.trueExpression.mgl_jsonExpressionObject];
-            }
-            
-            if (self.falseExpression.expressionType == NSConditionalExpressionType) {
-                // Fold nested conditionals into a single case expression.
-                NSArray *falseArguments = self.falseExpression.mgl_jsonExpressionObject;
-                falseArguments = [falseArguments subarrayWithRange:NSMakeRange(1, falseArguments.count - 1)];
-                [arguments addObjectsFromArray:falseArguments];
-            } else {
-                [arguments addObject:self.falseExpression.mgl_jsonExpressionObject];
-            }
-            
-            [arguments insertObject:@"case" atIndex:0];
             return arguments;
         }
             
