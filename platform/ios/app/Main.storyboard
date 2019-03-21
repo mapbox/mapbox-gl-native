@@ -59,8 +59,6 @@
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
-                        <outlet property="frameTimeGraphView" destination="BHE-Wn-x69" id="sFg-9b-DgH"/>
-                        <outlet property="hudLabel" destination="58y-pX-YyB" id="aGG-7a-bZR"/>
                         <segue destination="zvf-Qd-4Ru" kind="show" identifier="ShowSnapshots" id="hzX-Jp-UJq"/>
                         <segue destination="dgL-Bu-te0" kind="show" identifier="ShowCustomLocationManger" id="kDM-0K-hSf"/>
                     </connections>
@@ -71,55 +69,6 @@
                         <action selector="handleLongPress:" destination="WaX-pd-UZQ" id="dkk-bc-rvl"/>
                     </connections>
                 </pongPressGestureRecognizer>
-                <view contentMode="scaleToFill" id="kNe-zV-9ha" customClass="MGLMapView">
-                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <subviews>
-                        <button hidden="YES" opaque="NO" userInteractionEnabled="NO" alpha="0.69999999999999996" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="58y-pX-YyB">
-                            <rect key="frame" x="16" y="50" width="40" height="20"/>
-                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                            <accessibility key="accessibilityConfiguration">
-                                <accessibilityTraits key="traits" button="YES" notEnabled="YES"/>
-                            </accessibility>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="viz-kn-dfK"/>
-                                <constraint firstAttribute="height" constant="20" id="zSU-Mb-f1v"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                            <inset key="contentEdgeInsets" minX="4" minY="2" maxX="4" maxY="2"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                    <integer key="value" value="2"/>
-                                </userDefinedRuntimeAttribute>
-                            </userDefinedRuntimeAttributes>
-                        </button>
-                        <view hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BHE-Wn-x69" customClass="MBXFrameTimeGraphView">
-                            <rect key="frame" x="0.0" y="467" width="375" height="200"/>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <accessibility key="accessibilityConfiguration">
-                                <accessibilityTraits key="traits" notEnabled="YES"/>
-                            </accessibility>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="200" id="TgT-yb-9e5"/>
-                            </constraints>
-                        </view>
-                    </subviews>
-                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <gestureRecognizers/>
-                    <constraints>
-                        <constraint firstItem="58y-pX-YyB" firstAttribute="top" secondItem="kNe-zV-9ha" secondAttribute="topMargin" constant="30" id="89S-qk-mPR"/>
-                        <constraint firstItem="BHE-Wn-x69" firstAttribute="leading" secondItem="kNe-zV-9ha" secondAttribute="leading" id="aHd-3F-9nV"/>
-                        <constraint firstAttribute="bottom" secondItem="BHE-Wn-x69" secondAttribute="bottom" id="bfH-4q-2uU"/>
-                        <constraint firstItem="58y-pX-YyB" firstAttribute="leading" secondItem="kNe-zV-9ha" secondAttribute="leadingMargin" id="cXU-Qh-ilW"/>
-                        <constraint firstAttribute="trailing" secondItem="BHE-Wn-x69" secondAttribute="trailing" id="lZL-gi-2XC"/>
-                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="58y-pX-YyB" secondAttribute="trailing" id="txU-Gp-2du"/>
-                    </constraints>
-                    <viewLayoutGuide key="safeArea" id="EIN-ng-f35"/>
-                    <connections>
-                        <outlet property="delegate" destination="WaX-pd-UZQ" id="za0-3B-qR6"/>
-                        <outletCollection property="gestureRecognizers" destination="lfd-mn-7en" appends="YES" id="0PH-gH-GRm"/>
-                    </connections>
-                </view>
             </objects>
             <point key="canvasLocation" x="1365.5999999999999" y="348.57571214392806"/>
         </scene>

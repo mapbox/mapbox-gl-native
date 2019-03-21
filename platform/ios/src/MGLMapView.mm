@@ -1390,7 +1390,7 @@ public:
 
 - (void)sleepGL:(__unused NSNotification *)notification
 {
-    NSLog(@"sleepGL START");
+    NSLog(@"sleepGL START (self=%p)", self);
     // If this view targets an external display, such as AirPlay or CarPlay, we
     // can safely continue to render OpenGL content without tripping
     // gpus_ReturnNotPermittedKillClient in libGPUSupportMercury, because the
@@ -1398,6 +1398,7 @@ public:
     // background.
     if (self.window.screen != [UIScreen mainScreen])
     {
+        NSLog(@"sleepGL early return");
         return;
     }
     
@@ -1447,7 +1448,7 @@ public:
         [self.glView deleteDrawable];
     }
     
-    NSLog(@"sleepGL END");
+    NSLog(@"sleepGL END (self=%p)", self);
 }
 
 - (void)wakeGL:(__unused NSNotification *)notification
