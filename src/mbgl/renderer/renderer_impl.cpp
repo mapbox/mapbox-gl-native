@@ -310,13 +310,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     backend.updateAssumedState();
 
-    // TODO: remove cast
-    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
-
-    if (parameters.contextMode == GLContextMode::Shared) {
-        glContext.setDirtyState();
-    }
-   
     // Set render tiles to the render items.
     for (auto& renderItem : renderItems) {
         if (!renderItem.source) {
@@ -370,6 +363,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 placement->updateLayerOpacities(*symbolLayer);
             }
         }
+    }
+
+    const auto encoder = parameters.context.createCommandEncoder();
+
+    // TODO: remove cast
+    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
+
+    if (parameters.contextMode == GLContextMode::Shared) {
+        glContext.setDirtyState();
     }
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
@@ -595,8 +597,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         observer->onDidFinishRenderingMap();
     }
 
-    // Cleanup only after signaling completion
-    parameters.context.performCleanup();
+    // CommandEncoder destructor submits render commands.
 }
 
 void  Renderer::Impl::flush() {

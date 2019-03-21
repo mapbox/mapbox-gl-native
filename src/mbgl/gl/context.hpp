@@ -214,6 +214,8 @@ private:
     VertexArray createVertexArray();
     bool supportsVertexArrays() const;
 
+    std::unique_ptr<gfx::CommandEncoder> createCommandEncoder() override;
+
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;
     friend detail::BufferDeleter;
