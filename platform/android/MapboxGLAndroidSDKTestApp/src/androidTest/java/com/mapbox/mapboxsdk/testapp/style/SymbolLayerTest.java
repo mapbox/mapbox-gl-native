@@ -598,7 +598,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getTextVariableAnchor().getValue());
 
     // Set and Get
-    String[] propertyValue = [undefined];
+    String[] propertyValue = new String[0];
     layer.setProperties(textVariableAnchor(propertyValue));
     assertEquals(layer.getTextVariableAnchor().getValue(), propertyValue);
   }
