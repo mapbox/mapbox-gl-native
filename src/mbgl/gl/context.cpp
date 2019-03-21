@@ -6,6 +6,7 @@
 #include <mbgl/gl/renderbuffer_resource.hpp>
 #include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gl/texture.hpp>
+#include <mbgl/gl/command_encoder.hpp>
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
@@ -689,6 +690,10 @@ void Context::setColorMode(const gfx::ColorMode& color) {
     }
 
     colorMask = color.mask;
+}
+
+std::unique_ptr<gfx::CommandEncoder> Context::createCommandEncoder() {
+    return std::make_unique<gl::CommandEncoder>(*this);
 }
 
 void Context::draw(const gfx::DrawMode& drawMode,

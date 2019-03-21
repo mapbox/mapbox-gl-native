@@ -6,6 +6,7 @@
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gfx/texture.hpp>
 #include <mbgl/gfx/renderbuffer.hpp>
+#include <mbgl/gfx/command_encoder.hpp>
 #include <mbgl/gfx/draw_scope.hpp>
 #include <mbgl/gfx/program.hpp>
 #include <mbgl/gfx/types.hpp>
@@ -148,6 +149,9 @@ public:
 private:
     template <typename Backend, typename Name>
     std::unique_ptr<Program<Name>> createProgram(const ProgramParameters&);
+
+public:
+    virtual std::unique_ptr<CommandEncoder> createCommandEncoder() = 0;
 };
 
 } // namespace gfx
