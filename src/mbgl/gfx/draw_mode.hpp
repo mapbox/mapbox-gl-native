@@ -9,12 +9,13 @@ namespace gfx {
 
 class DrawMode {
 protected:
-    DrawMode(DrawModeType type_, float)
-        : type(type_) {
+    DrawMode(DrawModeType type_, float value_)
+        : type(type_), value(value_) {
     }
 
 public:
     const DrawModeType type;
+    const float value;
 };
 
 class Points : public DrawMode {
