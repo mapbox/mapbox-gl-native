@@ -198,7 +198,11 @@ global.defaultValueJava = function(property) {
              switch (property.value) {
               case 'string':
               case 'enum':
-                return '[' + property['default'] + "]";
+                if (property['default'] !== undefined) {
+                    return '[' + property['default'] + ']';
+                } else {
+                    return 'new String[0]';
+                }
               case 'number':
                 var result ='new Float[] {';
                 for (var i = 0; i < property.length; i++) {
