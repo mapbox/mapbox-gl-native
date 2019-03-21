@@ -6,6 +6,12 @@ namespace mbgl {
 namespace gfx {
 
 enum class PrimitiveType : uint8_t {
+    Point,
+    Line,
+    Triangle,
+};
+
+enum class DrawModeType : uint8_t {
     Points,
     Lines,
     LineLoop,

@@ -12,7 +12,7 @@ namespace mbgl {
 
 class HeatmapTextureProgram : public Program<
     shaders::heatmap_texture,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     TypeList<attributes::a_pos>,
     TypeList<
         uniforms::u_matrix,

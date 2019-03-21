@@ -240,7 +240,7 @@ public:
 };
 
 template <class Shaders,
-          class Primitive,
+          gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,
           class TextureList,
@@ -266,7 +266,7 @@ public:
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, AttributeList, UniformList, TextureList>;
+    using ProgramType = gl::Program<AttributeList, UniformList, TextureList>;
 
     ProgramType program;
 
@@ -320,6 +320,7 @@ public:
               const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
+        static_assert(Primitive == DrawMode::primitive, "incompatible draw mode");
         for (auto& segment : segments) {
             auto drawScopeIt = segment.drawScopes.find(layerID);
 
@@ -347,7 +348,7 @@ public:
 
 class SymbolIconProgram : public SymbolProgram<
     shaders::symbol_icon,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -387,7 +388,7 @@ enum class SymbolSDFPart {
 template <class PaintProperties>
 class SymbolSDFProgram : public SymbolProgram<
     shaders::symbol_sdf,
-    gfx::Triangle,
+    gfx::PrimitiveType::Triangle,
     SymbolLayoutAttributes,
     TypeList<
         uniforms::u_matrix,
@@ -410,7 +411,7 @@ class SymbolSDFProgram : public SymbolProgram<
 {
 public:
     using BaseProgram = SymbolProgram<shaders::symbol_sdf,
-        gfx::Triangle,
+        gfx::PrimitiveType::Triangle,
         SymbolLayoutAttributes,
         TypeList<
             uniforms::u_matrix,

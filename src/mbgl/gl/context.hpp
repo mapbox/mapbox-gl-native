@@ -110,7 +110,7 @@ public:
     void setColorMode(const gfx::ColorMode&);
     void setCullFaceMode(const gfx::CullFaceMode&);
 
-    void draw(gfx::PrimitiveType,
+    void draw(gfx::DrawModeType,
               std::size_t indexOffset,
               std::size_t indexLength);
 

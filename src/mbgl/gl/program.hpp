@@ -24,11 +24,9 @@
 namespace mbgl {
 namespace gl {
 
-template <class P, class AttributeList, class UniformList, class TextureList>
+template <class AttributeList, class UniformList, class TextureList>
 class Program {
 public:
-    using Primitive = P;
-
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : program(
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
@@ -118,7 +116,7 @@ public:
 
     template <class DrawMode>
     void draw(gfx::Context& genericContext,
-              DrawMode drawMode,
+              const DrawMode& drawMode,
               const gfx::DepthMode& depthMode,
               const gfx::StencilMode& stencilMode,
               const gfx::ColorMode& colorMode,
@@ -130,7 +128,6 @@ public:
               const gfx::IndexBuffer& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) {
-        static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
         auto& context = reinterpret_cast<gl::Context&>(genericContext);
 
         context.setDrawMode(drawMode);
@@ -150,7 +147,7 @@ public:
                         indexBuffer,
                         attributeLocations.toBindingArray(attributeBindings));
 
-        context.draw(drawMode.primitiveType,
+        context.draw(drawMode.type,
                      indexOffset,
                      indexLength);
     }

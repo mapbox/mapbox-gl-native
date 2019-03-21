@@ -704,11 +704,11 @@ void Context::setColorMode(const gfx::ColorMode& color) {
     colorMask = color.mask;
 }
 
-void Context::draw(gfx::PrimitiveType primitiveType,
+void Context::draw(gfx::DrawModeType drawMode,
                    std::size_t indexOffset,
                    std::size_t indexLength) {
     MBGL_CHECK_ERROR(glDrawElements(
-        Enum<gfx::PrimitiveType>::to(primitiveType),
+        Enum<gfx::DrawModeType>::to(drawMode),
         static_cast<GLsizei>(indexLength),
         GL_UNSIGNED_SHORT,
         reinterpret_cast<GLvoid*>(sizeof(uint16_t) * indexOffset)));

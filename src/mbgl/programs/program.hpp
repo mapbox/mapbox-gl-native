@@ -16,7 +16,7 @@
 namespace mbgl {
 
 template <class Shaders,
-          class Primitive,
+          gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
           class LayoutUniformList,
           class TextureList,
@@ -39,7 +39,7 @@ public:
 
     using TextureBindings = gfx::TextureBindings<TextureList>;
 
-    using ProgramType = gl::Program<Primitive, AttributeList, UniformList, TextureList>;
+    using ProgramType = gl::Program<AttributeList, UniformList, TextureList>;
 
     ProgramType program;
 
@@ -86,6 +86,7 @@ public:
               const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
               const std::string& layerID) {
+        static_assert(Primitive == DrawMode::primitive, "incompatible draw mode");
         for (auto& segment : segments) {
             auto drawScopeIt = segment.drawScopes.find(layerID);
 

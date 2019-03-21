@@ -512,7 +512,6 @@
         "mbgl/gfx/draw_scope.hpp": "src/mbgl/gfx/draw_scope.hpp",
         "mbgl/gfx/index_buffer.hpp": "src/mbgl/gfx/index_buffer.hpp",
         "mbgl/gfx/index_vector.hpp": "src/mbgl/gfx/index_vector.hpp",
-        "mbgl/gfx/primitives.hpp": "src/mbgl/gfx/primitives.hpp",
         "mbgl/gfx/stencil_mode.hpp": "src/mbgl/gfx/stencil_mode.hpp",
         "mbgl/gfx/texture.hpp": "src/mbgl/gfx/texture.hpp",
         "mbgl/gfx/types.hpp": "src/mbgl/gfx/types.hpp",
