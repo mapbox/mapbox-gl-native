@@ -29,10 +29,6 @@ class Program {
 public:
     using Primitive = P;
 
-    using AttributeBindings = gfx::AttributeBindings<AttributeList>;
-    using UniformValues = gfx::UniformValues<UniformList>;
-    using TextureBindings = gfx::TextureBindings<TextureList>;
-
     Program(Context& context, const std::string& vertexSource, const std::string& fragmentSource)
         : program(
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
@@ -46,7 +42,7 @@ public:
         uniformStates.queryLocations(program);
 
         // Texture units are specified via uniforms as well, so we need query their locations
-        textures.queryLocations(program);
+        textureStates.queryLocations(program);
     }
 
     template <class BinaryProgram>
@@ -54,7 +50,7 @@ public:
         : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
           attributeLocations(binaryProgram) {
         uniformStates.loadNamedLocations(binaryProgram);
-        textures.loadNamedLocations(binaryProgram);
+        textureStates.loadNamedLocations(binaryProgram);
     }
 
     static Program createProgram(gl::Context& context,
@@ -115,7 +111,7 @@ public:
                                   identifier,
                                   attributeLocations.getNamedLocations(),
                                   uniformStates.getNamedLocations(),
-                                  textures.getNamedLocations() };
+                                  textureStates.getNamedLocations() };
         }
         return {};
     }
@@ -127,10 +123,10 @@ public:
               gfx::StencilMode stencilMode,
               gfx::ColorMode colorMode,
               gfx::CullFaceMode cullFaceMode,
-              const UniformValues& uniformValues,
+              const gfx::UniformValues<UniformList>& uniformValues,
               gfx::DrawScope& drawScope,
-              const AttributeBindings& attributeBindings,
-              const TextureBindings& textureBindings,
+              const gfx::AttributeBindings<AttributeList>& attributeBindings,
+              const gfx::TextureBindings<TextureList>& textureBindings,
               const gfx::IndexBuffer& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) {
@@ -147,7 +143,7 @@ public:
 
         uniformStates.bind(uniformValues);
 
-        textures.bind(context, textureBindings);
+        textureStates.bind(context, textureBindings);
 
         auto& vertexArray = reinterpret_cast<gl::DrawScopeResource&>(*drawScope.resource).vertexArray;
         vertexArray.bind(context,
@@ -162,9 +158,9 @@ public:
 private:
     UniqueProgram program;
 
-    gl::UniformStates<UniformList> uniformStates;
     gl::AttributeLocations<AttributeList> attributeLocations;
-    gl::Textures<TextureList> textures;
+    gl::UniformStates<UniformList> uniformStates;
+    gl::TextureStates<TextureList> textureStates;
 };
 
 } // namespace gl
