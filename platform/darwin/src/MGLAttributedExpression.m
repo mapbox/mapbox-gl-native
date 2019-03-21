@@ -2,7 +2,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 
 const MGLAttributedExpressionKey MGLFontNamesAttribute = @"text-font";
-const MGLAttributedExpressionKey MGLFontSizeAttribute = @"font-scale";
+const MGLAttributedExpressionKey MGLFontScaleAttribute = @"font-scale";
 const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
 
 @implementation MGLAttributedExpression
@@ -12,7 +12,7 @@ const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
     return self;
 }
 
-+ (instancetype)attributedExpression:(NSExpression *)expression fontNames:(nullable NSArray<NSString *> *)fontNames fontSize:(nullable NSNumber *)fontSize {
++ (instancetype)attributedExpression:(NSExpression *)expression fontNames:(nullable NSArray<NSString *> *)fontNames fontScale:(nullable NSNumber *)fontScale {
     MGLAttributedExpression *attributedExpression;
     
     NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
@@ -21,8 +21,8 @@ const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
         attrs[MGLFontNamesAttribute] = fontNames;
     }
     
-    if (fontSize) {
-        attrs[MGLFontSizeAttribute] = fontSize;
+    if (fontScale) {
+        attrs[MGLFontScaleAttribute] = fontScale;
     }
     
     attributedExpression = [[self alloc] initWithExpression:expression attributes:attrs];

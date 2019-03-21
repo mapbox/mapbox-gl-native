@@ -551,7 +551,7 @@ with the `MGLSymbolStyleLayer.text` property.
  Key | Value Type
  --- | ---
  `MGLFontNamesAttribute` | `NSArray<NSString *>*`
- `MGLFontSizeAttribute` | `NSNumber`
+ `MGLFontScaleAttribute` | `NSNumber`
  `MGLFontColorAttribute` | `UIColor` or `NSColor` on macos
 
 This function corresponds to the
