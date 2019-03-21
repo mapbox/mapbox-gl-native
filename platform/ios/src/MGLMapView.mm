@@ -445,6 +445,12 @@ public:
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
     if (!background)
     {
+        // $$JR - TODO: Check that the GL view correctly resizes (or that
+        // the correct size is used when creating the framebuffer)
+        // This creates the GL view, but this can be called from initWithCoder
+        // with a size set from IB. Which might be very different from the
+        // actual device we're running on (imagine IB design is iPhone, device
+        // is iPad
         [self createGLView];
     }
 
@@ -964,8 +970,26 @@ public:
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(__unused GLKView *)view drawInRect:(__unused CGRect)rect
 {
+    BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    NSLog(@"glkView:drawInRect: background=%d dormant=%d renderer=%d",
+          background,
+          self.dormant,
+          (_rendererFrontend != nullptr));
+    
+    // $$JR
+    // This if statement looks wrong, shouldn't it be
+    //
+    //    if ( ! self.dormant && (_rendererFrontend != nullptr) )
+    //    {
+    //        _rendererFrontend->render();
+    //    }
+    // ?
+    //
+    
     if ( ! self.dormant || ! _rendererFrontend)
     {
+        // Ideally we'd have separate update/render here,
+        // perhaps even double-buffered
         _rendererFrontend->render();
     }
 }
@@ -1098,7 +1122,10 @@ public:
     if (displayLink && displayLink != _displayLink) {
         return;
     }
-    
+
+    BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    NSLog(@"updateFromDisplayLink: background=%d", background);
+
     if (_needsDisplayRefresh)
     {
         _needsDisplayRefresh = NO;
@@ -1156,6 +1183,15 @@ public:
 
 - (void)validateDisplayLink
 {
+    BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    NSLog(@"validateDisplayLink: background=%d", background);
+    
+    // $$JR TODO:
+    // What does "visible" mean here? Imagine a map view in a UIScrollView, where
+    // the map view is off-screen.
+    //
+    // This check below should consider the background state.
+    
     BOOL isVisible = self.superview && self.window;
     if (isVisible && ! _displayLink)
     {
@@ -1164,14 +1200,18 @@ public:
             self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
         }
 
+        NSLog(@"validateDisplayLink: Creating display link");
         _displayLink = [self.window.screen displayLinkWithTarget:self selector:@selector(updateFromDisplayLink:)];
         [self updateDisplayLinkPreferredFramesPerSecond];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
         _needsDisplayRefresh = YES;
+        
+        NSLog(@"validateDisplayLink: Manually calling update.");
         [self updateFromDisplayLink:_displayLink];
     }
     else if ( ! isVisible && _displayLink)
     {
+        NSLog(@"validateDisplayLink: invalidating link");
         [_displayLink invalidate];
         _displayLink = nil;
     }
@@ -1232,15 +1272,26 @@ public:
 
 - (void)didMoveToWindow
 {
+    BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    NSLog(@"didMoveToWindow: START window=%p background=%d", self.window, background);
+
     [self validateDisplayLink];
     [super didMoveToWindow];
+
+    NSLog(@"didMoveToWindow: END window=%p", self.window);
 }
 
 - (void)didMoveToSuperview
 {
+    BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    NSLog(@"didMoveToSuperview: START window=%p background=%d", self.window, background);
+
+    // $$JR Don't think we need validateDisplayLink here
     [self validateDisplayLink];
     [self installConstraints];
     [super didMoveToSuperview];
+    
+    NSLog(@"didMoveToSuperview: END window=%p", self.window);
 }
 
 - (void)refreshSupportedInterfaceOrientationsWithWindow:(UIWindow *)window {
@@ -1339,6 +1390,7 @@ public:
 
 - (void)sleepGL:(__unused NSNotification *)notification
 {
+    NSLog(@"sleepGL START");
     // If this view targets an external display, such as AirPlay or CarPlay, we
     // can safely continue to render OpenGL content without tripping
     // gpus_ReturnNotPermittedKillClient in libGPUSupportMercury, because the
@@ -1367,6 +1419,7 @@ public:
 
         [MGLMapboxEvents flush];
 
+        NSLog(@"sleepGL - pausing display link=%p", _displayLink);
         _displayLink.paused = YES;
 
         if ( ! self.glSnapshotView)
@@ -1377,8 +1430,10 @@ public:
             [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
         }
 
+        NSLog(@"sleepGL - taking snapshot");
         self.glSnapshotView.image = self.glView.snapshot;
         self.glSnapshotView.hidden = NO;
+        NSLog(@"sleepGL - snapshot=%p", self.glSnapshotView.image);
 
         if (self.debugMask && [self.glSnapshotView.subviews count] == 0)
         {
@@ -1388,17 +1443,24 @@ public:
             [self.glSnapshotView addSubview:snapshotTint];
         }
 
+        NSLog(@"sleepGL - deleting drawable");
         [self.glView deleteDrawable];
     }
+    
+    NSLog(@"sleepGL END");
 }
 
 - (void)wakeGL:(__unused NSNotification *)notification
 {
+    NSLog(@"wakeGL START");
+
     MGLLogInfo(@"Entering foreground.");
     MGLAssertIsMainThread();
 
     if (self.dormant && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground)
     {
+        NSLog(@"wakeGL from dormant");
+
         self.dormant = NO;
 
         [self createGLView];
@@ -1409,6 +1471,7 @@ public:
 
         [self.glView bindDrawable];
 
+        NSLog(@"wakeGL unpausing display link=%p", _displayLink);
         _displayLink.paused = NO;
 
         [self validateLocationServices];
@@ -1416,11 +1479,15 @@ public:
         [MGLMapboxEvents pushTurnstileEvent];
         [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
+    
+    NSLog(@"wakeGL END");
 }
 
 - (void)setHidden:(BOOL)hidden
 {
     super.hidden = hidden;
+    
+    NSLog(@"setHidden - pausing displaylink: %d", hidden);
     _displayLink.paused = hidden;
 }
 

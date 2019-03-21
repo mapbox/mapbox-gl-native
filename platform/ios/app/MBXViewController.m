@@ -234,14 +234,31 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     }
 }
 
+- (void)addMapViewAsSubview {
+    UIView *parentView = self.view;
+    
+    [parentView addSubview:self.mapView];
+    [self.mapView.topAnchor constraintEqualToAnchor:parentView.topAnchor].active = YES;
+    [self.mapView.leftAnchor constraintEqualToAnchor:parentView.leftAnchor].active = YES;
+    [self.mapView.rightAnchor constraintEqualToAnchor:parentView.rightAnchor].active = YES;
+    [self.mapView.bottomAnchor constraintEqualToAnchor:parentView.bottomAnchor].active = YES;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
+    // $$JR Rather than load the mapview from the storyboard (it's disconnected)
+    // we create the mapview here. This is so that we can install the above
+    // notification handlers BEFORE MGLMapView's
+    self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
+    [self addMapViewAsSubview];
+    
+    
     [self restoreState:nil];
 
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
@@ -318,6 +335,26 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             }
         }
     }];
+}
+
+- (void)didEnterBackground:(NSNotification *)notification {
+
+    // $$JR 
+    // Remove and re-add the mapview, to trigger the validateDisplayLink
+    // dance - this should ensure that the display link is created AND
+    // that updateFromDisplayLink is called from the background.
+    //
+    // This, coupled with the fact we now create the mapview AFTER, should
+    // ensure that MGLMapView.dormant == NO, when the render occurs. i.e.
+    // we've got into a situation where we're rendering GL in the background
+    
+    NSLog(@"didEnterBackground: start mapview shuffle");
+    [self.mapView removeFromSuperview];
+    [self addMapViewAsSubview];
+    NSLog(@"didEnterBackground: end");
+    
+    // Call the old method
+    [self saveState:notification];
 }
 
 - (void)saveState:(__unused NSNotification *)notification
