@@ -309,11 +309,11 @@ public:
 
     template <class DrawMode>
     void draw(gfx::Context& context,
-              DrawMode drawMode,
-              gfx::DepthMode depthMode,
-              gfx::StencilMode stencilMode,
-              gfx::ColorMode colorMode,
-              gfx::CullFaceMode cullFaceMode,
+              const DrawMode& drawMode,
+              const gfx::DepthMode& depthMode,
+              const gfx::StencilMode& stencilMode,
+              const gfx::ColorMode& colorMode,
+              const gfx::CullFaceMode& cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
               const SegmentVector<AttributeList>& segments,
               const UniformValues& uniformValues,
@@ -329,11 +329,11 @@ public:
 
             program.draw(
                 context,
-                std::move(drawMode),
-                std::move(depthMode),
-                std::move(stencilMode),
-                std::move(colorMode),
-                std::move(cullFaceMode),
+                drawMode,
+                depthMode,
+                stencilMode,
+                colorMode,
+                cullFaceMode,
                 uniformValues,
                 drawScopeIt->second,
                 allAttributeBindings.offset(segment.vertexOffset),
