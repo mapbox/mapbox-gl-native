@@ -3,7 +3,14 @@ add_executable(mbgl-offline
 )
 
 # args requires RTTI
-set_source_files_properties(bin/offline.cpp PROPERTIES COMPILE_OPTIONS "-frtti")
+# COMPILE_OPTIONS source file property was added in cmake version 3.11, so use
+# the property if the cmake version is 3.11 and greater. For older version of
+# cmake, use COMPILE_FLAGS to set the RTTI flag.
+if(CMAKE_VERSION VERSION_LESS 3.11.0)
+    set_source_files_properties(bin/offline.cpp PROPERTIES COMPILE_FLAGS "-frtti")
+else()
+    set_source_files_properties(bin/offline.cpp PROPERTIES COMPILE_OPTIONS "-frtti")
+endif()
 
 target_sources(mbgl-offline
     PRIVATE platform/default/include/mbgl/util/default_styles.hpp
