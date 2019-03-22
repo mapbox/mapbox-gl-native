@@ -1,9 +1,13 @@
 package com.mapbox.mapboxsdk.integration
 
 import android.support.test.filters.LargeTest
+import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.support.test.uiautomator.UiSelector
+import com.mapbox.mapboxsdk.testapp.activity.fragment.ViewPagerActivity
+import com.mapbox.mapboxsdk.testapp.activity.maplayout.GLSurfaceRecyclerViewActivity
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -13,20 +17,17 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ViewPagerScrollTest : BaseIntegrationTest() {
 
-  @Before
-  override fun beforeTest() {
-    super.beforeTest()
-    openFeature("ViewPager")
-  }
+  @get:Rule
+  var activityRule: ActivityTestRule<ViewPagerActivity> = ActivityTestRule(ViewPagerActivity::class.java)
 
   @Test
   @LargeTest
   fun scrollViewPager() {
-    for (i in 1..5) {
+    for (i in 1..4) {
       clickTab(i)
     }
 
-    for (i in 4 downTo 0) {
+    for (i in 3 downTo 0) {
       clickTab(i)
     }
   }
