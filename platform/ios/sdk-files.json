@@ -1,6 +1,7 @@
 {
     "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
     "sources": [
+        "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEDate.m",
         "platform/darwin/src/MGLBackgroundStyleLayer.mm",
         "platform/darwin/src/NSComparisonPredicate+MGLAdditions.mm",
         "platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Pinning/TSKSPKIHashCache.m",
@@ -36,7 +37,6 @@
         "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMETimerManager.m",
         "platform/darwin/src/MGLRasterStyleLayer.mm",
         "platform/darwin/src/MGLForegroundStyleLayer.mm",
-        "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENSDateWrapper.m",
         "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.m",
         "platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKPinFailureReport.m",
         "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogReportViewController.m",
@@ -242,6 +242,7 @@
         "NSComparisonPredicate+MGLAdditions.h": "platform/darwin/src/NSComparisonPredicate+MGLAdditions.h",
         "MGLMapAccessibilityElement.h": "platform/ios/src/MGLMapAccessibilityElement.h",
         "MGLScaleBar.h": "platform/ios/src/MGLScaleBar.h",
+        "MMEDate.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEDate.h",
         "CLLocationManager+MMEMobileEvents.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.h",
         "NSString+MGLAdditions.h": "platform/darwin/src/NSString+MGLAdditions.h",
         "UIDevice+MGLAdditions.h": "platform/ios/src/UIDevice+MGLAdditions.h",
@@ -321,7 +322,6 @@
         "MMELocationManager.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMELocationManager.h",
         "MMEMetrics.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetrics.h",
         "MMEMetricsManager.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetricsManager.h",
-        "MMENSDateWrapper.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENSDateWrapper.h",
         "MMENSURLSessionWrapper.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENSURLSessionWrapper.h",
         "MMETimerManager.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMETimerManager.h",
         "MMETypes.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMETypes.h",
