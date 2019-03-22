@@ -224,11 +224,11 @@ void SymbolBucket::sortFeatures(const float angle) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedRightTextIndex]);
         }
 
-        if (symbolInstance.placedCenterTextIndex) {
+        if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedCenterTextIndex]);
         }
 
-        if (symbolInstance.placedLeftTextIndex) {
+        if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedLeftTextIndex]);
         }
 

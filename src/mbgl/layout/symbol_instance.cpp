@@ -54,26 +54,37 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     iconOffset(iconOffset_),
     key(key_),
     textBoxScale(textBoxScale_),
-    radialTextOffset(radialTextOffset_) {
+    radialTextOffset(radialTextOffset_),
+    singleLine(shapedTextOrientations.singleLine) {
 
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
         iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.horizontal);
     }
-
-    if (shapedTextOrientations.right) {
+    
+    bool singleLineInitialized = false;
+    const auto initHorizontalGlyphQuads = [&] (SymbolQuads& quads, const Shaping& shaping) {
         writingModes |= WritingModeType::Horizontal;
-        rightJustifiedGlyphQuads = getGlyphQuads(shapedTextOrientations.right, textOffset, layout, textPlacement, positions);
+        if (!singleLine) {
+            quads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions);
+            return;
+        }
+        if (!singleLineInitialized) {
+            rightJustifiedGlyphQuads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions);
+            singleLineInitialized = true;
+        }
+    };
+    
+    if (shapedTextOrientations.right) {
+        initHorizontalGlyphQuads(rightJustifiedGlyphQuads, shapedTextOrientations.right);
     }
 
     if (shapedTextOrientations.center) {
-        writingModes |= WritingModeType::Horizontal;
-        centerJustifiedGlyphQuads = getGlyphQuads(shapedTextOrientations.center, textOffset, layout, textPlacement, positions);
+        initHorizontalGlyphQuads(centerJustifiedGlyphQuads, shapedTextOrientations.center);
     }
 
     if (shapedTextOrientations.left) {
-        writingModes |= WritingModeType::Horizontal;
-        leftJustifiedGlyphQuads = getGlyphQuads(shapedTextOrientations.left, textOffset, layout, textPlacement, positions);
+        initHorizontalGlyphQuads(leftJustifiedGlyphQuads, shapedTextOrientations.left);
     }
 
     if (shapedTextOrientations.vertical) {
