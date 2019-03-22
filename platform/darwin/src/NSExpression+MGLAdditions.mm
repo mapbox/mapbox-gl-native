@@ -882,19 +882,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     attrs = [NSMutableDictionary dictionaryWithDictionary:argumentObjects[index + 1]];
                 }
                 
-                if (attrs.count) {
-                    if (NSArray *fontNames = MGL_OBJC_DYNAMIC_CAST(attrs[MGLFontNamesAttribute], NSArray)) {
-                        attrs[MGLFontNamesAttribute] = fontNames[1];
-                    }
-                    if (NSArray *colorArray = MGL_OBJC_DYNAMIC_CAST(attrs[MGLFontColorAttribute], NSArray)) {
-                        if ([colorArray[0] isEqualToString:@"rgb"] || [colorArray[0] isEqualToString:@"rgba"]) {
-                            NSArray *colorArguments = [colorArray subarrayWithRange:NSMakeRange(1, colorArray.count - 1)];
-                            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(colorArguments);
-                            MGLColor *color = [NSExpression mgl_colorWithRGBComponents:subexpressions];
-
-                            attrs[MGLFontColorAttribute] = color;
-                        }
-                    }
+                for (NSString *key in attrs.allKeys) {
+                    attrs[key] = [NSExpression expressionWithMGLJSONObject:attrs[key]];
                 }
                 MGLAttributedExpression *attributedExpression = [[MGLAttributedExpression alloc] initWithExpression:expression attributes:attrs];
 
@@ -1016,17 +1005,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([constantValue isKindOfClass:[MGLAttributedExpression class]]) {
                 MGLAttributedExpression *attributedExpression = (MGLAttributedExpression *)constantValue;
                 id jsonObject = attributedExpression.expression.mgl_jsonExpressionObject;
-                NSMutableDictionary *attributedDictionary = [NSMutableDictionary dictionary];
+                NSMutableDictionary<MGLAttributedExpressionKey, NSExpression *> *attributedDictionary = [NSMutableDictionary dictionary];
                 
                 if (attributedExpression.attributes) {
                     attributedDictionary = [NSMutableDictionary dictionaryWithDictionary:attributedExpression.attributes];
-                    if (attributedDictionary[MGLFontNamesAttribute]) {
-                        attributedDictionary[MGLFontNamesAttribute] = @[@"literal", attributedDictionary[MGLFontNamesAttribute]];
+                    
+                    for (NSString *key in attributedExpression.attributes.allKeys) {
+                        attributedDictionary[key] = attributedExpression.attributes[key].mgl_jsonExpressionObject;
                     }
-                    if (attributedDictionary[MGLFontColorAttribute] && [attributedDictionary[MGLFontColorAttribute] isKindOfClass:[MGLColor class]]) {
-                        MGLColor *color = attributedDictionary[MGLFontColorAttribute];
-                        attributedDictionary[MGLFontColorAttribute] = color.mgl_jsonExpressionObject;
-                    }
+                    
                 } 
                 return @[jsonObject, attributedDictionary];
             }
