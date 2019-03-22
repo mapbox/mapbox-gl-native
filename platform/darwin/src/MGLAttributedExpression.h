@@ -2,10 +2,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSString * MGLAttributedExpressionKey NS_EXTENSIBLE_STRING_ENUM;
+/** Options for `MGLAttributedExpression.attributes`. */
+typedef NSString * MGLAttributedExpressionKey NS_TYPED_ENUM;
 
+/** The font name string array expression used to format the text. */
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontNamesAttribute;
+
+/** The font scale number expression relative to `MGLSymbolStyleLayer.textFontSize` used to format the text. */
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontScaleAttribute;
+
+/** The font color expression used to format the text. */
 FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontColorAttribute;
 
 /**
@@ -16,10 +22,10 @@ FOUNDATION_EXTERN MGL_EXPORT MGLAttributedExpressionKey const MGLFontColorAttrib
  ```swift
  let redColor = UIColor.red
  let expression = NSExpression(forConstantValue: "Foo")
- let attributes: Dictionary<MGLAttributedExpressionKey, NSExpression> = [.fontNamesAttribute : NSExpression(forConstantValue: ["DIN Offc Pro Italic",
-                                                                                                                               "Arial Unicode MS Regular"]),
-                                                                         .fontScaleAttribute: NSExpression(forConstantValue: 1.2),
-                                                                         .fontColorAttribute: NSExpression(forConstantValue: redColor)]
+ let attributes: [MGLAttributedExpressionKey: NSExpression] = [.fontNamesAttribute : NSExpression(forConstantValue: ["DIN Offc Pro Italic",
+                                                                                                                     "Arial Unicode MS Regular"]),
+                                                               .fontScaleAttribute: NSExpression(forConstantValue: 1.2),
+                                                               .fontColorAttribute: NSExpression(forConstantValue: redColor)]
  let attributedExpression = MGLAttributedExpression(expression, attributes:attributes)
  ```
  
@@ -37,9 +43,9 @@ MGL_EXPORT
  The formatting attributes dictionary.
  Key | Value Type
  --- | ---
- `MGLFontNamesAttribute` | `NSExpression`
- `MGLFontScaleAttribute` | `NSExpression`
- `MGLFontColorAttribute` | `NSExpression`
+ `MGLFontNamesAttribute` | An `NSExpression` evaluating to an `NSString` array.
+ `MGLFontScaleAttribute` | An `NSExpression` evaluating to an `NSNumber` value.
+ `MGLFontColorAttribute` | An `NSExpression` evaluating to an `UIColor`.
 
  */
 @property (strong, nonatomic, readonly) NSDictionary<MGLAttributedExpressionKey, NSExpression *> *attributes;
@@ -48,9 +54,9 @@ MGL_EXPORT
  The formatting attributes dictionary.
  Key | Value Type
  --- | ---
- `MGLFontNamesAttribute` | `NSExpression`
- `MGLFontScaleAttribute` | `NSExpression`
- `MGLFontColorAttribute` | `NSExpression`
+ `MGLFontNamesAttribute` | An `NSExpression` evaluating to an `NSString` array.
+ `MGLFontScaleAttribute` | An `NSExpression` evaluating to an `NSNumber` value.
+ `MGLFontColorAttribute` | An `NSExpression` evaluating to an `NSColor` on macos.
  */
 @property (strong, nonatomic, readonly) NSDictionary<MGLAttributedExpressionKey, NSExpression *> *attributes;
 #endif
