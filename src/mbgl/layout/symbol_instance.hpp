@@ -18,6 +18,7 @@ struct ShapedTextOrientations {
     Shaping& right = horizontal; 
     Shaping center;
     Shaping left;
+    bool singleLine = false;
 };
 
 class SymbolInstance {
@@ -45,14 +46,15 @@ public:
                    float radialTextOffset);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
-
     Anchor anchor;
     GeometryCoordinates line;
     bool hasText;
     bool hasIcon;
+    // Note: When singleLine == true, only `rightJustifiedGlyphQuads` is populated.
     SymbolQuads rightJustifiedGlyphQuads;
     SymbolQuads centerJustifiedGlyphQuads;
     SymbolQuads leftJustifiedGlyphQuads;
+
     SymbolQuads verticalGlyphQuads;
 
     optional<SymbolQuad> iconQuad;
@@ -72,6 +74,7 @@ public:
     optional<size_t> placedIconIndex;
     float textBoxScale;
     float radialTextOffset;
+    bool singleLine;
     uint32_t crossTileID = 0;
 };
 

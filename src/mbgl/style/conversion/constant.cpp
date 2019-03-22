@@ -147,11 +147,6 @@ optional<std::vector<float>> Converter<std::vector<float>>::operator()(const Con
     return result;
 }
 
-
-namespace {
-
-}  // namespace
-
 optional<std::vector<std::string>> Converter<std::vector<std::string>>::operator()(const Convertible& value, Error& error) const {
     if (!isArray(value)) {
         error.message = "value must be an array";
