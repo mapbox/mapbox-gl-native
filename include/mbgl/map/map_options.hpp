@@ -28,7 +28,7 @@ public:
      * @param mode Map rendering mode.
      * @return MapOptions for chaining options together.
      */
-    MapOptions withMapMode(MapMode mode);
+    MapOptions& withMapMode(MapMode mode);
 
     /**
      * @brief Gets the previously set (or default) map mode.
@@ -45,7 +45,7 @@ public:
      * @param mode Map constrain mode.
      * @return MapOptions for chaining options together.
      */
-    MapOptions withConstrainMode(ConstrainMode mode);
+    MapOptions& withConstrainMode(ConstrainMode mode);
 
     /**
      * @brief Gets the previously set (or default) constrain mode.
@@ -61,7 +61,7 @@ public:
      * @param mode Viewport mode.
      * @return MapOptions for chaining options together.
      */
-    MapOptions withViewportMode(ViewportMode mode);
+    MapOptions& withViewportMode(ViewportMode mode);
 
     /**
      * @brief Gets the previously set (or default) viewport mode.
@@ -77,7 +77,7 @@ public:
      * @param enableCollisions true to enable, false to disable
      * @return MapOptions for chaining options together.
      */
-    MapOptions withCrossSourceCollisions(bool enableCollisions);
+    MapOptions& withCrossSourceCollisions(bool enableCollisions);
 
     /**
      * @brief Gets the previously set (or default) crossSourceCollisions value.

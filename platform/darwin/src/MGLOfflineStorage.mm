@@ -226,8 +226,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         }
 
         _mbglCachePath = cachePath.UTF8String;
-        auto options = mbgl::ResourceOptions().withCachePath(_mbglCachePath)
-                                              .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+        mbgl::ResourceOptions options;
+        options.withCachePath(_mbglCachePath)
+               .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
         _mbglFileSource = std::static_pointer_cast<mbgl::DefaultFileSource>(mbgl::FileSource::getSharedFileSource(options));
 
         // Observe for changes to the API base URL (and find out the current one).
