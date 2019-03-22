@@ -19,54 +19,54 @@ ResourceOptions::~ResourceOptions() = default;
 ResourceOptions::ResourceOptions(ResourceOptions&&)  = default;
 ResourceOptions::ResourceOptions(const ResourceOptions& other) : impl_(std::make_unique<Impl>(*other.impl_)) {}
 
-ResourceOptions ResourceOptions::withAccessToken(std::string token) {
+ResourceOptions& ResourceOptions::withAccessToken(std::string token) {
     impl_->accessToken = std::move(token);
-    return std::move(*this);
+    return *this;
 }
 
 const std::string& ResourceOptions::accessToken() const {
     return impl_->accessToken;
 }
 
-ResourceOptions ResourceOptions::withBaseURL(std::string url) {
+ResourceOptions& ResourceOptions::withBaseURL(std::string url) {
     impl_->baseURL = std::move(url);
-    return std::move(*this);
+    return *this;
 }
 
 const std::string& ResourceOptions::baseURL() const {
     return impl_->baseURL;
 }
 
-ResourceOptions ResourceOptions::withCachePath(std::string path) {
+ResourceOptions& ResourceOptions::withCachePath(std::string path) {
     impl_->cachePath = std::move(path);
-    return std::move(*this);
+    return *this;
 }
 
 const std::string& ResourceOptions::cachePath() const {
     return impl_->cachePath;
 }
 
-ResourceOptions ResourceOptions::withAssetPath(std::string path) {
+ResourceOptions& ResourceOptions::withAssetPath(std::string path) {
     impl_->assetPath = std::move(path);
-    return std::move(*this);
+    return *this;
 }
 
 const std::string& ResourceOptions::assetPath() const {
     return impl_->assetPath;
 }
 
-ResourceOptions ResourceOptions::withMaximumCacheSize(uint64_t size) {
+ResourceOptions& ResourceOptions::withMaximumCacheSize(uint64_t size) {
     impl_->maximumSize = size;
-    return std::move(*this);
+    return *this;
 }
 
 uint64_t ResourceOptions::maximumCacheSize() const {
     return impl_->maximumSize;
 }
 
-ResourceOptions ResourceOptions::withPlatformContext(void* context) {
+ResourceOptions& ResourceOptions::withPlatformContext(void* context) {
     impl_->platformContext = context;
-    return std::move(*this);
+    return *this;
 }
 
 void* ResourceOptions::platformContext() const {

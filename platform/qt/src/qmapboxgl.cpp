@@ -1706,19 +1706,19 @@ void QMapboxGL::connectionEstablished()
 */
 
 mbgl::MapOptions mapOptionsFromQMapboxGLSettings(const QMapboxGLSettings &settings) {
-    return mbgl::MapOptions()
+    return std::move(mbgl::MapOptions()
         .withMapMode(static_cast<mbgl::MapMode>(settings.mapMode()))
         .withConstrainMode(static_cast<mbgl::ConstrainMode>(settings.constrainMode()))
-        .withViewportMode(static_cast<mbgl::ViewportMode>(settings.viewportMode()));
+        .withViewportMode(static_cast<mbgl::ViewportMode>(settings.viewportMode())));
 }
 
 mbgl::ResourceOptions resourceOptionsFromQMapboxGLSettings(const QMapboxGLSettings &settings) {
-    return mbgl::ResourceOptions()
+    return std::move(mbgl::ResourceOptions()
         .withAccessToken(settings.accessToken().toStdString())
         .withAssetPath(settings.assetPath().toStdString())
         .withBaseURL(settings.apiBaseUrl().toStdString())
         .withCachePath(settings.cacheDatabasePath().toStdString())
-        .withMaximumCacheSize(settings.cacheDatabaseMaximumSize());
+        .withMaximumCacheSize(settings.cacheDatabaseMaximumSize()));
 }
 
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio_)

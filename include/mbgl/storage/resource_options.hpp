@@ -25,7 +25,7 @@ public:
      * @param token Mapbox access token.
      * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions withAccessToken(std::string token);
+    ResourceOptions& withAccessToken(std::string token);
 
     /**
      * @brief Gets the previously set (or default) Mapbox access token.
@@ -40,7 +40,7 @@ public:
      * @param baseURL API base URL.
      * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions withBaseURL(std::string baseURL);
+    ResourceOptions& withBaseURL(std::string baseURL);
 
     /**
      * @brief Gets the previously set (or default) API base URL.
@@ -55,7 +55,7 @@ public:
      * @param path Cache path.
      * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions withCachePath(std::string path);
+    ResourceOptions& withCachePath(std::string path);
 
     /**
      * @brief Gets the previously set (or default) cache path.
@@ -71,7 +71,7 @@ public:
      * @param path Asset path.
      * @return ResourceOptions for chaining options together.
      */
-    ResourceOptions withAssetPath(std::string path);
+    ResourceOptions& withAssetPath(std::string path);
 
     /**
      * @brief Gets the previously set (or default) asset path.
@@ -86,7 +86,7 @@ public:
      * @param size Cache maximum size in bytes.
      * @return reference to ResourceOptions for chaining options together.
      */
-    ResourceOptions withMaximumCacheSize(uint64_t size);
+    ResourceOptions& withMaximumCacheSize(uint64_t size);
 
     /**
      * @brief Gets the previously set (or default) maximum allowed cache size.
@@ -102,7 +102,7 @@ public:
      * @param context Platform context.
      * @return reference to ResourceOptions for chaining options together.
      */
-    ResourceOptions withPlatformContext(void* context);
+    ResourceOptions& withPlatformContext(void* context);
 
     /**
      * @brief Gets the previously set (or default) platform context.

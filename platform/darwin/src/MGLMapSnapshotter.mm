@@ -624,9 +624,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     // App-global configuration
     MGLRendererConfiguration* config = [MGLRendererConfiguration currentConfiguration];
 
-    auto resourceOptions = mbgl::ResourceOptions()
-        .withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
-        .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+    mbgl::ResourceOptions resourceOptions;
+    resourceOptions.withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+                   .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
 
     // Create the snapshotter
     _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(
