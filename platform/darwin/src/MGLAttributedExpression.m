@@ -2,7 +2,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 
 const MGLAttributedExpressionKey MGLFontNamesAttribute = @"text-font";
-const MGLAttributedExpressionKey MGLFontSizeAttribute = @"font-scale";
+const MGLAttributedExpressionKey MGLFontScaleAttribute = @"font-scale";
 const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
 
 @implementation MGLAttributedExpression
@@ -12,24 +12,24 @@ const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
     return self;
 }
 
-+ (instancetype)attributedExpression:(NSExpression *)expression fontNames:(nullable NSArray<NSString *> *)fontNames fontSize:(nullable NSNumber *)fontSize {
++ (instancetype)attributedExpression:(NSExpression *)expression fontNames:(nullable NSArray<NSString *> *)fontNames fontScale:(nullable NSNumber *)fontScale {
     MGLAttributedExpression *attributedExpression;
     
     NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
     
     if (fontNames && fontNames.count > 0) {
-        attrs[MGLFontNamesAttribute] = fontNames;
+        attrs[MGLFontNamesAttribute] = [NSExpression expressionForConstantValue:fontNames];
     }
     
-    if (fontSize) {
-        attrs[MGLFontSizeAttribute] = fontSize;
+    if (fontScale) {
+        attrs[MGLFontScaleAttribute] = [NSExpression expressionForConstantValue:fontScale];
     }
     
     attributedExpression = [[self alloc] initWithExpression:expression attributes:attrs];
     return attributedExpression;
 }
 
-+ (instancetype)attributedExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey,id> *)attrs {
++ (instancetype)attributedExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey, NSExpression *> *)attrs {
     MGLAttributedExpression *attributedExpression;
     
     attributedExpression = [[self alloc] initWithExpression:expression attributes:attrs];
@@ -37,7 +37,7 @@ const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
     return attributedExpression;
 }
 
-- (instancetype)initWithExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey,id> *)attrs {
+- (instancetype)initWithExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey, NSExpression *> *)attrs {
     if (self = [super init])
     {
         MGLLogInfo(@"Starting %@ initialization.", NSStringFromClass([self class]));
