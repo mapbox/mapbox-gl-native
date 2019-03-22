@@ -15,8 +15,8 @@ workflows:
       - android-arm-template:
           name: android-gnustl-arm-v7
           stl: gnustl_shared
-          firebase_device_id: "m0"
-          firebase_device_os: "18"
+          firebase_device_id: "cheryl"
+          firebase_device_os: "25"
           image: android-ndk-r17c:1d5db0eb34
           abi: arm-v7
       - android-release:

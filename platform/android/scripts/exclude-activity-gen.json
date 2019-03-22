@@ -48,5 +48,6 @@
   "EspressoTestActivity",
   "ChangeResourcesCachePathActivity",
   "EspressoTestActivity",
-  "FragmentBackStackActivity"
+  "FragmentBackStackActivity",
+  "ChildFragmentMapInDialogActivity"
 ]
