@@ -550,10 +550,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         let redColor = UIColor.red
         #endif
         let expression = NSExpression(forConstantValue: "Foo")
-        let attributes: Dictionary<MGLAttributedExpressionKey, Any> = [.fontNamesAttribute : ["DIN Offc Pro Italic",
-                                                                                              "Arial Unicode MS Regular"],
-                                                                       .fontSizeAttribute: 1.2,
-                                                                       .fontColorAttribute: redColor]
+        let attributes: [MGLAttributedExpressionKey: NSExpression] = [.fontNamesAttribute : NSExpression(forConstantValue: ["DIN Offc Pro Italic",
+                                                                                                                            "Arial Unicode MS Regular"]),
+                                                                      .fontScaleAttribute: NSExpression(forConstantValue: 1.2),
+                                                                      .fontColorAttribute: NSExpression(forConstantValue: redColor)]
         let attributedExpression = MGLAttributedExpression(expression, attributes:attributes)
         //#-end-example-code
         
