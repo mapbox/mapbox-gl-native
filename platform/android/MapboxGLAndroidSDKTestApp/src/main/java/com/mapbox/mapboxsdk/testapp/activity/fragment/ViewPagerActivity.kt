@@ -26,46 +26,84 @@ class ViewPagerActivity : AppCompatActivity() {
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
     super.onRestoreInstanceState(savedInstanceState)
-    val currentPosition = viewPager!!.currentItem
-    for (i in 0 until FRAGMENT_COUNT) {
-      if (Math.abs(i - currentPosition) <= 1) {
-        viewPager.adapter?.instantiateItem(viewPager, 0)
-        break
-      }
+
+    val currentPosition = viewPager.currentItem
+    var mapFragment: SupportMapFragment
+
+    if (Math.abs(0 - currentPosition) <= 1) {
+      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 0) as SupportMapFragment
+      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.MAPBOX_STREETS) }
+    }
+
+    if (Math.abs(1 - currentPosition) <= 1) {
+      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 1) as SupportMapFragment
+      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.DARK) }
+    }
+
+    if (Math.abs(2 - currentPosition) <= 1) {
+      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 2) as SupportMapFragment
+      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
+    }
+
+    if (Math.abs(3 - currentPosition) <= 1) {
+      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 3) as SupportMapFragment
+      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
+    }
+
+    if (Math.abs(4 - currentPosition) <= 1) {
+      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 4) as SupportMapFragment
+      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
     }
   }
 
   internal class MapFragmentAdapter(fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
 
     override fun getCount(): Int {
-      return FRAGMENT_COUNT
+      return NUM_ITEMS
     }
 
-    override fun getItem(position: Int): Fragment {
-      return when (position) {
-        0 -> createFragment(Style.MAPBOX_STREETS, LatLng(34.920526, 102.634774))
-        1 -> createFragment(Style.DARK, LatLng(62.326440, 92.764913))
-        2 -> createFragment(Style.SATELLITE, LatLng(-25.007786, 133.623852))
-        3 -> createFragment(Style.LIGHT, LatLng(-19.922070, -43.939676))
-        4 -> createFragment(Style.OUTDOORS, LatLng(46.881020, 9.098098))
-        else -> createFragment(Style.TRAFFIC_DAY, LatLng(40.722517, -74.000029))
+    override fun getItem(position: Int): Fragment? {
+      var fragment: SupportMapFragment? = null
+      val options = MapboxMapOptions()
+      options.textureMode(true)
+
+      when (position) {
+        0 -> {
+          options.camera(CameraPosition.Builder().target(LatLng(34.920526, 102.634774)).zoom(3.0).build())
+          fragment = SupportMapFragment.newInstance(options)
+          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.MAPBOX_STREETS) }
+        }
+        1 -> {
+          options.camera(CameraPosition.Builder().target(LatLng(62.326440, 92.764913)).zoom(3.0).build())
+          fragment = SupportMapFragment.newInstance(options)
+          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.DARK) }
+        }
+        2 -> {
+          options.camera(CameraPosition.Builder().target(LatLng(-25.007786, 133.623852)).zoom(3.0).build())
+          fragment = SupportMapFragment.newInstance(options)
+          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
+        }
+        3 -> {
+          options.camera(CameraPosition.Builder().target(LatLng(62.326440, 92.764913)).zoom(3.0).build())
+          fragment = SupportMapFragment.newInstance(options)
+          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.LIGHT) }
+        }
+        4 -> {
+          options.camera(CameraPosition.Builder().target(LatLng(34.920526, 102.634774)).zoom(3.0).build())
+          fragment = SupportMapFragment.newInstance(options)
+          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.TRAFFIC_NIGHT) }
+        }
       }
-    }
-
-    private fun createFragment(@Style.StyleUrl style: String, latLng: LatLng): Fragment {
-      val options = MapboxMapOptions().camera(CameraPosition.Builder().target(latLng).zoom(3.0).build())
-      val fragment = SupportMapFragment.newInstance(options)
-      fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(style) }
       return fragment
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
       return "Page $position"
     }
-  }
 
-  companion object {
-    const val FRAGMENT_COUNT = 6
+    companion object {
+
+      private val NUM_ITEMS = 5
+    }
   }
 }
-

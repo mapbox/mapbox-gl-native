@@ -1,9 +1,13 @@
 package com.mapbox.mapboxsdk.integration
 
 import android.support.test.filters.LargeTest
+import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.support.test.uiautomator.UiSelector
+import com.mapbox.mapboxsdk.testapp.activity.fragment.FragmentBackStackActivity
+import com.mapbox.mapboxsdk.testapp.activity.maplayout.SimpleMapActivity
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -13,21 +17,19 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FragmentBackStackTest : BaseIntegrationTest() {
 
-  @Before
-  override fun beforeTest() {
-    super.beforeTest()
-    openFeature("Backstack Map Fragment")
-  }
+  @get:Rule
+  var activityRule: ActivityTestRule<FragmentBackStackActivity> = ActivityTestRule(FragmentBackStackActivity::class.java)
 
   @Test
   @LargeTest
   fun backPressedOnBackStackResumed(){
     device.waitForIdle()
     clickReplaceFragmentButton()
+    device.pressHome()
     device.waitForIdle()
-    pressHomeReturnWithRecentApps()
-    device.waitForIdle()
+    device.launchActivity(activityRule.activity.applicationContext, FragmentBackStackActivity::class.java)
     backPressBackStack()
+    device.waitForIdle()
   }
 
   private fun clickReplaceFragmentButton(){
