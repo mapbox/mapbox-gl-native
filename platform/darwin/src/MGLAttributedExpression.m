@@ -18,18 +18,18 @@ const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
     NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
     
     if (fontNames && fontNames.count > 0) {
-        attrs[MGLFontNamesAttribute] = fontNames;
+        attrs[MGLFontNamesAttribute] = [NSExpression expressionForConstantValue:fontNames];
     }
     
     if (fontScale) {
-        attrs[MGLFontScaleAttribute] = fontScale;
+        attrs[MGLFontScaleAttribute] = [NSExpression expressionForConstantValue:fontScale];
     }
     
     attributedExpression = [[self alloc] initWithExpression:expression attributes:attrs];
     return attributedExpression;
 }
 
-+ (instancetype)attributedExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey,id> *)attrs {
++ (instancetype)attributedExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey, NSExpression *> *)attrs {
     MGLAttributedExpression *attributedExpression;
     
     attributedExpression = [[self alloc] initWithExpression:expression attributes:attrs];
@@ -37,7 +37,7 @@ const MGLAttributedExpressionKey MGLFontColorAttribute = @"text-color";
     return attributedExpression;
 }
 
-- (instancetype)initWithExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey,id> *)attrs {
+- (instancetype)initWithExpression:(NSExpression *)expression attributes:(nonnull NSDictionary<MGLAttributedExpressionKey, NSExpression *> *)attrs {
     if (self = [super init])
     {
         MGLLogInfo(@"Starting %@ initialization.", NSStringFromClass([self class]));

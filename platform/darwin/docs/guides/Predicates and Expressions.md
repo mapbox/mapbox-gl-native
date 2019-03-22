@@ -550,9 +550,9 @@ with the `MGLSymbolStyleLayer.text` property.
 
  Key | Value Type
  --- | ---
- `MGLFontNamesAttribute` | `NSArray<NSString *>*`
- `MGLFontScaleAttribute` | `NSNumber`
- `MGLFontColorAttribute` | `UIColor` or `NSColor` on macos
+ `MGLFontNamesAttribute` | `NSExpression`
+ `MGLFontScaleAttribute` | `NSExpression`
+ `MGLFontColorAttribute` | `NSExpression`
 
 This function corresponds to the
 [`format`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-format)

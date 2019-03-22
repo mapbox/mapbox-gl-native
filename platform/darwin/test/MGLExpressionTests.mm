@@ -1048,8 +1048,8 @@ using namespace std::string_literals;
     }
     {
         MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]
-                                                                                       attributes:@{ MGLFontScaleAttribute: @(1.2),
-                                                                                                     MGLFontColorAttribute: @"yellow"}] ;
+                                                                                       attributes:@{ MGLFontScaleAttribute: MGLConstantExpression(@(1.2)),
+                                                                                                     MGLFontColorAttribute: MGLConstantExpression(@"yellow") }] ;
         NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
         
         NSExpression *compatibilityExpression = [NSExpression expressionForFunction:@"mgl_attributed:" arguments:@[MGLConstantExpression(attribute1)]];
@@ -1068,22 +1068,25 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *fontNames = [NSExpression expressionForAggregate:@[ MGLConstantExpression(@"DIN Offc Pro Bold"), MGLConstantExpression(@"Arial Unicode MS Bold") ]];
         MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]
-                                                                                       attributes:@{ MGLFontScaleAttribute: @(1.2),
-                                                                                                     MGLFontColorAttribute: @"yellow",
-                                                                                                     MGLFontNamesAttribute: @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]
+                                                                                       attributes:@{ MGLFontScaleAttribute: MGLConstantExpression(@(1.2)),
+                                                                                                     MGLFontColorAttribute: MGLConstantExpression(@"yellow"),
+                                                                                                     MGLFontNamesAttribute: fontNames
                                                                                                      }] ;
         NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
         
         NSArray *jsonExpression = @[ @"format", @"foo", @{ @"font-scale": @1.2, @"text-color": @"yellow" , @"text-font" : @[ @"literal", @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]]} ];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        NSExpression *exp = [NSExpression expressionWithMGLJSONObject:jsonExpression];
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *fontNames = [NSExpression expressionForAggregate:@[ MGLConstantExpression(@"DIN Offc Pro Bold"), MGLConstantExpression(@"Arial Unicode MS Bold") ]];
         MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionForConstantValue:@"foo"]
-                                                                                       attributes:@{ MGLFontScaleAttribute: @(1.2),
-                                                                                                     MGLFontColorAttribute: [MGLColor redColor],
-                                                                                                     MGLFontNamesAttribute: @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]
+                                                                                       attributes:@{ MGLFontScaleAttribute: MGLConstantExpression(@(1.2)),
+                                                                                                     MGLFontColorAttribute: MGLConstantExpression([MGLColor redColor]),
+                                                                                                     MGLFontNamesAttribute: fontNames
                                                                                                      }] ;
         NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
         
@@ -1092,10 +1095,11 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *fontNames = [NSExpression expressionForAggregate:@[ MGLConstantExpression(@"DIN Offc Pro Bold"), MGLConstantExpression(@"Arial Unicode MS Bold") ]];
         MGLAttributedExpression *attribute1 = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionWithFormat:@"CAST(x, 'NSString')"]
-                                                                                       attributes:@{ MGLFontScaleAttribute: @(1.2),
-                                                                                                     MGLFontColorAttribute: [MGLColor redColor],
-                                                                                                     MGLFontNamesAttribute: @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]
+                                                                                       attributes:@{ MGLFontScaleAttribute: MGLConstantExpression(@(1.2)),
+                                                                                                     MGLFontColorAttribute: MGLConstantExpression([MGLColor redColor]),
+                                                                                                     MGLFontNamesAttribute: fontNames
                                                                                                      }] ;
         NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@)", MGLConstantExpression(attribute1)];
         
