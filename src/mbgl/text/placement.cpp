@@ -464,14 +464,14 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedRightTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
-            if (symbolInstance.placedCenterTextIndex) {
+            if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
                 for (size_t i = 0; i < symbolInstance.centerJustifiedGlyphQuads.size() * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedCenterTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
-            if (symbolInstance.placedLeftTextIndex) {
+            if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
                 for (size_t i = 0; i < symbolInstance.leftJustifiedGlyphQuads.size() * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
