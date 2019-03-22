@@ -1,8 +1,12 @@
 package com.mapbox.mapboxsdk.integration
 
 import android.support.test.filters.LargeTest
+import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.testapp.activity.maplayout.GLSurfaceRecyclerViewActivity
+import com.mapbox.mapboxsdk.testapp.activity.maplayout.TextureRecyclerViewActivity
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -12,18 +16,16 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TextureViewReuseTest : BaseIntegrationTest() {
 
-  @Before
-  override fun beforeTest() {
-    super.beforeTest()
-    openFeature("RecyclerView TextureView")
-  }
+  @get:Rule
+  var activityRule: ActivityTestRule<TextureRecyclerViewActivity> = ActivityTestRule(TextureRecyclerViewActivity::class.java)
 
   @Test
   @LargeTest
-  fun scrollRecylerView() {
-    scrollRecyclerViewTo("Twenty-one")
+  fun scrollRecyclerView() {
     device.waitForIdle()
-    scrollRecyclerViewTo("One")
+    device.scrollRecyclerViewTo("Twenty-one")
+    device.waitForIdle()
+    device.scrollRecyclerViewTo("One")
     device.waitForIdle()
   }
 }

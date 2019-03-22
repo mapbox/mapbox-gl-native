@@ -10,6 +10,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.action.WaitAction
 import com.mapbox.mapboxsdk.testapp.activity.maplayout.MapInDialogActivity
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,9 +26,10 @@ class MapDialogFragmentTest {
     var activityRule: ActivityTestRule<MapInDialogActivity> = ActivityTestRule(MapInDialogActivity::class.java)
 
     @Test
+    @Ignore
     fun openCloseDialog() {
         onView(withId(R.id.button_open_dialog)).perform(click())
-        onView(withId(R.id.mapView)).perform(WaitAction(2500))
+        Thread.sleep(2500)
         Espresso.pressBack()
     }
 }
