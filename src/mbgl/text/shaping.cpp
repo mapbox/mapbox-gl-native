@@ -363,7 +363,6 @@ const Shaping getShaping(const TaggedString& formattedString,
                          const style::TextJustifyType textJustify,
                          const float spacing,
                          const Point<float>& translate,
-                         //const float verticalHeight,
                          const WritingModeType writingMode,
                          BiDi& bidi,
                          const GlyphMap& glyphs) {   
