@@ -6410,8 +6410,19 @@ public:
 }
 
 - (void)updateAttributionAlertView {
-    if (self.attributionController && self.attributionController.presentingViewController) {
+    if (self.attributionController.presentingViewController) {
         self.attributionController.popoverPresentationController.sourceRect = self.attributionButton.frame;
+        switch (self.attributionButtonPosition) {
+            case MGLOrnamentPositionTopLeft:
+            case MGLOrnamentPositionTopRight:
+                [self.attributionController.popoverPresentationController setPermittedArrowDirections:UIMenuControllerArrowUp];
+                break;
+            case MGLOrnamentPositionBottomLeft:
+            case MGLOrnamentPositionBottomRight:
+                [self.attributionController.popoverPresentationController setPermittedArrowDirections:UIMenuControllerArrowDown];
+                break;
+        }
+        [self.attributionController.popoverPresentationController.containerView setNeedsLayout];
     }
 }
 
