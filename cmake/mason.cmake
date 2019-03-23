@@ -178,7 +178,7 @@ macro(target_add_mason_package _TARGET _VISIBILITY _PACKAGE)
         message(FATAL_ERROR "[Mason] Package ${_PACKAGE} has not been initialized yet")
     endif()
 
-    target_include_directories(${_TARGET} ${_VISIBILITY} "${MASON_PACKAGE_${_PACKAGE}_INCLUDE_DIRS}")
+    target_include_directories(${_TARGET} SYSTEM ${_VISIBILITY} "${MASON_PACKAGE_${_PACKAGE}_INCLUDE_DIRS}")
     target_compile_definitions(${_TARGET} ${_VISIBILITY} "${MASON_PACKAGE_${_PACKAGE}_DEFINITIONS}")
     target_compile_options(${_TARGET} ${_VISIBILITY} "${MASON_PACKAGE_${_PACKAGE}_OPTIONS}")
     target_link_libraries(${_TARGET} ${_VISIBILITY} "${MASON_PACKAGE_${_PACKAGE}_LIBRARIES}")
