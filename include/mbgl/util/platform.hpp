@@ -24,9 +24,9 @@ void setCurrentThreadName(const std::string& name);
 void makeThreadLowPriority();
 
 // Shows an alpha image with the specified dimensions in a named window.
-void showDebugImage(std::string name, const char *data, size_t width, size_t height);
+void showDebugImage(const std::string& name, const char *data, size_t width, size_t height);
 
 // Shows an alpha image with the specified dimensions in a named window.
-void showColorDebugImage(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height);
+void showColorDebugImage(const std::string& name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height);
 } // namespace platform
 } // namespace mbgl

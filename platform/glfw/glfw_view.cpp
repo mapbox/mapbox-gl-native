@@ -645,7 +645,7 @@ void GLFWView::report(float duration) {
 }
 
 void GLFWView::setChangeStyleCallback(std::function<void()> callback) {
-    changeStyleCallback = callback;
+    changeStyleCallback = std::move(callback);
 }
 
 void GLFWView::setShouldClose() {
@@ -699,7 +699,7 @@ namespace mbgl {
 namespace platform {
 
 #ifndef MBGL_USE_GLES2
-void showDebugImage(std::string name, const char *data, size_t width, size_t height) {
+void showDebugImage(const std::string& name, const char *data, size_t width, size_t height) {
     glfwInit();
 
     static GLFWwindow *debugWindow = nullptr;
@@ -730,7 +730,7 @@ void showDebugImage(std::string name, const char *data, size_t width, size_t hei
     glfwMakeContextCurrent(currentWindow);
 }
 
-void showColorDebugImage(std::string name, const char *data, size_t logicalWidth, size_t logicalHeight, size_t width, size_t height) {
+void showColorDebugImage(const std::string& name, const char *data, size_t logicalWidth, size_t logicalHeight, size_t width, size_t height) {
     glfwInit();
 
     static GLFWwindow *debugWindow = nullptr;
