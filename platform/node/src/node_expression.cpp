@@ -173,7 +173,7 @@ struct ToValue {
             } else {
                 serializedSection.emplace("fontStack", mbgl::NullValue());
             }
-            sections.push_back(serializedSection);
+            sections.emplace_back(serializedSection);
         }
         serialized.emplace("sections", sections);
 
