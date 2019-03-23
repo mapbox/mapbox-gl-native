@@ -1,2 +1,4 @@
-Checks: 'modernize-*,misc-static-assert,llvm-namespace-comment,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-core.uninitialized.UndefReturn,-clang-analyzer-core.StackAddressEscape,-clang-analyzer-core.CallAndMessage,-clang-diagnostic-unused-command-line-argument,-clang-analyzer-core.uninitialized.*,-clang-analyzer-core.NullDereference,-clang-analyzer-core.NonNullParamChecker'
-HeaderFilterRegex: '\/mbgl\/'
+Checks: 'modernize-*,performance-*,bugprone-*,misc-static-assert,llvm-namespace-comment'
+WarningsAsErrors: '*'
+FormatStyle: 'file'
+HeaderFilterRegex: '.*'
