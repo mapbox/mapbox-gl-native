@@ -469,7 +469,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 
     map->setProjectionMode(projectionOptions);
 
-    map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr eptr) {
+    map->renderStill(camera, options.debugOptions, [this](std::exception_ptr eptr) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
