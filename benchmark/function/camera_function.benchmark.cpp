@@ -9,14 +9,18 @@ using namespace mbgl;
 using namespace mbgl::style;
 
 static std::string createFunctionJSON(size_t stopCount) {
-    std::string stops = "[";
+    std::string stops('[');
     for (size_t i = 0; i < stopCount; i++) {
         std::string value = std::to_string(24.0f / stopCount * i);
-        if (stops.size() > 1) stops += ",";
-        stops += "[" + value + ", " + value + "]";
+        if (stops.size() > 1) stops.append(',');
+        stops.append('[');
+        stops.append(value);
+        stops.append(',');
+        stops.append(value);
+        stops.append(']');
     }
-    stops += "]";
-    return R"({"type": "exponential", "base": 2,  "stops": )" + stops + "}";
+    stops.append("]}");
+    return std::string(R"({"type": "exponential", "base": 2,  "stops": )").append(stops);
 }
 
 static void Parse_CameraFunction(benchmark::State& state) {
