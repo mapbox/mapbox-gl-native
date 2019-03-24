@@ -120,7 +120,7 @@ FileSource* FileSource::getNativePeer(jni::JNIEnv& env, const jni::Object<FileSo
 mbgl::ResourceOptions FileSource::getSharedResourceOptions(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource) {
     FileSource* fileSource = FileSource::getNativePeer(env, jFileSource);
     assert(fileSource != nullptr);
-    return mbgl::ResourceOptions(fileSource->resourceOptions);
+    return fileSource->resourceOptions.clone();
 }
 
 void FileSource::registerNative(jni::JNIEnv& env) {

@@ -174,7 +174,7 @@ MapSnapshotter::MapSnapshotter(std::shared_ptr<Scheduler> scheduler,
                                const ResourceOptions& resourceOptions)
    : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>(
        "Map Snapshotter", std::move(scheduler), style, size, pixelRatio, cameraOptions,
-       region, programCacheDir, localFontFamily, resourceOptions)) {}
+       region, programCacheDir, localFontFamily, resourceOptions.clone())) {}
 
 MapSnapshotter::~MapSnapshotter() = default;
 

@@ -16,8 +16,9 @@ public:
     ResourceOptions();
     ~ResourceOptions();
 
-    ResourceOptions(ResourceOptions&&);
-    explicit ResourceOptions(const ResourceOptions&);
+    ResourceOptions(ResourceOptions&&) noexcept;
+
+    ResourceOptions clone() const;
 
     /**
      * @brief Sets the Mapbox access token - see https://docs.mapbox.com/help/how-mapbox-works/access-tokens/ for details.
@@ -112,6 +113,8 @@ public:
     void* platformContext() const;
 
 private:
+    ResourceOptions(const ResourceOptions&);
+
     class Impl;
     std::unique_ptr<Impl> impl_;
 };
