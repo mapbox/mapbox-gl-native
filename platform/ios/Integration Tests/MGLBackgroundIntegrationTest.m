@@ -6,17 +6,37 @@
 @property (nonatomic) BOOL rendererWasFlushed;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic) CADisplayLink *displayLink;
+- (void)updateFromDisplayLink:(CADisplayLink *)displayLink;
 @end
 
 @protocol MGLApplication;
 
 typedef void (^MGLNotificationBlock)(NSNotification*);
 
+#pragma mark - MGLBackgroundIntegrationTestMapView
+
+@interface MGLBackgroundIntegrationTestMapView : MGLMapView
+@property (nonatomic, copy) dispatch_block_t displayLinkDidUpdate;
+@end
+
+@implementation MGLBackgroundIntegrationTestMapView
+- (void)updateFromDisplayLink:(CADisplayLink *)displayLink {
+    [super updateFromDisplayLink:displayLink];
+    
+    if (self.displayLinkDidUpdate) {
+        self.displayLinkDidUpdate();
+    }
+}
+@end
+
+#pragma mark - MGLBackgroundIntegrationTest
+
 @interface MGLBackgroundIntegrationTest : MGLMapViewIntegrationTest
 @property (nonatomic) id<MGLApplication> oldApplication;
 @property (nonatomic) MGLMockApplication *mockApplication;
 @property (nonatomic, copy) MGLNotificationBlock willEnterForeground;
 @property (nonatomic, copy) MGLNotificationBlock didEnterBackground;
+@property (nonatomic, copy) dispatch_block_t displayLinkDidUpdate;
 @end
 
 @implementation MGLBackgroundIntegrationTest
@@ -65,6 +85,18 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     }
 }
 
+- (MGLMapView*)testMapViewWithFrame:(CGRect)frame styleURL:(NSURL *)styleURL {
+    MGLBackgroundIntegrationTestMapView *mapView = [[MGLBackgroundIntegrationTestMapView alloc] initWithFrame:frame styleURL:styleURL];
+    
+    mapView.displayLinkDidUpdate = ^{
+        if (self.displayLinkDidUpdate) {
+            self.displayLinkDidUpdate();
+        }
+    };
+    
+    return mapView;
+}
+
 #pragma mark - Tests
 
 - (void)testRendererWhenGoingIntoBackground {
@@ -74,7 +106,7 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
     XCTAssertFalse(self.mapView.rendererWasFlushed);
 
-    __weak MGLMapView *weakMapView = self.mapView;
+    __weak typeof(self) weakSelf = self;
 
     //
     // Enter background
@@ -84,26 +116,52 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     didEnterBackgroundExpectation.expectedFulfillmentCount = 1;
     didEnterBackgroundExpectation.assertForOverFulfill = YES;
 
+    __block NSInteger displayLinkCount = 0;
+    
+    self.displayLinkDidUpdate = ^{
+        displayLinkCount++;
+    };
+    
     self.didEnterBackground = ^(__unused NSNotification *notification){
-        MGLMapView *strongMapView = weakMapView;
+        typeof(self) strongSelf = weakSelf;
+        MGLMapView *mapView = strongSelf.mapView;
+        
+        // In general, because order of notifications is not guaranteed
+        // the following asserts are somewhat meaningless (don't do this in
+        // production) - however, because we're mocking their delivery (and
+        // we're tracking a bug)...
+
+        // MGLMapView responds to UIApplicationDidEnterBackgroundNotification and
+        // marks the map view as dormant. However, depending on the order of
+        // creation it's totally possible for client code also responding to
+        // this notification to be called first - and then trigger a scenario where
+        // GL can be rendering in the background - which can cause crashes.
+        
+        MGLTestAssert(strongSelf, !mapView.isDormant);
+        MGLTestAssert(strongSelf, !mapView.displayLink.isPaused);
+        
+        displayLinkCount = 0;
         
         // Remove the map view, and re-add to try and force a bad situation
-        UIView *parentView = strongMapView.superview;
+        UIView *parentView = mapView.superview;
         
         NSLog(@"Removing MGLMapView from super view");
-        [strongMapView removeFromSuperview];
+        [mapView removeFromSuperview];
         
         // Re-add
         NSLog(@"Re-adding MGLMapView as child");
-        [parentView addSubview:strongMapView];
-        [strongMapView.topAnchor constraintEqualToAnchor:parentView.topAnchor].active = YES;
-        [strongMapView.leftAnchor constraintEqualToAnchor:parentView.leftAnchor].active = YES;
-        [strongMapView.rightAnchor constraintEqualToAnchor:parentView.rightAnchor].active = YES;
-        [strongMapView.bottomAnchor constraintEqualToAnchor:parentView.bottomAnchor].active = YES;
+        [parentView addSubview:mapView];
+        
+        MGLTestAssert(strongSelf, displayLinkCount == 0, @"updateDisplayLink was called %ld times", displayLinkCount);
+        
+        [mapView.topAnchor constraintEqualToAnchor:parentView.topAnchor].active = YES;
+        [mapView.leftAnchor constraintEqualToAnchor:parentView.leftAnchor].active = YES;
+        [mapView.rightAnchor constraintEqualToAnchor:parentView.rightAnchor].active = YES;
+        [mapView.bottomAnchor constraintEqualToAnchor:parentView.bottomAnchor].active = YES;
     };
     
     [self.mockApplication enterBackground];
-    [self waitForExpectations:@[didEnterBackgroundExpectation] timeout:2.0];
+    [self waitForExpectations:@[didEnterBackgroundExpectation] timeout:0.5];
     
     XCTAssert(self.mapView.isDormant);
     XCTAssert(self.mapView.displayLink.isPaused);
@@ -119,11 +177,13 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     willEnterForegroundExpectation.assertForOverFulfill = YES;
 
     self.willEnterForeground = ^(NSNotification *notification) {
+        displayLinkCount = 0;
         [willEnterForegroundExpectation fulfill];
     };
     
     [self.mockApplication enterForeground];
-    [self waitForExpectations:@[willEnterForegroundExpectation] timeout:2.0];
+    XCTAssert(displayLinkCount == 0, @"updateDisplayLink was called %ld times", displayLinkCount);
+    [self waitForExpectations:@[willEnterForegroundExpectation] timeout:0.5];
     
     XCTAssertFalse(self.mapView.isDormant);
     XCTAssertFalse(self.mapView.displayLink.isPaused);

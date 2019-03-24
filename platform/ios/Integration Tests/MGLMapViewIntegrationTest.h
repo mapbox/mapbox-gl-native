@@ -38,6 +38,7 @@
 @property (nonatomic) id<MGLCalloutView> (^mapViewCalloutViewForAnnotation)(MGLMapView *mapView, id<MGLAnnotation> annotation);
 
 // Utility methods
+- (MGLMapView*)testMapViewWithFrame:(CGRect)frame styleURL:(NSURL *)styleURL;
 - (NSString*)validAccessToken;
 - (void)waitForMapViewToFinishLoadingStyleWithTimeout:(NSTimeInterval)timeout;
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout;
