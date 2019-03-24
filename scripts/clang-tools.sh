@@ -29,7 +29,7 @@ function run_clang_tidy() {
     ${CLANG_TIDY_PREFIX}/share/run-clang-tidy.py -j ${JOBS} \
         -clang-tidy-binary ${CLANG_TIDY} \
         -clang-apply-replacements-binary ${CLANG_APPLY} \
-        -fix ${FILES} 2>/dev/null || exit 1
+        -fix ${FILES} 2>/dev/null || exit 0
 }
 
 function run_clang_tidy_diff() {
