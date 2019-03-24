@@ -16,8 +16,12 @@ public:
 // These requires the complete type of Impl.
 ResourceOptions::ResourceOptions() : impl_(std::make_unique<Impl>()) {}
 ResourceOptions::~ResourceOptions() = default;
-ResourceOptions::ResourceOptions(ResourceOptions&&)  = default;
+ResourceOptions::ResourceOptions(ResourceOptions&&) noexcept = default;
 ResourceOptions::ResourceOptions(const ResourceOptions& other) : impl_(std::make_unique<Impl>(*other.impl_)) {}
+
+ResourceOptions ResourceOptions::clone() const {
+    return ResourceOptions(*this);
+}
 
 ResourceOptions& ResourceOptions::withAccessToken(std::string token) {
     impl_->accessToken = std::move(token);

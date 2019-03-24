@@ -17,8 +17,7 @@ public:
     MapOptions();
     ~MapOptions();
 
-    MapOptions(MapOptions&&);
-    explicit MapOptions(const MapOptions&);
+    MapOptions(MapOptions&&) noexcept;
 
     /**
      * @brief Sets the map rendering mode. By default, it is set to Continuous

@@ -13,8 +13,7 @@ public:
 // These requires the complete type of Impl.
 MapOptions::MapOptions() : impl_(std::make_unique<Impl>()) {}
 MapOptions::~MapOptions() = default;
-MapOptions::MapOptions(MapOptions&&) = default;
-MapOptions::MapOptions(const MapOptions& other) : impl_(std::make_unique<Impl>(*other.impl_)) {}
+MapOptions::MapOptions(MapOptions&&) noexcept = default;
 
 MapOptions& MapOptions::withMapMode(MapMode mode) {
     impl_->mapMode = mode;
