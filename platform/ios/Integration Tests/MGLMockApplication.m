@@ -8,6 +8,12 @@
 
 @implementation MGLMockApplication
 
+- (void)dealloc {
+    if (_delegate) {
+        CFRelease((CFTypeRef)_delegate);
+    }
+}
+
 - (instancetype)init {
     if ((self = [super init])) {
         _applicationState = UIApplicationStateActive;
@@ -30,6 +36,21 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationWillEnterForegroundNotification object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidBecomeActiveNotification object:self];
     self.applicationState = UIApplicationStateActive;
+}
+
+- (void)setDelegate:(id<UIApplicationDelegate>)delegate {
+    // Property is `assign`, but we want to retain
+    if (_delegate != delegate) {
+        if (_delegate) {
+            CFRelease((CFTypeRef)_delegate);
+        }
+        
+        _delegate = delegate;
+
+        if (_delegate) {
+            CFRetain((CFTypeRef)_delegate);
+        }
+    }
 }
 
 - (BOOL)openURL:(NSURL*)url {

@@ -53,6 +53,7 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     // Setup MGLMapView to use our new mocked application
     // Change notification handling here.
     self.oldApplication = self.mapView.application;
+    self.mockApplication.delegate = self.oldApplication.delegate;
     self.mapView.application = self.mockApplication;
 }
 
@@ -63,6 +64,7 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     // Swap back
     self.mapView.application = self.oldApplication;
     self.oldApplication = nil;
+    self.mockApplication.delegate = nil;
     self.mockApplication = nil;
     
     [super tearDown];
