@@ -10,7 +10,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
-#include <args/args.hxx>
+#include <args.hxx>
 
 #include <csignal>
 #include <fstream>

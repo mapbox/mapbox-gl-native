@@ -2,9 +2,6 @@ add_executable(mbgl-offline
     bin/offline.cpp
 )
 
-# args requires RTTI
-set_source_files_properties(bin/offline.cpp PROPERTIES COMPILE_OPTIONS "-frtti")
-
 target_sources(mbgl-offline
     PRIVATE platform/default/include/mbgl/util/default_styles.hpp
 )
@@ -15,9 +12,8 @@ target_include_directories(mbgl-offline
 
 target_link_libraries(mbgl-offline
     PRIVATE mbgl-core
+    PRIVATE args
 )
-
-target_add_mason_package(mbgl-offline PRIVATE args)
 
 mbgl_platform_offline()
 

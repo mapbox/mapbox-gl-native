@@ -2,18 +2,14 @@ add_executable(mbgl-render
     bin/render.cpp
 )
 
-# args requires RTTI
-set_source_files_properties(bin/render.cpp PROPERTIES COMPILE_OPTIONS "-frtti")
-
 target_include_directories(mbgl-render
     PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-render
     PRIVATE mbgl-core
+    PRIVATE args
 )
-
-target_add_mason_package(mbgl-render PRIVATE args)
 
 mbgl_platform_render()
 
