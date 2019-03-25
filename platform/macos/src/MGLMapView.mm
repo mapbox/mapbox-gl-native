@@ -695,7 +695,7 @@ public:
         self.dormant = NO;
     }
 
-    if (window && _mbglMap->getConstrainMode() == mbgl::ConstrainMode::None) {
+    if (window && _mbglMap->getMapOptions().constrainMode() == mbgl::ConstrainMode::None) {
         _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
     }
 

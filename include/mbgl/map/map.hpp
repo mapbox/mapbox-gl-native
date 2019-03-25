@@ -91,13 +91,10 @@ public:
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
 
-    // Constrain mode
+    // Map Options
     void setConstrainMode(ConstrainMode);
-    ConstrainMode getConstrainMode() const;
-
-    // Viewport mode
     void setViewportMode(ViewportMode);
-    ViewportMode getViewportMode() const;
+    MapOptions getMapOptions() const;
 
     //Projection Mode
     void setProjectionMode(const ProjectionMode&);
