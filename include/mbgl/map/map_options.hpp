@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <memory>
 
@@ -85,6 +86,22 @@ public:
      * false otherwise.
      */
     bool crossSourceCollisions() const;
+
+    /**
+     * @brief Sets the orientation of the Map. By default, it is set to
+     * Upwards.
+     *
+     * @param orientation Orientation of the Map.
+     * @return reference to MapOptions for chaining options together.
+     */
+    MapOptions& withNorthOrientation(NorthOrientation orientation);
+
+    /**
+     * @brief Gets the previously set (or default) orientation.
+     *
+     * @return Map orientation.
+     */
+    NorthOrientation northOrientation() const;
 
 private:
     class Impl;

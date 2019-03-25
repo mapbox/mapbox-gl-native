@@ -326,10 +326,6 @@ void Map::setNorthOrientation(NorthOrientation orientation) {
     impl->onUpdate();
 }
 
-NorthOrientation Map::getNorthOrientation() const {
-    return impl->transform.getNorthOrientation();
-}
-
 #pragma mark - Constrain mode
 
 void Map::setConstrainMode(mbgl::ConstrainMode mode) {
@@ -351,7 +347,8 @@ MapOptions Map::getMapOptions() const {
         .withMapMode(impl->mode)
         .withConstrainMode(impl->transform.getConstrainMode())
         .withViewportMode(impl->transform.getViewportMode())
-        .withCrossSourceCollisions(impl->crossSourceCollisions));
+        .withCrossSourceCollisions(impl->crossSourceCollisions)
+        .withNorthOrientation(impl->transform.getNorthOrientation()));
 }
 
 #pragma mark - Projection mode
