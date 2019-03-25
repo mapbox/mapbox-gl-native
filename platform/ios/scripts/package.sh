@@ -55,7 +55,7 @@ echo ${HASH}
 echo ${HASH} >> ${VERSION}
 
 PROJ_VERSION=$(git rev-list --count HEAD)
-SEM_VERSION="4.5.0-cn.1"
+SEM_VERSION="4.5.0-cn.2"
 SHORT_VERSION=${SEM_VERSION%-*}
 
 step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})"
