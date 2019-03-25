@@ -275,6 +275,7 @@
         "MGLRasterTileSource_Private.h": "platform/darwin/src/MGLRasterTileSource_Private.h",
         "MGLFeature_Private.h": "platform/darwin/src/MGLFeature_Private.h",
         "MGLRendererConfiguration.h": "platform/darwin/src/MGLRendererConfiguration.h",
+        "MGLApplication_Private.h": "platform/ios/src/MGLApplication_Private.h",
         "MMEReachability.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/Reachability/MMEReachability.h",
         "MMENamespacedDependencies.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENamespacedDependencies.h",
         "MapboxMobileEvents.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MapboxMobileEvents.h",
