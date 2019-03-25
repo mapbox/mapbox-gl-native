@@ -337,10 +337,6 @@ void Map::setConstrainMode(mbgl::ConstrainMode mode) {
     impl->onUpdate();
 }
 
-ConstrainMode Map::getConstrainMode() const {
-    return impl->transform.getConstrainMode();
-}
-
 #pragma mark - Viewport mode
 
 void Map::setViewportMode(mbgl::ViewportMode mode) {
@@ -348,8 +344,14 @@ void Map::setViewportMode(mbgl::ViewportMode mode) {
     impl->onUpdate();
 }
 
-ViewportMode Map::getViewportMode() const {
-    return impl->transform.getViewportMode();
+#pragma mark - Map options
+
+MapOptions Map::getMapOptions() const {
+    return std::move(MapOptions()
+        .withMapMode(impl->mode)
+        .withConstrainMode(impl->transform.getConstrainMode())
+        .withViewportMode(impl->transform.getViewportMode())
+        .withCrossSourceCollisions(impl->crossSourceCollisions));
 }
 
 #pragma mark - Projection mode

@@ -1163,7 +1163,7 @@ public:
     BOOL isVisible = self.superview && self.window;
     if (isVisible && ! _displayLink)
     {
-        if (_mbglMap && self.mbglMap.getConstrainMode() == mbgl::ConstrainMode::None)
+        if (_mbglMap && self.mbglMap.getMapOptions().constrainMode() == mbgl::ConstrainMode::None)
         {
             self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
         }
