@@ -920,6 +920,12 @@ jobs:
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
+      - run:
+          name: Generate iOS code coverage
+          command:
+            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
+                platform/ios/scripts/ios-code-coverage.sh CI
+            fi
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
