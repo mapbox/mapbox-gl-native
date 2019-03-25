@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "../src/MGLApplication.h"
+#import "../src/MGLApplication_Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -70,11 +70,11 @@
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
+#import "MGLApplication_Private.h"
 #import "MGLAttributionInfo_Private.h"
 #import "MGLMapAccessibilityElement.h"
 #import "MGLLocationManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
-#import "MGLApplication.h"
 
 #include <algorithm>
 #include <cstdlib>

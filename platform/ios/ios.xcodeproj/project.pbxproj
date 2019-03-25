@@ -450,8 +450,8 @@
 		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
 		CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */; };
 		CA1C973E2247FD2A00CB2E04 /* MGLBackgroundIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1C973D2247FD2A00CB2E04 /* MGLBackgroundIntegrationTest.m */; };
-		CA1C9740224805B300CB2E04 /* MGLApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1C973F224805B300CB2E04 /* MGLApplication.h */; };
-		CA1C9741224805B300CB2E04 /* MGLApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1C973F224805B300CB2E04 /* MGLApplication.h */; };
+		CA1C9740224805B300CB2E04 /* MGLApplication_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1C973F224805B300CB2E04 /* MGLApplication_Private.h */; };
+		CA1C9741224805B300CB2E04 /* MGLApplication_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1C973F224805B300CB2E04 /* MGLApplication_Private.h */; };
 		CA1C974422480BD000CB2E04 /* MGLMockApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1C974322480BD000CB2E04 /* MGLMockApplication.m */; };
 		CA1C974522480BD000CB2E04 /* MGLMockApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1C974322480BD000CB2E04 /* MGLMockApplication.m */; };
 		CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */; };
@@ -1107,7 +1107,7 @@
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
 		CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapSnapshotterTest.m; sourceTree = "<group>"; };
 		CA1C973D2247FD2A00CB2E04 /* MGLBackgroundIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLBackgroundIntegrationTest.m; sourceTree = "<group>"; };
-		CA1C973F224805B300CB2E04 /* MGLApplication.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLApplication.h; sourceTree = "<group>"; };
+		CA1C973F224805B300CB2E04 /* MGLApplication_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLApplication_Private.h; sourceTree = "<group>"; };
 		CA1C974222480BD000CB2E04 /* MGLMockApplication.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMockApplication.h; sourceTree = "<group>"; };
 		CA1C974322480BD000CB2E04 /* MGLMockApplication.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMockApplication.m; sourceTree = "<group>"; };
 		CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCameraTransitionTests.mm; sourceTree = "<group>"; };
@@ -2026,7 +2026,7 @@
 				DA88484A1CBAFB9800AB86E3 /* MGLMapView.mm */,
 				DA8848371CBAFB8500AB86E3 /* MGLMapView+IBAdditions.h */,
 				DA737EE01D056A4E005BDA16 /* MGLMapViewDelegate.h */,
-				CA1C973F224805B300CB2E04 /* MGLApplication.h */,
+				CA1C973F224805B300CB2E04 /* MGLApplication_Private.h */,
 			);
 			name = Kit;
 			path = src;
@@ -2429,7 +2429,7 @@
 				DAD1656E1CF41981001FF4B9 /* MGLFeature_Private.h in Headers */,
 				DA88483C1CBAFB8500AB86E3 /* MGLMapView.h in Headers */,
 				3EA9363147E77DD29FA06063 /* MGLRendererConfiguration.h in Headers */,
-				CA1C9740224805B300CB2E04 /* MGLApplication.h in Headers */,
+				CA1C9740224805B300CB2E04 /* MGLApplication_Private.h in Headers */,
 				55E5665121C2A1C20008B8B5 /* MMEReachability.h in Headers */,
 				55E5665221C2A2080008B8B5 /* MMENamespacedDependencies.h in Headers */,
 				55E5665321C2A2080008B8B5 /* MapboxMobileEvents.h in Headers */,
@@ -2562,7 +2562,7 @@
 				DA6408DC1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
 				353933F31D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
-				CA1C9741224805B300CB2E04 /* MGLApplication.h in Headers */,
+				CA1C9741224805B300CB2E04 /* MGLApplication_Private.h in Headers */,
 				96E516F820005A3000A02306 /* MGLCompactCalloutView.h in Headers */,
 				96E516E22000551900A02306 /* MGLPointCollection_Private.h in Headers */,
 				3538AA1E1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
