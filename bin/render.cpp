@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
 
     ThreadPool threadPool(4);
     HeadlessFrontend frontend({ width, height }, pixelRatio, threadPool);
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, threadPool,
-            MapOptions().withMapMode(MapMode::Static),
+    Map map(frontend, MapObserver::nullObserver(), pixelRatio, threadPool,
+            MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(cache_file).withAssetPath(asset_root).withAccessToken(std::string(token)));
 
     if (style.find("://") == std::string::npos) {

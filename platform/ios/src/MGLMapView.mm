@@ -479,6 +479,7 @@ public:
 
     mbgl::MapOptions mapOptions;
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
+              .withSize(self.size)
               .withConstrainMode(mbgl::ConstrainMode::None)
               .withViewportMode(mbgl::ViewportMode::Default)
               .withCrossSourceCollisions(enableCrossSourceCollisions);
@@ -488,7 +489,7 @@ public:
                    .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
 
     NSAssert(!_mbglMap, @"_mbglMap should be NULL");
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *_mbglThreadPool, mapOptions, resourceOptions);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, config.scaleFactor, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {

@@ -12,12 +12,11 @@ class MapAdapter : public Map {
 public:
     explicit MapAdapter(RendererFrontend& frontend,
                         MapObserver& observer,
-                        Size size,
                         float ratio,
                         std::shared_ptr<FileSource> fileSource,
                         Scheduler& scheduler,
                         const MapOptions& options)
-        : Map(std::make_unique<Map::Impl>(frontend, observer, scheduler, size, ratio, std::move(fileSource), options)) {}
+        : Map(std::make_unique<Map::Impl>(frontend, observer, scheduler, ratio, std::move(fileSource), options)) {}
 };
 
 } // namespace mbgl

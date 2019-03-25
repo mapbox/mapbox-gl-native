@@ -38,8 +38,8 @@ public:
     ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
     HeadlessFrontend frontend { pixelRatio, threadPool };
-    MapAdapter map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-                  threadPool, MapOptions().withMapMode(MapMode::Static)};
+    MapAdapter map { frontend, MapObserver::nullObserver(), pixelRatio, fileSource,
+                  threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 };
 
 std::vector<Feature> getTopClusterFeature(QueryTest& test) {

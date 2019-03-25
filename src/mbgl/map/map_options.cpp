@@ -9,6 +9,7 @@ public:
     ViewportMode viewportMode = ViewportMode::Default;
     NorthOrientation orientation = NorthOrientation::Upwards;
     bool crossSourceCollisions = true;
+    Size size;
 };
 
 // These requires the complete type of Impl.
@@ -59,6 +60,15 @@ MapOptions& MapOptions::withNorthOrientation(NorthOrientation orientation) {
 
 NorthOrientation MapOptions::northOrientation() const {
     return impl_->orientation;
+}
+
+MapOptions& MapOptions::withSize(Size size_) {
+    impl_->size = size_;
+    return *this;
+}
+
+Size MapOptions::size() const {
+    return impl_->size;
 }
 
 }  // namespace mbgl

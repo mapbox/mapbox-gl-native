@@ -10,7 +10,6 @@ namespace mbgl {
 Map::Impl::Impl(RendererFrontend& frontend_,
                 MapObserver& observer_,
                 Scheduler& scheduler_,
-                Size size_,
                 float pixelRatio_,
                 std::shared_ptr<FileSource> fileSource_,
                 const MapOptions& mapOptions)
@@ -27,7 +26,7 @@ Map::Impl::Impl(RendererFrontend& frontend_,
     transform.setNorthOrientation(mapOptions.northOrientation());
     style->impl->setObserver(this);
     rendererFrontend.setObserver(*this);
-    transform.resize(size_);
+    transform.resize(mapOptions.size());
 }
 
 Map::Impl::~Impl() {

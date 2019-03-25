@@ -32,8 +32,8 @@ public:
     float pixelRatio { 1 };
     HeadlessFrontend frontend { pixelRatio, threadPool };
 
-    MapAdapter map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, std::make_shared<StubFileSource>(),
-                  threadPool, MapOptions().withMapMode(MapMode::Static)};
+    MapAdapter map { frontend, MapObserver::nullObserver(), pixelRatio, std::make_shared<StubFileSource>(),
+                  threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,

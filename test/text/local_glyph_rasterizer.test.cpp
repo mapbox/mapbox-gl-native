@@ -43,8 +43,8 @@ public:
     ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
     HeadlessFrontend frontend;
-    MapAdapter map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-                  threadPool, MapOptions().withMapMode(MapMode::Static)};
+    MapAdapter map { frontend, MapObserver::nullObserver(), pixelRatio, fileSource,
+                  threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,

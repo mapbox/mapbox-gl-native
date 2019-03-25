@@ -73,8 +73,8 @@ TEST(Memory, Vector) {
     float ratio { 2 };
 
     HeadlessFrontend frontend { { 256, 256 }, ratio, test.threadPool };
-    MapAdapter map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-                   test.threadPool, MapOptions().withMapMode(MapMode::Static));
+    MapAdapter map(frontend, MapObserver::nullObserver(), ratio, test.fileSource,
+                   test.threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()));
     map.jumpTo(CameraOptions().withZoom(16));
     map.getStyle().loadURL("mapbox://streets");
 
@@ -86,8 +86,8 @@ TEST(Memory, Raster) {
     float ratio { 2 };
 
     HeadlessFrontend frontend { { 256, 256 }, ratio, test.threadPool };
-    MapAdapter map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-                   test.threadPool, MapOptions().withMapMode(MapMode::Static));
+    MapAdapter map(frontend, MapObserver::nullObserver(), ratio, test.fileSource,
+                   test.threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()));
     map.getStyle().loadURL("mapbox://satellite");
 
     frontend.render(map);
@@ -124,8 +124,8 @@ TEST(Memory, Footprint) {
     public:
         FrontendAndMap(MemoryTest& test_, const char* style)
             : frontend(Size{ 256, 256 }, 2, test_.threadPool)
-            , map(frontend, MapObserver::nullObserver(), frontend.getSize(), 2, test_.fileSource
-            , test_.threadPool, MapOptions().withMapMode(MapMode::Static)) {
+            , map(frontend, MapObserver::nullObserver(), 2, test_.fileSource
+            , test_.threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())) {
             map.jumpTo(CameraOptions().withZoom(16));
             map.getStyle().loadURL(style);
             frontend.render(map);

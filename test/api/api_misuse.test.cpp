@@ -25,9 +25,9 @@ TEST(API, RenderWithoutCallback) {
     float pixelRatio { 1 };
     HeadlessFrontend frontend { pixelRatio, threadPool };
 
-    auto map = std::make_unique<MapAdapter>(frontend, MapObserver::nullObserver(), frontend.getSize(),
+    auto map = std::make_unique<MapAdapter>(frontend, MapObserver::nullObserver(),
                                             pixelRatio, std::make_shared<StubFileSource>(), threadPool,
-                                            MapOptions().withMapMode(MapMode::Static));
+                                            MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()));
     map->renderStill(nullptr);
 
     // Force Map thread to join.

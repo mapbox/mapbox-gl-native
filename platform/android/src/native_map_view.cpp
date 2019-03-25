@@ -81,14 +81,15 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
     // Create Map options
     MapOptions options;
     options.withMapMode(MapMode::Continuous)
+           .withSize(mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) })
            .withConstrainMode(ConstrainMode::HeightOnly)
            .withViewportMode(ViewportMode::Default)
            .withCrossSourceCollisions(_crossSourceCollisions);
 
     // Create the core map
     map = std::make_unique<mbgl::Map>(
-        *rendererFrontend, *this, mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) },
-        pixelRatio, *threadPool, options, mbgl::android::FileSource::getSharedResourceOptions(_env, jFileSource));
+        *rendererFrontend, *this, pixelRatio, *threadPool, options,
+        mbgl::android::FileSource::getSharedResourceOptions(_env, jFileSource));
 }
 
 /**

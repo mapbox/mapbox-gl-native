@@ -1127,7 +1127,7 @@ void QMapboxGL::resize(const QSize& size_)
 {
     auto size = sanitizedSize(size_);
 
-    if (d_ptr->mapObj->getSize() == size)
+    if (d_ptr->mapObj->getMapOptions().size() == size)
         return;
 
     d_ptr->mapObj->setSize(size);
@@ -1705,8 +1705,9 @@ void QMapboxGL::connectionEstablished()
     \a copyrightsHtml is a string with a HTML snippet.
 */
 
-mbgl::MapOptions mapOptionsFromQMapboxGLSettings(const QMapboxGLSettings &settings) {
+mbgl::MapOptions mapOptionsFromQMapboxGLSettings(const QMapboxGLSettings &settings, const QSize &size) {
     return std::move(mbgl::MapOptions()
+        .withSize(sanitizedSize(size))
         .withMapMode(static_cast<mbgl::MapMode>(settings.mapMode()))
         .withConstrainMode(static_cast<mbgl::ConstrainMode>(settings.constrainMode()))
         .withViewportMode(static_cast<mbgl::ViewportMode>(settings.viewportMode())));
@@ -1740,8 +1741,8 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     auto resourceOptions = resourceOptionsFromQMapboxGLSettings(settings);
 
     // Setup the Map object.
-    mapObj = std::make_unique<mbgl::Map>(*this, *m_mapObserver, sanitizedSize(size), m_pixelRatio, *m_threadPool,
-                                         mapOptionsFromQMapboxGLSettings(settings), resourceOptions);
+    mapObj = std::make_unique<mbgl::Map>(*this, *m_mapObserver, m_pixelRatio, *m_threadPool,
+                                         mapOptionsFromQMapboxGLSettings(settings, size), resourceOptions);
 
      if (settings.resourceTransform()) {
          m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),

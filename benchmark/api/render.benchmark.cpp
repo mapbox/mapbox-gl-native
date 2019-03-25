@@ -45,8 +45,8 @@ static void prepare(Map& map, optional<std::string> json = {}) {
 static void API_renderStill_reuse_map(::benchmark::State& state) {
     RenderBenchmark bench;
     HeadlessFrontend frontend { size, pixelRatio, bench.threadPool };
-    Map map { frontend, MapObserver::nullObserver(), size, pixelRatio, bench.threadPool,
-              MapOptions().withMapMode(MapMode::Static),
+    Map map { frontend, MapObserver::nullObserver(), pixelRatio, bench.threadPool,
+              MapOptions().withMapMode(MapMode::Static).withSize(size),
               ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
     prepare(map);
 
@@ -58,8 +58,8 @@ static void API_renderStill_reuse_map(::benchmark::State& state) {
 static void API_renderStill_reuse_map_formatted_labels(::benchmark::State& state) {
     RenderBenchmark bench;
     HeadlessFrontend frontend { size, pixelRatio, bench.threadPool };
-    Map map { frontend, MapObserver::nullObserver(), size, pixelRatio, bench.threadPool,
-              MapOptions().withMapMode(MapMode::Static), ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
+    Map map { frontend, MapObserver::nullObserver(), pixelRatio, bench.threadPool,
+              MapOptions().withMapMode(MapMode::Static).withSize(size), ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
     prepare(map, util::read_file("benchmark/fixtures/api/style_formatted_labels.json"));
 
     while (state.KeepRunning()) {
@@ -70,8 +70,8 @@ static void API_renderStill_reuse_map_formatted_labels(::benchmark::State& state
 static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
     RenderBenchmark bench;
     HeadlessFrontend frontend { size, pixelRatio, bench.threadPool };
-    Map map { frontend, MapObserver::nullObserver(), size, pixelRatio, bench.threadPool,
-              MapOptions().withMapMode(MapMode::Static), ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
+    Map map { frontend, MapObserver::nullObserver(), pixelRatio, bench.threadPool,
+              MapOptions().withMapMode(MapMode::Static).withSize(size), ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
 
     while (state.KeepRunning()) {
         prepare(map, { "{}" });
@@ -86,8 +86,8 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         HeadlessFrontend frontend { size, pixelRatio, bench.threadPool };
-        Map map { frontend, MapObserver::nullObserver(), size, pixelRatio, bench.threadPool,
-                  MapOptions().withMapMode(MapMode::Static), ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
+        Map map { frontend, MapObserver::nullObserver(), pixelRatio, bench.threadPool,
+                  MapOptions().withMapMode(MapMode::Static).withSize(size), ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
         prepare(map);
         frontend.render(map);
     }

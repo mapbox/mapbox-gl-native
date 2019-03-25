@@ -29,12 +29,11 @@ using namespace style;
 
 Map::Map(RendererFrontend& frontend,
          MapObserver& observer,
-         const Size size,
          const float pixelRatio,
          Scheduler& scheduler,
          const MapOptions& mapOptions,
          const ResourceOptions& resourceOptions)
-    : impl(std::make_unique<Impl>(frontend, observer, scheduler, size, pixelRatio,
+    : impl(std::make_unique<Impl>(frontend, observer, scheduler, pixelRatio,
                                   FileSource::getSharedFileSource(resourceOptions), mapOptions)) {}
 
 Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {}
@@ -308,39 +307,27 @@ BoundOptions Map::getBounds() const {
         .withMaxZoom(impl->transform.getState().getMaxZoom());
 }
 
-#pragma mark - Size
+#pragma mark - Map options
 
 void Map::setSize(const Size size) {
     impl->transform.resize(size);
     impl->onUpdate();
 }
 
-Size Map::getSize() const {
-    return impl->transform.getState().getSize();
-}
-
-#pragma mark - North Orientation
-
 void Map::setNorthOrientation(NorthOrientation orientation) {
     impl->transform.setNorthOrientation(orientation);
     impl->onUpdate();
 }
-
-#pragma mark - Constrain mode
 
 void Map::setConstrainMode(mbgl::ConstrainMode mode) {
     impl->transform.setConstrainMode(mode);
     impl->onUpdate();
 }
 
-#pragma mark - Viewport mode
-
 void Map::setViewportMode(mbgl::ViewportMode mode) {
     impl->transform.setViewportMode(mode);
     impl->onUpdate();
 }
-
-#pragma mark - Map options
 
 MapOptions Map::getMapOptions() const {
     return std::move(MapOptions()
@@ -348,7 +335,8 @@ MapOptions Map::getMapOptions() const {
         .withConstrainMode(impl->transform.getConstrainMode())
         .withViewportMode(impl->transform.getViewportMode())
         .withCrossSourceCollisions(impl->crossSourceCollisions)
-        .withNorthOrientation(impl->transform.getNorthOrientation()));
+        .withNorthOrientation(impl->transform.getNorthOrientation())
+        .withSize(impl->transform.getState().getSize()));
 }
 
 #pragma mark - Projection mode
