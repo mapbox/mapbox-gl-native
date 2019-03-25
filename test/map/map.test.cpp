@@ -151,6 +151,18 @@ TEST(Map, LatLngBoundsToCamera) {
     EXPECT_NEAR(*virtualCamera.zoom, 1.55467, 1e-5);
 }
 
+TEST(Map, LatLngBoundsToCameraWithExcessivePadding) {
+    MapTest<> test;
+
+    test.map.jumpTo(CameraOptions().withCenter(LatLng { 40.712730, -74.005953 }).withZoom(16.0));
+
+    LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
+
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {500, 0, 1200, 0});
+    ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 16.0, 1e-5);
+}
+
 TEST(Map, LatLngBoundsToCameraWithBearing) {
     MapTest<> test;
 
