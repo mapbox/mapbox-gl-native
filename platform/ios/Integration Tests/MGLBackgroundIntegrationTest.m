@@ -3,7 +3,6 @@
 
 @interface MGLMapView (BackgroundTests)
 @property (nonatomic) id<MGLApplication> application;
-@property (nonatomic) BOOL rendererWasFlushed;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic) CADisplayLink *displayLink;
 - (void)updateFromDisplayLink:(CADisplayLink *)displayLink;
@@ -104,7 +103,6 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     XCTAssertFalse(self.mapView.isDormant);
     XCTAssertFalse(self.mapView.displayLink.isPaused);
     XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
-    XCTAssertFalse(self.mapView.rendererWasFlushed);
 
     __weak typeof(self) weakSelf = self;
 
@@ -116,12 +114,6 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     didEnterBackgroundExpectation.expectedFulfillmentCount = 1;
     didEnterBackgroundExpectation.assertForOverFulfill = YES;
 
-    __block NSInteger displayLinkCount = 0;
-    
-    self.displayLinkDidUpdate = ^{
-        displayLinkCount++;
-    };
-    
     self.didEnterBackground = ^(__unused NSNotification *notification){
         typeof(self) strongSelf = weakSelf;
         MGLMapView *mapView = strongSelf.mapView;
@@ -138,11 +130,90 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
         // GL can be rendering in the background - which can cause crashes.
         
         MGLTestAssert(strongSelf, !mapView.isDormant);
-        MGLTestAssert(strongSelf, !mapView.displayLink.isPaused);
+        
+        // However, the display should be paused (because this has now moved
+        // to ...WillResignActive...
+        MGLTestAssert(strongSelf, mapView.displayLink.isPaused);
+        
+        [didEnterBackgroundExpectation fulfill];
+    };
+    
+    [self.mockApplication enterBackground];
+    [self waitForExpectations:@[didEnterBackgroundExpectation] timeout:1.0];
+    
+    XCTAssert(self.mapView.isDormant);
+    
+    // TODO: What do we want here?
+    XCTAssert(!self.mapView.displayLink || self.mapView.displayLink.isPaused);
+    XCTAssert(self.mapView.application.applicationState == UIApplicationStateBackground);
+
+    //
+    // Enter foreground
+    //
+
+    XCTestExpectation *willEnterForegroundExpectation = [self expectationWithDescription:@"willEnterForeground"];
+    willEnterForegroundExpectation.expectedFulfillmentCount = 1;
+    willEnterForegroundExpectation.assertForOverFulfill = YES;
+
+    self.willEnterForeground = ^(NSNotification *notification) {
+        [willEnterForegroundExpectation fulfill];
+    };
+    
+    [self.mockApplication enterForeground];
+    [self waitForExpectations:@[willEnterForegroundExpectation] timeout:1.0];
+    
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssert(self.mapView.displayLink && !self.mapView.displayLink.isPaused);
+    XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
+}
+
+- (void)testRendererAdjustingViewsWhenGoingIntoBackground {
+    
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+    XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
+    
+    __weak typeof(self) weakSelf = self;
+    
+    //
+    // Enter background
+    //
+    
+    XCTestExpectation *didEnterBackgroundExpectation = [self expectationWithDescription:@"didEnterBackground"];
+    didEnterBackgroundExpectation.expectedFulfillmentCount = 1;
+    didEnterBackgroundExpectation.assertForOverFulfill = YES;
+    
+    __block NSInteger displayLinkCount = 0;
+    
+    self.displayLinkDidUpdate = ^{
+        displayLinkCount++;
+    };
+    
+    self.didEnterBackground = ^(__unused NSNotification *notification){
+        typeof(self) strongSelf = weakSelf;
+        MGLMapView *mapView = strongSelf.mapView;
+        
+        // In general, because order of notifications is not guaranteed
+        // the following asserts are somewhat meaningless (don't do this in
+        // production) - however, because we're mocking their delivery (and
+        // we're tracking a bug)...
+        
+        // MGLMapView responds to UIApplicationDidEnterBackgroundNotification and
+        // marks the map view as dormant. However, depending on the order of
+        // creation it's totally possible for client code also responding to
+        // this notification to be called first - and then trigger a scenario where
+        // GL can be rendering in the background - which can cause crashes.
+        
+        MGLTestAssert(strongSelf, !mapView.isDormant);
+        
+        // However, the display should be paused (because this has now moved
+        // to ...WillResignActive...
+        MGLTestAssert(strongSelf, mapView.displayLink.isPaused);
         
         displayLinkCount = 0;
         
         // Remove the map view, and re-add to try and force a bad situation
+        // This will delete/re-create the display link
         UIView *parentView = mapView.superview;
         
         NSLog(@"Removing MGLMapView from super view");
@@ -158,24 +229,27 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
         [mapView.leftAnchor constraintEqualToAnchor:parentView.leftAnchor].active = YES;
         [mapView.rightAnchor constraintEqualToAnchor:parentView.rightAnchor].active = YES;
         [mapView.bottomAnchor constraintEqualToAnchor:parentView.bottomAnchor].active = YES;
+        
+        [didEnterBackgroundExpectation fulfill];
     };
     
     [self.mockApplication enterBackground];
-    [self waitForExpectations:@[didEnterBackgroundExpectation] timeout:0.5];
+    [self waitForExpectations:@[didEnterBackgroundExpectation] timeout:1.0];
     
     XCTAssert(self.mapView.isDormant);
-    XCTAssert(self.mapView.displayLink.isPaused);
+    
+    // TODO: What do we want here?
+    XCTAssert(!self.mapView.displayLink || self.mapView.displayLink.isPaused);
     XCTAssert(self.mapView.application.applicationState == UIApplicationStateBackground);
-    XCTAssert(self.mapView.rendererWasFlushed);
-
+    
     //
     // Enter foreground
     //
-
+    
     XCTestExpectation *willEnterForegroundExpectation = [self expectationWithDescription:@"willEnterForeground"];
     willEnterForegroundExpectation.expectedFulfillmentCount = 1;
     willEnterForegroundExpectation.assertForOverFulfill = YES;
-
+    
     self.willEnterForeground = ^(NSNotification *notification) {
         displayLinkCount = 0;
         [willEnterForegroundExpectation fulfill];
@@ -183,12 +257,11 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     
     [self.mockApplication enterForeground];
     XCTAssert(displayLinkCount == 0, @"updateDisplayLink was called %ld times", displayLinkCount);
-    [self waitForExpectations:@[willEnterForegroundExpectation] timeout:0.5];
+    [self waitForExpectations:@[willEnterForegroundExpectation] timeout:1.0];
     
     XCTAssertFalse(self.mapView.isDormant);
-    XCTAssertFalse(self.mapView.displayLink.isPaused);
+    XCTAssert(self.mapView.displayLink && !self.mapView.displayLink.isPaused);
     XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
-    XCTAssert(self.mapView.rendererWasFlushed);
 }
 
 @end
