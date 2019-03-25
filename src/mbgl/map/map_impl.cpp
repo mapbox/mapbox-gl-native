@@ -24,6 +24,7 @@ Map::Impl::Impl(RendererFrontend& frontend_,
           fileSource(std::move(fileSource_)),
           style(std::make_unique<style::Style>(scheduler, *fileSource, pixelRatio)),
           annotationManager(*style) {
+    transform.setNorthOrientation(mapOptions.northOrientation());
     style->impl->setObserver(this);
     rendererFrontend.setObserver(*this);
     transform.resize(size_);

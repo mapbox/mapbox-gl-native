@@ -867,7 +867,7 @@ void QMapboxGL::pitchBy(double pitch_)
 */
 QMapboxGL::NorthOrientation QMapboxGL::northOrientation() const
 {
-    return static_cast<QMapboxGL::NorthOrientation>(d_ptr->mapObj->getNorthOrientation());
+    return static_cast<QMapboxGL::NorthOrientation>(d_ptr->mapObj->getMapOptions().northOrientation());
 }
 
 /*!

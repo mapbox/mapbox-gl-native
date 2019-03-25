@@ -87,11 +87,8 @@ public:
 
     /// @}
 
-    // North Orientation
-    void setNorthOrientation(NorthOrientation);
-    NorthOrientation getNorthOrientation() const;
-
     // Map Options
+    void setNorthOrientation(NorthOrientation);
     void setConstrainMode(ConstrainMode);
     void setViewportMode(ViewportMode);
     MapOptions getMapOptions() const;
