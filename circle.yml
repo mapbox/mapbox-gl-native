@@ -922,7 +922,7 @@ jobs:
           command: scripts/nitpick/generated-code.js darwin
       - run:
           name: Generate iOS code coverage
-          command:
+          command: |
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
                 platform/ios/scripts/ios-code-coverage.sh CI
             fi
