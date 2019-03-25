@@ -5,7 +5,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 
-#include <args/args.hxx>
+#include <args.hxx>
 
 #include <cstdlib>
 #include <iostream>

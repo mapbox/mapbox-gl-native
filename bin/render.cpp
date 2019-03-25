@@ -8,7 +8,7 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/style/style.hpp>
 
-#include <args/args.hxx>
+#include <args.hxx>
 
 #include <cstdlib>
 #include <iostream>
