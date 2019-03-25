@@ -34,7 +34,6 @@ class Map : private util::noncopyable {
 public:
     explicit Map(RendererFrontend&,
                  MapObserver&,
-                 Size size,
                  float pixelRatio,
                  Scheduler&,
                  const MapOptions&,
@@ -91,15 +90,12 @@ public:
     void setNorthOrientation(NorthOrientation);
     void setConstrainMode(ConstrainMode);
     void setViewportMode(ViewportMode);
+    void setSize(Size);
     MapOptions getMapOptions() const;
 
     //Projection Mode
     void setProjectionMode(const ProjectionMode&);
     ProjectionMode getProjectionMode() const;
-
-    // Size
-    void setSize(Size);
-    Size getSize() const;
 
     // Projection
     ScreenCoordinate pixelForLatLng(const LatLng&) const;

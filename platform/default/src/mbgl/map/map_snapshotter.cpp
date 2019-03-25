@@ -58,7 +58,7 @@ MapSnapshotter::Impl::Impl(std::shared_ptr<Scheduler> scheduler_,
                            const ResourceOptions& resourceOptions)
         : scheduler(std::move(scheduler_))
         , frontend(size, pixelRatio, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
-        , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *scheduler, MapOptions().withMapMode(MapMode::Static), resourceOptions) {
+        , map(frontend, MapObserver::nullObserver(), pixelRatio, *scheduler, MapOptions().withMapMode(MapMode::Static).withSize(size), resourceOptions) {
     if (style.first) {
         map.getStyle().loadJSON(style.second);
     } else{
@@ -141,7 +141,7 @@ void MapSnapshotter::Impl::setSize(Size size) {
 }
 
 Size MapSnapshotter::Impl::getSize() const {
-    return map.getSize();
+    return map.getMapOptions().size();
 }
 
 void MapSnapshotter::Impl::setCameraOptions(CameraOptions cameraOptions) {

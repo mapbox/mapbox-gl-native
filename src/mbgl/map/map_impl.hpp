@@ -30,7 +30,7 @@ struct StillImageRequest {
 
 class Map::Impl : public style::Observer, public RendererObserver {
 public:
-    Impl(RendererFrontend&, MapObserver&, Scheduler&, Size size, float pixelRatio, std::shared_ptr<FileSource>, const MapOptions&);
+    Impl(RendererFrontend&, MapObserver&, Scheduler&, float pixelRatio, std::shared_ptr<FileSource>, const MapOptions&);
     ~Impl() final;
 
     // StyleObserver

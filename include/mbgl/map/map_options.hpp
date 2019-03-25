@@ -2,6 +2,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/size.hpp>
 
 #include <memory>
 
@@ -102,6 +103,21 @@ public:
      * @return Map orientation.
      */
     NorthOrientation northOrientation() const;
+
+    /**
+     * @brief Sets the size to resize the map object and renderer backend.
+     *
+     * @param size_ A size given in logical pixels.
+     * @return reference to MapOptions for chaining options together.
+     */
+    MapOptions& withSize(Size size_);
+
+    /**
+     * @brief Gets the previously set size.
+     *
+     * @return Size.
+     */
+    Size size() const;
 
 private:
     class Impl;

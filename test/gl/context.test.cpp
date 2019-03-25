@@ -91,8 +91,8 @@ TEST(GLContextMode, Shared) {
 
     HeadlessFrontend frontend { pixelRatio, threadPool, {}, GLContextMode::Shared };
 
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, threadPool,
-            MapOptions().withMapMode(MapMode::Static),
+    Map map(frontend, MapObserver::nullObserver(), pixelRatio, threadPool,
+            MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));

@@ -292,6 +292,7 @@ public:
 
     mbgl::MapOptions mapOptions;
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
+              .withSize(self.size)
               .withConstrainMode(mbgl::ConstrainMode::None)
               .withViewportMode(mbgl::ViewportMode::Default)
               .withCrossSourceCollisions(enableCrossSourceCollisions);
@@ -300,7 +301,7 @@ public:
     resourceOptions.withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
                    .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
 
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *_mbglThreadPool, mapOptions, resourceOptions);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, config.scaleFactor, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.

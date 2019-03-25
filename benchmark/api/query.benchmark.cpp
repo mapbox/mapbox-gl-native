@@ -32,8 +32,8 @@ public:
     util::RunLoop loop;
     ThreadPool threadPool{ 4 };
     HeadlessFrontend frontend { { 1000, 1000 }, 1, threadPool };
-    Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, threadPool,
-              MapOptions().withMapMode(MapMode::Static),
+    Map map { frontend, MapObserver::nullObserver(), 1, threadPool,
+              MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
               ResourceOptions().withCachePath("benchmark/fixtures/api/cache.db").withAssetPath(".").withAccessToken("foobar") };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
 };

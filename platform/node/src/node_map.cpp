@@ -631,8 +631,10 @@ void NodeMap::cancel() {
     });
 
     frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, threadpool);
-    map = std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio, threadpool,
-                                      mbgl::MapOptions().withMapMode(mode).withCrossSourceCollisions(crossSourceCollisions),
+    map = std::make_unique<mbgl::Map>(*frontend, mapObserver, pixelRatio, threadpool,
+                                      mbgl::MapOptions().withSize(frontend->getSize())
+                                      .withMapMode(mode)
+                                      .withCrossSourceCollisions(crossSourceCollisions),
                                       mbgl::ResourceOptions().withPlatformContext(reinterpret_cast<void*>(this)));
 
     // FIXME: Reload the style after recreating the map. We need to find
@@ -1212,8 +1214,10 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
     }())
     , mapObserver(NodeMapObserver())
     , frontend(std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size { 256, 256 }, pixelRatio, threadpool))
-    , map(std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio, threadpool,
-                                      mbgl::MapOptions().withMapMode(mode).withCrossSourceCollisions(crossSourceCollisions),
+    , map(std::make_unique<mbgl::Map>(*frontend, mapObserver, pixelRatio, threadpool,
+                                      mbgl::MapOptions().withSize(frontend->getSize())
+                                      .withMapMode(mode)
+                                      .withCrossSourceCollisions(crossSourceCollisions),
                                       mbgl::ResourceOptions().withPlatformContext(reinterpret_cast<void*>(this))))
     , async(new uv_async_t) {
     async->data = this;

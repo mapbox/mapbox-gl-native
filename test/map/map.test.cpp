@@ -41,8 +41,8 @@ public:
     MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
         : fileSource(std::make_shared<FileSource>())
         , frontend(pixelRatio, threadPool)
-        , map(frontend, observer, frontend.getSize(), pixelRatio,
-              fileSource, threadPool, MapOptions().withMapMode(mode)) {}
+        , map(frontend, observer, pixelRatio,
+              fileSource, threadPool, MapOptions().withMapMode(mode).withSize(frontend.getSize())) {}
 
     template <typename T = FileSource>
     MapTest(const std::string& cachePath, const std::string& assetPath,
@@ -50,8 +50,8 @@ public:
             typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
             : fileSource(std::make_shared<T>(cachePath, assetPath))
             , frontend(pixelRatio, threadPool)
-            , map(frontend, observer, frontend.getSize(), pixelRatio,
-                  fileSource, threadPool, MapOptions().withMapMode(mode)) {}
+            , map(frontend, observer, pixelRatio,
+                  fileSource, threadPool, MapOptions().withMapMode(mode).withSize(frontend.getSize())) {}
 };
 
 TEST(Map, RendererState) {
@@ -85,7 +85,7 @@ TEST(Map, RendererState) {
         const ScreenCoordinate& point = test.frontend.pixelForLatLng(coordinate);
         EXPECT_NEAR(coordinate.latitude(), latLng.latitude(), 1e-1);
         EXPECT_NEAR(coordinate.longitude(), latLng.longitude(), 1e-1);
-        const Size size = test.map.getSize();
+        const Size size = test.map.getMapOptions().size();
         EXPECT_NEAR(point.x, size.width / 2.0, 1e-7);
         EXPECT_NEAR(point.y, size.height / 2.0, 1e-7);
     }
@@ -221,9 +221,10 @@ TEST(Map, CameraToLatLngBounds) {
 
     test.map.jumpTo(CameraOptions().withCenter(LatLng { 45, 90 }).withZoom(16.0));
 
+    const Size size = test.map.getMapOptions().size();
     LatLngBounds bounds = LatLngBounds::hull(
             test.map.latLngForPixel({}),
-            test.map.latLngForPixel({ double(test.map.getSize().width), double(test.map.getSize().height) }));
+            test.map.latLngForPixel({ double(size.width), double(size.height) }));
 
     CameraOptions camera = test.map.getCameraOptions();
 
@@ -734,8 +735,8 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
         });
     };
 
-    Map map(frontend, observer, frontend.getSize(), pixelRatio, threadPool,
-            MapOptions().withMapMode(MapMode::Continuous),
+    Map map(frontend, observer, pixelRatio, threadPool,
+            MapOptions().withMapMode(MapMode::Continuous).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 
