@@ -1078,7 +1078,6 @@ using namespace std::string_literals;
         
         NSArray *jsonExpression = @[ @"format", @"foo", @{ @"font-scale": @1.2, @"text-color": @"yellow" , @"text-font" : @[ @"literal", @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]]} ];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        NSExpression *exp = [NSExpression expressionWithMGLJSONObject:jsonExpression];
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
