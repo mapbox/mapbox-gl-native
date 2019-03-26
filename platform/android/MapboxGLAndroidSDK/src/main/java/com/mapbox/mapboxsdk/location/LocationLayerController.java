@@ -79,7 +79,7 @@ final class LocationLayerController {
   @VisibleForTesting
   final Set<String> layerSet = new HashSet<>();
   private final List<String> layerMap = new ArrayList<>();
-  private final String TAG = "LocationLayerController";
+  private final String TAG = "Mbgl-LocationLayerController";
   private Feature locationFeature;
   private GeoJsonSource locationSource;
 
@@ -115,6 +115,7 @@ final class LocationLayerController {
   }
 
   void applyStyle(@NonNull LocationComponentOptions options) {
+    Logger.d(TAG, "applyStyle()");
     String newLayerBelowOption = options.layerBelow();
     if ((layerBelow != null || newLayerBelowOption != null)) {
       if (layerBelow == null || !layerBelow.equals(newLayerBelowOption)) {
@@ -248,6 +249,7 @@ final class LocationLayerController {
   }
 
   private void addLayers(@NonNull String idBelowLayer) {
+    Logger.d(TAG, "LocationLayerController ----> addLayers()");
     layerBelow = idBelowLayer;
     addSymbolLayer(BEARING_LAYER, idBelowLayer);
     addSymbolLayer(FOREGROUND_LAYER, BEARING_LAYER);
@@ -273,6 +275,7 @@ final class LocationLayerController {
   }
 
   private void addPulsingCircleLayerToMap() {
+    Logger.d(TAG, "LocationLayerController ----> addPulsingCircleLayerToMap()");
     Layer pulsingCircleLayer = layerSourceProvider.generatePulsingCircleLayer();
     addLayerToMap(pulsingCircleLayer, ACCURACY_LAYER);
   }
@@ -384,6 +387,7 @@ final class LocationLayerController {
   }
 
   private void stylePulsingCircle(LocationComponentOptions options) {
+    Logger.d(TAG, "stylePulsingCircle() starting && options.pulseEnabled() = " + options.pulseEnabled());
     if (mapboxMap.getStyle() != null) {
       if (mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null) {
         Logger.d(TAG, "stylePulsingCircle: options.pulseEnabled() = " + options.pulseEnabled());

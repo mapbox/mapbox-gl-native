@@ -156,7 +156,6 @@
     <public name="mapbox_pulsingLocationCircleFadeEnabled" format="boolean" type="attr" />
     <public name="mapbox_pulsingLocationCircleColor" format="color" type="attr" />
     <public name="mapbox_pulsingLocationCircleDuration" format="float" type="attr" />
-    <public name="mapbox_pulsingLocationCircleFrequency" format="float" type="attr" />
     <public name="mapbox_pulsingLocationCircleAlpha" format="float" type="attr" />
     <public name="mapbox_pulsingLocationCircleInterpolator" format="string" type="attr" />
 </resources>

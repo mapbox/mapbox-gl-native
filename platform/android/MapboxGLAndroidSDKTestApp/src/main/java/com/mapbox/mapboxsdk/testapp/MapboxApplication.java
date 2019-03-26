@@ -52,7 +52,7 @@ public class MapboxApplication extends Application {
 
   private void initializeLogger() {
     Logger.setLoggerDefinition(new TimberLogger());
-    if (BuildConfig.DEBUG) {contro
+    if (BuildConfig.DEBUG) {
       Timber.plant(new DebugTree());
     }
   }

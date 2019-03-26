@@ -38,7 +38,6 @@
     <item name="mapbox_pulsingLocationCircleFadeEnabled">true</item>
     <item name="mapbox_pulsingLocationCircleColor">@color/mapbox_location_layer_blue</item>
     <item name="mapbox_pulsingLocationCircleDuration">1700</item>
-    <item name="mapbox_pulsingLocationCircleFrequency">1700</item>
     <item name="mapbox_pulsingLocationCircleAlpha">0.4</item>
     <item name="mapbox_pulsingLocationCircleInterpolator">decelerate</item>
   </style>

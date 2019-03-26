@@ -37,7 +37,7 @@
             android:layout_height="match_parent"
             android:layout_weight=".75"
             android:gravity="center"
-            android:text="Frequency:"
+            android:text="Duration:"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold" />

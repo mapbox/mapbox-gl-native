@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.location;
 import android.animation.ValueAnimator;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.animation.Interpolator;
 
 import com.mapbox.mapboxsdk.log.Logger;
@@ -50,25 +51,15 @@ public class PulsingLocationCircleAnimator {
   }
 
   private void createValueAnimator() {
-    //    handler.postDelayed(runnable, (long) locationComponentOptions.pulseFrequency());
     if (mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null) {
       Logger.d(TAG, "mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null");
+      Logger.d(TAG, "locationComponentOptions.pulseSingleDuration() = " + locationComponentOptions.pulseSingleDuration());
       pulsingCircleLayer = mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER);
-
-      if (pulsingCircleLayer != null) {
-        Logger.d(TAG, "pulsingCircleLayer != null");
-      } else {
-        Logger.d(TAG, "pulsingCircleLayer == null");
-      }
       animator = ValueAnimator.ofFloat(0f, PULSING_CIRCLE_RADIUS);
       animator.setDuration((long) locationComponentOptions.pulseSingleDuration());
       animator.setRepeatMode(ValueAnimator.RESTART);
       animator.setRepeatCount(ValueAnimator.INFINITE);
       animator.setInterpolator(interpolatorToUse);
-
-      Logger.d(TAG, "animator.getDuration() = " + animator.getDuration());
-      Logger.d(TAG, "animator.getRepeatMode() = " + animator.getRepeatMode());
-
       animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
         @Override
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -84,6 +75,7 @@ public class PulsingLocationCircleAnimator {
 
   private void startValueAnimator() {
     if (animator != null) {
+      Log.d(TAG, "startValueAnimator() animator != null");
       animator.start();
     }
   }

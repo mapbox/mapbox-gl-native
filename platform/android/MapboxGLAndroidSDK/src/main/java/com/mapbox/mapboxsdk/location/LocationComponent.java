@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.StyleRes;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.mapbox.android.core.location.LocationEngine;
@@ -657,6 +658,7 @@ public final class LocationComponent {
   @SuppressLint("MissingPermission")
   public void applyStyle(@NonNull final LocationComponentOptions options) {
     checkActivationState();
+    Logger.d(TAG, "LocationComponent applyStyle()");
     LocationComponent.this.options = options;
     if (mapboxMap.getStyle() != null) {
       locationLayerController.applyStyle(options);
@@ -1069,7 +1071,6 @@ public final class LocationComponent {
   public void onStop() {
     onLocationLayerStop();
     isComponentStarted = false;
-    Logger.d(TAG, "onStop()");
   }
 
   /**
@@ -1089,8 +1090,15 @@ public final class LocationComponent {
    * Internal use.
    */
   public void onFinishLoadingStyle() {
+    Logger.d(TAG, "onFinishLoadingStyle");
+    Logger.d(TAG, "isComponentInitialized = " + isComponentInitialized);
+
     if (isComponentInitialized) {
       style = mapboxMap.getStyle();
+      Logger.d(TAG, "isComponentInitialized == true && options.pulseAlpha() = " + options.pulseAlpha());
+      Logger.d(TAG, "isComponentInitialized == true && options.pulseSingleDuration() = " + options.pulseSingleDuration());
+      Logger.d(TAG, "isComponentInitialized == true && options.pulseColor() = " + options.pulseColor());
+
       locationLayerController.initializeComponents(style, options);
       locationCameraController.initializeOptions(options);
       onLocationLayerStart();
@@ -1110,6 +1118,13 @@ public final class LocationComponent {
       if (options.enableStaleState()) {
         staleStateManager.onStart();
       }
+      Logger.d(TAG, "onLocationLayerStart: options.pulseEnabled() = " + options.pulseEnabled());
+      if (options.pulseEnabled()) {
+        Logger.d(TAG, "onLocationLayerStart: locationAnimatorCoordinator.startLocationCirclePulsing(options, mapboxMap)");
+        Logger.d(TAG, "onLocationLayerStart: options.pulseColor() = " + options.pulseColor());
+        Logger.d(TAG, "onLocationLayerStart: options.pulseSingleDuration() = " + options.pulseSingleDuration());
+        locationAnimatorCoordinator.startLocationCirclePulsing(options, mapboxMap);
+      }
     }
 
     if (isEnabled) {
@@ -1125,9 +1140,6 @@ public final class LocationComponent {
       setLastLocation();
       updateCompassListenerState(true);
       setLastCompassHeading();
-      if (options.pulseEnabled()) {
-        locationAnimatorCoordinator.startLocationCirclePulsing(options, mapboxMap);
-      }
     }
   }
 
@@ -1147,7 +1159,8 @@ public final class LocationComponent {
       locationEngine.removeLocationUpdates(currentLocationEngineListener);
     }
     if (options.pulseEnabled()) {
-      Logger.d(TAG, "onLocationLayerStop: about to stop animation ");
+      Logger.d(TAG, "onLocationLayerStop: options.pulseEnabled()");
+      Logger.d(TAG, "onLocationLayerStop: locationAnimatorCoordinator.stopPulsingAnimation()");
       locationAnimatorCoordinator.stopPulsingAnimation();
     }
     mapboxMap.removeOnCameraMoveListener(onCameraMoveListener);
