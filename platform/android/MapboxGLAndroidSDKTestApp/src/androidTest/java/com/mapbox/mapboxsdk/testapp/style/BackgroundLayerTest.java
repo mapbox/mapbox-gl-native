@@ -73,7 +73,7 @@ public class BackgroundLayerTest extends BaseLayerTest {
     assertNull(layer.getBackgroundColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(backgroundColor(propertyValue));
     assertEquals(layer.getBackgroundColor().getValue(), propertyValue);
   }
@@ -85,8 +85,8 @@ public class BackgroundLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(backgroundColor(Color.RED));
-    assertEquals(layer.getBackgroundColorAsInt(), Color.RED);
+    layer.setProperties(backgroundColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getBackgroundColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test

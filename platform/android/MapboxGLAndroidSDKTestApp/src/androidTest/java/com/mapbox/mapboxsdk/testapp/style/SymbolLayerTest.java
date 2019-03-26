@@ -856,7 +856,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getIconColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(iconColor(propertyValue));
     assertEquals(layer.getIconColor().getValue(), propertyValue);
   }
@@ -881,8 +881,8 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(iconColor(Color.RED));
-    assertEquals(layer.getIconColorAsInt(), Color.RED);
+    layer.setProperties(iconColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getIconColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
@@ -905,7 +905,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getIconHaloColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(iconHaloColor(propertyValue));
     assertEquals(layer.getIconHaloColor().getValue(), propertyValue);
   }
@@ -930,8 +930,8 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(iconHaloColor(Color.RED));
-    assertEquals(layer.getIconHaloColorAsInt(), Color.RED);
+    layer.setProperties(iconHaloColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getIconHaloColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
@@ -1106,7 +1106,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getTextColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(textColor(propertyValue));
     assertEquals(layer.getTextColor().getValue(), propertyValue);
   }
@@ -1131,8 +1131,8 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(textColor(Color.RED));
-    assertEquals(layer.getTextColorAsInt(), Color.RED);
+    layer.setProperties(textColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getTextColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
@@ -1155,7 +1155,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getTextHaloColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(textHaloColor(propertyValue));
     assertEquals(layer.getTextHaloColor().getValue(), propertyValue);
   }
@@ -1180,8 +1180,8 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(textHaloColor(Color.RED));
-    assertEquals(layer.getTextHaloColorAsInt(), Color.RED);
+    layer.setProperties(textHaloColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getTextHaloColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test

@@ -170,7 +170,7 @@ public class FillLayerTest extends BaseLayerTest {
     assertNull(layer.getFillColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(fillColor(propertyValue));
     assertEquals(layer.getFillColor().getValue(), propertyValue);
   }
@@ -195,8 +195,8 @@ public class FillLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(fillColor(Color.RED));
-    assertEquals(layer.getFillColorAsInt(), Color.RED);
+    layer.setProperties(fillColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getFillColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
@@ -219,7 +219,7 @@ public class FillLayerTest extends BaseLayerTest {
     assertNull(layer.getFillOutlineColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(fillOutlineColor(propertyValue));
     assertEquals(layer.getFillOutlineColor().getValue(), propertyValue);
   }
@@ -244,8 +244,8 @@ public class FillLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(fillOutlineColor(Color.RED));
-    assertEquals(layer.getFillOutlineColorAsInt(), Color.RED);
+    layer.setProperties(fillOutlineColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getFillOutlineColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test

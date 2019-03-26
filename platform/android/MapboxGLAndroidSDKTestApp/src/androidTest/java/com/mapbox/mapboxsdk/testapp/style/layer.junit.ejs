@@ -186,8 +186,8 @@ public class <%- camelize(type) %>LayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(Color.RED));
-    assertEquals(layer.get<%- camelize(property.name) %>AsInt(), Color.RED);
+    layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.get<%- camelize(property.name) %>AsInt(), Color.argb(127, 255, 127, 0));
   }
 <% } -%>
 <% } -%>

@@ -103,8 +103,8 @@ public class LightTest extends BaseTest {
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(light);
       // Set and Get
-      light.setColor("rgba(0, 0, 0, 1)");
-      assertEquals("Color should match", "rgba(0, 0, 0, 1)".replaceAll("\\s+", ""), light.getColor());
+      light.setColor("rgba(255,128,0,0.7)");
+      assertEquals("Color should match", "rgba(255,128,0,0.7)", light.getColor());
     });
   }
 

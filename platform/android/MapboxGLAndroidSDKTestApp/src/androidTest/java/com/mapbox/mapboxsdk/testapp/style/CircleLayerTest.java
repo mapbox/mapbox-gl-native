@@ -157,7 +157,7 @@ public class CircleLayerTest extends BaseLayerTest {
     assertNull(layer.getCircleColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(circleColor(propertyValue));
     assertEquals(layer.getCircleColor().getValue(), propertyValue);
   }
@@ -182,8 +182,8 @@ public class CircleLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(circleColor(Color.RED));
-    assertEquals(layer.getCircleColorAsInt(), Color.RED);
+    layer.setProperties(circleColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getCircleColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
@@ -384,7 +384,7 @@ public class CircleLayerTest extends BaseLayerTest {
     assertNull(layer.getCircleStrokeColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(circleStrokeColor(propertyValue));
     assertEquals(layer.getCircleStrokeColor().getValue(), propertyValue);
   }
@@ -409,8 +409,8 @@ public class CircleLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(circleStrokeColor(Color.RED));
-    assertEquals(layer.getCircleStrokeColorAsInt(), Color.RED);
+    layer.setProperties(circleStrokeColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getCircleStrokeColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test

@@ -144,7 +144,7 @@ public class FillExtrusionLayerTest extends BaseLayerTest {
     assertNull(layer.getFillExtrusionColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(fillExtrusionColor(propertyValue));
     assertEquals(layer.getFillExtrusionColor().getValue(), propertyValue);
   }
@@ -169,8 +169,8 @@ public class FillExtrusionLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(fillExtrusionColor(Color.RED));
-    assertEquals(layer.getFillExtrusionColorAsInt(), Color.RED);
+    layer.setProperties(fillExtrusionColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getFillExtrusionColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test

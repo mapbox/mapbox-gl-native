@@ -222,7 +222,7 @@ public class LineLayerTest extends BaseLayerTest {
     assertNull(layer.getLineColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(lineColor(propertyValue));
     assertEquals(layer.getLineColor().getValue(), propertyValue);
   }
@@ -247,8 +247,8 @@ public class LineLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(lineColor(Color.RED));
-    assertEquals(layer.getLineColorAsInt(), Color.RED);
+    layer.setProperties(lineColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getLineColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
