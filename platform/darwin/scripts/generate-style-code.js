@@ -137,6 +137,8 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
                     }
                     return '@"{1, 1}"';
                 }
+                case 'anchor':
+                    return `@"{'top','bottom'}"`;
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -185,6 +187,8 @@ global.mbglTestValue = function (property, layerType) {
                 case 'offset':
                 case 'translate':
                     return '{ 1, 1 }';
+                case 'anchor':
+                    return '{ mbgl::style::SymbolAnchorType::Top, mbgl::style::SymbolAnchorType::Bottom }';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -200,6 +204,13 @@ global.mbglExpressionTestValue = function (property, layerType) {
             return `"${_.last(_.keys(property.values))}"`;
         case 'color':
             return 'mbgl::Color(1, 0, 0, 1)';
+        case 'array':
+            switch (arrayType(property)) {
+                case 'anchor':
+                    return `{"top", "bottom"}`;
+                default:
+                    break;
+            }
         default:
             return global.mbglTestValue(property, layerType);
     }
@@ -539,11 +550,12 @@ global.propertyType = function (property) {
                 case 'font':
                     return 'NSArray<NSString *> *';
                 case 'padding':
-                    return 'NSValue *';
                 case 'position':
                 case 'offset':
                 case 'translate':
                     return 'NSValue *';
+                case 'anchor':
+                    return 'NSArray<NSValue *> *';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -588,6 +600,8 @@ global.valueTransformerArguments = function (property) {
                 case 'offset':
                 case 'translate':
                     return ['std::array<float, 2>', objCType];
+                case 'anchor':
+                    return ['std::vector<mbgl::style::SymbolAnchorType>', objCType, 'mbgl::style::SymbolAnchorType', 'MGLTextAnchor'];
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -637,6 +651,8 @@ global.mbglType = function(property) {
                     return 'std::array<float, 2>';
                 case 'position':
                     return 'mbgl::style::Position';
+                case 'anchor':
+                    return 'std::vector<mbgl::style::SymbolAnchorType>';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
