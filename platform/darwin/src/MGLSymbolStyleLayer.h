@@ -223,6 +223,10 @@ typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
  */
 typedef NS_ENUM(NSUInteger, MGLTextJustification) {
     /**
+     The text is aligned towards the anchor position.
+     */
+    MGLTextJustificationAuto,
+    /**
      The text is aligned to the left.
      */
     MGLTextJustificationLeft,
@@ -1279,6 +1283,7 @@ MGL_EXPORT
  
  * Constant `MGLTextJustification` values
  * Any of the following constant string values:
+   * `auto`: The text is aligned towards the anchor position.
    * `left`: The text is aligned to the left.
    * `center`: The text is centered.
    * `right`: The text is aligned to the right.
@@ -1349,8 +1354,8 @@ MGL_EXPORT
  `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
  ems downward. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `text` is non-`nil`. Otherwise,
- it is ignored.
+ This property is only applied to the style if `text` is non-`nil`, and
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1372,8 +1377,8 @@ MGL_EXPORT
  `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
  ems upward. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `text` is non-`nil`. Otherwise,
- it is ignored.
+ This property is only applied to the style if `text` is non-`nil`, and
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1464,6 +1469,27 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *textPitchAlignment;
 
 /**
+ Radial offset of text, in the direction of the symbol's anchor. Useful in
+ combination with `textVariableAnchor`, which doesn't support the
+ two-dimensional `textOffset`.
+ 
+ This property is measured in ems.
+ 
+ This property is only applied to the style if `textOffset` is set to `nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *textRadialOffset;
+
+/**
  Rotates the text clockwise.
  
  This property is measured in degrees.
@@ -1548,6 +1574,32 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *textTransform;
+
+/**
+ To increase the chance of placing high-priority labels on the map, you can
+ provide an array of `textAnchor` locations: the render will attempt to place
+ the label at each location, in order, before moving onto the next label. Use
+ `textJustify: auto` to choose justification based on anchor position. To apply
+ an offset, use the `textRadialOffset` instead of the two-dimensional
+ `textOffset`.
+ 
+ This property is only applied to the style if `textAnchor` is set to `nil`, and
+ `textOffset` is set to `nil`, and `symbolPlacement` is set to an expression
+ that evaluates to or `MGLSymbolPlacementPoint`. Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant array values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *textVariableAnchor;
 
 #pragma mark - Accessing the Paint Attributes
 
