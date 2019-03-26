@@ -95,7 +95,7 @@ macos: $(MACOS_PROJ_PATH)
 
 .PHONY: xproj
 xproj: $(MACOS_PROJ_PATH)
-	open $(MACOS_WORK_PATH)
+	xed $(MACOS_WORK_PATH)
 
 .PHONY: test
 test: $(MACOS_PROJ_PATH)
@@ -237,7 +237,7 @@ ios: $(IOS_PROJ_PATH)
 
 .PHONY: iproj
 iproj: $(IOS_PROJ_PATH)
-	open $(IOS_WORK_PATH)
+	xed $(IOS_WORK_PATH)
 
 .PHONY: ios-lint
 ios-lint:
