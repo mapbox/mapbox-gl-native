@@ -133,7 +133,7 @@ public class HillshadeLayerTest extends BaseLayerTest {
     assertNull(layer.getHillshadeShadowColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(hillshadeShadowColor(propertyValue));
     assertEquals(layer.getHillshadeShadowColor().getValue(), propertyValue);
   }
@@ -145,8 +145,8 @@ public class HillshadeLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(hillshadeShadowColor(Color.RED));
-    assertEquals(layer.getHillshadeShadowColorAsInt(), Color.RED);
+    layer.setProperties(hillshadeShadowColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getHillshadeShadowColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
@@ -169,7 +169,7 @@ public class HillshadeLayerTest extends BaseLayerTest {
     assertNull(layer.getHillshadeHighlightColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(hillshadeHighlightColor(propertyValue));
     assertEquals(layer.getHillshadeHighlightColor().getValue(), propertyValue);
   }
@@ -181,8 +181,8 @@ public class HillshadeLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(hillshadeHighlightColor(Color.RED));
-    assertEquals(layer.getHillshadeHighlightColorAsInt(), Color.RED);
+    layer.setProperties(hillshadeHighlightColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getHillshadeHighlightColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 
   @Test
@@ -205,7 +205,7 @@ public class HillshadeLayerTest extends BaseLayerTest {
     assertNull(layer.getHillshadeAccentColor().getValue());
 
     // Set and Get
-    String propertyValue = "rgba(0, 0, 0, 1)";
+    String propertyValue = "rgba(255,128,0,0.7)";
     layer.setProperties(hillshadeAccentColor(propertyValue));
     assertEquals(layer.getHillshadeAccentColor().getValue(), propertyValue);
   }
@@ -217,7 +217,7 @@ public class HillshadeLayerTest extends BaseLayerTest {
     assertNotNull(layer);
 
     // Set and Get
-    layer.setProperties(hillshadeAccentColor(Color.RED));
-    assertEquals(layer.getHillshadeAccentColorAsInt(), Color.RED);
+    layer.setProperties(hillshadeAccentColor(Color.argb(127, 255, 127, 0)));
+    assertEquals(layer.getHillshadeAccentColorAsInt(), Color.argb(127, 255, 127, 0));
   }
 }

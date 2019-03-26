@@ -184,8 +184,7 @@ public class FormattedSection {
 
   void setTextColor(@NonNull Object textColor) {
     // called from JNI
-    // because core is returning R, G and B components in range of 0 to 1, we need to convert them to be in 0 to 255.
-    setTextColor(ColorUtils.colorToRgbaString(ColorUtils.rgbaToColor((String) textColor)));
+    setTextColor((String) textColor);
   }
 
   @Override

@@ -25,18 +25,7 @@ Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, std::stri
 }
 
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, Color>::operator()(jni::JNIEnv& env, const Color& value) const {
-    std::string result;
-    result.reserve(32);
-    result += "rgba(";
-    result += util::toString(value.r);
-    result += ", ";
-    result += util::toString(value.g);
-    result += ", ";
-    result += util::toString(value.b);
-    result += ", ";
-    result += util::toString(value.a);
-    result += ")";
-    return jni::Make<jni::String>(env, result);
+    return jni::Make<jni::String>(env, value.stringify());
 }
 
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, style::expression::Formatted>::operator()(jni::JNIEnv& env, const style::expression::Formatted& value) const {

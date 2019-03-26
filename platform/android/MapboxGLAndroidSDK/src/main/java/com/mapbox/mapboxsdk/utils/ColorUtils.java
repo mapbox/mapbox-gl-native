@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.ImageViewCompat;
 import android.util.TypedValue;
 import android.widget.ImageView;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 
@@ -111,12 +112,11 @@ public class ColorUtils {
     ImageViewCompat.setImageTintList(imageView, getSelector(tintColor));
   }
 
-  private static int normalizeColorComponent(String value) {
-    return (int) (Float.parseFloat(value) * 255);
-  }
-
   /**
    * Convert an rgba string to a Color int.
+   * <p>
+   * R, G, B color components have to be in the [0-255] range, while alpha has to be in the [0.0-1.0] range.
+   * For example: "rgba(255, 128, 0, 0.7)".
    *
    * @param value the String representation of rgba
    * @return the int representation of rgba
@@ -124,15 +124,14 @@ public class ColorUtils {
    */
   @ColorInt
   public static int rgbaToColor(@NonNull String value) {
-    Pattern c = Pattern.compile("rgba?\\s*\\(\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,"
-      + "?\\s*(\\d+\\.?\\d*)?\\s*\\)");
+    Pattern c = Pattern.compile("rgba?\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,?\\s*(\\d+\\.?\\d*)?\\s*\\)");
     Matcher m = c.matcher(value);
     if (m.matches() && m.groupCount() == 3) {
-      return Color.rgb(normalizeColorComponent(m.group(1)), normalizeColorComponent(m.group(2)),
-        normalizeColorComponent(m.group(3)));
+      return Color.rgb(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)),
+        Integer.parseInt(m.group(3)));
     } else if (m.matches() && m.groupCount() == 4) {
-      return Color.argb(normalizeColorComponent(m.group(4)), normalizeColorComponent(m.group(1)),
-        normalizeColorComponent(m.group(2)), normalizeColorComponent(m.group(3)));
+      return Color.argb((int) (Float.parseFloat(m.group(4)) * 255), Integer.parseInt(m.group(1)),
+        Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)));
     } else {
       throw new ConversionException("Not a valid rgb/rgba value");
     }
