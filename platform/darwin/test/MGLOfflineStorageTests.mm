@@ -21,7 +21,6 @@
                                                              appropriateForURL:nil
                                                                         create:NO
                                                                          error:nil];
-    // As of iOS SDK 12.2 unit tests now have a bundle id: com.apple.dt.xctest.tool
     NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];

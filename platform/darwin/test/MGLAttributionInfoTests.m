@@ -58,17 +58,18 @@
     
 #if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_2) || \
     (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_14_4)
-    
-    XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
-                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.apple.dt.xctest.tool#/77.63680/12.98108/14.00/0.0/0"]);
-    XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
-                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.apple.dt.xctest.tool&owner=mapbox&id=satellite-streets-v99&access_token=pk.feedcafedeadbeefbadebede&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13"]);
+    NSString *bundleId = @"com.apple.dt.xctest.tool";
 #else
-    XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
-                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.mapbox.Mapbox#/77.63680/12.98108/14.00/0.0/0"]);
-    XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
-                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.mapbox.Mapbox&owner=mapbox&id=satellite-streets-v99&access_token=pk.feedcafedeadbeefbadebede&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13"]);
+    NSString *bundleId = @"com.mapbox.Mapbox";
 #endif
+    
+    NSString *urlString = [NSString stringWithFormat:@"https://apps.mapbox.com/feedback/?referrer=%@#/77.63680/12.98108/14.00/0.0/0", bundleId];
+    XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
+                          [NSURL URLWithString:urlString]);
+    
+    urlString = [NSString stringWithFormat:@"https://apps.mapbox.com/feedback/?referrer=%@&owner=mapbox&id=satellite-streets-v99&access_token=pk.feedcafedeadbeefbadebede&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13", bundleId];
+    XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
+                          [NSURL URLWithString:urlString]);
 }
 
 - (void)testStyle {
