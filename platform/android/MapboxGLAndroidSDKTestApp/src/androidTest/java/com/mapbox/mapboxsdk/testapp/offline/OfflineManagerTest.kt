@@ -8,17 +8,21 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity
 import com.mapbox.mapboxsdk.testapp.utils.FileUtils
+import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
 class OfflineManagerTest {
 
   companion object {
     private const val TEST_DB_FILE_NAME = "offline_test.db"
+    private lateinit var mergedRegion: OfflineRegion
   }
 
   @Rule
@@ -26,14 +30,14 @@ class OfflineManagerTest {
   var rule = ActivityTestRule(FeatureOverviewActivity::class.java)
 
   private val context: Context by lazy { rule.activity }
-  private val latch: CountDownLatch = CountDownLatch(1)
 
-  @Test
-  fun offlineMergeListDeleteTest() {
+  @Test(timeout = 30_000)
+  fun a_copyFileFromAssets() {
+    val latch = CountDownLatch(1)
     rule.runOnUiThread {
       FileUtils.CopyFileFromAssetsTask(rule.activity, object : FileUtils.OnFileCopiedFromAssetsListener {
         override fun onFileCopiedFromAssets() {
-          mergeRegion()
+          latch.countDown()
         }
 
         override fun onError() {
@@ -44,42 +48,59 @@ class OfflineManagerTest {
     latch.await()
   }
 
-  private fun mergeRegion() {
-    OfflineManager.getInstance(context).mergeOfflineRegions(
-      FileSource.getResourcesCachePath(rule.activity) + "/" + TEST_DB_FILE_NAME,
-      object : OfflineManager.MergeOfflineRegionsCallback {
-        override fun onMerge(offlineRegions: Array<out OfflineRegion>?) {
+  @Test(timeout = 30_000)
+  fun b_mergeRegion() {
+    val latch = CountDownLatch(1)
+    rule.runOnUiThread {
+      OfflineManager.getInstance(context).mergeOfflineRegions(
+        FileSource.getResourcesCachePath(rule.activity) + "/" + TEST_DB_FILE_NAME,
+        object : OfflineManager.MergeOfflineRegionsCallback {
+          override fun onMerge(offlineRegions: Array<out OfflineRegion>?) {
+            assert(offlineRegions?.size == 1)
+            latch.countDown()
+          }
+
+          override fun onError(error: String?) {
+            throw RuntimeException("Unable to merge external offline database. $error")
+          }
+        })
+    }
+    latch.await()
+  }
+
+  @Test(timeout = 30_000)
+  fun c_listRegion() {
+    val latch = CountDownLatch(1)
+    rule.runOnUiThread {
+      OfflineManager.getInstance(context).listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+        override fun onList(offlineRegions: Array<out OfflineRegion>?) {
           assert(offlineRegions?.size == 1)
-          listRegion()
+          mergedRegion = offlineRegions!![0]
+          latch.countDown()
         }
 
         override fun onError(error: String?) {
           throw RuntimeException("Unable to merge external offline database. $error")
         }
       })
+    }
+    latch.await()
   }
 
-  private fun listRegion() {
-    OfflineManager.getInstance(context).listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-      override fun onList(offlineRegions: Array<out OfflineRegion>?) {
-        assert(offlineRegions?.size == 1)
-        deleteRegion(offlineRegions!![0])
-      }
-      override fun onError(error: String?) {
-        throw RuntimeException("Unable to merge external offline database. $error")
-      }
-    })
-  }
+  @Test(timeout = 30_000)
+  fun d_deleteRegion() {
+    val latch = CountDownLatch(1)
+    rule.runOnUiThread {
+      mergedRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+        override fun onDelete() {
+          latch.countDown()
+        }
 
-  private fun deleteRegion(offlineRegion: OfflineRegion) {
-    offlineRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
-      override fun onDelete() {
-        latch.countDown()
-      }
-
-      override fun onError(error: String?) {
-        throw RuntimeException("Unable to delete region")
-      }
-    })
+        override fun onError(error: String?) {
+          throw RuntimeException("Unable to delete region")
+        }
+      })
+    }
+    latch.await()
   }
 }
