@@ -39,7 +39,7 @@ std::array<double, 4> Color::toArray() const {
             r * 255 / a,
             g * 255 / a,
             b * 255 / a,
-            a,
+            floor(a * 100 + .5) / 100 // round to 2 decimal places
         }};
     }
 }
