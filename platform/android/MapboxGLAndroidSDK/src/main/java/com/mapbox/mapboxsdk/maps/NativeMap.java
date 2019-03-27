@@ -29,8 +29,6 @@ interface NativeMap {
   // Lifecycle API
   //
 
-  void update();
-
   void resizeView(int width, int height);
 
   void onLowMemory();
