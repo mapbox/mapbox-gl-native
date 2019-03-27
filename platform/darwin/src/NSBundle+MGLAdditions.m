@@ -36,8 +36,8 @@ const MGLExceptionName MGLBundleNotFoundException = @"MGLBundleNotFoundException
 + (nullable NSString *)mgl_applicationBundleIdentifier {
     NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
     
-#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_12_2) || \
-    (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED < __MAC_10_14_4)
+#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && (__IPHONE_OS_VERSION_MAX_ALLOWED < 120200)) || \
+    (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && (__MAC_OS_X_VERSION_MAX_ALLOWED < 101404))
     // Before SDK 12.2 (bundled with Xcode 10.2): There’s no main bundle identifier when running in a unit test bundle.
     // 12.2 and after: the above bundle identifier is: com.apple.dt.xctest.tool
     if (!bundleIdentifier) {

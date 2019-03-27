@@ -55,9 +55,9 @@
     XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://apps.mapbox.com/feedback/"]);
     XCTAssertTrue(infos[3].feedbackLink);
     NSURL *styleURL = [MGLStyle satelliteStreetsStyleURLWithVersion:99];
-    
-#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_2) || \
-    (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_14_4)
+        
+#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 120200) || \
+    (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 101404)
     NSString *bundleId = @"com.apple.dt.xctest.tool";
 #else
     NSString *bundleId = @"com.mapbox.Mapbox";
