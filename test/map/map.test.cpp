@@ -321,6 +321,36 @@ TEST(Map, DefaultBoundOptions) {
     EXPECT_EQ(*bounds.bounds, LatLngBounds::unbounded());
 }
 
+TEST(Map, MapOptions) {
+    MapTest<> test { 1, MapMode::Continuous };
+
+    test.map.setNorthOrientation(NorthOrientation::Rightwards);
+    test.map.setConstrainMode(ConstrainMode::None);
+    test.map.setViewportMode(ViewportMode::FlippedY);
+    Size size = { 512, 512 };
+    test.map.setSize(size);
+
+    auto options = test.map.getMapOptions();
+    EXPECT_EQ(options.mapMode(), MapMode::Continuous);
+    EXPECT_EQ(options.viewportMode(), ViewportMode::FlippedY);
+    EXPECT_EQ(options.constrainMode(), ConstrainMode::None);
+    EXPECT_EQ(options.northOrientation(), NorthOrientation::Rightwards);
+    EXPECT_EQ(options.size(), size);
+}
+
+TEST(Map, DefaultMapOptions) {
+    MapTest<> test;
+
+    auto options = test.map.getMapOptions();
+    EXPECT_EQ(options.mapMode(), MapMode::Static);
+    EXPECT_EQ(options.viewportMode(), ViewportMode::Default);
+    EXPECT_EQ(options.constrainMode(), ConstrainMode::HeightOnly);
+    EXPECT_EQ(options.northOrientation(), NorthOrientation::Upwards);
+    EXPECT_TRUE(options.crossSourceCollisions());
+    EXPECT_EQ(options.size().width, 256);
+    EXPECT_EQ(options.size().height, 256);
+}
+
 TEST(Map, SetStyleInvalidJSON) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
