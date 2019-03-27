@@ -143,8 +143,8 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      texsize,
                      crossfade,
                      parameters.pixelRatio),
-                     *posA,
-                     *posB,
+                     posA,
+                     posB,
                      LinePatternProgram::TextureBindings{
                          textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                      });
