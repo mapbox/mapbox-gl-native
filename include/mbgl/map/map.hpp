@@ -34,7 +34,6 @@ class Map : private util::noncopyable {
 public:
     explicit Map(RendererFrontend&,
                  MapObserver&,
-                 float pixelRatio,
                  Scheduler&,
                  const MapOptions&,
                  const ResourceOptions&);

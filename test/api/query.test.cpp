@@ -36,10 +36,9 @@ public:
     util::RunLoop loop;
     std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
     ThreadPool threadPool { 4 };
-    float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, threadPool };
-    MapAdapter map { frontend, MapObserver::nullObserver(), pixelRatio, fileSource,
-                  threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
+    HeadlessFrontend frontend { 1, threadPool };
+    MapAdapter map { frontend, MapObserver::nullObserver(), fileSource, threadPool,
+                  MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 };
 
 std::vector<Feature> getTopClusterFeature(QueryTest& test) {

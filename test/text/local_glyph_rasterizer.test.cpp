@@ -34,17 +34,16 @@ namespace {
 class LocalGlyphRasterizerTest {
 public:
     LocalGlyphRasterizerTest(const optional<std::string> fontFamily)
-        : frontend(pixelRatio, threadPool, optional<std::string>(), GLContextMode::Unique, fontFamily)
+        : frontend(1, threadPool, optional<std::string>(), GLContextMode::Unique, fontFamily)
     {
     }
 
     util::RunLoop loop;
     std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
     ThreadPool threadPool { 4 };
-    float pixelRatio { 1 };
     HeadlessFrontend frontend;
-    MapAdapter map { frontend, MapObserver::nullObserver(), pixelRatio, fileSource,
-                  threadPool, MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
+    MapAdapter map { frontend, MapObserver::nullObserver(), fileSource, threadPool,
+                  MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,

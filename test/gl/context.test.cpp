@@ -87,11 +87,10 @@ TEST(GLContextMode, Shared) {
     util::RunLoop loop;
 
     ThreadPool threadPool(4);
-    float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, threadPool, {}, GLContextMode::Shared };
+    HeadlessFrontend frontend { 1, threadPool, {}, GLContextMode::Shared };
 
-    Map map(frontend, MapObserver::nullObserver(), pixelRatio, threadPool,
+    Map map(frontend, MapObserver::nullObserver(), threadPool,
             MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
