@@ -40,11 +40,6 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
       public void surfaceDestroyed(SurfaceHolder holder) {
         onSurfaceDestroyed();
       }
-
-      @Override
-      public void surfaceCreated(SurfaceHolder holder) {
-        onSurfaceCreated(null, null);
-      }
     });
   }
 
