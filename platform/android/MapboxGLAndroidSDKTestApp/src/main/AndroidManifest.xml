@@ -173,7 +173,8 @@
         <activity
                 android:name=".activity.fragment.FragmentBackStackActivity"
                 android:description="@string/description_map_fragment_backstack"
-                android:label="@string/activity_map_fragment_backstack">
+                android:label="@string/activity_map_fragment_backstack"
+                android:launchMode="singleInstance">
             <meta-data
                     android:name="@string/category"
                     android:value="@string/category_integration" />
@@ -407,7 +408,8 @@
         <activity
             android:name=".activity.maplayout.SimpleMapActivity"
             android:description="@string/description_simple_map"
-            android:label="@string/activity_simple_map">
+            android:label="@string/activity_simple_map"
+            android:launchMode="singleInstance">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_basic" />
@@ -720,7 +722,8 @@
         <activity
             android:name=".activity.textureview.TextureViewDebugModeActivity"
             android:description="@string/description_textureview_debug"
-            android:label="@string/activity_textureview_debug">
+            android:label="@string/activity_textureview_debug"
+            android:launchMode="singleInstance">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_basic" />
