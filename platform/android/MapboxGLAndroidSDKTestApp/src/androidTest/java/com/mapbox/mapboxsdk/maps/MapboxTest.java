@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.support.test.annotation.UiThreadTest;
 import android.support.test.runner.AndroidJUnit4;
 import com.mapbox.mapboxsdk.Mapbox;
 import org.junit.Test;
@@ -16,6 +17,7 @@ public class MapboxTest {
   private static final String ACCESS_TOKEN_2 = "pk.0000000002";
 
   @Test
+  @UiThreadTest
   public void testConnected() {
     assertTrue(Mapbox.isConnected());
 
@@ -31,6 +33,7 @@ public class MapboxTest {
   }
 
   @Test
+  @UiThreadTest
   public void setAccessToken() {
     String realToken =  Mapbox.getAccessToken();
     Mapbox.setAccessToken(ACCESS_TOKEN);
