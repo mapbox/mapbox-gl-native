@@ -2508,10 +2508,15 @@ public:
 {
     MGLLogInfo(@"Resetting the map to the current style’s default viewport.");
     auto camera = self.mbglMap.getStyle().getDefaultCamera();
-    CGFloat pitch = *camera.pitch;
-    CLLocationDirection heading = mbgl::util::wrap(*camera.bearing, 0., 360.);
-    CLLocationDistance altitude = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
-    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(*camera.center)
+    
+    double pitch        = camera.pitch ? *camera.pitch : 0.0;
+    double bearing      = camera.bearing ? *camera.bearing : 0.0;
+    double zoom         = camera.zoom ? *camera.zoom : 0.0;
+    mbgl::LatLng center = camera.center ? *camera.center : mbgl::LatLng();
+    
+    CLLocationDirection heading = mbgl::util::wrap(bearing, 0., 360.);
+    CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoom, pitch, 0, self.frame.size);
+    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(center)
                                                        altitude:altitude
                                                           pitch:pitch
                                                         heading:heading];
