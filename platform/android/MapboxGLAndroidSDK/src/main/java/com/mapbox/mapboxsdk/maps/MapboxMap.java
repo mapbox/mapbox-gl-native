@@ -128,7 +128,6 @@ public final class MapboxMap {
    * Called when the hosting Activity/Fragment onStart() method is called.
    */
   void onStart() {
-    nativeMapView.update();
     locationComponent.onStart();
   }
 
