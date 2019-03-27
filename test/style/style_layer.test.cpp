@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
@@ -329,6 +330,17 @@ void testHasOverrides(LayoutType& layout) {
     auto formatExprOverride = std::make_unique<FormatExpression>(std::vector<FormatExpressionSection>{section});
     PropertyExpression<Formatted> propExprOverride(std::move(formatExprOverride));
     layout.template get<TextField>() = PropertyValueType<Formatted>(std::move(propExprOverride));
+    EXPECT_TRUE(MockOverrides::hasOverrides(layout.template get<TextField>()));
+
+    // Nested expressions, overridden text-color.
+    auto formattedExpr1 = format("first paragraph");
+    std::vector<FormatExpressionSection> sections{ { literal("second paragraph"), nullopt, nullopt, toColor(literal("blue")) } };
+    auto formattedExpr2 = std::make_unique<FormatExpression>(std::move(sections));
+    std::unordered_map<std::string, std::shared_ptr<Expression>> branches{ { "1st", std::move(formattedExpr1) },
+                                                                           { "2nd", std::move(formattedExpr2) } };
+    auto match = std::make_unique<Match<std::string>>(type::Formatted, literal("input"), std::move(branches), format("otherwise"));
+    PropertyExpression<Formatted> nestedPropExpr(std::move(match));
+    layout.template get<TextField>() = PropertyValueType<Formatted>(std::move(nestedPropExpr));
     EXPECT_TRUE(MockOverrides::hasOverrides(layout.template get<TextField>()));
 }
 
