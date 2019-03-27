@@ -44,6 +44,8 @@ workflows:
       - linux-gcc5-debug-coverage
       - linux-doxygen
       - ios-debug
+      - ios-debug-xcode-102:
+          name: ios-debug-xcode-10.2
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -903,6 +905,31 @@ jobs:
   ios-debug:
     macos:
       xcode: "10.1.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - install-macos-dependencies
+      - install-dependencies
+      - build-ios-test
+      - check-public-symbols
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
+      - run:
+          name: Lint plist files
+          command: make ios-lint
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
+  ios-debug-xcode-102:
+    macos:
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
