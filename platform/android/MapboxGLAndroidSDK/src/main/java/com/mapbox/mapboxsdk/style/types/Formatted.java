@@ -58,4 +58,12 @@ public class Formatted {
   public int hashCode() {
     return Arrays.hashCode(formattedSections);
   }
+
+  @Override
+  public String toString() {
+    return "Formatted{"
+      + "formattedSections="
+      + Arrays.toString(formattedSections)
+      + '}';
+  }
 }
