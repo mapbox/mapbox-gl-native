@@ -459,6 +459,7 @@
 		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		9C188C4F2242C95A0022FA55 /* MMEDate.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMEDate.m */; };
 		9C188C502242C96F0022FA55 /* MMEDate.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC51FE05D6F00C1BD0D /* MMEDate.h */; };
+		A4F36CDD224C1A94001B520C /* MBXTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A4F36CDC224C1A94001B520C /* MBXTestViewController.m */; };
 		AC1B0916221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
 		AC1B0917221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
 		AC1B0918221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = AC1B0915221CA14C00DB56C8 /* CLLocationManager+MMEMobileEvents.m */; };
@@ -1143,6 +1144,8 @@
 		96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapViewDirectionTests.mm; sourceTree = "<group>"; };
 		96F017292118FBAE00892778 /* MGLMapView_Experimental.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Experimental.h; sourceTree = "<group>"; };
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
+		A4F36CDB224C1A94001B520C /* MBXTestViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXTestViewController.h; sourceTree = "<group>"; };
+		A4F36CDC224C1A94001B520C /* MBXTestViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXTestViewController.m; sourceTree = "<group>"; };
 		AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLLocationManager+MMEMobileEvents.h"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.h"; sourceTree = "<group>"; };
 		AC1B0915221CA14C00DB56C8 /* CLLocationManager+MMEMobileEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CLLocationManager+MMEMobileEvents.m"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.m"; sourceTree = "<group>"; };
 		AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTelemetryConfig.h; sourceTree = "<group>"; };
@@ -1967,6 +1970,8 @@
 				632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */,
 				632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */,
 				6FA9341621EF372100AA9CA8 /* MBXOrnamentsViewController.h */,
+				A4F36CDB224C1A94001B520C /* MBXTestViewController.h */,
+				A4F36CDC224C1A94001B520C /* MBXTestViewController.m */,
 				6FA9341521EF372100AA9CA8 /* MBXOrnamentsViewController.m */,
 				DA821D051CCC6D59007508D4 /* Main.storyboard */,
 				DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */,
@@ -2906,6 +2911,7 @@
 					};
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 85826LGZGV;
 						LastSwiftMigration = 0820;
 					};
 					DA2E88501CC036F400F24E7B = {
@@ -2932,6 +2938,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				"zh-Hans",
@@ -3106,6 +3113,7 @@
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
 				6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
+				A4F36CDD224C1A94001B520C /* MBXTestViewController.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
 				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
@@ -3830,10 +3838,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL432;
 				PRODUCT_NAME = "Mapbox GL";
 				SWIFT_VERSION = 3.0;
 			};
@@ -4159,10 +4167,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL432;
 				PRODUCT_NAME = "Mapbox GL";
 				SWIFT_VERSION = 3.0;
 			};
@@ -4172,10 +4180,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL432;
 				PRODUCT_NAME = "Mapbox GL";
 				SWIFT_VERSION = 3.0;
 			};
