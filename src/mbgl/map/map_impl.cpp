@@ -174,17 +174,11 @@ void Map::Impl::jumpTo(const CameraOptions& camera) {
 
 void Map::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
 
-    if (style->getImage(id) != nullptr) {
-        done();
-        return;
+    if (style->getImage(id) == nullptr) {
+        observer.onStyleImageMissing(id);
     }
 
-    observer.onStyleImageMissing(id, [this, done](optional<std::unique_ptr<mbgl::style::Image>> image = {}) {
-        if (image) {
-            style->addImage(std::move(*image));
-        }
-        done();
-    });
+    done();
 }
 
 } // namespace mbgl
