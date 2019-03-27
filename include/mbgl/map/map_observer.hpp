@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/image.hpp>
 
 #include <cstdint>
 #include <string>
@@ -46,7 +47,7 @@ public:
     virtual void onDidFinishLoadingStyle() {}
     virtual void onSourceChanged(style::Source&) {}
     virtual void onDidBecomeIdle() {}
-    virtual void onStyleImageMissing(const std::string&) {}
+    virtual void onStyleImageMissing(const std::string&, std::function<void(optional<std::unique_ptr<mbgl::style::Image>>)> callback) { callback({}); }
 };
 
 } // namespace mbgl

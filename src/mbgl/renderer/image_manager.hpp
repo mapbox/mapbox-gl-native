@@ -64,7 +64,11 @@ private:
     bool loaded = false;
 
     std::unordered_map<ImageRequestor*, ImageRequestPair> requestors;
-    std::unordered_map<ImageRequestor*, ImageRequestPair> missingImageRequestors;
+    struct MissingImageRequestPair {
+        ImageRequestPair pair;
+        int callbacksRemaining;
+    };
+    std::unordered_map<ImageRequestor*, MissingImageRequestPair> missingImageRequestors;
     ImageMap images;
 
     ImageManagerObserver* observer = nullptr;

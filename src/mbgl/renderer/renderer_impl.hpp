@@ -89,7 +89,7 @@ private:
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
     // ImageManagerObserver implementation
-    void onStyleImageMissing(const std::string&) override;
+    void onStyleImageMissing(const std::string&, std::function<void()>) override;
 
     void updateFadingTiles();
 

@@ -159,8 +159,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         imageManager->updateImage(entry.second.after);
     }
 
-    imageManager->imagesAdded();
     imageManager->setLoaded(updateParameters.spriteLoaded);
+    imageManager->imagesAdded();
 
 
     const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters.layers);
@@ -836,8 +836,8 @@ void Renderer::Impl::onTileChanged(RenderSource&, const OverscaledTileID&) {
     observer->onInvalidate();
 }
 
-void Renderer::Impl::onStyleImageMissing(const std::string& id) {
-    observer->onStyleImageMissing(id);
+void Renderer::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
+    observer->onStyleImageMissing(id, done);
 }
 
 } // namespace mbgl

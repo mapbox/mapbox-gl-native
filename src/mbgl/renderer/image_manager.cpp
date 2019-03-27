@@ -92,23 +92,42 @@ void ImageManager::removeRequestor(ImageRequestor& requestor) {
 }
 
 void ImageManager::imagesAdded() {
-    for (const auto& entry : missingImageRequestors) {
-        notify(*entry.first, entry.second);
+    for (auto it = missingImageRequestors.begin(); it != missingImageRequestors.end();) {
+        if (it->second.callbacksRemaining == 0) {
+            notify(*it->first, it->second.pair);
+            missingImageRequestors.erase(it++);
+        } else {
+            it++;
+        }
     }
-    requestors.clear();
 }
 
 void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageRequestPair& pair) {
-    bool missing = false;
+    int missing = 0;
     for (const auto& dependency : pair.first) {
         auto it = images.find(dependency.first);
         if (it == images.end()) {
-            missing = true;
-            observer->onStyleImageMissing(dependency.first);
+            missing++;
         }
     }
-    if (missing) {
-        missingImageRequestors.emplace(&requestor, std::move(pair));
+
+
+    if (missing > 0) {
+        ImageRequestor* requestorPtr = &requestor;
+        missingImageRequestors.emplace(requestorPtr, MissingImageRequestPair { std::move(pair), missing });
+
+        for (const auto& dependency : pair.first) {
+            auto it = images.find(dependency.first);
+            if (it == images.end()) {
+                observer->onStyleImageMissing(dependency.first, [this, requestorPtr]() {
+                    auto it = missingImageRequestors.find(requestorPtr);
+                    if (it != missingImageRequestors.end()) {
+                        it->second.callbacksRemaining--;
+                    }
+                });
+            }
+        }
+
     } else {
         notify(requestor, pair);
     }
