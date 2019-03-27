@@ -3,9 +3,11 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/style/expression/formatted.hpp>
 #include <mbgl/style/expression/format_section_override.hpp>
+#include <mbgl/style/expression/value.hpp>
 
 namespace mbgl {
 namespace style {
@@ -56,25 +58,57 @@ struct FormatSectionOverrides<TypeList<PaintProperty...>> {
 
     template<typename Property, typename FormattedProperty>
     static bool hasOverride(const FormattedProperty& formatted) {
+
+        const auto checkLiteral = [] (const TextField::Type& literal) {
+            for (const auto& section : literal.sections) {
+                 if (Property::hasOverride(section)) {
+                     return true;
+                 }
+            }
+            return false;
+        };
+
         return formatted.match(
-                [] (const TextField::Type& t) {
-                    for (const auto& section : t.sections) {
-                        if (Property::hasOverride(section)) {
-                            return true;
-                        }
-                    }
-                    return false;
+                [&checkLiteral] (const TextField::Type& literal) {
+                    return checkLiteral(literal);
                 },
-                [] (const PropertyExpression<TextField::Type>& t) {
-                    if (t.getExpression().getKind() == expression::Kind::FormatExpression) {
-                        const auto* e = static_cast<const expression::FormatExpression*>(&t.getExpression());
-                        for (const auto& section : e->getSections()) {
-                            if (Property::hasOverride(section)) {
-                                return true;
+                [&checkLiteral] (const PropertyExpression<TextField::Type>& property) {
+                    bool expressionHasOverrides = false;
+                    const auto checkExpression = [&](const expression::Expression& e) {
+                        if (expressionHasOverrides) {
+                            return;
+                        }
+
+                        if (e.getKind() == expression::Kind::Literal &&
+                            e.getType() == expression::type::Formatted) {
+                            const auto* literalExpr = static_cast<const expression::Literal*>(&e);
+                            const auto formattedValue = expression::fromExpressionValue<expression::Formatted>(literalExpr->getValue());
+                            if (formattedValue && checkLiteral(*formattedValue)) {
+                                expressionHasOverrides = true;
+                            }
+                            return;
+                        }
+
+                        if (e.getKind() == expression::Kind::FormatExpression) {
+                            const auto* formatExpr = static_cast<const expression::FormatExpression*>(&e);
+                            for (const auto& section : formatExpr->getSections()) {
+                                if (Property::hasOverride(section)) {
+                                    expressionHasOverrides = true;
+                                    break;
+                                }
                             }
                         }
+                    };
+
+                    // Check root property expression and return early.
+                    checkExpression(property.getExpression());
+                    if (expressionHasOverrides) {
+                        return true;
                     }
-                    return false;
+
+                    // Traverse thru children and check whether any of them have overrides.
+                    property.getExpression().eachChild(checkExpression);
+                    return expressionHasOverrides;
                 },
                 [] (const auto&) {
                     return false;

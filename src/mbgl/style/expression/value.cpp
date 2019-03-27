@@ -166,6 +166,11 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
                     }
                     options.emplace("text-font", std::vector<mbgl::Value>{ std::string("literal"), fontStack });
                 }
+
+                if (section.textColor) {
+                    options.emplace("text-color", fromExpressionValue(*section.textColor));
+                }
+
                 serialized.push_back(options);
             }
             return serialized;
