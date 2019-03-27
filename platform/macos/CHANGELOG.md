@@ -24,6 +24,7 @@
 ### Packaging
 
 * Added Czech and Galician localizations. ([#13782](https://github.com/mapbox/mapbox-gl-native/pull/13782), [#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095))
+* Added support for building with Xcode 10.2 / iOS SDK 12.2. ([#14241](https://github.com/mapbox/mapbox-gl-native/pull/14241))
 
 ## 0.13.0 - December 20, 2018
 
