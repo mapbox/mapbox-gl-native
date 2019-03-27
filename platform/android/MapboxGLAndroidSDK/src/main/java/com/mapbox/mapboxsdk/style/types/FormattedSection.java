@@ -228,4 +228,14 @@ public class FormattedSection {
     params.put("text-color", textColor);
     return new Object[] {text, params};
   }
+
+  @Override
+  public String toString() {
+    return "FormattedSection{"
+      + "text='" + text + '\''
+      + ", fontScale=" + fontScale
+      + ", fontStack=" + Arrays.toString(fontStack)
+      + ", textColor='" + textColor + '\''
+      + '}';
+  }
 }
