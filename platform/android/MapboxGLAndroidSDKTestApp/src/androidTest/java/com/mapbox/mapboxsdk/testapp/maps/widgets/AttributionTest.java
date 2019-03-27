@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.maps.widgets;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.intent.Intents;
@@ -31,12 +32,14 @@ import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasData;
+import static android.support.test.espresso.matcher.RootMatchers.isDialog;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assume.assumeTrue;
 
 public class AttributionTest extends EspressoTest {
 
@@ -126,15 +129,20 @@ public class AttributionTest extends EspressoTest {
 
   @Test
   public void testTelemetryDialog() {
+    assumeTrue(
+      "Can only run on API Level 23 or newer because of instability",
+      Build.VERSION.SDK_INT >= 23
+    );
+
     validateTestSetup();
 
     // click on View to open dialog
     onView(withId(R.id.attributionView)).perform(click());
-    onView(withText(R.string.mapbox_attributionsDialogTitle)).check(matches(isDisplayed()));
+    onView(withText(R.string.mapbox_attributionsDialogTitle)).inRoot(isDialog()).check(matches(isDisplayed()));
 
     // click on item to open second dialog
-    onView(withText(R.string.mapbox_telemetrySettings)).perform(click());
-    onView(withText(R.string.mapbox_attributionTelemetryTitle)).check(matches(isDisplayed()));
+    onView(withText(R.string.mapbox_telemetrySettings)).inRoot(isDialog()).perform(click());
+    onView(withText(R.string.mapbox_attributionTelemetryTitle)).inRoot(isDialog()).check(matches(isDisplayed()));
   }
 
   @After
