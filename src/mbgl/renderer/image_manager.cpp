@@ -1,8 +1,15 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/gfx/context.hpp>
+#include <mbgl/renderer/image_manager_observer.hpp>
 
 namespace mbgl {
+
+static ImageManagerObserver nullObserver;
+
+void ImageManager::setObserver(ImageManagerObserver* observer_) {
+    observer = observer_ ? observer_ : &nullObserver;
+}
 
 void ImageManager::setLoaded(bool loaded_) {
     if (loaded == loaded_) {
@@ -13,7 +20,7 @@ void ImageManager::setLoaded(bool loaded_) {
 
     if (loaded) {
         for (const auto& entry : requestors) {
-            notify(*entry.first, entry.second);
+            checkMissingAndNotify(*entry.first, entry.second);
         }
         requestors.clear();
     }
@@ -73,7 +80,7 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
         }
     }
     if (isLoaded() || hasAllDependencies) {
-        notify(requestor, std::move(pair));
+        checkMissingAndNotify(requestor, std::move(pair));
     } else {
         requestors.emplace(&requestor, std::move(pair));
     }
@@ -81,6 +88,30 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
 
 void ImageManager::removeRequestor(ImageRequestor& requestor) {
     requestors.erase(&requestor);
+    missingImageRequestors.erase(&requestor);
+}
+
+void ImageManager::imagesAdded() {
+    for (const auto& entry : missingImageRequestors) {
+        notify(*entry.first, entry.second);
+    }
+    requestors.clear();
+}
+
+void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageRequestPair& pair) {
+    bool missing = false;
+    for (const auto& dependency : pair.first) {
+        auto it = images.find(dependency.first);
+        if (it == images.end()) {
+            missing = true;
+            observer->onStyleImageMissing(dependency.first);
+        }
+    }
+    if (missing) {
+        missingImageRequestors.emplace(&requestor, std::move(pair));
+    } else {
+        notify(requestor, pair);
+    }
 }
 
 void ImageManager::notify(ImageRequestor& requestor, const ImageRequestPair& pair) const {

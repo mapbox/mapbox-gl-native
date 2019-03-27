@@ -46,6 +46,7 @@ public:
     virtual void onDidFinishLoadingStyle() {}
     virtual void onSourceChanged(style::Source&) {}
     virtual void onDidBecomeIdle() {}
+    virtual void onStyleImageMissing(const std::string&) {}
 };
 
 } // namespace mbgl

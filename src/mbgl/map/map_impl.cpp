@@ -172,4 +172,8 @@ void Map::Impl::jumpTo(const CameraOptions& camera) {
     onUpdate();
 }
 
+void Map::Impl::onStyleImageMissing(const std::string& id) {
+    observer.onStyleImageMissing(id);
+}
+
 } // namespace mbgl

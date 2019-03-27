@@ -47,6 +47,7 @@ public:
     void onDidFinishRenderingFrame(RenderMode, bool) final;
     void onWillStartRenderingMap() final;
     void onDidFinishRenderingMap() final;
+    void onStyleImageMissing(const std::string&) final;
 
     // Map
     void jumpTo(const CameraOptions&);

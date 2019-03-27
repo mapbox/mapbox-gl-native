@@ -31,6 +31,9 @@ public:
 
     // Final frame
     virtual void onDidFinishRenderingMap() {}
+
+    // Style is missing an image
+    virtual void onStyleImageMissing(const std::string&) {}
 };
 
 } // namespace mbgl

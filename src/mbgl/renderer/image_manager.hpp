@@ -6,6 +6,7 @@
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/gfx/texture.hpp>
+#include <mbgl/renderer/image_manager_observer.hpp>
 
 #include <mapbox/shelf-pack.hpp>
 
@@ -39,6 +40,8 @@ public:
     ImageManager();
     ~ImageManager();
 
+    void setObserver(ImageManagerObserver*);
+
     void setLoaded(bool);
     bool isLoaded() const;
 
@@ -52,14 +55,19 @@ public:
 
     void getImages(ImageRequestor&, ImageRequestPair&&);
     void removeRequestor(ImageRequestor&);
+    void imagesAdded();
 
 private:
+    void checkMissingAndNotify(ImageRequestor&, const ImageRequestPair&);
     void notify(ImageRequestor&, const ImageRequestPair&) const;
 
     bool loaded = false;
 
     std::unordered_map<ImageRequestor*, ImageRequestPair> requestors;
+    std::unordered_map<ImageRequestor*, ImageRequestPair> missingImageRequestors;
     ImageMap images;
+
+    ImageManagerObserver* observer = nullptr;
 
 // Pattern stuff
 public:

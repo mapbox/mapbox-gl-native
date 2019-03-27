@@ -615,6 +615,7 @@
         "mbgl/renderer/group_by_layout.hpp": "src/mbgl/renderer/group_by_layout.hpp",
         "mbgl/renderer/image_atlas.hpp": "src/mbgl/renderer/image_atlas.hpp",
         "mbgl/renderer/image_manager.hpp": "src/mbgl/renderer/image_manager.hpp",
+        "mbgl/renderer/image_manager_observer.hpp": "src/mbgl/renderer/image_manager_observer.hpp",
         "mbgl/renderer/layers/render_background_layer.hpp": "src/mbgl/renderer/layers/render_background_layer.hpp",
         "mbgl/renderer/layers/render_circle_layer.hpp": "src/mbgl/renderer/layers/render_circle_layer.hpp",
         "mbgl/renderer/layers/render_custom_layer.hpp": "src/mbgl/renderer/layers/render_custom_layer.hpp",

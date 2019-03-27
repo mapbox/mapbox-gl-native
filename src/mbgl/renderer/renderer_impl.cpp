@@ -83,6 +83,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     if (!imageManager) {
         imageManager = std::make_unique<ImageManager>();
+        imageManager->setObserver(this);
     }
 
     if (updateParameters.mode != MapMode::Continuous) {
@@ -158,6 +159,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         imageManager->updateImage(entry.second.after);
     }
 
+    imageManager->imagesAdded();
     imageManager->setLoaded(updateParameters.spriteLoaded);
 
 
@@ -832,6 +834,10 @@ void Renderer::Impl::onTileError(RenderSource& source, const OverscaledTileID& t
 
 void Renderer::Impl::onTileChanged(RenderSource&, const OverscaledTileID&) {
     observer->onInvalidate();
+}
+
+void Renderer::Impl::onStyleImageMissing(const std::string& id) {
+    observer->onStyleImageMissing(id);
 }
 
 } // namespace mbgl
