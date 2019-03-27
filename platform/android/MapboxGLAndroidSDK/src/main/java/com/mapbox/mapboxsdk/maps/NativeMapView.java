@@ -136,15 +136,6 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void update() {
-    if (checkState("update")) {
-      return;
-    }
-
-    mapRenderer.requestRender();
-  }
-
-  @Override
   public void resizeView(int width, int height) {
     if (checkState("resizeView")) {
       return;
