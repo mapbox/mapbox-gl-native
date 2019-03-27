@@ -24,11 +24,10 @@ TEST(API, RecycleMapUpdateImages) {
     util::RunLoop loop;
 
     ThreadPool threadPool(4);
-    float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, threadPool };
+    HeadlessFrontend frontend { 1, threadPool };
     auto map = std::make_unique<MapAdapter>(frontend, MapObserver::nullObserver(),
-                                         pixelRatio, std::make_shared<StubFileSource>(), threadPool,
+                                         std::make_shared<StubFileSource>(), threadPool,
                                          MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()));
 
     EXPECT_TRUE(map);

@@ -41,8 +41,8 @@ public:
     MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
         : fileSource(std::make_shared<FileSource>())
         , frontend(pixelRatio, threadPool)
-        , map(frontend, observer, pixelRatio,
-              fileSource, threadPool, MapOptions().withMapMode(mode).withSize(frontend.getSize())) {}
+        , map(frontend, observer, fileSource, threadPool,
+              MapOptions().withMapMode(mode).withSize(frontend.getSize()).withPixelRatio(pixelRatio)) {}
 
     template <typename T = FileSource>
     MapTest(const std::string& cachePath, const std::string& assetPath,
@@ -50,8 +50,8 @@ public:
             typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
             : fileSource(std::make_shared<T>(cachePath, assetPath))
             , frontend(pixelRatio, threadPool)
-            , map(frontend, observer, pixelRatio,
-                  fileSource, threadPool, MapOptions().withMapMode(mode).withSize(frontend.getSize())) {}
+            , map(frontend, observer, fileSource, threadPool,
+                  MapOptions().withMapMode(mode).withSize(frontend.getSize()).withPixelRatio(pixelRatio)) {}
 };
 
 TEST(Map, RendererState) {
@@ -322,7 +322,8 @@ TEST(Map, DefaultBoundOptions) {
 }
 
 TEST(Map, MapOptions) {
-    MapTest<> test { 1, MapMode::Continuous };
+    float pixelRatio { 2 };
+    MapTest<> test { pixelRatio, MapMode::Continuous };
 
     test.map.setNorthOrientation(NorthOrientation::Rightwards);
     test.map.setConstrainMode(ConstrainMode::None);
@@ -336,6 +337,7 @@ TEST(Map, MapOptions) {
     EXPECT_EQ(options.constrainMode(), ConstrainMode::None);
     EXPECT_EQ(options.northOrientation(), NorthOrientation::Rightwards);
     EXPECT_EQ(options.size(), size);
+    EXPECT_EQ(options.pixelRatio(), pixelRatio);
 }
 
 TEST(Map, DefaultMapOptions) {
@@ -349,6 +351,7 @@ TEST(Map, DefaultMapOptions) {
     EXPECT_TRUE(options.crossSourceCollisions());
     EXPECT_EQ(options.size().width, 256);
     EXPECT_EQ(options.size().height, 256);
+    EXPECT_EQ(options.pixelRatio(), 1);
 }
 
 TEST(Map, SetStyleInvalidJSON) {
@@ -741,7 +744,6 @@ TEST(Map, DontLoadUnneededTiles) {
 TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
     ThreadPool threadPool { 4 };
-    float pixelRatio { 1 };
 
     using namespace std::chrono_literals;
 
@@ -753,7 +755,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
 
     util::Timer timer;
 
-    HeadlessFrontend frontend(pixelRatio, threadPool);
+    HeadlessFrontend frontend(1, threadPool);
 
     StubMapObserver observer;
     observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderMode) {
@@ -765,7 +767,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
         });
     };
 
-    Map map(frontend, observer, pixelRatio, threadPool,
+    Map map(frontend, observer, threadPool,
             MapOptions().withMapMode(MapMode::Continuous).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));

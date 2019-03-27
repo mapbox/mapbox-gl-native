@@ -119,6 +119,21 @@ public:
      */
     Size size() const;
 
+    /**
+     * @brief Sets the custom pixel ratio. By default, it is set to 1.
+     *
+     * @param ratio Pixel ratio value.
+     * @return reference to MapOptions for chaining options together.
+     */
+    MapOptions& withPixelRatio(float ratio);
+
+    /**
+     * @brief Gets the previously set (or default) pixel ratio value.
+     *
+     * @return pixel ratio value.
+     */
+    float pixelRatio() const;
+
 private:
     class Impl;
     std::unique_ptr<Impl> impl_;
