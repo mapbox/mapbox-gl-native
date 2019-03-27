@@ -120,9 +120,9 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
             auto it = images.find(dependency.first);
             if (it == images.end()) {
                 observer->onStyleImageMissing(dependency.first, [this, requestorPtr]() {
-                    auto it = missingImageRequestors.find(requestorPtr);
-                    if (it != missingImageRequestors.end()) {
-                        it->second.callbacksRemaining--;
+                    auto missing = missingImageRequestors.find(requestorPtr);
+                    if (missing != missingImageRequestors.end()) {
+                        missing->second.callbacksRemaining--;
                     }
                 });
             }
