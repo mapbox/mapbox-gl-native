@@ -405,7 +405,6 @@ static const CGFloat kAnnotationScale = 0.125f;
 
     NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
 
-    CGFloat epsilon = 0.0000001;
     CGSize size = self.mapView.bounds.size;
 
     CGSize annotationSize = CGSizeMake(40.0, 40.0);

@@ -277,7 +277,7 @@
 
                 // Now set another coordinate.
                 MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:target2
-                                                                        fromDistance:altitude
+                                                                            altitude:altitude
                                                                                pitch:0.0
                                                                              heading:0.0];
 

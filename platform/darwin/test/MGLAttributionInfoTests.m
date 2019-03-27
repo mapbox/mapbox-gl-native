@@ -55,10 +55,21 @@
     XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://apps.mapbox.com/feedback/"]);
     XCTAssertTrue(infos[3].feedbackLink);
     NSURL *styleURL = [MGLStyle satelliteStreetsStyleURLWithVersion:99];
+        
+#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 120200) || \
+    (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 101404)
+    NSString *bundleId = @"com.apple.dt.xctest.tool";
+#else
+    NSString *bundleId = @"com.mapbox.Mapbox";
+#endif
+    
+    NSString *urlString = [NSString stringWithFormat:@"https://apps.mapbox.com/feedback/?referrer=%@#/77.63680/12.98108/14.00/0.0/0", bundleId];
     XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
-                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.mapbox.Mapbox#/77.63680/12.98108/14.00/0.0/0"]);
+                          [NSURL URLWithString:urlString]);
+    
+    urlString = [NSString stringWithFormat:@"https://apps.mapbox.com/feedback/?referrer=%@&owner=mapbox&id=satellite-streets-v99&access_token=pk.feedcafedeadbeefbadebede&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13", bundleId];
     XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
-                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.mapbox.Mapbox&owner=mapbox&id=satellite-streets-v99&access_token=pk.feedcafedeadbeefbadebede&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13"]);
+                          [NSURL URLWithString:urlString]);
 }
 
 - (void)testStyle {
