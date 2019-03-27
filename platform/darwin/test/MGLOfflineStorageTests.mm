@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "MGLOfflineStorage_Private.h"
+#import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 
 #import <XCTest/XCTest.h>
@@ -10,7 +11,6 @@
 #pragma clang diagnostic ignored "-Wshadow"
 
 @interface MGLOfflineStorageTests : XCTestCase <MGLOfflineStorageDelegate>
-
 @end
 
 @implementation MGLOfflineStorageTests
@@ -21,8 +21,7 @@
                                                              appropriateForURL:nil
                                                                         create:NO
                                                                          error:nil];
-    // Unit tests don't use the main bundle; use com.mapbox.ios.sdk instead.
-    NSString *bundleIdentifier = [NSBundle bundleForClass:[MGLMapView class]].bundleIdentifier;
+    NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryURL.path], @"Cache subdirectory should exist.");
@@ -208,8 +207,8 @@
                                                              appropriateForURL:nil
                                                                         create:NO
                                                                          error:nil];
-    // Unit tests don't use the main bundle; use com.mapbox.ios.sdk instead.
-    NSString *bundleIdentifier = [NSBundle bundleForClass:[MGLMapView class]].bundleIdentifier;
+    // As of iOS SDK 12.2 unit tests now have a bundle id: com.apple.dt.xctest.tool
+    NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryURL.path], @"Cache subdirectory should exist.");

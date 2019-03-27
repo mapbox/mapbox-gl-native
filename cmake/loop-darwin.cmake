@@ -7,6 +7,10 @@ target_include_directories(mbgl-loop-darwin
     PRIVATE src
 )
 
+target_link_libraries(mbgl-loop-darwin PUBLIC
+    optional
+)
+
 create_source_groups(mbgl-loop-darwin)
 
 set_target_properties(mbgl-loop-darwin PROPERTIES FOLDER "Core")
