@@ -635,7 +635,7 @@ optional<std::unique_ptr<Expression>> composite(type::Type type,
 optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type type,
                                                                   const Convertible& value,
                                                                   Error& err,
-																  bool convertTokens) {
+                                                                  bool convertTokens) {
     if (!isObject(value)) {
         err.message = "function must be an object";
         return nullopt;
