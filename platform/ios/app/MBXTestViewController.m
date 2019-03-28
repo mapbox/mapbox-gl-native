@@ -69,10 +69,9 @@
         point.title = [NSString stringWithFormat:@"%.f, %.f", coordinate.latitude, coordinate.longitude];
         [pointAnnotations addObject:point];
     }
-    
     [self.mapView addAnnotations:pointAnnotations];
-    [_timer invalidate];
-    _timer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateCenter) userInfo:nil repeats:YES];
+//    [_timer invalidate];
+//    _timer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateCenter) userInfo:nil repeats:YES];
 }
 
 - (void)updateCenter {
@@ -103,7 +102,7 @@
         CGFloat hue = (CGFloat)annotation.coordinate.longitude / 100;
         annotationView.backgroundColor = [UIColor colorWithHue:hue saturation:0.5 brightness:1 alpha:1];
     }
-    
+    [annotationView setHidden:YES];
     return annotationView;
 }
 
