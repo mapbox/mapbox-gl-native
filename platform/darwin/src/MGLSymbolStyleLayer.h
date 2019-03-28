@@ -1589,7 +1589,22 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant array values
+ * Constant `MGLTextAnchor` array values
+ * Constant array, whose each element is any of the following constant string
+ values:
+   * `center`: The center of the text is placed closest to the anchor.
+   * `left`: The left side of the text is placed closest to the anchor.
+   * `right`: The right side of the text is placed closest to the anchor.
+   * `top`: The top of the text is placed closest to the anchor.
+   * `bottom`: The bottom of the text is placed closest to the anchor.
+   * `top-left`: The top left corner of the text is placed closest to the
+ anchor.
+   * `top-right`: The top right corner of the text is placed closest to the
+ anchor.
+   * `bottom-left`: The bottom left corner of the text is placed closest to the
+ anchor.
+   * `bottom-right`: The bottom right corner of the text is placed closest to
+ the anchor.
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
