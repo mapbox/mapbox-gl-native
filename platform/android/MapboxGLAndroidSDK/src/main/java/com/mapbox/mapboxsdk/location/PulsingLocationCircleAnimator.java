@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.location;
 
+import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -17,7 +18,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 /**
  * Manages the logic of the interpolated animation which is applied to the LocationComponent's pulsing circle
  */
-public class PulsingLocationCircleAnimator {
+public class PulsingLocationCircleAnimator extends MapboxAnimator  {
 
   private static final String TAG = "Mbgl-PulsingLocationCircleAnimator";
   private static final float PULSING_CIRCLE_RADIUS = 60;
@@ -43,6 +44,21 @@ public class PulsingLocationCircleAnimator {
     this.interpolatorToUse = interpolatorToUse;
     this.mapboxMap = mapboxMap;
     this.locationComponentOptions = locationComponentOptions;
+  }
+
+  @Override
+  public void onAnimationUpdate(ValueAnimator animation) {
+    super.onAnimationUpdate(animation);
+  }
+
+  @Override
+  Object getTarget() {
+    return super.getTarget();
+  }
+
+  @Override
+  TypeEvaluator provideEvaluator() {
+    return null;
   }
 
   public void startPulsingAnimation() {

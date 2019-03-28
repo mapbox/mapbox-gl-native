@@ -52,6 +52,7 @@ public final class LocationComponentConstants {
   static final String PROPERTY_FOREGROUND_STALE_ICON = "mapbox-property-foreground-stale-icon";
   static final String PROPERTY_BACKGROUND_STALE_ICON = "mapbox-property-background-stale-icon";
   static final String PROPERTY_BEARING_ICON = "mapbox-property-shadow-icon";
+  static final String PROPERTY_PULSING_RADIUS = "mapbox-property-pulsing-circle-radius";
 
   // Layers
 

@@ -1306,6 +1306,7 @@ public final class LocationComponent {
   }
 
   private void showLocationLayerIfHidden() {
+    Logger.d(TAG, "showLocationLayerIfHidden()");
     boolean isLocationLayerHidden = locationLayerController.isHidden();
     if (isEnabled && isComponentStarted && isLocationLayerHidden) {
       locationLayerController.show();
