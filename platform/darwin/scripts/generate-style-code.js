@@ -352,6 +352,9 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         if (property.type === 'enum') {
             doc += '* Any of the following constant string values:\n';
             doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
+        } else if (property.type === 'array' && property.value === 'enum') {
+            doc += '* Constant array, whose each element is any of the following constant string values:\n';
+            doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
         }
         doc += '* Predefined functions, including mathematical and string operators\n' +
             '* Conditional expressions\n' +
@@ -426,6 +429,8 @@ global.describeType = function (property) {
                     return '`CGVector`';
                 case 'position':
                     return '`MGLSphericalPosition`';
+                case 'anchor':
+                    return '`MGLTextAnchor` array';
                 default:
                     return 'array';
             }
