@@ -121,7 +121,7 @@ function httpRequest() {
                     reject(error);
                 }).on('end', () => {
                     if (res.statusCode < 200 || res.statusCode >= 300) {
-                        return reject(new Error('Failed to fetch the results from codecov.io. StatusCode=' + res.statusCode));
+                        return reject(new Error('Failed to fetch coverage report from codecov.io. StatusCode=' + res.statusCode));
                     }
 
                     try {
@@ -143,15 +143,28 @@ function httpRequest() {
     });
 }
 
-httpRequest().then((body) => {
-    const dataSource = parseResponse(body);
-    if (dataSource) {
-        return uploadData(dataSource);
-    } else {
-        throw new Error('Failed to parse the results received from codecov.io.');
-    }
-}).then(data => {
-    console.log('Successfully uploaded code coverage metrics to S3');
-}).catch(err => {
-    console.error('Failed to upload code coverage metrics to S3: ' + err.message);
-});
+var errResponse = false;
+const publishWithRetry = (maxRetries) =>  {
+    httpRequest().then((body) => {
+        const dataSource = parseResponse(body);
+        if (dataSource) {
+            return uploadData(dataSource);
+        } else {
+            errResponse = true;
+            throw new Error('Failed to parse coverage report received from codecov.io.');
+        }
+    }).then(data => {
+        console.log('Successfully uploaded code coverage metrics to S3');
+    }).catch(err => {
+        if (maxRetries > 1 && errResponse) {
+            console.log('Invalid coverage report received. Trying to retrieve again.');
+            errResponse = false;
+            return publishWithRetry(maxRetries - 1);
+        }
+
+        console.error('Failed to upload code coverage metrics to S3: ' + err.message);
+    });
+};
+
+// Fetch and publish code coverage report
+publishWithRetry(5);
