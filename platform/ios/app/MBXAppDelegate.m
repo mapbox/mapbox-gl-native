@@ -20,7 +20,7 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
             // the token.
             accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MBXMapboxAccessTokenDefaultsKey];
         }
-        [MGLAccountManager setAccessToken:@""];
+        [MGLAccountManager setAccessToken:accessToken];
 #ifndef MGL_DISABLE_LOGGING
         [MGLLoggingConfiguration sharedConfiguration].loggingLevel = MGLLoggingLevelFault;
 #endif
