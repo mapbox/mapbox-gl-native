@@ -66,6 +66,7 @@ workflows:
               only:
                 - master
     jobs:
+      - metrics-nightly
       - ios-release-template:
           name: ios-release-nightly
       - ios-sanitize-nightly
@@ -956,6 +957,21 @@ jobs:
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
+  metrics-nightly:
+    docker:
+      - image: mbgl/linux-gcc-5:54f59e3ac5
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
+    steps:
+      - install-dependencies
+      - run:
+          name: Collect GitHub statistics
+          command: |
+              scripts/publish_github_stats.js
 
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
