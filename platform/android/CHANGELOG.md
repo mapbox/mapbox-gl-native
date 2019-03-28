@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.3.0 - March 28, 2019
+
+### Bugs
+ - Fix MapView reuse issues [#14127](https://github.com/mapbox/mapbox-gl-native/pull/14127)
+ - Don't call OnSurfaceCreated from the main thread [#14244](https://github.com/mapbox/mapbox-gl-native/pull/14244)
+
 ## 7.3.0-beta.1 - March 20, 2019
 
 ### Features
