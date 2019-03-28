@@ -16,6 +16,11 @@
 
 #import <objc/runtime.h>
 
+
+@interface MGLMapView (MBXViewController)
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
+@end
+
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = 38.8999418, .longitude = -77.033996 },
     { .latitude = 37.7884307, .longitude = -122.3998631 },
@@ -208,6 +213,9 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) BOOL shouldLimitCameraChanges;
 @property (nonatomic) BOOL randomWalk;
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
+@property (nonatomic) CLLocationCoordinate2D circlingCameraCenterCoordinate;
+@property (nonatomic) CLLocationDirection circlingCameraDirection;
+@property (nonatomic) NSTimer *circlingTimer;
 
 @end
 
@@ -233,6 +241,66 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         }];
     }
 }
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (NSProcessInfo.processInfo.environment[@"AUTOMATE"]) {
+        [self setup14232ReproSteps];
+    }
+}
+
+- (void)setup14232ReproSteps {
+    
+    // Add 100 annotations
+    [self parseFeaturesAddingCount:100 usingViews:YES];
+
+    self.circlingCameraCenterCoordinate = CLLocationCoordinate2DMake(38.899835, -77.034068);
+    self.circlingCameraDirection = 0.0;
+    self.circlingTimer = [NSTimer scheduledTimerWithTimeInterval:.3 target:self selector:@selector(circlingCameraTimerFired:) userInfo:nil repeats:YES];
+    
+}
+
+
+- (void)circlingCameraTimerFired:(NSTimer*)timer {
+    
+    BOOL isVisible = self.view.superview && self.view.window;
+    
+    if (!isVisible) {
+        return;
+    }
+    
+    // Not a circle, but good enough for this test
+    CLLocationDistance distRadians = 10000.0/6378100.0;
+    
+    CLLocationDegrees bearing = self.circlingCameraDirection * M_PI / 180.0;
+    CLLocationDegrees lat1 = self.circlingCameraCenterCoordinate.latitude * M_PI / 180.0;
+    CLLocationDegrees lon1 = self.circlingCameraCenterCoordinate.longitude * M_PI / 180.0;
+    
+    CLLocationDegrees lat2 = asin(sin(lat1) * cos(distRadians) + cos(lat1) * sin(distRadians) * cos(bearing));
+    CLLocationDegrees lon2 = lon1 + atan2(sin(bearing) * sin(distRadians) * cos(lat1), cos(distRadians) - sin(lat1) * sin(lat2));
+
+    CLLocationCoordinate2D newCenter = CLLocationCoordinate2DMake(lat2 * 180.0 / M_PI,
+                                                                  lon2 * 180.0 / M_PI);
+    
+//    [self.mapView setCenterCoordinate:newCenter zoomLevel:9 animated:YES];
+
+    CAMediaTimingFunction *function = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    [self.mapView _setCenterCoordinate:newCenter
+                           edgePadding:self.mapView.contentInset
+                             zoomLevel:10.0
+                             direction:self.mapView.direction
+                              duration:.25
+               animationTimingFunction:function
+                     completionHandler:nil];
+    
+    self.circlingCameraDirection += 20.0;
+    
+    if (self.circlingCameraDirection >= 360.0) {
+        self.circlingCameraDirection = 0.0;
+    }
+}
+
 
 - (void)viewDidLoad
 {
