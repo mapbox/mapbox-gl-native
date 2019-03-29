@@ -50,6 +50,8 @@
     self.mapView.centerCoordinate = CLLocationCoordinate2DMake(0, 66);
     self.mapView.zoomLevel = 2;
     self.mapView.delegate = self;
+    self.mapView.showsUserLocation = YES;
+    self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
     [self.view addSubview:self.mapView];
     
     // Specify coordinates for our annotations.
@@ -81,30 +83,30 @@
 #pragma mark - MGLMapViewDelegate methods
 
 // This delegate method is where you tell the map to load a view for a specific annotation. To load a static MGLAnnotationImage, you would use `-mapView:imageForAnnotation:`.
-- (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id <MGLAnnotation>)annotation {
-    // This example is only concerned with point annotations.
-    if (![annotation isKindOfClass:[MGLPointAnnotation class]]) {
-        return nil;
-    }
-    
-    // Use the point annotation’s longitude value (as a string) as the reuse identifier for its view.
-    NSString *reuseIdentifier = [NSString stringWithFormat:@"%f", annotation.coordinate.longitude];
-    
-    // For better performance, always try to reuse existing annotations.
-    CustomAnnotationView *annotationView = [mapView dequeueReusableAnnotationViewWithIdentifier:reuseIdentifier];
-    
-    // If there’s no reusable annotation view available, initialize a new one.
-    if (!annotationView) {
-        annotationView = [[CustomAnnotationView alloc] initWithReuseIdentifier:reuseIdentifier];
-        annotationView.bounds = CGRectMake(0, 0, 40, 40);
-        
-        // Set the annotation view’s background color to a value determined by its longitude.
-        CGFloat hue = (CGFloat)annotation.coordinate.longitude / 100;
-        annotationView.backgroundColor = [UIColor colorWithHue:hue saturation:0.5 brightness:1 alpha:1];
-    }
-    [annotationView setHidden:YES];
-    return annotationView;
-}
+//- (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id <MGLAnnotation>)annotation {
+//    // This example is only concerned with point annotations.
+//    if (![annotation isKindOfClass:[MGLPointAnnotation class]]) {
+//        return nil;
+//    }
+//
+//    // Use the point annotation’s longitude value (as a string) as the reuse identifier for its view.
+//    NSString *reuseIdentifier = [NSString stringWithFormat:@"%f", annotation.coordinate.longitude];
+//
+//    // For better performance, always try to reuse existing annotations.
+//    CustomAnnotationView *annotationView = [mapView dequeueReusableAnnotationViewWithIdentifier:reuseIdentifier];
+//
+//    // If there’s no reusable annotation view available, initialize a new one.
+//    if (!annotationView) {
+//        annotationView = [[CustomAnnotationView alloc] initWithReuseIdentifier:reuseIdentifier];
+//        annotationView.bounds = CGRectMake(0, 0, 40, 40);
+//
+//        // Set the annotation view’s background color to a value determined by its longitude.
+//        CGFloat hue = (CGFloat)annotation.coordinate.longitude / 100;
+//        annotationView.backgroundColor = [UIColor colorWithHue:hue saturation:0.5 brightness:1 alpha:1];
+//    }
+////    [annotationView setHidden:YES];
+//    return annotationView;
+//}
 
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id<MGLAnnotation>)annotation {
     return YES;
