@@ -1226,19 +1226,39 @@ public:
 }
 
 - (void)willMoveToWindow:(UIWindow *)newWindow {
+    
+    if (newWindow == nil) {
+#ifdef WORKAROUND_1125
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = NO;
+
+        // Following 2 not necessary?
+        _rendererFrontend->flush();
+#endif
+        [self validateDisplayLink]; // Moved from didMove...
+    }
+    
     [super willMoveToWindow:newWindow];
     [self refreshSupportedInterfaceOrientationsWithWindow:newWindow];
 }
 
 - (void)didMoveToWindow
 {
-    [self validateDisplayLink];
     [super didMoveToWindow];
+    
+    if (self.window) {
+#ifdef WORKAROUND_1125
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = YES;
+#endif
+        [self validateDisplayLink];
+    }
+
 }
 
 - (void)didMoveToSuperview
 {
-    [self validateDisplayLink];
+    [self validateDisplayLink]; // Is this necessary?
     [self installConstraints];
     [super didMoveToSuperview];
 }

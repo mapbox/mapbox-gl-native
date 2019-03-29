@@ -14,14 +14,16 @@
 
 @implementation MBXTabBarController
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
+- (void)viewDidLoad {
+    [super viewDidLoad];
     
     if (NSProcessInfo.processInfo.environment[@"AUTOMATE"]) {
-        [NSTimer scheduledTimerWithTimeInterval:2.0
+        [NSTimer scheduledTimerWithTimeInterval:0.25
                                         repeats:YES block:^(NSTimer * _Nonnull timer) {
-                                            self.tab = !self.tab;
-                                            [self setSelectedIndex:self.tab];
+                                            if (self.presentedViewController == nil) {
+                                                self.tab = !self.tab;
+                                                [self setSelectedIndex:self.tab];
+                                            }
                                         }];
     }
 }

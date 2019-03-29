@@ -216,6 +216,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) CLLocationCoordinate2D circlingCameraCenterCoordinate;
 @property (nonatomic) CLLocationDirection circlingCameraDirection;
 @property (nonatomic) NSTimer *circlingTimer;
+@property (nonatomic) BOOL circling;
 
 @end
 
@@ -242,36 +243,42 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     }
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    if (self.circling) {
+        [self.circlingTimer invalidate];
+        self.circlingTimer = nil;
+    }
+}
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    if (NSProcessInfo.processInfo.environment[@"AUTOMATE"]) {
-        [self setup14232ReproSteps];
+    if (self.circling) {
+        self.circlingTimer = [NSTimer scheduledTimerWithTimeInterval:.25
+                                                              target:self
+                                                            selector:@selector(circlingCameraTimerFired:)
+                                                            userInfo:nil
+                                                             repeats:YES];
     }
 }
 
 - (void)setup14232ReproSteps {
     
-    // Add 100 annotations
-    [self parseFeaturesAddingCount:100 usingViews:YES];
-
-    self.circlingCameraCenterCoordinate = CLLocationCoordinate2DMake(38.899835, -77.034068);
-    self.circlingCameraDirection = 0.0;
-    self.circlingTimer = [NSTimer scheduledTimerWithTimeInterval:.3 target:self selector:@selector(circlingCameraTimerFired:) userInfo:nil repeats:YES];
+    self.circling = (NSProcessInfo.processInfo.environment[@"CIRCLING"]);
     
+    // Add 100 annotations
+
+    if (self.circling) {
+        self.circlingCameraCenterCoordinate = CLLocationCoordinate2DMake(38.899835, -77.034068);
+        self.circlingCameraDirection = 0.0;
+        self.circlingTimer = [NSTimer scheduledTimerWithTimeInterval:.25 target:self selector:@selector(circlingCameraTimerFired:) userInfo:nil repeats:YES];
+
+//      [self parseFeaturesAddingCount:1000 usingViews:YES];
+    }
 }
 
-
 - (void)circlingCameraTimerFired:(NSTimer*)timer {
-    
-    BOOL isVisible = self.view.superview && self.view.window;
-    
-    if (!isVisible) {
-        return;
-    }
-    
-    // Not a circle, but good enough for this test
-    CLLocationDistance distRadians = 10000.0/6378100.0;
+    CLLocationDistance distRadians  = 10000.0/6378100.0;
     
     CLLocationDegrees bearing = self.circlingCameraDirection * M_PI / 180.0;
     CLLocationDegrees lat1 = self.circlingCameraCenterCoordinate.latitude * M_PI / 180.0;
@@ -283,8 +290,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     CLLocationCoordinate2D newCenter = CLLocationCoordinate2DMake(lat2 * 180.0 / M_PI,
                                                                   lon2 * 180.0 / M_PI);
     
-//    [self.mapView setCenterCoordinate:newCenter zoomLevel:9 animated:YES];
-
     CAMediaTimingFunction *function = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
     [self.mapView _setCenterCoordinate:newCenter
                            edgePadding:self.mapView.contentInset
@@ -306,6 +311,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 {
     [super viewDidLoad];
 
+    [self setup14232ReproSteps];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
