@@ -252,6 +252,7 @@ public:
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
+@property (nonatomic) BOOL enablePresentsWithTransaction;
 
 /// Experimental rendering performance measurement.
 @property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
@@ -702,7 +703,7 @@ public:
     _glView.delegate = self;
 
     CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-    eaglLayer.presentsWithTransaction = YES;
+    eaglLayer.presentsWithTransaction = NO;
     
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
@@ -1101,6 +1102,13 @@ public:
 {
     MGLAssertIsMainThread();
 
+    // Not "visible" - this isn't a full definition of visibility, but if
+    // the map view doesn't have a window then it *cannot* be visible.
+    if (!self.window) {
+        return;
+    }
+
+    // Mismatched display link
     if (displayLink && displayLink != _displayLink) {
         return;
     }
@@ -1114,7 +1122,22 @@ public:
         [self updateAnnotationViews];
         [self updateCalloutView];
         
-        [self.glView display];
+        if (self.enablePresentsWithTransaction)
+        {
+            CFTimeInterval before = CACurrentMediaTime();
+            [self.glView display];
+            CFTimeInterval after = CACurrentMediaTime();
+
+            if (after-before >= 1.0) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self emergencyRecreateGL];
+                });
+            }
+        }
+        else
+        {
+            [self.glView display];
+        }
     }
 
     if (self.experimental_enableFrameRateMeasurement)
@@ -1231,15 +1254,85 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
+// See https://github.com/mapbox/mapbox-gl-native/issues/14232
+- (void)emergencyRecreateGL {
+    MGLLogError(@"Rendering took too long - creating GL views");
+
+    CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+    eaglLayer.presentsWithTransaction = NO;
+
+    [self sleepGL:nil];
+
+    // Just performing a sleepGL/wakeGL pair isn't sufficient - in this case
+    // we can still get errors when calling bindDrawable. Here we completely
+    // recreate the GLKView
+    
+    [self.userLocationAnnotationView removeFromSuperview];
+    [_glView removeFromSuperview];
+    
+    _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
+    _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _glView.enableSetNeedsDisplay = NO;
+    _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+    _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
+    _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    _glView.layer.opaque = _opaque;
+    _glView.delegate = self;
+
+    [self insertSubview:_glView atIndex:0];
+    _glView.contentMode = UIViewContentModeCenter;
+
+    if (self.annotationContainerView)
+    {
+        [_glView insertSubview:self.annotationContainerView atIndex:0];
+    }
+    
+    [self updateUserLocationAnnotationView];
+    
+    // Do not bind...yet
+    
+    if (self.window) {
+        [self wakeGL:nil];
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = self.enablePresentsWithTransaction;
+    }
+    else {
+        MGLLogDebug(@"No window - skipping wakeGL");
+    }
+}
+
 - (void)willMoveToWindow:(UIWindow *)newWindow {
     [super willMoveToWindow:newWindow];
     [self refreshSupportedInterfaceOrientationsWithWindow:newWindow];
+    
+    if (!newWindow)
+    {
+        // See https://github.com/mapbox/mapbox-gl-native/issues/14232
+        // In iOS 12.2, CAEAGLLayer.presentsWithTransaction can cause dramatic
+        // slow down. The exact cause of this is unknown, but this work around
+        // appears to lessen the effects.
+        //
+        // Also, consider calling the new mbgl::Renderer::flush()
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = NO;
+        
+        // Moved from didMoveToWindow
+        [self validateDisplayLink];
+    }
 }
 
 - (void)didMoveToWindow
 {
-    [self validateDisplayLink];
     [super didMoveToWindow];
+    
+    if (self.window)
+    {
+        // See above comment
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = self.enablePresentsWithTransaction;
+        
+        [self validateDisplayLink];
+    }
 }
 
 - (void)didMoveToSuperview
@@ -4151,6 +4244,8 @@ public:
     [newAnnotationContainerView addSubviews:annotationViews];
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
     self.annotationContainerView = newAnnotationContainerView;
+    
+    self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > 0);
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -4324,6 +4419,8 @@ public:
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
         [self.annotationContainerView.annotationViews removeObject:annotationView];
+        
+        self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > 0);
 
         if (annotationTag == _selectedAnnotationTag)
         {
