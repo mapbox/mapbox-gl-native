@@ -33,10 +33,7 @@ void RenderLineLayer::transition(const TransitionParameters& parameters) {
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    style::Properties<LineFloorwidth>::Unevaluated extra(unevaluated.get<style::LineWidth>());
-    evaluated = RenderLinePaintProperties::PossiblyEvaluated(
-        unevaluated.evaluate(parameters).concat(extra.evaluate(parameters)));
-
+    evaluated = unevaluated.evaluate(parameters);
     crossfade = parameters.getCrossfadeParameters();
 
     passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0

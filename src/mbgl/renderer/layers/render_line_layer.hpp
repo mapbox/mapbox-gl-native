@@ -10,15 +10,6 @@
 
 namespace mbgl {
 
-struct LineFloorwidth : style::DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
-    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
-    static float defaultValue() { return 1.0; }
-};
-
-class RenderLinePaintProperties : public style::ConcatenateProperties<
-    style::LinePaintProperties,
-    style::Properties<LineFloorwidth>> {};
-
 class RenderLineLayer: public RenderLayer {
 public:
     using StyleLayerImpl = style::LineLayer::Impl;
@@ -44,7 +35,7 @@ public:
 
     // Paint properties
     style::LinePaintProperties::Unevaluated unevaluated;
-    RenderLinePaintProperties::PossiblyEvaluated evaluated;
+    style::LinePaintProperties::PossiblyEvaluated evaluated;
 
     const style::LineLayer::Impl& impl() const;
 

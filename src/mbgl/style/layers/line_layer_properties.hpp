@@ -52,6 +52,11 @@ struct LineWidth : DataDrivenPaintProperty<float, attributes::width, uniforms::w
     static float defaultValue() { return 1; }
 };
 
+struct LineFloorWidth : DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
+    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
+    static float defaultValue() { return 1.0f; }
+};
+
 struct LineGapWidth : DataDrivenPaintProperty<float, attributes::gapwidth, uniforms::gapwidth> {
     static float defaultValue() { return 0; }
 };
@@ -88,6 +93,7 @@ class LinePaintProperties : public Properties<
     LineTranslate,
     LineTranslateAnchor,
     LineWidth,
+    LineFloorWidth,
     LineGapWidth,
     LineOffset,
     LineBlur,

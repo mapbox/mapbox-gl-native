@@ -20,7 +20,7 @@ public:
 
     // These aliases are used by the PatternLayout template
     using RenderLayerType = RenderLineLayer;
-    using PossiblyEvaluatedPaintProperties = RenderLinePaintProperties::PossiblyEvaluated;
+    using PossiblyEvaluatedPaintProperties = style::LinePaintProperties::PossiblyEvaluated;
     using PossiblyEvaluatedLayoutProperties = style::LineLayoutProperties::PossiblyEvaluated;
 
     LineBucket(const PossiblyEvaluatedLayoutProperties layout,

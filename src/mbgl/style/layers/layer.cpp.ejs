@@ -153,6 +153,9 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
         return;
     auto impl_ = mutableImpl();
     impl_->paint.template get<<%- camelize(property.name) %>>().value = value;
+<% if (property.name === 'line-width') { -%>
+    impl_->paint.template get<LineFloorWidth>().value = value;
+<% } -%>
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
