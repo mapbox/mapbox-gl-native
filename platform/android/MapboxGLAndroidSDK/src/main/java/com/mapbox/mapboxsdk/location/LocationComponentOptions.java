@@ -1195,8 +1195,6 @@ public class LocationComponentOptions implements Parcelable {
           + locationComponentOptions.elevation() + ". Must be >= 0");
       }
 
-      // TODO: Finish this logic below
-
       if (locationComponentOptions.pulseEnabled() == null) {
 
         Log.d("LCOptions", "autoBuild: this.pulsingCircleFadeEnabled == null ");

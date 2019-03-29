@@ -36,14 +36,16 @@ public class PulsingLocationCircleAnimator extends MapboxAnimator  {
    * @param mapboxMap                the MapboxMap object which pulsing circle should be shown on
    * @param locationComponentOptions the stying options of the LocationComponent pulsing circle
    */
-  public PulsingLocationCircleAnimator(@NonNull final Interpolator interpolatorToUse,
-                                       @NonNull final MapboxMap mapboxMap,
-                                       @NonNull final LocationComponentOptions locationComponentOptions) {
+  public PulsingLocationCircleAnimator(AnimationsValueChangeListener updateListener, Object target,
+                                       Object animatedValue, double minUpdateInterval, long timeElapsed,
+                                       Interpolator interpolatorToUse, MapboxMap mapboxMap,
+                                       LocationComponentOptions locationComponentOptions) {
+    super(updateListener, target, animatedValue, minUpdateInterval, timeElapsed);
     Logger.d(TAG,"creating PulsingLocationCircleAnimator()");
-    this.opacityCounter = 0;
     this.interpolatorToUse = interpolatorToUse;
     this.mapboxMap = mapboxMap;
     this.locationComponentOptions = locationComponentOptions;
+    this.opacityCounter = 0;
   }
 
   @Override
@@ -61,32 +63,15 @@ public class PulsingLocationCircleAnimator extends MapboxAnimator  {
     return null;
   }
 
-  public void startPulsingAnimation() {
-    createValueAnimator();
-    startValueAnimator();
-  }
-
-  private void createValueAnimator() {
+  public ValueAnimator getValueAnimator() {
     if (mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null) {
-      Logger.d(TAG, "mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null");
-      Logger.d(TAG, "locationComponentOptions.pulseSingleDuration() = " + locationComponentOptions.pulseSingleDuration());
-      pulsingCircleLayer = mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER);
       animator = ValueAnimator.ofFloat(0f, PULSING_CIRCLE_RADIUS);
       animator.setDuration((long) locationComponentOptions.pulseSingleDuration());
       animator.setRepeatMode(ValueAnimator.RESTART);
       animator.setRepeatCount(ValueAnimator.INFINITE);
       animator.setInterpolator(interpolatorToUse);
-      animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-        @Override
-        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-          pulsingCircleLayer.setProperties(circleRadius((Float) valueAnimator.getAnimatedValue()));
-          if (locationComponentOptions.pulsingCircleFadeEnabled()) {
-            pulsingCircleLayer.setProperties(circleOpacity(1 - opacityCounter * .01f));
-            opacityCounter++;
-          }
-        }
-      });
     }
+    return animator;
   }
 
   private void startValueAnimator() {
@@ -121,7 +106,7 @@ public class PulsingLocationCircleAnimator extends MapboxAnimator  {
   public void resumePulsingAnimation() {
     if (animator != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       animator.resume();
-//      createValueAnimator();
+//      getValueAnimator();
 //      startValueAnimator();
     }
   }

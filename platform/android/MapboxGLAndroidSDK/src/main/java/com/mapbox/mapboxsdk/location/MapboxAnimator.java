@@ -61,10 +61,12 @@ abstract class MapboxAnimator<K> extends ValueAnimator implements ValueAnimator.
     addListener(new AnimatorListener());
   }
 
-  /**
-   * This empty "default" constructor exists because {@link PulsingLocationCircleAnimator} extends this class.
-   */
-  public MapboxAnimator() {
+  public MapboxAnimator(AnimationsValueChangeListener<K> updateListener, K target, K animatedValue, double minUpdateInterval, long timeElapsed) {
+    this.updateListener = updateListener;
+    this.target = target;
+    this.animatedValue = animatedValue;
+    this.minUpdateInterval = minUpdateInterval;
+    this.timeElapsed = timeElapsed;
   }
 
   @Override

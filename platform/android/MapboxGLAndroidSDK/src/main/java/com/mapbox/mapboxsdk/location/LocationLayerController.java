@@ -48,7 +48,6 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_GPS_BEARING;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_LOCATION_STALE;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_PULSING_CIRCLE_LAYER;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_PULSING_RADIUS;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_SHADOW_ICON_OFFSET;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_ICON;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_LAYER;
@@ -60,6 +59,7 @@ import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
 import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
@@ -117,7 +117,7 @@ final class LocationLayerController {
   }
 
   void applyStyle(@NonNull LocationComponentOptions options) {
-    Logger.d(TAG, "applyStyle()");
+    this.options = options;
     String newLayerBelowOption = options.layerBelow();
     if ((layerBelow != null || newLayerBelowOption != null)) {
       if (layerBelow == null || !layerBelow.equals(newLayerBelowOption)) {
@@ -131,9 +131,6 @@ final class LocationLayerController {
         setRenderMode(renderMode);
       }
     }
-
-    this.options = options;
-
     float elevation = options.elevation();
     // Only add icon elevation if the values greater than 0.
     if (elevation > 0) {
@@ -201,16 +198,13 @@ final class LocationLayerController {
 
   void show() {
     isHidden = false;
-    Logger.d(TAG, "show()");
 //    addPulsingCircleLayerToMap();
     setRenderMode(renderMode);
   }
 
   void hide() {
     isHidden = true;
-    Logger.d(TAG, "hide()");
     for (String layerId : layerSet) {
-      Logger.d(TAG, "layerId = " + layerId);
       setLayerVisibility(layerId, false);
     }
   }
@@ -254,7 +248,6 @@ final class LocationLayerController {
   }
 
   private void addLayers(@NonNull String idBelowLayer) {
-    Logger.d(TAG, "LocationLayerController ----> addLayers()");
     layerBelow = idBelowLayer;
     addSymbolLayer(BEARING_LAYER, idBelowLayer);
     addSymbolLayer(FOREGROUND_LAYER, BEARING_LAYER);
@@ -280,10 +273,9 @@ final class LocationLayerController {
   }
 
   private void addPulsingCircleLayerToMap() {
-    Logger.d(TAG, "LocationLayerController ----> addPulsingCircleLayerToMap()");
+    pulsingCircleIsEnabled = options.pulseEnabled();
     Layer pulsingCircleLayer = layerSourceProvider.generatePulsingCircleLayer();
     addLayerToMap(pulsingCircleLayer, ACCURACY_LAYER);
-    pulsingCircleIsEnabled = options.pulseEnabled();
   }
 
   private void removeLayers() {
@@ -304,8 +296,14 @@ final class LocationLayerController {
   }
 
   private void updatePulsingCircleRadius(float radius) {
-    locationFeature.addNumberProperty(PROPERTY_PULSING_RADIUS, radius);
-    refreshSource();
+    Layer pulsingCircleLayer = mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER);
+    if (pulsingCircleLayer != null) {
+      pulsingCircleLayer.setProperties(circleRadius(radius));
+
+      // TODO: Finish below to account for fade option usage
+      /*pulsingCircleLayer.setProperties(circleOpacity(1 - opacityCounter * .01f));
+      opacityCounter++;*/
+    }
   }
 
   //
@@ -398,7 +396,6 @@ final class LocationLayerController {
   }
 
   private void stylePulsingCircle(LocationComponentOptions options) {
-    Logger.d(TAG, "stylePulsingCircle() starting && options.pulseEnabled() = " + options.pulseEnabled());
     if (mapboxMap.getStyle() != null) {
       if (mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null) {
         Logger.d(TAG, "stylePulsingCircle: options.pulseEnabled() = " + options.pulseEnabled());
