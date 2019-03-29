@@ -2,7 +2,6 @@
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/gl/debugging.hpp>
 
 #include <cassert>
 

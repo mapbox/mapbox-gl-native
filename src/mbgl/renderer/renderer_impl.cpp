@@ -17,7 +17,6 @@
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/debugging.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -365,7 +364,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-    const auto encoder = parameters.context.createCommandEncoder();
 
     // TODO: remove cast
     gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
@@ -377,7 +375,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
-        MBGL_DEBUG_GROUP(parameters.context, "upload");
+        const auto debugGroup(parameters.encoder->createDebugGroup("upload"));
 
         parameters.imageManager.upload(parameters.context);
         parameters.lineAtlas.upload(parameters.context);
@@ -396,7 +394,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (parameters.staticData.has3D) {
         parameters.staticData.backendSize = parameters.backend.getFramebufferSize();
 
-        MBGL_DEBUG_GROUP(parameters.context, "3d");
+        const auto debugGroup(parameters.encoder->createDebugGroup("3d"));
         parameters.pass = RenderPass::Pass3D;
 
         if (!parameters.staticData.depthRenderbuffer ||
@@ -410,7 +408,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
-                MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
+                const auto layerDebugGroup(parameters.encoder->createDebugGroup(it->layer.getID().c_str()));
                 it->layer.render(parameters, it->source);
             }
         }
@@ -422,7 +420,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         using namespace gl::value;
 
-        MBGL_DEBUG_GROUP(parameters.context, "clear");
         parameters.backend.bind();
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
             glContext.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
@@ -436,7 +433,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
-        MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
+        const auto debugGroup(parameters.encoder->createDebugGroup("clipping masks"));
 
         static const Properties<>::PossiblyEvaluated properties {};
         static const ClippingMaskProgram::Binders paintAttributeData(properties, 0);
@@ -518,13 +515,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
     {
         parameters.pass = RenderPass::Opaque;
-        MBGL_DEBUG_GROUP(parameters.context, "opaque");
+        const auto debugGroup(parameters.encoder->createDebugGroup("opaque"));
 
         uint32_t i = 0;
         for (auto it = renderItems.rbegin(); it != renderItems.rend(); ++it, ++i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
-                MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
+                const auto layerDebugGroup(parameters.encoder->createDebugGroup(it->layer.getID().c_str()));
                 it->layer.render(parameters, it->source);
             }
         }
@@ -534,13 +531,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     {
         parameters.pass = RenderPass::Translucent;
-        MBGL_DEBUG_GROUP(parameters.context, "translucent");
+        const auto debugGroup(parameters.encoder->createDebugGroup("translucent"));
 
         uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
         for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
-                MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
+                const auto layerDebugGroup(parameters.encoder->createDebugGroup(it->layer.getID().c_str()));
                 it->layer.render(parameters, it->source);
             }
         }
@@ -549,7 +546,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
     {
-        MBGL_DEBUG_GROUP(parameters.context, "debug");
+        const auto debugGroup(parameters.encoder->createDebugGroup("debug"));
 
         // Finalize the rendering, e.g. by calling debug render calls per tile.
         // This guarantees that we have at least one function per tile called.
