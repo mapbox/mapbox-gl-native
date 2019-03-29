@@ -51,7 +51,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition 
   @Keep
   public OfflineGeometryRegionDefinition(
       String styleURL, Geometry geometry, double minZoom, double maxZoom, float pixelRatio) {
-    this(styleURL, geometry, minZoom, maxZoom, pixelRatio, true);
+    this(styleURL, geometry, minZoom, maxZoom, pixelRatio, false);
   }
 
   /**

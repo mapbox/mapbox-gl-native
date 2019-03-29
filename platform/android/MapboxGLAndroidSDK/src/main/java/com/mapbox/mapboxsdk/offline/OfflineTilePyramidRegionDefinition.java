@@ -48,7 +48,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   @Keep
   public OfflineTilePyramidRegionDefinition(
       String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
-    this(styleURL, bounds, minZoom, maxZoom, pixelRatio, true);
+    this(styleURL, bounds, minZoom, maxZoom, pixelRatio, false);
   }
 
   /**
