@@ -1234,12 +1234,35 @@ public:
 - (void)willMoveToWindow:(UIWindow *)newWindow {
     [super willMoveToWindow:newWindow];
     [self refreshSupportedInterfaceOrientationsWithWindow:newWindow];
+    
+    if (!newWindow)
+    {
+        // See https://github.com/mapbox/mapbox-gl-native/issues/14232
+        // In iOS 12.2, CAEAGLLayer.presentsWithTransaction can cause dramatic
+        // slow down. The exact cause of this is unknown, but this work around
+        // appears to lessen the effects.
+        //
+        // Also, consider calling the new mbgl::Renderer::flush()
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = NO;
+        
+        // Moved from didMoveToWindow
+        [self validateDisplayLink];
+    }
 }
 
 - (void)didMoveToWindow
 {
-    [self validateDisplayLink];
     [super didMoveToWindow];
+    
+    if (self.window)
+    {
+        // See above comment
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = YES;
+        
+        [self validateDisplayLink];
+    }
 }
 
 - (void)didMoveToSuperview
