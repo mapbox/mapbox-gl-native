@@ -19,7 +19,7 @@ using namespace style;
 static_assert(sizeof(LineLayoutVertex) == 12, "expected LineLayoutVertex size");
 
 template <class Values, class...Args>
-Values makeValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+Values makeValues(const style::LinePaintProperties::PossiblyEvaluated& properties,
                   const RenderTile& tile,
                   const TransformState& state,
                   const std::array<float, 2>& pixelsToGLUnits,
@@ -38,7 +38,7 @@ Values makeValues(const RenderLinePaintProperties::PossiblyEvaluated& properties
 }
 
 LineProgram::LayoutUniformValues
-LineProgram::layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+LineProgram::layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated& properties,
                                  const RenderTile& tile,
                                  const TransformState& state,
                                  const std::array<float, 2>& pixelsToGLUnits) {
@@ -51,7 +51,7 @@ LineProgram::layoutUniformValues(const RenderLinePaintProperties::PossiblyEvalua
 }
 
 LineSDFProgram::LayoutUniformValues
-LineSDFProgram::layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+LineSDFProgram::layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated& properties,
                                     float pixelRatio,
                                     const RenderTile& tile,
                                     const TransformState& state,
@@ -88,7 +88,7 @@ LineSDFProgram::layoutUniformValues(const RenderLinePaintProperties::PossiblyEva
 }
 
 LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
-    const RenderLinePaintProperties::PossiblyEvaluated& properties,
+    const style::LinePaintProperties::PossiblyEvaluated& properties,
     const RenderTile& tile,
     const TransformState& state,
     const std::array<float, 2>& pixelsToGLUnits,
@@ -110,7 +110,7 @@ LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
 }
 
 LineGradientProgram::LayoutUniformValues LineGradientProgram::layoutUniformValues(
-    const RenderLinePaintProperties::PossiblyEvaluated& properties,
+    const style::LinePaintProperties::PossiblyEvaluated& properties,
     const RenderTile& tile,
     const TransformState& state,
     const std::array<float, 2>& pixelsToGLUnits) {

@@ -39,7 +39,7 @@ class LineProgram : public Program<
         uniforms::ratio,
         uniforms::gl_units_to_pixels>,
     TypeList<>,
-    RenderLinePaintProperties>
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
@@ -90,7 +90,7 @@ public:
     static const int8_t extrudeScale = 63;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
                         const std::array<float, 2>& pixelsToGLUnits);
@@ -109,13 +109,13 @@ class LinePatternProgram : public Program<
         uniforms::fade>,
     TypeList<
         textures::image>,
-    RenderLinePaintProperties>
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
                         const std::array<float, 2>& pixelsToGLUnits,
@@ -140,13 +140,13 @@ class LineSDFProgram : public Program<
         uniforms::sdfgamma>,
     TypeList<
         textures::image>,
-    RenderLinePaintProperties>
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         float pixelRatio,
                         const RenderTile&,
                         const TransformState&,
@@ -167,13 +167,13 @@ class LineGradientProgram : public Program<
         uniforms::gl_units_to_pixels>,
     TypeList<
         textures::image>,
-    RenderLinePaintProperties>
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
                         const std::array<float, 2>& pixelsToGLUnits);
