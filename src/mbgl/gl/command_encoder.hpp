@@ -7,7 +7,7 @@ namespace gl {
 
 class Context;
 
-class CommandEncoder : public gfx::CommandEncoder {
+class CommandEncoder final : public gfx::CommandEncoder {
 public:
     explicit CommandEncoder(gl::Context& context_) : context(context_) {
     }
@@ -15,6 +15,10 @@ public:
     ~CommandEncoder() override;
 
 private:
+    void pushDebugGroup(const char* name) override;
+    void popDebugGroup() override;
+
+public:
     gl::Context& context;
 };
 

@@ -26,6 +26,7 @@ class UnwrappedTileID;
 
 namespace gfx {
 class Context;
+class CommandEncoder;
 } // namespace gfx
 
 class PaintParameters {
@@ -40,9 +41,11 @@ public:
                     ImageManager&,
                     LineAtlas&,
                     Placement::VariableOffsets);
+    ~PaintParameters();
 
     gfx::Context& context;
     RendererBackend& backend;
+    const std::unique_ptr<gfx::CommandEncoder> encoder;
 
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;
