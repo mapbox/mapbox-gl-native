@@ -357,9 +357,16 @@ final class MapGestureDetector {
       int action = motionEvent.getActionMasked();
       if (action == MotionEvent.ACTION_DOWN) {
         executeDoubleTap = true;
+
+        // disable the move detector in preparation for the quickzoom,
+        // so that we don't move the map's center slightly before the quickzoom is started (see #14227)
+        gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
 
       if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+        // re-enabled the move detector
+        gesturesManager.getMoveGestureDetector().setEnabled(true);
+
         if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled() || !executeDoubleTap) {
           return false;
         }
@@ -496,8 +503,6 @@ final class MapGestureDetector {
         if (!uiSettings.isQuickZoomGesturesEnabled()) {
           return false;
         }
-        // when quickzoom, disable move gesture
-        gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
 
       cancelTransitionsIfRequired();
@@ -538,11 +543,6 @@ final class MapGestureDetector {
 
     @Override
     public void onScaleEnd(@NonNull StandardScaleGestureDetector detector, float velocityX, float velocityY) {
-      if (quickZoom) {
-        //if quickzoom, re-enabling move gesture detector
-        gesturesManager.getMoveGestureDetector().setEnabled(true);
-      }
-
       if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
         // resetting default angle threshold
         gesturesManager.getRotateGestureDetector().setAngleThreshold(
