@@ -850,6 +850,9 @@ jobs:
       - build-test
       - save-dependencies
       - run-unit-tests
+      - run:
+          name: Build offline CLI
+          command: make offline
 
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
