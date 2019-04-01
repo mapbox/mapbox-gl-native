@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+### Features
+ - Enable variable label placement [#14184](https://github.com/mapbox/mapbox-gl-native/pull/14184)
+
 ## 7.3.0 - March 28, 2019
 
 ### Bugs
