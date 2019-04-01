@@ -13,16 +13,19 @@
 
 namespace mbgl {
 
-class RendererBackend;
 class RendererObserver;
 class RenderedQueryOptions;
 class Scheduler;
 class SourceQueryOptions;
 class UpdateParameters;
 
+namespace gfx {
+class RendererBackend;
+} // namespace gfx
+
 class Renderer {
 public:
-    Renderer(RendererBackend&, float pixelRatio_, Scheduler&,
+    Renderer(gfx::RendererBackend&, float pixelRatio_, Scheduler&,
              GLContextMode = GLContextMode::Unique,
              const optional<std::string> programCacheDir = {},
              const optional<std::string> localFontFamily = {});

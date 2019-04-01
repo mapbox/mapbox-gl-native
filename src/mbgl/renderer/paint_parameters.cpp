@@ -9,7 +9,7 @@ namespace mbgl {
 PaintParameters::PaintParameters(gfx::Context& context_,
                     float pixelRatio_,
                     GLContextMode contextMode_,
-                    RendererBackend& backend_,
+                    gfx::RendererBackend& backend_,
                     const UpdateParameters& updateParameters,
                     const EvaluatedLight& evaluatedLight_,
                     RenderStaticData& staticData_,

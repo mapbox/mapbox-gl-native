@@ -1,21 +1,14 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/renderer/renderer_backend.hpp>
+#include <mbgl/gl/renderer_backend.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 
 #include <functional>
 
 using namespace mbgl;
 
-class StubRendererBackend: public RendererBackend {
+class StubRendererBackend: public gl::RendererBackend {
 public:
-    void bind() override {
-    }
-
-    mbgl::Size getFramebufferSize() const override {
-        return mbgl::Size{};
-    }
-
     void activate() override {
         if (activateFunction) activateFunction();
     }
@@ -29,7 +22,13 @@ public:
     }
 
     gl::ProcAddress getExtensionFunctionPointer(const char*) override {
-        return {};
+        abort();
+        return nullptr;
+    }
+
+    gfx::Renderable& getDefaultRenderable() override {
+        abort();
+        return reinterpret_cast<gfx::Renderable&>(*this);
     }
 
     std::function<void ()> activateFunction;

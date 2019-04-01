@@ -14,14 +14,14 @@ using namespace mbgl;
 using namespace mbgl::platform;
 
 TEST(OffscreenTexture, EmptyRed) {
-    HeadlessBackend backend({ 512, 256 });
+    gl::HeadlessBackend backend({ 512, 256 });
     gfx::BackendScope scope { backend };
 
-    // Scissor test shouldn't leak after HeadlessBackend::bind().
+    // Scissor test shouldn't leak after gl::HeadlessBackend::bind().
     MBGL_CHECK_ERROR(glScissor(64, 64, 128, 128));
-    backend.getContext().scissorTest.setCurrentValue(true);
+    static_cast<gl::Context&>(backend.getContext()).scissorTest.setCurrentValue(true);
 
-    backend.bind();
+    backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
     MBGL_CHECK_ERROR(glClearColor(1.0f, 0.0f, 0.0f, 1.0f));
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
@@ -76,9 +76,9 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
-    HeadlessBackend backend({ 512, 256 });
-    auto& context = backend.getContext();
+    gl::HeadlessBackend backend({ 512, 256 });
     gfx::BackendScope scope { backend };
+    auto& context = static_cast<gl::Context&>(backend.getContext());
 
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));
     MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -126,7 +126,7 @@ void main() {
     Buffer triangleBuffer({ 0, 0.5, 0.5, -0.5, -0.5, -0.5 });
     Buffer viewportBuffer({ -1, -1, 1, -1, -1, 1, 1, 1 });
 
-    backend.bind();
+    backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
     // First, draw red to the bound FBO.
     context.clear(Color::red(), {}, {});
@@ -154,7 +154,7 @@ void main() {
     test::checkImage("test/fixtures/offscreen_texture/render-to-texture", image, 0, 0);
 
     // Now reset the FBO back to normal and retrieve the original (restored) framebuffer.
-    backend.bind();
+    backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
     image = backend.readStillImage();
     test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);

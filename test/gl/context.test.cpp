@@ -8,6 +8,7 @@
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
@@ -104,8 +105,8 @@ TEST(GLContextMode, Shared) {
 
     {
         // Custom rendering outside of GL Native render loop.
-        frontend.getBackend()->bind();
         gfx::BackendScope scope { *frontend.getBackend() };
+        frontend.getBackend()->getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
         Shader paintShader(vertexShaderSource, fragmentShaderSource);
         Buffer triangleBuffer({ 0, 0.5, 0.5, -0.5, -0.5, -0.5 });

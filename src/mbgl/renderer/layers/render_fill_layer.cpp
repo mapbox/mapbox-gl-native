@@ -8,8 +8,10 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/context.hpp>
+#include <mbgl/gfx/renderable.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
@@ -63,9 +65,6 @@ bool RenderFillLayer::hasCrossfade() const {
 }
 
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
-    // TODO: remove cast
-    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
-
     if (unevaluated.get<FillPattern>().isUndefined()) {
         for (const RenderTile& tile : renderTiles) {
             auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
@@ -89,7 +88,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                                                   evaluated.get<FillTranslateAnchor>(),
                                                   parameters.state)
                         ),
-                        uniforms::world::Value( glContext.viewport.getCurrentValue().size ),
+                        uniforms::world::Value( parameters.backend.getDefaultRenderable().getSize() ),
                     },
                     paintPropertyBinders,
                     evaluated,
@@ -174,7 +173,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),
-                        glContext.viewport.getCurrentValue().size,
+                        parameters.backend.getDefaultRenderable().getSize(),
                         geometryTile.iconAtlasTexture->size,
                         crossfade,
                         tile.id,

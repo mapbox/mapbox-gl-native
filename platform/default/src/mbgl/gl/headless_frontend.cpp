@@ -1,4 +1,5 @@
 #include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_state.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
@@ -58,7 +59,7 @@ Renderer* HeadlessFrontend::getRenderer() {
     return renderer.get();
 }
 
-RendererBackend* HeadlessFrontend::getBackend() {
+gfx::RendererBackend* HeadlessFrontend::getBackend() {
     return &backend;
 }
 

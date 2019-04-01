@@ -13,9 +13,12 @@ namespace mbgl {
 
 class Scheduler;
 class Renderer;
-class RendererBackend;
 class Map;
 class TransformState;
+
+namespace gfx {
+class RendererBackend;
+} // namespace gfx
 
 class HeadlessFrontend : public RendererFrontend {
 public:
@@ -31,7 +34,7 @@ public:
     void setSize(Size);
 
     Renderer* getRenderer();
-    RendererBackend* getBackend();
+    gfx::RendererBackend* getBackend();
     CameraOptions getCameraOptions();
 
     bool hasImage(const std::string&);
@@ -50,7 +53,7 @@ private:
     Size size;
     float pixelRatio;
 
-    HeadlessBackend backend;
+    gl::HeadlessBackend backend;
     util::AsyncTask asyncInvalidate;
 
     std::unique_ptr<Renderer> renderer;

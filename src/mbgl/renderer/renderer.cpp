@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-Renderer::Renderer(RendererBackend& backend,
+Renderer::Renderer(gfx::RendererBackend& backend,
                    float pixelRatio_,
                    Scheduler& scheduler_,
                    GLContextMode contextMode_,

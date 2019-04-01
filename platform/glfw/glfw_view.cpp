@@ -1,4 +1,5 @@
 #include "glfw_view.hpp"
+#include "glfw_gl_backend.hpp"
 #include "glfw_renderer_frontend.hpp"
 #include "ny_route.hpp"
 
@@ -105,8 +106,10 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     glfwSetKeyCallback(window, onKey);
 
     glfwGetWindowSize(window, &width, &height);
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    pixelRatio = static_cast<float>(fbWidth) / width;
+
+    backend = std::make_unique<GLFWGLBackend>(window);
+
+    pixelRatio = static_cast<float>(backend->getSize().width) / width;
 
     glfwMakeContextCurrent(nullptr);
 
@@ -158,14 +161,8 @@ void GLFWView::setRenderFrontend(GLFWRendererFrontend* rendererFrontend_) {
     rendererFrontend = rendererFrontend_;
 }
 
-void GLFWView::updateAssumedState() {
-    assumeFramebufferBinding(0);
-    assumeViewport(0, 0, getFramebufferSize());
-}
-
-void GLFWView::bind() {
-    setFramebufferBinding(0);
-    setViewport(0, 0, getFramebufferSize());
+mbgl::gfx::RendererBackend& GLFWView::getRendererBackend() {
+    return backend->getRendererBackend();
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -499,11 +496,7 @@ void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
 
 void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
-    view->fbWidth = width;
-    view->fbHeight = height;
-
-    mbgl::gfx::BackendScope scope { *view, mbgl::gfx::BackendScope::ScopeType::Implicit };
-    view->bind();
+    view->backend->setSize({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 
     // This is only triggered when the framebuffer is resized, but not the window. It can
     // happen when you move the window between screens with a different pixel ratio.
@@ -578,7 +571,7 @@ void GLFWView::run() {
 
             updateAnimatedAnnotations();
 
-            activate();
+            mbgl::gfx::BackendScope scope { backend->getRendererBackend() };
 
             rendererFrontend->render();
 
@@ -606,22 +599,6 @@ float GLFWView::getPixelRatio() const {
 
 mbgl::Size GLFWView::getSize() const {
     return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
-}
-
-mbgl::Size GLFWView::getFramebufferSize() const {
-    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
-}
-
-mbgl::gl::ProcAddress GLFWView::getExtensionFunctionPointer(const char* name) {
-    return glfwGetProcAddress(name);
-}
-
-void GLFWView::activate() {
-    glfwMakeContextCurrent(window);
-}
-
-void GLFWView::deactivate() {
-    glfwMakeContextCurrent(nullptr);
 }
 
 void GLFWView::invalidate() {

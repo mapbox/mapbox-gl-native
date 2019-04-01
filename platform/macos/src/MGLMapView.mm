@@ -34,7 +34,8 @@
 #import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/style/image.hpp>
 #import <mbgl/renderer/renderer.hpp>
-#import <mbgl/renderer/renderer_backend.hpp>
+#import <mbgl/gl/renderer_backend.hpp>
+#import <mbgl/gl/renderable_resource.hpp>
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/storage/resource_options.hpp>
 #import <mbgl/math/wrap.hpp>
@@ -3041,10 +3042,27 @@ public:
     _mbglMap->setDebug(options);
 }
 
-/// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::RendererBackend, public mbgl::MapObserver {
+class MGLMapViewImpl;
+
+class MGLMapViewRenderable final : public mbgl::gl::RenderableResource {
 public:
-    MGLMapViewImpl(MGLMapView *nativeView_) : nativeView(nativeView_) {}
+    MGLMapViewRenderable(MGLMapViewImpl& backend_) : backend(backend_) {
+    }
+
+    void bind() override;
+
+private:
+    MGLMapViewImpl& backend;
+};
+
+/// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
+class MGLMapViewImpl : public mbgl::gl::RendererBackend,
+                       public mbgl::gfx::Renderable,
+                       public mbgl::MapObserver {
+public:
+    MGLMapViewImpl(MGLMapView *nativeView_) : mbgl::gfx::Renderable(
+          nativeView_.framebufferSize,
+          std::make_unique<MGLMapViewRenderable>(*this)), nativeView(nativeView_) {}
 
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
         bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;
@@ -3141,6 +3159,10 @@ public:
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
     }
 
+    mbgl::gfx::Renderable& getDefaultRenderable() override {
+        return *this;
+    }
+
     void activate() override {
         if (activationCount++) {
             return;
@@ -3164,13 +3186,9 @@ public:
         assumeViewport(0, 0, nativeView.framebufferSize);
     }
 
-    void bind() override {
+    void restoreFramebufferBinding() {
         setFramebufferBinding(fbo);
         setViewport(0, 0, nativeView.framebufferSize);
-    }
-
-    mbgl::Size getFramebufferSize() const override {
-        return nativeView.framebufferSize;
     }
 
     mbgl::PremultipliedImage readStillImage() {
@@ -3187,5 +3205,9 @@ private:
     /// The reference counted count of activation calls
     NSUInteger activationCount = 0;
 };
+
+void MGLMapViewRenderable::bind() {
+    backend.restoreFramebufferBinding();
+}
 
 @end

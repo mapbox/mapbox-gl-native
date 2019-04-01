@@ -19,7 +19,8 @@
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
+#import <mbgl/gl/renderer_backend.hpp>
+#import <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/geo.hpp>
@@ -6719,10 +6720,26 @@ public:
     return _annotationViewReuseQueueByIdentifier[identifier];
 }
 
-class MBGLView : public mbgl::RendererBackend, public mbgl::MapObserver
-{
+class MBGLView;
+
+class MBGLMapViewRenderable final : public mbgl::gl::RenderableResource {
 public:
-    MBGLView(MGLMapView* nativeView_) : nativeView(nativeView_) {
+    MBGLMapViewRenderable(MBGLView& backend_) : backend(backend_) {
+    }
+
+    void bind() override;
+
+private:
+    MBGLView& backend;
+};
+
+class MBGLView : public mbgl::gl::RendererBackend,
+                 public mbgl::gfx::Renderable,
+                 public mbgl::MapObserver {
+public:
+    MBGLView(MGLMapView* nativeView_)  : mbgl::gfx::Renderable(
+          nativeView_.framebufferSize,
+          std::make_unique<MBGLMapViewRenderable>(*this)), nativeView(nativeView_) {
     }
 
     /// This function is called before we start rendering, when iOS invokes our rendering method.
@@ -6733,7 +6750,7 @@ public:
         assumeViewport(0, 0, nativeView.framebufferSize);
     }
 
-    void bind() override {
+    void restoreFramebufferBinding() {
         if (!implicitFramebufferBound()) {
             // Something modified our state, and we need to bind the original drawable again.
             // Doing this also sets the viewport to the full framebuffer.
@@ -6745,10 +6762,6 @@ public:
             // Our framebuffer is still bound, but the viewport might have changed.
             setViewport(0, 0, nativeView.framebufferSize);
         }
-    }
-
-    mbgl::Size getFramebufferSize() const override {
-        return nativeView.framebufferSize;
     }
 
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
@@ -6855,6 +6868,10 @@ public:
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
     }
 
+    mbgl::gfx::Renderable& getDefaultRenderable() override {
+        return *this;
+    }
+
     void activate() override
     {
         if (activationCount++)
@@ -6876,10 +6893,14 @@ public:
     }
 
 private:
-    __weak MGLMapView *nativeView = nullptr;
+    __weak MGLMapView* nativeView = nullptr;
 
     NSUInteger activationCount = 0;
 };
+
+void MBGLMapViewRenderable::bind() {
+    backend.restoreFramebufferBinding();
+}
 
 @end
 

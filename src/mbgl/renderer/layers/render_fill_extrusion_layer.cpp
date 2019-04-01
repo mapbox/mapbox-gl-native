@@ -4,7 +4,6 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/tile/tile.hpp>
@@ -13,6 +12,7 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/renderable_resource.hpp>
