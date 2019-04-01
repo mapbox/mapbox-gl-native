@@ -1,5 +1,6 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/enum.hpp>
+#include <mbgl/gl/renderer_backend.hpp>
 #include <mbgl/gl/vertex_buffer_resource.hpp>
 #include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/texture_resource.hpp>
@@ -53,12 +54,12 @@ static_assert(underlying_type(UniformDataType::SamplerCube) == GL_SAMPLER_CUBE, 
 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
-Context::Context()
+Context::Context(RendererBackend& backend_)
     : gfx::Context(gfx::ContextType::OpenGL, [] {
           GLint value;
           MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
           return value;
-      }()) {
+      }()), backend(backend_) {
 }
 
 Context::~Context() {
@@ -701,6 +702,7 @@ void Context::setColorMode(const gfx::ColorMode& color) {
 }
 
 std::unique_ptr<gfx::CommandEncoder> Context::createCommandEncoder() {
+    backend.updateAssumedState();
     return std::make_unique<gl::CommandEncoder>(*this);
 }
 

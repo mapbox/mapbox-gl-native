@@ -1,7 +1,6 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_layer.hpp>
@@ -16,7 +15,10 @@
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -35,7 +37,7 @@ static RendererObserver& nullObserver() {
     return observer;
 }
 
-Renderer::Impl::Impl(RendererBackend& backend_,
+Renderer::Impl::Impl(gfx::RendererBackend& backend_,
                      float pixelRatio_,
                      Scheduler& scheduler_,
                      GLContextMode contextMode_,
@@ -307,8 +309,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     observer->onWillStartRenderingFrame();
 
-    backend.updateAssumedState();
-
     // Set render tiles to the render items.
     for (auto& renderItem : renderItems) {
         if (!renderItem.source) {
@@ -364,7 +364,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-
     // TODO: remove cast
     gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
 
@@ -392,7 +391,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
     // depth rbo between them.
     if (parameters.staticData.has3D) {
-        parameters.staticData.backendSize = parameters.backend.getFramebufferSize();
+        parameters.staticData.backendSize = parameters.backend.getDefaultRenderable().getSize();
 
         const auto debugGroup(parameters.encoder->createDebugGroup("3d"));
         parameters.pass = RenderPass::Pass3D;
@@ -420,7 +419,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         using namespace gl::value;
 
-        parameters.backend.bind();
+        parameters.backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
             glContext.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
         } else if (parameters.contextMode == GLContextMode::Shared) {
@@ -600,7 +599,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 void  Renderer::Impl::flush() {
     assert(gfx::BackendScope::exists());
 
-    backend.getContext().flush();
+    gl::Context& glContext = static_cast<gl::Context&>(backend.getContext());
+    glContext.flush();
 }
 
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {

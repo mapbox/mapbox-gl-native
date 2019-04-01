@@ -1,10 +1,9 @@
 #pragma once
 
 namespace mbgl {
+namespace gfx {
 
 class RendererBackend;
-
-namespace gfx {
 
 class BackendScope {
 public:

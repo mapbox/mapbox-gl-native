@@ -27,6 +27,7 @@ namespace gl {
 
 constexpr size_t TextureMax = 64;
 using ProcAddress = void (*)();
+class RendererBackend;
 
 namespace extension {
 class VertexArray;
@@ -36,7 +37,7 @@ class ProgramBinary;
 
 class Context final : public gfx::Context {
 public:
-    Context();
+    Context(RendererBackend&);
     ~Context() override;
     Context(const Context&) = delete;
     Context& operator=(const Context& other) = delete;
@@ -136,6 +137,7 @@ public:
     }
 
 private:
+    RendererBackend& backend;
     bool cleanupOnDestruction = true;
 
     std::unique_ptr<extension::Debugging> debugging;

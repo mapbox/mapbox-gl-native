@@ -45,10 +45,10 @@ TEST(GLObject, Value) {
 }
 
 TEST(GLObject, Store) {
-    HeadlessBackend backend { { 256, 256 } };
+    gl::HeadlessBackend backend { { 256, 256 } };
     gfx::BackendScope scope { backend };
 
-    gl::Context context;
+    gl::Context context{ backend };
     EXPECT_TRUE(context.empty());
 
     gl::UniqueTexture texture = context.createUniqueTexture();

@@ -31,7 +31,7 @@ void GLFWRendererFrontend::render() {
     
     if (!updateParameters) return;
     
-    mbgl::gfx::BackendScope guard { glfwView, mbgl::gfx::BackendScope::ScopeType::Implicit };
+    mbgl::gfx::BackendScope guard { glfwView.getRendererBackend(), mbgl::gfx::BackendScope::ScopeType::Implicit };
 
     // onStyleImageMissing might be called during a render. The user implemented method
     // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.

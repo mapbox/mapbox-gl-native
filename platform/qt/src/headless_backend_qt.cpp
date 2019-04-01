@@ -6,21 +6,22 @@
 #include <cassert>
 
 namespace mbgl {
+namespace gl {
 
-class QtBackendImpl : public HeadlessBackend::Impl {
+class QtBackendImpl final : public HeadlessBackend::Impl {
 public:
-    ~QtBackendImpl() final = default;
+    ~QtBackendImpl() = default;
 
-    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) {
         QOpenGLContext* thisContext = QOpenGLContext::currentContext();
         return thisContext->getProcAddress(name);
     }
 
-    void activateContext() final {
+    void activateContext() {
         widget.makeCurrent();
     }
 
-    void deactivateContext() final {
+    void deactivateContext() {
         widget.doneCurrent();
     }
 
@@ -33,4 +34,5 @@ void HeadlessBackend::createImpl() {
     impl = std::make_unique<QtBackendImpl>();
 }
 
+} // namespace gl
 } // namespace mbgl

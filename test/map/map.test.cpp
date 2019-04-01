@@ -614,8 +614,8 @@ TEST(Map, AddLayer) {
 TEST(Map, WithoutVAOExtension) {
     MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
 
-    test.frontend.getBackend()->getContext().disableVAOExtension = true;
     gfx::BackendScope scope { *test.frontend.getBackend() };
+    static_cast<gl::Context&>(test.frontend.getBackend()->getContext()).disableVAOExtension = true;
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 

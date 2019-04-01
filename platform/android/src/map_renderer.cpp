@@ -1,6 +1,7 @@
 #include "map_renderer.hpp"
 
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -158,6 +159,9 @@ void MapRenderer::render(JNIEnv&) {
 void MapRenderer::onSurfaceCreated(JNIEnv&) {
     // Lock as the initialization can come from the main thread or the GL thread first
     std::lock_guard<std::mutex> lock(initialisationMutex);
+
+    // The GL context is already active if get a new surface.
+    gfx::BackendScope backendGuard { *backend, gfx::BackendScope::ScopeType::Implicit };
 
     // The android system will have already destroyed the underlying
     // GL resources if this is not the first initialization and an

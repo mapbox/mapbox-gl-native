@@ -1,6 +1,8 @@
 #include "qmapboxgl_map_renderer.hpp"
 #include "qmapboxgl_scheduler.hpp"
 
+#include <mbgl/gfx/backend_scope.hpp>
+
 #include <QThreadStorage>
 #include <QtGlobal>
 

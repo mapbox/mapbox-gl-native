@@ -1,6 +1,8 @@
 #include "android_renderer_backend.hpp"
 
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 
 #include <EGL/egl.h>
 
@@ -9,18 +11,27 @@
 namespace mbgl {
 namespace android {
 
-/**
- * From mbgl::View
- */
-void AndroidRendererBackend::bind() {
-    assert(gfx::BackendScope::exists());
-    setFramebufferBinding(0);
-    setViewport(0, 0, getFramebufferSize());
+class AndroidGLRenderableResource final : public mbgl::gl::RenderableResource {
+public:
+    AndroidGLRenderableResource(AndroidRendererBackend& backend_) : backend(backend_) {
+    }
+
+    void bind() override {
+        assert(gfx::BackendScope::exists());
+        backend.setFramebufferBinding(0);
+        backend.setViewport(0, 0, backend.getSize());
+    }
+
+private:
+    AndroidRendererBackend& backend;
+};
+
+AndroidRendererBackend::AndroidRendererBackend()
+    : mbgl::gfx::Renderable({ 64, 64 }, std::make_unique<AndroidGLRenderableResource>(*this)) {
 }
 
-/**
- * From mbgl::RendererBackend.
- */
+AndroidRendererBackend::~AndroidRendererBackend() = default;
+
 gl::ProcAddress AndroidRendererBackend::getExtensionFunctionPointer(const char* name) {
     assert(gfx::BackendScope::exists());
     return eglGetProcAddress(name);
@@ -28,34 +39,26 @@ gl::ProcAddress AndroidRendererBackend::getExtensionFunctionPointer(const char* 
 
 void AndroidRendererBackend::updateViewPort() {
     assert(gfx::BackendScope::exists());
-    setViewport(0, 0, getFramebufferSize());
+    setViewport(0, 0, size);
 }
 
 void AndroidRendererBackend::resizeFramebuffer(int width, int height) {
-    fbWidth = width;
-    fbHeight = height;
+    size = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 }
 
-PremultipliedImage AndroidRendererBackend::readFramebuffer() const {
+PremultipliedImage AndroidRendererBackend::readFramebuffer() {
     assert(gfx::BackendScope::exists());
-    return RendererBackend::readFramebuffer(getFramebufferSize());
+    return gl::RendererBackend::readFramebuffer(size);
 }
 
-mbgl::Size AndroidRendererBackend::getFramebufferSize() const {
-    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
-}
-
-/**
- * From mbgl::RendererBackend.
- */
 void AndroidRendererBackend::updateAssumedState() {
     assumeFramebufferBinding(0);
-    assumeViewport(0, 0, getFramebufferSize());
+    assumeViewport(0, 0, size);
 }
 
 void AndroidRendererBackend::markContextLost() {
     if (context) {
-        context->setCleanupOnDestruction(false);
+        getGLContext().setCleanupOnDestruction(false);
     }
 }
 

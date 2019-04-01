@@ -1,5 +1,5 @@
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
 #include <mbgl/util/thread_local.hpp>
 
 #include <cassert>
