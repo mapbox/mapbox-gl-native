@@ -77,9 +77,11 @@ final class LocationCameraController {
   void initializeOptions(LocationComponentOptions options) {
     this.options = options;
     if (options.trackingGesturesManagement()) {
-      mapboxMap.setGesturesManager(internalGesturesManager, true, true);
+      if (mapboxMap.getGesturesManager() != internalGesturesManager) {
+        mapboxMap.setGesturesManager(internalGesturesManager, true, true);
+      }
       adjustGesturesThresholds();
-    } else {
+    } else if (mapboxMap.getGesturesManager() != initialGesturesManager) {
       mapboxMap.setGesturesManager(initialGesturesManager, true, true);
     }
   }
