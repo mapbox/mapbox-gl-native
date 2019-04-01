@@ -408,6 +408,7 @@ public class LocationCameraControllerTest {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
     AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
+    when(mapboxMap.getGesturesManager()).thenReturn(initialGesturesManager);
     LocationCameraController camera = buildCamera(mapboxMap, initialGesturesManager, internalGesturesManager);
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     when(options.trackingGesturesManagement()).thenReturn(true);
@@ -421,12 +422,41 @@ public class LocationCameraControllerTest {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
     AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
+    when(mapboxMap.getGesturesManager()).thenReturn(internalGesturesManager);
     LocationCameraController camera = buildCamera(mapboxMap, initialGesturesManager, internalGesturesManager);
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     when(options.trackingGesturesManagement()).thenReturn(false);
     camera.initializeOptions(options);
 
     verify(mapboxMap).setGesturesManager(initialGesturesManager, true, true);
+  }
+
+  @Test
+  public void gesturesManagement_optionNotChangedInitial() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
+    when(mapboxMap.getGesturesManager()).thenReturn(initialGesturesManager);
+    LocationCameraController camera = buildCamera(mapboxMap, initialGesturesManager, internalGesturesManager);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    when(options.trackingGesturesManagement()).thenReturn(false);
+    camera.initializeOptions(options);
+
+    verify(mapboxMap, times(0)).setGesturesManager(initialGesturesManager, true, true);
+  }
+
+  @Test
+  public void gesturesManagement_optionNotChangedInternal() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
+    when(mapboxMap.getGesturesManager()).thenReturn(internalGesturesManager);
+    LocationCameraController camera = buildCamera(mapboxMap, initialGesturesManager, internalGesturesManager);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    when(options.trackingGesturesManagement()).thenReturn(true);
+    camera.initializeOptions(options);
+
+    verify(mapboxMap, times(0)).setGesturesManager(internalGesturesManager, true, true);
   }
 
   @Test
