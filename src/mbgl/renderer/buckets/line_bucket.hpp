@@ -17,14 +17,11 @@ class RenderLineLayer;
 
 class LineBucket final : public Bucket {
 public:
-
-    // These aliases are used by the PatternLayout template
-    using RenderLayerType = RenderLineLayer;
     using PossiblyEvaluatedPaintProperties = style::LinePaintProperties::PossiblyEvaluated;
     using PossiblyEvaluatedLayoutProperties = style::LineLayoutProperties::PossiblyEvaluated;
 
     LineBucket(const PossiblyEvaluatedLayoutProperties layout,
-               std::map<std::string, PossiblyEvaluatedPaintProperties> layerPaintProperties,
+               const std::map<std::string, PossiblyEvaluatedPaintProperties>& layerPaintProperties,
                const float zoom,
                const uint32_t overscaling);
     ~LineBucket() override;
@@ -77,8 +74,6 @@ private:
 
     const float zoom;
     const uint32_t overscaling;
-
-    float getLineWidth(const RenderLineLayer& layer) const;
 };
 
 } // namespace mbgl

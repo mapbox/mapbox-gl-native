@@ -19,25 +19,31 @@ namespace mbgl {
 
 using namespace style;
 
-RenderHeatmapLayer::RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-    unevaluated(impl().paint.untransitioned()), colorRamp({256, 1}) {
+inline const HeatmapLayer::Impl& impl(const Immutable<Layer::Impl>& impl) {
+    return static_cast<const HeatmapLayer::Impl&>(*impl);
 }
 
-const style::HeatmapLayer::Impl& RenderHeatmapLayer::impl() const {
-    return static_cast<const style::HeatmapLayer::Impl&>(*baseImpl);
+RenderHeatmapLayer::RenderHeatmapLayer(Immutable<HeatmapLayer::Impl> _impl)
+    : RenderLayer(makeMutable<HeatmapLayerProperties>(std::move(_impl))),
+    unevaluated(impl(baseImpl).paint.untransitioned()), colorRamp({256, 1}) {
 }
+
+RenderHeatmapLayer::~RenderHeatmapLayer() = default;
 
 void RenderHeatmapLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderHeatmapLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
+    auto properties = makeMutable<HeatmapLayerProperties>(
+        staticImmutableCast<HeatmapLayer::Impl>(baseImpl),
+        unevaluated.evaluate(parameters));
 
-    passes = (evaluated.get<style::HeatmapOpacity>() > 0)
+    passes = (properties->evaluated.get<style::HeatmapOpacity>() > 0)
             ? (RenderPass::Translucent | RenderPass::Pass3D)
             : RenderPass::None;
+
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderHeatmapLayer::hasTransition() const {
@@ -52,7 +58,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
+    const auto& evaluated = static_cast<const HeatmapLayerProperties&>(*evaluatedProperties).evaluated;
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& viewportSize = parameters.staticData.backendSize;
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};

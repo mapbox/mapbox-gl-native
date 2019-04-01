@@ -17,14 +17,17 @@
 namespace mbgl {
 
 using namespace style;
-RenderHillshadeLayer::RenderHillshadeLayer(Immutable<style::HillshadeLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-      unevaluated(impl().paint.untransitioned()) {
+
+inline const HillshadeLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const HillshadeLayer::Impl&>(*impl);
 }
 
-const style::HillshadeLayer::Impl& RenderHillshadeLayer::impl() const {
-    return static_cast<const style::HillshadeLayer::Impl&>(*baseImpl);
+RenderHillshadeLayer::RenderHillshadeLayer(Immutable<style::HillshadeLayer::Impl> _impl)
+    : RenderLayer(makeMutable<HillshadeLayerProperties>(std::move(_impl))),
+      unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
+
+RenderHillshadeLayer::~RenderHillshadeLayer() = default;
 
 const std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTileID& id) {
    const LatLng latlng0 = LatLng(id);
@@ -32,21 +35,26 @@ const std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTile
    return {{ (float)latlng0.latitude(), (float)latlng1.latitude() }};
 }
 
-const std::array<float, 2> RenderHillshadeLayer::getLight(const PaintParameters& parameters){
+const std::array<float, 2> RenderHillshadeLayer::getLight(const PaintParameters& parameters) {
+    const auto& evaluated = static_cast<const HillshadeLayerProperties&>(*evaluatedProperties).evaluated;
     float azimuthal = evaluated.get<HillshadeIlluminationDirection>() * util::DEG2RAD;
     if (evaluated.get<HillshadeIlluminationAnchor>() == HillshadeIlluminationAnchorType::Viewport) azimuthal = azimuthal - parameters.state.getBearing();
     return {{evaluated.get<HillshadeExaggeration>(), azimuthal}};
 }
 
 void RenderHillshadeLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderHillshadeLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
-    passes = (evaluated.get<style::HillshadeExaggeration >() > 0)
+    auto properties = makeMutable<HillshadeLayerProperties>(
+        staticImmutableCast<HillshadeLayer::Impl>(baseImpl),
+        unevaluated.evaluate(parameters));
+    passes = (properties->evaluated.get<style::HillshadeExaggeration >() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
+
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderHillshadeLayer::hasTransition() const {
@@ -60,7 +68,7 @@ bool RenderHillshadeLayer::hasCrossfade() const {
 void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src) {
     if (parameters.pass != RenderPass::Translucent && parameters.pass != RenderPass::Pass3D)
         return;
-
+    const auto& evaluated = static_cast<const HillshadeLayerProperties&>(*evaluatedProperties).evaluated;
     auto* demsrc = static_cast<RenderRasterDEMSource*>(src);
     const uint8_t TERRAIN_RGB_MAXZOOM = 15;
     const uint8_t maxzoom = demsrc != nullptr ? demsrc->getMaxZoom() : TERRAIN_RGB_MAXZOOM;

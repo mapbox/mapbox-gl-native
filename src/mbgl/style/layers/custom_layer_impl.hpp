@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layer_properties.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 
 #include <memory>
@@ -22,6 +23,12 @@ public:
     std::shared_ptr<CustomLayerHost> host;
 
     DECLARE_LAYER_TYPE_INFO;
+};
+
+class CustomLayerProperties final : public LayerProperties {
+public:
+    explicit CustomLayerProperties(Immutable<CustomLayer::Impl> impl)
+        : LayerProperties(std::move(impl)) {}
 };
 
 } // namespace style

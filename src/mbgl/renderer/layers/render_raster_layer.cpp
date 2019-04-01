@@ -14,23 +14,27 @@ namespace mbgl {
 
 using namespace style;
 
-RenderRasterLayer::RenderRasterLayer(Immutable<style::RasterLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-      unevaluated(impl().paint.untransitioned()) {
+inline const RasterLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const RasterLayer::Impl&>(*impl);
 }
 
-const style::RasterLayer::Impl& RenderRasterLayer::impl() const {
-    return static_cast<const style::RasterLayer::Impl&>(*baseImpl);
+RenderRasterLayer::RenderRasterLayer(Immutable<style::RasterLayer::Impl> _impl)
+    : RenderLayer(makeMutable<RasterLayerProperties>(std::move(_impl))),
+      unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
+
+RenderRasterLayer::~RenderRasterLayer() = default;
 
 void RenderRasterLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderRasterLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
-
-    passes = evaluated.get<style::RasterOpacity>() > 0 ? RenderPass::Translucent : RenderPass::None;
+    auto properties = makeMutable<RasterLayerProperties>(
+        staticImmutableCast<RasterLayer::Impl>(baseImpl),
+        unevaluated.evaluate(parameters));
+    passes = properties->evaluated.get<style::RasterOpacity>() > 0 ? RenderPass::Translucent : RenderPass::None;
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderRasterLayer::hasTransition() const {
@@ -72,7 +76,7 @@ static std::array<float, 3> spinWeights(float spin) {
 void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source) {
     if (parameters.pass != RenderPass::Translucent)
         return;
-
+    const auto& evaluated = static_cast<const RasterLayerProperties&>(*evaluatedProperties).evaluated;
     RasterProgram::Binders paintAttributeData{ evaluated, 0 };
 
     auto draw = [&] (const mat4& matrix,

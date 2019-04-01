@@ -20,22 +20,27 @@ namespace mbgl {
 
 using namespace style;
 
-RenderFillLayer::RenderFillLayer(Immutable<style::FillLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-      unevaluated(impl().paint.untransitioned()) {
+inline const FillLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const FillLayer::Impl&>(*impl);
 }
 
-const style::FillLayer::Impl& RenderFillLayer::impl() const {
-    return static_cast<const style::FillLayer::Impl&>(*baseImpl);
+RenderFillLayer::RenderFillLayer(Immutable<style::FillLayer::Impl> _impl)
+    : RenderLayer(makeMutable<FillLayerProperties>(std::move(_impl))),
+      unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
+
+RenderFillLayer::~RenderFillLayer() = default;
 
 void RenderFillLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
-    crossfade = parameters.getCrossfadeParameters();
+    auto properties = makeMutable<FillLayerProperties>(
+        staticImmutableCast<FillLayer::Impl>(baseImpl),
+        parameters.getCrossfadeParameters(),
+        unevaluated.evaluate(parameters));
+    auto& evaluated = properties->evaluated;
 
     if (unevaluated.get<style::FillOutlineColor>().isUndefined()) {
         evaluated.get<style::FillOutlineColor>() = evaluated.get<style::FillColor>();
@@ -54,6 +59,8 @@ void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     } else {
         passes |= RenderPass::Opaque;
     }
+
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderFillLayer::hasTransition() const {
@@ -61,10 +68,12 @@ bool RenderFillLayer::hasTransition() const {
 }
 
 bool RenderFillLayer::hasCrossfade() const {
-    return crossfade.t != 1;
+    return static_cast<const FillLayerProperties&>(*evaluatedProperties).crossfade.t != 1;
 }
 
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
+    const auto& evaluated = static_cast<const FillLayerProperties&>(*evaluatedProperties).evaluated;
+    const auto& crossfade = static_cast<const FillLayerProperties&>(*evaluatedProperties).crossfade;
     if (unevaluated.get<FillPattern>().isUndefined()) {
         for (const RenderTile& tile : renderTiles) {
             auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
@@ -240,7 +249,7 @@ bool RenderFillLayer::queryIntersectsFeature(
         const TransformState& transformState,
         const float pixelsToTileUnits,
         const mat4&) const {
-
+    const auto& evaluated = static_cast<const FillLayerProperties&>(*evaluatedProperties).evaluated;
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::FillTranslate>(),

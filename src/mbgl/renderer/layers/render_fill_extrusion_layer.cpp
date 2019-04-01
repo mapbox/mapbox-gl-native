@@ -20,26 +20,31 @@ namespace mbgl {
 
 using namespace style;
 
-RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-      unevaluated(impl().paint.untransitioned()) {
+inline const FillExtrusionLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const FillExtrusionLayer::Impl&>(*impl);
 }
 
-const style::FillExtrusionLayer::Impl& RenderFillExtrusionLayer::impl() const {
-    return static_cast<const style::FillExtrusionLayer::Impl&>(*baseImpl);
+RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
+    : RenderLayer(makeMutable<FillExtrusionLayerProperties>(std::move(_impl))),
+      unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
+
+RenderFillExtrusionLayer::~RenderFillExtrusionLayer() = default;
 
 void RenderFillExtrusionLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
-    crossfade = parameters.getCrossfadeParameters();
+    auto properties = makeMutable<FillExtrusionLayerProperties>(
+        staticImmutableCast<FillExtrusionLayer::Impl>(baseImpl),
+        parameters.getCrossfadeParameters(),
+        unevaluated.evaluate(parameters));
 
-    passes = (evaluated.get<style::FillExtrusionOpacity>() > 0)
+    passes = (properties->evaluated.get<style::FillExtrusionOpacity>() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderFillExtrusionLayer::hasTransition() const {
@@ -47,14 +52,15 @@ bool RenderFillExtrusionLayer::hasTransition() const {
 }
 
 bool RenderFillExtrusionLayer::hasCrossfade() const {
-    return crossfade.t != 1;
+    return static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).crossfade.t != 1;
 }
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
+    const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
+    const auto& crossfade = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).crossfade;
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& size = parameters.staticData.backendSize;
 
@@ -222,7 +228,7 @@ bool RenderFillExtrusionLayer::queryIntersectsFeature(
         const TransformState& transformState,
         const float pixelsToTileUnits,
         const mat4&) const {
-
+    const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::FillExtrusionTranslate>(),

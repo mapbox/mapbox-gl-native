@@ -18,28 +18,34 @@ namespace mbgl {
 
 using namespace style;
 
+inline const LineLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const LineLayer::Impl&>(*impl);
+}
+
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-      unevaluated(impl().paint.untransitioned()),
+    : RenderLayer(makeMutable<LineLayerProperties>(std::move(_impl))),
+      unevaluated(impl(baseImpl).paint.untransitioned()),
       colorRamp({256, 1}) {
 }
 
-const style::LineLayer::Impl& RenderLineLayer::impl() const {
-    return static_cast<const style::LineLayer::Impl&>(*baseImpl);
-}
+RenderLineLayer::~RenderLineLayer() = default;
 
 void RenderLineLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
-    crossfade = parameters.getCrossfadeParameters();
+    auto properties = makeMutable<LineLayerProperties>(
+        staticImmutableCast<LineLayer::Impl>(baseImpl),
+        parameters.getCrossfadeParameters(),
+        unevaluated.evaluate(parameters));
+    auto& evaluated = properties->evaluated;
 
     passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0
               && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
               && evaluated.get<style::LineWidth>().constantOr(1.0) > 0)
              ? RenderPass::Translucent : RenderPass::None;
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderLineLayer::hasTransition() const {
@@ -47,13 +53,15 @@ bool RenderLineLayer::hasTransition() const {
 }
 
 bool RenderLineLayer::hasCrossfade() const {
-    return crossfade.t != 1;
+    return static_cast<const LineLayerProperties&>(*evaluatedProperties).crossfade.t != 1;
 }
 
 void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
+    const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
+    const auto& crossfade = static_cast<const LineLayerProperties&>(*evaluatedProperties).crossfade;
 
     for (const RenderTile& tile : renderTiles) {
         auto bucket_ = tile.tile.getBucket<LineBucket>(*baseImpl);
@@ -213,7 +221,7 @@ bool RenderLineLayer::queryIntersectsFeature(
         const TransformState& transformState,
         const float pixelsToTileUnits,
         const mat4&) const {
-
+    const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
     // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
@@ -259,6 +267,7 @@ void RenderLineLayer::updateColorRamp() {
 }
 
 float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {
+    const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
     float lineWidth = evaluated.get<style::LineWidth>()
             .evaluate(feature, zoom, style::LineWidth::defaultValue());
     float gapWidth = evaluated.get<style::LineGapWidth>()

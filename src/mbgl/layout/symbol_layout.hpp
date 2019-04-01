@@ -16,7 +16,6 @@ namespace mbgl {
 
 class BucketParameters;
 class Anchor;
-class RenderLayer;
 class PlacedSymbol;
 
 namespace style {
@@ -26,7 +25,7 @@ class Filter;
 class SymbolLayout final : public Layout {
 public:
     SymbolLayout(const BucketParameters&,
-                 const std::vector<const RenderLayer*>&,
+                 const std::vector<Immutable<style::LayerProperties>>&,
                  std::unique_ptr<GeometryTileLayer>,
                  ImageDependencies&,
                  GlyphDependencies&);

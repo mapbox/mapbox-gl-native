@@ -16,8 +16,6 @@ class RenderFillExtrusionLayer;
 class FillExtrusionBucket final : public Bucket {
 public:
     ~FillExtrusionBucket() override;
-    // These aliases are used by the PatternLayout template
-    using RenderLayerType = RenderFillExtrusionLayer;
     using PossiblyEvaluatedPaintProperties = style::FillExtrusionPaintProperties::PossiblyEvaluated;
     using PossiblyEvaluatedLayoutProperties = style::Properties<>::PossiblyEvaluated;
 

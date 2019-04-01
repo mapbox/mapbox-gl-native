@@ -3,6 +3,7 @@
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/style/layer_properties.hpp>
 
 namespace mbgl {
 
@@ -22,31 +23,32 @@ public:
     PatternLayerMap patterns;
 };
 
-template <class B>
+template <class BucketType,
+          class LayerPropertiesType,
+          class PatternPropertyType,
+          class PossiblyEvaluatedPaintPropertiesType,
+          class PossiblyEvaluatedLayoutPropertiesType = typename style::Properties<>::PossiblyEvaluated>
 class PatternLayout : public Layout {
 public:
     PatternLayout(const BucketParameters& parameters,
-                  const std::vector<const RenderLayer*>& layers,
+                  const std::vector<Immutable<style::LayerProperties>>& group,
                   std::unique_ptr<GeometryTileLayer> sourceLayer_,
                   ImageDependencies& patternDependencies)
-                  : Layout(),
-                    bucketLeaderID(layers.at(0)->getID()),
-                    sourceLayer(std::move(sourceLayer_)),
+                  : sourceLayer(std::move(sourceLayer_)),
                     zoom(parameters.tileID.overscaledZ),
                     overscaling(parameters.tileID.overscaleFactor()),
                     hasPattern(false) {
+        assert(!group.empty());
+        auto leaderLayerProperties = staticImmutableCast<LayerPropertiesType>(group.front());
+        layout = leaderLayerProperties->layerImpl().layout.evaluate(PropertyEvaluationParameters(zoom));
+        sourceLayerID = leaderLayerProperties->layerImpl().sourceLayer;
+        bucketLeaderID = leaderLayerProperties->layerImpl().id;
 
-        using PatternLayer = typename B::RenderLayerType;
-        const auto renderLayer = static_cast<const PatternLayer*>(layers.at(0));
-        const typename PatternLayer::StyleLayerImpl& leader = renderLayer->impl();
-        layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
-        sourceLayerID = leader.sourceLayer;
-        groupID = renderLayer->getID();
-
-        for (const auto& layer : layers) {
-            const typename B::PossiblyEvaluatedPaintProperties evaluatedProps = static_cast<const PatternLayer*>(layer)->evaluated;
-            const auto patternProperty = evaluatedProps.template get<typename PatternLayer::PatternProperty>();
-            const auto constantPattern = patternProperty.constantOr({ "", "" });
+        for (const auto& layerProperties : group) {
+            const std::string& layerId = layerProperties->baseImpl->id;
+            const auto evaluatedProps = static_cast<const LayerPropertiesType&>(*layerProperties).evaluated;
+            const auto patternProperty = evaluatedProps.template get<PatternPropertyType>();
+            const auto constantPattern = patternProperty.constantOr(Faded<std::basic_string<char> >{ "", ""});
             // determine if layer group has any layers that use *-pattern property and add
             // constant pattern dependencies.
             if (!patternProperty.isConstant()) {
@@ -56,33 +58,34 @@ public:
                 patternDependencies.emplace(constantPattern.to, ImageType::Pattern);
                 patternDependencies.emplace(constantPattern.from, ImageType::Pattern);
             }
-            layerPaintProperties.emplace(layer->getID(), std::move(evaluatedProps));
+            layerPaintProperties.emplace(layerId, std::move(evaluatedProps));
         }
 
         const size_t featureCount = sourceLayer->featureCount();
         for (size_t i = 0; i < featureCount; ++i) {
             auto feature = sourceLayer->getFeature(i);
-            if (!leader.filter(style::expression::EvaluationContext { this->zoom, feature.get() }))
+            if (!leaderLayerProperties->layerImpl().filter(style::expression::EvaluationContext { this->zoom, feature.get() }))
                 continue;
 
             PatternLayerMap patternDependencyMap;
             if (hasPattern) {
-                for (const auto& layer : layers) {
-                    const auto it = layerPaintProperties.find(layer->getID());
+                for (const auto& layerProperties : group) {
+                    const std::string& layerId = layerProperties->baseImpl->id;
+                    const auto it = layerPaintProperties.find(layerId);
                     if (it != layerPaintProperties.end()) {
                         const auto paint = it->second;
-                        const auto patternProperty = paint.template get<typename PatternLayer::PatternProperty>();
+                        const auto patternProperty = paint.template get<PatternPropertyType>();
                         if (!patternProperty.isConstant()) {
                             // For layers with non-data-constant pattern properties, evaluate their expression and add
                             // the patterns to the dependency vector
-                            const auto min = patternProperty.evaluate(*feature, zoom - 1, PatternLayer::PatternProperty::defaultValue());
-                            const auto mid = patternProperty.evaluate(*feature, zoom, PatternLayer::PatternProperty::defaultValue());
-                            const auto max = patternProperty.evaluate(*feature, zoom + 1, PatternLayer::PatternProperty::defaultValue());
+                            const auto min = patternProperty.evaluate(*feature, zoom - 1, PatternPropertyType::defaultValue());
+                            const auto mid = patternProperty.evaluate(*feature, zoom, PatternPropertyType::defaultValue());
+                            const auto max = patternProperty.evaluate(*feature, zoom + 1, PatternPropertyType::defaultValue());
 
                             patternDependencies.emplace(min.to, ImageType::Pattern);
                             patternDependencies.emplace(mid.to, ImageType::Pattern);
                             patternDependencies.emplace(max.to, ImageType::Pattern);
-                            patternDependencyMap.emplace(layer->getID(), PatternDependency {min.to, mid.to, max.to});
+                            patternDependencyMap.emplace(layerId, PatternDependency {min.to, mid.to, max.to});
 
                         }
                     }
@@ -99,15 +102,15 @@ public:
     }
 
     void createBucket(const ImagePositions& patternPositions, std::unique_ptr<FeatureIndex>& featureIndex, std::unordered_map<std::string, std::shared_ptr<Bucket>>& buckets, const bool, const bool) override {
-        auto bucket = std::make_shared<B>(layout, layerPaintProperties, zoom, overscaling);
+        auto bucket = std::make_shared<BucketType>(layout, layerPaintProperties, zoom, overscaling);
         for (auto & patternFeature : features) {
             const auto i = patternFeature.i;
             std::unique_ptr<GeometryTileFeature> feature = std::move(patternFeature.feature);
-            PatternLayerMap patterns = patternFeature.patterns;
+            const PatternLayerMap& patterns = patternFeature.patterns;
             GeometryCollection geometries = feature->getGeometries();
 
             bucket->addFeature(*feature, geometries, patternPositions, patterns);
-            featureIndex->insert(geometries, i, sourceLayerID, groupID);
+            featureIndex->insert(geometries, i, sourceLayerID, bucketLeaderID);
         }
         if (bucket->hasData()) {
             for (const auto& pair : layerPaintProperties) {
@@ -116,19 +119,18 @@ public:
         }
     };
 
-    std::map<std::string, typename B::PossiblyEvaluatedPaintProperties> layerPaintProperties;
-    const std::string bucketLeaderID;
+    std::map<std::string, PossiblyEvaluatedPaintPropertiesType> layerPaintProperties;
+    std::string bucketLeaderID;
 
 
 private:
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
     std::vector<PatternFeature> features;
-    typename B::PossiblyEvaluatedLayoutProperties layout;
+    PossiblyEvaluatedLayoutPropertiesType layout;
 
     const float zoom;
     const uint32_t overscaling;
     std::string sourceLayerID;
-    std::string groupID;
     bool hasPattern;
 };
 
