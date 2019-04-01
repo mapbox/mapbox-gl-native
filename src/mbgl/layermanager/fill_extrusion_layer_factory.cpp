@@ -26,8 +26,10 @@ std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::
 
 std::unique_ptr<Layout> FillExtrusionLayerFactory::createLayout(const LayoutParameters& parameters,
                                                                 std::unique_ptr<GeometryTileLayer> layer,
-                                                                const std::vector<const RenderLayer*>& group) noexcept {
-    return std::make_unique<PatternLayout<FillExtrusionBucket>>(parameters.bucketParameters, group, std::move(layer), parameters.imageDependencies);
+                                                                const std::vector<Immutable<style::LayerProperties>>& group) noexcept {
+    using namespace style;
+    using LayoutType = PatternLayout<FillExtrusionBucket, FillExtrusionLayerProperties, FillExtrusionPattern, FillExtrusionPaintProperties::PossiblyEvaluated>;
+    return std::make_unique<LayoutType>(parameters.bucketParameters, group, std::move(layer), parameters.imageDependencies);
 }
 
 std::unique_ptr<RenderLayer> FillExtrusionLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {

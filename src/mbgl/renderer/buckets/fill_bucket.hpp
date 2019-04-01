@@ -18,8 +18,6 @@ class RenderFillLayer;
 class FillBucket final : public Bucket {
 public:
     ~FillBucket() override;
-    // These aliases are used by the PatternLayout template
-    using RenderLayerType = RenderFillLayer;
     using PossiblyEvaluatedPaintProperties = style::FillPaintProperties::PossiblyEvaluated;
     using PossiblyEvaluatedLayoutProperties = style::Properties<>::PossiblyEvaluated;
 

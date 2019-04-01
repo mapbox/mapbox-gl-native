@@ -24,7 +24,7 @@ std::unique_ptr<style::Layer> HeatmapLayerFactory::createLayer(const std::string
     return layer;
 }
 
-std::unique_ptr<Bucket> HeatmapLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) noexcept {
+std::unique_ptr<Bucket> HeatmapLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<Immutable<style::LayerProperties>>& layers) noexcept {
     return std::make_unique<HeatmapBucket>(parameters, layers);
 }
 

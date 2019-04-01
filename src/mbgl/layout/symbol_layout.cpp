@@ -40,16 +40,18 @@ expression::Value sectionOptionsToValue(const SectionOptions& options) {
     }
     return result;
 }
+
+inline const SymbolLayerProperties& toSymbolLayerProperties(const Immutable<LayerProperties>& layer) {
+    return static_cast<const SymbolLayerProperties&>(*layer);
+}
+
 } // namespace
-
-
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
-                           const std::vector<const RenderLayer*>& layers,
+                           const std::vector<Immutable<style::LayerProperties>>& layers,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : Layout(),
-      bucketLeaderID(layers.at(0)->getID()),
+    : bucketLeaderID(layers.front()->baseImpl->id),
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
@@ -57,11 +59,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<TextSize>()),
-      iconSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<IconSize>())
+      textSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<TextSize>()),
+      iconSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<IconSize>())
     {
 
-    const SymbolLayer::Impl& leader = toRenderSymbolLayer(layers.at(0))->impl();
+    const SymbolLayer::Impl& leader = toSymbolLayerProperties(layers.at(0)).layerImpl();
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
@@ -104,7 +106,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
 
     for (const auto& layer : layers) {
-        layerPaintProperties.emplace(layer->getID(), toRenderSymbolLayer(layer)->evaluated);
+        layerPaintProperties.emplace(layer->baseImpl->id, toSymbolLayerProperties(layer).evaluated);
     }
 
     // Determine glyph dependencies

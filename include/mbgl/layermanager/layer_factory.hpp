@@ -6,6 +6,9 @@
 
 namespace mbgl {
 
+namespace style {
+class LayerProperties;
+}  // namespace style
 class Bucket;
 class BucketParameters;
 class GeometryTileLayer;
@@ -28,9 +31,9 @@ public:
     /// Returns a new RenderLayer instance.
     virtual std::unique_ptr<RenderLayer> createRenderLayer(Immutable<style::Layer::Impl>) noexcept = 0;
     /// Returns a new Bucket instance on success call; returns `nullptr` otherwise. 
-    virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) noexcept;
+    virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<Immutable<style::LayerProperties>>&) noexcept;
     /// Returns a new Layout instance on success call; returns `nullptr` otherwise. 
-    virtual std::unique_ptr<Layout> createLayout(const LayoutParameters&, std::unique_ptr<GeometryTileLayer>, const std::vector<const RenderLayer*>&) noexcept;
+    virtual std::unique_ptr<Layout> createLayout(const LayoutParameters&, std::unique_ptr<GeometryTileLayer>, const std::vector<Immutable<style::LayerProperties>>&) noexcept;
 
 protected:
     optional<std::string> getSource(const style::conversion::Convertible& value) const noexcept;

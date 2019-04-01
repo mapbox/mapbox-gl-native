@@ -9,14 +9,12 @@ namespace mbgl {
 
 class FillBucket;
 
-class RenderFillLayer: public RenderLayer {
+class RenderFillLayer final : public RenderLayer {
 public:
-    using StyleLayerImpl = style::FillLayer::Impl;
-    using PatternProperty = style::FillPattern;
+    explicit RenderFillLayer(Immutable<style::FillLayer::Impl>);
+    ~RenderFillLayer() override;
 
-    RenderFillLayer(Immutable<style::FillLayer::Impl>);
-    ~RenderFillLayer() final = default;
-
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
@@ -33,16 +31,6 @@ public:
 
     // Paint properties
     style::FillPaintProperties::Unevaluated unevaluated;
-    style::FillPaintProperties::PossiblyEvaluated evaluated;
-
-    const style::FillLayer::Impl& impl() const;
-private:
-    CrossfadeParameters crossfade;
-
 };
-
-inline const RenderFillLayer* toRenderFillLayer(const RenderLayer* layer) {
-    return static_cast<const RenderFillLayer*>(layer);
-}
 
 } // namespace mbgl

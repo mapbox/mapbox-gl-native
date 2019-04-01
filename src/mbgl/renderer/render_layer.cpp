@@ -10,8 +10,9 @@ namespace mbgl {
 
 using namespace style;
 
-RenderLayer::RenderLayer(Immutable<style::Layer::Impl> baseImpl_)
-    : baseImpl(std::move(baseImpl_)) {
+RenderLayer::RenderLayer(Immutable<style::LayerProperties> properties)
+    : evaluatedProperties(std::move(properties)),
+      baseImpl(evaluatedProperties->baseImpl) {
 }
 
 void RenderLayer::setImpl(Immutable<style::Layer::Impl> impl) {

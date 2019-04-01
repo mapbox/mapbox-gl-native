@@ -312,22 +312,23 @@ void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependen
     }
 }
 
-static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vector<Immutable<style::Layer::Impl>>& layers, float zoom) {
-    std::vector<std::unique_ptr<RenderLayer>> renderLayers;
-    renderLayers.reserve(layers.size());
+static std::vector<Immutable<style::LayerProperties>> toEvaluatedProperties(const std::vector<Immutable<style::Layer::Impl>>& layers, float zoom) {
+    std::vector<Immutable<style::LayerProperties>> result;
+    result.reserve(layers.size());
     for (auto& layer : layers) {
-        renderLayers.push_back(LayerManager::get()->createRenderLayer(layer));
+        auto renderLayer = LayerManager::get()->createRenderLayer(layer);
 
-        renderLayers.back()->transition(TransitionParameters {
+        renderLayer->transition(TransitionParameters {
             Clock::time_point::max(),
             TransitionOptions()
         });
 
-        renderLayers.back()->evaluate(PropertyEvaluationParameters {
+        renderLayer->evaluate(PropertyEvaluationParameters {
             zoom
         });
+        result.push_back(renderLayer->evaluatedProperties);
     }
-    return renderLayers;
+    return result;
 }
 
 void GeometryTileWorker::parse() {
@@ -348,10 +349,14 @@ void GeometryTileWorker::parse() {
     ImageDependencies imageDependencies;
 
     // Create render layers and group by layout
-    std::vector<std::unique_ptr<RenderLayer>> renderLayers = toRenderLayers(*layers, id.overscaledZ);
-    std::vector<std::vector<const RenderLayer*>> groups = groupByLayout(renderLayers);
+    std::vector<Immutable<style::LayerProperties>> evaluatedProperties = toEvaluatedProperties(*layers, id.overscaledZ);
+    std::unordered_map<std::string, std::vector<Immutable<style::LayerProperties>>> groupMap;
+    for (auto layer : evaluatedProperties) {
+        groupMap[layoutKey(*layer->baseImpl)].push_back(std::move(layer));
+    }
 
-    for (auto& group : groups) {
+    for (auto& pair : groupMap) {
+        const auto& group = pair.second;
         if (obsolete) {
             return;
         }
@@ -360,35 +365,35 @@ void GeometryTileWorker::parse() {
             continue; // Tile has no data.
         }
 
-        const RenderLayer& leader = *group.at(0);
-        BucketParameters parameters { id, mode, pixelRatio, leader.baseImpl->getTypeInfo() };
+        const style::Layer::Impl& leaderImpl = *(group.at(0)->baseImpl);
+        BucketParameters parameters { id, mode, pixelRatio, leaderImpl.getTypeInfo() };
 
-        auto geometryLayer = (*data)->getLayer(leader.baseImpl->sourceLayer);
+        auto geometryLayer = (*data)->getLayer(leaderImpl.sourceLayer);
         if (!geometryLayer) {
             continue;
         }
 
-        std::vector<std::string> layerIDs;
+        std::vector<std::string> layerIDs(group.size());
         for (const auto& layer : group) {
-            layerIDs.push_back(layer->getID());
+            layerIDs.push_back(layer->baseImpl->id);
         }
 
-        featureIndex->setBucketLayerIDs(leader.getID(), layerIDs);
+        featureIndex->setBucketLayerIDs(leaderImpl.id, layerIDs);
 
         // Symbol layers and layers that support pattern properties have an extra step at layout time to figure out what images/glyphs
         // are needed to render the layer. They use the intermediate Layout data structure to accomplish this,
         // and either immediately create a bucket if no images/glyphs are used, or the Layout is stored until
         // the images/glyphs are available to add the features to the buckets.
-        if (leader.baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::Required) {
-            auto layout = LayerManager::get()->createLayout({parameters, glyphDependencies, imageDependencies}, std::move(geometryLayer), group);
+        if (leaderImpl.getTypeInfo()->layout == LayerTypeInfo::Layout::Required) {
+            std::unique_ptr<Layout> layout = LayerManager::get()->createLayout({parameters, glyphDependencies, imageDependencies}, std::move(geometryLayer), group);
             if (layout->hasDependencies()) {
                 layouts.push_back(std::move(layout));
             } else {
                 layout->createBucket({}, featureIndex, buckets, firstLoad, showCollisionBoxes);
             }
         } else {
-            const Filter& filter = leader.baseImpl->filter;
-            const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
+            const Filter& filter = leaderImpl.filter;
+            const std::string& sourceLayerID = leaderImpl.sourceLayer;
             std::shared_ptr<Bucket> bucket = LayerManager::get()->createBucket(parameters, group);
 
             for (std::size_t i = 0; !obsolete && i < geometryLayer->featureCount(); i++) {
@@ -399,7 +404,7 @@ void GeometryTileWorker::parse() {
 
                 GeometryCollection geometries = feature->getGeometries();
                 bucket->addFeature(*feature, geometries, {}, PatternLayerMap ());
-                featureIndex->insert(geometries, i, sourceLayerID, leader.getID());
+                featureIndex->insert(geometries, i, sourceLayerID, leaderImpl.id);
             }
 
             if (!bucket->hasData()) {
@@ -407,7 +412,7 @@ void GeometryTileWorker::parse() {
             }
 
             for (const auto& layer : group) {
-                buckets.emplace(layer->getID(), bucket);
+                buckets.emplace(layer->baseImpl->id, bucket);
             }
         }
     }

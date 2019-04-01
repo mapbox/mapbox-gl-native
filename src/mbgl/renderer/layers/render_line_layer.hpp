@@ -10,20 +10,18 @@
 
 namespace mbgl {
 
-class RenderLineLayer: public RenderLayer {
+class RenderLineLayer final : public RenderLayer {
 public:
-    using StyleLayerImpl = style::LineLayer::Impl;
-    using PatternProperty = style::LinePattern;
+    explicit RenderLineLayer(Immutable<style::LineLayer::Impl>);
+    ~RenderLineLayer() override;
 
-    RenderLineLayer(Immutable<style::LineLayer::Impl>);
-    ~RenderLineLayer() final = default;
-
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
-    void update() final;
+    void update() override;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
@@ -35,20 +33,12 @@ public:
 
     // Paint properties
     style::LinePaintProperties::Unevaluated unevaluated;
-    style::LinePaintProperties::PossiblyEvaluated evaluated;
 
-    const style::LineLayer::Impl& impl() const;
-
-private:
     float getLineWidth(const GeometryTileFeature&, const float) const;
     void updateColorRamp();
-    CrossfadeParameters crossfade;
+
     PremultipliedImage colorRamp;
     optional<gfx::Texture> colorRampTexture;
 };
-
-inline const RenderLineLayer* toRenderLineLayer(const RenderLayer* layer) {
-    return static_cast<const RenderLineLayer*>(layer);
-}
 
 } // namespace mbgl

@@ -11,10 +11,10 @@ namespace mbgl {
 using namespace style;
 
 LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layout_,
-                       std::map<std::string, style::LinePaintProperties::PossiblyEvaluated> layerPaintProperties,
+                       const std::map<std::string, style::LinePaintProperties::PossiblyEvaluated>& layerPaintProperties,
                        const float zoom_,
                        const uint32_t overscaling_)
-    : layout(layout_),
+    : layout(std::move(layout_)),
       zoom(zoom_),
       overscaling(overscaling_) {
 
@@ -528,31 +528,26 @@ bool LineBucket::supportsLayer(const style::Layer::Impl& impl) const {
 }
 
 template <class Property>
-static float get(const RenderLineLayer& layer, const std::map<std::string, LineProgram::Binders>& paintPropertyBinders) {
-    auto it = paintPropertyBinders.find(layer.getID());
+static float get(const LinePaintProperties::PossiblyEvaluated& evaluated, const std::string& id, const std::map<std::string, LineProgram::Binders>& paintPropertyBinders) {
+    auto it = paintPropertyBinders.find(id);
     if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
-        return layer.evaluated.get<Property>().constantOr(Property::defaultValue());
+        return evaluated.get<Property>().constantOr(Property::defaultValue());
     } else {
         return *it->second.statistics<Property>().max();
     }
 }
 
-float LineBucket::getLineWidth(const RenderLineLayer& layer) const {
-    float lineWidth = get<LineWidth>(layer, paintPropertyBinders);
-    float gapWidth = get<LineGapWidth>(layer, paintPropertyBinders);
-
-    if (gapWidth) {
-        return gapWidth + 2 * lineWidth;
-    } else {
-        return lineWidth;
-    }
-}
-
 float LineBucket::getQueryRadius(const RenderLayer& layer) const {
-    const RenderLineLayer* lineLayer = toRenderLineLayer(&layer);
-    const std::array<float, 2>& translate = lineLayer->evaluated.get<LineTranslate>();
-    float offset = get<LineOffset>(*lineLayer, paintPropertyBinders);
-    return getLineWidth(*lineLayer) / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
+    const auto& evaluated = getEvaluated<LineLayerProperties>(layer.evaluatedProperties);
+    const std::array<float, 2>& translate = evaluated.get<LineTranslate>();
+    float offset = get<LineOffset>(evaluated, layer.getID(), paintPropertyBinders);
+    float lineWidth = get<LineWidth>(evaluated, layer.getID(), paintPropertyBinders);
+    float gapWidth = get<LineGapWidth>(evaluated, layer.getID(), paintPropertyBinders);
+    if (gapWidth) {
+        lineWidth = gapWidth + 2 * lineWidth;
+    }
+
+    return lineWidth / 2.0f + std::abs(offset) + util::length(translate[0], translate[1]);
 }
 
 } // namespace mbgl

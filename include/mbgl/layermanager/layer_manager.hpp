@@ -5,6 +5,9 @@
 #include <vector>
 
 namespace mbgl {
+namespace style {
+class LayerProperties;
+}  // namespace style
 class GeometryTileLayer;
 class LayerFactory;
 class RenderLayer;
@@ -37,9 +40,10 @@ public:
     /// Returns a new RenderLayer instance on success call; returns `nullptr` otherwise.
     std::unique_ptr<RenderLayer> createRenderLayer(Immutable<style::Layer::Impl>) noexcept;
     /// Returns a new Bucket instance on success call; returns `nullptr` otherwise.
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) noexcept;
+    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<Immutable<style::LayerProperties>>&) noexcept;
     /// Returns a new Layout instance on success call; returns `nullptr` otherwise. 
-    std::unique_ptr<Layout> createLayout(const LayoutParameters&, std::unique_ptr<GeometryTileLayer>, const std::vector<const RenderLayer*>&) noexcept;
+    std::unique_ptr<Layout> createLayout(const LayoutParameters&, std::unique_ptr<GeometryTileLayer>,
+                                         const std::vector<Immutable<style::LayerProperties>>&) noexcept;
 
     /**
      * @brief a build-time flag to enable/disable annotations in mapbox-gl-native core.

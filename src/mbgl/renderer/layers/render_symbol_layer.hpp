@@ -53,15 +53,15 @@ public:
 
 } // namespace style
 
-class BucketParameters;
-class SymbolLayout;
-class GeometryTileLayer;
-
 class RenderSymbolLayer final: public RenderLayer, public RenderLayerSymbolInterface {
 public:
-    RenderSymbolLayer(Immutable<style::SymbolLayer::Impl>);
-    ~RenderSymbolLayer() final = default;
+    explicit RenderSymbolLayer(Immutable<style::SymbolLayer::Impl>);
+    ~RenderSymbolLayer() override;
 
+    static style::IconPaintProperties::PossiblyEvaluated iconPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
+    static style::TextPaintProperties::PossiblyEvaluated textPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
+
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
@@ -69,30 +69,20 @@ public:
     void render(PaintParameters&, RenderSource*) override;
     void setRenderTiles(RenderTiles, const TransformState&) override;
 
-    static style::IconPaintProperties::PossiblyEvaluated iconPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
-    static style::TextPaintProperties::PossiblyEvaluated textPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
-
     // RenderLayerSymbolInterface overrides
-    const RenderLayerSymbolInterface* getSymbolInterface() const final;
-    const std::string& layerID() const final;
-    const std::vector<std::reference_wrapper<RenderTile>>& getRenderTiles() const final;
-    SymbolBucket* getSymbolBucket(const RenderTile&) const final;
+    const RenderLayerSymbolInterface* getSymbolInterface() const override;
+    const std::string& layerID() const override;
+    const std::vector<std::reference_wrapper<RenderTile>>& getRenderTiles() const override;
+    SymbolBucket* getSymbolBucket(const RenderTile&) const override;
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;
-    style::SymbolPaintProperties::PossiblyEvaluated evaluated;
 
     float iconSize = 1.0f;
     float textSize = 16.0f;
 
-    const style::SymbolLayer::Impl& impl() const;
-
 protected:
     void updateBucketPaintProperties(Bucket*) const final;
 };
-
-inline const RenderSymbolLayer* toRenderSymbolLayer(const RenderLayer* layer) {
-    return static_cast<const RenderSymbolLayer*>(layer);
-}
 
 } // namespace mbgl

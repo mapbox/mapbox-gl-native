@@ -141,10 +141,9 @@ bool FillBucket::supportsLayer(const style::Layer::Impl& impl) const {
     return style::FillLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
 }
 
-
 float FillBucket::getQueryRadius(const RenderLayer& layer) const {
-    const RenderFillLayer* fillLayer = toRenderFillLayer(&layer);
-    const std::array<float, 2>& translate = fillLayer->evaluated.get<FillTranslate>();
+    const auto& evaluated = getEvaluated<FillLayerProperties>(layer.evaluatedProperties);
+    const std::array<float, 2>& translate = evaluated.get<FillTranslate>();
     return util::length(translate[0], translate[1]);
 }
 

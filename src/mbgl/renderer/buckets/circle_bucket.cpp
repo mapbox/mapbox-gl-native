@@ -10,14 +10,14 @@ namespace mbgl {
 
 using namespace style;
 
-CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
+CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<Immutable<style::LayerProperties>>& layers)
     : mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(layer->baseImpl->id),
             std::forward_as_tuple(
-                toRenderCircleLayer(layer)->evaluated,
+                getEvaluated<CircleLayerProperties>(layer),
                 parameters.tileID.overscaledZ));
     }
 }
@@ -99,20 +99,20 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
 }
 
 template <class Property>
-static float get(const RenderCircleLayer& layer, const std::map<std::string, CircleProgram::Binders>& paintPropertyBinders) {
-    auto it = paintPropertyBinders.find(layer.getID());
+static float get(const CirclePaintProperties::PossiblyEvaluated& evaluated, const std::string& id, const std::map<std::string, CircleProgram::Binders>& paintPropertyBinders) {
+    auto it = paintPropertyBinders.find(id);
     if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
-        return layer.evaluated.get<Property>().constantOr(Property::defaultValue());
+        return evaluated.get<Property>().constantOr(Property::defaultValue());
     } else {
         return *it->second.statistics<Property>().max();
     }
 }
 
 float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
-    const RenderCircleLayer* circleLayer = toRenderCircleLayer(&layer);
-    float radius = get<CircleRadius>(*circleLayer, paintPropertyBinders);
-    float stroke = get<CircleStrokeWidth>(*circleLayer, paintPropertyBinders);
-    auto translate = circleLayer->evaluated.get<CircleTranslate>();
+    const auto& evaluated = getEvaluated<CircleLayerProperties>(layer.evaluatedProperties);
+    float radius = get<CircleRadius>(evaluated, layer.getID(), paintPropertyBinders);
+    float stroke = get<CircleStrokeWidth>(evaluated, layer.getID(), paintPropertyBinders);
+    auto translate = evaluated.get<CircleTranslate>();
     return radius + stroke + util::length(translate[0], translate[1]);
 }
 

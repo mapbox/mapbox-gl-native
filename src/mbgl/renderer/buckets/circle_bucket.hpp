@@ -15,7 +15,7 @@ class BucketParameters;
 
 class CircleBucket final : public Bucket {
 public:
-    CircleBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+    CircleBucket(const BucketParameters&, const std::vector<Immutable<style::LayerProperties>>&);
     ~CircleBucket() override;
 
     void addFeature(const GeometryTileFeature&,

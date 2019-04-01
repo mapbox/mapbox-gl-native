@@ -24,7 +24,7 @@ std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string&
     return layer;
 }
 
-std::unique_ptr<Bucket> CircleLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) noexcept {
+std::unique_ptr<Bucket> CircleLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<Immutable<style::LayerProperties>>& layers) noexcept {
     return std::make_unique<CircleBucket>(parameters, layers);
 }
 

@@ -14,8 +14,13 @@ namespace mbgl {
 
 using namespace style;
 
+inline const CustomLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const CustomLayer::Impl&>(*impl);
+}
+
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)), host(impl().host) {
+    : RenderLayer(makeMutable<CustomLayerProperties>(std::move(_impl))),
+      host(impl(baseImpl).host) {
     assert(gfx::BackendScope::exists());
     MBGL_CHECK_ERROR(host->initialize());
 }
@@ -29,12 +34,9 @@ RenderCustomLayer::~RenderCustomLayer() {
     }
 }
 
-const CustomLayer::Impl& RenderCustomLayer::impl() const {
-    return static_cast<const CustomLayer::Impl&>(*baseImpl);
-}
-
 void RenderCustomLayer::evaluate(const PropertyEvaluationParameters&) {
     passes = RenderPass::Translucent;
+    // It is fine to not update `evaluatedProperties`, as `baseImpl` should never be updated for this layer.
 }
 
 bool RenderCustomLayer::hasTransition() const {
@@ -49,12 +51,12 @@ void RenderCustomLayer::markContextDestroyed() {
 }
 
 void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
-    if (host != impl().host) {
+    if (host != impl(baseImpl).host) {
         //If the context changed, deinitialize the previous one before initializing the new one.
         if (host && !contextDestroyed) {
             MBGL_CHECK_ERROR(host->deinitialize());
         }
-        host = impl().host;
+        host = impl(baseImpl).host;
         MBGL_CHECK_ERROR(host->initialize());
     }
 

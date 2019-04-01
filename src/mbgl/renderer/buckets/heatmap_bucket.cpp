@@ -10,14 +10,14 @@ namespace mbgl {
 
 using namespace style;
 
-HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
+HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vector<Immutable<style::LayerProperties>>& layers)
     : mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(layer->baseImpl->id),
             std::forward_as_tuple(
-                toRenderHeatmapLayer(layer)->evaluated,
+                getEvaluated<HeatmapLayerProperties>(layer),
                 parameters.tileID.overscaledZ));
     }
 }

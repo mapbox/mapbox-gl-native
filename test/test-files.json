@@ -28,7 +28,6 @@
         "test/programs/binary_program.test.cpp",
         "test/programs/symbol_program.test.cpp",
         "test/renderer/backend_scope.test.cpp",
-        "test/renderer/group_by_layout.test.cpp",
         "test/renderer/image_manager.test.cpp",
         "test/sprite/sprite_loader.test.cpp",
         "test/sprite/sprite_parser.test.cpp",

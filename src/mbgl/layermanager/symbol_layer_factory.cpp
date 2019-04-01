@@ -26,7 +26,7 @@ std::unique_ptr<style::Layer> SymbolLayerFactory::createLayer(const std::string&
 
 std::unique_ptr<Layout> SymbolLayerFactory::createLayout(const LayoutParameters& parameters,
                                                          std::unique_ptr<GeometryTileLayer> tileLayer,
-                                                         const std::vector<const RenderLayer*>& group) noexcept {
+                                                         const std::vector<Immutable<style::LayerProperties>>& group) noexcept {
     return std::make_unique<SymbolLayout>(parameters.bucketParameters,
                                           group,
                                           std::move(tileLayer),

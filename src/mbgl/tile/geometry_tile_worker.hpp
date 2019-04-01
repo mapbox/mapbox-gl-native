@@ -20,9 +20,6 @@ class GeometryTile;
 class GeometryTileData;
 class Layout;
 
-template <class B>
-class PatternLayout;
-
 namespace style {
 class Layer;
 } // namespace style

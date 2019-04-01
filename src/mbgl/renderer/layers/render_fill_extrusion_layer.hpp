@@ -7,19 +7,12 @@
 
 namespace mbgl {
 
-template <class B>
-class PatternLayout;
-
-class FillExtrusionBucket;
-
-class RenderFillExtrusionLayer: public RenderLayer {
+class RenderFillExtrusionLayer final : public RenderLayer {
 public:
-    using StyleLayerImpl = style::FillExtrusionLayer::Impl;
-    using PatternProperty = style::FillExtrusionPattern;
+    explicit RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl>);
+    ~RenderFillExtrusionLayer() override;
 
-    RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl>);
-    ~RenderFillExtrusionLayer() final = default;
-
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
@@ -36,17 +29,8 @@ public:
 
     // Paint properties
     style::FillExtrusionPaintProperties::Unevaluated unevaluated;
-    style::FillExtrusionPaintProperties::PossiblyEvaluated evaluated;
-
-    const style::FillExtrusionLayer::Impl& impl() const;
 
     std::unique_ptr<gfx::OffscreenTexture> renderTexture;
-private:
-    CrossfadeParameters crossfade;
 };
-
-inline const RenderFillExtrusionLayer* toRenderFillExtrusionLayer(const RenderLayer* layer) {
-    return static_cast<const RenderFillExtrusionLayer*>(layer);
-}
 
 } // namespace mbgl

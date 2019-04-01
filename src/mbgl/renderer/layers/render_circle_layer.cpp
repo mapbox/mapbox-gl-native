@@ -15,21 +15,24 @@ namespace mbgl {
 
 using namespace style;
 
-RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-      unevaluated(impl().paint.untransitioned()) {
+inline const style::CircleLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const style::CircleLayer::Impl&>(*impl);
 }
 
-const style::CircleLayer::Impl& RenderCircleLayer::impl() const {
-    return static_cast<const style::CircleLayer::Impl&>(*baseImpl);
+RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
+    : RenderLayer(makeMutable<CircleLayerProperties>(std::move(_impl))),
+      unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
 
 void RenderCircleLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
+    auto properties = makeMutable<CircleLayerProperties>(
+        staticImmutableCast<CircleLayer::Impl>(baseImpl),
+        unevaluated.evaluate(parameters));
+    const auto& evaluated = properties->evaluated;
 
     passes = ((evaluated.get<style::CircleRadius>().constantOr(1) > 0 ||
                evaluated.get<style::CircleStrokeWidth>().constantOr(1) > 0)
@@ -38,6 +41,7 @@ void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters)
               && (evaluated.get<style::CircleOpacity>().constantOr(1) > 0 ||
                   evaluated.get<style::CircleStrokeOpacity>().constantOr(1) > 0))
              ? RenderPass::Translucent : RenderPass::None;
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderCircleLayer::hasTransition() const {
@@ -52,7 +56,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
+    const auto& evaluated = static_cast<const CircleLayerProperties&>(*evaluatedProperties).evaluated;
     const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
     const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
 
@@ -139,7 +143,7 @@ bool RenderCircleLayer::queryIntersectsFeature(
         const TransformState& transformState,
         const float pixelsToTileUnits,
         const mat4& posMatrix) const {
-
+    const auto& evaluated = static_cast<const CircleLayerProperties&>(*evaluatedProperties).evaluated;
     // Translate query geometry
     const GeometryCoordinates& translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,

@@ -9,11 +9,12 @@
 
 namespace mbgl {
 
-class RenderHeatmapLayer: public RenderLayer {
+class RenderHeatmapLayer final : public RenderLayer {
 public:
-    RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl>);
-    ~RenderHeatmapLayer() final = default;
+    explicit RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl>);
+    ~RenderHeatmapLayer() override;
 
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
@@ -31,20 +32,11 @@ public:
 
     // Paint properties
     style::HeatmapPaintProperties::Unevaluated unevaluated;
-    style::HeatmapPaintProperties::PossiblyEvaluated evaluated;
-
-    const style::HeatmapLayer::Impl& impl() const;
-
     PremultipliedImage colorRamp;
     std::unique_ptr<gfx::OffscreenTexture> renderTexture;
     optional<gfx::Texture> colorRampTexture;
 
-private:
     void updateColorRamp();
 };
-
-inline const RenderHeatmapLayer* toRenderHeatmapLayer(const RenderLayer* layer) {
-    return static_cast<const RenderHeatmapLayer*>(layer);
-}
 
 } // namespace mbgl

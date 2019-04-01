@@ -1,7 +1,7 @@
 #pragma once
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
-#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
 
@@ -11,7 +11,6 @@
 namespace mbgl {
 
 class Bucket;
-class BucketParameters;
 class TransitionParameters;
 class PropertyEvaluationParameters;
 class PaintParameters;
@@ -22,7 +21,7 @@ class TransformState;
 
 class RenderLayer {
 protected:
-    RenderLayer(Immutable<style::Layer::Impl>);
+    RenderLayer(Immutable<style::LayerProperties>);
 
 public:
     virtual ~RenderLayer() = default;
@@ -31,6 +30,7 @@ public:
     virtual void transition(const TransitionParameters&) = 0;
 
     // Fully evaluate possibly-transitioning paint properties based on a zoom level.
+    // Updates the contained `evaluatedProperties` member.
     virtual void evaluate(const PropertyEvaluationParameters&) = 0;
 
     // Returns true if any paint properties have active transitions.
@@ -65,6 +65,8 @@ public:
     using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     virtual void setRenderTiles(RenderTiles, const TransformState&);
 
+    // Latest evaluated properties.
+    Immutable<style::LayerProperties> evaluatedProperties;
     // Private implementation
     Immutable<style::Layer::Impl> baseImpl;
     void setImpl(Immutable<style::Layer::Impl>);
