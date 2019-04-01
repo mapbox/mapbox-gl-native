@@ -1,4 +1,4 @@
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
@@ -47,7 +47,7 @@ public:
     void render() {
         if (!renderer || !updateParameters) return;
         
-        mbgl::BackendScope guard { mbglBackend, mbgl::BackendScope::ScopeType::Implicit };
+        mbgl::gfx::BackendScope guard { mbglBackend, mbgl::gfx::BackendScope::ScopeType::Implicit };
         
         // onStyleImageMissing might be called during a render. The user implemented method
         // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.

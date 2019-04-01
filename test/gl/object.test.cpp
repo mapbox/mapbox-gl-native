@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/context.hpp>
 
@@ -46,7 +46,7 @@ TEST(GLObject, Value) {
 
 TEST(GLObject, Store) {
     HeadlessBackend backend { { 256, 256 } };
-    BackendScope scope { backend };
+    gfx::BackendScope scope { backend };
 
     gl::Context context;
     EXPECT_TRUE(context.empty());

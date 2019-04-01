@@ -4,6 +4,8 @@ namespace mbgl {
 
 class RendererBackend;
 
+namespace gfx {
+
 class BackendScope {
 public:
     // There are two types of scopes: Creating an "Implicit" scope tells Mapbox GL that the
@@ -32,4 +34,5 @@ private:
     bool activated = false;
 };
 
+} // namespace gfx
 } // namespace mbgl

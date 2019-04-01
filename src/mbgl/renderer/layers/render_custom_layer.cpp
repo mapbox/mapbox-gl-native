@@ -1,7 +1,7 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
@@ -15,12 +15,12 @@ using namespace style;
 
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
     : RenderLayer(std::move(_impl)), host(impl().host) {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     MBGL_CHECK_ERROR(host->initialize());
 }
 
 RenderCustomLayer::~RenderCustomLayer() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     if (contextDestroyed) {
         host->contextLost();
     } else {

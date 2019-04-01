@@ -135,7 +135,7 @@ void MapRenderer::render(JNIEnv&) {
     }
 
     // Activate the backend
-    BackendScope backendGuard { *backend };
+    gfx::BackendScope backendGuard { *backend };
 
     // Ensure that the "current" scheduler on the render thread is
     // this scheduler.

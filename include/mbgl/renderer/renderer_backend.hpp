@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/util/util.hpp>
@@ -82,7 +82,7 @@ protected:
 private:
     std::once_flag initialized;
 
-    friend class BackendScope;
+    friend class gfx::BackendScope;
 };
 
 MBGL_CONSTEXPR bool operator==(const RendererBackend& a, const RendererBackend& b) {

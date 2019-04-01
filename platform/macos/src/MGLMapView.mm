@@ -35,7 +35,6 @@
 #import <mbgl/style/image.hpp>
 #import <mbgl/renderer/renderer.hpp>
 #import <mbgl/renderer/renderer_backend.hpp>
-#import <mbgl/renderer/backend_scope.hpp>
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/storage/resource_options.hpp>
 #import <mbgl/math/wrap.hpp>

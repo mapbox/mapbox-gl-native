@@ -1,5 +1,5 @@
 #include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/extension.hpp>
 
@@ -10,7 +10,7 @@ namespace mbgl {
 RendererBackend::RendererBackend() = default;
 
 gl::Context& RendererBackend::getContext() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     std::call_once(initialized, [this] {
         context = std::make_unique<gl::Context>();
         context->enableDebugging();

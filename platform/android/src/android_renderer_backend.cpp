@@ -13,7 +13,7 @@ namespace android {
  * From mbgl::View
  */
 void AndroidRendererBackend::bind() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     setFramebufferBinding(0);
     setViewport(0, 0, getFramebufferSize());
 }
@@ -22,12 +22,12 @@ void AndroidRendererBackend::bind() {
  * From mbgl::RendererBackend.
  */
 gl::ProcAddress AndroidRendererBackend::getExtensionFunctionPointer(const char* name) {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     return eglGetProcAddress(name);
 }
 
 void AndroidRendererBackend::updateViewPort() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     setViewport(0, 0, getFramebufferSize());
 }
 
@@ -37,7 +37,7 @@ void AndroidRendererBackend::resizeFramebuffer(int width, int height) {
 }
 
 PremultipliedImage AndroidRendererBackend::readFramebuffer() const {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     return RendererBackend::readFramebuffer(getFramebufferSize());
 }
 

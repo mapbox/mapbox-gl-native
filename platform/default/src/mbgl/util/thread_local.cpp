@@ -1,6 +1,6 @@
 #include <mbgl/util/thread_local.hpp>
 
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -58,7 +58,7 @@ void ThreadLocal<T>::set(T* ptr) {
     }
 }
 
-template class ThreadLocal<BackendScope>;
+template class ThreadLocal<gfx::BackendScope>;
 template class ThreadLocal<Scheduler>;
 template class ThreadLocal<int>; // For unit tests
 

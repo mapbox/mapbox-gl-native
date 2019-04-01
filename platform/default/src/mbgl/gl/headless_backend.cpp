@@ -1,6 +1,6 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 
 #include <cassert>
 #include <stdexcept>
@@ -26,7 +26,7 @@ HeadlessBackend::HeadlessBackend(Size size_)
 }
 
 HeadlessBackend::~HeadlessBackend() {
-    BackendScope guard { *this };
+    gfx::BackendScope guard { *this };
     view.reset();
     context.reset();
 }
