@@ -37,7 +37,7 @@ public:
     void setShowCollisionBoxes(const bool showCollisionBoxes) override;
 
     void onGlyphsAvailable(GlyphMap) override;
-    void onImagesAvailable(ImageMap, ImageMap, uint64_t imageCorrelationID) override;
+    void onImagesAvailable(ImageMap, ImageMap, std::unordered_map<std::string,uint32_t> versionMap, uint64_t imageCorrelationID) override;
     
     void getGlyphs(GlyphDependencies);
     void getImages(ImageRequestPair);

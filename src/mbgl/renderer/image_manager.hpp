@@ -22,7 +22,7 @@ class Context;
 class ImageRequestor {
 public:
     virtual ~ImageRequestor() = default;
-    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, uint64_t imageCorrelationID) = 0;
+    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, std::unordered_map<std::string, uint32_t> versionMap, uint64_t imageCorrelationID) = 0;
 };
 
 /*
@@ -50,12 +50,14 @@ public:
     const style::Image::Impl* getImage(const std::string&) const;
 
     void addImage(Immutable<style::Image::Impl>);
-    void updateImage(Immutable<style::Image::Impl>);
+    bool updateImage(Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
     void getImages(ImageRequestor&, ImageRequestPair&&);
     void removeRequestor(ImageRequestor&);
     void imagesAdded();
+
+    std::map<std::string, uint32_t> updatedImageVersions;
 
 private:
     void checkMissingAndNotify(ImageRequestor&, const ImageRequestPair&);
@@ -63,12 +65,12 @@ private:
 
     bool loaded = false;
 
-    std::unordered_map<ImageRequestor*, ImageRequestPair> requestors;
+    std::map<ImageRequestor*, ImageRequestPair> requestors;
     struct MissingImageRequestPair {
         ImageRequestPair pair;
-        int callbacksRemaining;
+        unsigned int callbacksRemaining;
     };
-    std::unordered_map<ImageRequestor*, MissingImageRequestPair> missingImageRequestors;
+    std::map<ImageRequestor*, MissingImageRequestPair> missingImageRequestors;
     ImageMap images;
 
     ImageManagerObserver* observer = nullptr;
