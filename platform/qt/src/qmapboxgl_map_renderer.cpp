@@ -79,7 +79,7 @@ void QMapboxGLMapRenderer::render()
     }
 
     // The OpenGL implementation automatically enables the OpenGL context for us.
-    mbgl::BackendScope scope(m_backend, mbgl::BackendScope::ScopeType::Implicit);
+    mbgl::gfx::BackendScope scope(m_backend, mbgl::gfx::BackendScope::ScopeType::Implicit);
 
     m_renderer->render(*params);
 

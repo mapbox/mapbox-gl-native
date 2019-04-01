@@ -1,7 +1,7 @@
 #include <mbgl/util/thread_local.hpp>
 
 #include <mbgl/actor/scheduler.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 
 #include <array>
 #include <cassert>
@@ -42,7 +42,7 @@ void ThreadLocal<T>::set(T* ptr) {
 }
 
 template class ThreadLocal<Scheduler>;
-template class ThreadLocal<BackendScope>;
+template class ThreadLocal<gfx::BackendScope>;
 template class ThreadLocal<int>; // For unit tests
 
 } // namespace util

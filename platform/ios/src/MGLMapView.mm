@@ -20,7 +20,6 @@
 #include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/geo.hpp>

@@ -6,6 +6,7 @@
 #include <mbgl/test/map_adapter.hpp>
 
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -613,8 +614,8 @@ TEST(Map, AddLayer) {
 TEST(Map, WithoutVAOExtension) {
     MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
 
-    BackendScope scope { *test.frontend.getBackend() };
     test.frontend.getBackend()->getContext().disableVAOExtension = true;
+    gfx::BackendScope scope { *test.frontend.getBackend() };
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 

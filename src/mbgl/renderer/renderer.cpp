@@ -2,7 +2,7 @@
 
 #include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
 namespace mbgl {
@@ -18,7 +18,7 @@ Renderer::Renderer(RendererBackend& backend,
 }
 
 Renderer::~Renderer() {
-    BackendScope guard { impl->backend };
+    gfx::BackendScope guard { impl->backend };
     impl.reset();
 }
 
@@ -116,7 +116,7 @@ void Renderer::dumpDebugLogs() {
 }
 
 void Renderer::reduceMemoryUse() {
-    BackendScope guard { impl->backend };
+    gfx::BackendScope guard { impl->backend };
     impl->reduceMemoryUse();
 }
 

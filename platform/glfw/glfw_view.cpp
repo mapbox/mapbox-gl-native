@@ -14,7 +14,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
 
 #include <mapbox/cheap_ruler.hpp>
@@ -502,7 +502,7 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     view->fbWidth = width;
     view->fbHeight = height;
 
-    mbgl::BackendScope scope { *view, mbgl::BackendScope::ScopeType::Implicit };
+    mbgl::gfx::BackendScope scope { *view, mbgl::gfx::BackendScope::ScopeType::Implicit };
     view->bind();
 
     // This is only triggered when the framebuffer is resized, but not the window. It can

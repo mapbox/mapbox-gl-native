@@ -11,7 +11,7 @@ void QMapboxGLRendererBackend::updateAssumedState()
 
 void QMapboxGLRendererBackend::bind()
 {
-    assert(mbgl::BackendScope::exists());
+    assert(mbgl::gfx::BackendScope::exists());
 
     setFramebufferBinding(m_fbo);
     setViewport(0, 0, m_size);

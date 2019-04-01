@@ -19,7 +19,7 @@ HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, Scheduler& sch
               static_cast<uint32_t>(size.height * pixelRatio) }),
     asyncInvalidate([this] {
         if (renderer && updateParameters) {
-            mbgl::BackendScope guard { backend };
+            gfx::BackendScope guard { backend };
 
             // onStyleImageMissing might be called during a render. The user implemented method
             // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.

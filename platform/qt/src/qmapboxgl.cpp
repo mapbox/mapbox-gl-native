@@ -33,7 +33,6 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/resource_options.hpp>

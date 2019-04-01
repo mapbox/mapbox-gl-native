@@ -14,7 +14,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -56,7 +56,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {}
 
 Renderer::Impl::~Impl() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
 
     if (contextLost) {
         // Signal all RenderLayers that the context was lost
@@ -89,8 +89,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // Reset zoom history state.
         zoomHistory.first = true;
     }
-    
-    assert(BackendScope::exists());
+
+    assert(gfx::BackendScope::exists());
     if (LayerManager::annotationsEnabled) {
         updateParameters.annotationManager.updateData();
     }
@@ -598,7 +598,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 }
 
 void  Renderer::Impl::flush() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
 
     backend.getContext().flush();
 }
@@ -728,7 +728,7 @@ FeatureExtensionValue Renderer::Impl::queryFeatureExtensions(const std::string& 
 }
 
 void Renderer::Impl::reduceMemoryUse() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     for (const auto& entry : renderSources) {
         entry.second->reduceMemoryUse();
     }

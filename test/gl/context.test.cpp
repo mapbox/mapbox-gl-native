@@ -5,6 +5,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/storage/resource_options.hpp>
@@ -103,8 +104,8 @@ TEST(GLContextMode, Shared) {
 
     {
         // Custom rendering outside of GL Native render loop.
-        BackendScope scope { *frontend.getBackend() };
         frontend.getBackend()->bind();
+        gfx::BackendScope scope { *frontend.getBackend() };
 
         Shader paintShader(vertexShaderSource, fragmentShaderSource);
         Buffer triangleBuffer({ 0, 0.5, 0.5, -0.5, -0.5, -0.5 });

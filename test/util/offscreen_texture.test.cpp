@@ -1,12 +1,12 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/platform/gl_functions.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/offscreen_texture.hpp>
 
 
@@ -15,7 +15,7 @@ using namespace mbgl::platform;
 
 TEST(OffscreenTexture, EmptyRed) {
     HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gfx::BackendScope scope { backend };
 
     // Scissor test shouldn't leak after HeadlessBackend::bind().
     MBGL_CHECK_ERROR(glScissor(64, 64, 128, 128));
@@ -77,8 +77,8 @@ struct Buffer {
 
 TEST(OffscreenTexture, RenderToTexture) {
     HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
     auto& context = backend.getContext();
+    gfx::BackendScope scope { backend };
 
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));
     MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
