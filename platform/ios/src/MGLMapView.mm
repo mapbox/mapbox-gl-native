@@ -1116,27 +1116,6 @@ public:
         
         [self.glView display];
     }
-
-    if (self.experimental_enableFrameRateMeasurement)
-    {
-        CFTimeInterval now = CACurrentMediaTime();
-
-        self.frameTime = now - _displayLink.timestamp;
-        _frameDurations += self.frameTime;
-
-        _frameCount++;
-
-        CFTimeInterval elapsed = now - _frameCounterStartTime;
-
-        if (elapsed >= 1.0) {
-            self.averageFrameRate = _frameCount / elapsed;
-            self.averageFrameTime = (_frameDurations / _frameCount) * 1000;
-
-            _frameCount = 0;
-            _frameDurations = 0;
-            _frameCounterStartTime = now;
-        }
-    }
 }
 
 - (void)setNeedsGLDisplay
@@ -6087,6 +6066,27 @@ public:
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
     {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
+    }
+    
+    if (self.experimental_enableFrameRateMeasurement)
+    {
+        CFTimeInterval now = CACurrentMediaTime();
+        
+        self.frameTime = now - _displayLink.timestamp;
+        _frameDurations += self.frameTime;
+        
+        _frameCount++;
+        
+        CFTimeInterval elapsed = now - _frameCounterStartTime;
+        
+        if (elapsed >= 1.0) {
+            self.averageFrameRate = _frameCount / elapsed;
+            self.averageFrameTime = (_frameDurations / _frameCount) * 1000;
+            
+            _frameCount = 0;
+            _frameDurations = 0;
+            _frameCounterStartTime = now;
+        }
     }
 }
 
