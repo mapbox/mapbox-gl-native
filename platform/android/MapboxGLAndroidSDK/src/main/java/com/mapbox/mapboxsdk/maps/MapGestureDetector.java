@@ -74,7 +74,7 @@ final class MapGestureDetector {
    * User-set focal point.
    */
   @Nullable
-  private PointF focalPoint;
+  private PointF constantFocalPoint;
 
   private AndroidGesturesManager gesturesManager;
 
@@ -158,7 +158,7 @@ final class MapGestureDetector {
   /**
    * Set the gesture focal point.
    * <p>
-   * this is the center point used for calculate transformations from gestures, value is
+   * This is the center point used for calculate transformations from gestures, value is
    * overridden if end user provides his own through {@link UiSettings#setFocalPoint(PointF)}.
    * </p>
    *
@@ -172,22 +172,7 @@ final class MapGestureDetector {
         focalPoint = uiSettings.getFocalPoint();
       }
     }
-    this.focalPoint = focalPoint;
-  }
-
-  /**
-   * Get the current active gesture focal point.
-   * <p>
-   * This could be either the user provided focal point in
-   * {@link UiSettings#setFocalPoint(PointF)}or <code>null</code>.
-   * If it's <code>null</code>, gestures will use focal pointed returned by the detector.
-   * </p>
-   *
-   * @return the current active gesture focal point.
-   */
-  @Nullable
-  PointF getFocalPoint() {
-    return focalPoint;
+    this.constantFocalPoint = focalPoint;
   }
 
   /**
@@ -373,9 +358,9 @@ final class MapGestureDetector {
 
         PointF zoomFocalPoint;
         // Single finger double tap
-        if (focalPoint != null) {
+        if (constantFocalPoint != null) {
           // User provided focal point
-          zoomFocalPoint = focalPoint;
+          zoomFocalPoint = constantFocalPoint;
         } else {
           // Zoom in on gesture
           zoomFocalPoint = new PointF(motionEvent.getX(), motionEvent.getY());
@@ -475,9 +460,6 @@ final class MapGestureDetector {
   private final class ScaleGestureListener extends StandardScaleGestureDetector.SimpleStandardOnScaleGestureListener {
 
     private final float minimumVelocity;
-
-    @Nullable
-    private PointF scaleFocalPoint;
     private boolean quickZoom;
 
     ScaleGestureListener(float minimumVelocity) {
@@ -515,10 +497,7 @@ final class MapGestureDetector {
         );
       }
 
-      // setting focalPoint in #onScaleBegin() as well, because #onScale() might not get called before #onScaleEnd()
-      setScaleFocalPoint(detector);
-
-      sendTelemetryEvent(TelemetryConstants.PINCH, scaleFocalPoint);
+      sendTelemetryEvent(TelemetryConstants.PINCH, getScaleFocalPoint(detector));
 
       notifyOnScaleBeginListeners(detector);
 
@@ -530,11 +509,10 @@ final class MapGestureDetector {
       // dispatching camera start event only when the movement actually occurred
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
-      setScaleFocalPoint(detector);
-
       float scaleFactor = detector.getScaleFactor();
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
-      transform.zoomBy(zoomBy, scaleFocalPoint);
+      PointF focalPoint = getScaleFocalPoint(detector);
+      transform.zoomBy(zoomBy, focalPoint);
 
       notifyOnScaleListeners(detector);
 
@@ -562,21 +540,23 @@ final class MapGestureDetector {
 
       double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
       double currentZoom = transform.getRawZoom();
+      PointF focalPoint = getScaleFocalPoint(detector);
       long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
-      scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, scaleFocalPoint, animationTime);
+      scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, focalPoint, animationTime);
       scheduleAnimator(scaleAnimator);
     }
 
-    private void setScaleFocalPoint(@NonNull StandardScaleGestureDetector detector) {
-      if (focalPoint != null) {
+    @NonNull
+    private PointF getScaleFocalPoint(@NonNull StandardScaleGestureDetector detector) {
+      if (constantFocalPoint != null) {
         // around user provided focal point
-        scaleFocalPoint = focalPoint;
+        return constantFocalPoint;
       } else if (quickZoom) {
         // around center
-        scaleFocalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        return new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
       } else {
         // around gesture
-        scaleFocalPoint = detector.getFocalPoint();
+        return detector.getFocalPoint();
       }
     }
 
@@ -603,14 +583,12 @@ final class MapGestureDetector {
   }
 
   private final class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
-    @Nullable
-    private PointF rotateFocalPoint;
     private final float minimumScaleSpanWhenRotating;
     private final float minimumAngularVelocity;
     private final float defaultSpanSinceStartThreshold;
 
-    public RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity,
-                                 float defaultSpanSinceStartThreshold) {
+    RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity,
+                          float defaultSpanSinceStartThreshold) {
       this.minimumScaleSpanWhenRotating = minimumScaleSpanWhenRotating;
       this.minimumAngularVelocity = minimumAngularVelocity;
       this.defaultSpanSinceStartThreshold = defaultSpanSinceStartThreshold;
@@ -631,10 +609,7 @@ final class MapGestureDetector {
         gesturesManager.getStandardScaleGestureDetector().interrupt();
       }
 
-      // setting in #onRotateBegin() as well, because #onRotate() might not get called before #onRotateEnd()
-      setRotateFocalPoint(detector);
-
-      sendTelemetryEvent(TelemetryConstants.ROTATION, rotateFocalPoint);
+      sendTelemetryEvent(TelemetryConstants.ROTATION, getRotateFocalPoint(detector));
 
       notifyOnRotateBeginListeners(detector);
 
@@ -647,13 +622,12 @@ final class MapGestureDetector {
       // dispatching camera start event only when the movement actually occurred
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
-      setRotateFocalPoint(detector);
-
       // Calculate map bearing value
       double bearing = transform.getRawBearing() + rotationDegreesSinceLast;
 
       // Rotate the map
-      transform.setBearing(bearing, rotateFocalPoint.x, rotateFocalPoint.y);
+      PointF focalPoint = getRotateFocalPoint(detector);
+      transform.setBearing(bearing, focalPoint.x, focalPoint.y);
 
       notifyOnRotateListeners(detector);
 
@@ -687,21 +661,24 @@ final class MapGestureDetector {
         angularVelocity = -angularVelocity;
       }
 
-      rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
+      PointF focalPoint = getRotateFocalPoint(detector);
+      rotateAnimator = createRotateAnimator(angularVelocity, animationTime, focalPoint);
       scheduleAnimator(rotateAnimator);
     }
 
-    private void setRotateFocalPoint(@NonNull RotateGestureDetector detector) {
-      if (focalPoint != null) {
+    @NonNull
+    private PointF getRotateFocalPoint(@NonNull RotateGestureDetector detector) {
+      if (constantFocalPoint != null) {
         // User provided focal point
-        rotateFocalPoint = focalPoint;
+        return constantFocalPoint;
       } else {
         // around gesture
-        rotateFocalPoint = detector.getFocalPoint();
+        return detector.getFocalPoint();
       }
     }
 
-    private Animator createRotateAnimator(float angularVelocity, long animationTime) {
+    private Animator createRotateAnimator(float angularVelocity, long animationTime,
+                                          @NonNull final PointF animationFocalPoint) {
       ValueAnimator animator = ValueAnimator.ofFloat(angularVelocity, 0f);
       animator.setDuration(animationTime);
       animator.setInterpolator(new DecelerateInterpolator());
@@ -710,7 +687,7 @@ final class MapGestureDetector {
         public void onAnimationUpdate(@NonNull ValueAnimator animation) {
           transform.setBearing(
             transform.getRawBearing() + (float) animation.getAnimatedValue(),
-            rotateFocalPoint.x, rotateFocalPoint.y,
+            animationFocalPoint.x, animationFocalPoint.y,
             0L
           );
         }
@@ -802,9 +779,9 @@ final class MapGestureDetector {
 
       PointF zoomFocalPoint;
       // Single finger double tap
-      if (focalPoint != null) {
+      if (constantFocalPoint != null) {
         // User provided focal point
-        zoomFocalPoint = focalPoint;
+        zoomFocalPoint = constantFocalPoint;
       } else {
         // Zoom in on gesture
         zoomFocalPoint = detector.getFocalPoint();
