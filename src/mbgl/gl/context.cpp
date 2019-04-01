@@ -6,6 +6,7 @@
 #include <mbgl/gl/renderbuffer_resource.hpp>
 #include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gl/texture.hpp>
+#include <mbgl/gl/offscreen_texture.hpp>
 #include <mbgl/gl/command_encoder.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
@@ -553,6 +554,17 @@ void Context::updateTextureResourceSub(gfx::TextureResource& resource,
                                   Enum<gfx::TextureChannelDataType>::to(type), data));
 }
 
+std::unique_ptr<gfx::OffscreenTexture>
+Context::createOffscreenTexture(const Size size, const gfx::TextureChannelDataType type) {
+    return std::make_unique<gl::OffscreenTexture>(*this, size, type);
+}
+
+std::unique_ptr<gfx::OffscreenTexture>
+Context::createOffscreenTexture(const Size size,
+                                gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>& depth,
+                                gfx::TextureChannelDataType type) {
+    return std::make_unique<gl::OffscreenTexture>(*this, size, depth, type);
+}
 
 std::unique_ptr<gfx::DrawScopeResource> Context::createDrawScopeResource() {
     return std::make_unique<gl::DrawScopeResource>(createVertexArray());

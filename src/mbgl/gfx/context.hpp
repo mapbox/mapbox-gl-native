@@ -17,6 +17,8 @@ class ProgramParameters;
 
 namespace gfx {
 
+class OffscreenTexture;
+
 class Context {
 protected:
     Context(ContextType type_, uint32_t maximumVertexBindingCount_)
@@ -122,6 +124,14 @@ protected:
         TexturePixelType, TextureChannelDataType) = 0;
     virtual void updateTextureResourceSub(TextureResource&, uint16_t xOffset, uint16_t yOffset, Size, const void* data,
         TexturePixelType, TextureChannelDataType) = 0;
+
+public:
+    virtual std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
+        Size, gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) = 0;
+    virtual std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
+        Size,
+        gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
+        gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) = 0;
 
 public:
     template <RenderbufferPixelType pixelType>

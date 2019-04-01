@@ -11,6 +11,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 
@@ -57,26 +58,26 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
 
         if (!renderTexture || renderTexture->getSize() != size) {
+            renderTexture.reset();
             if (parameters.context.supportsHalfFloatTextures) {
-                renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::HalfFloat);
+                renderTexture = parameters.context.createOffscreenTexture(size, gfx::TextureChannelDataType::HalfFloat);
 
+                // TODO: try binding in the offscreen texture constructor
                 try {
-                    renderTexture->bind();
+                    renderTexture->getResource<gl::RenderableResource>().bind();
                 } catch (const std::runtime_error& ex) {
                     // can't render to a half-float texture; falling back to unsigned byte one
-                    renderTexture = nullopt;
+                    renderTexture.reset();
                     parameters.context.supportsHalfFloatTextures = false;
                 }
             }
 
-            if (!parameters.context.supportsHalfFloatTextures || !renderTexture) {
-                renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::UnsignedByte);
-                renderTexture->bind();
+            if (!renderTexture) {
+                renderTexture = parameters.context.createOffscreenTexture(size, gfx::TextureChannelDataType::UnsignedByte);
             }
-
-        } else {
-            renderTexture->bind();
         }
+
+        renderTexture->getResource<gl::RenderableResource>().bind();
 
         if (!colorRampTexture) {
             colorRampTexture = parameters.context.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);

@@ -3,8 +3,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/offscreen_texture.hpp>
+#include <mbgl/gfx/offscreen_texture.hpp>
 
 namespace mbgl {
 
@@ -41,7 +40,7 @@ public:
 
     const style::FillExtrusionLayer::Impl& impl() const;
 
-    optional<OffscreenTexture> renderTexture;
+    std::unique_ptr<gfx::OffscreenTexture> renderTexture;
 private:
     CrossfadeParameters crossfade;
 };

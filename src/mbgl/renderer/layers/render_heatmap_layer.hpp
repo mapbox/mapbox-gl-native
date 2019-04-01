@@ -4,8 +4,8 @@
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
 #include <mbgl/gfx/texture.hpp>
+#include <mbgl/gfx/offscreen_texture.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/offscreen_texture.hpp>
 
 namespace mbgl {
 
@@ -36,7 +36,7 @@ public:
     const style::HeatmapLayer::Impl& impl() const;
 
     PremultipliedImage colorRamp;
-    optional<OffscreenTexture> renderTexture;
+    std::unique_ptr<gfx::OffscreenTexture> renderTexture;
     optional<gfx::Texture> colorRampTexture;
 
 private:
