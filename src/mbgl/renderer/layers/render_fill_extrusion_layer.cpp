@@ -15,6 +15,7 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 
 namespace mbgl {
 
@@ -62,10 +63,11 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         const auto& size = parameters.staticData.backendSize;
 
         if (!renderTexture || renderTexture->getSize() != size) {
-            renderTexture = OffscreenTexture(parameters.context, size, *parameters.staticData.depthRenderbuffer);
+            renderTexture.reset();
+            renderTexture = parameters.context.createOffscreenTexture(size, *parameters.staticData.depthRenderbuffer);
         }
 
-        renderTexture->bind();
+        renderTexture->getResource<gl::RenderableResource>().bind();
 
         optional<float> depthClearValue = {};
         if (parameters.staticData.depthRenderbuffer->needsClearing()) depthClearValue = 1.0;

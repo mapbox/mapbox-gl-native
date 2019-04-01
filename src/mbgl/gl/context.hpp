@@ -201,6 +201,13 @@ private:
     void updateTextureResource(gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
     void updateTextureResourceSub(gfx::TextureResource&, const uint16_t xOffset, const uint16_t yOffset, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
+    std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
+        Size, gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
+    std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
+        Size,
+        gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
+        gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
+
     std::unique_ptr<gfx::RenderbufferResource> createRenderbufferResource(gfx::RenderbufferPixelType, Size size) override;
 
     std::unique_ptr<gfx::DrawScopeResource> createDrawScopeResource() override;

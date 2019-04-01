@@ -4,10 +4,11 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/defines.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gl/offscreen_texture.hpp>
 
-#include <mbgl/util/offscreen_texture.hpp>
 
 using namespace mbgl;
 using namespace mbgl::platform;
@@ -132,13 +133,13 @@ void main() {
 
     // Then, create a texture, bind it, and render yellow to that texture. This should not
     // affect the originally bound FBO.
-    OffscreenTexture texture(context, { 128, 128 });
+    gl::OffscreenTexture texture(context, { 128, 128 });
 
     // Scissor test shouldn't leak after OffscreenTexture::bind().
     MBGL_CHECK_ERROR(glScissor(32, 32, 64, 64));
     context.scissorTest.setCurrentValue(true);
 
-    texture.bind();
+    texture.getResource<gl::RenderableResource>().bind();
 
     context.clear(Color(), {}, {});
 

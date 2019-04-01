@@ -10,8 +10,9 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/hillshade_layer_impl.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
+#include <mbgl/gfx/offscreen_texture.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/offscreen_texture.hpp>
 
 namespace mbgl {
 
@@ -130,8 +131,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             assert(bucket.dem);
             const uint16_t stride = bucket.getDEMData().stride;
             const uint16_t tilesize = bucket.getDEMData().dim;
-            OffscreenTexture view(parameters.context, { tilesize, tilesize });
-            view.bind();
+            auto view = parameters.context.createOffscreenTexture({ tilesize, tilesize });
+            view->getResource<gl::RenderableResource>().bind();
 
             const Properties<>::PossiblyEvaluated properties;
             const HillshadePrepareProgram::Binders paintAttributeData{ properties, 0 };
@@ -173,7 +174,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 },
                 getID()
             );
-            bucket.texture = std::move(view.getTexture());
+            bucket.texture = std::move(view->getTexture());
             bucket.setPrepared(true);
         } else if (parameters.pass == RenderPass::Translucent) {
             assert(bucket.texture);
