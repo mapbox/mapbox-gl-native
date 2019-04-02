@@ -493,6 +493,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         observer->onDidFinishRenderingMap();
     }
 
+    if (updateParameters.mode == MapMode::Continuous) {
+        parameters.encoder->present(parameters.backend.getDefaultRenderable());
+    }
+
     // CommandEncoder destructor submits render commands.
 }
 

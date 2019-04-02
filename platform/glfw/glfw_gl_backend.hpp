@@ -11,8 +11,10 @@ class GLFWGLBackend final : public GLFWBackend,
                             public mbgl::gl::RendererBackend,
                             public mbgl::gfx::Renderable {
 public:
-    GLFWGLBackend(GLFWwindow*);
+    GLFWGLBackend(GLFWwindow*, bool capFrameRate);
     ~GLFWGLBackend() override;
+
+    void swap();
 
     // GLFWRendererBackend implementation
 public:

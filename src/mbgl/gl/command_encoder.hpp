@@ -18,6 +18,7 @@ public:
     friend class RenderPass;
 
     std::unique_ptr<gfx::RenderPass> createRenderPass(const char* name, const gfx::RenderPassDescriptor&) override;
+    void present(gfx::Renderable&) override;
 
 private:
     void pushDebugGroup(const char* name) override;

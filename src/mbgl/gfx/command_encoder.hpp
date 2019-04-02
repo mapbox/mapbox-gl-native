@@ -9,6 +9,7 @@ namespace gfx {
 
 class RenderPassDescriptor;
 class RenderPass;
+class Renderable;
 
 class CommandEncoder {
 protected:
@@ -28,6 +29,7 @@ public:
     }
 
     virtual std::unique_ptr<RenderPass> createRenderPass(const char* name, const RenderPassDescriptor&) = 0;
+    virtual void present(Renderable&) = 0;
 };
 
 } // namespace gfx
