@@ -9,7 +9,7 @@ void VertexArray::bind(Context& context,
                        const gfx::IndexBuffer& indexBuffer,
                        const AttributeBindingArray& bindings) {
     context.bindVertexArray = state->vertexArray;
-    state->indexBuffer = reinterpret_cast<const gl::IndexBufferResource&>(*indexBuffer.resource).buffer;
+    state->indexBuffer = indexBuffer.getResource<gl::IndexBufferResource>().buffer;
 
     state->bindings.reserve(bindings.size());
     for (AttributeLocation location = 0; location < bindings.size(); ++location) {

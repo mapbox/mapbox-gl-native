@@ -169,7 +169,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 allUniformValues,
                 allAttributeBindings,
                 HillshadePrepareProgram::TextureBindings{
-                    textures::image::Value{ *bucket.dem->resource },
+                    textures::image::Value{ bucket.dem->getResource() },
                 },
                 getID()
             );
@@ -186,7 +186,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                      bucket.segments,
                      tile.id,
                      HillshadeProgram::TextureBindings{
-                         textures::image::Value{ *bucket.texture->resource,  gfx::TextureFilterType::Linear },
+                         textures::image::Value{ bucket.texture->getResource(), gfx::TextureFilterType::Linear },
                      });
             } else {
                 // Draw the full tile.
@@ -196,7 +196,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                      parameters.staticData.rasterSegments,
                      tile.id,
                      HillshadeProgram::TextureBindings{
-                         textures::image::Value{ *bucket.texture->resource,  gfx::TextureFilterType::Linear },
+                         textures::image::Value{ bucket.texture->getResource(), gfx::TextureFilterType::Linear },
                      });
             }
         }

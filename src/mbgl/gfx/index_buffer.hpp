@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <cassert>
 
 namespace mbgl {
 namespace gfx {
@@ -14,8 +15,20 @@ public:
 
 class IndexBuffer {
 public:
+    IndexBuffer(const std::size_t elements_, std::unique_ptr<IndexBufferResource>&& resource_)
+        : elements(elements_), resource(std::move(resource_)) {
+    }
+
     std::size_t elements;
-    std::unique_ptr<const IndexBufferResource> resource;
+
+    template <typename T = IndexBufferResource>
+    T& getResource() const {
+        assert(resource);
+        return static_cast<T&>(*resource);
+    }
+
+protected:
+    std::unique_ptr<IndexBufferResource> resource;
 };
 
 } // namespace gfx

@@ -177,8 +177,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             allUniformValues,
             allAttributeBindings,
             HeatmapTextureProgram::TextureBindings{
-                textures::image::Value{ *renderTexture->getTexture().resource, gfx::TextureFilterType::Linear },
-                textures::color_ramp::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+                textures::image::Value{ renderTexture->getTexture().getResource(), gfx::TextureFilterType::Linear },
+                textures::color_ramp::Value{ colorRampTexture->getResource(), gfx::TextureFilterType::Linear },
             },
             getID()
         );

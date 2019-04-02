@@ -250,7 +250,7 @@ AttributeBinding attributeBinding(const VertexBuffer<detail::VertexType<As...>>&
     return {
         Descriptor::data.attributes[I],
         Descriptor::data.stride,
-        buffer.resource.get(),
+        &buffer.getResource(),
         0,
     };
 }

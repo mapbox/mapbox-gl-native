@@ -137,8 +137,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      *bucket.indexBuffer,
                      bucket.segments,
                      RasterProgram::TextureBindings{
-                         textures::image0::Value{ *bucket.texture->resource, filter },
-                         textures::image1::Value{ *bucket.texture->resource, filter },
+                         textures::image0::Value{ bucket.texture->getResource(), filter },
+                         textures::image1::Value{ bucket.texture->getResource(), filter },
                      });
             }
         }
@@ -161,8 +161,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      *bucket.indexBuffer,
                      bucket.segments,
                      RasterProgram::TextureBindings{
-                         textures::image0::Value{ *bucket.texture->resource, filter },
-                         textures::image1::Value{ *bucket.texture->resource, filter },
+                         textures::image0::Value{ bucket.texture->getResource(), filter },
+                         textures::image1::Value{ bucket.texture->getResource(), filter },
                      });
             } else {
                 // Draw the full tile.
@@ -171,8 +171,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      parameters.staticData.quadTriangleIndexBuffer,
                      parameters.staticData.rasterSegments,
                      RasterProgram::TextureBindings{
-                         textures::image0::Value{ *bucket.texture->resource, filter },
-                         textures::image1::Value{ *bucket.texture->resource, filter },
+                         textures::image0::Value{ bucket.texture->getResource(), filter },
+                         textures::image1::Value{ bucket.texture->getResource(), filter },
                      });
             }
         }
