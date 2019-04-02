@@ -695,9 +695,6 @@ public:
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
 
-    CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-    eaglLayer.presentsWithTransaction = YES;
-    
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
     _glView.contentMode = UIViewContentModeCenter;
@@ -6142,6 +6139,9 @@ public:
         return;
     }
 
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+
     // If the map is pitched consider the viewport to be exactly the same as the bounds.
     // Otherwise, add a small buffer.
     CGFloat largestWidth = MAX(_largestAnnotationViewSize.width, CGRectGetWidth(self.frame));
@@ -6236,6 +6236,8 @@ public:
             }
         }
     }
+
+    [CATransaction commit];
 }
 
 - (void)updateCalloutView
