@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/dsl_impl.hpp>
 #include <mbgl/style/expression/error.hpp>
 #include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/assertion.hpp>
@@ -14,16 +15,11 @@ namespace style {
 namespace expression {
 namespace dsl {
 
-static std::unique_ptr<Expression> compound(const char* op, std::vector<std::unique_ptr<Expression>> args) {
+std::unique_ptr<Expression> compound(const char* op, std::vector<std::unique_ptr<Expression>> args) {
     ParsingContext ctx;
     ParseResult result =  createCompoundExpression(op, std::move(args), ctx);
     assert(result);
     return std::move(*result);
-}
-
-template <class... Args>
-static std::unique_ptr<Expression> compound(const char* op, Args... args) {
-    return compound(op, vec(std::move(args)...));
 }
 
 std::unique_ptr<Expression> error(std::string message) {
