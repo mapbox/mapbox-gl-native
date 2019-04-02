@@ -136,7 +136,7 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
 
     imageManager.setLoaded(true);
     ASSERT_FALSE(notified);
-    imageManager.imagesAdded();
+    imageManager.notifyIfMissingImageAdded();
     ASSERT_TRUE(notified);
 }
 
