@@ -231,7 +231,7 @@ public:
 
     static gfx::Vertex<SymbolOpacityAttributes> opacityVertex(bool placed, float opacity) {
         return {
-            {{ static_cast<uint8_t>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(placed)) }}
+            {{ static_cast<float>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(placed)) }}
         };
     }
 };
