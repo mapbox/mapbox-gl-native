@@ -20,7 +20,13 @@ HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, Scheduler& sch
     asyncInvalidate([this] {
         if (renderer && updateParameters) {
             mbgl::BackendScope guard { backend };
-            renderer->render(*updateParameters);
+
+            // onStyleImageMissing might be called during a render. The user implemented method
+            // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.
+            // Copy the shared pointer here so that the parameters aren't destroyed while `render(...)` is
+            // still using them.
+            auto updateParameters_ = updateParameters;
+            renderer->render(*updateParameters_);
         }
     }),
     renderer(std::make_unique<Renderer>(backend, pixelRatio, scheduler, mode, programCacheDir, localFontFamily)) {
