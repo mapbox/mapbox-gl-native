@@ -29,8 +29,8 @@ constexpr const uint8_t ShaderSource<HeatmapTextureProgram>::hash[8];
 namespace gfx {
 
 template <>
-std::unique_ptr<Program<HeatmapTextureProgram>>
-Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
+std::unique_ptr<gfx::Program<HeatmapTextureProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
     return std::make_unique<gl::Program<HeatmapTextureProgram>>(programParameters);
 }
 

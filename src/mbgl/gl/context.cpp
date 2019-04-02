@@ -50,7 +50,7 @@ static_assert(underlying_type(UniformDataType::Sampler2D) == GL_SAMPLER_2D, "Ope
 static_assert(underlying_type(UniformDataType::SamplerCube) == GL_SAMPLER_CUBE, "OpenGL type mismatch");
 
 Context::Context(RendererBackend& backend_)
-    : gfx::Context(gfx::ContextType::OpenGL, [] {
+    : gfx::Context([] {
           GLint value;
           MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
           return value;

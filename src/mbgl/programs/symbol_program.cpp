@@ -1,5 +1,4 @@
 #include <mbgl/programs/symbol_program.hpp>
-#include <mbgl/gfx/context_impl.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -9,10 +8,6 @@
 #include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
-
-template std::unique_ptr<gfx::Program<SymbolIconProgram>> gfx::Context::createProgram(const ProgramParameters&);
-template std::unique_ptr<gfx::Program<SymbolSDFTextProgram>> gfx::Context::createProgram(const ProgramParameters&);
-template std::unique_ptr<gfx::Program<SymbolSDFIconProgram>> gfx::Context::createProgram(const ProgramParameters&);
 
 using namespace style;
 

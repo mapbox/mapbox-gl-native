@@ -14,6 +14,10 @@ using namespace mbgl;
 using namespace mbgl::platform;
 
 TEST(OffscreenTexture, EmptyRed) {
+    if (gfx::Backend::GetType() != gfx::Backend::Type::OpenGL) {
+        return;
+    }
+
     gl::HeadlessBackend backend({ 512, 256 });
     gfx::BackendScope scope { backend };
 
@@ -76,6 +80,10 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
+    if (gfx::Backend::GetType() != gfx::Backend::Type::OpenGL) {
+        return;
+    }
+
     gl::HeadlessBackend backend({ 512, 256 });
     gfx::BackendScope scope { backend };
     auto& context = static_cast<gl::Context&>(backend.getContext());

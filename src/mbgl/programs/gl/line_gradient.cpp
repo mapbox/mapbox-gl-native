@@ -29,8 +29,8 @@ constexpr const uint8_t ShaderSource<LineGradientProgram>::hash[8];
 namespace gfx {
 
 template <>
-std::unique_ptr<Program<LineGradientProgram>>
-Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
+std::unique_ptr<gfx::Program<LineGradientProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
     return std::make_unique<gl::Program<LineGradientProgram>>(programParameters);
 }
 

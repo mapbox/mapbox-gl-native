@@ -1,5 +1,4 @@
 #include <mbgl/programs/fill_extrusion_program.hpp>
-#include <mbgl/gfx/context_impl.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <mbgl/tile/tile_id.hpp>
@@ -7,9 +6,6 @@
 #include <mbgl/util/mat3.hpp>
 
 namespace mbgl {
-
-template std::unique_ptr<gfx::Program<FillExtrusionProgram>> gfx::Context::createProgram(const ProgramParameters&);
-template std::unique_ptr<gfx::Program<FillExtrusionPatternProgram>> gfx::Context::createProgram(const ProgramParameters&);
 
 using namespace style;
 

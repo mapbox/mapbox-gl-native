@@ -72,3 +72,15 @@ void GLFWGLBackend::setSize(const mbgl::Size newSize) {
 void GLFWGLBackend::swap() {
     glfwSwapBuffers(window);
 }
+
+namespace mbgl {
+namespace gfx {
+
+template <>
+std::unique_ptr<GLFWBackend>
+Backend::Create<mbgl::gfx::Backend::Type::OpenGL>(GLFWwindow* window, bool capFrameRate) {
+    return std::make_unique<GLFWGLBackend>(window, capFrameRate);
+}
+
+} // namespace gfx
+} // namespace mbgl

@@ -79,20 +79,22 @@ void HeadlessBackend::updateAssumedState() {
 PremultipliedImage HeadlessBackend::readStillImage() {
     return static_cast<gl::Context&>(getContext()).readFramebuffer<PremultipliedImage>(size);
 }
-    
+
 RendererBackend* HeadlessBackend::getRendererBackend() {
     return this;
 }
 
 } // namespace gl
 
-#ifndef OVERRIDE_HEADLESS_BACKEND_FACTORY
-// Default factory implementation.
-std::unique_ptr<gfx::HeadlessBackend> gfx::HeadlessBackend::make(Size size, gfx::ContextMode contextMode) {
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::HeadlessBackend>
+Backend::Create<gfx::Backend::Type::OpenGL>(const Size size, const gfx::ContextMode contextMode) {
     return std::make_unique<gl::HeadlessBackend>(size, contextMode);
 }
-#endif
 
+} // namespace gfx
 } // namespace mbgl
 
 

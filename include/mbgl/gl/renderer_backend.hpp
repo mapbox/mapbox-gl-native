@@ -17,9 +17,6 @@ public:
     RendererBackend(gfx::ContextMode);
     ~RendererBackend() override;
 
-    // Returns the backend's context which manages OpenGL state.
-    Context& getGLContext();
-
     // Called prior to rendering to update the internally assumed OpenGL state.
     virtual void updateAssumedState() = 0;
 

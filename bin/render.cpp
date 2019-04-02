@@ -4,6 +4,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/default_styles.hpp>
 
+#include <mbgl/gfx/backend.hpp>
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
 
@@ -17,6 +18,7 @@ int main(int argc, char *argv[]) {
     args::ArgumentParser argumentParser("Mapbox GL render tool");
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {"help"});
 
+    args::ValueFlag<std::string> backendValue(argumentParser, "Backend", "Rendering backend", {"backend"});
     args::ValueFlag<std::string> tokenValue(argumentParser, "key", "Mapbox access token", {'t', "token"});
     args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
     args::ValueFlag<std::string> outputValue(argumentParser, "file", "Output file name", {'o', "output"});

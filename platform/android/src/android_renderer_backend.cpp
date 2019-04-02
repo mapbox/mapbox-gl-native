@@ -59,7 +59,7 @@ void AndroidRendererBackend::updateAssumedState() {
 
 void AndroidRendererBackend::markContextLost() {
     if (context) {
-        getGLContext().setCleanupOnDestruction(false);
+        getContext<gl::Context>().setCleanupOnDestruction(false);
     }
 }
 

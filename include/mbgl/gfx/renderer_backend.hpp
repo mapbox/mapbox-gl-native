@@ -30,6 +30,11 @@ public:
     // Returns the device's context.
     Context& getContext();
 
+    template <typename T>
+    T& getContext() {
+        return static_cast<T&>(getContext());
+    }
+
     bool contextIsShared() const {
         return contextMode == ContextMode::Shared;
     }

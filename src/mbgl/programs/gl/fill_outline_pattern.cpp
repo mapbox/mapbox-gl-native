@@ -29,8 +29,8 @@ constexpr const uint8_t ShaderSource<FillOutlinePatternProgram>::hash[8];
 namespace gfx {
 
 template <>
-std::unique_ptr<Program<FillOutlinePatternProgram>>
-Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
+std::unique_ptr<gfx::Program<FillOutlinePatternProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
     return std::make_unique<gl::Program<FillOutlinePatternProgram>>(programParameters);
 }
 

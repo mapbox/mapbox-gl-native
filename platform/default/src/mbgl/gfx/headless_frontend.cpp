@@ -23,9 +23,9 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
                                    const gfx::ContextMode contextMode,
                                    const optional<std::string> localFontFamily)
     : size(size_),
-    pixelRatio(pixelRatio_),
-    backend(gfx::HeadlessBackend::make( { static_cast<uint32_t>(size.width * pixelRatio),
-                                          static_cast<uint32_t>(size.height * pixelRatio) }, contextMode)),
+      pixelRatio(pixelRatio_),
+      backend(gfx::HeadlessBackend::Create({ static_cast<uint32_t>(size.width * pixelRatio),
+                                             static_cast<uint32_t>(size.height * pixelRatio) }, contextMode)),
     asyncInvalidate([this] {
         if (renderer && updateParameters) {
             gfx::BackendScope guard { *getBackend() };

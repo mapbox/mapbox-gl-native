@@ -1,5 +1,5 @@
 #include "glfw_view.hpp"
-#include "glfw_gl_backend.hpp"
+#include "glfw_backend.hpp"
 #include "glfw_renderer_frontend.hpp"
 #include "ny_route.hpp"
 
@@ -17,6 +17,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/gfx/backend.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
 
@@ -76,6 +77,10 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #endif
 
+    if (mbgl::gfx::Backend::GetType() != mbgl::gfx::Backend::Type::OpenGL) {
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    }
+
     glfwWindowHint(GLFW_RED_BITS, 8);
     glfwWindowHint(GLFW_GREEN_BITS, 8);
     glfwWindowHint(GLFW_BLUE_BITS, 8);
@@ -100,7 +105,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
 
     glfwGetWindowSize(window, &width, &height);
 
-    backend = std::make_unique<GLFWGLBackend>(window, benchmark);
+    backend = GLFWBackend::Create(window, benchmark);
 
     pixelRatio = static_cast<float>(backend->getSize().width) / width;
 
