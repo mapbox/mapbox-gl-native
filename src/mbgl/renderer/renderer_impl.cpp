@@ -505,6 +505,17 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 #endif
 
+    // Ends the RenderPass
+    parameters.renderPass.reset();
+
+    if (updateParameters.mode == MapMode::Continuous) {
+        parameters.encoder->present(parameters.backend.getDefaultRenderable());
+    }
+
+    // CommandEncoder destructor submits render commands.
+    parameters.encoder.reset();
+
+
     const bool needsRepaint = isMapModeContinuous && hasTransitions(parameters.timePoint);
     observer->onDidFinishRenderingFrame(
         loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
@@ -521,12 +532,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // and there are no ongoing transitions.
         imageManager->reduceMemoryUseIfCacheSizeExceedsLimit();
     }
-
-    if (updateParameters.mode == MapMode::Continuous) {
-        parameters.encoder->present(parameters.backend.getDefaultRenderable());
-    }
-
-    // CommandEncoder destructor submits render commands.
 }
 
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
