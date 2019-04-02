@@ -197,7 +197,6 @@ tidy: compdb
 
 .PHONY: check
 check: compdb
-	@echo TARGET_BRANCH=$(TARGET_BRANCH)
 	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) $(TARGET_BRANCH) --diff
 endif
 
