@@ -660,6 +660,11 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
         }
     }
 
+    optional<std::unique_ptr<Expression>> defaultExpr;
+    if (objectMember(value, "default")) {
+        defaultExpr = convertLiteral(type, *objectMember(value, "default"), err);
+    }
+
     if (!objectMember(value, "property")) {
         // Camera function.
         switch (functionType) {
@@ -688,22 +693,22 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
     if (functionType == FunctionType::Identity) {
         return type.match(
             [&] (const type::StringType&) -> optional<std::unique_ptr<Expression>> {
-                return string(get(literal(*property)));
+                return string(get(literal(*property)), std::move(defaultExpr));
             },
             [&] (const type::NumberType&) -> optional<std::unique_ptr<Expression>> {
-                return number(get(literal(*property)));
+                return number(get(literal(*property)), std::move(defaultExpr));
             },
             [&] (const type::BooleanType&) -> optional<std::unique_ptr<Expression>> {
-                return boolean(get(literal(*property)));
+                return boolean(get(literal(*property)), std::move(defaultExpr));
             },
             [&] (const type::ColorType&) -> optional<std::unique_ptr<Expression>> {
-                return toColor(get(literal(*property)));
+                return toColor(get(literal(*property)), std::move(defaultExpr));
             },
             [&] (const type::Array& array) -> optional<std::unique_ptr<Expression>> {
-                return assertion(array, get(literal(*property)));
+                return assertion(array, get(literal(*property)), std::move(defaultExpr));
             },
             [&] (const type::FormattedType&) -> optional<std::unique_ptr<Expression>> {
-                return format(get(literal(*property)));
+                return toFormatted(get(literal(*property)), std::move(defaultExpr));
             },
             [&] (const auto&) -> optional<std::unique_ptr<Expression>>  {
                 assert(false); // No properties use this type.
