@@ -33,18 +33,9 @@ bool RenderLayer::needsRendering(float zoom) const {
            && baseImpl->maxZoom >= zoom;
 }
 
-void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState& state) {
-    renderTiles = filterRenderTiles(std::move(tiles));
-    sortRenderTiles(state);
-}
-
-RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
+void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState&) {
     auto filterFn = [](auto& tile){ return !tile.tile.isRenderable() || tile.tile.holdForFade(); };
-    return filterRenderTiles(std::move(tiles), filterFn);
-}
-
-void RenderLayer::sortRenderTiles(const TransformState&) {
-    // no-op
+    renderTiles = filterRenderTiles(std::move(tiles), filterFn);
 }
 
 const RenderLayerSymbolInterface* RenderLayer::getSymbolInterface() const {

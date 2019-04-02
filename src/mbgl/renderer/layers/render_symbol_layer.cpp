@@ -470,12 +470,9 @@ style::SymbolPropertyValues RenderSymbolLayer::textPropertyValues(const style::S
     };
 }
 
-RenderLayer::RenderTiles RenderSymbolLayer::filterRenderTiles(RenderTiles tiles) const {
+void RenderSymbolLayer::setRenderTiles(RenderTiles tiles, const TransformState& state) {
     auto filterFn = [](auto& tile){ return !tile.tile.isRenderable(); };
-    return RenderLayer::filterRenderTiles(std::move(tiles), filterFn);
-}
-
-void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
+    renderTiles = RenderLayer::filterRenderTiles(std::move(tiles), filterFn);
     // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
     // on top of each other, with lower symbols being drawn on top of higher symbols.
     std::sort(renderTiles.begin(), renderTiles.end(), [&state](const auto& a, const auto& b) {
