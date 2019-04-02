@@ -81,4 +81,5 @@
     <string name="description_recyclerview_textureview">Show a TextureView MapView as a recyclerView item</string>
     <string name="description_recyclerview_glsurfaceview">Show a GLSurfaceView MapView as a recyclerView item</string>
     <string name="description_nested_viewpager">Show a MapView inside a viewpager inside a recyclerView</string>
+    <string name="description_performance_measurement">Show the use PerformanceEvent for performance measurements</string>
 </resources>

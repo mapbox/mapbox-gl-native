@@ -81,4 +81,5 @@
     <string name="activity_recyclerview_textureview">RecyclerView TextureView</string>
     <string name="activity_recyclerview_glsurfaceview">RecyclerView GLSurfaceView</string>
     <string name="activity_nested_viewpager">Nested ViewPager</string>
+    <string name="activity_performance_measurement">Performance Measurement</string>
 </resources>
