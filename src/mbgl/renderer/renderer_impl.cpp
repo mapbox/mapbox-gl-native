@@ -40,13 +40,11 @@ static RendererObserver& nullObserver() {
 Renderer::Impl::Impl(gfx::RendererBackend& backend_,
                      float pixelRatio_,
                      Scheduler& scheduler_,
-                     GLContextMode contextMode_,
                      const optional<std::string> programCacheDir_,
                      const optional<std::string> localFontFamily_)
     : backend(backend_)
     , scheduler(scheduler_)
     , observer(&nullObserver())
-    , contextMode(contextMode_)
     , pixelRatio(pixelRatio_)
     , programCacheDir(std::move(programCacheDir_))
     , localFontFamily(std::move(localFontFamily_))
@@ -267,9 +265,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             } 
 
             // Handle layers without source.
-            if (layerNeedsRendering && sourceImpl.get() == sourceImpls->at(0).get()) {            
-                if (contextMode == GLContextMode::Unique
-                    && layerImpl.get() == layerImpls->at(0).get()) {
+            if (layerNeedsRendering && sourceImpl.get() == sourceImpls->at(0).get()) {
+                if (!backend.contextIsShared() && layerImpl.get() == layerImpls->at(0).get()) {
                     const auto& solidBackground = layer->getSolidBackground();
                     if (solidBackground) {
                         backgroundColor = *solidBackground;
@@ -358,7 +355,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     PaintParameters parameters {
         backend.getContext(),
         pixelRatio,
-        contextMode,
         backend,
         updateParameters,
         renderLight.getEvaluated(),
@@ -373,7 +369,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // TODO: remove cast
     gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
 
-    if (parameters.contextMode == GLContextMode::Shared) {
+    if (backend.contextIsShared()) {
         glContext.setDirtyState();
     }
 
@@ -428,7 +424,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
             glContext.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
-        } else if (parameters.contextMode == GLContextMode::Shared) {
+        } else if (backend.contextIsShared()) {
             glContext.clear({}, ClearDepth::Default, ClearStencil::Default);
         } else {
             glContext.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default);

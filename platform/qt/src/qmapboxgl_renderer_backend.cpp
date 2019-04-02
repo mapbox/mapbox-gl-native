@@ -21,8 +21,9 @@ private:
     QMapboxGLRendererBackend& backend;
 };
 
-QMapboxGLRendererBackend::QMapboxGLRendererBackend()
-    : mbgl::gfx::Renderable({ 0, 0 }, std::make_unique<QMapboxGLRenderableResource>(*this)) {
+QMapboxGLRendererBackend::QMapboxGLRendererBackend(const mbgl::gfx::ContextMode contextMode_)
+    : mbgl::gl::RendererBackend(contextMode_),
+      mbgl::gfx::Renderable({ 0, 0 }, std::make_unique<QMapboxGLRenderableResource>(*this)) {
 }
 
 QMapboxGLRendererBackend::~QMapboxGLRendererBackend() = default;

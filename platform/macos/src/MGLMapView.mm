@@ -286,7 +286,7 @@ public:
     _mbglThreadPool = mbgl::sharedThreadPool();
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.cacheDir, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
 
@@ -3060,9 +3060,12 @@ class MGLMapViewImpl : public mbgl::gl::RendererBackend,
                        public mbgl::gfx::Renderable,
                        public mbgl::MapObserver {
 public:
-    MGLMapViewImpl(MGLMapView *nativeView_) : mbgl::gfx::Renderable(
-          nativeView_.framebufferSize,
-          std::make_unique<MGLMapViewRenderable>(*this)), nativeView(nativeView_) {}
+    MGLMapViewImpl(MGLMapView* nativeView_)
+        : mbgl::gl::RendererBackend(mbgl::gfx::ContextMode::Unique),
+          mbgl::gfx::Renderable(nativeView_.framebufferSize,
+                                std::make_unique<MGLMapViewRenderable>(*this)),
+          nativeView(nativeView_) {
+    }
 
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
         bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;

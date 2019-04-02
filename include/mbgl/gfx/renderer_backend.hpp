@@ -12,10 +12,15 @@ class Context;
 class Renderable;
 class BackendScope;
 
-// TODO: Rename to "Device"
+// We can make some optimizations if we know that the drawing context is not shared with other code.
+enum class ContextMode : bool {
+    Unique,
+    Shared,
+};
+
 class RendererBackend {
 protected:
-    explicit RendererBackend();
+    explicit RendererBackend(ContextMode);
 
 public:
     virtual ~RendererBackend();
@@ -24,6 +29,10 @@ public:
 
     // Returns the device's context.
     Context& getContext();
+
+    bool contextIsShared() const {
+        return contextMode == ContextMode::Shared;
+    }
 
     // Returns a reference to the default surface that should be rendered on.
     virtual Renderable& getDefaultRenderable() = 0;
@@ -44,6 +53,7 @@ protected:
 
 protected:
     std::unique_ptr<Context> context;
+    const ContextMode contextMode;
     std::once_flag initialized;
 
     friend class BackendScope;

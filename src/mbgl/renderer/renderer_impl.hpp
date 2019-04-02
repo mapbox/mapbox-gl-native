@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_light.hpp>
@@ -41,8 +40,11 @@ class Renderer::Impl : public GlyphManagerObserver,
                        public ImageManagerObserver,
                        public RenderSourceObserver{
 public:
-    Impl(gfx::RendererBackend&, float pixelRatio_, Scheduler&, GLContextMode,
-         const optional<std::string> programCacheDir, const optional<std::string> localFontFamily_);
+    Impl(gfx::RendererBackend&,
+         float pixelRatio_,
+         Scheduler&,
+         const optional<std::string> programCacheDir,
+         const optional<std::string> localFontFamily_);
     ~Impl() final;
 
     void markContextLost() {
@@ -103,7 +105,6 @@ private:
 
     RendererObserver* observer;
 
-    const GLContextMode contextMode;
     const float pixelRatio;
     const optional<std::string> programCacheDir;
     const optional<std::string> localFontFamily;

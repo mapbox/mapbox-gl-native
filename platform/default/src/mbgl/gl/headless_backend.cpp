@@ -31,8 +31,8 @@ public:
     gl::Framebuffer framebuffer;
 };
 
-HeadlessBackend::HeadlessBackend(Size size_)
-    : mbgl::gfx::Renderable(size_, nullptr) {
+HeadlessBackend::HeadlessBackend(const Size size_, const gfx::ContextMode contextMode_)
+    : mbgl::gl::RendererBackend(contextMode_), mbgl::gfx::Renderable(size_, nullptr) {
 }
 
 HeadlessBackend::~HeadlessBackend() {

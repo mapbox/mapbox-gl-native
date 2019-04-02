@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/map/camera.hpp>
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/util/async_task.hpp>
@@ -22,8 +21,17 @@ class RendererBackend;
 
 class HeadlessFrontend : public RendererFrontend {
 public:
-    HeadlessFrontend(float pixelRatio_, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique, const optional<std::string> localFontFamily = {});
-    HeadlessFrontend(Size, float pixelRatio_, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique, const optional<std::string> localFontFamily = {});
+    HeadlessFrontend(float pixelRatio_,
+                     Scheduler&,
+                     const optional<std::string> programCacheDir = {},
+                     gfx::ContextMode mode = gfx::ContextMode::Unique,
+                     const optional<std::string> localFontFamily = {});
+    HeadlessFrontend(Size,
+                     float pixelRatio_,
+                     Scheduler&,
+                     const optional<std::string> programCacheDir = {},
+                     gfx::ContextMode mode = gfx::ContextMode::Unique,
+                     const optional<std::string> localFontFamily = {});
     ~HeadlessFrontend() override;
 
     void reset() override;

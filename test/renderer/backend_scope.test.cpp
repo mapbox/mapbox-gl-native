@@ -7,8 +7,11 @@
 
 using namespace mbgl;
 
-class StubRendererBackend: public gl::RendererBackend {
+class StubRendererBackend : public gl::RendererBackend {
 public:
+    StubRendererBackend() : gl::RendererBackend(gfx::ContextMode::Unique) {
+    }
+
     void activate() override {
         if (activateFunction) activateFunction();
     }

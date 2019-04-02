@@ -8,7 +8,9 @@
 namespace mbgl {
 namespace gl {
 
-RendererBackend::RendererBackend() = default;
+RendererBackend::RendererBackend(const gfx::ContextMode contextMode_)
+    : gfx::RendererBackend(contextMode_) {
+}
 
 std::unique_ptr<gfx::Context> RendererBackend::createContext() {
     auto result = std::make_unique<gl::Context>(*this);

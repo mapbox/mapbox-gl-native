@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/renderer/query.hpp>
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geojson.hpp>
@@ -26,7 +25,6 @@ class RendererBackend;
 class Renderer {
 public:
     Renderer(gfx::RendererBackend&, float pixelRatio_, Scheduler&,
-             GLContextMode = GLContextMode::Unique,
              const optional<std::string> programCacheDir = {},
              const optional<std::string> localFontFamily = {});
     ~Renderer();

@@ -20,7 +20,8 @@ private:
 };
 
 GLFWGLBackend::GLFWGLBackend(GLFWwindow* window_)
-    : mbgl::gfx::Renderable(
+    : mbgl::gl::RendererBackend(mbgl::gfx::ContextMode::Unique),
+      mbgl::gfx::Renderable(
           [window_] {
               int fbWidth, fbHeight;
               glfwGetFramebufferSize(window_, &fbWidth, &fbHeight);

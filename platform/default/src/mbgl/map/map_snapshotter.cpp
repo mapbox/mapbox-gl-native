@@ -56,14 +56,17 @@ MapSnapshotter::Impl::Impl(std::shared_ptr<Scheduler> scheduler_,
                            const optional<std::string> programCacheDir,
                            const optional<std::string> localFontFamily,
                            const ResourceOptions& resourceOptions)
-        : scheduler(std::move(scheduler_))
-        , frontend(size, pixelRatio, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
-        , map(frontend, MapObserver::nullObserver(), *scheduler,
-              MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
-              resourceOptions) {
+    : scheduler(std::move(scheduler_)),
+      frontend(
+          size, pixelRatio, *scheduler, programCacheDir, gfx::ContextMode::Unique, localFontFamily),
+      map(frontend,
+          MapObserver::nullObserver(),
+          *scheduler,
+          MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
+          resourceOptions) {
     if (style.first) {
         map.getStyle().loadJSON(style.second);
-    } else{
+    } else {
         map.getStyle().loadURL(style.second);
     }
 
