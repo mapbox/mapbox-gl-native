@@ -503,7 +503,7 @@ jobs:
           command: make compdb
       - run:
           name: Run Clang checks
-          command: make check
+          command: make check TARGET_BRANCH=${CIRCLE_TARGET_BRANCH:master}
           no_output_timeout: 20m
       - save-dependencies: { ccache: false }
 

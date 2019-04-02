@@ -33,7 +33,7 @@ function run_clang_tidy() {
 }
 
 function run_clang_tidy_diff() {
-    OUTPUT=$(git diff origin/master --src-prefix=${CDUP} --dst-prefix=${CDUP} | \
+    OUTPUT=$(git diff origin/$2 --src-prefix=${CDUP} --dst-prefix=${CDUP} | \
                 ${CLANG_TIDY_PREFIX}/share/clang-tidy-diff.py \
                     -clang-tidy-binary ${CLANG_TIDY} \
                     2>/dev/null)
@@ -45,7 +45,7 @@ function run_clang_tidy_diff() {
 
 function run_clang_format() {
     echo "Running clang-format on $0..."
-    DIFF_FILES=$(git diff origin/master --name-only *cpp)
+    DIFF_FILES=$(git diff origin/$2 --name-only *cpp)
     echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'run_clang_format' {}
     ${CLANG_FORMAT} -i ${CDUP}/$0 || exit 1
 }
@@ -54,7 +54,7 @@ export -f run_clang_tidy run_clang_tidy_diff run_clang_format
 
 echo "Running Clang checks... (this might take a while)"
 
-if [[ -n $2 ]] && [[ $2 == "--diff" ]]; then
+if [[ -n $3 ]] && [[ $3 == "--diff" ]]; then
     run_clang_tidy_diff $@
     # XXX disabled until we run clang-format over the entire codebase.
     #run_clang_format $@
