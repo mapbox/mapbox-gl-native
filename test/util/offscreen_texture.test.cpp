@@ -2,6 +2,7 @@
 
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
+#include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/defines.hpp>
@@ -179,4 +180,19 @@ void main() {
 
     image = backend.readStillImage();
     test::checkImage("test/fixtures/offscreen_texture/render-to-fbo-composited", image, 0, 0.1);
+}
+
+TEST(OffscreenTexture, ClearRenderPassColor) {
+    auto backend = gfx::HeadlessBackend::Create({ 128, 256 });
+    gfx::BackendScope scope { *backend->getRendererBackend() };
+    auto& context = backend->getRendererBackend()->getContext();
+    auto encoder = context.createCommandEncoder();
+    auto offscreenTexture = context.createOffscreenTexture({ 128, 256 });
+    auto renderPass = encoder->createRenderPass(
+        "offscreen texture", { *offscreenTexture, Color{ 1.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
+    renderPass.reset();
+    encoder.reset();
+
+    auto image = offscreenTexture->readStillImage();
+    test::checkImage("test/fixtures/offscreen_texture/clear-render-pass-color", image, 0, 0);
 }
