@@ -356,6 +356,17 @@ static optional<std::map<double, std::unique_ptr<Expression>>> convertStops(type
     return { std::move(stops) };
 }
 
+static void omitFirstStop(std::map<double, std::unique_ptr<Expression>>& stops) {
+    double min = std::numeric_limits<double>::max();
+    for (auto& s : stops) {
+        if (s.first < min) {
+            min = s.first;
+        }
+    }
+    stops.emplace(-std::numeric_limits<double>::infinity(), std::move(stops[min]));
+    stops.erase(min);
+}
+
 template <class T>
 optional<std::map<T, std::unique_ptr<Expression>>> convertBranches(type::Type type,
                                                                    const Convertible& value,
@@ -472,6 +483,7 @@ static optional<std::unique_ptr<Expression>> convertIntervalFunction(type::Type 
     if (!stops) {
         return nullopt;
     }
+    omitFirstStop(*stops);
     return step(type, std::move(input), std::move(*stops));
 }
 
