@@ -8,7 +8,6 @@ dependencies {
     api dependenciesList.mapboxJavaGeoJSON
     api dependenciesList.mapboxAndroidGestures
     implementation dependenciesList.mapboxJavaTurf
-    implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.okhttp3
