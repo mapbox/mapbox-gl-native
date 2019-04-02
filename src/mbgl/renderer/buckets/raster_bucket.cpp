@@ -2,17 +2,20 @@
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/gfx/context.hpp>
+#include <mbgl/util/id.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
 RasterBucket::RasterBucket(PremultipliedImage&& image_)
-    : image(std::make_shared<PremultipliedImage>(std::move(image_))) {
+    : image(std::make_shared<PremultipliedImage>(std::move(image_))),
+      drawScopeID(util::toHex(util::nextID())) {
 }
 
 RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_)
-    : image(std::move(image_)) {
+    : image(std::move(image_)),
+      drawScopeID(util::toHex(util::nextID())) {
 }
 
 RasterBucket::~RasterBucket() = default;

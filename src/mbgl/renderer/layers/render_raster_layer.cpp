@@ -83,7 +83,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      const auto& vertexBuffer,
                      const auto& indexBuffer,
                      const auto& segments,
-                     const auto& textureBindings) {
+                     const auto& textureBindings,
+                     const std::string& drawScopeID) {
         auto& programInstance = parameters.programs.getRasterLayerPrograms().raster;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
@@ -125,7 +126,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             allUniformValues,
             allAttributeBindings,
             textureBindings,
-            getID()
+            getID() + "/" + drawScopeID
         );
     };
 
@@ -144,7 +145,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      RasterProgram::TextureBindings{
                          textures::image0::Value{ bucket.texture->getResource(), filter },
                          textures::image1::Value{ bucket.texture->getResource(), filter },
-                     });
+                     },
+                     bucket.drawScopeID);
             }
         }
     } else {
@@ -168,7 +170,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      RasterProgram::TextureBindings{
                          textures::image0::Value{ bucket.texture->getResource(), filter },
                          textures::image1::Value{ bucket.texture->getResource(), filter },
-                     });
+                     },
+                     bucket.drawScopeID);
             } else {
                 // Draw the full tile.
                 draw(parameters.matrixForTile(tile.id, true),
@@ -178,7 +181,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      RasterProgram::TextureBindings{
                          textures::image0::Value{ bucket.texture->getResource(), filter },
                          textures::image1::Value{ bucket.texture->getResource(), filter },
-                     });
+                     },
+                     bucket.drawScopeID);
             }
         }
     }

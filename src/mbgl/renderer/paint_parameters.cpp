@@ -151,7 +151,7 @@ void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_w
                 properties
             ),
             ClippingMaskProgram::TextureBindings{},
-            "clipping"
+            "clipping/" + util::toString(stencilID)
         );
     }
 }

@@ -166,7 +166,8 @@ void drawIcon(const DrawFn& draw,
                 paintPropertyValues,
                 SymbolSDFIconProgram::TextureBindings{
                     textureBinding
-                });
+                },
+                "halo");
         }
 
         if (values.hasFill) {
@@ -180,7 +181,8 @@ void drawIcon(const DrawFn& draw,
                 paintPropertyValues,
                 SymbolSDFIconProgram::TextureBindings{
                     textureBinding
-                });
+                },
+                "fill");
         }
     } else {
         draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
@@ -193,7 +195,8 @@ void drawIcon(const DrawFn& draw,
             paintPropertyValues,
             SymbolIconProgram::TextureBindings{
                 textureBinding
-            });
+            },
+            "icon");
     }
 }
 
@@ -311,7 +314,8 @@ void drawText(const DrawFn& draw,
             paintPropertyValues,
             SymbolSDFTextProgram::TextureBindings{
                 textureBinding
-            });
+            },
+            "halo");
     }
 
     if (values.hasFill) {
@@ -325,7 +329,8 @@ void drawText(const DrawFn& draw,
             paintPropertyValues,
             SymbolSDFTextProgram::TextureBindings{
                 textureBinding
-            });
+            },
+            "fill");
     }
 }
 
@@ -409,7 +414,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                            const SymbolPropertyValues& values_,
                                            const auto& binders,
                                            const auto& paintProperties,
-                                           const auto& textureBindings) {
+                                           const auto& textureBindings,
+                                           const std::string& suffix) {
         const auto allUniformValues = programInstance.computeAllUniformValues(
             uniformValues,
             *symbolSizeBinder,
@@ -445,7 +451,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     allUniformValues,
                     allAttributeBindings,
                     textureBindings,
-                    this->getID()
+                    this->getID() + "/" + suffix
                 );
             },
             [&](const std::reference_wrapper<SegmentVector<SymbolTextAttributes>>& segmentVector) {
@@ -464,7 +470,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     allUniformValues,
                     allAttributeBindings,
                     textureBindings,
-                    this->getID()
+                    this->getID() + "/" + suffix
                 );
             }
         );
