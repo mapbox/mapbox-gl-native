@@ -77,17 +77,19 @@ void RenderTile::finishRender(PaintParameters& parameters) {
 
     auto& program = parameters.programs.debug;
 
-    if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
-        if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
-            tile.debugBucket->complete != tile.isComplete() ||
-            !(tile.debugBucket->modified == tile.modified) ||
-            !(tile.debugBucket->expires == tile.expires) ||
-            tile.debugBucket->debugMode != parameters.debugOptions) {
-            tile.debugBucket = std::make_unique<DebugBucket>(
-                tile.id, tile.isRenderable(), tile.isComplete(), tile.modified,
-                tile.expires, parameters.debugOptions, parameters.context);
-        }
+    if (parameters.debugOptions != MapDebugOptions::NoDebug &&
+        (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
+         tile.debugBucket->complete != tile.isComplete() ||
+         !(tile.debugBucket->modified == tile.modified) ||
+         !(tile.debugBucket->expires == tile.expires) ||
+         tile.debugBucket->debugMode != parameters.debugOptions)) {
+        tile.debugBucket = std::make_unique<DebugBucket>(
+            tile.id, tile.isRenderable(), tile.isComplete(), tile.modified, tile.expires,
+            parameters.debugOptions, parameters.context);
+    }
 
+    if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
+        assert(tile.debugBucket);
         const auto allAttributeBindings = program.computeAllAttributeBindings(
             *tile.debugBucket->vertexBuffer,
             paintAttributeData,
@@ -114,7 +116,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             ),
             allAttributeBindings,
             DebugProgram::TextureBindings{},
-            "debug"
+            "__debug/text-outline"
         );
 
         program.draw(
@@ -137,11 +139,12 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             ),
             allAttributeBindings,
             DebugProgram::TextureBindings{},
-            "debug"
+            "__debug/text"
         );
     }
 
     if (parameters.debugOptions & MapDebugOptions::TileBorders) {
+        assert(tile.debugBucket);
         parameters.programs.debug.draw(
             parameters.context,
             gfx::LineStrip { 4.0f * parameters.pixelRatio },
@@ -166,7 +169,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 properties
             ),
             DebugProgram::TextureBindings{},
-            "debug"
+            tile.debugBucket->drawScopeID
         );
     }
 }
