@@ -117,7 +117,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             ),
             allAttributeBindings,
             DebugProgram::TextureBindings{},
-            "__debug/text-outline"
+            "__debug/" + tile.debugBucket->drawScopeID + "/text-outline"
         );
 
         program.draw(
@@ -141,7 +141,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             ),
             allAttributeBindings,
             DebugProgram::TextureBindings{},
-            "__debug/text"
+            "__debug/" + tile.debugBucket->drawScopeID + "/text"
         );
     }
 
@@ -172,7 +172,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 properties
             ),
             DebugProgram::TextureBindings{},
-            tile.debugBucket->drawScopeID
+            "__debug/" + tile.debugBucket->drawScopeID
         );
     }
 }

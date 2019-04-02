@@ -3,6 +3,7 @@
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/id.hpp>
 
 #include <cmath>
 #include <string>
@@ -22,7 +23,7 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_),
-      drawScopeID("__debug/borders/" + util::toString(id)) {
+      drawScopeID("__debug/" + util::toHex(util::nextID())) {
 
     gfx::VertexVector<FillLayoutVertex> vertices;
     gfx::IndexVector<gfx::Lines> indices;

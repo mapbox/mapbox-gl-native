@@ -70,7 +70,8 @@ std::string toString(std::exception_ptr);
 template <class T>
 std::string toString(T) = delete;
 
-std::string toHex(size_t);
+std::string toHex(uint32_t);
+std::string toHex(uint64_t);
 
 inline float stof(const std::string& str) {
     return std::stof(str);
