@@ -91,15 +91,6 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     }
 
     glfwSetWindowUserPointer(window, this);
-    glfwMakeContextCurrent(window);
-    if (benchmark) {
-        // Disables vsync on platforms that support it.
-        glfwSwapInterval(0);
-    } else {
-        glfwSwapInterval(1);
-    }
-
-
     glfwSetCursorPosCallback(window, onMouseMove);
     glfwSetMouseButtonCallback(window, onMouseClick);
     glfwSetWindowSizeCallback(window, onWindowResize);
@@ -109,7 +100,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
 
     glfwGetWindowSize(window, &width, &height);
 
-    backend = std::make_unique<GLFWGLBackend>(window);
+    backend = std::make_unique<GLFWGLBackend>(window, benchmark);
 
     pixelRatio = static_cast<float>(backend->getSize().width) / width;
 
@@ -584,8 +575,6 @@ void GLFWView::run() {
             mbgl::gfx::BackendScope scope { backend->getRendererBackend() };
 
             rendererFrontend->render();
-
-            glfwSwapBuffers(window);
 
             report(1000 * (glfwGetTime() - started));
             if (benchmark) {
