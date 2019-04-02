@@ -673,6 +673,7 @@
         "mbgl/style/conversion/json.hpp": "src/mbgl/style/conversion/json.hpp",
         "mbgl/style/conversion/stringify.hpp": "src/mbgl/style/conversion/stringify.hpp",
         "mbgl/style/custom_tile_loader.hpp": "src/mbgl/style/custom_tile_loader.hpp",
+        "mbgl/style/expression/dsl_impl.hpp": "src/mbgl/style/expression/dsl_impl.hpp",
         "mbgl/style/expression/util.hpp": "src/mbgl/style/expression/util.hpp",
         "mbgl/style/image_impl.hpp": "src/mbgl/style/image_impl.hpp",
         "mbgl/style/layer_impl.hpp": "src/mbgl/style/layer_impl.hpp",
