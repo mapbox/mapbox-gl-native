@@ -297,6 +297,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     };
 
     std::vector<RenderItem> order;
+    std::vector<const RenderLayerSymbolInterface*> renderItemsWithSymbols;
 
     for (auto& layerImpl : *layerImpls) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
@@ -331,6 +332,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         layer->setRenderTiles(source->getRenderTiles(), parameters.state);
         order.emplace_back(*layer, source);
+
+        if (const RenderLayerSymbolInterface* symbolLayer = layer->getSymbolInterface()) {
+            renderItemsWithSymbols.push_back(symbolLayer);
+        }
     }
 
     {
@@ -338,10 +343,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             // TODO: Think about right way for symbol index to handle still rendering
             crossTileSymbolIndex.reset();
         }
-
-        std::vector<RenderItem> renderItemsWithSymbols;
-        std::copy_if(order.rbegin(), order.rend(), std::back_inserter(renderItemsWithSymbols),
-                [](const auto& item) { return item.layer.getSymbolInterface() != nullptr; });
 
         bool symbolBucketsChanged = false;
         const bool placementChanged = !placement->stillRecent(parameters.timePoint);
@@ -351,12 +352,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             placement = std::make_unique<Placement>(parameters.state, parameters.mapMode, updateParameters.transitionOptions, updateParameters.crossSourceCollisions, std::move(placement));
         }
 
-        for (const auto& item : renderItemsWithSymbols) {
-            if (crossTileSymbolIndex.addLayer(*item.layer.getSymbolInterface(), parameters.state.getLatLng().longitude())) symbolBucketsChanged = true;
+        for (auto it = renderItemsWithSymbols.rbegin(); it != renderItemsWithSymbols.rend(); ++it) {
+            const RenderLayerSymbolInterface *symbolLayer = *it;
+            if (crossTileSymbolIndex.addLayer(*symbolLayer, parameters.state.getLatLng().longitude())) symbolBucketsChanged = true;
 
             if (placementChanged) {
-                usedSymbolLayers.insert(item.layer.getID());
-                placement->placeLayer(*item.layer.getSymbolInterface(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+                usedSymbolLayers.insert(symbolLayer->layerID());
+                placement->placeLayer(*symbolLayer, parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
@@ -372,8 +374,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
         if (placementChanged || symbolBucketsChanged) {
-            for (const auto& item : renderItemsWithSymbols) {
-                placement->updateLayerOpacities(*item.layer.getSymbolInterface());
+            for (auto it = renderItemsWithSymbols.rbegin(); it != renderItemsWithSymbols.rend(); ++it) {
+                const RenderLayerSymbolInterface *symbolLayer = *it;
+                placement->updateLayerOpacities(*symbolLayer);
             }
         }
     }
