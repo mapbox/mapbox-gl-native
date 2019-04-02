@@ -171,7 +171,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
             const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
-            const gfx::TextureBinding textureBinding{ *geometryTile.iconAtlasTexture->resource,
+            const gfx::TextureBinding textureBinding{ geometryTile.iconAtlasTexture->getResource(),
                                                       bucket.sdfIcons ||
                                                               parameters.state.isChanging() ||
                                                               iconScaled || iconTransformed
@@ -221,7 +221,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (bucket.hasTextData()) {
-            const gfx::TextureBinding textureBinding{ *geometryTile.glyphAtlasTexture->resource,
+            const gfx::TextureBinding textureBinding{ geometryTile.glyphAtlasTexture->getResource(),
                                                       gfx::TextureFilterType::Linear };
 
             auto values = textPropertyValues(evaluated_, layout);

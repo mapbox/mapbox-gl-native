@@ -162,7 +162,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     patternPosA,
                     patternPosB,
                     FillExtrusionPatternProgram::TextureBindings{
-                        textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                        textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
                     }
                 );
             }
@@ -209,7 +209,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             allUniformValues,
             allAttributeBindings,
             ExtrusionTextureProgram::TextureBindings{
-                textures::image::Value{ *renderTexture->getTexture().resource },
+                textures::image::Value{ renderTexture->getTexture().getResource() },
             },
             getID());
     }

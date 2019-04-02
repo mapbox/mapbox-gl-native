@@ -220,7 +220,7 @@ void Context::verifyProgramLinkage(ProgramID program_) {
     throw std::runtime_error("program failed to link");
 }
 
-std::unique_ptr<const gfx::VertexBufferResource>
+std::unique_ptr<gfx::VertexBufferResource>
 Context::createVertexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
@@ -230,12 +230,12 @@ Context::createVertexBufferResource(const void* data, std::size_t size, const gf
     return std::make_unique<gl::VertexBufferResource>(std::move(result));
 }
 
-void Context::updateVertexBufferResource(const gfx::VertexBufferResource& resource, const void* data, std::size_t size) {
-    vertexBuffer = reinterpret_cast<const gl::VertexBufferResource&>(resource).buffer;
+void Context::updateVertexBufferResource(gfx::VertexBufferResource& resource, const void* data, std::size_t size) {
+    vertexBuffer = static_cast<gl::VertexBufferResource&>(resource).buffer;
     MBGL_CHECK_ERROR(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
 }
 
-std::unique_ptr<const gfx::IndexBufferResource>
+std::unique_ptr<gfx::IndexBufferResource>
 Context::createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
@@ -246,11 +246,11 @@ Context::createIndexBufferResource(const void* data, std::size_t size, const gfx
     return std::make_unique<gl::IndexBufferResource>(std::move(result));
 }
 
-void Context::updateIndexBufferResource(const gfx::IndexBufferResource& resource, const void* data, std::size_t size) {
+void Context::updateIndexBufferResource(gfx::IndexBufferResource& resource, const void* data, std::size_t size) {
     // Be sure to unbind any existing vertex array object before binding the index buffer
     // so that we don't mess up another VAO
     bindVertexArray = 0;
-    globalVertexArrayState.indexBuffer = reinterpret_cast<const gl::IndexBufferResource&>(resource).buffer;
+    globalVertexArrayState.indexBuffer = static_cast<gl::IndexBufferResource&>(resource).buffer;
     MBGL_CHECK_ERROR(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, data));
 }
 
@@ -470,9 +470,8 @@ Context::createFramebuffer(const gfx::Texture& color,
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(
-        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        reinterpret_cast<const gl::TextureResource&>(*color.resource).texture, 0));
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                            color.getResource<gl::TextureResource>().texture, 0));
     bindDepthStencilRenderbuffer(depthStencil);
     checkFramebuffer();
     return { color.size, std::move(fbo) };
@@ -481,9 +480,8 @@ Context::createFramebuffer(const gfx::Texture& color,
 Framebuffer Context::createFramebuffer(const gfx::Texture& color) {
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(
-        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        reinterpret_cast<const gl::TextureResource&>(*color.resource).texture, 0));
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                            color.getResource<gl::TextureResource>().texture, 0));
     checkFramebuffer();
     return { color.size, std::move(fbo) };
 }
@@ -496,9 +494,8 @@ Context::createFramebuffer(const gfx::Texture& color,
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    MBGL_CHECK_ERROR(glFramebufferTexture2D(
-        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        reinterpret_cast<const gl::TextureResource&>(*color.resource).texture, 0));
+    MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                            color.getResource<gl::TextureResource>().texture, 0));
 
     auto& depthResource = depth.getResource<gl::RenderbufferResource>();
     MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
@@ -525,27 +522,27 @@ Context::createTextureResource(const Size size,
     return resource;
 }
 
-void Context::updateTextureResource(const gfx::TextureResource& resource,
+void Context::updateTextureResource(gfx::TextureResource& resource,
                                     const Size size,
                                     const void* data,
                                     gfx::TexturePixelType format,
                                     gfx::TextureChannelDataType type) {
     // Always use texture unit 0 for manipulating it.
     activeTextureUnit = 0;
-    texture[0] = reinterpret_cast<const gl::TextureResource&>(resource).texture;
+    texture[0] = static_cast<gl::TextureResource&>(resource).texture;
     MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, Enum<gfx::TexturePixelType>::to(format),
                                   size.width, size.height, 0,
                                   Enum<gfx::TexturePixelType>::to(format),
                                   Enum<gfx::TextureChannelDataType>::to(type), data));
 }
 
-void Context::updateTextureResourceSub(const gfx::TextureResource& resource,
-                                    const uint16_t xOffset,
-                                    const uint16_t yOffset,
-                                    const Size size,
-                                    const void* data,
-                                    gfx::TexturePixelType format,
-                                    gfx::TextureChannelDataType type) {
+void Context::updateTextureResourceSub(gfx::TextureResource& resource,
+                                       const uint16_t xOffset,
+                                       const uint16_t yOffset,
+                                       const Size size,
+                                       const void* data,
+                                       gfx::TexturePixelType format,
+                                       gfx::TextureChannelDataType type) {
     // Always use texture unit 0 for manipulating it.
     activeTextureUnit = 0;
     texture[0] = static_cast<const gl::TextureResource&>(resource).texture;

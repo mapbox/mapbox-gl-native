@@ -215,7 +215,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments,
                  FillPatternProgram::TextureBindings{
-                     textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                     textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
                  });
 
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
@@ -225,7 +225,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments,
                      FillOutlinePatternProgram::TextureBindings{
-                         textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                         textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
                      });
             }
         }

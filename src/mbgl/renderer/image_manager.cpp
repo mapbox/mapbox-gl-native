@@ -259,7 +259,7 @@ void ImageManager::upload(gfx::Context& context) {
 
 gfx::TextureBinding ImageManager::textureBinding(gfx::Context& context) {
     upload(context);
-    return { *atlasTexture->resource, gfx::TextureFilterType::Linear };
+    return { atlasTexture->getResource(), gfx::TextureFilterType::Linear };
 }
 
 } // namespace mbgl

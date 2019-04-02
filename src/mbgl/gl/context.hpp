@@ -192,14 +192,14 @@ private:
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
 
-    std::unique_ptr<const gfx::VertexBufferResource> createVertexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
-    void updateVertexBufferResource(const gfx::VertexBufferResource&, const void* data, std::size_t size) override;
-    std::unique_ptr<const gfx::IndexBufferResource> createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
-    void updateIndexBufferResource(const gfx::IndexBufferResource&, const void* data, std::size_t size) override;
+    std::unique_ptr<gfx::VertexBufferResource> createVertexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
+    void updateVertexBufferResource(gfx::VertexBufferResource&, const void* data, std::size_t size) override;
+    std::unique_ptr<gfx::IndexBufferResource> createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
+    void updateIndexBufferResource(gfx::IndexBufferResource&, const void* data, std::size_t size) override;
 
     std::unique_ptr<gfx::TextureResource> createTextureResource(Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
-    void updateTextureResource(const gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
-    void updateTextureResourceSub(const gfx::TextureResource&, const uint16_t xOffset, const uint16_t yOffset, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
+    void updateTextureResource(gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
+    void updateTextureResourceSub(gfx::TextureResource&, const uint16_t xOffset, const uint16_t yOffset, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
     std::unique_ptr<gfx::RenderbufferResource> createRenderbufferResource(gfx::RenderbufferPixelType, Size size) override;
 

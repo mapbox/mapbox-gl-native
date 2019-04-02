@@ -143,7 +143,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      posA,
                      posB,
                      LinePatternProgram::TextureBindings{
-                         textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                         textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
                      });
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             if (!colorRampTexture) {
@@ -159,7 +159,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     {},
                     {},
                     LineGradientProgram::TextureBindings{
-                        textures::image::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+                        textures::image::Value{ colorRampTexture->getResource(), gfx::TextureFilterType::Linear },
                     });
         } else {
             draw(parameters.programs.getLineLayerPrograms().line,

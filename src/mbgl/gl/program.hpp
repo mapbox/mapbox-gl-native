@@ -194,7 +194,7 @@ public:
 
         instance.textureStates.bind(context, textureBindings);
 
-        auto& vertexArray = static_cast<gl::DrawScopeResource&>(*drawScope.resource).vertexArray;
+        auto& vertexArray = drawScope.getResource<gl::DrawScopeResource>().vertexArray;
         vertexArray.bind(context,
                         indexBuffer,
                         instance.attributeLocations.toBindingArray(attributeBindings));

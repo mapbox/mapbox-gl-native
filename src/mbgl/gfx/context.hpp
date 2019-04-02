@@ -51,7 +51,7 @@ public:
     template <class Vertex>
     void updateVertexBuffer(VertexBuffer<Vertex>& buffer, VertexVector<Vertex>&& v) {
         assert(v.elements() == buffer.elements);
-        updateVertexBufferResource(*buffer.resource, v.data(), v.bytes());
+        updateVertexBufferResource(buffer.getResource(), v.data(), v.bytes());
     }
 
     template <class DrawMode>
@@ -63,19 +63,19 @@ public:
     template <class DrawMode>
     void updateIndexBuffer(IndexBuffer& buffer, IndexVector<DrawMode>&& v) {
         assert(v.elements() == buffer.elements);
-        updateIndexBufferResource(*buffer.resource, v.data(), v.bytes());
+        updateIndexBufferResource(buffer.getResource(), v.data(), v.bytes());
     }
 
 protected:
-    virtual std::unique_ptr<const VertexBufferResource>
+    virtual std::unique_ptr<VertexBufferResource>
     createVertexBufferResource(const void* data, std::size_t size, const BufferUsageType) = 0;
     virtual void
-    updateVertexBufferResource(const VertexBufferResource&, const void* data, std::size_t size) = 0;
+    updateVertexBufferResource(VertexBufferResource&, const void* data, std::size_t size) = 0;
 
-    virtual std::unique_ptr<const IndexBufferResource>
+    virtual std::unique_ptr<IndexBufferResource>
     createIndexBufferResource(const void* data, std::size_t size, const BufferUsageType) = 0;
     virtual void
-    updateIndexBufferResource(const IndexBufferResource&, const void* data, std::size_t size) = 0;
+    updateIndexBufferResource(IndexBufferResource&, const void* data, std::size_t size) = 0;
 
 public:
     // Create a texture from an image with data.
@@ -99,28 +99,28 @@ public:
                        const Image& image,
                        TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
         auto format = image.channels == 4 ? TexturePixelType::RGBA : TexturePixelType::Alpha;
-        updateTextureResource(*texture.resource, image.size, image.data.get(), format, type);
+        updateTextureResource(texture.getResource(), image.size, image.data.get(), format, type);
         texture.size = image.size;
     }
 
     template <typename Image>
     void updateTextureSub(Texture& texture,
-                       const Image& image,
-                       const uint16_t offsetX,
-                       const uint16_t offsetY,
-                       TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
+                          const Image& image,
+                          const uint16_t offsetX,
+                          const uint16_t offsetY,
+                          TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
         assert(image.size.width + offsetX <= texture.size.width);
         assert(image.size.height + offsetY <= texture.size.height);
         auto format = image.channels == 4 ? TexturePixelType::RGBA : TexturePixelType::Alpha;
-        updateTextureResourceSub(*texture.resource, offsetX, offsetY, image.size, image.data.get(), format, type);
+        updateTextureResourceSub(texture.getResource(), offsetX, offsetY, image.size, image.data.get(), format, type);
     }
 
 protected:
     virtual std::unique_ptr<TextureResource> createTextureResource(
         Size, const void* data, TexturePixelType, TextureChannelDataType) = 0;
-    virtual void updateTextureResource(const TextureResource&, Size, const void* data,
+    virtual void updateTextureResource(TextureResource&, Size, const void* data,
         TexturePixelType, TextureChannelDataType) = 0;
-    virtual void updateTextureResourceSub(const TextureResource&, uint16_t xOffset, uint16_t yOffset, Size, const void* data,
+    virtual void updateTextureResourceSub(TextureResource&, uint16_t xOffset, uint16_t yOffset, Size, const void* data,
         TexturePixelType, TextureChannelDataType) = 0;
 
 public:
@@ -136,7 +136,7 @@ protected:
 
 public:
     DrawScope createDrawScope() {
-        return { createDrawScopeResource() };
+        return DrawScope{ createDrawScopeResource() };
     }
 
 protected:
