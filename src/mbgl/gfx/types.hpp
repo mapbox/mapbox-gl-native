@@ -5,10 +5,6 @@
 namespace mbgl {
 namespace gfx {
 
-enum class ContextType : uint8_t {
-    OpenGL,
-};
-
 enum class PrimitiveType : uint8_t {
     Point,
     Line,

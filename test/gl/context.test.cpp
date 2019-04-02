@@ -85,6 +85,10 @@ struct Buffer {
 };
 
 TEST(GLContextMode, Shared) {
+    if (gfx::Backend::GetType() != gfx::Backend::Type::OpenGL) {
+        return;
+    }
+
     util::RunLoop loop;
 
     HeadlessFrontend frontend { 1, {}, gfx::ContextMode::Shared };

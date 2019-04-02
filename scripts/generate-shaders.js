@@ -178,8 +178,8 @@ constexpr const uint8_t ShaderSource<${ShaderName}Program>::hash[8];
 namespace gfx {
 
 template <>
-std::unique_ptr<Program<${ShaderName}Program>>
-Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
+std::unique_ptr<gfx::Program<${ShaderName}Program>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
     return std::make_unique<gl::Program<${ShaderName}Program>>(programParameters);
 }
 

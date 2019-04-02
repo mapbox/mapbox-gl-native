@@ -610,6 +610,10 @@ TEST(Map, AddLayer) {
 }
 
 TEST(Map, WithoutVAOExtension) {
+    if (gfx::Backend::GetType() != gfx::Backend::Type::OpenGL) {
+        return;
+    }
+
     MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
 
     gfx::BackendScope scope { *test.frontend.getBackend() };

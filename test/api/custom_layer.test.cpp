@@ -87,6 +87,10 @@ public:
 };
 
 TEST(CustomLayer, Basic) {
+    if (gfx::Backend::GetType() != gfx::Backend::Type::OpenGL) {
+        return;
+    }
+
     util::RunLoop loop;
 
     HeadlessFrontend frontend { 1 };

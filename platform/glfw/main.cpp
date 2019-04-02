@@ -2,6 +2,7 @@
 #include "glfw_renderer_frontend.hpp"
 #include "settings_json.hpp"
 
+#include <mbgl/gfx/backend.hpp>
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
     args::Flag benchmarkFlag(argumentParser, "benchmark", "Toggle benchmark", {'b', "benchmark"});
     args::Flag offlineFlag(argumentParser, "offline", "Toggle offline", {'o', "offline"});
 
+    args::ValueFlag<std::string> backendValue(argumentParser, "Backend", "Rendering backend", {"backend"});
     args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
     args::ValueFlag<std::string> cacheDBValue(argumentParser, "file", "Cache database file name", {'c', "cache"});
     args::ValueFlag<double> lonValue(argumentParser, "degrees", "Longitude", {'x', "lon"});

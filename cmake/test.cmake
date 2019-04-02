@@ -26,6 +26,7 @@ target_include_directories(mbgl-test
 
 target_link_libraries(mbgl-test PRIVATE
     gtest
+    args
     mbgl-core
     shelf-pack-cpp
     unique_resource

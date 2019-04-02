@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/gfx/renderable.hpp>
+#include <mbgl/gfx/backend.hpp>
 #include <mbgl/gfx/renderer_backend.hpp>
 #include <mbgl/util/image.hpp>
 
@@ -15,8 +16,12 @@ namespace gfx {
 class HeadlessBackend : public gfx::Renderable {
 public:
     // Factory.
-    static std::unique_ptr<HeadlessBackend> make(Size = { 256, 256 }, gfx::ContextMode = gfx::ContextMode::Unique);
-    
+    static std::unique_ptr<HeadlessBackend>
+    Create(const Size size = { 256, 256 },
+           const gfx::ContextMode contextMode = gfx::ContextMode::Unique) {
+        return Backend::Create<HeadlessBackend, Size, gfx::ContextMode>(size, contextMode);
+    }
+
     virtual PremultipliedImage readStillImage() = 0;
     virtual RendererBackend* getRendererBackend() = 0;
     void setSize(Size);

@@ -29,8 +29,8 @@ constexpr const uint8_t ShaderSource<FillExtrusionProgram>::hash[8];
 namespace gfx {
 
 template <>
-std::unique_ptr<Program<FillExtrusionProgram>>
-Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
+std::unique_ptr<gfx::Program<FillExtrusionProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
     return std::make_unique<gl::Program<FillExtrusionProgram>>(programParameters);
 }
 

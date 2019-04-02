@@ -17,7 +17,7 @@ class RendererBackend;
 
 class GLFWView : public mbgl::MapObserver {
 public:
-    GLFWView(bool fullscreen = false, bool benchmark = false);
+    GLFWView(bool fullscreen, bool benchmark);
     ~GLFWView() override;
 
     float getPixelRatio() const;

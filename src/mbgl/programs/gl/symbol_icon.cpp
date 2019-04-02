@@ -29,8 +29,8 @@ constexpr const uint8_t ShaderSource<SymbolIconProgram>::hash[8];
 namespace gfx {
 
 template <>
-std::unique_ptr<Program<SymbolIconProgram>>
-Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
+std::unique_ptr<gfx::Program<SymbolIconProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
     return std::make_unique<gl::Program<SymbolIconProgram>>(programParameters);
 }
 
