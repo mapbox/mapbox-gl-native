@@ -10,8 +10,8 @@
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
-#include <mbgl/gl/renderable_resource.hpp>
+#include <mbgl/gfx/render_pass.hpp>
+#include <mbgl/gfx/context.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 
@@ -57,6 +57,10 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto& viewportSize = parameters.staticData.backendSize;
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
 
+        if (!colorRampTexture) {
+            colorRampTexture = parameters.context.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
+        }
+
         if (!renderTexture || renderTexture->getSize() != size) {
             renderTexture.reset();
             if (parameters.context.supportsHalfFloatTextures) {
@@ -74,14 +78,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             }
         }
 
-        renderTexture->getResource<gl::RenderableResource>().bind();
-
-        if (!colorRampTexture) {
-            colorRampTexture = parameters.context.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
-        }
-
-        // TODO: remove cast
-        static_cast<gl::Context&>(parameters.context).clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
+        auto renderPass = parameters.encoder->createRenderPass(
+            "heatmap texture", { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
 
         for (const RenderTile& tile : renderTiles) {
             auto bucket_ = tile.tile.getBucket<HeatmapBucket>(*baseImpl);
@@ -120,6 +118,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
             programInstance.draw(
                 parameters.context,
+                *renderPass,
                 gfx::Triangles(),
                 parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
                 stencilMode,
@@ -165,6 +164,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
         programInstance.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::Triangles(),
             gfx::DepthMode::disabled(),
             gfx::StencilMode::disabled(),

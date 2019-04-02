@@ -26,6 +26,7 @@ namespace gfx {
 class Context;
 class RendererBackend;
 class CommandEncoder;
+class RenderPass;
 } // namespace gfx
 
 class PaintParameters {
@@ -44,6 +45,7 @@ public:
     gfx::Context& context;
     gfx::RendererBackend& backend;
     const std::unique_ptr<gfx::CommandEncoder> encoder;
+    std::unique_ptr<gfx::RenderPass> renderPass;
 
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;

@@ -64,6 +64,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
     for (auto matrix : matrices) {
         programInstance.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::LineStrip { 4.0f * parameters.pixelRatio },
             gfx::DepthMode::disabled(),
             gfx::StencilMode::disabled(),

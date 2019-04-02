@@ -2,6 +2,7 @@
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/gfx/command_encoder.hpp>
+#include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {

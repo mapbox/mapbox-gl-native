@@ -16,9 +16,10 @@
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/gfx/renderer_backend.hpp>
+#include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
-#include <mbgl/gl/renderable_resource.hpp>
+#include <mbgl/gfx/context.hpp>
+#include <mbgl/gfx/renderable.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -366,9 +367,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     parameters.symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
 
-    // TODO: remove cast
-    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
-
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
@@ -415,22 +413,19 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
     {
-        using namespace gl::value;
-
-        parameters.backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
+        optional<Color> color;
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
-            glContext.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
-        } else if (backend.contextIsShared()) {
-            glContext.clear({}, ClearDepth::Default, ClearStencil::Default);
-        } else {
-            glContext.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default);
+            color = Color::black();
+        } else if (!backend.contextIsShared()) {
+            color = backgroundColor;
         }
+        parameters.renderPass = parameters.encoder->createRenderPass("main buffer", { parameters.backend.getDefaultRenderable(), color, 1, 0 });
     }
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
-        const auto debugGroup(parameters.encoder->createDebugGroup("clipping masks"));
+        const auto debugGroup(parameters.renderPass->createDebugGroup("clipping masks"));
 
         static const Properties<>::PossiblyEvaluated properties {};
         static const ClippingMaskProgram::Binders paintAttributeData(properties, 0);
@@ -440,6 +435,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             program.draw(
                 parameters.context,
+                *parameters.renderPass,
                 gfx::Triangles(),
                 gfx::DepthMode::disabled(),
                 gfx::StencilMode {
@@ -489,13 +485,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
     {
         parameters.pass = RenderPass::Opaque;
-        const auto debugGroup(parameters.encoder->createDebugGroup("opaque"));
+        const auto debugGroup(parameters.renderPass->createDebugGroup("opaque"));
 
         uint32_t i = 0;
         for (auto it = renderItems.rbegin(); it != renderItems.rend(); ++it, ++i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.encoder->createDebugGroup(it->layer.getID().c_str()));
+                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(it->layer.getID().c_str()));
                 it->layer.render(parameters, it->source);
             }
         }
@@ -505,13 +501,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
     {
         parameters.pass = RenderPass::Translucent;
-        const auto debugGroup(parameters.encoder->createDebugGroup("translucent"));
+        const auto debugGroup(parameters.renderPass->createDebugGroup("translucent"));
 
         uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
         for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.encoder->createDebugGroup(it->layer.getID().c_str()));
+                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(it->layer.getID().c_str()));
                 it->layer.render(parameters, it->source);
             }
         }
@@ -520,7 +516,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
     {
-        const auto debugGroup(parameters.encoder->createDebugGroup("debug"));
+        const auto debugGroup(parameters.renderPass->createDebugGroup("debug"));
 
         // Finalize the rendering, e.g. by calling debug render calls per tile.
         // This guarantees that we have at least one function per tile called.
