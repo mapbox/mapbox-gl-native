@@ -2,6 +2,7 @@
 #include <mbgl/style/conversion/position.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/dsl_impl.hpp>
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/match.hpp>
@@ -474,23 +475,43 @@ std::unique_ptr<Expression> categorical<bool>(type::Type type, const std::string
     return std::make_unique<Case>(type, std::move(trueBranch), std::move(falseCase));
 }
 
+static std::unique_ptr<Expression> numberOrDefault(type::Type type,
+                                                   std::unique_ptr<Expression> get,
+                                                   std::unique_ptr<Expression> expr,
+                                                   optional<std::unique_ptr<Expression>> def) {
+    if (!def) {
+        return expr;
+    }
+
+    std::vector<Case::Branch> branches;
+    branches.emplace_back(eq(compound("typeof", std::move(get)), literal("number")),
+                          std::move(expr));
+    return std::make_unique<Case>(type, std::move(branches), std::move(*def));
+}
+
 static optional<std::unique_ptr<Expression>> convertIntervalFunction(type::Type type,
                                                                      const Convertible& value,
                                                                      Error& error,
-                                                                     std::unique_ptr<Expression> input,
+                                                                     std::function<std::unique_ptr<Expression> (bool)> makeInput,
+                                                                     optional<std::unique_ptr<Expression>> def,
                                                                      bool convertTokens = false) {
     auto stops = convertStops(type, value, error, convertTokens);
     if (!stops) {
         return nullopt;
     }
     omitFirstStop(*stops);
-    return step(type, std::move(input), std::move(*stops));
+
+    return numberOrDefault(type,
+                           makeInput(false),
+                           step(type, makeInput(true), std::move(*stops)),
+                           std::move(def));
 }
 
 static optional<std::unique_ptr<Expression>> convertExponentialFunction(type::Type type,
                                                                         const Convertible& value,
                                                                         Error& error,
-                                                                        std::unique_ptr<Expression> input,
+                                                                        std::function<std::unique_ptr<Expression> (bool)> makeInput,
+                                                                        optional<std::unique_ptr<Expression>> def,
                                                                         bool convertTokens = false) {
     auto stops = convertStops(type, value, error, convertTokens);
     if (!stops) {
@@ -500,7 +521,11 @@ static optional<std::unique_ptr<Expression>> convertExponentialFunction(type::Ty
     if (!base) {
         return nullopt;
     }
-    return interpolate(type, exponential(*base), std::move(input), std::move(*stops));
+
+    return numberOrDefault(type,
+                           makeInput(false),
+                           interpolate(type, exponential(*base), makeInput(true), std::move(*stops)),
+                           std::move(def));
 }
 
 static optional<std::unique_ptr<Expression>> convertCategoricalFunction(type::Type type,
@@ -672,18 +697,21 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
         }
     }
 
-    optional<std::unique_ptr<Expression>> defaultExpr;
-    if (objectMember(value, "default")) {
-        defaultExpr = convertLiteral(type, *objectMember(value, "default"), err);
-    }
+    auto defaultExpr = [&]() -> optional<std::unique_ptr<Expression>> {
+        auto member = objectMember(value, "default");
+        if (member) {
+            return convertLiteral(type, *member, err);
+        }
+        return {};
+    };
 
     if (!objectMember(value, "property")) {
         // Camera function.
         switch (functionType) {
         case FunctionType::Interval:
-            return convertIntervalFunction(type, value, err, zoom(), convertTokens);
+            return convertIntervalFunction(type, value, err, [](bool) { return zoom(); }, defaultExpr(), convertTokens);
         case FunctionType::Exponential:
-            return convertExponentialFunction(type, value, err, zoom(), convertTokens);
+            return convertExponentialFunction(type, value, err, [](bool) { return zoom(); }, defaultExpr(), convertTokens);
         default:
             err.message = "unsupported function type";
             return nullopt;
@@ -705,22 +733,22 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
     if (functionType == FunctionType::Identity) {
         return type.match(
             [&] (const type::StringType&) -> optional<std::unique_ptr<Expression>> {
-                return string(get(literal(*property)), std::move(defaultExpr));
+                return string(get(literal(*property)), defaultExpr());
             },
             [&] (const type::NumberType&) -> optional<std::unique_ptr<Expression>> {
-                return number(get(literal(*property)), std::move(defaultExpr));
+                return number(get(literal(*property)), defaultExpr());
             },
             [&] (const type::BooleanType&) -> optional<std::unique_ptr<Expression>> {
-                return boolean(get(literal(*property)), std::move(defaultExpr));
+                return boolean(get(literal(*property)), defaultExpr());
             },
             [&] (const type::ColorType&) -> optional<std::unique_ptr<Expression>> {
-                return toColor(get(literal(*property)), std::move(defaultExpr));
+                return toColor(get(literal(*property)), defaultExpr());
             },
             [&] (const type::Array& array) -> optional<std::unique_ptr<Expression>> {
-                return assertion(array, get(literal(*property)), std::move(defaultExpr));
+                return assertion(array, get(literal(*property)), defaultExpr());
             },
             [&] (const type::FormattedType&) -> optional<std::unique_ptr<Expression>> {
-                return toFormatted(get(literal(*property)), std::move(defaultExpr));
+                return toFormatted(get(literal(*property)), defaultExpr());
             },
             [&] (const auto&) -> optional<std::unique_ptr<Expression>>  {
                 assert(false); // No properties use this type.
@@ -759,13 +787,21 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
 
     const auto& stop = arrayMember(first, 0);
 
+    const auto getProperty = [&](bool coerce) {
+        if (coerce) {
+            return number(get(literal(*property)));
+        } else {
+            return get(literal(*property));
+        }
+    };
+
     if (!isObject(stop)) {
         // Source function.
         switch (functionType) {
         case FunctionType::Interval:
-            return convertIntervalFunction(type, value, err, number(get(literal(*property))));
+            return convertIntervalFunction(type, value, err, getProperty, defaultExpr());
         case FunctionType::Exponential:
-            return convertExponentialFunction(type, value, err, number(get(literal(*property))));
+            return convertExponentialFunction(type, value, err, getProperty, defaultExpr());
         case FunctionType::Categorical:
             return convertCategoricalFunction(type, value, err, *property);
         default:
@@ -796,11 +832,18 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
             switch (functionType) {
             case FunctionType::Interval:
                 return composite<double>(type, value, err, [&] (type::Type type_, double, std::map<double, std::unique_ptr<Expression>> stops) {
-                    return step(type_, number(get(literal(*property))), std::move(stops));
+                    omitFirstStop(stops);
+                    return numberOrDefault(type,
+                                           getProperty(false),
+                                           step(type_, getProperty(true), std::move(stops)),
+                                           defaultExpr());
                 });
             case FunctionType::Exponential:
                 return composite<double>(type, value, err, [&] (type::Type type_, double base, std::map<double, std::unique_ptr<Expression>> stops) {
-                    return interpolate(type_, exponential(base), number(get(literal(*property))), std::move(stops));
+                    return numberOrDefault(type,
+                                           getProperty(false),
+                                           interpolate(type_, exponential(base), getProperty(true), std::move(stops)),
+                                           defaultExpr());
                 });
             case FunctionType::Categorical:
                 return composite<int64_t>(type, value, err, [&] (type::Type type_, double, std::map<int64_t, std::unique_ptr<Expression>> stops) {
