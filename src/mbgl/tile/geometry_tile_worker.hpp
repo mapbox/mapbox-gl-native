@@ -44,7 +44,7 @@ public:
     void setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_);
     
     void onGlyphsAvailable(GlyphMap glyphs);
-    void onImagesAvailable(ImageMap icons, ImageMap patterns, std::unordered_map<std::string, uint32_t> versionMap, uint64_t imageCorrelationID);
+    void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID);
 
 private:
     void coalesced();
@@ -96,7 +96,7 @@ private:
     GlyphMap glyphMap;
     ImageMap imageMap;
     ImageMap patternMap;
-    std::unordered_map<std::string, uint32_t> versionMap;
+    ImageVersionMap versionMap;
     
     bool showCollisionBoxes;
     bool firstLoad = true;

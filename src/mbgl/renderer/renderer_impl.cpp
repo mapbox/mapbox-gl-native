@@ -162,7 +162,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         hasImageDiff = imageManager->updateImage(entry.second.after) || hasImageDiff;
     }
 
-    imageManager->imagesAdded();
+    imageManager->notifyIfMissingImageAdded();
     imageManager->setLoaded(updateParameters.spriteLoaded);
 
 
@@ -838,7 +838,7 @@ void Renderer::Impl::onTileChanged(RenderSource&, const OverscaledTileID&) {
 }
 
 void Renderer::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
-    observer->onStyleImageMissing(id, done);
+    observer->onStyleImageMissing(id, std::move(done));
 }
 
 } // namespace mbgl

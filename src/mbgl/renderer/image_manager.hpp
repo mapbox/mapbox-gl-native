@@ -22,7 +22,7 @@ class Context;
 class ImageRequestor {
 public:
     virtual ~ImageRequestor() = default;
-    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, std::unordered_map<std::string, uint32_t> versionMap, uint64_t imageCorrelationID) = 0;
+    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) = 0;
 };
 
 /*
@@ -55,9 +55,9 @@ public:
 
     void getImages(ImageRequestor&, ImageRequestPair&&);
     void removeRequestor(ImageRequestor&);
-    void imagesAdded();
+    void notifyIfMissingImageAdded();
 
-    std::map<std::string, uint32_t> updatedImageVersions;
+    ImageVersionMap updatedImageVersions;
 
 private:
     void checkMissingAndNotify(ImageRequestor&, const ImageRequestPair&);

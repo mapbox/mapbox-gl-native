@@ -156,7 +156,7 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
     glyphManager.getGlyphs(*this, std::move(glyphDependencies));
 }
 
-void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, std::unordered_map<std::string, uint32_t> versionMap, uint64_t imageCorrelationID) {
+void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) {
     worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), std::move(patterns), std::move(versionMap), imageCorrelationID);
 }
 

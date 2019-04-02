@@ -8,8 +8,7 @@ class ImageManagerObserver {
 public:
     virtual ~ImageManagerObserver() = default;
 
-    using StyleImageMissingCallback = std::function<void()>;
-    virtual void onStyleImageMissing(const std::string&, RendererObserver::StyleImageMissingCallback done) { done(); }
+    virtual void onStyleImageMissing(const std::string&, std::function<void()> done) { done(); }
 };
 
 } // namespace mbgl

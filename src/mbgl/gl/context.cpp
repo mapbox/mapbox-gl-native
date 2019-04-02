@@ -555,7 +555,7 @@ void Context::updateTextureResourceSub(const gfx::TextureResource& resource,
                                     gfx::TextureChannelDataType type) {
     // Always use texture unit 0 for manipulating it.
     activeTextureUnit = 0;
-    texture[0] = reinterpret_cast<const gl::TextureResource&>(resource).texture;
+    texture[0] = static_cast<const gl::TextureResource&>(resource).texture;
     MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D, 0,
                                   xOffset, yOffset,
                                   size.width, size.height,

@@ -113,7 +113,7 @@ void ImageManager::removeRequestor(ImageRequestor& requestor) {
     missingImageRequestors.erase(&requestor);
 }
 
-void ImageManager::imagesAdded() {
+void ImageManager::notifyIfMissingImageAdded() {
     for (auto it = missingImageRequestors.begin(); it != missingImageRequestors.end();) {
         if (it->second.callbacksRemaining == 0) {
             notify(*it->first, it->second.pair);
@@ -132,7 +132,6 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
             missing++;
         }
     }
-
 
     if (missing > 0) {
         ImageRequestor* requestorPtr = &requestor;
@@ -161,7 +160,7 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
 void ImageManager::notify(ImageRequestor& requestor, const ImageRequestPair& pair) const {
     ImageMap iconMap;
     ImageMap patternMap;
-    std::unordered_map<std::string, uint32_t> versionMap;
+    ImageVersionMap versionMap;
 
     for (const auto& dependency : pair.first) {
         auto it = images.find(dependency.first);
