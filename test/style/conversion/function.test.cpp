@@ -108,5 +108,5 @@ TEST(StyleConversion, FormattedIdentityFunction) {
     auto fn1 = parseFunction(R"({ "property": "name", "type": "identity" })");
     ASSERT_TRUE(bool(fn1));
     ASSERT_TRUE(fn1->isExpression());
-    ASSERT_EQ(fn1->asExpression().getExpression(), *format(get(literal("name"))));
+    ASSERT_EQ(fn1->asExpression().getExpression().serialize(), format(get(literal("name")))->serialize());
 }
