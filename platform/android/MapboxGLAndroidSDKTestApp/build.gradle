@@ -9,7 +9,7 @@ android {
         targetSdkVersion androidVersions.targetSdkVersion
         versionCode 13
         versionName "6.0.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.mapbox.mapboxsdk.InstrumentationRunner"
     }
 
     compileOptions {
