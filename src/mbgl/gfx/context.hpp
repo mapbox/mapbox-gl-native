@@ -162,6 +162,12 @@ private:
 
 public:
     virtual std::unique_ptr<CommandEncoder> createCommandEncoder() = 0;
+
+#if not defined(NDEBUG)
+public:
+    virtual void visualizeStencilBuffer() = 0;
+    virtual void visualizeDepthBuffer(float depthRangeSize) = 0;
+#endif
 };
 
 } // namespace gfx

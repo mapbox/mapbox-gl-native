@@ -703,6 +703,9 @@ void Context::setColorMode(const gfx::ColorMode& color) {
 
 std::unique_ptr<gfx::CommandEncoder> Context::createCommandEncoder() {
     backend.updateAssumedState();
+    if (backend.contextIsShared()) {
+        setDirtyState();
+    }
     return std::make_unique<gl::CommandEncoder>(*this);
 }
 
@@ -810,6 +813,60 @@ void Context::performCleanup() {
         abandonedRenderbuffers.clear();
     }
 }
+
+#if not defined(NDEBUG)
+void Context::visualizeStencilBuffer() {
+#if not MBGL_USE_GLES2
+    setStencilMode(gfx::StencilMode::disabled());
+    setDepthMode(gfx::DepthMode::disabled());
+    setColorMode(gfx::ColorMode::unblended());
+    program = 0;
+
+    // Reset the value in case someone else changed it, or it's dirty.
+    pixelTransferStencil = gl::value::PixelTransferStencil::Default;
+
+    // Read the stencil buffer
+    const auto viewportValue = viewport.getCurrentValue();
+    auto image = readFramebuffer<AlphaImage, gfx::TexturePixelType::Stencil>(viewportValue.size, false);
+
+    // Scale the Stencil buffer to cover the entire color space.
+    auto it = image.data.get();
+    auto end = it + viewportValue.size.width * viewportValue.size.height;
+    const auto factor = 255.0f / *std::max_element(it, end);
+    for (; it != end; ++it) {
+        *it *= factor;
+    }
+
+    pixelZoom = { 1, 1 };
+    rasterPos = { -1, -1, 0, 1 };
+    drawPixels(image);
+#endif
+}
+
+void Context::visualizeDepthBuffer(const float depthRangeSize) {
+    (void)depthRangeSize;
+#if not MBGL_USE_GLES2
+    setStencilMode(gfx::StencilMode::disabled());
+    setDepthMode(gfx::DepthMode::disabled());
+    setColorMode(gfx::ColorMode::unblended());
+    program = 0;
+
+    // Scales the values in the depth buffer so that they cover the entire grayscale range. This
+    // makes it easier to spot tiny differences.
+    const float base = 1.0f / (1.0f - depthRangeSize);
+    pixelTransferDepth = { base, 1.0f - base };
+
+    // Read the stencil buffer
+    auto viewportValue = viewport.getCurrentValue();
+    auto image = readFramebuffer<AlphaImage, gfx::TexturePixelType::Depth>(viewportValue.size, false);
+
+    pixelZoom = { 1, 1 };
+    rasterPos = { -1, -1, 0, 1 };
+    drawPixels(image);
+#endif
+}
+
+#endif
 
 } // namespace gl
 } // namespace mbgl
