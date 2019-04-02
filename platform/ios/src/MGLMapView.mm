@@ -156,6 +156,8 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
+static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 3;
+
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
@@ -1122,12 +1124,17 @@ public:
         [self updateAnnotationViews];
         [self updateCalloutView];
         
+#ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
+#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 120200)
+        // See https://github.com/mapbox/mapbox-gl-native/issues/14232
+        // glClear can be blocked for 1 second. This code is an "escape hatch",
+        // an attempt to detect this situation and rebuild the GL views.
         if (self.enablePresentsWithTransaction)
         {
             CFTimeInterval before = CACurrentMediaTime();
             [self.glView display];
             CFTimeInterval after = CACurrentMediaTime();
-
+            
             if (after-before >= 1.0) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self emergencyRecreateGL];
@@ -1135,6 +1142,8 @@ public:
             }
         }
         else
+#endif
+#endif
         {
             [self.glView display];
         }
@@ -4245,7 +4254,7 @@ public:
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
     self.annotationContainerView = newAnnotationContainerView;
     
-    self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > 0);
+    self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -4420,7 +4429,7 @@ public:
         [annotationView removeFromSuperview];
         [self.annotationContainerView.annotationViews removeObject:annotationView];
         
-        self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > 0);
+        self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
 
         if (annotationTag == _selectedAnnotationTag)
         {
