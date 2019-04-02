@@ -56,7 +56,7 @@ public:
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
 #else
-    constexpr bool supportsProgramBinaries() const { return false; }
+    constexpr static bool supportsProgramBinaries() { return false; }
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
