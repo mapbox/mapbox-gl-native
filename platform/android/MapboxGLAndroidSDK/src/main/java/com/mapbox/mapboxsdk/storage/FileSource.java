@@ -194,7 +194,7 @@ public class FileSource {
    */
   @UiThread
   public static void initializeFileDirsPaths(Context context) {
-    ThreadUtils.checkThread("FileSource");
+    ThreadUtils.checkThread(TAG);
     lockPathLoaders();
     if (resourcesCachePath == null || internalCachePath == null) {
       new FileDirsPathsTask().execute(context);
