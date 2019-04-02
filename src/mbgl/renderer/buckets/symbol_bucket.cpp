@@ -48,6 +48,9 @@ void SymbolBucket::upload(gfx::Context& context) {
         if (!staticUploaded) {
             text.indexBuffer = context.createIndexBuffer(std::move(text.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw : gfx::BufferUsageType::StaticDraw);
             text.vertexBuffer = context.createVertexBuffer(std::move(text.vertices));
+            for (auto& pair : paintProperties) {
+                pair.second.textBinders.upload(context);
+            }
         } else if (!sortUploaded) {
             context.updateIndexBuffer(*text.indexBuffer, std::move(text.triangles));
         }
@@ -68,6 +71,9 @@ void SymbolBucket::upload(gfx::Context& context) {
         if (!staticUploaded) {
             icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw : gfx::BufferUsageType::StaticDraw);
             icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
+            for (auto& pair : paintProperties) {
+                pair.second.iconBinders.upload(context);
+            }
         } else if (!sortUploaded) {
             context.updateIndexBuffer(*icon.indexBuffer, std::move(icon.triangles));
         }
@@ -108,13 +114,6 @@ void SymbolBucket::upload(gfx::Context& context) {
             } else {
                 context.updateVertexBuffer(*collisionCircle.dynamicVertexBuffer, std::move(collisionCircle.dynamicVertices));
             }
-        }
-    }
-
-    if (!staticUploaded) {
-        for (auto& pair : paintProperties) {
-            pair.second.iconBinders.upload(context);
-            pair.second.textBinders.upload(context);
         }
     }
 
