@@ -1255,7 +1255,7 @@ public:
 {
     [super didMoveToWindow];
     
-    if (self.window)
+    if (self.superview)
     {
         // See above comment
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
@@ -1270,6 +1270,10 @@ public:
     [self validateDisplayLink];
     [self installConstraints];
     [super didMoveToSuperview];
+}
+
+- (void) willMoveToSuperview:(UIView *)newSuperview {
+    // ?
 }
 
 - (void)refreshSupportedInterfaceOrientationsWithWindow:(UIWindow *)window {
