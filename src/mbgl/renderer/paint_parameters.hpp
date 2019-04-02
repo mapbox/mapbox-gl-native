@@ -56,7 +56,7 @@ public:
 
     gfx::Context& context;
     gfx::RendererBackend& backend;
-    const std::unique_ptr<gfx::CommandEncoder> encoder;
+    std::unique_ptr<gfx::CommandEncoder> encoder;
     std::unique_ptr<gfx::RenderPass> renderPass;
 
     const TransformState& state;
