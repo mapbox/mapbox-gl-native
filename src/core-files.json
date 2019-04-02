@@ -352,7 +352,6 @@
         "mbgl/math/minmax.hpp": "include/mbgl/math/minmax.hpp",
         "mbgl/math/wrap.hpp": "include/mbgl/math/wrap.hpp",
         "mbgl/platform/gl_functions.hpp": "include/mbgl/platform/gl_functions.hpp",
-        "mbgl/renderer/mode.hpp": "include/mbgl/renderer/mode.hpp",
         "mbgl/renderer/query.hpp": "include/mbgl/renderer/query.hpp",
         "mbgl/renderer/renderer.hpp": "include/mbgl/renderer/renderer.hpp",
         "mbgl/renderer/renderer_frontend.hpp": "include/mbgl/renderer/renderer_frontend.hpp",

@@ -175,8 +175,7 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
 
     // Create the new backend and renderer
     backend = std::make_unique<AndroidRendererBackend>();
-    renderer = std::make_unique<Renderer>(*backend, pixelRatio, *threadPool,
-                                          GLContextMode::Unique, programCacheDir, localIdeographFontFamily);
+    renderer = std::make_unique<Renderer>(*backend, pixelRatio, *threadPool, programCacheDir, localIdeographFontFamily);
     rendererRef = std::make_unique<ActorRef<Renderer>>(*renderer, mailbox);
 
     // Set the observer on the new Renderer implementation

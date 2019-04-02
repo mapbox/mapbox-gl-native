@@ -9,7 +9,7 @@
 class QMapboxGLRendererBackend final : public mbgl::gl::RendererBackend,
                                        public mbgl::gfx::Renderable {
 public:
-    QMapboxGLRendererBackend();
+    QMapboxGLRendererBackend(mbgl::gfx::ContextMode);
     ~QMapboxGLRendererBackend() override;
 
     void updateFramebuffer(quint32 fbo, const mbgl::Size&);

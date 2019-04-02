@@ -2,7 +2,6 @@
 
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/renderer/render_light.hpp>
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gfx/stencil_mode.hpp>
@@ -33,7 +32,6 @@ class PaintParameters {
 public:
     PaintParameters(gfx::Context&,
                     float pixelRatio,
-                    GLContextMode,
                     gfx::RendererBackend&,
                     const UpdateParameters&,
                     const EvaluatedLight&,
@@ -57,7 +55,6 @@ public:
     RenderPass pass = RenderPass::Opaque;
     MapMode mapMode;
     MapDebugOptions debugOptions;
-    GLContextMode contextMode;
     TimePoint timePoint;
 
     float pixelRatio;

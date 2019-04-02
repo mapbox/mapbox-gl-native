@@ -90,7 +90,7 @@ TEST(GLContextMode, Shared) {
 
     ThreadPool threadPool(4);
 
-    HeadlessFrontend frontend { 1, threadPool, {}, GLContextMode::Shared };
+    HeadlessFrontend frontend { 1, threadPool, {}, gfx::ContextMode::Shared };
 
     Map map(frontend, MapObserver::nullObserver(), threadPool,
             MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),

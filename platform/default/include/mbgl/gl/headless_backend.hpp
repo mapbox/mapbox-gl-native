@@ -11,7 +11,7 @@ namespace gl {
 
 class HeadlessBackend final : public gl::RendererBackend, public gfx::Renderable {
 public:
-    HeadlessBackend(Size = { 256, 256 });
+    HeadlessBackend(Size = { 256, 256 }, gfx::ContextMode = gfx::ContextMode::Unique);
     ~HeadlessBackend() override;
 
     gfx::Renderable& getDefaultRenderable() override;

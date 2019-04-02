@@ -57,10 +57,6 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     return self;
 }
 
-- (mbgl::GLContextMode)contextMode {
-    return mbgl::GLContextMode::Unique;
-}
-
 - (const float)scaleFactor {
 #if TARGET_OS_IPHONE
     return [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];

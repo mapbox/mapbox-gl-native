@@ -10,11 +10,13 @@ namespace mbgl {
 Renderer::Renderer(gfx::RendererBackend& backend,
                    float pixelRatio_,
                    Scheduler& scheduler_,
-                   GLContextMode contextMode_,
                    const optional<std::string> programCacheDir_,
                    const optional<std::string> localFontFamily_)
-        : impl(std::make_unique<Impl>(backend, pixelRatio_, scheduler_,
-                                      contextMode_, std::move(programCacheDir_), std::move(localFontFamily_))) {
+    : impl(std::make_unique<Impl>(backend,
+                                  pixelRatio_,
+                                  scheduler_,
+                                  std::move(programCacheDir_),
+                                  std::move(localFontFamily_))) {
 }
 
 Renderer::~Renderer() {

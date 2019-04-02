@@ -17,7 +17,6 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #import <mbgl/gl/renderer_backend.hpp>
 #import <mbgl/gl/renderable_resource.hpp>
@@ -482,7 +481,7 @@ public:
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
     _mbglThreadPool = mbgl::sharedThreadPool();
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.cacheDir, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
 
@@ -6737,9 +6736,11 @@ class MBGLView : public mbgl::gl::RendererBackend,
                  public mbgl::gfx::Renderable,
                  public mbgl::MapObserver {
 public:
-    MBGLView(MGLMapView* nativeView_)  : mbgl::gfx::Renderable(
-          nativeView_.framebufferSize,
-          std::make_unique<MBGLMapViewRenderable>(*this)), nativeView(nativeView_) {
+    MBGLView(MGLMapView* nativeView_)
+        : mbgl::gl::RendererBackend(mbgl::gfx::ContextMode::Unique),
+          mbgl::gfx::Renderable(nativeView_.framebufferSize,
+                                std::make_unique<MBGLMapViewRenderable>(*this)),
+          nativeView(nativeView_) {
     }
 
     /// This function is called before we start rendering, when iOS invokes our rendering method.
