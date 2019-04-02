@@ -300,6 +300,7 @@ public:
 
     template <class DrawMode>
     void draw(gfx::Context& context,
+              gfx::RenderPass& renderPass,
               const DrawMode& drawMode,
               const gfx::DepthMode& depthMode,
               const gfx::StencilMode& stencilMode,
@@ -326,6 +327,7 @@ public:
 
             program->draw(
                 context,
+                renderPass,
                 drawMode,
                 depthMode,
                 stencilMode,

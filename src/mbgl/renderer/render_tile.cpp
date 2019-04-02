@@ -98,6 +98,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
 
         program.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::Lines { 4.0f * parameters.pixelRatio },
             gfx::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
@@ -121,6 +122,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
 
         program.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::Lines { 2.0f * parameters.pixelRatio },
             gfx::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
@@ -147,6 +149,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
         assert(tile.debugBucket);
         parameters.programs.debug.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::LineStrip { 4.0f * parameters.pixelRatio },
             gfx::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),

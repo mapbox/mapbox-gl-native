@@ -13,6 +13,7 @@ class ColorMode;
 class CullFaceMode;
 class DrawScope;
 class IndexBuffer;
+class RenderPass;
 template <class> class UniformValues;
 template <class> class AttributeBindings;
 template <class> class TextureBindings;
@@ -35,6 +36,7 @@ public:
     using TextureList = typename Name::TextureList;
 
     virtual void draw(Context&,
+                      RenderPass&,
                       const DrawMode&,
                       const DepthMode&,
                       const StencilMode&,

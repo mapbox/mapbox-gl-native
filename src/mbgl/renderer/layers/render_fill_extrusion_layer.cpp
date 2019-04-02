@@ -13,9 +13,8 @@
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/gfx/renderer_backend.hpp>
+#include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
-#include <mbgl/gl/renderable_resource.hpp>
 
 namespace mbgl {
 
@@ -52,9 +51,6 @@ bool RenderFillExtrusionLayer::hasCrossfade() const {
 }
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
-    // TODO: remove cast
-    gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
-
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
@@ -67,14 +63,14 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             renderTexture = parameters.context.createOffscreenTexture(size, *parameters.staticData.depthRenderbuffer);
         }
 
-        renderTexture->getResource<gl::RenderableResource>().bind();
-
         optional<float> depthClearValue = {};
         if (parameters.staticData.depthRenderbuffer->needsClearing()) depthClearValue = 1.0;
         // Flag the depth buffer as no longer needing to be cleared for the remainder of this pass.
         parameters.staticData.depthRenderbuffer->setShouldClear(false);
 
-        glContext.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
+        auto renderPass = parameters.encoder->createRenderPass(
+            "fill extrusion",
+            { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {} });
 
         auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
                         const optional<ImagePosition>& patternPositionA,
@@ -98,6 +94,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
             programInstance.draw(
                 parameters.context,
+                *renderPass,
                 gfx::Triangles(),
                 parameters.depthModeFor3D(gfx::DepthMaskType::ReadWrite),
                 gfx::StencilMode::disabled(),
@@ -201,6 +198,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         programInstance.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::Triangles(),
             gfx::DepthMode::disabled(),
             gfx::StencilMode::disabled(),

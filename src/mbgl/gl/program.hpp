@@ -156,6 +156,7 @@ public:
     };
 
     void draw(gfx::Context& genericContext,
+              gfx::RenderPass&,
               const gfx::DrawMode& drawMode,
               const gfx::DepthMode& depthMode,
               const gfx::StencilMode& stencilMode,

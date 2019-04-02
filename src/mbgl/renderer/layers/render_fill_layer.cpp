@@ -104,6 +104,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 programInstance.draw(
                     parameters.context,
+                    *parameters.renderPass,
                     drawMode,
                     depthMode,
                     parameters.stencilModeForClipping(tile.clip),
@@ -194,6 +195,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 programInstance.draw(
                     parameters.context,
+                    *parameters.renderPass,
                     drawMode,
                     depthMode,
                     parameters.stencilModeForClipping(tile.clip),

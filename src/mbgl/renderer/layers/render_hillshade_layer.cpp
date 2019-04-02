@@ -11,7 +11,7 @@
 #include <mbgl/style/layers/hillshade_layer_impl.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gfx/offscreen_texture.hpp>
-#include <mbgl/gl/renderable_resource.hpp>
+#include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/util/geo.hpp>
 
 namespace mbgl {
@@ -98,6 +98,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
 
         programInstance.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::Triangles(),
             parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
             gfx::StencilMode::disabled(),
@@ -132,7 +133,9 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             const uint16_t stride = bucket.getDEMData().stride;
             const uint16_t tilesize = bucket.getDEMData().dim;
             auto view = parameters.context.createOffscreenTexture({ tilesize, tilesize });
-            view->getResource<gl::RenderableResource>().bind();
+
+            auto renderPass = parameters.encoder->createRenderPass(
+                "hillshade prepare", { *view, Color{ 0.0f, 0.0f, 0.0f, 0.0f }, {}, {} });
 
             const Properties<>::PossiblyEvaluated properties;
             const HillshadePrepareProgram::Binders paintAttributeData{ properties, 0 };
@@ -160,6 +163,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
 
             programInstance.draw(
                 parameters.context,
+                *renderPass,
                 gfx::Triangles(),
                 parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
                 gfx::StencilMode::disabled(),
