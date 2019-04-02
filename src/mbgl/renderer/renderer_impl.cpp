@@ -369,10 +369,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // TODO: remove cast
     gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
 
-    if (backend.contextIsShared()) {
-        glContext.setDirtyState();
-    }
-
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
@@ -477,33 +473,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-#if not MBGL_USE_GLES2 and not defined(NDEBUG)
+#if not defined(NDEBUG)
     // Render tile clip boundaries, using stencil buffer to calculate fill color.
     if (parameters.debugOptions & MapDebugOptions::StencilClip) {
-        glContext.setStencilMode(gfx::StencilMode::disabled());
-        glContext.setDepthMode(gfx::DepthMode::disabled());
-        glContext.setColorMode(gfx::ColorMode::unblended());
-        glContext.program = 0;
-
-        // Reset the value in case someone else changed it, or it's dirty.
-        glContext.pixelTransferStencil = gl::value::PixelTransferStencil::Default;
-
-        // Read the stencil buffer
-        const auto viewport = glContext.viewport.getCurrentValue();
-        auto image = glContext.readFramebuffer<AlphaImage, gfx::TexturePixelType::Stencil>(viewport.size, false);
-
-        // Scale the Stencil buffer to cover the entire color space.
-        auto it = image.data.get();
-        auto end = it + viewport.size.width * viewport.size.height;
-        const auto factor = 255.0f / *std::max_element(it, end);
-        for (; it != end; ++it) {
-            *it *= factor;
-        }
-
-        glContext.pixelZoom = { 1, 1 };
-        glContext.rasterPos = { -1, -1, 0, 1 };
-        glContext.drawPixels(image);
-
+        parameters.context.visualizeStencilBuffer();
         return;
     }
 #endif
@@ -560,26 +533,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-#if not MBGL_USE_GLES2 and not defined(NDEBUG)
+#if not defined(NDEBUG)
     // Render the depth buffer.
     if (parameters.debugOptions & MapDebugOptions::DepthBuffer) {
-        glContext.setStencilMode(gfx::StencilMode::disabled());
-        glContext.setDepthMode(gfx::DepthMode::disabled());
-        glContext.setColorMode(gfx::ColorMode::unblended());
-        glContext.program = 0;
-
-        // Scales the values in the depth buffer so that they cover the entire grayscale range. This
-        // makes it easier to spot tiny differences.
-        const float base = 1.0f / (1.0f - parameters.depthRangeSize);
-        glContext.pixelTransferDepth = { base, 1.0f - base };
-
-        // Read the stencil buffer
-        auto viewport = glContext.viewport.getCurrentValue();
-        auto image = glContext.readFramebuffer<AlphaImage, gfx::TexturePixelType::Depth>(viewport.size, false);
-
-        glContext.pixelZoom = { 1, 1 };
-        glContext.rasterPos = { -1, -1, 0, 1 };
-        glContext.drawPixels(image);
+        parameters.context.visualizeDepthBuffer(parameters.depthRangeSize);
     }
 #endif
 
