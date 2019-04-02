@@ -78,8 +78,10 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
 
     segments.emplace_back(0, 0, vertices.elements(), indices.elements());
 
-    vertexBuffer = context.createVertexBuffer(std::move(vertices));
-    indexBuffer = context.createIndexBuffer(std::move(indices));
+    if (!vertices.empty()) {
+        vertexBuffer = context.createVertexBuffer(std::move(vertices));
+        indexBuffer = context.createIndexBuffer(std::move(indices));
+    }
 }
 
 } // namespace mbgl
