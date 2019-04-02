@@ -82,6 +82,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     if (!imageManager) {
         imageManager = std::make_unique<ImageManager>();
+        imageManager->setObserver(this);
     }
 
     if (updateParameters.mode != MapMode::Continuous) {
@@ -142,6 +143,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     const ImageDifference imageDiff = diffImages(imageImpls, updateParameters.images);
     imageImpls = updateParameters.images;
 
+    // Only trigger tile reparse for changed images. Changed images only need a relayout when they have a different size.
+    bool hasImageDiff = !imageDiff.removed.empty();
+
     // Remove removed images from sprite atlas.
     for (const auto& entry : imageDiff.removed) {
         imageManager->removeImage(entry.first);
@@ -154,9 +158,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Update changed images.
     for (const auto& entry : imageDiff.changed) {
-        imageManager->updateImage(entry.second.after);
+        hasImageDiff = imageManager->updateImage(entry.second.after) || hasImageDiff;
     }
 
+    imageManager->notifyIfMissingImageAdded();
     imageManager->setLoaded(updateParameters.spriteLoaded);
 
 
@@ -213,8 +218,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderSource->setObserver(this);
         renderSources.emplace(entry.first, std::move(renderSource));
     }
-
-    const bool hasImageDiff = !(imageDiff.added.empty() && imageDiff.removed.empty() && imageDiff.changed.empty());
 
     // Update all sources.
     for (const auto& source : *sourceImpls) {
@@ -835,6 +838,10 @@ void Renderer::Impl::onTileError(RenderSource& source, const OverscaledTileID& t
 
 void Renderer::Impl::onTileChanged(RenderSource&, const OverscaledTileID&) {
     observer->onInvalidate();
+}
+
+void Renderer::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
+    observer->onStyleImageMissing(id, std::move(done));
 }
 
 } // namespace mbgl

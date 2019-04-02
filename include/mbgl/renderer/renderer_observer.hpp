@@ -31,6 +31,10 @@ public:
 
     // Final frame
     virtual void onDidFinishRenderingMap() {}
+
+    // Style is missing an image
+    using StyleImageMissingCallback = std::function<void()>;
+    virtual void onStyleImageMissing(const std::string&, StyleImageMissingCallback done) { done(); }
 };
 
 } // namespace mbgl

@@ -157,8 +157,8 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
     glyphManager.getGlyphs(*this, std::move(glyphDependencies));
 }
 
-void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, uint64_t imageCorrelationID) {
-    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), std::move(patterns), imageCorrelationID);
+void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) {
+    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), std::move(patterns), std::move(versionMap), imageCorrelationID);
 }
 
 void GeometryTile::getImages(ImageRequestPair pair) {
@@ -192,6 +192,10 @@ void GeometryTile::upload(gfx::Context& context) {
     if (iconAtlas.image.valid()) {
         iconAtlasTexture = context.createTexture(iconAtlas.image);
         iconAtlas.image = {};
+    }
+
+    if (iconAtlasTexture) {
+        iconAtlas.patchUpdatedImages(context, *iconAtlasTexture, imageManager);
     }
 }
 

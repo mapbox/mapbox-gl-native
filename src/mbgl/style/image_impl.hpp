@@ -34,5 +34,6 @@ enum class ImageType : bool {
 using ImageMap = std::unordered_map<std::string, Immutable<style::Image::Impl>>;
 using ImageDependencies = std::unordered_map<std::string, ImageType>;
 using ImageRequestPair = std::pair<ImageDependencies, uint64_t>;
+using ImageVersionMap = std::unordered_map<std::string, uint32_t>;
 
 } // namespace mbgl

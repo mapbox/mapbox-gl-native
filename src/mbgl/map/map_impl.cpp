@@ -173,4 +173,14 @@ void Map::Impl::onDidFinishRenderingMap() {
     }
 };
 
+void Map::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
+
+    if (style->getImage(id) == nullptr) {
+        observer.onStyleImageMissing(id);
+    }
+
+    done();
+    onUpdate();
+}
+
 } // namespace mbgl

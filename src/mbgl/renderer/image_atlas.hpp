@@ -9,12 +9,20 @@
 
 namespace mbgl {
 
+namespace gfx {
+    class Texture;
+    class Context;
+} // namespace gfx
+
+class ImageManager;
+
 class ImagePosition {
 public:
-    ImagePosition(const mapbox::Bin&, const style::Image::Impl&);
+    ImagePosition(const mapbox::Bin&, const style::Image::Impl&, uint32_t version = 0);
 
     float pixelRatio;
     Rect<uint16_t> textureRect;
+    uint32_t version;
 
     std::array<uint16_t, 2> tl() const {
         return {{
@@ -51,8 +59,12 @@ public:
     PremultipliedImage image;
     ImagePositions iconPositions;
     ImagePositions patternPositions;
+
+    void patchUpdatedImages(gfx::Context&, gfx::Texture&, const ImageManager&);
+private:
+    void patchUpdatedImage(gfx::Context&, gfx::Texture&, ImagePosition& position, const ImageManager& imageManager, const std::string& name, uint16_t version);
 };
 
-ImageAtlas makeImageAtlas(const ImageMap&, const ImageMap&);
+ImageAtlas makeImageAtlas(const ImageMap&, const ImageMap&, const std::unordered_map<std::string, uint32_t>& versionMap);
 
 } // namespace mbgl
