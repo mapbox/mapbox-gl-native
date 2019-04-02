@@ -15,6 +15,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Packaging
 
 * Added a Galician localization. ([#14095](https://github.com/mapbox/mapbox-gl-native/pull/14095))
+* Added support for building from source with Xcode 10.2 / iOS SDK 12.2. ([#14241](https://github.com/mapbox/mapbox-gl-native/pull/14241))
 
 ### Offline maps
 

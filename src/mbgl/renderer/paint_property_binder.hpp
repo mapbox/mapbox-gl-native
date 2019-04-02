@@ -147,7 +147,7 @@ public:
     void upload(gfx::Context&) override {}
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters&) override {
-        if (!posA && !posB) {
+        if (!posA || !posB) {
             return;
         } else {
             constantPatternPositions = std::tuple<std::array<uint16_t, 4>, std::array<uint16_t, 4>> { posB->tlbr(), posA->tlbr() };
