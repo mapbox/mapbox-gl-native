@@ -1101,6 +1101,13 @@ public:
 {
     MGLAssertIsMainThread();
 
+    // Not "visible" - this isn't a full definition of visibility, but if
+    // the map view doesn't have a window then it *cannot* be visible.
+    if (!self.window) {
+        return;
+    }
+
+    // Mismatched display link
     if (displayLink && displayLink != _displayLink) {
         return;
     }
@@ -1114,7 +1121,15 @@ public:
         [self updateAnnotationViews];
         [self updateCalloutView];
         
+        CFTimeInterval before = CACurrentMediaTime();
         [self.glView display];
+        CFTimeInterval after = CACurrentMediaTime();
+
+        if (after-before >= 1.0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self emergencyRecreateGL];
+            });
+        }
     }
 
     if (self.experimental_enableFrameRateMeasurement)
@@ -1229,6 +1244,44 @@ public:
 
     _preferredFramesPerSecond = preferredFramesPerSecond;
     [self updateDisplayLinkPreferredFramesPerSecond];
+}
+
+// See https://github.com/mapbox/mapbox-gl-native/issues/14232
+- (void)emergencyRecreateGL {
+    MGLLogError(@"Rendering took too long - creating GL views");
+
+    CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+    eaglLayer.presentsWithTransaction = NO;
+
+    [self sleepGL:nil];
+
+    // Just performing a sleepGL/wakeGL pair isn't sufficient - in this case
+    // we can still get errors when calling bindDrawable. Here we completely
+    // recreate the GLKView
+    [_glView removeFromSuperview];
+    
+    _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
+    _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _glView.enableSetNeedsDisplay = NO;
+    _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+    _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
+    _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    _glView.layer.opaque = _opaque;
+    _glView.delegate = self;
+    
+    [self insertSubview:_glView atIndex:0];
+    _glView.contentMode = UIViewContentModeCenter;
+
+    // Do not bind...yet
+    
+    if (self.window) {
+        [self wakeGL:nil];
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = YES;
+    }
+    else {
+        MGLLogDebug(@"No window - skipping wakeGL");
+    }
 }
 
 - (void)willMoveToWindow:(UIWindow *)newWindow {
