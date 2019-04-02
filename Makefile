@@ -1,6 +1,8 @@
 export BUILDTYPE ?= Debug
 export IS_LOCAL_DEVELOPMENT ?= true
 export WITH_CXX11ABI ?= $(shell scripts/check-cxx11abi.sh)
+export TARGET_BRANCH ?= master
+
 
 ifeq ($(BUILDTYPE), Release)
 else ifeq ($(BUILDTYPE), RelWithDebInfo)
@@ -191,12 +193,11 @@ compdb: $(BUILD_DEPS) $(TEST_DEPS) $(MACOS_COMPDB_PATH)/Makefile
 
 .PHONY: tidy
 tidy: compdb
-	scripts/clang-tools.sh $(MACOS_COMPDB_PATH)
+	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) $(TARGET_BRANCH)
 
 .PHONY: check
 check: compdb
-	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) --diff
-
+	scripts/clang-tools.sh $(MACOS_COMPDB_PATH) $(TARGET_BRANCH) --diff
 endif
 
 #### iOS targets ##############################################################
@@ -383,11 +384,11 @@ compdb: $(LINUX_BUILD)
 
 .PHONY: tidy
 tidy: compdb
-	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) $(TARGET_BRANCH)
 
 .PHONY: check
 check: compdb
-	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) --diff
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) $(TARGET_BRANCH) --diff
 
 endif
 
