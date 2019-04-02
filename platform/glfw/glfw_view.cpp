@@ -176,6 +176,12 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             view->animateRouteCallback = nullptr;
 
         switch (key) {
+        case GLFW_KEY_I:
+            view->addMissingIcon();
+            break;
+        case GLFW_KEY_G:
+            view->updateIcon();
+            break;
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, true);
             break;
@@ -661,6 +667,24 @@ void GLFWView::onDidFinishLoadingStyle() {
     if (show3DExtrusions) {
         toggle3DExtrusions(show3DExtrusions);
     }
+}
+
+void GLFWView::addMissingIcon() {
+    map->getStyle().loadURL("http://localhost:8000/style.json");
+    map->jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng {}).withZoom(0.0).withBearing(0.0).withPitch(0.0));
+}
+
+void GLFWView::updateIcon() {
+    map->getStyle().addImage(makeImage("missing-icon", 22, 22, 1));
+}
+
+void GLFWView::onStyleImageMissing(const std::string& id) {
+    fprintf(stderr, "MISSING %s\n", id.c_str());
+    if (false) {
+    }
+        //callback({});
+    //callback(makeImage(id, 22, 22, 1));
+    map->getStyle().addImage(makeImage(id, 22, 22, 1));
 }
 
 void GLFWView::toggle3DExtrusions(bool visible) {

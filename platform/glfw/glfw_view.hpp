@@ -49,6 +49,7 @@ public:
 
     // mbgl::MapObserver implementation
     void onDidFinishLoadingStyle() override;
+    void onStyleImageMissing(const std::string&) override;//, std::function<void(mbgl::optional<std::unique_ptr<mbgl::style::Image>>)>) override;
 
 protected:
     // mbgl::Backend implementation
@@ -89,6 +90,9 @@ private:
 
     mbgl::AnnotationIDs animatedAnnotationIDs;
     std::vector<double> animatedAnnotationAddedTimes;
+
+    void addMissingIcon();
+    void updateIcon();
 
 private:
     void toggle3DExtrusions(bool visible);
