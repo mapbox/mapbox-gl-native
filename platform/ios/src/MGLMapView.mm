@@ -1266,6 +1266,8 @@ public:
     // Just performing a sleepGL/wakeGL pair isn't sufficient - in this case
     // we can still get errors when calling bindDrawable. Here we completely
     // recreate the GLKView
+    
+    [self.userLocationAnnotationView removeFromSuperview];
     [_glView removeFromSuperview];
     
     _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
@@ -1276,10 +1278,17 @@ public:
     _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
-    
+
     [self insertSubview:_glView atIndex:0];
     _glView.contentMode = UIViewContentModeCenter;
 
+    if (self.annotationContainerView)
+    {
+        [_glView insertSubview:self.annotationContainerView atIndex:0];
+    }
+    
+    [self updateUserLocationAnnotationView];
+    
     // Do not bind...yet
     
     if (self.window) {
