@@ -224,19 +224,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         staticData = std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio, programCacheDir);
     }
 
-    PaintParameters parameters {
-        backend.getContext(),
-        pixelRatio,
-        contextMode,
-        backend,
-        updateParameters,
-        renderLight.getEvaluated(),
-        *staticData,
-        *imageManager,
-        *lineAtlas,
-        placement->getVariableOffsets()
-    };
-
     Color backgroundColor;
 
     struct RenderItem {
@@ -250,6 +237,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     std::vector<const RenderLayerSymbolInterface*> renderItemsWithSymbols;
 
     // Update all sources and initialize renderItems.
+    staticData->has3D = false;
     renderItems.reserve(layerImpls->size());
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
@@ -263,7 +251,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             const auto* layerInfo = layerImpl->getTypeInfo();
             bool layerNeedsRendering = layer->needsRendering(zoomHistory.lastZoom);
 
-            parameters.staticData.has3D = (parameters.staticData.has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
+            staticData->has3D = (staticData->has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
@@ -280,7 +268,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             // Handle layers without source.
             if (layerNeedsRendering && sourceImpl.get() == sourceImpls->at(0).get()) {            
-                if (parameters.contextMode == GLContextMode::Unique
+                if (contextMode == GLContextMode::Unique
                     && layerImpl.get() == layerImpls->at(0).get()) {
                     const auto& solidBackground = layer->getSolidBackground();
                     if (solidBackground) {
@@ -315,46 +303,49 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             continue;
         }
 
-        renderItem.layer.setRenderTiles(renderItem.source->getRenderTiles(), parameters.state);
+        renderItem.layer.setRenderTiles(renderItem.source->getRenderTiles(), updateParameters.transformState);
         if (const RenderLayerSymbolInterface* symbolLayer = renderItem.layer.getSymbolInterface()) {
             renderItemsWithSymbols.push_back(symbolLayer);
         }
     }
 
     {
-        if (parameters.mapMode != MapMode::Continuous) {
+        if (updateParameters.mode != MapMode::Continuous) {
             // TODO: Think about right way for symbol index to handle still rendering
             crossTileSymbolIndex.reset();
         }
 
         bool symbolBucketsChanged = false;
-        const bool placementChanged = !placement->stillRecent(parameters.timePoint);
+        const bool placementChanged = !placement->stillRecent(updateParameters.timePoint);
         std::set<std::string> usedSymbolLayers;
 
         if (placementChanged) {
-            placement = std::make_unique<Placement>(parameters.state, parameters.mapMode, updateParameters.transitionOptions, updateParameters.crossSourceCollisions, std::move(placement));
+            placement = std::make_unique<Placement>(
+                updateParameters.transformState, updateParameters.mode,
+                updateParameters.transitionOptions, updateParameters.crossSourceCollisions,
+                std::move(placement));
         }
 
         for (auto it = renderItemsWithSymbols.rbegin(); it != renderItemsWithSymbols.rend(); ++it) {
             const RenderLayerSymbolInterface *symbolLayer = *it;
-            if (crossTileSymbolIndex.addLayer(*symbolLayer, parameters.state.getLatLng().longitude())) symbolBucketsChanged = true;
+            if (crossTileSymbolIndex.addLayer(*symbolLayer, updateParameters.transformState.getLatLng().longitude())) symbolBucketsChanged = true;
 
             if (placementChanged) {
                 usedSymbolLayers.insert(symbolLayer->layerID());
-                placement->placeLayer(*symbolLayer, parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+                mat4 projMatrix;
+                updateParameters.transformState.getProjMatrix(projMatrix);
+                placement->placeLayer(*symbolLayer, projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
         if (placementChanged) {
-            placement->commit(parameters.timePoint);
+            placement->commit(updateParameters.timePoint);
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-            parameters.variableOffsets = placement->getVariableOffsets();
             updateFadingTiles();
         } else {
             placement->setStale();
         }
 
-        parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
         if (placementChanged || symbolBucketsChanged) {
             for (auto it = renderItemsWithSymbols.rbegin(); it != renderItemsWithSymbols.rend(); ++it) {
@@ -363,6 +354,21 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
     }
+
+    PaintParameters parameters {
+        backend.getContext(),
+        pixelRatio,
+        contextMode,
+        backend,
+        updateParameters,
+        renderLight.getEvaluated(),
+        *staticData,
+        *imageManager,
+        *lineAtlas,
+        placement->getVariableOffsets()
+    };
+
+    parameters.symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
 
     // TODO: remove cast
     gl::Context& glContext = static_cast<gl::Context&>(parameters.context);
