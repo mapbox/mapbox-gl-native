@@ -3,7 +3,7 @@
 require('flow-remove-types/register');
 
 const path = require('path');
-const outputPath = 'src/mbgl/programs/gl';
+const outputPath = 'src/mbgl/programs';
 const zlib = require('zlib');
 const crypto = require('crypto');
 
@@ -79,7 +79,7 @@ const compressed = zlib.deflateSync(concatenated, {level: zlib.Z_BEST_COMPRESSIO
     .join(',\n    ')
     .trim();
 
-writeIfModified(path.join(outputPath, 'shader_source.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+writeIfModified(path.join(outputPath, 'gl', 'shader_source.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #pragma once
 
@@ -97,7 +97,7 @@ struct ShaderSource;
 } // namespace mbgl
 `);
 
-writeIfModified(path.join(outputPath, 'shader_source.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+writeIfModified(path.join(outputPath, 'gl', 'shader_source.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/util/compression.hpp>
@@ -122,7 +122,7 @@ const char* shaderSource() {
 } // namespace mbgl
 `);
 
-writeIfModified(path.join(outputPath, 'preludes.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+writeIfModified(path.join(outputPath, 'gl', 'preludes.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #pragma once
 
@@ -147,7 +147,7 @@ for (const key in offsets) {
 
     const { shaderName, ShaderName, originalKey } = offsets[key];
 
-    writeIfModified(path.join(outputPath, `${shaderName}.cpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+    writeIfModified(path.join(outputPath, 'gl', `${shaderName}.cpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/${shaderName}_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
