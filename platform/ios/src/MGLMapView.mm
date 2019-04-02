@@ -252,6 +252,7 @@ public:
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
+@property (nonatomic) BOOL enablePresentsWithTransaction;
 
 /// Experimental rendering performance measurement.
 @property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
@@ -702,7 +703,7 @@ public:
     _glView.delegate = self;
 
     CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-    eaglLayer.presentsWithTransaction = YES;
+    eaglLayer.presentsWithTransaction = NO;
     
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
@@ -1121,14 +1122,21 @@ public:
         [self updateAnnotationViews];
         [self updateCalloutView];
         
-        CFTimeInterval before = CACurrentMediaTime();
-        [self.glView display];
-        CFTimeInterval after = CACurrentMediaTime();
+        if (self.enablePresentsWithTransaction)
+        {
+            CFTimeInterval before = CACurrentMediaTime();
+            [self.glView display];
+            CFTimeInterval after = CACurrentMediaTime();
 
-        if (after-before >= 1.0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self emergencyRecreateGL];
-            });
+            if (after-before >= 1.0) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self emergencyRecreateGL];
+                });
+            }
+        }
+        else
+        {
+            [self.glView display];
         }
     }
 
@@ -1277,7 +1285,7 @@ public:
     if (self.window) {
         [self wakeGL:nil];
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-        eaglLayer.presentsWithTransaction = YES;
+        eaglLayer.presentsWithTransaction = self.enablePresentsWithTransaction;
     }
     else {
         MGLLogDebug(@"No window - skipping wakeGL");
@@ -1312,7 +1320,7 @@ public:
     {
         // See above comment
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-        eaglLayer.presentsWithTransaction = YES;
+        eaglLayer.presentsWithTransaction = self.enablePresentsWithTransaction;
         
         [self validateDisplayLink];
     }
@@ -4227,6 +4235,8 @@ public:
     [newAnnotationContainerView addSubviews:annotationViews];
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
     self.annotationContainerView = newAnnotationContainerView;
+    
+    self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > 0);
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -4400,6 +4410,8 @@ public:
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
         [self.annotationContainerView.annotationViews removeObject:annotationView];
+        
+        self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > 0);
 
         if (annotationTag == _selectedAnnotationTag)
         {
