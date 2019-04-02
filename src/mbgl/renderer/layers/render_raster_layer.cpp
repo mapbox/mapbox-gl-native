@@ -146,6 +146,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
         RasterBucket& bucket = *imageData->bucket;
         assert(bucket.texture);
 
+        size_t i = 0;
         for (const auto& matrix_ : *imageData->matrices) {
             draw(matrix_,
                 *bucket.vertexBuffer,
@@ -155,7 +156,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
                     textures::image0::Value{ bucket.texture->getResource(), filter },
                     textures::image1::Value{ bucket.texture->getResource(), filter },
                 },
-                bucket.drawScopeID);
+                bucket.drawScopeID + std::to_string(i++));
         }
     } else {
         for (const RenderTile& tile : renderTiles) {

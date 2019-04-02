@@ -68,7 +68,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
     const Properties<>::PossiblyEvaluated properties;
     const BackgroundProgram::Binders paintAttributeData(properties, 0);
 
-    auto draw = [&](auto& program, auto&& uniformValues, const auto& textureBindings) {
+    auto draw = [&](auto& program, auto&& uniformValues, const auto& textureBindings, const UnwrappedTileID& id) {
         const auto allUniformValues = program.computeAllUniformValues(
             std::move(uniformValues),
             paintAttributeData,
@@ -96,7 +96,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
             allUniformValues,
             allAttributeBindings,
             textureBindings,
-            getID()
+            getID() + "/" + util::toString(id)
         );
     };
     const auto& evaluated = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).evaluated;
@@ -123,7 +123,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
                 ),
                 BackgroundPatternProgram::TextureBindings{
                     textures::image::Value{ parameters.imageManager.textureBinding() },
-                }
+                },
+                tileID
             );
         }
     } else {
@@ -135,7 +136,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
                     uniforms::color::Value( evaluated.get<BackgroundColor>() ),
                     uniforms::opacity::Value( evaluated.get<BackgroundOpacity>() ),
                 },
-                BackgroundProgram::TextureBindings{}
+                BackgroundProgram::TextureBindings{},
+                tileID
             );
         }
     }
