@@ -36,6 +36,7 @@ public:
     SegmentVector<DebugAttributes> segments;
     optional<gfx::VertexBuffer<DebugLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> indexBuffer;
+    const std::string drawScopeID;
 };
 
 } // namespace mbgl

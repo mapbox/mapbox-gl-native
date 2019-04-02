@@ -21,7 +21,8 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
       complete(complete_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),
-      debugMode(debugMode_) {
+      debugMode(debugMode_),
+      drawScopeID("__debug/borders/" + util::toString(id)) {
 
     gfx::VertexVector<FillLayoutVertex> vertices;
     gfx::IndexVector<gfx::Lines> indices;
