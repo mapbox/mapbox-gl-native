@@ -449,16 +449,25 @@ static std::unique_ptr<Expression> interpolate(type::Type type, Interpolator int
 }
 
 template <class T>
-std::unique_ptr<Expression> categorical(type::Type type, const std::string& property, std::map<T, std::unique_ptr<Expression>> branches) {
+std::unique_ptr<Expression> categorical(type::Type type,
+                                        const std::string& property,
+                                        std::map<T, std::unique_ptr<Expression>> branches,
+                                        optional<std::unique_ptr<Expression>> def) {
     std::unordered_map<T, std::shared_ptr<Expression>> convertedBranches;
     for (auto& b : branches) {
         convertedBranches[b.first] = std::move(b.second);
     }
-    return std::make_unique<Match<T>>(type, get(literal(property)), std::move(convertedBranches), error("replaced with default"));
+    return std::make_unique<Match<T>>(type,
+                                      get(literal(property)),
+                                      std::move(convertedBranches),
+                                      def ? std::move(*def) : error("replaced with default"));
 }
 
 template <>
-std::unique_ptr<Expression> categorical<bool>(type::Type type, const std::string& property, std::map<bool, std::unique_ptr<Expression>> branches) {
+std::unique_ptr<Expression> categorical<bool>(type::Type type,
+                                              const std::string& property,
+                                              std::map<bool, std::unique_ptr<Expression>> branches,
+                                              optional<std::unique_ptr<Expression>> def) {
     auto it = branches.find(true);
     std::unique_ptr<Expression> trueCase = it == branches.end() ?
         error("replaced with default") :
@@ -469,10 +478,12 @@ std::unique_ptr<Expression> categorical<bool>(type::Type type, const std::string
         error("replaced with default") :
         std::move(it->second);
 
-    std::vector<typename Case::Branch> trueBranch;
-    trueBranch.emplace_back(get(literal(property)), std::move(trueCase));
+    std::vector<typename Case::Branch> convertedBranches;
+    convertedBranches.emplace_back(eq(get(literal(property)), literal(Value(true))), std::move(trueCase));
+    convertedBranches.emplace_back(eq(get(literal(property)), literal(Value(false))), std::move(falseCase));
 
-    return std::make_unique<Case>(type, std::move(trueBranch), std::move(falseCase));
+    return std::make_unique<Case>(type, std::move(convertedBranches),
+                                  def ? std::move(*def) : error("replaced with default"));
 }
 
 static std::unique_ptr<Expression> numberOrDefault(type::Type type,
@@ -531,7 +542,8 @@ static optional<std::unique_ptr<Expression>> convertExponentialFunction(type::Ty
 static optional<std::unique_ptr<Expression>> convertCategoricalFunction(type::Type type,
                                                                         const Convertible& value,
                                                                         Error& err,
-                                                                        const std::string& property) {
+                                                                        const std::string& property,
+                                                                        optional<std::unique_ptr<Expression>> def) {
     auto stopsValue = objectMember(value, "stops");
     if (!stopsValue) {
         err.message = "function value must specify stops";
@@ -565,7 +577,7 @@ static optional<std::unique_ptr<Expression>> convertCategoricalFunction(type::Ty
         if (!branches) {
             return nullopt;
         }
-        return categorical(type, property, std::move(*branches));
+        return categorical(type, property, std::move(*branches), std::move(def));
     }
 
     if (toNumber(arrayMember(first, 0))) {
@@ -573,7 +585,7 @@ static optional<std::unique_ptr<Expression>> convertCategoricalFunction(type::Ty
         if (!branches) {
             return nullopt;
         }
-        return categorical(type, property, std::move(*branches));
+        return categorical(type, property, std::move(*branches), std::move(def));
     }
 
     if (toString(arrayMember(first, 0))) {
@@ -581,7 +593,7 @@ static optional<std::unique_ptr<Expression>> convertCategoricalFunction(type::Ty
         if (!branches) {
             return nullopt;
         }
-        return categorical(type, property, std::move(*branches));
+        return categorical(type, property, std::move(*branches), std::move(def));
     }
 
     err.message = "stop domain value must be a number, string, or boolean";
@@ -803,7 +815,7 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
         case FunctionType::Exponential:
             return convertExponentialFunction(type, value, err, getProperty, defaultExpr());
         case FunctionType::Categorical:
-            return convertCategoricalFunction(type, value, err, *property);
+            return convertCategoricalFunction(type, value, err, *property, defaultExpr());
         default:
             err.message = "unsupported function type";
             return nullopt;
@@ -820,7 +832,7 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
             switch (functionType) {
             case FunctionType::Categorical:
                 return composite<bool>(type, value, err, [&] (type::Type type_, double, std::map<bool, std::unique_ptr<Expression>> stops) {
-                    return categorical<bool>(type_, *property, std::move(stops));
+                    return categorical<bool>(type_, *property, std::move(stops), defaultExpr());
                 });
             default:
                 err.message = "unsupported function type";
@@ -847,7 +859,7 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
                 });
             case FunctionType::Categorical:
                 return composite<int64_t>(type, value, err, [&] (type::Type type_, double, std::map<int64_t, std::unique_ptr<Expression>> stops) {
-                    return categorical<int64_t>(type_, *property, std::move(stops));
+                    return categorical<int64_t>(type_, *property, std::move(stops), defaultExpr());
                 });
             default:
                 err.message = "unsupported function type";
@@ -859,7 +871,7 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
             switch (functionType) {
             case FunctionType::Categorical:
                 return composite<std::string>(type, value, err, [&] (type::Type type_, double, std::map<std::string, std::unique_ptr<Expression>> stops) {
-                    return categorical<std::string>(type_, *property, std::move(stops));
+                    return categorical<std::string>(type_, *property, std::move(stops), defaultExpr());
                 });
             default:
                 err.message = "unsupported function type";
