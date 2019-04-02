@@ -176,6 +176,7 @@ public final class MapboxMap {
     if (style != null) {
       style.clear();
     }
+    cameraChangeDispatcher.onDestroy();
   }
 
   /**
