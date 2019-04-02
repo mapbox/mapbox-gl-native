@@ -278,12 +278,13 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onImagesAvailable(ImageMap newIconMap, ImageMap newPatternMap, uint64_t imageCorrelationID_) {
+void GeometryTileWorker::onImagesAvailable(ImageMap newIconMap, ImageMap newPatternMap, ImageVersionMap newVersionMap, uint64_t imageCorrelationID_) {
     if (imageCorrelationID != imageCorrelationID_) {
         return; // Ignore outdated image request replies.
     }
     imageMap = std::move(newIconMap);
     patternMap = std::move(newPatternMap);
+    versionMap = std::move(newVersionMap);
     pendingImageDependencies.clear();
     symbolDependenciesChanged();
 }
@@ -441,7 +442,7 @@ void GeometryTileWorker::finalizeLayout() {
     
     MBGL_TIMING_START(watch)
     optional<AlphaImage> glyphAtlasImage;
-    ImageAtlas iconAtlas = makeImageAtlas(imageMap, patternMap);
+    ImageAtlas iconAtlas = makeImageAtlas(imageMap, patternMap, versionMap);
     if (!layouts.empty()) {
         GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
         glyphAtlasImage = std::move(glyphAtlas.image);

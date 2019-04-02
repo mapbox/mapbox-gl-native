@@ -11,6 +11,7 @@
 #include <mbgl/map/zoom_history.hpp>
 #include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
+#include <mbgl/renderer/image_manager_observer.hpp>
 #include <mbgl/text/placement.hpp>
 
 #include <memory>
@@ -34,6 +35,7 @@ class LineAtlas;
 class CrossTileSymbolIndex;
 
 class Renderer::Impl : public GlyphManagerObserver,
+                       public ImageManagerObserver,
                        public RenderSourceObserver{
 public:
     Impl(RendererBackend&, float pixelRatio_, Scheduler&, GLContextMode,
@@ -85,6 +87,9 @@ private:
     // RenderSourceObserver implementation.
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
+
+    // ImageManagerObserver implementation
+    void onStyleImageMissing(const std::string&, std::function<void()>) override;
 
     void updateFadingTiles();
 

@@ -100,10 +100,24 @@ public:
         texture.size = image.size;
     }
 
+    template <typename Image>
+    void updateTextureSub(Texture& texture,
+                       const Image& image,
+                       const uint16_t offsetX,
+                       const uint16_t offsetY,
+                       TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
+        assert(image.size.width + offsetX <= texture.size.width);
+        assert(image.size.height + offsetY <= texture.size.height);
+        auto format = image.channels == 4 ? TexturePixelType::RGBA : TexturePixelType::Alpha;
+        updateTextureResourceSub(*texture.resource, offsetX, offsetY, image.size, image.data.get(), format, type);
+    }
+
 protected:
     virtual std::unique_ptr<TextureResource> createTextureResource(
         Size, const void* data, TexturePixelType, TextureChannelDataType) = 0;
     virtual void updateTextureResource(const TextureResource&, Size, const void* data,
+        TexturePixelType, TextureChannelDataType) = 0;
+    virtual void updateTextureResourceSub(const TextureResource&, uint16_t xOffset, uint16_t yOffset, Size, const void* data,
         TexturePixelType, TextureChannelDataType) = 0;
 
 public:
