@@ -1263,6 +1263,7 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
+#ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
 // See https://github.com/mapbox/mapbox-gl-native/issues/14232
 - (void)emergencyRecreateGL {
     MGLLogError(@"Rendering took too long - creating GL views");
@@ -1309,6 +1310,7 @@ public:
         MGLLogDebug(@"No window - skipping wakeGL");
     }
 }
+#endif
 
 - (void)willMoveToWindow:(UIWindow *)newWindow {
     [super willMoveToWindow:newWindow];
