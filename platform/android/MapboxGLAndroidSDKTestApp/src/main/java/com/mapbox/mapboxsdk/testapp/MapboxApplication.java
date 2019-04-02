@@ -40,7 +40,7 @@ public class MapboxApplication extends Application {
     initializeMapbox();
   }
 
-  private boolean initializeLeakCanary() {
+  protected boolean initializeLeakCanary() {
     if (LeakCanary.isInAnalyzerProcess(this)) {
       // This process is dedicated to LeakCanary for heap analysis.
       // You should not init your app in this process.
