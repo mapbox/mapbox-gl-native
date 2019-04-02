@@ -4,6 +4,7 @@
 
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <nan.h>
@@ -73,25 +74,19 @@ void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         expected = parseType(info[1]->ToObject());
     }
 
-    auto expr = info[0];
+    auto success = [&cons, &info](std::unique_ptr<Expression> result) {
+        auto nodeExpr = new NodeExpression(std::move(result));
+        const int argc = 0;
+        v8::Local<v8::Value> argv[0] = {};
+        auto wrapped = Nan::NewInstance(cons, argc, argv).ToLocalChecked();
+        nodeExpr->Wrap(wrapped);
+        info.GetReturnValue().Set(wrapped);
+    };
 
-    try {
-        ParsingContext ctx = expected ? ParsingContext(*expected) : ParsingContext();
-        ParseResult parsed = ctx.parseLayerPropertyExpression(mbgl::style::conversion::Convertible(expr));
-        if (parsed) {
-            assert(ctx.getErrors().size() == 0);
-            auto nodeExpr = new NodeExpression(std::move(*parsed));
-            const int argc = 0;
-            v8::Local<v8::Value> argv[0] = {};
-            auto wrapped = Nan::NewInstance(cons, argc, argv).ToLocalChecked();
-            nodeExpr->Wrap(wrapped);
-            info.GetReturnValue().Set(wrapped);
-            return;
-        }
-
+    auto fail = [&info](const std::vector<ParsingError>& errors) {
         v8::Local<v8::Array> result = Nan::New<v8::Array>();
-        for (std::size_t i = 0; i < ctx.getErrors().size(); i++) {
-            const auto& error = ctx.getErrors()[i];
+        for (std::size_t i = 0; i < errors.size(); ++i) {
+            const auto& error = errors[i];
             v8::Local<v8::Object> err = Nan::New<v8::Object>();
             Nan::Set(err,
                     Nan::New("key").ToLocalChecked(),
@@ -102,6 +97,29 @@ void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
             Nan::Set(result, Nan::New((uint32_t)i), err);
         }
         info.GetReturnValue().Set(result);
+    };
+
+    auto expr = info[0];
+
+    try {
+        mbgl::style::conversion::Convertible convertible(expr);
+
+        if (expr->IsObject() && !expr->IsArray() && expected) {
+            mbgl::style::conversion::Error error;
+            auto func = convertFunctionToExpression(*expected, convertible, error, false);
+            if (func) {
+                return success(std::move(*func));
+            }
+            return fail({ { error.message, "" } });
+        }
+
+        ParsingContext ctx = expected ? ParsingContext(*expected) : ParsingContext();
+        ParseResult parsed = ctx.parseLayerPropertyExpression(mbgl::style::conversion::Convertible(expr));
+        if (parsed) {
+            assert(ctx.getErrors().empty());
+            return success(std::move(*parsed));
+        }
+        return fail(ctx.getErrors());
     } catch(std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
