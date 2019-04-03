@@ -62,10 +62,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             if (parameters.context.supportsHalfFloatTextures) {
                 renderTexture = parameters.context.createOffscreenTexture(size, gfx::TextureChannelDataType::HalfFloat);
 
-                // TODO: try binding in the offscreen texture constructor
-                try {
-                    renderTexture->getResource<gl::RenderableResource>().bind();
-                } catch (const std::runtime_error& ex) {
+                if (!renderTexture->isRenderable()) {
                     // can't render to a half-float texture; falling back to unsigned byte one
                     renderTexture.reset();
                     parameters.context.supportsHalfFloatTextures = false;

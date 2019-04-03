@@ -75,6 +75,15 @@ OffscreenTexture::OffscreenTexture(
           size, std::make_unique<OffscreenTextureResource>(context, size_, renderbuffer, type)) {
 }
 
+bool OffscreenTexture::isRenderable() {
+    try {
+        getResource<OffscreenTextureResource>().bind();
+        return true;
+    } catch (const std::runtime_error& ex) {
+        return false;
+    }
+}
+
 PremultipliedImage OffscreenTexture::readStillImage() {
     return getResource<OffscreenTextureResource>().readStillImage();
 }

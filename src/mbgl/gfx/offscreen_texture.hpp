@@ -17,6 +17,8 @@ protected:
 public:
     virtual ~OffscreenTexture() = default;
 
+    virtual bool isRenderable() = 0;
+
     virtual PremultipliedImage readStillImage() = 0;
     virtual gfx::Texture& getTexture() = 0;
 };
