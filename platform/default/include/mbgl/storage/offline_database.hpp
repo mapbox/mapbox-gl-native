@@ -44,8 +44,7 @@ public:
     ~OfflineDatabase();
 
     void changePath(const std::string&);
-
-    void cleanup();
+    std::exception_ptr resetCache();
 
     optional<Response> get(const Resource&);
 
@@ -91,6 +90,7 @@ private:
     void migrateToVersion5();
     void migrateToVersion3();
     void migrateToVersion6();
+    void cleanup();
 
     mapbox::sqlite::Statement& getStatement(const char *);
 

@@ -124,6 +124,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `O` to toggle online connectivity\n");
     printf("- Press `Z` to cycle through north orientations\n");
     printf("- Prezz `X` to cycle through the viewport modes\n");
+    printf("- Press `I` to Delete existing database and re-initialize\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
     printf("- Press `B` to cycle through the color, stencil, and depth buffer\n");
     printf("- Press `D` to cycle through camera bounds: inside, crossing IDL at left, crossing IDL at right, and disabled\n");
@@ -220,6 +221,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_C:
             view->clearAnnotations();
+            break;
+        case GLFW_KEY_I:
+            view->resetCacheCallback();
             break;
         case GLFW_KEY_K:
             view->addRandomCustomPointAnnotations(1);

@@ -1136,4 +1136,12 @@ bool OfflineDatabase::exceedsOfflineMapboxTileCountLimit(const Resource& resourc
         && offlineMapboxTileCountLimitExceeded();
 }
 
+std::exception_ptr OfflineDatabase::resetCache() try {
+    removeExisting();
+    initialize();
+    return nullptr;
+} catch (...) {
+    return std::current_exception();
+}
+
 } // namespace mbgl
