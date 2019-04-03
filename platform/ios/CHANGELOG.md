@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 4.11.0
+
+* No public-facing changes in v4.11.0-alpha.1.
+
 ## 4.10.0
 
 ### Styles and rendering
