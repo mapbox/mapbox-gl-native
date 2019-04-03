@@ -40,6 +40,10 @@ public:
         onlineStatusCallback = callback;
     }
 
+    void setResetCacheCallback(std::function<void()> callback) {
+        resetCacheCallback = callback;
+    };
+
     void setShouldClose();
 
     void setWindowTitle(const std::string&);
@@ -120,6 +124,7 @@ private:
     std::function<void()> changeStyleCallback;
     std::function<void()> pauseResumeCallback;
     std::function<void()> onlineStatusCallback;
+    std::function<void()> resetCacheCallback;
     std::function<void(mbgl::Map*)> animateRouteCallback;
 
     mbgl::util::RunLoop runLoop;

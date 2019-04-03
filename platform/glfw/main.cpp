@@ -6,6 +6,7 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/renderer/renderer.hpp>
@@ -157,6 +158,14 @@ int main(int argc, char *argv[]) {
         }
 
         isPaused = !isPaused;
+    });
+
+    view->setResetCacheCallback([fileSource] () {
+        fileSource->resetCache([](std::exception_ptr ex) {
+            if (ex) {
+                mbgl::Log::Error(mbgl::Event::Database, "Failed to reset cache:: %s", mbgl::util::toString(ex).c_str());
+            }
+        });
     });
 
     // Load style

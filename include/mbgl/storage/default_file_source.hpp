@@ -174,6 +174,15 @@ public:
      */
     void put(const Resource&, const Response&);
 
+    /*
+     * Delete existing database and re-initialize.
+     *
+     * When the operation is complete or encounters an error, the given callback will be
+     * executed on the database thread; it is the responsibility of the SDK bindings
+     * to re-execute a user-provided callback on the main thread.
+     */
+    void resetCache(std::function<void (std::exception_ptr)>);
+
     // For testing only.
     void setOnlineStatus(bool);
 
