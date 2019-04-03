@@ -112,4 +112,15 @@ class MapboxMapTest {
     mapboxMap.onDestroy()
     verify { cameraChangeDispatcher.onDestroy() }
   }
+
+  @Test
+  fun testStyleClearedOnDestroy() {
+    val style = mockk<Style>(relaxed = true)
+    val builder = mockk<Style.Builder>(relaxed = true)
+    every { builder.build(nativeMapView) } returns style
+    mapboxMap.setStyle(builder)
+
+    mapboxMap.onDestroy()
+    verify(exactly = 1) { style.clear() }
+  }
 }

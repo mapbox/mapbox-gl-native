@@ -3,8 +3,10 @@ package com.mapbox.mapboxsdk.maps
 import android.graphics.Bitmap
 import android.graphics.drawable.ShapeDrawable
 import com.mapbox.mapboxsdk.constants.MapboxConstants
+import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions
+import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import io.mockk.every
 import io.mockk.mockk
@@ -25,16 +27,8 @@ class StyleTest {
 
     @Before
     fun setup() {
-        nativeMapView = mockk()
+        nativeMapView = mockk(relaxed = true)
         mapboxMap = MapboxMap(nativeMapView, null, null, null, null, null)
-        every { nativeMapView.styleUrl = any() } answers {}
-        every { nativeMapView.styleJson = any() } answers {}
-        every { nativeMapView.addLayerBelow(any(), any()) } answers {}
-        every { nativeMapView.addLayerAbove(any(), any()) } answers {}
-        every { nativeMapView.addLayerAt(any(), any()) } answers {}
-        every { nativeMapView.addSource(any()) } answers {}
-        every { nativeMapView.addImages(any()) } answers {}
-        every { nativeMapView.transitionOptions = any() } answers {}
         every { nativeMapView.isDestroyed } returns false
         mapboxMap.injectLocationComponent(spyk())
     }
@@ -313,5 +307,105 @@ class StyleTest {
         verify(exactly = 0) { nativeMapView.addImages(any()) }
         mapboxMap.notifyStyleLoaded()
         verify(exactly = 1) { nativeMapView.addImages(any()) }
+    }
+
+    @Test
+    fun testSourceSkippedIfAdditionFails() {
+        val source1 = mockk<GeoJsonSource>(relaxed = true)
+        every { source1.id } returns "source1"
+        val source2 = mockk<GeoJsonSource>(relaxed = true)
+        every { source2.id } returns "source1" // same ID
+
+        val builder = Style.Builder().withSource(source1)
+        mapboxMap.setStyle(builder)
+        mapboxMap.notifyStyleLoaded()
+
+        every { nativeMapView.addSource(any()) } throws CannotAddSourceException("Duplicate ID")
+
+        try {
+            mapboxMap.style!!.addSource(source2)
+        } catch (ex: Exception) {
+            Assert.assertEquals("Source that failed to be added shouldn't be cached", source1, mapboxMap.style!!.getSource("source1"))
+        }
+    }
+
+    @Test
+    fun testLayerSkippedIfAdditionFails() {
+        val layer1 = mockk<SymbolLayer>(relaxed = true)
+        every { layer1.id } returns "layer1"
+        val layer2 = mockk<SymbolLayer>(relaxed = true)
+        every { layer2.id } returns "layer1" // same ID
+
+        val builder = Style.Builder().withLayer(layer1)
+        mapboxMap.setStyle(builder)
+        mapboxMap.notifyStyleLoaded()
+
+        every { nativeMapView.addLayer(any()) } throws CannotAddLayerException("Duplicate ID")
+
+        try {
+            mapboxMap.style!!.addLayer(layer2)
+        } catch (ex: Exception) {
+            Assert.assertEquals("Layer that failed to be added shouldn't be cached", layer1, mapboxMap.style!!.getLayer("layer1"))
+        }
+    }
+
+    @Test
+    fun testLayerSkippedIfAdditionBelowFails() {
+        val layer1 = mockk<SymbolLayer>(relaxed = true)
+        every { layer1.id } returns "layer1"
+        val layer2 = mockk<SymbolLayer>(relaxed = true)
+        every { layer2.id } returns "layer1" // same ID
+
+        val builder = Style.Builder().withLayer(layer1)
+        mapboxMap.setStyle(builder)
+        mapboxMap.notifyStyleLoaded()
+
+        every { nativeMapView.addLayerBelow(any(), "") } throws CannotAddLayerException("Duplicate ID")
+
+        try {
+            mapboxMap.style!!.addLayerBelow(layer2, "")
+        } catch (ex: Exception) {
+            Assert.assertEquals("Layer that failed to be added shouldn't be cached", layer1, mapboxMap.style!!.getLayer("layer1"))
+        }
+    }
+
+    @Test
+    fun testLayerSkippedIfAdditionAboveFails() {
+        val layer1 = mockk<SymbolLayer>(relaxed = true)
+        every { layer1.id } returns "layer1"
+        val layer2 = mockk<SymbolLayer>(relaxed = true)
+        every { layer2.id } returns "layer1" // same ID
+
+        val builder = Style.Builder().withLayer(layer1)
+        mapboxMap.setStyle(builder)
+        mapboxMap.notifyStyleLoaded()
+
+        every { nativeMapView.addLayerAbove(any(), "") } throws CannotAddLayerException("Duplicate ID")
+
+        try {
+            mapboxMap.style!!.addLayerAbove(layer2, "")
+        } catch (ex: Exception) {
+            Assert.assertEquals("Layer that failed to be added shouldn't be cached", layer1, mapboxMap.style!!.getLayer("layer1"))
+        }
+    }
+
+    @Test
+    fun testLayerSkippedIfAdditionAtFails() {
+        val layer1 = mockk<SymbolLayer>(relaxed = true)
+        every { layer1.id } returns "layer1"
+        val layer2 = mockk<SymbolLayer>(relaxed = true)
+        every { layer2.id } returns "layer1" // same ID
+
+        val builder = Style.Builder().withLayer(layer1)
+        mapboxMap.setStyle(builder)
+        mapboxMap.notifyStyleLoaded()
+
+        every { nativeMapView.addLayerAt(any(), 5) } throws CannotAddLayerException("Duplicate ID")
+
+        try {
+            mapboxMap.style!!.addLayerAt(layer2, 5)
+        } catch (ex: Exception) {
+            Assert.assertEquals("Layer that failed to be added shouldn't be cached", layer1, mapboxMap.style!!.getLayer("layer1"))
+        }
     }
 }
