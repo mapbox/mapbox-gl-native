@@ -1267,6 +1267,22 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
+- (void)setEnablePresentsWithTransaction:(BOOL)enablePresentsWithTransaction
+{
+    if (_enablePresentsWithTransaction == enablePresentsWithTransaction)
+    {
+        return;
+    }
+    
+    _enablePresentsWithTransaction = enablePresentsWithTransaction;
+    
+    // If the map is visible, change the layer property too
+    if (self.window) {
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = enablePresentsWithTransaction;
+    }
+}
+
 #ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
 // See https://github.com/mapbox/mapbox-gl-native/issues/14232
 - (void)emergencyRecreateGL {
