@@ -103,6 +103,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousToggleTwoMaps,
     MBXSettingsMiscellaneousLocalizeLabels,
     MBXSettingsMiscellaneousShowSnapshots,
+    MBXSettingsMiscellaneousMissingIcon,
     MBXSettingsMiscellaneousShouldLimitCameraChanges,
     MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousOrnamentsPlacement,
@@ -499,6 +500,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 [NSString stringWithFormat:@"%@ Second Map", ([self.view viewWithTag:2] == nil ? @"Show" : @"Hide")],
                 [NSString stringWithFormat:@"Show Labels in %@", (_localizingLabels ? @"Default Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
                 @"Show Snapshots",
+                @"Missing Icon",
                 [NSString stringWithFormat:@"%@ Camera Changes", (_shouldLimitCameraChanges ? @"Unlimit" : @"Limit")],
                 @"View Route Simulation",
                 @"Ornaments Placement",
@@ -744,6 +746,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 case MBXSettingsMiscellaneousShowSnapshots:
                 {
                     [self performSegueWithIdentifier:@"ShowSnapshots" sender:nil];
+                    break;
+                }
+                case MBXSettingsMiscellaneousMissingIcon:
+                {
+                    [self loadMissingIcon];
                     break;
                 }
                 case MBXSettingsMiscellaneousShowCustomLocationManager:
@@ -1716,6 +1723,16 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoords
                                                        count:sizeof(lineCoords)/sizeof(lineCoords[0])];
     [self.mapView addAnnotation:line];
+}
+
+- (void)loadMissingIcon
+{
+    NSURL *customStyleJSON = [[NSBundle mainBundle] URLForResource:@"missing_icon" withExtension:@"json"];
+    [self.mapView setStyleURL:customStyleJSON];
+}
+
+- (void)mapView:(MGLMapView *)mapView didFailLoadingStyleImage:(NSString *)missingImage {
+    NSLog(@"%@", missingImage);
 }
 
 - (void)printTelemetryLogFile
