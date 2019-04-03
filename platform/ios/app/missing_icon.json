@@ -1,0 +1,40 @@
+{
+    "version": 8,
+    "name": "Mapbox Streets",
+    "sprite": "mapbox://sprites/mapbox/streets-v8",
+    "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+    "sources": {
+        "point": {
+            "type": "geojson",
+            "data": {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [0, 0]
+                }
+            }
+        }
+    },
+    "layers": [{
+        "id": "bg",
+        "type": "background",
+        "paint": {
+            "background-color": "#f00"
+        }
+    }, {
+        "id": "point",
+        "type": "circle",
+        "source": "point",
+        "paint": {
+            "circle-radius": 100
+        }
+    }, {
+        "id": "icon",
+        "type": "symbol",
+        "source": "point",
+        "layout": {
+            "icon-image": "missing-icon"
+        }
+    }]
+}
