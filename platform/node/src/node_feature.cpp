@@ -47,9 +47,9 @@ public:
     }
 
 private:
-    v8::Local<v8::String> type(const char* type) {
+    v8::Local<v8::String> type(const char* type_) {
         Nan::EscapableHandleScope scope;
-        return scope.Escape(Nan::New(type).ToLocalChecked());
+        return scope.Escape(Nan::New(type_).ToLocalChecked());
     }
 };
 

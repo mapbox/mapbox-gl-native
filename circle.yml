@@ -488,8 +488,8 @@ jobs:
       - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
     steps:
       - install-dependencies: { ccache: false }

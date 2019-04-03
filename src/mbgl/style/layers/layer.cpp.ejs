@@ -118,11 +118,11 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
     return <%- camelize(property.name) %>::defaultValue();
 }
 
-<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+const <%- propertyValueType(property) %>& <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
     return impl().layout.get<<%- camelize(property.name) %>>();
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(const <%- propertyValueType(property) %>& value) {
     if (value == get<%- camelize(property.name) %>())
         return;
     auto impl_ = mutableImpl();
@@ -144,11 +144,11 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 <% } -%>
 }
 
-<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+const <%- propertyValueType(property) %>& <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
     return impl().paint.template get<<%- camelize(property.name) %>>().value;
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(const <%- propertyValueType(property) %>& value) {
     if (value == get<%- camelize(property.name) %>())
         return;
     auto impl_ = mutableImpl();
@@ -193,7 +193,7 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
     <%
         const paintConversions = {};
@@ -260,7 +260,7 @@ optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string&
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
     <%
         const layoutConversions = {};

@@ -66,11 +66,11 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapRadius() {
     return { 30 };
 }
 
-PropertyValue<float> HeatmapLayer::getHeatmapRadius() const {
+const PropertyValue<float>& HeatmapLayer::getHeatmapRadius() const {
     return impl().paint.template get<HeatmapRadius>().value;
 }
 
-void HeatmapLayer::setHeatmapRadius(PropertyValue<float> value) {
+void HeatmapLayer::setHeatmapRadius(const PropertyValue<float>& value) {
     if (value == getHeatmapRadius())
         return;
     auto impl_ = mutableImpl();
@@ -93,11 +93,11 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapWeight() {
     return { 1 };
 }
 
-PropertyValue<float> HeatmapLayer::getHeatmapWeight() const {
+const PropertyValue<float>& HeatmapLayer::getHeatmapWeight() const {
     return impl().paint.template get<HeatmapWeight>().value;
 }
 
-void HeatmapLayer::setHeatmapWeight(PropertyValue<float> value) {
+void HeatmapLayer::setHeatmapWeight(const PropertyValue<float>& value) {
     if (value == getHeatmapWeight())
         return;
     auto impl_ = mutableImpl();
@@ -120,11 +120,11 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapIntensity() {
     return { 1 };
 }
 
-PropertyValue<float> HeatmapLayer::getHeatmapIntensity() const {
+const PropertyValue<float>& HeatmapLayer::getHeatmapIntensity() const {
     return impl().paint.template get<HeatmapIntensity>().value;
 }
 
-void HeatmapLayer::setHeatmapIntensity(PropertyValue<float> value) {
+void HeatmapLayer::setHeatmapIntensity(const PropertyValue<float>& value) {
     if (value == getHeatmapIntensity())
         return;
     auto impl_ = mutableImpl();
@@ -149,11 +149,11 @@ ColorRampPropertyValue HeatmapLayer::getDefaultHeatmapColor() {
     return *conversion::convertJSON<ColorRampPropertyValue>(rawValue, error);
 }
 
-ColorRampPropertyValue HeatmapLayer::getHeatmapColor() const {
+const ColorRampPropertyValue& HeatmapLayer::getHeatmapColor() const {
     return impl().paint.template get<HeatmapColor>().value;
 }
 
-void HeatmapLayer::setHeatmapColor(ColorRampPropertyValue value) {
+void HeatmapLayer::setHeatmapColor(const ColorRampPropertyValue& value) {
     if (value == getHeatmapColor())
         return;
     auto impl_ = mutableImpl();
@@ -176,11 +176,11 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> HeatmapLayer::getHeatmapOpacity() const {
+const PropertyValue<float>& HeatmapLayer::getHeatmapOpacity() const {
     return impl().paint.template get<HeatmapOpacity>().value;
 }
 
-void HeatmapLayer::setHeatmapOpacity(PropertyValue<float> value) {
+void HeatmapLayer::setHeatmapOpacity(const PropertyValue<float>& value) {
     if (value == getHeatmapOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -233,7 +233,7 @@ optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Co
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::HeatmapRadius || property == Property::HeatmapWeight) {

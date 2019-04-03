@@ -8,6 +8,7 @@
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/math.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -62,7 +63,7 @@ Placement::Placement(const TransformState& state_, MapMode mapMode_, style::Tran
     : collisionIndex(state_)
     , state(state_)
     , mapMode(mapMode_)
-    , transitionOptions(transitionOptions_)
+    , transitionOptions(std::move(transitionOptions_))
     , collisionGroups(crossSourceCollisions)
     , prevPlacement(std::move(prevPlacement_))
 {
@@ -80,7 +81,7 @@ void Placement::placeLayer(const RenderLayerSymbolInterface& symbolInterface, co
             continue;
         }
         assert(renderTile.tile.kind == Tile::Kind::Geometry);
-        GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
+        auto& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
 
         auto bucket = symbolInterface.getSymbolBucket(renderTile);
         if (!bucket) {

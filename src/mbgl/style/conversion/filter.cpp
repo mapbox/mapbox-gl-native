@@ -233,7 +233,7 @@ optional<mbgl::Value> serializeLegacyFilter(const Convertible& values) {
             if (arrayValue) {
                 result.push_back(*arrayValue);
             } else {
-                result.push_back(NullValue());
+                result.emplace_back(NullValue());
             }
         }
         return (mbgl::Value)result;

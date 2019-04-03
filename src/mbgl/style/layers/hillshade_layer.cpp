@@ -66,11 +66,11 @@ PropertyValue<float> HillshadeLayer::getDefaultHillshadeIlluminationDirection() 
     return { 335 };
 }
 
-PropertyValue<float> HillshadeLayer::getHillshadeIlluminationDirection() const {
+const PropertyValue<float>& HillshadeLayer::getHillshadeIlluminationDirection() const {
     return impl().paint.template get<HillshadeIlluminationDirection>().value;
 }
 
-void HillshadeLayer::setHillshadeIlluminationDirection(PropertyValue<float> value) {
+void HillshadeLayer::setHillshadeIlluminationDirection(const PropertyValue<float>& value) {
     if (value == getHillshadeIlluminationDirection())
         return;
     auto impl_ = mutableImpl();
@@ -93,11 +93,11 @@ PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getDefaultHillsha
     return { HillshadeIlluminationAnchorType::Viewport };
 }
 
-PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getHillshadeIlluminationAnchor() const {
+const PropertyValue<HillshadeIlluminationAnchorType>& HillshadeLayer::getHillshadeIlluminationAnchor() const {
     return impl().paint.template get<HillshadeIlluminationAnchor>().value;
 }
 
-void HillshadeLayer::setHillshadeIlluminationAnchor(PropertyValue<HillshadeIlluminationAnchorType> value) {
+void HillshadeLayer::setHillshadeIlluminationAnchor(const PropertyValue<HillshadeIlluminationAnchorType>& value) {
     if (value == getHillshadeIlluminationAnchor())
         return;
     auto impl_ = mutableImpl();
@@ -120,11 +120,11 @@ PropertyValue<float> HillshadeLayer::getDefaultHillshadeExaggeration() {
     return { 0.5 };
 }
 
-PropertyValue<float> HillshadeLayer::getHillshadeExaggeration() const {
+const PropertyValue<float>& HillshadeLayer::getHillshadeExaggeration() const {
     return impl().paint.template get<HillshadeExaggeration>().value;
 }
 
-void HillshadeLayer::setHillshadeExaggeration(PropertyValue<float> value) {
+void HillshadeLayer::setHillshadeExaggeration(const PropertyValue<float>& value) {
     if (value == getHillshadeExaggeration())
         return;
     auto impl_ = mutableImpl();
@@ -147,11 +147,11 @@ PropertyValue<Color> HillshadeLayer::getDefaultHillshadeShadowColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> HillshadeLayer::getHillshadeShadowColor() const {
+const PropertyValue<Color>& HillshadeLayer::getHillshadeShadowColor() const {
     return impl().paint.template get<HillshadeShadowColor>().value;
 }
 
-void HillshadeLayer::setHillshadeShadowColor(PropertyValue<Color> value) {
+void HillshadeLayer::setHillshadeShadowColor(const PropertyValue<Color>& value) {
     if (value == getHillshadeShadowColor())
         return;
     auto impl_ = mutableImpl();
@@ -174,11 +174,11 @@ PropertyValue<Color> HillshadeLayer::getDefaultHillshadeHighlightColor() {
     return { Color::white() };
 }
 
-PropertyValue<Color> HillshadeLayer::getHillshadeHighlightColor() const {
+const PropertyValue<Color>& HillshadeLayer::getHillshadeHighlightColor() const {
     return impl().paint.template get<HillshadeHighlightColor>().value;
 }
 
-void HillshadeLayer::setHillshadeHighlightColor(PropertyValue<Color> value) {
+void HillshadeLayer::setHillshadeHighlightColor(const PropertyValue<Color>& value) {
     if (value == getHillshadeHighlightColor())
         return;
     auto impl_ = mutableImpl();
@@ -201,11 +201,11 @@ PropertyValue<Color> HillshadeLayer::getDefaultHillshadeAccentColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> HillshadeLayer::getHillshadeAccentColor() const {
+const PropertyValue<Color>& HillshadeLayer::getHillshadeAccentColor() const {
     return impl().paint.template get<HillshadeAccentColor>().value;
 }
 
-void HillshadeLayer::setHillshadeAccentColor(PropertyValue<Color> value) {
+void HillshadeLayer::setHillshadeAccentColor(const PropertyValue<Color>& value) {
     if (value == getHillshadeAccentColor())
         return;
     auto impl_ = mutableImpl();
@@ -262,7 +262,7 @@ optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const 
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::HillshadeIlluminationDirection || property == Property::HillshadeExaggeration) {

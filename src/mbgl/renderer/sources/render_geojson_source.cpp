@@ -66,7 +66,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto extensionGetters = mapbox::eternal::hash_map
     {"expansion-zoom", &getClusterExpansionZoom}
 });
 
-}
+} // namespace
 
 RenderGeoJSONSource::RenderGeoJSONSource(Immutable<style::GeoJSONSource::Impl> impl_)
     : RenderSource(impl_) {

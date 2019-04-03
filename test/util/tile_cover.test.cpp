@@ -3,8 +3,8 @@
 #include <mbgl/map/transform.hpp>
 
 #include <algorithm>
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
+#include <cstdlib>     /* srand, rand */
+#include <ctime>       /* time */
 #include <gtest/gtest.h>
 
 using namespace mbgl;
@@ -314,9 +314,9 @@ TEST(TileCount, BoundsCrossingAntimeridian) {
 }
 
 TEST(TileCover, DISABLED_FuzzPoly) {
-    while(1)
+    while(true)
     {
-        std::srand (time(NULL));
+        std::srand (time(nullptr));
         std::size_t len = std::rand() % 10000 + 3;
         Polygon<double> polygon;
 
@@ -342,9 +342,9 @@ TEST(TileCover, DISABLED_FuzzPoly) {
 }
 
 TEST(TileCover, DISABLED_FuzzLine) {
-    while(1)
+    while(true)
     {
-        std::srand (time(NULL));
+        std::srand (time(nullptr));
         std::size_t len = std::rand() % 10000 + 3;
         MultiLineString<double> mls;
 

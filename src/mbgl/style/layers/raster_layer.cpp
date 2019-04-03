@@ -66,11 +66,11 @@ PropertyValue<float> RasterLayer::getDefaultRasterOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> RasterLayer::getRasterOpacity() const {
+const PropertyValue<float>& RasterLayer::getRasterOpacity() const {
     return impl().paint.template get<RasterOpacity>().value;
 }
 
-void RasterLayer::setRasterOpacity(PropertyValue<float> value) {
+void RasterLayer::setRasterOpacity(const PropertyValue<float>& value) {
     if (value == getRasterOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -93,11 +93,11 @@ PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
     return { 0 };
 }
 
-PropertyValue<float> RasterLayer::getRasterHueRotate() const {
+const PropertyValue<float>& RasterLayer::getRasterHueRotate() const {
     return impl().paint.template get<RasterHueRotate>().value;
 }
 
-void RasterLayer::setRasterHueRotate(PropertyValue<float> value) {
+void RasterLayer::setRasterHueRotate(const PropertyValue<float>& value) {
     if (value == getRasterHueRotate())
         return;
     auto impl_ = mutableImpl();
@@ -120,11 +120,11 @@ PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
     return { 0 };
 }
 
-PropertyValue<float> RasterLayer::getRasterBrightnessMin() const {
+const PropertyValue<float>& RasterLayer::getRasterBrightnessMin() const {
     return impl().paint.template get<RasterBrightnessMin>().value;
 }
 
-void RasterLayer::setRasterBrightnessMin(PropertyValue<float> value) {
+void RasterLayer::setRasterBrightnessMin(const PropertyValue<float>& value) {
     if (value == getRasterBrightnessMin())
         return;
     auto impl_ = mutableImpl();
@@ -147,11 +147,11 @@ PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
     return { 1 };
 }
 
-PropertyValue<float> RasterLayer::getRasterBrightnessMax() const {
+const PropertyValue<float>& RasterLayer::getRasterBrightnessMax() const {
     return impl().paint.template get<RasterBrightnessMax>().value;
 }
 
-void RasterLayer::setRasterBrightnessMax(PropertyValue<float> value) {
+void RasterLayer::setRasterBrightnessMax(const PropertyValue<float>& value) {
     if (value == getRasterBrightnessMax())
         return;
     auto impl_ = mutableImpl();
@@ -174,11 +174,11 @@ PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
     return { 0 };
 }
 
-PropertyValue<float> RasterLayer::getRasterSaturation() const {
+const PropertyValue<float>& RasterLayer::getRasterSaturation() const {
     return impl().paint.template get<RasterSaturation>().value;
 }
 
-void RasterLayer::setRasterSaturation(PropertyValue<float> value) {
+void RasterLayer::setRasterSaturation(const PropertyValue<float>& value) {
     if (value == getRasterSaturation())
         return;
     auto impl_ = mutableImpl();
@@ -201,11 +201,11 @@ PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
     return { 0 };
 }
 
-PropertyValue<float> RasterLayer::getRasterContrast() const {
+const PropertyValue<float>& RasterLayer::getRasterContrast() const {
     return impl().paint.template get<RasterContrast>().value;
 }
 
-void RasterLayer::setRasterContrast(PropertyValue<float> value) {
+void RasterLayer::setRasterContrast(const PropertyValue<float>& value) {
     if (value == getRasterContrast())
         return;
     auto impl_ = mutableImpl();
@@ -228,11 +228,11 @@ PropertyValue<RasterResamplingType> RasterLayer::getDefaultRasterResampling() {
     return { RasterResamplingType::Linear };
 }
 
-PropertyValue<RasterResamplingType> RasterLayer::getRasterResampling() const {
+const PropertyValue<RasterResamplingType>& RasterLayer::getRasterResampling() const {
     return impl().paint.template get<RasterResampling>().value;
 }
 
-void RasterLayer::setRasterResampling(PropertyValue<RasterResamplingType> value) {
+void RasterLayer::setRasterResampling(const PropertyValue<RasterResamplingType>& value) {
     if (value == getRasterResampling())
         return;
     auto impl_ = mutableImpl();
@@ -255,11 +255,11 @@ PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
     return { 300 };
 }
 
-PropertyValue<float> RasterLayer::getRasterFadeDuration() const {
+const PropertyValue<float>& RasterLayer::getRasterFadeDuration() const {
     return impl().paint.template get<RasterFadeDuration>().value;
 }
 
-void RasterLayer::setRasterFadeDuration(PropertyValue<float> value) {
+void RasterLayer::setRasterFadeDuration(const PropertyValue<float>& value) {
     if (value == getRasterFadeDuration())
         return;
     auto impl_ = mutableImpl();
@@ -324,7 +324,7 @@ optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Con
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::RasterOpacity || property == Property::RasterHueRotate || property == Property::RasterBrightnessMin || property == Property::RasterBrightnessMax || property == Property::RasterSaturation || property == Property::RasterContrast || property == Property::RasterFadeDuration) {

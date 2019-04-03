@@ -185,8 +185,8 @@ struct bcp47_parser : qi::grammar<Iterator>
 };
 
 LanguageTag LanguageTag::fromBCP47(const std::string& bcp47Tag) {
-    typedef std::string::const_iterator iterator_type;
-    typedef bcp47_parser<iterator_type> bcp47_parser;
+    using iterator_type = std::string::const_iterator;
+    using bcp47_parser = bcp47_parser<iterator_type>;
 
     bcp47_parser parser;
     std::string::const_iterator iter = bcp47Tag.begin();

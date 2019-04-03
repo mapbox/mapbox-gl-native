@@ -48,7 +48,7 @@ public:
     template <typename T = FileSource>
     MapTest(const std::string& cachePath, const std::string& assetPath,
             float pixelRatio = 1, MapMode mode = MapMode::Static,
-            typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
+            typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = nullptr)
             : fileSource(std::make_shared<T>(cachePath, assetPath))
             , frontend(pixelRatio, threadPool)
             , map(frontend, observer, fileSource, threadPool,

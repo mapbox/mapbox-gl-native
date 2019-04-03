@@ -25,44 +25,44 @@ public:
     // Paint properties
 
     static PropertyValue<bool> getDefaultFillAntialias();
-    PropertyValue<bool> getFillAntialias() const;
-    void setFillAntialias(PropertyValue<bool>);
+    const PropertyValue<bool>& getFillAntialias() const;
+    void setFillAntialias(const PropertyValue<bool>&);
     void setFillAntialiasTransition(const TransitionOptions&);
     TransitionOptions getFillAntialiasTransition() const;
 
     static PropertyValue<float> getDefaultFillOpacity();
-    PropertyValue<float> getFillOpacity() const;
-    void setFillOpacity(PropertyValue<float>);
+    const PropertyValue<float>& getFillOpacity() const;
+    void setFillOpacity(const PropertyValue<float>&);
     void setFillOpacityTransition(const TransitionOptions&);
     TransitionOptions getFillOpacityTransition() const;
 
     static PropertyValue<Color> getDefaultFillColor();
-    PropertyValue<Color> getFillColor() const;
-    void setFillColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getFillColor() const;
+    void setFillColor(const PropertyValue<Color>&);
     void setFillColorTransition(const TransitionOptions&);
     TransitionOptions getFillColorTransition() const;
 
     static PropertyValue<Color> getDefaultFillOutlineColor();
-    PropertyValue<Color> getFillOutlineColor() const;
-    void setFillOutlineColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getFillOutlineColor() const;
+    void setFillOutlineColor(const PropertyValue<Color>&);
     void setFillOutlineColorTransition(const TransitionOptions&);
     TransitionOptions getFillOutlineColorTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultFillTranslate();
-    PropertyValue<std::array<float, 2>> getFillTranslate() const;
-    void setFillTranslate(PropertyValue<std::array<float, 2>>);
+    const PropertyValue<std::array<float, 2>>& getFillTranslate() const;
+    void setFillTranslate(const PropertyValue<std::array<float, 2>>&);
     void setFillTranslateTransition(const TransitionOptions&);
     TransitionOptions getFillTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultFillTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getFillTranslateAnchor() const;
-    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    const PropertyValue<TranslateAnchorType>& getFillTranslateAnchor() const;
+    void setFillTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
     void setFillTranslateAnchorTransition(const TransitionOptions&);
     TransitionOptions getFillTranslateAnchorTransition() const;
 
     static PropertyValue<std::string> getDefaultFillPattern();
-    PropertyValue<std::string> getFillPattern() const;
-    void setFillPattern(PropertyValue<std::string>);
+    const PropertyValue<std::string>& getFillPattern() const;
+    void setFillPattern(const PropertyValue<std::string>&);
     void setFillPatternTransition(const TransitionOptions&);
     TransitionOptions getFillPatternTransition() const;
 

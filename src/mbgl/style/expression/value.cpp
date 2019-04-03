@@ -171,7 +171,7 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
                     options.emplace("text-color", fromExpressionValue(*section.textColor));
                 }
 
-                serialized.push_back(options);
+                serialized.emplace_back(options);
             }
             return serialized;
         },

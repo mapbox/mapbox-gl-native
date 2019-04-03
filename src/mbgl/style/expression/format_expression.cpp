@@ -152,7 +152,7 @@ mbgl::Value FormatExpression::serialize() const {
         if (section.textColor) {
             options.emplace(kFormattedSectionTextColor, (*section.textColor)->serialize());
         }
-        serialized.push_back(options);
+        serialized.emplace_back(options);
     }
     return serialized;
 }

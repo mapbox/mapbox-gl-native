@@ -66,11 +66,11 @@ PropertyValue<float> CircleLayer::getDefaultCircleRadius() {
     return { 5 };
 }
 
-PropertyValue<float> CircleLayer::getCircleRadius() const {
+const PropertyValue<float>& CircleLayer::getCircleRadius() const {
     return impl().paint.template get<CircleRadius>().value;
 }
 
-void CircleLayer::setCircleRadius(PropertyValue<float> value) {
+void CircleLayer::setCircleRadius(const PropertyValue<float>& value) {
     if (value == getCircleRadius())
         return;
     auto impl_ = mutableImpl();
@@ -93,11 +93,11 @@ PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> CircleLayer::getCircleColor() const {
+const PropertyValue<Color>& CircleLayer::getCircleColor() const {
     return impl().paint.template get<CircleColor>().value;
 }
 
-void CircleLayer::setCircleColor(PropertyValue<Color> value) {
+void CircleLayer::setCircleColor(const PropertyValue<Color>& value) {
     if (value == getCircleColor())
         return;
     auto impl_ = mutableImpl();
@@ -120,11 +120,11 @@ PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
     return { 0 };
 }
 
-PropertyValue<float> CircleLayer::getCircleBlur() const {
+const PropertyValue<float>& CircleLayer::getCircleBlur() const {
     return impl().paint.template get<CircleBlur>().value;
 }
 
-void CircleLayer::setCircleBlur(PropertyValue<float> value) {
+void CircleLayer::setCircleBlur(const PropertyValue<float>& value) {
     if (value == getCircleBlur())
         return;
     auto impl_ = mutableImpl();
@@ -147,11 +147,11 @@ PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> CircleLayer::getCircleOpacity() const {
+const PropertyValue<float>& CircleLayer::getCircleOpacity() const {
     return impl().paint.template get<CircleOpacity>().value;
 }
 
-void CircleLayer::setCircleOpacity(PropertyValue<float> value) {
+void CircleLayer::setCircleOpacity(const PropertyValue<float>& value) {
     if (value == getCircleOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -174,11 +174,11 @@ PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
+const PropertyValue<std::array<float, 2>>& CircleLayer::getCircleTranslate() const {
     return impl().paint.template get<CircleTranslate>().value;
 }
 
-void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value) {
+void CircleLayer::setCircleTranslate(const PropertyValue<std::array<float, 2>>& value) {
     if (value == getCircleTranslate())
         return;
     auto impl_ = mutableImpl();
@@ -201,11 +201,11 @@ PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor(
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
+const PropertyValue<TranslateAnchorType>& CircleLayer::getCircleTranslateAnchor() const {
     return impl().paint.template get<CircleTranslateAnchor>().value;
 }
 
-void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+void CircleLayer::setCircleTranslateAnchor(const PropertyValue<TranslateAnchorType>& value) {
     if (value == getCircleTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
@@ -228,11 +228,11 @@ PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
     return { CirclePitchScaleType::Map };
 }
 
-PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale() const {
+const PropertyValue<CirclePitchScaleType>& CircleLayer::getCirclePitchScale() const {
     return impl().paint.template get<CirclePitchScale>().value;
 }
 
-void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value) {
+void CircleLayer::setCirclePitchScale(const PropertyValue<CirclePitchScaleType>& value) {
     if (value == getCirclePitchScale())
         return;
     auto impl_ = mutableImpl();
@@ -255,11 +255,11 @@ PropertyValue<AlignmentType> CircleLayer::getDefaultCirclePitchAlignment() {
     return { AlignmentType::Viewport };
 }
 
-PropertyValue<AlignmentType> CircleLayer::getCirclePitchAlignment() const {
+const PropertyValue<AlignmentType>& CircleLayer::getCirclePitchAlignment() const {
     return impl().paint.template get<CirclePitchAlignment>().value;
 }
 
-void CircleLayer::setCirclePitchAlignment(PropertyValue<AlignmentType> value) {
+void CircleLayer::setCirclePitchAlignment(const PropertyValue<AlignmentType>& value) {
     if (value == getCirclePitchAlignment())
         return;
     auto impl_ = mutableImpl();
@@ -282,11 +282,11 @@ PropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
     return { 0 };
 }
 
-PropertyValue<float> CircleLayer::getCircleStrokeWidth() const {
+const PropertyValue<float>& CircleLayer::getCircleStrokeWidth() const {
     return impl().paint.template get<CircleStrokeWidth>().value;
 }
 
-void CircleLayer::setCircleStrokeWidth(PropertyValue<float> value) {
+void CircleLayer::setCircleStrokeWidth(const PropertyValue<float>& value) {
     if (value == getCircleStrokeWidth())
         return;
     auto impl_ = mutableImpl();
@@ -309,11 +309,11 @@ PropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> CircleLayer::getCircleStrokeColor() const {
+const PropertyValue<Color>& CircleLayer::getCircleStrokeColor() const {
     return impl().paint.template get<CircleStrokeColor>().value;
 }
 
-void CircleLayer::setCircleStrokeColor(PropertyValue<Color> value) {
+void CircleLayer::setCircleStrokeColor(const PropertyValue<Color>& value) {
     if (value == getCircleStrokeColor())
         return;
     auto impl_ = mutableImpl();
@@ -336,11 +336,11 @@ PropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> CircleLayer::getCircleStrokeOpacity() const {
+const PropertyValue<float>& CircleLayer::getCircleStrokeOpacity() const {
     return impl().paint.template get<CircleStrokeOpacity>().value;
 }
 
-void CircleLayer::setCircleStrokeOpacity(PropertyValue<float> value) {
+void CircleLayer::setCircleStrokeOpacity(const PropertyValue<float>& value) {
     if (value == getCircleStrokeOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -417,7 +417,7 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::CircleRadius || property == Property::CircleBlur || property == Property::CircleOpacity || property == Property::CircleStrokeWidth || property == Property::CircleStrokeOpacity) {
