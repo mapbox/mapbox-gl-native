@@ -1254,10 +1254,10 @@ std::unique_ptr<mbgl::AsyncRequest> NodeFileSource::request(const mbgl::Resource
     Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
     Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));
 
-    auto request = Nan::ObjectWrap::Unwrap<node_mbgl::NodeRequest>(instance);
-    request->Execute();
+    auto req = Nan::ObjectWrap::Unwrap<node_mbgl::NodeRequest>(instance);
+    req->Execute();
 
-    return std::make_unique<node_mbgl::NodeRequest::NodeAsyncRequest>(request);
+    return std::make_unique<node_mbgl::NodeRequest::NodeAsyncRequest>(req);
 }
 
 } // namespace node_mbgl

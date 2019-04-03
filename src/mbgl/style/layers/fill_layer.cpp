@@ -66,11 +66,11 @@ PropertyValue<bool> FillLayer::getDefaultFillAntialias() {
     return { true };
 }
 
-PropertyValue<bool> FillLayer::getFillAntialias() const {
+const PropertyValue<bool>& FillLayer::getFillAntialias() const {
     return impl().paint.template get<FillAntialias>().value;
 }
 
-void FillLayer::setFillAntialias(PropertyValue<bool> value) {
+void FillLayer::setFillAntialias(const PropertyValue<bool>& value) {
     if (value == getFillAntialias())
         return;
     auto impl_ = mutableImpl();
@@ -93,11 +93,11 @@ PropertyValue<float> FillLayer::getDefaultFillOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> FillLayer::getFillOpacity() const {
+const PropertyValue<float>& FillLayer::getFillOpacity() const {
     return impl().paint.template get<FillOpacity>().value;
 }
 
-void FillLayer::setFillOpacity(PropertyValue<float> value) {
+void FillLayer::setFillOpacity(const PropertyValue<float>& value) {
     if (value == getFillOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -120,11 +120,11 @@ PropertyValue<Color> FillLayer::getDefaultFillColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> FillLayer::getFillColor() const {
+const PropertyValue<Color>& FillLayer::getFillColor() const {
     return impl().paint.template get<FillColor>().value;
 }
 
-void FillLayer::setFillColor(PropertyValue<Color> value) {
+void FillLayer::setFillColor(const PropertyValue<Color>& value) {
     if (value == getFillColor())
         return;
     auto impl_ = mutableImpl();
@@ -147,11 +147,11 @@ PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
     return { {} };
 }
 
-PropertyValue<Color> FillLayer::getFillOutlineColor() const {
+const PropertyValue<Color>& FillLayer::getFillOutlineColor() const {
     return impl().paint.template get<FillOutlineColor>().value;
 }
 
-void FillLayer::setFillOutlineColor(PropertyValue<Color> value) {
+void FillLayer::setFillOutlineColor(const PropertyValue<Color>& value) {
     if (value == getFillOutlineColor())
         return;
     auto impl_ = mutableImpl();
@@ -174,11 +174,11 @@ PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate() const {
+const PropertyValue<std::array<float, 2>>& FillLayer::getFillTranslate() const {
     return impl().paint.template get<FillTranslate>().value;
 }
 
-void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value) {
+void FillLayer::setFillTranslate(const PropertyValue<std::array<float, 2>>& value) {
     if (value == getFillTranslate())
         return;
     auto impl_ = mutableImpl();
@@ -201,11 +201,11 @@ PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor() const {
+const PropertyValue<TranslateAnchorType>& FillLayer::getFillTranslateAnchor() const {
     return impl().paint.template get<FillTranslateAnchor>().value;
 }
 
-void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+void FillLayer::setFillTranslateAnchor(const PropertyValue<TranslateAnchorType>& value) {
     if (value == getFillTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
@@ -228,11 +228,11 @@ PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
     return { "" };
 }
 
-PropertyValue<std::string> FillLayer::getFillPattern() const {
+const PropertyValue<std::string>& FillLayer::getFillPattern() const {
     return impl().paint.template get<FillPattern>().value;
 }
 
-void FillLayer::setFillPattern(PropertyValue<std::string> value) {
+void FillLayer::setFillPattern(const PropertyValue<std::string>& value) {
     if (value == getFillPattern())
         return;
     auto impl_ = mutableImpl();
@@ -293,7 +293,7 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::FillAntialias) {

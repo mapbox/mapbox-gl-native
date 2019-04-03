@@ -113,7 +113,7 @@ mbgl::Value Coercion::serialize() const {
         // by string expressions that get implicitly coerced to "formatted".
         std::vector<mbgl::Value> serialized{{ std::string("format") }};
         serialized.push_back(inputs[0]->serialize());
-        serialized.push_back(std::unordered_map<std::string, mbgl::Value>());
+        serialized.emplace_back(std::unordered_map<std::string, mbgl::Value>());
         return serialized;
     } else {
         return Expression::serialize();

@@ -64,11 +64,11 @@ PropertyValue<LineCapType> LineLayer::getDefaultLineCap() {
     return LineCap::defaultValue();
 }
 
-PropertyValue<LineCapType> LineLayer::getLineCap() const {
+const PropertyValue<LineCapType>& LineLayer::getLineCap() const {
     return impl().layout.get<LineCap>();
 }
 
-void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
+void LineLayer::setLineCap(const PropertyValue<LineCapType>& value) {
     if (value == getLineCap())
         return;
     auto impl_ = mutableImpl();
@@ -80,11 +80,11 @@ PropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
     return LineJoin::defaultValue();
 }
 
-PropertyValue<LineJoinType> LineLayer::getLineJoin() const {
+const PropertyValue<LineJoinType>& LineLayer::getLineJoin() const {
     return impl().layout.get<LineJoin>();
 }
 
-void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
+void LineLayer::setLineJoin(const PropertyValue<LineJoinType>& value) {
     if (value == getLineJoin())
         return;
     auto impl_ = mutableImpl();
@@ -96,11 +96,11 @@ PropertyValue<float> LineLayer::getDefaultLineMiterLimit() {
     return LineMiterLimit::defaultValue();
 }
 
-PropertyValue<float> LineLayer::getLineMiterLimit() const {
+const PropertyValue<float>& LineLayer::getLineMiterLimit() const {
     return impl().layout.get<LineMiterLimit>();
 }
 
-void LineLayer::setLineMiterLimit(PropertyValue<float> value) {
+void LineLayer::setLineMiterLimit(const PropertyValue<float>& value) {
     if (value == getLineMiterLimit())
         return;
     auto impl_ = mutableImpl();
@@ -112,11 +112,11 @@ PropertyValue<float> LineLayer::getDefaultLineRoundLimit() {
     return LineRoundLimit::defaultValue();
 }
 
-PropertyValue<float> LineLayer::getLineRoundLimit() const {
+const PropertyValue<float>& LineLayer::getLineRoundLimit() const {
     return impl().layout.get<LineRoundLimit>();
 }
 
-void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
+void LineLayer::setLineRoundLimit(const PropertyValue<float>& value) {
     if (value == getLineRoundLimit())
         return;
     auto impl_ = mutableImpl();
@@ -131,11 +131,11 @@ PropertyValue<float> LineLayer::getDefaultLineOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> LineLayer::getLineOpacity() const {
+const PropertyValue<float>& LineLayer::getLineOpacity() const {
     return impl().paint.template get<LineOpacity>().value;
 }
 
-void LineLayer::setLineOpacity(PropertyValue<float> value) {
+void LineLayer::setLineOpacity(const PropertyValue<float>& value) {
     if (value == getLineOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -158,11 +158,11 @@ PropertyValue<Color> LineLayer::getDefaultLineColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> LineLayer::getLineColor() const {
+const PropertyValue<Color>& LineLayer::getLineColor() const {
     return impl().paint.template get<LineColor>().value;
 }
 
-void LineLayer::setLineColor(PropertyValue<Color> value) {
+void LineLayer::setLineColor(const PropertyValue<Color>& value) {
     if (value == getLineColor())
         return;
     auto impl_ = mutableImpl();
@@ -185,11 +185,11 @@ PropertyValue<std::array<float, 2>> LineLayer::getDefaultLineTranslate() {
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> LineLayer::getLineTranslate() const {
+const PropertyValue<std::array<float, 2>>& LineLayer::getLineTranslate() const {
     return impl().paint.template get<LineTranslate>().value;
 }
 
-void LineLayer::setLineTranslate(PropertyValue<std::array<float, 2>> value) {
+void LineLayer::setLineTranslate(const PropertyValue<std::array<float, 2>>& value) {
     if (value == getLineTranslate())
         return;
     auto impl_ = mutableImpl();
@@ -212,11 +212,11 @@ PropertyValue<TranslateAnchorType> LineLayer::getDefaultLineTranslateAnchor() {
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> LineLayer::getLineTranslateAnchor() const {
+const PropertyValue<TranslateAnchorType>& LineLayer::getLineTranslateAnchor() const {
     return impl().paint.template get<LineTranslateAnchor>().value;
 }
 
-void LineLayer::setLineTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+void LineLayer::setLineTranslateAnchor(const PropertyValue<TranslateAnchorType>& value) {
     if (value == getLineTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
@@ -239,11 +239,11 @@ PropertyValue<float> LineLayer::getDefaultLineWidth() {
     return { 1 };
 }
 
-PropertyValue<float> LineLayer::getLineWidth() const {
+const PropertyValue<float>& LineLayer::getLineWidth() const {
     return impl().paint.template get<LineWidth>().value;
 }
 
-void LineLayer::setLineWidth(PropertyValue<float> value) {
+void LineLayer::setLineWidth(const PropertyValue<float>& value) {
     if (value == getLineWidth())
         return;
     auto impl_ = mutableImpl();
@@ -267,11 +267,11 @@ PropertyValue<float> LineLayer::getDefaultLineGapWidth() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineGapWidth() const {
+const PropertyValue<float>& LineLayer::getLineGapWidth() const {
     return impl().paint.template get<LineGapWidth>().value;
 }
 
-void LineLayer::setLineGapWidth(PropertyValue<float> value) {
+void LineLayer::setLineGapWidth(const PropertyValue<float>& value) {
     if (value == getLineGapWidth())
         return;
     auto impl_ = mutableImpl();
@@ -294,11 +294,11 @@ PropertyValue<float> LineLayer::getDefaultLineOffset() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineOffset() const {
+const PropertyValue<float>& LineLayer::getLineOffset() const {
     return impl().paint.template get<LineOffset>().value;
 }
 
-void LineLayer::setLineOffset(PropertyValue<float> value) {
+void LineLayer::setLineOffset(const PropertyValue<float>& value) {
     if (value == getLineOffset())
         return;
     auto impl_ = mutableImpl();
@@ -321,11 +321,11 @@ PropertyValue<float> LineLayer::getDefaultLineBlur() {
     return { 0 };
 }
 
-PropertyValue<float> LineLayer::getLineBlur() const {
+const PropertyValue<float>& LineLayer::getLineBlur() const {
     return impl().paint.template get<LineBlur>().value;
 }
 
-void LineLayer::setLineBlur(PropertyValue<float> value) {
+void LineLayer::setLineBlur(const PropertyValue<float>& value) {
     if (value == getLineBlur())
         return;
     auto impl_ = mutableImpl();
@@ -348,11 +348,11 @@ PropertyValue<std::vector<float>> LineLayer::getDefaultLineDasharray() {
     return { {  } };
 }
 
-PropertyValue<std::vector<float>> LineLayer::getLineDasharray() const {
+const PropertyValue<std::vector<float>>& LineLayer::getLineDasharray() const {
     return impl().paint.template get<LineDasharray>().value;
 }
 
-void LineLayer::setLineDasharray(PropertyValue<std::vector<float>> value) {
+void LineLayer::setLineDasharray(const PropertyValue<std::vector<float>>& value) {
     if (value == getLineDasharray())
         return;
     auto impl_ = mutableImpl();
@@ -375,11 +375,11 @@ PropertyValue<std::string> LineLayer::getDefaultLinePattern() {
     return { "" };
 }
 
-PropertyValue<std::string> LineLayer::getLinePattern() const {
+const PropertyValue<std::string>& LineLayer::getLinePattern() const {
     return impl().paint.template get<LinePattern>().value;
 }
 
-void LineLayer::setLinePattern(PropertyValue<std::string> value) {
+void LineLayer::setLinePattern(const PropertyValue<std::string>& value) {
     if (value == getLinePattern())
         return;
     auto impl_ = mutableImpl();
@@ -402,11 +402,11 @@ ColorRampPropertyValue LineLayer::getDefaultLineGradient() {
     return { {} };
 }
 
-ColorRampPropertyValue LineLayer::getLineGradient() const {
+const ColorRampPropertyValue& LineLayer::getLineGradient() const {
     return impl().paint.template get<LineGradient>().value;
 }
 
-void LineLayer::setLineGradient(ColorRampPropertyValue value) {
+void LineLayer::setLineGradient(const ColorRampPropertyValue& value) {
     if (value == getLineGradient())
         return;
     auto impl_ = mutableImpl();
@@ -483,7 +483,7 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::LineOpacity || property == Property::LineWidth || property == Property::LineGapWidth || property == Property::LineOffset || property == Property::LineBlur) {
@@ -680,7 +680,7 @@ optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Conv
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::LineCap) {

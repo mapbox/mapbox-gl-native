@@ -126,7 +126,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
-            GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);            
+            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);            
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);

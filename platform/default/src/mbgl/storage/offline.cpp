@@ -10,6 +10,7 @@
 #include <rapidjson/writer.h>
 
 #include <cmath>
+#include <utility>
 
 namespace mbgl {
 
@@ -33,7 +34,7 @@ OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
 // OfflineGeometryRegionDefinition
 
 OfflineGeometryRegionDefinition::OfflineGeometryRegionDefinition(std::string styleURL_, Geometry<double> geometry_, double minZoom_, double maxZoom_, float pixelRatio_, bool includeIdeographs_)
-    : styleURL(styleURL_)
+    : styleURL(std::move(styleURL_))
     , geometry(std::move(geometry_))
     , minZoom(minZoom_)
     , maxZoom(maxZoom_)

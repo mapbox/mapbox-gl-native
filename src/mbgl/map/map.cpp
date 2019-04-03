@@ -252,7 +252,7 @@ CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const Edg
 
     std::vector<LatLng> latLngs;
     forEachPoint(geometry, [&](const Point<double>& pt) {
-        latLngs.push_back({ pt.y, pt.x });
+        latLngs.emplace_back(pt.y, pt.x);
     });
     return cameraForLatLngs(latLngs, padding, bearing, pitch);
 }

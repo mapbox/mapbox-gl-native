@@ -41,7 +41,7 @@ std::unique_ptr<Expression> literal(Value value) {
 std::unique_ptr<Expression> literal(std::initializer_list<double> value) {
     std::vector<Value> values;
     for (auto i : value) {
-        values.push_back(i);
+        values.emplace_back(i);
     }
     return literal(values);
 }
@@ -49,7 +49,7 @@ std::unique_ptr<Expression> literal(std::initializer_list<double> value) {
 std::unique_ptr<Expression> literal(std::initializer_list<const char *> value) {
     std::vector<Value> values;
     for (auto i : value) {
-        values.push_back(std::string(i));
+        values.emplace_back(std::string(i));
     }
     return literal(values);
 }

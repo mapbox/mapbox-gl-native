@@ -25,50 +25,50 @@ public:
     // Paint properties
 
     static PropertyValue<float> getDefaultFillExtrusionOpacity();
-    PropertyValue<float> getFillExtrusionOpacity() const;
-    void setFillExtrusionOpacity(PropertyValue<float>);
+    const PropertyValue<float>& getFillExtrusionOpacity() const;
+    void setFillExtrusionOpacity(const PropertyValue<float>&);
     void setFillExtrusionOpacityTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionOpacityTransition() const;
 
     static PropertyValue<Color> getDefaultFillExtrusionColor();
-    PropertyValue<Color> getFillExtrusionColor() const;
-    void setFillExtrusionColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getFillExtrusionColor() const;
+    void setFillExtrusionColor(const PropertyValue<Color>&);
     void setFillExtrusionColorTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionColorTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultFillExtrusionTranslate();
-    PropertyValue<std::array<float, 2>> getFillExtrusionTranslate() const;
-    void setFillExtrusionTranslate(PropertyValue<std::array<float, 2>>);
+    const PropertyValue<std::array<float, 2>>& getFillExtrusionTranslate() const;
+    void setFillExtrusionTranslate(const PropertyValue<std::array<float, 2>>&);
     void setFillExtrusionTranslateTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultFillExtrusionTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getFillExtrusionTranslateAnchor() const;
-    void setFillExtrusionTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    const PropertyValue<TranslateAnchorType>& getFillExtrusionTranslateAnchor() const;
+    void setFillExtrusionTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
     void setFillExtrusionTranslateAnchorTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionTranslateAnchorTransition() const;
 
     static PropertyValue<std::string> getDefaultFillExtrusionPattern();
-    PropertyValue<std::string> getFillExtrusionPattern() const;
-    void setFillExtrusionPattern(PropertyValue<std::string>);
+    const PropertyValue<std::string>& getFillExtrusionPattern() const;
+    void setFillExtrusionPattern(const PropertyValue<std::string>&);
     void setFillExtrusionPatternTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionPatternTransition() const;
 
     static PropertyValue<float> getDefaultFillExtrusionHeight();
-    PropertyValue<float> getFillExtrusionHeight() const;
-    void setFillExtrusionHeight(PropertyValue<float>);
+    const PropertyValue<float>& getFillExtrusionHeight() const;
+    void setFillExtrusionHeight(const PropertyValue<float>&);
     void setFillExtrusionHeightTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionHeightTransition() const;
 
     static PropertyValue<float> getDefaultFillExtrusionBase();
-    PropertyValue<float> getFillExtrusionBase() const;
-    void setFillExtrusionBase(PropertyValue<float>);
+    const PropertyValue<float>& getFillExtrusionBase() const;
+    void setFillExtrusionBase(const PropertyValue<float>&);
     void setFillExtrusionBaseTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionBaseTransition() const;
 
     static PropertyValue<bool> getDefaultFillExtrusionVerticalGradient();
-    PropertyValue<bool> getFillExtrusionVerticalGradient() const;
-    void setFillExtrusionVerticalGradient(PropertyValue<bool>);
+    const PropertyValue<bool>& getFillExtrusionVerticalGradient() const;
+    void setFillExtrusionVerticalGradient(const PropertyValue<bool>&);
     void setFillExtrusionVerticalGradientTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionVerticalGradientTransition() const;
 

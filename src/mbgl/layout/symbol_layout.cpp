@@ -117,8 +117,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             FontStack baseFontStack = layout.evaluate<TextFont>(zoom, ft);
 
             ft.formattedText = TaggedString();
-            for (std::size_t j = 0; j < formatted.sections.size(); j++) {
-                const auto& section = formatted.sections[j];
+            for (const auto & section : formatted.sections) {
                 std::string u8string = section.text;
                 if (textTransform == TextTransformType::Uppercase) {
                     u8string = platform::uppercase(u8string);

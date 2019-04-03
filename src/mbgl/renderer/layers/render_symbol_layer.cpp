@@ -148,7 +148,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         };
 
         assert(tile.tile.kind == Tile::Kind::Geometry);
-        GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
+        auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
 
         if (bucket.hasIconData()) {
             auto values = iconPropertyValues(evaluated_, layout);

@@ -43,8 +43,8 @@ public:
 
 <% for (const property of layoutProperties) { -%>
     static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
-    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    const <%- propertyValueType(property) %>& get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(const <%- propertyValueType(property) %>&);
 
 <% } -%>
 <% } -%>
@@ -52,8 +52,8 @@ public:
 
 <% for (const property of paintProperties) { -%>
     static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
-    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    const <%- propertyValueType(property) %>& get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(const <%- propertyValueType(property) %>&);
     void set<%- camelize(property.name) %>Transition(const TransitionOptions&);
     TransitionOptions get<%- camelize(property.name) %>Transition() const;
 

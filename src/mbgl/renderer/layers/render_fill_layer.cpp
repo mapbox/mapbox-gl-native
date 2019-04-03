@@ -150,7 +150,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         const auto fillPatternValue = evaluated.get<FillPattern>().constantOr(Faded<std::basic_string<char>>{"", ""});
         for (const RenderTile& tile : renderTiles) {
-            GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
+            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
             optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
             optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
 

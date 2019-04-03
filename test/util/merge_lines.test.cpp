@@ -15,7 +15,7 @@ namespace {
 PropertyMap properties;
 LineString<int16_t> emptyLine;
 
-}
+} // namespace
 
 class SymbolFeatureStub : public SymbolFeature {
 public:

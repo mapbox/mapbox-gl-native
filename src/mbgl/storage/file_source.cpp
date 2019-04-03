@@ -18,7 +18,7 @@ std::shared_ptr<FileSource> FileSource::getSharedFileSource(const ResourceOption
         it = it->second.expired() ? fileSources.erase(it) : ++it;
     }
 
-    const uint64_t context = reinterpret_cast<uint64_t>(options.platformContext());
+    const auto context = reinterpret_cast<uint64_t>(options.platformContext());
     const std::string key = options.baseURL() + '|' + options.accessToken() + '|' + options.cachePath() + '|' + util::toString(context);
 
     std::shared_ptr<mbgl::FileSource> fileSource;

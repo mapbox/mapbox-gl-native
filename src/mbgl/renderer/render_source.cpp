@@ -11,6 +11,7 @@
 #include <mbgl/tile/tile.hpp>
 
 #include <mbgl/layermanager/layer_manager.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -50,7 +51,7 @@ std::unique_ptr<RenderSource> RenderSource::create(Immutable<Source::Impl> impl)
 static RenderSourceObserver nullObserver;
 
 RenderSource::RenderSource(Immutable<style::Source::Impl> impl)
-    : baseImpl(impl),
+    : baseImpl(std::move(impl)),
       observer(&nullObserver) {
 }
 

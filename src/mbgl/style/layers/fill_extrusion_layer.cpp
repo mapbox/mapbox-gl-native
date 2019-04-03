@@ -66,11 +66,11 @@ PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> FillExtrusionLayer::getFillExtrusionOpacity() const {
+const PropertyValue<float>& FillExtrusionLayer::getFillExtrusionOpacity() const {
     return impl().paint.template get<FillExtrusionOpacity>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionOpacity(PropertyValue<float> value) {
+void FillExtrusionLayer::setFillExtrusionOpacity(const PropertyValue<float>& value) {
     if (value == getFillExtrusionOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -93,11 +93,11 @@ PropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> FillExtrusionLayer::getFillExtrusionColor() const {
+const PropertyValue<Color>& FillExtrusionLayer::getFillExtrusionColor() const {
     return impl().paint.template get<FillExtrusionColor>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionColor(PropertyValue<Color> value) {
+void FillExtrusionLayer::setFillExtrusionColor(const PropertyValue<Color>& value) {
     if (value == getFillExtrusionColor())
         return;
     auto impl_ = mutableImpl();
@@ -120,11 +120,11 @@ PropertyValue<std::array<float, 2>> FillExtrusionLayer::getDefaultFillExtrusionT
     return { {{ 0, 0 }} };
 }
 
-PropertyValue<std::array<float, 2>> FillExtrusionLayer::getFillExtrusionTranslate() const {
+const PropertyValue<std::array<float, 2>>& FillExtrusionLayer::getFillExtrusionTranslate() const {
     return impl().paint.template get<FillExtrusionTranslate>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionTranslate(PropertyValue<std::array<float, 2>> value) {
+void FillExtrusionLayer::setFillExtrusionTranslate(const PropertyValue<std::array<float, 2>>& value) {
     if (value == getFillExtrusionTranslate())
         return;
     auto impl_ = mutableImpl();
@@ -147,11 +147,11 @@ PropertyValue<TranslateAnchorType> FillExtrusionLayer::getDefaultFillExtrusionTr
     return { TranslateAnchorType::Map };
 }
 
-PropertyValue<TranslateAnchorType> FillExtrusionLayer::getFillExtrusionTranslateAnchor() const {
+const PropertyValue<TranslateAnchorType>& FillExtrusionLayer::getFillExtrusionTranslateAnchor() const {
     return impl().paint.template get<FillExtrusionTranslateAnchor>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+void FillExtrusionLayer::setFillExtrusionTranslateAnchor(const PropertyValue<TranslateAnchorType>& value) {
     if (value == getFillExtrusionTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
@@ -174,11 +174,11 @@ PropertyValue<std::string> FillExtrusionLayer::getDefaultFillExtrusionPattern() 
     return { "" };
 }
 
-PropertyValue<std::string> FillExtrusionLayer::getFillExtrusionPattern() const {
+const PropertyValue<std::string>& FillExtrusionLayer::getFillExtrusionPattern() const {
     return impl().paint.template get<FillExtrusionPattern>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionPattern(PropertyValue<std::string> value) {
+void FillExtrusionLayer::setFillExtrusionPattern(const PropertyValue<std::string>& value) {
     if (value == getFillExtrusionPattern())
         return;
     auto impl_ = mutableImpl();
@@ -201,11 +201,11 @@ PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
     return { 0 };
 }
 
-PropertyValue<float> FillExtrusionLayer::getFillExtrusionHeight() const {
+const PropertyValue<float>& FillExtrusionLayer::getFillExtrusionHeight() const {
     return impl().paint.template get<FillExtrusionHeight>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionHeight(PropertyValue<float> value) {
+void FillExtrusionLayer::setFillExtrusionHeight(const PropertyValue<float>& value) {
     if (value == getFillExtrusionHeight())
         return;
     auto impl_ = mutableImpl();
@@ -228,11 +228,11 @@ PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
     return { 0 };
 }
 
-PropertyValue<float> FillExtrusionLayer::getFillExtrusionBase() const {
+const PropertyValue<float>& FillExtrusionLayer::getFillExtrusionBase() const {
     return impl().paint.template get<FillExtrusionBase>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionBase(PropertyValue<float> value) {
+void FillExtrusionLayer::setFillExtrusionBase(const PropertyValue<float>& value) {
     if (value == getFillExtrusionBase())
         return;
     auto impl_ = mutableImpl();
@@ -255,11 +255,11 @@ PropertyValue<bool> FillExtrusionLayer::getDefaultFillExtrusionVerticalGradient(
     return { true };
 }
 
-PropertyValue<bool> FillExtrusionLayer::getFillExtrusionVerticalGradient() const {
+const PropertyValue<bool>& FillExtrusionLayer::getFillExtrusionVerticalGradient() const {
     return impl().paint.template get<FillExtrusionVerticalGradient>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionVerticalGradient(PropertyValue<bool> value) {
+void FillExtrusionLayer::setFillExtrusionVerticalGradient(const PropertyValue<bool>& value) {
     if (value == getFillExtrusionVerticalGradient())
         return;
     auto impl_ = mutableImpl();
@@ -324,7 +324,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         return Error { "layer doesn't support this property" };
     }
 
-    Property property = static_cast<Property>(it->second);
+    auto property = static_cast<Property>(it->second);
 
         
     if (property == Property::FillExtrusionOpacity) {
