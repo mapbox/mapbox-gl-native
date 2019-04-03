@@ -6827,6 +6827,20 @@ public:
     void onDidFinishLoadingStyle() override {
         [nativeView didFinishLoadingStyle];
     }
+    
+    void onStyleImageMissing(const std::string& imageIdentifier) override {
+        NSString *imageName = [NSString stringWithUTF8String:imageIdentifier.c_str()];
+        
+        if ([nativeView.delegate respondsToSelector:@selector(mapView:didFailToLoadImage:)]) {
+            UIImage *imageToLoad = [nativeView.delegate mapView:nativeView didFailToLoadImage:imageName];
+            
+            if (imageToLoad) {
+                auto image = [imageToLoad mgl_styleImageWithIdentifier:imageName];
+                nativeView.mbglMap.getStyle().addImage(std::move(image));
+            }
+            
+        }
+    }
 
     mbgl::gl::ProcAddress getExtensionFunctionPointer(const char* name) override {
         static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));

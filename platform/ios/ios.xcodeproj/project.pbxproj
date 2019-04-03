@@ -459,6 +459,7 @@
 		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		9C188C4F2242C95A0022FA55 /* MMEDate.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMEDate.m */; };
 		9C188C502242C96F0022FA55 /* MMEDate.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC51FE05D6F00C1BD0D /* MMEDate.h */; };
+		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC1B0916221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
 		AC1B0917221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
 		AC1B0918221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = AC1B0915221CA14C00DB56C8 /* CLLocationManager+MMEMobileEvents.m */; };
@@ -1143,6 +1144,7 @@
 		96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapViewDirectionTests.mm; sourceTree = "<group>"; };
 		96F017292118FBAE00892778 /* MGLMapView_Experimental.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Experimental.h; sourceTree = "<group>"; };
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
+		A4F3FB1C2254865900A30170 /* missing_icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = missing_icon.json; sourceTree = "<group>"; };
 		AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLLocationManager+MMEMobileEvents.h"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.h"; sourceTree = "<group>"; };
 		AC1B0915221CA14C00DB56C8 /* CLLocationManager+MMEMobileEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CLLocationManager+MMEMobileEvents.m"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.m"; sourceTree = "<group>"; };
 		AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTelemetryConfig.h; sourceTree = "<group>"; };
@@ -1883,6 +1885,7 @@
 			children = (
 				353BAEF51D646370009A8DA9 /* amsterdam.geojson */,
 				DA1DC96C1CB6C6CE006E619F /* points.geojson */,
+				A4F3FB1C2254865900A30170 /* missing_icon.json */,
 				DA1DC96D1CB6C6CE006E619F /* polyline.geojson */,
 				1F26B6C220E1A351007BCC21 /* simple_route.json */,
 				DA1DC96F1CB6C6CE006E619F /* threestates.geojson */,
@@ -2932,6 +2935,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				"zh-Hans",
@@ -3001,6 +3005,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DD4823771D94AE6C00EB71B7 /* numeric_filter_style.json in Resources */,
+				A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */,
 				DA1DC9701CB6C6CE006E619F /* points.geojson in Resources */,
 				353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */,
 				DA1DC9711CB6C6CE006E619F /* polyline.geojson in Resources */,
