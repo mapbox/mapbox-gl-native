@@ -1727,12 +1727,15 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 - (void)loadMissingIcon
 {
+    self.mapView.centerCoordinate = CLLocationCoordinate2DMake(0, 0);
+    self.mapView.zoomLevel = 1;
     NSURL *customStyleJSON = [[NSBundle mainBundle] URLForResource:@"missing_icon" withExtension:@"json"];
     [self.mapView setStyleURL:customStyleJSON];
 }
 
-- (void)mapView:(MGLMapView *)mapView didFailLoadingStyleImage:(NSString *)missingImage {
-    NSLog(@"%@", missingImage);
+- (UIImage *)mapView:(MGLMapView *)mapView didFailToLoadImage:(NSString *)imageName {
+    UIImage *backupImage = [UIImage imageNamed:@"AppIcon"];
+    return backupImage;
 }
 
 - (void)printTelemetryLogFile
