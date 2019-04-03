@@ -18,6 +18,8 @@ public:
                      gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
                      gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
 
+    bool isRenderable() override;
+
     PremultipliedImage readStillImage() override;
     gfx::Texture& getTexture() override;
 };
