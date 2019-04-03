@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.MapEventFactory;
 import com.mapbox.android.telemetry.MapState;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.TelemetryEnabler;
