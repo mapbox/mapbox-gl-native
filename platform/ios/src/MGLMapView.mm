@@ -158,7 +158,7 @@ const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
 /// The number of view annotations (excluding the user location view) that must
 /// be descendents of `MGLMapView` before presentsWithTransaction is enabled.
-static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 3;
+static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 0;
 
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
