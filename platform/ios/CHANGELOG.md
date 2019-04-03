@@ -24,6 +24,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Added `MGLOrnamentPosition` enum and margin properties to customize scale bar, compass, logo, and attribution position within the map view. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
 * Added an `MGLMapView.prefetchesTiles` property to configure lower-resolution tile prefetching behavior. ([#14031](https://github.com/mapbox/mapbox-gl-native/pull/14031))
+* Speculatively fixed a performance issue seen on iOS 12.2, when an `MGLMapView` is repeatedly removed and re-added in a view hierarchy. ([#14264](https://github.com/mapbox/mapbox-gl-native/pull/14264))
+
 
 ## 4.9.0 - February 27, 2019
 
