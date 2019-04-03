@@ -12,7 +12,7 @@ class ClippingMaskProgram : public Program<
     gfx::PrimitiveType::Triangle,
     PositionOnlyLayoutAttributes,
     TypeList<
-        uniforms::u_matrix>,
+        uniforms::matrix>,
     TypeList<>,
     style::Properties<>>
 {

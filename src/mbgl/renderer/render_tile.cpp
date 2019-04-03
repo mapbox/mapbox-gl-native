@@ -4,7 +4,7 @@
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -105,8 +105,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             tile.debugBucket->segments,
             program.computeAllUniformValues(
                 DebugProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( matrix ),
-                    uniforms::u_color::Value( Color::white() )
+                    uniforms::matrix::Value( matrix ),
+                    uniforms::color::Value( Color::white() )
                 },
                 paintAttributeData,
                 properties,
@@ -128,8 +128,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             tile.debugBucket->segments,
             program.computeAllUniformValues(
                 DebugProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( matrix ),
-                    uniforms::u_color::Value( Color::black() )
+                    uniforms::matrix::Value( matrix ),
+                    uniforms::color::Value( Color::black() )
                 },
                 paintAttributeData,
                 properties,
@@ -153,8 +153,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileBorderSegments,
             program.computeAllUniformValues(
                 DebugProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( matrix ),
-                    uniforms::u_color::Value( Color::red() )
+                    uniforms::matrix::Value( matrix ),
+                    uniforms::color::Value( Color::red() )
                 },
                 paintAttributeData,
                 properties,

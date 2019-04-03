@@ -12,10 +12,13 @@
 #include <string>
 
 namespace mbgl {
+namespace gfx {
+class Context;
+} // namespace gfx
 
 class RenderStaticData {
 public:
-    RenderStaticData(gl::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
+    RenderStaticData(gfx::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
 
     gfx::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertexBuffer;
     gfx::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;

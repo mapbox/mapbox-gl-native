@@ -17,6 +17,8 @@ task androidNitpick {
         verifyVendorSubmodulePin(MAPBOX_JAVA_DIR, MAPBOX_JAVA_TAG_PREFIX, versions.mapboxServices)
         verifyVendorSubmodulePin(MAPBOX_TELEMETRY_DIR, MAPBOX_TELEMETRY_TAG_PREFIX, versions.mapboxTelemetry)
         verifyVendorSubmodulePin(MAPBOX_GESTURES_DIR, MAPBOX_GESTURES_TAG_PREFIX, versions.mapboxGestures)
+        
+        verifyLicenseGeneration()
     }
 }
 
@@ -51,4 +53,12 @@ private def verifyVendorSubmodulePin(def dir, def prefix, def version) {
                 "If you've bumped the pin, make sure to verify the version tag prefix in the android-nitpick.gradle file.")
     }
     output.close()
+}
+
+private def verifyLicenseGeneration() {
+    println "Verify license generation with git diff..."
+    exec {
+      workingDir = "${rootDir}"
+      commandLine "python", "scripts/validate-license.py"
+    }
 }

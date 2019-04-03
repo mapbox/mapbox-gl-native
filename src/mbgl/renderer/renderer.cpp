@@ -34,6 +34,10 @@ void Renderer::render(const UpdateParameters& updateParameters) {
     impl->render(updateParameters);
 }
 
+void Renderer::flush() {
+    impl->flush();
+}
+
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
     return impl->queryRenderedFeatures(geometry, options);
 }

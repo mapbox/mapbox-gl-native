@@ -17,10 +17,14 @@ namespace gfx {
 
 class Context {
 protected:
-    Context(ContextType type_) : backend(type_) {
+    Context(ContextType type_, uint32_t maximumVertexBindingCount_)
+        : backend(type_), maximumVertexBindingCount(maximumVertexBindingCount_) {
     }
 
+public:
     const ContextType backend;
+    static constexpr const uint32_t minimumRequiredVertexBindingCount = 8;
+    const uint32_t maximumVertexBindingCount;
 
 public:
     Context(Context&&) = delete;
@@ -28,6 +32,10 @@ public:
     Context& operator=(Context&& other) = delete;
     Context& operator=(const Context& other) = delete;
     virtual ~Context() = default;
+
+public:
+    // Called at the end of a frame.
+    virtual void performCleanup() = 0;
 
 public:
     template <class Vertex>
@@ -92,10 +100,24 @@ public:
         texture.size = image.size;
     }
 
+    template <typename Image>
+    void updateTextureSub(Texture& texture,
+                       const Image& image,
+                       const uint16_t offsetX,
+                       const uint16_t offsetY,
+                       TextureChannelDataType type = TextureChannelDataType::UnsignedByte) {
+        assert(image.size.width + offsetX <= texture.size.width);
+        assert(image.size.height + offsetY <= texture.size.height);
+        auto format = image.channels == 4 ? TexturePixelType::RGBA : TexturePixelType::Alpha;
+        updateTextureResourceSub(*texture.resource, offsetX, offsetY, image.size, image.data.get(), format, type);
+    }
+
 protected:
     virtual std::unique_ptr<TextureResource> createTextureResource(
         Size, const void* data, TexturePixelType, TextureChannelDataType) = 0;
     virtual void updateTextureResource(const TextureResource&, Size, const void* data,
+        TexturePixelType, TextureChannelDataType) = 0;
+    virtual void updateTextureResourceSub(const TextureResource&, uint16_t xOffset, uint16_t yOffset, Size, const void* data,
         TexturePixelType, TextureChannelDataType) = 0;
 
 public:

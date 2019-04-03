@@ -1,0 +1,10 @@
+{
+    "//": "This file can be edited manually and is the canonical source.",
+    "sources": [
+        "platform/default/src/mbgl/storage/file_source.cpp",
+        "platform/default/src/mbgl/storage/http_file_source.cpp",
+        "platform/default/src/mbgl/storage/sqlite3.cpp"
+    ],
+    "public_headers": {},
+    "private_headers": {}
+}

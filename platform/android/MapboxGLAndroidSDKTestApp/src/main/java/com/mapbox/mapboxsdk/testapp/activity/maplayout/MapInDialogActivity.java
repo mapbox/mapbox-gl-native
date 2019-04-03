@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,9 +16,6 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 /**
  * Test activity showcasing showing a Map inside of a DialogFragment.
- * <p>
- * Uses the deprecated TextureView API to workaround the issue of seeing a grey background before the gl surface.
- * </p>
  */
 public class MapInDialogActivity extends AppCompatActivity {
 
@@ -64,23 +60,6 @@ public class MapInDialogActivity extends AppCompatActivity {
       mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Style.OUTDOORS));
     }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-      return new Dialog(getActivity(), getTheme()) {
-        @Override
-        public void dismiss() {
-          if (mapView != null && !mapView.isDestroyed()) {
-            mapView.onPause();
-            mapView.onStop();
-            mapView.onDestroy();
-            mapView = null;
-          }
-          super.dismiss();
-        }
-      };
-    }
-
     @Override
     public void onStart() {
       super.onStart();
@@ -96,25 +75,20 @@ public class MapInDialogActivity extends AppCompatActivity {
     @Override
     public void onPause() {
       super.onPause();
-      if (mapView != null) {
-        mapView.onPause();
-      }
+      mapView.onPause();
     }
 
     @Override
     public void onStop() {
       super.onStop();
-      if (mapView != null) {
-        mapView.onStop();
-      }
+      mapView.onStop();
     }
 
     @Override
     public void onDestroyView() {
       super.onDestroyView();
-      if (mapView != null) {
-        mapView.onDestroy();
-      }
+      mapView.onDestroy();
+      mapView = null;
     }
 
     @Override

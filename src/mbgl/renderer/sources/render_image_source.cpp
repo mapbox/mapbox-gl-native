@@ -7,7 +7,7 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/logging.hpp>
@@ -73,8 +73,8 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileBorderSegments,
             programInstance.computeAllUniformValues(
                 DebugProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( matrix ),
-                    uniforms::u_color::Value( Color::red() )
+                    uniforms::matrix::Value( matrix ),
+                    uniforms::color::Value( Color::red() )
                 },
                 paintAttributeData,
                 properties,

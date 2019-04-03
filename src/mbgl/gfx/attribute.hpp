@@ -14,7 +14,7 @@
 #define MBGL_DEFINE_ATTRIBUTE(type_, n_, name_)                                                    \
     struct name_ {                                                                                 \
         using Type = ::mbgl::gfx::AttributeType<type_, n_>;                                        \
-        static auto name() {                                                                       \
+        static constexpr auto name() {                                                             \
             return #name_;                                                                         \
         }                                                                                          \
     }

@@ -414,12 +414,12 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A Boolean value indicating whether the map should prefetch tiles.
  
- When this property is set to YES, the map view prefetches loads tiles designed for a
- low zoom level and displays them until receiving more detailed tiles for the current
- zoom level. The prefetched tiles typically contain simplified versions of each shape,
- improving the map view’s perceived performance.
+ When this property is set to `YES`, the map view prefetches tiles designed for
+ a low zoom level and displays them until receiving more detailed tiles for the
+ current zoom level. The prefetched tiles typically contain simplified versions
+ of each shape, improving the map view’s perceived performance.
  
- The default value of this property is YES.
+ The default value of this property is `YES`.
  */
 @property (nonatomic, assign) BOOL prefetchesTiles;
 
@@ -434,17 +434,18 @@ MGL_EXPORT IB_DESIGNABLE
 #pragma mark Displaying the User’s Location
 
 /**
- The object that this map view uses to start and stop the delivery of location-related
- updates.
+ The object that this map view uses to start and stop the delivery of
+ location-related updates.
 
- To receive the current user location, implement the `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
- and `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
+ To receive the current user location, implement the
+ `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]` and
+ `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
 
- If setting this property to `nil` or if no custom manager is provided this property
- is set to the default location manager.
+ If setting this property to `nil` or if no custom manager is provided this
+ property is set to the default location manager.
 
- `MGLMapView` uses a default location manager. If you want to substitute your own
- location manager, you should do so by setting this property before setting
+ `MGLMapView` uses a default location manager. If you want to substitute your
+ own location manager, you should do so by setting this property before setting
  `showsUserLocation` to `YES`. To restore the default location manager,
  set this property to `nil`.
  */

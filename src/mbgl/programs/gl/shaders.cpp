@@ -1,4 +1,5 @@
 #include <mbgl/programs/gl/shaders.hpp>
+#include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/util/string.hpp>
@@ -9,20 +10,17 @@ namespace mbgl {
 namespace programs {
 namespace gl {
 
-std::string fragmentSource(const ProgramParameters& parameters, const char* fragmentSource) {
-    return parameters.getDefines() + fragmentShaderPrelude + fragmentSource;
-}
-
-std::string vertexSource(const ProgramParameters& parameters, const char* vertexSource) {
-    return parameters.getDefines() + vertexShaderPrelude + vertexSource;
-}
-
-std::string programIdentifier(const std::string& vertexSource, const std::string& fragmentSource) {
+std::string programIdentifier(const std::string& defines1,
+                              const std::string& defines2,
+                              const uint8_t hash1[8],
+                              const uint8_t hash2[8]) {
     std::string result;
-    result.reserve((sizeof(size_t) * 2) * 2 + 2); // 2 size_t hex values + "v2"
-    result += util::toHex(std::hash<std::string>()(vertexSource));
-    result += util::toHex(std::hash<std::string>()(fragmentSource));
-    result += "v3";
+    result.reserve(8 + 8 + (sizeof(size_t) * 2) * 2 + 2);
+    result.append(util::toHex(std::hash<std::string>()(defines1)));
+    result.append(util::toHex(std::hash<std::string>()(defines2)));
+    result.append(hash1, hash2 + 8);
+    result.append(hash2, hash2 + 8);
+    result.append("v3");
     return result;
 }
 

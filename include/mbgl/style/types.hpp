@@ -81,6 +81,7 @@ enum class AlignmentType : uint8_t {
 };
 
 enum class TextJustifyType : uint8_t {
+    Auto,
     Center,
     Left,
     Right
@@ -97,6 +98,8 @@ enum class SymbolAnchorType : uint8_t {
     BottomLeft,
     BottomRight
 };
+
+using TextVariableAnchorType = SymbolAnchorType;
 
 enum class TextTransformType : uint8_t {
     None,

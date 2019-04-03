@@ -52,12 +52,15 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         return;
     }
 
+    // TODO: remove cast
+    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& viewportSize = parameters.staticData.backendSize;
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
 
         if (!renderTexture || renderTexture->getSize() != size) {
-            if (parameters.context.supportsHalfFloatTextures) {
+            if (glContext.supportsHalfFloatTextures) {
                 renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::HalfFloat);
 
                 try {
@@ -65,11 +68,11 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 } catch (const std::runtime_error& ex) {
                     // can't render to a half-float texture; falling back to unsigned byte one
                     renderTexture = nullopt;
-                    parameters.context.supportsHalfFloatTextures = false;
+                    glContext.supportsHalfFloatTextures = false;
                 }
             }
 
-            if (!parameters.context.supportsHalfFloatTextures || !renderTexture) {
+            if (!glContext.supportsHalfFloatTextures || !renderTexture) {
                 renderTexture = OffscreenTexture(parameters.context, size, gfx::TextureChannelDataType::UnsignedByte);
                 renderTexture->bind();
             }
@@ -82,7 +85,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             colorRampTexture = parameters.context.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
         }
 
-        parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
+        glContext.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
 
         for (const RenderTile& tile : renderTiles) {
             auto bucket_ = tile.tile.getBucket<HeatmapBucket>(*baseImpl);
@@ -99,13 +102,13 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-            auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap.get(evaluated);
+            auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap;
        
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 HeatmapProgram::LayoutUniformValues {
-                    uniforms::u_intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
-                    uniforms::u_matrix::Value( tile.matrix ),
-                    uniforms::heatmap::u_extrude_scale::Value( extrudeScale )
+                    uniforms::intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
+                    uniforms::matrix::Value( tile.matrix ),
+                    uniforms::heatmap::extrude_scale::Value( extrudeScale )
                 },
                 paintPropertyBinders,
                 evaluated,
@@ -148,9 +151,9 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HeatmapTextureProgram::LayoutUniformValues{
-                uniforms::u_matrix::Value( viewportMat ),
-                uniforms::u_world::Value( size ),
-                uniforms::u_opacity::Value( evaluated.get<HeatmapOpacity>() )
+                uniforms::matrix::Value( viewportMat ),
+                uniforms::world::Value( size ),
+                uniforms::opacity::Value( evaluated.get<HeatmapOpacity>() )
             },
             paintAttributeData,
             properties,
@@ -176,8 +179,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             allUniformValues,
             allAttributeBindings,
             HeatmapTextureProgram::TextureBindings{
-                textures::u_image::Value{ *renderTexture->getTexture().resource, gfx::TextureFilterType::Linear },
-                textures::u_color_ramp::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+                textures::image::Value{ *renderTexture->getTexture().resource, gfx::TextureFilterType::Linear },
+                textures::color_ramp::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
             },
             getID()
         );

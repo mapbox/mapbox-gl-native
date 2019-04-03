@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/line_gradient_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<LineGradientProgram> {
+    static constexpr const char* name = "line_gradient";
+    static constexpr const uint8_t hash[8] = { 0xee, 0xdd, 0x10, 0x3d, 0x1a, 0x21, 0x26, 0x25 };
+    static constexpr const auto vertexOffset = 34335;
+    static constexpr const auto fragmentOffset = 37054;
+};
+
+constexpr const char* ShaderSource<LineGradientProgram>::name;
+constexpr const uint8_t ShaderSource<LineGradientProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<LineGradientProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<LineGradientProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "line_gradient",
-        programs::gl::shaderSource() + 34335, programs::gl::shaderSource() + 37054);
+    return std::make_unique<gl::Program<LineGradientProgram>>(programParameters);
 }
 
 } // namespace gfx
@@ -50,7 +69,7 @@ varying highp float v_lineprogress;
 
 
 #ifndef HAS_UNIFORM_u_blur
-uniform lowp float a_blur_t;
+uniform lowp float u_blur_t;
 attribute lowp vec2 a_blur;
 varying lowp float blur;
 #else
@@ -59,7 +78,7 @@ uniform lowp float u_blur;
 
 
 #ifndef HAS_UNIFORM_u_opacity
-uniform lowp float a_opacity_t;
+uniform lowp float u_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
 #else
@@ -68,7 +87,7 @@ uniform lowp float u_opacity;
 
 
 #ifndef HAS_UNIFORM_u_gapwidth
-uniform lowp float a_gapwidth_t;
+uniform lowp float u_gapwidth_t;
 attribute mediump vec2 a_gapwidth;
 #else
 uniform mediump float u_gapwidth;
@@ -76,7 +95,7 @@ uniform mediump float u_gapwidth;
 
 
 #ifndef HAS_UNIFORM_u_offset
-uniform lowp float a_offset_t;
+uniform lowp float u_offset_t;
 attribute lowp vec2 a_offset;
 #else
 uniform lowp float u_offset;
@@ -84,7 +103,7 @@ uniform lowp float u_offset;
 
 
 #ifndef HAS_UNIFORM_u_width
-uniform lowp float a_width_t;
+uniform lowp float u_width_t;
 attribute mediump vec2 a_width;
 #else
 uniform mediump float u_width;
@@ -94,35 +113,35 @@ uniform mediump float u_width;
 void main() {
     
 #ifndef HAS_UNIFORM_u_blur
-    blur = unpack_mix_vec2(a_blur, a_blur_t);
+    blur = unpack_mix_vec2(a_blur, u_blur_t);
 #else
     lowp float blur = u_blur;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_opacity
-    opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+    opacity = unpack_mix_vec2(a_opacity, u_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_gapwidth
-    mediump float gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
+    mediump float gapwidth = unpack_mix_vec2(a_gapwidth, u_gapwidth_t);
 #else
     mediump float gapwidth = u_gapwidth;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_offset
-    lowp float offset = unpack_mix_vec2(a_offset, a_offset_t);
+    lowp float offset = unpack_mix_vec2(a_offset, u_offset_t);
 #else
     lowp float offset = u_offset;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_width
-    mediump float width = unpack_mix_vec2(a_width, a_width_t);
+    mediump float width = unpack_mix_vec2(a_width, u_width_t);
 #else
     mediump float width = u_width;
 #endif

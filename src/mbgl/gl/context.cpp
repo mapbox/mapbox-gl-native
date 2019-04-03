@@ -5,6 +5,7 @@
 #include <mbgl/gl/texture_resource.hpp>
 #include <mbgl/gl/draw_scope_resource.hpp>
 #include <mbgl/gl/texture.hpp>
+#include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
@@ -67,7 +68,7 @@ static_assert(underlying_type(UniformDataType::SamplerCube) == GL_SAMPLER_CUBE, 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
 Context::Context()
-    : gfx::Context(gfx::ContextType::OpenGL), maximumVertexBindingCount([] {
+    : gfx::Context(gfx::ContextType::OpenGL, [] {
           GLint value;
           MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
           return value;
@@ -160,12 +161,10 @@ void Context::enableDebugging() {
     MBGL_CHECK_ERROR(debugging->debugMessageCallback(extension::Debugging::DebugCallback, nullptr));
 }
 
-UniqueShader Context::createShader(ShaderType type, const std::string& source) {
+UniqueShader Context::createShader(ShaderType type, const std::initializer_list<const char*>& sources) {
     UniqueShader result { MBGL_CHECK_ERROR(glCreateShader(static_cast<GLenum>(type))), { this } };
 
-    const GLchar* sources = source.data();
-    const auto lengths = static_cast<GLsizei>(source.length());
-    MBGL_CHECK_ERROR(glShaderSource(result, 1, &sources, &lengths));
+    MBGL_CHECK_ERROR(glShaderSource(result, static_cast<GLsizei>(sources.size()), sources.begin(), nullptr));
     MBGL_CHECK_ERROR(glCompileShader(result));
 
     GLint status = 0;
@@ -547,6 +546,24 @@ void Context::updateTextureResource(const gfx::TextureResource& resource,
                                   Enum<gfx::TextureChannelDataType>::to(type), data));
 }
 
+void Context::updateTextureResourceSub(const gfx::TextureResource& resource,
+                                    const uint16_t xOffset,
+                                    const uint16_t yOffset,
+                                    const Size size,
+                                    const void* data,
+                                    gfx::TexturePixelType format,
+                                    gfx::TextureChannelDataType type) {
+    // Always use texture unit 0 for manipulating it.
+    activeTextureUnit = 0;
+    texture[0] = static_cast<const gl::TextureResource&>(resource).texture;
+    MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D, 0,
+                                  xOffset, yOffset,
+                                  size.width, size.height,
+                                  Enum<gfx::TexturePixelType>::to(format),
+                                  Enum<gfx::TextureChannelDataType>::to(type), data));
+}
+
+
 std::unique_ptr<gfx::DrawScopeResource> Context::createDrawScopeResource() {
     return std::make_unique<gl::DrawScopeResource>(createVertexArray());
 }
@@ -708,6 +725,19 @@ void Context::draw(const gfx::DrawMode& drawMode,
 }
 
 void Context::performCleanup() {
+    // TODO: Find a better way to unbind VAOs after we're done with them without introducing
+    // unnecessary bind(0)/bind(N) sequences.
+    {
+        MBGL_DEBUG_GROUP(*this, "cleanup");
+
+        activeTextureUnit = 1;
+        texture[1] = 0;
+        activeTextureUnit = 0;
+        texture[0] = 0;
+
+        bindVertexArray = 0;
+    }
+
     for (auto id : abandonedPrograms) {
         if (program == id) {
             program.setDirty();
@@ -773,6 +803,10 @@ void Context::performCleanup() {
                                                abandonedRenderbuffers.data()));
         abandonedRenderbuffers.clear();
     }
+}
+
+void Context::flush() {
+    MBGL_CHECK_ERROR(glFinish());
 }
 
 } // namespace gl

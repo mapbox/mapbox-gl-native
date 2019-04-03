@@ -1,16 +1,17 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/util/geo.hpp>
+#include <mbgl/util/size.hpp>
 
 #include <memory>
-#include <string>
 
 namespace mbgl {
 
 /**
  * @brief Holds values for Map options.
  */
-class MapOptions {
+class MapOptions final {
 public:
     /**
      * @brief Constructs a MapOptions object with default values.
@@ -18,13 +19,15 @@ public:
     MapOptions();
     ~MapOptions();
 
+    MapOptions(MapOptions&&) noexcept;
+
     /**
      * @brief Sets the map rendering mode. By default, it is set to Continuous
      * so the map will render as data arrives from the network and react
      * immediately to state changes.
      *
      * @param mode Map rendering mode.
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
     MapOptions& withMapMode(MapMode mode);
 
@@ -41,7 +44,7 @@ public:
      * HeightOnly.
      *
      * @param mode Map constrain mode.
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
     MapOptions& withConstrainMode(ConstrainMode mode);
 
@@ -57,7 +60,7 @@ public:
      * orientation of the map as some devices may use inverted orientation.
      *
      * @param mode Viewport mode.
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
     MapOptions& withViewportMode(ViewportMode mode);
 
@@ -69,57 +72,11 @@ public:
     ViewportMode viewportMode() const;
 
     /**
-     * @brief Sets the cache path.
-     *
-     * @param path Cache path.
-     * @return reference to MapOptions for chaining options together.
-     */
-    MapOptions& withCachePath(std::string path);
-
-    /**
-     * @brief Gets the previously set (or default) cache path.
-     *
-     * @return cache path
-     */
-    const std::string& cachePath() const;
-
-    /**
-     * @brief Sets the asset path, which is the root directory from where
-     * the asset:// scheme gets resolved in a style.
-     *
-     * @param path Asset path.
-     * @return reference to MapOptions for chaining options together.
-     */
-    MapOptions& withAssetRoot(std::string path);
-
-    /**
-     * @brief Gets the previously set (or default) asset path.
-     *
-     * @return asset path
-     */
-    const std::string& assetRoot() const;
-
-    /**
-     * @brief Sets the maximum cache size.
-     *
-     * @param size Cache maximum size in bytes.
-     * @return reference to MapOptions for chaining options together.
-     */
-    MapOptions& withMaximumCacheSize(uint64_t size);
-
-    /**
-     * @brief Gets the previously set (or default) maximum allowed cache size.
-     *
-     * @return maximum allowed cache database size in bytes.
-     */
-    uint64_t maximumCacheSize() const;
-
-    /**
      * @brief Specify whether to enable cross-source symbol collision detection
      * or not. By default, it is set to true.
      *
      * @param enableCollisions true to enable, false to disable
-     * @return reference to MapOptions for chaining options together.
+     * @return MapOptions for chaining options together.
      */
     MapOptions& withCrossSourceCollisions(bool enableCollisions);
 
@@ -131,9 +88,55 @@ public:
      */
     bool crossSourceCollisions() const;
 
+    /**
+     * @brief Sets the orientation of the Map. By default, it is set to
+     * Upwards.
+     *
+     * @param orientation Orientation of the Map.
+     * @return reference to MapOptions for chaining options together.
+     */
+    MapOptions& withNorthOrientation(NorthOrientation orientation);
+
+    /**
+     * @brief Gets the previously set (or default) orientation.
+     *
+     * @return Map orientation.
+     */
+    NorthOrientation northOrientation() const;
+
+    /**
+     * @brief Sets the size to resize the map object and renderer backend.
+     *
+     * @param size_ A size given in logical pixels.
+     * @return reference to MapOptions for chaining options together.
+     */
+    MapOptions& withSize(Size size_);
+
+    /**
+     * @brief Gets the previously set size.
+     *
+     * @return Size.
+     */
+    Size size() const;
+
+    /**
+     * @brief Sets the custom pixel ratio. By default, it is set to 1.
+     *
+     * @param ratio Pixel ratio value.
+     * @return reference to MapOptions for chaining options together.
+     */
+    MapOptions& withPixelRatio(float ratio);
+
+    /**
+     * @brief Gets the previously set (or default) pixel ratio value.
+     *
+     * @return pixel ratio value.
+     */
+    float pixelRatio() const;
+
 private:
     class Impl;
-    std::shared_ptr<Impl> impl_;
+    std::unique_ptr<Impl> impl_;
 };
 
 }  // namespace mbgl

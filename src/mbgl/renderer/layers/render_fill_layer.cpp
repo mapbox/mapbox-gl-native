@@ -63,6 +63,9 @@ bool RenderFillLayer::hasCrossfade() const {
 }
 
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
+    // TODO: remove cast
+    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+
     if (unevaluated.get<FillPattern>().isUndefined()) {
         for (const RenderTile& tile : renderTiles) {
             auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
@@ -71,24 +74,22 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             }
             FillBucket& bucket = *bucket_;
 
-            auto draw = [&] (auto& program,
+            auto draw = [&] (auto& programInstance,
                              const auto& drawMode,
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments,
                              auto&& textureBindings) {
-                auto& programInstance = program.get(evaluated);
-
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillProgram::LayoutUniformValues {
-                        uniforms::u_matrix::Value(
+                        uniforms::matrix::Value(
                             tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                                   evaluated.get<FillTranslateAnchor>(),
                                                   parameters.state)
                         ),
-                        uniforms::u_world::Value( parameters.context.viewport.getCurrentValue().size ),
+                        uniforms::world::Value( glContext.viewport.getCurrentValue().size ),
                     },
                     paintPropertyBinders,
                     evaluated,
@@ -159,14 +160,12 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             }
             FillBucket& bucket = *bucket_;
 
-            auto draw = [&] (auto& program,
+            auto draw = [&] (auto& programInstance,
                              const auto& drawMode,
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments,
                              auto&& textureBindings) {
-                auto& programInstance = program.get(evaluated);
-
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
                 paintPropertyBinders.setPatternParameters(patternPosA, patternPosB, crossfade);
 
@@ -175,7 +174,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),
-                        parameters.context.viewport.getCurrentValue().size,
+                        glContext.viewport.getCurrentValue().size,
                         geometryTile.iconAtlasTexture->size,
                         crossfade,
                         tile.id,
@@ -216,7 +215,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments,
                  FillPatternProgram::TextureBindings{
-                     textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                     textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                  });
 
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
@@ -226,7 +225,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments,
                      FillOutlinePatternProgram::TextureBindings{
-                         textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                         textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                      });
             }
         }

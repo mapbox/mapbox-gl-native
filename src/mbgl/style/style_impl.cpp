@@ -254,6 +254,7 @@ bool Style::Impl::isLoaded() const {
 void Style::Impl::addImage(std::unique_ptr<style::Image> image) {
     images.remove(image->getID()); // We permit using addImage to update.
     images.add(std::move(image));
+    observer->onUpdate();
 }
 
 void Style::Impl::removeImage(const std::string& id) {

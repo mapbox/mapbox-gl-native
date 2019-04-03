@@ -5,10 +5,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
+import com.mapbox.turf.TurfMeasurement;
+
+import static com.mapbox.turf.TurfConstants.UNIT_METRES;
 
 
 /**
@@ -209,7 +213,8 @@ public class LatLng implements Parcelable {
   @NonNull
   public LatLng wrap() {
     return new LatLng(latitude, wrap(longitude,
-            GeometryConstants.MIN_WRAP_LONGITUDE, GeometryConstants.MAX_WRAP_LONGITUDE));
+      GeometryConstants.MIN_WRAP_LONGITUDE, GeometryConstants.MAX_WRAP_LONGITUDE)
+    );
   }
 
 
@@ -218,8 +223,10 @@ public class LatLng implements Parcelable {
    * <p>
    * Same formula as used in Core GL (wrap.hpp)
    * std::fmod((std::fmod((value - min), d) + d), d) + min;
-   *
+   * </p>
+   * <p>
    * Multiples of max value will be wrapped to max.
+   * </p>
    *
    * @param value Value to wrap
    * @param min   Minimum value
@@ -318,24 +325,10 @@ public class LatLng implements Parcelable {
    * @return distance in meters
    */
   public double distanceTo(@NonNull LatLng other) {
-    if (latitude == other.latitude && longitude == other.longitude) {
-      // return 0.0 to avoid a NaN
-      return 0.0;
-    }
-
-    final double a1 = Math.toRadians(this.latitude);
-    final double a2 = Math.toRadians(this.longitude);
-    final double b1 = Math.toRadians(other.getLatitude());
-    final double b2 = Math.toRadians(other.getLongitude());
-
-    final double cosa1 = Math.cos(a1);
-    final double cosb1 = Math.cos(b1);
-
-    final double t1 = cosa1 * Math.cos(a2) * cosb1 * Math.cos(b2);
-    final double t2 = cosa1 * Math.sin(a2) * cosb1 * Math.sin(b2);
-    final double t3 = Math.sin(a1) * Math.sin(b1);
-    final double tt = Math.acos(t1 + t2 + t3);
-
-    return GeometryConstants.RADIUS_EARTH_METERS * tt;
+    return TurfMeasurement.distance(
+      Point.fromLngLat(longitude, latitude),
+      Point.fromLngLat(other.getLongitude(), other.getLatitude()),
+      UNIT_METRES
+    );
   }
 }

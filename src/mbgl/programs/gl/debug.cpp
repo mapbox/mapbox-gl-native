@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/debug_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<DebugProgram> {
+    static constexpr const char* name = "debug";
+    static constexpr const uint8_t hash[8] = { 0xa8, 0x7d, 0x87, 0x6e, 0x36, 0xa8, 0x81, 0xe3 };
+    static constexpr const auto vertexOffset = 12450;
+    static constexpr const auto fragmentOffset = 12546;
+};
+
+constexpr const char* ShaderSource<DebugProgram>::name;
+constexpr const uint8_t ShaderSource<DebugProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<DebugProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<DebugProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "debug",
-        programs::gl::shaderSource() + 12450, programs::gl::shaderSource() + 12546);
+    return std::make_unique<gl::Program<DebugProgram>>(programParameters);
 }
 
 } // namespace gfx

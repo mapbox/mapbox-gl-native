@@ -9,23 +9,23 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_dimension);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
+MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, dimension);
+MBGL_DEFINE_UNIFORM_SCALAR(float, maxzoom);
 } // namespace uniforms
 
 class HillshadePrepareProgram : public Program<
     HillshadePrepareProgram,
     gfx::PrimitiveType::Triangle,
     TypeList<
-        attributes::a_pos,
-        attributes::a_texture_pos>,
+        attributes::pos,
+        attributes::texture_pos>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_dimension,
-        uniforms::u_zoom,
-        uniforms::u_maxzoom>,
+        uniforms::matrix,
+        uniforms::dimension,
+        uniforms::zoom,
+        uniforms::maxzoom>,
     TypeList<
-        textures::u_image>,
+        textures::image>,
     style::Properties<>> {
 public:
     using Program::Program;

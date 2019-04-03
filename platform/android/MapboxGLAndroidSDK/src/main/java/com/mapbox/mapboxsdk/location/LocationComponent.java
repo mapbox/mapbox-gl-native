@@ -220,7 +220,6 @@ public final class LocationComponent {
    * @param style   the proxy object for current map style. More info at {@link Style}
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style) {
     activateLocationComponent(context, style,
@@ -237,7 +236,6 @@ public final class LocationComponent {
    *                                 there should be no location engine initialized
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         boolean useDefaultLocationEngine) {
@@ -259,7 +257,6 @@ public final class LocationComponent {
    * @param locationEngineRequest    the location request
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         boolean useDefaultLocationEngine,
@@ -284,7 +281,6 @@ public final class LocationComponent {
    * @param options                  the options
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         boolean useDefaultLocationEngine,
@@ -309,7 +305,6 @@ public final class LocationComponent {
    * @param styleRes the LocationComponent style res
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style, @StyleRes int styleRes) {
     activateLocationComponent(context, style, LocationComponentOptions.createFromAttributes(context, styleRes));
@@ -327,7 +322,6 @@ public final class LocationComponent {
    * @param options the options
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @NonNull LocationComponentOptions options) {
@@ -346,7 +340,6 @@ public final class LocationComponent {
    * @param styleRes       the LocationComponent style res
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine, @StyleRes int styleRes) {
@@ -365,7 +358,6 @@ public final class LocationComponent {
    * @param styleRes              the LocationComponent style res
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
@@ -382,7 +374,6 @@ public final class LocationComponent {
    * @param locationEngine the engine
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine) {
@@ -398,7 +389,6 @@ public final class LocationComponent {
    * @param locationEngineRequest the location request
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
@@ -415,7 +405,6 @@ public final class LocationComponent {
    * @param options        the options
    * @deprecated use {@link LocationComponentActivationOptions.Builder} instead
    */
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
@@ -453,8 +442,7 @@ public final class LocationComponent {
    *
    * @param activationOptions a fully built {@link LocationComponentActivationOptions} object
    */
-  public void activateLocationComponent(@NonNull LocationComponentActivationOptions
-                                            activationOptions) {
+  public void activateLocationComponent(@NonNull LocationComponentActivationOptions activationOptions) {
     LocationComponentOptions options = activationOptions.locationComponentOptions();
     if (options == null) {
       int styleRes = activationOptions.styleRes();
@@ -496,6 +484,7 @@ public final class LocationComponent {
    *
    * @param isEnabled true if the plugin should be visible and listen for location updates, false otherwise.
    */
+  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void setLocationComponentEnabled(boolean isEnabled) {
     checkActivationState();
     if (isEnabled) {
@@ -954,7 +943,6 @@ public final class LocationComponent {
    * @return the last known location
    */
   @Nullable
-  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public Location getLastKnownLocation() {
     checkActivationState();
     return lastLocation;

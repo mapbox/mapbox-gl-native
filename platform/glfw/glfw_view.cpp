@@ -385,7 +385,7 @@ GLFWView::makeImage(const std::string& id, int width, int height, float pixelRat
 
 void GLFWView::nextOrientation() {
     using NO = mbgl::NorthOrientation;
-    switch (map->getNorthOrientation()) {
+    switch (map->getMapOptions().northOrientation()) {
         case NO::Upwards: map->setNorthOrientation(NO::Rightwards); break;
         case NO::Rightwards: map->setNorthOrientation(NO::Downwards); break;
         case NO::Downwards: map->setNorthOrientation(NO::Leftwards); break;

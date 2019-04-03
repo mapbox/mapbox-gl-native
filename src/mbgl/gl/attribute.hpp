@@ -3,6 +3,7 @@
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/literal.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -50,13 +51,15 @@ public:
                   }
               };
 
-              return Locations{ maybeBindLocation(As::name())... };
+              return Locations{ maybeBindLocation(
+                  concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... };
           }()) {
     }
 
     template <class BinaryProgram>
     AttributeLocations(const BinaryProgram& program)
-        : locations{ program.attributeLocation(As::name())... } {
+        : locations{ program.attributeLocation(
+              concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... } {
     }
 
     NamedAttributeLocations getNamedLocations() const {
@@ -68,7 +71,9 @@ public:
             }
         };
 
-        util::ignore({ (maybeAddLocation(As::name(), locations.template get<As>()), 0)... });
+        util::ignore({ (maybeAddLocation(concat_literals<&string_literal<'a', '_'>::value, &As::name>::value(),
+                                         locations.template get<As>()),
+                        0)... });
 
         return result;
     }
@@ -86,6 +91,37 @@ public:
 
         util::ignore({ (maybeAddBinding(locations.template get<As>(), bindings.template get<As>()), 0)... });
 
+        return result;
+    }
+};
+
+template <class>
+class AttributeKey;
+
+constexpr auto attributeDefinePrefix() {
+    return "#define HAS_UNIFORM_u_";
+}
+
+template <class... As>
+class AttributeKey<TypeList<As...>> final {
+public:
+    static_assert(sizeof...(As) <= 32, "attribute count exceeds 32");
+
+    static uint32_t compute(const gfx::AttributeBindings<TypeList<As...>>& bindings) {
+        uint32_t value = 0;
+        util::ignore(
+            { (bindings.template get<As>() ? (void)(value |= 1 << TypeIndex<As, As...>::value)
+                                           : (void)0,
+               0)... });
+        return value;
+    }
+
+    static std::string defines(const gfx::AttributeBindings<TypeList<As...>>& bindings) {
+        std::string result;
+        util::ignore({ (!bindings.template get<As>()
+                            ? (void)(result += concat_literals<&attributeDefinePrefix, &As::name, &string_literal<'\n'>::value>::value())
+                            : (void)0,
+                        0)... });
         return result;
     }
 };

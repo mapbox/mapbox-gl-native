@@ -492,6 +492,38 @@ void SymbolLayer::setTextJustify(PropertyValue<TextJustifyType> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+PropertyValue<float> SymbolLayer::getDefaultTextRadialOffset() {
+    return TextRadialOffset::defaultValue();
+}
+
+PropertyValue<float> SymbolLayer::getTextRadialOffset() const {
+    return impl().layout.get<TextRadialOffset>();
+}
+
+void SymbolLayer::setTextRadialOffset(PropertyValue<float> value) {
+    if (value == getTextRadialOffset())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<TextRadialOffset>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+PropertyValue<std::vector<TextVariableAnchorType>> SymbolLayer::getDefaultTextVariableAnchor() {
+    return TextVariableAnchor::defaultValue();
+}
+
+PropertyValue<std::vector<TextVariableAnchorType>> SymbolLayer::getTextVariableAnchor() const {
+    return impl().layout.get<TextVariableAnchor>();
+}
+
+void SymbolLayer::setTextVariableAnchor(PropertyValue<std::vector<TextVariableAnchorType>> value) {
+    if (value == getTextVariableAnchor())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<TextVariableAnchor>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 PropertyValue<SymbolAnchorType> SymbolLayer::getDefaultTextAnchor() {
     return TextAnchor::defaultValue();
 }
@@ -1325,6 +1357,8 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         TextLineHeight,
         TextLetterSpacing,
         TextJustify,
+        TextRadialOffset,
+        TextVariableAnchor,
         TextAnchor,
         TextMaxAngle,
         TextRotate,
@@ -1364,6 +1398,8 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         { "text-line-height", static_cast<uint8_t>(Property::TextLineHeight) },
         { "text-letter-spacing", static_cast<uint8_t>(Property::TextLetterSpacing) },
         { "text-justify", static_cast<uint8_t>(Property::TextJustify) },
+        { "text-radial-offset", static_cast<uint8_t>(Property::TextRadialOffset) },
+        { "text-variable-anchor", static_cast<uint8_t>(Property::TextVariableAnchor) },
         { "text-anchor", static_cast<uint8_t>(Property::TextAnchor) },
         { "text-max-angle", static_cast<uint8_t>(Property::TextMaxAngle) },
         { "text-rotate", static_cast<uint8_t>(Property::TextRotate) },
@@ -1525,7 +1561,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
     }
     
-    if (property == Property::IconSize || property == Property::IconRotate || property == Property::TextSize || property == Property::TextMaxWidth || property == Property::TextLetterSpacing || property == Property::TextRotate) {
+    if (property == Property::IconSize || property == Property::IconRotate || property == Property::TextSize || property == Property::TextMaxWidth || property == Property::TextLetterSpacing || property == Property::TextRadialOffset || property == Property::TextRotate) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
@@ -1554,6 +1590,11 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
         if (property == Property::TextLetterSpacing) {
             setTextLetterSpacing(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextRadialOffset) {
+            setTextRadialOffset(*typedValue);
             return nullopt;
         }
         
@@ -1670,6 +1711,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         }
         
         setTextJustify(*typedValue);
+        return nullopt;
+        
+    }
+    
+    if (property == Property::TextVariableAnchor) {
+        Error error;
+        optional<PropertyValue<std::vector<TextVariableAnchorType>>> typedValue = convert<PropertyValue<std::vector<TextVariableAnchorType>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setTextVariableAnchor(*typedValue);
         return nullopt;
         
     }

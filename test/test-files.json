@@ -114,6 +114,7 @@
         "mbgl/test/fake_file_source.hpp": "test/src/mbgl/test/fake_file_source.hpp",
         "mbgl/test/fixture_log_observer.hpp": "test/src/mbgl/test/fixture_log_observer.hpp",
         "mbgl/test/getrss.hpp": "test/src/mbgl/test/getrss.hpp",
+        "mbgl/test/map_adapter.hpp": "test/src/mbgl/test/map_adapter.hpp",
         "mbgl/test/mock.hpp": "test/src/mbgl/test/mock.hpp",
         "mbgl/test/sqlite3_test_fs.hpp": "test/src/mbgl/test/sqlite3_test_fs.hpp",
         "mbgl/test/stub_file_source.hpp": "test/src/mbgl/test/stub_file_source.hpp",

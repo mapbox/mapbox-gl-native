@@ -4,7 +4,7 @@
 
 #ifndef MGL_LOGGING_DISABLED
     #ifndef MGL_LOGGING_ENABLE_DEBUG
-        #ifdef DEBUG
+        #ifndef NDEBUG
             #define MGL_LOGGING_ENABLE_DEBUG 1
         #endif
     #endif

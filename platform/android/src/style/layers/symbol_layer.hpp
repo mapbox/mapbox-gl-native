@@ -80,6 +80,10 @@ public:
 
     jni::Local<jni::Object<jni::ObjectTag>> getTextJustify(jni::JNIEnv&);
 
+    jni::Local<jni::Object<jni::ObjectTag>> getTextRadialOffset(jni::JNIEnv&);
+
+    jni::Local<jni::Object<jni::ObjectTag>> getTextVariableAnchor(jni::JNIEnv&);
+
     jni::Local<jni::Object<jni::ObjectTag>> getTextAnchor(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getTextMaxAngle(jni::JNIEnv&);

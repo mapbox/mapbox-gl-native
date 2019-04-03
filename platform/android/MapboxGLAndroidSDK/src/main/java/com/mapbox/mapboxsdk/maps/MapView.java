@@ -911,7 +911,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     /**
      * Called when the map has finished rendering.
      *
-     * @param fully true if map is fully rendered, false if fully rendered
+     * @param fully true if map is fully rendered, false if not fully rendered
      */
     void onDidFinishRenderingMap(boolean fully);
   }

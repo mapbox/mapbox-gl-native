@@ -1,9 +1,9 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
-#include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/renderer/image_manager_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/util/io.hpp>
@@ -108,11 +108,11 @@ TEST(ImageManager, RemoveReleasesBinPackRect) {
 
 class StubImageRequestor : public ImageRequestor {
 public:
-    void onImagesAvailable(ImageMap icons, ImageMap patterns, uint64_t imageCorrelationID_) final {
-        if (imagesAvailable && imageCorrelationID == imageCorrelationID_) imagesAvailable(icons, patterns);
+    void onImagesAvailable(ImageMap icons, ImageMap patterns, std::unordered_map<std::string, uint32_t> versionMap, uint64_t imageCorrelationID_) final {
+        if (imagesAvailable && imageCorrelationID == imageCorrelationID_) imagesAvailable(icons, patterns, versionMap);
     }
 
-    std::function<void (ImageMap, ImageMap)> imagesAvailable;
+    std::function<void (ImageMap, ImageMap, std::unordered_map<std::string, uint32_t>)> imagesAvailable;
     uint64_t imageCorrelationID = 0;
 };
 
@@ -121,7 +121,10 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
     StubImageRequestor requestor;
     bool notified = false;
 
-    requestor.imagesAvailable = [&] (ImageMap, ImageMap) {
+    ImageManagerObserver observer;
+    imageManager.setObserver(&observer);
+
+    requestor.imagesAvailable = [&] (ImageMap, ImageMap, std::unordered_map<std::string, uint32_t>) {
         notified = true;
     };
 
@@ -132,6 +135,8 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
+    ASSERT_FALSE(notified);
+    imageManager.notifyIfMissingImageAdded();
     ASSERT_TRUE(notified);
 }
 
@@ -140,7 +145,7 @@ TEST(ImageManager, NotifiesRequestorImmediatelyIfDependenciesAreSatisfied) {
     StubImageRequestor requestor;
     bool notified = false;
 
-    requestor.imagesAvailable = [&] (ImageMap, ImageMap) {
+    requestor.imagesAvailable = [&] (ImageMap, ImageMap, std::unordered_map<std::string, uint32_t>) {
         notified = true;
     };
 

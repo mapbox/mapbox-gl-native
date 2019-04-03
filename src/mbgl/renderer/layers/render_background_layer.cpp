@@ -9,7 +9,6 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
@@ -103,7 +102,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                     parameters.state
                 ),
                 BackgroundPatternProgram::TextureBindings{
-                    textures::u_image::Value{ parameters.imageManager.textureBinding(parameters.context) },
+                    textures::image::Value{ parameters.imageManager.textureBinding(parameters.context) },
                 }
             );
         }
@@ -112,9 +111,9 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
             draw(
                 parameters.programs.getBackgroundLayerPrograms().background,
                 BackgroundProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( parameters.matrixForTile(tileID) ),
-                    uniforms::u_color::Value( evaluated.get<BackgroundColor>() ),
-                    uniforms::u_opacity::Value( evaluated.get<BackgroundOpacity>() ),
+                    uniforms::matrix::Value( parameters.matrixForTile(tileID) ),
+                    uniforms::color::Value( evaluated.get<BackgroundColor>() ),
+                    uniforms::opacity::Value( evaluated.get<BackgroundOpacity>() ),
                 },
                 BackgroundProgram::TextureBindings{}
             );

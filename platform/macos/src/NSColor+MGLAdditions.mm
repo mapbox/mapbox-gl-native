@@ -37,7 +37,7 @@
 @implementation NSExpression (MGLColorAdditions)
 
 + (NSExpression *)mgl_expressionForRGBComponents:(NSArray<NSExpression *> *)components {
-    if (NSColor *color = [self mgl_colorWithComponentExpressions:components]) {
+    if (NSColor *color = [self mgl_colorWithRGBComponents:components]) {
         return [NSExpression expressionForConstantValue:color];
     }
     
@@ -49,7 +49,7 @@
 }
 
 + (NSExpression *)mgl_expressionForRGBAComponents:(NSArray<NSExpression *> *)components {
-    if (NSColor *color = [self mgl_colorWithComponentExpressions:components]) {
+    if (NSColor *color = [self mgl_colorWithRGBComponents:components]) {
         return [NSExpression expressionForConstantValue:color];
     }
     
@@ -62,7 +62,7 @@
 /**
  Returns a color object corresponding to the given component expressions.
  */
-+ (NSColor *)mgl_colorWithComponentExpressions:(NSArray<NSExpression *> *)componentExpressions {
++ (NSColor *)mgl_colorWithRGBComponents:(NSArray<NSExpression *> *)componentExpressions {
     // Map the component expressions to constant components. If any component is
     // a non-constant expression, the components cannot be converted into a
     // constant color value.

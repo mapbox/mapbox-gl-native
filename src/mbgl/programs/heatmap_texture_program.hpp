@@ -12,14 +12,14 @@ namespace mbgl {
 class HeatmapTextureProgram : public Program<
     HeatmapTextureProgram,
     gfx::PrimitiveType::Triangle,
-    TypeList<attributes::a_pos>,
+    TypeList<attributes::pos>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_world,
-        uniforms::u_opacity>,
+        uniforms::matrix,
+        uniforms::world,
+        uniforms::opacity>,
     TypeList<
-        textures::u_image,
-        textures::u_color_ramp>,
+        textures::image,
+        textures::color_ramp>,
     style::Properties<>> {
 public:
     using Program::Program;

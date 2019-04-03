@@ -8,7 +8,6 @@
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 
@@ -66,23 +65,23 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
 
         const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-        auto& programInstance = parameters.programs.getCircleLayerPrograms().circle.get(evaluated);
+        auto& programInstance = parameters.programs.getCircleLayerPrograms().circle;
    
         const auto allUniformValues = programInstance.computeAllUniformValues(
             CircleProgram::LayoutUniformValues {
-                uniforms::u_matrix::Value(
+                uniforms::matrix::Value(
                     tile.translatedMatrix(evaluated.get<CircleTranslate>(),
                                           evaluated.get<CircleTranslateAnchor>(),
                                           parameters.state)
                 ),
-                uniforms::u_scale_with_map::Value( scaleWithMap ),
-                uniforms::u_extrude_scale::Value( pitchWithMap
+                uniforms::scale_with_map::Value( scaleWithMap ),
+                uniforms::extrude_scale::Value( pitchWithMap
                     ? std::array<float, 2> {{
                         tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
                         tile.id.pixelsToTileUnits(1, parameters.state.getZoom()) }}
                     : parameters.pixelsToGLUnits ),
-                uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() ),
-                uniforms::u_pitch_with_map::Value( pitchWithMap )
+                uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() ),
+                uniforms::pitch_with_map::Value( pitchWithMap )
             },
             paintPropertyBinders,
             evaluated,

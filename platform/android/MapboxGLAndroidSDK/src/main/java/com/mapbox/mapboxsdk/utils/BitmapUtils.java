@@ -13,7 +13,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.support.v7.content.res.AppCompatResources;
 import android.view.View;
 
 import java.io.ByteArrayOutputStream;
@@ -152,7 +151,7 @@ public class BitmapUtils {
   @Nullable
   public static Drawable getDrawableFromRes(@NonNull Context context, @DrawableRes int drawableRes,
                                             @Nullable @ColorInt Integer tintColor) {
-    Drawable drawable = AppCompatResources.getDrawable(context, drawableRes);
+    Drawable drawable = context.getResources().getDrawable(drawableRes);
     if (drawable == null) {
       return null;
     }

@@ -1,7 +1,4 @@
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/util/constants.hpp>
-
-#include <cassert>
 
 namespace mbgl {
 
@@ -10,14 +7,16 @@ public:
     MapMode mapMode = MapMode::Continuous;
     ConstrainMode constrainMode = ConstrainMode::HeightOnly;
     ViewportMode viewportMode = ViewportMode::Default;
-    std::string cachePath;
-    std::string assetRoot;
-    uint64_t maximumSize{mbgl::util::DEFAULT_MAX_CACHE_SIZE};
+    NorthOrientation orientation = NorthOrientation::Upwards;
     bool crossSourceCollisions = true;
+    Size size = { 64, 64 };
+    float pixelRatio = 1.0;
 };
 
-MapOptions::MapOptions() : impl_(std::make_shared<MapOptions::Impl>()) {}
+// These requires the complete type of Impl.
+MapOptions::MapOptions() : impl_(std::make_unique<Impl>()) {}
 MapOptions::~MapOptions() = default;
+MapOptions::MapOptions(MapOptions&&) noexcept = default;
 
 MapOptions& MapOptions::withMapMode(MapMode mode) {
     impl_->mapMode = mode;
@@ -46,33 +45,6 @@ ViewportMode MapOptions::viewportMode() const {
     return impl_->viewportMode;
 }
 
-MapOptions& MapOptions::withCachePath(std::string path) {
-    impl_->cachePath = std::move(path);
-    return *this;
-}
-
-const std::string& MapOptions::cachePath() const {
-    return impl_->cachePath;
-}
-
-MapOptions& MapOptions::withAssetRoot(std::string path) {
-    impl_->assetRoot = std::move(path);
-    return *this;
-}
-
-const std::string& MapOptions::assetRoot() const {
-    return impl_->assetRoot;
-}
-
-MapOptions& MapOptions::withMaximumCacheSize(uint64_t size) {
-    impl_->maximumSize = size;
-    return *this;
-}
-
-uint64_t MapOptions::maximumCacheSize() const {
-    return impl_->maximumSize;
-}
-
 MapOptions& MapOptions::withCrossSourceCollisions(bool enableCollisions) {
     impl_->crossSourceCollisions = enableCollisions;
     return *this;
@@ -80,6 +52,33 @@ MapOptions& MapOptions::withCrossSourceCollisions(bool enableCollisions) {
 
 bool MapOptions::crossSourceCollisions() const {
     return impl_->crossSourceCollisions;
+}
+
+MapOptions& MapOptions::withNorthOrientation(NorthOrientation orientation) {
+    impl_->orientation = orientation;
+    return *this;
+}
+
+NorthOrientation MapOptions::northOrientation() const {
+    return impl_->orientation;
+}
+
+MapOptions& MapOptions::withSize(Size size_) {
+    impl_->size = size_;
+    return *this;
+}
+
+Size MapOptions::size() const {
+    return impl_->size;
+}
+
+MapOptions& MapOptions::withPixelRatio(float ratio) {
+    impl_->pixelRatio = ratio;
+    return *this;
+}
+
+float MapOptions::pixelRatio() const {
+    return impl_->pixelRatio;
 }
 
 }  // namespace mbgl

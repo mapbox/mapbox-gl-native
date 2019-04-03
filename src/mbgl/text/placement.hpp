@@ -12,6 +12,7 @@ namespace mbgl {
 
 class RenderLayerSymbolInterface;
 class SymbolBucket;
+class SymbolInstance;
 
 class OpacityState {
 public:
@@ -31,6 +32,16 @@ public:
     OpacityState text;
 };
 
+class VariableOffset {
+public:
+    float radialOffset;
+    float width;
+    float height;
+    style::TextVariableAnchorType anchor;
+    float textBoxScale;
+    optional<style::TextVariableAnchorType> prevAnchor;
+};
+
 class JointPlacement {
 public:
     JointPlacement(bool text_, bool icon_, bool skipFade_)
@@ -45,7 +56,7 @@ public:
     // visible right away.
     const bool skipFade;
 };
-    
+  
 struct RetainedQueryData {
     uint32_t bucketInstanceId;
     std::shared_ptr<FeatureIndex> featureIndex;
@@ -80,9 +91,9 @@ private:
     
 class Placement {
 public:
-    Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions);
+    Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, std::unique_ptr<Placement> prevPlacementOrNull = nullptr);
     void placeLayer(const RenderLayerSymbolInterface&, const mat4&, bool showCollisionBoxes);
-    void commit(const Placement& prevPlacement, TimePoint);
+    void commit(TimePoint);
     void updateLayerOpacities(const RenderLayerSymbolInterface&);
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
@@ -94,8 +105,10 @@ public:
     void setStale();
     
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
-private:
+    using VariableOffsets = std::reference_wrapper<const std::unordered_map<uint32_t, VariableOffset>>;
+    VariableOffsets getVariableOffsets() const { return std::cref(variableOffsets); }
 
+private:
     void placeLayerBucket(
             SymbolBucket&,
             const mat4& posMatrix,
@@ -109,6 +122,7 @@ private:
             const CollisionGroups::CollisionGroup& collisionGroup);
 
     void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
+    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&);
 
     CollisionIndex collisionIndex;
 
@@ -121,11 +135,13 @@ private:
 
     std::unordered_map<uint32_t, JointPlacement> placements;
     std::unordered_map<uint32_t, JointOpacityState> opacities;
+    std::unordered_map<uint32_t, VariableOffset> variableOffsets;
 
     bool stale = false;
     
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
     CollisionGroups collisionGroups;
+    std::unique_ptr<Placement> prevPlacement;
 };
 
 } // namespace mbgl

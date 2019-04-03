@@ -9,6 +9,7 @@
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/algorithm/generate_clip_ids.hpp>
+#include <mbgl/text/placement.hpp>
 
 #include <array>
 
@@ -23,13 +24,13 @@ class ImageManager;
 class LineAtlas;
 class UnwrappedTileID;
 
-namespace gl {
+namespace gfx {
 class Context;
-} // namespace gl
+} // namespace gfx
 
 class PaintParameters {
 public:
-    PaintParameters(gl::Context&,
+    PaintParameters(gfx::Context&,
                     float pixelRatio,
                     GLContextMode,
                     RendererBackend&,
@@ -37,9 +38,10 @@ public:
                     const EvaluatedLight&,
                     RenderStaticData&,
                     ImageManager&,
-                    LineAtlas&);
+                    LineAtlas&,
+                    Placement::VariableOffsets);
 
-    gl::Context& context;
+    gfx::Context& context;
     RendererBackend& backend;
 
     const TransformState& state;
@@ -56,6 +58,7 @@ public:
     TimePoint timePoint;
 
     float pixelRatio;
+    Placement::VariableOffsets variableOffsets;
     std::array<float, 2> pixelsToGLUnits;
     algorithm::ClipIDGenerator clipIDGenerator;
 

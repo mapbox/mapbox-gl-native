@@ -38,10 +38,10 @@ float lightIntensity(const EvaluatedLight& light) {
 FillExtrusionProgram::LayoutUniformValues FillExtrusionProgram::layoutUniformValues(
     mat4 matrix, const TransformState& state, const EvaluatedLight& light) {
     return {
-        uniforms::u_matrix::Value( matrix ),
-        uniforms::u_lightcolor::Value( lightColor(light) ),
-        uniforms::u_lightpos::Value( lightPosition(light, state) ),
-        uniforms::u_lightintensity::Value( lightIntensity(light) )
+        uniforms::matrix::Value( matrix ),
+        uniforms::lightcolor::Value( lightColor(light) ),
+        uniforms::lightpos::Value( lightPosition(light, state) ),
+        uniforms::lightintensity::Value( lightIntensity(light) )
     };
 }
 
@@ -60,16 +60,16 @@ FillExtrusionPatternProgram::layoutUniformValues(mat4 matrix,
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
 
     return {
-        uniforms::u_matrix::Value( matrix ),
-        uniforms::u_scale::Value( {{pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale}} ),
-        uniforms::u_texsize::Value( atlasSize ),
-        uniforms::u_fade::Value( crossfade.t ),
-        uniforms::u_pixel_coord_upper::Value( std::array<float, 2>{{ float(pixelX >> 16), float(pixelY >> 16) }} ),
-        uniforms::u_pixel_coord_lower::Value( std::array<float, 2>{{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }} ),
-        uniforms::u_height_factor::Value( heightFactor ),
-        uniforms::u_lightcolor::Value( lightColor(light) ),
-        uniforms::u_lightpos::Value( lightPosition(light, state) ),
-        uniforms::u_lightintensity::Value( lightIntensity(light) ),
+        uniforms::matrix::Value( matrix ),
+        uniforms::scale::Value( {{pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale}} ),
+        uniforms::texsize::Value( atlasSize ),
+        uniforms::fade::Value( crossfade.t ),
+        uniforms::pixel_coord_upper::Value( std::array<float, 2>{{ float(pixelX >> 16), float(pixelY >> 16) }} ),
+        uniforms::pixel_coord_lower::Value( std::array<float, 2>{{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }} ),
+        uniforms::height_factor::Value( heightFactor ),
+        uniforms::lightcolor::Value( lightColor(light) ),
+        uniforms::lightpos::Value( lightPosition(light, state) ),
+        uniforms::lightintensity::Value( lightIntensity(light) ),
     };
 }
 

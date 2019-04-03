@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/heatmap_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<HeatmapProgram> {
+    static constexpr const char* name = "heatmap";
+    static constexpr const uint8_t hash[8] = { 0xab, 0x97, 0x81, 0x5c, 0xa2, 0x88, 0xaa, 0x7e };
+    static constexpr const auto vertexOffset = 7983;
+    static constexpr const auto fragmentOffset = 9030;
+};
+
+constexpr const char* ShaderSource<HeatmapProgram>::name;
+constexpr const uint8_t ShaderSource<HeatmapProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<HeatmapProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<HeatmapProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "heatmap",
-        programs::gl::shaderSource() + 7983, programs::gl::shaderSource() + 9030);
+    return std::make_unique<gl::Program<HeatmapProgram>>(programParameters);
 }
 
 } // namespace gfx
@@ -22,7 +41,7 @@ Context::createProgram<gl::Context>(const ProgramParameters& programParameters) 
 /*
 
 #ifndef HAS_UNIFORM_u_weight
-uniform lowp float a_weight_t;
+uniform lowp float u_weight_t;
 attribute highp vec2 a_weight;
 varying highp float weight;
 #else
@@ -31,7 +50,7 @@ uniform highp float u_weight;
 
 
 #ifndef HAS_UNIFORM_u_radius
-uniform lowp float a_radius_t;
+uniform lowp float u_radius_t;
 attribute mediump vec2 a_radius;
 #else
 uniform mediump float u_radius;
@@ -58,14 +77,14 @@ const highp float ZERO = 1.0 / 255.0 / 16.0;
 void main(void) {
     
 #ifndef HAS_UNIFORM_u_weight
-    weight = unpack_mix_vec2(a_weight, a_weight_t);
+    weight = unpack_mix_vec2(a_weight, u_weight_t);
 #else
     highp float weight = u_weight;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_radius
-    mediump float radius = unpack_mix_vec2(a_radius, a_radius_t);
+    mediump float radius = unpack_mix_vec2(a_radius, u_radius_t);
 #else
     mediump float radius = u_radius;
 #endif

@@ -6,6 +6,7 @@
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/gfx/texture.hpp>
+#include <mbgl/renderer/image_manager_observer.hpp>
 
 #include <mapbox/shelf-pack.hpp>
 
@@ -21,7 +22,7 @@ class Context;
 class ImageRequestor {
 public:
     virtual ~ImageRequestor() = default;
-    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, uint64_t imageCorrelationID) = 0;
+    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) = 0;
 };
 
 /*
@@ -39,6 +40,8 @@ public:
     ImageManager();
     ~ImageManager();
 
+    void setObserver(ImageManagerObserver*);
+
     void setLoaded(bool);
     bool isLoaded() const;
 
@@ -47,19 +50,30 @@ public:
     const style::Image::Impl* getImage(const std::string&) const;
 
     void addImage(Immutable<style::Image::Impl>);
-    void updateImage(Immutable<style::Image::Impl>);
+    bool updateImage(Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
     void getImages(ImageRequestor&, ImageRequestPair&&);
     void removeRequestor(ImageRequestor&);
+    void notifyIfMissingImageAdded();
+
+    ImageVersionMap updatedImageVersions;
 
 private:
+    void checkMissingAndNotify(ImageRequestor&, const ImageRequestPair&);
     void notify(ImageRequestor&, const ImageRequestPair&) const;
 
     bool loaded = false;
 
-    std::unordered_map<ImageRequestor*, ImageRequestPair> requestors;
+    std::map<ImageRequestor*, ImageRequestPair> requestors;
+    struct MissingImageRequestPair {
+        ImageRequestPair pair;
+        unsigned int callbacksRemaining;
+    };
+    std::map<ImageRequestor*, MissingImageRequestPair> missingImageRequestors;
     ImageMap images;
+
+    ImageManagerObserver* observer = nullptr;
 
 // Pattern stuff
 public:

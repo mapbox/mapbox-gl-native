@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <com.mapbox.mapboxsdk.testapp.view.MapViewPager
-        android:id="@+id/viewpager"
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

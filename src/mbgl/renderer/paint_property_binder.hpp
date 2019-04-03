@@ -4,6 +4,7 @@
 #include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/util/literal.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
@@ -147,7 +148,7 @@ public:
     void upload(gfx::Context&) override {}
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters&) override {
-        if (!posA && !posB) {
+        if (!posA || !posB) {
             return;
         } else {
             constantPatternPositions = std::tuple<std::array<uint16_t, 4>, std::array<uint16_t, 4>> { posB->tlbr(), posA->tlbr() };
@@ -431,17 +432,15 @@ PaintPropertyBinder<T, UniformValueType, PossiblyEvaluatedType, As...>::create(c
 }
 
 template <class Attr>
-struct ZoomInterpolatedAttribute {
-    static auto name() { return Attr::name(); }
+struct ZoomInterpolatedAttribute : public Attr {
     using Type = ZoomInterpolatedAttributeType<typename Attr::Type>;
 };
 
 template <class Attr>
 struct InterpolationUniform {
     using Value = float;
-    static auto name() {
-        static const std::string name = Attr::name() + std::string("_t");
-        return name.c_str();
+    static constexpr auto name() {
+        return concat_literals<&Attr::name, &string_literal<'_', 't'>::value>::value();
     }
 };
 
@@ -542,29 +541,6 @@ public:
         util::ignore({
             result.set(TypeIndex<Ps, Ps...>::value,
                        currentProperties.template get<Ps>().isConstant())...
-        });
-        return result;
-    }
-
-    template <class>
-    struct UniformDefines;
-
-    template <class... Us>
-    struct UniformDefines<TypeList<Us...>> {
-        static void appendDefines(std::vector<std::string>& defines) {
-            util::ignore({
-                (defines.push_back(std::string("#define HAS_UNIFORM_") + Us::name()), 0)...
-            });
-        }
-    };
-
-    template <class EvaluatedProperties>
-    static std::vector<std::string> defines(const EvaluatedProperties& currentProperties) {
-        std::vector<std::string> result;
-        util::ignore({
-            (currentProperties.template get<Ps>().isConstant()
-                ? UniformDefines<typename Ps::UniformList>::appendDefines(result)
-                : (void) 0, 0)...
         });
         return result;
     }

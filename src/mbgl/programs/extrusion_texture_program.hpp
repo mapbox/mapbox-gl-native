@@ -12,13 +12,13 @@ namespace mbgl {
 class ExtrusionTextureProgram : public Program<
     ExtrusionTextureProgram,
     gfx::PrimitiveType::Triangle,
-    TypeList<attributes::a_pos>,
+    TypeList<attributes::pos>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_world,
-        uniforms::u_opacity>,
+        uniforms::matrix,
+        uniforms::world,
+        uniforms::opacity>,
     TypeList<
-        textures::u_image>,
+        textures::image>,
     style::Properties<>> {
 public:
     using Program::Program;

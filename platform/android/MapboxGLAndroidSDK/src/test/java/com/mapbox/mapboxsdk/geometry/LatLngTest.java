@@ -175,7 +175,7 @@ public class LatLngTest {
     LatLng latLng2 = new LatLng(1.0, 1.0);
     assertEquals("distances should match",
       latLng1.distanceTo(latLng2),
-      157425.53710839353, DELTA);
+      157298.7453847275, DELTA);
   }
 
   @Test
@@ -184,6 +184,15 @@ public class LatLngTest {
     LatLng latLng2 = new LatLng(40.71199035644531, -74.0081);
     double distance = latLng1.distanceTo(latLng2);
     assertEquals("distance should match", 0.0, distance, DELTA);
+  }
+
+  // Regression test for #14216
+  @Test
+  public void testDistanceToClosePointNotNaN() {
+    LatLng latLng = new LatLng(40.00599, -105.29261);
+    LatLng other = new LatLng(40.005990000000025, -105.29260999999997);
+    double distance = latLng.distanceTo(other);
+    assertNotEquals(distance, Double.NaN);
   }
 
   @Test

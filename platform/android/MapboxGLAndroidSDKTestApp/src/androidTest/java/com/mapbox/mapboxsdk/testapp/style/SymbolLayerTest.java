@@ -559,7 +559,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getTextJustify().getValue());
 
     // Set and Get
-    String propertyValue = TEXT_JUSTIFY_LEFT;
+    String propertyValue = TEXT_JUSTIFY_AUTO;
     layer.setProperties(textJustify(propertyValue));
     assertEquals(layer.getTextJustify().getValue(), propertyValue);
   }
@@ -575,6 +575,32 @@ public class SymbolLayerTest extends BaseLayerTest {
     Expression expression = string(Expression.get("undefined"));
     layer.setProperties(textJustify(expression));
     assertEquals(layer.getTextJustify().getExpression(), expression);
+  }
+
+  @Test
+  @UiThreadTest
+  public void testTextRadialOffsetAsConstant() {
+    Timber.i("text-radial-offset");
+    assertNotNull(layer);
+    assertNull(layer.getTextRadialOffset().getValue());
+
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(textRadialOffset(propertyValue));
+    assertEquals(layer.getTextRadialOffset().getValue(), propertyValue);
+  }
+
+  @Test
+  @UiThreadTest
+  public void testTextVariableAnchorAsConstant() {
+    Timber.i("text-variable-anchor");
+    assertNotNull(layer);
+    assertNull(layer.getTextVariableAnchor().getValue());
+
+    // Set and Get
+    String[] propertyValue = new String[0];
+    layer.setProperties(textVariableAnchor(propertyValue));
+    assertEquals(layer.getTextVariableAnchor().getValue(), propertyValue);
   }
 
   @Test

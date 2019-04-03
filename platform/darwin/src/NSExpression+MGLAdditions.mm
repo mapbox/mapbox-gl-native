@@ -1,3 +1,4 @@
+#import "MGLFoundation_Private.h"
 #import "NSExpression+MGLPrivateAdditions.h"
 
 #import "MGLTypes.h"
@@ -878,9 +879,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 NSExpression *expression = [NSExpression expressionWithMGLJSONObject:argumentObjects[index]];
                 NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
                 if ((index + 1) < argumentObjects.count) {
-                    attrs = argumentObjects[index + 1];
+                    attrs = [NSMutableDictionary dictionaryWithDictionary:argumentObjects[index + 1]];
                 }
                 
+                for (NSString *key in attrs.allKeys) {
+                    attrs[key] = [NSExpression expressionWithMGLJSONObject:attrs[key]];
+                }
                 MGLAttributedExpression *attributedExpression = [[MGLAttributedExpression alloc] initWithExpression:expression attributes:attrs];
 
                 [attributedExpressions addObject:[NSExpression expressionForConstantValue:attributedExpression]];
@@ -1001,19 +1005,17 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([constantValue isKindOfClass:[MGLAttributedExpression class]]) {
                 MGLAttributedExpression *attributedExpression = (MGLAttributedExpression *)constantValue;
                 id jsonObject = attributedExpression.expression.mgl_jsonExpressionObject;
-                NSMutableArray *attributes = [NSMutableArray array];
-                if ([jsonObject isKindOfClass:[NSArray class]]) {
-                    [attributes addObjectsFromArray:jsonObject];
-                } else {
-                    [attributes addObject:jsonObject];
-                }
+                NSMutableDictionary<MGLAttributedExpressionKey, NSExpression *> *attributedDictionary = [NSMutableDictionary dictionary];
+                
                 if (attributedExpression.attributes) {
-                    [attributes addObject:attributedExpression.attributes];
-                } else {
-                    [attributes addObject:@{}];
-                }
- 
-                return attributes;
+                    attributedDictionary = [NSMutableDictionary dictionaryWithDictionary:attributedExpression.attributes];
+                    
+                    for (NSString *key in attributedExpression.attributes.allKeys) {
+                        attributedDictionary[key] = attributedExpression.attributes[key].mgl_jsonExpressionObject;
+                    }
+                    
+                } 
+                return @[jsonObject, attributedDictionary];
             }
             return self.constantValue;
         }
@@ -1215,27 +1217,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         }
             
         case NSConditionalExpressionType: {
-            NSMutableArray *arguments = [NSMutableArray arrayWithObjects:self.predicate.mgl_jsonExpressionObject, nil];
+            NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"case", self.predicate.mgl_jsonExpressionObject, nil];
+            [arguments addObject:self.trueExpression.mgl_jsonExpressionObject];
+            [arguments addObject:self.falseExpression.mgl_jsonExpressionObject];
             
-            if (self.trueExpression.expressionType == NSConditionalExpressionType) {
-                // Fold nested conditionals into a single case expression.
-                NSArray *trueArguments = self.trueExpression.mgl_jsonExpressionObject;
-                trueArguments = [trueArguments subarrayWithRange:NSMakeRange(1, trueArguments.count - 1)];
-                [arguments addObjectsFromArray:trueArguments];
-            } else {
-                [arguments addObject:self.trueExpression.mgl_jsonExpressionObject];
-            }
-            
-            if (self.falseExpression.expressionType == NSConditionalExpressionType) {
-                // Fold nested conditionals into a single case expression.
-                NSArray *falseArguments = self.falseExpression.mgl_jsonExpressionObject;
-                falseArguments = [falseArguments subarrayWithRange:NSMakeRange(1, falseArguments.count - 1)];
-                [arguments addObjectsFromArray:falseArguments];
-            } else {
-                [arguments addObject:self.falseExpression.mgl_jsonExpressionObject];
-            }
-            
-            [arguments insertObject:@"case" atIndex:0];
             return arguments;
         }
             

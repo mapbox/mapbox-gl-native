@@ -71,6 +71,7 @@ namespace mbgl {
     });
 
     MBGL_DEFINE_ENUM(MGLTextJustification, {
+        { MGLTextJustificationAuto, "auto" },
         { MGLTextJustificationLeft, "left" },
         { MGLTextJustificationCenter, "center" },
         { MGLTextJustificationRight, "right" },
@@ -906,6 +907,24 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLTextPitchAlignment>().toExpression(propertyValue);
 }
 
+- (void)setTextRadialOffset:(NSExpression *)textRadialOffset {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting textRadialOffset: %@", textRadialOffset);
+
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(textRadialOffset, true);
+    self.rawLayer->setTextRadialOffset(mbglValue);
+}
+
+- (NSExpression *)textRadialOffset {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getTextRadialOffset();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultTextRadialOffset();
+    }
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
+}
+
 - (void)setTextRotation:(NSExpression *)textRotation {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting textRotation: %@", textRotation);
@@ -965,6 +984,24 @@ namespace mbgl {
         propertyValue = self.rawLayer->getDefaultTextTransform();
     }
     return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toExpression(propertyValue);
+}
+
+- (void)setTextVariableAnchor:(NSExpression *)textVariableAnchor {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting textVariableAnchor: %@", textVariableAnchor);
+
+    auto mbglValue = MGLStyleValueTransformer<std::vector<mbgl::style::SymbolAnchorType>, NSArray<NSValue *> *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toPropertyValue<mbgl::style::PropertyValue<std::vector<mbgl::style::SymbolAnchorType>>>(textVariableAnchor, false);
+    self.rawLayer->setTextVariableAnchor(mbglValue);
+}
+
+- (NSExpression *)textVariableAnchor {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getTextVariableAnchor();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultTextVariableAnchor();
+    }
+    return MGLStyleValueTransformer<std::vector<mbgl::style::SymbolAnchorType>, NSArray<NSValue *> *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toExpression(propertyValue);
 }
 
 #pragma mark - Accessing the Paint Attributes

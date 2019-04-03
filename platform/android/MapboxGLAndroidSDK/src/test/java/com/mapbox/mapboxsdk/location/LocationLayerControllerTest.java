@@ -39,6 +39,7 @@ import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_ACCURA
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_COMPASS_BEARING;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_GPS_BEARING;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_LATLNG;
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -157,6 +158,24 @@ public class LocationLayerControllerTest {
       bitmapProvider, options, internalRenderModeChangedListener);
 
     verify(style).addLayerBelow(accuracyLayer, BACKGROUND_LAYER);
+  }
+
+  @Test
+  public void onInitialization_numberOfCachedLayerIdsIsConstant() {
+    OnRenderModeChangedListener internalRenderModeChangedListener = mock(OnRenderModeChangedListener.class);
+    LayerSourceProvider sourceProvider = buildLayerProvider();
+    GeoJsonSource locationSource = mock(GeoJsonSource.class);
+    when(sourceProvider.generateSource(any(Feature.class))).thenReturn(locationSource);
+    LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+
+    LocationLayerController controller =
+      new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+        bitmapProvider, options, internalRenderModeChangedListener);
+
+    controller.initializeComponents(mapboxMap.getStyle(), options);
+
+    assertEquals(5, controller.layerSet.size());
   }
 
   @Test
@@ -299,22 +318,6 @@ public class LocationLayerControllerTest {
     OnRenderModeChangedListener internalRenderModeChangedListener = mock(OnRenderModeChangedListener.class);
     LayerSourceProvider sourceProvider = buildLayerProvider();
     when(sourceProvider.generateSource(any(Feature.class))).thenReturn(mock(GeoJsonSource.class));
-
-    Layer bearingLayer = mock(Layer.class);
-    when(bearingLayer.getId()).thenReturn(BEARING_LAYER);
-    when(sourceProvider.generateLayer(BEARING_LAYER)).thenReturn(bearingLayer);
-    Layer foregroundLayer = mock(Layer.class);
-    when(foregroundLayer.getId()).thenReturn(FOREGROUND_LAYER);
-    when(sourceProvider.generateLayer(FOREGROUND_LAYER)).thenReturn(foregroundLayer);
-    Layer backgroundLayer = mock(Layer.class);
-    when(backgroundLayer.getId()).thenReturn(BACKGROUND_LAYER);
-    when(sourceProvider.generateLayer(BACKGROUND_LAYER)).thenReturn(backgroundLayer);
-    Layer shadowLayer = mock(Layer.class);
-    when(shadowLayer.getId()).thenReturn(SHADOW_LAYER);
-    when(sourceProvider.generateLayer(SHADOW_LAYER)).thenReturn(shadowLayer);
-    Layer accuracyLayer = mock(Layer.class);
-    when(accuracyLayer.getId()).thenReturn(ACCURACY_LAYER);
-    when(sourceProvider.generateAccuracyLayer()).thenReturn(accuracyLayer);
 
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
@@ -606,18 +609,23 @@ public class LocationLayerControllerTest {
     LayerSourceProvider layerSourceProvider = mock(LayerSourceProvider.class);
 
     Layer shadowLayer = mock(Layer.class);
+    when(shadowLayer.getId()).thenReturn(SHADOW_LAYER);
     when(layerSourceProvider.generateLayer(SHADOW_LAYER)).thenReturn(shadowLayer);
 
     Layer backgroundLayer = mock(Layer.class);
+    when(backgroundLayer.getId()).thenReturn(BACKGROUND_LAYER);
     when(layerSourceProvider.generateLayer(BACKGROUND_LAYER)).thenReturn(backgroundLayer);
 
     Layer foregroundLayer = mock(Layer.class);
+    when(foregroundLayer.getId()).thenReturn(FOREGROUND_LAYER);
     when(layerSourceProvider.generateLayer(FOREGROUND_LAYER)).thenReturn(foregroundLayer);
 
     Layer bearingLayer = mock(Layer.class);
+    when(bearingLayer.getId()).thenReturn(BEARING_LAYER);
     when(layerSourceProvider.generateLayer(BEARING_LAYER)).thenReturn(bearingLayer);
 
     Layer accuracyLayer = mock(Layer.class);
+    when(accuracyLayer.getId()).thenReturn(ACCURACY_LAYER);
     when(layerSourceProvider.generateAccuracyLayer()).thenReturn(accuracyLayer);
     return layerSourceProvider;
   }

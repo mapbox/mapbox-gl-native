@@ -1,20 +1,24 @@
 #pragma once
 
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
+#include <mbgl/map/map_options.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/size.hpp>
 
 namespace mbgl {
+
+class FileSource;
+class ResourceTransform;
 
 struct StillImageRequest {
     StillImageRequest(Map::StillImageCallback&& callback_)
@@ -26,20 +30,7 @@ struct StillImageRequest {
 
 class Map::Impl : public style::Observer, public RendererObserver {
 public:
-    Impl(Map&,
-         RendererFrontend&,
-         MapObserver&,
-         FileSource&,
-         Scheduler&,
-
-         Size size,
-         float pixelRatio,
-
-         MapMode,
-         ConstrainMode,
-         ViewportMode,
-         bool crossSourceCollisions);
-
+    Impl(RendererFrontend&, MapObserver&, Scheduler&, std::shared_ptr<FileSource>, const MapOptions&);
     ~Impl() final;
 
     // StyleObserver
@@ -56,11 +47,13 @@ public:
     void onDidFinishRenderingFrame(RenderMode, bool) final;
     void onWillStartRenderingMap() final;
     void onDidFinishRenderingMap() final;
+    void onStyleImageMissing(const std::string&, std::function<void()>) final;
 
-    Map& map;
+    // Map
+    void jumpTo(const CameraOptions&);
+
     MapObserver& observer;
     RendererFrontend& rendererFrontend;
-    FileSource& fileSource;
     Scheduler& scheduler;
 
     Transform transform;
@@ -70,6 +63,8 @@ public:
     const bool crossSourceCollisions;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
+
+    std::shared_ptr<FileSource> fileSource;
 
     std::unique_ptr<style::Style> style;
     AnnotationManager annotationManager;

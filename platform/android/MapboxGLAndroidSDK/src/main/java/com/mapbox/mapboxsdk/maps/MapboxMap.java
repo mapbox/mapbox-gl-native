@@ -128,7 +128,6 @@ public final class MapboxMap {
    * Called when the hosting Activity/Fragment onStart() method is called.
    */
   void onStart() {
-    nativeMapView.update();
     locationComponent.onStart();
   }
 
@@ -174,6 +173,10 @@ public final class MapboxMap {
    */
   void onDestroy() {
     locationComponent.onDestroy();
+    if (style != null) {
+      style.clear();
+    }
+    cameraChangeDispatcher.onDestroy();
   }
 
   /**
@@ -813,7 +816,7 @@ public final class MapboxMap {
   public void setStyle(Style.Builder builder, final Style.OnStyleLoaded callback) {
     locationComponent.onStartLoadingMap();
     if (style != null) {
-      style.onWillStartLoadingMap();
+      style.clear();
     }
 
     if (callback != null) {

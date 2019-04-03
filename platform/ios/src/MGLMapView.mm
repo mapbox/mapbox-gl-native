@@ -11,7 +11,7 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/storage/reachability.h>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
@@ -156,6 +156,10 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
+/// The number of view annotations (excluding the user location view) that must
+/// be descendents of `MGLMapView` before presentsWithTransaction is enabled.
+static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 0;
+
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
@@ -252,6 +256,7 @@ public:
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
+@property (nonatomic) BOOL enablePresentsWithTransaction;
 
 /// Experimental rendering performance measurement.
 @property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
@@ -328,6 +333,9 @@ public:
     CFTimeInterval _frameCounterStartTime;
     NSInteger _frameCount;
     CFTimeInterval _frameDurations;
+    
+    BOOL _atLeastiOS_12_2_0;
+
 }
 
 #pragma mark - Setup & Teardown -
@@ -441,6 +449,7 @@ public:
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = NO;
+    _atLeastiOS_12_2_0 = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){12,2,0}];
 
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
     if (!background)
@@ -479,12 +488,18 @@ public:
 
     mbgl::MapOptions mapOptions;
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
+              .withSize(self.size)
+              .withPixelRatio(config.scaleFactor)
               .withConstrainMode(mbgl::ConstrainMode::None)
               .withViewportMode(mbgl::ViewportMode::Default)
               .withCrossSourceCollisions(enableCrossSourceCollisions);
 
+    mbgl::ResourceOptions resourceOptions;
+    resourceOptions.withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+                   .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+
     NSAssert(!_mbglMap, @"_mbglMap should be NULL");
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mapOptions);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -675,6 +690,20 @@ public:
              static_cast<uint32_t>(self.glView.drawableHeight) };
 }
 
++ (GLKView *)GLKViewWithFrame:(CGRect)frame context:(EAGLContext *)context opaque:(BOOL)opaque
+{
+    GLKView *glView = [[GLKView alloc] initWithFrame:frame context:context];
+    glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    glView.enableSetNeedsDisplay = NO;
+    glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+    glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
+    glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    glView.layer.opaque = opaque;
+    glView.contentMode = UIViewContentModeCenter;
+    
+    return glView;
+}
+
 - (void)createGLView
 {
     if (_context) return;
@@ -686,21 +715,14 @@ public:
 
     // create GL view
     //
-    _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
-    _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _glView.enableSetNeedsDisplay = NO;
-    _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
-    _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-    _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
-    _glView.layer.opaque = _opaque;
+    _glView = [MGLMapView GLKViewWithFrame:self.bounds context:_context opaque:_opaque];
     _glView.delegate = self;
 
     CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-    eaglLayer.presentsWithTransaction = YES;
+    eaglLayer.presentsWithTransaction = NO;
     
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
-    _glView.contentMode = UIViewContentModeCenter;
 }
 
 - (UIImage *)compassImage
@@ -1095,6 +1117,13 @@ public:
 {
     MGLAssertIsMainThread();
 
+    // Not "visible" - this isn't a full definition of visibility, but if
+    // the map view doesn't have a window then it *cannot* be visible.
+    if (!self.window) {
+        return;
+    }
+
+    // Mismatched display link
     if (displayLink && displayLink != _displayLink) {
         return;
     }
@@ -1107,8 +1136,28 @@ public:
         [self updateUserLocationAnnotationView];
         [self updateAnnotationViews];
         [self updateCalloutView];
-        
-        [self.glView display];
+
+#ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
+        // See https://github.com/mapbox/mapbox-gl-native/issues/14232
+        // glClear can be blocked for 1 second. This code is an "escape hatch",
+        // an attempt to detect this situation and rebuild the GL views.
+        if (self.enablePresentsWithTransaction && _atLeastiOS_12_2_0)
+        {
+            CFTimeInterval before = CACurrentMediaTime();
+            [self.glView display];
+            CFTimeInterval after = CACurrentMediaTime();
+            
+            if (after-before >= 1.0) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self emergencyRecreateGL];
+                });
+            }
+        }
+        else
+#endif
+        {
+            [self.glView display];
+        }
     }
 
     if (self.experimental_enableFrameRateMeasurement)
@@ -1159,7 +1208,7 @@ public:
     BOOL isVisible = self.superview && self.window;
     if (isVisible && ! _displayLink)
     {
-        if (_mbglMap && self.mbglMap.getConstrainMode() == mbgl::ConstrainMode::None)
+        if (_mbglMap && self.mbglMap.getMapOptions().constrainMode() == mbgl::ConstrainMode::None)
         {
             self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
         }
@@ -1225,15 +1274,96 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
+- (void)setEnablePresentsWithTransaction:(BOOL)enablePresentsWithTransaction
+{
+    if (_enablePresentsWithTransaction == enablePresentsWithTransaction)
+    {
+        return;
+    }
+    
+    _enablePresentsWithTransaction = enablePresentsWithTransaction;
+    
+    // If the map is visible, change the layer property too
+    if (self.window) {
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = enablePresentsWithTransaction;
+    }
+}
+
+#ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
+// See https://github.com/mapbox/mapbox-gl-native/issues/14232
+- (void)emergencyRecreateGL {
+    MGLLogError(@"Rendering took too long - creating GL views");
+
+    CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+    eaglLayer.presentsWithTransaction = NO;
+
+    [self sleepGL:nil];
+
+    // Just performing a sleepGL/wakeGL pair isn't sufficient - in this case
+    // we can still get errors when calling bindDrawable. Here we completely
+    // recreate the GLKView
+    
+    [self.userLocationAnnotationView removeFromSuperview];
+    [_glView removeFromSuperview];
+    
+    _glView = [MGLMapView GLKViewWithFrame:self.bounds context:_context opaque:_opaque];
+    _glView.delegate = self;
+
+    [self insertSubview:_glView atIndex:0];
+
+    if (self.annotationContainerView)
+    {
+        [_glView insertSubview:self.annotationContainerView atIndex:0];
+    }
+    
+    [self updateUserLocationAnnotationView];
+    
+    // Do not bind...yet
+    
+    if (self.window) {
+        [self wakeGL:nil];
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = self.enablePresentsWithTransaction;
+    }
+    else {
+        MGLLogDebug(@"No window - skipping wakeGL");
+    }
+}
+#endif
+
 - (void)willMoveToWindow:(UIWindow *)newWindow {
     [super willMoveToWindow:newWindow];
     [self refreshSupportedInterfaceOrientationsWithWindow:newWindow];
+    
+    if (!newWindow)
+    {
+        // See https://github.com/mapbox/mapbox-gl-native/issues/14232
+        // In iOS 12.2, CAEAGLLayer.presentsWithTransaction can cause dramatic
+        // slow down. The exact cause of this is unknown, but this work around
+        // appears to lessen the effects.
+        //
+        // Also, consider calling the new mbgl::Renderer::flush()
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = NO;
+        
+        // Moved from didMoveToWindow
+        [self validateDisplayLink];
+    }
 }
 
 - (void)didMoveToWindow
 {
-    [self validateDisplayLink];
     [super didMoveToWindow];
+    
+    if (self.window)
+    {
+        // See above comment
+        CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+        eaglLayer.presentsWithTransaction = self.enablePresentsWithTransaction;
+        
+        [self validateDisplayLink];
+    }
 }
 
 - (void)didMoveToSuperview
@@ -2508,10 +2638,15 @@ public:
 {
     MGLLogInfo(@"Resetting the map to the current style’s default viewport.");
     auto camera = self.mbglMap.getStyle().getDefaultCamera();
-    CGFloat pitch = *camera.pitch;
-    CLLocationDirection heading = mbgl::util::wrap(*camera.bearing, 0., 360.);
-    CLLocationDistance altitude = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
-    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(*camera.center)
+    
+    double pitch        = camera.pitch ? *camera.pitch : 0.0;
+    double bearing      = camera.bearing ? *camera.bearing : 0.0;
+    double zoom         = camera.zoom ? *camera.zoom : 0.0;
+    mbgl::LatLng center = camera.center ? *camera.center : mbgl::LatLng();
+    
+    CLLocationDirection heading = mbgl::util::wrap(bearing, 0., 360.);
+    CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoom, pitch, 0, self.frame.size);
+    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(center)
                                                        altitude:altitude
                                                           pitch:pitch
                                                         heading:heading];
@@ -2560,11 +2695,13 @@ public:
     }
 }
 
-- (void)setPrefetchesTiles:(BOOL)prefetchesTiles{
+- (void)setPrefetchesTiles:(BOOL)prefetchesTiles
+{
     _mbglMap->setPrefetchZoomDelta(prefetchesTiles ? mbgl::util::DEFAULT_PREFETCH_ZOOM_DELTA : 0);
 }
 
-- (BOOL)prefetchesTiles{
+- (BOOL)prefetchesTiles
+{
     return _mbglMap->getPrefetchZoomDelta() > 0 ? YES : NO;
 }
 
@@ -4138,6 +4275,8 @@ public:
     [newAnnotationContainerView addSubviews:annotationViews];
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
     self.annotationContainerView = newAnnotationContainerView;
+    
+    self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -4311,6 +4450,8 @@ public:
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
         [self.annotationContainerView.annotationViews removeObject:annotationView];
+        
+        self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
 
         if (annotationTag == _selectedAnnotationTag)
         {
@@ -6685,6 +6826,20 @@ public:
     
     void onDidFinishLoadingStyle() override {
         [nativeView didFinishLoadingStyle];
+    }
+    
+    void onStyleImageMissing(const std::string& imageIdentifier) override {
+        NSString *imageName = [NSString stringWithUTF8String:imageIdentifier.c_str()];
+        
+        if ([nativeView.delegate respondsToSelector:@selector(mapView:didFailToLoadImage:)]) {
+            UIImage *imageToLoad = [nativeView.delegate mapView:nativeView didFailToLoadImage:imageName];
+            
+            if (imageToLoad) {
+                auto image = [imageToLoad mgl_styleImageWithIdentifier:imageName];
+                nativeView.mbglMap.getStyle().addImage(std::move(image));
+            }
+            
+        }
     }
 
     mbgl::gl::ProcAddress getExtensionFunctionPointer(const char* name) override {

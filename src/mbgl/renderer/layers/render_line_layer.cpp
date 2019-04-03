@@ -9,7 +9,6 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
@@ -34,10 +33,7 @@ void RenderLineLayer::transition(const TransitionParameters& parameters) {
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    style::Properties<LineFloorwidth>::Unevaluated extra(unevaluated.get<style::LineWidth>());
-    evaluated = RenderLinePaintProperties::PossiblyEvaluated(
-        unevaluated.evaluate(parameters).concat(extra.evaluate(parameters)));
-
+    evaluated = unevaluated.evaluate(parameters);
     crossfade = parameters.getCrossfadeParameters();
 
     passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0
@@ -66,11 +62,10 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         LineBucket& bucket = *bucket_;
 
-        auto draw = [&](auto& program, auto&& uniformValues,
+        auto draw = [&](auto& programInstance,
+                        auto&& uniformValues,
                         const optional<ImagePosition>& patternPositionA,
                         const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
-            auto& programInstance = program.get(evaluated);
-
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
             paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
@@ -145,10 +140,10 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      texsize,
                      crossfade,
                      parameters.pixelRatio),
-                     *posA,
-                     *posB,
+                     posA,
+                     posB,
                      LinePatternProgram::TextureBindings{
-                         textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                         textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                      });
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             if (!colorRampTexture) {
@@ -164,7 +159,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     {},
                     {},
                     LineGradientProgram::TextureBindings{
-                        textures::u_image::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
+                        textures::image::Value{ *colorRampTexture->resource, gfx::TextureFilterType::Linear },
                     });
         } else {
             draw(parameters.programs.getLineLayerPrograms().line,

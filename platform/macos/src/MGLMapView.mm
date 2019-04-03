@@ -36,8 +36,8 @@
 #import <mbgl/renderer/renderer.hpp>
 #import <mbgl/renderer/renderer_backend.hpp>
 #import <mbgl/renderer/backend_scope.hpp>
-#import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
+#import <mbgl/storage/resource_options.hpp>
 #import <mbgl/math/wrap.hpp>
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/chrono.hpp>
@@ -292,10 +292,17 @@ public:
 
     mbgl::MapOptions mapOptions;
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
+              .withSize(self.size)
+              .withPixelRatio(config.scaleFactor)
               .withConstrainMode(mbgl::ConstrainMode::None)
               .withViewportMode(mbgl::ViewportMode::Default)
               .withCrossSourceCollisions(enableCrossSourceCollisions);
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *config.fileSource, *_mbglThreadPool, mapOptions);
+
+    mbgl::ResourceOptions resourceOptions;
+    resourceOptions.withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+                   .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
@@ -690,7 +697,7 @@ public:
         self.dormant = NO;
     }
 
-    if (window && _mbglMap->getConstrainMode() == mbgl::ConstrainMode::None) {
+    if (window && _mbglMap->getMapOptions().constrainMode() == mbgl::ConstrainMode::None) {
         _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
     }
 

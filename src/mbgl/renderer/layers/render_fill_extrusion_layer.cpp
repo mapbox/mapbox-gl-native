@@ -51,6 +51,9 @@ bool RenderFillExtrusionLayer::hasCrossfade() const {
 }
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
+    // TODO: remove cast
+    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
+
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
@@ -69,8 +72,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         // Flag the depth buffer as no longer needing to be cleared for the remainder of this pass.
         parameters.staticData.depthRenderbuffer->shouldClear(false);
 
-        parameters.context.setStencilMode(gfx::StencilMode::disabled());
-        parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
+        glContext.setStencilMode(gfx::StencilMode::disabled());
+        glContext.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
 
         auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
                         const optional<ImagePosition>& patternPositionA,
@@ -116,7 +119,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
-                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion.get(evaluated),
+                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion,
                     bucket,
                     FillExtrusionProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -143,7 +146,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
-                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern.get(evaluated),
+                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern,
                     bucket,
                     FillExtrusionPatternProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -160,7 +163,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     patternPosA,
                     patternPosB,
                     FillExtrusionPatternProgram::TextureBindings{
-                        textures::u_image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                        textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
                     }
                 );
             }
@@ -179,9 +182,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::LayoutUniformValues{
-                uniforms::u_matrix::Value( viewportMat ),
-                uniforms::u_world::Value( size ),
-                uniforms::u_opacity::Value( evaluated.get<FillExtrusionOpacity>() )
+                uniforms::matrix::Value( viewportMat ),
+                uniforms::world::Value( size ),
+                uniforms::opacity::Value( evaluated.get<FillExtrusionOpacity>() )
             },
             paintAttributeData,
             properties,
@@ -207,7 +210,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             allUniformValues,
             allAttributeBindings,
             ExtrusionTextureProgram::TextureBindings{
-                textures::u_image::Value{ *renderTexture->getTexture().resource },
+                textures::image::Value{ *renderTexture->getTexture().resource },
             },
             getID());
     }

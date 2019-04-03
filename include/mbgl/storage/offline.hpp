@@ -153,7 +153,7 @@ public:
     bool requiredResourceCountIsPrecise = false;
 
     bool complete() const {
-        return completedResourceCount == requiredResourceCount;
+        return completedResourceCount >= requiredResourceCount;
     }
 };
 

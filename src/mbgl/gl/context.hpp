@@ -46,7 +46,7 @@ public:
 
     void enableDebugging();
 
-    UniqueShader createShader(ShaderType type, const std::string& source);
+    UniqueShader createShader(ShaderType type, const std::initializer_list<const char*>& sources);
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
     UniqueProgram createProgram(BinaryProgramFormat binaryFormat, const std::string& binaryProgram);
     void verifyProgramLinkage(ProgramID);
@@ -56,7 +56,7 @@ public:
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
 #else
-    constexpr bool supportsProgramBinaries() const { return false; }
+    constexpr static bool supportsProgramBinaries() { return false; }
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
@@ -110,11 +110,16 @@ public:
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
-    void performCleanup();
+    void performCleanup() override;
 
     // Drain pools and remove abandoned objects, in preparation for destroying the store.
     // Only call this while the OpenGL context is exclusive to this thread.
     void reset();
+
+    // Flush pending graphics commands. Will block until the pipeline
+    // is empty. Should be used only with a very good reason because
+    // it will have a performance impact.
+    void flush();
 
     bool empty() const {
         return pooledTextures.empty()
@@ -172,9 +177,7 @@ public:
 #endif // MBGL_USE_GLES2
 
     bool supportsHalfFloatTextures = false;
-    const uint32_t maximumVertexBindingCount;
-    static constexpr const uint32_t minimumRequiredVertexBindingCount = 8;
-    
+
 private:
     State<value::StencilFunc> stencilFunc;
     State<value::StencilMask> stencilMask;
@@ -208,6 +211,7 @@ private:
 
     std::unique_ptr<gfx::TextureResource> createTextureResource(Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
     void updateTextureResource(const gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
+    void updateTextureResourceSub(const gfx::TextureResource&, const uint16_t xOffset, const uint16_t yOffset, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
     std::unique_ptr<gfx::DrawScopeResource> createDrawScopeResource() override;
 

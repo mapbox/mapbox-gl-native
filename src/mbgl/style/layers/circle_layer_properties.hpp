@@ -12,19 +12,19 @@
 namespace mbgl {
 namespace style {
 
-struct CircleRadius : DataDrivenPaintProperty<float, attributes::a_radius, uniforms::u_radius> {
+struct CircleRadius : DataDrivenPaintProperty<float, attributes::radius, uniforms::radius> {
     static float defaultValue() { return 5; }
 };
 
-struct CircleColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
+struct CircleColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct CircleBlur : DataDrivenPaintProperty<float, attributes::a_blur, uniforms::u_blur> {
+struct CircleBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
     static float defaultValue() { return 0; }
 };
 
-struct CircleOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
+struct CircleOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
     static float defaultValue() { return 1; }
 };
 
@@ -44,15 +44,15 @@ struct CirclePitchAlignment : PaintProperty<AlignmentType> {
     static AlignmentType defaultValue() { return AlignmentType::Viewport; }
 };
 
-struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::a_stroke_width, uniforms::u_stroke_width> {
+struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::stroke_width, uniforms::stroke_width> {
     static float defaultValue() { return 0; }
 };
 
-struct CircleStrokeColor : DataDrivenPaintProperty<Color, attributes::a_stroke_color, uniforms::u_stroke_color> {
+struct CircleStrokeColor : DataDrivenPaintProperty<Color, attributes::stroke_color, uniforms::stroke_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct CircleStrokeOpacity : DataDrivenPaintProperty<float, attributes::a_stroke_opacity, uniforms::u_stroke_opacity> {
+struct CircleStrokeOpacity : DataDrivenPaintProperty<float, attributes::stroke_opacity, uniforms::stroke_opacity> {
     static float defaultValue() { return 1; }
 };
 

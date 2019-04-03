@@ -3,16 +3,15 @@ package com.mapbox.mapboxsdk.testapp.activity.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapFragment;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -24,6 +23,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class MapFragmentActivity extends AppCompatActivity implements MapFragment.OnMapViewReadyCallback,
   OnMapReadyCallback, MapView.OnDidFinishRenderingFrameListener {
 
+  private static final String TAG = "com.mapbox.map";
   private MapboxMap mapboxMap;
   private MapView mapView;
   private boolean initialCameraAnimation = true;
@@ -32,14 +32,18 @@ public class MapFragmentActivity extends AppCompatActivity implements MapFragmen
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map_fragment);
+
+    MapFragment mapFragment;
     if (savedInstanceState == null) {
-      MapFragment mapFragment = MapFragment.newInstance(createFragmentOptions());
+      mapFragment = MapFragment.newInstance(createFragmentOptions());
       getFragmentManager()
         .beginTransaction()
-        .add(R.id.fragment_container, mapFragment, "com.mapbox.map")
+        .add(R.id.fragment_container, mapFragment, TAG)
         .commit();
-      mapFragment.getMapAsync(this);
+    } else {
+      mapFragment = (MapFragment) getFragmentManager().findFragmentByTag(TAG);
     }
+    mapFragment.getMapAsync(this);
   }
 
   private MapboxMapOptions createFragmentOptions() {

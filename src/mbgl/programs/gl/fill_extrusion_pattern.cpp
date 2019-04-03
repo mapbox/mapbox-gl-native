@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/fill_extrusion_pattern_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<FillExtrusionPatternProgram> {
+    static constexpr const char* name = "fill_extrusion_pattern";
+    static constexpr const uint8_t hash[8] = { 0x93, 0x2b, 0xd1, 0xab, 0xa3, 0xf2, 0x24, 0x63 };
+    static constexpr const auto vertexOffset = 23237;
+    static constexpr const auto fragmentOffset = 26157;
+};
+
+constexpr const char* ShaderSource<FillExtrusionPatternProgram>::name;
+constexpr const uint8_t ShaderSource<FillExtrusionPatternProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<FillExtrusionPatternProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<FillExtrusionPatternProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "fill_extrusion_pattern",
-        programs::gl::shaderSource() + 23237, programs::gl::shaderSource() + 26157);
+    return std::make_unique<gl::Program<FillExtrusionPatternProgram>>(programParameters);
 }
 
 } // namespace gfx
@@ -40,7 +59,7 @@ varying vec4 v_lighting;
 
 
 #ifndef HAS_UNIFORM_u_base
-uniform lowp float a_base_t;
+uniform lowp float u_base_t;
 attribute lowp vec2 a_base;
 varying lowp float base;
 #else
@@ -49,7 +68,7 @@ uniform lowp float u_base;
 
 
 #ifndef HAS_UNIFORM_u_height
-uniform lowp float a_height_t;
+uniform lowp float u_height_t;
 attribute lowp vec2 a_height;
 varying lowp float height;
 #else
@@ -58,7 +77,7 @@ uniform lowp float u_height;
 
 
 #ifndef HAS_UNIFORM_u_pattern_from
-uniform lowp float a_pattern_from_t;
+uniform lowp float u_pattern_from_t;
 attribute lowp vec4 a_pattern_from;
 varying lowp vec4 pattern_from;
 #else
@@ -67,7 +86,7 @@ uniform lowp vec4 u_pattern_from;
 
 
 #ifndef HAS_UNIFORM_u_pattern_to
-uniform lowp float a_pattern_to_t;
+uniform lowp float u_pattern_to_t;
 attribute lowp vec4 a_pattern_to;
 varying lowp vec4 pattern_to;
 #else
@@ -78,14 +97,14 @@ uniform lowp vec4 u_pattern_to;
 void main() {
     
 #ifndef HAS_UNIFORM_u_base
-    base = unpack_mix_vec2(a_base, a_base_t);
+    base = unpack_mix_vec2(a_base, u_base_t);
 #else
     lowp float base = u_base;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_height
-    height = unpack_mix_vec2(a_height, a_height_t);
+    height = unpack_mix_vec2(a_height, u_height_t);
 #else
     lowp float height = u_height;
 #endif
