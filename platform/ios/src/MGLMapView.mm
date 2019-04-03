@@ -690,6 +690,20 @@ public:
              static_cast<uint32_t>(self.glView.drawableHeight) };
 }
 
++ (GLKView *)GLKViewWithFrame:(CGRect)frame context:(EAGLContext *)context opaque:(BOOL)opaque
+{
+    GLKView *glView = [[GLKView alloc] initWithFrame:frame context:context];
+    glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    glView.enableSetNeedsDisplay = NO;
+    glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
+    glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
+    glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    glView.layer.opaque = opaque;
+    glView.contentMode = UIViewContentModeCenter;
+    
+    return glView;
+}
+
 - (void)createGLView
 {
     if (_context) return;
@@ -701,13 +715,7 @@ public:
 
     // create GL view
     //
-    _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
-    _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _glView.enableSetNeedsDisplay = NO;
-    _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
-    _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-    _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
-    _glView.layer.opaque = _opaque;
+    _glView = [MGLMapView GLKViewWithFrame:self.bounds context:_context opaque:_opaque];
     _glView.delegate = self;
 
     CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
@@ -715,7 +723,6 @@ public:
     
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
-    _glView.contentMode = UIViewContentModeCenter;
 }
 
 - (UIImage *)compassImage
@@ -1300,17 +1307,10 @@ public:
     [self.userLocationAnnotationView removeFromSuperview];
     [_glView removeFromSuperview];
     
-    _glView = [[GLKView alloc] initWithFrame:self.bounds context:_context];
-    _glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _glView.enableSetNeedsDisplay = NO;
-    _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
-    _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
-    _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
-    _glView.layer.opaque = _opaque;
+    _glView = [MGLMapView GLKViewWithFrame:self.bounds context:_context opaque:_opaque];
     _glView.delegate = self;
 
     [self insertSubview:_glView atIndex:0];
-    _glView.contentMode = UIViewContentModeCenter;
 
     if (self.annotationContainerView)
     {
