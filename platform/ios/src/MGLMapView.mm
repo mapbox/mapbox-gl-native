@@ -156,6 +156,8 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
+/// The number of view annotations (excluding the user location view) that must
+/// be descendents of `MGLMapView` before presentsWithTransaction is enabled.
 static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 3;
 
 /// An indication that the requested annotation was not found or is nonexistent.
@@ -331,6 +333,9 @@ public:
     CFTimeInterval _frameCounterStartTime;
     NSInteger _frameCount;
     CFTimeInterval _frameDurations;
+    
+    BOOL _atLeastiOS_12_2_0;
+
 }
 
 #pragma mark - Setup & Teardown -
@@ -444,6 +449,7 @@ public:
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = NO;
+    _atLeastiOS_12_2_0 = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){12,2,0}];
 
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
     if (!background)
@@ -1123,13 +1129,12 @@ public:
         [self updateUserLocationAnnotationView];
         [self updateAnnotationViews];
         [self updateCalloutView];
-        
+
 #ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
-#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 120200)
         // See https://github.com/mapbox/mapbox-gl-native/issues/14232
         // glClear can be blocked for 1 second. This code is an "escape hatch",
         // an attempt to detect this situation and rebuild the GL views.
-        if (self.enablePresentsWithTransaction)
+        if (self.enablePresentsWithTransaction && _atLeastiOS_12_2_0)
         {
             CFTimeInterval before = CACurrentMediaTime();
             [self.glView display];
@@ -1142,7 +1147,6 @@ public:
             }
         }
         else
-#endif
 #endif
         {
             [self.glView display];
