@@ -123,4 +123,32 @@ class MapboxMapTest {
     mapboxMap.onDestroy()
     verify(exactly = 1) { style.clear() }
   }
+
+  @Test
+  fun testStyleCallbackNotCalledWhenPreviousFailed() {
+    val style = mockk<Style>(relaxed = true)
+    val builder = mockk<Style.Builder>(relaxed = true)
+    every { builder.build(nativeMapView) } returns style
+    val onStyleLoadedListener = mockk<Style.OnStyleLoaded>(relaxed = true)
+
+    mapboxMap.setStyle(builder, onStyleLoadedListener)
+    mapboxMap.onFailLoadingStyle()
+    mapboxMap.setStyle(builder, onStyleLoadedListener)
+    mapboxMap.onFinishLoadingStyle()
+    verify(exactly = 1) { onStyleLoadedListener.onStyleLoaded(style) }
+  }
+
+  @Test
+  fun testStyleCallbackNotCalledWhenPreviousNotFinished() {
+    // regression test for #14337
+    val style = mockk<Style>(relaxed = true)
+    val builder = mockk<Style.Builder>(relaxed = true)
+    every { builder.build(nativeMapView) } returns style
+    val onStyleLoadedListener = mockk<Style.OnStyleLoaded>(relaxed = true)
+
+    mapboxMap.setStyle(builder, onStyleLoadedListener)
+    mapboxMap.setStyle(builder, onStyleLoadedListener)
+    mapboxMap.onFinishLoadingStyle()
+    verify(exactly = 1) { onStyleLoadedListener.onStyleLoaded(style) }
+  }
 }
