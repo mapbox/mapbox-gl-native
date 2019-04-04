@@ -219,38 +219,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderSource->setObserver(this);
         renderSources.emplace(entry.first, std::move(renderSource));
     }
-
-    // Update all sources.
-    for (const auto& source : *sourceImpls) {
-        std::vector<Immutable<Layer::Impl>> filteredLayers;
-        bool needsRendering = false;
-        bool needsRelayout = false;
-
-        for (const auto& layer : *layerImpls) {
-
-            if (layer->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired
-                    || layer->source != source->id) {
-                continue;
-            }
-
-            if (!needsRendering && getRenderLayer(layer->id)->needsRendering(zoomHistory.lastZoom)) {
-                needsRendering = true;
-            }
-
-            if (!needsRelayout && (hasImageDiff || hasLayoutDifference(layerDiff, layer->id))) {
-                needsRelayout = true;
-            }
-
-            filteredLayers.push_back(layer);
-        }
-
-        renderSources.at(source->id)->update(source,
-                                             filteredLayers,
-                                             needsRendering,
-                                             needsRelayout,
-                                             tileParameters);
-    }
-
     transformState = updateParameters.transformState;
 
     if (!staticData) {
@@ -269,6 +237,67 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         *lineAtlas,
         placement->getVariableOffsets()
     };
+
+    Color backgroundColor;
+
+    struct RenderItem {
+        RenderItem(RenderLayer& layer_, RenderSource* source_)
+            : layer(layer_), source(source_) {}
+        RenderLayer& layer;
+        RenderSource* source;
+    };
+
+    std::vector<RenderItem> renderItems;
+    std::vector<const RenderLayerSymbolInterface*> renderItemsWithSymbols;
+
+    // Update all sources and initialize renderItems.
+    renderItems.reserve(layerImpls->size());
+    for (const auto& sourceImpl : *sourceImpls) {
+        RenderSource* source = renderSources.at(sourceImpl->id).get();
+        std::vector<Immutable<Layer::Impl>> filteredLayersForSource;
+        filteredLayersForSource.reserve(layerImpls->size());
+        bool sourceNeedsRendering = false;
+        bool sourceNeedsRelayout = false;       
+
+        for (const auto& layerImpl : *layerImpls) {
+            RenderLayer* layer = getRenderLayer(layerImpl->id);
+            const auto* layerInfo = layerImpl->getTypeInfo();
+            bool layerNeedsRendering = layer->needsRendering(zoomHistory.lastZoom);
+
+            parameters.staticData.has3D = (parameters.staticData.has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
+
+            if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
+                if (layerImpl->source == sourceImpl->id) {
+                    sourceNeedsRendering |= layerNeedsRendering;
+                    sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || hasLayoutDifference(layerDiff, layerImpl->id));
+                    filteredLayersForSource.push_back(layerImpl);
+
+                    if (layerNeedsRendering) {
+                        renderItems.emplace_back(*layer, source);
+                    }
+                }
+                continue;
+            } 
+
+            // Handle layers without source.
+            if (layerNeedsRendering && sourceImpl.get() == sourceImpls->at(0).get()) {            
+                if (parameters.contextMode == GLContextMode::Unique
+                    && layerImpl.get() == layerImpls->at(0).get()) {
+                    const auto& solidBackground = layer->getSolidBackground();
+                    if (solidBackground) {
+                        backgroundColor = *solidBackground;
+                        continue; // This layer is shown with background color, and it shall not be added to render items. 
+                    }
+                }
+                renderItems.emplace_back(*layer, nullptr);
+            }
+        }
+        source->update(sourceImpl,
+                       filteredLayersForSource,
+                       sourceNeedsRendering,
+                       sourceNeedsRelayout,
+                       tileParameters);
+    }
 
     bool loaded = updateParameters.styleLoaded && isLoaded();
     if (updateParameters.mode != MapMode::Continuous && !loaded) {
@@ -289,54 +318,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (parameters.contextMode == GLContextMode::Shared) {
         glContext.setDirtyState();
     }
-
-    Color backgroundColor;
-
-    struct RenderItem {
-        RenderItem(RenderLayer& layer_, RenderSource* source_)
-            : layer(layer_), source(source_) {}
-        RenderLayer& layer;
-        RenderSource* source;
-    };
-
-    std::vector<RenderItem> order;
-    std::vector<const RenderLayerSymbolInterface*> renderItemsWithSymbols;
-
-    for (auto& layerImpl : *layerImpls) {
-        RenderLayer* layer = getRenderLayer(layerImpl->id);
-        assert(layer);
-
-        parameters.staticData.has3D |=
-                (layerImpl->getTypeInfo()->pass3d == LayerTypeInfo::Pass3D::Required);
-
-        if (!layer->needsRendering(zoomHistory.lastZoom)) {
+   
+    // Set render tiles to the render items.
+    for (auto& renderItem : renderItems) {
+        if (!renderItem.source) {
             continue;
         }
 
-        if (parameters.contextMode == GLContextMode::Unique
-            && layerImpl.get() == layerImpls->at(0).get()) {
-            const auto& solidBackground = layer->getSolidBackground();
-            if (solidBackground) {
-                backgroundColor = *solidBackground;
-                continue;
-            }
-        }
-
-        if (layerImpl->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired) {
-            order.emplace_back(*layer, nullptr);
-            continue;
-        }
-
-        RenderSource* source = getRenderSource(layer->baseImpl->source);
-        if (!source) {
-            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->getID().c_str());
-            continue;
-        }
-
-        layer->setRenderTiles(source->getRenderTiles(), parameters.state);
-        order.emplace_back(*layer, source);
-
-        if (const RenderLayerSymbolInterface* symbolLayer = layer->getSymbolInterface()) {
+        renderItem.layer.setRenderTiles(renderItem.source->getRenderTiles(), parameters.state);
+        if (const RenderLayerSymbolInterface* symbolLayer = renderItem.layer.getSymbolInterface()) {
             renderItemsWithSymbols.push_back(symbolLayer);
         }
     }
@@ -416,8 +406,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
         parameters.staticData.depthRenderbuffer->shouldClear(true);
 
-        uint32_t i = static_cast<uint32_t>(order.size()) - 1;
-        for (auto it = order.begin(); it != order.end(); ++it, --i) {
+        uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
+        for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
                 MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
@@ -522,7 +512,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Actually render the layers
 
-    parameters.depthRangeSize = 1 - (order.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
+    parameters.depthRangeSize = 1 - (renderItems.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
@@ -531,7 +521,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         MBGL_DEBUG_GROUP(parameters.context, "opaque");
 
         uint32_t i = 0;
-        for (auto it = order.rbegin(); it != order.rend(); ++it, ++i) {
+        for (auto it = renderItems.rbegin(); it != renderItems.rend(); ++it, ++i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
                 MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
@@ -546,8 +536,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.pass = RenderPass::Translucent;
         MBGL_DEBUG_GROUP(parameters.context, "translucent");
 
-        uint32_t i = static_cast<uint32_t>(order.size()) - 1;
-        for (auto it = order.begin(); it != order.end(); ++it, --i) {
+        uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
+        for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
                 MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
@@ -645,7 +635,7 @@ void Renderer::Impl::queryRenderedSymbols(std::unordered_map<std::string, std::v
         bucketQueryData.push_back(placement->getQueryData(entry.first));
     }
     // Although symbol query is global, symbol results are only sortable within a bucket
-    // For a predictable global sort order, we sort the buckets based on their corresponding tile position
+    // For a predictable global sort renderItems, we sort the buckets based on their corresponding tile position
     std::sort(bucketQueryData.begin(), bucketQueryData.end(), [](const RetainedQueryData& a, const RetainedQueryData& b) {
         return
             std::tie(a.tileID.canonical.z, a.tileID.canonical.y, a.tileID.wrap, a.tileID.canonical.x) <
@@ -692,7 +682,7 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
         return result;
     }
 
-    // Combine all results based on the style layer order.
+    // Combine all results based on the style layer renderItems.
     for (const auto& layerImpl : *layerImpls) {
         const RenderLayer* layer = getRenderLayer(layerImpl->id);
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
