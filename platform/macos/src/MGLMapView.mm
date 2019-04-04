@@ -1290,7 +1290,7 @@ public:
 }
 
 - (MGLCoordinateBounds)visibleCoordinateBounds {
-    return [self convertRect:[self NSEdgeInsetsInsetRect:self.bounds edgeInsets:self.contentInset] toCoordinateBoundsFromView:self];
+    return [self convertRect:[self NSEdgeInsetsInsetRect:self.bounds edgeInsets:self.contentInsets] toCoordinateBoundsFromView:self];
 }
 
 - (CGRect)NSEdgeInsetsInsetRect:(CGRect)rect edgeInsets:(NSEdgeInsets)insets {
