@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.location;
 /**
  * Contains all the constants being used for the {@link LocationComponent}.
  */
-final class LocationComponentConstants {
+public final class LocationComponentConstants {
 
   // Controls the compass update rate in milliseconds
   static final long COMPASS_UPDATE_RATE_MS = 500;
