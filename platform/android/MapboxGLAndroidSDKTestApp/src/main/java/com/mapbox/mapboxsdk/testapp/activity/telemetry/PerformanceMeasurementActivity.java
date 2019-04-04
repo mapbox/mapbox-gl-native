@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Call;
-import okhttp3.EventListener;
 import okhttp3.OkHttpClient;
 import timber.log.Timber;
 
@@ -35,8 +34,6 @@ public class PerformanceMeasurementActivity extends AppCompatActivity {
 
   private MapView mapView;
 
-  private Map<String, Long> startTimes = new HashMap<>();
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -44,33 +41,11 @@ public class PerformanceMeasurementActivity extends AppCompatActivity {
     mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
 
-
-    OkHttpClient.Builder builder = new OkHttpClient.Builder();
-    builder.eventListener(new EventListener() {
-
-      @Override
-      public void callStart(Call call) {
-        String url = call.request().url().toString();
-        startTimes.put(url, System.nanoTime());
-        super.callStart(call);
-        Timber.e("callStart: %s", url);
-      }
-
-      @Override
-      public void callEnd(Call call) {
-        String url = call.request().url().toString();
-        Timber.e("callEnd: %s", url);
-        Long start = startTimes.get(url);
-        if (start != null) {
-          long elapsed = System.nanoTime() - start;
-          triggerPerformanceEvent(url.substring(0, url.indexOf('?')), elapsed);
-          startTimes.remove(start);
-          Timber.e("callEnd: %s took %d", url, elapsed);
-        }
-        super.callEnd(call);
-      }
-    });
-    HttpRequestUtil.setOkHttpClient(builder.build());
+    EventListener eventListener = new EventListener();
+    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .eventListener(eventListener)
+            .build();
+    HttpRequestUtil.setOkHttpClient(okHttpClient);
 
     mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(
       new Style.Builder().fromUrl(Style.MAPBOX_STREETS)));
@@ -109,9 +84,7 @@ public class PerformanceMeasurementActivity extends AppCompatActivity {
 
   @Override
   protected void onDestroy() {
-
-    startTimes.clear();
-
+    HttpRequestUtil.setOkHttpClient(null);
     super.onDestroy();
     mapView.onDestroy();
   }
@@ -122,8 +95,7 @@ public class PerformanceMeasurementActivity extends AppCompatActivity {
     mapView.onSaveInstanceState(outState);
   }
 
-  private void triggerPerformanceEvent(String style, long elapsed) {
-
+  private static void triggerPerformanceEvent(String style, long elapsed) {
     List<Attribute<String>> attributes = new ArrayList<>();
     attributes.add(
             new Attribute<>("style_id", style));
@@ -175,8 +147,37 @@ public class PerformanceMeasurementActivity extends AppCompatActivity {
     return "{" + width + "," + height + "}";
   }
 
-  private class Attribute<T> {
+  private static class EventListener extends okhttp3.EventListener {
+
+    private Map<String, Long> startTimes = new HashMap<>();
+
+    @Override
+    public void callStart(Call call) {
+      String url = call.request().url().toString();
+      startTimes.put(url, System.nanoTime());
+      super.callStart(call);
+      Timber.e("callStart: %s", url);
+    }
+
+    @Override
+    public void callEnd(Call call) {
+      String url = call.request().url().toString();
+      Timber.e("callEnd: %s", url);
+      Long start = startTimes.get(url);
+      if (start != null) {
+        long elapsed = System.nanoTime() - start;
+        triggerPerformanceEvent(url.substring(0, url.indexOf('?')), elapsed);
+        startTimes.remove(start);
+        Timber.e("callEnd: %s took %d", url, elapsed);
+      }
+      super.callEnd(call);
+    }
+  }
+
+  private static class Attribute<T> {
+
     private String name;
+
     private T value;
 
     Attribute(String name, T value) {
@@ -184,4 +185,5 @@ public class PerformanceMeasurementActivity extends AppCompatActivity {
       this.value = value;
     }
   }
+
 }
