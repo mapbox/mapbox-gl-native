@@ -100,7 +100,7 @@ public:
                                       const optional<PatternDependency>&,
                                       const style::expression::Value&) = 0;
     virtual void upload(gfx::Context& context) = 0;
-    virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) = 0;
+    virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) = 0;
     virtual std::tuple<ExpandToType<As, optional<gfx::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
     virtual std::tuple<ExpandToType<As, float>...> interpolationFactor(float currentZoom) const = 0;
     virtual std::tuple<ExpandToType<As, UniformValueType>...> uniformValue(const PossiblyEvaluatedType& currentValue) const = 0;
@@ -119,7 +119,7 @@ public:
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
     void upload(gfx::Context&) override {}
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
 
     std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
         return {};
@@ -147,7 +147,7 @@ public:
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
     void upload(gfx::Context&) override {}
 
-    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters&) override {
+    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, const CrossfadeParameters&) override {
         if (!posA || !posB) {
             return;
         } else {
@@ -185,7 +185,7 @@ public:
         : expression(std::move(expression_)),
           defaultValue(std::move(defaultValue_)) {
     }
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         auto evaluated = expression.evaluate(EvaluationContext(&feature).withFormattedSection(&formattedSection), defaultValue);
@@ -243,7 +243,7 @@ public:
           defaultValue(std::move(defaultValue_)),
           zoomRange({zoom, zoom + 1}) {
     }
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         Range<T> range = {
@@ -317,7 +317,7 @@ public:
           zoomRange({zoom, zoom + 1}) {
     }
 
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters& crossfade_) override {
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters& crossfade_) override {
         crossfade = crossfade_;
     };
 
@@ -486,7 +486,7 @@ public:
         });
     }
 
-    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters& crossfade) const {
+    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, const CrossfadeParameters& crossfade) const {
         util::ignore({
             (binders.template get<Ps>()->setPatternParameters(posA, posB, crossfade), 0)...
         });
