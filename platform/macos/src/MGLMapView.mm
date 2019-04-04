@@ -1290,7 +1290,19 @@ public:
 }
 
 - (MGLCoordinateBounds)visibleCoordinateBounds {
-    return [self convertRect:UIEdgeInsetsInsetRect(self.bounds, self.contentInset) toCoordinateBoundsFromView:self];
+    return [self convertRect:NSEdgeInsetsInsetRect(self.bounds, self.contentInset) toCoordinateBoundsFromView:self];
+}
+
+- (CGRect)NSEdgeInsetsInsetRect(CGRect rect, NSEdgeInsets insets) {
+	if (((insets.top + insets.bottom) > rect.size.height) || ((insets.left + insets.right) > rect.size.width)) {
+		return CGRectNull;
+	} else {
+		rect.origin.x += insets.left;
+		rect.origin.y += insets.bottom;
+		rect.size.height -= (insets.top + insets.bottom);
+		rect.size.width -= (insets.left + insets.right);
+		return rect;
+	}
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds {
