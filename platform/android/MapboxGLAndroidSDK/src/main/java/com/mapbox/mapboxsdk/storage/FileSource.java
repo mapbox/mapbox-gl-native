@@ -231,7 +231,7 @@ public class FileSource {
    * @param context the context to derive the files directory path from
    * @return the files directory path
    */
-  @Nullable
+  @NonNull
   public static String getResourcesCachePath(@NonNull Context context) {
     resourcesCachePathLoaderLock.lock();
     try {
