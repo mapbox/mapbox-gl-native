@@ -93,12 +93,13 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
     pending = true;
 
     std::vector<Immutable<Layer::Impl>> impls;
+    impls.reserve(layers.size());
 
     for (const auto& layer : layers) {
         // Skip irrelevant layers.
-        if (layer->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired ||
-            layer->source != sourceID ||
-            id.overscaledZ < std::floor(layer->minZoom) ||
+        assert(layer->getTypeInfo()->source != LayerTypeInfo::Source::NotRequired);
+        assert(layer->source == sourceID);
+        if (id.overscaledZ < std::floor(layer->minZoom) ||
             id.overscaledZ >= std::ceil(layer->maxZoom) ||
             layer->visibility == VisibilityType::None) {
             continue;
