@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mapbox.android.telemetry.AppUserTurnstile;
-import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.MapState;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.TelemetryEnabler;
 import com.mapbox.android.telemetry.SessionInterval;
@@ -23,7 +21,7 @@ public class TelemetryImpl implements TelemetryDefinition {
 
   @Nullable
   private MapboxTelemetry telemetry;
-
+  private MapEventFactory mapEventFactory;
   public TelemetryImpl() {
     Context appContext = Mapbox.getApplicationContext();
     String accessToken = Mapbox.getAccessToken();
@@ -32,6 +30,8 @@ public class TelemetryImpl implements TelemetryDefinition {
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       telemetry.enable();
     }
+    mapEventFactory = new MapEventFactory(appContext);
+
   }
 
   /**
@@ -42,8 +42,7 @@ public class TelemetryImpl implements TelemetryDefinition {
     AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
       BuildConfig.MAPBOX_SDK_VERSION);
     telemetry.push(turnstileEvent);
-    MapEventFactory mapEventFactory = new MapEventFactory();
-    telemetry.push(mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD));
+    telemetry.push(mapEventFactory.buildMapLoadEvent());
   }
 
   /**
@@ -56,10 +55,9 @@ public class TelemetryImpl implements TelemetryDefinition {
    */
   @Override
   public void onGestureInteraction(String eventType, double latitude, double longitude, double zoom) {
-    MapEventFactory mapEventFactory = new MapEventFactory();
     MapState state = new MapState(latitude, longitude, zoom);
     state.setGesture(eventType);
-    telemetry.push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, state));
+    telemetry.push(mapEventFactory.buildMapClickEvent(state));
   }
 
   /**
@@ -99,8 +97,7 @@ public class TelemetryImpl implements TelemetryDefinition {
 
   @Override
   public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
-    MapEventFactory mapEventFactory = new MapEventFactory();
-    telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
+    telemetry.push(mapEventFactory.buildOfflineDownloadStartEvent(
       offlineDefinition instanceof OfflineTilePyramidRegionDefinition ? "tileregion" : "shaperegion",
       offlineDefinition.getMinZoom(),
       offlineDefinition.getMaxZoom(),
