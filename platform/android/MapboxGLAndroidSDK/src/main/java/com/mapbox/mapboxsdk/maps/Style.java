@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.util.DisplayMetrics;
 import android.util.Pair;
-
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
@@ -324,13 +323,49 @@ public class Style {
    * @param bitmap the pre-multiplied Bitmap
    * @param sdf    the flag indicating image is an SDF or template image
    */
-  public void addImage(@NonNull final String name, @NonNull final Bitmap bitmap, boolean sdf) {
+  public void addImage(@NonNull final String name, @NonNull Bitmap bitmap, boolean sdf) {
+    validateState("addImage");
+    nativeMap.addImages(new Image[]{toImage(new Builder.ImageWrapper(name, bitmap, sdf))});
+  }
+
+  /**
+   * Adds an image asynchronously, to be used in the map's style.
+   *
+   * @param name  the name of the image
+   * @param image the pre-multiplied Bitmap
+   */
+  public void addImageAsync(@NonNull String name, @NonNull Bitmap image) {
+    addImageAsync(name, image, false);
+  }
+
+  /**
+   * Adds an drawable asynchronously, to be converted into a bitmap to be used in the map's style.
+   *
+   * @param name     the name of the image
+   * @param drawable the drawable instance to convert
+   */
+  public void addImageAsync(@NonNull String name, @NonNull Drawable drawable) {
+    Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+    if (bitmap == null) {
+      throw new IllegalArgumentException("Provided drawable couldn't be converted to a Bitmap.");
+    }
+    addImageAsync(name, bitmap, false);
+  }
+
+  /**
+   * Adds an image asynchronously, to be used in the map's style.
+   *
+   * @param name   the name of the image
+   * @param bitmap the pre-multiplied Bitmap
+   * @param sdf    the flag indicating image is an SDF or template image
+   */
+  public void addImageAsync(@NonNull final String name, @NonNull Bitmap bitmap, boolean sdf) {
     validateState("addImage");
     new BitmapImageConversionTask(nativeMap).execute(new Builder.ImageWrapper(name, bitmap, sdf));
   }
 
   /**
-   * Adds an images to be used in the map's style.
+   * Adds images to be used in the map's style.
    *
    * @param images the map of images to add
    */
@@ -339,12 +374,39 @@ public class Style {
   }
 
   /**
-   * Adds an images to be used in the map's style.
+   * Adds images to be used in the map's style.
    *
    * @param images the map of images to add
    * @param sdf    the flag indicating image is an SDF or template image
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images, boolean sdf) {
+    validateState("addImage");
+    Image[] convertedImages = new Image[images.size()];
+    int index = 0;
+    for (Builder.ImageWrapper imageWrapper : Builder.ImageWrapper.convertToImageArray(images, sdf)) {
+      convertedImages[index] = toImage(imageWrapper);
+      index++;
+    }
+
+    nativeMap.addImages(convertedImages);
+  }
+
+  /**
+   * Adds images asynchronously, to be used in the map's style.
+   *
+   * @param images the map of images to add
+   */
+  public void addImagesAsync(@NonNull HashMap<String, Bitmap> images) {
+    addImagesAsync(images, false);
+  }
+
+  /**
+   * Adds images asynchronously, to be used in the map's style.
+   *
+   * @param images the map of images to add
+   * @param sdf    the flag indicating image is an SDF or template image
+   */
+  public void addImagesAsync(@NonNull HashMap<String, Bitmap> images, boolean sdf) {
     validateState("addImages");
     new BitmapImageConversionTask(nativeMap).execute(Builder.ImageWrapper.convertToImageArray(images, sdf));
   }
@@ -903,7 +965,22 @@ public class Style {
     }
   }
 
-  private static class BitmapImageConversionTask extends AsyncTask<Builder.ImageWrapper, Void, List<Image>> {
+  private static Image toImage(Builder.ImageWrapper imageWrapper) {
+    Bitmap bitmap = imageWrapper.bitmap;
+    if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+      bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+    }
+
+    ByteBuffer buffer = ByteBuffer.allocate(bitmap.getByteCount());
+    bitmap.copyPixelsToBuffer(buffer);
+    float pixelRatio = (float) bitmap.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
+
+    return new Image(buffer.array(), pixelRatio, imageWrapper.id,
+      bitmap.getWidth(), bitmap.getHeight(), imageWrapper.sdf
+    );
+  }
+
+  private static class BitmapImageConversionTask extends AsyncTask<Builder.ImageWrapper, Void, Image[]> {
 
     private WeakReference<NativeMap> nativeMap;
 
@@ -913,39 +990,20 @@ public class Style {
 
     @NonNull
     @Override
-    protected List<Image> doInBackground(Builder.ImageWrapper... params) {
+    protected Image[] doInBackground(Builder.ImageWrapper... params) {
       List<Image> images = new ArrayList<>();
-      ByteBuffer buffer;
-      String name;
-      Bitmap bitmap;
-      boolean sdf;
-
       for (Builder.ImageWrapper param : params) {
-        name = param.id;
-        bitmap = param.bitmap;
-        sdf = param.sdf;
-
-        if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
-          bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
-        }
-
-        buffer = ByteBuffer.allocate(bitmap.getByteCount());
-        bitmap.copyPixelsToBuffer(buffer);
-
-        float pixelRatio = (float) bitmap.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
-
-        images.add(new Image(buffer.array(), pixelRatio, name, bitmap.getWidth(), bitmap.getHeight(), sdf));
+        images.add(toImage(param));
       }
-
-      return images;
+      return images.toArray(new Image[images.size()]);
     }
 
     @Override
-    protected void onPostExecute(@NonNull List<Image> images) {
+    protected void onPostExecute(@NonNull Image[] images) {
       super.onPostExecute(images);
       NativeMap nativeMap = this.nativeMap.get();
       if (nativeMap != null && !nativeMap.isDestroyed()) {
-        nativeMap.addImages(images.toArray(new Image[images.size()]));
+        nativeMap.addImages(images);
       }
     }
   }

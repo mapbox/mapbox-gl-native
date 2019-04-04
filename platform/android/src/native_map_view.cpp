@@ -261,6 +261,18 @@ void NativeMapView::onSourceChanged(mbgl::style::Source& source) {
     }
 }
 
+void NativeMapView::onStyleImageMissing(const std::string& imageId) {
+    assert(vm != nullptr);
+
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto& javaClass = jni::Class<NativeMapView>::Singleton(*_env);
+    static auto onStyleImageMissing = javaClass.GetMethod<void (jni::String)>(*_env, "onStyleImageMissing");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onStyleImageMissing, jni::Make<jni::String>(*_env, imageId));
+    }
+}
+
 // JNI Methods //
 
 void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {
