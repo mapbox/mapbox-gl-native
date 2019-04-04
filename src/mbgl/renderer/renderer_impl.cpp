@@ -165,7 +165,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     imageManager->notifyIfMissingImageAdded();
     imageManager->setLoaded(updateParameters.spriteLoaded);
 
-
     const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters.layers);
     layerImpls = updateParameters.layers;
 
@@ -191,15 +190,14 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Update layers for class and zoom changes.
     for (const auto& entry : renderLayers) {
         RenderLayer& layer = *entry.second;
-        const bool layerAdded = layerDiff.added.count(entry.first);
-        const bool layerChanged = layerDiff.changed.count(entry.first);
+        const bool layerAddedOrChanged = layerDiff.added.count(entry.first) || layerDiff.changed.count(entry.first);
 
-        if (layerAdded || layerChanged) {
+        if (layerAddedOrChanged) {
             layer.transition(transitionParameters);
             layer.update();
         }
 
-        if (layerAdded || layerChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
+        if (layerAddedOrChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
             layer.evaluate(evaluationParameters);
         }
     }
