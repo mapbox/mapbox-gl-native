@@ -568,7 +568,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera region will change
    */
-  public void addOnCameraWillChangeListener(OnCameraWillChangeListener listener) {
+  public void addOnCameraWillChangeListener(@NonNull OnCameraWillChangeListener listener) {
     mapChangeReceiver.addOnCameraWillChangeListener(listener);
   }
 
@@ -577,7 +577,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera region will change
    */
-  public void removeOnCameraWillChangeListener(OnCameraWillChangeListener listener) {
+  public void removeOnCameraWillChangeListener(@NonNull OnCameraWillChangeListener listener) {
     mapChangeReceiver.removeOnCameraWillChangeListener(listener);
   }
 
@@ -586,7 +586,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera is changing
    */
-  public void addOnCameraIsChangingListener(OnCameraIsChangingListener listener) {
+  public void addOnCameraIsChangingListener(@NonNull OnCameraIsChangingListener listener) {
     mapChangeReceiver.addOnCameraIsChangingListener(listener);
   }
 
@@ -595,7 +595,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera is changing
    */
-  public void removeOnCameraIsChangingListener(OnCameraIsChangingListener listener) {
+  public void removeOnCameraIsChangingListener(@NonNull OnCameraIsChangingListener listener) {
     mapChangeReceiver.removeOnCameraIsChangingListener(listener);
   }
 
@@ -604,7 +604,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera region did change
    */
-  public void addOnCameraDidChangeListener(OnCameraDidChangeListener listener) {
+  public void addOnCameraDidChangeListener(@NonNull OnCameraDidChangeListener listener) {
     mapChangeReceiver.addOnCameraDidChangeListener(listener);
   }
 
@@ -613,7 +613,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera region did change
    */
-  public void removeOnCameraDidChangeListener(OnCameraDidChangeListener listener) {
+  public void removeOnCameraDidChangeListener(@NonNull OnCameraDidChangeListener listener) {
     mapChangeReceiver.removeOnCameraDidChangeListener(listener);
   }
 
@@ -622,7 +622,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map will start loading
    */
-  public void addOnWillStartLoadingMapListener(OnWillStartLoadingMapListener listener) {
+  public void addOnWillStartLoadingMapListener(@NonNull OnWillStartLoadingMapListener listener) {
     mapChangeReceiver.addOnWillStartLoadingMapListener(listener);
   }
 
@@ -631,7 +631,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map will start loading
    */
-  public void removeOnWillStartLoadingMapListener(OnWillStartLoadingMapListener listener) {
+  public void removeOnWillStartLoadingMapListener(@NonNull OnWillStartLoadingMapListener listener) {
     mapChangeReceiver.removeOnWillStartLoadingMapListener(listener);
   }
 
@@ -640,7 +640,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has finished loading
    */
-  public void addOnDidFinishLoadingMapListener(OnDidFinishLoadingMapListener listener) {
+  public void addOnDidFinishLoadingMapListener(@NonNull OnDidFinishLoadingMapListener listener) {
     mapChangeReceiver.addOnDidFinishLoadingMapListener(listener);
   }
 
@@ -649,7 +649,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has finished loading
    */
-  public void removeOnDidFinishLoadingMapListener(OnDidFinishLoadingMapListener listener) {
+  public void removeOnDidFinishLoadingMapListener(@NonNull OnDidFinishLoadingMapListener listener) {
     mapChangeReceiver.removeOnDidFinishLoadingMapListener(listener);
   }
 
@@ -658,7 +658,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map failed to load
    */
-  public void addOnDidFailLoadingMapListener(OnDidFailLoadingMapListener listener) {
+  public void addOnDidFailLoadingMapListener(@NonNull OnDidFailLoadingMapListener listener) {
     mapChangeReceiver.addOnDidFailLoadingMapListener(listener);
   }
 
@@ -667,7 +667,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map failed to load
    */
-  public void removeOnDidFailLoadingMapListener(OnDidFailLoadingMapListener listener) {
+  public void removeOnDidFailLoadingMapListener(@NonNull OnDidFailLoadingMapListener listener) {
     mapChangeReceiver.removeOnDidFailLoadingMapListener(listener);
   }
 
@@ -676,7 +676,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera will start rendering a frame
    */
-  public void addOnWillStartRenderingFrameListener(OnWillStartRenderingFrameListener listener) {
+  public void addOnWillStartRenderingFrameListener(@NonNull OnWillStartRenderingFrameListener listener) {
     mapChangeReceiver.addOnWillStartRenderingFrameListener(listener);
   }
 
@@ -685,7 +685,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the camera will start rendering a frame
    */
-  public void removeOnWillStartRenderingFrameListener(OnWillStartRenderingFrameListener listener) {
+  public void removeOnWillStartRenderingFrameListener(@NonNull OnWillStartRenderingFrameListener listener) {
     mapChangeReceiver.removeOnWillStartRenderingFrameListener(listener);
   }
 
@@ -694,7 +694,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has finished rendering a frame
    */
-  public void addOnDidFinishRenderingFrameListener(OnDidFinishRenderingFrameListener listener) {
+  public void addOnDidFinishRenderingFrameListener(@NonNull OnDidFinishRenderingFrameListener listener) {
     mapChangeReceiver.addOnDidFinishRenderingFrameListener(listener);
   }
 
@@ -703,7 +703,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has finished rendering a frame
    */
-  public void removeOnDidFinishRenderingFrameListener(OnDidFinishRenderingFrameListener listener) {
+  public void removeOnDidFinishRenderingFrameListener(@NonNull OnDidFinishRenderingFrameListener listener) {
     mapChangeReceiver.removeOnDidFinishRenderingFrameListener(listener);
   }
 
@@ -712,7 +712,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map will start rendering
    */
-  public void addOnWillStartRenderingMapListener(OnWillStartRenderingMapListener listener) {
+  public void addOnWillStartRenderingMapListener(@NonNull OnWillStartRenderingMapListener listener) {
     mapChangeReceiver.addOnWillStartRenderingMapListener(listener);
   }
 
@@ -721,7 +721,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map will start rendering
    */
-  public void removeOnWillStartRenderingMapListener(OnWillStartRenderingMapListener listener) {
+  public void removeOnWillStartRenderingMapListener(@NonNull OnWillStartRenderingMapListener listener) {
     mapChangeReceiver.removeOnWillStartRenderingMapListener(listener);
   }
 
@@ -730,7 +730,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has finished rendering
    */
-  public void addOnDidFinishRenderingMapListener(OnDidFinishRenderingMapListener listener) {
+  public void addOnDidFinishRenderingMapListener(@NonNull OnDidFinishRenderingMapListener listener) {
     mapChangeReceiver.addOnDidFinishRenderingMapListener(listener);
   }
 
@@ -748,7 +748,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has entered the idle state.
    */
-  public void addOnDidBecomeIdleListener(OnDidBecomeIdleListener listener) {
+  public void addOnDidBecomeIdleListener(@NonNull OnDidBecomeIdleListener listener) {
     mapChangeReceiver.addOnDidBecomeIdleListener(listener);
   }
 
@@ -757,7 +757,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has entered the idle state.
    */
-  public void removeOnDidBecomeIdleListener(OnDidBecomeIdleListener listener) {
+  public void removeOnDidBecomeIdleListener(@NonNull OnDidBecomeIdleListener listener) {
     mapChangeReceiver.removeOnDidBecomeIdleListener(listener);
   }
 
@@ -767,7 +767,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the style has finished loading
    */
-  public void addOnDidFinishLoadingStyleListener(OnDidFinishLoadingStyleListener listener) {
+  public void addOnDidFinishLoadingStyleListener(@NonNull OnDidFinishLoadingStyleListener listener) {
     mapChangeReceiver.addOnDidFinishLoadingStyleListener(listener);
   }
 
@@ -776,7 +776,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the style has finished loading
    */
-  public void removeOnDidFinishLoadingStyleListener(OnDidFinishLoadingStyleListener listener) {
+  public void removeOnDidFinishLoadingStyleListener(@NonNull OnDidFinishLoadingStyleListener listener) {
     mapChangeReceiver.removeOnDidFinishLoadingStyleListener(listener);
   }
 
@@ -785,7 +785,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the source has changed
    */
-  public void addOnSourceChangedListener(OnSourceChangedListener listener) {
+  public void addOnSourceChangedListener(@NonNull OnSourceChangedListener listener) {
     mapChangeReceiver.addOnSourceChangedListener(listener);
   }
 
@@ -794,8 +794,26 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the source has changed
    */
-  public void removeOnSourceChangedListener(OnSourceChangedListener listener) {
+  public void removeOnSourceChangedListener(@NonNull OnSourceChangedListener listener) {
     mapChangeReceiver.removeOnSourceChangedListener(listener);
+  }
+
+  /**
+   * Set a callback that's invoked when the id of an icon is missing.
+   *
+   * @param listener The callback that's invoked when the id of an icon is missing
+   */
+  public void addOnStyleImageMissingListener(@NonNull OnStyleImageMissingListener listener) {
+    mapChangeReceiver.addOnStyleImageMissingListener(listener);
+  }
+
+  /**
+   * Set a callback that's invoked when a map source has changed.
+   *
+   * @param listener The callback that's invoked when the source has changed
+   */
+  public void removeOnStyleImageMissingListener(@NonNull OnStyleImageMissingListener listener) {
+    mapChangeReceiver.removeOnStyleImageMissingListener(listener);
   }
 
   /**
@@ -974,6 +992,21 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
      * @param id the id of the source that has changed
      */
     void onSourceChangedListener(String id);
+  }
+
+  /**
+   * Interface definition for a callback to be invoked with the id of a missing icon.
+   * <p>
+   * {@link MapView#addOnStyleImageMissingListener(OnStyleImageMissingListener)}
+   * </p>
+   */
+  public interface OnStyleImageMissingListener {
+    /**
+     * Called when the map is missing an icon.
+     *
+     * @param id the id of the icon that is missing
+     */
+    void onStyleImageMissing(@NonNull String id);
   }
 
   /**

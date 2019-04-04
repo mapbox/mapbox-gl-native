@@ -1025,7 +1025,9 @@ final class NativeMapView implements NativeMap {
 
   @Keep
   private void onDidBecomeIdle() {
-    stateCallback.onDidBecomeIdle();
+    if (stateCallback != null) {
+      stateCallback.onDidBecomeIdle();
+    }
   }
 
   @Keep
@@ -1039,6 +1041,14 @@ final class NativeMapView implements NativeMap {
   private void onSourceChanged(String sourceId) {
     if (stateCallback != null) {
       stateCallback.onSourceChanged(sourceId);
+    }
+  }
+
+  @Keep
+  private void onStyleImageMissing(String imageId) {
+    Logger.e(TAG, "OnStyleImageMissing: " + imageId);
+    if (stateCallback != null) {
+      stateCallback.onStyleImageMissing(imageId);
     }
   }
 
@@ -1473,5 +1483,7 @@ final class NativeMapView implements NativeMap {
     void onDidBecomeIdle();
 
     void onSourceChanged(String sourceId);
+
+    void onStyleImageMissing(String imageId);
   }
 }
