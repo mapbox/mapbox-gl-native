@@ -1290,10 +1290,10 @@ public:
 }
 
 - (MGLCoordinateBounds)visibleCoordinateBounds {
-    return [self convertRect:NSEdgeInsetsInsetRect(self.bounds, self.contentInset) toCoordinateBoundsFromView:self];
+    return [self convertRect:[self NSEdgeInsetsInsetRect:self.bounds edgeInsets:self.contentInset] toCoordinateBoundsFromView:self];
 }
 
-- (CGRect)NSEdgeInsetsInsetRect(CGRect rect, NSEdgeInsets insets) {
+- (CGRect)NSEdgeInsetsInsetRect:(CGRect)rect edgeInsets:(NSEdgeInsets)insets {
     if (((insets.top + insets.bottom) > rect.size.height) || ((insets.left + insets.right) > rect.size.width)) {
         return CGRectNull;
     } else {
