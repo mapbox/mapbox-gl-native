@@ -18,7 +18,7 @@ if [ -z `which wget` ]; then
     brew install wget
 fi
 
-if [ -z `which jazzy` ]; then
+if [[ -z `which jazzy` || $(jazzy -v) != "jazzy version: ${JAZZY_VERSION}" ]]; then
     step "Installing jazzy…"
 
     CIRCLECI=${CIRCLECI:-false}
