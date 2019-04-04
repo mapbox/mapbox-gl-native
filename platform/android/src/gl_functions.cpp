@@ -102,7 +102,12 @@ void (* const glReadPixels)(GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, void
 void (* const glRenderbufferStorage)(GLenum, GLenum, GLsizei, GLsizei) = ::glRenderbufferStorage;
 void (* const glSampleCoverage)(GLfloat, GLboolean) = ::glSampleCoverage;
 void (* const glScissor)(GLint, GLint, GLsizei, GLsizei) = ::glScissor;
-void (* const glShaderSource)(GLuint, GLsizei, const GLchar * const*, const GLint *) = ::glShaderSource;
+
+// Some implementations use `const GLchar* const*` and others `const GLchar**`.
+void (* const glShaderSource)(GLuint, GLsizei, const GLchar * const*, const GLint *) = [](GLuint shader, GLsizei count, const GLchar * const * string, const GLint *length) {
+    ::glShaderSource(shader, count, const_cast<const GLchar **>(string), length);
+};
+
 void (* const glStencilFunc)(GLenum, GLint, GLuint) = ::glStencilFunc;
 void (* const glStencilFuncSeparate)(GLenum, GLenum, GLint, GLuint) = ::glStencilFuncSeparate;
 void (* const glStencilMask)(GLuint) = ::glStencilMask;
