@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue that caused conditional expressions to crash when passed nested conditional expressions as parameters. ([#14181](https://github.com/mapbox/mapbox-gl-native/pull/14181))
 * Added `MGLSymbolStyleLayer.textVariableAnchor` and `MGLSymbolStyleLayer.textRadialOffset` API to enable variable label placement ([#14184](https://github.com/mapbox/mapbox-gl-native/pull/14184))
 * Added `-[MGLMapViewDelegate mapView:didFailToLoadImage:]` to load missing symbol icons in the style if they are not found. ([#14302](https://github.com/mapbox/mapbox-gl-native/pull/14302))
+* Fixed a possible crash with certain expressions containing arguments that evaluate to a dictionary containing `NSArray` or `NSNumber` values. ([#14352](https://github.com/mapbox/mapbox-gl-native/pull/14352))
 
 ### Packaging
 
