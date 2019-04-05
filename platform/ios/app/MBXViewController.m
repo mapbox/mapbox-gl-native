@@ -1115,8 +1115,33 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 - (void)styleSymbolLayer
 {
-    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
-    stateLayer.textColor = [NSExpression expressionForConstantValue:[UIColor redColor]];
+    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label"];
+    
+    MGLAttributedExpression *firstRowAttribute = [MGLAttributedExpression attributedExpression:[NSExpression expressionForKeyPath:@"name"]
+                                                                                     fontNames:nil
+                                                                                     fontScale:nil];
+    MGLAttributedExpression *lineBreak = [MGLAttributedExpression attributedExpression:[NSExpression expressionForConstantValue:@"\n"]
+                                                                             fontNames:nil
+                                                                             fontScale:nil];
+    NSExpression *fontNames = [NSExpression expressionForAggregate:@[ [NSExpression expressionForConstantValue:@"Arial Unicode MS Bold"] ]];
+    MGLAttributedExpression *formatAttribute = [MGLAttributedExpression attributedExpression:[NSExpression expressionForKeyPath:@"name"]
+                                                                                  attributes:@{ MGLFontScaleAttribute :
+                                                                                                    [NSExpression expressionForConstantValue:@(0.8)],
+                                                                                                MGLFontColorAttribute :
+                                                                                                    [NSExpression expressionForConstantValue:@"blue"],
+                                                                                                MGLFontNamesAttribute :
+                                                                                                    fontNames
+                                                                                                }];
+    
+    NSExpression *attributedExpression = [NSExpression expressionWithFormat:@"mgl_attributed:(%@, %@, %@)",
+                                          [NSExpression expressionForConstantValue:firstRowAttribute],
+                                          [NSExpression expressionForConstantValue:lineBreak],
+                                          [NSExpression expressionForConstantValue:formatAttribute]
+                                          ];
+    
+    NSExpression * expression = [NSExpression expressionWithFormat:@"MGL_MATCH(2 - 1,  1, %@, 'Foo')", attributedExpression];
+    
+    stateLayer.text = expression;
 }
 
 - (void)styleBuildingLayer

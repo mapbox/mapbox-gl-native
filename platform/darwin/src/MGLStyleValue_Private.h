@@ -86,7 +86,7 @@ public:
             return mbglValue;
         }
 
-        NSArray *jsonExpression = expression.mgl_jsonExpressionObject;
+        NSArray *jsonExpression = @[ @"format", @"foo", @{ @"text-color": @[@"rgb", @255, @0, @0] } ];
 
         mbgl::style::conversion::Error valueError;
         auto value = mbgl::style::conversion::convert<MBGLValue>(
