@@ -35,8 +35,6 @@ public:
 
     void render(const UpdateParameters&);
 
-    void flush();
-
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions& options = {}) const;
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate& point, const RenderedQueryOptions& options = {}) const;

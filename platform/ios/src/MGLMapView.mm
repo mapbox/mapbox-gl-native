@@ -1341,8 +1341,6 @@ public:
         // In iOS 12.2, CAEAGLLayer.presentsWithTransaction can cause dramatic
         // slow down. The exact cause of this is unknown, but this work around
         // appears to lessen the effects.
-        //
-        // Also, consider calling the new mbgl::Renderer::flush()
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
         eaglLayer.presentsWithTransaction = NO;
         
