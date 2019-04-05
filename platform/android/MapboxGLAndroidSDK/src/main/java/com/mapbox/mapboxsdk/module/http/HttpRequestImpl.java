@@ -3,15 +3,16 @@ package com.mapbox.mapboxsdk.module.http;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.http.HttpRequest;
 import com.mapbox.mapboxsdk.http.HttpIdentifier;
 import com.mapbox.mapboxsdk.http.HttpLogger;
-import com.mapbox.mapboxsdk.http.HttpResponder;
+import com.mapbox.mapboxsdk.http.HttpRequest;
 import com.mapbox.mapboxsdk.http.HttpRequestUrl;
+import com.mapbox.mapboxsdk.http.HttpResponder;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dispatcher;
@@ -42,7 +43,11 @@ public class HttpRequestImpl implements HttpRequest {
       Build.CPU_ABI)
   );
 
-  private static OkHttpClient client = new OkHttpClient.Builder().dispatcher(getDispatcher()).build();
+  @VisibleForTesting
+  static final OkHttpClient DEFAULT_CLIENT = new OkHttpClient.Builder().dispatcher(getDispatcher()).build();
+
+  @VisibleForTesting
+  static OkHttpClient client = DEFAULT_CLIENT;
 
   private Call call;
 
@@ -94,8 +99,12 @@ public class HttpRequestImpl implements HttpRequest {
     HttpLogger.logEnabled = enabled;
   }
 
-  public static void setOkHttpClient(OkHttpClient okHttpClient) {
-    HttpRequestImpl.client = okHttpClient;
+  public static void setOkHttpClient(@Nullable OkHttpClient okHttpClient) {
+    if (okHttpClient != null) {
+      HttpRequestImpl.client = okHttpClient;
+    } else {
+      HttpRequestImpl.client = DEFAULT_CLIENT;
+    }
   }
 
   private static class OkHttpCallback implements Callback {
