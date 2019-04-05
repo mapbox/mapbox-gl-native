@@ -1,12 +1,9 @@
 package com.mapbox.mapboxsdk;
 
 import android.content.Context;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertSame;
@@ -32,13 +29,13 @@ public class MapboxTest {
   @Test
   public void testGetAccessToken() {
     final String accessToken = "pk.0000000001";
-    injectMapboxSingleton(accessToken);
+    MapboxInjector.inject(context, accessToken);
     assertSame(accessToken, Mapbox.getAccessToken());
   }
 
   @Test
   public void testApplicationContext() {
-    injectMapboxSingleton("pk.0000000001");
+    MapboxInjector.inject(context, "pk.0000000001");
     assertNotNull(Mapbox.getApplicationContext());
     assertNotEquals(context, appContext);
     assertEquals(appContext, appContext);
@@ -71,27 +68,7 @@ public class MapboxTest {
 
   @After
   public void after() {
-    clearMapboxSingleton();
+    MapboxInjector.clear();
   }
 
-  private void injectMapboxSingleton(String accessToken) {
-    Mapbox mapbox = new Mapbox(context, accessToken);
-    try {
-      Field field = Mapbox.class.getDeclaredField("INSTANCE");
-      field.setAccessible(true);
-      field.set(mapbox, mapbox);
-    } catch (Exception exception) {
-      throw new AssertionError();
-    }
-  }
-
-  private void clearMapboxSingleton() {
-    try {
-      Field field = Mapbox.class.getDeclaredField("INSTANCE");
-      field.setAccessible(true);
-      field.set(field, null);
-    } catch (Exception exception) {
-      throw new AssertionError();
-    }
-  }
 }

@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.module.http;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import okhttp3.OkHttpClient;
 import okio.Buffer;
 
@@ -38,10 +39,14 @@ public class HttpRequestUtil {
 
   /**
    * Set the OkHttpClient used for requesting map resources.
+   * <p>
+   * This configuration survives across mapView instances.
+   * Reset the OkHttpClient to the default by passing null as parameter.
+   * </p>
    *
    * @param client the OkHttpClient
    */
-  public static void setOkHttpClient(OkHttpClient client) {
+  public static void setOkHttpClient(@Nullable OkHttpClient client) {
     HttpRequestImpl.setOkHttpClient(client);
   }
 
