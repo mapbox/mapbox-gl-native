@@ -598,13 +598,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // CommandEncoder destructor submits render commands.
 }
 
-void  Renderer::Impl::flush() {
-    assert(gfx::BackendScope::exists());
-
-    gl::Context& glContext = static_cast<gl::Context&>(backend.getContext());
-    glContext.flush();
-}
-
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
     std::vector<const RenderLayer*> layers;
     if (options.layerIDs) {

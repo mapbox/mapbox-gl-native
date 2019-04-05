@@ -811,9 +811,5 @@ void Context::performCleanup() {
     }
 }
 
-void Context::flush() {
-    MBGL_CHECK_ERROR(glFinish());
-}
-
 } // namespace gl
 } // namespace mbgl
