@@ -1,7 +1,7 @@
 # Mapbox GL Android Test documentation
 
 ## Testing
-We currently support the following types of testing on the Mapbox Android SDK:
+We currently support the following types of testing on the Mapbox Maps SDK for Android:
 
  - [Unit tests](docs/UNIT_TESTS.md) using [JUnit](http://developer.android.com/tools/testing-support-library/index.html#AndroidJUnitRunner)
  - [UI tests](docs/UI_TESTS.md) using [Espresso](http://developer.android.com/tools/testing-support-library/index.html#Espresso)
