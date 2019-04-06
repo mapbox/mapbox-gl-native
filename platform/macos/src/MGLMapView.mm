@@ -1289,11 +1289,7 @@ public:
     return [NSSet setWithObjects:@"centerCoordinate", @"zoomLevel", @"direction", @"bounds", nil];
 }
 
-- (MGLCoordinateBounds)visibleCoordinateBounds {
-    return [self convertRect:[self NSEdgeInsetsInsetRect:self.bounds edgeInsets:self.contentInsets] toCoordinateBoundsFromView:self];
-}
-
-- (CGRect)NSEdgeInsetsInsetRect:(CGRect)rect edgeInsets:(NSEdgeInsets)insets {
+static CGRect MGLEdgeInsetsInsetRect(CGRect rect, NSEdgeInsets insets) {
     if (((insets.top + insets.bottom) > rect.size.height) || ((insets.left + insets.right) > rect.size.width)) {
         return CGRectNull;
     } else {
@@ -1303,6 +1299,10 @@ public:
         rect.size.width -= (insets.left + insets.right);
         return rect;
     }
+}
+
+- (MGLCoordinateBounds)visibleCoordinateBounds {
+    return [self convertRect:MGLEdgeInsetsInsetRect(self.bounds, self.contentInsets) toCoordinateBoundsFromView:self];
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds {
