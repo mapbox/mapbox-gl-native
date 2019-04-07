@@ -139,7 +139,7 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
     }
 }
 
-void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, uint64_t correlationID_) {
+void GeometryTileWorker::setLayers(std::vector<Immutable<LayerProperties>> layers_, uint64_t correlationID_) {
     try {
         layers = std::move(layers_);
         correlationID = correlationID_;
@@ -312,25 +312,6 @@ void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependen
     }
 }
 
-static std::vector<Immutable<style::LayerProperties>> toEvaluatedProperties(const std::vector<Immutable<style::Layer::Impl>>& layers, float zoom) {
-    std::vector<Immutable<style::LayerProperties>> result;
-    result.reserve(layers.size());
-    for (auto& layer : layers) {
-        auto renderLayer = LayerManager::get()->createRenderLayer(layer);
-
-        renderLayer->transition(TransitionParameters {
-            Clock::time_point::max(),
-            TransitionOptions()
-        });
-
-        renderLayer->evaluate(PropertyEvaluationParameters {
-            zoom
-        });
-        result.push_back(renderLayer->evaluatedProperties);
-    }
-    return result;
-}
-
 void GeometryTileWorker::parse() {
     if (!data || !layers) {
         return;
@@ -340,7 +321,7 @@ void GeometryTileWorker::parse() {
 
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
 
-    buckets.clear();
+    renderData.clear();
     layouts.clear();
 
     featureIndex = std::make_unique<FeatureIndex>(*data ? (*data)->clone() : nullptr);
@@ -349,9 +330,8 @@ void GeometryTileWorker::parse() {
     ImageDependencies imageDependencies;
 
     // Create render layers and group by layout
-    std::vector<Immutable<style::LayerProperties>> evaluatedProperties = toEvaluatedProperties(*layers, id.overscaledZ);
     std::unordered_map<std::string, std::vector<Immutable<style::LayerProperties>>> groupMap;
-    for (auto layer : evaluatedProperties) {
+    for (auto layer : *layers) {
         groupMap[layoutKey(*layer->baseImpl)].push_back(std::move(layer));
     }
 
@@ -389,7 +369,7 @@ void GeometryTileWorker::parse() {
             if (layout->hasDependencies()) {
                 layouts.push_back(std::move(layout));
             } else {
-                layout->createBucket({}, featureIndex, buckets, firstLoad, showCollisionBoxes);
+                layout->createBucket({}, featureIndex, renderData, firstLoad, showCollisionBoxes);
             }
         } else {
             const Filter& filter = leaderImpl.filter;
@@ -412,7 +392,7 @@ void GeometryTileWorker::parse() {
             }
 
             for (const auto& layer : group) {
-                buckets.emplace(layer->baseImpl->id, bucket);
+                renderData.emplace(layer->baseImpl->id, LayerRenderData{bucket, layer});
             }
         }
     }
@@ -466,7 +446,7 @@ void GeometryTileWorker::finalizeLayout() {
             }
 
             // layout adds the bucket to buckets
-            layout->createBucket(iconAtlas.patternPositions, featureIndex, buckets, firstLoad, showCollisionBoxes);
+            layout->createBucket(iconAtlas.patternPositions, featureIndex, renderData, firstLoad, showCollisionBoxes);
         }
     }
 
@@ -481,7 +461,7 @@ void GeometryTileWorker::finalizeLayout() {
                        " Time");
 
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
-        std::move(buckets),
+        std::move(renderData),
         std::move(featureIndex),
         std::move(glyphAtlasImage),
         std::move(iconAtlas)

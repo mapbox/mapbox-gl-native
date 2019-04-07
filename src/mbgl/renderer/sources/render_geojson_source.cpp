@@ -84,7 +84,7 @@ bool RenderGeoJSONSource::isLoaded() const {
 }
 
 void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
-                                 const std::vector<Immutable<Layer::Impl>>& layers,
+                                 const std::vector<Immutable<LayerProperties>>& layers,
                                  const bool needsRendering,
                                  const bool needsRelayout,
                                  const TileParameters& parameters) {

@@ -7,7 +7,7 @@
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/style/source_impl.hpp>
-#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layer_properties.hpp>
 
 #include <unordered_map>
 #include <vector>
@@ -50,7 +50,7 @@ public:
     virtual bool isLoaded() const = 0;
 
     virtual void update(Immutable<style::Source::Impl>,
-                        const std::vector<Immutable<style::Layer::Impl>>&,
+                        const std::vector<Immutable<style::LayerProperties>>&,
                         bool needsRendering,
                         bool needsRelayout,
                         const TileParameters&) = 0;

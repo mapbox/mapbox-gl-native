@@ -28,7 +28,7 @@ std::unique_ptr<Layout> FillExtrusionLayerFactory::createLayout(const LayoutPara
                                                                 std::unique_ptr<GeometryTileLayer> layer,
                                                                 const std::vector<Immutable<style::LayerProperties>>& group) noexcept {
     using namespace style;
-    using LayoutType = PatternLayout<FillExtrusionBucket, FillExtrusionLayerProperties, FillExtrusionPattern, FillExtrusionPaintProperties::PossiblyEvaluated>;
+    using LayoutType = PatternLayout<FillExtrusionBucket, FillExtrusionLayerProperties, FillExtrusionPattern>;
     return std::make_unique<LayoutType>(parameters.bucketParameters, group, std::move(layer), parameters.imageDependencies);
 }
 

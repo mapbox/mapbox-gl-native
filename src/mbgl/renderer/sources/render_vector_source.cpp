@@ -24,7 +24,7 @@ bool RenderVectorSource::isLoaded() const {
 }
 
 void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
-                                const std::vector<Immutable<Layer::Impl>>& layers,
+                                const std::vector<Immutable<style::LayerProperties>>& layers,
                                 const bool needsRendering,
                                 const bool needsRelayout,
                                 const TileParameters& parameters) {

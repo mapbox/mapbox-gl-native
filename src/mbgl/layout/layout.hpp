@@ -11,6 +11,7 @@ class Bucket;
 class BucketParameters;
 class RenderLayer;
 class FeatureIndex;
+class LayerRenderData;
 
 class Layout {
 public:
@@ -18,7 +19,7 @@ public:
 
     virtual void createBucket(const ImagePositions&,
                               std::unique_ptr<FeatureIndex>&,
-                              std::unordered_map<std::string, std::shared_ptr<Bucket>>&,
+                              std::unordered_map<std::string, LayerRenderData>&,
                               const bool,
                               const bool) = 0;
 

@@ -11,7 +11,7 @@ namespace mbgl {
 using namespace style;
 
 LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layout_,
-                       const std::map<std::string, style::LinePaintProperties::PossiblyEvaluated>& layerPaintProperties,
+                       const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                        const float zoom_,
                        const uint32_t overscaling_)
     : layout(std::move(layout_)),
@@ -23,7 +23,7 @@ LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layo
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                pair.second,
+                getEvaluated<LineLayerProperties>(pair.second),
                 zoom));
     }
 }

@@ -11,7 +11,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/storage/resource.hpp>
-#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layer_properties.hpp>
 
 #include <string>
 #include <memory>
@@ -21,6 +21,7 @@
 namespace mbgl {
 
 class DebugBucket;
+class LayerRenderData;
 class TransformState;
 class TileObserver;
 class RenderLayer;
@@ -33,13 +34,16 @@ namespace gl {
 class Context;
 } // namespace gl
 
-class Tile : private util::noncopyable {
+
+class Tile {
 public:
     enum class Kind : uint8_t {
         Geometry,
         Raster,
         RasterDEM
     };
+    Tile(const Tile&) = delete;
+    Tile& operator=(const Tile&) = delete;
 
     Tile(Kind, OverscaledTileID);
     virtual ~Tile();
@@ -53,6 +57,9 @@ public:
 
     virtual void upload(gfx::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
+    virtual const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const {
+        return nullptr;
+    }
 
     template <class T>
     T* getBucket(const style::Layer::Impl& layer) const {
@@ -60,7 +67,7 @@ public:
     }
 
     virtual void setShowCollisionBoxes(const bool) {}
-    virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
+    virtual void setLayers(const std::vector<Immutable<style::LayerProperties>>&) {}
     virtual void setMask(TileMask&&) {}
 
     virtual void queryRenderedFeatures(

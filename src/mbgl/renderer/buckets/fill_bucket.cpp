@@ -28,7 +28,7 @@ using namespace style;
 struct GeometryTooLongException : std::exception {};
 
 FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties,
-                       std::map<std::string, FillBucket::PossiblyEvaluatedPaintProperties> layerPaintProperties,
+                       const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                        const float zoom,
                        const uint32_t) {
 
@@ -37,7 +37,7 @@ FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties,
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                pair.second,
+                getEvaluated<FillLayerProperties>(pair.second),
                 zoom));
     }
 }

@@ -26,7 +26,6 @@ public:
 template <class BucketType,
           class LayerPropertiesType,
           class PatternPropertyType,
-          class PossiblyEvaluatedPaintPropertiesType,
           class PossiblyEvaluatedLayoutPropertiesType = typename style::Properties<>::PossiblyEvaluated>
 class PatternLayout : public Layout {
 public:
@@ -46,8 +45,8 @@ public:
 
         for (const auto& layerProperties : group) {
             const std::string& layerId = layerProperties->baseImpl->id;
-            const auto evaluatedProps = static_cast<const LayerPropertiesType&>(*layerProperties).evaluated;
-            const auto patternProperty = evaluatedProps.template get<PatternPropertyType>();
+            const auto& evaluated = style::getEvaluated<LayerPropertiesType>(layerProperties);
+            const auto patternProperty = evaluated.template get<PatternPropertyType>();
             const auto constantPattern = patternProperty.constantOr(Faded<std::basic_string<char> >{ "", ""});
             // determine if layer group has any layers that use *-pattern property and add
             // constant pattern dependencies.
@@ -58,7 +57,7 @@ public:
                 patternDependencies.emplace(constantPattern.to, ImageType::Pattern);
                 patternDependencies.emplace(constantPattern.from, ImageType::Pattern);
             }
-            layerPaintProperties.emplace(layerId, std::move(evaluatedProps));
+            layerPropertiesMap.emplace(layerId, layerProperties);
         }
 
         const size_t featureCount = sourceLayer->featureCount();
@@ -71,9 +70,9 @@ public:
             if (hasPattern) {
                 for (const auto& layerProperties : group) {
                     const std::string& layerId = layerProperties->baseImpl->id;
-                    const auto it = layerPaintProperties.find(layerId);
-                    if (it != layerPaintProperties.end()) {
-                        const auto paint = it->second;
+                    const auto it = layerPropertiesMap.find(layerId);
+                    if (it != layerPropertiesMap.end()) {
+                        const auto paint = static_cast<const LayerPropertiesType&>(*it->second).evaluated;
                         const auto patternProperty = paint.template get<PatternPropertyType>();
                         if (!patternProperty.isConstant()) {
                             // For layers with non-data-constant pattern properties, evaluate their expression and add
@@ -101,8 +100,8 @@ public:
         return hasPattern;
     }
 
-    void createBucket(const ImagePositions& patternPositions, std::unique_ptr<FeatureIndex>& featureIndex, std::unordered_map<std::string, std::shared_ptr<Bucket>>& buckets, const bool, const bool) override {
-        auto bucket = std::make_shared<BucketType>(layout, layerPaintProperties, zoom, overscaling);
+    void createBucket(const ImagePositions& patternPositions, std::unique_ptr<FeatureIndex>& featureIndex, std::unordered_map<std::string, LayerRenderData>& renderData, const bool, const bool) override {
+        auto bucket = std::make_shared<BucketType>(layout, layerPropertiesMap, zoom, overscaling);
         for (auto & patternFeature : features) {
             const auto i = patternFeature.i;
             std::unique_ptr<GeometryTileFeature> feature = std::move(patternFeature.feature);
@@ -113,17 +112,16 @@ public:
             featureIndex->insert(geometries, i, sourceLayerID, bucketLeaderID);
         }
         if (bucket->hasData()) {
-            for (const auto& pair : layerPaintProperties) {
-                buckets.emplace(pair.first, bucket);
+            for (const auto& pair : layerPropertiesMap) {
+                renderData.emplace(pair.first, LayerRenderData {bucket, pair.second});
             }
         }
     };
 
-    std::map<std::string, PossiblyEvaluatedPaintPropertiesType> layerPaintProperties;
+private:
+    std::map<std::string, Immutable<style::LayerProperties>> layerPropertiesMap;
     std::string bucketLeaderID;
 
-
-private:
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
     std::vector<PatternFeature> features;
     PossiblyEvaluatedLayoutPropertiesType layout;
