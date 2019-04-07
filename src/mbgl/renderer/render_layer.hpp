@@ -19,6 +19,12 @@ class RenderLayerSymbolInterface;
 class RenderTile;
 class TransformState;
 
+class LayerRenderData {
+public:
+    std::shared_ptr<Bucket> bucket;
+    Immutable<style::LayerProperties> layerProperties;
+};
+
 class RenderLayer {
 protected:
     RenderLayer(Immutable<style::LayerProperties>);
@@ -90,6 +96,7 @@ protected:
     // the cached paint properties) can be still in use while the tile is loading new buckets (which will
     // correpond to the current paint properties of the layer).
     virtual void updateBucketPaintProperties(Bucket*) const;
+
     using FilterFunctionPtr = bool (*)(RenderTile&);
     RenderTiles filterRenderTiles(RenderTiles, FilterFunctionPtr) const;
 

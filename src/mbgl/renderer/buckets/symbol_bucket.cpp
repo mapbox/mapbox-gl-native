@@ -8,8 +8,12 @@ namespace mbgl {
 
 using namespace style;
 
+const SymbolLayerProperties& toSymbolLayerProperties(const Immutable<LayerProperties>& layer) {
+    return static_cast<const SymbolLayerProperties&>(*layer);
+}
+
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
-                           const std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated>& paintProperties_,
+                           const std::map<std::string, Immutable<style::LayerProperties>>& paintProperties_,
                            const style::PropertyValue<float>& textSize,
                            const style::PropertyValue<float>& iconSize,
                            float zoom,
@@ -30,7 +34,7 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       tilePixelRatio(tilePixelRatio_) {
 
     for (const auto& pair : paintProperties_) {
-        auto layerPaintProperties = pair.second;
+        auto layerPaintProperties = toSymbolLayerProperties(pair.second).evaluated;
         if (hasFormatSectionOverrides()) {
             setPaintPropertyOverrides(layerPaintProperties);
         }

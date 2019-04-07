@@ -61,7 +61,7 @@ Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
         return it == tiles.end() ? cache.get(tileID) : it->second.get();
 }
 
-void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
+void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& layers,
                          const bool needsRendering,
                          const bool needsRelayout,
                          const TileParameters& parameters,

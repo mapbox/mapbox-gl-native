@@ -24,7 +24,7 @@ bool RenderCustomGeometrySource::isLoaded() const {
 }
 
 void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_,
-                                 const std::vector<Immutable<Layer::Impl>>& layers,
+                                 const std::vector<Immutable<style::LayerProperties>>& layers,
                                  const bool needsRendering,
                                  const bool needsRelayout,
                                  const TileParameters& parameters) {

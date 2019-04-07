@@ -106,7 +106,7 @@ std::vector<Feature> RenderImageSource::querySourceFeatures(const SourceQueryOpt
 }
 
 void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
-                               const std::vector<Immutable<Layer::Impl>>&,
+                               const std::vector<Immutable<LayerProperties>>&,
                                const bool needsRendering,
                                const bool,
                                const TileParameters& parameters) {

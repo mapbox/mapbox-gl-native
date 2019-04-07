@@ -87,21 +87,22 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
 }
 
 
-void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) {
+void GeometryTile::setLayers(const std::vector<Immutable<LayerProperties>>& layers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     pending = true;
 
-    std::vector<Immutable<Layer::Impl>> impls;
+    std::vector<Immutable<LayerProperties>> impls;
     impls.reserve(layers.size());
 
     for (const auto& layer : layers) {
         // Skip irrelevant layers.
-        assert(layer->getTypeInfo()->source != LayerTypeInfo::Source::NotRequired);
-        assert(layer->source == sourceID);
-        assert(layer->visibility != VisibilityType::None);
-        if (id.overscaledZ < std::floor(layer->minZoom) ||
-            id.overscaledZ >= std::ceil(layer->maxZoom)) {
+        const auto& layerImpl = *layer->baseImpl;
+        assert(layerImpl.getTypeInfo()->source != LayerTypeInfo::Source::NotRequired);
+        assert(layerImpl.source == sourceID);
+        assert(layerImpl.visibility != VisibilityType::None);
+        if (id.overscaledZ < std::floor(layerImpl.minZoom) ||
+            id.overscaledZ >= std::ceil(layerImpl.maxZoom)) {
             continue;
         }
 
@@ -127,7 +128,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
         pending = false;
     }
     
-    buckets = std::move(result.buckets);
+    layerIdToLayerRenderData = std::move(result.renderData);
     
     latestFeatureIndex = std::move(result.featureIndex);
 
@@ -180,8 +181,8 @@ void GeometryTile::upload(gfx::Context& context) {
         }
     };
 
-    for (auto& entry : buckets) {
-        uploadFn(*entry.second);
+    for (auto& entry : layerIdToLayerRenderData) {
+        uploadFn(*entry.second.bucket);
     }
 
     if (glyphAtlasImage) {
@@ -200,14 +201,21 @@ void GeometryTile::upload(gfx::Context& context) {
 }
 
 Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
-    const auto it = buckets.find(layer.id);
-    if (it == buckets.end()) {
+    const LayerRenderData* data = getLayerRenderData(layer);
+    return data ? data->bucket.get() : nullptr; 
+}
+
+const LayerRenderData* GeometryTile::getLayerRenderData(const style::Layer::Impl& layerImpl) const {
+    const auto it = layerIdToLayerRenderData.find(layerImpl.id);
+    if (it == layerIdToLayerRenderData.end()) {
         return nullptr;
     }
-    Bucket* result = it->second.get();
-    assert(result);
-    // Bucket might be outdated, see issue #12432.
-    return result->supportsLayer(layer) ? result : nullptr;
+    const LayerRenderData& result = it->second;
+    if (result.layerProperties->baseImpl->getTypeInfo() != layerImpl.getTypeInfo()) {
+        // Layer data might be outdated, see issue #12432.
+        return nullptr;
+    }
+    return &result;
 }
 
 float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {

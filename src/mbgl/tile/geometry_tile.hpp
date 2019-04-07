@@ -33,7 +33,7 @@ public:
     void setError(std::exception_ptr);
     void setData(std::unique_ptr<const GeometryTileData>);
 
-    void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
+    void setLayers(const std::vector<Immutable<style::LayerProperties>>&) override;
     void setShowCollisionBoxes(const bool showCollisionBoxes) override;
 
     void onGlyphsAvailable(GlyphMap) override;
@@ -44,6 +44,7 @@ public:
 
     void upload(gfx::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
+    const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -63,16 +64,16 @@ public:
 
     class LayoutResult {
     public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+        std::unordered_map<std::string, LayerRenderData> renderData;
         std::unique_ptr<FeatureIndex> featureIndex;
         optional<AlphaImage> glyphAtlasImage;
         ImageAtlas iconAtlas;
 
-        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets_,
+        LayoutResult(std::unordered_map<std::string, LayerRenderData> renderData_,
                      std::unique_ptr<FeatureIndex> featureIndex_,
                      optional<AlphaImage> glyphAtlasImage_,
                      ImageAtlas iconAtlas_)
-            : buckets(std::move(buckets_)),
+            : renderData(std::move(renderData_)),
               featureIndex(std::move(featureIndex_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlas(std::move(iconAtlas_)) {}
@@ -109,7 +110,7 @@ private:
 
     uint64_t correlationID = 0;
 
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+    std::unordered_map<std::string, LayerRenderData> layerIdToLayerRenderData;
     
     std::shared_ptr<FeatureIndex> latestFeatureIndex;
 
