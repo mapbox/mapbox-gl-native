@@ -180,4 +180,11 @@ public final class Mapbox {
     accessToken = accessToken.trim().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
     return accessToken.length() != 0 && (accessToken.startsWith("pk.") || accessToken.startsWith("sk."));
   }
+
+  /**
+   * Internal use. Check if the {@link Mapbox#INSTANCE} is present.
+   */
+  public static boolean hasInstance() {
+    return INSTANCE != null;
+  }
 }
