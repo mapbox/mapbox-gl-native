@@ -1360,3 +1360,17 @@ TEST(OfflineDatabse, ChangePath) {
     util::deleteFile(newPath);
 }
 
+TEST(OfflineDatabse, resetCache) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
+
+    OfflineDatabase db(filename);
+    auto result = db.resetCache();
+    EXPECT_FALSE(result);
+
+    auto regions = db.listRegions().value();
+    EXPECT_EQ(0u, regions.size());
+    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
