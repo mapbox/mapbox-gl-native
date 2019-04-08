@@ -32,7 +32,7 @@ public class MapEventFactory {
   private final Context appContext;
 
   MapEventFactory(Context appContext) {
-   this.appContext = appContext;
+    this.appContext = appContext;
   }
 
   Event buildMapLoadEvent() {
@@ -99,7 +99,9 @@ public class MapEventFactory {
 
   private String obtainCellularCarrier(Context context) {
     TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-    if(manager == null) return NO_CARRIER;
+    if (manager == null) {
+      return NO_CARRIER;
+    }
     String carrierName = manager.getNetworkOperatorName();
 
     if (TextUtils.isEmpty(carrierName)) {

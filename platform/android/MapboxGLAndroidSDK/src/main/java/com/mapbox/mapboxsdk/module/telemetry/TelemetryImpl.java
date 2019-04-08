@@ -4,11 +4,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.MapboxTelemetry;
-import com.mapbox.android.telemetry.TelemetryEnabler;
 import com.mapbox.android.telemetry.SessionInterval;
-
+import com.mapbox.android.telemetry.TelemetryEnabler;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
@@ -22,6 +22,7 @@ public class TelemetryImpl implements TelemetryDefinition {
   @Nullable
   private MapboxTelemetry telemetry;
   private MapEventFactory mapEventFactory;
+
   public TelemetryImpl() {
     Context appContext = Mapbox.getApplicationContext();
     String accessToken = Mapbox.getAccessToken();
