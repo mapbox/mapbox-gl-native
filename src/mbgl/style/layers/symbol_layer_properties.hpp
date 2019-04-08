@@ -29,7 +29,7 @@ struct SymbolAvoidEdges : LayoutProperty<bool> {
 
 struct SymbolZOrder : LayoutProperty<SymbolZOrderType> {
     static constexpr const char *name() { return "symbol-z-order"; }
-    static SymbolZOrderType defaultValue() { return SymbolZOrderType::ViewportY; }
+    static SymbolZOrderType defaultValue() { return SymbolZOrderType::Auto; }
 };
 
 struct IconAllowOverlap : LayoutProperty<bool> {
