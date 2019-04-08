@@ -27,6 +27,11 @@ struct SymbolAvoidEdges : LayoutProperty<bool> {
     static bool defaultValue() { return false; }
 };
 
+struct SymbolSortKey : DataDrivenLayoutProperty<float> {
+    static constexpr const char *name() { return "symbol-sort-key"; }
+    static float defaultValue() { return 0; }
+};
+
 struct SymbolZOrder : LayoutProperty<SymbolZOrderType> {
     static constexpr const char *name() { return "symbol-z-order"; }
     static SymbolZOrderType defaultValue() { return SymbolZOrderType::Auto; }
@@ -270,6 +275,7 @@ class SymbolLayoutProperties : public Properties<
     SymbolPlacement,
     SymbolSpacing,
     SymbolAvoidEdges,
+    SymbolSortKey,
     SymbolZOrder,
     IconAllowOverlap,
     IconIgnorePlacement,

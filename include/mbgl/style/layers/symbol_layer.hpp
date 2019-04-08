@@ -38,6 +38,10 @@ public:
     const PropertyValue<bool>& getSymbolAvoidEdges() const;
     void setSymbolAvoidEdges(const PropertyValue<bool>&);
 
+    static PropertyValue<float> getDefaultSymbolSortKey();
+    const PropertyValue<float>& getSymbolSortKey() const;
+    void setSymbolSortKey(const PropertyValue<float>&);
+
     static PropertyValue<SymbolZOrderType> getDefaultSymbolZOrder();
     const PropertyValue<SymbolZOrderType>& getSymbolZOrder() const;
     void setSymbolZOrder(const PropertyValue<SymbolZOrderType>&);
