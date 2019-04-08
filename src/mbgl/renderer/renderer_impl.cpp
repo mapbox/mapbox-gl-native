@@ -248,17 +248,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         for (const auto& layerImpl : *layerImpls) {
             RenderLayer* layer = getRenderLayer(layerImpl->id);
             const auto* layerInfo = layerImpl->getTypeInfo();
-            bool layerNeedsRendering = layer->needsRendering(zoomHistory.lastZoom);
-
+            const bool layerNeedsRendering = layer->needsRendering(zoomHistory.lastZoom);
             staticData->has3D = (staticData->has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
-                    sourceNeedsRendering |= layerNeedsRendering;
                     sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || hasLayoutDifference(layerDiff, layerImpl->id));
-                    filteredLayersForSource.push_back(layerImpl);
-
                     if (layerNeedsRendering) {
+                        sourceNeedsRendering = true;
+                        filteredLayersForSource.push_back(layerImpl);
                         renderItems.emplace_back(*layer, source);
                     }
                 }

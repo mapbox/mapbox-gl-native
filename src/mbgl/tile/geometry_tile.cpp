@@ -99,9 +99,9 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
         // Skip irrelevant layers.
         assert(layer->getTypeInfo()->source != LayerTypeInfo::Source::NotRequired);
         assert(layer->source == sourceID);
+        assert(layer->visibility != VisibilityType::None);
         if (id.overscaledZ < std::floor(layer->minZoom) ||
-            id.overscaledZ >= std::ceil(layer->maxZoom) ||
-            layer->visibility == VisibilityType::None) {
+            id.overscaledZ >= std::ceil(layer->maxZoom)) {
             continue;
         }
 
