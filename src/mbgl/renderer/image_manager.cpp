@@ -90,19 +90,20 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
     // if all icons are available. If any are missing, call `onStyleImageMissing`
     // to give the user a chance to provide the icon. If they are not provided
     // by the next frame we'll assume they are permanently missing.
-    bool hasAllDependencies = true;
     if (!isLoaded()) {
+        bool hasAllDependencies = true;
         for (const auto& dependency : pair.first) {
             if (images.find(dependency.first) == images.end()) {
                 hasAllDependencies = false;
+                break;
             }
         }
-    }
 
-    if (hasAllDependencies) {
-        notify(requestor, pair);
-    } else if (!isLoaded()) {
-        requestors.emplace(&requestor, std::move(pair));
+        if (hasAllDependencies) {
+            notify(requestor, pair);
+        } else {
+            requestors.emplace(&requestor, std::move(pair));
+        }
     } else {
         checkMissingAndNotify(requestor, std::move(pair));
     }
