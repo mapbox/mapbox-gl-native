@@ -3,8 +3,9 @@ package com.mapbox.mapboxsdk.maps.renderer;
 import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
+
+import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -21,6 +22,10 @@ import javax.microedition.khronos.opengles.GL10;
  */
 @Keep
 public abstract class MapRenderer implements MapRendererScheduler {
+
+  static {
+    LibraryLoader.load();
+  }
 
   private static final String TAG = "Mbgl-MapRenderer";
 

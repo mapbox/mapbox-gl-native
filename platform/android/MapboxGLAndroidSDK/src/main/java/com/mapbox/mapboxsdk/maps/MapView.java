@@ -26,6 +26,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer;
@@ -118,6 +119,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     if (isInEditMode()) {
       // in IDE layout editor, just return
       return;
+    }
+
+    if (!Mapbox.hasInstance()) {
+      throw new MapboxConfigurationException();
     }
 
     // hide surface until map is fully loaded #10990
