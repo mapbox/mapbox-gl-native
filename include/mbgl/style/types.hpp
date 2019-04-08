@@ -70,6 +70,7 @@ enum class SymbolPlacementType : uint8_t {
 };
     
 enum class SymbolZOrderType : uint8_t {
+    Auto,
     ViewportY,
     Source
 };
