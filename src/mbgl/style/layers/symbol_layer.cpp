@@ -108,6 +108,22 @@ void SymbolLayer::setSymbolAvoidEdges(const PropertyValue<bool>& value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+PropertyValue<float> SymbolLayer::getDefaultSymbolSortKey() {
+    return SymbolSortKey::defaultValue();
+}
+
+const PropertyValue<float>& SymbolLayer::getSymbolSortKey() const {
+    return impl().layout.get<SymbolSortKey>();
+}
+
+void SymbolLayer::setSymbolSortKey(const PropertyValue<float>& value) {
+    if (value == getSymbolSortKey())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<SymbolSortKey>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 PropertyValue<SymbolZOrderType> SymbolLayer::getDefaultSymbolZOrder() {
     return SymbolZOrder::defaultValue();
 }
@@ -1333,6 +1349,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         SymbolPlacement,
         SymbolSpacing,
         SymbolAvoidEdges,
+        SymbolSortKey,
         SymbolZOrder,
         IconAllowOverlap,
         IconIgnorePlacement,
@@ -1374,6 +1391,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         { "symbol-placement", static_cast<uint8_t>(Property::SymbolPlacement) },
         { "symbol-spacing", static_cast<uint8_t>(Property::SymbolSpacing) },
         { "symbol-avoid-edges", static_cast<uint8_t>(Property::SymbolAvoidEdges) },
+        { "symbol-sort-key", static_cast<uint8_t>(Property::SymbolSortKey) },
         { "symbol-z-order", static_cast<uint8_t>(Property::SymbolZOrder) },
         { "icon-allow-overlap", static_cast<uint8_t>(Property::IconAllowOverlap) },
         { "icon-ignore-placement", static_cast<uint8_t>(Property::IconIgnorePlacement) },
@@ -1520,6 +1538,55 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
     }
     
+    if (property == Property::SymbolSortKey || property == Property::IconSize || property == Property::IconRotate || property == Property::TextSize || property == Property::TextMaxWidth || property == Property::TextLetterSpacing || property == Property::TextRadialOffset || property == Property::TextRotate) {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        if (property == Property::SymbolSortKey) {
+            setSymbolSortKey(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconSize) {
+            setIconSize(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconRotate) {
+            setIconRotate(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextSize) {
+            setTextSize(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextMaxWidth) {
+            setTextMaxWidth(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextLetterSpacing) {
+            setTextLetterSpacing(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextRadialOffset) {
+            setTextRadialOffset(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextRotate) {
+            setTextRotate(*typedValue);
+            return nullopt;
+        }
+        
+    }
+    
     if (property == Property::SymbolZOrder) {
         Error error;
         optional<PropertyValue<SymbolZOrderType>> typedValue = convert<PropertyValue<SymbolZOrderType>>(value, error, false, false);
@@ -1556,50 +1623,6 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
         if (property == Property::TextRotationAlignment) {
             setTextRotationAlignment(*typedValue);
-            return nullopt;
-        }
-        
-    }
-    
-    if (property == Property::IconSize || property == Property::IconRotate || property == Property::TextSize || property == Property::TextMaxWidth || property == Property::TextLetterSpacing || property == Property::TextRadialOffset || property == Property::TextRotate) {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-        
-        if (property == Property::IconSize) {
-            setIconSize(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::IconRotate) {
-            setIconRotate(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::TextSize) {
-            setTextSize(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::TextMaxWidth) {
-            setTextMaxWidth(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::TextLetterSpacing) {
-            setTextLetterSpacing(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::TextRadialOffset) {
-            setTextRadialOffset(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::TextRotate) {
-            setTextRotate(*typedValue);
             return nullopt;
         }
         
