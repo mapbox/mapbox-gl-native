@@ -78,6 +78,7 @@ MBGL_DEFINE_ENUM(SymbolAnchorType, {
 });
 
 MBGL_DEFINE_ENUM(SymbolZOrderType, {
+    { SymbolZOrderType::Auto, "auto" },
     { SymbolZOrderType::ViewportY, "viewport-y" },
     { SymbolZOrderType::Source, "source" }
 });
