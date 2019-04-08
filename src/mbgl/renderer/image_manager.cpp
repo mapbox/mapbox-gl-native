@@ -95,6 +95,7 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
         for (const auto& dependency : pair.first) {
             if (images.find(dependency.first) == images.end()) {
                 hasAllDependencies = false;
+                break;
             }
         }
 
