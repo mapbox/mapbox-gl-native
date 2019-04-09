@@ -96,6 +96,13 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         return;
     }
 
+    const bool hasSymbolSortKey = !leader.layout.get<SymbolSortKey>().isUndefined();
+    const auto symbolZOrder = layout.get<SymbolZOrder>();
+    const bool sortFeaturesByKey = symbolZOrder != SymbolZOrderType::ViewportY && hasSymbolSortKey;
+    const bool zOrderByViewportY = symbolZOrder == SymbolZOrderType::ViewportY || (symbolZOrder == SymbolZOrderType::Auto && !sortFeaturesByKey);
+    sortFeaturesByY = zOrderByViewportY && (layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
+        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
+
     for (const auto& layer : layers) {
         layerPaintProperties.emplace(layer->getID(), toRenderSymbolLayer(layer)->evaluated);
     }
@@ -156,7 +163,13 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (ft.formattedText || ft.icon) {
-            features.push_back(std::move(ft));
+            if (sortFeaturesByKey) {
+                ft.sortKey = layout.evaluate<SymbolSortKey>(zoom, ft);
+                const auto lowerBound = std::lower_bound(features.begin(), features.end(), ft);
+                features.insert(lowerBound, std::move(ft));
+            } else {
+                features.push_back(std::move(ft));
+            }
         }
     }
 
@@ -541,10 +554,6 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
 }
 
 void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, std::shared_ptr<Bucket>>& buckets, const bool firstLoad, const bool showCollisionBoxes) {
-    const bool zOrderByViewport = layout.get<SymbolZOrder>() == SymbolZOrderType::ViewportY;
-    const bool sortFeaturesByY = zOrderByViewport && (layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
-        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
-
     auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), tilePixelRatio);
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
@@ -590,7 +599,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
                 symbolInstance.placedIconIndex = bucket->icon.placedSymbols.size() - 1;
                 PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
                 iconSymbol.vertexStartIndex = addSymbol(bucket->icon, sizeData, *symbolInstance.iconQuad,
-                                                        symbolInstance.anchor, iconSymbol);
+                                                        symbolInstance.anchor, iconSymbol, feature.sortKey);
 
                 for (auto& pair : bucket->paintProperties) {
                     pair.second.iconBinders.populateVertexVectors(feature, bucket->icon.vertices.elements(), {}, {});
@@ -645,7 +654,7 @@ std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
             }
             lastAddedSection = symbolQuad.sectionIndex;
         }
-        size_t index = addSymbol(bucket.text, sizeData, symbolQuad, symbolInstance.anchor, placedSymbol);
+        size_t index = addSymbol(bucket.text, sizeData, symbolQuad, symbolInstance.anchor, placedSymbol, feature.sortKey);
         if (firstSymbol) {
             placedSymbol.vertexStartIndex = index;
             firstSymbol = false;
@@ -659,7 +668,8 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
                                const Range<float> sizeData,
                                const SymbolQuad& symbol,
                                const Anchor& labelAnchor,
-                               PlacedSymbol& placedSymbol) {
+                               PlacedSymbol& placedSymbol,
+                               float sortKey) {
     constexpr const uint16_t vertexLength = 4;
 
     const auto &tl = symbol.tl;
@@ -668,8 +678,10 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     const auto &br = symbol.br;
     const auto &tex = symbol.tex;
 
-    if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-        buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements());
+    if (buffer.segments.empty() ||
+        buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max() ||
+        fabs(buffer.segments.back().sortKey - sortKey) > std::numeric_limits<float>::epsilon()) {
+        buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements(), 0ul, 0ul, sortKey);
     }
 
     // We're generating triangle fans, so we always start with the first
