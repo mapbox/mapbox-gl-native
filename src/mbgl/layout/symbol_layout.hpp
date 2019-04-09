@@ -66,7 +66,8 @@ private:
                      const Range<float> sizeData,
                      const SymbolQuad&,
                      const Anchor& labelAnchor,
-                     PlacedSymbol& placedSymbol);
+                     PlacedSymbol& placedSymbol,
+                     unsigned int sortKey);
 
     // Adds symbol quads to bucket and returns formatted section index of last
     // added quad.
@@ -97,6 +98,7 @@ private:
 
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
+    bool sortFeaturesByY = false;
 
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;
