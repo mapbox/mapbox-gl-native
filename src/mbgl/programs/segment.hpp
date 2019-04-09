@@ -14,11 +14,13 @@ public:
     Segment(std::size_t vertexOffset_,
             std::size_t indexOffset_,
             std::size_t vertexLength_ = 0,
-            std::size_t indexLength_ = 0)
+            std::size_t indexLength_ = 0,
+            float sortKey_ = 0.0f)
         : vertexOffset(vertexOffset_),
           indexOffset(indexOffset_),
           vertexLength(vertexLength_),
-          indexLength(indexLength_) {}
+          indexLength(indexLength_),
+          sortKey(sortKey_) {}
 
     Segment(Segment&&) = default;
 
@@ -36,6 +38,8 @@ public:
     //   * when two fill layers have the same layout properties, but one
     //     uses fill-color and the other uses fill-pattern
     mutable std::map<std::string, gfx::DrawScope> drawScopes;
+
+    float sortKey;
 };
 
 template <class AttributeList>
