@@ -6,13 +6,13 @@ public class MapState {
   private double zoom;
   private String gesture;
 
-  public MapState(double latitude, double longitude, double zoom) {
+  MapState(double latitude, double longitude, double zoom) {
     this.latitude = latitude;
     this.longitude = longitude;
     this.zoom = zoom;
   }
 
-  public void setGesture(String gesture) {
+  void setGesture(String gesture) {
     this.gesture = gesture;
   }
 

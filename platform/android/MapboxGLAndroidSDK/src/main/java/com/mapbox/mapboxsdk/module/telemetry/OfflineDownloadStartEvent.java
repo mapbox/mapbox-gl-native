@@ -1,54 +1,51 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
-import android.os.Parcelable;
 
-import com.google.gson.annotations.SerializedName;
 import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.TelemetryUtils;
 
-
-public class OfflineDownloadStartEvent extends Event implements Parcelable {
-
-  private static final String OFFLINE_DOWNLOAD_START = "map.offlineDownload.start";
-
-  @SerializedName("event")
-  private final String event;
-
-  @SerializedName("created")
+/**
+ * Event will be sent while offline download start.
+ */
+@SuppressLint("ParcelCreator")
+public class OfflineDownloadStartEvent extends Event {
+  private final String event = "map.offlineDownload.start";
   private final String created;
-
-  @SerializedName("minZoom")
   private final Double minZoom;
-
-  @SerializedName("maxZoom")
   private final Double maxZoom;
-
-  @SerializedName("shapeForOfflineRegion")
   private final String shapeForOfflineRegion;
-
-  @SerializedName("styleURL")
   private String styleURL;
 
-  public void setStyleURL(String styleURL) {
+  void setStyleURL(String styleURL) {
     this.styleURL = styleURL;
   }
 
-  OfflineDownloadStartEvent(String shapeForOfflineRegion, Double minZoom, Double maxZoom) {
-    this.event = OFFLINE_DOWNLOAD_START;
-    this.created = TelemetryUtils.obtainCurrentDate();
+  OfflineDownloadStartEvent(PhoneState phoneState, String shapeForOfflineRegion, Double minZoom, Double maxZoom) {
+    this.created = phoneState.getCreated();
     this.shapeForOfflineRegion = shapeForOfflineRegion;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
   }
 
-  private OfflineDownloadStartEvent(Parcel in) {
-    event = in.readString();
-    created = in.readString();
-    shapeForOfflineRegion = in.readString();
-    minZoom = in.readDouble();
-    maxZoom = in.readDouble();
-    styleURL = in.readString();
+  String getCreated() {
+    return created;
+  }
+
+  Double getMinZoom() {
+    return minZoom;
+  }
+
+  Double getMaxZoom() {
+    return maxZoom;
+  }
+
+  String getShapeForOfflineRegion() {
+    return shapeForOfflineRegion;
+  }
+
+  String getStyleURL() {
+    return styleURL;
   }
 
   @Override
@@ -58,23 +55,5 @@ public class OfflineDownloadStartEvent extends Event implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
-    dest.writeString(event);
-    dest.writeString(created);
-    dest.writeString(shapeForOfflineRegion);
-    dest.writeDouble(minZoom);
-    dest.writeDouble(maxZoom);
-    dest.writeString(styleURL);
   }
-
-  public static final Creator<OfflineDownloadStartEvent> CREATOR = new Creator<OfflineDownloadStartEvent>() {
-    @Override
-    public OfflineDownloadStartEvent createFromParcel(Parcel in) {
-      return new OfflineDownloadStartEvent(in);
-    }
-
-    @Override
-    public OfflineDownloadStartEvent[] newArray(int size) {
-      return new OfflineDownloadStartEvent[size];
-    }
-  };
 }
