@@ -1,4 +1,4 @@
-#import "MGLMetricsManager_Private.h"
+#import "MGLSDKMetricsManager_Private.h"
 #import "MGLNetworkConfiguration_Private.h"
 #if TARGET_OS_IOS
 #import "MGLMapboxEvents.h"

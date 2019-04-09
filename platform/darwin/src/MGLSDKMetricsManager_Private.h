@@ -1,4 +1,4 @@
-#import "MGLMetricsManager.h"
+#import "MGLSDKMetricsManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
