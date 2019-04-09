@@ -21,18 +21,16 @@ public class TelemetryImpl implements TelemetryDefinition {
 
   @Nullable
   private MapboxTelemetry telemetry;
-  private MapEventFactory mapEventFactory;
+  private Context appContext;
 
   public TelemetryImpl() {
-    Context appContext = Mapbox.getApplicationContext();
+    appContext = Mapbox.getApplicationContext();
     String accessToken = Mapbox.getAccessToken();
     telemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT);
     TelemetryEnabler.State telemetryState = TelemetryEnabler.retrieveTelemetryStateFromPreferences();
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       telemetry.enable();
     }
-    mapEventFactory = new MapEventFactory(appContext);
-
   }
 
   /**
@@ -43,7 +41,7 @@ public class TelemetryImpl implements TelemetryDefinition {
     AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
       BuildConfig.MAPBOX_SDK_VERSION);
     telemetry.push(turnstileEvent);
-    telemetry.push(mapEventFactory.buildMapLoadEvent());
+    telemetry.push(MapEventFactory.buildMapLoadEvent(new PhoneState(appContext)));
   }
 
   /**
@@ -58,7 +56,7 @@ public class TelemetryImpl implements TelemetryDefinition {
   public void onGestureInteraction(String eventType, double latitude, double longitude, double zoom) {
     MapState state = new MapState(latitude, longitude, zoom);
     state.setGesture(eventType);
-    telemetry.push(mapEventFactory.buildMapClickEvent(state));
+    telemetry.push(MapEventFactory.buildMapClickEvent(new PhoneState(appContext), state));
   }
 
   /**
@@ -98,7 +96,7 @@ public class TelemetryImpl implements TelemetryDefinition {
 
   @Override
   public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
-    telemetry.push(mapEventFactory.buildOfflineDownloadStartEvent(
+    telemetry.push(MapEventFactory.buildOfflineDownloadStartEvent(new PhoneState(appContext),
       offlineDefinition instanceof OfflineTilePyramidRegionDefinition ? "tileregion" : "shaperegion",
       offlineDefinition.getMinZoom(),
       offlineDefinition.getMaxZoom(),
