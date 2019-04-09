@@ -7,6 +7,7 @@
 #include "../../geojson/feature_collection.hpp"
 #include "../../android_renderer_frontend.hpp"
 #include <jni/jni.hpp>
+#include <mbgl/util/thread.hpp>
 
 namespace mbgl {
 namespace android {
@@ -59,8 +60,7 @@ private:
     jni::Local<jni::Object<Source>> createJavaPeer(jni::JNIEnv&);
     std::unique_ptr<Update> awaitingUpdate;
     std::unique_ptr<Update> update;
-    std::shared_ptr<ThreadPool> threadPool;
-    std::unique_ptr<Actor<FeatureConverter>> converter;
+    std::unique_ptr<util::Thread<FeatureConverter>> converter;
 
     template <class JNIType>
     void setCollectionAsync(jni::JNIEnv&, const jni::Object<JNIType>&);
