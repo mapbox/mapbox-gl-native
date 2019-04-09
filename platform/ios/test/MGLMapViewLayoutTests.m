@@ -211,6 +211,27 @@
     }
 }
 
+- (void)testAttributionButtonPlacementInvalidPosition {
+    CGFloat margin = -400.0;
+    
+    UIView *attributionButton = self.mapView.attributionButton;
+    NSArray *testDataList = [self makeTestDataListWithView:attributionButton margin:margin];
+    
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.attributionButtonPosition = testData.position;
+        self.mapView.attributionButtonMargins = testData.offset;
+        
+        //invoke layout
+        [self.superView setNeedsLayout];
+        XCTAssertThrowsSpecificNamed(
+                                     [self.superView layoutIfNeeded],
+                                     NSException,
+                                     NSInvalidArgumentException,
+                                     @"should throw NSInvalidArgumentException"
+                                     );
+    }
+}
+
 - (void)testLogoPlacement {
     double accuracy = 0.01;
     CGFloat margin = 4.0;

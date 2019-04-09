@@ -962,6 +962,11 @@ public:
     [self updateUserLocationAnnotationView];
 
     [self updateAttributionAlertView];
+    
+    if (!CGRectContainsRect(self.bounds, self.attributionButton.frame)) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"The attribution is not in the visible area of the mapview. Please check your position and offset settings"];
+    }
 }
 
 /// Updates `contentInset` to reflect the current window geometry.
