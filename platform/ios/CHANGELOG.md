@@ -22,6 +22,16 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInset` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
 * Fixed a feature querying bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 
+### Other changes
+
+* Added variants of several animated `MGLMapView` methods that accept completion handlers ([#14381](https://github.com/mapbox/mapbox-gl-native/pull/14381)):
+  * `-[MGLMapView setVisibleCoordinateBounds:edgePadding:animated:completionHandler:]`
+  * `-[MGLMapView setContentInset:animated:completionHandler:]`
+  * `-[MGLMapView setUserTrackingMode:animated:completionHandler:]`
+  * `-[MGLMapView setTargetCoordinate:animated:completionHandler:]`
+  * `-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]`
+  * `-[MGLMapView selectAnnotation:animated:completionHandler:]`
+
 ## 5.0.0 - May 22, 2019
 
 This release improves how monthly active users are counted. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://www.mapbox.com/52219) and [#14421](https://github.com/mapbox/mapbox-gl-native/pull/14421).
