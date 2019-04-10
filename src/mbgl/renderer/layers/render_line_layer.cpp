@@ -32,6 +32,7 @@ RenderLineLayer::~RenderLineLayer() = default;
 
 void RenderLineLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
+    updateColorRamp();
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
@@ -277,10 +278,6 @@ float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const fl
     } else {
         return lineWidth;
     }
-}
-
-void RenderLineLayer::update() {
-    updateColorRamp();
 }
 
 } // namespace mbgl

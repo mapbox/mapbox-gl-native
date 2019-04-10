@@ -35,6 +35,9 @@ public:
     // Begin transitions for any properties that have changed since the last frame.
     virtual void transition(const TransitionParameters&) = 0;
 
+    // Overloaded version for transitions to a new layer impl.
+    void transition(const TransitionParameters&, Immutable<style::Layer::Impl> newImpl);
+
     // Fully evaluate possibly-transitioning paint properties based on a zoom level.
     // Updates the contained `evaluatedProperties` member.
     virtual void evaluate(const PropertyEvaluationParameters&) = 0;
@@ -75,14 +78,8 @@ public:
     Immutable<style::LayerProperties> evaluatedProperties;
     // Private implementation
     Immutable<style::Layer::Impl> baseImpl;
-    void setImpl(Immutable<style::Layer::Impl>);
 
     virtual void markContextDestroyed();
-
-    // TODO: Figure out how to remove this or whether layers other than
-    // RenderHeatmapLayer and RenderLineLayer need paint property updates,
-    // similar to color ramp. Temporarily moved to the base.
-    virtual void update();
 
     // TODO: Only for background layers.
     virtual optional<Color> getSolidBackground() const;
