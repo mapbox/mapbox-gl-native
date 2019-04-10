@@ -1022,6 +1022,8 @@
 				355BA4EC1D41633E00CCC6D5 /* NSColor+MGLAdditions.mm */,
 				405C03961DB0004E001AC280 /* NSImage+MGLAdditions.h */,
 				405C03971DB0004E001AC280 /* NSImage+MGLAdditions.mm */,
+				DAE6C3801CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.h */,
+				DAE6C3811CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -1121,8 +1123,6 @@
 				352903991D6C63B80002C7DF /* NSPredicate+MGLAdditions.h */,
 				3529039A1D6C63B80002C7DF /* NSPredicate+MGLAdditions.mm */,
 				1FC481842098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h */,
-				DAE6C3801CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.h */,
-				DAE6C3811CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.m */,
 				DAE6C3821CC31E2A00DB3429 /* NSString+MGLAdditions.h */,
 				DAE6C3831CC31E2A00DB3429 /* NSString+MGLAdditions.m */,
 				DAED385D1D62CED700D7640F /* NSURL+MGLAdditions.h */,

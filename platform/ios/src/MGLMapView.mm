@@ -48,7 +48,6 @@
 #import "NSDate+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSPredicate+MGLPrivateAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
 #import "UIDevice+MGLAdditions.h"
@@ -299,7 +298,6 @@ public:
     /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
     BOOL _isChangingAnnotationLayers;
     BOOL _isWaitingForRedundantReachableNotification;
-    BOOL _isTargetingInterfaceBuilder;
 
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
@@ -404,14 +402,12 @@ public:
     }
 
     NSString *styleURLString = @(self.mbglMap.getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
-    MGLAssert(styleURLString || _isTargetingInterfaceBuilder, @"Invalid style URL string %@", styleURLString);
+    MGLAssert(styleURLString, @"Invalid style URL string %@", styleURLString);
     return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
 - (void)setStyleURL:(nullable NSURL *)styleURL
 {
-    if (_isTargetingInterfaceBuilder) return;
-
     if ( ! styleURL)
     {
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -446,7 +442,6 @@ public:
 
 - (void)commonInit
 {
-    _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = NO;
     _atLeastiOS_12_2_0 = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){12,2,0}];
 
@@ -501,7 +496,7 @@ public:
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // start paused if in IB
-    if (_isTargetingInterfaceBuilder || background) {
+    if (background) {
         self.dormant = YES;
     }
 
@@ -1006,7 +1001,7 @@ public:
 
     [self adjustContentInset];
 
-    if (!_isTargetingInterfaceBuilder && _mbglMap) {
+    if (_mbglMap) {
         self.mbglMap.setSize([self size]);
     }
 
@@ -5341,7 +5336,7 @@ public:
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
     MGLLogDebug(@"Setting showsUserLocation: %@", MGLStringFromBOOL(showsUserLocation));
-    if (showsUserLocation == _showsUserLocation || _isTargetingInterfaceBuilder) return;
+    if (showsUserLocation == _showsUserLocation) return;
 
     _showsUserLocation = showsUserLocation;
 
