@@ -99,6 +99,95 @@ class MapLoadEvent extends Event {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    MapLoadEvent that = (MapLoadEvent) o;
+
+    if (Float.compare(that.resolution, resolution) != 0) {
+      return false;
+    }
+    if (Float.compare(that.accessibilityFontScale, accessibilityFontScale) != 0) {
+      return false;
+    }
+    if (batteryLevel != that.batteryLevel) {
+      return false;
+    }
+    if (pluggedIn != that.pluggedIn) {
+      return false;
+    }
+    if (wifi != that.wifi) {
+      return false;
+    }
+    if (!operatingSystem.equals(that.operatingSystem)) {
+      return false;
+    }
+    if (model != null ? !model.equals(that.model) : that.model != null) {
+      return false;
+    }
+    if (created != null ? !created.equals(that.created) : that.created != null) {
+      return false;
+    }
+    if (userId != null ? !userId.equals(that.userId) : that.userId != null) {
+      return false;
+    }
+    if (carrier != null ? !carrier.equals(that.carrier) : that.carrier != null) {
+      return false;
+    }
+    if (cellularNetworkType != null ? !cellularNetworkType.equals(that.cellularNetworkType) :
+      that.cellularNetworkType != null) {
+      return false;
+    }
+    return orientation != null ? orientation.equals(that.orientation) : that.orientation == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = event.hashCode();
+    result = 31 * result + operatingSystem.hashCode();
+    result = 31 * result + sdkIdentifier.hashCode();
+    result = 31 * result + sdkVersion.hashCode();
+    result = 31 * result + (model != null ? model.hashCode() : 0);
+    result = 31 * result + (created != null ? created.hashCode() : 0);
+    result = 31 * result + (userId != null ? userId.hashCode() : 0);
+    result = 31 * result + (carrier != null ? carrier.hashCode() : 0);
+    result = 31 * result + (cellularNetworkType != null ? cellularNetworkType.hashCode() : 0);
+    result = 31 * result + (orientation != null ? orientation.hashCode() : 0);
+    result = 31 * result + (resolution != +0.0f ? Float.floatToIntBits(resolution) : 0);
+    result = 31 * result + (accessibilityFontScale != +0.0f ? Float.floatToIntBits(accessibilityFontScale) : 0);
+    result = 31 * result + batteryLevel;
+    result = 31 * result + (pluggedIn ? 1 : 0);
+    result = 31 * result + (wifi ? 1 : 0);
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return "MapLoadEvent{"
+      + "event='" + event + '\''
+      + ", operatingSystem='" + operatingSystem + '\''
+      + ", sdkIdentifier='" + sdkIdentifier + '\''
+      + ", sdkVersion='" + sdkVersion + '\''
+      + ", model='" + model + '\''
+      + ", created='" + created + '\''
+      + ", userId='" + userId + '\''
+      + ", carrier='" + carrier + '\''
+      + ", cellularNetworkType='" + cellularNetworkType + '\''
+      + ", orientation='" + orientation + '\''
+      + ", resolution=" + resolution
+      + ", accessibilityFontScale=" + accessibilityFontScale
+      + ", batteryLevel=" + batteryLevel
+      + ", pluggedIn=" + pluggedIn
+      + ", wifi=" + wifi
+      + '}';
+  }
+
+  @Override
   public int describeContents() {
     return 0;
   }

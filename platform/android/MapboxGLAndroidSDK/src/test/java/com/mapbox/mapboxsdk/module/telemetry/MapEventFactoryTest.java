@@ -2,8 +2,10 @@ package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.os.Build;
 
+import com.google.gson.Gson;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.constants.TelemetryConstants;
+import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,12 +29,13 @@ public class MapEventFactoryTest {
   private static final Double MIN_ZOOM = 1.0;
   private static final Double MAX_ZOOM = 10.0;
   private static final String STYLE_URL = "style url";
-  private static final Long SIZE_OF_RESOURCES_COMPLETED = 100L;
-  private static final Long NUMBER_OF_TILE_COMPLETED = 1000L;
-  private static final String STATE = "state";
+  private static final long SIZE_OF_RESOURCES_COMPLETED = 100L;
+  private static final long NUMBER_OF_TILE_COMPLETED = 1000L;
+  private static final int STATE = OfflineRegion.STATE_ACTIVE;
 
-  MapState mapState;
-  PhoneState phoneState;
+  private MapState mapState;
+  private PhoneState phoneState;
+  private Gson gson = new Gson();
 
   @Before
   public void setUp() {
@@ -43,7 +46,7 @@ public class MapEventFactoryTest {
     phoneState.setCarrier(CARRIER);
     phoneState.setCellularNetworkType(NETWORK_TYPE);
     phoneState.setCreated(CREATED);
-    phoneState.setOrientation(PhoneState.LANDSCAPE);
+    phoneState.setOrientation(PhoneState.Orientation.ORIENTATION_LANDSCAPE);
     phoneState.setPluggedIn(PLUGIN);
     phoneState.setResolution(RESOLUTION);
     phoneState.setWifi(WIFI);
@@ -61,9 +64,12 @@ public class MapEventFactoryTest {
     assertEquals(NETWORK_TYPE, mapClickEvent.getCellularNetworkType());
     assertEquals(CREATED, mapClickEvent.getCreated());
     assertEquals(TelemetryConstants.DOUBLE_TAP, mapClickEvent.getGesture());
-    assertEquals(PhoneState.LANDSCAPE, mapClickEvent.getOrientation());
+    assertEquals("Landscape", mapClickEvent.getOrientation());
     assertEquals(PLUGIN, mapClickEvent.isPluggedIn());
     assertEquals(WIFI, mapClickEvent.isWifi());
+    String json = gson.toJson(mapClickEvent);
+    MapClickEvent event = gson.fromJson(json, MapClickEvent.class);
+    assertEquals(mapClickEvent, event);
   }
 
   @Test
@@ -76,12 +82,15 @@ public class MapEventFactoryTest {
     assertEquals(CARRIER, mapLoadEvent.getCarrier());
     assertEquals(NETWORK_TYPE, mapLoadEvent.getCellularNetworkType());
     assertEquals(CREATED, mapLoadEvent.getCreated());
-    assertEquals(PhoneState.LANDSCAPE, mapLoadEvent.getOrientation());
+    assertEquals("Landscape", mapLoadEvent.getOrientation());
     assertEquals(BuildConfig.MAPBOX_SDK_IDENTIFIER, mapLoadEvent.getSdkIdentifier());
     assertEquals(BuildConfig.MAPBOX_SDK_VERSION, mapLoadEvent.getSdkVersion());
     assertEquals(PLUGIN, mapLoadEvent.isPluggedIn());
     assertEquals(WIFI, mapLoadEvent.isWifi());
     assertEquals(FONT_SCALE, mapLoadEvent.getAccessibilityFontScale(), 0);
+    String json = gson.toJson(mapLoadEvent);
+    MapLoadEvent event = gson.fromJson(json, MapLoadEvent.class);
+    assertEquals(mapLoadEvent, event);
   }
 
   @Test
@@ -94,9 +103,12 @@ public class MapEventFactoryTest {
     assertEquals(CARRIER, mapDraggedEvent.getCarrier());
     assertEquals(NETWORK_TYPE, mapDraggedEvent.getCellularNetworkType());
     assertEquals(CREATED, mapDraggedEvent.getCreated());
-    assertEquals(PhoneState.LANDSCAPE, mapDraggedEvent.getOrientation());
+    assertEquals("Landscape", mapDraggedEvent.getOrientation());
     assertEquals(PLUGIN, mapDraggedEvent.isPluggedIn());
     assertEquals(WIFI, mapDraggedEvent.isWifi());
+    String json = gson.toJson(mapDraggedEvent);
+    MapDragendEvent event = gson.fromJson(json, MapDragendEvent.class);
+    assertEquals(mapDraggedEvent, event);
   }
 
   @Test
@@ -111,6 +123,9 @@ public class MapEventFactoryTest {
     assertEquals(NUMBER_OF_TILE_COMPLETED, offlineDownloadEndEvent.getNumberOfTilesCompleted());
     assertEquals(STATE, offlineDownloadEndEvent.getState());
     assertEquals(CREATED, offlineDownloadEndEvent.getCreated());
+    String json = gson.toJson(offlineDownloadEndEvent);
+    OfflineDownloadEndEvent event = gson.fromJson(json, OfflineDownloadEndEvent.class);
+    assertEquals(offlineDownloadEndEvent, event);
   }
 
   @Test
@@ -122,5 +137,8 @@ public class MapEventFactoryTest {
     assertEquals(MAX_ZOOM, offlineDownloadStartEvent.getMaxZoom());
     assertEquals(STYLE_URL, offlineDownloadStartEvent.getStyleURL());
     assertEquals(CREATED, offlineDownloadStartEvent.getCreated());
+    String json = gson.toJson(offlineDownloadStartEvent);
+    OfflineDownloadStartEvent event = gson.fromJson(json, OfflineDownloadStartEvent.class);
+    assertEquals(offlineDownloadStartEvent, event);
   }
 }

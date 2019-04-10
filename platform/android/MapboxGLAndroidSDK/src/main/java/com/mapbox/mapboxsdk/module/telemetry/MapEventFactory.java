@@ -1,8 +1,11 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 
 import com.mapbox.android.telemetry.TelemetryUtils;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
 class MapEventFactory {
 
@@ -13,7 +16,10 @@ class MapEventFactory {
 
   static OfflineDownloadStartEvent buildOfflineDownloadStartEvent(PhoneState phoneState,
                                                                   String shapeForOfflineRegion,
-                                                                  Double minZoom, Double maxZoom,
+                                                                  @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+                                                                    to = MapboxConstants.MAXIMUM_ZOOM) Double minZoom,
+                                                                  @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+                                                                    to = MapboxConstants.MAXIMUM_ZOOM) Double maxZoom,
                                                                   String styleURL) {
 
     OfflineDownloadStartEvent offlineEvent =
@@ -24,11 +30,14 @@ class MapEventFactory {
 
   static OfflineDownloadEndEvent buildOfflineDownloadCompleteEvent(PhoneState phoneState,
                                                                    String shapeForOfflineRegion,
-                                                                   Double minZoom, Double maxZoom,
+                                                                   @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+                                                                     to = MapboxConstants.MAXIMUM_ZOOM) Double minZoom,
+                                                                   @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+                                                                     to = MapboxConstants.MAXIMUM_ZOOM) Double maxZoom,
                                                                    String styleURL,
                                                                    Long sizeOfResourcesCompleted,
                                                                    Long numberOfTilesCompleted,
-                                                                   String state) {
+                                                                   @OfflineRegion.DownloadState int state) {
 
     OfflineDownloadEndEvent offlineEvent =
       new OfflineDownloadEndEvent(phoneState, shapeForOfflineRegion, minZoom, maxZoom);
