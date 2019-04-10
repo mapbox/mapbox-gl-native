@@ -88,10 +88,6 @@ public:
     const style::SymbolLayer::Impl& impl() const;
 
 protected:
-    static style::SymbolPropertyValues iconPropertyValues(const style::SymbolPaintProperties::PossiblyEvaluated&,
-                                                          const style::SymbolLayoutProperties::PossiblyEvaluated&);
-    static style::SymbolPropertyValues textPropertyValues(const style::SymbolPaintProperties::PossiblyEvaluated&,
-                                                          const style::SymbolLayoutProperties::PossiblyEvaluated&);
     void updateBucketPaintProperties(Bucket*) const final;
 };
 

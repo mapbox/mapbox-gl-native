@@ -307,6 +307,48 @@ public:
               const gfx::ColorMode& colorMode,
               const gfx::CullFaceMode& cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
+              const Segment<AttributeList>& segment,
+              const UniformValues& uniformValues,
+              const AttributeBindings& allAttributeBindings,
+              const TextureBindings& textureBindings,
+              const std::string& layerID) {
+        static_assert(Primitive == gfx::PrimitiveTypeOf<DrawMode>::value, "incompatible draw mode");
+
+        if (!program) {
+            return;
+        }
+
+        auto drawScopeIt = segment.drawScopes.find(layerID);
+        if (drawScopeIt == segment.drawScopes.end()) {
+            drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
+        }
+
+        program->draw(
+            context,
+            renderPass,
+            drawMode,
+            depthMode,
+            stencilMode,
+            colorMode,
+            cullFaceMode,
+            uniformValues,
+            drawScopeIt->second,
+            allAttributeBindings.offset(segment.vertexOffset),
+            textureBindings,
+            indexBuffer,
+            segment.indexOffset,
+            segment.indexLength);
+    }
+
+    template <class DrawMode>
+    void draw(gfx::Context& context,
+              gfx::RenderPass& renderPass,
+              const DrawMode& drawMode,
+              const gfx::DepthMode& depthMode,
+              const gfx::StencilMode& stencilMode,
+              const gfx::ColorMode& colorMode,
+              const gfx::CullFaceMode& cullFaceMode,
+              const gfx::IndexBuffer& indexBuffer,
               const SegmentVector<AttributeList>& segments,
               const UniformValues& uniformValues,
               const AttributeBindings& allAttributeBindings,
@@ -318,28 +360,20 @@ public:
             return;
         }
 
-        for (auto& segment : segments) {
-            auto drawScopeIt = segment.drawScopes.find(layerID);
-
-            if (drawScopeIt == segment.drawScopes.end()) {
-                drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
-            }
-
-            program->draw(
-                context,
-                renderPass,
-                drawMode,
-                depthMode,
-                stencilMode,
-                colorMode,
-                cullFaceMode,
-                uniformValues,
-                drawScopeIt->second,
-                allAttributeBindings.offset(segment.vertexOffset),
-                textureBindings,
-                indexBuffer,
-                segment.indexOffset,
-                segment.indexLength);
+        for (const auto& segment : segments) {
+            draw(context,
+                 renderPass,
+                 drawMode,
+                 depthMode,
+                 stencilMode,
+                 colorMode,
+                 cullFaceMode,
+                 indexBuffer,
+                 segment,
+                 uniformValues,
+                 allAttributeBindings,
+                 textureBindings,
+                 layerID);
         }
     }
 };
