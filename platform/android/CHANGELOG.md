@@ -4,6 +4,18 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.4.0-alpha.2 - April 10, 2019
+### Bugs
+ - Check for Mapbox#INSTANCE when initializing the MapView [#14366](https://github.com/mapbox/mapbox-gl-native/pull/14366)
+ - Clear previous style loaded listener when setting a new style[#14338](https://github.com/mapbox/mapbox-gl-native/pull/14338)
+
+### Features
+ - Allow resetting a custom OkHttp client to the default impl [#14349](https://github.com/mapbox/mapbox-gl-native/pull/14349)
+ - Expose LocationComponentConstants class [#14333](https://github.com/mapbox/mapbox-gl-native/pull/14333)
+
+### Build
+ - Fix build with mismatching glShaderSource signature[#14339](https://github.com/mapbox/mapbox-gl-native/pull/14339)
+
 ## 7.4.0-alpha.1 - April 3, 2019
 
 ### Bugs
