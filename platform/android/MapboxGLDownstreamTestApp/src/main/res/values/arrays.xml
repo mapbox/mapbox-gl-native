@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="language_array">
+        <item>Default for Device</item>
+        <item>English</item>
+        <item>French</item>
+        <item>German</item>
+        <item>Indonesian</item>
+    </string-array>
+
+    <string-array name="language_values_array">
+        <item>@string/default_locale</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>de</item>
+        <item>in</item>
+    </string-array>
+
+    <string-array name="unit_type_array">
+        <item>Default for Device</item>
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
+
+    <string-array name="unit_type_values_array">
+        <item>@string/default_unit_type</item>
+        <item>metric</item>
+        <item>imperial</item>
+    </string-array>
+
+    <string-array name="route_profile_array">
+        <item>Driving</item>
+        <item>Cycling</item>
+        <item>Walking</item>
+    </string-array>
+
+    <string-array name="route_profile_values_array">
+        <item>driving-traffic</item>
+        <item>cycling</item>
+        <item>walking</item>
+    </string-array>
+</resources>

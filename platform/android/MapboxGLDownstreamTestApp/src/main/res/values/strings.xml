@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">MapboxGLDownstreamTestApp</string>
+    <string name="unit_type_key" translatable="false">unit_type</string>
+    <string name="language_key" translatable="false">language</string>
+    <string name="offline_version_key" translatable="false">offline_preference_key</string>
+    <string name="mapbox_access_token">YOUR_ACCESS_TOKEN_GOES_HERE</string>
+    <string name="view_examples_key" translatable="false">view_examples</string>
+    <string name="git_hash_key" translatable="false">git_hash</string>
+    <string name="general_category_title">General</string>
+    <string name="simulate_route_key" translatable="false">simulate_route</string>
+    <string name="simulate_route">Simulate Route</string>
+    <string name="default_locale" translatable="false">default_for_device</string>
+    <string name="default_unit_type" translatable="false">default_for_device</string>
+    <string name="language">Language</string>
+    <string name="unit_type">Unit Type</string>
+    <string name="route_profile_key" translatable="false">route_profile</string>
+    <string name="route_profile">Route Profile</string>
+    <string name="offline_category_title">Offline</string>
+    <string name="offline_enabled" translatable="false">offline_region_download</string>
+    <string name="offline_enabled_title">Offline routing enabled</string>
+    <string name="offline_region_download" translatable="false">offline_region_download</string>
+    <string name="offline_region_download_title">Download offline region</string>
+    <string name="offline_version_title">Choose offline version</string>
+    <string name="explanation_long_press_waypoint">Long press map to place waypoint</string>
+    <string name="error_route_not_available">Current route is not available</string>
+    <string name="error_select_longer_route">Please select a longer route</string>
+    <string name="error_valid_route_not_found">Valid route not found.</string>
+</resources>
