@@ -1786,6 +1786,26 @@ public class PropertyFactory {
   }
 
   /**
+   * Sorts features in ascending order based on this value. Features with a higher sort key will appear above features with a lower sort key wehn they overlap. Features with a lower sort key will have priority over other features when doing placement.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> symbolSortKey(Float value) {
+    return new LayoutPropertyValue<>("symbol-sort-key", value);
+  }
+
+  /**
+   * Sorts features in ascending order based on this value. Features with a higher sort key will appear above features with a lower sort key wehn they overlap. Features with a lower sort key will have priority over other features when doing placement.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Expression> symbolSortKey(Expression value) {
+    return new LayoutPropertyValue<>("symbol-sort-key", value);
+  }
+
+  /**
    * Controls the order in which overlapping symbols in the same layer are rendered
    *
    * @param value a String value

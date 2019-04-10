@@ -182,6 +182,18 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the SymbolSortKey property
+   *
+   * @return property wrapper value around Float
+   */
+  @NonNull
+  @SuppressWarnings("unchecked")
+  public PropertyValue<Float> getSymbolSortKey() {
+    checkThread();
+    return (PropertyValue<Float>) new PropertyValue("symbol-sort-key", nativeGetSymbolSortKey());
+  }
+
+  /**
    * Get the SymbolZOrder property
    *
    * @return property wrapper value around String
@@ -1112,6 +1124,10 @@ public class SymbolLayer extends Layer {
   @NonNull
   @Keep
   private native Object nativeGetSymbolAvoidEdges();
+
+  @NonNull
+  @Keep
+  private native Object nativeGetSymbolSortKey();
 
   @NonNull
   @Keep
