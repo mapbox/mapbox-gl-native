@@ -812,6 +812,8 @@ void Context::performCleanup() {
                                                abandonedRenderbuffers.data()));
         abandonedRenderbuffers.clear();
     }
+
+    MBGL_CHECK_ERROR(glFinish());
 }
 
 #if not defined(NDEBUG)
