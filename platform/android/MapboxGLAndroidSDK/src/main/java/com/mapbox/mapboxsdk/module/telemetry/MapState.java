@@ -1,12 +1,17 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
+import android.support.annotation.FloatRange;
+
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+
 public class MapState {
   private double latitude;
   private double longitude;
   private double zoom;
   private String gesture;
 
-  MapState(double latitude, double longitude, double zoom) {
+  MapState(double latitude, double longitude, @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+    to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
     this.latitude = latitude;
     this.longitude = longitude;
     this.zoom = zoom;

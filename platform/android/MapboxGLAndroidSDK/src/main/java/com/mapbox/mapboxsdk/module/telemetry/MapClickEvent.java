@@ -83,6 +83,91 @@ class MapClickEvent extends Event {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    MapClickEvent that = (MapClickEvent) o;
+
+    if (Double.compare(that.latitude, latitude) != 0) {
+      return false;
+    }
+    if (Double.compare(that.longitude, longitude) != 0) {
+      return false;
+    }
+    if (Double.compare(that.zoom, zoom) != 0) {
+      return false;
+    }
+    if (batteryLevel != that.batteryLevel) {
+      return false;
+    }
+    if (pluggedIn != that.pluggedIn) {
+      return false;
+    }
+    if (wifi != that.wifi) {
+      return false;
+    }
+    if (created != null ? !created.equals(that.created) : that.created != null) {
+      return false;
+    }
+    if (gesture != null ? !gesture.equals(that.gesture) : that.gesture != null) {
+      return false;
+    }
+    if (cellularNetworkType != null ? !cellularNetworkType.equals(that.cellularNetworkType) :
+      that.cellularNetworkType != null) {
+      return false;
+    }
+    if (carrier != null ? !carrier.equals(that.carrier) : that.carrier != null) {
+      return false;
+    }
+    return orientation != null ? orientation.equals(that.orientation) : that.orientation == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result;
+    long temp;
+    result = event.hashCode();
+    result = 31 * result + (created != null ? created.hashCode() : 0);
+    result = 31 * result + (gesture != null ? gesture.hashCode() : 0);
+    result = 31 * result + (cellularNetworkType != null ? cellularNetworkType.hashCode() : 0);
+    result = 31 * result + (carrier != null ? carrier.hashCode() : 0);
+    result = 31 * result + (orientation != null ? orientation.hashCode() : 0);
+    temp = Double.doubleToLongBits(latitude);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(longitude);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(zoom);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    result = 31 * result + batteryLevel;
+    result = 31 * result + (pluggedIn ? 1 : 0);
+    result = 31 * result + (wifi ? 1 : 0);
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return "MapClickEvent{"
+      + "event='" + event + '\''
+      + ", created='" + created + '\''
+      + ", gesture='" + gesture + '\''
+      + ", cellularNetworkType='" + cellularNetworkType + '\''
+      + ", carrier='" + carrier + '\''
+      + ", orientation='" + orientation + '\''
+      + ", latitude=" + latitude
+      + ", longitude=" + longitude
+      + ", zoom=" + zoom
+      + ", batteryLevel=" + batteryLevel
+      + ", pluggedIn=" + pluggedIn
+      + ", wifi=" + wifi
+      + '}';
+  }
+
+  @Override
   public int describeContents() {
     return 0;
   }
