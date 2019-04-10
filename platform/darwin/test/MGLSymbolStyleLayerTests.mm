@@ -1003,6 +1003,75 @@
         XCTAssertThrowsSpecificNamed(layer.symbolPlacement = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
+    // symbol-sort-key
+    {
+        XCTAssertTrue(rawLayer->getSymbolSortKey().isUndefined(),
+                      @"symbol-sort-key should be unset initially.");
+        NSExpression *defaultExpression = layer.symbolSortKey;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
+        layer.symbolSortKey = constantExpression;
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a constant value expression should update symbol-sort-key.");
+        XCTAssertEqualObjects(layer.symbolSortKey, constantExpression,
+                              @"symbolSortKey should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.symbolSortKey = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a camera expression should update symbol-sort-key.");
+        XCTAssertEqualObjects(layer.symbolSortKey, functionExpression,
+                              @"symbolSortKey should round-trip camera expressions.");
+
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.symbolSortKey = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                interpolate(linear(), number(get("keyName")), 18.0, literal(1.0))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a data expression should update symbol-sort-key.");
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.symbolSortKey, pedanticFunctionExpression,
+                              @"symbolSortKey should round-trip data expressions.");
+
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.symbolSortKey = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a camera-data expression should update symbol-sort-key.");
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.symbolSortKey, pedanticFunctionExpression,
+                              @"symbolSortKey should round-trip camera-data expressions.");
+
+        layer.symbolSortKey = nil;
+        XCTAssertTrue(rawLayer->getSymbolSortKey().isUndefined(),
+                      @"Unsetting symbolSortKey should return symbol-sort-key to the default value.");
+        XCTAssertEqualObjects(layer.symbolSortKey, defaultExpression,
+                              @"symbolSortKey should return the default value after being unset.");
+    }
+
     // symbol-spacing
     {
         XCTAssertTrue(rawLayer->getSymbolSpacing().isUndefined(),
@@ -2994,6 +3063,7 @@
     [self testPropertyName:@"maximum-text-width" isBoolean:NO];
     [self testPropertyName:@"symbol-avoids-edges" isBoolean:YES];
     [self testPropertyName:@"symbol-placement" isBoolean:NO];
+    [self testPropertyName:@"symbol-sort-key" isBoolean:NO];
     [self testPropertyName:@"symbol-spacing" isBoolean:NO];
     [self testPropertyName:@"symbol-z-order" isBoolean:NO];
     [self testPropertyName:@"text" isBoolean:NO];
@@ -3053,6 +3123,7 @@
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementPoint].MGLSymbolPlacementValue, MGLSymbolPlacementPoint);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLine].MGLSymbolPlacementValue, MGLSymbolPlacementLine);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLineCenter].MGLSymbolPlacementValue, MGLSymbolPlacementLineCenter);
+    XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderAuto].MGLSymbolZOrderValue, MGLSymbolZOrderAuto);
     XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderViewportY].MGLSymbolZOrderValue, MGLSymbolZOrderViewportY);
     XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderSource].MGLSymbolZOrderValue, MGLSymbolZOrderSource);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorCenter].MGLTextAnchorValue, MGLTextAnchorCenter);

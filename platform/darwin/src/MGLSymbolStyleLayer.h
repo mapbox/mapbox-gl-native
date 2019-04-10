@@ -158,6 +158,11 @@ typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
  */
 typedef NS_ENUM(NSUInteger, MGLSymbolZOrder) {
     /**
+     If `MGLSymbolStyleLayer.symbolSortKey` is set, sort based on that.
+     Otherwise sort symbols by their position relative to the viewport.
+     */
+    MGLSymbolZOrderAuto,
+    /**
      Specify this z order if symbols’ appearance relies on lower features
      overlapping higher features. For example, symbols with a pin-like
      appearance would require this z order.
@@ -1019,6 +1024,23 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *symbolPlacement;
 
 /**
+ Sorts features in ascending order based on this value. Features with a higher
+ sort key will appear above features with a lower sort key wehn they overlap.
+ Features with a lower sort key will have priority over other features when
+ doing placement.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *symbolSortKey;
+
+/**
  Distance between two symbol anchors.
  
  This property is measured in points.
@@ -1045,13 +1067,15 @@ MGL_EXPORT
 /**
  Controls the order in which overlapping symbols in the same layer are rendered
  
- The default value of this property is an expression that evaluates to
- `viewport-y`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `auto`.
+ Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
  * Constant `MGLSymbolZOrder` values
  * Any of the following constant string values:
+   * `auto`: If `symbol-sort-key` is set, sort based on that. Otherwise sort
+ symbols by their position relative to the viewport.
    * `viewport-y`: Specify this z order if symbols’ appearance relies on lower
  features overlapping higher features. For example, symbols with a pin-like
  appearance would require this z order.
