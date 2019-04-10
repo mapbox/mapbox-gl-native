@@ -298,7 +298,7 @@ public:
         return allAttributeBindings.activeCount();
     }
 
-    template <class DrawMode>
+    template <class DrawMode, class SegmentsContainer>
     void draw(gfx::Context& context,
               gfx::RenderPass& renderPass,
               const DrawMode& drawMode,
@@ -307,7 +307,7 @@ public:
               const gfx::ColorMode& colorMode,
               const gfx::CullFaceMode& cullFaceMode,
               const gfx::IndexBuffer& indexBuffer,
-              const SegmentVector<AttributeList>& segments,
+              const SegmentsContainer& segments,
               const UniformValues& uniformValues,
               const AttributeBindings& allAttributeBindings,
               const TextureBindings& textureBindings,
@@ -318,7 +318,7 @@ public:
             return;
         }
 
-        for (auto& segment : segments) {
+        for (const Segment<AttributeList>& segment : segments) {
             auto drawScopeIt = segment.drawScopes.find(layerID);
 
             if (drawScopeIt == segment.drawScopes.end()) {
