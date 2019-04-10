@@ -32,6 +32,7 @@ RenderHeatmapLayer::~RenderHeatmapLayer() = default;
 
 void RenderHeatmapLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
+    updateColorRamp();
 }
 
 void RenderHeatmapLayer::evaluate(const PropertyEvaluationParameters& parameters) {
@@ -187,10 +188,6 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             getID()
         );
     }
-}
-
-void RenderHeatmapLayer::update() {
-    updateColorRamp();
 }
 
 void RenderHeatmapLayer::updateColorRamp() {

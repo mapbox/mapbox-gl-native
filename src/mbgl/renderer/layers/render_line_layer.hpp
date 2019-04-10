@@ -21,7 +21,6 @@ private:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
-    void update() override;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,

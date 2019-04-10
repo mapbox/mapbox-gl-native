@@ -15,8 +15,9 @@ RenderLayer::RenderLayer(Immutable<style::LayerProperties> properties)
       baseImpl(evaluatedProperties->baseImpl) {
 }
 
-void RenderLayer::setImpl(Immutable<style::Layer::Impl> impl) {
-    baseImpl = std::move(impl);
+void RenderLayer::transition(const TransitionParameters& parameters, Immutable<style::Layer::Impl> newImpl) {
+    baseImpl = std::move(newImpl);
+    transition(parameters);
 }
 
 const std::string& RenderLayer::getID() const {
@@ -41,10 +42,6 @@ void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState&) {
 
 const RenderLayerSymbolInterface* RenderLayer::getSymbolInterface() const {
     return nullptr;
-}
-
-void RenderLayer::update() {
-    // no-op
 }
 
 optional<Color> RenderLayer::getSolidBackground() const {

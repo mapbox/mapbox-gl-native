@@ -175,12 +175,14 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Create render layers for newly added layers.
     for (const auto& entry : layerDiff.added) {
-        renderLayers.emplace(entry.first, LayerManager::get()->createRenderLayer(entry.second));
+        auto renderLayer = LayerManager::get()->createRenderLayer(entry.second);
+        renderLayer->transition(transitionParameters);
+        renderLayers.emplace(entry.first, std::move(renderLayer));
     }
 
     // Update render layers for changed layers.
     for (const auto& entry : layerDiff.changed) {
-        renderLayers.at(entry.first)->setImpl(entry.second.after);
+        renderLayers.at(entry.first)->transition(transitionParameters, entry.second.after);
     }
 
     if (!layerDiff.removed.empty() || !layerDiff.added.empty() || !layerDiff.changed.empty()) {
@@ -191,12 +193,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     for (const auto& entry : renderLayers) {
         RenderLayer& layer = *entry.second;
         const bool layerAddedOrChanged = layerDiff.added.count(entry.first) || layerDiff.changed.count(entry.first);
-
-        if (layerAddedOrChanged) {
-            layer.transition(transitionParameters);
-            layer.update();
-        }
-
         if (layerAddedOrChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
             layer.evaluate(evaluationParameters);
         }
