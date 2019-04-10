@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="MapDocument">
             <connections>
                 <outlet property="addOfflinePackWindow" destination="NmZ-Tf-v2O" id="ZPE-9L-vPJ"/>
-                <outlet property="includeIdeographsBox" destination="Jbt-z6-eg9" id="bsz-FH-emx"/>
+                <outlet property="includesIdeographicGlyphsBox" destination="Jbt-z6-eg9" id="4M4-jN-qxP"/>
                 <outlet property="mapView" destination="q4d-kF-8Hi" id="7hI-dS-A5R"/>
                 <outlet property="mapViewContextMenu" destination="XbX-6a-Mgy" id="YD0-1r-5N2"/>
                 <outlet property="maximumOfflinePackZoomLevelField" destination="5sj-XD-neD" id="Edu-lU-3j9"/>
@@ -56,7 +56,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="388" y="211" width="642" height="480"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="TuG-C5-zLS">
                 <rect key="frame" x="0.0" y="0.0" width="642" height="480"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -312,7 +312,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="109" y="131" width="392" height="221"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" misplaced="YES" id="Aqq-bl-feU">
                 <rect key="frame" x="0.0" y="0.0" width="392" height="221"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -487,7 +487,7 @@ Gw
         </window>
     </objects>
     <resources>
-        <image name="NSApplicationIcon" width="128" height="128"/>
+        <image name="NSApplicationIcon" width="32" height="32"/>
         <image name="NSListViewTemplate" width="14" height="10"/>
         <image name="NSShareTemplate" width="11" height="16"/>
         <image name="symbol" width="13" height="13"/>
