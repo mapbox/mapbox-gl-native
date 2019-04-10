@@ -34,6 +34,8 @@ public final class Mapbox {
   private String accessToken;
   @Nullable
   private TelemetryDefinition telemetry;
+  @Nullable
+  private MapboxAccounts accounts;
 
   /**
    * Get an instance of Mapbox.
@@ -56,6 +58,7 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken);
       if (isAccessTokenValid(accessToken)) {
         initializeTelemetry();
+        INSTANCE.accounts = new MapboxAccounts();
       }
       ConnectivityReceiver.instance(appContext);
     }
@@ -85,6 +88,11 @@ public final class Mapbox {
     validateMapbox();
     INSTANCE.accessToken = accessToken;
     FileSource.getInstance(getApplicationContext()).setAccessToken(accessToken);
+  }
+
+  public static String getSkuToken() {
+    validateMapbox();
+    return INSTANCE.accounts.getSkuToken();
   }
 
   /**
