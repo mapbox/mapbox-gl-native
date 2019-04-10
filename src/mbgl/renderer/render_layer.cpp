@@ -54,33 +54,18 @@ optional<Color> RenderLayer::getSolidBackground() const {
 RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles, FilterFunctionPtr filterFn) const {
     assert(filterFn != nullptr);
     RenderTiles filtered;
-    // We only need clipping when we're drawing fill or line layers.
-    const bool needsClipping_ =
-            baseImpl->getTypeInfo()->clipping == LayerTypeInfo::Clipping::Required;
 
     for (auto& tileRef : tiles) {
         auto& tile = tileRef.get();
         if (filterFn(tile)) {
             continue;
         }
-
-        if (Bucket* bucket = tile.tile.getBucket(*baseImpl)) {
-            tile.used = true;
-            tile.needsClipping |= needsClipping_;
-            filtered.emplace_back(tile);
-            if (tile.tile.isComplete()) {
-                updateBucketPaintProperties(bucket);
-            }
-        }
+        filtered.emplace_back(tile);
     }
     return filtered;
 }
 
 void RenderLayer::markContextDestroyed() {
-    // no-op
-}
-
-void RenderLayer::updateBucketPaintProperties(Bucket*) const {
     // no-op
 }
 

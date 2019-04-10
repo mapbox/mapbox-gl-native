@@ -8,10 +8,6 @@ namespace mbgl {
 
 using namespace style;
 
-const SymbolLayerProperties& toSymbolLayerProperties(const Immutable<LayerProperties>& layer) {
-    return static_cast<const SymbolLayerProperties&>(*layer);
-}
-
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
                            const std::map<std::string, Immutable<style::LayerProperties>>& paintProperties_,
                            const style::PropertyValue<float>& textSize,
@@ -34,17 +30,13 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       tilePixelRatio(tilePixelRatio_) {
 
     for (const auto& pair : paintProperties_) {
-        auto layerPaintProperties = toSymbolLayerProperties(pair.second).evaluated;
-        if (hasFormatSectionOverrides()) {
-            setPaintPropertyOverrides(layerPaintProperties);
-        }
+        const auto& evaluated = getEvaluated<SymbolLayerProperties>(pair.second);
         paintProperties.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(PaintProperties {
-                layerPaintProperties,
-                { RenderSymbolLayer::iconPaintProperties(layerPaintProperties), zoom },
-                { RenderSymbolLayer::textPaintProperties(layerPaintProperties), zoom }
+                { RenderSymbolLayer::iconPaintProperties(evaluated), zoom },
+                { RenderSymbolLayer::textPaintProperties(evaluated), zoom }
             }));
     }
 }
@@ -246,19 +238,7 @@ void SymbolBucket::sortFeatures(const float angle) {
     }
 }
 
-void SymbolBucket::updatePaintProperties(const std::string& layerID,
-                                         style::SymbolPaintProperties::PossiblyEvaluated updated) {
-    if (hasFormatSectionOverrides()) {
-        SymbolLayerPaintPropertyOverrides::updateOverrides(paintProperties.at(layerID).evaluated, updated);
-    }
-    paintProperties.at(layerID).evaluated = updated;
-}
-
-void SymbolBucket::setPaintPropertyOverrides(style::SymbolPaintProperties::PossiblyEvaluated& paint) {
-    SymbolLayerPaintPropertyOverrides::setOverrides(layout, paint);
-}
-
-bool SymbolBucket::hasFormatSectionOverrides() {
+bool SymbolBucket::hasFormatSectionOverrides() const {
     if (!hasFormatSectionOverrides_) {
         hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
     }

@@ -33,7 +33,7 @@ public:
 
     bool isLoaded() const;
 
-    void update(const std::vector<Immutable<style::LayerProperties>>&,
+    void update(const std::vector<Immutable<style::LayerProperties>>& visibleLayers,
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&,

@@ -206,16 +206,34 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
 }
 
 const LayerRenderData* GeometryTile::getLayerRenderData(const style::Layer::Impl& layerImpl) const {
-    const auto it = layerIdToLayerRenderData.find(layerImpl.id);
+    auto* that = const_cast<GeometryTile*>(this);
+    return that->getMutableLayerRenderData(layerImpl);
+}
+
+bool GeometryTile::updateLayerProperties(const Immutable<style::LayerProperties>& layerProperties) {
+    LayerRenderData* renderData = getMutableLayerRenderData(*layerProperties->baseImpl);
+    if (!renderData) {
+        return false;
+    }
+
+    if (renderData->layerProperties != layerProperties) {
+        renderData->layerProperties = layerProperties;
+    }
+
+    return true;
+}
+
+LayerRenderData* GeometryTile::getMutableLayerRenderData(const style::Layer::Impl& layerImpl) {
+    auto it = layerIdToLayerRenderData.find(layerImpl.id);
     if (it == layerIdToLayerRenderData.end()) {
         return nullptr;
     }
-    const LayerRenderData& result = it->second;
+    LayerRenderData& result = it->second;
     if (result.layerProperties->baseImpl->getTypeInfo() != layerImpl.getTypeInfo()) {
         // Layer data might be outdated, see issue #12432.
         return nullptr;
     }
-    return &result;
+    return &result;   
 }
 
 float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {

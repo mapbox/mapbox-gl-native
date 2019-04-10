@@ -60,6 +60,10 @@ public:
     virtual const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const {
         return nullptr;
     }
+    // Updates the contained layer render data with the given properties.
+    // Returns `true` if the corresponding render layer data is present in this tile (and i.e. it
+    // was succesfully updated); returns `false` otherwise.
+    virtual bool updateLayerProperties(const Immutable<style::LayerProperties>&) { return true; }
 
     template <class T>
     T* getBucket(const style::Layer::Impl& layer) const {

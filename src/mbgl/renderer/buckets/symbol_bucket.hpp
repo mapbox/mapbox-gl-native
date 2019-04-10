@@ -61,10 +61,7 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
     bool hasCollisionCircleData() const;
-    bool hasFormatSectionOverrides();
-    void updatePaintProperties(const std::string& layerID,
-                               style::SymbolPaintProperties::PossiblyEvaluated);
-    void setPaintPropertyOverrides(style::SymbolPaintProperties::PossiblyEvaluated&);
+    bool hasFormatSectionOverrides() const;
 
     void updateOpacity();
     void sortFeatures(const float angle);
@@ -86,7 +83,6 @@ public:
     std::vector<SymbolInstance> symbolInstances;
 
     struct PaintProperties {
-        style::SymbolPaintProperties::PossiblyEvaluated evaluated;
         SymbolIconProgram::Binders iconBinders;
         SymbolSDFTextProgram::Binders textBinders;
     };
@@ -136,7 +132,7 @@ public:
     const float tilePixelRatio;
     uint32_t bucketInstanceId = 0;
     bool justReloaded = false;
-    optional<bool> hasFormatSectionOverrides_;
+    mutable optional<bool> hasFormatSectionOverrides_;
 
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };

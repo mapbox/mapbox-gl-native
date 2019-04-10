@@ -45,6 +45,7 @@ public:
     void upload(gfx::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
     const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const override;
+    bool updateLayerProperties(const Immutable<style::LayerProperties>&) override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -95,6 +96,8 @@ protected:
     const GeometryTileData* getData() {
         return latestFeatureIndex ? latestFeatureIndex->getData() : nullptr;
     }
+
+    LayerRenderData* getMutableLayerRenderData(const style::Layer::Impl&);
 
 private:
     void markObsolete();

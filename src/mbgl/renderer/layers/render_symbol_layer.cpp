@@ -72,20 +72,24 @@ using SegmentsWrapper = variant<SegmentWrapper, SegmentVectorWrapper>;
 struct RenderableSegment {
     RenderableSegment(SegmentWrapper segment_,
                       const RenderTile& tile_,
-                      SymbolBucket& bucket_,
+                      const LayerRenderData& renderData_,
                       const SymbolBucket::PaintProperties& bucketPaintProperties_,
                       float sortKey_) :
     segment(std::move(segment_)),
     tile(tile_),
-    bucket(bucket_),
+    renderData(renderData_),
     bucketPaintProperties(bucketPaintProperties_),
     sortKey(sortKey_) {}
 
     SegmentWrapper segment;
     const RenderTile& tile;
-    SymbolBucket& bucket;
+    const LayerRenderData& renderData;
     const SymbolBucket::PaintProperties& bucketPaintProperties;
     float sortKey;
+
+    bool hasIconData() const {
+        return static_cast<const SymbolBucket&>(*renderData.bucket).hasIconData();
+    }
 
     friend bool operator < (const RenderableSegment& lhs, const RenderableSegment& rhs) {
         return lhs.sortKey < rhs.sortKey;
@@ -95,16 +99,17 @@ struct RenderableSegment {
 template <typename DrawFn>
 void drawIcon(const DrawFn& draw,
               const RenderTile& tile,
-              SymbolBucket& bucket,
+              const LayerRenderData& renderData,
               SegmentsWrapper iconSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
               const PaintParameters& parameters) {
     assert(tile.tile.kind == Tile::Kind::Geometry);
     auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
-    const auto& evaluated_ = bucketPaintProperties.evaluated;
+    auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
+    const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
     const auto& layout = bucket.layout;
-    auto values = iconPropertyValues(evaluated_, layout);
-    const auto& paintPropertyValues = RenderSymbolLayer::iconPaintProperties(evaluated_);
+    auto values = iconPropertyValues(evaluated, layout);
+    const auto& paintPropertyValues = RenderSymbolLayer::iconPaintProperties(evaluated);
 
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
         layout.get<IconRotationAlignment>() == AlignmentType::Map;
@@ -179,20 +184,21 @@ void drawIcon(const DrawFn& draw,
 template <typename DrawFn>
 void drawText(const DrawFn& draw,
               const RenderTile& tile,
-              SymbolBucket& bucket,
+              const LayerRenderData& renderData,
               SegmentsWrapper textSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
               const PaintParameters& parameters) {
     assert(tile.tile.kind == Tile::Kind::Geometry);
     auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
-    const auto& evaluated_ = bucketPaintProperties.evaluated;
+    auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
+    const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
     const auto& layout = bucket.layout;
 
     const gfx::TextureBinding textureBinding{ geometryTile.glyphAtlasTexture->getResource(),
                                               gfx::TextureFilterType::Linear };
 
-    auto values = textPropertyValues(evaluated_, layout);
-    const auto& paintPropertyValues = RenderSymbolLayer::textPaintProperties(evaluated_);
+    auto values = textPropertyValues(evaluated, layout);
+    const auto& paintPropertyValues = RenderSymbolLayer::textPaintProperties(evaluated);
     bool hasVariablePacement = false;
 
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
@@ -322,13 +328,20 @@ RenderSymbolLayer::~RenderSymbolLayer() = default;
 
 void RenderSymbolLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
+    hasFormatSectionOverrides = SymbolLayerPaintPropertyOverrides::hasOverrides(impl(baseImpl).layout.get<TextField>());
 }
 
 void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     auto properties = makeMutable<SymbolLayerProperties>(
         staticImmutableCast<SymbolLayer::Impl>(baseImpl),
         unevaluated.evaluate(parameters));
-    const auto& evaluated = properties->evaluated;
+    auto& evaluated = properties->evaluated;
+    auto& layout = impl(baseImpl).layout;
+
+    if (hasFormatSectionOverrides) {
+        SymbolLayerPaintPropertyOverrides::setOverrides(layout, evaluated);
+    }
+
     auto hasIconOpacity = evaluated.get<style::IconColor>().constantOr(Color::black()).a > 0 ||
                           evaluated.get<style::IconHaloColor>().constantOr(Color::black()).a > 0;
     auto hasTextOpacity = evaluated.get<style::TextColor>().constantOr(Color::black()).a > 0 ||
@@ -442,17 +455,18 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     };
 
     for (const RenderTile& tile : renderTiles) {
-        auto bucket_ = tile.tile.getBucket<SymbolBucket>(*baseImpl);
-        if (!bucket_) {
+        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        if (!renderData) {
             continue;
         }
 
-        SymbolBucket& bucket = *bucket_;
+        auto& bucket = static_cast<SymbolBucket&>(*renderData->bucket);
         assert(bucket.paintProperties.find(getID()) != bucket.paintProperties.end());
         const auto& bucketPaintProperties = bucket.paintProperties.at(getID());
-        auto addRenderables = [&renderableSegments, &tile, &bucket, &bucketPaintProperties, it = renderableSegments.begin()] (auto& segments) mutable {
+
+        auto addRenderables = [&renderableSegments, &tile, renderData, &bucketPaintProperties, it = renderableSegments.begin()] (auto& segments) mutable {
             for (auto& segment : segments) {
-                it = renderableSegments.emplace_hint(it, SegmentWrapper{std::ref(segment)}, tile, bucket, bucketPaintProperties, segment.sortKey);
+                it = renderableSegments.emplace_hint(it, SegmentWrapper{std::ref(segment)}, tile, *renderData, bucketPaintProperties, segment.sortKey);
             }
         };
 
@@ -460,7 +474,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             if (sortFeaturesByKey) {
                 addRenderables(bucket.icon.segments);
             } else {
-                drawIcon(draw, tile, bucket, std::ref(bucket.icon.segments), bucketPaintProperties, parameters);
+                drawIcon(draw, tile, *renderData, std::ref(bucket.icon.segments), bucketPaintProperties, parameters);
             }
         }
 
@@ -468,7 +482,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             if (sortFeaturesByKey) {
                 addRenderables(bucket.text.segments);
             } else {
-                drawText(draw, tile, bucket, std::ref(bucket.text.segments), bucketPaintProperties, parameters);
+                drawText(draw, tile, *renderData, std::ref(bucket.text.segments), bucketPaintProperties, parameters);
             }
         }
 
@@ -551,10 +565,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
     if (sortFeaturesByKey) {
         for (auto& renderable : renderableSegments) {
-            if (renderable.bucket.hasIconData()) {
-                drawIcon(draw, renderable.tile, renderable.bucket, renderable.segment, renderable.bucketPaintProperties, parameters);
+            if (renderable.hasIconData()) {
+                drawIcon(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
             } else {
-                drawText(draw, renderable.tile, renderable.bucket, renderable.segment, renderable.bucketPaintProperties, parameters);
+                drawText(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
             }
         }
     }
@@ -600,12 +614,6 @@ void RenderSymbolLayer::setRenderTiles(RenderTiles tiles, const TransformState& 
 
         return std::tie(b.get().id.canonical.z, par.y, par.x) < std::tie(a.get().id.canonical.z, pbr.y, pbr.x);
     });
-}
-
-void RenderSymbolLayer::updateBucketPaintProperties(Bucket* bucket) const {
-    assert(bucket->supportsLayer(*baseImpl));
-    const auto& evaluated = static_cast<const SymbolLayerProperties&>(*evaluatedProperties).evaluated;
-    static_cast<SymbolBucket*>(bucket)->updatePaintProperties(getID(), evaluated);
 }
 
 } // namespace mbgl

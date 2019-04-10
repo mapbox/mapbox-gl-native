@@ -81,8 +81,7 @@ private:
     float iconSize = 1.0f;
     float textSize = 16.0f;
 
-protected:
-    void updateBucketPaintProperties(Bucket*) const final;
+    bool hasFormatSectionOverrides = false;
 };
 
 } // namespace mbgl
