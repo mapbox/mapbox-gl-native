@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Preference
+        android:key="@string/view_examples_key"
+        android:title="View List of Navigation Examples">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.mapbox.mapboxsdk.downstream.testapp.NavigationLauncherActivity"
+            android:targetPackage="com.mapbox.mapboxsdk.downstream.testapp"/>
+    </Preference>
+
+    <Preference
+        android:key="@string/git_hash_key"
+        android:title="Latest git Hash"/>
+
+    <PreferenceCategory
+        android:title="@string/general_category_title">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/simulate_route_key"
+            android:title="@string/simulate_route"/>
+
+        <ListPreference
+            android:defaultValue="@string/default_locale"
+            android:entries="@array/language_array"
+            android:entryValues="@array/language_values_array"
+            android:key="@string/language_key"
+            android:title="@string/language"/>
+
+        <ListPreference
+            android:defaultValue="@string/default_unit_type"
+            android:entries="@array/unit_type_array"
+            android:entryValues="@array/unit_type_values_array"
+            android:key="@string/unit_type_key"
+            android:title="@string/unit_type"/>
+
+        <ListPreference
+            android:entries="@array/route_profile_array"
+            android:entryValues="@array/route_profile_values_array"
+            android:key="@string/route_profile_key"
+            android:title="@string/route_profile"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/offline_category_title">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/offline_enabled"
+            android:title="@string/offline_enabled_title"/>
+
+        <Preference
+            android:key="@string/offline_region_download"
+            android:title="@string/offline_region_download_title">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="com.mapbox.services.android.navigation.testapp.activity.OfflineRegionDownloadActivity"
+                android:targetPackage="com.mapbox.services.android.navigation.app"/>
+        </Preference>
+
+        <ListPreference
+            android:enabled="false"
+            android:key="@string/offline_version_key"
+            android:title="@string/offline_version_title"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
