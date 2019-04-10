@@ -23,7 +23,8 @@ const LayerTypeInfo* HeatmapLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::Required,
           LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::Clipping::NotRequired
+          LayerTypeInfo::Clipping::NotRequired,
+          LayerTypeInfo::FadingTiles::NotRequired
         };
     return &typeInfo;
 }

@@ -23,7 +23,8 @@ const LayerTypeInfo* CircleLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::NotRequired,
           LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::Clipping::NotRequired
+          LayerTypeInfo::Clipping::NotRequired,
+          LayerTypeInfo::FadingTiles::NotRequired
         };
     return &typeInfo;
 }
