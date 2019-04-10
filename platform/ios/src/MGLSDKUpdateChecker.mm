@@ -1,6 +1,5 @@
 #import "MGLSDKUpdateChecker.h"
 #import "NSBundle+MGLAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
 
 @implementation MGLSDKUpdateChecker
 

@@ -1,6 +1,8 @@
 #import "MGLAccountManager_Private.h"
 #import "NSBundle+MGLAdditions.h"
+#if TARGET_OS_OSX
 #import "NSProcessInfo+MGLAdditions.h"
+#endif
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
@@ -40,9 +42,12 @@
 }
 
 + (instancetype)sharedManager {
+#if TARGET_OS_OSX
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
         return nil;
     }
+#endif
+    
     static dispatch_once_t onceToken;
     static MGLAccountManager *_sharedManager;
     void (^setupBlock)(void) = ^{

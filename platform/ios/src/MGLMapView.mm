@@ -48,7 +48,6 @@
 #import "NSDate+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSPredicate+MGLPrivateAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
 #import "UIDevice+MGLAdditions.h"
