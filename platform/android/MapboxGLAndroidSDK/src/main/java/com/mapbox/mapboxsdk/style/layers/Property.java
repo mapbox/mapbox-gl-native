@@ -111,6 +111,10 @@ public final class Property {
   // SYMBOL_Z_ORDER: Controls the order in which overlapping symbols in the same layer are rendered
 
   /**
+   * If {@link SYMBOL_SORT_KEY} is set, sort based on that. Otherwise sort symbols by their position relative to the viewport.
+   */
+  public static final String SYMBOL_Z_ORDER_AUTO = "auto";
+  /**
    * Symbols will be sorted by their y-position relative to the viewport.
    */
   public static final String SYMBOL_Z_ORDER_VIEWPORT_Y = "viewport-y";
@@ -123,6 +127,7 @@ public final class Property {
    * Controls the order in which overlapping symbols in the same layer are rendered
    */
   @StringDef({
+      SYMBOL_Z_ORDER_AUTO,
       SYMBOL_Z_ORDER_VIEWPORT_Y,
       SYMBOL_Z_ORDER_SOURCE,
     })

@@ -142,13 +142,39 @@ public class SymbolLayerTest extends BaseLayerTest {
 
   @Test
   @UiThreadTest
+  public void testSymbolSortKeyAsConstant() {
+    Timber.i("symbol-sort-key");
+    assertNotNull(layer);
+    assertNull(layer.getSymbolSortKey().getValue());
+
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(symbolSortKey(propertyValue));
+    assertEquals(layer.getSymbolSortKey().getValue(), propertyValue);
+  }
+
+  @Test
+  @UiThreadTest
+  public void testSymbolSortKeyAsExpression() {
+    Timber.i("symbol-sort-key-expression");
+    assertNotNull(layer);
+    assertNull(layer.getSymbolSortKey().getExpression());
+
+    // Set and Get
+    Expression expression = number(Expression.get("undefined"));
+    layer.setProperties(symbolSortKey(expression));
+    assertEquals(layer.getSymbolSortKey().getExpression(), expression);
+  }
+
+  @Test
+  @UiThreadTest
   public void testSymbolZOrderAsConstant() {
     Timber.i("symbol-z-order");
     assertNotNull(layer);
     assertNull(layer.getSymbolZOrder().getValue());
 
     // Set and Get
-    String propertyValue = SYMBOL_Z_ORDER_VIEWPORT_Y;
+    String propertyValue = SYMBOL_Z_ORDER_AUTO;
     layer.setProperties(symbolZOrder(propertyValue));
     assertEquals(layer.getSymbolZOrder().getValue(), propertyValue);
   }
