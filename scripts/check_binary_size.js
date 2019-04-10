@@ -40,6 +40,8 @@ function getPriorSize() {
         console.log('No merge base available.');
         return Promise.resolve(null);
     }
+    
+    console.log(`mergeBase: ${mergeBase}`);
 
     return github.checks.listForRef({
         owner: 'mapbox',
@@ -51,7 +53,9 @@ function getPriorSize() {
             console.log('No matching check found.');
             return Promise.resolve(null);
         }
-        return +run.output.summary.match(/`.*` is (\d+) bytes/)[1];
+        const priorSize = +run.output.summary.match(/`.*` is (\d+) bytes/)[1];
+        console.log("priorSize: " + priorSize);
+        return priorSize
     });
 }
 
@@ -62,6 +66,7 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
             const title = (() => {
                 if (prior) {
                     const change = size - prior;
+                    console.log(`change: ${size} - ${prior} = ${change}`)
                     const percent = (change / prior) * 100;
                     return `${change >= 0 ? '+' : ''}${prettyBytes(change)} ${percent.toFixed(3)}% (${prettyBytes(size)})`;
                 } else {
