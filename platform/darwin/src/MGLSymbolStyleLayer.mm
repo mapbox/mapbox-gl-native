@@ -54,6 +54,7 @@ namespace mbgl {
     });
 
     MBGL_DEFINE_ENUM(MGLSymbolZOrder, {
+        { MGLSymbolZOrderAuto, "auto" },
         { MGLSymbolZOrderViewportY, "viewport-y" },
         { MGLSymbolZOrderSource, "source" },
     });
@@ -585,6 +586,24 @@ namespace mbgl {
         propertyValue = self.rawLayer->getDefaultSymbolPlacement();
     }
     return MGLStyleValueTransformer<mbgl::style::SymbolPlacementType, NSValue *, mbgl::style::SymbolPlacementType, MGLSymbolPlacement>().toExpression(propertyValue);
+}
+
+- (void)setSymbolSortKey:(NSExpression *)symbolSortKey {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting symbolSortKey: %@", symbolSortKey);
+
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(symbolSortKey, true);
+    self.rawLayer->setSymbolSortKey(mbglValue);
+}
+
+- (NSExpression *)symbolSortKey {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getSymbolSortKey();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultSymbolSortKey();
+    }
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setSymbolSpacing:(NSExpression *)symbolSpacing {
