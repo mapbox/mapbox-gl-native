@@ -4,7 +4,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 4.11.0
 
-* No public-facing changes in v4.11.0-alpha.1.
 * Fixed an Interface Builder crash when using an `MGLMapView` in a storyboard. ([#14379](https://github.com/mapbox/mapbox-gl-native/pull/14379))
 
 ## 4.10.0
