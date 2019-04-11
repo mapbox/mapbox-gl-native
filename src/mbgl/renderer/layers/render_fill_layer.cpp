@@ -68,19 +68,18 @@ bool RenderFillLayer::hasTransition() const {
 }
 
 bool RenderFillLayer::hasCrossfade() const {
-    return static_cast<const FillLayerProperties&>(*evaluatedProperties).crossfade.t != 1;
+    return getCrossfade<FillLayerProperties>(evaluatedProperties).t != 1;
 }
 
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
-    const auto& evaluated = static_cast<const FillLayerProperties&>(*evaluatedProperties).evaluated;
-    const auto& crossfade = static_cast<const FillLayerProperties&>(*evaluatedProperties).crossfade;
     if (unevaluated.get<FillPattern>().isUndefined()) {
         for (const RenderTile& tile : renderTiles) {
-            auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
-            if (!bucket_) {
+            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            if (!renderData) {
                 continue;
             }
-            FillBucket& bucket = *bucket_;
+            auto& bucket = static_cast<FillBucket&>(*renderData->bucket);
+            const auto& evaluated = getEvaluated<FillLayerProperties>(renderData->layerProperties);
 
             auto draw = [&] (auto& programInstance,
                              const auto& drawMode,
@@ -157,17 +156,20 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
         if (parameters.pass != RenderPass::Translucent) {
             return;
         }
-        const auto fillPatternValue = evaluated.get<FillPattern>().constantOr(Faded<std::basic_string<char>>{"", ""});
+
         for (const RenderTile& tile : renderTiles) {
+            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            if (!renderData) {
+                continue;
+            }
+            auto& bucket = static_cast<FillBucket&>(*renderData->bucket);
+            const auto& evaluated = getEvaluated<FillLayerProperties>(renderData->layerProperties);
+            const auto& crossfade = getCrossfade<FillLayerProperties>(renderData->layerProperties);
+
+            const auto& fillPatternValue = evaluated.get<FillPattern>().constantOr(Faded<std::basic_string<char>>{"", ""});
             auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
             optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
             optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
-
-            auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
-            if (!bucket_) {
-                continue;
-            }
-            FillBucket& bucket = *bucket_;
 
             auto draw = [&] (auto& programInstance,
                              const auto& drawMode,
@@ -249,7 +251,7 @@ bool RenderFillLayer::queryIntersectsFeature(
         const TransformState& transformState,
         const float pixelsToTileUnits,
         const mat4&) const {
-    const auto& evaluated = static_cast<const FillLayerProperties&>(*evaluatedProperties).evaluated;
+    const auto& evaluated = getEvaluated<FillLayerProperties>(evaluatedProperties);
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::FillTranslate>(),

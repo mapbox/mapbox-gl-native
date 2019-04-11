@@ -56,17 +56,16 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-    const auto& evaluated = static_cast<const CircleLayerProperties&>(*evaluatedProperties).evaluated;
-    const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
-    const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
 
     for (const RenderTile& tile : renderTiles) {
-        auto bucket_ = tile.tile.getBucket<CircleBucket>(*baseImpl);
-        if (!bucket_) {
+        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        if (!renderData) {
             continue;
         }
-        CircleBucket& bucket = *bucket_;
-
+        auto& bucket = static_cast<CircleBucket&>(*renderData->bucket);
+        const auto& evaluated = getEvaluated<CircleLayerProperties>(renderData->layerProperties);
+        const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
+        const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
         const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
         auto& programInstance = parameters.programs.getCircleLayerPrograms().circle;
