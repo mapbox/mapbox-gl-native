@@ -19,6 +19,7 @@
 #include <mbgl/util/math.hpp>
 
 #include <cmath>
+#include <set>
 
 namespace mbgl {
 
@@ -36,11 +37,245 @@ Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float 
 }
 
 struct RenderableSegment {
+    RenderableSegment(bool isIcon_,
+                      SegmentVector<SymbolTextAttributes> segments_,
+                      const RenderTile& tile_,
+                      SymbolBucket& bucket_,
+                      const SymbolBucket::PaintProperties& bucketPaintProperties_,
+                      unsigned int sortKey_) :
+    isIcon(isIcon_),
+    segments(std::move(segments_)),
+    tile(tile_),
+    bucket(bucket_),
+    bucketPaintProperties(bucketPaintProperties_),
+    sortKey(sortKey_) {}
+
+    bool isIcon;
     SegmentVector<SymbolTextAttributes> segments;
-    std::function<void(const SegmentVector<SymbolTextAttributes>&)> drawSegments;
+    const RenderTile& tile;
+    SymbolBucket& bucket;
+    const SymbolBucket::PaintProperties& bucketPaintProperties;
     unsigned int sortKey;
+
+    friend bool operator < (const RenderableSegment& lhs, const RenderableSegment& rhs) {
+        return lhs.sortKey < rhs.sortKey;
+    }
 };
 
+template <typename DrawFn>
+void drawIcon(const DrawFn& draw,
+              const RenderTile& tile,
+              SymbolBucket& bucket,
+              const SegmentVector<SymbolTextAttributes>& iconSegments,
+              const SymbolBucket::PaintProperties& bucketPaintProperties,
+              const PaintParameters& parameters) {
+    assert(tile.tile.kind == Tile::Kind::Geometry);
+    auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
+    const auto& evaluated_ = bucketPaintProperties.evaluated;
+    const auto& layout = bucket.layout;
+    auto values = RenderSymbolLayer::iconPropertyValues(evaluated_, layout);
+    const auto& paintPropertyValues = RenderSymbolLayer::iconPaintProperties(evaluated_);
+
+    const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
+        layout.get<IconRotationAlignment>() == AlignmentType::Map;
+
+    if (alongLine) {
+        reprojectLineLabels(bucket.icon.dynamicVertices,
+                            bucket.icon.placedSymbols,
+                            tile.matrix,
+                            values,
+                            tile,
+                            *bucket.iconSizeBinder,
+                            parameters.state);
+
+        parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
+    }
+
+    const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
+    const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
+
+    const gfx::TextureBinding textureBinding{ geometryTile.iconAtlasTexture->getResource(),
+                                            bucket.sdfIcons ||
+                                                    parameters.state.isChanging() ||
+                                                    iconScaled || iconTransformed
+                                                ? gfx::TextureFilterType::Linear
+                                                : gfx::TextureFilterType::Nearest };
+
+    const Size texsize = geometryTile.iconAtlasTexture->size;
+
+    if (bucket.sdfIcons) {
+        if (values.hasHalo) {
+            draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
+                SymbolSDFIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+                bucket.icon,
+                iconSegments,
+                bucket.iconSizeBinder,
+                values,
+                bucketPaintProperties.iconBinders,
+                paintPropertyValues,
+                SymbolSDFIconProgram::TextureBindings{
+                    textureBinding,
+                });
+        }
+
+        if (values.hasFill) {
+            draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
+                SymbolSDFIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+                bucket.icon,
+                iconSegments,
+                bucket.iconSizeBinder,
+                values,
+                bucketPaintProperties.iconBinders,
+                paintPropertyValues,
+                SymbolSDFIconProgram::TextureBindings{
+                    textureBinding,
+                });
+        }
+    } else {
+        draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
+            SymbolIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
+            bucket.icon,
+            iconSegments,
+            bucket.iconSizeBinder,
+            values,
+            bucketPaintProperties.iconBinders,
+            paintPropertyValues,
+            SymbolIconProgram::TextureBindings{
+                textureBinding,
+            });
+    }
+}
+
+template <typename DrawFn>
+void drawText(const DrawFn& draw,
+              const RenderTile& tile,
+              SymbolBucket& bucket,
+              const SegmentVector<SymbolTextAttributes>& textSegments,
+              const SymbolBucket::PaintProperties& bucketPaintProperties,
+              const PaintParameters& parameters) {
+    assert(tile.tile.kind == Tile::Kind::Geometry);
+    auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
+    const auto& evaluated_ = bucketPaintProperties.evaluated;
+    const auto& layout = bucket.layout;
+
+    const gfx::TextureBinding textureBinding{ geometryTile.glyphAtlasTexture->getResource(),
+                                              gfx::TextureFilterType::Linear };
+
+    auto values = RenderSymbolLayer::textPropertyValues(evaluated_, layout);
+    const auto& paintPropertyValues = RenderSymbolLayer::textPaintProperties(evaluated_);
+    bool hasVariablePacement = false;
+
+    const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
+        layout.get<TextRotationAlignment>() == AlignmentType::Map;
+
+    if (alongLine) {
+        reprojectLineLabels(bucket.text.dynamicVertices,
+                            bucket.text.placedSymbols,
+                            tile.matrix,
+                            values,
+                            tile,
+                            *bucket.textSizeBinder,
+                            parameters.state);
+
+        parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+    } else if (!layout.get<TextVariableAnchor>().empty()) {
+        bucket.text.dynamicVertices.clear();
+
+        const auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(parameters.state.getZoom());
+        const float tileScale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
+        const bool rotateWithMap = layout.get<TextRotationAlignment>() == AlignmentType::Map;
+        const bool pitchWithMap = layout.get<TextPitchAlignment>() == AlignmentType::Map;
+        const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, parameters.state.getZoom());
+        const auto labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, parameters.state, pixelsToTileUnits);
+
+        for (const PlacedSymbol& symbol : bucket.text.placedSymbols) {
+            optional<VariableOffset> variableOffset;
+            if (!symbol.hidden && symbol.crossTileID != 0u) {
+                auto it = parameters.variableOffsets.get().find(symbol.crossTileID);
+                if (it != parameters.variableOffsets.get().end()) {
+                    variableOffset = it->second;
+                    hasVariablePacement |= true;
+                }
+            }
+
+            if (!variableOffset) {
+                // These symbols are from a justification that is not being used, or a label that wasn't placed
+                // so we don't need to do the extra math to figure out what incremental shift to apply.
+                hideGlyphs(symbol.glyphOffsets.size(), bucket.text.dynamicVertices);
+            } else {
+                const Point<float> tileAnchor = symbol.anchorPoint;
+                const auto projectedAnchor = project(tileAnchor, pitchWithMap ? tile.matrix : labelPlaneMatrix);
+                const float perspectiveRatio = 0.5f + 0.5f * (parameters.state.getCameraToCenterDistance() / projectedAnchor.second);
+                float renderTextSize = evaluateSizeForFeature(partiallyEvaluatedSize, symbol) * perspectiveRatio / util::ONE_EM;
+                if (pitchWithMap) {
+                    // Go from size in pixels to equivalent size in tile units
+                    renderTextSize *= bucket.tilePixelRatio / tileScale;
+                }
+
+                auto shift = calculateVariableRenderShift(
+                        (*variableOffset).anchor,
+                        (*variableOffset).width,
+                        (*variableOffset).height,
+                        (*variableOffset).radialOffset,
+                        (*variableOffset).textBoxScale,
+                        renderTextSize);
+
+                // Usual case is that we take the projected anchor and add the pixel-based shift
+                // calculated above. In the (somewhat weird) case of pitch-aligned text, we add an equivalent
+                // tile-unit based shift to the anchor before projecting to the label plane.
+                Point<float> shiftedAnchor;
+                if (pitchWithMap) {
+                    shiftedAnchor = project(Point<float>(tileAnchor.x + shift.x, tileAnchor.y + shift.y),
+                                            labelPlaneMatrix).first;
+                } else {
+                    if (rotateWithMap) {
+                        auto rotated = util::rotate(shift, -parameters.state.getPitch());
+                        shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
+                                                    projectedAnchor.first.y + rotated.y);
+                    } else {
+                        shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
+                                                    projectedAnchor.first.y + shift.y);
+                    }
+                }
+
+                for (std::size_t i = 0; i < symbol.glyphOffsets.size(); i++) {
+                    addDynamicAttributes(shiftedAnchor, 0, bucket.text.dynamicVertices);
+                }
+            }
+        }
+        parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+    }
+
+    const Size texsize = geometryTile.glyphAtlasTexture->size;
+
+    if (values.hasHalo) {
+        draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
+            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+            bucket.text,
+            textSegments,
+            bucket.textSizeBinder,
+            values,
+            bucketPaintProperties.textBinders,
+            paintPropertyValues,
+            SymbolSDFTextProgram::TextureBindings{
+                textureBinding,
+            });
+    }
+
+    if (values.hasFill) {
+        draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
+            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+            bucket.text,
+            textSegments,
+            bucket.textSizeBinder,
+            values,
+            bucketPaintProperties.textBinders,
+            paintPropertyValues,
+            SymbolSDFTextProgram::TextureBindings{
+                textureBinding,
+            });
+    }
+}
 } // namespace
 
 RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
@@ -99,8 +334,54 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 
     const bool sortFeaturesByKey = !impl().layout.get<SymbolSortKey>().isUndefined();
-    std::vector<RenderableSegment> renderableSegments;
-    renderableSegments.reserve(renderTiles.size());
+    std::set<RenderableSegment> renderableSegments;
+
+    const auto draw = [&parameters, this] (auto& programInstance,
+                                           auto&& uniformValues,
+                                           const auto& buffers,
+                                           const auto& segments,
+                                           const auto& symbolSizeBinder,
+                                           const SymbolPropertyValues& values_,
+                                           const auto& binders,
+                                           const auto& paintProperties,
+                                           auto&& textureBindings) {
+
+        const auto allUniformValues = programInstance.computeAllUniformValues(
+            std::move(uniformValues),
+            *symbolSizeBinder,
+            binders,
+            paintProperties,
+            parameters.state.getZoom()
+        );
+
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+            *buffers.vertexBuffer,
+            *buffers.dynamicVertexBuffer,
+            *buffers.opacityVertexBuffer,
+            binders,
+            paintProperties
+        );
+
+        this->checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+        programInstance.draw(
+            parameters.context,
+            *parameters.renderPass,
+            gfx::Triangles(),
+            values_.pitchAlignment == AlignmentType::Map
+                ? parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly)
+                : gfx::DepthMode::disabled(),
+            gfx::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
+            gfx::CullFaceMode::disabled(),
+            *buffers.indexBuffer,
+            segments,
+            allUniformValues,
+            allAttributeBindings,
+            std::move(textureBindings),
+            this->getID()
+        );
+    };
 
     for (const RenderTile& tile : renderTiles) {
         auto bucket_ = tile.tile.getBucket<SymbolBucket>(*baseImpl);
@@ -110,270 +391,26 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         SymbolBucket& bucket = *bucket_;
         assert(bucket.paintProperties.find(getID()) != bucket.paintProperties.end());
         const auto& bucketPaintProperties = bucket.paintProperties.at(getID());
-        const auto& evaluated_ = bucketPaintProperties.evaluated;
-        const auto& layout = bucket.layout;
 
-        const auto draw = [&parameters, this] (auto& programInstance,
-                                               auto&& uniformValues,
-                                               const auto& buffers,
-                                               const auto& segments,
-                                               const auto& symbolSizeBinder,
-                                               const SymbolPropertyValues& values_,
-                                               const auto& binders,
-                                               const auto& paintProperties,
-                                               auto&& textureBindings) {
-
-            const auto allUniformValues = programInstance.computeAllUniformValues(
-                std::move(uniformValues),
-                *symbolSizeBinder,
-                binders,
-                paintProperties,
-                parameters.state.getZoom()
-            );
-
-            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-                *buffers.vertexBuffer,
-                *buffers.dynamicVertexBuffer,
-                *buffers.opacityVertexBuffer,
-                binders,
-                paintProperties
-            );
-
-            this->checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
-
-            programInstance.draw(
-                parameters.context,
-                *parameters.renderPass,
-                gfx::Triangles(),
-                values_.pitchAlignment == AlignmentType::Map
-                    ? parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly)
-                    : gfx::DepthMode::disabled(),
-                gfx::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(),
-                gfx::CullFaceMode::disabled(),
-                *buffers.indexBuffer,
-                segments,
-                allUniformValues,
-                allAttributeBindings,
-                std::move(textureBindings),
-                this->getID()
-            );
-        };
-
-        assert(tile.tile.kind == Tile::Kind::Geometry);
-        auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
+        auto it = renderableSegments.begin();
 
         if (bucket.hasIconData()) {
-            auto renderIcon = [&](const auto& iconSegments) {
-                auto values = iconPropertyValues(evaluated_, layout);
-                const auto& paintPropertyValues = iconPaintProperties(evaluated_);
-
-                const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
-                    layout.get<IconRotationAlignment>() == AlignmentType::Map;
-
-                if (alongLine) {
-                    reprojectLineLabels(bucket.icon.dynamicVertices,
-                                        bucket.icon.placedSymbols,
-                                        tile.matrix,
-                                        values,
-                                        tile,
-                                        *bucket.iconSizeBinder,
-                                        parameters.state);
-
-                    parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
-                }
-
-                const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
-                const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
-
-                const gfx::TextureBinding textureBinding{ geometryTile.iconAtlasTexture->getResource(),
-                                                        bucket.sdfIcons ||
-                                                                parameters.state.isChanging() ||
-                                                                iconScaled || iconTransformed
-                                                            ? gfx::TextureFilterType::Linear
-                                                            : gfx::TextureFilterType::Nearest };
-
-                const Size texsize = geometryTile.iconAtlasTexture->size;
-
-                if (bucket.sdfIcons) {
-                    if (values.hasHalo) {
-                        draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                            SymbolSDFIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
-                            bucket.icon,
-                            iconSegments,
-                            bucket.iconSizeBinder,
-                            values,
-                            bucketPaintProperties.iconBinders,
-                            paintPropertyValues,
-                            SymbolSDFIconProgram::TextureBindings{
-                                textureBinding,
-                            });
-                    }
-
-                    if (values.hasFill) {
-                        draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                            SymbolSDFIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
-                            bucket.icon,
-                            iconSegments,
-                            bucket.iconSizeBinder,
-                            values,
-                            bucketPaintProperties.iconBinders,
-                            paintPropertyValues,
-                            SymbolSDFIconProgram::TextureBindings{
-                                textureBinding,
-                            });
-                    }
-                } else {
-                    draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
-                        SymbolIconProgram::layoutUniformValues(false, false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
-                        bucket.icon,
-                        iconSegments,
-                        bucket.iconSizeBinder,
-                        values,
-                        bucketPaintProperties.iconBinders,
-                        paintPropertyValues,
-                        SymbolIconProgram::TextureBindings{
-                            textureBinding,
-                        });
-                }
-            };
-
             if (sortFeaturesByKey) {
-                for (const auto& segment : bucket.icon.segments) {
-                    renderableSegments.push_back({{segment}, renderIcon, segment.sortKey});
+                for (auto& segment : bucket.icon.segments) {
+                    renderableSegments.emplace_hint(it, true, SegmentVector<SymbolTextAttributes>{segment}, tile, bucket, bucketPaintProperties, segment.sortKey);
                 }
             } else {
-                renderIcon(bucket.icon.segments);
+                drawIcon(draw, tile, bucket, bucket.icon.segments, bucketPaintProperties, parameters);
             }
         }
 
         if (bucket.hasTextData()) {
-            auto renderText = [&](const auto& textSegments) {
-                const gfx::TextureBinding textureBinding{ geometryTile.glyphAtlasTexture->getResource(),
-                                                        gfx::TextureFilterType::Linear };
-
-                auto values = textPropertyValues(evaluated_, layout);
-                const auto& paintPropertyValues = textPaintProperties(evaluated_);
-                bool hasVariablePacement = false;
-
-                const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
-                    layout.get<TextRotationAlignment>() == AlignmentType::Map;
-
-                if (alongLine) {
-                    reprojectLineLabels(bucket.text.dynamicVertices,
-                                        bucket.text.placedSymbols,
-                                        tile.matrix,
-                                        values,
-                                        tile,
-                                        *bucket.textSizeBinder,
-                                        parameters.state);
-
-                    parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
-                } else if (!layout.get<TextVariableAnchor>().empty()) {
-                    bucket.text.dynamicVertices.clear();
-
-                    const auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(parameters.state.getZoom());
-                    const float tileScale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
-                    const bool rotateWithMap = layout.get<TextRotationAlignment>() == AlignmentType::Map;
-                    const bool pitchWithMap = layout.get<TextPitchAlignment>() == AlignmentType::Map;
-                    const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, parameters.state.getZoom());
-                    const auto labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, parameters.state, pixelsToTileUnits);
-
-                    for (const PlacedSymbol& symbol : bucket.text.placedSymbols) {
-                        optional<VariableOffset> variableOffset;
-                        if (!symbol.hidden && symbol.crossTileID != 0u) {
-                            auto it = parameters.variableOffsets.get().find(symbol.crossTileID);
-                            if (it != parameters.variableOffsets.get().end()) {
-                                variableOffset = it->second;
-                                hasVariablePacement |= true;
-                            }
-                        }
-
-                        if (!variableOffset) {
-                            // These symbols are from a justification that is not being used, or a label that wasn't placed
-                            // so we don't need to do the extra math to figure out what incremental shift to apply.
-                            hideGlyphs(symbol.glyphOffsets.size(), bucket.text.dynamicVertices);
-                        } else {
-                            const Point<float> tileAnchor = symbol.anchorPoint;
-                            const auto projectedAnchor = project(tileAnchor, pitchWithMap ? tile.matrix : labelPlaneMatrix);
-                            const float perspectiveRatio = 0.5f + 0.5f * (parameters.state.getCameraToCenterDistance() / projectedAnchor.second);
-                            float renderTextSize = evaluateSizeForFeature(partiallyEvaluatedSize, symbol) * perspectiveRatio / util::ONE_EM;
-                            if (pitchWithMap) {
-                                // Go from size in pixels to equivalent size in tile units
-                                renderTextSize *= bucket.tilePixelRatio / tileScale;
-                            }
-
-                            auto shift = calculateVariableRenderShift(
-                                    (*variableOffset).anchor,
-                                    (*variableOffset).width,
-                                    (*variableOffset).height,
-                                    (*variableOffset).radialOffset,
-                                    (*variableOffset).textBoxScale,
-                                    renderTextSize);
-
-                            // Usual case is that we take the projected anchor and add the pixel-based shift
-                            // calculated above. In the (somewhat weird) case of pitch-aligned text, we add an equivalent
-                            // tile-unit based shift to the anchor before projecting to the label plane.
-                            Point<float> shiftedAnchor;
-                            if (pitchWithMap) {
-                                shiftedAnchor = project(Point<float>(tileAnchor.x + shift.x, tileAnchor.y + shift.y),
-                                                        labelPlaneMatrix).first;
-                            } else {
-                                if (rotateWithMap) {
-                                    auto rotated = util::rotate(shift, -parameters.state.getPitch());
-                                    shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
-                                                                projectedAnchor.first.y + rotated.y);
-                                } else {
-                                    shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
-                                                                projectedAnchor.first.y + shift.y);
-                                }
-                            }
-
-                            for (std::size_t i = 0; i < symbol.glyphOffsets.size(); i++) {
-                                addDynamicAttributes(shiftedAnchor, 0, bucket.text.dynamicVertices);
-                            }
-                        }
-                    }
-                    parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
-                }
-
-                const Size texsize = geometryTile.glyphAtlasTexture->size;
-
-                if (values.hasHalo) {
-                    draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-                        SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
-                        bucket.text,
-                        textSegments,
-                        bucket.textSizeBinder,
-                        values,
-                        bucketPaintProperties.textBinders,
-                        paintPropertyValues,
-                        SymbolSDFTextProgram::TextureBindings{
-                            textureBinding,
-                        });
-                }
-
-                if (values.hasFill) {
-                    draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-                        SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
-                        bucket.text,
-                        textSegments,
-                        bucket.textSizeBinder,
-                        values,
-                        bucketPaintProperties.textBinders,
-                        paintPropertyValues,
-                        SymbolSDFTextProgram::TextureBindings{
-                            textureBinding,
-                        });
-                }
-            };
-
             if (sortFeaturesByKey) {
-                for (const auto& segment : bucket.text.segments) {
-                    renderableSegments.push_back({{segment}, renderText, segment.sortKey});
+                for (auto& segment : bucket.text.segments) {
+                    renderableSegments.emplace_hint(it, false, SegmentVector<SymbolTextAttributes>{segment}, tile, bucket, bucketPaintProperties, segment.sortKey);
                 }
             } else {
-                renderText(bucket.text.segments);
+                drawText(draw, tile, bucket, bucket.text.segments, bucketPaintProperties, parameters);
             }
         }
 
@@ -456,12 +493,12 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 
     if (sortFeaturesByKey) {
-        std::sort(renderableSegments.begin(), renderableSegments.end(), [](const auto& a, const auto& b) {
-            return a.sortKey < b.sortKey;
-        });
-
         for (auto& renderable : renderableSegments) {
-            renderable.drawSegments(renderable.segments);
+            if (renderable.isIcon) {
+                drawIcon(draw, renderable.tile, renderable.bucket, renderable.segments, renderable.bucketPaintProperties, parameters);
+            } else {
+                drawText(draw, renderable.tile, renderable.bucket, renderable.segments, renderable.bucketPaintProperties, parameters);
+            }
         }
     }
 }

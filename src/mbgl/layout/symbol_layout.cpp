@@ -162,23 +162,19 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             imageDependencies.emplace(*ft.icon, ImageType::Icon);
         }
 
-        if (sortFeaturesByKey) {
-            ft.sortKey = static_cast<unsigned int>(layout.evaluate<SymbolSortKey>(zoom, ft));
-        }
-
         if (ft.formattedText || ft.icon) {
-            features.push_back(std::move(ft));
+            if (sortFeaturesByKey) {
+                ft.sortKey = static_cast<unsigned int>(layout.evaluate<SymbolSortKey>(zoom, ft));
+                const auto lowerBound = std::lower_bound(features.begin(), features.end(), ft);
+                features.insert(lowerBound, std::move(ft));
+            } else {
+                features.push_back(std::move(ft));
+            }
         }
     }
 
     if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
         util::mergeLines(features);
-    }
-
-    if (sortFeaturesByKey) {
-        std::sort(features.begin(), features.end(), [](const auto& a, const auto& b) {
-            return a.sortKey < b.sortKey;
-        });
     }
 }
 
