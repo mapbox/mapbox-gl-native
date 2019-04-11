@@ -15,11 +15,11 @@ import java.util.Calendar;
  * usage only.
  */
 class AccountsManager {
-  private final static String PREFERENCE_USER_ID = "com.mapbox.mapboxsdk.accounts.userid";
-  private final static String PREFERENCE_TIMESTAMP = "com.mapbox.mapboxsdk.accounts.timestamp";
-  private final static String PREFERENCE_SKU_TOKEN = "com.mapbox.mapboxsdk.accounts.skutoken";
+  private static final String PREFERENCE_USER_ID = "com.mapbox.mapboxsdk.accounts.userid";
+  private static final String PREFERENCE_TIMESTAMP = "com.mapbox.mapboxsdk.accounts.timestamp";
+  private static final String PREFERENCE_SKU_TOKEN = "com.mapbox.mapboxsdk.accounts.skutoken";
 
-  private final static long ONE_HOUR_MILLIS = 60 * 60 * 1_000L;
+  static final long ONE_HOUR_MILLIS = 60 * 60 * 1_000L;
 
   private long timestamp;
   private String skuToken;
@@ -64,7 +64,11 @@ class AccountsManager {
   }
 
   private boolean isExpired() {
-    return (getNow() - timestamp > ONE_HOUR_MILLIS);
+    return isExpired(getNow(), timestamp);
+  }
+
+  static boolean isExpired(long now, long then) {
+    return ((now - then) > ONE_HOUR_MILLIS);
   }
 
   private long persistRotation(String skuToken) {
@@ -81,7 +85,7 @@ class AccountsManager {
       .getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 
-  private long getNow() {
+  static long getNow() {
     return Calendar.getInstance(MapboxConstants.MAPBOX_LOCALE).getTimeInMillis();
   }
 

@@ -106,7 +106,8 @@ public class FileSource {
    */
   @NonNull
   private static String getCachePath(@NonNull Context context) {
-    SharedPreferences preferences = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    SharedPreferences preferences = context.getSharedPreferences(
+      MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     String cachePath = preferences.getString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, null);
 
     if (!isPathWritable(cachePath)) {
