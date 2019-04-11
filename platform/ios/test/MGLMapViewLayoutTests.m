@@ -171,6 +171,27 @@
     }
 }
 
+- (void)testCompassPlacementInvalidPosition {
+    CGFloat margin = -_superView.bounds.size.width;
+
+    UIView *scaleBar = self.mapView.scaleBar;
+    NSArray *testDataList = [self makeTestDataListWithView:scaleBar margin:margin];
+
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.compassViewPosition = testData.position;
+        self.mapView.compassViewMargins = testData.offset;
+
+        //invoke layout
+        [self.superView setNeedsLayout];
+        XCTAssertThrowsSpecificNamed(
+                                     [self.superView layoutIfNeeded],
+                                     NSException,
+                                     NSInvalidArgumentException,
+                                     @"should throw NSInvalidArgumentException"
+                                     );
+    }
+}
+
 - (void)testScalebarPlacement {
     double accuracy = 0.01;
     CGFloat margin = 4.0;
@@ -188,6 +209,27 @@
 
         XCTAssertEqualWithAccuracy(CGRectGetMinX(scaleBar.frame), testData.expectedOrigin.x, accuracy);
         XCTAssertEqualWithAccuracy(CGRectGetMinY(scaleBar.frame), testData.expectedOrigin.y, accuracy);
+    }
+}
+
+- (void)testScalebarPlacementInvalidPosition {
+    CGFloat margin = -_superView.bounds.size.width;
+
+    UIView *scaleBar = self.mapView.scaleBar;
+    NSArray *testDataList = [self makeTestDataListWithView:scaleBar margin:margin];
+
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.scaleBarPosition = testData.position;
+        self.mapView.scaleBarMargins = testData.offset;
+
+        //invoke layout
+        [self.superView setNeedsLayout];
+        XCTAssertThrowsSpecificNamed(
+                                     [self.superView layoutIfNeeded],
+                                     NSException,
+                                     NSInvalidArgumentException,
+                                     @"should throw NSInvalidArgumentException"
+                                     );
     }
 }
 
@@ -212,15 +254,15 @@
 }
 
 - (void)testAttributionButtonPlacementInvalidPosition {
-    CGFloat margin = -400.0;
-    
+    CGFloat margin = -_superView.bounds.size.width;
+
     UIView *attributionButton = self.mapView.attributionButton;
     NSArray *testDataList = [self makeTestDataListWithView:attributionButton margin:margin];
     
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.attributionButtonPosition = testData.position;
         self.mapView.attributionButtonMargins = testData.offset;
-        
+
         //invoke layout
         [self.superView setNeedsLayout];
         XCTAssertThrowsSpecificNamed(
@@ -251,5 +293,27 @@
         XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.frame), testData.expectedOrigin.y, accuracy);
     }
 }
+
+- (void)testLogoPlacementInvalidPosition {
+    CGFloat margin = -_superView.bounds.size.width;
+
+    UIView *attributionButton = self.mapView.attributionButton;
+    NSArray *testDataList = [self makeTestDataListWithView:attributionButton margin:margin];
+
+    for (MGLOrnamentTestData *testData in testDataList) {
+        self.mapView.logoViewPosition = testData.position;
+        self.mapView.logoViewMargins = testData.offset;
+
+        //invoke layout
+        [self.superView setNeedsLayout];
+        XCTAssertThrowsSpecificNamed(
+                                     [self.superView layoutIfNeeded],
+                                     NSException,
+                                     NSInvalidArgumentException,
+                                     @"should throw NSInvalidArgumentException"
+                                     );
+    }
+}
+
 
 @end

@@ -967,6 +967,18 @@ public:
         [NSException raise:NSInvalidArgumentException
                     format:@"The attribution is not in the visible area of the mapview. Please check your position and offset settings"];
     }
+    if (!CGRectContainsRect(self.bounds, self.scaleBar.frame)) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"The scaleBar is not in the visible area of the mapview. Please check your position and offset settings"];
+    }
+    if (!CGRectContainsRect(self.bounds, self.compassView.frame)) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"The compassView is not in the visible area of the mapview. Please check your position and offset settings"];
+    }
+    if (!CGRectContainsRect(self.bounds, self.logoView.frame)) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"The logoView is not in the visible area of the mapview. Please check your position and offset settings"];
+    }
 }
 
 /// Updates `contentInset` to reflect the current window geometry.
