@@ -15,10 +15,6 @@ import java.util.Calendar;
  * usage only.
  */
 class AccountsManager {
-
-  // TODO: Move to Constants? Repeated in FileSource.
-  private static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
-
   private final static String PREFERENCE_USER_ID = "com.mapbox.mapboxsdk.accounts.userid";
   private final static String PREFERENCE_TIMESTAMP = "com.mapbox.mapboxsdk.accounts.timestamp";
   private final static String PREFERENCE_SKU_TOKEN = "com.mapbox.mapboxsdk.accounts.skutoken";
@@ -81,7 +77,8 @@ class AccountsManager {
   }
 
   private @NonNull SharedPreferences getSharedPreferences() {
-    return Mapbox.getApplicationContext().getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    return Mapbox.getApplicationContext()
+      .getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 
   private long getNow() {
