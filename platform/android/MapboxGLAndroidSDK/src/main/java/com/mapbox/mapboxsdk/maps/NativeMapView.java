@@ -65,8 +65,11 @@ final class NativeMapView implements NativeMap {
   // Device density
   private final float pixelRatio;
 
-  // Flag to indicating destroy was called
+  // Flag to indicate destroy was called
   private boolean destroyed = false;
+
+  // Flag to indicate surface was destroyed
+  private boolean hasSurface = false;
 
   // Holds the pointer to JNI NativeMapView
   @Keep
@@ -890,7 +893,7 @@ final class NativeMapView implements NativeMap {
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
                                              @Nullable String[] layerIds,
                                              @Nullable Expression filter) {
-    if (checkState("queryRenderedFeatures")) {
+    if (checkState("queryRenderedFeatures") || !hasSurface) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForPoint(coordinates.x / pixelRatio,
@@ -903,7 +906,7 @@ final class NativeMapView implements NativeMap {
   public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
                                              @Nullable String[] layerIds,
                                              @Nullable Expression filter) {
-    if (checkState("queryRenderedFeatures")) {
+    if (checkState("queryRenderedFeatures") || !hasSurface) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForBox(
@@ -1416,6 +1419,16 @@ final class NativeMapView implements NativeMap {
   @Override
   public boolean isDestroyed() {
     return destroyed;
+  }
+
+  @Override
+  public boolean hasSurface() {
+    return hasSurface;
+  }
+
+  @Override
+  public void setHasSurface(boolean hasSurface) {
+    this.hasSurface = hasSurface;
   }
 
   public interface ViewCallback {

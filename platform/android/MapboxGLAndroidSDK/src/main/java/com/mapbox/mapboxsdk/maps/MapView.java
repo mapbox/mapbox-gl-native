@@ -19,7 +19,6 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -36,12 +35,11 @@ import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -74,7 +72,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private MapboxMapOptions mapboxMapOptions;
   private MapRenderer mapRenderer;
   private boolean destroyed;
-  private boolean hasSurface;
 
   private CompassView compassView;
   private PointF focalPoint;
@@ -292,6 +289,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
           MapView.this.onSurfaceCreated();
           super.onSurfaceCreated(gl, config);
         }
+
+        @Override
+        protected void onSurfaceDestroyed() {
+          MapView.this.onSurfaceDestroyed();
+          super.onSurfaceDestroyed();
+        }
       };
 
       addView(textureView, 0);
@@ -303,6 +306,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
           MapView.this.onSurfaceCreated();
           super.onSurfaceCreated(gl, config);
+        }
+
+        @Override
+        protected void onSurfaceDestroyed() {
+          MapView.this.onSurfaceDestroyed();
+          super.onSurfaceDestroyed();
         }
       };
 
@@ -316,7 +325,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   private void onSurfaceCreated() {
-    hasSurface = true;
+    nativeMapView.setHasSurface(true);
     post(new Runnable() {
       @Override
       public void run() {
@@ -327,6 +336,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
         }
       }
     });
+  }
+
+  private void onSurfaceDestroyed() {
+    if (nativeMapView != null) {
+      nativeMapView.setHasSurface(false);
+    }
   }
 
   /**
@@ -427,7 +442,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       mapboxMap.onDestroy();
     }
 
-    if (nativeMapView != null && hasSurface) {
+    if (nativeMapView != null && nativeMapView.hasSurface()) {
       // null when destroying an activity programmatically mapbox-navigation-android/issues/503
       nativeMapView.destroy();
       nativeMapView = null;
@@ -439,10 +454,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-   *  The maximum frame rate at which the map view is rendered,
-   *  but it can't excess the ability of device hardware.
+   * The maximum frame rate at which the map view is rendered,
+   * but it can't excess the ability of device hardware.
    *
-   * @param maximumFps  Can be set to arbitrary integer values.
+   * @param maximumFps Can be set to arbitrary integer values.
    */
   public void setMaximumFps(int maximumFps) {
     if (mapRenderer != null) {
@@ -747,8 +762,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-
-   /**
+   * /**
    * Set a callback that's invoked when the style has finished loading.
    *
    * @param listener The callback that's invoked when the style has finished loading
