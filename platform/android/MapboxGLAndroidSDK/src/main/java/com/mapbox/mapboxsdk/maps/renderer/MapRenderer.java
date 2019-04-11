@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

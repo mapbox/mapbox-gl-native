@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.feature;
 
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -89,6 +90,11 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
   protected void onStart() {
     super.onStart();
     mapView.onStart();
+
+    if (mapboxMap != null) {
+      // Regression test for #14394
+      mapboxMap.queryRenderedFeatures(new PointF(0,0));
+    }
   }
 
   @Override
