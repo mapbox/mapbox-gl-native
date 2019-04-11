@@ -306,6 +306,10 @@ public class OfflineRegion {
    * @param state the download state
    */
   public void setDownloadState(@DownloadState int state) {
+    if (this.state == state) {
+      return;
+    }
+
     if (state == STATE_ACTIVE) {
       fileSource.activate();
     } else {
