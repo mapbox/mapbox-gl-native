@@ -25,5 +25,10 @@ inline const auto& getEvaluated(const Immutable<LayerProperties>& properties) {
     return static_cast<const Derived&>(*properties).evaluated;
 }
 
+template <class Derived>
+inline const auto& getCrossfade(const Immutable<LayerProperties>& properties) {
+    return static_cast<const Derived&>(*properties).crossfade;
+}
+
 } // namespace style
 } // namespace mbgl

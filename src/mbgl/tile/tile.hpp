@@ -58,6 +58,7 @@ public:
     virtual void upload(gfx::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
     virtual const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const {
+        assert(false);
         return nullptr;
     }
     // Updates the contained layer render data with the given properties.

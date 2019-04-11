@@ -52,15 +52,13 @@ bool RenderFillExtrusionLayer::hasTransition() const {
 }
 
 bool RenderFillExtrusionLayer::hasCrossfade() const {
-    return static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).crossfade.t != 1;
+    return getCrossfade<FillExtrusionLayerProperties>(evaluatedProperties).t != 1;
 }
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-    const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
-    const auto& crossfade = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).crossfade;
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& size = parameters.staticData.backendSize;
 
@@ -78,22 +76,27 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             "fill extrusion",
             { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {} });
 
-        auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
+        auto draw = [&](auto& programInstance,
+                        const auto& evaluated_,
+                        const auto& crossfade_,
+                        const auto& tileBucket,
+                        auto&& uniformValues,
                         const optional<ImagePosition>& patternPositionA,
-                        const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
+                        const optional<ImagePosition>& patternPositionB,
+                        auto&& textureBindings) {
             const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(getID());
-            paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
+            paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade_);
 
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
                 paintPropertyBinders,
-                evaluated,
+                evaluated_,
                 parameters.state.getZoom()
             );
             const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                 *tileBucket.vertexBuffer,
                 paintPropertyBinders,
-                evaluated
+                evaluated_
             );
 
             checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
@@ -116,14 +119,17 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         if (unevaluated.get<FillExtrusionPattern>().isUndefined()) {
             for (const RenderTile& tile : renderTiles) {
-                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
-                if (!bucket_) {
+                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                if (!renderData) {
                     continue;
                 }
-                FillExtrusionBucket& bucket = *bucket_;
-
+                auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
+                const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(renderData->layerProperties);
+                const auto& crossfade = getCrossfade<FillExtrusionLayerProperties>(renderData->layerProperties);
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion,
+                    evaluated,
+                    crossfade,
                     bucket,
                     FillExtrusionProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -139,18 +145,23 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             }
         } else {
             for (const RenderTile& tile : renderTiles) {
-                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
-                if (!bucket_) {
+                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                if (!renderData) {
                     continue;
                 }
+                auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
+                const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(renderData->layerProperties);
+                const auto& crossfade = getCrossfade<FillExtrusionLayerProperties>(renderData->layerProperties);
+
                 const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
                 auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
                 optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
                 optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
-                FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern,
+                    evaluated,
+                    crossfade,
                     bucket,
                     FillExtrusionPatternProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -175,6 +186,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
     } else if (parameters.pass == RenderPass::Translucent) {
         const auto& size = parameters.staticData.backendSize;
+        const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
 
         mat4 viewportMat;
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);

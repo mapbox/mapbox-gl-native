@@ -45,7 +45,7 @@ bool RenderBackgroundLayer::hasTransition() const {
 }
 
 bool RenderBackgroundLayer::hasCrossfade() const {
-    return static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).crossfade.t != 1;
+    return getCrossfade<BackgroundLayerProperties>(evaluatedProperties).t != 1;
 }
 
 void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {

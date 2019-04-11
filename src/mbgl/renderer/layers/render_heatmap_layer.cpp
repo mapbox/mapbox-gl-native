@@ -59,7 +59,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-    const auto& evaluated = static_cast<const HeatmapLayerProperties&>(*evaluatedProperties).evaluated;
+
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& viewportSize = parameters.staticData.backendSize;
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
@@ -89,11 +89,12 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             "heatmap texture", { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
 
         for (const RenderTile& tile : renderTiles) {
-            auto bucket_ = tile.tile.getBucket<HeatmapBucket>(*baseImpl);
-            if (!bucket_) {
+            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            if (!renderData) {
                 continue;
             }
-            HeatmapBucket& bucket = *bucket_;
+            auto& bucket = static_cast<HeatmapBucket&>(*renderData->bucket);
+            const auto& evaluated = getEvaluated<HeatmapLayerProperties>(renderData->layerProperties);
 
             const auto extrudeScale = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
 
@@ -155,7 +156,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             HeatmapTextureProgram::LayoutUniformValues{
                 uniforms::matrix::Value( viewportMat ),
                 uniforms::world::Value( size ),
-                uniforms::opacity::Value( evaluated.get<HeatmapOpacity>() )
+                uniforms::opacity::Value( getEvaluated<HeatmapLayerProperties>(evaluatedProperties).get<HeatmapOpacity>() )
             },
             paintAttributeData,
             properties,

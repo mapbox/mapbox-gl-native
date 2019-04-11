@@ -54,22 +54,22 @@ bool RenderLineLayer::hasTransition() const {
 }
 
 bool RenderLineLayer::hasCrossfade() const {
-    return static_cast<const LineLayerProperties&>(*evaluatedProperties).crossfade.t != 1;
+    return getCrossfade<LineLayerProperties>(evaluatedProperties).t != 1;
 }
 
 void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-    const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
-    const auto& crossfade = static_cast<const LineLayerProperties&>(*evaluatedProperties).crossfade;
 
     for (const RenderTile& tile : renderTiles) {
-        auto bucket_ = tile.tile.getBucket<LineBucket>(*baseImpl);
-        if (!bucket_) {
+        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        if (!renderData) {
             continue;
         }
-        LineBucket& bucket = *bucket_;
+        auto& bucket = static_cast<LineBucket&>(*renderData->bucket);
+        const auto& evaluated = getEvaluated<LineLayerProperties>(renderData->layerProperties);
+        const auto& crossfade = getCrossfade<LineLayerProperties>(renderData->layerProperties);
 
         auto draw = [&](auto& programInstance,
                         auto&& uniformValues,
@@ -134,7 +134,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      });
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
-            const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
+            const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
             auto& geometryTile = static_cast<GeometryTile&>(tile.tile);            
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
