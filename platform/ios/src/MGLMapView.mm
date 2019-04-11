@@ -831,7 +831,10 @@ public:
 {
     MGLAssertIsMainThread();
 
-    _rendererFrontend->reduceMemoryUse();
+    if ( ! self.dormant)
+    {
+        _rendererFrontend->reduceMemoryUse();
+    }
 }
 
 #pragma mark - Layout -
