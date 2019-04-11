@@ -22,6 +22,7 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
   @NonNull
   private final GLSurfaceView glSurfaceView;
+  private boolean hasSurface;
 
   public GLSurfaceViewMapRenderer(Context context,
                                   GLSurfaceView glSurfaceView,
@@ -33,11 +34,18 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
     glSurfaceView.setRenderer(this);
     glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
     glSurfaceView.setPreserveEGLContextOnPause(true);
-
     glSurfaceView.getHolder().addCallback(new SurfaceHolderCallbackAdapter() {
 
       @Override
+      public void surfaceCreated(SurfaceHolder holder) {
+        super.surfaceCreated(holder);
+        hasSurface = true;
+      }
+
+      @Override
       public void surfaceDestroyed(SurfaceHolder holder) {
+        super.surfaceDestroyed(holder);
+        hasSurface = false;
         onSurfaceDestroyed();
       }
     });
@@ -74,6 +82,11 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   }
 
   @Override
+  protected void onSurfaceDestroyed() {
+    super.onSurfaceDestroyed();
+  }
+
+  @Override
   public void onSurfaceChanged(GL10 gl, int width, int height) {
     super.onSurfaceChanged(gl, width, height);
   }
@@ -90,6 +103,9 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
    */
   @Override
   public void requestRender() {
+    if (!hasSurface) {
+      return;
+    }
     glSurfaceView.requestRender();
   }
 
