@@ -36,9 +36,8 @@ Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float 
 }
 
 struct RenderableSegment {
-    using SegmentRefVector = std::vector<std::reference_wrapper<const Segment<SymbolTextAttributes>>>;
-    SegmentRefVector segments;
-    std::function<void(const SegmentRefVector&)> drawSegments;
+    SegmentVector<SymbolTextAttributes> segments;
+    std::function<void(const SegmentVector<SymbolTextAttributes>&)> drawSegments;
     unsigned int sortKey;
 };
 
@@ -241,7 +240,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (sortFeaturesByKey) {
                 for (const auto& segment : bucket.icon.segments) {
-                    renderableSegments.push_back({{std::cref(segment)}, renderIcon, segment.sortKey});
+                    renderableSegments.push_back({{segment}, renderIcon, segment.sortKey});
                 }
             } else {
                 renderIcon(bucket.icon.segments);
@@ -371,7 +370,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (sortFeaturesByKey) {
                 for (const auto& segment : bucket.text.segments) {
-                    renderableSegments.push_back({{std::cref(segment)}, renderText, segment.sortKey});
+                    renderableSegments.push_back({{segment}, renderText, segment.sortKey});
                 }
             } else {
                 renderText(bucket.text.segments);

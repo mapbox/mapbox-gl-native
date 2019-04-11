@@ -20,9 +20,8 @@ public:
           indexOffset(indexOffset_),
           vertexLength(vertexLength_),
           indexLength(indexLength_),
+          drawScopes(std::make_shared<std::map<std::string, gfx::DrawScope>>()),
           sortKey(sortKey_) {}
-
-    Segment(Segment&&) = default;
 
     const std::size_t vertexOffset;
     const std::size_t indexOffset;
@@ -37,7 +36,7 @@ public:
     //     data-driven paint properties
     //   * when two fill layers have the same layout properties, but one
     //     uses fill-color and the other uses fill-pattern
-    mutable std::map<std::string, gfx::DrawScope> drawScopes;
+    mutable std::shared_ptr<std::map<std::string, gfx::DrawScope>> drawScopes;
 
     unsigned int sortKey;
 };

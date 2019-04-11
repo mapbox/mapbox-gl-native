@@ -90,10 +90,10 @@ public:
         }
 
         for (auto& segment : segments) {
-            auto drawScopeIt = segment.drawScopes.find(layerID);
+            auto drawScopeIt = segment.drawScopes->find(layerID);
 
-            if (drawScopeIt == segment.drawScopes.end()) {
-                drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
+            if (drawScopeIt == segment.drawScopes->end()) {
+                drawScopeIt = segment.drawScopes->emplace(layerID, context.createDrawScope()).first;
             }
 
             program->draw(
