@@ -292,8 +292,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
         @Override
         protected void onSurfaceDestroyed() {
-          MapView.this.onSurfaceDestroyed();
           super.onSurfaceDestroyed();
+          MapView.this.onSurfaceDestroyed();
         }
       };
 
@@ -310,8 +310,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
         @Override
         protected void onSurfaceDestroyed() {
-          MapView.this.onSurfaceDestroyed();
           super.onSurfaceDestroyed();
+          MapView.this.onSurfaceDestroyed();
         }
       };
 
@@ -442,7 +442,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       mapboxMap.onDestroy();
     }
 
-    if (nativeMapView != null && nativeMapView.hasSurface()) {
+    if (nativeMapView != null) {
       // null when destroying an activity programmatically mapbox-navigation-android/issues/503
       nativeMapView.destroy();
       nativeMapView = null;
@@ -762,7 +762,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-   * /**
+   *
    * Set a callback that's invoked when the style has finished loading.
    *
    * @param listener The callback that's invoked when the style has finished loading
