@@ -35,7 +35,7 @@ public final class Mapbox {
   @Nullable
   private TelemetryDefinition telemetry;
   @Nullable
-  private MapboxAccounts accounts;
+  private AccountsManager accounts;
 
   /**
    * Get an instance of Mapbox.
@@ -58,7 +58,7 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken);
       if (isAccessTokenValid(accessToken)) {
         initializeTelemetry();
-        INSTANCE.accounts = new MapboxAccounts();
+        INSTANCE.accounts = new AccountsManager();
       }
       ConnectivityReceiver.instance(appContext);
     }

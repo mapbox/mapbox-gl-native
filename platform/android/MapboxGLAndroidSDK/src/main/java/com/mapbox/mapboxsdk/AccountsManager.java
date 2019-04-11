@@ -14,7 +14,7 @@ import java.util.Calendar;
  * using Android's SharedPreferences for storage. This class is meant for internal SDK
  * usage only.
  */
-class MapboxAccounts {
+class AccountsManager {
 
   // TODO: Move to Constants? Repeated in FileSource.
   private static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
@@ -28,7 +28,7 @@ class MapboxAccounts {
   private long timestamp;
   private String skuToken;
 
-  MapboxAccounts() {
+  AccountsManager() {
     String userId = validateUserId();
     validateRotation(userId);
   }
