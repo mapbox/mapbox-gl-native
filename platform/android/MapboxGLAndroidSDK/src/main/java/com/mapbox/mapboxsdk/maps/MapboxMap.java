@@ -12,7 +12,6 @@ import android.support.annotation.Size;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.view.View;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -1882,20 +1881,25 @@ public final class MapboxMap {
   }
 
   /**
-   * Queries the map for rendered features
+   * Queries the map for rendered features.
+   * <p>
+   * Returns an empty list if either the map or underlying render surface has been destroyed.
+   * </p>
    *
    * @param coordinates the point to query
    * @param layerIds    optionally - only query these layers
    * @return the list of feature
    */
   @NonNull
-  public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates, @Nullable String...
-    layerIds) {
+  public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates, @Nullable String... layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, null);
   }
 
   /**
    * Queries the map for rendered features
+   * <p>
+   * Returns an empty list if either the map or underlying render surface has been destroyed.
+   * </p>
    *
    * @param coordinates the point to query
    * @param filter      filters the returned features with an expression
@@ -1911,19 +1915,24 @@ public final class MapboxMap {
 
   /**
    * Queries the map for rendered features
+   * <p>
+   * Returns an empty list if either the map or underlying render surface has been destroyed.
+   * </p>
    *
    * @param coordinates the box to query
    * @param layerIds    optionally - only query these layers
    * @return the list of feature
    */
   @NonNull
-  public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
-                                             @Nullable String... layerIds) {
+  public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates, @Nullable String... layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, null);
   }
 
   /**
    * Queries the map for rendered features
+   * <p>
+   * Returns an empty list if either the map or underlying render surface has been destroyed.
+   * </p>
    *
    * @param coordinates the box to query
    * @param filter      filters the returned features with an expression
