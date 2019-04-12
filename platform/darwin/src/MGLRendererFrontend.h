@@ -57,14 +57,6 @@ public:
         renderer->render(*updateParameters_);
     }
     
-    void flush() {
-        mbgl::BackendScope guard { mbglBackend, mbgl::BackendScope::ScopeType::Implicit };
-
-        if (renderer) {
-            renderer->flush();
-        }
-    }
-    
     mbgl::Renderer* getRenderer() {
         return renderer.get();
     }
