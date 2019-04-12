@@ -7,6 +7,8 @@
 #include <mbgl/util/version.hpp>
 
 #import <Foundation/Foundation.h>
+
+#import "MGLAccountManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLNetworkConfiguration_Private.h"
 
@@ -196,16 +198,22 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
     auto shared = request->shared; // Explicit copy so that it also gets copied into the completion handler block below.
 
     @autoreleasepool {
-        NSURL* url = [NSURL URLWithString:@(resource.url.c_str())];
+        NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
         MGLLogDebug(@"Requesting URI: %@", url.relativePath);
         if (impl->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
-            NSString* absoluteString = [url.absoluteString
-                stringByAppendingFormat:(url.query ? @"&%@" : @"?%@"), @"events=true"];
-            url = [NSURL URLWithString:absoluteString];
+            NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+            NSArray *newQueryItems = @[
+                [NSURLQueryItem queryItemWithName:@"events" value:@"true"],
+                [NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken]
+            ];
+
+            components.queryItems = components.queryItems ? [components.queryItems arrayByAddingObjectsFromArray:newQueryItems] : newQueryItems;
+
+            url = components.URL;
         }
 
-        NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL:url];
+        NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
         if (resource.priorEtag) {
             [req addValue:@(resource.priorEtag->c_str())
                  forHTTPHeaderField:@"If-None-Match"];

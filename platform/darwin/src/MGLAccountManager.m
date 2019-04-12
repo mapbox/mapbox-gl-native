@@ -1,26 +1,37 @@
 #import "MGLAccountManager_Private.h"
 #import "NSBundle+MGLAdditions.h"
+
 #if TARGET_OS_OSX
 #import "NSProcessInfo+MGLAdditions.h"
 #endif
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
-
-@interface MGLAccountManager ()
-
-@property (atomic) NSString *accessToken;
-@property (nonatomic) NSURL *apiBaseURL;
-
-@end
-#else
-@interface MGLAccountManager ()
-
-@property (atomic) NSString *accessToken;
-@property (nonatomic) NSURL *apiBaseURL;
-
-@end
 #endif
+
+@interface MGLSKUToken : NSObject
+
++ (NSString *)skuToken;
+
+@end
+
+@implementation MGLSKUToken
+
++ (NSString *)skuToken {
+    return @"not an actual token — this will be provided by the mbxaccounts library";
+}
+
+@end
+
+@interface MGLAccountManager ()
+
+@property (atomic) NSString *accessToken;
+@property (nonatomic) NSURL *apiBaseURL;
+
+@property (atomic) NSString *skuToken;
+@property (atomic) NSDate *skuTokenExpiration;
+
+@end
 
 @implementation MGLAccountManager
 
@@ -39,6 +50,10 @@
     if (apiBaseURL.length && [NSURL URLWithString:apiBaseURL]) {
         [self setAPIBaseURL:[NSURL URLWithString:apiBaseURL]];
     }
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+    self.skuToken = [MGLSKUToken skuToken];
+#endif
 }
 
 + (instancetype)sharedManager {
@@ -91,6 +106,22 @@
 
 + (NSURL *)apiBaseURL {
     return [MGLAccountManager sharedManager].apiBaseURL;
+}
+
++ (void)setSkuToken:(NSString *)skuToken {
+    NSTimeInterval oneHour = 60 * 60; // TODO: make this const
+    MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate dateWithTimeIntervalSinceNow:oneHour];
+
+    MGLAccountManager.sharedManager.skuToken = skuToken;
+}
+
++ (NSString *)skuToken {
+    return [MGLAccountManager.sharedManager isSKUTokenExpired] ? [MGLSKUToken skuToken] : MGLAccountManager.sharedManager.skuToken;
+}
+
+- (BOOL)isSKUTokenExpired {
+    NSTimeInterval secondsUntilExpiration = [MGLAccountManager.sharedManager.skuTokenExpiration timeIntervalSinceDate:NSDate.date];
+    return secondsUntilExpiration < 0;
 }
 
 @end
