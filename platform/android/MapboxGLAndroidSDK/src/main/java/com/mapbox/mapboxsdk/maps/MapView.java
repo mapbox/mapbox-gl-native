@@ -65,7 +65,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private final InitialRenderCallback initialRenderCallback = new InitialRenderCallback();
 
   @Nullable
-  private NativeMapView nativeMapView;
+  private NativeMap nativeMapView;
   @Nullable
   private MapboxMap mapboxMap;
   private AttributionClickListener attributionClickListener;
@@ -155,7 +155,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     final CameraChangeDispatcher cameraDispatcher = new CameraChangeDispatcher();
 
     // setup components for MapboxMap creation
-    Projection proj = new Projection(nativeMapView);
+    Projection proj = new Projection(nativeMapView, this);
     UiSettings uiSettings = new UiSettings(proj, focalInvalidator, compassView, attrView, logoView, getPixelRatio());
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
     IconManager iconManager = new IconManager(nativeMapView);

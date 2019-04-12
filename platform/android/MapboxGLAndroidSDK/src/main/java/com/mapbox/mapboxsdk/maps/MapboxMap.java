@@ -56,7 +56,7 @@ public final class MapboxMap {
 
   private static final String TAG = "Mbgl-MapboxMap";
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMapView;
   private final UiSettings uiSettings;
   private final Projection projection;
   private final Transform transform;
@@ -78,7 +78,7 @@ public final class MapboxMap {
 
   private boolean debugActive;
 
-  MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
+  MapboxMap(NativeMap map, Transform transform, UiSettings ui, Projection projection,
             OnGesturesManagerInteractionListener listener, CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
     this.uiSettings = ui;
@@ -652,7 +652,7 @@ public final class MapboxMap {
    * @return the height of the map
    */
   public float getHeight() {
-    return nativeMapView.getHeight();
+    return projection.getHeight();
   }
 
   /**
@@ -661,7 +661,7 @@ public final class MapboxMap {
    * @return the width of the map
    */
   public float getWidth() {
-    return nativeMapView.getWidth();
+    return projection.getWidth();
   }
 
   //

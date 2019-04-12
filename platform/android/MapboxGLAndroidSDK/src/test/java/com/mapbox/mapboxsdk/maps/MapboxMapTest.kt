@@ -17,7 +17,7 @@ class MapboxMapTest {
 
   private lateinit var mapboxMap: MapboxMap
 
-  private lateinit var nativeMapView: NativeMapView
+  private lateinit var nativeMapView: NativeMap
 
   private lateinit var transform: Transform
 

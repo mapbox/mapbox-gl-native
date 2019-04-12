@@ -23,7 +23,7 @@ public class AnnotationManagerTest {
 
   @Test
   public void checksAddAMarker() throws Exception {
-    NativeMapView aNativeMapView = mock(NativeMapView.class);
+    NativeMap aNativeMapView = mock(NativeMapView.class);
     MapView aMapView = mock(MapView.class);
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
     IconManager aIconManager = mock(IconManager.class);

@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 abstract class BaseLayerTest {
-    private lateinit var nativeMapView: NativeMapView
+    private lateinit var nativeMapView: NativeMap
 
     companion object {
         const val WIDTH = 500
