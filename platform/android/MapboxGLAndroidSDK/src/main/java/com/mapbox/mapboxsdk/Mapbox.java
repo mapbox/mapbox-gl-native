@@ -90,8 +90,13 @@ public final class Mapbox {
     FileSource.getInstance(getApplicationContext()).setAccessToken(accessToken);
   }
 
+  /**
+   * Returns a SKU token, refreshed if necessary. This method is meant for internal SDK
+   * usage only.
+   *
+   * @return the SKU token
+   */
   public static String getSkuToken() {
-    validateMapbox();
     return INSTANCE.accounts.getSkuToken();
   }
 
