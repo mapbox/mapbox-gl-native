@@ -263,4 +263,10 @@ interface NativeMap {
   @NonNull
   long[] queryShapeAnnotations(RectF rectF);
 
+  @NonNull
+  RectF getDensityDependantRectangle(RectF rectangle);
+
+  long getNativePtr();
+
+  void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback);
 }

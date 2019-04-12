@@ -23,7 +23,7 @@ class StyleTest {
 
     private lateinit var mapboxMap: MapboxMap
 
-    private lateinit var nativeMapView: NativeMapView
+    private lateinit var nativeMapView: NativeMap
 
     @Before
     fun setup() {
