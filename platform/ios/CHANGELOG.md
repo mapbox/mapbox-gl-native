@@ -6,6 +6,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an Interface Builder crash when using an `MGLMapView` in a storyboard. ([#14379](https://github.com/mapbox/mapbox-gl-native/pull/14379))
 * Fix a bug that wrong position of attribution dialog after rotation. ([#14185](https://github.com/mapbox/mapbox-gl-native/pull/14185))
+* Fixed a bug where non-opaque `UIColor` values were ignored when assigned to a style layer color property. ([#14406](https://github.com/mapbox/mapbox-gl-native/pull/14406))
 
 ## 4.10.0
 
