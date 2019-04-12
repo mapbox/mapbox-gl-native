@@ -236,10 +236,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     std::set<RenderItem> renderItems;
     std::vector<const RenderLayerSymbolInterface*> renderItemsWithSymbols;
+    auto renderItemsEmplaceHint = renderItems.begin();
 
     // Update all sources and initialize renderItems.
     staticData->has3D = false;
-    
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
         std::vector<Immutable<Layer::Impl>> filteredLayersForSource;
@@ -263,7 +263,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     if (layerNeedsRendering) {
                         sourceNeedsRendering = true;
                         filteredLayersForSource.push_back(layerImpl);
-                        renderItems.emplace(*layer, source, index);
+                        renderItemsEmplaceHint = renderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
                     }
                 }
                 continue;
@@ -278,7 +278,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                         continue; // This layer is shown with background color, and it shall not be added to render items. 
                     }
                 }
-                renderItems.emplace(*layer, nullptr, index);
+                renderItemsEmplaceHint = renderItems.emplace_hint(renderItemsEmplaceHint, *layer, nullptr, index);
             }
         }
         source->update(sourceImpl,
