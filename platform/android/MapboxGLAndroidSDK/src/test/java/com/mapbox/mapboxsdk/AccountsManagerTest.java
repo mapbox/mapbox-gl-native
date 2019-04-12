@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk;
 
+import android.text.format.DateUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,7 +11,7 @@ public class AccountsManagerTest {
     long now = AccountsManager.getNow();
 
     long defaultValue = 0L;
-    long tooOld = now - AccountsManager.ONE_HOUR_MILLIS - 1;
+    long tooOld = now - DateUtils.HOUR_IN_MILLIS - 1;
     long futureValue = now + 1;
     long immediatePast = now - 1;
 
