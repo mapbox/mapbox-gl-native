@@ -3,11 +3,10 @@ package com.mapbox.mapboxsdk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 
 import com.mapbox.core.utils.TextUtils;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-
-import java.util.Calendar;
 
 /**
  * This class wraps the functionality provided by MapboxAccounts and manages its state
@@ -18,8 +17,6 @@ class AccountsManager {
   private static final String PREFERENCE_USER_ID = "com.mapbox.mapboxsdk.accounts.userid";
   private static final String PREFERENCE_TIMESTAMP = "com.mapbox.mapboxsdk.accounts.timestamp";
   private static final String PREFERENCE_SKU_TOKEN = "com.mapbox.mapboxsdk.accounts.skutoken";
-
-  static final long ONE_HOUR_MILLIS = 60 * 60 * 1_000L;
 
   private long timestamp;
   private String skuToken;
@@ -68,7 +65,7 @@ class AccountsManager {
   }
 
   static boolean isExpired(long now, long then) {
-    return ((now - then) > ONE_HOUR_MILLIS);
+    return ((now - then) > DateUtils.HOUR_IN_MILLIS);
   }
 
   private long persistRotation(String skuToken) {
@@ -80,20 +77,23 @@ class AccountsManager {
     return now;
   }
 
-  private @NonNull SharedPreferences getSharedPreferences() {
+  @NonNull
+  private SharedPreferences getSharedPreferences() {
     return Mapbox.getApplicationContext()
-      .getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        .getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 
   static long getNow() {
-    return Calendar.getInstance(MapboxConstants.MAPBOX_LOCALE).getTimeInMillis();
+    return System.currentTimeMillis();
   }
 
-  private @NonNull String generateUserId() {
+  @NonNull
+  private String generateUserId() {
     return "placeholder"; // TODO
   }
 
-  private @NonNull String generateSkuToken(String userId) {
+  @NonNull
+  private String generateSkuToken(String userId) {
     return "placeholder"; // TODO
   }
 }
