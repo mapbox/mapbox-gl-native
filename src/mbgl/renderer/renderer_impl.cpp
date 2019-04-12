@@ -226,26 +226,32 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     Color backgroundColor;
 
     struct RenderItem {
-        RenderItem(RenderLayer& layer_, RenderSource* source_)
-            : layer(layer_), source(source_) {}
-        RenderLayer& layer;
+        RenderItem(RenderLayer& layer_, RenderSource* source_, uint32_t index_)
+            : layer(layer_), source(source_), index(index_) {}
+        std::reference_wrapper<RenderLayer> layer;
         RenderSource* source;
+        uint32_t index;
+        bool operator<(const RenderItem& other) const { return index < other.index; }
     };
 
-    std::vector<RenderItem> renderItems;
+    std::set<RenderItem> renderItems;
     std::vector<const RenderLayerSymbolInterface*> renderItemsWithSymbols;
 
     // Update all sources and initialize renderItems.
     staticData->has3D = false;
-    renderItems.reserve(layerImpls->size());
+    
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
         std::vector<Immutable<Layer::Impl>> filteredLayersForSource;
         filteredLayersForSource.reserve(layerImpls->size());
         bool sourceNeedsRendering = false;
         bool sourceNeedsRelayout = false;       
-
-        for (const auto& layerImpl : *layerImpls) {
+        
+        uint32_t index = 0u;
+        const auto begin = layerImpls->begin();
+        const auto end = layerImpls->end();
+        for (auto it = begin; it != end; ++it, ++index) {
+            const Immutable<Layer::Impl>& layerImpl = *it;
             RenderLayer* layer = getRenderLayer(layerImpl->id);
             const auto* layerInfo = layerImpl->getTypeInfo();
             const bool layerNeedsRendering = layer->needsRendering(zoomHistory.lastZoom);
@@ -257,7 +263,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     if (layerNeedsRendering) {
                         sourceNeedsRendering = true;
                         filteredLayersForSource.push_back(layerImpl);
-                        renderItems.emplace_back(*layer, source);
+                        renderItems.emplace(*layer, source, index);
                     }
                 }
                 continue;
@@ -272,7 +278,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                         continue; // This layer is shown with background color, and it shall not be added to render items. 
                     }
                 }
-                renderItems.emplace_back(*layer, nullptr);
+                renderItems.emplace(*layer, nullptr, index);
             }
         }
         source->update(sourceImpl,
@@ -298,9 +304,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (!renderItem.source) {
             continue;
         }
-
-        renderItem.layer.setRenderTiles(renderItem.source->getRenderTiles(), updateParameters.transformState);
-        if (const RenderLayerSymbolInterface* symbolLayer = renderItem.layer.getSymbolInterface()) {
+        RenderLayer& renderLayer = renderItem.layer;
+        renderLayer.setRenderTiles(renderItem.source->getRenderTiles(), updateParameters.transformState);
+        if (const RenderLayerSymbolInterface* symbolLayer = renderLayer.getSymbolInterface()) {
             renderItemsWithSymbols.push_back(symbolLayer);
         }
     }
@@ -400,9 +406,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
         for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
-            if (it->layer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.encoder->createDebugGroup(it->layer.getID().c_str()));
-                it->layer.render(parameters, it->source);
+            RenderLayer& renderLayer = it->layer;
+            if (renderLayer.hasRenderPass(parameters.pass)) {
+                const auto layerDebugGroup(parameters.encoder->createDebugGroup(renderLayer.getID().c_str()));
+                renderLayer.render(parameters, it->source);
             }
         }
     }
@@ -488,9 +495,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         uint32_t i = 0;
         for (auto it = renderItems.rbegin(); it != renderItems.rend(); ++it, ++i) {
             parameters.currentLayer = i;
-            if (it->layer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(it->layer.getID().c_str()));
-                it->layer.render(parameters, it->source);
+            RenderLayer& renderLayer = it->layer;
+            if (renderLayer.hasRenderPass(parameters.pass)) {
+                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderLayer.getID().c_str()));
+                renderLayer.render(parameters, it->source);
             }
         }
     }
@@ -504,9 +512,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
         for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
-            if (it->layer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(it->layer.getID().c_str()));
-                it->layer.render(parameters, it->source);
+            RenderLayer& renderLayer = it->layer;
+            if (renderLayer.hasRenderPass(parameters.pass)) {
+                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderLayer.getID().c_str()));
+                renderLayer.render(parameters, it->source);
             }
         }
     }
