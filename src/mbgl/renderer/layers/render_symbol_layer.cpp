@@ -37,8 +37,9 @@ Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float 
 }
 
 struct RenderableSegment {
+    using SegmentRefVector = std::vector<std::reference_wrapper<const Segment<SymbolTextAttributes>>>;
     RenderableSegment(bool isIcon_,
-                      SegmentVector<SymbolTextAttributes> segments_,
+                      SegmentRefVector segments_,
                       const RenderTile& tile_,
                       SymbolBucket& bucket_,
                       const SymbolBucket::PaintProperties& bucketPaintProperties_,
@@ -51,7 +52,7 @@ struct RenderableSegment {
     sortKey(sortKey_) {}
 
     bool isIcon;
-    SegmentVector<SymbolTextAttributes> segments;
+    SegmentRefVector segments;
     const RenderTile& tile;
     SymbolBucket& bucket;
     const SymbolBucket::PaintProperties& bucketPaintProperties;
@@ -62,11 +63,11 @@ struct RenderableSegment {
     }
 };
 
-template <typename DrawFn>
+template <typename DrawFn, typename SegmentsContainer>
 void drawIcon(const DrawFn& draw,
               const RenderTile& tile,
               SymbolBucket& bucket,
-              const SegmentVector<SymbolTextAttributes>& iconSegments,
+              const SegmentsContainer& iconSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
               const PaintParameters& parameters) {
     assert(tile.tile.kind == Tile::Kind::Geometry);
@@ -146,11 +147,11 @@ void drawIcon(const DrawFn& draw,
     }
 }
 
-template <typename DrawFn>
+template <typename DrawFn, typename SegmentsContainer>
 void drawText(const DrawFn& draw,
               const RenderTile& tile,
               SymbolBucket& bucket,
-              const SegmentVector<SymbolTextAttributes>& textSegments,
+              const SegmentsContainer& textSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
               const PaintParameters& parameters) {
     assert(tile.tile.kind == Tile::Kind::Geometry);
@@ -397,7 +398,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         if (bucket.hasIconData()) {
             if (sortFeaturesByKey) {
                 for (auto& segment : bucket.icon.segments) {
-                    renderableSegments.emplace_hint(it, true, SegmentVector<SymbolTextAttributes>{segment}, tile, bucket, bucketPaintProperties, segment.sortKey);
+                    renderableSegments.emplace_hint(it, true, RenderableSegment::SegmentRefVector{std::cref(segment)}, tile, bucket, bucketPaintProperties, segment.sortKey);
                 }
             } else {
                 drawIcon(draw, tile, bucket, bucket.icon.segments, bucketPaintProperties, parameters);
@@ -407,7 +408,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         if (bucket.hasTextData()) {
             if (sortFeaturesByKey) {
                 for (auto& segment : bucket.text.segments) {
-                    renderableSegments.emplace_hint(it, false, SegmentVector<SymbolTextAttributes>{segment}, tile, bucket, bucketPaintProperties, segment.sortKey);
+                    renderableSegments.emplace_hint(it, false, RenderableSegment::SegmentRefVector{std::cref(segment)}, tile, bucket, bucketPaintProperties, segment.sortKey);
                 }
             } else {
                 drawText(draw, tile, bucket, bucket.text.segments, bucketPaintProperties, parameters);
