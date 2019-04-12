@@ -17,6 +17,7 @@
 #include "../conversion/url_or_tileset.hpp"
 
 #include <string>
+#include <mbgl/util/shared_thread_pool.hpp>
 
 // GeoJSONSource uses a "coalescing" model for high frequency asynchronous data update calls,
 // which in practice means, that any update that started processing is going to finish
@@ -47,14 +48,16 @@ namespace android {
         : Source(env, std::make_unique<mbgl::style::GeoJSONSource>(
                 jni::Make<std::string>(env, sourceId),
                 convertGeoJSONOptions(env, options)))
-        , converter(std::make_unique<util::Thread<FeatureConverter>>("GeoJSONSource")) {
+        , threadPool(sharedThreadPool())
+        , converter(std::make_unique<Actor<FeatureConverter>>(*threadPool)) {
     }
 
     GeoJSONSource::GeoJSONSource(jni::JNIEnv& env,
                                  mbgl::style::Source& coreSource,
                                  AndroidRendererFrontend& frontend)
         : Source(env, coreSource, createJavaPeer(env), frontend)
-        , converter(std::make_unique<util::Thread<FeatureConverter>>("GeoJSONSource")) {
+        , threadPool(sharedThreadPool())
+        , converter(std::make_unique<Actor<FeatureConverter>>(*threadPool)) {
     }
 
     GeoJSONSource::~GeoJSONSource() = default;
@@ -64,7 +67,7 @@ namespace android {
         std::shared_ptr<std::string> json = std::make_shared<std::string>(jni::Make<std::string>(env, jString));
 
         Update::Converter converterFn = [this, json](ActorRef<Callback> _callback) {
-            converter->actor().invoke(&FeatureConverter::convertJson, json, _callback);
+            converter->self().invoke(&FeatureConverter::convertJson, json, _callback);
         };
 
         setAsync(converterFn);
@@ -167,7 +170,7 @@ namespace android {
         auto object = std::make_shared<decltype(global)>(std::move(global));
 
         Update::Converter converterFn = [this, object](ActorRef<Callback> _callback) {
-            converter->actor().invoke(&FeatureConverter::convertObject<JNIType>, object, _callback);
+            converter->self().invoke(&FeatureConverter::convertObject<JNIType>, object, _callback);
         };
 
         setAsync(converterFn);
@@ -178,12 +181,12 @@ namespace android {
                 std::move(converterFn),
                 std::make_unique<Actor<Callback>>(
                         *Scheduler::GetCurrent(),
-                        [this](GeoJSON geoJSON) {
+                        [this](GeoJSON /*geoJSON*/) {
                             // conversion from Java features to core ones finished
                             android::UniqueEnv _env = android::AttachEnv();
 
                             // Update the core source
-                            source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(geoJSON);
+//                            source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(geoJSON);
 
                             // if there is an awaiting update, execute it, otherwise, release resources
                             if (awaitingUpdate) {

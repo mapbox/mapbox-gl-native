@@ -2,6 +2,7 @@
 #include <mbgl/actor/mailbox.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
+#include <android/log.h>
 
 namespace mbgl {
 
@@ -10,11 +11,13 @@ ThreadPool::ThreadPool(std::size_t count) {
     for (std::size_t i = 0; i < count; ++i) {
         threads.emplace_back([this, i]() {
             platform::setCurrentThreadName(std::string{ "Worker " } + util::toString(i + 1));
+            __android_log_write(ANDROID_LOG_ERROR, "JNI_THREAD", ("created new: " + mbgl::platform::getCurrentThreadName()).c_str());
 
             while (true) {
                 std::unique_lock<std::mutex> lock(mutex);
 
                 cv.wait(lock, [this] {
+                    __android_log_write(ANDROID_LOG_ERROR, "JNI_THREAD", ("aweaken: " + mbgl::platform::getCurrentThreadName()).c_str());
                     return !queue.empty() || terminate;
                 });
 
