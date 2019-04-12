@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.3.1 - April 12, 2019
+## Bugs 
+ - Harden renderer invocation when Activity is resumed [#14395](https://github.com/mapbox/mapbox-gl-native/pull/14395)
+ - Check for Mapbox#INSTANCE when initializing the MapView [#14366](https://github.com/mapbox/mapbox-gl-native/pull/14366)
+ - Disable binary programs shaders [#14298](https://github.com/mapbox/mapbox-gl-native/pull/14298)
+
 ## 7.4.0-alpha.2 - April 10, 2019
 ### Bugs
  - Check for Mapbox#INSTANCE when initializing the MapView [#14366](https://github.com/mapbox/mapbox-gl-native/pull/14366)
