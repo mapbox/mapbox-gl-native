@@ -190,7 +190,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  @return An initialized expression equivalent to `object`, suitable for use as
     the value of a style layer attribute.
  */
-+ (instancetype)expressionWithMGLJSONObject:(id)object NS_SWIFT_NAME(init(mglJSONObject:));
++ (instancetype)expressionWithMGLJSONObject:(nullable id)object NS_SWIFT_NAME(init(mglJSONObject:));
 
 /**
  An equivalent Foundation object that can be serialized as JSON.

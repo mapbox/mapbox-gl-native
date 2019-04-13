@@ -792,24 +792,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([curveType isEqualToString:@"cubic-bezier"]) {
                 curveParameters = @[@"literal", [interpolationOptions subarrayWithRange:NSMakeRange(1, 4)]];
             }
-            
-            NSAssert(curveParameters, @"curveParameters should be non-nil");
-            if (curveParameters) {
-                NSExpression *curveParameterExpression = [NSExpression expressionWithMGLJSONObject:curveParameters];
-                argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-                NSExpression *inputExpression = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
-                NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-                NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
-                NSEnumerator *stopEnumerator = stopExpressions.objectEnumerator;
-                while (NSNumber *key = stopEnumerator.nextObject) {
-                    NSExpression *valueExpression = stopEnumerator.nextObject;
-                    stops[key] = [NSExpression expressionWithMGLJSONObject:valueExpression];
-                }
-                NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
-                return [NSExpression expressionForFunction:@"mgl_interpolate:withCurveType:parameters:stops:"
-                                                 arguments:@[inputExpression, curveTypeExpression, curveParameterExpression, stopExpression]];
+            NSExpression *curveParameterExpression = [NSExpression expressionWithMGLJSONObject:curveParameters];
+            argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
+            NSExpression *inputExpression = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
+            NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
+            NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
+            NSEnumerator *stopEnumerator = stopExpressions.objectEnumerator;
+            while (NSNumber *key = stopEnumerator.nextObject) {
+                NSExpression *valueExpression = stopEnumerator.nextObject;
+                stops[key] = [NSExpression expressionWithMGLJSONObject:valueExpression];
             }
-            
+            NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
+            return [NSExpression expressionForFunction:@"mgl_interpolate:withCurveType:parameters:stops:"
+                                             arguments:@[inputExpression, curveTypeExpression, curveParameterExpression, stopExpression]];
         } else if ([op isEqualToString:@"step"]) {
             NSExpression *inputExpression = [NSExpression expressionWithMGLJSONObject:argumentObjects[0]];
             NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
@@ -1031,7 +1026,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         }
             
         case NSKeyPathExpressionType: {
-            NSArray *expressionObject = @[];
+            NSArray *expressionObject;
             NSArray *keyPath = [self.keyPath componentsSeparatedByString:@"."];
             for (NSString *pathComponent in keyPath) {
                 if (expressionObject) {
@@ -1042,7 +1037,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             }
             
             NSAssert(expressionObject.count > 0, @"expressionObject should be non-empty");
-            return expressionObject;
+
+            // Return a non-null value to quieten static analysis
+            return expressionObject ?: @[];
         }
             
         case NSFunctionExpressionType: {
