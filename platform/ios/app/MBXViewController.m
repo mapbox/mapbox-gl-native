@@ -155,13 +155,13 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         {{ 12.966246,   77.586505 },    19000 }     // Bengaluru
     };
 
-    NSInteger index                   = drand48() * (sizeof(landmasses)/sizeof(landmasses[0]));
+    NSInteger index                   = arc4random_uniform(sizeof(landmasses)/sizeof(landmasses[0]));
     CLLocationCoordinate2D coordinate = landmasses[index].coordinate;
     CLLocationDistance radius         = landmasses[index].radius;
 
     // Now create a world coord
-    CLLocationDegrees heading          = drand48()*360.0;
-    CLLocationDistance distance        = drand48()*radius;
+    CLLocationDegrees heading          = (CLLocationDegrees)arc4random_uniform(360);
+    CLLocationDistance distance        = (CLLocationDistance)arc4random_uniform(radius);
     CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, distance);
     return newLocation;
 }
@@ -1775,8 +1775,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     NSMutableArray *annotations = [[NSMutableArray alloc] initWithCapacity:numAnnotations];
     for (NSInteger i = 0; i<numAnnotations; i++) {
 
-        CLLocationDegrees heading          = drand48()*360.0;
-        CLLocationDistance distance        = drand48()*radius;
+        CLLocationDegrees heading          = (CLLocationDegrees)arc4random_uniform(360);
+        CLLocationDistance distance        = (CLLocationDistance)arc4random_uniform(radius);
         CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, distance);
 
         MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
@@ -1814,12 +1814,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [self.mapView addAnnotation:annotation];
 
     // Add annotations around that coord
-    [self addAnnotations:50 aroundCoordinate:annotation.coordinate radius:100000.0]; // 100km
+    [self addAnnotations:50 aroundCoordinate:annotation.coordinate radius:100000]; // 100km
 
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:annotation.coordinate
                                                                 altitude:10000.0
-                                                                   pitch:drand48()*60.0
-                                                                 heading:drand48()*360];
+                                                                   pitch:(CLLocationDegrees)arc4random_uniform(60)
+                                                                 heading:(CLLocationDegrees)arc4random_uniform(360)];
     [self.mapView flyToCamera:camera
                  withDuration:duration
                  peakAltitude:2000000.0
