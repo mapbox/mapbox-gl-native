@@ -1,0 +1,63 @@
+#
+# Packages the sample Linux app for Ubuntu.
+# See: https://github.com/mapbox/mapbox-gl-native/tree/master/platform/linux
+#
+
+name: mapbox-maps
+base: core18
+version: '20190413-master'
+summary: A simple map application for Linux.
+description: |
+  A simple map application and test suite for Linux, based on Mapbox GL Native
+  and GLFW. Keyboard shortcuts for testing functionality are logged to the
+  console when the test app is started. Please note that to run the app you
+  need to set up a MAPBOX_ACCESS_TOKEN environment variable with a valid
+  Mapbox access token (you can get a free one at https://www.mapbox.com).
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+parts:
+  mbgl-glfw:
+    plugin: dump
+    source-type: git
+    source-branch: master
+    source: https://github.com/mapbox/mapbox-gl-native
+    override-build: |
+      curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+      nvm install 8.15.1
+      make clean glfw-app
+    build-packages:
+      - automake
+      - build-essential
+      - ccache
+      - cmake
+      - cmake-data
+      - curl
+      - git
+      - libcurl4-openssl-dev
+      - libglu1-mesa-dev
+      - libllvm3.9
+      - libpng-dev
+      - libsqlite3-dev
+      - libtool
+      - libxcursor-dev
+      - libxi-dev
+      - libxinerama-dev
+      - libxrandr-dev
+      - libxxf86vm-dev
+      - make
+      - pkg-config
+      - python-pip
+      - x11proto-randr-dev
+      - x11proto-xext-dev
+      - x11proto-xf86vidmode-dev
+      - xutils-dev
+      - zlib1g-dev
+
+apps:
+  mbgl-glfw:
+    command: mbgl-glfw
