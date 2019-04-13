@@ -4,7 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIView (MGLAdditions)
 
-- (UIViewController *)mgl_viewControllerForLayoutGuides;
+- (nullable UIViewController *)mgl_viewControllerForLayoutGuides;
 
 - (NSLayoutYAxisAnchor *)mgl_safeTopAnchor;
 
