@@ -1524,7 +1524,7 @@ public:
     [self resumeGL];
 }
 
-- (BOOL)supportBackgroundRendering
+- (BOOL)supportsBackgroundRendering
 {
     // If this view targets an external display, such as AirPlay or CarPlay, we
     // can safely continue to render OpenGL content without tripping
@@ -1536,7 +1536,7 @@ public:
 
 - (void)resignGL
 {
-    if ([self supportBackgroundRendering])
+    if ([self supportsBackgroundRendering])
     {
         return;
     }
@@ -1550,15 +1550,16 @@ public:
     
     // For OpenGL this calls glFinish as recommended in
     // https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/ImplementingaMultitasking-awareOpenGLESApplication/ImplementingaMultitasking-awareOpenGLESApplication.html#//apple_ref/doc/uid/TP40008793-CH5-SW1
+    // reduceMemoryUse(), calls performCleanup(), which calls glFinish
     if (_rendererFrontend)
     {
-        _rendererFrontend->flush();
+        _rendererFrontend->reduceMemoryUse();
     }
 }
 
 - (void)sleepGL:(__unused NSNotification *)notification
 {
-    if ([self supportBackgroundRendering])
+    if ([self supportsBackgroundRendering])
     {
         return;
     }
@@ -1604,11 +1605,6 @@ public:
         }
 
         [self.glView deleteDrawable];
-    }
-    
-    if (_rendererFrontend)
-    {
-        _rendererFrontend->flush();
     }
 }
 
