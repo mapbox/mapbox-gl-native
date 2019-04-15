@@ -1471,6 +1471,12 @@ NSDictionary<NSNumber *, NSExpression *> *MGLLocalizedStopDictionary(NSDictionar
                 if (localizedValues != self.constantValue) {
                     return [NSExpression expressionForConstantValue:localizedValues];
                 }
+            } else if ([self.constantValue isKindOfClass:[MGLAttributedExpression class]]) {
+                MGLAttributedExpression *attributedExpression = (MGLAttributedExpression *)self.constantValue;
+                NSExpression *localizedExpression = [attributedExpression.expression mgl_expressionLocalizedIntoLocale:locale];
+                MGLAttributedExpression *localizedAttributedExpression = [MGLAttributedExpression attributedExpression:localizedExpression attributes:attributedExpression.attributes];
+                
+                return [NSExpression expressionForConstantValue:localizedAttributedExpression];
             }
             return self;
         }

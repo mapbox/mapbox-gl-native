@@ -1086,6 +1086,7 @@ MGL_EXPORT
  You can set this property to an expression containing any of the following:
  
  * Constant string values
+ * Formatted expressions.
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
