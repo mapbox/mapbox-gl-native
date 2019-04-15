@@ -22,7 +22,6 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
   @NonNull
   private final GLSurfaceView glSurfaceView;
-  private boolean hasSurface;
 
   public GLSurfaceViewMapRenderer(Context context,
                                   GLSurfaceView glSurfaceView,
@@ -46,7 +45,7 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
       public void surfaceDestroyed(SurfaceHolder holder) {
         super.surfaceDestroyed(holder);
         hasSurface = false;
-        onSurfaceDestroyed();
+        nativeReset();
       }
     });
   }

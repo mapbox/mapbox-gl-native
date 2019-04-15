@@ -39,10 +39,6 @@ interface NativeMap {
 
   boolean isDestroyed();
 
-  boolean hasSurface();
-
-  void setHasSurface(boolean hasSurface);
-
   //
   // Camera API
   //
