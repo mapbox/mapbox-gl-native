@@ -289,12 +289,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
           MapView.this.onSurfaceCreated();
           super.onSurfaceCreated(gl, config);
         }
-
-        @Override
-        protected void onSurfaceDestroyed() {
-          super.onSurfaceDestroyed();
-          MapView.this.onSurfaceDestroyed();
-        }
       };
 
       addView(textureView, 0);
@@ -306,12 +300,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
           MapView.this.onSurfaceCreated();
           super.onSurfaceCreated(gl, config);
-        }
-
-        @Override
-        protected void onSurfaceDestroyed() {
-          super.onSurfaceDestroyed();
-          MapView.this.onSurfaceDestroyed();
         }
       };
 
@@ -325,7 +313,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   private void onSurfaceCreated() {
-    nativeMapView.setHasSurface(true);
     post(new Runnable() {
       @Override
       public void run() {
@@ -336,12 +323,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
         }
       }
     });
-  }
-
-  private void onSurfaceDestroyed() {
-    if (nativeMapView != null) {
-      nativeMapView.setHasSurface(false);
-    }
   }
 
   /**
