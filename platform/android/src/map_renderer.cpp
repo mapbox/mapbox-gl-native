@@ -195,10 +195,15 @@ void MapRenderer::onSurfaceChanged(JNIEnv& env, jint width, jint height) {
     requestRender();
 }
 
-void MapRenderer::onSurfaceDestroyed(JNIEnv&) {
+void MapRenderer::onRendererReset(JNIEnv&) {
     // Make sure to destroy the renderer on the GL Thread
     auto self = ActorRef<MapRenderer>(*this, mailbox);
     self.ask(&MapRenderer::resetRenderer).wait();
+}
+
+// needs to be called on GL thread
+void MapRenderer::onSurfaceDestroyed(JNIEnv&) {
+    resetRenderer();
 }
 
 // Static methods //
@@ -214,6 +219,7 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
                                          jni::MakePeer<MapRenderer, const jni::Object<MapRenderer>&, jni::jfloat, const jni::String&, const jni::String&>,
                                          "nativeInitialize", "finalize",
                                          METHOD(&MapRenderer::render, "nativeRender"),
+                                         METHOD(&MapRenderer::onRendererReset, "nativeReset"),
                                          METHOD(&MapRenderer::onSurfaceCreated,
                                                 "nativeOnSurfaceCreated"),
                                          METHOD(&MapRenderer::onSurfaceChanged,
