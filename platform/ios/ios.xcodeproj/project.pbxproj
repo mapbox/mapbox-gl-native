@@ -69,6 +69,8 @@
 		1FF48588223710BE00F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF48585223710BE00F19727 /* MGLAttributedExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1FF48589223710BE00F19727 /* MGLAttributedExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FF48586223710BE00F19727 /* MGLAttributedExpression.m */; };
 		1FF4858A223710BE00F19727 /* MGLAttributedExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FF48586223710BE00F19727 /* MGLAttributedExpression.m */; };
+		1FFAEDB822650A23009A1B2A /* basic-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 1FFAEDB722650A23009A1B2A /* basic-style.json */; };
+		1FFAEDB922650A23009A1B2A /* basic-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 1FFAEDB722650A23009A1B2A /* basic-style.json */; };
 		30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */; };
@@ -856,6 +858,7 @@
 		1FDB00CB21F8F15300D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = cs; path = cs.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		1FF48585223710BE00F19727 /* MGLAttributedExpression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLAttributedExpression.h; sourceTree = "<group>"; };
 		1FF48586223710BE00F19727 /* MGLAttributedExpression.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLAttributedExpression.m; sourceTree = "<group>"; };
+		1FFAEDB722650A23009A1B2A /* basic-style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "basic-style.json"; path = "../../darwin/test/basic-style.json"; sourceTree = "<group>"; };
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		20DABE881DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+MGLAdditions.h"; path = "src/UIImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
@@ -1925,6 +1928,7 @@
 				DA2E88551CC036F400F24E7B /* Info.plist */,
 				DA2784FB1DF02FF4001D5B8D /* Media.xcassets */,
 				DA35D0871E1A6309007DED41 /* one-liner.json */,
+				1FFAEDB722650A23009A1B2A /* basic-style.json */,
 				1F8A59F62165326C004DFE75 /* sideload_sat.db */,
 			);
 			name = "SDK Tests";
@@ -2852,6 +2856,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FFAEDB922650A23009A1B2A /* basic-style.json in Resources */,
 				16376B471FFDB92B0000563E /* one-liner.json in Resources */,
 				1F8A59F821653275004DFE75 /* sideload_sat.db in Resources */,
 			);
@@ -2895,6 +2900,7 @@
 				1F8A59F72165326D004DFE75 /* sideload_sat.db in Resources */,
 				353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */,
 				DA35D0881E1A6309007DED41 /* one-liner.json in Resources */,
+				1FFAEDB822650A23009A1B2A /* basic-style.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

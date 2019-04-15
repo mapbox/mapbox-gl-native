@@ -28,7 +28,7 @@
     [super setUp];
 
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"basic-style" withExtension:@"json"];
     self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) styleURL:styleURL];
     self.mapView.delegate = self;
     if (!self.mapView.style) {
@@ -140,11 +140,8 @@
 
 - (void)testSources {
     NSSet<MGLSource *> *initialSources = self.style.sources;
-    if ([initialSources.anyObject.identifier isEqualToString:@"com.mapbox.annotations"]) {
-        XCTAssertEqual(self.style.sources.count, 1UL);
-    } else {
-        XCTAssertEqual(self.style.sources.count, 0UL);
-    }
+    XCTAssertTrue(initialSources.count <= 2);
+    
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
     XCTAssertEqual(self.style.sources.count, initialSources.count + 1);
@@ -250,11 +247,9 @@
 
 - (void)testLayers {
     NSArray<MGLStyleLayer *> *initialLayers = self.style.layers;
-    if ([initialLayers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
-        XCTAssertEqual(self.style.layers.count, 1UL);
-    } else {
-        XCTAssertEqual(self.style.layers.count, 0UL);
-    }
+
+    XCTAssertTrue(initialLayers.count <= 2);
+
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:shapeSource];
@@ -396,6 +391,8 @@
     NSURL *url = [NSURL fileURLWithPath:filePath];
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" URL:url options:nil];
     [self.style addSource:source];
+    
+    NSUInteger startIndex = self.style.layers.count;
 
     MGLCircleStyleLayer *layer1 = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layer1" source:source];
     [self.style addLayer:layer1];
@@ -413,7 +410,7 @@
     [self.style insertLayer:layer0 belowLayer:layer1];
 
     NSArray<MGLStyleLayer *> *layers = [self.style layers];
-    NSUInteger startIndex = 0;
+    
     if ([layers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
         startIndex++;
     }
@@ -426,6 +423,36 @@
 }
 
 #pragma mark Localization tests
+
+- (void)testLocalization {
+    MGLSymbolStyleLayer *countryLabel = (MGLSymbolStyleLayer *)[self.style layerWithIdentifier:@"country-label"];
+    {
+        NSLocale *locale = [NSLocale localeWithLocaleIdentifier:@"de_DE"];
+        [self.style localizeLabelsIntoLocale:locale];
+
+        NSArray * keypathArray = @[ [NSExpression expressionForKeyPath:@"name_de"],
+                                    [NSExpression expressionForKeyPath:@"name"]];
+        NSExpression *coalesceExpression = [NSExpression expressionWithFormat:@"mgl_coalesce:(%@)", @[ [NSExpression expressionWithFormat:@"mgl_coalesce:(%@)", keypathArray],
+                                                                                                       [NSExpression expressionWithFormat:@"mgl_coalesce:(%@)", keypathArray] ]];
+        MGLAttributedExpression *attributedExpression = [MGLAttributedExpression attributedExpression:coalesceExpression attributes:@{}];
+        NSExpression *localizedExpression = [NSExpression mgl_expressionForAttributedExpressions:@[ [NSExpression expressionForConstantValue:attributedExpression] ]];
+        XCTAssertEqualObjects(countryLabel.text, localizedExpression);
+        countryLabel.text = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+    }
+    {
+        NSLocale *locale = [NSLocale localeWithLocaleIdentifier:@"es"];
+        [self.style localizeLabelsIntoLocale:locale];
+        
+        NSArray * keypathArray = @[ [NSExpression expressionForKeyPath:@"name_es"],
+                                    [NSExpression expressionForKeyPath:@"name"]];
+        NSExpression *coalesceExpression = [NSExpression expressionWithFormat:@"mgl_coalesce:(%@)", @[ [NSExpression expressionWithFormat:@"mgl_coalesce:(%@)", keypathArray],
+                                                                                                       [NSExpression expressionWithFormat:@"mgl_coalesce:(%@)", keypathArray] ]];
+        MGLAttributedExpression *attributedExpression = [MGLAttributedExpression attributedExpression:coalesceExpression attributes:@{}];
+        NSExpression *localizedExpression = [NSExpression mgl_expressionForAttributedExpressions:@[ [NSExpression expressionForConstantValue:attributedExpression] ]];
+        XCTAssertEqualObjects(countryLabel.text, localizedExpression);
+        countryLabel.text = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+    }
+}
 
 - (void)testLanguageMatching {
     {
