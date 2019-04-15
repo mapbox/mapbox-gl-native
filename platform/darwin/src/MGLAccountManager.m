@@ -28,8 +28,10 @@
 @property (atomic) NSString *accessToken;
 @property (nonatomic) NSURL *apiBaseURL;
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 @property (atomic) NSString *skuToken;
 @property (atomic) NSDate *skuTokenExpiration;
+#endif
 
 @end
 
@@ -108,6 +110,10 @@
     return [MGLAccountManager sharedManager].apiBaseURL;
 }
 
+#pragma mark - SKU Tokens
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+
 + (void)setSkuToken:(NSString *)skuToken {
     NSTimeInterval oneHour = 60 * 60; // TODO: make this const
     MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate dateWithTimeIntervalSinceNow:oneHour];
@@ -123,5 +129,7 @@
     NSTimeInterval secondsUntilExpiration = [MGLAccountManager.sharedManager.skuTokenExpiration timeIntervalSinceDate:NSDate.date];
     return secondsUntilExpiration < 0;
 }
+
+#endif
 
 @end

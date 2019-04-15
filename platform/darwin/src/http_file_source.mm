@@ -8,9 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MGLAccountManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLNetworkConfiguration_Private.h"
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MGLAccountManager_Private.h"
+#endif
 
 #include <mutex>
 #include <chrono>
@@ -200,6 +203,8 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
     @autoreleasepool {
         NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
         MGLLogDebug(@"Requesting URI: %@", url.relativePath);
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
         if (impl->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
             NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
@@ -212,6 +217,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 
             url = components.URL;
         }
+#endif
 
         NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
         if (resource.priorEtag) {
