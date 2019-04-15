@@ -24,7 +24,7 @@
             android:id="@+id/radiusBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="48dp"
+            android:layout_marginBottom="16dp"
             android:progress="9000"
             android:max="15000"
             android:layout_above="@id/stepsBar"/>
