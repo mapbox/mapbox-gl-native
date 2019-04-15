@@ -1200,6 +1200,16 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
     }
     {
+        NSExpression *keyExpression = [NSExpression expressionForKeyPath:@"name_en"];
+        MGLAttributedExpression *attributedExpression = [MGLAttributedExpression attributedExpression:keyExpression attributes:@{}];
+        NSExpression *original = [NSExpression expressionForConstantValue:attributedExpression];
+        
+        NSExpression *coalesceExpression = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        MGLAttributedExpression *expectedAttributedExpression = [MGLAttributedExpression attributedExpression:coalesceExpression attributes:@{}];
+        NSExpression *expected = [NSExpression expressionForConstantValue:expectedAttributedExpression];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
         NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
