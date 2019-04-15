@@ -30,9 +30,9 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   // Holds the pointer to the native peer after initialisation
   private long nativePtr = 0;
-
   private double expectedRenderTime = 0;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
+  protected boolean hasSurface;
 
   public MapRenderer(@NonNull Context context, String localIdeographFontFamily) {
     float pixelRatio = context.getResources().getDisplayMetrics().density;
@@ -132,6 +132,8 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   private native void nativeOnSurfaceDestroyed();
 
+  protected native void nativeReset();
+
   private native void nativeRender();
 
   private long timeElapsed;
@@ -155,5 +157,14 @@ public abstract class MapRenderer implements MapRendererScheduler {
       return;
     }
     expectedRenderTime = 1E9 / maximumFps;
+  }
+
+  /**
+   * Returns true if renderer has a surface to draw on.
+   *
+   * @return returns if renderer has a surface, false otherwise
+   */
+  public boolean hasSurface() {
+    return hasSurface;
   }
 }
