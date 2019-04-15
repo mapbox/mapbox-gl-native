@@ -9,14 +9,22 @@
 
 namespace mbgl {
 
+struct ThreadLifecycle {
+    virtual void onThreadCreated() const = 0;
+    virtual void onThreadDestroyed() const = 0;
+    virtual ~ThreadLifecycle() = default;
+};
+
 class ThreadPool : public Scheduler {
 public:
-    ThreadPool(std::size_t count);
+    explicit ThreadPool(std::size_t count);
+    ThreadPool(std::size_t count, std::unique_ptr<ThreadLifecycle> _lifecycle);
     ~ThreadPool() override;
 
     void schedule(std::weak_ptr<Mailbox>) override;
 
 private:
+    std::unique_ptr<ThreadLifecycle> lifecycle;
     std::vector<std::thread> threads;
     std::queue<std::weak_ptr<Mailbox>> queue;
     std::mutex mutex;

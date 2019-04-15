@@ -5,11 +5,16 @@
 
 namespace mbgl {
 
-ThreadPool::ThreadPool(std::size_t count) {
+ThreadPool::ThreadPool(std::size_t count) : ThreadPool::ThreadPool(count, nullptr) {}
+
+ThreadPool::ThreadPool(std::size_t count, std::unique_ptr<ThreadLifecycle > _lifecycle) : lifecycle(std::move(_lifecycle)) {
     threads.reserve(count);
     for (std::size_t i = 0; i < count; ++i) {
         threads.emplace_back([this, i]() {
             platform::setCurrentThreadName(std::string{ "Worker " } + util::toString(i + 1));
+            if (lifecycle) {
+                lifecycle->onThreadCreated();
+            }
 
             while (true) {
                 std::unique_lock<std::mutex> lock(mutex);
@@ -19,6 +24,9 @@ ThreadPool::ThreadPool(std::size_t count) {
                 });
 
                 if (terminate) {
+                    if (lifecycle) {
+                        lifecycle->onThreadDestroyed();
+                    }
                     return;
                 }
 
