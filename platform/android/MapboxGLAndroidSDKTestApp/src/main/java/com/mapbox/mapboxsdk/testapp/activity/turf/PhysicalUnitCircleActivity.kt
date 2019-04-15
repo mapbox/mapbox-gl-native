@@ -8,9 +8,8 @@ import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.style.layers.BackgroundLayer
+import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.FillLayer
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.backgroundColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.testapp.R
@@ -25,6 +24,9 @@ class PhysicalUnitCircleActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeL
   companion object {
     const val LAYER_ID = "circle-id"
     const val SOURCE_ID = "circle-id"
+    const val LATITUDE = 22.928207
+    const val LONGITUDE = 15.0155543
+    const val ZOOM = 10.0
   }
 
   private lateinit var source: GeoJsonSource
@@ -38,12 +40,12 @@ class PhysicalUnitCircleActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeL
     mapView.getMapAsync { mapboxMap ->
 
       mapboxMap.cameraPosition = CameraPosition.Builder()
-        .target(LatLng(22.928207, 15.011543))
-        .zoom(10.0)
+        .target(LatLng(LATITUDE, LONGITUDE))
+        .zoom(ZOOM)
         .build()
 
       source = GeoJsonSource(SOURCE_ID, TurfTransformation.circle(
-        Point.fromLngLat(0.0, 0.0), 9000.0, 10, "meters")
+        Point.fromLngLat(LONGITUDE, LATITUDE), 9000.0, 10, "meters")
       )
 
       stepsBar.setOnSeekBarChangeListener(this)
@@ -51,7 +53,12 @@ class PhysicalUnitCircleActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeL
 
       mapboxMap.setStyle(Style.Builder()
         .fromUrl(Style.SATELLITE_STREETS)
-        .withLayer(FillLayer(LAYER_ID, SOURCE_ID).withProperties(fillColor(Color.RED)))
+        .withLayer(FillLayer(LAYER_ID, SOURCE_ID).withProperties(fillColor(interpolate(
+          exponential(0.5f), zoom(),
+          stop(8, color(Color.RED)),
+          stop(12, color(Color.BLUE)),
+          stop(16, color(Color.GREEN))
+        ))))
         .withSource(source)
       )
     }
@@ -66,7 +73,7 @@ class PhysicalUnitCircleActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeL
       }
 
       source.setGeoJson(TurfTransformation.circle(
-        Point.fromLngLat(0.0, 0.0), radius, steps, "meters")
+        Point.fromLngLat(LONGITUDE, LATITUDE), radius, steps, "meters")
       )
     }
   }
