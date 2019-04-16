@@ -3,9 +3,6 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/custom_geometry_tile.hpp>
 
-#include <mbgl/algorithm/generate_clip_ids.hpp>
-#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
-
 namespace mbgl {
 
 using namespace style;
@@ -51,7 +48,6 @@ void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_
 }
 
 void RenderCustomGeometrySource::startRender(PaintParameters& parameters) {
-    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
     tilePyramid.startRender(parameters);
 }
 

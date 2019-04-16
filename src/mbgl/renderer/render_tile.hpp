@@ -2,7 +2,6 @@
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/clip_id.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/renderer/tile_mask.hpp>
 
@@ -24,7 +23,6 @@ public:
 
     UnwrappedTileID id;
     Tile& tile;
-    ClipID clip;
     mat4 matrix;
     mat4 nearClippedMatrix;
     bool used = false;

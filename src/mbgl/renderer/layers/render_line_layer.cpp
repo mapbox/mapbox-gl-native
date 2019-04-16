@@ -1,6 +1,7 @@
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -62,6 +63,8 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         return;
     }
 
+    parameters.renderTileClippingMasks(renderTiles);
+
     for (const RenderTile& tile : renderTiles) {
         const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
         if (!renderData) {
@@ -98,7 +101,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                 *parameters.renderPass,
                 gfx::Triangles(),
                 parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
-                parameters.stencilModeForClipping(tile.clip),
+                parameters.stencilModeForClipping(tile.id),
                 parameters.colorModeForRenderPass(),
                 gfx::CullFaceMode::disabled(),
                 *bucket.indexBuffer,

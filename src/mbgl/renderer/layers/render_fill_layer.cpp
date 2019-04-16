@@ -1,6 +1,7 @@
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -73,6 +74,7 @@ bool RenderFillLayer::hasCrossfade() const {
 
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
     if (unevaluated.get<FillPattern>().isUndefined()) {
+        parameters.renderTileClippingMasks(renderTiles);
         for (const RenderTile& tile : renderTiles) {
             const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
             if (!renderData) {
@@ -115,7 +117,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     *parameters.renderPass,
                     drawMode,
                     depthMode,
-                    parameters.stencilModeForClipping(tile.clip),
+                    parameters.stencilModeForClipping(tile.id),
                     parameters.colorModeForRenderPass(),
                     gfx::CullFaceMode::disabled(),
                     indexBuffer,
@@ -156,6 +158,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
         if (parameters.pass != RenderPass::Translucent) {
             return;
         }
+
+        parameters.renderTileClippingMasks(renderTiles);
 
         for (const RenderTile& tile : renderTiles) {
             const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
@@ -209,7 +213,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     *parameters.renderPass,
                     drawMode,
                     depthMode,
-                    parameters.stencilModeForClipping(tile.clip),
+                    parameters.stencilModeForClipping(tile.id),
                     parameters.colorModeForRenderPass(),
                     gfx::CullFaceMode::disabled(),
                     indexBuffer,

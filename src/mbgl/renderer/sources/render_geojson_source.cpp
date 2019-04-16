@@ -4,9 +4,6 @@
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 
-#include <mbgl/algorithm/generate_clip_ids.hpp>
-#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
-
 #include <mapbox/eternal.hpp>
 
 namespace mbgl {
@@ -127,7 +124,6 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
 }
 
 void RenderGeoJSONSource::startRender(PaintParameters& parameters) {
-    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
     tilePyramid.startRender(parameters);
 }
 

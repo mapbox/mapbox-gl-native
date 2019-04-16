@@ -168,6 +168,8 @@ public:
     virtual void visualizeStencilBuffer() = 0;
     virtual void visualizeDepthBuffer(float depthRangeSize) = 0;
 #endif
+
+    virtual void clearStencilBuffer(int32_t) = 0;
 };
 
 } // namespace gfx

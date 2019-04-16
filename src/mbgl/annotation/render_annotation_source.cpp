@@ -3,9 +3,6 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 
-#include <mbgl/algorithm/generate_clip_ids.hpp>
-#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
-
 #include <mbgl/layermanager/layer_manager.hpp>
 
 namespace mbgl {
@@ -51,7 +48,6 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
 }
 
 void RenderAnnotationSource::startRender(PaintParameters& parameters) {
-    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
     tilePyramid.startRender(parameters);
 }
 

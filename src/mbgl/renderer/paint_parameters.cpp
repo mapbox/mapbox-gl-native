@@ -1,8 +1,11 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/gfx/command_encoder.hpp>
 #include <mbgl/gfx/render_pass.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
@@ -73,15 +76,94 @@ gfx::DepthMode PaintParameters::depthModeFor3D(gfx::DepthMaskType mask) const {
     return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { 0.0, 1.0 } };
 }
 
-gfx::StencilMode PaintParameters::stencilModeForClipping(const ClipID& id) const {
-    return gfx::StencilMode {
-        gfx::StencilMode::Equal { static_cast<uint32_t>(id.mask.to_ulong()) },
-        static_cast<int32_t>(id.reference.to_ulong()),
-        0,
-        gfx::StencilOpType::Keep,
-        gfx::StencilOpType::Keep,
-        gfx::StencilOpType::Replace
-    };
+void PaintParameters::clearStencil() {
+    nextStencilID = 1;
+    context.clearStencilBuffer(0b00000000);
+}
+
+namespace {
+
+// Detects a difference in keys of renderTiles and tileClippingMaskIDs
+bool tileIDsIdentical(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles,
+                      const std::map<UnwrappedTileID, int32_t>& tileClippingMaskIDs) {
+    assert(std::is_sorted(renderTiles.begin(), renderTiles.end(),
+                          [](const RenderTile& a, const RenderTile& b) { return a.id < b.id; }));
+    if (renderTiles.size() != tileClippingMaskIDs.size()) {
+        return false;
+    }
+    return std::equal(renderTiles.begin(), renderTiles.end(), tileClippingMaskIDs.begin(),
+                      [](const RenderTile& a, const auto& b) { return a.id == b.first; });
+}
+
+} // namespace
+
+void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles) {
+    if (renderTiles.empty() || tileIDsIdentical(renderTiles, tileClippingMaskIDs)) {
+        // The current stencil mask is for this source already; no need to draw another one.
+        return;
+    }
+
+    if (nextStencilID + renderTiles.size() > 256) {
+        // we'll run out of fresh IDs so we need to clear and start from scratch
+        clearStencil();
+    }
+
+    tileClippingMaskIDs.clear();
+
+    auto& program = staticData.programs.clippingMask;
+    const style::Properties<>::PossiblyEvaluated properties {};
+    const ClippingMaskProgram::Binders paintAttributeData(properties, 0);
+
+    for (const RenderTile& renderTile : renderTiles) {
+        const int32_t stencilID = nextStencilID++;
+        tileClippingMaskIDs.emplace(renderTile.id, stencilID);
+
+        program.draw(
+            context,
+            *renderPass,
+            gfx::Triangles(),
+            gfx::DepthMode::disabled(),
+            gfx::StencilMode {
+                gfx::StencilMode::Always{},
+                stencilID,
+                0b11111111,
+                gfx::StencilOpType::Keep,
+                gfx::StencilOpType::Keep,
+                gfx::StencilOpType::Replace
+            },
+            gfx::ColorMode::disabled(),
+            gfx::CullFaceMode::disabled(),
+            staticData.quadTriangleIndexBuffer,
+            staticData.tileTriangleSegments,
+            program.computeAllUniformValues(
+                ClippingMaskProgram::LayoutUniformValues {
+                    uniforms::matrix::Value( matrixForTile(renderTile.id) ),
+                },
+                paintAttributeData,
+                properties,
+                state.getZoom()
+            ),
+            program.computeAllAttributeBindings(
+                staticData.tileVertexBuffer,
+                paintAttributeData,
+                properties
+            ),
+            ClippingMaskProgram::TextureBindings{},
+            "clipping"
+        );
+    }
+}
+
+gfx::StencilMode PaintParameters::stencilModeForClipping(const UnwrappedTileID& tileID) const {
+    auto it = tileClippingMaskIDs.find(tileID);
+    assert(it != tileClippingMaskIDs.end());
+    const int32_t id = it != tileClippingMaskIDs.end() ? it->second : 0b00000000;
+    return gfx::StencilMode{ gfx::StencilMode::Equal{ 0b11111111 },
+                             id,
+                             0b00000000,
+                             gfx::StencilOpType::Keep,
+                             gfx::StencilOpType::Keep,
+                             gfx::StencilOpType::Replace };
 }
 
 gfx::ColorMode PaintParameters::colorModeForRenderPass() const {

@@ -98,10 +98,6 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
             const auto extrudeScale = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
 
-            const auto stencilMode = parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gfx::StencilMode::disabled();
-
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
             auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap;
@@ -129,7 +125,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 *renderPass,
                 gfx::Triangles(),
                 parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
-                stencilMode,
+                gfx::StencilMode::disabled(),
                 gfx::ColorMode::additive(),
                 gfx::CullFaceMode::disabled(),
                 *bucket.indexBuffer,
