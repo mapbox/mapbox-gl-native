@@ -1714,11 +1714,19 @@ public:
 
     // Only restart the display link if we're not hidden
 //    self.displayLink.paused = ![self displayLinkShouldRun];
-    MGLAssert(self.displayLink, @"");
-    
-    if ([self mapViewIsVisible])
+    if (self.displayLink)
     {
-        [self startDisplayLink];
+        if ([self mapViewIsVisible])
+        {
+            [self startDisplayLink];
+        }
+    }
+    else
+    {
+        // This is required since at the start of the application, didMoveToWindow
+        // can be called when still in an inactive state. In this case, we haven't
+        // had an opportunity to create the display link, so create it here.
+        [self validateDisplayLink];
     }
 }
 
