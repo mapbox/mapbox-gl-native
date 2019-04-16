@@ -1134,7 +1134,7 @@ public:
     }
 
     // Check to ensure rendering doesn't occur in the background
-    if (([UIApplication sharedApplication].applicationState != UIApplicationStateActive) &&
+    if (([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) &&
         ![self supportsBackgroundRendering])
     {
         return;
@@ -1503,12 +1503,12 @@ public:
 
 - (void)willEnterForeground:(NSNotification *)notification
 {
-    [self wakeGL:notification];
+    // Do nothing, currently if wakeGL is called here it's a no-op.
 }
 
 - (void)didBecomeActive:(NSNotification *)notification
 {
-//    [self wakeGL:notification];
+    [self wakeGL:notification];
     self.lastSnapshotImage = nil;
 }
 
