@@ -9,6 +9,11 @@
 @implementation MGLMockApplication
 
 - (void)dealloc {
+
+    if (_applicationState != UIApplicationStateActive) {
+        [self enterForeground];
+    }
+    
     if (_delegate) {
         CFRelease((CFTypeRef)_delegate);
     }

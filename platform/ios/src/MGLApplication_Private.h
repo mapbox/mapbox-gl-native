@@ -12,5 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)openURL:(NSURL*)url NS_DEPRECATED_IOS(2_0, 10_0, "Please use openURL:options:completionHandler: instead") NS_EXTENSION_UNAVAILABLE_IOS("");
 @end
 
+// Conform UIApplication
+@interface UIApplication (MGLApplicationConformation) <MGLApplication>
+@end
+
+@protocol MGLApplicationProvider <NSObject>
+- (id<MGLApplication>)applicationForSender:(id)sender;
+@end
+
 NS_ASSUME_NONNULL_END
 

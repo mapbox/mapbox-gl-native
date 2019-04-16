@@ -2,7 +2,7 @@
 #import "MGLMockApplication.h"
 
 @interface MGLMapView (BackgroundTests)
-@property (nonatomic) id<MGLApplication> application;
+@property (nonatomic, readonly) id<MGLApplication> application;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic) CADisplayLink *displayLink;
 - (void)updateFromDisplayLink:(CADisplayLink *)displayLink;
@@ -30,8 +30,7 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
 
 #pragma mark - MGLBackgroundIntegrationTest
 
-@interface MGLBackgroundIntegrationTest : MGLMapViewIntegrationTest
-@property (nonatomic) id<MGLApplication> oldApplication;
+@interface MGLBackgroundIntegrationTest : MGLMapViewIntegrationTest <MGLApplicationProvider>
 @property (nonatomic) MGLMockApplication *mockApplication;
 @property (nonatomic, copy) MGLNotificationBlock willEnterForeground;
 @property (nonatomic, copy) MGLNotificationBlock didEnterBackground;
@@ -49,22 +48,11 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:self.mockApplication];
     
     [super setUp];
-    
-    // Setup MGLMapView to use our new mocked application
-    // Change notification handling here.
-    self.oldApplication = self.mapView.application;
-    self.mockApplication.delegate = self.oldApplication.delegate;
-    self.mapView.application = self.mockApplication;
 }
 
 - (void)tearDown {
-
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    // Swap back
-    self.mapView.application = self.oldApplication;
-    self.oldApplication = nil;
-    self.mockApplication.delegate = nil;
     self.mockApplication = nil;
     
     [super tearDown];
@@ -98,10 +86,16 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     return mapView;
 }
 
+#pragma mark - MGLApplicationProvider
+
+- (id<MGLApplication>)applicationForSender:(id)mapView
+{
+    return self.mockApplication;
+}
+
 #pragma mark - Tests
 
 - (void)testRendererWhenGoingIntoBackground {
-    
     XCTAssertFalse(self.mapView.isDormant);
     XCTAssertFalse(self.mapView.displayLink.isPaused);
     XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
@@ -111,7 +105,6 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     //
     // Enter background
     //
-    
     XCTestExpectation *didEnterBackgroundExpectation = [self expectationWithDescription:@"didEnterBackground"];
     didEnterBackgroundExpectation.expectedFulfillmentCount = 1;
     didEnterBackgroundExpectation.assertForOverFulfill = YES;
@@ -119,7 +112,7 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     self.didEnterBackground = ^(__unused NSNotification *notification){
         typeof(self) strongSelf = weakSelf;
         MGLMapView *mapView = strongSelf.mapView;
-        
+
         // In general, because order of notifications is not guaranteed
         // the following asserts are somewhat meaningless (don't do this in
         // production) - however, because we're mocking their delivery (and
@@ -258,7 +251,7 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     };
     
     [self.mockApplication enterForeground];
-    XCTAssert(displayLinkCount == 0, @"updateDisplayLink was called %ld times", displayLinkCount);
+    XCTAssert(displayLinkCount == 1, @"updateDisplayLink was called %ld times", displayLinkCount);
     [self waitForExpectations:@[willEnterForegroundExpectation] timeout:1.0];
     
     XCTAssertFalse(self.mapView.isDormant);
@@ -358,4 +351,126 @@ typedef void (^MGLNotificationBlock)(NSNotification*);
     XCTAssert(!self.mapView.displayLink || self.mapView.displayLink.isPaused);
 }
 
+
+- (void)testMovingMapViewToNewWindow {
+    XCTAssertNotNil(self.mapView.window);
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+    XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
+    
+    __block NSInteger displayLinkCount = 0;
+    
+    self.displayLinkDidUpdate = ^{
+        displayLinkCount++;
+    };
+
+    UIWindow *window = [[UIWindow alloc] initWithFrame:self.mapView.bounds];
+    [window addSubview:self.mapView];
+    
+    XCTAssertEqualObjects(self.mapView.window, window);
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+    XCTAssert(displayLinkCount == 1);
+}
+
+// This test requires us to KVO the map view's window.screen, and tear down/setup
+// the display link accordingly
+- (void)testDisplayLinkWhenMovingMapViewToAnotherScreenPENDING {
+    XCTAssertNotNil(self.mapView.window);
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+    XCTAssert(self.mapView.application.applicationState == UIApplicationStateActive);
+
+    UIScreen *thisScreen = self.mapView.window.screen;
+    UIScreen * _Nonnull otherScreen = nil;
+    
+    for (UIScreen *screen in [UIScreen screens]) {
+        if (screen != thisScreen) {
+            otherScreen = screen;
+            break;
+        }
+    }
+    
+    if (!otherScreen) {
+        printf("warning: no secondary screen detected - attempting nil screen\n");
+    }
+    
+    __block NSInteger displayLinkCount = 0;
+    
+    self.displayLinkDidUpdate = ^{
+        displayLinkCount++;
+    };
+
+    self.mapView.window.screen = otherScreen;
+    
+    XCTAssert(self.mapView.isDormant || otherScreen);
+    XCTAssert(self.mapView.displayLink.isPaused || otherScreen);
+    XCTAssert(displayLinkCount == 0);
+
+    displayLinkCount = 0;
+    
+    self.mapView.window.screen = thisScreen;
+
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+    XCTAssert(displayLinkCount == 0);
+}
+
+// We don't currently include view hierarchy visibility in our notion of "visible"
+// so this test will fail at the moment.
+- (void)testDisplayLinkWhenHidingMapViewsParentViewPENDING {
+
+    // Move views around for test
+    UIView *mapView = self.mapView;
+    UIView *parentView = [[UIView alloc] initWithFrame:mapView.frame];
+    UIView *grandParentView = mapView.superview;
+    [grandParentView addSubview:parentView];
+    [parentView addSubview:mapView];
+    
+    [mapView.topAnchor constraintEqualToAnchor:parentView.topAnchor].active = YES;
+    [mapView.leftAnchor constraintEqualToAnchor:parentView.leftAnchor].active = YES;
+    [mapView.rightAnchor constraintEqualToAnchor:parentView.rightAnchor].active = YES;
+    [mapView.bottomAnchor constraintEqualToAnchor:parentView.bottomAnchor].active = YES;
+
+    [grandParentView.topAnchor constraintEqualToAnchor:parentView.topAnchor].active = YES;
+    [grandParentView.leftAnchor constraintEqualToAnchor:parentView.leftAnchor].active = YES;
+    [grandParentView.rightAnchor constraintEqualToAnchor:parentView.rightAnchor].active = YES;
+    [grandParentView.bottomAnchor constraintEqualToAnchor:parentView.bottomAnchor].active = YES;
+
+    
+    XCTAssertNotNil(self.mapView.window);
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+
+    // Hide the parent view
+    parentView.hidden = YES;
+
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssert(self.mapView.displayLink.isPaused);
+
+    // Show the parent view
+    parentView.hidden = NO;
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+}
+
+// We don't currently include view hierarchy visibility in our notion of "visible"
+// so this test will fail at the moment.
+- (void)testDisplayLinkWhenHidingMapViewsWindowPENDING {
+    
+    XCTAssertNotNil(self.mapView.window);
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+    
+    // Hide the window
+    self.mapView.window.hidden = YES;
+    
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssert(self.mapView.displayLink.isPaused);
+    
+    // Show the window
+    self.mapView.window.hidden = NO;
+    XCTAssertFalse(self.mapView.isDormant);
+    XCTAssertFalse(self.mapView.displayLink.isPaused);
+}
 @end

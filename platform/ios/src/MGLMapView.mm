@@ -192,10 +192,6 @@ public:
     NSString *viewReuseIdentifier;
 };
 
-@interface UIApplication (MGLApplicationConformation) <MGLApplication>
-@end
-
-
 #pragma mark - Private -
 
 @interface MGLMapView () <UIGestureRecognizerDelegate,
@@ -277,6 +273,7 @@ public:
 // Application properties
 @property (nonatomic) id<MGLApplication> application;
 @property (nonatomic) CADisplayLink *displayLink;
+@property (nonatomic) UIScreen *displayLinkScreen;
 @property (nonatomic) UIImage *lastSnapshotImage;
 
 
@@ -485,6 +482,8 @@ public:
     _opaque = NO;
     _atLeastiOS_12_2_0 = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){12,2,0}];
 
+    // TODO: For testing, the mocked application is set after this point. Consider
+    // postponing until the correct application exists.
     BOOL background = _application.applicationState == UIApplicationStateBackground;
     if (!background)
     {
@@ -535,7 +534,7 @@ public:
     NSAssert(!_mbglMap, @"_mbglMap should be NULL");
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, *_mbglThreadPool, mapOptions, resourceOptions);
 
-    // start paused if in IB
+    // start paused if launched into the background
     if (background) {
         self.dormant = YES;
     }
@@ -691,7 +690,7 @@ public:
     _pendingLongitude = NAN;
     _targetCoordinate = kCLLocationCoordinate2DInvalid;
 
-    if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
+    if (self.application.applicationState != UIApplicationStateBackground) {
         [MGLMapboxEvents pushTurnstileEvent];
         [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
@@ -816,7 +815,7 @@ public:
         [self removeAnnotations:annotations];
     }
 
-    [self validateDisplayLink];
+    [self destroyDisplayLink];
 
     [self destroyCoreObjects];
 
@@ -849,6 +848,15 @@ public:
 
     _delegate = delegate;
 
+    if ([delegate conformsToProtocol:@protocol(MGLApplicationProvider)])
+    {
+        self.application = [(id<MGLApplicationProvider>)delegate applicationForSender:self];
+    }
+    else
+    {
+        self.application = [UIApplication sharedApplication];
+    }
+    
     _delegateHasAlphasForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:alphaForShapeAnnotation:)];
     _delegateHasStrokeColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
     _delegateHasFillColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
@@ -1156,7 +1164,7 @@ public:
     if (displayLink && displayLink != _displayLink) {
         return;
     }
-    
+
     if (_needsDisplayRefresh)
     {
         _needsDisplayRefresh = NO;
@@ -1224,44 +1232,103 @@ public:
 
     if ( ! self.dormant)
     {
-        [self validateDisplayLink];
+        [self.displayLink invalidate];
+        self.displayLink = nil;
         self.dormant = YES;
+        
+        if (_rendererFrontend)
+        {
+            _rendererFrontend->reduceMemoryUse();
+        }
+
         [self.glView deleteDrawable];
     }
 
     [self destroyCoreObjects];
 }
 
+- (BOOL)displayLinkShouldExist
+{
+    BOOL active = (self.application.applicationState == UIApplicationStateActive) ||
+                    [self supportsBackgroundRendering];
+    return active;
+}
+
+- (BOOL)mapViewIsVisible
+{
+    // "Visible" is not strictly true here - for example, the view hiearchy is not
+    // currently observed (e.g. looking at a parent's or the window's hidden
+    // status.
+    BOOL isVisible = self.superview && self.window && !self.isHidden;
+    return isVisible;
+}
+
+- (void)createDisplayLink
+{
+    MGLAssert(!self.displayLinkScreen, @"");
+    MGLAssert(!self.displayLink, @"");
+    MGLAssert(self.window.screen, @"");
+    
+    self.displayLinkScreen  = self.window.screen;
+    self.displayLink        = [self.window.screen displayLinkWithTarget :self selector :@selector(updateFromDisplayLink :)];
+    self.displayLink.paused = YES;
+
+    [self updateDisplayLinkPreferredFramesPerSecond];
+
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+}
+
+- (void)destroyDisplayLink
+{
+    [self.displayLink invalidate];
+    self.displayLink = nil;
+    self.displayLinkScreen = nil;
+}
+
+- (void)startDisplayLink
+{
+    MGLAssert(self.displayLink, @"");
+    MGLAssert([self mapViewIsVisible], @"Display link should only be started when allowed");
+    
+    self.displayLink.paused = NO;
+    [self setNeedsGLDisplay];
+    [self updateFromDisplayLink:self.displayLink];
+}
+
+- (void)stopDisplayLink
+{
+    self.displayLink.paused = YES;
+}
+
 - (void)validateDisplayLink
 {
-    BOOL isVisible = self.superview && self.window;
+    MGLAssert(!self.displayLink, @"");
     
-    if (isVisible && ! _displayLink)
+    if ([self displayLinkShouldExist])
     {
-        BOOL active = (self.application.applicationState == UIApplicationStateActive);
+        if (!self.displayLink)
+        {
+            // TODO: Move this logic, it doen't belong here.
+            if (_mbglMap && self.mbglMap.getMapOptions().constrainMode() == mbgl::ConstrainMode::None)
+            {
+                self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
+            }
 
-        if (_mbglMap && self.mbglMap.getMapOptions().constrainMode() == mbgl::ConstrainMode::None)
-        {
-            self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
-        }
-        
-        _displayLink = [self.window.screen displayLinkWithTarget:self selector:@selector(updateFromDisplayLink:)];
-        
-        _displayLink.paused = !active;
-        
-        [self updateDisplayLinkPreferredFramesPerSecond];
-        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-        
-        if (active)
-        {
-            _needsDisplayRefresh = YES;
-            [self updateFromDisplayLink:_displayLink];
+            [self createDisplayLink];
+            
+            // Now should it be running?
+            if ([self mapViewIsVisible])
+            {
+                [self startDisplayLink];
+            }
         }
     }
-    else if ( ! isVisible && _displayLink)
+    else
     {
-        [_displayLink invalidate];
-        _displayLink = nil;
+        if (self.displayLink)
+        {
+            [self destroyDisplayLink];
+        }
     }
 }
 
@@ -1383,10 +1450,11 @@ public:
         // appears to lessen the effects.
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
         eaglLayer.presentsWithTransaction = NO;
-        
-        // Moved from didMoveToWindow
-        [self validateDisplayLink];
     }
+    
+    // Changing windows regardless of whether it's a new one, or the map is being
+    // removed from the hierarchy
+    [self destroyDisplayLink];
 }
 
 - (void)didMoveToWindow
@@ -1405,7 +1473,6 @@ public:
 
 - (void)didMoveToSuperview
 {
-    [self validateDisplayLink];
     [self installConstraints];
     [super didMoveToSuperview];
 }
@@ -1417,7 +1484,7 @@ public:
     // the app delegate's application:supportedInterfaceOrientationsForWindow:
     // method) and the device's supported orientations to determine whether to rotate.
     
-    UIApplication *application = [UIApplication sharedApplication];
+    id<MGLApplication> application = self.application;
     
     if (window && [application.delegate respondsToSelector:@selector(application:supportedInterfaceOrientationsForWindow:)]) {
         self.applicationSupportedInterfaceOrientations = [application.delegate application:application supportedInterfaceOrientationsForWindow:window];
@@ -1555,6 +1622,8 @@ public:
     {
         _rendererFrontend->reduceMemoryUse();
     }
+    
+    [self stopDisplayLink];
 }
 
 - (void)sleepGL:(__unused NSNotification *)notification
@@ -1576,6 +1645,8 @@ public:
     {
         _rendererFrontend->reduceMemoryUse();
     }
+    
+    [self destroyDisplayLink];
     
     if ( ! self.dormant)
     {
@@ -1627,7 +1698,7 @@ public:
 
         [self.glView bindDrawable];
 
-        [self validateDisplayLink];
+        [self createDisplayLink];
         
         [self validateLocationServices];
 
@@ -1636,12 +1707,19 @@ public:
     }
 }
 
+
 - (void)resumeGL
 {
     self.lastSnapshotImage = nil;
 
     // Only restart the display link if we're not hidden
-    self.displayLink.paused = self.hidden;
+//    self.displayLink.paused = ![self displayLinkShouldRun];
+    MGLAssert(self.displayLink, @"");
+    
+    if ([self mapViewIsVisible])
+    {
+        [self startDisplayLink];
+    }
 }
 
 
@@ -1649,9 +1727,7 @@ public:
 {
     super.hidden = hidden;
     
-    BOOL inactive = (self.application.applicationState != UIApplicationStateActive);
-    
-    self.displayLink.paused = hidden || inactive;
+    self.displayLink.paused = ![self mapViewIsVisible];
 }
 
 - (void)tintColorDidChange
