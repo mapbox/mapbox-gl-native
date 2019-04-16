@@ -1,19 +1,16 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.annotation.SuppressLint;
-import android.os.Parcel;
 import android.support.annotation.FloatRange;
 
-import com.mapbox.android.telemetry.Event;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 /**
  * Event will be sent while offline download start.
  */
 @SuppressLint("ParcelCreator")
-public class OfflineDownloadStartEvent extends Event {
-  private final String event = "map.offlineDownload.start";
-  private final String created;
+public class OfflineDownloadStartEvent extends MapBaseEvent {
+  private static final String EVENT_NAME = "map.offlineDownload.start";
   private final Double minZoom;
   private final Double maxZoom;
   private final String shapeForOfflineRegion;
@@ -24,14 +21,15 @@ public class OfflineDownloadStartEvent extends Event {
                               to = MapboxConstants.MAXIMUM_ZOOM) Double minZoom,
                             @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
                               to = MapboxConstants.MAXIMUM_ZOOM) Double maxZoom) {
-    this.created = phoneState.getCreated();
+    super(phoneState);
     this.shapeForOfflineRegion = shapeForOfflineRegion;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
   }
 
-  void setStyleURL(String styleURL) {
-    this.styleURL = styleURL;
+  @Override
+  String getEventName() {
+    return EVENT_NAME;
   }
 
   String getCreated() {
@@ -52,6 +50,10 @@ public class OfflineDownloadStartEvent extends Event {
 
   String getStyleURL() {
     return styleURL;
+  }
+
+  void setStyleURL(String styleURL) {
+    this.styleURL = styleURL;
   }
 
   @Override
@@ -104,12 +106,4 @@ public class OfflineDownloadStartEvent extends Event {
       + '}';
   }
 
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-  }
 }
