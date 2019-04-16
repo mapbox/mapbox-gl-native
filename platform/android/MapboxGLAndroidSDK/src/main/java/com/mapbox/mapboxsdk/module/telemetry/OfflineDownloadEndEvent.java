@@ -1,10 +1,8 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.annotation.SuppressLint;
-import android.os.Parcel;
 import android.support.annotation.FloatRange;
 
-import com.mapbox.android.telemetry.Event;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
@@ -12,9 +10,8 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion;
  * Event will be sent while offline download end.
  */
 @SuppressLint("ParcelCreator")
-public class OfflineDownloadEndEvent extends Event {
-  private final String event = "map.offlineDownload.end";
-  private final String created;
+public class OfflineDownloadEndEvent extends MapBaseEvent {
+  private static final String EVENT_NAME = "map.offlineDownload.end";
   private final Double minZoom;
   private final Double maxZoom;
   private final String shapeForOfflineRegion;
@@ -28,26 +25,15 @@ public class OfflineDownloadEndEvent extends Event {
                             to = MapboxConstants.MAXIMUM_ZOOM) Double minZoom,
                           @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
                             to = MapboxConstants.MAXIMUM_ZOOM) Double maxZoom) {
-    this.created = phoneState.getCreated();
+    super(phoneState);
     this.shapeForOfflineRegion = shapeForOfflineRegion;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
   }
 
-  void setStyleURL(String styleURL) {
-    this.styleURL = styleURL;
-  }
-
-  void setSizeOfResourcesCompleted(long sizeOfResourcesCompleted) {
-    this.sizeOfResourcesCompleted = sizeOfResourcesCompleted;
-  }
-
-  void setNumberOfTilesCompleted(long numberOfTilesCompleted) {
-    this.numberOfTilesCompleted = numberOfTilesCompleted;
-  }
-
-  void setState(@OfflineRegion.DownloadState int state) {
-    this.state = state;
+  @Override
+  String getEventName() {
+    return EVENT_NAME;
   }
 
   String getCreated() {
@@ -70,16 +56,32 @@ public class OfflineDownloadEndEvent extends Event {
     return styleURL;
   }
 
+  void setStyleURL(String styleURL) {
+    this.styleURL = styleURL;
+  }
+
   long getSizeOfResourcesCompleted() {
     return sizeOfResourcesCompleted;
+  }
+
+  void setSizeOfResourcesCompleted(long sizeOfResourcesCompleted) {
+    this.sizeOfResourcesCompleted = sizeOfResourcesCompleted;
   }
 
   long getNumberOfTilesCompleted() {
     return numberOfTilesCompleted;
   }
 
+  void setNumberOfTilesCompleted(long numberOfTilesCompleted) {
+    this.numberOfTilesCompleted = numberOfTilesCompleted;
+  }
+
   int getState() {
     return state;
+  }
+
+  void setState(@OfflineRegion.DownloadState int state) {
+    this.state = state;
   }
 
   @Override
@@ -145,14 +147,5 @@ public class OfflineDownloadEndEvent extends Event {
       + ", numberOfTilesCompleted=" + numberOfTilesCompleted
       + ", state=" + state
       + '}';
-  }
-
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
   }
 }

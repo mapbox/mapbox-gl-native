@@ -1,18 +1,14 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.annotation.SuppressLint;
-import android.os.Parcel;
-
-import com.mapbox.android.telemetry.Event;
 
 /**
  * Event that represents users' gestures on map, for the details of gestures,
  * please refer to {@link com.mapbox.mapboxsdk.constants.TelemetryConstants}
  */
 @SuppressLint("ParcelCreator")
-class MapClickEvent extends Event {
-  private final String event = "map.click";
-  private final String created;
+class MapClickEvent extends MapBaseEvent {
+  private static final String EVENT_NAME = "map.click";
   private final String gesture;
   private final String cellularNetworkType;
   private final String carrier;
@@ -25,17 +21,22 @@ class MapClickEvent extends Event {
   private final boolean wifi;
 
   MapClickEvent(PhoneState phoneState, MapState mapState) {
+    super(phoneState);
     this.gesture = mapState.getGesture();
     this.latitude = mapState.getLatitude();
     this.longitude = mapState.getLongitude();
     this.zoom = mapState.getZoom();
-    this.created = phoneState.getCreated();
     this.batteryLevel = phoneState.getBatteryLevel();
     this.pluggedIn = phoneState.isPluggedIn();
     this.cellularNetworkType = phoneState.getCellularNetworkType();
     this.orientation = phoneState.getOrientation();
     this.carrier = phoneState.getCarrier();
     this.wifi = phoneState.isWifi();
+  }
+
+  @Override
+  String getEventName() {
+    return EVENT_NAME;
   }
 
   String getCreated() {
@@ -167,12 +168,4 @@ class MapClickEvent extends Event {
       + '}';
   }
 
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-  }
 }

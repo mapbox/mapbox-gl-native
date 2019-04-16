@@ -17,12 +17,12 @@ public class MapState {
     this.zoom = zoom;
   }
 
-  void setGesture(String gesture) {
-    this.gesture = gesture;
-  }
-
   String getGesture() {
     return gesture;
+  }
+
+  void setGesture(String gesture) {
+    this.gesture = gesture;
   }
 
   double getLatitude() {
