@@ -247,6 +247,8 @@ public:
     void visualizeStencilBuffer() override;
     void visualizeDepthBuffer(float depthRangeSize) override;
 #endif
+
+    void clearStencilBuffer(int32_t) override;
 };
 
 } // namespace gl

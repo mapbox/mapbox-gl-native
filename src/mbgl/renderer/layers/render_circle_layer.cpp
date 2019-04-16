@@ -103,9 +103,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
             *parameters.renderPass,
             gfx::Triangles(),
             parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
-            parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gfx::StencilMode::disabled(),
+            gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gfx::CullFaceMode::disabled(),
             *bucket.indexBuffer,

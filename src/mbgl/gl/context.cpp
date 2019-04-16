@@ -870,5 +870,10 @@ void Context::visualizeDepthBuffer(const float depthRangeSize) {
 
 #endif
 
+void Context::clearStencilBuffer(const int32_t bits) {
+    MBGL_CHECK_ERROR(glClearStencil(bits));
+    MBGL_CHECK_ERROR(glClear(GL_STENCIL_BUFFER_BIT));
+}
+
 } // namespace gl
 } // namespace mbgl

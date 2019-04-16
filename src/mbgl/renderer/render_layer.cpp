@@ -2,6 +2,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/util/logging.hpp>

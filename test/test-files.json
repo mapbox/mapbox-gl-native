@@ -3,8 +3,6 @@
     "sources": [
         "test/actor/actor.test.cpp",
         "test/actor/actor_ref.test.cpp",
-        "test/algorithm/covered_by_children.test.cpp",
-        "test/algorithm/generate_clip_ids.test.cpp",
         "test/algorithm/update_renderables.test.cpp",
         "test/algorithm/update_tile_masks.test.cpp",
         "test/api/annotations.test.cpp",

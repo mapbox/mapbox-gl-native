@@ -420,61 +420,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.renderPass = parameters.encoder->createRenderPass("main buffer", { parameters.backend.getDefaultRenderable(), color, 1, 0 });
     }
 
-    // - CLIPPING MASKS ----------------------------------------------------------------------------
-    // Draws the clipping masks to the stencil buffer.
-    {
-        const auto debugGroup(parameters.renderPass->createDebugGroup("clipping masks"));
-
-        static const Properties<>::PossiblyEvaluated properties {};
-        static const ClippingMaskProgram::Binders paintAttributeData(properties, 0);
-
-        for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
-            auto& program = parameters.staticData.programs.clippingMask;
-
-            program.draw(
-                parameters.context,
-                *parameters.renderPass,
-                gfx::Triangles(),
-                gfx::DepthMode::disabled(),
-                gfx::StencilMode {
-                    gfx::StencilMode::Always(),
-                    static_cast<int32_t>(clipID.second.reference.to_ulong()),
-                    0b11111111,
-                    gfx::StencilOpType::Keep,
-                    gfx::StencilOpType::Keep,
-                    gfx::StencilOpType::Replace
-                },
-                gfx::ColorMode::disabled(),
-                gfx::CullFaceMode::disabled(),
-                parameters.staticData.quadTriangleIndexBuffer,
-                parameters.staticData.tileTriangleSegments,
-                program.computeAllUniformValues(
-                    ClippingMaskProgram::LayoutUniformValues {
-                        uniforms::matrix::Value( parameters.matrixForTile(clipID.first) ),
-                    },
-                    paintAttributeData,
-                    properties,
-                    parameters.state.getZoom()
-                ),
-                program.computeAllAttributeBindings(
-                    parameters.staticData.tileVertexBuffer,
-                    paintAttributeData,
-                    properties
-                ),
-                ClippingMaskProgram::TextureBindings{},
-                "clipping"
-            );
-        }
-    }
-
-#if not defined(NDEBUG)
-    // Render tile clip boundaries, using stencil buffer to calculate fill color.
-    if (parameters.debugOptions & MapDebugOptions::StencilClip) {
-        parameters.context.visualizeStencilBuffer();
-        return;
-    }
-#endif
-
     // Actually render the layers
 
     parameters.depthRangeSize = 1 - (renderItems.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
@@ -530,8 +475,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
 #if not defined(NDEBUG)
-    // Render the depth buffer.
-    if (parameters.debugOptions & MapDebugOptions::DepthBuffer) {
+    if (parameters.debugOptions & MapDebugOptions::StencilClip) {
+        // Render tile clip boundaries, using stencil buffer to calculate fill color.
+        parameters.context.visualizeStencilBuffer();
+    } else if (parameters.debugOptions & MapDebugOptions::DepthBuffer) {
+        // Render the depth buffer.
         parameters.context.visualizeDepthBuffer(parameters.depthRangeSize);
     }
 #endif

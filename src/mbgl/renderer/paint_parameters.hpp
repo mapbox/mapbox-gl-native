@@ -7,10 +7,11 @@
 #include <mbgl/gfx/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/text/placement.hpp>
 
 #include <array>
+#include <map>
+#include <vector>
 
 namespace mbgl {
 
@@ -21,6 +22,8 @@ class TransformState;
 class ImageManager;
 class LineAtlas;
 class UnwrappedTileID;
+class RenderSource;
+class RenderTile;
 
 namespace gfx {
 class Context;
@@ -62,13 +65,11 @@ public:
     float pixelRatio;
     Placement::VariableOffsets variableOffsets;
     std::array<float, 2> pixelsToGLUnits;
-    algorithm::ClipIDGenerator clipIDGenerator;
 
     Programs& programs;
 
     gfx::DepthMode depthModeForSublayer(uint8_t n, gfx::DepthMaskType) const;
     gfx::DepthMode depthModeFor3D(gfx::DepthMaskType) const;
-    gfx::StencilMode stencilModeForClipping(const ClipID&) const;
     gfx::ColorMode colorModeForRenderPass() const;
 
     mat4 matrixForTile(const UnwrappedTileID&, bool aligned = false) const;
@@ -77,10 +78,24 @@ public:
     mat4 alignedProjMatrix;
     mat4 nearClippedProjMatrix;
 
+    // Stencil handling
+public:
+    void renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>&);
+    gfx::StencilMode stencilModeForClipping(const UnwrappedTileID&) const;
+
+private:
+    void clearStencil();
+
+    // This needs to be an ordered map so that we have the same order as the renderTiles.
+    std::map<UnwrappedTileID, int32_t> tileClippingMaskIDs;
+    int32_t nextStencilID = 1;
+
+public:
     int numSublayers = 3;
     uint32_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
+
     
     float symbolFadeChange;
 };
