@@ -382,6 +382,10 @@
 		967C864C210A9D3C004DF794 /* UIDevice+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 967C8649210A9D3C004DF794 /* UIDevice+MGLAdditions.h */; };
 		967C864D210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */; };
 		967C864E210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */; };
+		9680273F22653B84006BA4A1 /* MBXSKUToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 9680273E22653B84006BA4A1 /* MBXSKUToken.h */; };
+		9680274022653B84006BA4A1 /* MBXSKUToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 9680273E22653B84006BA4A1 /* MBXSKUToken.h */; };
+		9680276422655696006BA4A1 /* libmbxaccounts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9680274122653C3E006BA4A1 /* libmbxaccounts.a */; };
+		96802766226556C5006BA4A1 /* libmbxaccounts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9680274122653C3E006BA4A1 /* libmbxaccounts.a */; };
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
 		96E516DC2000547000A02306 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
@@ -1067,6 +1071,8 @@
 		966FCF511F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserLocationHeadingArrowLayer.m; sourceTree = "<group>"; };
 		967C8649210A9D3C004DF794 /* UIDevice+MGLAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIDevice+MGLAdditions.h"; sourceTree = "<group>"; };
 		967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+MGLAdditions.m"; sourceTree = "<group>"; };
+		9680273E22653B84006BA4A1 /* MBXSKUToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBXSKUToken.h; path = "../vendor/mapbox-accounts-ios/MBXSKUToken.h"; sourceTree = "<group>"; };
+		9680274122653C3E006BA4A1 /* libmbxaccounts.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbxaccounts.a; path = "vendor/mapbox-accounts-ios/libmbxaccounts.a"; sourceTree = SOURCE_ROOT; };
 		968F36B41E4D0FC6003A5522 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027241E57C76E004B8E66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027271E57C77A004B8E66 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1408,6 +1414,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96802766226556C5006BA4A1 /* libmbxaccounts.a in Frameworks */,
 				DAABF73D1CBC59BB005B1825 /* libmbgl-core.a in Frameworks */,
 				55D120A61F791007004B6D81 /* libmbgl-loop-darwin.a in Frameworks */,
 				55D120A81F79100C004B6D81 /* libmbgl-filesource.a in Frameworks */,
@@ -1421,6 +1428,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAAE5F8720F046E60089D85B /* libmbgl-core.a in Frameworks */,
+				9680276422655696006BA4A1 /* libmbxaccounts.a in Frameworks */,
 				DAAE5F8920F047240089D85B /* libmbgl-filesource.a in Frameworks */,
 				DAAE5F8A20F0472E0089D85B /* libmbgl-loop-darwin.a in Frameworks */,
 				55CF7531213ED92A00ED86C4 /* libicu.a in Frameworks */,
@@ -1772,6 +1780,14 @@
 			name = Fixtures;
 			sourceTree = "<group>";
 		};
+		9680276322655623006BA4A1 /* Accounts */ = {
+			isa = PBXGroup;
+			children = (
+				9680273E22653B84006BA4A1 /* MBXSKUToken.h */,
+			);
+			name = Accounts;
+			sourceTree = "<group>";
+		};
 		CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1871,6 +1887,7 @@
 		DA1DC9921CB6DF24006E619F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9680274122653C3E006BA4A1 /* libmbxaccounts.a */,
 				55CF7530213ED92A00ED86C4 /* libicu.a */,
 				55CF752E213ED92000ED86C4 /* libicu.a */,
 				55D120A91F79100C004B6D81 /* libmbgl-filesource.a */,
@@ -2248,10 +2265,11 @@
 		DAD165851CF4D08B001FF4B9 /* Telemetry */ = {
 			isa = PBXGroup;
 			children = (
+				9680276322655623006BA4A1 /* Accounts */,
+				40834BA11FE05CFD00C1BD0D /* Development */,
 				AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */,
 				AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */,
 				40834BA21FE05D3100C1BD0D /* Runtime */,
-				40834BA11FE05CFD00C1BD0D /* Development */,
 			);
 			name = Telemetry;
 			sourceTree = "<group>";
@@ -2368,6 +2386,7 @@
 				DA35A29E1CC9E94C00E826B2 /* MGLCoordinateFormatter.h in Headers */,
 				DAF0D8181DFE6B2800B28378 /* MGLAttributionInfo_Private.h in Headers */,
 				DAAF722B1DA903C700312FA4 /* MGLStyleValue.h in Headers */,
+				9680273F22653B84006BA4A1 /* MBXSKUToken.h in Headers */,
 				DA8847F71CBAFA5100AB86E3 /* MGLOverlay.h in Headers */,
 				DA35A2B11CCA141D00E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
 				DA88488B1CBB037E00AB86E3 /* SMCalloutView.h in Headers */,
@@ -2500,6 +2519,7 @@
 				96E516E92000560B00A02306 /* MGLAnnotationImage_Private.h in Headers */,
 				96E516E52000560B00A02306 /* MGLOfflinePack_Private.h in Headers */,
 				DD9BE4F91EB263D20079A3AF /* UIViewController+MGLAdditions.h in Headers */,
+				9680274022653B84006BA4A1 /* MBXSKUToken.h in Headers */,
 				DAF2571C201901E200367EF5 /* MGLHillshadeStyleLayer.h in Headers */,
 				74CB5EC4219B282500102936 /* MGLCircleStyleLayer_Private.h in Headers */,
 				DABFB8621CBE99E500D62B32 /* MGLOfflinePack.h in Headers */,
@@ -3714,6 +3734,11 @@
 				INFOPLIST_FILE = framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/vendor/mapbox-accounts-ios",
+				);
 				LLVM_LTO = YES;
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -3746,6 +3771,11 @@
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/vendor/mapbox-accounts-ios",
 				);
 				LLVM_LTO = YES;
 				OTHER_CFLAGS = "-fvisibility=hidden";
@@ -4102,6 +4132,11 @@
 				INFOPLIST_FILE = framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/vendor/mapbox-accounts-ios",
+				);
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -4145,6 +4180,11 @@
 				INFOPLIST_FILE = framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/vendor/mapbox-accounts-ios",
+				);
 				LLVM_LTO = YES;
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -4201,6 +4241,11 @@
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/vendor/mapbox-accounts-ios",
+				);
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -4233,6 +4278,11 @@
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/vendor/mapbox-accounts-ios",
 				);
 				LLVM_LTO = YES;
 				OTHER_CFLAGS = "-fvisibility=hidden";

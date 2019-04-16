@@ -7,21 +7,8 @@
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
+#import "MBXSKUToken.h"
 #endif
-
-@interface MGLSKUToken : NSObject
-
-+ (NSString *)skuToken;
-
-@end
-
-@implementation MGLSKUToken
-
-+ (NSString *)skuToken {
-    return @"not an actual token — this will be provided by the mbxaccounts library";
-}
-
-@end
 
 @interface MGLAccountManager ()
 
@@ -54,7 +41,7 @@
     }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    self.skuToken = [MGLSKUToken skuToken];
+    self.skuToken = [MBXSKUToken skuToken];
 #endif
 }
 
@@ -122,7 +109,7 @@
 }
 
 + (NSString *)skuToken {
-    return [MGLAccountManager.sharedManager isSKUTokenExpired] ? [MGLSKUToken skuToken] : MGLAccountManager.sharedManager.skuToken;
+    return [MGLAccountManager.sharedManager isSKUTokenExpired] ? [MBXSKUToken skuToken] : MGLAccountManager.sharedManager.skuToken;
 }
 
 - (BOOL)isSKUTokenExpired {
