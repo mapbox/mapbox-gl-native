@@ -10,7 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Speculatively fixed a bug where GL rendering could occur in the background. ([#14439](https://github.com/mapbox/mapbox-gl-native/pull/14439))
 * Fixed a bug with jittery callout views when using sprite-based annotations. ([#14445](https://github.com/mapbox/mapbox-gl-native/pull/14445))
 
-## 4.10.0
+## 4.10.0 - April 17, 2019
 
 ### Styles and rendering
 

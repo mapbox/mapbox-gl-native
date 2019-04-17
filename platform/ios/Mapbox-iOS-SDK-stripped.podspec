@@ -1,6 +1,6 @@
 Pod::Spec.new do |m|
 
-  version = '4.11.0-alpha.2'
+  version = '4.10.0'
 
   m.name    = 'Mapbox-iOS-SDK-stripped'
   m.version = "#{version}-stripped"
