@@ -25,7 +25,6 @@ class MapLoadEvent extends MapBaseEvent {
   private final boolean pluggedIn;
   private final boolean wifi;
 
-
   MapLoadEvent(String userId, PhoneState phoneState) {
     super(phoneState);
     this.userId = userId;
