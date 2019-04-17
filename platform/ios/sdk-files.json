@@ -252,6 +252,7 @@
         "MGLMultiPoint_Private.h": "platform/darwin/src/MGLMultiPoint_Private.h",
         "UIColor+MGLAdditions.h": "platform/ios/src/UIColor+MGLAdditions.h",
         "MGLAttributionInfo_Private.h": "platform/darwin/src/MGLAttributionInfo_Private.h",
+        "MBXSKUToken.h": "platform/ios/vendor/mapbox-accounts-ios/MBXSKUToken.h",
         "SMCalloutView.h": "platform/ios/vendor/SMCalloutView/SMCalloutView.h",
         "MGLOfflineRegion_Private.h": "platform/darwin/src/MGLOfflineRegion_Private.h",
         "MMEPinningConfigurationProvider.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEPinningConfigurationProvider.h",
