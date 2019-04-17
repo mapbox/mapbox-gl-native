@@ -2,6 +2,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString *const MBXAccountsSKUIDMaps;
+
 @interface MBXSKUToken : NSObject
 
 + (NSString *)skuToken;
