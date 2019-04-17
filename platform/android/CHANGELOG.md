@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.3.2 - April 17, 2019
+## Bugs
+ - Unify has surface state handling, allow querying after map resume [#14426](https://github.com/mapbox/mapbox-gl-native/pull/14426)
+
 ## 7.3.1 - April 12, 2019
 ## Bugs 
  - Harden renderer invocation when Activity is resumed [#14395](https://github.com/mapbox/mapbox-gl-native/pull/14395)
