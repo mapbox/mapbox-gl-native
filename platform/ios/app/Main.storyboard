@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -77,16 +77,23 @@
                     </view>
                     <navigationItem key="navigationItem" id="p8W-eP-el5">
                         <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" image="settings.png" id="Jw8-JP-CaZ" userLabel="Map Settings">
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Map settings"/>
-                            </userDefinedRuntimeAttributes>
-                            <connections>
-                                <action selector="showSettings:" destination="WaX-pd-UZQ" id="X2C-Ee-Qvt"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem image="settings.png" id="Jw8-JP-CaZ" userLabel="Map Settings">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Map settings"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="showSettings:" destination="WaX-pd-UZQ" id="X2C-Ee-Qvt"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Item" id="1Cm-ct-O5U">
+                                <connections>
+                                    <segue destination="GJx-bG-Csz" kind="presentation" id="26R-NA-y08"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                         <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KsN-ny-Hou">
-                            <rect key="frame" x="65" y="5.5" width="203" height="33"/>
+                            <rect key="frame" x="94" y="5.5" width="181" height="33"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
                             <state key="normal" title="Streets"/>
@@ -458,6 +465,56 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RtO-ic-8Nc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2073" y="1082"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="CA1-w0-WrG">
+            <objects>
+                <viewController storyboardIdentifier="TestViewContraller" modalPresentationStyle="overCurrentContext" useStoryboardIdentifierAsRestorationIdentifier="YES" id="GJx-bG-Csz" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="lfe-Lv-9UZ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ebb-JT-aem">
+                                <rect key="frame" x="67" y="225" width="241" height="237"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Uwx-u1-cIQ">
+                                        <rect key="frame" x="66" y="84" width="109" height="68"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <state key="normal" title="GO BACK        ">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="titleShadowColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="dismissVC:" destination="Mkp-39-rGL" eventType="touchUpInside" id="CLv-FL-ZC5"/>
+                                            <segue destination="PSe-Ot-7Ff" kind="show" id="Y1W-H4-LaP"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" red="0.7713280857" green="0.154259277" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="Uwx-u1-cIQ" firstAttribute="centerX" secondItem="Ebb-JT-aem" secondAttribute="centerX" id="kf5-XQ-IKQ"/>
+                                    <constraint firstItem="Uwx-u1-cIQ" firstAttribute="centerY" secondItem="Ebb-JT-aem" secondAttribute="centerY" id="zDh-sq-na8"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Ebb-JT-aem" firstAttribute="top" secondItem="fqA-v0-5jT" secondAttribute="top" constant="205" id="45n-9z-nv8"/>
+                            <constraint firstItem="Ebb-JT-aem" firstAttribute="leading" secondItem="fqA-v0-5jT" secondAttribute="leading" constant="67" id="RDZ-Cn-F9L"/>
+                            <constraint firstItem="Ebb-JT-aem" firstAttribute="centerX" secondItem="fqA-v0-5jT" secondAttribute="centerX" id="nGy-4p-ZoI"/>
+                            <constraint firstItem="Ebb-JT-aem" firstAttribute="centerY" secondItem="fqA-v0-5jT" secondAttribute="centerY" id="qFA-1a-taz"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="fqA-v0-5jT"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="m43-cj-X2x">
+                        <barButtonItem key="leftBarButtonItem" title="Item" id="CfS-cZ-RkU"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aAg-U7-GVL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="Mkp-39-rGL" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="5200.8000000000002" y="794.75262368815595"/>
         </scene>
     </scenes>
     <resources>

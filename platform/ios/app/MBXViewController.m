@@ -107,6 +107,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousShouldLimitCameraChanges,
     MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousOrnamentsPlacement,
+    MBXSettingsMiscellaneousModalView,
     MBXSettingsMiscellaneousPrintLogFile,
     MBXSettingsMiscellaneousDeleteLogFile
 };
@@ -504,6 +505,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 [NSString stringWithFormat:@"%@ Camera Changes", (_shouldLimitCameraChanges ? @"Unlimit" : @"Limit")],
                 @"View Route Simulation",
                 @"Ornaments Placement",
+                @"Present Modal View",
             ]];
 
             if (self.debugLoggingEnabled)
@@ -770,6 +772,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     MBXOrnamentsViewController *ornamentsViewController = [[MBXOrnamentsViewController alloc] init];
                     [self.navigationController pushViewController:ornamentsViewController animated:YES];
+                    break;
+                }
+                case MBXSettingsMiscellaneousModalView:
+                {
+                    [self presentModalVCOverMapView];
                     break;
                 }
                 default:
@@ -2240,6 +2247,14 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
     _localizingLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+}
+
+- (void)presentModalVCOverMapView {
+    [self parseFeaturesAddingCount:100 usingViews:YES];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    UIViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"TestViewController"];
+    [self.navigationController presentViewController:vc animated:YES completion:nil];
+    
 }
 
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera {
