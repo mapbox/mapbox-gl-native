@@ -255,7 +255,7 @@ public:
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
-@property (nonatomic) BOOL enablePresentsWithTransaction;
+@property (nonatomic, readonly) BOOL enablePresentsWithTransaction;
 @property (nonatomic) UIImage *lastSnapshotImage;
 
 /// Experimental rendering performance measurement.
@@ -1286,19 +1286,17 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
-- (void)setEnablePresentsWithTransaction:(BOOL)enablePresentsWithTransaction
+- (void)updatePresentsWithTransaction
 {
-    if (_enablePresentsWithTransaction == enablePresentsWithTransaction)
-    {
-        return;
-    }
+    BOOL hasEnoughViewAnnotations = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
+    BOOL hasAnAnchoredCallout = [self hasAnAnchoredAnnotationCalloutView];
     
-    _enablePresentsWithTransaction = enablePresentsWithTransaction;
+    _enablePresentsWithTransaction = (hasEnoughViewAnnotations || hasAnAnchoredCallout);
     
     // If the map is visible, change the layer property too
     if (self.window) {
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-        eaglLayer.presentsWithTransaction = enablePresentsWithTransaction;
+        eaglLayer.presentsWithTransaction = _enablePresentsWithTransaction;
     }
 }
 
@@ -2349,6 +2347,10 @@ public:
 {
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, calloutView);
+    
+    [self updatePresentsWithTransaction];
+    
+    // TODO: Add sibling disappear method
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
@@ -4339,7 +4341,7 @@ public:
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
     self.annotationContainerView = newAnnotationContainerView;
     
-    self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
+    [self updatePresentsWithTransaction];
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -4513,8 +4515,6 @@ public:
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
         [self.annotationContainerView.annotationViews removeObject:annotationView];
-        
-        self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
 
         if (annotationTag == _selectedAnnotationTag)
         {
@@ -4536,6 +4536,8 @@ public:
         _isChangingAnnotationLayers = YES;
         self.mbglMap.removeAnnotation(annotationTag);
     }
+
+    [self updatePresentsWithTransaction];
 
     [self didChangeValueForKey:@"annotations"];
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
@@ -5214,6 +5216,8 @@ public:
         {
             [self.delegate mapView:self didDeselectAnnotationView:annotationView];
         }
+        
+        [self updatePresentsWithTransaction];
     }
 }
 
@@ -6438,6 +6442,19 @@ public:
             }
         }
     }
+}
+
+- (BOOL)hasAnAnchoredAnnotationCalloutView
+{
+    // TODO: Remove duplicate code.
+    UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
+    id <MGLAnnotation> annotation = calloutView.representedObject;
+    
+    BOOL isAnchoredToAnnotation = (calloutView
+                                   && annotation
+                                   && [calloutView respondsToSelector:@selector(isAnchoredToAnnotation)]
+                                   && calloutView.isAnchoredToAnnotation);
+    return isAnchoredToAnnotation;
 }
 
 - (void)updateCalloutView
