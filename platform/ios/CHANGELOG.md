@@ -10,6 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue that caused `MGL_FUNCTION` to ignore multiple formatting parameters when passed a `format` function as parameter. ([#14064](https://github.com/mapbox/mapbox-gl-native/pull/14064))
 * Added `mgl_attributed:` expression operator, which concatenates `MGLAttributedExpression` objects for specifying rich text in the `MGLSymbolStyleLayer.text` property. ([#14094](https://github.com/mapbox/mapbox-gl-native/pull/14094))
 * Fixed an issue that caused conditional expressions to crash when passed nested conditional expressions as parameters. ([#14181](https://github.com/mapbox/mapbox-gl-native/pull/14181))
+* Added `MGLSymbolStyleLayer.textVariableAnchor` and `MGLSymbolStyleLayer.textRadialOffset` API to enable variable label placement ([#14184](https://github.com/mapbox/mapbox-gl-native/pull/14184))
 * Added `-[MGLMapViewDelegate mapView:didFailToLoadImage:]` to load missing symbol icons in the style if they are not found. ([#14302](https://github.com/mapbox/mapbox-gl-native/pull/14302))
 * Fixed a possible crash with certain expressions containing arguments that evaluate to a dictionary containing `NSArray` or `NSNumber` values. ([#14352](https://github.com/mapbox/mapbox-gl-native/pull/14352))
 * Fixed a bug where non-opaque `UIColor` values were ignored when assigned to a style layer color property. ([#14406](https://github.com/mapbox/mapbox-gl-native/pull/14406))
