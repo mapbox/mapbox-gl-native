@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.geojson.Feature;
@@ -29,6 +28,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
+import timber.log.Timber;
 
 import java.util.Arrays;
 import java.util.List;
@@ -126,13 +126,21 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     mapView.getMapAsync(this);
     mapView.onCreate(savedInstanceState);
     ((ViewGroup) findViewById(R.id.container)).addView(mapView);
+
+    // Use OnStyleImageMissing API to lazily load an icon
+    mapView.addOnStyleImageMissingListener(id -> {
+      Style style = mapboxMap.getStyle();
+      if (style != null) {
+        Timber.e("Adding image with id: %s", id);
+        Bitmap androidIcon = BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_android_2));
+        style.addImage(id, Objects.requireNonNull(androidIcon));
+      }
+    });
   }
 
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    // marker image
-    Bitmap androidBitmap = BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_android_2));
     Bitmap carBitmap = BitmapUtils.getBitmapFromDrawable(
       getResources().getDrawable(R.drawable.ic_directions_car_black));
 
@@ -168,7 +176,6 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
 
     mapboxMap.setStyle(new Style.Builder()
       .fromUrl("asset://streets.json")
-      .withImage("Android", Objects.requireNonNull(androidBitmap), false)
       .withImage("Car", Objects.requireNonNull(carBitmap), false)
       .withSources(markerSource, mapboxSignSource)
       .withLayers(markerSymbolLayer, mapboxSignSymbolLayer)

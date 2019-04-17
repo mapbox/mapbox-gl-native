@@ -11,10 +11,10 @@ import java.util.List;
 
 class ShapeAnnotationContainer implements ShapeAnnotations {
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMapView;
   private final LongSparseArray<Annotation> annotations;
 
-  ShapeAnnotationContainer(NativeMapView nativeMapView, LongSparseArray<Annotation> annotations) {
+  ShapeAnnotationContainer(NativeMap nativeMapView, LongSparseArray<Annotation> annotations) {
     this.nativeMapView = nativeMapView;
     this.annotations = annotations;
   }

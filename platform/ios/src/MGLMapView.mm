@@ -256,6 +256,7 @@ public:
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
 @property (nonatomic) BOOL enablePresentsWithTransaction;
+@property (nonatomic) UIImage *lastSnapshotImage;
 
 /// Experimental rendering performance measurement.
 @property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
@@ -635,9 +636,11 @@ public:
     // observe app activity
     //
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willTerminate) name:UIApplicationWillTerminateNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    
     // As of 3.7.5, we intentionally do not listen for `UIApplicationWillResignActiveNotification` or call `sleepGL:` in response to it, as doing
     // so causes a loop when asking for location permission. See: https://github.com/mapbox/mapbox-gl-native/issues/11225
 
@@ -831,10 +834,12 @@ public:
 {
     MGLAssertIsMainThread();
 
-    if ( ! self.dormant)
+    if ( ! self.dormant && _rendererFrontend)
     {
         _rendererFrontend->reduceMemoryUse();
     }
+    
+    self.lastSnapshotImage = nil;
 }
 
 #pragma mark - Layout -
@@ -984,7 +989,7 @@ public:
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(__unused GLKView *)view drawInRect:(__unused CGRect)rect
 {
-    if ( ! self.dormant || ! _rendererFrontend)
+    if ( ! self.dormant && _rendererFrontend)
     {
         _rendererFrontend->render();
     }
@@ -1125,6 +1130,13 @@ public:
 
     // Mismatched display link
     if (displayLink && displayLink != _displayLink) {
+        return;
+    }
+
+    // Check to ensure rendering doesn't occur in the background
+    if (([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) &&
+        ![self supportsBackgroundRendering])
+    {
         return;
     }
     
@@ -1465,6 +1477,55 @@ public:
     [self setNeedsLayout];
 }
 
+#pragma mark - Application lifecycle
+- (void)willResignActive:(NSNotification *)notification
+{
+    if ([self supportsBackgroundRendering])
+    {
+        return;
+    }
+    
+    self.lastSnapshotImage = self.glView.snapshot;
+    
+    // For OpenGL this calls glFinish as recommended in
+    // https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/ImplementingaMultitasking-awareOpenGLESApplication/ImplementingaMultitasking-awareOpenGLESApplication.html#//apple_ref/doc/uid/TP40008793-CH5-SW1
+    // reduceMemoryUse(), calls performCleanup(), which calls glFinish
+    if (_rendererFrontend)
+    {
+        _rendererFrontend->reduceMemoryUse();
+    }
+}
+
+- (void)didEnterBackground:(NSNotification *)notification
+{
+    [self sleepGL:notification];
+}
+
+- (void)willEnterForeground:(NSNotification *)notification
+{
+    // Do nothing, currently if wakeGL is called here it's a no-op.
+}
+
+- (void)didBecomeActive:(NSNotification *)notification
+{
+    [self wakeGL:notification];
+    self.lastSnapshotImage = nil;
+}
+
+#pragma mark - GL / display link wake/sleep
+
+- (BOOL)supportsBackgroundRendering
+{
+    // If this view targets an external display, such as AirPlay or CarPlay, we
+    // can safely continue to render OpenGL content without tripping
+    // gpus_ReturnNotPermittedKillClient in libGPUSupportMercury, because the
+    // external connection keeps the application from truly receding to the
+    // background.
+    return (self.window.screen != [UIScreen mainScreen]);
+}
+
+
+
 - (void)sleepGL:(__unused NSNotification *)notification
 {
     // If this view targets an external display, such as AirPlay or CarPlay, we
@@ -1472,7 +1533,7 @@ public:
     // gpus_ReturnNotPermittedKillClient in libGPUSupportMercury, because the
     // external connection keeps the application from truly receding to the
     // background.
-    if (self.window.screen != [UIScreen mainScreen])
+    if ([self supportsBackgroundRendering])
     {
         return;
     }
@@ -1485,7 +1546,10 @@ public:
     // Compromise position: release everything but currently rendering tiles
     // A possible improvement would be to store a copy of the GL buffers that we could use to rapidly
     // restart, but that we could also discard in response to a memory warning.
-    _rendererFrontend->reduceMemoryUse();
+    if (_rendererFrontend)
+    {
+        _rendererFrontend->reduceMemoryUse();
+    }
 
     if ( ! self.dormant)
     {
@@ -1505,7 +1569,7 @@ public:
             [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
         }
 
-        self.glSnapshotView.image = self.glView.snapshot;
+        self.glSnapshotView.image = self.lastSnapshotImage;
         self.glSnapshotView.hidden = NO;
 
         if (self.debugMask && [self.glSnapshotView.subviews count] == 0)

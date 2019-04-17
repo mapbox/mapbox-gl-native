@@ -356,6 +356,9 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             doc += '* Constant array, whose each element is any of the following constant string values:\n';
             doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
         }
+        if (property.type === 'formatted') {
+            doc += '* Formatted expressions.\n';
+        }
         doc += '* Predefined functions, including mathematical and string operators\n' +
             '* Conditional expressions\n' +
             '* Variable assignments and references to assigned variables\n';

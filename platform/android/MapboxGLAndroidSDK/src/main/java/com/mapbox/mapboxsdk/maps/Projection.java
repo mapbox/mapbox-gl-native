@@ -21,12 +21,14 @@ import java.util.List;
 public class Projection {
 
   @NonNull
-  private final NativeMapView nativeMapView;
-  private int[] contentPadding;
+  private final NativeMap nativeMapView;
+  @NonNull
+  private final MapView mapView;
+  private int[] contentPadding = new int[] {0, 0, 0, 0};
 
-  Projection(@NonNull NativeMapView nativeMapView) {
+  Projection(@NonNull NativeMap nativeMapView, @NonNull MapView mapView) {
     this.nativeMapView = nativeMapView;
-    this.contentPadding = new int[] {0, 0, 0, 0};
+    this.mapView = mapView;
   }
 
   void setContentPadding(int[] contentPadding) {
@@ -120,14 +122,14 @@ public class Projection {
 
     if (ignorePadding) {
       left = 0;
-      right = nativeMapView.getWidth();
+      right = mapView.getWidth();
       top = 0;
-      bottom = nativeMapView.getHeight();
+      bottom = mapView.getHeight();
     } else {
       left = (float) contentPadding[0];
-      right = (float) (nativeMapView.getWidth() - contentPadding[2]);
+      right = (float) (mapView.getWidth() - contentPadding[2]);
       top = (float) contentPadding[1];
-      bottom = (float) (nativeMapView.getHeight() - contentPadding[3]);
+      bottom = (float) (mapView.getHeight() - contentPadding[3]);
     }
 
     LatLng center = fromScreenLocation(new PointF(left + (right - left) / 2, top + (bottom - top) / 2));
@@ -258,11 +260,11 @@ public class Projection {
   }
 
   float getHeight() {
-    return nativeMapView.getHeight();
+    return mapView.getHeight();
   }
 
   float getWidth() {
-    return nativeMapView.getWidth();
+    return mapView.getWidth();
   }
 
   /**
