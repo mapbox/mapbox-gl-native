@@ -51,6 +51,7 @@ function getPriorSize() {
             console.log('No matching check found.');
             return Promise.resolve(null);
         }
+        console.log(`RUN: ${run.output.summary}`)
         return +run.output.summary.match(/`.*` is (\d+) bytes/)[1];
     });
 }
@@ -61,6 +62,8 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
         getPriorSize().then(prior => {
             const title = (() => {
                 if (prior) {
+                    console.log("change = size - prior");
+                    console.log(`${change} = ${size} - ${prior}`)
                     const change = size - prior;
                     const percent = (change / prior) * 100;
                     return `${change >= 0 ? '+' : ''}${prettyBytes(change)} ${percent.toFixed(3)}% (${prettyBytes(size)})`;
