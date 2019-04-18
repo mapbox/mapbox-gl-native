@@ -32,10 +32,6 @@ public class OfflineDownloadStartEvent extends MapBaseEvent {
     return EVENT_NAME;
   }
 
-  String getCreated() {
-    return created;
-  }
-
   Double getMinZoom() {
     return minZoom;
   }
@@ -67,9 +63,6 @@ public class OfflineDownloadStartEvent extends MapBaseEvent {
 
     OfflineDownloadStartEvent that = (OfflineDownloadStartEvent) o;
 
-    if (created != null ? !created.equals(that.created) : that.created != null) {
-      return false;
-    }
     if (minZoom != null ? !minZoom.equals(that.minZoom) : that.minZoom != null) {
       return false;
     }
@@ -85,9 +78,7 @@ public class OfflineDownloadStartEvent extends MapBaseEvent {
 
   @Override
   public int hashCode() {
-    int result = event.hashCode();
-    result = 31 * result + (created != null ? created.hashCode() : 0);
-    result = 31 * result + (minZoom != null ? minZoom.hashCode() : 0);
+    int result = minZoom != null ? minZoom.hashCode() : 0;
     result = 31 * result + (maxZoom != null ? maxZoom.hashCode() : 0);
     result = 31 * result + (shapeForOfflineRegion != null ? shapeForOfflineRegion.hashCode() : 0);
     result = 31 * result + (styleURL != null ? styleURL.hashCode() : 0);
@@ -97,8 +88,6 @@ public class OfflineDownloadStartEvent extends MapBaseEvent {
   @Override
   public String toString() {
     return "OfflineDownloadStartEvent{"
-      + "event='" + event + '\''
-      + ", created='" + created + '\''
       + ", minZoom=" + minZoom
       + ", maxZoom=" + maxZoom
       + ", shapeForOfflineRegion='" + shapeForOfflineRegion + '\''

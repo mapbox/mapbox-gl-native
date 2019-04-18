@@ -59,10 +59,6 @@ class MapLoadEvent extends MapBaseEvent {
     return model;
   }
 
-  String getCreated() {
-    return created;
-  }
-
   String getUserId() {
     return userId;
   }
@@ -131,9 +127,6 @@ class MapLoadEvent extends MapBaseEvent {
     if (model != null ? !model.equals(that.model) : that.model != null) {
       return false;
     }
-    if (created != null ? !created.equals(that.created) : that.created != null) {
-      return false;
-    }
     if (userId != null ? !userId.equals(that.userId) : that.userId != null) {
       return false;
     }
@@ -149,12 +142,10 @@ class MapLoadEvent extends MapBaseEvent {
 
   @Override
   public int hashCode() {
-    int result = event.hashCode();
-    result = 31 * result + operatingSystem.hashCode();
+    int result = operatingSystem != null ? operatingSystem.hashCode() : 0;
     result = 31 * result + sdkIdentifier.hashCode();
     result = 31 * result + sdkVersion.hashCode();
     result = 31 * result + (model != null ? model.hashCode() : 0);
-    result = 31 * result + (created != null ? created.hashCode() : 0);
     result = 31 * result + (userId != null ? userId.hashCode() : 0);
     result = 31 * result + (carrier != null ? carrier.hashCode() : 0);
     result = 31 * result + (cellularNetworkType != null ? cellularNetworkType.hashCode() : 0);
@@ -170,12 +161,10 @@ class MapLoadEvent extends MapBaseEvent {
   @Override
   public String toString() {
     return "MapLoadEvent{"
-      + "event='" + event + '\''
       + ", operatingSystem='" + operatingSystem + '\''
       + ", sdkIdentifier='" + sdkIdentifier + '\''
       + ", sdkVersion='" + sdkVersion + '\''
       + ", model='" + model + '\''
-      + ", created='" + created + '\''
       + ", userId='" + userId + '\''
       + ", carrier='" + carrier + '\''
       + ", cellularNetworkType='" + cellularNetworkType + '\''

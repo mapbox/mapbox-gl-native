@@ -36,10 +36,6 @@ class MapDragendEvent extends MapBaseEvent {
     return EVENT_NAME;
   }
 
-  String getCreated() {
-    return created;
-  }
-
   String getOrientation() {
     return orientation;
   }
@@ -105,9 +101,6 @@ class MapDragendEvent extends MapBaseEvent {
     if (wifi != that.wifi) {
       return false;
     }
-    if (created != null ? !created.equals(that.created) : that.created != null) {
-      return false;
-    }
     if (orientation != null ? !orientation.equals(that.orientation) : that.orientation != null) {
       return false;
     }
@@ -122,9 +115,7 @@ class MapDragendEvent extends MapBaseEvent {
   public int hashCode() {
     int result;
     long temp;
-    result = event.hashCode();
-    result = 31 * result + (created != null ? created.hashCode() : 0);
-    result = 31 * result + (orientation != null ? orientation.hashCode() : 0);
+    result = orientation != null ? orientation.hashCode() : 0;
     result = 31 * result + (carrier != null ? carrier.hashCode() : 0);
     result = 31 * result + (cellularNetworkType != null ? cellularNetworkType.hashCode() : 0);
     result = 31 * result + batteryLevel;
@@ -142,8 +133,6 @@ class MapDragendEvent extends MapBaseEvent {
   @Override
   public String toString() {
     return "MapDragendEvent{"
-      + "event='" + event + '\''
-      + ", created='" + created + '\''
       + ", orientation='" + orientation + '\''
       + ", carrier='" + carrier + '\''
       + ", cellularNetworkType='" + cellularNetworkType + '\''

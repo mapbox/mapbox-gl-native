@@ -10,15 +10,23 @@ import com.mapbox.android.telemetry.Event;
  */
 @SuppressLint("ParcelCreator")
 public abstract class MapBaseEvent extends Event {
-  final String event;
-  final String created;
+  private final String event;
+  private final String created;
 
   MapBaseEvent(PhoneState phoneState) {
-    event = getEventName();
+    this.event = getEventName();
     this.created = phoneState.getCreated();
   }
 
   abstract String getEventName();
+
+  public String getEvent() {
+    return event;
+  }
+
+  public String getCreated() {
+    return created;
+  }
 
   @Override
   public int describeContents() {
