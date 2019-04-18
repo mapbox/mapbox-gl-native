@@ -3,9 +3,10 @@ package com.mapbox.mapboxsdk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 
-import com.mapbox.core.utils.TextUtils;
+import com.mapbox.android.accounts.v1.MapboxAccounts;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 /**
@@ -89,11 +90,11 @@ class AccountsManager {
 
   @NonNull
   private String generateUserId() {
-    return "placeholder"; // TODO
+    return MapboxAccounts.obtainEndUserId();
   }
 
   @NonNull
   private String generateSkuToken(String userId) {
-    return "placeholder"; // TODO
+    return MapboxAccounts.obtainMapsSkuUserToken(userId);
   }
 }
