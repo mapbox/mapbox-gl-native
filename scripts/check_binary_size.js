@@ -46,6 +46,7 @@ function getPriorSize() {
         repo: 'mapbox-gl-native',
         ref: mergeBase
     }).then(({data}) => {
+        console.log(JSON.stringify(data));
         const run = data.check_runs.find(run => run.name === name);
         if (!run) {
             console.log('No matching check found.');
