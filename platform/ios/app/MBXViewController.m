@@ -294,7 +294,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         }
     }
     [self.mapView addGestureRecognizer:singleTap];
-    
+    [self.mapView removeAnnotations:self.mapView.annotations];
     // Display a secondary map on any connected external display.
     // https://developer.apple.com/documentation/uikit/windows_and_screens/displaying_content_on_a_connected_screen?language=objc
     self.helperWindows = [NSMutableArray array];
