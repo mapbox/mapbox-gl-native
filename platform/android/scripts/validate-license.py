@@ -10,7 +10,7 @@ call('cd ../../ && make android-license', shell=True)
 ## Git diff changes
 p = Popen(['git', 'diff', '--name-only', 'LICENSE.md'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 output, err = p.communicate(b"input data that is passed to subprocess' stdin")
-if "platform/android/LICENSE.md" in output:
+if b"platform/android/LICENSE.md" in output:
    raise ValueError("""An error ocurred while validating the license generation. 
             Changes were detected to the license generation output 
             but weren't commited. Run make android-license and 
