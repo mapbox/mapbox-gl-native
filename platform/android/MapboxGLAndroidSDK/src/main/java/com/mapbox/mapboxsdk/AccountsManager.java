@@ -10,9 +10,21 @@ import com.mapbox.android.accounts.v1.MapboxAccounts;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 /**
- * This class wraps the functionality provided by MapboxAccounts and manages its state
- * using Android's SharedPreferences for storage. This class is meant for internal SDK
- * usage only.
+ * REMOVAL OR MODIFICATION OF THE FOLLOWING CODE VIOLATES THE MAPBOX TERMS
+ * OF SERVICE
+ *
+ * The following code is used to access Mapbox's Mapping APIs.
+ *
+ * Removal or modification of this code when used with Mapbox's Mapping APIs
+ * can result in termination of your agreement and/or your account with
+ * Mapbox.
+ *
+ * Using this code to access Mapbox Mapping APIs from outside the Mapbox Maps
+ * SDK also violates the Mapbox Terms of Service. On Android, Mapping APIs
+ * should be accessed using the methods documented at
+ * https://www.mapbox.com/android.
+ *
+ * You can access the Mapbox Terms of Service at https://www.mapbox.com/tos/
  */
 class AccountsManager {
   private static final String PREFERENCE_USER_ID = "com.mapbox.mapboxsdk.accounts.userid";
