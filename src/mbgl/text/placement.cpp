@@ -77,9 +77,7 @@ void Placement::placeLayer(const RenderLayerSymbolInterface& symbolInterface, co
     std::unordered_set<uint32_t> seenCrossTileIDs;
 
     for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
-        if (!renderTile.tile.isRenderable()) {
-            continue;
-        }
+        assert(renderTile.tile.isRenderable());
         assert(renderTile.tile.kind == Tile::Kind::Geometry);
         auto& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
 
@@ -186,162 +184,175 @@ void Placement::placeLayerBucket(
     std::vector<style::TextVariableAnchorType> variableTextAnchors = bucket.layout.get<style::TextVariableAnchor>();
     const bool rotateWithMap = bucket.layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
     const bool pitchWithMap = bucket.layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
-    
-    for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
 
-        if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
-            if (holdingForFade) {
-                // Mark all symbols from this tile as "not placed", but don't add to seenCrossTileIDs, because we don't
-                // know yet if we have a duplicate in a parent tile that _should_ be placed.
-                placements.emplace(symbolInstance.crossTileID, JointPlacement(false, false, false));
-                continue;
-            }
+    const bool zOrderByViewportY = bucket.layout.get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY;
 
-            bool placeText = false;
-            bool placeIcon = false;
-            bool offscreen = true;
-            optional<size_t> horizontalTextIndex = symbolInstance.getDefaultHorizontalPlacedTextIndex();
-            if (horizontalTextIndex) {
-                CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
-                PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*horizontalTextIndex);
-                const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
-                if (variableTextAnchors.empty()) {
-                    auto placed = collisionIndex.placeFeature(textCollisionFeature, {},
-                            posMatrix, textLabelPlaneMatrix, textPixelRatio,
-                            placedSymbol, scale, fontSize,
-                            bucket.layout.get<style::TextAllowOverlap>(),
-                            pitchWithMap,
-                            showCollisionBoxes, avoidEdges, collisionGroup.second);
-                    placeText = placed.first;
-                    offscreen &= placed.second;
-                } else if (!textCollisionFeature.alongLine && !textCollisionFeature.boxes.empty()) {
-                    const CollisionBox& textBox = symbolInstance.textCollisionFeature.boxes[0];
-                    const float width = textBox.x2 - textBox.x1;
-                    const float height = textBox.y2 - textBox.y1;
-                    const float textBoxScale = symbolInstance.textBoxScale;
+    auto placeSymbol = [&] (SymbolInstance& symbolInstance) {
+        if (seenCrossTileIDs.count(symbolInstance.crossTileID) != 0u) return;
 
-                    // If this symbol was in the last placement, shift the previously used
-                    // anchor to the front of the anchor list.
-                    if (prevPlacement) {
-                        auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                        if (prevOffset != prevPlacement->variableOffsets.end() &&
-                            variableTextAnchors.front() != prevOffset->second.anchor) {
-                            std::vector<style::TextVariableAnchorType> filtered;
-                            filtered.reserve(variableTextAnchors.size());
-                            filtered.push_back(prevOffset->second.anchor);
-                            for (auto anchor : variableTextAnchors) {
-                                if (anchor != prevOffset->second.anchor) {
-                                    filtered.push_back(anchor);
-                                }
+        if (holdingForFade) {
+            // Mark all symbols from this tile as "not placed", but don't add to seenCrossTileIDs, because we don't
+            // know yet if we have a duplicate in a parent tile that _should_ be placed.
+            placements.emplace(symbolInstance.crossTileID, JointPlacement(false, false, false));
+            return;
+        }
+
+        bool placeText = false;
+        bool placeIcon = false;
+        bool offscreen = true;
+        optional<size_t> horizontalTextIndex = symbolInstance.getDefaultHorizontalPlacedTextIndex();
+        if (horizontalTextIndex) {
+            CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
+            PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*horizontalTextIndex);
+            const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
+            if (variableTextAnchors.empty()) {
+                auto placed = collisionIndex.placeFeature(textCollisionFeature, {},
+                        posMatrix, textLabelPlaneMatrix, textPixelRatio,
+                        placedSymbol, scale, fontSize,
+                        bucket.layout.get<style::TextAllowOverlap>(),
+                        pitchWithMap,
+                        showCollisionBoxes, avoidEdges, collisionGroup.second);
+                placeText = placed.first;
+                offscreen &= placed.second;
+            } else if (!textCollisionFeature.alongLine && !textCollisionFeature.boxes.empty()) {
+                const CollisionBox& textBox = symbolInstance.textCollisionFeature.boxes[0];
+                const float width = textBox.x2 - textBox.x1;
+                const float height = textBox.y2 - textBox.y1;
+                const float textBoxScale = symbolInstance.textBoxScale;
+
+                // If this symbol was in the last placement, shift the previously used
+                // anchor to the front of the anchor list.
+                if (prevPlacement) {
+                    auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
+                    if (prevOffset != prevPlacement->variableOffsets.end() &&
+                        variableTextAnchors.front() != prevOffset->second.anchor) {
+                        std::vector<style::TextVariableAnchorType> filtered;
+                        filtered.reserve(variableTextAnchors.size());
+                        filtered.push_back(prevOffset->second.anchor);
+                        for (auto anchor : variableTextAnchors) {
+                            if (anchor != prevOffset->second.anchor) {
+                                filtered.push_back(anchor);
                             }
-                            variableTextAnchors = std::move(filtered);
                         }
+                        variableTextAnchors = std::move(filtered);
+                    }
+                }
+
+                for (auto anchor : variableTextAnchors) {
+                    Point<float> shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.radialTextOffset, textBoxScale);
+                    if (rotateWithMap) {            
+                        float angle = pitchWithMap ? state.getBearing() : -state.getBearing();
+                        shift = util::rotate(shift, angle);
                     }
 
-                    for (auto anchor : variableTextAnchors) {
-                        Point<float> shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.radialTextOffset, textBoxScale);
-                        if (rotateWithMap) {            
-                            float angle = pitchWithMap ? state.getBearing() : -state.getBearing();
-                            shift = util::rotate(shift, angle);
-                        }
+                    auto placed = collisionIndex.placeFeature(textCollisionFeature, shift,
+                                                                posMatrix, mat4(), textPixelRatio,
+                                                                placedSymbol, scale, fontSize,
+                                                                bucket.layout.get<style::TextAllowOverlap>(),
+                                                                pitchWithMap,
+                                                                showCollisionBoxes, avoidEdges, collisionGroup.second);
 
-                        auto placed = collisionIndex.placeFeature(textCollisionFeature, shift,
-                                                                  posMatrix, mat4(), textPixelRatio,
-                                                                  placedSymbol, scale, fontSize,
-                                                                  bucket.layout.get<style::TextAllowOverlap>(),
-                                                                  pitchWithMap,
-                                                                  showCollisionBoxes, avoidEdges, collisionGroup.second);
+                    if (placed.first) {
+                        assert(symbolInstance.crossTileID != 0u);
+                        optional<style::TextVariableAnchorType> prevAnchor;
 
-                        if (placed.first) {
-                            assert(symbolInstance.crossTileID != 0u);
-                            optional<style::TextVariableAnchorType> prevAnchor;
-
-                            // If this label was placed in the previous placement, record the anchor position
-                            // to allow us to animate the transition
-                            if (prevPlacement) {
-                                auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                                auto prevPlacements = prevPlacement->placements.find(symbolInstance.crossTileID);
-                                if (prevOffset != prevPlacement->variableOffsets.end() &&
-                                    prevPlacements != prevPlacement->placements.end() &&
-                                    prevPlacements->second.text) {
-                                    prevAnchor = prevOffset->second.anchor;
-                                }
+                        // If this label was placed in the previous placement, record the anchor position
+                        // to allow us to animate the transition
+                        if (prevPlacement) {
+                            auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
+                            auto prevPlacements = prevPlacement->placements.find(symbolInstance.crossTileID);
+                            if (prevOffset != prevPlacement->variableOffsets.end() &&
+                                prevPlacements != prevPlacement->placements.end() &&
+                                prevPlacements->second.text) {
+                                prevAnchor = prevOffset->second.anchor;
                             }
-
-                            variableOffsets.insert(std::make_pair(symbolInstance.crossTileID, VariableOffset{
-                                symbolInstance.radialTextOffset,
-                                width,
-                                height,
-                                anchor,
-                                textBoxScale,
-                                prevAnchor
-                            }));
-                            markUsedJustification(bucket, anchor, symbolInstance);
-
-                            placeText = placed.first;
-                            offscreen &= placed.second;
-                            break;
                         }
+
+                        variableOffsets.insert(std::make_pair(symbolInstance.crossTileID, VariableOffset{
+                            symbolInstance.radialTextOffset,
+                            width,
+                            height,
+                            anchor,
+                            textBoxScale,
+                            prevAnchor
+                        }));
+                        markUsedJustification(bucket, anchor, symbolInstance);
+
+                        placeText = placed.first;
+                        offscreen &= placed.second;
+                        break;
                     }
+                }
 
-                    // If we didn't get placed, we still need to copy our position from the last placement for
-                    // fade animations
-                    if (prevPlacement && variableOffsets.find(symbolInstance.crossTileID) == variableOffsets.end()) {
-                        auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                        if (prevOffset != prevPlacement->variableOffsets.end()) {
-                            variableOffsets[symbolInstance.crossTileID] = prevOffset->second;
-                            markUsedJustification(bucket, prevOffset->second.anchor, symbolInstance);
-                        }
+                // If we didn't get placed, we still need to copy our position from the last placement for
+                // fade animations
+                if (prevPlacement && variableOffsets.find(symbolInstance.crossTileID) == variableOffsets.end()) {
+                    auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
+                    if (prevOffset != prevPlacement->variableOffsets.end()) {
+                        variableOffsets[symbolInstance.crossTileID] = prevOffset->second;
+                        markUsedJustification(bucket, prevOffset->second.anchor, symbolInstance);
                     }
                 }
             }
-
-            if (symbolInstance.placedIconIndex) {
-                PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
-                const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
-
-                auto placed = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature, {},
-                        posMatrix, iconLabelPlaneMatrix, textPixelRatio,
-                        placedSymbol, scale, fontSize,
-                        bucket.layout.get<style::IconAllowOverlap>(),
-                        pitchWithMap,
-                        showCollisionBoxes, avoidEdges, collisionGroup.second);
-                placeIcon = placed.first;
-                offscreen &= placed.second;
-            }
-
-            const bool iconWithoutText = !symbolInstance.hasText || bucket.layout.get<style::TextOptional>();
-            const bool textWithoutIcon = !symbolInstance.hasIcon || bucket.layout.get<style::IconOptional>();
-
-            // combine placements for icon and text
-            if (!iconWithoutText && !textWithoutIcon) {
-                placeText = placeIcon = placeText && placeIcon;
-            } else if (!textWithoutIcon) {
-                placeText = placeText && placeIcon;
-            } else if (!iconWithoutText) {
-                placeIcon = placeText && placeIcon;
-            }
-
-            if (placeText) {
-                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
-            }
-
-            if (placeIcon) {
-                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
-            }
-
-            assert(symbolInstance.crossTileID != 0);
-
-            if (placements.find(symbolInstance.crossTileID) != placements.end()) {
-                // If there's a previous placement with this ID, it comes from a tile that's fading out
-                // Erase it so that the placement result from the non-fading tile supersedes it
-                placements.erase(symbolInstance.crossTileID);
-            }
-            
-            placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText || alwaysShowText, placeIcon || alwaysShowIcon, offscreen || bucket.justReloaded));
-            seenCrossTileIDs.insert(symbolInstance.crossTileID);
         }
-    } 
+
+        if (symbolInstance.placedIconIndex) {
+            PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
+            const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
+
+            auto placed = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature, {},
+                    posMatrix, iconLabelPlaneMatrix, textPixelRatio,
+                    placedSymbol, scale, fontSize,
+                    bucket.layout.get<style::IconAllowOverlap>(),
+                    pitchWithMap,
+                    showCollisionBoxes, avoidEdges, collisionGroup.second);
+            placeIcon = placed.first;
+            offscreen &= placed.second;
+        }
+
+        const bool iconWithoutText = !symbolInstance.hasText || bucket.layout.get<style::TextOptional>();
+        const bool textWithoutIcon = !symbolInstance.hasIcon || bucket.layout.get<style::IconOptional>();
+
+        // combine placements for icon and text
+        if (!iconWithoutText && !textWithoutIcon) {
+            placeText = placeIcon = placeText && placeIcon;
+        } else if (!textWithoutIcon) {
+            placeText = placeText && placeIcon;
+        } else if (!iconWithoutText) {
+            placeIcon = placeText && placeIcon;
+        }
+
+        if (placeText) {
+            collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
+        }
+
+        if (placeIcon) {
+            collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
+        }
+
+        assert(symbolInstance.crossTileID != 0);
+
+        if (placements.find(symbolInstance.crossTileID) != placements.end()) {
+            // If there's a previous placement with this ID, it comes from a tile that's fading out
+            // Erase it so that the placement result from the non-fading tile supersedes it
+            placements.erase(symbolInstance.crossTileID);
+        }
+        
+        placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText || alwaysShowText, placeIcon || alwaysShowIcon, offscreen || bucket.justReloaded));
+        seenCrossTileIDs.insert(symbolInstance.crossTileID);
+    };
+
+    if (zOrderByViewportY) {
+        const auto& sortedSymbols = bucket.getSortedSymbols(state.getBearing());
+        // Place in the reverse order than draw i.e., starting from the foreground elements.
+        for (auto it = sortedSymbols.rbegin(); it != sortedSymbols.rend(); ++it) {
+            placeSymbol(*it);
+        }
+    } else {
+        for (SymbolInstance& symbol : bucket.symbolInstances) {
+            placeSymbol(symbol);
+        }
+    }
 
     bucket.justReloaded = false;
 }
@@ -398,9 +409,7 @@ void Placement::commit(TimePoint now) {
 void Placement::updateLayerOpacities(const RenderLayerSymbolInterface& symbolInterface) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
-        if (!renderTile.tile.isRenderable()) {
-            continue;
-        }
+        assert(renderTile.tile.isRenderable());
 
         auto bucket = symbolInterface.getSymbolBucket(renderTile);
         if (!bucket) {

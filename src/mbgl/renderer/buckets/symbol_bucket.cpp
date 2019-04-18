@@ -182,38 +182,16 @@ void SymbolBucket::sortFeatures(const float angle) {
     sortUploaded = false;
     uploaded = false;
 
-    // If the symbols are allowed to overlap sort them by their vertical screen position.
-    // The index array buffer is rewritten to reference the (unchanged) vertices in the
-    // sorted order.
-
-    // To avoid sorting the actual symbolInstance array we sort an array of indexes.
-    std::vector<size_t> symbolInstanceIndexes;
-    symbolInstanceIndexes.reserve(symbolInstances.size());
-    for (size_t i = 0; i < symbolInstances.size(); i++) {
-        symbolInstanceIndexes.push_back(i);
-    }
-
-    const float sin = std::sin(angle);
-    const float cos = std::cos(angle);
-
-    std::sort(symbolInstanceIndexes.begin(), symbolInstanceIndexes.end(), [sin, cos, this](size_t &aIndex, size_t &bIndex) {
-        const SymbolInstance& a = symbolInstances[aIndex];
-        const SymbolInstance& b = symbolInstances[bIndex];
-        const auto aRotated = static_cast<int32_t>(::lround(sin * a.anchor.point.x + cos * a.anchor.point.y));
-        const auto bRotated = static_cast<int32_t>(::lround(sin * b.anchor.point.x + cos * b.anchor.point.y));
-        return aRotated != bRotated ?
-            aRotated < bRotated :
-            a.dataFeatureIndex > b.dataFeatureIndex;
-    });
-
     text.triangles.clear();
     icon.triangles.clear();
 
     featureSortOrder = std::make_unique<std::vector<size_t>>();
-    featureSortOrder->reserve(symbolInstanceIndexes.size());
+    featureSortOrder->reserve(symbolInstances.size());
 
-    for (auto i : symbolInstanceIndexes) {
-        const SymbolInstance& symbolInstance = symbolInstances[i];
+    // If the symbols are allowed to overlap sort them by their vertical screen position.
+    // The index array buffer is rewritten to reference the (unchanged) vertices in the
+    // sorted order.
+    for (const SymbolInstance& symbolInstance : getSortedSymbols(angle)) {
         featureSortOrder->push_back(symbolInstance.dataFeatureIndex);
 
         if (symbolInstance.placedRightTextIndex) {
@@ -236,6 +214,23 @@ void SymbolBucket::sortFeatures(const float angle) {
             addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
         }
     }
+}
+
+std::vector<std::reference_wrapper<SymbolInstance>> SymbolBucket::getSortedSymbols(const float angle) {
+    std::vector<std::reference_wrapper<SymbolInstance>> result(symbolInstances.begin(), symbolInstances.end());
+    const float sin = std::sin(angle);
+    const float cos = std::cos(angle);
+
+    std::sort(result.begin(), result.end(), [sin, cos](const SymbolInstance& a, const SymbolInstance& b) {
+        const auto aRotated = ::lround(sin * a.anchor.point.x + cos * a.anchor.point.y);
+        const auto bRotated = ::lround(sin * b.anchor.point.x + cos * b.anchor.point.y);
+        if (aRotated != bRotated) {
+            return aRotated < bRotated;
+        }
+        return a.dataFeatureIndex > b.dataFeatureIndex;  // aRotated == bRotated
+    });
+
+    return result;
 }
 
 bool SymbolBucket::hasFormatSectionOverrides() const {

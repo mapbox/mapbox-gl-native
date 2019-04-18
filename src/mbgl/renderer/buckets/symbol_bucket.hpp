@@ -65,6 +65,8 @@ public:
 
     void updateOpacity();
     void sortFeatures(const float angle);
+    // The result contains references to the `symbolInstances` items, sorted by viewport Y.
+    std::vector<std::reference_wrapper<SymbolInstance>> getSortedSymbols(const float angle);
 
     const style::SymbolLayoutProperties::PossiblyEvaluated layout;
     const bool sdfIcons;
