@@ -13,6 +13,11 @@ public class MapboxConstants {
   public static final Locale MAPBOX_LOCALE = Locale.US;
 
   /**
+   * The name of the desired preferences file for Android's SharedPreferences.
+   */
+  public static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
+
+  /**
    * Key used to switch storage to external in AndroidManifest.xml
    */
   public static final String KEY_META_DATA_SET_STORAGE_EXTERNAL = "com.mapbox.SetStorageExternal";
