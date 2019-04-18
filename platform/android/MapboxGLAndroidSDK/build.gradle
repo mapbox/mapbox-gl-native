@@ -17,6 +17,7 @@ dependencies {
     testImplementation dependenciesList.mockk
     testImplementation dependenciesList.robolectric
     testImplementation dependenciesList.kotlinLib
+    testImplementation dependenciesList.commonsIO
 }
 
 android {

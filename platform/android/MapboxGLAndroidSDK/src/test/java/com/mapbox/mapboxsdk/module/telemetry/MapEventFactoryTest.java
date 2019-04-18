@@ -56,8 +56,8 @@ public class MapEventFactoryTest {
   public void testClickEvent() {
     mapState.setGesture(TelemetryConstants.DOUBLE_TAP);
     MapClickEvent mapClickEvent = MapEventFactory.buildMapClickEvent(phoneState, mapState);
-    assertEquals(LATITUDE, mapClickEvent.getLatitude(), 0);
-    assertEquals(LONGITUDE, mapClickEvent.getLongitude(), 0);
+    assertEquals(LATITUDE, mapClickEvent.getLat(), 0);
+    assertEquals(LONGITUDE, mapClickEvent.getLng(), 0);
     assertEquals(ZOOM, mapClickEvent.getZoom(), 0);
     assertEquals(BATTERY_LEVEL, mapClickEvent.getBatteryLevel());
     assertEquals(CARRIER, mapClickEvent.getCarrier());

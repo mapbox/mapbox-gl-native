@@ -13,8 +13,8 @@ class MapClickEvent extends MapBaseEvent {
   private final String cellularNetworkType;
   private final String carrier;
   private final String orientation;
-  private final double latitude;
-  private final double longitude;
+  private final double lat;
+  private final double lng;
   private final double zoom;
   private final int batteryLevel;
   private final boolean pluggedIn;
@@ -23,8 +23,8 @@ class MapClickEvent extends MapBaseEvent {
   MapClickEvent(PhoneState phoneState, MapState mapState) {
     super(phoneState);
     this.gesture = mapState.getGesture();
-    this.latitude = mapState.getLatitude();
-    this.longitude = mapState.getLongitude();
+    this.lat = mapState.getLatitude();
+    this.lng = mapState.getLongitude();
     this.zoom = mapState.getZoom();
     this.batteryLevel = phoneState.getBatteryLevel();
     this.pluggedIn = phoneState.isPluggedIn();
@@ -37,10 +37,6 @@ class MapClickEvent extends MapBaseEvent {
   @Override
   String getEventName() {
     return EVENT_NAME;
-  }
-
-  String getCreated() {
-    return created;
   }
 
   String getGesture() {
@@ -59,12 +55,12 @@ class MapClickEvent extends MapBaseEvent {
     return orientation;
   }
 
-  double getLatitude() {
-    return latitude;
+  double getLat() {
+    return lat;
   }
 
-  double getLongitude() {
-    return longitude;
+  double getLng() {
+    return lng;
   }
 
   double getZoom() {
@@ -94,10 +90,10 @@ class MapClickEvent extends MapBaseEvent {
 
     MapClickEvent that = (MapClickEvent) o;
 
-    if (Double.compare(that.latitude, latitude) != 0) {
+    if (Double.compare(that.lat, lat) != 0) {
       return false;
     }
-    if (Double.compare(that.longitude, longitude) != 0) {
+    if (Double.compare(that.lng, lng) != 0) {
       return false;
     }
     if (Double.compare(that.zoom, zoom) != 0) {
@@ -110,9 +106,6 @@ class MapClickEvent extends MapBaseEvent {
       return false;
     }
     if (wifi != that.wifi) {
-      return false;
-    }
-    if (created != null ? !created.equals(that.created) : that.created != null) {
       return false;
     }
     if (gesture != null ? !gesture.equals(that.gesture) : that.gesture != null) {
@@ -132,15 +125,13 @@ class MapClickEvent extends MapBaseEvent {
   public int hashCode() {
     int result;
     long temp;
-    result = event.hashCode();
-    result = 31 * result + (created != null ? created.hashCode() : 0);
-    result = 31 * result + (gesture != null ? gesture.hashCode() : 0);
+    result = gesture != null ? gesture.hashCode() : 0;
     result = 31 * result + (cellularNetworkType != null ? cellularNetworkType.hashCode() : 0);
     result = 31 * result + (carrier != null ? carrier.hashCode() : 0);
     result = 31 * result + (orientation != null ? orientation.hashCode() : 0);
-    temp = Double.doubleToLongBits(latitude);
+    temp = Double.doubleToLongBits(lat);
     result = 31 * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(longitude);
+    temp = Double.doubleToLongBits(lng);
     result = 31 * result + (int) (temp ^ (temp >>> 32));
     temp = Double.doubleToLongBits(zoom);
     result = 31 * result + (int) (temp ^ (temp >>> 32));
@@ -153,14 +144,12 @@ class MapClickEvent extends MapBaseEvent {
   @Override
   public String toString() {
     return "MapClickEvent{"
-      + "event='" + event + '\''
-      + ", created='" + created + '\''
       + ", gesture='" + gesture + '\''
       + ", cellularNetworkType='" + cellularNetworkType + '\''
       + ", carrier='" + carrier + '\''
       + ", orientation='" + orientation + '\''
-      + ", latitude=" + latitude
-      + ", longitude=" + longitude
+      + ", lat=" + lat
+      + ", lng=" + lng
       + ", zoom=" + zoom
       + ", batteryLevel=" + batteryLevel
       + ", pluggedIn=" + pluggedIn
