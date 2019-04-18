@@ -71,6 +71,12 @@ License: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ===========================================================================
 
+Mapbox GL uses portions of the Mapbox Accounts SDK for Android.  
+URL: [https://github.com/mapbox/mapbox-accounts-android](https://github.com/mapbox/mapbox-accounts-android)  
+License: [Mapbox Terms of Service](https://www.mapbox.com/tos/)
+
+===========================================================================
+
 Mapbox GL uses portions of the Mapbox Android Core Library.  
 URL: [https://github.com/mapbox/mapbox-events-android](https://github.com/mapbox/mapbox-events-android)  
 License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
