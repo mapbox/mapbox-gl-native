@@ -985,6 +985,12 @@
         <!-- <meta-data -->
         <!-- android:name="com.mapbox.SetStorageExternal" -->
         <!-- android:value="true" /> -->
+
+         <!-- Set value to true to have tile loading measurements on -->
+         <meta-data
+         android:name="com.mapbox.MeasureTileDownloadOn"
+         android:value="false" />
+
     </application>
 
 </manifest>

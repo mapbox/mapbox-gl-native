@@ -8,9 +8,11 @@ import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
+import com.mapbox.mapboxsdk.testapp.utils.TileLoadingMeasurementUtils;
 import com.mapbox.mapboxsdk.testapp.utils.TimberLogger;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
+
 import timber.log.Timber;
 
 import static timber.log.Timber.DebugTree;
@@ -80,6 +82,7 @@ public class MapboxApplication extends Application {
       throw new IllegalStateException("Telemetry was unavailable during test application start.");
     }
     telemetry.setDebugLoggingEnabled(true);
+    TileLoadingMeasurementUtils.setUpTileLoadingMeasurement();
 
     MapStrictMode.setStrictModeEnabled(true);
   }

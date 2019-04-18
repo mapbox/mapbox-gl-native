@@ -23,6 +23,16 @@ public class MapboxConstants {
   public static final boolean DEFAULT_SET_STORAGE_EXTERNAL = false;
 
   /**
+   * Key used to switch Tile Download Measuring on/off in AndroidManifest.xml
+   */
+  public static final String KEY_META_DATA_MEASURE_TILE_DOWNLOAD_ON = "com.mapbox.MeasureTileDownloadOn";
+
+  /**
+   * Default value for KEY_META_DATA_MEASURE_TILE_DOWNLOAD_ON (default is off)
+   */
+  public static final boolean DEFAULT_MEASURE_TILE_DOWNLOAD_ON = false;
+
+  /**
    * Unmeasured state
    */
   public static final float UNMEASURED = -1f;
