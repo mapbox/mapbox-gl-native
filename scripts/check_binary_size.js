@@ -62,10 +62,10 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
         getPriorSize().then(prior => {
             const title = (() => {
                 if (prior) {
-                    console.log("change = size - prior");
-                    console.log(`${change} = ${size} - ${prior}`)
                     const change = size - prior;
                     const percent = (change / prior) * 100;
+                    console.log("change = size - prior");
+                    console.log(`${change} = ${size} - ${prior}`)
                     return `${change >= 0 ? '+' : ''}${prettyBytes(change)} ${percent.toFixed(3)}% (${prettyBytes(size)})`;
                 } else {
                     return prettyBytes(size);
