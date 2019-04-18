@@ -24,6 +24,7 @@ using NamedAttributeLocations = std::vector<std::pair<const std::string, Attribu
 class Context;
 void bindAttributeLocation(Context&, ProgramID, AttributeLocation, const char * name);
 std::set<std::string> getActiveAttributes(ProgramID);
+optional<AttributeLocation> queryLocation(ProgramID id, const char* name);
 
 template <class>
 class AttributeLocations;
@@ -37,24 +38,7 @@ private:
     Locations locations;
 
 public:
-    AttributeLocations(Context& context, const ProgramID& id)
-        : locations([&] {
-              std::set<std::string> activeAttributes = getActiveAttributes(id);
-
-              AttributeLocation location = 0;
-              auto maybeBindLocation = [&](const char* name) -> optional<AttributeLocation> {
-                  if (activeAttributes.count(name)) {
-                      bindAttributeLocation(context, id, location, name);
-                      return location++;
-                  } else {
-                      return {};
-                  }
-              };
-
-              return Locations{ maybeBindLocation(
-                  concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... };
-          }()) {
-    }
+    AttributeLocations() = default;
 
     template <class BinaryProgram>
     AttributeLocations(const BinaryProgram& program)
@@ -62,6 +46,11 @@ public:
               concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... } {
     }
 
+    void queryLocations(const ProgramID& id) {
+        locations = Locations{
+            queryLocation(id, concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... };
+    }
+    
     NamedAttributeLocations getNamedLocations() const {
         NamedAttributeLocations result;
 
