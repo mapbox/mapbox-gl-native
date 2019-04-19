@@ -43,7 +43,7 @@ static BOOL _MGLAccountsSDKEnabled;
     }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    if (self.accountsSDKEnabled) {
+    if (self.isAccountsSDKEnabled) {
         self.skuToken = [MBXSKUToken skuToken];
     }
 #endif
