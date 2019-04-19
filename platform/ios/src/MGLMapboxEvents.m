@@ -145,14 +145,12 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
             [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
         }
 
-        [self updateEventsManagerSkuId];
+        if (MGLAccountManager.isAccountsSDKEnabled) {
+            [[self sharedInstance] eventsManager].skuId = MBXAccountsSKUIDMaps;
+        }
         
         [self flush];
     });
-}
-
-+ (void)updateEventsManagerSkuId {
-    [[self sharedInstance] eventsManager].skuId = MGLAccountManager.accountsSDKEnabled ? MBXAccountsSKUIDMaps : nil;
 }
 
 + (void)pushTurnstileEvent {
