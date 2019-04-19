@@ -42,10 +42,6 @@ static BOOL _MGLAccountsSDKEnabled;
     }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    if (accessToken.length) {
-        self.accessToken = accessToken;
-    }
-
     // TODO: Use MGL_OBJC_DYNAMIC_CAST (that requires moving the macro, where it
     // doesn't require a C++ header)
     NSNumber *accountsSDKNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAccountsSDKEnabled"];

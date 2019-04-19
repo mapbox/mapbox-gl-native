@@ -216,10 +216,8 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
             // Only add the token if we have enabled the accounts SDK
             if (MGLAccountManager.isAccountsSDKEnabled)
             {
-                NSString *skuToken = MGLAccountManager.skuToken;
-                if (skuToken) {
-                    [newQueryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:skuToken]];
-                }
+                NSCAssert(MGLAccountManager.skuToken, @"skuToken should be non-nil if the accounts SDK is enabled");
+                [newQueryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken]];
             }
 
             components.queryItems = components.queryItems ? [components.queryItems arrayByAddingObjectsFromArray:newQueryItems] : newQueryItems;
