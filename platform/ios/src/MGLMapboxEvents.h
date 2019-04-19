@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)pushEvent:(NSString *)event withAttributes:(MMEMapboxEventAttributes *)attributeDictionary;
 + (void)flush;
 + (void)ensureMetricsOptoutExists;
++ (void)updateEventsManagerSkuId;
 
 @end
 

@@ -208,10 +208,19 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         if (impl->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
             NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
-            NSArray *newQueryItems = @[
-                [NSURLQueryItem queryItemWithName:@"events" value:@"true"],
-                [NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken]
-            ];
+            
+            NSMutableArray *newQueryItems = [NSMutableArray arrayWithArray:@[
+                [NSURLQueryItem queryItemWithName:@"events" value:@"true"]
+                ]];
+
+            // Only add the token if we have enabled the accounts SDK
+            if (MGLAccountManager.isAccountsSDKEnabled)
+            {
+                NSString *skuToken = MGLAccountManager.skuToken;
+                if (skuToken) {
+                    [newQueryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:skuToken]];
+                }
+            }
 
             components.queryItems = components.queryItems ? [components.queryItems arrayByAddingObjectsFromArray:newQueryItems] : newQueryItems;
 
