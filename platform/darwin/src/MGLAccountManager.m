@@ -18,7 +18,6 @@ static BOOL _MGLAccountsSDKEnabled;
 @property (nonatomic) NSURL *apiBaseURL;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-@property (class, nonatomic, readonly) BOOL isAccountsSDKEnabled;
 @property (atomic) NSString *skuToken;
 @property (atomic) NSDate *skuTokenExpiration;
 #endif
