@@ -6,6 +6,7 @@
 #include <mbgl/test/map_adapter.hpp>
 
 #include <mbgl/map/map_options.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
@@ -47,7 +48,7 @@ public:
     template <typename T = FileSource>
     MapTest(const std::string& cachePath, const std::string& assetPath,
             float pixelRatio = 1, MapMode mode = MapMode::Static,
-            typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
+            typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = nullptr)
             : fileSource(std::make_shared<T>(cachePath, assetPath))
             , frontend(pixelRatio, threadPool)
             , map(frontend, observer, fileSource, threadPool,
@@ -613,8 +614,8 @@ TEST(Map, AddLayer) {
 TEST(Map, WithoutVAOExtension) {
     MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
 
-    BackendScope scope { *test.frontend.getBackend() };
-    test.frontend.getBackend()->getContext().disableVAOExtension = true;
+    gfx::BackendScope scope { *test.frontend.getBackend() };
+    static_cast<gl::Context&>(test.frontend.getBackend()->getContext()).disableVAOExtension = true;
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 

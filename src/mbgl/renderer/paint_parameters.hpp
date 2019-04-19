@@ -2,7 +2,6 @@
 
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/renderer/render_light.hpp>
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gfx/stencil_mode.hpp>
@@ -15,7 +14,6 @@
 
 namespace mbgl {
 
-class RendererBackend;
 class UpdateParameters;
 class RenderStaticData;
 class Programs;
@@ -26,23 +24,28 @@ class UnwrappedTileID;
 
 namespace gfx {
 class Context;
+class RendererBackend;
+class CommandEncoder;
+class RenderPass;
 } // namespace gfx
 
 class PaintParameters {
 public:
     PaintParameters(gfx::Context&,
                     float pixelRatio,
-                    GLContextMode,
-                    RendererBackend&,
+                    gfx::RendererBackend&,
                     const UpdateParameters&,
                     const EvaluatedLight&,
                     RenderStaticData&,
                     ImageManager&,
                     LineAtlas&,
                     Placement::VariableOffsets);
+    ~PaintParameters();
 
     gfx::Context& context;
-    RendererBackend& backend;
+    gfx::RendererBackend& backend;
+    const std::unique_ptr<gfx::CommandEncoder> encoder;
+    std::unique_ptr<gfx::RenderPass> renderPass;
 
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;
@@ -54,7 +57,6 @@ public:
     RenderPass pass = RenderPass::Opaque;
     MapMode mapMode;
     MapDebugOptions debugOptions;
-    GLContextMode contextMode;
     TimePoint timePoint;
 
     float pixelRatio;

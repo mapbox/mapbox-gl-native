@@ -7,6 +7,7 @@ dependencies {
     api dependenciesList.mapboxAndroidTelemetry
     api dependenciesList.mapboxJavaGeoJSON
     api dependenciesList.mapboxAndroidGestures
+    api dependenciesList.mapboxAndroidAccounts
     implementation dependenciesList.mapboxJavaTurf
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
@@ -17,6 +18,7 @@ dependencies {
     testImplementation dependenciesList.mockk
     testImplementation dependenciesList.robolectric
     testImplementation dependenciesList.kotlinLib
+    testImplementation dependenciesList.commonsIO
 }
 
 android {

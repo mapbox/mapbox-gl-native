@@ -7,9 +7,11 @@
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/immutable.hpp>
-#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layer_properties.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/tile/tile.hpp>
 
 #include <atomic>
 #include <memory>
@@ -20,9 +22,6 @@ class GeometryTile;
 class GeometryTileData;
 class Layout;
 
-template <class B>
-class PatternLayout;
-
 namespace style {
 class Layer;
 } // namespace style
@@ -32,14 +31,14 @@ public:
     GeometryTileWorker(ActorRef<GeometryTileWorker> self,
                        ActorRef<GeometryTile> parent,
                        OverscaledTileID,
-                       const std::string&,
+                       std::string,
                        const std::atomic<bool>&,
                        const MapMode,
                        const float pixelRatio,
                        const bool showCollisionBoxes_);
     ~GeometryTileWorker();
 
-    void setLayers(std::vector<Immutable<style::Layer::Impl>>, uint64_t correlationID);
+    void setLayers(std::vector<Immutable<style::LayerProperties>>, uint64_t correlationID);
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
     void setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_);
     
@@ -72,7 +71,7 @@ private:
     const float pixelRatio;
     
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+    std::unordered_map<std::string, LayerRenderData> renderData;
 
     enum State {
         Idle,
@@ -86,7 +85,7 @@ private:
     uint64_t imageCorrelationID = 0;
 
     // Outer optional indicates whether we've received it or not.
-    optional<std::vector<Immutable<style::Layer::Impl>>> layers;
+    optional<std::vector<Immutable<style::LayerProperties>>> layers;
     optional<std::unique_ptr<const GeometryTileData>> data;
 
     std::vector<std::unique_ptr<Layout>> layouts;

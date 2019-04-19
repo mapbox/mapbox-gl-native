@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -14,6 +13,8 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
  * Base class for the different Layer types
  */
 public abstract class Layer {
+
+  private final static String TAG = "Mbgl-Layer";
 
   @Keep
   private long nativePtr;
@@ -39,7 +40,7 @@ public abstract class Layer {
    * Validates if layer interaction is happening on the UI thread
    */
   protected void checkThread() {
-    ThreadUtils.checkThread("Layer");
+    ThreadUtils.checkThread(TAG);
   }
 
   public void setProperties(@NonNull PropertyValue<?>... properties) {

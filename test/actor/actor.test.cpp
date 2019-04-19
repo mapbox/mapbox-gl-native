@@ -101,7 +101,7 @@ TEST(Actor, DestructionBlocksOnSend) {
               waited(false) {
         }
 
-        ~TestScheduler() {
+        ~TestScheduler() override {
             EXPECT_TRUE(waited.load());
         }
 

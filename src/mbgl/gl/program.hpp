@@ -156,6 +156,7 @@ public:
     };
 
     void draw(gfx::Context& genericContext,
+              gfx::RenderPass&,
               const gfx::DrawMode& drawMode,
               const gfx::DepthMode& depthMode,
               const gfx::StencilMode& stencilMode,
@@ -168,7 +169,7 @@ public:
               const gfx::IndexBuffer& indexBuffer,
               std::size_t indexOffset,
               std::size_t indexLength) override {
-        auto& context = reinterpret_cast<gl::Context&>(genericContext);
+        auto& context = static_cast<gl::Context&>(genericContext);
 
         context.setDepthMode(depthMode);
         context.setStencilMode(stencilMode);
@@ -194,7 +195,7 @@ public:
 
         instance.textureStates.bind(context, textureBindings);
 
-        auto& vertexArray = reinterpret_cast<gl::DrawScopeResource&>(*drawScope.resource).vertexArray;
+        auto& vertexArray = drawScope.getResource<gl::DrawScopeResource>().vertexArray;
         vertexArray.bind(context,
                         indexBuffer,
                         instance.attributeLocations.toBindingArray(attributeBindings));

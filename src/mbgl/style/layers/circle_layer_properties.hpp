@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -69,6 +71,19 @@ class CirclePaintProperties : public Properties<
     CircleStrokeColor,
     CircleStrokeOpacity
 > {};
+
+class CircleLayerProperties final : public LayerProperties {
+public:
+    explicit CircleLayerProperties(Immutable<CircleLayer::Impl>);
+    CircleLayerProperties(
+        Immutable<CircleLayer::Impl>,
+        CirclePaintProperties::PossiblyEvaluated);
+    ~CircleLayerProperties() override;
+
+    const CircleLayer::Impl& layerImpl() const;
+    // Data members.
+    CirclePaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

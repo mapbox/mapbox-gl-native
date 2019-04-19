@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -44,6 +46,19 @@ class HillshadePaintProperties : public Properties<
     HillshadeHighlightColor,
     HillshadeAccentColor
 > {};
+
+class HillshadeLayerProperties final : public LayerProperties {
+public:
+    explicit HillshadeLayerProperties(Immutable<HillshadeLayer::Impl>);
+    HillshadeLayerProperties(
+        Immutable<HillshadeLayer::Impl>,
+        HillshadePaintProperties::PossiblyEvaluated);
+    ~HillshadeLayerProperties() override;
+
+    const HillshadeLayer::Impl& layerImpl() const;
+    // Data members.
+    HillshadePaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

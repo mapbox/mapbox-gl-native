@@ -1,7 +1,6 @@
 #import "MGLFoundation.h"
 #import <Foundation/Foundation.h>
 
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/util/optional.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -15,9 +14,6 @@ MGL_EXPORT
 
 /** Returns an instance of the current renderer configuration. */
 @property (class, nonatomic, readonly) MGLRendererConfiguration *currentConfiguration;
-
-/** The GL context mode to use. Defaults to `mbgl::GLContextMode::Unique` */
-@property (nonatomic, readonly) mbgl::GLContextMode contextMode;
 
 /** The scale factor to use.
 

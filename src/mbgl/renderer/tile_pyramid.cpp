@@ -61,7 +61,7 @@ Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
         return it == tiles.end() ? cache.get(tileID) : it->second.get();
 }
 
-void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
+void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& layers,
                          const bool needsRendering,
                          const bool needsRelayout,
                          const TileParameters& parameters,
@@ -237,6 +237,27 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 
     for (auto& pair : tiles) {
         pair.second->setShowCollisionBoxes(parameters.debugOptions & MapDebugOptions::Collision);
+    }
+
+    // Initialize render tiles fields and update the tile contained layer render data.
+    for (RenderTile& renderTile : renderTiles) {
+        Tile& tile = renderTile.tile;
+        if (!tile.isRenderable()) continue;
+
+        const bool holdForFade = tile.holdForFade();
+        for (const auto& layerProperties : layers) {
+            const auto* typeInfo = layerProperties->baseImpl->getTypeInfo();
+            if (holdForFade && typeInfo->fadingTiles == LayerTypeInfo::FadingTiles::NotRequired) {
+                continue;
+            }
+            // Update layer properties for complete tiles; for incomplete just check the presence.
+            bool layerRenderableInTile = tile.isComplete() ? tile.updateLayerProperties(layerProperties)
+                                                           : static_cast<bool>(tile.getBucket(*layerProperties->baseImpl));
+            if (layerRenderableInTile) {
+                renderTile.used = true;
+                renderTile.needsClipping = (renderTile.needsClipping || typeInfo->clipping == LayerTypeInfo::Clipping::Required);
+            }
+        }
     }
 }
 

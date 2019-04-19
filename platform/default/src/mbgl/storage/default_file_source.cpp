@@ -14,13 +14,14 @@
 #include <mbgl/util/stopwatch.hpp>
 
 #include <cassert>
+#include <utility>
 
 namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
     Impl(std::shared_ptr<FileSource> assetFileSource_, std::string cachePath, uint64_t maximumCacheSize)
-            : assetFileSource(assetFileSource_)
+            : assetFileSource(std::move(assetFileSource_))
             , localFileSource(std::make_unique<LocalFileSource>())
             , offlineDatabase(std::make_unique<OfflineDatabase>(cachePath, maximumCacheSize)) {
     }

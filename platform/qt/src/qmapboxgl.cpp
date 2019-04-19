@@ -33,7 +33,6 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/resource_options.hpp>
@@ -68,8 +67,8 @@
 using namespace QMapbox;
 
 // mbgl::GLContextMode
-static_assert(mbgl::underlying_type(QMapboxGLSettings::UniqueGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Unique), "error");
-static_assert(mbgl::underlying_type(QMapboxGLSettings::SharedGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Shared), "error");
+static_assert(mbgl::underlying_type(QMapboxGLSettings::UniqueGLContext) == mbgl::underlying_type(mbgl::gfx::ContextMode::Unique), "error");
+static_assert(mbgl::underlying_type(QMapboxGLSettings::SharedGLContext) == mbgl::underlying_type(mbgl::gfx::ContextMode::Shared), "error");
 
 // mbgl::MapMode
 static_assert(mbgl::underlying_type(QMapboxGLSettings::Continuous) == mbgl::underlying_type(mbgl::MapMode::Continuous), "error");

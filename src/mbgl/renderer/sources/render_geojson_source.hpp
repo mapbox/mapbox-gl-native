@@ -18,7 +18,7 @@ public:
     bool isLoaded() const final;
 
     void update(Immutable<style::Source::Impl>,
-                const std::vector<Immutable<style::Layer::Impl>>&,
+                const std::vector<Immutable<style::LayerProperties>>&,
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&) final;

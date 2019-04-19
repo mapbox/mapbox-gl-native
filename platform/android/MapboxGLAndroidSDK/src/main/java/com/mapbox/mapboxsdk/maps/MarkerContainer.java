@@ -17,11 +17,11 @@ import java.util.List;
  */
 class MarkerContainer implements Markers {
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMapView;
   private final LongSparseArray<Annotation> annotations;
   private final IconManager iconManager;
 
-  MarkerContainer(NativeMapView nativeMapView, LongSparseArray<Annotation> annotations, IconManager iconManager) {
+  MarkerContainer(NativeMap nativeMapView, LongSparseArray<Annotation> annotations, IconManager iconManager) {
     this.nativeMapView = nativeMapView;
     this.annotations = annotations;
     this.iconManager = iconManager;

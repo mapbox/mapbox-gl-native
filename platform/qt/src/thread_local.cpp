@@ -1,8 +1,5 @@
 #include <mbgl/util/thread_local.hpp>
 
-#include <mbgl/actor/scheduler.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
-
 #include <array>
 #include <cassert>
 
@@ -10,40 +7,33 @@
 
 namespace mbgl {
 namespace util {
+namespace impl {
 
-template <class T>
-class ThreadLocal<T>::Impl {
-public:
-    QThreadStorage<std::array<T*, 1>> local;
-};
+// QThreadStorage tries to be smart and take ownership of the data, which we don't want. So we're
+// wrapping it in another type which doesn't own the pointer it contains.
+using StorageType = QThreadStorage<std::array<void*, 1>>;
 
-template <class T>
-ThreadLocal<T>::ThreadLocal() : impl(std::make_unique<Impl>()) {
-    set(nullptr);
+ThreadLocalBase::ThreadLocalBase() {
+    static_assert(sizeof(storage) >= sizeof(StorageType), "storage is too small");
+    static_assert(alignof(decltype(storage)) % alignof(StorageType) == 0, "storage is incorrectly aligned");
+    new (&reinterpret_cast<StorageType&>(storage)) QThreadStorage<void*>();
 }
 
-template <class T>
-ThreadLocal<T>::~ThreadLocal() {
-    // ThreadLocal will not take ownership
-    // of the pointer it is managing. The pointer
-    // needs to be explicitly cleared before we
-    // destroy this object.
+ThreadLocalBase::~ThreadLocalBase() {
+    // ThreadLocal will not take ownership of the pointer it is managing. The pointer
+    // needs to be explicitly cleared before we destroy this object.
     assert(!get());
+    reinterpret_cast<StorageType&>(storage).~QThreadStorage();
 }
 
-template <class T>
-T* ThreadLocal<T>::get() {
-    return impl->local.localData()[0];
+void* ThreadLocalBase::get() {
+    return reinterpret_cast<StorageType&>(storage).localData()[0];
 }
 
-template <class T>
-void ThreadLocal<T>::set(T* ptr) {
-   impl->local.localData()[0] = ptr;
+void ThreadLocalBase::set(void* ptr) {
+    reinterpret_cast<StorageType&>(storage).setLocalData({{ ptr }});
 }
 
-template class ThreadLocal<Scheduler>;
-template class ThreadLocal<BackendScope>;
-template class ThreadLocal<int>; // For unit tests
-
+} // namespace impl
 } // namespace util
 } // namespace mbgl

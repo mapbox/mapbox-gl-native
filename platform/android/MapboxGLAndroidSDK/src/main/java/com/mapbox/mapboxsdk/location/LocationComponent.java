@@ -1509,4 +1509,13 @@ public final class LocationComponent {
       throw new LocationComponentNotInitializedException();
     }
   }
+
+  /**
+   * Returns whether the location component is activated.
+   *
+   * @return true if the component is activated, false otherwise
+   */
+  public boolean isLocationComponentActivated() {
+    return isComponentInitialized;
+  }
 }

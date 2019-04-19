@@ -2,23 +2,25 @@
 
 #include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
 namespace mbgl {
 
-Renderer::Renderer(RendererBackend& backend,
+Renderer::Renderer(gfx::RendererBackend& backend,
                    float pixelRatio_,
                    Scheduler& scheduler_,
-                   GLContextMode contextMode_,
                    const optional<std::string> programCacheDir_,
                    const optional<std::string> localFontFamily_)
-        : impl(std::make_unique<Impl>(backend, pixelRatio_, scheduler_,
-                                      contextMode_, std::move(programCacheDir_), std::move(localFontFamily_))) {
+    : impl(std::make_unique<Impl>(backend,
+                                  pixelRatio_,
+                                  scheduler_,
+                                  std::move(programCacheDir_),
+                                  std::move(localFontFamily_))) {
 }
 
 Renderer::~Renderer() {
-    BackendScope guard { impl->backend };
+    gfx::BackendScope guard { impl->backend };
     impl.reset();
 }
 
@@ -32,10 +34,6 @@ void Renderer::setObserver(RendererObserver* observer) {
 
 void Renderer::render(const UpdateParameters& updateParameters) {
     impl->render(updateParameters);
-}
-
-void Renderer::flush() {
-    impl->flush();
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
@@ -116,7 +114,7 @@ void Renderer::dumpDebugLogs() {
 }
 
 void Renderer::reduceMemoryUse() {
-    BackendScope guard { impl->backend };
+    gfx::BackendScope guard { impl->backend };
     impl->reduceMemoryUse();
 }
 

@@ -4,7 +4,7 @@
 #include <mbgl/test/map_adapter.hpp>
 
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/exception.hpp>

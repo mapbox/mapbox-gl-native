@@ -1,33 +1,45 @@
 #include <mbgl/gl/headless_backend.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 
 #include <cassert>
 #include <stdexcept>
 #include <type_traits>
 
 namespace mbgl {
+namespace gl {
 
-class HeadlessBackend::View {
+class HeadlessRenderableResource final : public gl::RenderableResource {
 public:
-    View(gl::Context& context, Size size_)
-        : color(context.createRenderbuffer<gl::RenderbufferType::RGBA>(size_)),
-          depthStencil(context.createRenderbuffer<gl::RenderbufferType::DepthStencil>(size_)),
+    HeadlessRenderableResource(gl::Context& context_, Size size_)
+        : context(context_),
+          color(context.createRenderbuffer<gfx::RenderbufferPixelType::RGBA>(size_)),
+          depthStencil(context.createRenderbuffer<gfx::RenderbufferPixelType::DepthStencil>(size_)),
           framebuffer(context.createFramebuffer(color, depthStencil)) {
     }
 
-    gl::Renderbuffer<gl::RenderbufferType::RGBA> color;
-    gl::Renderbuffer<gl::RenderbufferType::DepthStencil> depthStencil;
+    void bind() override {
+        context.bindFramebuffer = framebuffer.framebuffer;
+        context.scissorTest = false;
+        context.viewport = { 0, 0, framebuffer.size };
+    }
+
+    gl::Context& context;
+    gfx::Renderbuffer<gfx::RenderbufferPixelType::RGBA> color;
+    gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil> depthStencil;
     gl::Framebuffer framebuffer;
 };
 
-HeadlessBackend::HeadlessBackend(Size size_)
-    : size(size_) {
+HeadlessBackend::HeadlessBackend(const Size size_, const gfx::ContextMode contextMode_)
+    : mbgl::gl::RendererBackend(contextMode_), mbgl::gfx::Renderable(size_, nullptr) {
 }
 
 HeadlessBackend::~HeadlessBackend() {
-    BackendScope guard { *this };
-    view.reset();
+    gfx::BackendScope guard { *this };
+    resource.reset();
+    // Explicitly reset the context so that it is destructed and cleaned up before we destruct
+    // the impl object.
     context.reset();
 }
 
@@ -53,16 +65,11 @@ void HeadlessBackend::deactivate() {
     active = false;
 }
 
-void HeadlessBackend::bind() {
-    gl::Context& context_ = getContext();
-
-    if (!view) {
-        view = std::make_unique<View>(context_, size);
+gfx::Renderable& HeadlessBackend::getDefaultRenderable() {
+    if (!resource) {
+        resource = std::make_unique<HeadlessRenderableResource>(static_cast<gl::Context&>(getContext()), size);
     }
-
-    context_.bindFramebuffer = view->framebuffer.framebuffer;
-    context_.scissorTest = false;
-    context_.viewport = { 0, 0, size };
+    return *this;
 }
 
 Size HeadlessBackend::getFramebufferSize() const {
@@ -75,11 +82,12 @@ void HeadlessBackend::updateAssumedState() {
 
 void HeadlessBackend::setSize(Size size_) {
     size = size_;
-    view.reset();
+    resource.reset();
 }
 
 PremultipliedImage HeadlessBackend::readStillImage() {
-    return getContext().readFramebuffer<PremultipliedImage>(size);
+    return static_cast<gl::Context&>(getContext()).readFramebuffer<PremultipliedImage>(size);
 }
 
+} // namespace gl
 } // namespace mbgl

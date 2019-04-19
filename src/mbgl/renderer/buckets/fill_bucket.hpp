@@ -18,13 +18,11 @@ class RenderFillLayer;
 class FillBucket final : public Bucket {
 public:
     ~FillBucket() override;
-    // These aliases are used by the PatternLayout template
-    using RenderLayerType = RenderFillLayer;
     using PossiblyEvaluatedPaintProperties = style::FillPaintProperties::PossiblyEvaluated;
     using PossiblyEvaluatedLayoutProperties = style::Properties<>::PossiblyEvaluated;
 
     FillBucket(const PossiblyEvaluatedLayoutProperties layout,
-               std::map<std::string, PossiblyEvaluatedPaintProperties> layerPaintProperties,
+               const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                const float zoom,
                const uint32_t overscaling);
 

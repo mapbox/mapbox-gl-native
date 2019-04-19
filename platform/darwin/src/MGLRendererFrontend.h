@@ -1,7 +1,7 @@
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
+#include <mbgl/gl/renderer_backend.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -13,7 +13,7 @@
 class MGLRenderFrontend : public mbgl::RendererFrontend
 {
 public:
-    MGLRenderFrontend(std::unique_ptr<mbgl::Renderer> renderer_, MGLMapView* nativeView_, mbgl::RendererBackend& mbglBackend_, bool async = false)
+    MGLRenderFrontend(std::unique_ptr<mbgl::Renderer> renderer_, MGLMapView* nativeView_, mbgl::gl::RendererBackend& mbglBackend_, bool async = false)
         : renderer(std::move(renderer_))
         , nativeView(nativeView_)
         , mbglBackend(mbglBackend_) {
@@ -47,7 +47,7 @@ public:
     void render() {
         if (!renderer || !updateParameters) return;
         
-        mbgl::BackendScope guard { mbglBackend, mbgl::BackendScope::ScopeType::Implicit };
+        mbgl::gfx::BackendScope guard { mbglBackend, mbgl::gfx::BackendScope::ScopeType::Implicit };
         
         // onStyleImageMissing might be called during a render. The user implemented method
         // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.
@@ -69,7 +69,7 @@ public:
 private:
     std::unique_ptr<mbgl::Renderer> renderer;
     __weak MGLMapView *nativeView = nullptr;
-    mbgl::RendererBackend& mbglBackend;
+    mbgl::gl::RendererBackend& mbglBackend;
     std::shared_ptr<mbgl::UpdateParameters> updateParameters;
     mbgl::optional<mbgl::util::AsyncTask> asyncInvalidate;
 };

@@ -1,26 +1,27 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/platform/gl_functions.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/texture.hpp>
 #include <mbgl/gl/defines.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gl/offscreen_texture.hpp>
 
-#include <mbgl/util/offscreen_texture.hpp>
 
 using namespace mbgl;
 using namespace mbgl::platform;
 
 TEST(OffscreenTexture, EmptyRed) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
 
-    // Scissor test shouldn't leak after HeadlessBackend::bind().
+    // Scissor test shouldn't leak after gl::HeadlessBackend::bind().
     MBGL_CHECK_ERROR(glScissor(64, 64, 128, 128));
-    backend.getContext().scissorTest.setCurrentValue(true);
+    static_cast<gl::Context&>(backend.getContext()).scissorTest.setCurrentValue(true);
 
-    backend.bind();
+    backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
     MBGL_CHECK_ERROR(glClearColor(1.0f, 0.0f, 0.0f, 1.0f));
     MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT));
@@ -75,9 +76,9 @@ struct Buffer {
 
 
 TEST(OffscreenTexture, RenderToTexture) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
-    auto& context = backend.getContext();
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
+    auto& context = static_cast<gl::Context&>(backend.getContext());
 
     MBGL_CHECK_ERROR(glEnable(GL_BLEND));
     MBGL_CHECK_ERROR(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -125,20 +126,20 @@ void main() {
     Buffer triangleBuffer({ 0, 0.5, 0.5, -0.5, -0.5, -0.5 });
     Buffer viewportBuffer({ -1, -1, 1, -1, -1, 1, 1, 1 });
 
-    backend.bind();
+    backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
     // First, draw red to the bound FBO.
     context.clear(Color::red(), {}, {});
 
     // Then, create a texture, bind it, and render yellow to that texture. This should not
     // affect the originally bound FBO.
-    OffscreenTexture texture(context, { 128, 128 });
+    gl::OffscreenTexture texture(context, { 128, 128 });
 
     // Scissor test shouldn't leak after OffscreenTexture::bind().
     MBGL_CHECK_ERROR(glScissor(32, 32, 64, 64));
     context.scissorTest.setCurrentValue(true);
 
-    texture.bind();
+    texture.getResource<gl::RenderableResource>().bind();
 
     context.clear(Color(), {}, {});
 
@@ -153,13 +154,13 @@ void main() {
     test::checkImage("test/fixtures/offscreen_texture/render-to-texture", image, 0, 0);
 
     // Now reset the FBO back to normal and retrieve the original (restored) framebuffer.
-    backend.bind();
+    backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
     image = backend.readStillImage();
     test::checkImage("test/fixtures/offscreen_texture/render-to-fbo", image, 0, 0);
 
     // Now, composite the Framebuffer texture we've rendered to onto the main FBO.
-    gl::bindTexture(context, 0, { *texture.getTexture().resource, gfx::TextureFilterType::Linear });
+    gl::bindTexture(context, 0, { texture.getTexture().getResource(), gfx::TextureFilterType::Linear });
     MBGL_CHECK_ERROR(glUseProgram(compositeShader.program));
     MBGL_CHECK_ERROR(glUniform1i(u_texture, 0));
     MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, viewportBuffer.buffer));

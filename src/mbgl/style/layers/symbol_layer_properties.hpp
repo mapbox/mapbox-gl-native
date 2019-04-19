@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -27,9 +29,14 @@ struct SymbolAvoidEdges : LayoutProperty<bool> {
     static bool defaultValue() { return false; }
 };
 
+struct SymbolSortKey : DataDrivenLayoutProperty<float> {
+    static constexpr const char *name() { return "symbol-sort-key"; }
+    static float defaultValue() { return 0; }
+};
+
 struct SymbolZOrder : LayoutProperty<SymbolZOrderType> {
     static constexpr const char *name() { return "symbol-z-order"; }
-    static SymbolZOrderType defaultValue() { return SymbolZOrderType::ViewportY; }
+    static SymbolZOrderType defaultValue() { return SymbolZOrderType::Auto; }
 };
 
 struct IconAllowOverlap : LayoutProperty<bool> {
@@ -270,6 +277,7 @@ class SymbolLayoutProperties : public Properties<
     SymbolPlacement,
     SymbolSpacing,
     SymbolAvoidEdges,
+    SymbolSortKey,
     SymbolZOrder,
     IconAllowOverlap,
     IconIgnorePlacement,
@@ -324,6 +332,19 @@ class SymbolPaintProperties : public Properties<
     TextTranslate,
     TextTranslateAnchor
 > {};
+
+class SymbolLayerProperties final : public LayerProperties {
+public:
+    explicit SymbolLayerProperties(Immutable<SymbolLayer::Impl>);
+    SymbolLayerProperties(
+        Immutable<SymbolLayer::Impl>,
+        SymbolPaintProperties::PossiblyEvaluated);
+    ~SymbolLayerProperties() override;
+
+    const SymbolLayer::Impl& layerImpl() const;
+    // Data members.
+    SymbolPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

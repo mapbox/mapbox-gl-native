@@ -1,6 +1,7 @@
 #pragma once
 
 namespace mbgl {
+namespace gfx {
 
 class RendererBackend;
 
@@ -32,4 +33,5 @@ private:
     bool activated = false;
 };
 
+} // namespace gfx
 } // namespace mbgl

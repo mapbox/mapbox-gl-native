@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_light.hpp>
@@ -20,7 +19,6 @@
 
 namespace mbgl {
 
-class RendererBackend;
 class RendererObserver;
 class RenderSource;
 class RenderLayer;
@@ -34,12 +32,19 @@ class ImageManager;
 class LineAtlas;
 class CrossTileSymbolIndex;
 
+namespace gfx {
+class RendererBackend;
+} // namespace gfx
+
 class Renderer::Impl : public GlyphManagerObserver,
                        public ImageManagerObserver,
                        public RenderSourceObserver{
 public:
-    Impl(RendererBackend&, float pixelRatio_, Scheduler&, GLContextMode,
-         const optional<std::string> programCacheDir, const optional<std::string> localFontFamily_);
+    Impl(gfx::RendererBackend&,
+         float pixelRatio_,
+         Scheduler&,
+         const optional<std::string> programCacheDir,
+         const optional<std::string> localFontFamily_);
     ~Impl() final;
 
     void markContextLost() {
@@ -49,8 +54,6 @@ public:
     void setObserver(RendererObserver*);
 
     void render(const UpdateParameters&);
-
-    void flush();
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&) const;
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;
@@ -95,12 +98,11 @@ private:
 
     friend class Renderer;
 
-    RendererBackend& backend;
+    gfx::RendererBackend& backend;
     Scheduler& scheduler;
 
     RendererObserver* observer;
 
-    const GLContextMode contextMode;
     const float pixelRatio;
     const optional<std::string> programCacheDir;
     const optional<std::string> localFontFamily;

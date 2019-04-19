@@ -25,7 +25,8 @@ std::unique_ptr<style::Layer> LayerManager::createLayer(
     return nullptr;
 }
 
-std::unique_ptr<Bucket> LayerManager::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) noexcept {
+std::unique_ptr<Bucket> LayerManager::createBucket(const BucketParameters& parameters,
+                                                   const std::vector<Immutable<style::LayerProperties>>& layers) noexcept {
     assert(!layers.empty());
     assert(parameters.layerType->layout == style::LayerTypeInfo::Layout::NotRequired);
     LayerFactory* factory = getFactory(parameters.layerType);
@@ -35,7 +36,7 @@ std::unique_ptr<Bucket> LayerManager::createBucket(const BucketParameters& param
 
 std::unique_ptr<Layout> LayerManager::createLayout(const LayoutParameters& parameters,
                                                    std::unique_ptr<GeometryTileLayer> tileLayer,
-                                                   const std::vector<const RenderLayer*>& layers) noexcept {
+                                                   const std::vector<Immutable<style::LayerProperties>>& layers) noexcept {
     assert(!layers.empty());
     assert(parameters.bucketParameters.layerType->layout == style::LayerTypeInfo::Layout::Required);
     LayerFactory* factory = getFactory(parameters.bucketParameters.layerType);

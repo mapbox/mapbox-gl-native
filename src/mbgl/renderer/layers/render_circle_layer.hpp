@@ -6,11 +6,12 @@
 
 namespace mbgl {
 
-class RenderCircleLayer: public RenderLayer {
+class RenderCircleLayer final : public RenderLayer {
 public:
-    RenderCircleLayer(Immutable<style::CircleLayer::Impl>);
+    explicit RenderCircleLayer(Immutable<style::CircleLayer::Impl>);
     ~RenderCircleLayer() final = default;
 
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
@@ -27,13 +28,6 @@ public:
 
     // Paint properties
     style::CirclePaintProperties::Unevaluated unevaluated;
-    style::CirclePaintProperties::PossiblyEvaluated evaluated;
-
-    const style::CircleLayer::Impl& impl() const;
 };
-
-inline const RenderCircleLayer* toRenderCircleLayer(const RenderLayer* layer) {
-    return static_cast<const RenderCircleLayer*>(layer);
-}
 
 } // namespace mbgl

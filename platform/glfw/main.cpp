@@ -109,9 +109,9 @@ int main(int argc, char *argv[]) {
     }
 
     mbgl::ThreadPool threadPool(4);
-    GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(backend, view->getPixelRatio(), threadPool), backend };
+    GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(view->getRendererBackend(), view->getPixelRatio(), threadPool), *view };
 
-    mbgl::Map map(rendererFrontend, backend, threadPool,
+    mbgl::Map map(rendererFrontend, *view, threadPool,
                   mbgl::MapOptions().withSize(view->getSize()).withPixelRatio(view->getPixelRatio()), resourceOptions);
 
     backend.setMap(&map);

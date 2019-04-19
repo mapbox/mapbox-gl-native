@@ -4,7 +4,6 @@
 #include "qmapboxgl_renderer_backend.hpp"
 
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/util.hpp>

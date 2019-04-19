@@ -50,6 +50,10 @@ public:
         delegate.invoke(&RendererObserver::onDidFinishRenderingMap);
     }
 
+    void onStyleImageMissing(const std::string& id, StyleImageMissingCallback done) override {
+        delegate.invoke(&RendererObserver::onStyleImageMissing, id, done);
+    }
+
 private:
     std::shared_ptr<Mailbox> mailbox;
     ActorRef<RendererObserver> delegate;

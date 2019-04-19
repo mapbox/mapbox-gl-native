@@ -49,6 +49,12 @@ struct LayerTypeInfo {
      * requires clipping. Contains \c Clipping::NotRequired otherwise.
      */
     const enum class Clipping { Required, NotRequired } clipping;
+
+    /**
+     * @brief contains \c FadingTiles::Required if the corresponding layer type
+     * requires rendering on fading tiles. Contains \c FadingTiles::NotRequired otherwise.
+     */
+    const enum class FadingTiles { Required, NotRequired } fadingTiles;
 };
 
 /**

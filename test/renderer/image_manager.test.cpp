@@ -157,3 +157,78 @@ TEST(ImageManager, NotifiesRequestorImmediatelyIfDependenciesAreSatisfied) {
 
     ASSERT_TRUE(notified);
 }
+
+
+class StubImageManagerObserver : public ImageManagerObserver {
+    public:
+    int count = 0;
+    virtual void onStyleImageMissing(const std::string&, std::function<void()> done) override {
+        count++;
+        done();
+    }
+};
+
+TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
+    ImageManager imageManager;
+    StubImageRequestor requestor;
+    StubImageManagerObserver observer;
+
+    imageManager.setObserver(&observer);
+
+    bool notified = false;
+
+    requestor.imagesAvailable = [&] (ImageMap, ImageMap, std::unordered_map<std::string, uint32_t>) {
+        notified = true;
+    };
+
+    uint64_t imageCorrelationID = 0;
+    ImageDependencies dependencies;
+    dependencies.emplace("pre", ImageType::Icon);
+    imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+
+    EXPECT_EQ(observer.count, 0);
+    ASSERT_FALSE(notified);
+
+    imageManager.setLoaded(true);
+
+    EXPECT_EQ(observer.count, 1);
+    ASSERT_FALSE(notified);
+
+    imageManager.notifyIfMissingImageAdded();
+
+    EXPECT_EQ(observer.count, 1);
+    ASSERT_TRUE(notified);
+
+}
+
+TEST(ImageManager, OnStyleImageMissingAfterSpriteLoaded) {
+    ImageManager imageManager;
+    StubImageRequestor requestor;
+    StubImageManagerObserver observer;
+
+    imageManager.setObserver(&observer);
+
+    bool notified = false;
+
+    requestor.imagesAvailable = [&] (ImageMap, ImageMap, std::unordered_map<std::string, uint32_t>) {
+        notified = true;
+    };
+
+    EXPECT_EQ(observer.count, 0);
+    ASSERT_FALSE(notified);
+
+    imageManager.setLoaded(true);
+
+    uint64_t imageCorrelationID = 0;
+    ImageDependencies dependencies;
+    dependencies.emplace("after", ImageType::Icon);
+    imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+
+    EXPECT_EQ(observer.count, 1);
+    ASSERT_FALSE(notified);
+
+    imageManager.notifyIfMissingImageAdded();
+
+    EXPECT_EQ(observer.count, 1);
+    ASSERT_TRUE(notified);
+}

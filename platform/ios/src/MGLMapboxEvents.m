@@ -1,6 +1,6 @@
 #import "MGLMapboxEvents.h"
+#import "MBXSKUToken.h"
 #import "NSBundle+MGLAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"mapbox-maps-ios";
 static NSString * const MGLMapboxAccountType = @"MGLMapboxAccountType";
@@ -32,9 +32,6 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
 }
 
 + (nullable instancetype)sharedInstance {
-    if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
-        return nil;
-    }
     
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedInstance;
@@ -146,6 +143,8 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
         if ([MGLMapboxEvents sharedInstance].baseURL) {
             [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
         }
+
+        [[MGLMapboxEvents sharedInstance] eventsManager].skuId = MBXAccountsSKUIDMaps;
         
         [self flush];
     });

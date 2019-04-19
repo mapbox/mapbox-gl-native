@@ -91,7 +91,7 @@ const Response response = [] {
     return res;
 }();
 
-} // namespace
+} // namespace fixture
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     FixtureLog log;

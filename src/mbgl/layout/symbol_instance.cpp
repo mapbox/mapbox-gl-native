@@ -1,5 +1,6 @@
 #include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <utility>
 
 namespace mbgl {
 
@@ -34,7 +35,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const IndexedSubfeature& indexedFeature,
                                const std::size_t layoutFeatureIndex_,
                                const std::size_t dataFeatureIndex_,
-                               const std::u16string& key_,
+                               std::u16string key_,
                                const float overscaling,
                                const float rotate,
                                float radialTextOffset_) :
@@ -52,7 +53,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     dataFeatureIndex(dataFeatureIndex_),
     textOffset(textOffset_),
     iconOffset(iconOffset_),
-    key(key_),
+    key(std::move(key_)),
     textBoxScale(textBoxScale_),
     radialTextOffset(radialTextOffset_),
     singleLine(shapedTextOrientations.singleLine) {

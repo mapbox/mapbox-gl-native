@@ -12,8 +12,8 @@ EvaluationResult Let::evaluate(const EvaluationContext& params) const {
 }
 
 void Let::eachChild(const std::function<void(const Expression&)>& visit) const {
-    for (auto it = bindings.begin(); it != bindings.end(); it++) {
-        visit(*it->second);
+    for (const auto& binding : bindings) {
+        visit(*binding.second);
     }
     visit(*result);
 }

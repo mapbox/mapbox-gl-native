@@ -6,7 +6,7 @@ using namespace mbgl::util;
 
 class TestType {
 public:
-    TestType() : i1(0), i2(1) {
+    TestType() {
         str[0] = 'a';
     }
     
@@ -18,14 +18,14 @@ public:
     TestType(const TestType&) = delete;
     TestType& operator=(const TestType&) = delete;
 
-    int i1;
-    int i2;
+    int i1 = 0;
+    int i2 = 1;
     char str[256];
 };
 
 bool  IsStackAllocated (const peer& a, const void* obj1) {
-    uintptr_t a_ptr = (uintptr_t)(&a);
-    uintptr_t obj   = (uintptr_t)(obj1);
+    auto a_ptr = (uintptr_t)(&a);
+    auto obj = (uintptr_t)(obj1);
     return (obj >= a_ptr && obj < a_ptr + sizeof(peer));
 };
 
@@ -163,7 +163,7 @@ TEST(Peer, UniquePtr) {
     EXPECT_FALSE(u1.has_value());
 
     peer u2;
-    TestType * t3 = new TestType();
+    auto* t3 = new TestType();
     u2 = std::unique_ptr<TestType>(t3);
     EXPECT_TRUE(u2.has_value());
 }

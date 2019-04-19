@@ -28,7 +28,7 @@ using namespace style;
 struct GeometryTooLongException : std::exception {};
 
 FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties,
-                       std::map<std::string, FillBucket::PossiblyEvaluatedPaintProperties> layerPaintProperties,
+                       const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                        const float zoom,
                        const uint32_t) {
 
@@ -37,7 +37,7 @@ FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties,
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                pair.second,
+                getEvaluated<FillLayerProperties>(pair.second),
                 zoom));
     }
 }
@@ -141,10 +141,9 @@ bool FillBucket::supportsLayer(const style::Layer::Impl& impl) const {
     return style::FillLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
 }
 
-
 float FillBucket::getQueryRadius(const RenderLayer& layer) const {
-    const RenderFillLayer* fillLayer = toRenderFillLayer(&layer);
-    const std::array<float, 2>& translate = fillLayer->evaluated.get<FillTranslate>();
+    const auto& evaluated = getEvaluated<FillLayerProperties>(layer.evaluatedProperties);
+    const std::array<float, 2>& translate = evaluated.get<FillTranslate>();
     return util::length(translate[0], translate[1]);
 }
 

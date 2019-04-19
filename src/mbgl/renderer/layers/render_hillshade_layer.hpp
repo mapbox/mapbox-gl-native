@@ -9,9 +9,10 @@ namespace mbgl {
 
 class RenderHillshadeLayer: public RenderLayer {
 public:
-    RenderHillshadeLayer(Immutable<style::HillshadeLayer::Impl>);
-    ~RenderHillshadeLayer() final = default;
+    explicit RenderHillshadeLayer(Immutable<style::HillshadeLayer::Impl>);
+    ~RenderHillshadeLayer() override;
 
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
@@ -21,10 +22,7 @@ public:
 
     // Paint properties
     style::HillshadePaintProperties::Unevaluated unevaluated;
-    style::HillshadePaintProperties::PossiblyEvaluated evaluated;
 
-    const style::HillshadeLayer::Impl& impl() const;
-private:
     const std::array<float, 2> getLatRange(const UnwrappedTileID& id);
     const std::array<float, 2> getLight(const PaintParameters& parameters);
 };

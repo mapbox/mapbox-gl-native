@@ -16,7 +16,6 @@ namespace mbgl {
 
 class BucketParameters;
 class Anchor;
-class RenderLayer;
 class PlacedSymbol;
 
 namespace style {
@@ -26,7 +25,7 @@ class Filter;
 class SymbolLayout final : public Layout {
 public:
     SymbolLayout(const BucketParameters&,
-                 const std::vector<const RenderLayer*>&,
+                 const std::vector<Immutable<style::LayerProperties>>&,
                  std::unique_ptr<GeometryTileLayer>,
                  ImageDependencies&,
                  GlyphDependencies&);
@@ -36,12 +35,12 @@ public:
     void prepareSymbols(const GlyphMap&, const GlyphPositions&,
                  const ImageMap&, const ImagePositions&) override;
 
-    void createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, std::shared_ptr<Bucket>>&, const bool firstLoad, const bool showCollisionBoxes) override;
+    void createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>&, const bool firstLoad, const bool showCollisionBoxes) override;
 
     bool hasSymbolInstances() const override;
     bool hasDependencies() const override;
 
-    std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated> layerPaintProperties;
+    std::map<std::string, Immutable<style::LayerProperties>> layerPaintProperties;
 
     const std::string bucketLeaderID;
     std::vector<SymbolInstance> symbolInstances;
@@ -66,7 +65,8 @@ private:
                      const Range<float> sizeData,
                      const SymbolQuad&,
                      const Anchor& labelAnchor,
-                     PlacedSymbol& placedSymbol);
+                     PlacedSymbol& placedSymbol,
+                     float sortKey);
 
     // Adds symbol quads to bucket and returns formatted section index of last
     // added quad.
@@ -97,6 +97,7 @@ private:
 
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
+    bool sortFeaturesByY = false;
 
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;

@@ -3,8 +3,8 @@
 
 #include <functional>
 #include <cmath>
-#include <assert.h>
-#include <limits.h>
+#include <cassert>
+#include <climits>
 #include <algorithm>
 
 namespace mbgl {

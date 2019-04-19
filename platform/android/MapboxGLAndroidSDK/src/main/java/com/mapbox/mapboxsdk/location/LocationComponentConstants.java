@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.location;
 /**
  * Contains all the constants being used for the {@link LocationComponent}.
  */
-final class LocationComponentConstants {
+public final class LocationComponentConstants {
 
   // Controls the compass update rate in milliseconds
   static final long COMPASS_UPDATE_RATE_MS = 500;
@@ -33,7 +33,12 @@ final class LocationComponentConstants {
   static final long DEFAULT_FASTEST_INTERVAL_MILLIS = 1000;
 
   // Sources
-  static final String LOCATION_SOURCE = "mapbox-location-source";
+
+  /**
+   * Source ID of the location's GeoJsonSource.
+   */
+  public static final String LOCATION_SOURCE = "mapbox-location-source";
+
   static final String PROPERTY_GPS_BEARING = "mapbox-property-gps-bearing";
   static final String PROPERTY_COMPASS_BEARING = "mapbox-property-compass-bearing";
   static final String PROPERTY_LOCATION_STALE = "mapbox-property-location-stale";

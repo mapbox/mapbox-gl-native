@@ -1,19 +1,15 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gl/renderer_backend.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 
 #include <functional>
 
 using namespace mbgl;
 
-class StubRendererBackend: public RendererBackend {
+class StubRendererBackend : public gl::RendererBackend {
 public:
-    void bind() override {
-    }
-
-    mbgl::Size getFramebufferSize() const override {
-        return mbgl::Size{};
+    StubRendererBackend() : gl::RendererBackend(gfx::ContextMode::Unique) {
     }
 
     void activate() override {
@@ -29,7 +25,13 @@ public:
     }
 
     gl::ProcAddress getExtensionFunctionPointer(const char*) override {
-        return {};
+        abort();
+        return nullptr;
+    }
+
+    gfx::Renderable& getDefaultRenderable() override {
+        abort();
+        return reinterpret_cast<gfx::Renderable&>(*this);
     }
 
     std::function<void ()> activateFunction;
@@ -49,7 +51,7 @@ TEST(BackendScope, SingleScope) {
     backend.deactivateFunction = [&] { deactivated = true; };
 
     {
-        BackendScope test { backend };
+        gfx::BackendScope test { backend };
     }
 
     ASSERT_TRUE(activated);
@@ -67,10 +69,10 @@ TEST(BackendScope, NestedScopes) {
     backend.deactivateFunction = [&] { deactivated++; };
 
     {
-        BackendScope outer { backend };
+        gfx::BackendScope outer { backend };
         ASSERT_EQ(1, activated);
         {
-            BackendScope inner { backend };
+            gfx::BackendScope inner { backend };
             ASSERT_EQ(1, activated);
         }
         ASSERT_EQ(0, deactivated);
@@ -96,10 +98,10 @@ TEST(BackendScope, ChainedScopes) {
     backendB.deactivateFunction = [&] { activatedB = false; };
 
     {
-        BackendScope scopeA { backendA };
+        gfx::BackendScope scopeA { backendA };
         ASSERT_TRUE(activatedA);
         {
-            BackendScope scopeB { backendB };
+            gfx::BackendScope scopeB { backendB };
             ASSERT_FALSE(activatedA);
             ASSERT_TRUE(activatedB);
         }

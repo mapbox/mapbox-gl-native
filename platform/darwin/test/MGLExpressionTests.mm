@@ -282,9 +282,14 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], color);
     }
     {
-        MGLColor *color = [MGLColor mgl_colorWithColor:{ 255.0/255, 239.0/255, 213.0/255, 0.5 }]; // papayawhip
+        // Transform color components to non-premultiplied values
+        float alpha = 0.5;
+        float red = (255.0 * alpha) / 255;
+        float green = (239.0 * alpha) / 255;
+        float blue = (213.0 * alpha) / 255;
+        MGLColor *color = [MGLColor mgl_colorWithColor:{ red, green, blue, alpha }]; // papayawhip
         NSExpression *expression = [NSExpression expressionForConstantValue:color];
-        NSArray *jsonExpression = @[@"rgba", @255, @239, @213, @0.5];
+        NSArray *jsonExpression = @[@"rgba", @127.5, @119.5, @106.5, @0.5];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], color);
     }
@@ -1078,7 +1083,6 @@ using namespace std::string_literals;
         
         NSArray *jsonExpression = @[ @"format", @"foo", @{ @"font-scale": @1.2, @"text-color": @"yellow" , @"text-font" : @[ @"literal", @[ @"DIN Offc Pro Bold", @"Arial Unicode MS Bold" ]]} ];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        NSExpression *exp = [NSExpression expressionWithMGLJSONObject:jsonExpression];
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
@@ -1193,6 +1197,16 @@ using namespace std::string_literals;
     {
         NSExpression *original = MGLConstantExpression(@"{name_en}");
         NSExpression *expected = original;
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *keyExpression = [NSExpression expressionForKeyPath:@"name_en"];
+        MGLAttributedExpression *attributedExpression = [MGLAttributedExpression attributedExpression:keyExpression attributes:@{}];
+        NSExpression *original = [NSExpression expressionForConstantValue:attributedExpression];
+        
+        NSExpression *coalesceExpression = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        MGLAttributedExpression *expectedAttributedExpression = [MGLAttributedExpression attributedExpression:coalesceExpression attributes:@{}];
+        NSExpression *expected = [NSExpression expressionForConstantValue:expectedAttributedExpression];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
     }
     {

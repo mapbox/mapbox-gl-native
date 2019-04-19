@@ -12,6 +12,7 @@
 #include <mbgl/util/i18n.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile.hpp>
 
 #include <mapbox/polylabel.hpp>
 
@@ -40,16 +41,18 @@ expression::Value sectionOptionsToValue(const SectionOptions& options) {
     }
     return result;
 }
+
+inline const SymbolLayerProperties& toSymbolLayerProperties(const Immutable<LayerProperties>& layer) {
+    return static_cast<const SymbolLayerProperties&>(*layer);
+}
+
 } // namespace
-
-
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
-                           const std::vector<const RenderLayer*>& layers,
+                           const std::vector<Immutable<style::LayerProperties>>& layers,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : Layout(),
-      bucketLeaderID(layers.at(0)->getID()),
+    : bucketLeaderID(layers.front()->baseImpl->id),
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
@@ -57,11 +60,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<TextSize>()),
-      iconSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<IconSize>())
+      textSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<TextSize>()),
+      iconSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<IconSize>())
     {
 
-    const SymbolLayer::Impl& leader = toRenderSymbolLayer(layers.at(0))->impl();
+    const SymbolLayer::Impl& leader = toSymbolLayerProperties(layers.at(0)).layerImpl();
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
@@ -96,8 +99,15 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         return;
     }
 
+    const bool hasSymbolSortKey = !leader.layout.get<SymbolSortKey>().isUndefined();
+    const auto symbolZOrder = layout.get<SymbolZOrder>();
+    const bool sortFeaturesByKey = symbolZOrder != SymbolZOrderType::ViewportY && hasSymbolSortKey;
+    const bool zOrderByViewportY = symbolZOrder == SymbolZOrderType::ViewportY || (symbolZOrder == SymbolZOrderType::Auto && !sortFeaturesByKey);
+    sortFeaturesByY = zOrderByViewportY && (layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
+        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
+
     for (const auto& layer : layers) {
-        layerPaintProperties.emplace(layer->getID(), toRenderSymbolLayer(layer)->evaluated);
+        layerPaintProperties.emplace(layer->baseImpl->id, layer);
     }
 
     // Determine glyph dependencies
@@ -117,8 +127,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             FontStack baseFontStack = layout.evaluate<TextFont>(zoom, ft);
 
             ft.formattedText = TaggedString();
-            for (std::size_t j = 0; j < formatted.sections.size(); j++) {
-                const auto& section = formatted.sections[j];
+            for (const auto & section : formatted.sections) {
                 std::string u8string = section.text;
                 if (textTransform == TextTransformType::Uppercase) {
                     u8string = platform::uppercase(u8string);
@@ -157,7 +166,13 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (ft.formattedText || ft.icon) {
-            features.push_back(std::move(ft));
+            if (sortFeaturesByKey) {
+                ft.sortKey = layout.evaluate<SymbolSortKey>(zoom, ft);
+                const auto lowerBound = std::lower_bound(features.begin(), features.end(), ft);
+                features.insert(lowerBound, std::move(ft));
+            } else {
+                features.push_back(std::move(ft));
+            }
         }
     }
 
@@ -541,11 +556,7 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
     return tileDistances;
 }
 
-void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, std::shared_ptr<Bucket>>& buckets, const bool firstLoad, const bool showCollisionBoxes) {
-    const bool zOrderByViewport = layout.get<SymbolZOrder>() == SymbolZOrderType::ViewportY;
-    const bool sortFeaturesByY = zOrderByViewport && (layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
-        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
-
+void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>& renderData, const bool firstLoad, const bool showCollisionBoxes) {
     auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), tilePixelRatio);
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
@@ -591,7 +602,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
                 symbolInstance.placedIconIndex = bucket->icon.placedSymbols.size() - 1;
                 PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
                 iconSymbol.vertexStartIndex = addSymbol(bucket->icon, sizeData, *symbolInstance.iconQuad,
-                                                        symbolInstance.anchor, iconSymbol);
+                                                        symbolInstance.anchor, iconSymbol, feature.sortKey);
 
                 for (auto& pair : bucket->paintProperties) {
                     pair.second.iconBinders.populateVertexVectors(feature, bucket->icon.vertices.elements(), {}, {});
@@ -608,7 +619,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
             if (!firstLoad) {
                 bucket->justReloaded = true;
             }
-            buckets.emplace(pair.first, bucket);
+            renderData.emplace(pair.first, LayerRenderData{bucket, pair.second});
         }
     }
 
@@ -646,7 +657,7 @@ std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
             }
             lastAddedSection = symbolQuad.sectionIndex;
         }
-        size_t index = addSymbol(bucket.text, sizeData, symbolQuad, symbolInstance.anchor, placedSymbol);
+        size_t index = addSymbol(bucket.text, sizeData, symbolQuad, symbolInstance.anchor, placedSymbol, feature.sortKey);
         if (firstSymbol) {
             placedSymbol.vertexStartIndex = index;
             firstSymbol = false;
@@ -660,7 +671,8 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
                                const Range<float> sizeData,
                                const SymbolQuad& symbol,
                                const Anchor& labelAnchor,
-                               PlacedSymbol& placedSymbol) {
+                               PlacedSymbol& placedSymbol,
+                               float sortKey) {
     constexpr const uint16_t vertexLength = 4;
 
     const auto &tl = symbol.tl;
@@ -669,8 +681,10 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     const auto &br = symbol.br;
     const auto &tex = symbol.tex;
 
-    if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-        buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements());
+    if (buffer.segments.empty() ||
+        buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max() ||
+        fabs(buffer.segments.back().sortKey - sortKey) > std::numeric_limits<float>::epsilon()) {
+        buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements(), 0ul, 0ul, sortKey);
     }
 
     // We're generating triangle fans, so we always start with the first

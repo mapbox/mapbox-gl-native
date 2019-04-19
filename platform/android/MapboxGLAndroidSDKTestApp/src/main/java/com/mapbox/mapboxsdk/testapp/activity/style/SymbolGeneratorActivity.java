@@ -362,7 +362,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
     @Override
     protected void onPostExecute(HashMap<String, Bitmap> bitmapHashMap) {
       super.onPostExecute(bitmapHashMap);
-      mapboxMap.getStyle().addImages(bitmapHashMap);
+      mapboxMap.getStyle().addImagesAsync(bitmapHashMap);
     }
   }
 }

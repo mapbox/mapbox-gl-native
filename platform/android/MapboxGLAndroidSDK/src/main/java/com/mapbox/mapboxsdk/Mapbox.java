@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -35,6 +34,8 @@ public final class Mapbox {
   private String accessToken;
   @Nullable
   private TelemetryDefinition telemetry;
+  @Nullable
+  private AccountsManager accounts;
 
   /**
    * Get an instance of Mapbox.
@@ -49,13 +50,15 @@ public final class Mapbox {
   @UiThread
   @NonNull
   public static synchronized Mapbox getInstance(@NonNull Context context, @Nullable String accessToken) {
-    ThreadUtils.checkThread("Mapbox");
+    ThreadUtils.init(context);
+    ThreadUtils.checkThread(TAG);
     if (INSTANCE == null) {
       Context appContext = context.getApplicationContext();
       FileSource.initializeFileDirsPaths(appContext);
       INSTANCE = new Mapbox(appContext, accessToken);
       if (isAccessTokenValid(accessToken)) {
         initializeTelemetry();
+        INSTANCE.accounts = new AccountsManager();
       }
       ConnectivityReceiver.instance(appContext);
     }
@@ -85,6 +88,16 @@ public final class Mapbox {
     validateMapbox();
     INSTANCE.accessToken = accessToken;
     FileSource.getInstance(getApplicationContext()).setAccessToken(accessToken);
+  }
+
+  /**
+   * Returns a SKU token, refreshed if necessary. This method is meant for internal SDK
+   * usage only.
+   *
+   * @return the SKU token
+   */
+  public static String getSkuToken() {
+    return INSTANCE.accounts.getSkuToken();
   }
 
   /**
@@ -179,5 +192,12 @@ public final class Mapbox {
 
     accessToken = accessToken.trim().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
     return accessToken.length() != 0 && (accessToken.startsWith("pk.") || accessToken.startsWith("sk."));
+  }
+
+  /**
+   * Internal use. Check if the {@link Mapbox#INSTANCE} is present.
+   */
+  public static boolean hasInstance() {
+    return INSTANCE != null;
   }
 }

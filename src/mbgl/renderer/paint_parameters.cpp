@@ -1,14 +1,15 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/gfx/command_encoder.hpp>
+#include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
 PaintParameters::PaintParameters(gfx::Context& context_,
                     float pixelRatio_,
-                    GLContextMode contextMode_,
-                    RendererBackend& backend_,
+                    gfx::RendererBackend& backend_,
                     const UpdateParameters& updateParameters,
                     const EvaluatedLight& evaluatedLight_,
                     RenderStaticData& staticData_,
@@ -17,6 +18,7 @@ PaintParameters::PaintParameters(gfx::Context& context_,
                     Placement::VariableOffsets variableOffsets_)
     : context(context_),
     backend(backend_),
+    encoder(context.createCommandEncoder()),
     state(updateParameters.transformState),
     evaluatedLight(evaluatedLight_),
     staticData(staticData_),
@@ -24,7 +26,6 @@ PaintParameters::PaintParameters(gfx::Context& context_,
     lineAtlas(lineAtlas_),
     mapMode(updateParameters.mode),
     debugOptions(updateParameters.debugOptions),
-    contextMode(contextMode_),
     timePoint(updateParameters.timePoint),
     pixelRatio(pixelRatio_),
     variableOffsets(variableOffsets_),
@@ -52,6 +53,8 @@ PaintParameters::PaintParameters(gfx::Context& context_,
         pixelsToGLUnits[1] *= -1;
     }
 }
+
+PaintParameters::~PaintParameters() = default;
 
 mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID, bool aligned) const {
     mat4 matrix;

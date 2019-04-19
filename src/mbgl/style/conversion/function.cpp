@@ -251,7 +251,7 @@ static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, con
                             error.message = "value must be an array of numbers";
                             return nullopt;
                         }
-                        result.push_back(double(*number));
+                        result.emplace_back(double(*number));
                     }
                     return literal(result);
                 },
@@ -264,7 +264,7 @@ static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, con
                             error.message = "value must be an array of strings";
                             return nullopt;
                         }
-                        result.push_back(*string);
+                        result.emplace_back(*string);
                     }
                     return literal(result);
                 },

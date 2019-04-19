@@ -4,7 +4,6 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/tile/tile.hpp>
@@ -13,33 +12,39 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
+#include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
-#include <mbgl/gl/context.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
-RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)),
-      unevaluated(impl().paint.untransitioned()) {
+inline const FillExtrusionLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const FillExtrusionLayer::Impl&>(*impl);
 }
 
-const style::FillExtrusionLayer::Impl& RenderFillExtrusionLayer::impl() const {
-    return static_cast<const style::FillExtrusionLayer::Impl&>(*baseImpl);
+RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
+    : RenderLayer(makeMutable<FillExtrusionLayerProperties>(std::move(_impl))),
+      unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
+
+RenderFillExtrusionLayer::~RenderFillExtrusionLayer() = default;
 
 void RenderFillExtrusionLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
 
 void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    evaluated = unevaluated.evaluate(parameters);
-    crossfade = parameters.getCrossfadeParameters();
+    auto properties = makeMutable<FillExtrusionLayerProperties>(
+        staticImmutableCast<FillExtrusionLayer::Impl>(baseImpl),
+        parameters.getCrossfadeParameters(),
+        unevaluated.evaluate(parameters));
 
-    passes = (evaluated.get<style::FillExtrusionOpacity>() > 0)
+    passes = (properties->evaluated.get<style::FillExtrusionOpacity>() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
+    evaluatedProperties = std::move(properties);
 }
 
 bool RenderFillExtrusionLayer::hasTransition() const {
@@ -47,56 +52,58 @@ bool RenderFillExtrusionLayer::hasTransition() const {
 }
 
 bool RenderFillExtrusionLayer::hasCrossfade() const {
-    return crossfade.t != 1;
+    return getCrossfade<FillExtrusionLayerProperties>(evaluatedProperties).t != 1;
 }
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*) {
-    // TODO: remove cast
-    gl::Context& glContext = reinterpret_cast<gl::Context&>(parameters.context);
-
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
-
     if (parameters.pass == RenderPass::Pass3D) {
         const auto& size = parameters.staticData.backendSize;
 
         if (!renderTexture || renderTexture->getSize() != size) {
-            renderTexture = OffscreenTexture(parameters.context, size, *parameters.staticData.depthRenderbuffer);
+            renderTexture.reset();
+            renderTexture = parameters.context.createOffscreenTexture(size, *parameters.staticData.depthRenderbuffer);
         }
-
-        renderTexture->bind();
 
         optional<float> depthClearValue = {};
         if (parameters.staticData.depthRenderbuffer->needsClearing()) depthClearValue = 1.0;
         // Flag the depth buffer as no longer needing to be cleared for the remainder of this pass.
-        parameters.staticData.depthRenderbuffer->shouldClear(false);
+        parameters.staticData.depthRenderbuffer->setShouldClear(false);
 
-        glContext.setStencilMode(gfx::StencilMode::disabled());
-        glContext.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
+        auto renderPass = parameters.encoder->createRenderPass(
+            "fill extrusion",
+            { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {} });
 
-        auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues,
+        auto draw = [&](auto& programInstance,
+                        const auto& evaluated_,
+                        const auto& crossfade_,
+                        const auto& tileBucket,
+                        auto&& uniformValues,
                         const optional<ImagePosition>& patternPositionA,
-                        const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
+                        const optional<ImagePosition>& patternPositionB,
+                        auto&& textureBindings) {
             const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(getID());
-            paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
+            paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade_);
 
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
                 paintPropertyBinders,
-                evaluated,
+                evaluated_,
                 parameters.state.getZoom()
             );
             const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                 *tileBucket.vertexBuffer,
                 paintPropertyBinders,
-                evaluated
+                evaluated_
             );
 
             checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
             programInstance.draw(
                 parameters.context,
+                *renderPass,
                 gfx::Triangles(),
                 parameters.depthModeFor3D(gfx::DepthMaskType::ReadWrite),
                 gfx::StencilMode::disabled(),
@@ -112,14 +119,17 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         if (unevaluated.get<FillExtrusionPattern>().isUndefined()) {
             for (const RenderTile& tile : renderTiles) {
-                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
-                if (!bucket_) {
+                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                if (!renderData) {
                     continue;
                 }
-                FillExtrusionBucket& bucket = *bucket_;
-
+                auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
+                const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(renderData->layerProperties);
+                const auto& crossfade = getCrossfade<FillExtrusionLayerProperties>(renderData->layerProperties);
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion,
+                    evaluated,
+                    crossfade,
                     bucket,
                     FillExtrusionProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -135,18 +145,23 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             }
         } else {
             for (const RenderTile& tile : renderTiles) {
-                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
-                if (!bucket_) {
+                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                if (!renderData) {
                     continue;
                 }
+                auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
+                const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(renderData->layerProperties);
+                const auto& crossfade = getCrossfade<FillExtrusionLayerProperties>(renderData->layerProperties);
+
                 const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
-                GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
+                auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
                 optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
                 optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
-                FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern,
+                    evaluated,
+                    crossfade,
                     bucket,
                     FillExtrusionPatternProgram::layoutUniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -163,7 +178,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     patternPosA,
                     patternPosB,
                     FillExtrusionPatternProgram::TextureBindings{
-                        textures::image::Value{ *geometryTile.iconAtlasTexture->resource, gfx::TextureFilterType::Linear },
+                        textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
                     }
                 );
             }
@@ -171,6 +186,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
     } else if (parameters.pass == RenderPass::Translucent) {
         const auto& size = parameters.staticData.backendSize;
+        const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
 
         mat4 viewportMat;
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
@@ -200,6 +216,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         programInstance.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::Triangles(),
             gfx::DepthMode::disabled(),
             gfx::StencilMode::disabled(),
@@ -210,7 +227,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             allUniformValues,
             allAttributeBindings,
             ExtrusionTextureProgram::TextureBindings{
-                textures::image::Value{ *renderTexture->getTexture().resource },
+                textures::image::Value{ renderTexture->getTexture().getResource() },
             },
             getID());
     }
@@ -223,7 +240,7 @@ bool RenderFillExtrusionLayer::queryIntersectsFeature(
         const TransformState& transformState,
         const float pixelsToTileUnits,
         const mat4&) const {
-
+    const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::FillExtrusionTranslate>(),

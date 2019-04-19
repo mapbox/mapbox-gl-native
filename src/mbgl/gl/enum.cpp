@@ -283,5 +283,37 @@ platform::GLenum Enum<gfx::TextureChannelDataType>::to(const gfx::TextureChannel
     return GL_INVALID_ENUM;
 }
 
+template <>
+gfx::RenderbufferPixelType Enum<gfx::RenderbufferPixelType>::from(const platform::GLint value) {
+    switch (value) {
+#if not MBGL_USE_GLES2
+        case GL_RGBA8: return gfx::RenderbufferPixelType::RGBA;
+        case GL_DEPTH_COMPONENT: return gfx::RenderbufferPixelType::Depth;
+        case GL_DEPTH24_STENCIL8: return gfx::RenderbufferPixelType::DepthStencil;
+#else
+        case GL_RGBA8_OES: return gfx::RenderbufferPixelType::RGBA;
+        case GL_DEPTH_COMPONENT16: return gfx::RenderbufferPixelType::Depth;
+        case GL_DEPTH24_STENCIL8_OES: return gfx::RenderbufferPixelType::DepthStencil;
+#endif
+    }
+    return {};
+}
+
+template <>
+platform::GLenum Enum<gfx::RenderbufferPixelType>::to(const gfx::RenderbufferPixelType value) {
+    switch (value) {
+#if not MBGL_USE_GLES2
+        case gfx::RenderbufferPixelType::RGBA: return GL_RGBA8;
+        case gfx::RenderbufferPixelType::Depth: return GL_DEPTH_COMPONENT;
+        case gfx::RenderbufferPixelType::DepthStencil: return GL_DEPTH24_STENCIL8;
+#else
+        case gfx::RenderbufferPixelType::RGBA: return GL_RGBA8_OES;
+        case gfx::RenderbufferPixelType::Depth: return GL_DEPTH_COMPONENT16;
+        case gfx::RenderbufferPixelType::DepthStencil: return GL_DEPTH24_STENCIL8_OES;
+#endif
+    }
+    return GL_INVALID_ENUM;
+}
+
 } // namespace gl
 } // namespace mbgl

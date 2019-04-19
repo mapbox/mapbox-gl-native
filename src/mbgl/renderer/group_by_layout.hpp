@@ -1,12 +1,12 @@
 #pragma once
 
+#include <mbgl/style/layer_impl.hpp>
+
 #include <vector>
 #include <memory>
 
 namespace mbgl {
 
-class RenderLayer;
-
-std::vector<std::vector<const RenderLayer*>> groupByLayout(const std::vector<std::unique_ptr<RenderLayer>>&);
+std::string layoutKey(const style::Layer::Impl& impl);
 
 } // namespace mbgl

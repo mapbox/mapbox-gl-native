@@ -13,6 +13,11 @@ public class MapboxConstants {
   public static final Locale MAPBOX_LOCALE = Locale.US;
 
   /**
+   * The name of the desired preferences file for Android's SharedPreferences.
+   */
+  public static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
+
+  /**
    * Key used to switch storage to external in AndroidManifest.xml
    */
   public static final String KEY_META_DATA_SET_STORAGE_EXTERNAL = "com.mapbox.SetStorageExternal";
@@ -21,6 +26,16 @@ public class MapboxConstants {
    * Default value for KEY_META_DATA_SET_STORAGE_EXTERNAL (default is internal storage)
    */
   public static final boolean DEFAULT_SET_STORAGE_EXTERNAL = false;
+
+  /**
+   * Key used to switch Tile Download Measuring on/off in AndroidManifest.xml
+   */
+  public static final String KEY_META_DATA_MEASURE_TILE_DOWNLOAD_ON = "com.mapbox.MeasureTileDownloadOn";
+
+  /**
+   * Default value for KEY_META_DATA_MEASURE_TILE_DOWNLOAD_ON (default is off)
+   */
+  public static final boolean DEFAULT_MEASURE_TILE_DOWNLOAD_ON = false;
 
   /**
    * Unmeasured state

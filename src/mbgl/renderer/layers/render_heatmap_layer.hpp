@@ -4,22 +4,22 @@
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
 #include <mbgl/gfx/texture.hpp>
+#include <mbgl/gfx/offscreen_texture.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/offscreen_texture.hpp>
 
 namespace mbgl {
 
-class RenderHeatmapLayer: public RenderLayer {
+class RenderHeatmapLayer final : public RenderLayer {
 public:
-    RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl>);
-    ~RenderHeatmapLayer() final = default;
+    explicit RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl>);
+    ~RenderHeatmapLayer() override;
 
+private:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
-    void update() final;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
@@ -31,20 +31,11 @@ public:
 
     // Paint properties
     style::HeatmapPaintProperties::Unevaluated unevaluated;
-    style::HeatmapPaintProperties::PossiblyEvaluated evaluated;
-
-    const style::HeatmapLayer::Impl& impl() const;
-
     PremultipliedImage colorRamp;
-    optional<OffscreenTexture> renderTexture;
+    std::unique_ptr<gfx::OffscreenTexture> renderTexture;
     optional<gfx::Texture> colorRampTexture;
 
-private:
     void updateColorRamp();
 };
-
-inline const RenderHeatmapLayer* toRenderHeatmapLayer(const RenderLayer* layer) {
-    return static_cast<const RenderHeatmapLayer*>(layer);
-}
 
 } // namespace mbgl

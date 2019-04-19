@@ -287,7 +287,7 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
             outputType = (*output)->getType();
         }
         
-        branches.push_back(std::make_pair(std::move(labels), std::move(*output)));
+        branches.emplace_back(std::move(labels), std::move(*output));
     }
 
     auto input = ctx.parse(arrayMember(value, 1), 1, {type::Value});

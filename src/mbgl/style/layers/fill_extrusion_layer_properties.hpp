@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -54,6 +56,21 @@ class FillExtrusionPaintProperties : public Properties<
     FillExtrusionBase,
     FillExtrusionVerticalGradient
 > {};
+
+class FillExtrusionLayerProperties final : public LayerProperties {
+public:
+    explicit FillExtrusionLayerProperties(Immutable<FillExtrusionLayer::Impl>);
+    FillExtrusionLayerProperties(
+        Immutable<FillExtrusionLayer::Impl>,
+        CrossfadeParameters,
+        FillExtrusionPaintProperties::PossiblyEvaluated);
+    ~FillExtrusionLayerProperties() override;
+
+    const FillExtrusionLayer::Impl& layerImpl() const;
+    // Data members.
+    CrossfadeParameters crossfade;
+    FillExtrusionPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-JAZZY_VERSION="0.9.5"
+JAZZY_VERSION="0.9.6"
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
@@ -18,7 +18,7 @@ if [ -z `which wget` ]; then
     brew install wget
 fi
 
-if [ -z `which jazzy` ]; then
+if [[ -z `which jazzy` || $(jazzy -v) != "jazzy version: ${JAZZY_VERSION}" ]]; then
     step "Installing jazzy…"
 
     CIRCLECI=${CIRCLECI:-false}

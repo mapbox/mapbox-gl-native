@@ -7,6 +7,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
 import com.mapbox.mapboxsdk.testapp.R
+import com.mapbox.mapboxsdk.testapp.utils.NavUtils
 import kotlinx.android.synthetic.main.activity_backstack_fragment.*
 
 /**
@@ -14,32 +15,38 @@ import kotlinx.android.synthetic.main.activity_backstack_fragment.*
  */
 class FragmentBackStackActivity : AppCompatActivity() {
 
-    private lateinit var mapFragment: SupportMapFragment
+  private lateinit var mapFragment: SupportMapFragment
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_backstack_fragment)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_backstack_fragment)
 
-        mapFragment = SupportMapFragment.newInstance()
-        mapFragment.getMapAsync { initMap(it) }
+    mapFragment = SupportMapFragment.newInstance()
+    mapFragment.getMapAsync { initMap(it) }
 
-        supportFragmentManager.beginTransaction().apply {
-            add(R.id.container, mapFragment)
-        }.commit()
+    supportFragmentManager.beginTransaction().apply {
+      add(R.id.container, mapFragment)
+    }.commit()
 
-        button.setOnClickListener { handleClick(it) }
+    button.setOnClickListener { handleClick(it) }
+  }
+
+  private fun initMap(mapboxMap: MapboxMap) {
+    mapboxMap.setStyle(Style.SATELLITE) {
+      mapboxMap.setPadding(300, 300, 300, 300)
     }
+  }
 
-    private fun initMap(mapboxMap: MapboxMap) {
-        mapboxMap.setStyle(Style.SATELLITE) {
-            mapboxMap.setPadding(300, 300, 300, 300)
-        }
-    }
+  private fun handleClick(button: View) {
+    supportFragmentManager.beginTransaction().apply {
+      replace(R.id.container, NestedViewPagerActivity.ItemAdapter.EmptyFragment())
+      addToBackStack("map_empty_fragment")
+    }.commit()
+  }
 
-    private fun handleClick(button: View) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.container, NestedViewPagerActivity.ItemAdapter.EmptyFragment())
-            addToBackStack("map_empty_fragment")
-        }.commit()
-    }
+  override fun onBackPressed() {
+    // activity uses singleInstance for testing purposes
+    // code below provides a default navigation when using the app
+    NavUtils.navigateHome(this)
+  }
 }

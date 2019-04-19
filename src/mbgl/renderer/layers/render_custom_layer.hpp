@@ -5,22 +5,20 @@
 
 namespace mbgl {
 
-class RenderCustomLayer: public RenderLayer {
+class RenderCustomLayer final : public RenderLayer {
 public:
-    RenderCustomLayer(Immutable<style::CustomLayer::Impl>);
-    ~RenderCustomLayer() final;
+    explicit RenderCustomLayer(Immutable<style::CustomLayer::Impl>);
+    ~RenderCustomLayer() override;
 
-    void transition(const TransitionParameters&) final {}
+private:
+    void transition(const TransitionParameters&) override {}
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
-    void markContextDestroyed() final;
+    void markContextDestroyed() override;
 
-    void render(PaintParameters&, RenderSource*) final;
+    void render(PaintParameters&, RenderSource*) override;
 
-    const style::CustomLayer::Impl& impl() const;
-
-private:
     bool contextDestroyed = false;
     std::shared_ptr<style::CustomLayerHost> host;
 };

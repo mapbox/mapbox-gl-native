@@ -17,10 +17,9 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
+#import <mbgl/gl/renderer_backend.hpp>
+#import <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/geo.hpp>
@@ -49,7 +48,6 @@
 #import "NSDate+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "NSPredicate+MGLPrivateAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
 #import "UIDevice+MGLAdditions.h"
@@ -215,6 +213,7 @@ public:
 @property (nonatomic) NSMutableArray<NSLayoutConstraint *> *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
 @property (nonatomic) NSMutableArray<NSLayoutConstraint *> *attributionButtonConstraints;
+@property (nonatomic, weak) UIAlertController *attributionController;
 
 @property (nonatomic, readwrite) MGLStyle *style;
 
@@ -256,7 +255,8 @@ public:
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
-@property (nonatomic) BOOL enablePresentsWithTransaction;
+@property (nonatomic, readonly) BOOL enablePresentsWithTransaction;
+@property (nonatomic) UIImage *lastSnapshotImage;
 
 /// Experimental rendering performance measurement.
 @property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
@@ -300,7 +300,6 @@ public:
     /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
     BOOL _isChangingAnnotationLayers;
     BOOL _isWaitingForRedundantReachableNotification;
-    BOOL _isTargetingInterfaceBuilder;
 
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
@@ -405,14 +404,12 @@ public:
     }
 
     NSString *styleURLString = @(self.mbglMap.getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
-    MGLAssert(styleURLString || _isTargetingInterfaceBuilder, @"Invalid style URL string %@", styleURLString);
+    MGLAssert(styleURLString, @"Invalid style URL string %@", styleURLString);
     return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
 - (void)setStyleURL:(nullable NSURL *)styleURL
 {
-    if (_isTargetingInterfaceBuilder) return;
-
     if ( ! styleURL)
     {
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -447,7 +444,6 @@ public:
 
 - (void)commonInit
 {
-    _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = NO;
     _atLeastiOS_12_2_0 = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){12,2,0}];
 
@@ -482,7 +478,7 @@ public:
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
     _mbglThreadPool = mbgl::sharedThreadPool();
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.cacheDir, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
 
@@ -502,7 +498,7 @@ public:
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // start paused if in IB
-    if (_isTargetingInterfaceBuilder || background) {
+    if (background) {
         self.dormant = YES;
     }
 
@@ -640,9 +636,11 @@ public:
     // observe app activity
     //
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willTerminate) name:UIApplicationWillTerminateNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    
     // As of 3.7.5, we intentionally do not listen for `UIApplicationWillResignActiveNotification` or call `sleepGL:` in response to it, as doing
     // so causes a loop when asking for location permission. See: https://github.com/mapbox/mapbox-gl-native/issues/11225
 
@@ -836,7 +834,12 @@ public:
 {
     MGLAssertIsMainThread();
 
-    _rendererFrontend->reduceMemoryUse();
+    if ( ! self.dormant && _rendererFrontend)
+    {
+        _rendererFrontend->reduceMemoryUse();
+    }
+    
+    self.lastSnapshotImage = nil;
 }
 
 #pragma mark - Layout -
@@ -986,7 +989,7 @@ public:
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(__unused GLKView *)view drawInRect:(__unused CGRect)rect
 {
-    if ( ! self.dormant || ! _rendererFrontend)
+    if ( ! self.dormant && _rendererFrontend)
     {
         _rendererFrontend->render();
     }
@@ -1007,7 +1010,7 @@ public:
 
     [self adjustContentInset];
 
-    if (!_isTargetingInterfaceBuilder && _mbglMap) {
+    if (_mbglMap) {
         self.mbglMap.setSize([self size]);
     }
 
@@ -1022,6 +1025,8 @@ public:
     }
 
     [self updateUserLocationAnnotationView];
+
+    [self updateAttributionAlertView];
 }
 
 /// Updates `contentInset` to reflect the current window geometry.
@@ -1125,6 +1130,13 @@ public:
 
     // Mismatched display link
     if (displayLink && displayLink != _displayLink) {
+        return;
+    }
+
+    // Check to ensure rendering doesn't occur in the background
+    if (([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) &&
+        ![self supportsBackgroundRendering])
+    {
         return;
     }
     
@@ -1274,19 +1286,17 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
-- (void)setEnablePresentsWithTransaction:(BOOL)enablePresentsWithTransaction
+- (void)updatePresentsWithTransaction
 {
-    if (_enablePresentsWithTransaction == enablePresentsWithTransaction)
-    {
-        return;
-    }
+    BOOL hasEnoughViewAnnotations = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
+    BOOL hasAnAnchoredCallout = [self hasAnAnchoredAnnotationCalloutView];
     
-    _enablePresentsWithTransaction = enablePresentsWithTransaction;
+    _enablePresentsWithTransaction = (hasEnoughViewAnnotations || hasAnAnchoredCallout);
     
     // If the map is visible, change the layer property too
     if (self.window) {
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
-        eaglLayer.presentsWithTransaction = enablePresentsWithTransaction;
+        eaglLayer.presentsWithTransaction = _enablePresentsWithTransaction;
     }
 }
 
@@ -1342,8 +1352,6 @@ public:
         // In iOS 12.2, CAEAGLLayer.presentsWithTransaction can cause dramatic
         // slow down. The exact cause of this is unknown, but this work around
         // appears to lessen the effects.
-        //
-        // Also, consider calling the new mbgl::Renderer::flush()
         CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
         eaglLayer.presentsWithTransaction = NO;
         
@@ -1467,6 +1475,55 @@ public:
     [self setNeedsLayout];
 }
 
+#pragma mark - Application lifecycle
+- (void)willResignActive:(NSNotification *)notification
+{
+    if ([self supportsBackgroundRendering])
+    {
+        return;
+    }
+    
+    self.lastSnapshotImage = self.glView.snapshot;
+    
+    // For OpenGL this calls glFinish as recommended in
+    // https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/ImplementingaMultitasking-awareOpenGLESApplication/ImplementingaMultitasking-awareOpenGLESApplication.html#//apple_ref/doc/uid/TP40008793-CH5-SW1
+    // reduceMemoryUse(), calls performCleanup(), which calls glFinish
+    if (_rendererFrontend)
+    {
+        _rendererFrontend->reduceMemoryUse();
+    }
+}
+
+- (void)didEnterBackground:(NSNotification *)notification
+{
+    [self sleepGL:notification];
+}
+
+- (void)willEnterForeground:(NSNotification *)notification
+{
+    // Do nothing, currently if wakeGL is called here it's a no-op.
+}
+
+- (void)didBecomeActive:(NSNotification *)notification
+{
+    [self wakeGL:notification];
+    self.lastSnapshotImage = nil;
+}
+
+#pragma mark - GL / display link wake/sleep
+
+- (BOOL)supportsBackgroundRendering
+{
+    // If this view targets an external display, such as AirPlay or CarPlay, we
+    // can safely continue to render OpenGL content without tripping
+    // gpus_ReturnNotPermittedKillClient in libGPUSupportMercury, because the
+    // external connection keeps the application from truly receding to the
+    // background.
+    return (self.window.screen != [UIScreen mainScreen]);
+}
+
+
+
 - (void)sleepGL:(__unused NSNotification *)notification
 {
     // If this view targets an external display, such as AirPlay or CarPlay, we
@@ -1474,7 +1531,7 @@ public:
     // gpus_ReturnNotPermittedKillClient in libGPUSupportMercury, because the
     // external connection keeps the application from truly receding to the
     // background.
-    if (self.window.screen != [UIScreen mainScreen])
+    if ([self supportsBackgroundRendering])
     {
         return;
     }
@@ -1487,7 +1544,10 @@ public:
     // Compromise position: release everything but currently rendering tiles
     // A possible improvement would be to store a copy of the GL buffers that we could use to rapidly
     // restart, but that we could also discard in response to a memory warning.
-    _rendererFrontend->reduceMemoryUse();
+    if (_rendererFrontend)
+    {
+        _rendererFrontend->reduceMemoryUse();
+    }
 
     if ( ! self.dormant)
     {
@@ -1507,7 +1567,7 @@ public:
             [self insertSubview:self.glSnapshotView aboveSubview:self.glView];
         }
 
-        self.glSnapshotView.image = self.glView.snapshot;
+        self.glSnapshotView.image = self.lastSnapshotImage;
         self.glSnapshotView.hidden = NO;
 
         if (self.debugMask && [self.glSnapshotView.subviews count] == 0)
@@ -2287,6 +2347,10 @@ public:
 {
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, calloutView);
+    
+    [self updatePresentsWithTransaction];
+    
+    // TODO: Add sibling disappear method
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
@@ -2425,6 +2489,7 @@ public:
     
     UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
     [viewController presentViewController:attributionController animated:YES completion:NULL];
+    self.attributionController = attributionController;
 }
 
 - (void)presentTelemetryAlertController
@@ -4276,7 +4341,7 @@ public:
     [_glView insertSubview:newAnnotationContainerView atIndex:0];
     self.annotationContainerView = newAnnotationContainerView;
     
-    self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
+    [self updatePresentsWithTransaction];
 }
 
 /// Initialize and return a default annotation image that depicts a round pin
@@ -4450,8 +4515,6 @@ public:
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
         [self.annotationContainerView.annotationViews removeObject:annotationView];
-        
-        self.enablePresentsWithTransaction = (self.annotationContainerView.annotationViews.count > MGLPresentsWithTransactionAnnotationCount);
 
         if (annotationTag == _selectedAnnotationTag)
         {
@@ -4473,6 +4536,8 @@ public:
         _isChangingAnnotationLayers = YES;
         self.mbglMap.removeAnnotation(annotationTag);
     }
+
+    [self updatePresentsWithTransaction];
 
     [self didChangeValueForKey:@"annotations"];
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
@@ -5151,6 +5216,8 @@ public:
         {
             [self.delegate mapView:self didDeselectAnnotationView:annotationView];
         }
+        
+        [self updatePresentsWithTransaction];
     }
 }
 
@@ -5344,7 +5411,7 @@ public:
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
     MGLLogDebug(@"Setting showsUserLocation: %@", MGLStringFromBOOL(showsUserLocation));
-    if (showsUserLocation == _showsUserLocation || _isTargetingInterfaceBuilder) return;
+    if (showsUserLocation == _showsUserLocation) return;
 
     _showsUserLocation = showsUserLocation;
 
@@ -6377,6 +6444,19 @@ public:
     }
 }
 
+- (BOOL)hasAnAnchoredAnnotationCalloutView
+{
+    // TODO: Remove duplicate code.
+    UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
+    id <MGLAnnotation> annotation = calloutView.representedObject;
+    
+    BOOL isAnchoredToAnnotation = (calloutView
+                                   && annotation
+                                   && [calloutView respondsToSelector:@selector(isAnchoredToAnnotation)]
+                                   && calloutView.isAnchoredToAnnotation);
+    return isAnchoredToAnnotation;
+}
+
 - (void)updateCalloutView
 {
     UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
@@ -6410,6 +6490,23 @@ public:
         if ( ! CGPointEqualToPoint(calloutView.center, centerPoint)) {
             calloutView.center = centerPoint;
         }
+    }
+}
+
+- (void)updateAttributionAlertView {
+    if (self.attributionController.presentingViewController) {
+        self.attributionController.popoverPresentationController.sourceRect = self.attributionButton.frame;
+        switch (self.attributionButtonPosition) {
+            case MGLOrnamentPositionTopLeft:
+            case MGLOrnamentPositionTopRight:
+                [self.attributionController.popoverPresentationController setPermittedArrowDirections:UIMenuControllerArrowUp];
+                break;
+            case MGLOrnamentPositionBottomLeft:
+            case MGLOrnamentPositionBottomRight:
+                [self.attributionController.popoverPresentationController setPermittedArrowDirections:UIMenuControllerArrowDown];
+                break;
+        }
+        [self.attributionController.popoverPresentationController.containerView setNeedsLayout];
     }
 }
 
@@ -6720,10 +6817,28 @@ public:
     return _annotationViewReuseQueueByIdentifier[identifier];
 }
 
-class MBGLView : public mbgl::RendererBackend, public mbgl::MapObserver
-{
+class MBGLView;
+
+class MBGLMapViewRenderable final : public mbgl::gl::RenderableResource {
 public:
-    MBGLView(MGLMapView* nativeView_) : nativeView(nativeView_) {
+    MBGLMapViewRenderable(MBGLView& backend_) : backend(backend_) {
+    }
+
+    void bind() override;
+
+private:
+    MBGLView& backend;
+};
+
+class MBGLView : public mbgl::gl::RendererBackend,
+                 public mbgl::gfx::Renderable,
+                 public mbgl::MapObserver {
+public:
+    MBGLView(MGLMapView* nativeView_)
+        : mbgl::gl::RendererBackend(mbgl::gfx::ContextMode::Unique),
+          mbgl::gfx::Renderable(nativeView_.framebufferSize,
+                                std::make_unique<MBGLMapViewRenderable>(*this)),
+          nativeView(nativeView_) {
     }
 
     /// This function is called before we start rendering, when iOS invokes our rendering method.
@@ -6734,7 +6849,7 @@ public:
         assumeViewport(0, 0, nativeView.framebufferSize);
     }
 
-    void bind() override {
+    void restoreFramebufferBinding() {
         if (!implicitFramebufferBound()) {
             // Something modified our state, and we need to bind the original drawable again.
             // Doing this also sets the viewport to the full framebuffer.
@@ -6746,10 +6861,6 @@ public:
             // Our framebuffer is still bound, but the viewport might have changed.
             setViewport(0, 0, nativeView.framebufferSize);
         }
-    }
-
-    mbgl::Size getFramebufferSize() const override {
-        return nativeView.framebufferSize;
     }
 
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
@@ -6856,6 +6967,10 @@ public:
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
     }
 
+    mbgl::gfx::Renderable& getDefaultRenderable() override {
+        return *this;
+    }
+
     void activate() override
     {
         if (activationCount++)
@@ -6877,10 +6992,14 @@ public:
     }
 
 private:
-    __weak MGLMapView *nativeView = nullptr;
+    __weak MGLMapView* nativeView = nullptr;
 
     NSUInteger activationCount = 0;
 };
+
+void MBGLMapViewRenderable::bind() {
+    backend.restoreFramebufferBinding();
+}
 
 @end
 

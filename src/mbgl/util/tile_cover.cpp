@@ -237,9 +237,7 @@ TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project/* = t
  : impl( std::make_unique<TileCover::Impl>(z, geom, project)) {
 }
 
-TileCover::~TileCover() {
-
-}
+TileCover::~TileCover() = default;
 
 optional<UnwrappedTileID> TileCover::next() {
     return impl->next();
