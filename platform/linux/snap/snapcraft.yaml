@@ -30,6 +30,7 @@ parts:
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
       nvm install 8.15.1
       make clean glfw-app
+      cp build/linux-x86_64/Debug/mbgl-glfw /bin
     build-packages:
       - automake
       - build-essential
@@ -60,4 +61,4 @@ parts:
 
 apps:
   mbgl-glfw:
-    command: mbgl-glfw
+    command: /bin/mbgl-glfw
