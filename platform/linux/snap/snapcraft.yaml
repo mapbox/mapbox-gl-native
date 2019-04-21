@@ -5,7 +5,7 @@
 
 name: mapbox-demo
 base: core18
-version: '20190420-master'
+version: '20190421-master'
 summary: A simple map application for Linux.
 description: |
   A simple map application and test suite for Linux, based on Mapbox GL Native
@@ -16,6 +16,10 @@ description: |
 
 grade: stable
 confinement: strict
+
+apps:
+  mbgl-glfw:
+    command: bin/mbgl-glfw
 
 parts:
   mbgl-glfw:
@@ -29,8 +33,16 @@ parts:
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
       nvm install 8.15.1
+      sed -i '/ca-bundle.crt/d' platform/default/src/mbgl/storage/http_file_source.cpp
       make clean glfw-app
-      cp build/linux-x86_64/Debug/mbgl-glfw /bin
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp build/linux-x86_64/Debug/mbgl-glfw $SNAPCRAFT_PART_INSTALL/bin/mbgl-glfw
+    stage:
+      - bin/
+      - usr/lib
+    prime:
+      - bin/
+      - usr/lib
     build-packages:
       - automake
       - build-essential
@@ -58,7 +70,23 @@ parts:
       - x11proto-xf86vidmode-dev
       - xutils-dev
       - zlib1g-dev
-
-apps:
-  mbgl-glfw:
-    command: /bin/mbgl-glfw
+    stage-packages:
+      - libx11-6
+      - libasn1-8-heimdal
+      - libcurl4-openssl-dev
+      - libgl1
+      - libglvnd0
+      - libglx0
+      - libgssapi3-heimdal
+      - libhcrypto4-heimdal
+      - libheimbase1-heimdal
+      - libheimntlm0-heimdal
+      - libhx509-5-heimdal
+      - libkrb5-26-heimdal
+      - libldap-2.4-2
+      - libnghttp2-14
+      - libpsl5
+      - libroken18-heimdal
+      - librtmp1
+      - libsasl2-2
+      - libwind0-heimdal

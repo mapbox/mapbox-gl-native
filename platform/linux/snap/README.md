@@ -22,7 +22,7 @@ First increase the default memory available to snapcraft. The default is 2G and 
 export SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G
 ```
 
-After that, run `snapcraft` to build the package:
+After that, run `snapcraft` to build the package. If you're planning to update the Snap Store with this build, make sure you update the version string in `snapcraft.yaml` with the right date:
 
 ```
 snapcraft --debug
@@ -35,7 +35,7 @@ snapcraft --debug
 You can install the snap package locally with:
 
 ```
-sudo snap install my-snap-name_0.1_amd64.snap --dangerous --devmode
+sudo snap install mapbox-demo_20190420-master_amd64.snap --dangerous --devmode
 ```
 
 ## Publishing it to the Snap Store
@@ -49,5 +49,5 @@ snapcraft login
 Upload the snap and release it into the edge channel:
 
 ```
-snapcraft push --release=edge mysnap_latest_amd64.snap
+snapcraft push --release=edge mapbox-demo_20190420-master_amd64.snap
 ```
