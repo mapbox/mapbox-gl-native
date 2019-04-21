@@ -3,9 +3,9 @@
 # See: https://github.com/mapbox/mapbox-gl-native/tree/master/platform/linux
 #
 
-name: mapbox-maps
+name: mapbox-demo
 base: core18
-version: '20190413-master'
+version: '20190420-master'
 summary: A simple map application for Linux.
 description: |
   A simple map application and test suite for Linux, based on Mapbox GL Native
@@ -14,8 +14,8 @@ description: |
   need to set up a MAPBOX_ACCESS_TOKEN environment variable with a valid
   Mapbox access token (you can get a free one at https://www.mapbox.com).
 
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+grade: stable
+confinement: strict
 
 parts:
   mbgl-glfw:
