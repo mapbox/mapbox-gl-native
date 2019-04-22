@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fix a bug that wrong position of attribution dialog after rotation. ([#14185](https://github.com/mapbox/mapbox-gl-native/pull/14185))
 * Speculatively fixed a bug where GL rendering could occur in the background. ([#14439](https://github.com/mapbox/mapbox-gl-native/pull/14439))
 * Fixed a bug with jittery callout views when using sprite-based annotations. ([#14445](https://github.com/mapbox/mapbox-gl-native/pull/14445))
+* Improved `MGLLocationManager` optional protocol properties briding to Swift. ([#14477](https://github.com/mapbox/mapbox-gl-native/pull/14477))
 
 ## 4.10.0 - April 17, 2019
 
