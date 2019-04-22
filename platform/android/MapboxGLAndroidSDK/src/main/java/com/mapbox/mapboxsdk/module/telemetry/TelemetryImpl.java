@@ -41,7 +41,9 @@ public class TelemetryImpl implements TelemetryDefinition {
   public void onAppUserTurnstileEvent() {
     AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
       BuildConfig.MAPBOX_SDK_VERSION);
-    turnstileEvent.setSkuId(MapboxAccounts.SKU_ID_MAPS_MAUS);
+    if (Mapbox.getSkuToken() != null) {
+      turnstileEvent.setSkuId(MapboxAccounts.SKU_ID_MAPS_MAUS);
+    }
     telemetry.push(turnstileEvent);
     telemetry.push(MapEventFactory.buildMapLoadEvent(new PhoneState(appContext)));
   }
