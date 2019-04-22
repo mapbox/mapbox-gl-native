@@ -578,7 +578,8 @@ public class LocationComponentOptions implements Parcelable {
   }
 
   /**
-   * Sets the base elevation of this view, in pixels.
+   * Sets the base elevation of this view, in pixels. To turn off the shadow that appears under
+   * the location icon, set the elevation to 0.
    *
    * @return the elevation currently set for the location component icon
    * @attr ref R.styleable#LocationComponent_elevation
