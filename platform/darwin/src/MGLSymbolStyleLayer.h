@@ -158,6 +158,11 @@ typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
  */
 typedef NS_ENUM(NSUInteger, MGLSymbolZOrder) {
     /**
+     If `MGLSymbolStyleLayer.symbolSortKey` is set, sort based on that.
+     Otherwise sort symbols by their position relative to the viewport.
+     */
+    MGLSymbolZOrderAuto,
+    /**
      Specify this z order if symbols’ appearance relies on lower features
      overlapping higher features. For example, symbols with a pin-like
      appearance would require this z order.
@@ -222,6 +227,10 @@ typedef NS_ENUM(NSUInteger, MGLTextAnchor) {
  property.
  */
 typedef NS_ENUM(NSUInteger, MGLTextJustification) {
+    /**
+     The text is aligned towards the anchor position.
+     */
+    MGLTextJustificationAuto,
     /**
      The text is aligned to the left.
      */
@@ -1015,6 +1024,23 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *symbolPlacement;
 
 /**
+ Sorts features in ascending order based on this value. Features with a higher
+ sort key will appear above features with a lower sort key wehn they overlap.
+ Features with a lower sort key will have priority over other features when
+ doing placement.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *symbolSortKey;
+
+/**
  Distance between two symbol anchors.
  
  This property is measured in points.
@@ -1041,13 +1067,15 @@ MGL_EXPORT
 /**
  Controls the order in which overlapping symbols in the same layer are rendered
  
- The default value of this property is an expression that evaluates to
- `viewport-y`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `auto`.
+ Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
  * Constant `MGLSymbolZOrder` values
  * Any of the following constant string values:
+   * `auto`: If `symbol-sort-key` is set, sort based on that. Otherwise sort
+ symbols by their position relative to the viewport.
    * `viewport-y`: Specify this z order if symbols’ appearance relies on lower
  features overlapping higher features. For example, symbols with a pin-like
  appearance would require this z order.
@@ -1082,6 +1110,7 @@ MGL_EXPORT
  You can set this property to an expression containing any of the following:
  
  * Constant string values
+ * Formatted expressions.
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1279,6 +1308,7 @@ MGL_EXPORT
  
  * Constant `MGLTextJustification` values
  * Any of the following constant string values:
+   * `auto`: The text is aligned towards the anchor position.
    * `left`: The text is aligned to the left.
    * `center`: The text is centered.
    * `right`: The text is aligned to the right.
@@ -1349,8 +1379,8 @@ MGL_EXPORT
  `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
  ems downward. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `text` is non-`nil`. Otherwise,
- it is ignored.
+ This property is only applied to the style if `text` is non-`nil`, and
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1372,8 +1402,8 @@ MGL_EXPORT
  `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
  ems upward. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `text` is non-`nil`. Otherwise,
- it is ignored.
+ This property is only applied to the style if `text` is non-`nil`, and
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1464,6 +1494,27 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *textPitchAlignment;
 
 /**
+ Radial offset of text, in the direction of the symbol's anchor. Useful in
+ combination with `textVariableAnchor`, which doesn't support the
+ two-dimensional `textOffset`.
+ 
+ This property is measured in ems.
+ 
+ This property is only applied to the style if `textOffset` is set to `nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *textRadialOffset;
+
+/**
  Rotates the text clockwise.
  
  This property is measured in degrees.
@@ -1548,6 +1599,47 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *textTransform;
+
+/**
+ To increase the chance of placing high-priority labels on the map, you can
+ provide an array of `textAnchor` locations: the render will attempt to place
+ the label at each location, in order, before moving onto the next label. Use
+ `textJustify: auto` to choose justification based on anchor position. To apply
+ an offset, use the `textRadialOffset` instead of the two-dimensional
+ `textOffset`.
+ 
+ This property is only applied to the style if `textAnchor` is set to `nil`, and
+ `textOffset` is set to `nil`, and `symbolPlacement` is set to an expression
+ that evaluates to or `MGLSymbolPlacementPoint`. Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `MGLTextAnchor` array values
+ * Constant array, whose each element is any of the following constant string
+ values:
+   * `center`: The center of the text is placed closest to the anchor.
+   * `left`: The left side of the text is placed closest to the anchor.
+   * `right`: The right side of the text is placed closest to the anchor.
+   * `top`: The top of the text is placed closest to the anchor.
+   * `bottom`: The bottom of the text is placed closest to the anchor.
+   * `top-left`: The top left corner of the text is placed closest to the
+ anchor.
+   * `top-right`: The top right corner of the text is placed closest to the
+ anchor.
+   * `bottom-left`: The bottom left corner of the text is placed closest to the
+ anchor.
+   * `bottom-right`: The bottom right corner of the text is placed closest to
+ the anchor.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *textVariableAnchor;
 
 #pragma mark - Accessing the Paint Attributes
 

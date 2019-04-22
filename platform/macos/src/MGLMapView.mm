@@ -34,10 +34,10 @@
 #import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/style/image.hpp>
 #import <mbgl/renderer/renderer.hpp>
-#import <mbgl/renderer/renderer_backend.hpp>
-#import <mbgl/renderer/backend_scope.hpp>
-#import <mbgl/storage/default_file_source.hpp>
+#import <mbgl/gl/renderer_backend.hpp>
+#import <mbgl/gl/renderable_resource.hpp>
 #import <mbgl/storage/network_status.hpp>
+#import <mbgl/storage/resource_options.hpp>
 #import <mbgl/math/wrap.hpp>
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/chrono.hpp>
@@ -286,16 +286,23 @@ public:
     _mbglThreadPool = mbgl::sharedThreadPool();
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *_mbglThreadPool, config.cacheDir, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
 
     mbgl::MapOptions mapOptions;
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
+              .withSize(self.size)
+              .withPixelRatio(config.scaleFactor)
               .withConstrainMode(mbgl::ConstrainMode::None)
               .withViewportMode(mbgl::ViewportMode::Default)
               .withCrossSourceCollisions(enableCrossSourceCollisions);
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *config.fileSource, *_mbglThreadPool, mapOptions);
+
+    mbgl::ResourceOptions resourceOptions;
+    resourceOptions.withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+                   .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, *_mbglThreadPool, mapOptions, resourceOptions);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
@@ -690,7 +697,7 @@ public:
         self.dormant = NO;
     }
 
-    if (window && _mbglMap->getConstrainMode() == mbgl::ConstrainMode::None) {
+    if (window && _mbglMap->getMapOptions().constrainMode() == mbgl::ConstrainMode::None) {
         _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
     }
 
@@ -3035,10 +3042,30 @@ public:
     _mbglMap->setDebug(options);
 }
 
-/// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::RendererBackend, public mbgl::MapObserver {
+class MGLMapViewImpl;
+
+class MGLMapViewRenderable final : public mbgl::gl::RenderableResource {
 public:
-    MGLMapViewImpl(MGLMapView *nativeView_) : nativeView(nativeView_) {}
+    MGLMapViewRenderable(MGLMapViewImpl& backend_) : backend(backend_) {
+    }
+
+    void bind() override;
+
+private:
+    MGLMapViewImpl& backend;
+};
+
+/// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
+class MGLMapViewImpl : public mbgl::gl::RendererBackend,
+                       public mbgl::gfx::Renderable,
+                       public mbgl::MapObserver {
+public:
+    MGLMapViewImpl(MGLMapView* nativeView_)
+        : mbgl::gl::RendererBackend(mbgl::gfx::ContextMode::Unique),
+          mbgl::gfx::Renderable(nativeView_.framebufferSize,
+                                std::make_unique<MGLMapViewRenderable>(*this)),
+          nativeView(nativeView_) {
+    }
 
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
         bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;
@@ -3135,6 +3162,10 @@ public:
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
     }
 
+    mbgl::gfx::Renderable& getDefaultRenderable() override {
+        return *this;
+    }
+
     void activate() override {
         if (activationCount++) {
             return;
@@ -3158,13 +3189,9 @@ public:
         assumeViewport(0, 0, nativeView.framebufferSize);
     }
 
-    void bind() override {
+    void restoreFramebufferBinding() {
         setFramebufferBinding(fbo);
         setViewport(0, 0, nativeView.framebufferSize);
-    }
-
-    mbgl::Size getFramebufferSize() const override {
-        return nativeView.framebufferSize;
     }
 
     mbgl::PremultipliedImage readStillImage() {
@@ -3181,5 +3208,9 @@ private:
     /// The reference counted count of activation calls
     NSUInteger activationCount = 0;
 };
+
+void MGLMapViewRenderable::bind() {
+    backend.restoreFramebufferBinding();
+}
 
 @end

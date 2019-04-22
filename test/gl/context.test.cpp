@@ -5,9 +5,11 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -86,14 +88,13 @@ struct Buffer {
 TEST(GLContextMode, Shared) {
     util::RunLoop loop;
 
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
-    float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, threadPool, {}, GLContextMode::Shared };
+    HeadlessFrontend frontend { 1, threadPool, {}, gfx::ContextMode::Shared };
 
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio,
-            fileSource, threadPool, MapOptions().withMapMode(MapMode::Static));
+    Map map(frontend, MapObserver::nullObserver(), threadPool,
+            MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
+            ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));
 
@@ -104,8 +105,8 @@ TEST(GLContextMode, Shared) {
 
     {
         // Custom rendering outside of GL Native render loop.
-        BackendScope scope { *frontend.getBackend() };
-        frontend.getBackend()->bind();
+        gfx::BackendScope scope { *frontend.getBackend() };
+        frontend.getBackend()->getDefaultRenderable().getResource<gl::RenderableResource>().bind();
 
         Shader paintShader(vertexShaderSource, fragmentShaderSource);
         Buffer triangleBuffer({ 0, 0.5, 0.5, -0.5, -0.5, -0.5 });

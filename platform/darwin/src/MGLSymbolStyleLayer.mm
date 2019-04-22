@@ -54,6 +54,7 @@ namespace mbgl {
     });
 
     MBGL_DEFINE_ENUM(MGLSymbolZOrder, {
+        { MGLSymbolZOrderAuto, "auto" },
         { MGLSymbolZOrderViewportY, "viewport-y" },
         { MGLSymbolZOrderSource, "source" },
     });
@@ -71,6 +72,7 @@ namespace mbgl {
     });
 
     MBGL_DEFINE_ENUM(MGLTextJustification, {
+        { MGLTextJustificationAuto, "auto" },
         { MGLTextJustificationLeft, "left" },
         { MGLTextJustificationCenter, "center" },
         { MGLTextJustificationRight, "right" },
@@ -586,6 +588,24 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::SymbolPlacementType, NSValue *, mbgl::style::SymbolPlacementType, MGLSymbolPlacement>().toExpression(propertyValue);
 }
 
+- (void)setSymbolSortKey:(NSExpression *)symbolSortKey {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting symbolSortKey: %@", symbolSortKey);
+
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(symbolSortKey, true);
+    self.rawLayer->setSymbolSortKey(mbglValue);
+}
+
+- (NSExpression *)symbolSortKey {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getSymbolSortKey();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultSymbolSortKey();
+    }
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
+}
+
 - (void)setSymbolSpacing:(NSExpression *)symbolSpacing {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting symbolSpacing: %@", symbolSpacing);
@@ -906,6 +926,24 @@ namespace mbgl {
     return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLTextPitchAlignment>().toExpression(propertyValue);
 }
 
+- (void)setTextRadialOffset:(NSExpression *)textRadialOffset {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting textRadialOffset: %@", textRadialOffset);
+
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(textRadialOffset, true);
+    self.rawLayer->setTextRadialOffset(mbglValue);
+}
+
+- (NSExpression *)textRadialOffset {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getTextRadialOffset();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultTextRadialOffset();
+    }
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
+}
+
 - (void)setTextRotation:(NSExpression *)textRotation {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting textRotation: %@", textRotation);
@@ -965,6 +1003,24 @@ namespace mbgl {
         propertyValue = self.rawLayer->getDefaultTextTransform();
     }
     return MGLStyleValueTransformer<mbgl::style::TextTransformType, NSValue *, mbgl::style::TextTransformType, MGLTextTransform>().toExpression(propertyValue);
+}
+
+- (void)setTextVariableAnchor:(NSExpression *)textVariableAnchor {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting textVariableAnchor: %@", textVariableAnchor);
+
+    auto mbglValue = MGLStyleValueTransformer<std::vector<mbgl::style::SymbolAnchorType>, NSArray<NSValue *> *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toPropertyValue<mbgl::style::PropertyValue<std::vector<mbgl::style::SymbolAnchorType>>>(textVariableAnchor, false);
+    self.rawLayer->setTextVariableAnchor(mbglValue);
+}
+
+- (NSExpression *)textVariableAnchor {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getTextVariableAnchor();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultTextVariableAnchor();
+    }
+    return MGLStyleValueTransformer<std::vector<mbgl::style::SymbolAnchorType>, NSArray<NSValue *> *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toExpression(propertyValue);
 }
 
 #pragma mark - Accessing the Paint Attributes

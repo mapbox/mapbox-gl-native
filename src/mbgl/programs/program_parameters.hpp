@@ -3,7 +3,6 @@
 #include <mbgl/util/optional.hpp>
 
 #include <string>
-#include <vector>
 
 namespace mbgl {
 
@@ -13,8 +12,6 @@ public:
 
     const std::string& getDefines() const;
     optional<std::string> cachePath(const char* name) const;
-
-    ProgramParameters withAdditionalDefines(const std::vector<std::string>& defines) const;
 
 private:
     std::string defines;

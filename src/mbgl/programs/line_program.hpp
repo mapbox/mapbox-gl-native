@@ -17,29 +17,29 @@ class LinePatternPos;
 class ImagePosition;
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_ratio);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_a);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_b);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_sdfgamma);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_a);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_b);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_gl_units_to_pixels);
+MBGL_DEFINE_UNIFORM_SCALAR(float, ratio);
+MBGL_DEFINE_UNIFORM_SCALAR(float, tex_y_a);
+MBGL_DEFINE_UNIFORM_SCALAR(float, tex_y_b);
+MBGL_DEFINE_UNIFORM_SCALAR(float, sdfgamma);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, patternscale_a);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, patternscale_b);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, gl_units_to_pixels);
 } // namespace uniforms
 
 using LineLayoutAttributes = TypeList<
-    attributes::a_pos_normal,
-    attributes::a_data<uint8_t, 4>>;
+    attributes::pos_normal,
+    attributes::data<uint8_t, 4>>;
 
 class LineProgram : public Program<
     LineProgram,
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_ratio,
-        uniforms::u_gl_units_to_pixels>,
+        uniforms::matrix,
+        uniforms::ratio,
+        uniforms::gl_units_to_pixels>,
     TypeList<>,
-    RenderLinePaintProperties>
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
@@ -90,7 +90,7 @@ public:
     static const int8_t extrudeScale = 63;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
                         const std::array<float, 2>& pixelsToGLUnits);
@@ -101,21 +101,21 @@ class LinePatternProgram : public Program<
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_ratio,
-        uniforms::u_gl_units_to_pixels,
-        uniforms::u_scale,
-        uniforms::u_texsize,
-        uniforms::u_fade>,
+        uniforms::matrix,
+        uniforms::ratio,
+        uniforms::gl_units_to_pixels,
+        uniforms::scale,
+        uniforms::texsize,
+        uniforms::fade>,
     TypeList<
-        textures::u_image>,
-    RenderLinePaintProperties>
+        textures::image>,
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
                         const std::array<float, 2>& pixelsToGLUnits,
@@ -129,24 +129,24 @@ class LineSDFProgram : public Program<
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_ratio,
-        uniforms::u_gl_units_to_pixels,
-        uniforms::u_patternscale_a,
-        uniforms::u_patternscale_b,
-        uniforms::u_tex_y_a,
-        uniforms::u_tex_y_b,
-        uniforms::u_mix,
-        uniforms::u_sdfgamma>,
+        uniforms::matrix,
+        uniforms::ratio,
+        uniforms::gl_units_to_pixels,
+        uniforms::patternscale_a,
+        uniforms::patternscale_b,
+        uniforms::tex_y_a,
+        uniforms::tex_y_b,
+        uniforms::mix,
+        uniforms::sdfgamma>,
     TypeList<
-        textures::u_image>,
-    RenderLinePaintProperties>
+        textures::image>,
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         float pixelRatio,
                         const RenderTile&,
                         const TransformState&,
@@ -162,18 +162,18 @@ class LineGradientProgram : public Program<
     gfx::PrimitiveType::Triangle,
     LineLayoutAttributes,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_ratio,
-        uniforms::u_gl_units_to_pixels>,
+        uniforms::matrix,
+        uniforms::ratio,
+        uniforms::gl_units_to_pixels>,
     TypeList<
-        textures::u_image>,
-    RenderLinePaintProperties>
+        textures::image>,
+    style::LinePaintProperties>
 {
 public:
     using Program::Program;
 
     static LayoutUniformValues
-    layoutUniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+    layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
                         const std::array<float, 2>& pixelsToGLUnits);
@@ -189,10 +189,10 @@ public:
           lineGradient(context, programParameters),
           lineSDF(context, programParameters),
           linePattern(context, programParameters) {}
-    ProgramMap<LineProgram> line;
-    ProgramMap<LineGradientProgram> lineGradient;
-    ProgramMap<LineSDFProgram> lineSDF;
-    ProgramMap<LinePatternProgram> linePattern;
+    LineProgram line;
+    LineGradientProgram lineGradient;
+    LineSDFProgram lineSDF;
+    LinePatternProgram linePattern;
 };
 
 } // namespace mbgl

@@ -65,7 +65,7 @@ final class NativeMapView implements NativeMap {
   // Device density
   private final float pixelRatio;
 
-  // Flag to indicating destroy was called
+  // Flag to indicate destroy was called
   private boolean destroyed = false;
 
   // Holds the pointer to JNI NativeMapView
@@ -133,15 +133,6 @@ final class NativeMapView implements NativeMap {
     destroyed = true;
     viewCallback = null;
     nativeDestroy();
-  }
-
-  @Override
-  public void update() {
-    if (checkState("update")) {
-      return;
-    }
-
-    mapRenderer.requestRender();
   }
 
   @Override
@@ -541,7 +532,7 @@ final class NativeMapView implements NativeMap {
   @Override
   @NonNull
   public long[] queryPointAnnotations(RectF rect) {
-    if (checkState("queryPointAnnotations")) {
+    if (checkState("queryPointAnnotations") || !mapRenderer.hasSurface()) {
       return new long[] {};
     }
     return nativeQueryPointAnnotations(rect);
@@ -550,7 +541,7 @@ final class NativeMapView implements NativeMap {
   @Override
   @NonNull
   public long[] queryShapeAnnotations(RectF rectF) {
-    if (checkState("queryShapeAnnotations")) {
+    if (checkState("queryShapeAnnotations") || !mapRenderer.hasSurface()) {
       return new long[] {};
     }
     return nativeQueryShapeAnnotations(rectF);
@@ -899,7 +890,7 @@ final class NativeMapView implements NativeMap {
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
                                              @Nullable String[] layerIds,
                                              @Nullable Expression filter) {
-    if (checkState("queryRenderedFeatures")) {
+    if (checkState("queryRenderedFeatures") || !mapRenderer.hasSurface()) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForPoint(coordinates.x / pixelRatio,
@@ -912,7 +903,7 @@ final class NativeMapView implements NativeMap {
   public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
                                              @Nullable String[] layerIds,
                                              @Nullable Expression filter) {
-    if (checkState("queryRenderedFeatures")) {
+    if (checkState("queryRenderedFeatures") || !mapRenderer.hasSurface()) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForBox(
@@ -946,7 +937,9 @@ final class NativeMapView implements NativeMap {
     return pixelRatio;
   }
 
-  RectF getDensityDependantRectangle(final RectF rectangle) {
+  @NonNull
+  @Override
+  public RectF getDensityDependantRectangle(final RectF rectangle) {
     return new RectF(
       rectangle.left / pixelRatio,
       rectangle.top / pixelRatio,
@@ -1031,7 +1024,9 @@ final class NativeMapView implements NativeMap {
 
   @Keep
   private void onDidBecomeIdle() {
-    stateCallback.onDidBecomeIdle();
+    if (stateCallback != null) {
+      stateCallback.onDidBecomeIdle();
+    }
   }
 
   @Keep
@@ -1049,14 +1044,27 @@ final class NativeMapView implements NativeMap {
   }
 
   @Keep
+  private void onStyleImageMissing(String imageId) {
+    Logger.e(TAG, "OnStyleImageMissing: " + imageId);
+    if (stateCallback != null) {
+      stateCallback.onStyleImageMissing(imageId);
+    }
+  }
+
+  @Keep
   protected void onSnapshotReady(@Nullable Bitmap mapContent) {
     if (checkState("OnSnapshotReady")) {
       return;
     }
-
-    Bitmap viewContent = viewCallback.getViewContent();
-    if (snapshotReadyCallback != null && mapContent != null && viewContent != null) {
-      snapshotReadyCallback.onSnapshotReady(BitmapUtils.mergeBitmap(mapContent, viewContent));
+    if (snapshotReadyCallback != null && mapContent != null) {
+      if (viewCallback == null) {
+        snapshotReadyCallback.onSnapshotReady(mapContent);
+      } else {
+        Bitmap viewContent = viewCallback.getViewContent();
+        if (viewContent != null) {
+          snapshotReadyCallback.onSnapshotReady(BitmapUtils.mergeBitmap(mapContent, viewContent));
+        }
+      }
     }
   }
 
@@ -1364,21 +1372,8 @@ final class NativeMapView implements NativeMap {
   @Keep
   private native boolean nativeGetPrefetchTiles();
 
-  int getWidth() {
-    if (checkState("") || viewCallback == null) {
-      return 0;
-    }
-    return viewCallback.getWidth();
-  }
-
-  int getHeight() {
-    if (checkState("") || viewCallback == null) {
-      return 0;
-    }
-    return viewCallback.getHeight();
-  }
-
-  long getNativePtr() {
+  @Override
+  public long getNativePtr() {
     return nativePtr;
   }
 
@@ -1386,7 +1381,8 @@ final class NativeMapView implements NativeMap {
   // Snapshot
   //
 
-  void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback) {
+  @Override
+  public void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback) {
     if (checkState("addSnapshotCallback")) {
       return;
     }
@@ -1428,10 +1424,6 @@ final class NativeMapView implements NativeMap {
   }
 
   public interface ViewCallback {
-    int getWidth();
-
-    int getHeight();
-
     @Nullable
     Bitmap getViewContent();
   }
@@ -1464,5 +1456,7 @@ final class NativeMapView implements NativeMap {
     void onDidBecomeIdle();
 
     void onSourceChanged(String sourceId);
+
+    void onStyleImageMissing(String imageId);
   }
 }

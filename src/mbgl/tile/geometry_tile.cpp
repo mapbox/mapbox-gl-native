@@ -13,7 +13,6 @@
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/logging.hpp>
@@ -88,20 +87,22 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
 }
 
 
-void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) {
+void GeometryTile::setLayers(const std::vector<Immutable<LayerProperties>>& layers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     pending = true;
 
-    std::vector<Immutable<Layer::Impl>> impls;
+    std::vector<Immutable<LayerProperties>> impls;
+    impls.reserve(layers.size());
 
     for (const auto& layer : layers) {
         // Skip irrelevant layers.
-        if (layer->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired ||
-            layer->source != sourceID ||
-            id.overscaledZ < std::floor(layer->minZoom) ||
-            id.overscaledZ >= std::ceil(layer->maxZoom) ||
-            layer->visibility == VisibilityType::None) {
+        const auto& layerImpl = *layer->baseImpl;
+        assert(layerImpl.getTypeInfo()->source != LayerTypeInfo::Source::NotRequired);
+        assert(layerImpl.source == sourceID);
+        assert(layerImpl.visibility != VisibilityType::None);
+        if (id.overscaledZ < std::floor(layerImpl.minZoom) ||
+            id.overscaledZ >= std::ceil(layerImpl.maxZoom)) {
             continue;
         }
 
@@ -127,7 +128,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
         pending = false;
     }
     
-    buckets = std::move(result.buckets);
+    layerIdToLayerRenderData = std::move(result.renderData);
     
     latestFeatureIndex = std::move(result.featureIndex);
 
@@ -157,8 +158,8 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
     glyphManager.getGlyphs(*this, std::move(glyphDependencies));
 }
 
-void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, uint64_t imageCorrelationID) {
-    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), std::move(patterns), imageCorrelationID);
+void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) {
+    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), std::move(patterns), std::move(versionMap), imageCorrelationID);
 }
 
 void GeometryTile::getImages(ImageRequestPair pair) {
@@ -180,8 +181,8 @@ void GeometryTile::upload(gfx::Context& context) {
         }
     };
 
-    for (auto& entry : buckets) {
-        uploadFn(*entry.second);
+    for (auto& entry : layerIdToLayerRenderData) {
+        uploadFn(*entry.second.bucket);
     }
 
     if (glyphAtlasImage) {
@@ -193,17 +194,46 @@ void GeometryTile::upload(gfx::Context& context) {
         iconAtlasTexture = context.createTexture(iconAtlas.image);
         iconAtlas.image = {};
     }
+
+    if (iconAtlasTexture) {
+        iconAtlas.patchUpdatedImages(context, *iconAtlasTexture, imageManager);
+    }
 }
 
 Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
-    const auto it = buckets.find(layer.id);
-    if (it == buckets.end()) {
+    const LayerRenderData* data = getLayerRenderData(layer);
+    return data ? data->bucket.get() : nullptr; 
+}
+
+const LayerRenderData* GeometryTile::getLayerRenderData(const style::Layer::Impl& layerImpl) const {
+    auto* that = const_cast<GeometryTile*>(this);
+    return that->getMutableLayerRenderData(layerImpl);
+}
+
+bool GeometryTile::updateLayerProperties(const Immutable<style::LayerProperties>& layerProperties) {
+    LayerRenderData* renderData = getMutableLayerRenderData(*layerProperties->baseImpl);
+    if (!renderData) {
+        return false;
+    }
+
+    if (renderData->layerProperties != layerProperties) {
+        renderData->layerProperties = layerProperties;
+    }
+
+    return true;
+}
+
+LayerRenderData* GeometryTile::getMutableLayerRenderData(const style::Layer::Impl& layerImpl) {
+    auto it = layerIdToLayerRenderData.find(layerImpl.id);
+    if (it == layerIdToLayerRenderData.end()) {
         return nullptr;
     }
-    Bucket* result = it->second.get();
-    assert(result);
-    // Bucket might be outdated, see issue #12432.
-    return result->supportsLayer(layer) ? result : nullptr;
+    LayerRenderData& result = it->second;
+    if (result.layerProperties->baseImpl->getTypeInfo() != layerImpl.getTypeInfo()) {
+        // Layer data might be outdated, see issue #12432.
+        return nullptr;
+    }
+    return &result;   
 }
 
 float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {

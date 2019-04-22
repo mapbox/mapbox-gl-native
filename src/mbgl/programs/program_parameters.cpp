@@ -40,13 +40,4 @@ optional<std::string> ProgramParameters::cachePath(const char* name) const {
     }
 }
 
-ProgramParameters ProgramParameters::withAdditionalDefines(const std::vector<std::string>& additionalDefines) const {
-    ProgramParameters result(*this);
-    for (const auto& define : additionalDefines) {
-        result.defines += define;
-        result.defines += "\n";
-    }
-    return result;
-}
-
 } // namespace mbgl

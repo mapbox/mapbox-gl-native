@@ -8,6 +8,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -37,6 +39,13 @@ struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %>
     template<typename T> static bool hasOverride(const T& t) { return !!t.<%- camelizeWithLeadingLowercase(property.name) %>; };
 <% } -%>
 };
+<% if (property.name === 'line-width') { -%>
+
+struct LineFloorWidth : DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
+    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
+    static float defaultValue() { return 1.0f; }
+};
+<% } -%>
 <%   } -%>
 
 <% } -%>
@@ -52,9 +61,31 @@ class <%- camelize(type) %>LayoutProperties : public Properties<
 class <%- camelize(type) %>PaintProperties : public Properties<
 <% for (const property of paintProperties.slice(0, -1)) { -%>
     <%- camelize(property.name) %>,
+<% if (property.name === 'line-width') { -%>
+    LineFloorWidth,
+<% } -%>
 <% } -%>
     <%- camelize(paintProperties.slice(-1)[0].name) %>
 > {};
+
+class <%- camelize(type) %>LayerProperties final : public LayerProperties {
+public:
+    explicit <%- camelize(type) %>LayerProperties(Immutable<<%- camelize(type) %>Layer::Impl>);
+    <%- camelize(type) %>LayerProperties(
+        Immutable<<%- camelize(type) %>Layer::Impl>,
+<% if (type === 'background' || type === 'fill' || type === 'line' || type === 'fill-extrusion') { -%>
+        CrossfadeParameters,
+<% } -%>
+        <%- camelize(type) %>PaintProperties::PossiblyEvaluated);
+    ~<%- camelize(type) %>LayerProperties() override;
+
+    const <%- camelize(type) %>Layer::Impl& layerImpl() const;
+    // Data members.
+<% if (type === 'background' || type === 'fill' || type === 'line' || type === 'fill-extrusion') { -%>
+    CrossfadeParameters crossfade;
+<% } -%>
+    <%- camelize(type) %>PaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

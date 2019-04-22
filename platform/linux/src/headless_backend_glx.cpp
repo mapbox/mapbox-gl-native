@@ -7,6 +7,7 @@
 #include <GL/glx.h>
 
 namespace mbgl {
+namespace gl {
 
 // This class provides a singleton that contains information about the configuration used for
 // instantiating new headless rendering contexts.
@@ -127,4 +128,5 @@ void HeadlessBackend::createImpl() {
     impl = std::make_unique<GLXBackendImpl>();
 }
 
+} // namespace gl
 } // namespace mbgl

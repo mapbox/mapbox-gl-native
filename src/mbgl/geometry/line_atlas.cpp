@@ -138,7 +138,7 @@ void LineAtlas::upload(gfx::Context& context) {
 
 gfx::TextureBinding LineAtlas::textureBinding(gfx::Context& context) {
     upload(context);
-    return { *texture->resource, gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
+    return { texture->getResource(), gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
              gfx::TextureWrapType::Repeat, gfx::TextureWrapType::Clamp };
 }
 

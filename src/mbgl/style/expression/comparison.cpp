@@ -2,6 +2,7 @@
 #include <mbgl/style/expression/comparison.hpp>
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <utility>
 
 namespace mbgl {
 namespace style {
@@ -149,7 +150,7 @@ CollatorComparison::CollatorComparison(
         std::unique_ptr<Expression> rhs_,
         std::unique_ptr<Expression> collator_)
     : Expression(Kind::Comparison, type::Boolean),
-      op(op_),
+      op(std::move(op_)),
       compare(getCollatorComparisonFunction(op)),
       lhs(std::move(lhs_)),
       rhs(std::move(rhs_)),

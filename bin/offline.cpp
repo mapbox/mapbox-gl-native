@@ -5,7 +5,7 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 
-#include <args/args.hxx>
+#include <args.hxx>
 
 #include <cstdlib>
 #include <iostream>
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
             : region(region_),
               fileSource(fileSource_),
               loop(loop_),
-              mergePath(mergePath_),
+              mergePath(std::move(mergePath_)),
               start(util::now()) {
         }
 

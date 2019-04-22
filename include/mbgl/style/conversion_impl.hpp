@@ -89,29 +89,20 @@ public:
         new (static_cast<void*>(&storage)) std::decay_t<T>(std::forward<T>(value));
     }
 
-    Convertible(Convertible&& v)
-        : vtable(v.vtable)
-    {
-        if (vtable) {
-            vtable->move(std::move(v.storage), this->storage);
-        }
+    Convertible(Convertible&& v) : vtable(v.vtable) {
+        vtable->move(std::move(v.storage), storage);
     }
 
     ~Convertible() {
-        if (vtable) {
-            vtable->destroy(storage);
-        }
+        vtable->destroy(storage);
     }
 
     Convertible& operator=(Convertible&& v) {
-        if (vtable) {
+        if (this != &v) {
             vtable->destroy(storage);
+            vtable = v.vtable;
+            vtable->move(std::move(v.storage), storage);
         }
-        vtable = v.vtable;
-        if (vtable) {
-            vtable->move(std::move(v.storage), this->storage);
-        }
-        v.vtable = nullptr;
         return *this;
     }
 
@@ -235,9 +226,7 @@ private:
         using Traits = ConversionTraits<T>;
         static VTable vtable = {
             [] (Storage&& src, Storage& dest) {
-                auto srcValue = reinterpret_cast<T&&>(src);
-                new (static_cast<void*>(&dest)) T(std::move(srcValue));
-                srcValue.~T();
+                new (static_cast<void*>(&dest)) T(reinterpret_cast<T&&>(src));
             },
             [] (Storage& s) {
                 reinterpret_cast<T&>(s).~T();

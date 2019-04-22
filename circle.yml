@@ -15,8 +15,8 @@ workflows:
       - android-arm-template:
           name: android-gnustl-arm-v7
           stl: gnustl_shared
-          firebase_device_id: "m0"
-          firebase_device_os: "18"
+          firebase_device_id: "htc_m8"
+          firebase_device_os: "19"
           image: android-ndk-r17c:1d5db0eb34
           abi: arm-v7
       - android-release:
@@ -64,6 +64,7 @@ workflows:
               only:
                 - master
     jobs:
+      - metrics-nightly
       - ios-release-template:
           name: ios-release-nightly
       - ios-sanitize-nightly
@@ -487,8 +488,8 @@ jobs:
       - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
     steps:
       - install-dependencies: { ccache: false }
@@ -500,7 +501,7 @@ jobs:
           command: make compdb
       - run:
           name: Run Clang checks
-          command: make check
+          command: make check TARGET_BRANCH=${CIRCLE_TARGET_BRANCH:master}
           no_output_timeout: 20m
       - save-dependencies: { ccache: false }
 
@@ -571,7 +572,16 @@ jobs:
               gcloud firebase test android run --type instrumentation \
                 --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
                 --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-                --device-ids  << parameters.firebase_device_id >> --os-version-ids << parameters.firebase_device_os >> --locales en --orientations portrait --timeout 20m
+                --device-ids  << parameters.firebase_device_id >> --os-version-ids << parameters.firebase_device_os >> --locales en --orientations portrait --timeout 20m \
+                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" --directories-to-pull /sdcard --results-dir mapbox-android-sdk-${CIRCLE_BUILD_NUM}
+              coverageFile=`gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/mapbox-android-sdk-${CIRCLE_BUILD_NUM}/**/*.ec | tail -1`
+              gsutil cp $coverageFile $PWD/platform/android/MapboxGLAndroidSDK/build/jacoco | true
+            fi
+      - run:
+          name: Parse and send Jacoco reports
+          command: |
+            if [[ $CIRCLE_BRANCH == master ]]; then
+              make android-create-jacoco-report && make android-parse-and-send-jacoco-report
             fi
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
@@ -740,7 +750,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -838,6 +848,9 @@ jobs:
       - build-test
       - save-dependencies
       - run-unit-tests
+      - run:
+          name: Build offline CLI
+          command: make offline
 
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
@@ -864,6 +877,12 @@ jobs:
             curl -sSfL -o codecov https://codecov.io/bash
             chmod +x codecov
             ./codecov -c
+      - run:
+          name: Upload coverage metrics to s3
+          command: |
+            if [[ $CIRCLE_BRANCH == master ]]; then
+                scripts/publish_core_codecoverage.js -p Linux -s Core
+            fi
 
 # ------------------------------------------------------------------------------
   linux-doxygen:
@@ -893,7 +912,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -916,9 +935,24 @@ jobs:
       - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
+  metrics-nightly:
+    docker:
+      - image: mbgl/linux-gcc-5:54f59e3ac5
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
+    steps:
+      - install-dependencies
+      - run:
+          name: Collect GitHub statistics
+          command: |
+              scripts/publish_github_stats.js
+
+# ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -941,7 +975,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -960,7 +994,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -979,7 +1013,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-template:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1019,7 +1053,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-tag:
     macos:
-      xcode: "10.1.0"
+      xcode: "10.2.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1

@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeMapViewTest {
 
-    private lateinit var nativeMapView: NativeMapView
+    private lateinit var nativeMapView: NativeMap
 
     companion object {
         const val DELTA = 0.000001

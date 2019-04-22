@@ -29,8 +29,6 @@ interface NativeMap {
   // Lifecycle API
   //
 
-  void update();
-
   void resizeView(int width, int height);
 
   void onLowMemory();
@@ -261,4 +259,10 @@ interface NativeMap {
   @NonNull
   long[] queryShapeAnnotations(RectF rectF);
 
+  @NonNull
+  RectF getDensityDependantRectangle(RectF rectangle);
+
+  long getNativePtr();
+
+  void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback);
 }

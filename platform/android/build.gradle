@@ -12,6 +12,7 @@ buildscript {
         classpath dependenciesList.bintrayPlugin
         classpath dependenciesList.artifactoryPlugin
         classpath dependenciesList.androidPublishPlugin
+        classpath dependenciesList.jacocoPlugin
     }
 }
 
@@ -23,7 +24,7 @@ allprojects {
         // For publishing Maps SDK files to Bintray
         maven { url 'https://mapbox.bintray.com/mapbox' }
         // Snapshot repository
-        //maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+        // maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
@@ -34,3 +35,4 @@ subprojects {
 // Load build system information. If this file does not exist, run
 // `make platform/android/gradle/configuration.gradle`
 apply from: "${rootDir}/gradle/configuration.gradle"
+apply from: "${rootDir}/gradle/download-schema.gradle"

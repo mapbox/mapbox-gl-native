@@ -11,21 +11,20 @@
 namespace mbgl {
 
 using CollisionBoxLayoutAttributes = TypeList<
-    attributes::a_pos,
-    attributes::a_anchor_pos,
-    attributes::a_extrude,
-    attributes::a_shift>;
+    attributes::pos,
+    attributes::anchor_pos,
+    attributes::extrude>;
 
-using CollisionBoxDynamicAttributes = TypeList<attributes::a_placed>;
+using CollisionBoxDynamicAttributes = TypeList<attributes::placed, attributes::shift>;
 
 class CollisionBoxProgram : public Program<
     CollisionBoxProgram,
     gfx::PrimitiveType::Line,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_camera_to_center_distance>,
+        uniforms::matrix,
+        uniforms::extrude_scale,
+        uniforms::camera_to_center_distance>,
     TypeList<>,
     style::Properties<>>
 {
@@ -45,22 +44,20 @@ public:
             {{
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
-            }},
-            {{
-                0.0f,
-                0.0f
             }}
         };
     }
 
-    static gfx::Vertex<CollisionBoxDynamicAttributes> dynamicVertex(bool placed, bool notUsed) {
+    static gfx::Vertex<CollisionBoxDynamicAttributes> dynamicVertex(bool placed, bool notUsed, Point<float> shift) {
         return {
-            {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }}
+            {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }},
+            {{ shift.x, shift.y }}
         };
     }
 
 	template <class DrawMode>
     void draw(gfx::Context& context,
+              gfx::RenderPass& renderPass,
               const DrawMode& drawMode,
               const gfx::DepthMode& depthMode,
               const gfx::StencilMode& stencilMode,
@@ -94,6 +91,7 @@ public:
 
             program->draw(
                     context,
+                    renderPass,
                     std::move(drawMode),
                     std::move(depthMode),
                     std::move(stencilMode),
@@ -116,10 +114,10 @@ class CollisionCircleProgram : public Program<
     gfx::PrimitiveType::Triangle,
     TypeListConcat<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     TypeList<
-        uniforms::u_matrix,
-        uniforms::u_extrude_scale,
-        uniforms::u_overscale_factor,
-        uniforms::u_camera_to_center_distance>,
+        uniforms::matrix,
+        uniforms::extrude_scale,
+        uniforms::overscale_factor,
+        uniforms::camera_to_center_distance>,
     TypeList<>,
     style::Properties<>>
 {
@@ -139,16 +137,13 @@ public:
             {{
                 static_cast<int16_t>(::round(o.x)),
                 static_cast<int16_t>(::round(o.y))
-            }},
-            {{
-                0.0f,
-                0.0f
             }}
         };
     }
 
     template <class DrawMode>
     void draw(gfx::Context& context,
+              gfx::RenderPass& renderPass,
               const DrawMode& drawMode,
               const gfx::DepthMode& depthMode,
               const gfx::StencilMode& stencilMode,
@@ -180,6 +175,7 @@ public:
 
             program->draw(
                     context,
+                    renderPass,
                     std::move(drawMode),
                     std::move(depthMode),
                     std::move(stencilMode),

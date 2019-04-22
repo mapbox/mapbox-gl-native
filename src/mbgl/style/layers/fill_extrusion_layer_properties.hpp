@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -16,7 +18,7 @@ struct FillExtrusionOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct FillExtrusionColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
+struct FillExtrusionColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
 };
 
@@ -28,15 +30,15 @@ struct FillExtrusionTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct FillExtrusionPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
+struct FillExtrusionPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
     static std::string defaultValue() { return ""; }
 };
 
-struct FillExtrusionHeight : DataDrivenPaintProperty<float, attributes::a_height, uniforms::u_height> {
+struct FillExtrusionHeight : DataDrivenPaintProperty<float, attributes::height, uniforms::height> {
     static float defaultValue() { return 0; }
 };
 
-struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::a_base, uniforms::u_base> {
+struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::base, uniforms::base> {
     static float defaultValue() { return 0; }
 };
 
@@ -54,6 +56,21 @@ class FillExtrusionPaintProperties : public Properties<
     FillExtrusionBase,
     FillExtrusionVerticalGradient
 > {};
+
+class FillExtrusionLayerProperties final : public LayerProperties {
+public:
+    explicit FillExtrusionLayerProperties(Immutable<FillExtrusionLayer::Impl>);
+    FillExtrusionLayerProperties(
+        Immutable<FillExtrusionLayer::Impl>,
+        CrossfadeParameters,
+        FillExtrusionPaintProperties::PossiblyEvaluated);
+    ~FillExtrusionLayerProperties() override;
+
+    const FillExtrusionLayer::Impl& layerImpl() const;
+    // Data members.
+    CrossfadeParameters crossfade;
+    FillExtrusionPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

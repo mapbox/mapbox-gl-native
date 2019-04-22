@@ -46,13 +46,13 @@ EvaluationResult Step::evaluate(const EvaluationContext& params) const {
 
 void Step::eachChild(const std::function<void(const Expression&)>& visit) const {
     visit(*input);
-    for (auto it = stops.begin(); it != stops.end(); it++) {
-        visit(*it->second);
+    for (const auto& stop : stops) {
+        visit(*stop.second);
     }
 }
 
 void Step::eachStop(const std::function<void(double, const Expression&)>& visit) const {
-    for (const auto &stop : stops) {
+    for (const auto& stop : stops) {
         visit(stop.first, *stop.second);
     }
 }

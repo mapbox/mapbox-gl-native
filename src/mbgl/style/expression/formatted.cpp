@@ -104,7 +104,7 @@ optional<Formatted> Converter<Formatted>::operator()(const Convertible& value, E
                 }
             }
 
-            sections.push_back(FormattedSection(*sectionText, fontScale, textFont, textColor));
+            sections.emplace_back(*sectionText, fontScale, textFont, textColor);
         }
         return Formatted(sections);
     } else if (optional<std::string> result = toString(value)) {

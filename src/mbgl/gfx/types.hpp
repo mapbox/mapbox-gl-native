@@ -171,5 +171,11 @@ enum class TextureWrapType : bool {
     Repeat,
 };
 
+enum class RenderbufferPixelType : uint8_t {
+    RGBA,
+    Depth,
+    DepthStencil,
+};
+
 } // namespace gfx
 } // namespace mbgl

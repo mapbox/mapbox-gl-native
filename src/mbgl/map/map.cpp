@@ -27,24 +27,16 @@ namespace mbgl {
 
 using namespace style;
 
-Map::Map(RendererFrontend& rendererFrontend,
-         MapObserver& mapObserver,
-         const Size size,
-         const float pixelRatio,
-         FileSource& fileSource,
+Map::Map(RendererFrontend& frontend,
+         MapObserver& observer,
          Scheduler& scheduler,
-         const MapOptions& options)
-    : impl(std::make_unique<Impl>(*this,
-                                  rendererFrontend,
-                                  mapObserver,
-                                  fileSource,
-                                  scheduler,
-                                  size,
-                                  pixelRatio,
-                                  options.mapMode(),
-                                  options.constrainMode(),
-                                  options.viewportMode(),
-                                  options.crossSourceCollisions())) {}
+         const MapOptions& mapOptions,
+         const ResourceOptions& resourceOptions)
+    : impl(std::make_unique<Impl>(frontend, observer, scheduler,
+                                  FileSource::getSharedFileSource(resourceOptions),
+                                  mapOptions)) {}
+
+Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {}
 
 Map::~Map() = default;
 
@@ -139,9 +131,7 @@ CameraOptions Map::getCameraOptions(const EdgeInsets& padding) const {
 }
 
 void Map::jumpTo(const CameraOptions& camera) {
-    impl->cameraMutated = true;
-    impl->transform.jumpTo(camera);
-    impl->onUpdate();
+    impl->jumpTo(camera);
 }
 
 void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
@@ -214,8 +204,13 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
         scaleY -= (padding.top() + padding.bottom()) / height;
         minScale = util::min(scaleX, scaleY);
     }
-    double zoom = transform.getZoom() + util::log2(minScale);
-    zoom = util::clamp(zoom, transform.getState().getMinZoom(), transform.getState().getMaxZoom());
+
+    double zoom = transform.getZoom();
+    if (minScale > 0) {
+        zoom = util::clamp(zoom + util::log2(minScale), transform.getState().getMinZoom(), transform.getState().getMaxZoom());
+    } else {
+        Log::Error(Event::General, "Unable to calculate appropriate zoom level for bounds. Vertical or horizontal padding is greater than map's height or width.");
+    }
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     ScreenCoordinate centerPixel = nePixel + swPixel;
@@ -257,7 +252,7 @@ CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const Edg
 
     std::vector<LatLng> latLngs;
     forEachPoint(geometry, [&](const Point<double>& pt) {
-        latLngs.push_back({ pt.y, pt.x });
+        latLngs.emplace_back(pt.y, pt.x);
     });
     return cameraForLatLngs(latLngs, padding, bearing, pitch);
 }
@@ -312,48 +307,37 @@ BoundOptions Map::getBounds() const {
         .withMaxZoom(impl->transform.getState().getMaxZoom());
 }
 
-#pragma mark - Size
+#pragma mark - Map options
 
 void Map::setSize(const Size size) {
     impl->transform.resize(size);
     impl->onUpdate();
 }
 
-Size Map::getSize() const {
-    return impl->transform.getState().getSize();
-}
-
-#pragma mark - North Orientation
-
 void Map::setNorthOrientation(NorthOrientation orientation) {
     impl->transform.setNorthOrientation(orientation);
     impl->onUpdate();
 }
-
-NorthOrientation Map::getNorthOrientation() const {
-    return impl->transform.getNorthOrientation();
-}
-
-#pragma mark - Constrain mode
 
 void Map::setConstrainMode(mbgl::ConstrainMode mode) {
     impl->transform.setConstrainMode(mode);
     impl->onUpdate();
 }
 
-ConstrainMode Map::getConstrainMode() const {
-    return impl->transform.getConstrainMode();
-}
-
-#pragma mark - Viewport mode
-
 void Map::setViewportMode(mbgl::ViewportMode mode) {
     impl->transform.setViewportMode(mode);
     impl->onUpdate();
 }
 
-ViewportMode Map::getViewportMode() const {
-    return impl->transform.getViewportMode();
+MapOptions Map::getMapOptions() const {
+    return std::move(MapOptions()
+        .withMapMode(impl->mode)
+        .withConstrainMode(impl->transform.getConstrainMode())
+        .withViewportMode(impl->transform.getViewportMode())
+        .withCrossSourceCollisions(impl->crossSourceCollisions)
+        .withNorthOrientation(impl->transform.getNorthOrientation())
+        .withSize(impl->transform.getState().getSize())
+        .withPixelRatio(impl->pixelRatio));
 }
 
 #pragma mark - Projection mode

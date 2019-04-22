@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/clipping_mask_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<ClippingMaskProgram> {
+    static constexpr const char* name = "clipping_mask";
+    static constexpr const uint8_t hash[8] = { 0x3e, 0x17, 0xc2, 0x3a, 0x1f, 0xf0, 0xa8, 0xa3 };
+    static constexpr const auto vertexOffset = 7848;
+    static constexpr const auto fragmentOffset = 7944;
+};
+
+constexpr const char* ShaderSource<ClippingMaskProgram>::name;
+constexpr const uint8_t ShaderSource<ClippingMaskProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<ClippingMaskProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<ClippingMaskProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "clipping_mask",
-        programs::gl::shaderSource() + 7848, programs::gl::shaderSource() + 7944);
+    return std::make_unique<gl::Program<ClippingMaskProgram>>(programParameters);
 }
 
 } // namespace gfx

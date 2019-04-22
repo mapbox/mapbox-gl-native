@@ -12,6 +12,7 @@
 #include <mbgl/util/i18n.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile.hpp>
 
 #include <mapbox/polylabel.hpp>
 
@@ -40,16 +41,18 @@ expression::Value sectionOptionsToValue(const SectionOptions& options) {
     }
     return result;
 }
+
+inline const SymbolLayerProperties& toSymbolLayerProperties(const Immutable<LayerProperties>& layer) {
+    return static_cast<const SymbolLayerProperties&>(*layer);
+}
+
 } // namespace
-
-
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
-                           const std::vector<const RenderLayer*>& layers,
+                           const std::vector<Immutable<style::LayerProperties>>& layers,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : Layout(),
-      bucketLeaderID(layers.at(0)->getID()),
+    : bucketLeaderID(layers.front()->baseImpl->id),
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
@@ -57,11 +60,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<TextSize>()),
-      iconSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<IconSize>())
+      textSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<TextSize>()),
+      iconSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<IconSize>())
     {
 
-    const SymbolLayer::Impl& leader = toRenderSymbolLayer(layers.at(0))->impl();
+    const SymbolLayer::Impl& leader = toSymbolLayerProperties(layers.at(0)).layerImpl();
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
@@ -96,8 +99,15 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         return;
     }
 
+    const bool hasSymbolSortKey = !leader.layout.get<SymbolSortKey>().isUndefined();
+    const auto symbolZOrder = layout.get<SymbolZOrder>();
+    const bool sortFeaturesByKey = symbolZOrder != SymbolZOrderType::ViewportY && hasSymbolSortKey;
+    const bool zOrderByViewportY = symbolZOrder == SymbolZOrderType::ViewportY || (symbolZOrder == SymbolZOrderType::Auto && !sortFeaturesByKey);
+    sortFeaturesByY = zOrderByViewportY && (layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
+        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
+
     for (const auto& layer : layers) {
-        layerPaintProperties.emplace(layer->getID(), toRenderSymbolLayer(layer)->evaluated);
+        layerPaintProperties.emplace(layer->baseImpl->id, layer);
     }
 
     // Determine glyph dependencies
@@ -117,8 +127,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             FontStack baseFontStack = layout.evaluate<TextFont>(zoom, ft);
 
             ft.formattedText = TaggedString();
-            for (std::size_t j = 0; j < formatted.sections.size(); j++) {
-                const auto& section = formatted.sections[j];
+            for (const auto & section : formatted.sections) {
                 std::string u8string = section.text;
                 if (textTransform == TextTransformType::Uppercase) {
                     u8string = platform::uppercase(u8string);
@@ -157,7 +166,13 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (ft.formattedText || ft.icon) {
-            features.push_back(std::move(ft));
+            if (sortFeaturesByKey) {
+                ft.sortKey = layout.evaluate<SymbolSortKey>(zoom, ft);
+                const auto lowerBound = std::lower_bound(features.begin(), features.end(), ft);
+                features.insert(lowerBound, std::move(ft));
+            } else {
+                features.push_back(std::move(ft));
+            }
         }
     }
 
@@ -174,44 +189,173 @@ bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
+namespace {
+
+// The radial offset is to the edge of the text box
+// In the horizontal direction, the edge of the text box is where glyphs start
+// But in the vertical direction, the glyphs appear to "start" at the baseline
+// We don't actually load baseline data, but we assume an offset of ONE_EM - 17
+// (see "yOffset" in shaping.js)
+const float baselineOffset = 7.0f;
+
+// We don't care which shaping we get because this is used for collision purposes
+// and all the justifications have the same collision box.
+const Shaping& getDefaultHorizontalShaping(const ShapedTextOrientations& shapedTextOrientations) {
+    if (shapedTextOrientations.right) return shapedTextOrientations.right;
+    if (shapedTextOrientations.center) return shapedTextOrientations.center;
+    if (shapedTextOrientations.left) return shapedTextOrientations.left;
+    return shapedTextOrientations.horizontal;
+}
+
+Shaping& shapingForTextJustifyType(ShapedTextOrientations& shapedTextOrientations, style::TextJustifyType type) {
+    switch(type) {
+    case style::TextJustifyType::Right: return shapedTextOrientations.right;
+    case style::TextJustifyType::Left: return shapedTextOrientations.left;
+    case style::TextJustifyType::Center: return shapedTextOrientations.center;
+    default:
+        assert(false);
+        return shapedTextOrientations.horizontal;
+    }
+}
+
+}  // namespace
+
+// static
+Point<float> SymbolLayout::evaluateRadialOffset(SymbolAnchorType anchor, float radialOffset) {
+    Point<float> result{};
+    // solve for r where r^2 + r^2 = radialOffset^2
+    const float sqrt2 = 1.41421356237f;
+    const float hypotenuse = radialOffset / sqrt2;
+
+    switch (anchor) {
+    case SymbolAnchorType::TopRight:
+    case SymbolAnchorType::TopLeft:
+        result.y = hypotenuse - baselineOffset;
+        break;
+    case SymbolAnchorType::BottomRight:
+    case SymbolAnchorType::BottomLeft:
+        result.y = -hypotenuse + baselineOffset;
+        break;
+    case SymbolAnchorType::Bottom:
+        result.y = -radialOffset + baselineOffset;
+        break;
+    case SymbolAnchorType::Top:
+        result.y = radialOffset - baselineOffset;
+        break;
+    default:
+        break;
+    }
+
+    switch (anchor) {
+    case SymbolAnchorType::TopRight:
+    case SymbolAnchorType::BottomRight:
+        result.x = -hypotenuse;
+        break;
+    case SymbolAnchorType::TopLeft:
+    case SymbolAnchorType::BottomLeft:
+        result.x = hypotenuse;
+        break;
+    case SymbolAnchorType::Left:
+        result.x = radialOffset;
+        break;
+    case SymbolAnchorType::Right:
+        result.x = -radialOffset;
+        break;
+    default:
+        break;
+    }
+
+    return result;
+}
+
 void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
                            const ImageMap& imageMap, const ImagePositions& imagePositions) {
-    const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
-        layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
+    const bool isPointPlacement = layout.get<SymbolPlacement>() == SymbolPlacementType::Point;
+    const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && !isPointPlacement;
 
     for (auto it = features.begin(); it != features.end(); ++it) {
         auto& feature = *it;
         if (feature.geometry.empty()) continue;
 
-        std::pair<Shaping, Shaping> shapedTextOrientations;
+        ShapedTextOrientations shapedTextOrientations;
         optional<PositionedIcon> shapedIcon;
+        Point<float> textOffset;
 
         // if feature has text, shape the text
         if (feature.formattedText) {
-            auto applyShaping = [&] (const TaggedString& formattedText, WritingModeType writingMode) {
-                const float oneEm = 24.0f;
+            const float lineHeight = layout.get<TextLineHeight>() * util::ONE_EM;
+            const float spacing = util::i18n::allowsLetterSpacing(feature.formattedText->rawText()) ? layout.evaluate<TextLetterSpacing>(zoom, feature) * util::ONE_EM : 0.0f;
+
+            auto applyShaping = [&] (const TaggedString& formattedText, WritingModeType writingMode, SymbolAnchorType textAnchor, TextJustifyType textJustify) {
                 const Shaping result = getShaping(
                     /* string */ formattedText,
-                    /* maxWidth: ems */ layout.get<SymbolPlacement>() == SymbolPlacementType::Point ?
-                        layout.evaluate<TextMaxWidth>(zoom, feature) * oneEm : 0,
-                    /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
-                    /* anchor */ layout.evaluate<TextAnchor>(zoom, feature),
-                    /* justify */ layout.evaluate<TextJustify>(zoom, feature),
-                    /* spacing: ems */ util::i18n::allowsLetterSpacing(feature.formattedText->rawText()) ? layout.evaluate<TextLetterSpacing>(zoom, feature) * oneEm : 0.0f,
-                    /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
-                    /* verticalHeight */ oneEm,
+                    /* maxWidth: ems */ isPointPlacement ? layout.evaluate<TextMaxWidth>(zoom, feature) * util::ONE_EM : 0.0f,
+                    /* ems */ lineHeight,
+                    textAnchor,
+                    textJustify,
+                    /* ems */ spacing,
+                    /* translate */ textOffset,
                     /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi,
                     /* glyphs */ glyphMap);
 
                 return result;
             };
+            const std::vector<style::TextVariableAnchorType> variableTextAnchor = layout.evaluate<TextVariableAnchor>(zoom, feature);
+            const float radialOffset = layout.evaluate<TextRadialOffset>(zoom, feature);
+            const SymbolAnchorType textAnchor = layout.evaluate<TextAnchor>(zoom, feature); 
+            if (variableTextAnchor.empty()) {
+                // Layers with variable anchors use the `text-radial-offset` property and the [x, y] offset vector
+                // is calculated at placement time instead of layout time
+                if (radialOffset > 0.0f) {
+                    // The style spec says don't use `text-offset` and `text-radial-offset` together
+                    // but doesn't actually specify what happens if you use both. We go with the radial offset.
+                    textOffset = evaluateRadialOffset(textAnchor, radialOffset * util::ONE_EM);
+                } else {
+                    textOffset = { layout.evaluate<TextOffset>(zoom, feature)[0] * util::ONE_EM,
+                                   layout.evaluate<TextOffset>(zoom, feature)[1] * util::ONE_EM};
+                }
+            }
+            TextJustifyType textJustify = textAlongLine ? TextJustifyType::Center : layout.evaluate<TextJustify>(zoom, feature);
+             // If this layer uses text-variable-anchor, generate shapings for all justification possibilities.
+            if (!textAlongLine && !variableTextAnchor.empty()) {
+                std::vector<TextJustifyType> justifications;
+                if (textJustify != TextJustifyType::Auto) {
+                    justifications.push_back(textJustify);
+                } else {
+                    for (auto anchor : variableTextAnchor) {
+                        justifications.push_back(getAnchorJustification(anchor));
+                    }
+                }
+                for (TextJustifyType justification: justifications) {
+                    Shaping& shapingForJustification = shapingForTextJustifyType(shapedTextOrientations, justification);
+                    if (shapingForJustification) {
+                        continue;
+                    }
+                    // If using text-variable-anchor for the layer, we use a center anchor for all shapings and apply
+                    // the offsets for the anchor in the placement step.
+                    Shaping shaping = applyShaping(*feature.formattedText, WritingModeType::Horizontal, SymbolAnchorType::Center, justification);
+                    if (shaping) {
+                        shapingForJustification = std::move(shaping);
+                        if (shaping.lineCount == 1u) {
+                            shapedTextOrientations.singleLine = true;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                if (textJustify == TextJustifyType::Auto) {
+                    textJustify = getAnchorJustification(textAnchor);
+                }
+                Shaping shaping = applyShaping(*feature.formattedText, WritingModeType::Horizontal, textAnchor, textJustify);
+                if (shaping) {
+                    shapedTextOrientations.horizontal = std::move(shaping);
+                }
 
-            shapedTextOrientations.first = applyShaping(*feature.formattedText, WritingModeType::Horizontal);
-
-            if (util::i18n::allowsVerticalWritingMode(feature.formattedText->rawText()) && textAlongLine) {
-                feature.formattedText->verticalizePunctuation();
-                shapedTextOrientations.second = applyShaping(*feature.formattedText, WritingModeType::Vertical);
+                if (util::i18n::allowsVerticalWritingMode(feature.formattedText->rawText()) && textAlongLine) {
+                    feature.formattedText->verticalizePunctuation();
+                    shapedTextOrientations.vertical = applyShaping(*feature.formattedText, WritingModeType::Vertical, textAnchor, textJustify);
+                }
             }
         }
 
@@ -236,8 +380,8 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
         }
 
         // if either shapedText or icon position is present, add the feature
-        if (shapedTextOrientations.first || shapedIcon) {
-            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositions);
+        if (getDefaultHorizontalShaping(shapedTextOrientations) || shapedIcon) {
+            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositions, textOffset);
         }
 
         feature.geometry.clear();
@@ -248,15 +392,17 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
 
 void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                               const SymbolFeature& feature,
-                              const std::pair<Shaping, Shaping>& shapedTextOrientations,
+                              const ShapedTextOrientations& shapedTextOrientations,
                               optional<PositionedIcon> shapedIcon,
-                              const GlyphPositions& glyphPositions) {
+                              const GlyphPositions& glyphPositions,
+                              Point<float> offset) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
     const float layoutTextSize = layout.evaluate<TextSize>(zoom + 1, feature);
     const float layoutIconSize = layout.evaluate<IconSize>(zoom + 1, feature);
-    const std::array<float, 2> textOffset = layout.evaluate<TextOffset>(zoom, feature);
+    const std::array<float, 2> textOffset = {{ offset.x, offset.y }};
+
     const std::array<float, 2> iconOffset = layout.evaluate<IconOffset>(zoom, feature);
 
     // To reduce the number of labels that jump around when zooming we need
@@ -274,6 +420,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float iconPadding = layout.get<IconPadding>() * tilePixelRatio;
     const float textMaxAngle = layout.get<TextMaxAngle>() * util::DEG2RAD;
     const float rotation = layout.evaluate<IconRotate>(zoom, feature);
+    const float radialTextOffset = layout.evaluate<TextRadialOffset>(zoom, feature) * util::ONE_EM;
     const SymbolPlacementType textPlacement = layout.get<TextRotationAlignment>() != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
@@ -296,7 +443,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                     textBoxScale, textPadding, textPlacement, textOffset,
                     iconBoxScale, iconPadding, iconOffset,
                     glyphPositions, indexedFeature, layoutFeatureIndex, feature.index,
-                    feature.formattedText ? feature.formattedText->rawText() : std::u16string(), overscaling, rotation);
+                    feature.formattedText ? feature.formattedText->rawText() : std::u16string(), overscaling, rotation, radialTextOffset);
         }
     };
 
@@ -308,8 +455,8 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             Anchors anchors = getAnchors(line,
                                          symbolSpacing,
                                          textMaxAngle,
-                                         (shapedTextOrientations.second ?: shapedTextOrientations.first).left,
-                                         (shapedTextOrientations.second ?: shapedTextOrientations.first).right,
+                                         (shapedTextOrientations.vertical ?: getDefaultHorizontalShaping(shapedTextOrientations)).left,
+                                         (shapedTextOrientations.vertical ?: getDefaultHorizontalShaping(shapedTextOrientations)).right,
                                          (shapedIcon ? shapedIcon->left() : 0),
                                          (shapedIcon ? shapedIcon->right() : 0),
                                          glyphSize,
@@ -329,8 +476,8 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             if (line.size() > 1) {
                 optional<Anchor> anchor = getCenterAnchor(line,
                                                           textMaxAngle,
-                                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).left,
-                                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).right,
+                                                          (shapedTextOrientations.vertical ?: getDefaultHorizontalShaping(shapedTextOrientations)).left,
+                                                          (shapedTextOrientations.vertical ?: getDefaultHorizontalShaping(shapedTextOrientations)).right,
                                                           (shapedIcon ? shapedIcon->left() : 0),
                                                           (shapedIcon ? shapedIcon->right() : 0),
                                                           glyphSize,
@@ -409,30 +556,42 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
     return tileDistances;
 }
 
-void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, std::shared_ptr<Bucket>>& buckets, const bool firstLoad, const bool showCollisionBoxes) {
-    const bool zOrderByViewport = layout.get<SymbolZOrder>() == SymbolZOrderType::ViewportY;
-    const bool sortFeaturesByY = zOrderByViewport && (layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
-        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
-
-    auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances));
+void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>& renderData, const bool firstLoad, const bool showCollisionBoxes) {
+    auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), tilePixelRatio);
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
-
         const bool hasText = symbolInstance.hasText;
         const bool hasIcon = symbolInstance.hasIcon;
+        const bool singleLine = symbolInstance.singleLine;
 
         const auto& feature = features.at(symbolInstance.layoutFeatureIndex);
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
         if (hasText && feature.formattedText) {
-            std::size_t index = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedTextIndex, symbolInstance.horizontalGlyphQuads);
-
-            if (symbolInstance.writingModes & WritingModeType::Vertical) {
-                index = addSymbolGlyphQuads(*bucket, symbolInstance, feature, WritingModeType::Vertical, symbolInstance.placedVerticalTextIndex, symbolInstance.verticalGlyphQuads, index);
+            optional<std::size_t> lastAddedSection;
+            if (singleLine) {
+                optional<std::size_t> placedTextIndex;
+                lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, placedTextIndex, symbolInstance.rightJustifiedGlyphQuads, lastAddedSection);
+                symbolInstance.placedRightTextIndex = placedTextIndex;
+                symbolInstance.placedCenterTextIndex = placedTextIndex;
+                symbolInstance.placedLeftTextIndex = placedTextIndex;
+            } else {
+                if (!symbolInstance.rightJustifiedGlyphQuads.empty()) {
+                    lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedRightTextIndex, symbolInstance.rightJustifiedGlyphQuads, lastAddedSection);
+                }
+                if (!symbolInstance.centerJustifiedGlyphQuads.empty()) {
+                    lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedCenterTextIndex, symbolInstance.centerJustifiedGlyphQuads, lastAddedSection);
+                }
+                if (!symbolInstance.leftJustifiedGlyphQuads.empty()) {
+                    lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, symbolInstance.writingModes, symbolInstance.placedLeftTextIndex, symbolInstance.leftJustifiedGlyphQuads, lastAddedSection);
+                }
             }
-
-            updatePaintPropertiesForSection(*bucket, feature, index);
+            if (symbolInstance.writingModes & WritingModeType::Vertical) {
+                lastAddedSection = addSymbolGlyphQuads(*bucket, symbolInstance, feature, WritingModeType::Vertical, symbolInstance.placedVerticalTextIndex, symbolInstance.verticalGlyphQuads, lastAddedSection);
+            }
+            assert(lastAddedSection); // True, as hasText == true;
+            updatePaintPropertiesForSection(*bucket, feature, *lastAddedSection);
         }
 
         if (hasIcon) {
@@ -443,7 +602,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
                 symbolInstance.placedIconIndex = bucket->icon.placedSymbols.size() - 1;
                 PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
                 iconSymbol.vertexStartIndex = addSymbol(bucket->icon, sizeData, *symbolInstance.iconQuad,
-                                                        symbolInstance.anchor, iconSymbol);
+                                                        symbolInstance.anchor, iconSymbol, feature.sortKey);
 
                 for (auto& pair : bucket->paintProperties) {
                     pair.second.iconBinders.populateVertexVectors(feature, bucket->icon.vertices.elements(), {}, {});
@@ -460,7 +619,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
             if (!firstLoad) {
                 bucket->justReloaded = true;
             }
-            buckets.emplace(pair.first, bucket);
+            renderData.emplace(pair.first, LayerRenderData{bucket, pair.second});
         }
     }
 
@@ -498,7 +657,7 @@ std::size_t SymbolLayout::addSymbolGlyphQuads(SymbolBucket& bucket,
             }
             lastAddedSection = symbolQuad.sectionIndex;
         }
-        size_t index = addSymbol(bucket.text, sizeData, symbolQuad, symbolInstance.anchor, placedSymbol);
+        size_t index = addSymbol(bucket.text, sizeData, symbolQuad, symbolInstance.anchor, placedSymbol, feature.sortKey);
         if (firstSymbol) {
             placedSymbol.vertexStartIndex = index;
             firstSymbol = false;
@@ -512,7 +671,8 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
                                const Range<float> sizeData,
                                const SymbolQuad& symbol,
                                const Anchor& labelAnchor,
-                               PlacedSymbol& placedSymbol) {
+                               PlacedSymbol& placedSymbol,
+                               float sortKey) {
     constexpr const uint16_t vertexLength = 4;
 
     const auto &tl = symbol.tl;
@@ -521,8 +681,10 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     const auto &br = symbol.br;
     const auto &tex = symbol.tex;
 
-    if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-        buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements());
+    if (buffer.segments.empty() ||
+        buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max() ||
+        fabs(buffer.segments.back().sortKey - sortKey) > std::numeric_limits<float>::epsilon()) {
+        buffer.segments.emplace_back(buffer.vertices.elements(), buffer.triangles.elements(), 0ul, 0ul, sortKey);
     }
 
     // We're generating triangle fans, so we always start with the first
@@ -600,7 +762,7 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
 
                 // Dynamic vertices are initialized so that the vertex count always agrees with
                 // the layout vertex buffer, but they will always be updated before rendering happens
-                auto dynamicVertex = CollisionBoxProgram::dynamicVertex(false, false);
+                auto dynamicVertex = CollisionBoxProgram::dynamicVertex(false, false, {});
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);

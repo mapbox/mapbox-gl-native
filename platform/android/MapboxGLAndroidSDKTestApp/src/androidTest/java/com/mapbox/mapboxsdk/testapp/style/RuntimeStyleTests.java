@@ -2,12 +2,10 @@ package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
@@ -22,19 +20,15 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
-
 import junit.framework.Assert;
-
 import org.hamcrest.Matcher;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import timber.log.Timber;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-
-import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -364,11 +358,6 @@ public class RuntimeStyleTests extends EspressoTest {
         // OK
       }
     }
-  }
-
-  @After
-  public void unregisterIntentServiceIdlingResource() {
-    Espresso.unregisterIdlingResources(idlingResource);
   }
 
   public abstract class BaseViewAction implements ViewAction {

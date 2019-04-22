@@ -1,26 +1,32 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
+#include <mbgl/gfx/renderer_backend.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/renderable_resource.hpp>
 #include <mbgl/util/mat4.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
+inline const CustomLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    return static_cast<const CustomLayer::Impl&>(*impl);
+}
+
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
-    : RenderLayer(std::move(_impl)), host(impl().host) {
-    assert(BackendScope::exists());
+    : RenderLayer(makeMutable<CustomLayerProperties>(std::move(_impl))),
+      host(impl(baseImpl).host) {
+    assert(gfx::BackendScope::exists());
     MBGL_CHECK_ERROR(host->initialize());
 }
 
 RenderCustomLayer::~RenderCustomLayer() {
-    assert(BackendScope::exists());
+    assert(gfx::BackendScope::exists());
     if (contextDestroyed) {
         host->contextLost();
     } else {
@@ -28,12 +34,9 @@ RenderCustomLayer::~RenderCustomLayer() {
     }
 }
 
-const CustomLayer::Impl& RenderCustomLayer::impl() const {
-    return static_cast<const CustomLayer::Impl&>(*baseImpl);
-}
-
 void RenderCustomLayer::evaluate(const PropertyEvaluationParameters&) {
     passes = RenderPass::Translucent;
+    // It is fine to not update `evaluatedProperties`, as `baseImpl` should never be updated for this layer.
 }
 
 bool RenderCustomLayer::hasTransition() const {
@@ -48,16 +51,17 @@ void RenderCustomLayer::markContextDestroyed() {
 }
 
 void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
-    if (host != impl().host) {
+    if (host != impl(baseImpl).host) {
         //If the context changed, deinitialize the previous one before initializing the new one.
         if (host && !contextDestroyed) {
             MBGL_CHECK_ERROR(host->deinitialize());
         }
-        host = impl().host;
+        host = impl(baseImpl).host;
         MBGL_CHECK_ERROR(host->initialize());
     }
 
-    gl::Context& glContext = paintParameters.context;
+    // TODO: remove cast
+    auto& glContext = static_cast<gl::Context&>(paintParameters.context);
     const TransformState& state = paintParameters.state;
 
     // Reset GL state to a known state so the CustomLayer always has a clean slate.
@@ -85,7 +89,7 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
 
     // Reset the view back to our original one, just in case the CustomLayer changed
     // the viewport or Framebuffer.
-    paintParameters.backend.bind();
+    paintParameters.backend.getDefaultRenderable().getResource<gl::RenderableResource>().bind();
     glContext.setDirtyState();
 }
 

@@ -3,6 +3,7 @@
 #include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/literal.hpp>
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 
@@ -73,21 +74,21 @@ public:
         util::ignore(
             { // Some shader programs have uniforms declared, but not used, so they're not active.
               // Therefore, we'll only verify them when they are indeed active.
-              (active.find(Us::name()) != active.end()
-                   ? verifyUniform<typename Us::Value>(active.at(Us::name()))
+              (active.find(concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value()) != active.end()
+                   ? verifyUniform<typename Us::Value>(active.at(concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value()))
                    : false)... });
 #endif
 
-        state = State{ gl::uniformLocation(id, Us::name())... };
+        state = State{ gl::uniformLocation(id, concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value())... };
     }
 
     template <class BinaryProgram>
     void loadNamedLocations(const BinaryProgram& program) {
-        state = State{ UniformState<typename Us::Value>(program.uniformLocation(Us::name()))... };
+        state = State{ UniformState<typename Us::Value>(program.uniformLocation(concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value()))... };
     }
 
     NamedUniformLocations getNamedLocations() const {
-        return NamedUniformLocations{ { Us::name(), state.template get<Us>().location }... };
+        return NamedUniformLocations{ { concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value(), state.template get<Us>().location }... };
     }
 
     void bind(const gfx::UniformValues<TypeList<Us...>>& values) {

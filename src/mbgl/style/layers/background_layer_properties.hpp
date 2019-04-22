@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -29,6 +31,21 @@ class BackgroundPaintProperties : public Properties<
     BackgroundPattern,
     BackgroundOpacity
 > {};
+
+class BackgroundLayerProperties final : public LayerProperties {
+public:
+    explicit BackgroundLayerProperties(Immutable<BackgroundLayer::Impl>);
+    BackgroundLayerProperties(
+        Immutable<BackgroundLayer::Impl>,
+        CrossfadeParameters,
+        BackgroundPaintProperties::PossiblyEvaluated);
+    ~BackgroundLayerProperties() override;
+
+    const BackgroundLayer::Impl& layerImpl() const;
+    // Data members.
+    CrossfadeParameters crossfade;
+    BackgroundPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

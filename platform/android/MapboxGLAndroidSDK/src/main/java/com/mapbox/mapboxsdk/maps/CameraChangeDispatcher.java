@@ -142,6 +142,14 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
     }
   }
 
+  void onDestroy() {
+    handler.removeCallbacksAndMessages(null);
+    onCameraMoveStarted.clear();
+    onCameraMoveCanceled.clear();
+    onCameraMove.clear();
+    onCameraIdle.clear();
+  }
+
   private static class CameraChangeHandler extends Handler {
 
     private WeakReference<CameraChangeDispatcher> dispatcherWeakReference;

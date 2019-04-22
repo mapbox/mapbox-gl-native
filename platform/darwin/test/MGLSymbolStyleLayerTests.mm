@@ -1003,6 +1003,75 @@
         XCTAssertThrowsSpecificNamed(layer.symbolPlacement = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
+    // symbol-sort-key
+    {
+        XCTAssertTrue(rawLayer->getSymbolSortKey().isUndefined(),
+                      @"symbol-sort-key should be unset initially.");
+        NSExpression *defaultExpression = layer.symbolSortKey;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
+        layer.symbolSortKey = constantExpression;
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a constant value expression should update symbol-sort-key.");
+        XCTAssertEqualObjects(layer.symbolSortKey, constantExpression,
+                              @"symbolSortKey should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.symbolSortKey = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a camera expression should update symbol-sort-key.");
+        XCTAssertEqualObjects(layer.symbolSortKey, functionExpression,
+                              @"symbolSortKey should round-trip camera expressions.");
+
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.symbolSortKey = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                interpolate(linear(), number(get("keyName")), 18.0, literal(1.0))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a data expression should update symbol-sort-key.");
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.symbolSortKey, pedanticFunctionExpression,
+                              @"symbolSortKey should round-trip data expressions.");
+
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.symbolSortKey = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getSymbolSortKey(), propertyValue,
+                       @"Setting symbolSortKey to a camera-data expression should update symbol-sort-key.");
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.symbolSortKey, pedanticFunctionExpression,
+                              @"symbolSortKey should round-trip camera-data expressions.");
+
+        layer.symbolSortKey = nil;
+        XCTAssertTrue(rawLayer->getSymbolSortKey().isUndefined(),
+                      @"Unsetting symbolSortKey should return symbol-sort-key to the default value.");
+        XCTAssertEqualObjects(layer.symbolSortKey, defaultExpression,
+                              @"symbolSortKey should return the default value after being unset.");
+    }
+
     // symbol-spacing
     {
         XCTAssertTrue(rawLayer->getSymbolSpacing().isUndefined(),
@@ -1741,6 +1810,75 @@
         XCTAssertThrowsSpecificNamed(layer.textPitchAlignment = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
+    // text-radial-offset
+    {
+        XCTAssertTrue(rawLayer->getTextRadialOffset().isUndefined(),
+                      @"text-radial-offset should be unset initially.");
+        NSExpression *defaultExpression = layer.textRadialOffset;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
+        layer.textRadialOffset = constantExpression;
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
+        XCTAssertEqual(rawLayer->getTextRadialOffset(), propertyValue,
+                       @"Setting textRadialOffset to a constant value expression should update text-radial-offset.");
+        XCTAssertEqualObjects(layer.textRadialOffset, constantExpression,
+                              @"textRadialOffset should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.textRadialOffset = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getTextRadialOffset(), propertyValue,
+                       @"Setting textRadialOffset to a camera expression should update text-radial-offset.");
+        XCTAssertEqualObjects(layer.textRadialOffset, functionExpression,
+                              @"textRadialOffset should round-trip camera expressions.");
+
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.textRadialOffset = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                interpolate(linear(), number(get("keyName")), 18.0, literal(1.0))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getTextRadialOffset(), propertyValue,
+                       @"Setting textRadialOffset to a data expression should update text-radial-offset.");
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.textRadialOffset, pedanticFunctionExpression,
+                              @"textRadialOffset should round-trip data expressions.");
+
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.textRadialOffset = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getTextRadialOffset(), propertyValue,
+                       @"Setting textRadialOffset to a camera-data expression should update text-radial-offset.");
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.textRadialOffset, pedanticFunctionExpression,
+                              @"textRadialOffset should round-trip camera-data expressions.");
+
+        layer.textRadialOffset = nil;
+        XCTAssertTrue(rawLayer->getTextRadialOffset().isUndefined(),
+                      @"Unsetting textRadialOffset should return text-radial-offset to the default value.");
+        XCTAssertEqualObjects(layer.textRadialOffset, defaultExpression,
+                              @"textRadialOffset should return the default value after being unset.");
+    }
+
     // text-rotate
     {
         XCTAssertTrue(rawLayer->getTextRotate().isUndefined(),
@@ -1890,6 +2028,50 @@
                       @"Unsetting textTransform should return text-transform to the default value.");
         XCTAssertEqualObjects(layer.textTransform, defaultExpression,
                               @"textTransform should return the default value after being unset.");
+    }
+
+    // text-variable-anchor
+    {
+        XCTAssertTrue(rawLayer->getTextVariableAnchor().isUndefined(),
+                      @"text-variable-anchor should be unset initially.");
+        NSExpression *defaultExpression = layer.textVariableAnchor;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"{'top','bottom'}"];
+        layer.textVariableAnchor = constantExpression;
+        mbgl::style::PropertyValue<std::vector<mbgl::style::SymbolAnchorType>> propertyValue = { { mbgl::style::SymbolAnchorType::Top, mbgl::style::SymbolAnchorType::Bottom } };
+        XCTAssertEqual(rawLayer->getTextVariableAnchor(), propertyValue,
+                       @"Setting textVariableAnchor to a constant value expression should update text-variable-anchor.");
+        XCTAssertEqualObjects(layer.textVariableAnchor, constantExpression,
+                              @"textVariableAnchor should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"{'top','bottom'}"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.textVariableAnchor = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<std::vector<mbgl::style::SymbolAnchorType>>(
+                step(zoom(), literal({"top", "bottom"}), 18.0, literal({"top", "bottom"}))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getTextVariableAnchor(), propertyValue,
+                       @"Setting textVariableAnchor to a camera expression should update text-variable-anchor.");
+        XCTAssertEqualObjects(layer.textVariableAnchor, functionExpression,
+                              @"textVariableAnchor should round-trip camera expressions.");
+
+
+        layer.textVariableAnchor = nil;
+        XCTAssertTrue(rawLayer->getTextVariableAnchor().isUndefined(),
+                      @"Unsetting textVariableAnchor should return text-variable-anchor to the default value.");
+        XCTAssertEqualObjects(layer.textVariableAnchor, defaultExpression,
+                              @"textVariableAnchor should return the default value after being unset.");
+
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.textVariableAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.textVariableAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // icon-color
@@ -2881,6 +3063,7 @@
     [self testPropertyName:@"maximum-text-width" isBoolean:NO];
     [self testPropertyName:@"symbol-avoids-edges" isBoolean:YES];
     [self testPropertyName:@"symbol-placement" isBoolean:NO];
+    [self testPropertyName:@"symbol-sort-key" isBoolean:NO];
     [self testPropertyName:@"symbol-spacing" isBoolean:NO];
     [self testPropertyName:@"symbol-z-order" isBoolean:NO];
     [self testPropertyName:@"text" isBoolean:NO];
@@ -2896,9 +3079,11 @@
     [self testPropertyName:@"is-text-optional" isBoolean:YES];
     [self testPropertyName:@"text-padding" isBoolean:NO];
     [self testPropertyName:@"text-pitch-alignment" isBoolean:NO];
+    [self testPropertyName:@"text-radial-offset" isBoolean:NO];
     [self testPropertyName:@"text-rotation" isBoolean:NO];
     [self testPropertyName:@"text-rotation-alignment" isBoolean:NO];
     [self testPropertyName:@"text-transform" isBoolean:NO];
+    [self testPropertyName:@"text-variable-anchor" isBoolean:NO];
     [self testPropertyName:@"icon-color" isBoolean:NO];
     [self testPropertyName:@"icon-halo-blur" isBoolean:NO];
     [self testPropertyName:@"icon-halo-color" isBoolean:NO];
@@ -2938,6 +3123,7 @@
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementPoint].MGLSymbolPlacementValue, MGLSymbolPlacementPoint);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLine].MGLSymbolPlacementValue, MGLSymbolPlacementLine);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLineCenter].MGLSymbolPlacementValue, MGLSymbolPlacementLineCenter);
+    XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderAuto].MGLSymbolZOrderValue, MGLSymbolZOrderAuto);
     XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderViewportY].MGLSymbolZOrderValue, MGLSymbolZOrderViewportY);
     XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderSource].MGLSymbolZOrderValue, MGLSymbolZOrderSource);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorCenter].MGLTextAnchorValue, MGLTextAnchorCenter);
@@ -2949,6 +3135,7 @@
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorTopRight].MGLTextAnchorValue, MGLTextAnchorTopRight);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorBottomLeft].MGLTextAnchorValue, MGLTextAnchorBottomLeft);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorBottomRight].MGLTextAnchorValue, MGLTextAnchorBottomRight);
+    XCTAssertEqual([NSValue valueWithMGLTextJustification:MGLTextJustificationAuto].MGLTextJustificationValue, MGLTextJustificationAuto);
     XCTAssertEqual([NSValue valueWithMGLTextJustification:MGLTextJustificationLeft].MGLTextJustificationValue, MGLTextJustificationLeft);
     XCTAssertEqual([NSValue valueWithMGLTextJustification:MGLTextJustificationCenter].MGLTextJustificationValue, MGLTextJustificationCenter);
     XCTAssertEqual([NSValue valueWithMGLTextJustification:MGLTextJustificationRight].MGLTextJustificationValue, MGLTextJustificationRight);

@@ -4,9 +4,9 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -39,7 +39,7 @@ void main() {
 
 class TestLayer : public mbgl::style::CustomLayerHost {
 public:
-    void initialize() {
+    void initialize() override {
         program = MBGL_CHECK_ERROR(glCreateProgram());
         vertexShader = MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER));
         fragmentShader = MBGL_CHECK_ERROR(glCreateShader(GL_FRAGMENT_SHADER));
@@ -59,7 +59,7 @@ public:
         MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), triangle, GL_STATIC_DRAW));
     }
 
-    void render(const mbgl::style::CustomLayerRenderParameters&) {
+    void render(const mbgl::style::CustomLayerRenderParameters&) override {
         MBGL_CHECK_ERROR(glUseProgram(program));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
@@ -67,9 +67,9 @@ public:
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 3));
     }
 
-    void contextLost() {}
+    void contextLost() override {}
 
-    void deinitialize() {
+    void deinitialize() override {
          if (program) {
                 MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
                 MBGL_CHECK_ERROR(glDetachShader(program, vertexShader));
@@ -90,12 +90,11 @@ public:
 TEST(CustomLayer, Basic) {
     util::RunLoop loop;
 
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
     ThreadPool threadPool(4);
-    float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, threadPool };
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-            threadPool, MapOptions().withMapMode(MapMode::Static));
+    HeadlessFrontend frontend { 1, threadPool };
+    Map map(frontend, MapObserver::nullObserver(), threadPool,
+            MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
+            ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 37.8, -122.5 }).withZoom(10.0));
     map.getStyle().addLayer(std::make_unique<CustomLayer>(

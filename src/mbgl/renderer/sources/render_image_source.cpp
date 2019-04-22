@@ -7,7 +7,7 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
-#include <mbgl/gl/context.hpp>
+#include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/logging.hpp>
@@ -38,10 +38,10 @@ void RenderImageSource::startRender(PaintParameters& parameters) {
 
     matrices.clear();
 
-    for (size_t i = 0; i < tileIds.size(); i++) {
+    for (auto& tileId : tileIds) {
         mat4 matrix;
         matrix::identity(matrix);
-        parameters.state.matrixFor(matrix, tileIds[i]);
+        parameters.state.matrixFor(matrix, tileId);
         matrix::multiply(matrix, parameters.alignedProjMatrix, matrix);
         matrices.push_back(matrix);
     }
@@ -64,6 +64,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
     for (auto matrix : matrices) {
         programInstance.draw(
             parameters.context,
+            *parameters.renderPass,
             gfx::LineStrip { 4.0f * parameters.pixelRatio },
             gfx::DepthMode::disabled(),
             gfx::StencilMode::disabled(),
@@ -73,8 +74,8 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileBorderSegments,
             programInstance.computeAllUniformValues(
                 DebugProgram::LayoutUniformValues {
-                    uniforms::u_matrix::Value( matrix ),
-                    uniforms::u_color::Value( Color::red() )
+                    uniforms::matrix::Value( matrix ),
+                    uniforms::color::Value( Color::red() )
                 },
                 paintAttributeData,
                 properties,
@@ -105,7 +106,7 @@ std::vector<Feature> RenderImageSource::querySourceFeatures(const SourceQueryOpt
 }
 
 void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
-                               const std::vector<Immutable<Layer::Impl>>&,
+                               const std::vector<Immutable<LayerProperties>>&,
                                const bool needsRendering,
                                const bool,
                                const TileParameters& parameters) {
@@ -166,7 +167,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     auto idealTiles = util::tileCover(transformState, transformState.getZoom());
     for (auto tile : idealTiles) {
         if (tile.wrap != 0 && tileCover[0].canonical.isChildOf(tile.canonical)) {
-            tileIds.push_back({ tile.wrap, tileCover[0].canonical });
+            tileIds.emplace_back(tile.wrap, tileCover[0].canonical);
             hasVisibleTile = true;
         }
         else if (!hasVisibleTile) {

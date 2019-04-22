@@ -4,6 +4,7 @@
 #include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/util/literal.hpp>
 #include <mbgl/util/type_list.hpp>
 #include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
@@ -99,7 +100,7 @@ public:
                                       const optional<PatternDependency>&,
                                       const style::expression::Value&) = 0;
     virtual void upload(gfx::Context& context) = 0;
-    virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) = 0;
+    virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) = 0;
     virtual std::tuple<ExpandToType<As, optional<gfx::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
     virtual std::tuple<ExpandToType<As, float>...> interpolationFactor(float currentZoom) const = 0;
     virtual std::tuple<ExpandToType<As, UniformValueType>...> uniformValue(const PossiblyEvaluatedType& currentValue) const = 0;
@@ -118,7 +119,7 @@ public:
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
     void upload(gfx::Context&) override {}
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
 
     std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
         return {};
@@ -146,8 +147,8 @@ public:
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
     void upload(gfx::Context&) override {}
 
-    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters&) override {
-        if (!posA && !posB) {
+    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, const CrossfadeParameters&) override {
+        if (!posA || !posB) {
             return;
         } else {
             constantPatternPositions = std::tuple<std::array<uint16_t, 4>, std::array<uint16_t, 4>> { posB->tlbr(), posA->tlbr() };
@@ -184,7 +185,7 @@ public:
         : expression(std::move(expression_)),
           defaultValue(std::move(defaultValue_)) {
     }
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         auto evaluated = expression.evaluate(EvaluationContext(&feature).withFormattedSection(&formattedSection), defaultValue);
@@ -242,7 +243,7 @@ public:
           defaultValue(std::move(defaultValue_)),
           zoomRange({zoom, zoom + 1}) {
     }
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         Range<T> range = {
@@ -316,7 +317,7 @@ public:
           zoomRange({zoom, zoom + 1}) {
     }
 
-    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters& crossfade_) override {
+    void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters& crossfade_) override {
         crossfade = crossfade_;
     };
 
@@ -431,17 +432,15 @@ PaintPropertyBinder<T, UniformValueType, PossiblyEvaluatedType, As...>::create(c
 }
 
 template <class Attr>
-struct ZoomInterpolatedAttribute {
-    static auto name() { return Attr::name(); }
+struct ZoomInterpolatedAttribute : public Attr {
     using Type = ZoomInterpolatedAttributeType<typename Attr::Type>;
 };
 
 template <class Attr>
 struct InterpolationUniform {
     using Value = float;
-    static auto name() {
-        static const std::string name = Attr::name() + std::string("_t");
-        return name.c_str();
+    static constexpr auto name() {
+        return concat_literals<&Attr::name, &string_literal<'_', 't'>::value>::value();
     }
 };
 
@@ -487,7 +486,7 @@ public:
         });
     }
 
-    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters& crossfade) const {
+    void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, const CrossfadeParameters& crossfade) const {
         util::ignore({
             (binders.template get<Ps>()->setPatternParameters(posA, posB, crossfade), 0)...
         });
@@ -542,29 +541,6 @@ public:
         util::ignore({
             result.set(TypeIndex<Ps, Ps...>::value,
                        currentProperties.template get<Ps>().isConstant())...
-        });
-        return result;
-    }
-
-    template <class>
-    struct UniformDefines;
-
-    template <class... Us>
-    struct UniformDefines<TypeList<Us...>> {
-        static void appendDefines(std::vector<std::string>& defines) {
-            util::ignore({
-                (defines.push_back(std::string("#define HAS_UNIFORM_") + Us::name()), 0)...
-            });
-        }
-    };
-
-    template <class EvaluatedProperties>
-    static std::vector<std::string> defines(const EvaluatedProperties& currentProperties) {
-        std::vector<std::string> result;
-        util::ignore({
-            (currentProperties.template get<Ps>().isConstant()
-                ? UniformDefines<typename Ps::UniformList>::appendDefines(result)
-                : (void) 0, 0)...
         });
         return result;
     }

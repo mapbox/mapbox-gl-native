@@ -78,7 +78,7 @@ std::string toPaddedHex(T x) {
     return result;
 }
 
-}
+} // namespace
 
 std::string toHex(size_t value) {
     return toPaddedHex(value);

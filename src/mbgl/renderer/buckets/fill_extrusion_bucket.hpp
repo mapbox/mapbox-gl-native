@@ -16,13 +16,11 @@ class RenderFillExtrusionLayer;
 class FillExtrusionBucket final : public Bucket {
 public:
     ~FillExtrusionBucket() override;
-    // These aliases are used by the PatternLayout template
-    using RenderLayerType = RenderFillExtrusionLayer;
     using PossiblyEvaluatedPaintProperties = style::FillExtrusionPaintProperties::PossiblyEvaluated;
     using PossiblyEvaluatedLayoutProperties = style::Properties<>::PossiblyEvaluated;
 
-    FillExtrusionBucket(const PossiblyEvaluatedLayoutProperties,
-                        std::map<std::string, PossiblyEvaluatedPaintProperties>,
+    FillExtrusionBucket(const PossiblyEvaluatedLayoutProperties&,
+                        const std::map<std::string, Immutable<style::LayerProperties>>&,
                         const float,
                         const uint32_t);
 

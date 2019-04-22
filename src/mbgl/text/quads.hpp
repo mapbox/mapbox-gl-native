@@ -49,6 +49,7 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
                        const Shaping& shapedText);
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
+                          const std::array<float, 2> textOffset,
                           const style::SymbolLayoutProperties::Evaluated&,
                           style::SymbolPlacementType placement,
                           const GlyphPositions& positions);

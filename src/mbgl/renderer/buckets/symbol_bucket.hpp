@@ -35,12 +35,14 @@ public:
     std::vector<float> glyphOffsets;
     bool hidden;
     size_t vertexStartIndex;
+    // The crossTileID is only filled/used on the foreground for variable text anchors
+    uint32_t crossTileID = 0u;
 };
 
 class SymbolBucket final : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
-                 const std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated>&,
+                 const std::map<std::string, Immutable<style::LayerProperties>>&,
                  const style::PropertyValue<float>& textSize,
                  const style::PropertyValue<float>& iconSize,
                  float zoom,
@@ -48,7 +50,8 @@ public:
                  bool iconsNeedLinear,
                  bool sortFeaturesByY,
                  const std::string bucketLeaderID,
-                 const std::vector<SymbolInstance>&&);
+                 const std::vector<SymbolInstance>&&,
+                 const float tilePixelRatio);
     ~SymbolBucket() override;
 
     void upload(gfx::Context&) override;
@@ -58,10 +61,7 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
     bool hasCollisionCircleData() const;
-    bool hasFormatSectionOverrides();
-    void updatePaintProperties(const std::string& layerID,
-                               style::SymbolPaintProperties::PossiblyEvaluated);
-    void setPaintPropertyOverrides(style::SymbolPaintProperties::PossiblyEvaluated&);
+    bool hasFormatSectionOverrides() const;
 
     void updateOpacity();
     void sortFeatures(const float angle);
@@ -83,7 +83,6 @@ public:
     std::vector<SymbolInstance> symbolInstances;
 
     struct PaintProperties {
-        style::SymbolPaintProperties::PossiblyEvaluated evaluated;
         SymbolIconProgram::Binders iconBinders;
         SymbolSDFTextProgram::Binders textBinders;
     };
@@ -130,9 +129,10 @@ public:
         optional<gfx::IndexBuffer> indexBuffer;
     } collisionCircle;
 
+    const float tilePixelRatio;
     uint32_t bucketInstanceId = 0;
     bool justReloaded = false;
-    optional<bool> hasFormatSectionOverrides_;
+    mutable optional<bool> hasFormatSectionOverrides_;
 
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };

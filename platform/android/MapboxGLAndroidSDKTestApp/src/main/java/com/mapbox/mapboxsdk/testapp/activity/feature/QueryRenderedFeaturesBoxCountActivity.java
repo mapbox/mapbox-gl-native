@@ -1,22 +1,23 @@
 package com.mapbox.mapboxsdk.testapp.activity.feature;
 
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.NavUtils;
+import timber.log.Timber;
 
 import java.util.List;
 import java.util.Map;
-
-import timber.log.Timber;
 
 /**
  * Test activity showcasing using the query rendered features API to count features in a rectangle.
@@ -89,6 +90,11 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
   protected void onStart() {
     super.onStart();
     mapView.onStart();
+
+    if (mapboxMap != null) {
+      // Regression test for #14394
+      mapboxMap.queryRenderedFeatures(new PointF(0, 0));
+    }
   }
 
   @Override
@@ -125,5 +131,24 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        // activity uses singleInstance for testing purposes
+        // code below provides a default navigation when using the app
+        onBackPressed();
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onBackPressed() {
+    // activity uses singleInstance for testing purposes
+    // code below provides a default navigation when using the app
+    NavUtils.navigateHome(this);
   }
 }

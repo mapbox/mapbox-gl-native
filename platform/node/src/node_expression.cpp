@@ -173,7 +173,7 @@ struct ToValue {
             } else {
                 serializedSection.emplace("fontStack", mbgl::NullValue());
             }
-            sections.push_back(serializedSection);
+            sections.emplace_back(serializedSection);
         }
         serialized.emplace("sections", sections);
 
@@ -205,7 +205,7 @@ v8::Local<v8::Value> toJS(const Value& value) {
 }
 
 void NodeExpression::Evaluate(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
+    auto* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
 
     if (info.Length() < 2 || !info[0]->IsObject()) {
@@ -246,7 +246,7 @@ void NodeExpression::Evaluate(const Nan::FunctionCallbackInfo<v8::Value>& info) 
 }
 
 void NodeExpression::GetType(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
+    auto* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
 
     const type::Type type = expression->getType();
@@ -255,19 +255,19 @@ void NodeExpression::GetType(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void NodeExpression::IsFeatureConstant(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
+    auto* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
     info.GetReturnValue().Set(Nan::New(isFeatureConstant(*expression)));
 }
 
 void NodeExpression::IsZoomConstant(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
+    auto* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
     info.GetReturnValue().Set(Nan::New(isZoomConstant(*expression)));
 }
 
 void NodeExpression::Serialize(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
+    auto* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
 
     const mbgl::Value serialized = expression->serialize();

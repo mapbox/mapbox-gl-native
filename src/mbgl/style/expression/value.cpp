@@ -166,7 +166,12 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
                     }
                     options.emplace("text-font", std::vector<mbgl::Value>{ std::string("literal"), fontStack });
                 }
-                serialized.push_back(options);
+
+                if (section.textColor) {
+                    options.emplace("text-color", fromExpressionValue(*section.textColor));
+                }
+
+                serialized.emplace_back(options);
             }
             return serialized;
         },
@@ -323,6 +328,9 @@ template struct ValueConverter<std::vector<float>>;
 
 template type::Type valueTypeToExpressionType<std::vector<std::string>>();
 template struct ValueConverter<std::vector<std::string>>;
+
+template type::Type valueTypeToExpressionType<std::vector<TextVariableAnchorType>>();
+template struct ValueConverter<std::vector<TextVariableAnchorType>>;
 
 template type::Type valueTypeToExpressionType<AlignmentType>();
 template struct ValueConverter<AlignmentType>;

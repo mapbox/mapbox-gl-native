@@ -182,6 +182,18 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the SymbolSortKey property
+   *
+   * @return property wrapper value around Float
+   */
+  @NonNull
+  @SuppressWarnings("unchecked")
+  public PropertyValue<Float> getSymbolSortKey() {
+    checkThread();
+    return (PropertyValue<Float>) new PropertyValue("symbol-sort-key", nativeGetSymbolSortKey());
+  }
+
+  /**
    * Get the SymbolZOrder property
    *
    * @return property wrapper value around String
@@ -467,6 +479,30 @@ public class SymbolLayer extends Layer {
   public PropertyValue<String> getTextJustify() {
     checkThread();
     return (PropertyValue<String>) new PropertyValue("text-justify", nativeGetTextJustify());
+  }
+
+  /**
+   * Get the TextRadialOffset property
+   *
+   * @return property wrapper value around Float
+   */
+  @NonNull
+  @SuppressWarnings("unchecked")
+  public PropertyValue<Float> getTextRadialOffset() {
+    checkThread();
+    return (PropertyValue<Float>) new PropertyValue("text-radial-offset", nativeGetTextRadialOffset());
+  }
+
+  /**
+   * Get the TextVariableAnchor property
+   *
+   * @return property wrapper value around String[]
+   */
+  @NonNull
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String[]> getTextVariableAnchor() {
+    checkThread();
+    return (PropertyValue<String[]>) new PropertyValue("text-variable-anchor", nativeGetTextVariableAnchor());
   }
 
   /**
@@ -1091,6 +1127,10 @@ public class SymbolLayer extends Layer {
 
   @NonNull
   @Keep
+  private native Object nativeGetSymbolSortKey();
+
+  @NonNull
+  @Keep
   private native Object nativeGetSymbolZOrder();
 
   @NonNull
@@ -1184,6 +1224,14 @@ public class SymbolLayer extends Layer {
   @NonNull
   @Keep
   private native Object nativeGetTextJustify();
+
+  @NonNull
+  @Keep
+  private native Object nativeGetTextRadialOffset();
+
+  @NonNull
+  @Keep
+  private native Object nativeGetTextVariableAnchor();
 
   @NonNull
   @Keep

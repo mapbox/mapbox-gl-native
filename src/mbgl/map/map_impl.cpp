@@ -1,39 +1,31 @@
 #include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/map/map_impl.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/util/exception.hpp>
 
 namespace mbgl {
 
-Map::Impl::Impl(Map& map_,
-                RendererFrontend& frontend,
-                MapObserver& mapObserver,
-                FileSource& fileSource_,
+Map::Impl::Impl(RendererFrontend& frontend_,
+                MapObserver& observer_,
                 Scheduler& scheduler_,
-                Size size_,
-                float pixelRatio_,
-                MapMode mode_,
-                ConstrainMode constrainMode_,
-                ViewportMode viewportMode_,
-                bool crossSourceCollisions_)
-    : map(map_),
-      observer(mapObserver),
-      rendererFrontend(frontend),
-      fileSource(fileSource_),
-      scheduler(scheduler_),
-      transform(observer,
-                constrainMode_,
-                viewportMode_),
-      mode(mode_),
-      pixelRatio(pixelRatio_),
-      crossSourceCollisions(crossSourceCollisions_),
-      style(std::make_unique<style::Style>(scheduler, fileSource, pixelRatio)),
-      annotationManager(*style) {
-
+                std::shared_ptr<FileSource> fileSource_,
+                const MapOptions& mapOptions)
+        : observer(observer_),
+          rendererFrontend(frontend_),
+          scheduler(scheduler_),
+          transform(observer, mapOptions.constrainMode(), mapOptions.viewportMode()),
+          mode(mapOptions.mapMode()),
+          pixelRatio(mapOptions.pixelRatio()),
+          crossSourceCollisions(mapOptions.crossSourceCollisions()),
+          fileSource(std::move(fileSource_)),
+          style(std::make_unique<style::Style>(scheduler, *fileSource, pixelRatio)),
+          annotationManager(*style) {
+    transform.setNorthOrientation(mapOptions.northOrientation());
     style->impl->setObserver(this);
     rendererFrontend.setObserver(*this);
-    transform.resize(size_);
+    transform.resize(mapOptions.size());
 }
 
 Map::Impl::~Impl() {
@@ -73,7 +65,7 @@ void Map::Impl::onUpdate() {
         style->impl->getSourceImpls(),
         style->impl->getLayerImpls(),
         annotationManager,
-        fileSource,
+        *fileSource,
         prefetchZoomDelta,
         bool(stillImageRequest),
         crossSourceCollisions
@@ -90,7 +82,7 @@ void Map::Impl::onStyleLoading() {
 
 void Map::Impl::onStyleLoaded() {
     if (!cameraMutated) {
-        map.jumpTo(style->getDefaultCamera());
+        jumpTo(style->getDefaultCamera());
     }
     if (LayerManager::annotationsEnabled) {
         annotationManager.onStyleLoaded();
@@ -172,5 +164,21 @@ void Map::Impl::onDidFinishRenderingMap() {
         }
     }
 };
+
+void Map::Impl::jumpTo(const CameraOptions& camera) {
+    cameraMutated = true;
+    transform.jumpTo(camera);
+    onUpdate();
+}
+
+void Map::Impl::onStyleImageMissing(const std::string& id, std::function<void()> done) {
+
+    if (style->getImage(id) == nullptr) {
+        observer.onStyleImageMissing(id);
+    }
+
+    done();
+    onUpdate();
+}
 
 } // namespace mbgl

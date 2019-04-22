@@ -1,13 +1,16 @@
 package com.mapbox.mapboxsdk.offline;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.lang.annotation.Retention;
@@ -29,6 +32,9 @@ public class OfflineRegion {
   }
 
   // Members
+
+  // Application context
+  private final Context context;
 
   // Holds the pointer to JNI OfflineRegion
   @Keep
@@ -223,6 +229,7 @@ public class OfflineRegion {
   @Keep
   private OfflineRegion(long offlineRegionPtr, FileSource fileSource, long id,
                         OfflineRegionDefinition definition, byte[] metadata) {
+    this.context = Mapbox.getApplicationContext();
     this.fileSource = fileSource;
     this.id = id;
     this.definition = definition;
@@ -306,10 +313,16 @@ public class OfflineRegion {
    * @param state the download state
    */
   public void setDownloadState(@DownloadState int state) {
+    if (this.state == state) {
+      return;
+    }
+
     if (state == STATE_ACTIVE) {
+      ConnectivityReceiver.instance(context).activate();
       fileSource.activate();
     } else {
       fileSource.deactivate();
+      ConnectivityReceiver.instance(context).deactivate();
     }
 
     this.state = state;

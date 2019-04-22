@@ -17,5 +17,6 @@
 
 + (NSExpression *)mgl_expressionForRGBComponents:(NSArray<NSExpression *> *)components;
 + (NSExpression *)mgl_expressionForRGBAComponents:(NSArray<NSExpression *> *)components;
++ (UIColor *)mgl_colorWithRGBComponents:(NSArray<NSExpression *> *)components;
 
 @end

@@ -1,24 +1,28 @@
 package com.mapbox.mapboxsdk.testapp.activity;
 
-import android.support.test.espresso.IdlingResource;
+import android.support.annotation.UiThread;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
-import com.mapbox.mapboxsdk.testapp.utils.LoadStyleIdlingResource;
+
 
 /**
  * Base class for all tests using EspressoTestActivity as wrapper.
  * <p>
- * Uses {@link LoadStyleIdlingResource} to load "assets/streets.json" as style.
+ * Loads "assets/streets.json" as style.
  * </p>
  */
 public class EspressoTest extends BaseTest {
 
   @Override
-  protected IdlingResource generateIdlingResource() {
-    return new LoadStyleIdlingResource(rule.getActivity());
-  }
-
-  @Override
   protected final Class getActivityClass() {
     return EspressoTestActivity.class;
+  }
+
+  @UiThread
+  @Override
+  protected void initMap(MapboxMap mapboxMap) {
+    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://streets.json"));
+    super.initMap(mapboxMap);
   }
 }

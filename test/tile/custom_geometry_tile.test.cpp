@@ -11,6 +11,7 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
@@ -120,7 +121,9 @@ TEST(CustomGeometryTile, InvokeTileChanged) {
         ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
     };
 
-    tile.setLayers({{ layer.baseImpl }});
+    Immutable<LayerProperties> layerProperties = makeMutable<CircleLayerProperties>(staticImmutableCast<CircleLayer::Impl>(layer.baseImpl));
+    std::vector<Immutable<LayerProperties>> layers { layerProperties };
+    tile.setLayers(layers);
     tile.setObserver(&observer);
     tile.setTileData(features);
 

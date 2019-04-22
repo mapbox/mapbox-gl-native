@@ -20,6 +20,8 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
 @UiThread
 public class Light {
 
+  private static final String TAG = "Mbgl-Light";
+
   @Keep
   private long nativePtr;
 
@@ -192,7 +194,7 @@ public class Light {
   }
 
   private void checkThread(){
-    ThreadUtils.checkThread("Light");
+    ThreadUtils.checkThread(TAG);
   }
 
   @Keep

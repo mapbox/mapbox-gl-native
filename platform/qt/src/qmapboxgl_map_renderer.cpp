@@ -1,6 +1,8 @@
 #include "qmapboxgl_map_renderer.hpp"
 #include "qmapboxgl_scheduler.hpp"
 
+#include <mbgl/gfx/backend_scope.hpp>
+
 #include <QThreadStorage>
 #include <QtGlobal>
 
@@ -25,7 +27,8 @@ static auto *getScheduler() {
 };
 
 QMapboxGLMapRenderer::QMapboxGLMapRenderer(qreal pixelRatio, mbgl::ThreadPool &tp, QMapboxGLSettings::GLContextMode mode, const QString &localFontFamily)
-    : m_renderer(std::make_unique<mbgl::Renderer>(m_backend, pixelRatio, tp, static_cast<mbgl::GLContextMode>(mode), mbgl::optional<std::string> {},
+    : m_backend(static_cast<mbgl::gfx::ContextMode>(mode)),
+      m_renderer(std::make_unique<mbgl::Renderer>(m_backend, pixelRatio, tp, mbgl::optional<std::string> {},
                  localFontFamily.isEmpty() ? mbgl::nullopt : mbgl::optional<std::string> { localFontFamily.toStdString() }))
     , m_forceScheduler(needsToForceScheduler())
 {
@@ -79,7 +82,7 @@ void QMapboxGLMapRenderer::render()
     }
 
     // The OpenGL implementation automatically enables the OpenGL context for us.
-    mbgl::BackendScope scope(m_backend, mbgl::BackendScope::ScopeType::Implicit);
+    mbgl::gfx::BackendScope scope(m_backend, mbgl::gfx::BackendScope::ScopeType::Implicit);
 
     m_renderer->render(*params);
 

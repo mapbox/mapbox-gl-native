@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_geometry_tile_feature.hpp>
 
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
@@ -43,10 +43,10 @@ PropertyMap properties;
 } // namespace
 
 TEST(Buckets, CircleBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
 
-    gl::Context context;
+    gl::Context context{ backend };
     CircleBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0, nullptr }, {} };
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
@@ -62,11 +62,11 @@ TEST(Buckets, CircleBucket) {
 }
 
 TEST(Buckets, FillBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
     style::Properties<>::PossiblyEvaluated layout;
 
-    gl::Context context;
+    gl::Context context{ backend };
     FillBucket bucket { layout, {}, 5.0f, 1};
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
@@ -81,11 +81,11 @@ TEST(Buckets, FillBucket) {
 }
 
 TEST(Buckets, LineBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
     style::LineLayoutProperties::PossiblyEvaluated layout;
 
-    gl::Context context;
+    gl::Context context{ backend };
     LineBucket bucket { layout, {}, 10.0f, 1 };
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
@@ -105,8 +105,8 @@ TEST(Buckets, LineBucket) {
 }
 
 TEST(Buckets, SymbolBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
 
     style::SymbolLayoutProperties::PossiblyEvaluated layout;
     bool sdfIcons = false;
@@ -115,8 +115,8 @@ TEST(Buckets, SymbolBucket) {
     std::string bucketLeaderID = "test";
     std::vector<SymbolInstance> symbolInstances;
 
-    gl::Context context;
-    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances) };
+    gl::Context context{ backend };
+    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), 1.0f };
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());
@@ -139,10 +139,10 @@ TEST(Buckets, SymbolBucket) {
 }
 
 TEST(Buckets, RasterBucket) {
-    HeadlessBackend backend({ 512, 256 });
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend({ 512, 256 });
+    gfx::BackendScope scope { backend };
 
-    gl::Context context;
+    gl::Context context{ backend };
     PremultipliedImage rgba({ 1, 1 });
 
     // RasterBucket::hasData() is always true.

@@ -30,13 +30,13 @@ FillPatternProgram::layoutUniformValues(mat4 matrix,
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
 
     return {
-        uniforms::u_matrix::Value( matrix ),
-        uniforms::u_world::Value( framebufferSize ),
-        uniforms::u_texsize::Value( atlasSize ),
-        uniforms::u_scale::Value({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} } ),
-        uniforms::u_fade::Value( crossfade.t ),
-        uniforms::u_pixel_coord_upper::Value( std::array<float, 2> {{ float(pixelX >> 16), float(pixelY >> 16) }}),
-        uniforms::u_pixel_coord_lower::Value( std::array<float, 2> {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }} )
+        uniforms::matrix::Value( matrix ),
+        uniforms::world::Value( framebufferSize ),
+        uniforms::texsize::Value( atlasSize ),
+        uniforms::scale::Value({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} } ),
+        uniforms::fade::Value( crossfade.t ),
+        uniforms::pixel_coord_upper::Value( std::array<float, 2> {{ float(pixelX >> 16), float(pixelY >> 16) }}),
+        uniforms::pixel_coord_lower::Value( std::array<float, 2> {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }} )
     };
 }
 

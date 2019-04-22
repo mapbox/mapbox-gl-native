@@ -104,13 +104,8 @@ endmacro()
 
 
 macro(mbgl_filesource)
-    target_sources(mbgl-filesource
-        # File source
-        PRIVATE platform/default/src/mbgl/storage/http_file_source.cpp
-
-        # Database
-        PRIVATE platform/default/src/mbgl/storage/sqlite3.cpp
-    )
+    # Modify platform/linux/filesource-files.json to change the source files for this target.
+    target_sources_from_file(mbgl-filesource PRIVATE platform/linux/filesource-files.json)
 
     # We're not referencing any cURL symbols since we're dynamically loading it. However, we want to
     # link the library anyway since we're definitely going to load it on startup anyway.

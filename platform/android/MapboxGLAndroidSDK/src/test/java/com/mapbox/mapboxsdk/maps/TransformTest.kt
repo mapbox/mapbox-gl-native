@@ -13,7 +13,7 @@ import org.robolectric.RobolectricTestRunner
 class TransformTest {
 
   private lateinit var mapView: MapView
-  private lateinit var nativeMapView: NativeMapView
+  private lateinit var nativeMapView: NativeMap
   private lateinit var transform: Transform
 
   @Before

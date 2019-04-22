@@ -25,20 +25,20 @@ public:
     // Paint properties
 
     static PropertyValue<Color> getDefaultBackgroundColor();
-    PropertyValue<Color> getBackgroundColor() const;
-    void setBackgroundColor(PropertyValue<Color>);
+    const PropertyValue<Color>& getBackgroundColor() const;
+    void setBackgroundColor(const PropertyValue<Color>&);
     void setBackgroundColorTransition(const TransitionOptions&);
     TransitionOptions getBackgroundColorTransition() const;
 
     static PropertyValue<std::string> getDefaultBackgroundPattern();
-    PropertyValue<std::string> getBackgroundPattern() const;
-    void setBackgroundPattern(PropertyValue<std::string>);
+    const PropertyValue<std::string>& getBackgroundPattern() const;
+    void setBackgroundPattern(const PropertyValue<std::string>&);
     void setBackgroundPatternTransition(const TransitionOptions&);
     TransitionOptions getBackgroundPatternTransition() const;
 
     static PropertyValue<float> getDefaultBackgroundOpacity();
-    PropertyValue<float> getBackgroundOpacity() const;
-    void setBackgroundOpacity(PropertyValue<float>);
+    const PropertyValue<float>& getBackgroundOpacity() const;
+    void setBackgroundOpacity(const PropertyValue<float>&);
     void setBackgroundOpacityTransition(const TransitionOptions&);
     TransitionOptions getBackgroundOpacityTransition() const;
 

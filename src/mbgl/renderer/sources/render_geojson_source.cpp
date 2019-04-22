@@ -66,7 +66,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto extensionGetters = mapbox::eternal::hash_map
     {"expansion-zoom", &getClusterExpansionZoom}
 });
 
-}
+} // namespace
 
 RenderGeoJSONSource::RenderGeoJSONSource(Immutable<style::GeoJSONSource::Impl> impl_)
     : RenderSource(impl_) {
@@ -84,7 +84,7 @@ bool RenderGeoJSONSource::isLoaded() const {
 }
 
 void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
-                                 const std::vector<Immutable<Layer::Impl>>& layers,
+                                 const std::vector<Immutable<LayerProperties>>& layers,
                                  const bool needsRendering,
                                  const bool needsRelayout,
                                  const TileParameters& parameters) {

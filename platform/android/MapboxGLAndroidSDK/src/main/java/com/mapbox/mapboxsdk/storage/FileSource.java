@@ -31,7 +31,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class FileSource {
 
   private static final String TAG = "Mbgl-FileSource";
-  private static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
   private static final String MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH = "fileSourceResourcesCachePath";
   private static final Lock resourcesCachePathLoaderLock = new ReentrantLock();
   private static final Lock internalCachePathLoaderLock = new ReentrantLock();
@@ -107,7 +106,8 @@ public class FileSource {
    */
   @NonNull
   private static String getCachePath(@NonNull Context context) {
-    SharedPreferences preferences = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    SharedPreferences preferences = context.getSharedPreferences(
+      MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     String cachePath = preferences.getString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, null);
 
     if (!isPathWritable(cachePath)) {
@@ -116,7 +116,7 @@ public class FileSource {
 
       // Reset stored cache path
       SharedPreferences.Editor editor =
-        context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
+        context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
       editor.remove(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH).apply();
     }
 
@@ -194,7 +194,7 @@ public class FileSource {
    */
   @UiThread
   public static void initializeFileDirsPaths(Context context) {
-    ThreadUtils.checkThread("FileSource");
+    ThreadUtils.checkThread(TAG);
     lockPathLoaders();
     if (resourcesCachePath == null || internalCachePath == null) {
       new FileDirsPathsTask().execute(context);
@@ -231,7 +231,7 @@ public class FileSource {
    * @param context the context to derive the files directory path from
    * @return the files directory path
    */
-  @Nullable
+  @NonNull
   public static String getResourcesCachePath(@NonNull Context context) {
     resourcesCachePathLoaderLock.lock();
     try {
@@ -306,7 +306,7 @@ public class FileSource {
             callback.onError(fileSourceActivatedMessage);
           } else {
             final SharedPreferences.Editor editor =
-              context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
+              context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
             editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path);
             editor.apply();
             setResourcesCachePath(context, path);

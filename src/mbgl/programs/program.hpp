@@ -13,6 +13,10 @@
 
 namespace mbgl {
 
+namespace gfx {
+class RenderPass;
+} // namespace gfx
+
 template <class Name,
           gfx::PrimitiveType Primitive,
           class LayoutAttributeList,
@@ -67,6 +71,7 @@ public:
 
     template <class DrawMode>
     void draw(gfx::Context& context,
+              gfx::RenderPass& renderPass,
               const DrawMode& drawMode,
               const gfx::DepthMode& depthMode,
               const gfx::StencilMode& stencilMode,
@@ -93,6 +98,7 @@ public:
 
             program->draw(
                 context,
+                renderPass,
                 drawMode,
                 depthMode,
                 stencilMode,
@@ -107,36 +113,6 @@ public:
                 segment.indexLength);
         }
     }
-};
-
-template <class Program>
-class ProgramMap {
-public:
-    using PaintProperties = typename Program::PaintProperties;
-    using Binders = typename Program::Binders;
-    using Bitset = typename Binders::Bitset;
-
-    ProgramMap(gfx::Context& context_, ProgramParameters parameters_)
-        : context(context_),
-          parameters(std::move(parameters_)) {
-    }
-
-    Program& get(const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        Bitset bits = Binders::constants(currentProperties);
-        auto it = programs.find(bits);
-        if (it != programs.end()) {
-            return it->second;
-        }
-        return programs.emplace(std::piecewise_construct,
-                                std::forward_as_tuple(bits),
-                                std::forward_as_tuple(context,
-                                    parameters.withAdditionalDefines(Binders::defines(currentProperties)))).first->second;
-    }
-
-private:
-    gfx::Context& context;
-    ProgramParameters parameters;
-    std::unordered_map<Bitset, Program> programs;
 };
 
 class LayerTypePrograms {

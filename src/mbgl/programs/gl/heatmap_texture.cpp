@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/heatmap_texture_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<HeatmapTextureProgram> {
+    static constexpr const char* name = "heatmap_texture";
+    static constexpr const uint8_t hash[8] = { 0x9f, 0xc7, 0x56, 0xb2, 0x9e, 0x8f, 0x15, 0xff };
+    static constexpr const auto vertexOffset = 9491;
+    static constexpr const auto fragmentOffset = 9671;
+};
+
+constexpr const char* ShaderSource<HeatmapTextureProgram>::name;
+constexpr const uint8_t ShaderSource<HeatmapTextureProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<HeatmapTextureProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<HeatmapTextureProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "heatmap_texture",
-        programs::gl::shaderSource() + 9491, programs::gl::shaderSource() + 9671);
+    return std::make_unique<gl::Program<HeatmapTextureProgram>>(programParameters);
 }
 
 } // namespace gfx

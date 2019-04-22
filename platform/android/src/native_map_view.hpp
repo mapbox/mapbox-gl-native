@@ -6,7 +6,6 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
 #include "annotation/marker.hpp"
@@ -70,6 +69,7 @@ public:
     void onDidBecomeIdle() override;
     void onDidFinishLoadingStyle() override;
     void onSourceChanged(mbgl::style::Source&) override;
+    void onStyleImageMissing(const std::string&) override;
 
     // JNI //
 

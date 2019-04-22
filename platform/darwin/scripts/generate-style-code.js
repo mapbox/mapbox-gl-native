@@ -137,6 +137,8 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
                     }
                     return '@"{1, 1}"';
                 }
+                case 'anchor':
+                    return `@"{'top','bottom'}"`;
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -185,6 +187,8 @@ global.mbglTestValue = function (property, layerType) {
                 case 'offset':
                 case 'translate':
                     return '{ 1, 1 }';
+                case 'anchor':
+                    return '{ mbgl::style::SymbolAnchorType::Top, mbgl::style::SymbolAnchorType::Bottom }';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -200,6 +204,13 @@ global.mbglExpressionTestValue = function (property, layerType) {
             return `"${_.last(_.keys(property.values))}"`;
         case 'color':
             return 'mbgl::Color(1, 0, 0, 1)';
+        case 'array':
+            switch (arrayType(property)) {
+                case 'anchor':
+                    return `{"top", "bottom"}`;
+                default:
+                    break;
+            }
         default:
             return global.mbglTestValue(property, layerType);
     }
@@ -341,6 +352,12 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         if (property.type === 'enum') {
             doc += '* Any of the following constant string values:\n';
             doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
+        } else if (property.type === 'array' && property.value === 'enum') {
+            doc += '* Constant array, whose each element is any of the following constant string values:\n';
+            doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
+        }
+        if (property.type === 'formatted') {
+            doc += '* Formatted expressions.\n';
         }
         doc += '* Predefined functions, including mathematical and string operators\n' +
             '* Conditional expressions\n' +
@@ -415,6 +432,8 @@ global.describeType = function (property) {
                     return '`CGVector`';
                 case 'position':
                     return '`MGLSphericalPosition`';
+                case 'anchor':
+                    return '`MGLTextAnchor` array';
                 default:
                     return 'array';
             }
@@ -539,11 +558,12 @@ global.propertyType = function (property) {
                 case 'font':
                     return 'NSArray<NSString *> *';
                 case 'padding':
-                    return 'NSValue *';
                 case 'position':
                 case 'offset':
                 case 'translate':
                     return 'NSValue *';
+                case 'anchor':
+                    return 'NSArray<NSValue *> *';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -588,6 +608,8 @@ global.valueTransformerArguments = function (property) {
                 case 'offset':
                 case 'translate':
                     return ['std::array<float, 2>', objCType];
+                case 'anchor':
+                    return ['std::vector<mbgl::style::SymbolAnchorType>', objCType, 'mbgl::style::SymbolAnchorType', 'MGLTextAnchor'];
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -637,6 +659,8 @@ global.mbglType = function(property) {
                     return 'std::array<float, 2>';
                 case 'position':
                     return 'mbgl::style::Position';
+                case 'anchor':
+                    return 'std::vector<mbgl::style::SymbolAnchorType>';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }

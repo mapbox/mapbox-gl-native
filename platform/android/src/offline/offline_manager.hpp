@@ -1,7 +1,5 @@
 #pragma once
 
-
-#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/offline.hpp>
 #include <jni/jni.hpp>
 
@@ -10,8 +8,12 @@
 #include "offline_region_definition.hpp"
 #include "../java_types.hpp"
 
+#include <memory>
 
 namespace mbgl {
+
+class DefaultFileSource;
+
 namespace android {
 
 class OfflineManager {
@@ -85,7 +87,7 @@ public:
 
 
 private:
-    mbgl::DefaultFileSource& fileSource;
+    std::shared_ptr<mbgl::DefaultFileSource> fileSource;
 };
 
 } // namespace android

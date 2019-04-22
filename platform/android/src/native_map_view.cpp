@@ -13,6 +13,7 @@
 
 #include <jni/jni.hpp>
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/constants.hpp>
@@ -74,24 +75,22 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
         return;
     }
 
-    // Get native peer for file source
-    mbgl::FileSource& fileSource = mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource);
-
     // Create a renderer frontend
     rendererFrontend = std::make_unique<AndroidRendererFrontend>(mapRenderer);
 
     // Create Map options
     MapOptions options;
     options.withMapMode(MapMode::Continuous)
+           .withSize(mbgl::Size{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) })
+           .withPixelRatio(pixelRatio)
            .withConstrainMode(ConstrainMode::HeightOnly)
            .withViewportMode(ViewportMode::Default)
            .withCrossSourceCollisions(_crossSourceCollisions);
 
     // Create the core map
-    map = std::make_unique<mbgl::Map>(*rendererFrontend, *this,
-                                      mbgl::Size{ static_cast<uint32_t>(width),
-                                                  static_cast<uint32_t>(height) }, pixelRatio,
-                                      fileSource, *threadPool, options);
+    map = std::make_unique<mbgl::Map>(
+        *rendererFrontend, *this, *threadPool, options,
+        mbgl::android::FileSource::getSharedResourceOptions(_env, jFileSource));
 }
 
 /**
@@ -259,6 +258,18 @@ void NativeMapView::onSourceChanged(mbgl::style::Source& source) {
     auto weakReference = javaPeer.get(*_env);
     if (weakReference) {
         weakReference.Call(*_env, onSourceChanged, sourceId);
+    }
+}
+
+void NativeMapView::onStyleImageMissing(const std::string& imageId) {
+    assert(vm != nullptr);
+
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto& javaClass = jni::Class<NativeMapView>::Singleton(*_env);
+    static auto onStyleImageMissing = javaClass.GetMethod<void (jni::String)>(*_env, "onStyleImageMissing");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onStyleImageMissing, jni::Make<jni::String>(*_env, imageId));
     }
 }
 

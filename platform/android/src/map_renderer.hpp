@@ -1,13 +1,15 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <memory>
+#include <mutex>
 #include <utility>
 
 #include <jni/jni.hpp>
-#include <mbgl/storage/default_file_source.hpp>
 
 namespace mbgl {
 
@@ -92,10 +94,11 @@ private:
 
     void onSurfaceChanged(JNIEnv&, jint width, jint height);
 
+    void onSurfaceDestroyed(JNIEnv&);
+
 private:
     // Called on either Main or GL thread //
-
-    void onSurfaceDestroyed(JNIEnv&);
+    void onRendererReset(JNIEnv&);
 
 private:
     jni::WeakReference<jni::Object<MapRenderer>, jni::EnvAttachingDeleter> javaPeer;

@@ -7,8 +7,32 @@
 
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_properties.hpp>
 
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
+
 namespace mbgl {
 namespace style {
+
+<%- camelize(type) %>LayerProperties::<%- camelize(type) %>LayerProperties(
+    Immutable<<%- camelize(type) %>Layer::Impl> impl_)
+    : LayerProperties(std::move(impl_)) {}
+
+<%- camelize(type) %>LayerProperties::<%- camelize(type) %>LayerProperties(
+    Immutable<<%- camelize(type) %>Layer::Impl> impl_,
+<% if (type === 'background' || type === 'fill' || type === 'line' || type === 'fill-extrusion') { -%>
+    CrossfadeParameters crossfade_,
+<% } -%>
+    <%- camelize(type) %>PaintProperties::PossiblyEvaluated evaluated_)
+  : LayerProperties(std::move(impl_)),
+<% if (type === 'background' || type === 'fill' || type === 'line' || type === 'fill-extrusion') { -%>
+    crossfade(std::move(crossfade_)),
+<% } -%>
+    evaluated(std::move(evaluated_)) {}
+
+<%- camelize(type) %>LayerProperties::~<%- camelize(type) %>LayerProperties() = default;
+
+const <%- camelize(type) %>Layer::Impl& <%- camelize(type) %>LayerProperties::layerImpl() const {
+    return static_cast<const <%- camelize(type) %>Layer::Impl&>(*baseImpl);
+}
 
 } // namespace style
 } // namespace mbgl

@@ -49,6 +49,27 @@ optional<T> Converter<T, typename std::enable_if_t<std::is_enum<T>::value>>::ope
     return *result;
 }
 
+template <class T>
+auto Converter<std::vector<T>, typename std::enable_if_t<std::is_enum<T>::value>>::operator()(const Convertible& value, Error& error) const -> optional<std::vector<T>> {
+    if (!isArray(value)) {
+        error.message = "value must be an array";
+        return nullopt;
+    }
+
+    std::vector<T> result;
+    result.reserve(arrayLength(value));
+
+    for (std::size_t i = 0; i < arrayLength(value); ++i) {
+        optional<T> enumItem = Converter<T>{}(arrayMember(value, i), error);
+        if (!enumItem) {
+            return nullopt;
+        }
+        result.push_back(*enumItem);
+    }
+
+    return result;
+}
+
 template optional<AlignmentType> Converter<AlignmentType>::operator()(const Convertible&, Error&) const;
 template optional<CirclePitchScaleType> Converter<CirclePitchScaleType>::operator()(const Convertible&, Error&) const;
 template optional<HillshadeIlluminationAnchorType> Converter<HillshadeIlluminationAnchorType>::operator()(const Convertible&, Error&) const;
@@ -64,6 +85,7 @@ template optional<TextJustifyType> Converter<TextJustifyType>::operator()(const 
 template optional<TextTransformType> Converter<TextTransformType>::operator()(const Convertible&, Error&) const;
 template optional<TranslateAnchorType> Converter<TranslateAnchorType>::operator()(const Convertible&, Error&) const;
 template optional<VisibilityType> Converter<VisibilityType>::operator()(const Convertible&, Error&) const;
+template optional<std::vector<TextVariableAnchorType>> Converter<std::vector<TextVariableAnchorType>>::operator()(const Convertible&, Error&) const;
 
 optional<Color> Converter<Color>::operator()(const Convertible& value, Error& error) const {
     optional<std::string> string = toString(value);

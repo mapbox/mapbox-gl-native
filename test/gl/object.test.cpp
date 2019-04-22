@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/context.hpp>
 
@@ -45,10 +45,10 @@ TEST(GLObject, Value) {
 }
 
 TEST(GLObject, Store) {
-    HeadlessBackend backend { { 256, 256 } };
-    BackendScope scope { backend };
+    gl::HeadlessBackend backend { { 256, 256 } };
+    gfx::BackendScope scope { backend };
 
-    gl::Context context;
+    gl::Context context{ backend };
     EXPECT_TRUE(context.empty());
 
     gl::UniqueTexture texture = context.createUniqueTexture();

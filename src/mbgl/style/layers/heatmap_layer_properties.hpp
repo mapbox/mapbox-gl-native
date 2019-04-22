@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -12,11 +14,11 @@
 namespace mbgl {
 namespace style {
 
-struct HeatmapRadius : DataDrivenPaintProperty<float, attributes::a_radius, uniforms::u_radius> {
+struct HeatmapRadius : DataDrivenPaintProperty<float, attributes::radius, uniforms::radius> {
     static float defaultValue() { return 30; }
 };
 
-struct HeatmapWeight : DataDrivenPaintProperty<float, attributes::a_weight, uniforms::u_weight> {
+struct HeatmapWeight : DataDrivenPaintProperty<float, attributes::weight, uniforms::weight> {
     static float defaultValue() { return 1; }
 };
 
@@ -38,6 +40,19 @@ class HeatmapPaintProperties : public Properties<
     HeatmapColor,
     HeatmapOpacity
 > {};
+
+class HeatmapLayerProperties final : public LayerProperties {
+public:
+    explicit HeatmapLayerProperties(Immutable<HeatmapLayer::Impl>);
+    HeatmapLayerProperties(
+        Immutable<HeatmapLayer::Impl>,
+        HeatmapPaintProperties::PossiblyEvaluated);
+    ~HeatmapLayerProperties() override;
+
+    const HeatmapLayer::Impl& layerImpl() const;
+    // Data members.
+    HeatmapPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

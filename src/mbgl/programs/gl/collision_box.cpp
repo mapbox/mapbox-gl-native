@@ -1,18 +1,37 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/programs/collision_box_program.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
 
 namespace mbgl {
+namespace programs {
+namespace gl {
+
+template <typename>
+struct ShaderSource;
+
+template <>
+struct ShaderSource<CollisionBoxProgram> {
+    static constexpr const char* name = "collision_box";
+    static constexpr const uint8_t hash[8] = { 0xcb, 0x6a, 0x9b, 0xd1, 0x1f, 0x31, 0xf8, 0x5b };
+    static constexpr const auto vertexOffset = 9956;
+    static constexpr const auto fragmentOffset = 10635;
+};
+
+constexpr const char* ShaderSource<CollisionBoxProgram>::name;
+constexpr const uint8_t ShaderSource<CollisionBoxProgram>::hash[8];
+
+} // namespace gl
+} // namespace programs
+
 namespace gfx {
 
 template <>
 std::unique_ptr<Program<CollisionBoxProgram>>
 Context::createProgram<gl::Context>(const ProgramParameters& programParameters) {
-    return gl::Program<CollisionBoxProgram>::createProgram(
-        reinterpret_cast<gl::Context&>(*this), programParameters, "collision_box",
-        programs::gl::shaderSource() + 9956, programs::gl::shaderSource() + 10635);
+    return std::make_unique<gl::Program<CollisionBoxProgram>>(programParameters);
 }
 
 } // namespace gfx

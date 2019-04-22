@@ -34,8 +34,8 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEvaluatedLayoutProperties,
-                       std::map<std::string, FillExtrusionBucket::PossiblyEvaluatedPaintProperties> layerPaintProperties,
+FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEvaluatedLayoutProperties&,
+                       const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                        const float zoom,
                        const uint32_t) {
     for (const auto& pair : layerPaintProperties) {
@@ -43,7 +43,7 @@ FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEval
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                pair.second,
+                getEvaluated<FillExtrusionLayerProperties>(pair.second),
                 zoom));
     }
 }
@@ -185,8 +185,8 @@ bool FillExtrusionBucket::supportsLayer(const style::Layer::Impl& impl) const {
 }
 
 float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
-    const RenderFillExtrusionLayer* fillExtrusionLayer = toRenderFillExtrusionLayer(&layer);
-    const std::array<float, 2>& translate = fillExtrusionLayer->evaluated.get<FillExtrusionTranslate>();
+    const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(layer.evaluatedProperties);
+    const std::array<float, 2>& translate = evaluated.get<FillExtrusionTranslate>();
     return util::length(translate[0], translate[1]);
 }
 

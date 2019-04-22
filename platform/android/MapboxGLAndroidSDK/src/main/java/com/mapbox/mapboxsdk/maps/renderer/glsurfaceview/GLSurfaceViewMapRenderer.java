@@ -2,10 +2,8 @@ package com.mapbox.mapboxsdk.maps.renderer.glsurfaceview;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-
 import android.support.annotation.NonNull;
 import android.view.SurfaceHolder;
-
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
 
@@ -25,8 +23,6 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   @NonNull
   private final GLSurfaceView glSurfaceView;
 
-  private boolean requestDestroy;
-
   public GLSurfaceViewMapRenderer(Context context,
                                   GLSurfaceView glSurfaceView,
                                   String localIdeographFontFamily) {
@@ -37,14 +33,20 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
     glSurfaceView.setRenderer(this);
     glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
     glSurfaceView.setPreserveEGLContextOnPause(true);
-
     glSurfaceView.getHolder().addCallback(new SurfaceHolderCallbackAdapter() {
 
       @Override
-      public void surfaceDestroyed(SurfaceHolder holder) {
-        requestDestroy = true;
+      public void surfaceCreated(SurfaceHolder holder) {
+        super.surfaceCreated(holder);
+        hasSurface = true;
       }
 
+      @Override
+      public void surfaceDestroyed(SurfaceHolder holder) {
+        super.surfaceDestroyed(holder);
+        hasSurface = false;
+        nativeReset();
+      }
     });
   }
 
@@ -60,9 +62,6 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
   @Override
   public void onDestroy() {
-    if (requestDestroy) {
-      onSurfaceDestroyed();
-    }
     super.onDestroy();
   }
 
@@ -82,6 +81,11 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   }
 
   @Override
+  protected void onSurfaceDestroyed() {
+    super.onSurfaceDestroyed();
+  }
+
+  @Override
   public void onSurfaceChanged(GL10 gl, int width, int height) {
     super.onSurfaceChanged(gl, width, height);
   }
@@ -98,6 +102,9 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
    */
   @Override
   public void requestRender() {
+    if (!hasSurface) {
+      return;
+    }
     glSurfaceView.requestRender();
   }
 

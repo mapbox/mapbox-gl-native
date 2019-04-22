@@ -9,7 +9,7 @@ namespace mbgl {
 using namespace style;
 
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
-                           const std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated>& paintProperties_,
+                           const std::map<std::string, Immutable<style::LayerProperties>>& paintProperties_,
                            const style::PropertyValue<float>& textSize,
                            const style::PropertyValue<float>& iconSize,
                            float zoom,
@@ -17,7 +17,8 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
-                           const std::vector<SymbolInstance>&& symbolInstances_)
+                           const std::vector<SymbolInstance>&& symbolInstances_,
+                           float tilePixelRatio_)
     : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
@@ -25,20 +26,17 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       bucketLeaderID(std::move(bucketName_)),
       symbolInstances(std::move(symbolInstances_)),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
-      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
+      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
+      tilePixelRatio(tilePixelRatio_) {
 
     for (const auto& pair : paintProperties_) {
-        auto layerPaintProperties = pair.second;
-        if (hasFormatSectionOverrides()) {
-            setPaintPropertyOverrides(layerPaintProperties);
-        }
+        const auto& evaluated = getEvaluated<SymbolLayerProperties>(pair.second);
         paintProperties.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
             std::forward_as_tuple(PaintProperties {
-                layerPaintProperties,
-                { RenderSymbolLayer::iconPaintProperties(layerPaintProperties), zoom },
-                { RenderSymbolLayer::textPaintProperties(layerPaintProperties), zoom }
+                { RenderSymbolLayer::iconPaintProperties(evaluated), zoom },
+                { RenderSymbolLayer::textPaintProperties(evaluated), zoom }
             }));
     }
 }
@@ -201,8 +199,8 @@ void SymbolBucket::sortFeatures(const float angle) {
     std::sort(symbolInstanceIndexes.begin(), symbolInstanceIndexes.end(), [sin, cos, this](size_t &aIndex, size_t &bIndex) {
         const SymbolInstance& a = symbolInstances[aIndex];
         const SymbolInstance& b = symbolInstances[bIndex];
-        const int32_t aRotated = static_cast<int32_t>(::lround(sin * a.anchor.point.x + cos * a.anchor.point.y));
-        const int32_t bRotated = static_cast<int32_t>(::lround(sin * b.anchor.point.x + cos * b.anchor.point.y));
+        const auto aRotated = static_cast<int32_t>(::lround(sin * a.anchor.point.x + cos * a.anchor.point.y));
+        const auto bRotated = static_cast<int32_t>(::lround(sin * b.anchor.point.x + cos * b.anchor.point.y));
         return aRotated != bRotated ?
             aRotated < bRotated :
             a.dataFeatureIndex > b.dataFeatureIndex;
@@ -218,31 +216,29 @@ void SymbolBucket::sortFeatures(const float angle) {
         const SymbolInstance& symbolInstance = symbolInstances[i];
         featureSortOrder->push_back(symbolInstance.dataFeatureIndex);
 
-        if (symbolInstance.placedTextIndex) {
-            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);
+        if (symbolInstance.placedRightTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedRightTextIndex]);
         }
+
+        if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedCenterTextIndex]);
+        }
+
+        if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedLeftTextIndex]);
+        }
+
         if (symbolInstance.placedVerticalTextIndex) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedVerticalTextIndex]);
         }
+
         if (symbolInstance.placedIconIndex) {
             addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
         }
     }
 }
 
-void SymbolBucket::updatePaintProperties(const std::string& layerID,
-                                         style::SymbolPaintProperties::PossiblyEvaluated updated) {
-    if (hasFormatSectionOverrides()) {
-        SymbolLayerPaintPropertyOverrides::updateOverrides(paintProperties.at(layerID).evaluated, updated);
-    }
-    paintProperties.at(layerID).evaluated = updated;
-}
-
-void SymbolBucket::setPaintPropertyOverrides(style::SymbolPaintProperties::PossiblyEvaluated& paint) {
-    SymbolLayerPaintPropertyOverrides::setOverrides(layout, paint);
-}
-
-bool SymbolBucket::hasFormatSectionOverrides() {
+bool SymbolBucket::hasFormatSectionOverrides() const {
     if (!hasFormatSectionOverrides_) {
         hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
     }

@@ -30,16 +30,6 @@ enum class ShaderType : uint32_t {
     Fragment = 0x8B30
 };
 
-enum class RenderbufferType : uint32_t {
-    RGBA = 0x8058,
-    DepthStencil = 0x88F0,
-#if not MBGL_USE_GLES2
-    DepthComponent = 0x1902,     // GL_DEPTH_COMPONENT
-#else
-    DepthComponent = 0x81A5,     // GL_DEPTH_COMPONENT16
-#endif // MBGL_USE_GLES2
-};
-
 struct PixelStorageType {
     int32_t alignment;
 };

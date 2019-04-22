@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 namespace mbgl {
+namespace gl {
 
 class EAGLBackendImpl : public HeadlessBackend::Impl {
 public:
@@ -50,4 +51,5 @@ void HeadlessBackend::createImpl() {
     impl = std::make_unique<EAGLBackendImpl>();
 }
 
+} // namespace gl
 } // namespace mbgl

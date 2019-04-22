@@ -72,7 +72,7 @@ global.evaluatedType = function (property) {
     if (property.length) {
       return `std::array<${evaluatedType({type: property.value})}, ${property.length}>`;
     } else {
-      return `std::vector<${evaluatedType({type: property.value})}>`;
+      return `std::vector<${evaluatedType({type: property.value, name: property.name})}>`;
     }
   default: throw new Error(`unknown type for ${property.name}`)
   }
@@ -99,7 +99,7 @@ function attributeUniformType(property, type) {
        [ property.name.replace(type + '-', '').replace(/-/g, '_') ];
 
     return names.map(name => {
-      return `attributes::a_${name}, uniforms::u_${name}`
+      return `attributes::${name}, uniforms::${name}`
     }).join(', ');
 }
 
@@ -153,7 +153,11 @@ global.defaultValue = function (property) {
 
   switch (property.type) {
   case 'number':
+  if (property.default === undefined) {
+    return 0;
+  } else {
     return property.default;
+  }
   case 'formatted':
   case 'string':
     return JSON.stringify(property.default || "");

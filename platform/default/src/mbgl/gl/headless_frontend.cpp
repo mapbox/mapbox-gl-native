@@ -1,4 +1,5 @@
 #include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_state.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
@@ -8,22 +9,38 @@
 
 namespace mbgl {
 
-HeadlessFrontend::HeadlessFrontend(float pixelRatio_, Scheduler& scheduler, const optional<std::string> programCacheDir, GLContextMode mode, const optional<std::string> localFontFamily)
-    : HeadlessFrontend({ 256, 256 }, pixelRatio_, scheduler, programCacheDir, mode, localFontFamily) {
+HeadlessFrontend::HeadlessFrontend(float pixelRatio_,
+                                   Scheduler& scheduler,
+                                   const optional<std::string> programCacheDir,
+                                   const gfx::ContextMode contextMode,
+                                   const optional<std::string> localFontFamily)
+    : HeadlessFrontend(
+          { 256, 256 }, pixelRatio_, scheduler, programCacheDir, contextMode, localFontFamily) {
 }
 
-HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, Scheduler& scheduler, const optional<std::string> programCacheDir, GLContextMode mode, const optional<std::string> localFontFamily)
+HeadlessFrontend::HeadlessFrontend(Size size_,
+                                   float pixelRatio_,
+                                   Scheduler& scheduler,
+                                   const optional<std::string> programCacheDir,
+                                   const gfx::ContextMode contextMode,
+                                   const optional<std::string> localFontFamily)
     : size(size_),
     pixelRatio(pixelRatio_),
     backend({ static_cast<uint32_t>(size.width * pixelRatio),
-              static_cast<uint32_t>(size.height * pixelRatio) }),
+              static_cast<uint32_t>(size.height * pixelRatio) }, contextMode),
     asyncInvalidate([this] {
         if (renderer && updateParameters) {
-            mbgl::BackendScope guard { backend };
-            renderer->render(*updateParameters);
+            gfx::BackendScope guard { backend };
+
+            // onStyleImageMissing might be called during a render. The user implemented method
+            // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.
+            // Copy the shared pointer here so that the parameters aren't destroyed while `render(...)` is
+            // still using them.
+            auto updateParameters_ = updateParameters;
+            renderer->render(*updateParameters_);
         }
     }),
-    renderer(std::make_unique<Renderer>(backend, pixelRatio, scheduler, mode, programCacheDir, localFontFamily)) {
+    renderer(std::make_unique<Renderer>(backend, pixelRatio, scheduler, programCacheDir, localFontFamily)) {
 }
 
 HeadlessFrontend::~HeadlessFrontend() = default;
@@ -52,7 +69,7 @@ Renderer* HeadlessFrontend::getRenderer() {
     return renderer.get();
 }
 
-RendererBackend* HeadlessFrontend::getBackend() {
+gfx::RendererBackend* HeadlessFrontend::getBackend() {
     return &backend;
 }
 

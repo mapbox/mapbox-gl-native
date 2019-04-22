@@ -3,5 +3,6 @@
 #if __APPLE__
     #define MBGL_HAS_BINARY_PROGRAMS 0
 #else
-    #define MBGL_HAS_BINARY_PROGRAMS 1
+    // https://github.com/mapbox/mapbox-gl-native/issues/14294
+    #define MBGL_HAS_BINARY_PROGRAMS 0
 #endif

@@ -6,8 +6,7 @@
 
 namespace mbgl {
 
-Mailbox::Mailbox() {
-}
+Mailbox::Mailbox() = default;
 
 Mailbox::Mailbox(Scheduler& scheduler_)
     : scheduler(&scheduler_) {

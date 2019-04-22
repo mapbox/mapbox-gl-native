@@ -15,7 +15,7 @@ class BucketParameters;
 
 class HeatmapBucket final : public Bucket {
 public:
-    HeatmapBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+    HeatmapBucket(const BucketParameters&, const std::vector<Immutable<style::LayerProperties>>&);
     ~HeatmapBucket() override;
 
     void addFeature(const GeometryTileFeature&,

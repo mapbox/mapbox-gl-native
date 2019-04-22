@@ -26,32 +26,32 @@ public:
     // Paint properties
 
     static PropertyValue<float> getDefaultHeatmapRadius();
-    PropertyValue<float> getHeatmapRadius() const;
-    void setHeatmapRadius(PropertyValue<float>);
+    const PropertyValue<float>& getHeatmapRadius() const;
+    void setHeatmapRadius(const PropertyValue<float>&);
     void setHeatmapRadiusTransition(const TransitionOptions&);
     TransitionOptions getHeatmapRadiusTransition() const;
 
     static PropertyValue<float> getDefaultHeatmapWeight();
-    PropertyValue<float> getHeatmapWeight() const;
-    void setHeatmapWeight(PropertyValue<float>);
+    const PropertyValue<float>& getHeatmapWeight() const;
+    void setHeatmapWeight(const PropertyValue<float>&);
     void setHeatmapWeightTransition(const TransitionOptions&);
     TransitionOptions getHeatmapWeightTransition() const;
 
     static PropertyValue<float> getDefaultHeatmapIntensity();
-    PropertyValue<float> getHeatmapIntensity() const;
-    void setHeatmapIntensity(PropertyValue<float>);
+    const PropertyValue<float>& getHeatmapIntensity() const;
+    void setHeatmapIntensity(const PropertyValue<float>&);
     void setHeatmapIntensityTransition(const TransitionOptions&);
     TransitionOptions getHeatmapIntensityTransition() const;
 
     static ColorRampPropertyValue getDefaultHeatmapColor();
-    ColorRampPropertyValue getHeatmapColor() const;
-    void setHeatmapColor(ColorRampPropertyValue);
+    const ColorRampPropertyValue& getHeatmapColor() const;
+    void setHeatmapColor(const ColorRampPropertyValue&);
     void setHeatmapColorTransition(const TransitionOptions&);
     TransitionOptions getHeatmapColorTransition() const;
 
     static PropertyValue<float> getDefaultHeatmapOpacity();
-    PropertyValue<float> getHeatmapOpacity() const;
-    void setHeatmapOpacity(PropertyValue<float>);
+    const PropertyValue<float>& getHeatmapOpacity() const;
+    void setHeatmapOpacity(const PropertyValue<float>&);
     void setHeatmapOpacityTransition(const TransitionOptions&);
     TransitionOptions getHeatmapOpacityTransition() const;
 

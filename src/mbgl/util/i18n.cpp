@@ -16,7 +16,7 @@ namespace {
         return codepoint >= first && codepoint <= last;                                            \
     }
 
-// The following table comes from <http://www.unicode.org/Public/10.0.0/ucd/Blocks.txt>.
+// The following table comes from <http://www.unicode.org/Public/12.0.0/ucd/Blocks.txt>.
 // Keep it synchronized with <http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt>.
 
 // DEFINE_IS_IN_UNICODE_BLOCK(BasicLatin, 0x0000, 0x007F)
@@ -226,6 +226,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(RumiNumeralSymbols, 0x10E60, 0x10E7F)
 // DEFINE_IS_IN_UNICODE_BLOCK(OldSogdian, 0x10F00, 0x10F2F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Sogdian, 0x10F30, 0x10F6F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Elymaic, 0x10FE0, 0x10FFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Brahmi, 0x11000, 0x1107F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Kaithi, 0x11080, 0x110CF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SoraSompeng, 0x110D0, 0x110FF)
@@ -246,6 +247,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Ahom, 0x11700, 0x1173F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Dogra, 0x11800, 0x1184F)
 // DEFINE_IS_IN_UNICODE_BLOCK(WarangCiti, 0x118A0, 0x118FF)
+// DEFINE_IS_IN_UNICODE_BLOCK(Nandinagari, 0x119A0, 0x119FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(ZanabazarSquare, 0x11A00, 0x11A4F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Soyombo, 0x11A50, 0x11AAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(PauCinHau, 0x11AC0, 0x11AFF)
@@ -254,10 +256,12 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MasaramGondi, 0x11D00, 0x11D5F)
 // DEFINE_IS_IN_UNICODE_BLOCK(GunjalaGondi, 0x11D60, 0x11DAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Makasar, 0x11EE0, 0x11EFF)
+// DEFINE_IS_IN_UNICODE_BLOCK(TamilSupplement, 0x11FC0, 0x11FFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Cuneiform, 0x12000, 0x123FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CuneiformNumbersandPunctuation, 0x12400, 0x1247F)
 // DEFINE_IS_IN_UNICODE_BLOCK(EarlyDynasticCuneiform, 0x12480, 0x1254F)
 // DEFINE_IS_IN_UNICODE_BLOCK(EgyptianHieroglyphs, 0x13000, 0x1342F)
+// DEFINE_IS_IN_UNICODE_BLOCK(EgyptianHieroglyphFormatControls, 0x13430, 0x1343F)
 // DEFINE_IS_IN_UNICODE_BLOCK(AnatolianHieroglyphs, 0x14400, 0x1467F)
 // DEFINE_IS_IN_UNICODE_BLOCK(BamumSupplement, 0x16800, 0x16A3F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Mro, 0x16A40, 0x16A6F)
@@ -270,6 +274,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(TangutComponents, 0x18800, 0x18AFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(KanaSupplement, 0x1B000, 0x1B0FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(KanaExtendedA, 0x1B100, 0x1B12F)
+// DEFINE_IS_IN_UNICODE_BLOCK(SmallKanaExtension, 0x1B130, 0x1B16F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Nushu, 0x1B170, 0x1B2FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Duployan, 0x1BC00, 0x1BC9F)
 // DEFINE_IS_IN_UNICODE_BLOCK(ShorthandFormatControls, 0x1BCA0, 0x1BCAF)
@@ -282,9 +287,12 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MathematicalAlphanumericSymbols, 0x1D400, 0x1D7FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SuttonSignWriting, 0x1D800, 0x1DAAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(GlagoliticSupplement, 0x1E000, 0x1E02F)
+// DEFINE_IS_IN_UNICODE_BLOCK(NyiakengPuachueHmong, 0x1E100, 0x1E14F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Wancho, 0x1E2C0, 0x1E2FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MendeKikakui, 0x1E800, 0x1E8DF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Adlam, 0x1E900, 0x1E95F)
 // DEFINE_IS_IN_UNICODE_BLOCK(IndicSiyaqNumbers, 0x1EC70, 0x1ECBF)
+// DEFINE_IS_IN_UNICODE_BLOCK(OttomanSiyaqNumbers, 0x1ED00, 0x1ED4F)
 // DEFINE_IS_IN_UNICODE_BLOCK(ArabicMathematicalAlphabeticSymbols, 0x1EE00, 0x1EEFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(MahjongTiles, 0x1F000, 0x1F02F)
 // DEFINE_IS_IN_UNICODE_BLOCK(DominoTiles, 0x1F030, 0x1F09F)
@@ -300,6 +308,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementalArrowsC, 0x1F800, 0x1F8FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementalSymbolsandPictographs, 0x1F900, 0x1F9FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(ChessSymbols, 0x1FA00, 0x1FA6F)
+// DEFINE_IS_IN_UNICODE_BLOCK(SymbolsandPictographsExtendedA, 0x1FA70, 0x1FAFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionB, 0x20000, 0x2A6DF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionC, 0x2A700, 0x2B73F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionD, 0x2B740, 0x2B81F)
@@ -419,7 +428,9 @@ bool allowsVerticalWritingMode(const std::u16string& string) {
 }
 
 // The following logic comes from
-// <http://www.unicode.org/Public/vertical/revision-17/VerticalOrientation-17.txt>.
+// <http://www.unicode.org/Public/12.0.0/ucd/VerticalOrientation.txt>.
+// Keep it synchronized with
+// <http://www.unicode.org/Public/UCD/latest/ucd/VerticalOrientation.txt>.
 // The data file denotes with “U” or “Tu” any codepoint that may be drawn
 // upright in vertical text but does not distinguish between upright and
 // “neutral” characters.

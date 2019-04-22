@@ -7,8 +7,8 @@ dependencies {
     api dependenciesList.mapboxAndroidTelemetry
     api dependenciesList.mapboxJavaGeoJSON
     api dependenciesList.mapboxAndroidGestures
+    api dependenciesList.mapboxAndroidAccounts
     implementation dependenciesList.mapboxJavaTurf
-    implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.okhttp3
@@ -18,14 +18,11 @@ dependencies {
     testImplementation dependenciesList.mockk
     testImplementation dependenciesList.robolectric
     testImplementation dependenciesList.kotlinLib
+    testImplementation dependenciesList.commonsIO
 }
 
 android {
     compileSdkVersion androidVersions.compileSdkVersion
-
-    // Roboelectric 4.0 required config
-    // http://robolectric.org/migrating/#migrating-to-40
-    testOptions.unitTests.includeAndroidResources = true
 
     defaultConfig {
         minSdkVersion androidVersions.minSdkVersion
@@ -134,12 +131,16 @@ android {
     testOptions {
         unitTests {
             returnDefaultValues true
+
+            // Roboelectric 4.0 required config
+            // http://robolectric.org/migrating/#migrating-to-40
             includeAndroidResources = true
         }
     }
 
     buildTypes {
         debug {
+            testCoverageEnabled true
             jniDebuggable true
         }
     }
@@ -170,3 +171,4 @@ apply from: "${rootDir}/gradle/gradle-dependencies-graph.gradle"
 apply from: "${rootDir}/gradle/gradle-update-vendor-modules.gradle"
 apply from: "${rootDir}/gradle/android-nitpick.gradle"
 apply from: "${rootDir}/gradle/gradle-bintray.gradle"
+apply from: "${rootDir}/gradle/jacoco-report.gradle"

@@ -56,6 +56,11 @@ namespace android {
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getSymbolAvoidEdges()));
     }
 
+    jni::Local<jni::Object<>> SymbolLayer::getSymbolSortKey(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getSymbolSortKey()));
+    }
+
     jni::Local<jni::Object<>> SymbolLayer::getSymbolZOrder(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getSymbolZOrder()));
@@ -174,6 +179,16 @@ namespace android {
     jni::Local<jni::Object<>> SymbolLayer::getTextJustify(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextJustify()));
+    }
+
+    jni::Local<jni::Object<>> SymbolLayer::getTextRadialOffset(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextRadialOffset()));
+    }
+
+    jni::Local<jni::Object<>> SymbolLayer::getTextVariableAnchor(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextVariableAnchor()));
     }
 
     jni::Local<jni::Object<>> SymbolLayer::getTextAnchor(jni::JNIEnv& env) {
@@ -490,6 +505,7 @@ namespace android {
             METHOD(&SymbolLayer::getSymbolPlacement, "nativeGetSymbolPlacement"),
             METHOD(&SymbolLayer::getSymbolSpacing, "nativeGetSymbolSpacing"),
             METHOD(&SymbolLayer::getSymbolAvoidEdges, "nativeGetSymbolAvoidEdges"),
+            METHOD(&SymbolLayer::getSymbolSortKey, "nativeGetSymbolSortKey"),
             METHOD(&SymbolLayer::getSymbolZOrder, "nativeGetSymbolZOrder"),
             METHOD(&SymbolLayer::getIconAllowOverlap, "nativeGetIconAllowOverlap"),
             METHOD(&SymbolLayer::getIconIgnorePlacement, "nativeGetIconIgnorePlacement"),
@@ -514,6 +530,8 @@ namespace android {
             METHOD(&SymbolLayer::getTextLineHeight, "nativeGetTextLineHeight"),
             METHOD(&SymbolLayer::getTextLetterSpacing, "nativeGetTextLetterSpacing"),
             METHOD(&SymbolLayer::getTextJustify, "nativeGetTextJustify"),
+            METHOD(&SymbolLayer::getTextRadialOffset, "nativeGetTextRadialOffset"),
+            METHOD(&SymbolLayer::getTextVariableAnchor, "nativeGetTextVariableAnchor"),
             METHOD(&SymbolLayer::getTextAnchor, "nativeGetTextAnchor"),
             METHOD(&SymbolLayer::getTextMaxAngle, "nativeGetTextMaxAngle"),
             METHOD(&SymbolLayer::getTextRotate, "nativeGetTextRotate"),

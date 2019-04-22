@@ -2,12 +2,12 @@ add_executable(mbgl-glfw
     platform/glfw/main.cpp
 )
 
-# args requires RTTI
-set_source_files_properties(platform/glfw/main.cpp PROPERTIES COMPILE_OPTIONS "-frtti")
-
 target_sources(mbgl-glfw
     PRIVATE platform/glfw/glfw_view.hpp
     PRIVATE platform/glfw/glfw_view.cpp
+    PRIVATE platform/glfw/glfw_backend.hpp
+    PRIVATE platform/glfw/glfw_gl_backend.hpp
+    PRIVATE platform/glfw/glfw_gl_backend.cpp
     PRIVATE platform/glfw/glfw_renderer_frontend.hpp
     PRIVATE platform/glfw/glfw_renderer_frontend.cpp
     PRIVATE platform/glfw/settings_json.hpp
@@ -23,9 +23,8 @@ target_link_libraries(mbgl-glfw
     PRIVATE mbgl-core
     PRIVATE glfw
     PRIVATE cheap-ruler-cpp
+    PRIVATE args
 )
-
-target_add_mason_package(mbgl-glfw PRIVATE args)
 
 mbgl_platform_glfw()
 

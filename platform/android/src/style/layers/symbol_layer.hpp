@@ -32,6 +32,8 @@ public:
 
     jni::Local<jni::Object<jni::ObjectTag>> getSymbolAvoidEdges(jni::JNIEnv&);
 
+    jni::Local<jni::Object<jni::ObjectTag>> getSymbolSortKey(jni::JNIEnv&);
+
     jni::Local<jni::Object<jni::ObjectTag>> getSymbolZOrder(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getIconAllowOverlap(jni::JNIEnv&);
@@ -79,6 +81,10 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getTextLetterSpacing(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getTextJustify(jni::JNIEnv&);
+
+    jni::Local<jni::Object<jni::ObjectTag>> getTextRadialOffset(jni::JNIEnv&);
+
+    jni::Local<jni::Object<jni::ObjectTag>> getTextVariableAnchor(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getTextAnchor(jni::JNIEnv&);
 

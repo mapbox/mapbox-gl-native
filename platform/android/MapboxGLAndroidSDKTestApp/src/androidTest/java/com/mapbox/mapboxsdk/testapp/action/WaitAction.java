@@ -3,10 +3,11 @@ package com.mapbox.mapboxsdk.testapp.action;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
-
 import org.hamcrest.Matcher;
 
+import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 
 public final class WaitAction implements ViewAction {
 
@@ -29,6 +30,10 @@ public final class WaitAction implements ViewAction {
   @Override
   public void perform(UiController uiController, View view) {
     uiController.loopMainThreadForAtLeast(loopTime);
+  }
+
+  public static void invoke(long loopTime) {
+    onView(isRoot()).perform(new WaitAction(loopTime));
   }
 }
 

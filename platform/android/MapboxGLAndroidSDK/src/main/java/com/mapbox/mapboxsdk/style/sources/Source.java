@@ -1,9 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
@@ -11,6 +9,8 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
  * Base Peer class for sources. see source.hpp for the other half of the peer.
  */
 public abstract class Source {
+
+  private static final String TAG = "Mbgl-Source";
 
   @Keep
   private long nativePtr;
@@ -40,7 +40,7 @@ public abstract class Source {
    * Validates if source interaction is happening on the UI thread
    */
   protected void checkThread() {
-    ThreadUtils.checkThread("Source");
+    ThreadUtils.checkThread(TAG);
   }
 
   /**

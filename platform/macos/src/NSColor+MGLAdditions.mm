@@ -15,15 +15,34 @@
     }
     [srgbColor getRed:&r green:&g blue:&b alpha:&a];
 
-    return { (float)r, (float)g, (float)b, (float)a };
+    // NSColor provides non-premultiplied color components, so we have to premultiply each
+    // color component with the alpha value to transform it into a valid
+    // mbgl::Color which expects premultiplied color components.
+    return { static_cast<float>(r*a), static_cast<float>(g*a), static_cast<float>(b*a), static_cast<float>(a) };
 }
 
 + (NSColor *)mgl_colorWithColor:(mbgl::Color)color {
+    // If there is no alpha value, return original color values.
+    if (color.a == 0.0f) {
+        // macOS 10.12 Sierra and below uses calibrated RGB by default.
+        if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
+            return [NSColor colorWithCalibratedRed:color.r green:color.g blue:color.b alpha:color.a];
+        } else {
+            return [NSColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
+        }
+    }
+    
+    // mbgl::Color provides premultiplied color components, so we have to convert color
+    // components to non-premultiplied values to return a valid NSColor object.
+    float red = static_cast<float>((color.r / color.a));
+    float green = static_cast<float>((color.g / color.a));
+    float blue = static_cast<float>((color.b / color.a));
+
     // macOS 10.12 Sierra and below uses calibrated RGB by default.
     if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
-        return [NSColor colorWithCalibratedRed:color.r green:color.g blue:color.b alpha:color.a];
+        return [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:color.a];
     } else {
-        return [NSColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
+        return [NSColor colorWithRed:red green:green blue:blue alpha:color.a];
     }
 }
 
@@ -37,7 +56,7 @@
 @implementation NSExpression (MGLColorAdditions)
 
 + (NSExpression *)mgl_expressionForRGBComponents:(NSArray<NSExpression *> *)components {
-    if (NSColor *color = [self mgl_colorWithComponentExpressions:components]) {
+    if (NSColor *color = [self mgl_colorWithRGBComponents:components]) {
         return [NSExpression expressionForConstantValue:color];
     }
     
@@ -49,7 +68,7 @@
 }
 
 + (NSExpression *)mgl_expressionForRGBAComponents:(NSArray<NSExpression *> *)components {
-    if (NSColor *color = [self mgl_colorWithComponentExpressions:components]) {
+    if (NSColor *color = [self mgl_colorWithRGBComponents:components]) {
         return [NSExpression expressionForConstantValue:color];
     }
     
@@ -62,7 +81,7 @@
 /**
  Returns a color object corresponding to the given component expressions.
  */
-+ (NSColor *)mgl_colorWithComponentExpressions:(NSArray<NSExpression *> *)componentExpressions {
++ (NSColor *)mgl_colorWithRGBComponents:(NSArray<NSExpression *> *)componentExpressions {
     // Map the component expressions to constant components. If any component is
     // a non-constant expression, the components cannot be converted into a
     // constant color value.

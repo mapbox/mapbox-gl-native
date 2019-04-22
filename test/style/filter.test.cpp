@@ -117,10 +117,10 @@ TEST(Filter, EqualsType) {
     ASSERT_TRUE(filter(f, {{}}, {}, FeatureType::LineString, {}));
     ASSERT_FALSE(filter(f, {{}}, {}, FeatureType::Point, {}));
 
-    invalidFilter("[\"==\", \"$type\"]");
-    invalidFilter("[\"==\", \"$type\", null]");
-    invalidFilter("[\"==\", \"$type\", \"foo\", 1]");
-    invalidFilter("[\"==\", \"$type\", \"foo\", \"Point\"]");
+    invalidFilter(R"(["==", "$type"])");
+    invalidFilter(R"(["==", "$type", null])");
+    invalidFilter(R"(["==", "$type", "foo", 1])");
+    invalidFilter(R"(["==", "$type", "foo", "Point"])");
 }
 
 TEST(Filter, InType) {
