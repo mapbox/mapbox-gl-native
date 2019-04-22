@@ -96,6 +96,7 @@ public final class Mapbox {
    *
    * @return the SKU token
    */
+  @Nullable
   public static String getSkuToken() {
     return INSTANCE.accounts.getSkuToken();
   }
