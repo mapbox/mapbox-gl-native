@@ -991,6 +991,11 @@
          android:name="com.mapbox.MeasureTileDownloadOn"
          android:value="false" />
 
+        <!-- Set value to true to have SKU tokens included in API requests -->
+        <meta-data
+            android:name="com.mapbox.EnableSkuToken"
+            android:value="true" />
+
     </application>
 
 </manifest>
