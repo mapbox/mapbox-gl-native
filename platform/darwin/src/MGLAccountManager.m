@@ -120,14 +120,7 @@ static BOOL _MGLAccountsSDKEnabled;
 }
 
 + (nonnull NSUserDefaults *)skuDefaults {
-    static NSUserDefaults *defaults;
-    
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.mapbox.accounts"];
-    });
-    
-    return defaults;
+    return [NSUserDefaults standardUserDefaults];
 }
 
 + (NSString *)skuUserId {
