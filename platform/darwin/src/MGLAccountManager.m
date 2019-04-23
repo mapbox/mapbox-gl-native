@@ -18,6 +18,9 @@ static BOOL _MGLAccountsSDKEnabled;
 @property (nonatomic) NSURL *apiBaseURL;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+@property (class, readonly, nonnull) NSUserDefaults *skuDefaults;
+@property (class, readonly, nonnull) NSString *skuUserId;
+
 @property (atomic) NSString *skuToken;
 @property (atomic) NSDate *skuTokenExpiration;
 #endif
@@ -50,7 +53,7 @@ static BOOL _MGLAccountsSDKEnabled;
     }
     
     if (self.isAccountsSDKEnabled) {
-        self.skuToken = [MBXSKUToken skuToken];
+        self.skuToken = [MBXSKUToken mapsSKUTokenForUserId:self.skuUserId];
     }
 
 #endif
@@ -116,6 +119,28 @@ static BOOL _MGLAccountsSDKEnabled;
     return _MGLAccountsSDKEnabled;
 }
 
++ (nonnull NSUserDefaults *)skuDefaults {
+    static NSUserDefaults *defaults;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.mapbox.accounts"];
+    });
+    
+    return defaults;
+}
+
++ (NSString *)skuUserId {
+    static NSString *userIdKey = @"MGLMapboxAccountsSDKUserId";
+    NSString *userId = [self.skuDefaults stringForKey:userIdKey];
+
+    if (!userId && self.isAccountsSDKEnabled) {
+        userId = [MBXSKUToken generateEndUserId];
+        [self.skuDefaults setObject:userId forKey:userIdKey];
+    }
+    return userId;
+}
+
 + (void)setSkuToken:(NSString *)skuToken {
     if (MGLAccountManager.isAccountsSDKEnabled) {
         NSTimeInterval oneHour = 60 * 60; // TODO: make this const
@@ -130,7 +155,9 @@ static BOOL _MGLAccountsSDKEnabled;
 
 + (NSString *)skuToken {
     if (MGLAccountManager.isAccountsSDKEnabled) {
-        return [MGLAccountManager.sharedManager isSKUTokenExpired] ? [MBXSKUToken skuToken] : MGLAccountManager.sharedManager.skuToken;
+        return [MGLAccountManager.sharedManager isSKUTokenExpired] ?
+            [MBXSKUToken mapsSKUTokenForUserId:self.skuUserId] :
+            MGLAccountManager.sharedManager.skuToken;
     }
     else {
         return nil;
