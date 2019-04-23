@@ -685,6 +685,9 @@ void Renderer::Impl::reduceMemoryUse() {
     }
     backend.getContext().performCleanup();
     observer->onInvalidate();
+    if (imageManager) {
+        imageManager->reduceMemoryUse();
+    }
 }
 
 void Renderer::Impl::dumDebugLogs() {

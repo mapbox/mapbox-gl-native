@@ -48,8 +48,8 @@ bool ImageManager::updateImage(Immutable<style::Image::Impl> image_) {
         updatedImageVersions[image_->id]++;
     }
 
-    removeImage(image_->id);
-    addImage(std::move(image_));
+    removePattern(image_->id);
+    oldImage->second = std::move(image_);
 
     return sizeChanged;
 }
@@ -57,7 +57,11 @@ bool ImageManager::updateImage(Immutable<style::Image::Impl> image_) {
 void ImageManager::removeImage(const std::string& id) {
     assert(images.find(id) != images.end());
     images.erase(id);
+    requestedImages.erase(id);
+    removePattern(id);
+}
 
+void ImageManager::removePattern(const std::string& id) {
     auto it = patterns.find(id);
     if (it != patterns.end()) {
         // Clear pattern from the atlas image.
@@ -95,7 +99,12 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
         for (const auto& dependency : pair.first) {
             if (images.find(dependency.first) == images.end()) {
                 hasAllDependencies = false;
-                break;
+            } else {
+                // Associate requestor with an image that was provided by the client.
+                auto it = requestedImages.find(dependency.first);
+                if (it != requestedImages.end()) {
+                    it->second.emplace(&requestor);
+                }
             }
         }
 
@@ -112,15 +121,30 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
 void ImageManager::removeRequestor(ImageRequestor& requestor) {
     requestors.erase(&requestor);
     missingImageRequestors.erase(&requestor);
+    for (auto& requestedImage : requestedImages) {
+        requestedImage.second.erase(&requestor);
+    }
 }
 
 void ImageManager::notifyIfMissingImageAdded() {
     for (auto it = missingImageRequestors.begin(); it != missingImageRequestors.end();) {
         if (it->second.callbacksRemaining == 0) {
             notify(*it->first, it->second.pair);
-            missingImageRequestors.erase(it++);
+            it = missingImageRequestors.erase(it);
         } else {
-            it++;
+            ++it;
+        }
+    }
+}
+
+void ImageManager::reduceMemoryUse() {
+    for (auto it = requestedImages.cbegin(); it != requestedImages.cend();) {
+        if (it->second.empty() && images.find(it->first) != images.end()) {
+            images.erase(it->first);
+            removePattern(it->first);
+            it = requestedImages.erase(it);
+        } else {
+            ++it;
         }
     }
 }
@@ -131,6 +155,7 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
         auto it = images.find(dependency.first);
         if (it == images.end()) {
             missing++;
+            requestedImages[dependency.first].emplace(&requestor);
         }
     }
 
