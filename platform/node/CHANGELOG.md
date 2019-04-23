@@ -1,4 +1,5 @@
 # master
+- Mark Node versions > 8 as unsupported
 - Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
 - Add `crossSourceCollisions` map option, with default of `true`. When set to `false`, cross-source collision detection is disabled. ([#12820] (https://github.com/mapbox/mapbox-gl-native/issues/12820))
 - Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
