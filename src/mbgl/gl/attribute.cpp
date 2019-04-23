@@ -1,6 +1,5 @@
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/defines.hpp>
 
 namespace mbgl {
 namespace gl {

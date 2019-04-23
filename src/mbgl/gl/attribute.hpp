@@ -2,18 +2,12 @@
 
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gl/types.hpp>
-#include <mbgl/util/ignore.hpp>
 #include <mbgl/util/literal.hpp>
-#include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <cstddef>
 #include <vector>
-#include <set>
-#include <functional>
 #include <string>
 #include <array>
-#include <limits>
 
 namespace mbgl {
 namespace gl {
@@ -21,9 +15,6 @@ namespace gl {
 using AttributeBindingArray = std::vector<optional<gfx::AttributeBinding>>;
 using NamedAttributeLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
-class Context;
-void bindAttributeLocation(Context&, ProgramID, AttributeLocation, const char * name);
-std::set<std::string> getActiveAttributes(ProgramID);
 optional<AttributeLocation> queryLocation(ProgramID id, const char* name);
 
 template <class>
