@@ -108,6 +108,8 @@ TEST(ImageManager, RemoveReleasesBinPackRect) {
 
 class StubImageRequestor : public ImageRequestor {
 public:
+    StubImageRequestor(ImageManager& imageManager) : ImageRequestor(imageManager) {}
+
     void onImagesAvailable(ImageMap icons, ImageMap patterns, std::unordered_map<std::string, uint32_t> versionMap, uint64_t imageCorrelationID_) final {
         if (imagesAvailable && imageCorrelationID == imageCorrelationID_) imagesAvailable(icons, patterns, versionMap);
     }
@@ -118,7 +120,7 @@ public:
 
 TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
     ImageManager imageManager;
-    StubImageRequestor requestor;
+    StubImageRequestor requestor(imageManager);
     bool notified = false;
 
     ImageManagerObserver observer;
@@ -142,7 +144,7 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
 
 TEST(ImageManager, NotifiesRequestorImmediatelyIfDependenciesAreSatisfied) {
     ImageManager imageManager;
-    StubImageRequestor requestor;
+    StubImageRequestor requestor(imageManager);
     bool notified = false;
 
     requestor.imagesAvailable = [&] (ImageMap, ImageMap, std::unordered_map<std::string, uint32_t>) {
@@ -170,7 +172,7 @@ class StubImageManagerObserver : public ImageManagerObserver {
 
 TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
     ImageManager imageManager;
-    StubImageRequestor requestor;
+    StubImageRequestor requestor(imageManager);
     StubImageManagerObserver observer;
 
     imageManager.setObserver(&observer);
@@ -203,7 +205,7 @@ TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
 
 TEST(ImageManager, OnStyleImageMissingAfterSpriteLoaded) {
     ImageManager imageManager;
-    StubImageRequestor requestor;
+    StubImageRequestor requestor(imageManager);
     StubImageManagerObserver observer;
 
     imageManager.setObserver(&observer);

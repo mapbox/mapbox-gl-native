@@ -288,4 +288,11 @@ gfx::TextureBinding ImageManager::textureBinding(gfx::Context& context) {
     return { atlasTexture->getResource(), gfx::TextureFilterType::Linear };
 }
 
+ImageRequestor::ImageRequestor(ImageManager& imageManager_) : imageManager(imageManager_) {
+}
+
+ImageRequestor::~ImageRequestor() {
+    imageManager.removeRequestor(*this);
+}
+
 } // namespace mbgl

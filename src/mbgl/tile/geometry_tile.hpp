@@ -22,7 +22,7 @@ class TileParameters;
 class GlyphAtlas;
 class ImageAtlas;
 
-class GeometryTile : public Tile, public GlyphRequestor, ImageRequestor {
+class GeometryTile : public Tile, public GlyphRequestor, public ImageRequestor {
 public:
     GeometryTile(const OverscaledTileID&,
                  std::string sourceID,

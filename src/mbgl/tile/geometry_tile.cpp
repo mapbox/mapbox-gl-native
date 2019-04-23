@@ -42,6 +42,7 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            std::string sourceID_,
                            const TileParameters& parameters)
     : Tile(Kind::Geometry, id_),
+      ImageRequestor(parameters.imageManager),
       sourceID(std::move(sourceID_)),
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,
@@ -60,7 +61,6 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
 
 GeometryTile::~GeometryTile() {
     glyphManager.removeRequestor(*this);
-    imageManager.removeRequestor(*this);
     markObsolete();
 }
 
