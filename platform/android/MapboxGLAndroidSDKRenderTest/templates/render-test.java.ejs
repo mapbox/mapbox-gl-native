@@ -1,0 +1,135 @@
+<%
+  const data = locals.test;
+-%>
+// This file is generated.
+package com.mapbox.mapboxsdk.test.render.<%- data['package'] %>;
+
+import android.graphics.Bitmap;
+import android.support.test.rule.ActivityTestRule;
+import android.view.ViewGroup;
+import android.view.Gravity;
+import android.widget.FrameLayout;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.test.render.FileUtils;
+import com.mapbox.mapboxsdk.test.render.MainActivity;
+import com.mapbox.mapboxsdk.test.render.R;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Render test <%- data['description'] %>
+ */
+public class <%- data['name'] %> {
+
+  @Rule
+  public ActivityTestRule rule = new ActivityTestRule<>(MainActivity.class);
+
+  private MapView mapView;
+  private MapboxMap mapboxMap;
+  private final CountDownLatch latch = new CountDownLatch(1);
+
+  @Test
+  public void testRender() throws Throwable {
+    rule.runOnUiThread(() -> {
+      ViewGroup container = rule.getActivity().findViewById(R.id.container);
+      MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+      mapboxMapOptions.logoEnabled(false);
+      mapboxMapOptions.compassEnabled(false);
+      mapboxMapOptions.attributionEnabled(false);
+<% if (data['pixelratio'] != null) { -%>
+      float pixelRatio = <%- data['pixelratio'] %>;
+      mapboxMapOptions.pixelRatio(pixelRatio);
+<% } -%>
+
+      mapView = new MapView(container.getContext(), mapboxMapOptions);
+      mapView.onCreate(null);
+<% if (data['width'] != null) { -%>
+      int width = <%- data['width'] %>;
+<% } else {-%>
+      int width = 512;
+<% } -%>
+<% if (data['height'] != null) { -%>
+      int height = <%- data['height'] %>;
+<% } else {-%>
+      int height = 512;
+<% } -%>
+      mapView.setLayoutParams(new FrameLayout.LayoutParams(width, height, Gravity.CENTER));
+      container.addView(mapView);
+      
+<% if (data['zoom'] != null) { -%>
+      double zoom = <%- data['zoom'] %>;
+<% } else {-%>
+      double zoom = 0;
+<% } -%>
+<% if (data['tilt'] != null) { -%>
+      double tilt = <%- data['tilt'] %>;
+<% } else {-%>
+      double tilt = 0;
+<% } -%>
+<% if (data['bearing'] != null) { -%>
+      double bearing = <%- data['bearing'] %>;
+<% } else {-%>
+      double bearing = 0;
+<% } -%>
+<% if (data['latitude'] != null) { -%>
+      double latitude = <%- data['latitude'] %>;
+<% } else {-%>
+      double latitude = 0;
+<% } -%>
+<% if (data['longitude'] != null) { -%>
+      double longitude = <%- data['longitude'] %>;
+<% } else {-%>
+      double longitude = 0;
+<% } -%>
+      final CameraPosition.Builder cameraBuilder = new CameraPosition.Builder();
+      cameraBuilder.bearing(bearing);
+      cameraBuilder.target(new LatLng(latitude, longitude));
+      cameraBuilder.tilt(tilt);
+      cameraBuilder.zoom(zoom);
+
+      String stylePath = "asset://<%- data['asset_path'] %>/style.json";
+      mapView.addOnDidFinishRenderingMapListener(fully -> {
+        if (fully) {
+            mapboxMap.snapshot(this::saveResults);
+        }
+      });
+      mapView.getMapAsync(mapboxMap -> {
+        this.mapboxMap = mapboxMap;
+        mapboxMap.setCameraPosition(cameraBuilder.build());
+        mapboxMap.setStyle(new Style.Builder().fromUrl(stylePath), style -> {
+          // operation
+        });
+      });
+
+      mapView.onStart();
+      mapView.onResume();
+
+    });
+    if (!latch.await(5000, TimeUnit.MILLISECONDS)) {
+      throw new RuntimeException();
+    }
+  }
+
+  private void saveResults(Bitmap snapshot) {
+    String path = FileUtils.createTestDirectory("<%- data['result'] %>");
+    FileUtils.writeTestResultToDisk(path, snapshot);
+    FileUtils.copyAsset(rule.getActivity().getAssets(), "<%- data['asset_path'] %>/expected.png",path +"/expected.png");
+    FileUtils.copyAsset(rule.getActivity().getAssets(), "<%- data['asset_path'] %>/style.json",path +"/style.json");
+    finishTest();
+  }
+
+  private void finishTest() {
+    mapView.onPause();
+    mapView.onStop();
+    mapView.onDestroy();
+    latch.countDown();
+  }
+}

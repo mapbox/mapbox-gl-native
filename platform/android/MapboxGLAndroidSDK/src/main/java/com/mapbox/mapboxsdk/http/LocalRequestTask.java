@@ -26,7 +26,8 @@ class LocalRequestTask extends AsyncTask<String, Void, byte[]> {
   @Override
   protected byte[] doInBackground(String... strings) {
     return loadFile(Mapbox.getApplicationContext().getAssets(),
-      "integration/" + strings[0]
+      strings[0]
+        //remove `local://` from resource uri
         .substring(8)
         .replaceAll("%20", " ")
         .replaceAll("%2c", ","));
@@ -64,9 +65,8 @@ class LocalRequestTask extends AsyncTask<String, Void, byte[]> {
   }
 
   private static void logFileError(Exception exception) {
-    String message = "Load file failed";
-    Logger.e(TAG, message, exception);
-    MapStrictMode.strictModeViolation(message, exception);
+    Logger.e(TAG, exception.toString());
+    MapStrictMode.strictModeViolation(exception.getMessage(), exception);
   }
 
   public interface OnLocalRequestResponse {

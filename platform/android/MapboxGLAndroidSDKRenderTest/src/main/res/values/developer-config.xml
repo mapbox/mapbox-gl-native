@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string translatable="false" name="mapbox_access_token">@null</string>
+</resources>

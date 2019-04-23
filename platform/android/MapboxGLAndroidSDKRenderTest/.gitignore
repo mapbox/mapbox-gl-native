@@ -1,0 +1,7 @@
+/build
+src/main/res/values/developer-config.xml
+scripts/main.list
+src/androidTest/assets
+src/main/assets
+src/androidTest/java
+/node_modules

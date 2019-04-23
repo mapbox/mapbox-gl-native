@@ -1,0 +1,35 @@
+{
+  "name": "@mapbox/mapbox-rendertest",
+  "version": "0.1.0",
+  "description": "Generates render tests for Mapbox GL Native",
+  "bin": "bin/mapbox-rendertest",
+  "repository": "https://github.com/mapbox/mapbox-gl-native",
+  "author": "Tobrun Van Nuland <tobrun@mapbox.com>",
+  "license": "ISC",
+  "dependencies": {
+    "@mapbox/flow-remove-types": "^1.3.0-await.upstream.2",
+    "array.prototype.flatmap": "^1.2.1",
+    "ejs": "2.6.1",
+    "es": "^0.7.3",
+    "esm": "^3.0.9",
+    "fs-extra": "^5.0.0",
+    "parsimmon": "^1.7.2",
+    "yargs": "^11.0.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.2",
+    "eslint": "^4.19.1",
+    "eslint-plugin-flowtype": "^2.46.1",
+    "flow-bin": "^0.71.0",
+    "npm-run-all": "^4.1.2"
+  },
+  "scripts": {
+    "gen": "node -r esm scripts/main.js",
+    "clean": "rm -rf src/androidTest/java/com/mapbox/mapboxsdk/test/render/* && rm -rf src/main/assets/* && rm -rf build/* && adb shell rm -rf /sdcard/mapbox/render/*",
+    "build": "cd .. && ./gradlew -Pmapbox.abis=arm64-v8a :MapboxGLAndroidSDKRenderTest:assembleDebug :MapboxGLAndroidSDKRenderTest:assembleAndroidTest",
+    "test": "cd .. && ./gradlew -Pmapbox.abis=arm64-v8a :MapboxGLAndroidSDKRenderTest:connectedAndroidTest",
+    "pull": "adb pull /sdcard/mapbox/render/ build/outputs/",
+    "pixelmatch": "node scripts/pixelmatch.js"
+  },
+  "main": "index.js"
+}

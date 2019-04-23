@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion androidVersions.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.mapbox.mapboxsdk.test.render"
+        minSdkVersion androidVersions.minSdkVersion
+        targetSdkVersion androidVersions.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dexOptions {
+        maxProcessCount 8
+        javaMaxHeapSize "2g"
+        preDexLibraries true
+    }
+}
+
+dependencies {
+    implementation project(':MapboxGLAndroidSDK')
+    implementation dependenciesList.supportAppcompatV7
+    implementation dependenciesList.supportConstraintLayout
+    testImplementation dependenciesList.junit
+    androidTestImplementation dependenciesList.supportAnnotations
+    androidTestImplementation dependenciesList.testRunner
+    androidTestImplementation dependenciesList.testRules
+    androidTestImplementation dependenciesList.testEspressoCore
+    androidTestImplementation dependenciesList.testEspressoIntents
+    androidTestImplementation dependenciesList.testEspressoContrib
+}
