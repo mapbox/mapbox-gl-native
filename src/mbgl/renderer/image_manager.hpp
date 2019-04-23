@@ -56,12 +56,14 @@ public:
     void getImages(ImageRequestor&, ImageRequestPair&&);
     void removeRequestor(ImageRequestor&);
     void notifyIfMissingImageAdded();
+    void reduceMemoryUse();
 
     ImageVersionMap updatedImageVersions;
 
 private:
     void checkMissingAndNotify(ImageRequestor&, const ImageRequestPair&);
     void notify(ImageRequestor&, const ImageRequestPair&) const;
+    void removePattern(const std::string&);
 
     bool loaded = false;
 
@@ -71,6 +73,7 @@ private:
         unsigned int callbacksRemaining;
     };
     std::map<ImageRequestor*, MissingImageRequestPair> missingImageRequestors;
+    std::map<std::string, std::set<ImageRequestor*>> requestedImages;
     ImageMap images;
 
     ImageManagerObserver* observer = nullptr;
