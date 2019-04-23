@@ -19,11 +19,7 @@ namespace gfx {
 class Context;
 } // namespace gfx
 
-class ImageRequestor {
-public:
-    virtual ~ImageRequestor() = default;
-    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) = 0;
-};
+class ImageRequestor;
 
 /*
     ImageManager does two things:
@@ -103,6 +99,15 @@ private:
     PremultipliedImage atlasImage;
     mbgl::optional<gfx::Texture> atlasTexture;
     bool dirty = true;
+};
+
+class ImageRequestor {
+public:
+    explicit ImageRequestor(ImageManager&);
+    virtual ~ImageRequestor();
+    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) = 0;
+private:
+    ImageManager& imageManager;
 };
 
 } // namespace mbgl
