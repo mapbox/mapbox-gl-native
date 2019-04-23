@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.4.0-beta.2 - April 23, 2019
+### Features
+ - Enable/Disable SKU token handling [#14476](https://github.com/mapbox/mapbox-gl-native/pull/14476)
+
 ## 7.4.0-beta.1 - April 19, 2019
 ### Bugs
  - Order render items properly across several sources [#14408](https://github.com/mapbox/mapbox-gl-native/pull/14408)
