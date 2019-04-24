@@ -441,6 +441,10 @@ final class LocationAnimatorCoordinator {
       this.maxAnimationFps = maxAnimationFps;
   }
 
+  public int getMaxAnimationFps() {
+    return maxAnimationFps;
+  }
+
   private Interpolator retrievePulseInterpolator(String desiredInterpolatorFromOptions) {
     switch(desiredInterpolatorFromOptions) {
       case PulseMode.LINEAR:
