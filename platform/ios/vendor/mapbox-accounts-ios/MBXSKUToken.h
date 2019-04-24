@@ -7,9 +7,8 @@ extern NSString *const MBXAccountsNavigationSKUIDMaps;
 
 @interface MBXSKUToken : NSObject
 
-+ (NSString *)mapsSKUTokenForUserId:(NSString *)userId;
-+ (NSString *)navigationSKUTokenForUserId:(NSString *)userId;
-+ (NSString *)generateEndUserId;
+@property (class, nonatomic, readonly) NSString *mapsToken;
+@property (class, nonatomic, readonly) NSString *navigationToken;
 
 @end
 
