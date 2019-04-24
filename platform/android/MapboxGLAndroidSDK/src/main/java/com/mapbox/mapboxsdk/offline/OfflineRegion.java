@@ -284,6 +284,7 @@ public class OfflineRegion {
             @Override
             public void run() {
               if (observer != null) {
+                System.out.println("DEBUG " + status.getCompletedResourceCount() + "/" + status.getRequiredResourceCount() + " resources; " + status.getCompletedResourceSize() + " bytes downloaded.");
                 observer.onStatusChanged(status);
               }
             }
@@ -298,6 +299,7 @@ public class OfflineRegion {
             @Override
             public void run() {
               if (observer != null) {
+                System.out.println("DEBUG onError " + error);
                 observer.onError(error);
               }
             }
@@ -312,6 +314,7 @@ public class OfflineRegion {
             @Override
             public void run() {
               if (observer != null) {
+                System.out.println("DEBUG mapboxTileCountLimitExceeded");
                 observer.mapboxTileCountLimitExceeded(limit);
               }
             }
