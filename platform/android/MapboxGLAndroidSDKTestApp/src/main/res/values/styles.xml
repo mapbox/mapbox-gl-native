@@ -50,6 +50,8 @@
         <item name="mapbox_elevation">0dp</item>
         <item name="mapbox_compassAnimationEnabled">false</item>
         <item name="mapbox_accuracyAnimationEnabled">false</item>
+        
+        <item name="mapbox_layer_above">road-label</item>
     </style>
 
 </resources>
