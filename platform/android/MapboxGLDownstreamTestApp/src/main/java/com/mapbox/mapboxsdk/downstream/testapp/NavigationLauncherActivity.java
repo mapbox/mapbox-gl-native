@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.core.constants.Constants;
+import com.mapbox.core.utils.TextUtils;
 import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -49,6 +51,7 @@ import com.mapbox.services.android.navigation.ui.v5.route.OnRouteSelectionChange
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 import com.mapbox.services.android.navigation.v5.utils.LocaleUtils;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +63,8 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Response;
 import timber.log.Timber;
+
+import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class NavigationLauncherActivity extends AppCompatActivity implements OnMapReadyCallback,
   MapboxMap.OnMapLongClickListener, OnRouteSelectionChangeListener {
@@ -264,6 +269,7 @@ public class NavigationLauncherActivity extends AppCompatActivity implements OnM
       .getRoute(new SimplifiedCallback() {
         @Override
         public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+          System.out.println("PGS url " + call.request().url().toString());
           if (validRouteResponse(response)) {
             hideLoading();
             route = response.body().routes().get(0);
@@ -320,6 +326,16 @@ public class NavigationLauncherActivity extends AppCompatActivity implements OnM
     );
   }
 
+  private String obtainOfflinePath() {
+    File offline = getExternalStoragePublicDirectory("Offline");
+    return offline.getAbsolutePath();
+  }
+
+  private String retrieveOfflineVersionFromPreferences() {
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    return sharedPreferences.getString(getString(R.string.offline_version_key), "");
+  }
+
   private void launchNavigationWithRoute() {
     if (route == null) {
       Snackbar.make(mapView, R.string.error_route_not_available, Snackbar.LENGTH_SHORT).show();
@@ -334,6 +350,18 @@ public class NavigationLauncherActivity extends AppCompatActivity implements OnM
       .build();
     optionsBuilder.initialMapCameraPosition(initialPosition);
     optionsBuilder.directionsRoute(route);
+    String offlinePath = obtainOfflinePath();
+    if (!TextUtils.isEmpty(offlinePath)) {
+      optionsBuilder.offlineRoutingTilesPath(offlinePath);
+    }
+    String offlineVersion = retrieveOfflineVersionFromPreferences();
+    if (!offlineVersion.isEmpty()) {
+      optionsBuilder.offlineRoutingTilesVersion(offlineVersion);
+    }
+    // TODO Testing merging previously sideloaded region
+    optionsBuilder.offlineMapDatabasePath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + "kingfarm_to_rockville.db");
+    // TODO Testing merging previously downloaded region
+    // optionsBuilder.offlineMapDatabasePath(getFilesDir().getPath() + "/" + "mbgl-offline.db");
     NavigationLauncher.startNavigation(this, optionsBuilder.build());
   }
 
