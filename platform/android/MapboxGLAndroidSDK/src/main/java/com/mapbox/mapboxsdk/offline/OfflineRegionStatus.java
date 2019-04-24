@@ -14,37 +14,37 @@ import android.support.annotation.Keep;
 public class OfflineRegionStatus {
 
   @OfflineRegion.DownloadState
-  private int downloadState = OfflineRegion.STATE_INACTIVE;
+  private int downloadState;
 
   /**
    * The number of resources (inclusive of tiles) that have been fully downloaded
    * and are ready for offline access.
    */
-  private long completedResourceCount = 0;
+  private final long completedResourceCount;
 
   /**
    * The cumulative size, in bytes, of all resources (inclusive of tiles) that have
    * been fully downloaded.
    */
-  private long completedResourceSize = 0;
+  private final long completedResourceSize;
 
   /**
    * The number of tiles that have been fully downloaded and are ready for
    * offline access.
    */
-  private long completedTileCount = 0;
+  private final long completedTileCount;
 
   /**
    * The cumulative size, in bytes, of all tiles that have been fully downloaded.
    */
-  private long completedTileSize = 0;
+  private final long completedTileSize;
 
   /**
    * The number of resources that are known to be required for this region. See the
    * documentation for `requiredResourceCountIsPrecise` for an important caveat
    * about this number.
    */
-  private long requiredResourceCount = 0;
+  private final long requiredResourceCount;
 
   /**
    * This property is true when the value of requiredResourceCount is a precise
@@ -56,7 +56,7 @@ public class OfflineRegionStatus {
    * precise number of required resources, at which point it is set to true.
    * </p>
    */
-  private boolean requiredResourceCountIsPrecise = true;
+  private final boolean requiredResourceCountIsPrecise;
 
   /*
    * Use setObserver(OfflineRegionObserver observer) to obtain a OfflineRegionStatus object.
@@ -83,7 +83,7 @@ public class OfflineRegionStatus {
    * @return true if download is complete, false if not
    */
   public boolean isComplete() {
-    return (completedResourceCount == requiredResourceCount) && downloadState == OfflineRegion.STATE_INACTIVE;
+    return completedResourceCount >= requiredResourceCount;
   }
 
   /**
