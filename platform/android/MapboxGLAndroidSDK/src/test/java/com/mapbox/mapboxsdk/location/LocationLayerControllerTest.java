@@ -400,7 +400,8 @@ public class LocationLayerControllerTest {
     layerController.applyStyle(options);
 
     verify(style, times(0)).removeLayer(any(String.class));
-    verify(style, times(5)).addLayerBelow(any(Layer.class), Mockito.<String>any());
+    verify(style, times(1)).addLayer(any(Layer.class));
+    verify(style, times(4)).addLayerBelow(any(Layer.class), Mockito.<String>any());
   }
 
   @Test

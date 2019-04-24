@@ -156,6 +156,7 @@
         <attr name="mapbox_iconPaddingBottom" format="integer"/>
 
         <!-- Map layer configuration -->
+        <attr name="mapbox_layer_above" format="string"/>
         <attr name="mapbox_layer_below" format="string"/>
 
         <!-- Icon scale based on map zoom levels -->

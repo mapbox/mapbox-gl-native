@@ -67,4 +67,15 @@ public class LocationComponentOptionsTest {
       .elevation(-500)
       .build();
   }
+
+  @Test
+  public void passingBothLayerPositionOptions_throwsException() throws Exception {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("You cannot set both layerAbove and layerBelow options."
+      + "Choose one or the other.");
+    LocationComponentOptions.builder(context)
+      .layerAbove("above")
+      .layerBelow("below")
+      .build();
+  }
 }

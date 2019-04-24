@@ -77,8 +77,7 @@ final class LocationLayerController {
 
   private boolean isHidden = true;
 
-  @Nullable
-  private String layerBelow;
+  private LocationComponentPositionManager positionManager;
 
   LocationLayerController(MapboxMap mapboxMap, Style style, LayerSourceProvider layerSourceProvider,
                           LayerFeatureProvider featureProvider, LayerBitmapProvider bitmapProvider,
@@ -95,8 +94,9 @@ final class LocationLayerController {
 
   void initializeComponents(Style style, LocationComponentOptions options) {
     this.style = style;
+    this.positionManager = new LocationComponentPositionManager(style, options.layerAbove(), options.layerBelow());
     addLocationSource();
-    addLayers(options.layerBelow());
+    addLayers();
     applyStyle(options);
 
     if (isHidden) {
@@ -107,18 +107,15 @@ final class LocationLayerController {
   }
 
   void applyStyle(@NonNull LocationComponentOptions options) {
-    String newLayerBelowOption = options.layerBelow();
-    if ((layerBelow != null || newLayerBelowOption != null)) {
-      if (layerBelow == null || !layerBelow.equals(newLayerBelowOption)) {
-        removeLayers();
-        addLayers(newLayerBelowOption);
-        if (isHidden) {
-          for (String layerId : layerSet) {
-            setLayerVisibility(layerId, false);
-          }
+    if (positionManager.update(options.layerAbove(), options.layerBelow())) {
+      removeLayers();
+      addLayers();
+      if (isHidden) {
+        for (String layerId : layerSet) {
+          setLayerVisibility(layerId, false);
         }
-        setRenderMode(renderMode);
       }
+      setRenderMode(renderMode);
     }
 
     this.options = options;
@@ -237,9 +234,13 @@ final class LocationLayerController {
     }
   }
 
-  private void addLayers(@NonNull String idBelowLayer) {
-    layerBelow = idBelowLayer;
-    addSymbolLayer(BEARING_LAYER, idBelowLayer);
+  private void addLayers() {
+    // positions the top-most reference layer
+    Layer layer = layerSourceProvider.generateLayer(BEARING_LAYER);
+    positionManager.addLayerToMap(layer);
+    layerSet.add(layer.getId());
+
+    // adds remaining layers while keeping the order
     addSymbolLayer(FOREGROUND_LAYER, BEARING_LAYER);
     addSymbolLayer(BACKGROUND_LAYER, FOREGROUND_LAYER);
     addSymbolLayer(SHADOW_LAYER, BACKGROUND_LAYER);

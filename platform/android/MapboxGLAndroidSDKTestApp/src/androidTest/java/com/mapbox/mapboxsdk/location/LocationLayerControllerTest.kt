@@ -284,8 +284,7 @@ class LocationLayerControllerTest : EspressoTest() {
         TestingAsyncUtils.waitForLayer(uiController, mapView)
         assertThat(mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER).isEmpty(), `is`(true))
 
-        val options =
-          LocationComponentOptions.createFromAttributes(context, com.mapbox.mapboxsdk.testapp.R.style.CustomLocationComponent)
+        val options = component.locationComponentOptions
             .toBuilder()
             .layerBelow("road-label")
             .build()

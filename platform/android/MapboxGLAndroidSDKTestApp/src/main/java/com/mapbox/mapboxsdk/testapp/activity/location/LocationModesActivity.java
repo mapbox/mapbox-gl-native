@@ -207,7 +207,6 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
 
       options = options.toBuilder()
         .padding(padding)
-        .layerBelow("road-label")
         .build();
     }
 

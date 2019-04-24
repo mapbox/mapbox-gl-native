@@ -150,4 +150,9 @@
 
     <!-- Accuracy animation-->
     <public name="mapbox_accuracyAnimationEnabled" format="boolean" type="attr" />
+
+    <!--LocationComponent position-->
+    <public name="mapbox_layer_above" format="string" type="attr" />
+    <public name="mapbox_layer_below" format="string" type="attr" />
+
 </resources>
