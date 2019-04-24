@@ -31,7 +31,13 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see `CLLocationManager.distanceFilter`
  */
-@property(nonatomic, assign) CLLocationDistance distanceFilter;
+- (CLLocationDistance)distanceFilter;
+
+/**
+ Sets the minimum update distance in meters.
+ @param distanceFilter The distance filter in meters.
+ */
+- (void)setDistanceFilter:(CLLocationDistance) distanceFilter;
 
 /**
  Specifies the accuracy of the location data.
@@ -43,7 +49,14 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see `CLLocationManager.desiredAccuracy`
  */
-@property (nonatomic, assign) CLLocationAccuracy desiredAccuracy;
+- (CLLocationAccuracy)desiredAccuracy;
+
+/**
+ Sets the desired location accuracy.
+ 
+ @param desiredAccuracy The desired location accuracy.
+ */
+- (void)setDesiredAccuracy:(CLLocationAccuracy)desiredAccuracy;
 
 /**
  Specifies the type of user activity associated with the location updates.
@@ -56,7 +69,14 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see `CLLocationManager.activityType`
  */
-@property (nonatomic, assign) CLActivityType activityType;
+- (CLActivityType)activityType;
+
+/**
+ Sets the type of user activity associated with the location updates.
+ 
+ @param activityType The location's manager activity type.
+ */
+- (void)setActivityType:(CLActivityType)activityType;
 
 @required
 
