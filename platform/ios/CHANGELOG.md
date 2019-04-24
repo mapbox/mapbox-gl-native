@@ -6,7 +6,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an Interface Builder crash when using an `MGLMapView` in a storyboard. ([#14379](https://github.com/mapbox/mapbox-gl-native/pull/14379))
 * Fix a bug that wrong position of attribution dialog after rotation. ([#14185](https://github.com/mapbox/mapbox-gl-native/pull/14185))
-* Speculatively fixed a bug where GL rendering could occur in the background. ([#14439](https://github.com/mapbox/mapbox-gl-native/pull/14439))
 * Fixed a bug with jittery callout views when using sprite-based annotations. ([#14445](https://github.com/mapbox/mapbox-gl-native/pull/14445))
 * Improved `MGLLocationManager` optional protocol properties briding to Swift. ([#14477](https://github.com/mapbox/mapbox-gl-native/pull/14477))
 
@@ -21,6 +20,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added `-[MGLMapViewDelegate mapView:didFailToLoadImage:]` to load missing symbol icons in the style if they are not found. ([#14302](https://github.com/mapbox/mapbox-gl-native/pull/14302))
 * Fixed a possible crash with certain expressions containing arguments that evaluate to a dictionary containing `NSArray` or `NSNumber` values. ([#14352](https://github.com/mapbox/mapbox-gl-native/pull/14352))
 * Fixed a bug where non-opaque `UIColor` values were ignored when assigned to a style layer color property. ([#14406](https://github.com/mapbox/mapbox-gl-native/pull/14406))
+* Speculatively fixed a bug where GL rendering could occur in the background. ([#14439](https://github.com/mapbox/mapbox-gl-native/pull/14439))
 
 ### Packaging
 
