@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 /// The current global SKU.
-@property (class, atomic, readonly) NSString *skuToken;
+@property (class, atomic, readonly, nullable) NSString *skuToken;
+@property (class, nonatomic, readonly) BOOL isAccountsSDKEnabled;
 #endif
 
 @end
