@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.offline;
 
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
@@ -25,6 +26,7 @@ public class OfflineRegionError {
   public static final String REASON_CONNECTION = "REASON_CONNECTION";
   public static final String REASON_OTHER = "REASON_OTHER";
 
+  @NonNull
   @ErrorReason
   private final String reason;
 
@@ -32,11 +34,12 @@ public class OfflineRegionError {
    * /* An error message from the request handler, e.g. a server message or a system message
    * /* informing the user about the reason for the failure.
    */
+  @NonNull
   private final String message;
 
   // Constructors
   @Keep
-  private OfflineRegionError(String reason, String message) {
+  private OfflineRegionError(@NonNull String reason, @NonNull String message) {
     // For JNI use only
     this.reason = reason;
     this.message = message;
@@ -44,12 +47,46 @@ public class OfflineRegionError {
 
   // Getters
 
+  @NonNull
   @ErrorReason
   public String getReason() {
     return reason;
   }
 
+  @NonNull
   public String getMessage() {
     return message;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    OfflineRegionError that = (OfflineRegionError) o;
+
+    if (!reason.equals(that.reason)) {
+      return false;
+    }
+    return message.equals(that.message);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = reason.hashCode();
+    result = 31 * result + message.hashCode();
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return "OfflineRegionError{"
+      + "reason='" + reason + '\''
+      + ", message='" + message + '\''
+      + '}';
   }
 }
