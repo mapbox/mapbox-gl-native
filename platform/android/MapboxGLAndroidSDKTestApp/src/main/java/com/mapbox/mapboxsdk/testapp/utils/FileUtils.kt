@@ -19,7 +19,7 @@ class FileUtils {
     override fun doInBackground(vararg strings: String): Boolean? {
       val assetName = strings[0]
       val destinationPath = strings[1]
-
+      
       contextWeakReference.get()?.let {
         try {
           copyAsset(it, assetName, destinationPath)
