@@ -5,6 +5,7 @@
         "mapbox/optional.hpp": "vendor/variant/include/mapbox/optional.hpp",
         "mapbox/recursive_wrapper.hpp": "vendor/variant/include/mapbox/recursive_wrapper.hpp",
         "mapbox/variant.hpp": "vendor/variant/include/mapbox/variant.hpp",
+        "mapbox/variant_cast.hpp": "vendor/variant/include/mapbox/variant_cast.hpp",
         "mapbox/variant_io.hpp": "vendor/variant/include/mapbox/variant_io.hpp",
         "mapbox/variant_visitor.hpp": "vendor/variant/include/mapbox/variant_visitor.hpp"
     },
