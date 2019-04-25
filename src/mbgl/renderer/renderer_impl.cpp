@@ -49,12 +49,15 @@ Renderer::Impl::Impl(gfx::RendererBackend& backend_,
     , pixelRatio(pixelRatio_)
     , programCacheDir(std::move(programCacheDir_))
     , localFontFamily(std::move(localFontFamily_))
+    , imageManager(std::make_unique<ImageManager>())
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {}
+    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {
+    imageManager->setObserver(this);
+}
 
 Renderer::Impl::~Impl() {
     assert(gfx::BackendScope::exists());
@@ -80,13 +83,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         glyphManager = std::make_unique<GlyphManager>(updateParameters.fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily));
         glyphManager->setObserver(this);
     }
+    const bool isMapModeContinuous = updateParameters.mode == MapMode::Continuous;
 
-    if (!imageManager) {
-        imageManager = std::make_unique<ImageManager>();
-        imageManager->setObserver(this);
-    }
-
-    if (updateParameters.mode != MapMode::Continuous) {
+    if (!isMapModeContinuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
     }
@@ -97,8 +96,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
-
-    const bool isMapModeContinuous = updateParameters.mode == MapMode::Continuous;
 
     const TransitionOptions transitionOptions = isMapModeContinuous ? updateParameters.transitionOptions : TransitionOptions();
 
@@ -284,8 +281,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                        tileParameters);
     }
 
-    bool loaded = updateParameters.styleLoaded && isLoaded();
-    if (updateParameters.mode != MapMode::Continuous && !loaded) {
+    const bool loaded = updateParameters.styleLoaded && isLoaded();
+    if (!isMapModeContinuous && !loaded) {
         return;
     }
 
@@ -308,7 +305,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     {
-        if (updateParameters.mode != MapMode::Continuous) {
+        if (!isMapModeContinuous) {
             // TODO: Think about right way for symbol index to handle still rendering
             crossTileSymbolIndex.reset();
         }
@@ -541,7 +538,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     observer->onDidFinishRenderingFrame(
         loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-        updateParameters.mode == MapMode::Continuous && hasTransitions(parameters.timePoint)
+        isMapModeContinuous && hasTransitions(parameters.timePoint)
     );
 
     if (!loaded) {
@@ -695,9 +692,7 @@ void Renderer::Impl::dumDebugLogs() {
         entry.second->dumpDebugLogs();
     }
 
-    if (imageManager) {
-        imageManager->dumpDebugLogs();
-    }
+    imageManager->dumpDebugLogs();
 }
 
 RenderLayer* Renderer::Impl::getRenderLayer(const std::string& id) {
@@ -757,7 +752,7 @@ bool Renderer::Impl::isLoaded() const {
         }
     }
 
-    if (!imageManager || !imageManager->isLoaded()) {
+    if (!imageManager->isLoaded()) {
         return false;
     }
 
