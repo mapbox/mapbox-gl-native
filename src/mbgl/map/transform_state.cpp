@@ -278,7 +278,7 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
         return {};
     }
 
-    mat4 mat = coordinatePointMatrix(getZoom());
+    mat4 mat = coordinatePointMatrix();
     vec4 p;
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 c = {{ pt.x, pt.y, 0, 1 }};
@@ -292,7 +292,7 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
     }
 
     float targetZ = 0;
-    mat4 mat = coordinatePointMatrix(getZoom());
+    mat4 mat = coordinatePointMatrix();
 
     mat4 inverted;
     bool err = matrix::invert(inverted, mat);
@@ -325,10 +325,10 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
     return Projection::unproject(util::interpolate(p0, p1, t), scale / util::tileSize, wrapMode);
 }
 
-mat4 TransformState::coordinatePointMatrix(double z) const {
+mat4 TransformState::coordinatePointMatrix() const {
     mat4 proj;
     getProjMatrix(proj);
-    float s = Projection::worldSize(scale) / std::pow(2, z);
+    float s = util::tileSize;
     matrix::scale(proj, proj, s, s, 1);
     matrix::multiply(proj, getPixelMatrix(), proj);
     return proj;
@@ -426,7 +426,7 @@ float TransformState::maxPitchScaleFactor() const {
         return {};
     }
     auto latLng = screenCoordinateToLatLng({ 0, static_cast<float>(getSize().height) });
-    mat4 mat = coordinatePointMatrix(getZoom());
+    mat4 mat = coordinatePointMatrix();
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 p = {{ pt.x, pt.y, 0, 1 }};
     vec4 topPoint;

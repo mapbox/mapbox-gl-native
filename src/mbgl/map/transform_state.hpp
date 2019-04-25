@@ -104,7 +104,7 @@ private:
     // logical dimensions
     Size size;
 
-    mat4 coordinatePointMatrix(double z) const;
+    mat4 coordinatePointMatrix() const;
     mat4 getPixelMatrix() const;
 
     /** Recenter the map so that the given coordinate is located at the given
