@@ -11,7 +11,6 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -272,23 +271,25 @@ public class FileSource {
    */
   public static void setResourcesCachePath(@NonNull Context context,
                                            @NonNull final String path,
-                                           @NonNull ResourcesCachePathChangeCallback callback) {
+                                           @Nullable final ResourcesCachePathChangeCallback callback) {
     final String fileSourceActivatedMessage = "Cannot set path, file source is activated."
       + " Make sure that the map or a resources download is not running.";
     if (getInstance(context).isActivated()) {
       Logger.w(TAG, fileSourceActivatedMessage);
-      callback.onError(fileSourceActivatedMessage);
+      if (callback != null) {
+        callback.onError(fileSourceActivatedMessage);
+      }
     } else if (path.equals(resourcesCachePath)) {
-      // no need to change the path
-      callback.onSuccess(path);
+      if (callback != null) {
+        // no need to change the path
+        callback.onSuccess(path);
+      }
     } else {
       final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
-      final WeakReference<ResourcesCachePathChangeCallback> callbackWeakReference = new WeakReference<>(callback);
       new FileUtils.CheckFileWritePermissionTask(new FileUtils.OnCheckFileWritePermissionListener() {
         @Override
         public void onWritePermissionGranted() {
           final Context context = contextWeakReference.get();
-          final ResourcesCachePathChangeCallback callback = callbackWeakReference.get();
 
           if (callback == null) {
             Logger.w(TAG, "Lost callback reference.");
@@ -316,7 +317,6 @@ public class FileSource {
 
         @Override
         public void onError() {
-          final ResourcesCachePathChangeCallback callback = callbackWeakReference.get();
           if (callback != null) {
             String message = "Path is not writable: " + path;
             Logger.e(TAG, message);
