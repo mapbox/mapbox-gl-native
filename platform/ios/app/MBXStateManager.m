@@ -18,12 +18,11 @@
     return _currentState;
 }
 
-- (void)saveState:(MBXState*)state forKey:(NSObject*)key {
+- (void)saveState:(MBXState*)state {
 
 }
 
 -(void)restoreState {
-    // Load from NSUserDefaults
 }
 
 -(void)resetState {

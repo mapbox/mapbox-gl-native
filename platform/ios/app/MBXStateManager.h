@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype) sharedManager;
 
-- (void)saveState:(MBXState*)state forKey:(NSObject*)key;
+- (void)saveState:(MBXState*)state;
 
 - (void)restoreState;
 

@@ -172,15 +172,20 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    MBXState *test = [[MBXState alloc] init];
+    test.userTrackingMode = MGLUserTrackingModeNone;
 
-    [[MBXStateManager sharedManager].currentState saveDebugMaskState:NO];
-    [[MBXStateManager sharedManager].currentState saveUserTrackingModeState:MGLUserTrackingModeNone];
-    [[MBXStateManager sharedManager].currentState saveShowsUserLocationState:NO];
+//    MBXState *currentState = [MBXStateManager sharedManager].currentState;
+//
+//    currentState.debugMask = MGLMapDebugTileBoundariesMask;
+    
+//    [MBXStateManager sharedManager].currentState.userTrackingMode = NO;
+    [MBXStateManager sharedManager].currentState.showsUserLocation = NO;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
-    [self restoreState:[MBXStateManager sharedManager].currentState];
+    // Restore state here
 
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
 
@@ -224,38 +229,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             }
         }
     }];
-}
-
-- (void)saveState:(__unused NSNotification *)notification
-{
-    MBXState *currentState = [MBXStateManager sharedManager].currentState;
-    [currentState saveMapCameraState:self.mapView.camera];
-    [currentState saveShowsUserLocationState:self.mapView.showsUserLocation];
-    [currentState saveUserTrackingModeState:self.mapView.userTrackingMode];
-    [currentState saveDebugMaskState:self.mapView.debugMask];
-    [currentState saveZoomLevelHUDState:self.mapInfoHUDEnabled];
-    [currentState saveDisplayTimeFrameGraphState:self.frameTimeGraphEnabled];
-}
-
-- (void)restoreState:(MBXState*)state
-{
-    if (state.camera)
-    {
-        self.mapView.camera = state.camera;
-    }
-
-    self.mapView.showsUserLocation = state.showsUserLocation;
-    self.mapView.userTrackingMode = state.userTrackingMode;
-    self.mapView.debugMask = state.debugMask;
-    self.mapInfoHUDEnabled = state.showsZoomLevelHUD;
-
-    [self updateHUD];
-
-    if (state.showsTimeFrameGraph == YES)
-    {
-        self.frameTimeGraphEnabled = YES;
-        self.frameTimeGraphView.hidden = NO;
-    }
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations
@@ -407,7 +380,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     self.mapInfoHUDEnabled = !self.mapInfoHUDEnabled;
                     self.hudLabel.hidden = !self.mapInfoHUDEnabled;
 
-                    [[MBXStateManager sharedManager].currentState saveZoomLevelHUDState:self.mapInfoHUDEnabled];
+//                    [MBXStateManager sharedManager].currentState.showsZoomLevelHUD:self.mapInfoHUDEnabled;
 
                     self.reuseQueueStatsEnabled = NO;
                     [self updateHUD];
@@ -417,7 +390,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     self.frameTimeGraphEnabled = !self.frameTimeGraphEnabled;
                     self.frameTimeGraphView.hidden = !self.frameTimeGraphEnabled;
-                    [[MBXStateManager sharedManager].currentState saveDisplayTimeFrameGraphState:self.frameTimeGraphEnabled];
+//                    [[MBXStateManager sharedManager].currentState.showsTimeFrameGraph:self.frameTimeGraphEnabled];
                     break;
                 }
                 case MBXSettingsDebugToolsShowReuseQueueStats:
@@ -425,7 +398,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     self.reuseQueueStatsEnabled = !self.reuseQueueStatsEnabled;
                     self.hudLabel.hidden = !self.reuseQueueStatsEnabled;
                     self.mapInfoHUDEnabled = NO;
-                    [[MBXStateManager sharedManager].currentState saveZoomLevelHUDState:self.mapInfoHUDEnabled];
+//                    [[MBXStateManager sharedManager].currentState.showsZoomLevelHUD:self.mapInfoHUDEnabled];
                     break;
                 }
                 default:

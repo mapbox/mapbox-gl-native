@@ -7,11 +7,10 @@ NSString *const MBXDebugMask = @"MBXDebugMask";
 NSString *const MBXShowsZoomLevelHUD =  @"MBXShowsZoomLevelHUD";
 NSString *const MBXShowsTimeFrameGraph = @"MBXShowsFrameTimeGraph";
 
-
 @implementation MBXState
 
 - (instancetype) init {
-    if ((self = super.self)) {
+    if (self = [super init]) {
         NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys: @"", MBXCamera,
             @"", MBXUserTrackingMode,
             @"", MBXShowsUserLocation,
@@ -25,53 +24,77 @@ NSString *const MBXShowsTimeFrameGraph = @"MBXShowsFrameTimeGraph";
     return self;
 }
 
-- (void)saveMapCameraState:(MGLMapCamera *)camera {
-    _camera = camera;
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *archivedCamera = [NSKeyedArchiver archivedDataWithRootObject:camera];
-    [self.state setValue:camera forKey:@"MBXCamera"];
-    [defaults setObject:archivedCamera forKey:@"MBXCamera"];
-    [defaults synchronize];
+- (void) setCamera:(MGLMapCamera *)camera {
+    self.camera = camera;
 }
 
-- (void)saveUserTrackingModeState:(NSInteger)trackingMode; {
-    _userTrackingMode = trackingMode;
+- (MGLMapCamera*)camera {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [self.state setValue:@(trackingMode) forKey:@"MBXUserTrackingMode"];
-    [defaults setInteger:trackingMode forKey:@"MBXUserTrackingMode"];
-    [defaults synchronize];
+    NSData *archivedCamera = [defaults objectForKey:@"MBXCamera"];
+    MGLMapCamera *unarchivedCamera = archivedCamera ? [NSKeyedUnarchiver unarchiveObjectWithData:archivedCamera] : nil;
+    return unarchivedCamera;
 }
 
-- (void)saveShowsUserLocationState:(BOOL)showUserLocation {
-    _showsUserLocation = showUserLocation;
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [self.state setValue:@(showUserLocation) forKey:@"MBXShowsUserLocation"];
-    [defaults setBool:showUserLocation forKey:@"MBXShowsUserLocation"];
-    [defaults synchronize];
+-(void)setTest:(NSObject *)test {
+    _test = test;
 }
 
-- (void)saveDebugMaskState:(NSInteger)debugMask {
-    _debugMask = debugMask;
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [self.state setValue:@(debugMask) forKey:@"MBXDebugMask"];
-    [defaults setInteger:debugMask forKey:@"MBXDebugMask"];
-    [defaults synchronize];
+- (void)setUserTrackingMode:(MGLUserTrackingMode)userTrackingMode {
+     _userTrackingMode = userTrackingMode;
 }
 
-- (void)saveZoomLevelHUDState:(BOOL)showsZoomLevelHUD {
-    _showsZoomLevelHUD = showsZoomLevelHUD;
+- (MGLUserTrackingMode)userTrackingMode {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [self.state setValue:@(showsZoomLevelHUD) forKey:@"MBXShowsZoomLevelHUD"];
-    [defaults setBool:showsZoomLevelHUD forKey:@"MBXShowsZoomLevelHUD"];
-    [defaults synchronize];
+    MGLUserTrackingMode uncheckedTrackingMode = [defaults integerForKey:@"MBXUserTrackingMode"];
+
+    if (uncheckedTrackingMode >= 0 &&
+        (MGLUserTrackingMode)uncheckedTrackingMode >= MGLUserTrackingModeNone &&
+        (MGLUserTrackingMode)uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
+    {
+        return uncheckedTrackingMode;
+    }
+
+    return 0;
 }
 
-- (void)saveDisplayTimeFrameGraphState:(BOOL)displayTimeFramGraphState {
-    _showsTimeFrameGraph = displayTimeFramGraphState;
+- (void)setShowsUserLocation:(BOOL)showsUserLocation {
+    self.showsUserLocation = showsUserLocation;
+}
+
+- (BOOL)showsUserLocation {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [self.state setValue:@(displayTimeFramGraphState) forKey:@"MBXShowsFrameTimeGraph"];
-    [defaults setBool:displayTimeFramGraphState forKey:@"MBXShowsFrameTimeGraph"];
-    [defaults synchronize];
+    NSInteger showsUserLocation = [defaults integerForKey:@"MBXShowsUserLocation"];
+    return showsUserLocation;
+}
+
+- (void)setDebugMask:(MGLMapDebugMaskOptions)debugMask {
+    self.debugMask = debugMask;
+}
+
+- (MGLMapDebugMaskOptions)debugMask {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSInteger debugMask = [defaults integerForKey:@"MBXDebugMask"];
+    return debugMask;
+}
+
+- (void)setShowsZoomLevelHUD:(BOOL)showsZoomLevelHUD {
+    self.showsZoomLevelHUD = showsZoomLevelHUD;
+}
+
+-(BOOL)showsZoomLevelHUD {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    BOOL showsZoomLevelHUD = [defaults integerForKey:@"MBXShowsZoomLevelHUD"];
+    return showsZoomLevelHUD;
+}
+
+-(void)setShowsTimeFrameGraph:(BOOL)showsTimeFrameGraph {
+    self.showsTimeFrameGraph = showsTimeFrameGraph;
+}
+
+-(BOOL)showsTimeFrameGraph {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    BOOL showsTimeFrameGraph = [defaults integerForKey:@"MBXShowsTimeFrameGraph"];
+    return showsTimeFrameGraph;
 }
 
 @end
