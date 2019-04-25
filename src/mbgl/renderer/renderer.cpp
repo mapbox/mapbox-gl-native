@@ -110,7 +110,7 @@ FeatureExtensionValue Renderer::queryFeatureExtensions(const std::string& source
 }
 
 void Renderer::dumpDebugLogs() {
-    impl->dumDebugLogs();
+    impl->dumpDebugLogs();
 }
 
 void Renderer::reduceMemoryUse() {

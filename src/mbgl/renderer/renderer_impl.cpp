@@ -687,7 +687,7 @@ void Renderer::Impl::reduceMemoryUse() {
     }
 }
 
-void Renderer::Impl::dumDebugLogs() {
+void Renderer::Impl::dumpDebugLogs() {
     for (const auto& entry : renderSources) {
         entry.second->dumpDebugLogs();
     }

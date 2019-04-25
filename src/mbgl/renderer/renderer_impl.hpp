@@ -66,7 +66,7 @@ public:
                                                  const optional<std::map<std::string, Value>>& args) const;
 
     void reduceMemoryUse();
-    void dumDebugLogs();
+    void dumpDebugLogs();
 
 private:
     bool isLoaded() const;
