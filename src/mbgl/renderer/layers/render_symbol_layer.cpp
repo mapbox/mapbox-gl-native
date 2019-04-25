@@ -74,25 +74,41 @@ struct RenderableSegment {
                       const RenderTile& tile_,
                       const LayerRenderData& renderData_,
                       const SymbolBucket::PaintProperties& bucketPaintProperties_,
-                      float sortKey_) :
+                      float sortKey_,
+                      bool isText_) :
     segment(std::move(segment_)),
     tile(tile_),
     renderData(renderData_),
     bucketPaintProperties(bucketPaintProperties_),
-    sortKey(sortKey_) {}
+    sortKey(sortKey_),
+    isText(isText_) {}
 
     SegmentWrapper segment;
     const RenderTile& tile;
     const LayerRenderData& renderData;
     const SymbolBucket::PaintProperties& bucketPaintProperties;
     float sortKey;
-
-    bool hasIconData() const {
-        return static_cast<const SymbolBucket&>(*renderData.bucket).hasIconData();
-    }
+    bool isText;
 
     friend bool operator < (const RenderableSegment& lhs, const RenderableSegment& rhs) {
-        return lhs.sortKey < rhs.sortKey;
+        // Sort renderable segments by a sort key.
+        if (lhs.sortKey < rhs.sortKey) {
+            return true;
+        }
+
+        // In cases when sort key is the same, sort by the type of a segment (text over icons),
+        // and for segments of the same type with the same sort key, sort by a tile id.
+        if (lhs.sortKey == rhs.sortKey) {
+            if (!lhs.isText && rhs.isText) {
+                return true;
+            }
+
+            if (lhs.isText == rhs.isText)  {
+                return lhs.tile.id < rhs.tile.id;
+            }
+        }
+
+        return false;
     }
 };
 
@@ -383,7 +399,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 
     const bool sortFeaturesByKey = !impl(baseImpl).layout.get<SymbolSortKey>().isUndefined();
-    std::set<RenderableSegment> renderableSegments;
+    std::multiset<RenderableSegment> renderableSegments;
 
     const auto draw = [&parameters, this] (auto& programInstance,
                                            const auto& uniformValues,
@@ -464,15 +480,15 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         assert(bucket.paintProperties.find(getID()) != bucket.paintProperties.end());
         const auto& bucketPaintProperties = bucket.paintProperties.at(getID());
 
-        auto addRenderables = [&renderableSegments, &tile, renderData, &bucketPaintProperties, it = renderableSegments.begin()] (auto& segments) mutable {
+        auto addRenderables = [&renderableSegments, &tile, renderData, &bucketPaintProperties, it = renderableSegments.begin()] (auto& segments, bool isText) mutable {
             for (auto& segment : segments) {
-                it = renderableSegments.emplace_hint(it, SegmentWrapper{std::ref(segment)}, tile, *renderData, bucketPaintProperties, segment.sortKey);
+                it = renderableSegments.emplace_hint(it, SegmentWrapper{std::ref(segment)}, tile, *renderData, bucketPaintProperties, segment.sortKey, isText);
             }
         };
 
         if (bucket.hasIconData()) {
             if (sortFeaturesByKey) {
-                addRenderables(bucket.icon.segments);
+                addRenderables(bucket.icon.segments, false /*isText*/);
             } else {
                 drawIcon(draw, tile, *renderData, std::ref(bucket.icon.segments), bucketPaintProperties, parameters);
             }
@@ -480,7 +496,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (bucket.hasTextData()) {
             if (sortFeaturesByKey) {
-                addRenderables(bucket.text.segments);
+                addRenderables(bucket.text.segments, true /*isText*/);
             } else {
                 drawText(draw, tile, *renderData, std::ref(bucket.text.segments), bucketPaintProperties, parameters);
             }
@@ -565,10 +581,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
     if (sortFeaturesByKey) {
         for (auto& renderable : renderableSegments) {
-            if (renderable.hasIconData()) {
-                drawIcon(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
-            } else {
+            if (renderable.isText) {
                 drawText(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
+            } else {
+                drawIcon(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
             }
         }
     }
