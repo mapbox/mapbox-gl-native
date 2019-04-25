@@ -13,4 +13,8 @@
         android:id="@+id/action_toggle_text_font"
         android:title="@string/toggle_text_font"/>
 
+    <item
+        android:id="@+id/action_animate_style_icon"
+        android:title="@string/toggle_animate_icon"/>
+
 </menu>

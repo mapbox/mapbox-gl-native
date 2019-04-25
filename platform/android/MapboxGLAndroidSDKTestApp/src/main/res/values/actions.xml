@@ -83,6 +83,7 @@
     <string name="toggle_text_size">Toggle text size</string>
     <string name="toggle_text_field_contents">Toggle text field contents</string>
     <string name="toggle_text_font">Toggle text font</string>
+    <string name="toggle_animate_icon">Animate icon</string>
     <string name="zoom_in">Zoom in</string>
     <string name="zoom_out">Zoom out</string>
     <string name="zoom_by_2">Zoom by 2</string>

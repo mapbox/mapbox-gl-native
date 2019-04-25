@@ -1,7 +1,12 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.geojson.Feature;
@@ -108,6 +115,56 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   private MapboxMap mapboxMap;
   private MapView mapView;
 
+  class AnimatedIcon {
+    private Bitmap canvasBitmap;
+    private Bitmap icon;
+    private Canvas canvas;
+    private String iconID;
+    private ValueAnimator animator;
+    private static final String PROPERTY_ROTATE = "rotate";
+    PropertyValuesHolder propertyRotate = PropertyValuesHolder.ofInt(PROPERTY_ROTATE, 0, 360);
+    private int angle;
+    private final Paint paint = new Paint();
+
+    public AnimatedIcon(String iconID_, Bitmap icon_) {
+      iconID = iconID_;
+      icon = icon_;
+      canvasBitmap = Bitmap.createBitmap(icon_.getWidth(), icon_.getHeight(), icon_.getConfig());
+      canvas = new Canvas(canvasBitmap);
+      canvas.drawBitmap(icon,0,0, paint);
+      animator = new ValueAnimator();
+      animator.setValues(propertyRotate);
+      animator.setInterpolator(new AccelerateDecelerateInterpolator());
+      animator.setDuration(3000);
+      animator.addUpdateListener(animation -> {
+        angle = (int) animation.getAnimatedValue(PROPERTY_ROTATE);
+        render();
+      });
+    }
+
+    public Bitmap getCanvasBitmap() {
+      return canvasBitmap;
+    }
+
+    public void animate() {
+      animator.start();
+    }
+
+    public void render() {
+      // TODO: interleave with onDidFinishRenderingFrame callback
+      Matrix matrix = new Matrix();
+      matrix.setRotate (angle, canvasBitmap.getWidth()/2, canvasBitmap.getHeight()/2);
+      canvasBitmap.eraseColor(Color.TRANSPARENT);
+      canvas.drawBitmap(icon, matrix, paint);
+      Style style = mapboxMap.getStyle();
+      if (style != null) {
+        style.addImage(iconID, Objects.requireNonNull(getCanvasBitmap()));
+      }
+    }
+  }
+
+  private AnimatedIcon animatedIcon;
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -133,7 +190,8 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
       if (style != null) {
         Timber.e("Adding image with id: %s", id);
         Bitmap androidIcon = BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_android_2));
-        style.addImage(id, Objects.requireNonNull(androidIcon));
+        animatedIcon = new AnimatedIcon(id, androidIcon);
+        style.addImage(id, Objects.requireNonNull(animatedIcon.getCanvasBitmap()));
       }
     });
   }
@@ -240,6 +298,10 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     }
   }
 
+  private void animateStyleIcon() {
+    animatedIcon.animate();
+  }
+
   private void shuffleMapboxSign() {
     if (mapboxSignSymbolLayer != null) {
       mapboxSignSymbolLayer.setProperties(
@@ -342,6 +404,9 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
         return true;
       case R.id.action_toggle_text_font:
         toggleTextFont();
+        return true;
+      case R.id.action_animate_style_icon:
+        animateStyleIcon();
         return true;
       default:
         return super.onOptionsItemSelected(item);
