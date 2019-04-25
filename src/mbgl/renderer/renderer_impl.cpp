@@ -684,7 +684,7 @@ void Renderer::Impl::reduceMemoryUse() {
     observer->onInvalidate();
 }
 
-void Renderer::Impl::dumDebugLogs() {
+void Renderer::Impl::dumpDebugLogs() {
     for (const auto& entry : renderSources) {
         entry.second->dumpDebugLogs();
     }
