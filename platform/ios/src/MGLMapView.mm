@@ -1377,7 +1377,6 @@ public:
 - (void)didMoveToSuperview
 {
     [self validateDisplayLink];
-    [self installConstraints];
     [super didMoveToSuperview];
 }
 
