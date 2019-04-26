@@ -39,19 +39,19 @@ static gfx::VertexVector<RasterLayoutVertex> rasterVertices() {
     return result;
 }
 
-static gfx::VertexVector<ExtrusionTextureLayoutVertex> extrusionTextureVertices() {
-    gfx::VertexVector<ExtrusionTextureLayoutVertex> result;
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 0 }));
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 0 }));
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 0, 1 }));
-    result.emplace_back(ExtrusionTextureProgram::layoutVertex({ 1, 1 }));
+static gfx::VertexVector<HeatmapTextureLayoutVertex> heatmapTextureVertices() {
+    gfx::VertexVector<HeatmapTextureLayoutVertex> result;
+    result.emplace_back(HeatmapTextureProgram::layoutVertex({ 0, 0 }));
+    result.emplace_back(HeatmapTextureProgram::layoutVertex({ 1, 0 }));
+    result.emplace_back(HeatmapTextureProgram::layoutVertex({ 0, 1 }));
+    result.emplace_back(HeatmapTextureProgram::layoutVertex({ 1, 1 }));
     return result;
 }
 
 RenderStaticData::RenderStaticData(gfx::Context& context, float pixelRatio, const optional<std::string>& programCacheDir)
     : tileVertexBuffer(context.createVertexBuffer(tileVertices())),
       rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
-      extrusionTextureVertexBuffer(context.createVertexBuffer(extrusionTextureVertices())),
+      heatmapTextureVertexBuffer(context.createVertexBuffer(heatmapTextureVertices())),
       quadTriangleIndexBuffer(context.createIndexBuffer(quadTriangleIndices())),
       tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())),
       programs(context, ProgramParameters { pixelRatio, false, programCacheDir })
@@ -62,7 +62,7 @@ RenderStaticData::RenderStaticData(gfx::Context& context, float pixelRatio, cons
     tileTriangleSegments.emplace_back(0, 0, 4, 6);
     tileBorderSegments.emplace_back(0, 0, 4, 5);
     rasterSegments.emplace_back(0, 0, 4, 6);
-    extrusionTextureSegments.emplace_back(0, 0, 4, 6);
+    heatmapTextureSegments.emplace_back(0, 0, 4, 6);
 }
 
 } // namespace mbgl

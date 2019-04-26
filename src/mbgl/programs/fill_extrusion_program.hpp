@@ -2,7 +2,6 @@
 
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
-#include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/textures.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -34,12 +33,14 @@ using FillExtrusionLayoutAttributes = TypeList<
 
 using FillExtrusionUniforms = TypeList<
     uniforms::matrix,
+    uniforms::opacity,
     uniforms::lightcolor,
     uniforms::lightpos,
     uniforms::lightintensity>;
 
 using FillExtrusionPatternUniforms = TypeList<
     uniforms::matrix,
+    uniforms::opacity,
     uniforms::scale,
     uniforms::texsize,
     uniforms::fade,
@@ -82,7 +83,7 @@ public:
     }
 
     static LayoutUniformValues
-    layoutUniformValues(mat4, const TransformState&, const EvaluatedLight&);
+    layoutUniformValues(mat4, const TransformState&, const float opacity, const EvaluatedLight&);
 };
 
 class FillExtrusionPatternProgram : public Program<
@@ -102,6 +103,7 @@ public:
                                                    const CrossfadeParameters&,
                                                    const UnwrappedTileID&,
                                                    const TransformState&,
+                                                   const float opacity,
                                                    const float heightFactor,
                                                    const float pixelRatio,
                                                    const EvaluatedLight&);
@@ -115,11 +117,10 @@ class FillExtrusionLayerPrograms final : public LayerTypePrograms {
 public:
     FillExtrusionLayerPrograms(gfx::Context& context, const ProgramParameters& programParameters)
         : fillExtrusion(context, programParameters),
-          fillExtrusionPattern(context, programParameters),
-          extrusionTexture(context, programParameters) {}
+          fillExtrusionPattern(context, programParameters) {
+    }
     FillExtrusionProgram fillExtrusion;
     FillExtrusionPatternProgram fillExtrusionPattern;
-    ExtrusionTextureProgram extrusionTexture;
 };
 
 } // namespace mbgl

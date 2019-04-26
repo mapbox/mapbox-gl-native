@@ -4,7 +4,7 @@
 #include <mbgl/gfx/index_buffer.hpp>
 #include <mbgl/gfx/renderbuffer.hpp>
 #include <mbgl/programs/background_program.hpp>
-#include <mbgl/programs/extrusion_texture_program.hpp>
+#include <mbgl/programs/heatmap_texture_program.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/util/optional.hpp>
@@ -22,7 +22,7 @@ public:
 
     gfx::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertexBuffer;
     gfx::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
-    gfx::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
+    gfx::VertexBuffer<HeatmapTextureLayoutVertex> heatmapTextureVertexBuffer;
 
     gfx::IndexBuffer quadTriangleIndexBuffer;
     gfx::IndexBuffer tileBorderIndexBuffer;
@@ -30,7 +30,7 @@ public:
     SegmentVector<BackgroundAttributes> tileTriangleSegments;
     SegmentVector<DebugAttributes> tileBorderSegments;
     SegmentVector<RasterAttributes> rasterSegments;
-    SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
+    SegmentVector<HeatmapTextureAttributes> heatmapTextureSegments;
 
     optional<gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>> depthRenderbuffer;
     bool has3D = false;

@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<LineSDFProgram> {
     static constexpr const char* name = "line_sdf";
     static constexpr const uint8_t hash[8] = { 0x66, 0x20, 0x75, 0x4e, 0xbe, 0x02, 0x9e, 0x67 };
-    static constexpr const auto vertexOffset = 43475;
-    static constexpr const auto fragmentOffset = 47089;
+    static constexpr const auto vertexOffset = 43203;
+    static constexpr const auto fragmentOffset = 46817;
 };
 
 constexpr const char* ShaderSource<LineSDFProgram>::name;

@@ -1786,7 +1786,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Sorts features in ascending order based on this value. Features with a higher sort key will appear above features with a lower sort key wehn they overlap. Features with a lower sort key will have priority over other features when doing placement.
+   * Sorts features in ascending order based on this value. Features with a higher sort key will appear above features with a lower sort key when they overlap. Features with a lower sort key will have priority over other features when doing placement.
    *
    * @param value a Float value
    * @return property wrapper around Float
@@ -1796,7 +1796,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Sorts features in ascending order based on this value. Features with a higher sort key will appear above features with a lower sort key wehn they overlap. Features with a lower sort key will have priority over other features when doing placement.
+   * Sorts features in ascending order based on this value. Features with a higher sort key will appear above features with a lower sort key when they overlap. Features with a lower sort key will have priority over other features when doing placement.
    *
    * @param value a Float value
    * @return property wrapper around Float

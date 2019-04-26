@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillExtrusionProgram> {
     static constexpr const char* name = "fill_extrusion";
-    static constexpr const uint8_t hash[8] = { 0x49, 0x8a, 0xa2, 0x8b, 0x21, 0x74, 0x27, 0x93 };
+    static constexpr const uint8_t hash[8] = { 0x9d, 0x76, 0x7f, 0xaa, 0x86, 0x57, 0x56, 0x96 };
     static constexpr const auto vertexOffset = 21238;
-    static constexpr const auto fragmentOffset = 23121;
+    static constexpr const auto fragmentOffset = 23169;
 };
 
 constexpr const char* ShaderSource<FillExtrusionProgram>::name;
@@ -44,6 +44,7 @@ uniform vec3 u_lightcolor;
 uniform lowp vec3 u_lightpos;
 uniform lowp float u_lightintensity;
 uniform float u_vertical_gradient;
+uniform lowp float u_opacity;
 
 attribute vec2 a_pos;
 attribute vec4 a_normal_ed;
@@ -141,6 +142,7 @@ void main() {
     v_color.r += clamp(color.r * directional * u_lightcolor.r, mix(0.0, 0.3, 1.0 - u_lightcolor.r), 1.0);
     v_color.g += clamp(color.g * directional * u_lightcolor.g, mix(0.0, 0.3, 1.0 - u_lightcolor.g), 1.0);
     v_color.b += clamp(color.b * directional * u_lightcolor.b, mix(0.0, 0.3, 1.0 - u_lightcolor.b), 1.0);
+    v_color *= u_opacity;
 }
 
 */
