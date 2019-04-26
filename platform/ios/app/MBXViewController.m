@@ -7,6 +7,7 @@
 #import "MBXEmbeddedMapViewController.h"
 #import "MBXOrnamentsViewController.h"
 #import "MBXStateManager.h"
+#import "MBXState.h"
 
 #import "MBXFrameTimeGraphView.h"
 
@@ -152,7 +153,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic, getter=isLocalizingLabels) BOOL localizingLabels;
 @property (nonatomic) BOOL reuseQueueStatsEnabled;
 @property (nonatomic) BOOL mapInfoHUDEnabled;
-@property (nonatomic) BOOL frameTimeGraphEnabled;
+//@property (nonatomic) BOOL frameTimeGraphEnabled;
 @property (nonatomic) BOOL randomWalk;
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
 
@@ -302,7 +303,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 [NSString stringWithFormat:@"%@ Overdraw Visualization",
                     (debugMask & MGLMapDebugOverdrawVisualizationMask ? @"Hide" :@"Show")],
                 [NSString stringWithFormat:@"%@ Map Info HUD", (_mapInfoHUDEnabled ? @"Hide" :@"Show")],
-                [NSString stringWithFormat:@"%@ Frame Time Graph", (_frameTimeGraphEnabled ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Frame Time Graph", ([MBXStateManager sharedManager].currentState.showsTimeFrameGraph ? @"Hide" :@"Show")],
                 [NSString stringWithFormat:@"%@ Reuse Queue Stats", (_reuseQueueStatsEnabled ? @"Hide" :@"Show")]
             ]];
             break;
@@ -388,8 +389,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 }
                 case MBXSettingsDebugToolsShowFrameTimeGraph:
                 {
-                    self.frameTimeGraphEnabled = !self.frameTimeGraphEnabled;
-                    self.frameTimeGraphView.hidden = !self.frameTimeGraphEnabled;
+                    [MBXStateManager sharedManager].currentState.showsTimeFrameGraph = ![MBXStateManager sharedManager].currentState.showsTimeFrameGraph;
+                    self.frameTimeGraphView.hidden = ![MBXStateManager sharedManager].currentState.showsTimeFrameGraph;
 //                    [[MBXStateManager sharedManager].currentState.showsTimeFrameGraph:self.frameTimeGraphEnabled];
                     break;
                 }
@@ -1270,7 +1271,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 }
 
 - (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered {
-    if (self.frameTimeGraphEnabled) {
+    if ([MBXStateManager sharedManager].currentState.showsTimeFrameGraph) {
         [self.frameTimeGraphView updatePathWithFrameDuration:mapView.frameTime];
     }
 }

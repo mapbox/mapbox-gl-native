@@ -7,6 +7,7 @@ FOUNDATION_EXTERN NSString *const MBXCamera;
 FOUNDATION_EXTERN NSString *const MBXUserTrackingMode;
 FOUNDATION_EXTERN NSString *const MBXShowsUserLocation;
 FOUNDATION_EXTERN NSString *const MBXDebugMaskValue;
+FOUNDATION_EXTERN NSString *const MBXShowsZoomLevelHUD;
 FOUNDATION_EXTERN NSString *const MBXShowsZoomLevelOrnament;
 FOUNDATION_EXTERN NSString *const MBXShowsTimeFrameGraph;
 
