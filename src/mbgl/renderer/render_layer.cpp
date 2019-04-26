@@ -29,11 +29,14 @@ bool RenderLayer::hasRenderPass(RenderPass pass) const {
     return bool(passes & pass);
 }
 
-bool RenderLayer::needsRendering(float zoom) const {
+bool RenderLayer::needsRendering() const {
     return passes != RenderPass::None
-           && baseImpl->visibility != style::VisibilityType::None
-           && baseImpl->minZoom <= zoom
-           && baseImpl->maxZoom >= zoom;
+           && baseImpl->visibility != style::VisibilityType::None;
+}
+
+bool RenderLayer::supportsZoom(float zoom) const {
+    // TODO: shall we use rounding or epsilon comparisons?
+    return baseImpl->minZoom <= zoom && baseImpl->maxZoom >= zoom;
 }
 
 void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState&) {

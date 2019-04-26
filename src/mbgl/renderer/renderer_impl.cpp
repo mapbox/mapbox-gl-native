@@ -247,23 +247,26 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             const Immutable<Layer::Impl>& layerImpl = *it;
             RenderLayer* layer = getRenderLayer(layerImpl->id);
             const auto* layerInfo = layerImpl->getTypeInfo();
-            const bool layerNeedsRendering = layer->needsRendering(zoomHistory.lastZoom);
+            const bool layerNeedsRendering = layer->needsRendering();
+            const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
             staticData->has3D = (staticData->has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
                     sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || hasLayoutDifference(layerDiff, layerImpl->id));
                     if (layerNeedsRendering) {
-                        sourceNeedsRendering = true;
                         filteredLayersForSource.push_back(layer->evaluatedProperties);
-                        renderItemsEmplaceHint = renderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
+                        if (zoomFitsLayer) {
+                            sourceNeedsRendering = true;
+                            renderItemsEmplaceHint = renderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
+                        }
                     }
                 }
                 continue;
             } 
 
             // Handle layers without source.
-            if (layerNeedsRendering && sourceImpl.get() == sourceImpls->at(0).get()) {
+            if (layerNeedsRendering && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
                 if (!backend.contextIsShared() && layerImpl.get() == layerImpls->at(0).get()) {
                     const auto& solidBackground = layer->getSolidBackground();
                     if (solidBackground) {
@@ -577,9 +580,10 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
     // Combine all results based on the style layer renderItems.
     for (const auto& layerImpl : *layerImpls) {
         const RenderLayer* layer = getRenderLayer(layerImpl->id);
-        if (!layer->needsRendering(zoomHistory.lastZoom)) {
+        if (!layer->needsRendering() || !layer->supportsZoom(zoomHistory.lastZoom)) {
             continue;
         }
+
         auto it = resultsByLayer.find(layer->baseImpl->id);
         if (it != resultsByLayer.end()) {
             std::move(it->second.begin(), it->second.end(), std::back_inserter(result));
