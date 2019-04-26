@@ -72,8 +72,10 @@ gfx::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gfx::DepthMaskTy
     return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { nearDepth, farDepth } };
 }
 
-gfx::DepthMode PaintParameters::depthModeFor3D(gfx::DepthMaskType mask) const {
-    return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { 0.0, 1.0 } };
+gfx::DepthMode PaintParameters::depthModeFor3D() const {
+    return gfx::DepthMode{ gfx::DepthFunctionType::LessEqual,
+                           gfx::DepthMaskType::ReadWrite,
+                           { 0.0, depthRangeSize } };
 }
 
 void PaintParameters::clearStencil() {
@@ -161,6 +163,24 @@ gfx::StencilMode PaintParameters::stencilModeForClipping(const UnwrappedTileID& 
     return gfx::StencilMode{ gfx::StencilMode::Equal{ 0b11111111 },
                              id,
                              0b00000000,
+                             gfx::StencilOpType::Keep,
+                             gfx::StencilOpType::Keep,
+                             gfx::StencilOpType::Replace };
+}
+
+gfx::StencilMode PaintParameters::stencilModeFor3D() {
+    if (nextStencilID + 1 > 256) {
+        clearStencil();
+    }
+
+    // We're potentially destroying the stencil clipping mask in this pass. That means we'll have
+    // to recreate it for the next source if any.
+    tileClippingMaskIDs.clear();
+
+    const int32_t id = nextStencilID++;
+    return gfx::StencilMode{ gfx::StencilMode::NotEqual{ 0b11111111 },
+                             id,
+                             0b11111111,
                              gfx::StencilOpType::Keep,
                              gfx::StencilOpType::Keep,
                              gfx::StencilOpType::Replace };

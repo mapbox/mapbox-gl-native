@@ -36,9 +36,10 @@ float lightIntensity(const EvaluatedLight& light) {
 }
 
 FillExtrusionProgram::LayoutUniformValues FillExtrusionProgram::layoutUniformValues(
-    mat4 matrix, const TransformState& state, const EvaluatedLight& light) {
+    mat4 matrix, const TransformState& state, const float opacity, const EvaluatedLight& light) {
     return {
         uniforms::matrix::Value( matrix ),
+        uniforms::opacity::Value( opacity ),
         uniforms::lightcolor::Value( lightColor(light) ),
         uniforms::lightpos::Value( lightPosition(light, state) ),
         uniforms::lightintensity::Value( lightIntensity(light) )
@@ -51,6 +52,7 @@ FillExtrusionPatternProgram::layoutUniformValues(mat4 matrix,
                                            const CrossfadeParameters& crossfade,
                                            const UnwrappedTileID& tileID,
                                            const TransformState& state,
+                                           const float opacity,
                                            const float heightFactor,
                                            const float pixelRatio,
                                            const EvaluatedLight& light) {
@@ -61,6 +63,7 @@ FillExtrusionPatternProgram::layoutUniformValues(mat4 matrix,
 
     return {
         uniforms::matrix::Value( matrix ),
+        uniforms::opacity::Value( opacity ),
         uniforms::scale::Value( {{pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale}} ),
         uniforms::texsize::Value( atlasSize ),
         uniforms::fade::Value( crossfade.t ),

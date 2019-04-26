@@ -159,7 +159,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.state.getZoom()
         );
         const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            parameters.staticData.extrusionTextureVertexBuffer,
+            parameters.staticData.heatmapTextureVertexBuffer,
             paintAttributeData,
             properties
         );
@@ -175,7 +175,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.colorModeForRenderPass(),
             gfx::CullFaceMode::disabled(),
             parameters.staticData.quadTriangleIndexBuffer,
-            parameters.staticData.extrusionTextureSegments,
+            parameters.staticData.heatmapTextureSegments,
             allUniformValues,
             allAttributeBindings,
             HeatmapTextureProgram::TextureBindings{

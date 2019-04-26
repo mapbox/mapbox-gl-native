@@ -69,7 +69,7 @@ public:
     Programs& programs;
 
     gfx::DepthMode depthModeForSublayer(uint8_t n, gfx::DepthMaskType) const;
-    gfx::DepthMode depthModeFor3D(gfx::DepthMaskType) const;
+    gfx::DepthMode depthModeFor3D() const;
     gfx::ColorMode colorModeForRenderPass() const;
 
     mat4 matrixForTile(const UnwrappedTileID&, bool aligned = false) const;
@@ -82,6 +82,7 @@ public:
 public:
     void renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>&);
     gfx::StencilMode stencilModeForClipping(const UnwrappedTileID&) const;
+    gfx::StencilMode stencilModeFor3D();
 
 private:
     void clearStencil();
@@ -96,7 +97,7 @@ public:
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 
-    
+
     float symbolFadeChange;
 };
 
