@@ -371,7 +371,7 @@ TEST(Transform, Antimeridian) {
     transform.jumpTo(CameraOptions().withCenter(coordinateWaikiri).withZoom(10.0));
     ScreenCoordinate pixelWaikiri = transform.latLngToScreenCoordinate(coordinateWaikiri);
     ASSERT_DOUBLE_EQ(500, pixelWaikiri.x);
-    ASSERT_DOUBLE_EQ(500, pixelWaikiri.y);
+    ASSERT_NEAR(500, pixelWaikiri.y, 1e-10);
 
     transform.jumpTo(CameraOptions().withCenter(LatLng { coordinateWaikiri.latitude(), 180.0213 }));
     ScreenCoordinate pixelWaikiriLongest = transform.latLngToScreenCoordinate(coordinateWaikiri);

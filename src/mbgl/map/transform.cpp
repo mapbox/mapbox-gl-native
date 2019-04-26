@@ -107,9 +107,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         }
     }
 
-    const Point<double> startPoint = Projection::project(startLatLng, state.scale);
-    const Point<double> endPoint = Projection::project(latLng, state.scale);
-
     ScreenCoordinate center = getScreenCoordinate(padding);
     center.y = state.size.height - center.y;
 
@@ -132,8 +129,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     state.rotating = bearing != startBearing;
 
     startTransition(camera, animation, [=](double t) {
-        Point<double> framePoint = util::interpolate(startPoint, endPoint, t);
-        LatLng frameLatLng = Projection::unproject(framePoint, startScale);
+        LatLng frameLatLng(util::interpolate(startLatLng.latitude(), latLng.latitude(), t),
+                           util::interpolate(startLatLng.longitude(), latLng.longitude(), t));
         double frameScale = util::interpolate(startScale, scale, t);
         state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
 
