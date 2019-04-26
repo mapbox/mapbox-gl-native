@@ -3,14 +3,22 @@
 NSString *const MBXCamera = @"MBXCamera";
 NSString *const MBXUserTrackingMode = @"MBXUserTrackingMode";
 NSString *const MBXShowsUserLocation = @"MBXShowsUserLocation";
-NSString *const MBXDebugMask = @"MBXDebugMask";
-NSString *const MBXShowsZoomLevelHUD =  @"MBXShowsZoomLevelHUD";
+NSString *const MBXDebugMask = @"MBXDebugMaskValue";
+NSString *const MBXShowsZoomLevelHUD =  @"MBXShowsZoomLevelOrnament";
 NSString *const MBXShowsTimeFrameGraph = @"MBXShowsFrameTimeGraph";
+
+@interface MBXState()
+
+@property NSUserDefaults *standardUserDefaults;
+@property MGLMapView *mapView;
+
+@end
 
 @implementation MBXState
 
-- (instancetype) init {
+- (instancetype)initForMapView:(MGLMapView*)mapView {
     if (self = [super init]) {
+
         NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys: @"", MBXCamera,
             @"", MBXUserTrackingMode,
             @"", MBXShowsUserLocation,
@@ -20,81 +28,81 @@ NSString *const MBXShowsTimeFrameGraph = @"MBXShowsFrameTimeGraph";
             nil];
 
         _state = dictionary;
+        _standardUserDefaults = [NSUserDefaults standardUserDefaults];
+        _mapView = mapView;
     }
     return self;
 }
 
-- (void) setCamera:(MGLMapCamera *)camera {
-    self.camera = camera;
+
+// Current map camera
+- (void)setCamera:(MGLMapCamera *)camera {
+    NSData *archivedCamera = [NSKeyedArchiver archivedDataWithRootObject:self.mapView.camera];
+    [self.standardUserDefaults setObject:archivedCamera forKey:MBXCamera];
+    _camera = camera;
 }
 
-- (MGLMapCamera*)camera {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *archivedCamera = [defaults objectForKey:@"MBXCamera"];
+- (MGLMapCamera*)getCamera {
+    NSData *archivedCamera = [self.standardUserDefaults objectForKey:MBXCamera];
     MGLMapCamera *unarchivedCamera = archivedCamera ? [NSKeyedUnarchiver unarchiveObjectWithData:archivedCamera] : nil;
     return unarchivedCamera;
 }
 
--(void)setTest:(NSObject *)test {
-    _test = test;
-}
-
+// User tracking mode status
 - (void)setUserTrackingMode:(MGLUserTrackingMode)userTrackingMode {
-     _userTrackingMode = userTrackingMode;
+    [self.standardUserDefaults setInteger:self.mapView.userTrackingMode forKey:MBXUserTrackingMode];
+    _userTrackingMode = userTrackingMode;
 }
 
-- (MGLUserTrackingMode)userTrackingMode {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    MGLUserTrackingMode uncheckedTrackingMode = [defaults integerForKey:@"MBXUserTrackingMode"];
-
-    if (uncheckedTrackingMode >= 0 &&
-        (MGLUserTrackingMode)uncheckedTrackingMode >= MGLUserTrackingModeNone &&
-        (MGLUserTrackingMode)uncheckedTrackingMode <= MGLUserTrackingModeFollowWithCourse)
+- (MGLUserTrackingMode)getUserTrackingMode {
+    if (_userTrackingMode >= 0 &&
+        _userTrackingMode >= MGLUserTrackingModeNone &&
+        _userTrackingMode <= MGLUserTrackingModeFollowWithCourse)
     {
-        return uncheckedTrackingMode;
+        return _userTrackingMode;
     }
 
-    return 0;
+    return MGLUserTrackingModeNone;
 }
 
+// User location status
 - (void)setShowsUserLocation:(BOOL)showsUserLocation {
-    self.showsUserLocation = showsUserLocation;
+    [self.standardUserDefaults setBool:self.mapView.showsUserLocation forKey:MBXShowsUserLocation];
+    _showsUserLocation = showsUserLocation;
 }
 
-- (BOOL)showsUserLocation {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSInteger showsUserLocation = [defaults integerForKey:@"MBXShowsUserLocation"];
-    return showsUserLocation;
+- (BOOL)getShowsUserLocation {
+    return [self.standardUserDefaults boolForKey:MBXShowsUserLocation];
 }
 
+// Debug mask value
 - (void)setDebugMask:(MGLMapDebugMaskOptions)debugMask {
-    self.debugMask = debugMask;
+    [self.standardUserDefaults setInteger:self.mapView.debugMask forKey:MBXDebugMaskValue];
+    _debugMask = debugMask;
 }
 
-- (MGLMapDebugMaskOptions)debugMask {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSInteger debugMask = [defaults integerForKey:@"MBXDebugMask"];
-    return debugMask;
+- (MGLMapDebugMaskOptions)getDebugMask {
+    return [self.standardUserDefaults integerForKey:MBXDebugMaskValue];
 }
 
-- (void)setShowsZoomLevelHUD:(BOOL)showsZoomLevelHUD {
-    self.showsZoomLevelHUD = showsZoomLevelHUD;
+// Zoom level ornament
+- (void)setShowsZoomLevelOrnament:(BOOL)showsZoomLevelOrnament {
+    [self.standardUserDefaults setBool:self.mapView.showsZoomLevelOrnament forKey:MBXShowsZoomLevelOrnament];
+    _showsZoomLevelOrnament = showsZoomLevelOrnament;
 }
 
--(BOOL)showsZoomLevelHUD {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    BOOL showsZoomLevelHUD = [defaults integerForKey:@"MBXShowsZoomLevelHUD"];
-    return showsZoomLevelHUD;
+-(BOOL)getShowsZoomLevelHUD {
+    return [self.standardUserDefaults boolForKey:MBXShowsZoomLevelOrnament];
 }
 
+// Time frame graph
 -(void)setShowsTimeFrameGraph:(BOOL)showsTimeFrameGraph {
-    self.showsTimeFrameGraph = showsTimeFrameGraph;
+    [self.standardUserDefaults setBool:self.mapView.showsTimeFrameGraph forKey:MBXShowsTimeFrameGraph];
+    _showsTimeFrameGraph = showsTimeFrameGraph;
 }
 
--(BOOL)showsTimeFrameGraph {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    BOOL showsTimeFrameGraph = [defaults integerForKey:@"MBXShowsTimeFrameGraph"];
-    return showsTimeFrameGraph;
+-(BOOL)getShowsTimeFrameGraph {
+    return [self.standardUserDefaults boolForKey:MBXShowsTimeFrameGraph];
 }
 
 @end
