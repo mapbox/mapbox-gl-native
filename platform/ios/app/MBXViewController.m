@@ -107,7 +107,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousShouldLimitCameraChanges,
     MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousOrnamentsPlacement,
-    MBXSettingsMiscellaneousModalView,
     MBXSettingsMiscellaneousPrintLogFile,
     MBXSettingsMiscellaneousDeleteLogFile
 };
@@ -210,7 +209,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) BOOL shouldLimitCameraChanges;
 @property (nonatomic) BOOL randomWalk;
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
-
+@property (nonatomic) BOOL addedAnnotation;
 @end
 
 @interface MGLMapView (MBXViewController)
@@ -320,6 +319,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             }
         }
     }];
+    [self parseFeaturesAddingCount:1000 usingViews:YES];
+    self.addedAnnotation = NO;
 }
 
 - (void)saveState:(__unused NSNotification *)notification
@@ -505,7 +506,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 [NSString stringWithFormat:@"%@ Camera Changes", (_shouldLimitCameraChanges ? @"Unlimit" : @"Limit")],
                 @"View Route Simulation",
                 @"Ornaments Placement",
-                @"Present Modal View",
             ]];
 
             if (self.debugLoggingEnabled)
@@ -772,11 +772,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     MBXOrnamentsViewController *ornamentsViewController = [[MBXOrnamentsViewController alloc] init];
                     [self.navigationController pushViewController:ornamentsViewController animated:YES];
-                    break;
-                }
-                case MBXSettingsMiscellaneousModalView:
-                {
-                    [self presentModalVCOverMapView];
                     break;
                 }
                 default:
@@ -1206,6 +1201,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         regionsLayer.fillOpacity = [NSExpression expressionForConstantValue:@0.5];
     });
 }
+
 
 - (void)styleQuery
 {
@@ -2249,14 +2245,19 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     _localizingLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
 }
 
-- (void)presentModalVCOverMapView {
-    [self parseFeaturesAddingCount:100 usingViews:YES];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    UIViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"TestViewController"];
-    [self.navigationController presentViewController:vc animated:YES completion:nil];
-    
+- (IBAction)toggleTestAnnotation:(id)sender {
+    NSUInteger i = arc4random_uniform((uint32_t)[self.mapView.visibleAnnotations count]);
+    [self.mapView selectAnnotation:self.mapView.visibleAnnotations[i] moveIntoView:NO animateSelection:NO];
 }
 
+- (void)mapView:(MGLMapView *)mapView didSelectAnnotationView:(MGLAnnotationView *)annotationView {
+    if (!self.addedAnnotation) {
+        annotationView.backgroundColor = [UIColor purpleColor];
+    } else {
+        annotationView.backgroundColor = [UIColor greenColor];
+    }
+    self.addedAnnotation = !self.addedAnnotation;
+}
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera {
     if (_shouldLimitCameraChanges) {
         // Get the current camera to restore it after.
@@ -2293,7 +2294,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     if (reason != MGLCameraChangeReasonProgrammatic) {
         self.randomWalk = NO;
     }
-
+    
     [self updateHUD];
     [self updateHelperMapViews];
 }

@@ -86,14 +86,19 @@
                                     <action selector="showSettings:" destination="WaX-pd-UZQ" id="X2C-Ee-Qvt"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Item" id="1Cm-ct-O5U">
+                            <barButtonItem title="Modal VC" id="1Cm-ct-O5U">
                                 <connections>
                                     <segue destination="GJx-bG-Csz" kind="presentation" id="26R-NA-y08"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem title="+/-" id="KhU-cX-Fxj">
+                                <connections>
+                                    <action selector="toggleTestAnnotation:" destination="WaX-pd-UZQ" id="Fri-qB-x7v"/>
+                                </connections>
+                            </barButtonItem>
                         </leftBarButtonItems>
-                        <button key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KsN-ny-Hou">
-                            <rect key="frame" x="94" y="5.5" width="181" height="33"/>
+                        <button key="titleView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KsN-ny-Hou">
+                            <rect key="frame" x="169" y="5.5" width="106" height="33"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
                             <state key="normal" title="Streets"/>
