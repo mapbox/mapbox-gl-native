@@ -15,10 +15,32 @@ struct ThreadLifecycle {
     virtual ~ThreadLifecycle() = default;
 };
 
+struct ThreadLifecycleV2 {
+    ThreadLifecycleV2() = default;
+    ThreadLifecycleV2(std::function<void*()> onThreadCreated_,
+                      std::function<void(void*)> onThreadDestroyed_) :
+                      onThreadCreatedFn(onThreadCreated_),
+                      onThreadDestroyedFn(onThreadDestroyed_) {}
+
+    void onThreadCreated() const {
+        privateData = onThreadCreatedFn();
+    }
+
+    void onThreadDestroyed() const {
+        onThreadDestroyedFn(privateData);
+    }
+
+private:
+    std::function<void*()> onThreadCreatedFn = []{return nullptr;};
+    std::function<void(void*)> onThreadDestroyedFn = [](void*){};
+    mutable void* privateData = NULL;
+};
+
 class ThreadPool : public Scheduler {
 public:
     explicit ThreadPool(std::size_t count);
     ThreadPool(std::size_t count, std::unique_ptr<ThreadLifecycle> _lifecycle);
+    ThreadPool(std::size_t count, ThreadLifecycleV2 = ThreadLifecycleV2());
     ~ThreadPool() override;
 
     void schedule(std::weak_ptr<Mailbox>) override;
