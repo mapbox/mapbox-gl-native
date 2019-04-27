@@ -41,6 +41,10 @@
         if (dictionary[MBXDebugMaskValue]) {
             _currentState.debugMask = ((NSNumber *)dictionary[MBXDebugMaskValue]).intValue;
         }
+
+        if (dictionary[MBXShowsZoomLevelOrnament]) {
+            _currentState.showsZoomLevelOrnament = [dictionary[MBXShowsZoomLevelOrnament] boolValue];
+        }
         
         if (dictionary[MBXShowsTimeFrameGraph]) {
             _currentState.showsTimeFrameGraph = [dictionary[MBXShowsTimeFrameGraph] boolValue];
@@ -62,6 +66,7 @@
         [dictionary setValue:@(state.userTrackingMode) forKey:MBXUserTrackingMode];
         [dictionary setValue:@(state.showsUserLocation) forKey:MBXShowsUserLocation];
         [dictionary setValue:@(state.debugMask) forKey:MBXDebugMaskValue];
+        [dictionary setValue:@(state.showsZoomLevelOrnament) forKey:MBXShowsZoomLevelOrnament];
         [dictionary setValue:@(state.showsTimeFrameGraph) forKey:MBXShowsTimeFrameGraph];
         
         [[NSUserDefaults standardUserDefaults] setObject:dictionary forKey:@"mapStateKey"];
@@ -73,6 +78,7 @@
 }
 
 -(void)restoreState {
+    
 }
 
 -(void)resetState {

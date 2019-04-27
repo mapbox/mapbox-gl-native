@@ -22,8 +22,6 @@ FOUNDATION_EXTERN NSString *const MBXShowsTimeFrameGraph;
 @property (nonatomic) BOOL showsZoomLevelOrnament;
 @property (nonatomic) BOOL showsTimeFrameGraph;
 
-@property (nonatomic, strong) NSObject *test;
-
 @end
 
 NS_ASSUME_NONNULL_END
