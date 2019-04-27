@@ -66,5 +66,7 @@
 			<string>settings</string>
 		</dict>
 	</array>
+	<key>MGLMapboxAccountsSDKEnabled</key>
+	<true/>
 </dict>
 </plist>
