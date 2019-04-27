@@ -208,20 +208,17 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         if (impl->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
             NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
-            
-            NSMutableArray *newQueryItems = [NSMutableArray arrayWithArray:@[
-                [NSURLQueryItem queryItemWithName:@"events" value:@"true"]
-                ]];
+            NSURLQueryItem *accountsQueryItem = nil;
 
             // Only add the token if we have enabled the accounts SDK
-            if (MGLAccountManager.isAccountsSDKEnabled)
-            {
+            if (MGLAccountManager.isAccountsSDKEnabled) {
                 NSCAssert(MGLAccountManager.skuToken, @"skuToken should be non-nil if the accounts SDK is enabled");
-                [newQueryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken]];
+                accountsQueryItem = [NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken];
+            } else {
+                accountsQueryItem = [NSURLQueryItem queryItemWithName:@"events" value:@"true"];
             }
 
-            components.queryItems = components.queryItems ? [components.queryItems arrayByAddingObjectsFromArray:newQueryItems] : newQueryItems;
-
+            components.queryItems = components.queryItems ? [components.queryItems arrayByAddingObject:accountsQueryItem] : @[accountsQueryItem];
             url = components.URL;
         }
 #endif
