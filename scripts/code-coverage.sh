@@ -22,7 +22,7 @@ if [[ $CIRCLE_SHA1 ]]; then
     circle_sha="$CIRCLE_SHA1"
 fi
 
-commit_message= git log --format=oneline -n 1 $CIRCLE_SHA1
+commit_message=git log --pretty=%s -n 1
 echo $commit_message
 # Create a formatted JSON file that contains the current coverage.
 current_date=$(TZ=UTC date +"%FT%T%z")
