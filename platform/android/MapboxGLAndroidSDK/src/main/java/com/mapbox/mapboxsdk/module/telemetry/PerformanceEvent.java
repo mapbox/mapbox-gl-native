@@ -16,14 +16,18 @@ import java.util.List;
  * <p>
  * Bundle is expected to have following properties:
  * "attributes", "counters", and "metadata" with String values.
+ * </p>
  * <p>
  * Attributes: a string representing an array of name/string value pair objects.
  * Counters: a string representing an array of name/number value pair objects.
  * Metadata is a string representation of a JsonObject with string values.
+ * </p>
  * <p>
  * Here is an example of a Performance event bundle data:
+ * </p>
  * <p>
  * "attributes": [{ "name": "style_id", "value": "mapbox://styles/mapbox/streets-v10"}]
+ * </p>
  * <p>
  * "counters": [{"name": "fps_average", "value": 90.7655486547093},
  * {"name": "fps_deviation", "value": 29.301809631465574}]
@@ -39,6 +43,7 @@ import java.util.List;
  * “gpu”: “Qualcomm, Adreno (TM) 540, OpenGL ES 3.2 V@313.0 (GIT@7bf2852, Ie32bfa6f6f)“,
  * “manufacturer”: “Google”
  * }
+ * </p>
  */
 @SuppressLint("ParcelCreator")
 class PerformanceEvent extends MapBaseEvent {
