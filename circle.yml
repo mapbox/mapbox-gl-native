@@ -922,6 +922,12 @@ jobs:
       - build-ios-test
       - check-public-symbols
       - run:
+          name: Upload coverage results to codecov.io
+          command: |
+            curl -sSfL -o codecov https://codecov.io/bash 
+            chmod +x codecov
+            ./codecov -F ios -J 'CI' -c
+      - run:
           name: Check symbol namespacing for mapbox-events-ios
           command: make ios-check-events-symbols
       - run:

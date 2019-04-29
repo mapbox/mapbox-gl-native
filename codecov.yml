@@ -1,9 +1,23 @@
 ignore:
   - "test/"
   - "vendor/"
-
+#  - "platform/ios/test"
+  - "platform/ios/vendor"
+  - "platform/darwin/test/"
+  - "platform/darwin/include"
+  - "platform/darwin/docs"
+  - "platform/ios/app"
+  - "platform/ios/resources"
+  - "platform/ios/scripts"
+flags:
+  ios:
+    paths:
+      - "platform/darwin/" - "platform/ios/"
 coverage:
   status:
     project:
       default:
+        threshold: 1%
+      ios:
+        flags: ios
         threshold: 1%
