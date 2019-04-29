@@ -50,5 +50,6 @@
   "EspressoTestActivity",
   "FragmentBackStackActivity",
   "ChildFragmentMapInDialogActivity",
-  "PerformanceMeasurementActivity"
+  "PerformanceMeasurementActivity",
+  "DownloadRegionActivity"
 ]

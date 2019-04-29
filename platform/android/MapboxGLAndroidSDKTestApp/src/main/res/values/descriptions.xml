@@ -18,6 +18,7 @@
     <string name="description_map_padding">Map Padding example</string>
     <string name="description_debug_mode">Debug Mode</string>
     <string name="description_offline">Offline Map example</string>
+    <string name="description_region">Download an offline region.</string>
     <string name="description_update_metadata">Update metadata example</string>
     <string name="description_offline_region_delete">Delete region example</string>
     <string name="description_change_resources_cache_path">Change resources cache path example</string>
