@@ -925,6 +925,10 @@ jobs:
           name: Check symbol namespacing for mapbox-events-ios
           command: make ios-check-events-symbols
       - run:
+          name: Get iOS code coverage
+          command: |
+              platform/ios/scripts/ios-code-coverage.sh CI
+      - run:
           name: Lint plist files
           command: make ios-lint
       - run:
@@ -1022,11 +1026,6 @@ jobs:
           name: Build dynamic framework for device and simulator
           command: make iframework
           no_output_timeout: 5m
-      - build-ios-test
-      - run:
-          name: Get iOS code coverage
-          command: |
-              platform/ios/scripts/ios-code-coverage.sh CI
       - deploy:
           name: Upload snapshot build to s3
           command: |
