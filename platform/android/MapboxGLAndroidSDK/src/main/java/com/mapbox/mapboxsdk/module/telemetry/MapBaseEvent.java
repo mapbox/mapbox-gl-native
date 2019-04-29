@@ -9,7 +9,7 @@ import com.mapbox.android.telemetry.Event;
  * Base event class for telemetry events.
  */
 @SuppressLint("ParcelCreator")
-public abstract class MapBaseEvent extends Event {
+abstract class MapBaseEvent extends Event {
   private final String event;
   private final String created;
 
@@ -20,11 +20,11 @@ public abstract class MapBaseEvent extends Event {
 
   abstract String getEventName();
 
-  public String getEvent() {
+  String getEvent() {
     return event;
   }
 
-  public String getCreated() {
+  String getCreated() {
     return created;
   }
 

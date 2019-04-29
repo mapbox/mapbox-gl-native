@@ -115,6 +115,7 @@ public class TelemetryImpl implements TelemetryDefinition {
     if (data == null) {
       data = new Bundle();
     }
-    telemetry.push(new PerformanceEvent(UUID.randomUUID().toString(), data));
+    telemetry.push(MapEventFactory.buildPerformanceEvent(new PhoneState(appContext),
+      UUID.randomUUID().toString(), data));
   }
 }
