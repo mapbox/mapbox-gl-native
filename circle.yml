@@ -963,10 +963,6 @@ jobs:
       - run:
           name: Build and run SDK unit tests with thread and undefined behavior sanitizers
           command: make ios-sanitize
-      - run:
-          name: Get iOS code coverage
-          command: |
-              platform/ios/scripts/ios-code-coverage.sh CI
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1026,6 +1022,11 @@ jobs:
           name: Build dynamic framework for device and simulator
           command: make iframework
           no_output_timeout: 5m
+      - build-ios-test
+      - run:
+          name: Get iOS code coverage
+          command: |
+              platform/ios/scripts/ios-code-coverage.sh CI
       - deploy:
           name: Upload snapshot build to s3
           command: |

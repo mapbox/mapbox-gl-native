@@ -21,12 +21,14 @@ circle_sha=""
 if [[ $CIRCLE_SHA1 ]]; then
     circle_sha="$CIRCLE_SHA1"
 fi
-# Create a formatted JSON file that contains the current coverage.
 
+commit_message= git log --format=oneline -n 1 $CIRCLE_SHA1
+echo $commit_message
+# Create a formatted JSON file that contains the current coverage.
 current_date=$(TZ=UTC date +"%FT%T%z")
 file_name=$2_coverage.json
 cat <<EOF > $file_name
-{"code_coverage":$1,"platform":"$2","sdk":"Maps","scheme":"$3","created_at":"$current_date","sha":"$circle_sha"}
+{"code_coverage":$1,"branch":"$CIRCLE_BRANCH","commit_message":"$commit_message",platform":"$2","sdk":"Maps","scheme":"$3","created_at":"$current_date","sha":"$circle_sha"}
 EOF
 gzip -f $file_name
 
@@ -35,4 +37,3 @@ if [ -z `which aws` ]; then
 fi
 
 aws s3 cp $file_name.gz s3://mapbox-loading-dock/raw/mobile.codecoverage/$current_date/
-echo $
