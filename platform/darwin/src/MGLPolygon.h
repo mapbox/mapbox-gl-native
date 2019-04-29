@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  `-[MGLMapView addAnnotation:]` or `-[MGLMapView addOverlay:]` method. Configure
  a polygon overlay’s appearance using
  `-[MGLMapViewDelegate mapView:strokeColorForShapeAnnotation:]` and
- `-[MGLMapViewDelegate mapView:fillColorForPolygonAnnotation:]`.
+ `-[MGLMapViewDelegate mapView:fillColorForShape:]`.
 
  The vertices are automatically connected in the order in which you provide
  them. You should close the polygon by specifying the same
@@ -44,6 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  To make the polygon straddle the antimeridian, specify some longitudes less
  than −180 degrees or greater than 180 degrees.
+ 
+ To approximate a circle that corresponds to a physical radius, use an
+ `MGLCircle` object.
  
  #### Related examples
  See the <a href="https://docs.mapbox.com/ios/maps/examples/polygon/">

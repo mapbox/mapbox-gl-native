@@ -54,6 +54,8 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
     func mapView(_ mapView: MGLMapView, strokeColorForShapeAnnotation annotation: MGLShape) -> NSColor { return .black }
 
     func mapView(_ mapView: MGLMapView, fillColorForPolygonAnnotation annotation: MGLPolygon) -> NSColor { return .black }
+    
+    func mapView(_ mapView: MGLMapView, fillColorFor shape: MGLShape) -> NSColor { return .black }
 
     func mapView(_ mapView: MGLMapView, calloutViewControllerFor annotation: MGLAnnotation) -> NSViewController? { return nil }
 

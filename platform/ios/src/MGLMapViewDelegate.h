@@ -1,11 +1,19 @@
 #import <UIKit/UIKit.h>
 
-#import "Mapbox.h"
 #import "MGLCameraChangeReason.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol MGLAnnotation;
+@protocol MGLCalloutView;
+@class MGLAnnotationImage;
+@class MGLAnnotationView;
+@class MGLCircle;
+@class MGLMapCamera;
 @class MGLMapView;
+@class MGLPolygon;
+@class MGLPolyline;
+@class MGLShape;
 
 /**
  The `MGLMapViewDelegate` protocol defines a set of optional methods that you
@@ -422,25 +430,25 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (UIColor *)mapView:(MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation;
 
-/**
- Returns the color to use when rendering the fill of a polygon annotation.
+- (UIColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation __attribute__((deprecated("", "-mapView:fillColorForShape:")));
 
- The default fill color is the map view’s tint color. If a pattern color is
+/**
+ Returns the color to use when rendering the fill of a shape annotation.
+
+ This method is only called for `MGLPolygon` and `MGLCircle` annotations. It is
+ not possible to fill a polyline or point annotation.
+
+ The default fill color is the selected menu item color. If a pattern color is
  specified, the result is undefined.
 
  Opacity may be set by specifying an alpha component. The default alpha value is
  `1.0` and results in a completely opaque shape.
 
  @param mapView The map view rendering the polygon annotation.
- @param annotation The annotation being rendered.
- @return The polygon’s interior fill color.
-
- #### Related examples
- See the <a href="https://docs.mapbox.com/ios/maps/examples/polygon/">Add
- a polygon annotation</a> example to learn how to modify the color of a an
- `MGLPolygon` at runtime.
+ @param shape The annotation being rendered.
+ @return The shape’s fill color.
  */
-- (UIColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
+- (UIColor *)mapView:(MGLMapView *)mapView fillColorForShape:(MGLShape *)shape;
 
 /**
  Returns the line width in points to use when rendering the outline of a

@@ -112,10 +112,20 @@ NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinateFromLocationCoordinate(CLLoca
                                      MGLRadiansFromDegrees(locationCoordinate.longitude));
 }
 
+NS_INLINE CLLocationCoordinate2D MGLLocationCoordinateFromRadianCoordinate(MGLRadianCoordinate2D radianCoordinate) {
+    return CLLocationCoordinate2DMake(MGLDegreesFromRadians(radianCoordinate.latitude),
+                                      MGLDegreesFromRadians(radianCoordinate.longitude));
+}
+
 /**
  Returns the distance in radians given two coordinates.
  */
 MGLRadianDistance MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to);
+
+/**
+ Returns the distance given two coordinates.
+ */
+CLLocationDistance MGLDistanceBetweenLocationCoordinates(CLLocationCoordinate2D from, CLLocationCoordinate2D to);
 
 /**
  Returns direction in radians given two coordinates.
@@ -128,6 +138,10 @@ MGLRadianDirection MGLRadianCoordinatesDirection(MGLRadianCoordinate2D from, MGL
 MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGLRadianCoordinate2D coordinate,
                                                                    MGLRadianDistance distance,
                                                                    MGLRadianDirection direction);
+
+CLLocationCoordinate2D MGLCoordinateAtDistanceFacingDirection(CLLocationCoordinate2D coordinate,
+                                                              CLLocationDistance distance,
+                                                              CLLocationDirection direction);
 
 /**
  Returns the direction from one coordinate to another.

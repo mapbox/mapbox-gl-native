@@ -41,6 +41,7 @@ custom_categories:
       - MGLMultiPoint
       - MGLPointAnnotation
       - MGLPointCollection
+      - MGLCircle
       - MGLPolygon
       - MGLPolyline
       - MGLMultiPolygon

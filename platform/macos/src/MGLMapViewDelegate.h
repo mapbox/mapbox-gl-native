@@ -6,6 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLAnnotationImage;
 @class MGLPolygon;
 @class MGLPolyline;
+@class MGLCircle;
 @class MGLShape;
 
 /**
@@ -227,20 +228,25 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSColor *)mapView:(MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation;
 
-/**
- Returns the color to use when rendering the fill of a polygon annotation.
+- (NSColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation __attribute__((deprecated("", "-mapView:fillColorForShape:")));
 
+/**
+ Returns the color to use when rendering the fill of a shape annotation.
+
+ This method is only called for `MGLPolygon` and `MGLCircle` annotations. It is
+ not possible to fill a polyline or point annotation.
+ 
  The default fill color is the selected menu item color. If a pattern color is
  specified, the result is undefined.
 
  Opacity may be set by specifying an alpha component. The default alpha value is
  `1.0` and results in a completely opaque shape.
 
- @param mapView The map view rendering the polygon annotation.
- @param annotation The annotation being rendered.
- @return The polygon’s interior fill color.
+ @param mapView The map view rendering the shape annotation.
+ @param shape The annotation being rendered.
+ @return The shape’s fill color.
  */
-- (NSColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
+- (NSColor *)mapView:(MGLMapView *)mapView fillColorForShape:(MGLShape *)shape;
 
 /**
  Returns the line width in points to use when rendering the outline of a

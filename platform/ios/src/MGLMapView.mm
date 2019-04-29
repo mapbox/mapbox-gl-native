@@ -38,6 +38,7 @@
 #import "MGLFeature_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
+#import "MGLCircle_Private.h"
 #import "MGLOfflineStorage_Private.h"
 #import "MGLVectorTileSource_Private.h"
 #import "MGLFoundation_Private.h"
@@ -317,6 +318,7 @@ public:
 
     BOOL _delegateHasAlphasForShapeAnnotations;
     BOOL _delegateHasStrokeColorsForShapeAnnotations;
+    BOOL _delegateHasFillColorsForPolygonAnnotations;
     BOOL _delegateHasFillColorsForShapeAnnotations;
     BOOL _delegateHasLineWidthsForShapeAnnotations;
 
@@ -826,7 +828,8 @@ public:
 
     _delegateHasAlphasForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:alphaForShapeAnnotation:)];
     _delegateHasStrokeColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];
-    _delegateHasFillColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
+    _delegateHasFillColorsForPolygonAnnotations = [_delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
+    _delegateHasFillColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:fillColorForShape:)];
     _delegateHasLineWidthsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
 }
 
@@ -2557,7 +2560,7 @@ public:
             [MGLMapboxEvents ensureMetricsOptoutExists];
         }
     }
-    else if ([keyPath isEqualToString:@"coordinate"] && [object conformsToProtocol:@protocol(MGLAnnotation)] && ![object isKindOfClass:[MGLMultiPoint class]])
+    else if ([keyPath isEqualToString:@"coordinate"] && [object conformsToProtocol:@protocol(MGLAnnotation)] && ![object isKindOfClass:[MGLMultiPoint class]] && ![object isKindOfClass:[MGLCircle class]])
     {
         id <MGLAnnotation> annotation = object;
         MGLAnnotationTag annotationTag = (MGLAnnotationTag)(NSUInteger)context;
@@ -2588,7 +2591,8 @@ public:
             }
         }
     }
-    else if ([keyPath isEqualToString:@"coordinates"] && [object isKindOfClass:[MGLMultiPoint class]])
+    else if (([keyPath isEqualToString:@"coordinates"] && [object isKindOfClass:[MGLMultiPoint class]]) ||
+             (([keyPath isEqualToString:@"coordinate"] || [keyPath isEqualToString:@"radius"]) && [object isKindOfClass:[MGLCircle class]]))
     {
         MGLMultiPoint *annotation = object;
         MGLAnnotationTag annotationTag = (MGLAnnotationTag)(NSUInteger)context;
@@ -4222,6 +4226,21 @@ public:
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
         }
+        else if ([annotation isKindOfClass:[MGLCircle class]])
+        {
+            // The circle knows how to style itself (with the map view’s help).
+            MGLCircle *circle = (MGLCircle *)annotation;
+            
+            _isChangingAnnotationLayers = YES;
+            MGLAnnotationTag annotationTag = _mbglMap->addAnnotation([circle annotationObjectWithDelegate:self]);
+            MGLAnnotationContext context;
+            context.annotation = annotation;
+            _annotationContextsByAnnotationTag[annotationTag] = context;
+            _annotationTagsByAnnotation[annotation] = annotationTag;
+            
+            [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
+            [(NSObject *)annotation addObserver:self forKeyPath:@"radius" options:0 context:(void *)(NSUInteger)annotationTag];
+        }
         else if ( ! [annotation isKindOfClass:[MGLMultiPolyline class]]
                  && ![annotation isKindOfClass:[MGLMultiPolygon class]]
                  && ![annotation isKindOfClass:[MGLShapeCollection class]]
@@ -4439,11 +4458,26 @@ public:
     return color.mgl_color;
 }
 
-- (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation
+- (mbgl::Color)fillColorForShape:(MGLShape *)shape
 {
-    UIColor *color = (_delegateHasFillColorsForShapeAnnotations
-                      ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
-                      : self.tintColor);
+    UIColor *color = self.tintColor;
+    if (_delegateHasFillColorsForShapeAnnotations)
+    {
+        color = [self.delegate mapView:self fillColorForShape:shape];
+    }
+    else if (_delegateHasFillColorsForPolygonAnnotations && [shape isKindOfClass:[MGLPolygon class]])
+    {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            NSLog(@"-[MGLMapViewDelegate mapView:fillColorForPolygonAnnotation:] is deprecated; "
+                  @"use -[MGLMapViewDelegate mapView:fillColorForShape:] instead."
+                  @"This warning will only appear once.");
+        });
+        color = [self.delegate mapView:self fillColorForPolygonAnnotation:(MGLPolygon *)shape];
+#pragma clang diagnostic pop
+    }
     return color.mgl_color;
 }
 
@@ -4534,6 +4568,10 @@ public:
         else if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
             [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinates" context:(void *)(NSUInteger)annotationTag];
+        }
+        if ([annotation isKindOfClass:[MGLCircle class]])
+        {
+            [(NSObject *)annotation removeObserver:self forKeyPath:@"radius" context:(void *)(NSUInteger)annotationTag];
         }
 
         _isChangingAnnotationLayers = YES;
@@ -5285,6 +5323,10 @@ public:
         if ([annotation conformsToProtocol:@protocol(MGLOverlay)])
         {
             bounds.extend(MGLLatLngBoundsFromCoordinateBounds(((id <MGLOverlay>)annotation).overlayBounds));
+        }
+        else if ([annotation isKindOfClass:[MGLCircle class]])
+        {
+            bounds.extend(MGLLatLngBoundsFromCoordinateBounds(((MGLCircle *)annotation).coordinateBounds));
         }
         else
         {

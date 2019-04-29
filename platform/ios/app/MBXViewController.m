@@ -2128,9 +2128,13 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     return [color colorWithAlphaComponent:0.9];
 }
 
-- (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForPolygonAnnotation:(__unused MGLPolygon *)annotation
+- (UIColor *)mapView:(__unused MGLMapView *)mapView fillColorForShape:(MGLShape *)shape
 {
-    UIColor *color = annotation.pointCount > 3 ? [UIColor greenColor] : [UIColor redColor];
+    UIColor *color = [UIColor redColor];
+    if ([shape isKindOfClass:[MGLPolygon class]] && [(MGLPolygon *)shape pointCount] > 3)
+    {
+        color = [UIColor greenColor];
+    }
     return [color colorWithAlphaComponent:0.5];
 }
 

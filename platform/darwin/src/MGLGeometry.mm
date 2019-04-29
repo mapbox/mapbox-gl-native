@@ -3,6 +3,7 @@
 #import "MGLFoundation.h"
 
 #import <mbgl/util/projection.hpp>
+#import <mbgl/util/constants.hpp>
 
 #if !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
 #import <Cocoa/Cocoa.h>
@@ -67,6 +68,12 @@ MGLRadianDistance MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinate2D from
     return 2 * atan2(sqrt(a), sqrt(1 - a));
 }
 
+CLLocationDistance MGLDistanceBetweenLocationCoordinates(CLLocationCoordinate2D from, CLLocationCoordinate2D to) {
+    MGLRadianDistance radianDistance = MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinateFromLocationCoordinate(from),
+                                                                           MGLRadianCoordinateFromLocationCoordinate(to));
+    return radianDistance * mbgl::util::EARTH_RADIUS_M;
+}
+
 MGLRadianDirection MGLRadianCoordinatesDirection(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to) {
     double a = sin(to.longitude - from.longitude) * cos(to.latitude);
     double b = cos(from.latitude) * sin(to.latitude)
@@ -82,6 +89,16 @@ MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGLRadianCoor
     double otherLongitude = coordinate.longitude + atan2(sin(direction) * sin(distance) * cos(coordinate.latitude),
                                                          cos(distance) - sin(coordinate.latitude) * sin(otherLatitude));
     return MGLRadianCoordinate2DMake(otherLatitude, otherLongitude);
+}
+
+CLLocationCoordinate2D MGLCoordinateAtDistanceFacingDirection(CLLocationCoordinate2D coordinate,
+                                                              CLLocationDistance distance,
+                                                              CLLocationDirection direction) {
+    MGLRadianCoordinate2D radianCenter = MGLRadianCoordinateFromLocationCoordinate(coordinate);
+    MGLRadianCoordinate2D radianVertex = MGLRadianCoordinateAtDistanceFacingDirection(radianCenter,
+                                                                                      distance / mbgl::util::EARTH_RADIUS_M,
+                                                                                      MGLRadiansFromDegrees(direction));
+    return MGLLocationCoordinateFromRadianCoordinate(radianVertex);
 }
 
 CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstCoordinate, CLLocationCoordinate2D secondCoordinate) {

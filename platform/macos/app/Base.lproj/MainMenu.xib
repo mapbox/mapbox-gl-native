@@ -542,9 +542,9 @@
                                     <action selector="dropManyPins:" target="-1" id="Rtv-8N-3Z8"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Add Polygon and Polyline" keyEquivalent="l" id="DVr-vT-lpe">
+                            <menuItem title="Simulate Nightfall" keyEquivalent="l" id="DVr-vT-lpe">
                                 <connections>
-                                    <action selector="drawPolygonAndPolyLineAnnotations:" target="-1" id="EhT-CB-gee"/>
+                                    <action selector="addNightAndLighthouse:" target="-1" id="EhT-CB-gee"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Add Animated Annotation" id="Etf-JN-Aoc">

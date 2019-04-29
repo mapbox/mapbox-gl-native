@@ -69,8 +69,8 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  
  A circle style layer renders circles whose radii are measured in screen units.
  To display circles on the map whose radii correspond to real-world distances,
- use many-sided regular polygons and configure their appearance using an
- `MGLFillStyleLayer` object.
+ use `MGLCircle` or many-sided regular `MGLPolygon` objects and configure their
+ appearance using an `MGLFillStyleLayer` object.
 
  You can access an existing circle style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;

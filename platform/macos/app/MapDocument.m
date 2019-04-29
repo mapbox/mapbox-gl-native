@@ -99,7 +99,7 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
     BOOL _showsToolTipsOnDroppedPins;
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
-    BOOL _isShowingPolygonAndPolylineAnnotations;
+    BOOL _isShowingNightAndLighthouse;
     BOOL _isShowingAnimatedAnnotation;
 
     MGLMapSnapshotter *_snapshotter;
@@ -627,7 +627,7 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
 
 - (IBAction)removeAllAnnotations:(id)sender {
     [self.mapView removeAnnotations:self.mapView.annotations];
-    _isShowingPolygonAndPolylineAnnotations = NO;
+    _isShowingNightAndLighthouse = NO;
     _isShowingAnimatedAnnotation = NO;
 }
 
@@ -673,33 +673,55 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
     self.mapView.camera = self.mapView.camera;
 }
 
-- (IBAction)drawPolygonAndPolyLineAnnotations:(id)sender {
+- (IBAction)addNightAndLighthouse:(id)sender {
 
-    if (_isShowingPolygonAndPolylineAnnotations) {
-        [self removeAllAnnotations:sender];
+    if (_isShowingNightAndLighthouse) {
         return;
     }
 
-    _isShowingPolygonAndPolylineAnnotations = YES;
+    _isShowingNightAndLighthouse = YES;
 
-    // Pacific Northwest triangle
-    CLLocationCoordinate2D triangleCoordinates[3] = {
-        CLLocationCoordinate2DMake(44, -122),
-        CLLocationCoordinate2DMake(46, -122),
-        CLLocationCoordinate2DMake(46, -121)
+    // Daylight map, produced by multiple spherical caps simulating night
+    // https://en.wikipedia.org/wiki/Twilight
+    CLLocationDistance nightRadius = M_PI_2 * 6378137.0;
+    CLLocationDistance nightCapRadii[] = {
+        nightRadius, // civil twilight
+        nightRadius * (1.0 - 18.0 / 180 * 2), // nautical twilight
+        nightRadius * (1.0 - 12.0 / 180 * 2), // astronomical twilight
+        nightRadius * (1.0 - 6.0 / 180 * 2), // night
     };
-    MGLPolygon *triangle = [MGLPolygon polygonWithCoordinates:triangleCoordinates count:3];
-    [self.mapView addAnnotation:triangle];
+    NSMutableArray *nightCaps = [NSMutableArray array];
+    for (size_t i = 0; i < sizeof(nightCapRadii) / sizeof(nightCapRadii[0]); i++) {
+        MGLCircle *cap = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(23.5, 0)
+                                                        radius:nightCapRadii[i]];
+        cap.title = @"Night";
+        [nightCaps addObject:cap];
+    }
+    [self.mapView addAnnotations:nightCaps];
+    
+    // Concentric circles around Boston Light
+    // https://en.wikipedia.org/wiki/Boston_Light
+    CLLocationCoordinate2D epicenter = CLLocationCoordinate2DMake(42.32792025, -70.8901050288306);
+    NSMutableArray *concentricCircles = [NSMutableArray array];
+    for (NSUInteger magnitude = 0; magnitude < 8; magnitude++) {
+        CLLocationDistance radius = exp(magnitude);
+        MGLCircle *circle = [MGLCircle circleWithCenterCoordinate:epicenter radius:radius];
+        [concentricCircles addObject:circle];
+    }
+    [self.mapView addAnnotations:concentricCircles];
+    [self.mapView showAnnotations:@[concentricCircles[5]] animated:NO];
 
-    // West coast line
-    CLLocationCoordinate2D lineCoordinates[4] = {
-        CLLocationCoordinate2DMake(47.6025, -122.3327),
-        CLLocationCoordinate2DMake(45.5189, -122.6726),
-        CLLocationCoordinate2DMake(37.7790, -122.4177),
-        CLLocationCoordinate2DMake(34.0532, -118.2349)
-    };
-    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:4];
-    [self.mapView addAnnotation:line];
+    __block NSUInteger stepCount = 0;
+    [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+        // Pulse each circle for a minute.
+        [concentricCircles enumerateObjectsUsingBlock:^(MGLCircle * _Nonnull circle, NSUInteger magnitude, BOOL * _Nonnull stop) {
+            circle.radius = exp(magnitude) + exp(magnitude - 1) * sin(M_PI / 10 * stepCount);
+        }];
+
+        if (++stepCount >= 60) {
+            [timer invalidate];
+        }
+    }];
 }
 
 - (IBAction)drawAnimatedAnnotation:(id)sender {
@@ -1249,8 +1271,8 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
     if (menuItem.action == @selector(dropManyPins:)) {
         return YES;
     }
-    if (menuItem.action == @selector(drawPolygonAndPolyLineAnnotations:)) {
-        return !_isShowingPolygonAndPolylineAnnotations;
+    if (menuItem.action == @selector(addNightAndLighthouse:)) {
+        return !_isShowingNightAndLighthouse;
     }
     if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
         return !_isShowingAnimatedAnnotation;
@@ -1442,7 +1464,11 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
 }
 
 - (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation {
-    return 0.8;
+    return [annotation isKindOfClass:[MGLCircle class]] ? 0.1 : 0.8;
+}
+
+- (NSColor *)mapView:(MGLMapView *)mapView fillColorForShape:(MGLShape *)shape {
+    return shape.title ? [NSColor blackColor] : [NSColor whiteColor];
 }
 
 #pragma mark - MGLComputedShapeSourceDataSource

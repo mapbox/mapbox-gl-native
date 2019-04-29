@@ -20,6 +20,8 @@
 
 ### Annotations
 
+* Added the `MGLCircle` class for adding physical circles to the map view as overlays or to a shape source as polygons. ([#14534](https://github.com/mapbox/mapbox-gl-native/pull/14534))
+* Deprecated the `-[MGLMapViewDelegate mapView:fillColorForPolygonAnnotation:]` method in favor of `-[MGLMapViewDelegate mapView:fillColorForShape:]`, which is also called for `MGLCircle` annotations. ([#14534](https://github.com/mapbox/mapbox-gl-native/pull/14534))
 * Fixed a bug with `MGLMapView.visibleAnnotations` that resulted in incorrect results and performance degradation. ([#13745](https://github.com/mapbox/mapbox-gl-native/pull/13745))
 * Fixed a bug where selecting partially on-screen annotations (without a callout) would move the map. ([#13727](https://github.com/mapbox/mapbox-gl-native/pull/13727))
 

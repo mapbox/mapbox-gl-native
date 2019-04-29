@@ -2,6 +2,7 @@
 #import <XCTest/XCTest.h>
 
 #import "../../darwin/src/MGLGeometry_Private.h"
+#import "../../darwin/src/MGLCircle_Private.h"
 
 @interface MGLGeometryTests : XCTestCase
 @end
@@ -205,6 +206,73 @@
     {
         CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(-91, -361);
         XCTAssertFalse(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+}
+
+- (void)testCircles {
+    {
+        MGLCircle *circle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(0, 0) radius:0];
+        XCTAssertEqual(circle.coordinate.latitude, 0);
+        XCTAssertEqual(circle.coordinate.longitude, 0);
+        XCTAssertEqual(circle.radius, 0);
+        XCTAssertEqual(circle.numberOfVertices, 0ul);
+        XCTAssertEqual([circle linearRingWithNumberOfVertices:0].size(), 0ul);
+    }
+    {
+        MGLCircle *positiveCircle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(0, 0) radius:10];
+        XCTAssertEqual(positiveCircle.radius, 10);
+        MGLCircle *negativeCircle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(0, 0) radius:-10];
+        XCTAssertEqual(negativeCircle.radius, -10);
+        XCTAssertEqual(positiveCircle.numberOfVertices, negativeCircle.numberOfVertices);
+    }
+    {
+        MGLCircle *bigCircle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(0, 0) radius:1000];
+        XCTAssertEqual(bigCircle.radius, 1000);
+        XCTAssertEqual(bigCircle.numberOfVertices, 5261ul);
+        MGLCircle *biggerCircle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(0, 0) radius:10000];
+        XCTAssertEqual(biggerCircle.radius, 10000);
+        XCTAssertEqual(biggerCircle.numberOfVertices, 21600ul);
+    }
+    {
+        MGLCoordinateBounds bounds = MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(0, 0));
+        MGLCircle *circle = [MGLCircle circleWithCoordinateBounds:bounds];
+        XCTAssertEqual(circle.coordinate.latitude, 0);
+        XCTAssertEqual(circle.coordinate.longitude, 0);
+        XCTAssertEqual(circle.radius, 0);
+    }
+    {
+        MGLCoordinateBounds bounds = MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(0, 0), CLLocationCoordinate2DMake(1, 0));
+        MGLCircle *circle = [MGLCircle circleWithCoordinateBounds:bounds];
+        XCTAssertEqual(circle.coordinate.latitude, 0.5);
+        XCTAssertEqual(circle.coordinate.longitude, 0);
+        XCTAssertGreaterThan(circle.radius, 0);
+        MGLCoordinateSpan span = MGLCoordinateBoundsGetCoordinateSpan(circle.coordinateBounds);
+        XCTAssertGreaterThan(span.latitudeDelta, 0);
+        XCTAssertGreaterThan(span.longitudeDelta, 0);
+    }
+    const CLLocationDistance earthRadius = 6378137.0;
+    {
+        MGLCircle *circle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(0, 0) radius:M_PI_2 * earthRadius];
+        XCTAssertEqual(circle.coordinate.latitude, 0);
+        XCTAssertEqual(circle.coordinate.longitude, 0);
+        XCTAssertEqual(circle.radius, M_PI_2 * earthRadius);
+        XCTAssertEqual([circle linearRingWithNumberOfVertices:128].size(), 128ul);
+    }
+    {
+        MGLCircle *circle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(23.5, 0) radius:M_PI_2 * earthRadius];
+        XCTAssertEqual(circle.coordinate.latitude, 23.5);
+        XCTAssertEqual(circle.coordinate.longitude, 0);
+        XCTAssertEqual(circle.radius, M_PI_2 * earthRadius);
+        XCTAssertEqual([circle linearRingWithNumberOfVertices:128].size(), 128ul + 3,
+                       @"Polar cap should have extra vertices to cover North Pole.");
+    }
+    {
+        MGLCircle *circle = [MGLCircle circleWithCenterCoordinate:CLLocationCoordinate2DMake(-23.5, 20) radius:M_PI_2 * earthRadius];
+        XCTAssertEqual(circle.coordinate.latitude, -23.5);
+        XCTAssertEqual(circle.coordinate.longitude, 20);
+        XCTAssertEqual(circle.radius, M_PI_2 * earthRadius);
+        XCTAssertEqual([circle linearRingWithNumberOfVertices:128].size(), 128ul + 3,
+                       @"Polar cap should have extra vertices to cover South Pole.");
     }
 }
 

@@ -516,6 +516,12 @@
 		DA35A2CB1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C81CCAAAD200E826B2 /* NSValue+MGLAdditions.m */; };
 		DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C81CCAAAD200E826B2 /* NSValue+MGLAdditions.m */; };
 		DA35D0881E1A6309007DED41 /* one-liner.json in Resources */ = {isa = PBXBuildFile; fileRef = DA35D0871E1A6309007DED41 /* one-liner.json */; };
+		DA44897E2270FFC5005B8357 /* MGLCircle.h in Headers */ = {isa = PBXBuildFile; fileRef = DA44897C2270FFC5005B8357 /* MGLCircle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA44897F2270FFC5005B8357 /* MGLCircle.h in Headers */ = {isa = PBXBuildFile; fileRef = DA44897C2270FFC5005B8357 /* MGLCircle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA4489802270FFC5005B8357 /* MGLCircle.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA44897D2270FFC5005B8357 /* MGLCircle.mm */; };
+		DA4489812270FFC5005B8357 /* MGLCircle.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA44897D2270FFC5005B8357 /* MGLCircle.mm */; };
+		DA448989227311C5005B8357 /* MGLCircle_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA448988227311C5005B8357 /* MGLCircle_Private.h */; };
+		DA44898A227311C5005B8357 /* MGLCircle_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA448988227311C5005B8357 /* MGLCircle_Private.h */; };
 		DA5DB12A1FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA5DB1291FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m */; };
 		DA6408DB1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA6408D91DA4E7D300908C90 /* MGLVectorStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA6408DC1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA6408D91DA4E7D300908C90 /* MGLVectorStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1173,6 +1179,9 @@
 		DA35A2D11CCAB25200E826B2 /* jazzy.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = jazzy.yml; sourceTree = "<group>"; };
 		DA35D0871E1A6309007DED41 /* one-liner.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "one-liner.json"; path = "../../darwin/test/one-liner.json"; sourceTree = "<group>"; };
 		DA3C6FF21E2859E700F962BE /* test-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "test-Bridging-Header.h"; path = "../../darwin/test/test-Bridging-Header.h"; sourceTree = "<group>"; };
+		DA44897C2270FFC5005B8357 /* MGLCircle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLCircle.h; sourceTree = "<group>"; };
+		DA44897D2270FFC5005B8357 /* MGLCircle.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCircle.mm; sourceTree = "<group>"; };
+		DA448988227311C5005B8357 /* MGLCircle_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCircle_Private.h; sourceTree = "<group>"; };
 		DA4A26961CB6E795000B7809 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA57D4AA1EBA8ED300793288 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DA57D4AB1EBA909900793288 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = lt; path = lt.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -2151,6 +2160,9 @@
 			children = (
 				CA65C4F721E9BB080068B0D4 /* MGLCluster.h */,
 				DA8847E01CBAFA5100AB86E3 /* MGLAnnotation.h */,
+				DA448988227311C5005B8357 /* MGLCircle_Private.h */,
+				DA44897C2270FFC5005B8357 /* MGLCircle.h */,
+				DA44897D2270FFC5005B8357 /* MGLCircle.mm */,
 				DAD1656A1CF41981001FF4B9 /* MGLFeature_Private.h */,
 				DAD165691CF41981001FF4B9 /* MGLFeature.h */,
 				DAD1656B1CF41981001FF4B9 /* MGLFeature.mm */,
@@ -2314,6 +2326,7 @@
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */,
+				DA44897E2270FFC5005B8357 /* MGLCircle.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
@@ -2373,6 +2386,7 @@
 				74CB5ED1219B286400102936 /* MGLSymbolStyleLayer_Private.h in Headers */,
 				9221BAAD2069843A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h in Headers */,
 				96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */,
+				DA448989227311C5005B8357 /* MGLCircle_Private.h in Headers */,
 				408AA8571DAEDA1700022900 /* NSDictionary+MGLAdditions.h in Headers */,
 				DA88483F1CBAFB8500AB86E3 /* MGLUserLocation.h in Headers */,
 				558DE7A01E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
@@ -2480,6 +2494,7 @@
 				DA35A2CA1CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				350098BC1D480108004B2AF0 /* MGLVectorTileSource.h in Headers */,
 				FA68F14B1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */,
+				DA44897F2270FFC5005B8357 /* MGLCircle.h in Headers */,
 				96E516DE200054F700A02306 /* MGLGeometry_Private.h in Headers */,
 				353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
 				3566C76D1D4A8DFA008152BC /* MGLRasterTileSource.h in Headers */,
@@ -2573,6 +2588,7 @@
 				353933F31D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
 				96E516F820005A3000A02306 /* MGLCompactCalloutView.h in Headers */,
+				DA44898A227311C5005B8357 /* MGLCircle_Private.h in Headers */,
 				96E516E22000551900A02306 /* MGLPointCollection_Private.h in Headers */,
 				3538AA1E1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
 				30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */,
@@ -3148,6 +3164,7 @@
 				96036A03200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
 				ACA65F592140697200537748 /* MMEDispatchManager.m in Sources */,
 				40834BF31FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
+				DA4489802270FFC5005B8357 /* MGLCircle.mm in Sources */,
 				35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				3538AA1F1D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				AC1B0918221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.m in Sources */,
@@ -3272,6 +3289,7 @@
 				ACA65F5A2140697200537748 /* MMEDispatchManager.m in Sources */,
 				3538AA201D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				DA00FC911D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
+				DA4489812270FFC5005B8357 /* MGLCircle.mm in Sources */,
 				40834C051FE05E1800C1BD0D /* MMEDate.m in Sources */,
 				AC1B0919221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.m in Sources */,
 				40834BFA1FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */,

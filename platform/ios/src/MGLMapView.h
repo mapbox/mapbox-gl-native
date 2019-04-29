@@ -11,8 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLAnnotationView;
 @class MGLAnnotationImage;
 @class MGLUserLocation;
-@class MGLPolyline;
-@class MGLPolygon;
 @class MGLShape;
 @class MGLStyle;
 
