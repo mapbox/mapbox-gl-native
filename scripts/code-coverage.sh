@@ -28,7 +28,7 @@ echo $commit_message
 current_date=$(TZ=UTC date +"%FT%T%z")
 file_name=$2_coverage.json
 cat <<EOF > $file_name
-{"code_coverage":$1,"branch":"$CIRCLE_BRANCH","commit_message":"$commit_message",platform":"$2","sdk":"Maps","scheme":"$3","created_at":"$current_date","sha":"$circle_sha"}
+{"code_coverage":$1,"branch":"$CIRCLE_BRANCH","commit_message":"$commit_message","platform":"$2","sdk":"Maps","scheme":"$3","created_at":"$current_date","sha":"$circle_sha"}
 EOF
 gzip -f $file_name
 
