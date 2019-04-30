@@ -245,44 +245,17 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     [self restoreState:nil];
 
-    self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
-    self.mapView.showsScale = YES;
-    self.mapView.showsUserHeadingIndicator = YES;
-    self.mapView.experimental_enableFrameRateMeasurement = YES;
-    self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
-
     if ([MGLAccountManager accessToken].length)
     {
         self.styleIndex = -1;
         [self cycleStyles:self];
     }
-    else
-    {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Access Token" message:@"Enter your Mapbox access token to load Mapbox-hosted tiles and styles:" preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField)
-         {
-             textField.keyboardType = UIKeyboardTypeURL;
-             textField.autocorrectionType = UITextAutocorrectionTypeNo;
-             textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-         }];
 
-        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
-        {
-            UITextField *textField = alertController.textFields.firstObject;
-            NSString *accessToken = textField.text;
-            [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:MBXMapboxAccessTokenDefaultsKey];
-            [MGLAccountManager setAccessToken:accessToken];
-
-            self.styleIndex = -1;
-            [self cycleStyles:self];
-            [self.mapView reloadStyle:self];
-        }];
-        [alertController addAction:OKAction];
-        alertController.preferredAction = OKAction;
-
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
+    self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
+    self.mapView.showsScale = YES;
+    self.mapView.showsUserHeadingIndicator = YES;
+    self.mapView.experimental_enableFrameRateMeasurement = YES;
+    self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
 
     // Add fall-through single tap gesture recognizer. This will be called when
     // the map view's tap recognizers fail.

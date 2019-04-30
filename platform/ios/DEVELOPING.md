@@ -152,7 +152,9 @@ To instead run the cross-platform tests in Xcode instead of on the command line:
 
 ## Access tokens
 
-The included applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/). You will be prompted for this access token the first time you launch the demo or benchmarking application. In the iOS Simulator, you can paste your access token by pressing Command-V, holding down the left mouse button in the text field, and pressing the Paste button that appears.
+The included applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/). 
+
+Before running the demo ("`iosapp`") or benchmarking ("`bench`") applications, first create a new text file called `.mapbox` or `mapbox` in your home directory containing your access token. The access token will then be automatically inserted into the application's Info.plist at runtime.
 
 ## Using iosapp
 
