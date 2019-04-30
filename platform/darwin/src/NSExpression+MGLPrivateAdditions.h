@@ -13,8 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSObject (MGLExpressionAdditions)
 
-- (NSNumber *)mgl_number;
-- (NSNumber *)mgl_numberWithFallbackValues:(id)fallbackValue, ... NS_REQUIRES_NIL_TERMINATION;
+- (nullable NSNumber *)mgl_number;
+- (nullable NSNumber *)mgl_numberWithFallbackValues:(id)fallbackValue, ... NS_REQUIRES_NIL_TERMINATION;
 
 @end
 

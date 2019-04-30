@@ -823,9 +823,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     minimum = [NSExpression expressionWithMGLJSONObject:valueExpression];
                 }
             }
-            NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
-            return [NSExpression expressionForFunction:@"mgl_step:from:stops:"
-                                             arguments:@[inputExpression, minimum, stopExpression]];
+            
+            NSAssert(minimum, @"minimum should be non-nil");
+            if (minimum) {
+                NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
+                return [NSExpression expressionForFunction:@"mgl_step:from:stops:"
+                                                 arguments:@[inputExpression, minimum, stopExpression]];
+            }
+            
         } else if ([op isEqualToString:@"zoom"]) {
             return NSExpression.zoomLevelVariableExpression;
         } else if ([op isEqualToString:@"heatmap-density"]) {
@@ -1030,7 +1035,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     expressionObject = @[@"get", pathComponent];
                 }
             }
-            return expressionObject;
+            
+            NSAssert(expressionObject.count > 0, @"expressionObject should be non-empty");
+
+            // Return a non-null value to quieten static analysis
+            return expressionObject ?: @[];
         }
             
         case NSFunctionExpressionType: {

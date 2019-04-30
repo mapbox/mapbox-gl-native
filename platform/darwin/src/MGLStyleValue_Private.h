@@ -291,7 +291,7 @@ private: // Private utilities for converting from mbgl to mgl values
     }
 
     // Array
-    static ObjCType toMGLRawStyleValue(const std::vector<MBGLElement> &mbglStopValue) {
+    static NSArray<NSExpression*> *toMGLRawStyleValue(const std::vector<MBGLElement> &mbglStopValue) {
         NSMutableArray *array = [NSMutableArray arrayWithCapacity:mbglStopValue.size()];
         for (const auto &mbglElement: mbglStopValue) {
             [array addObject:[NSExpression expressionForConstantValue:toMGLRawStyleValue(mbglElement)]];

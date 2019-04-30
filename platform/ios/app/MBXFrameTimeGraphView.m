@@ -59,7 +59,12 @@ const CGFloat MBXFrameTimeBarWidth = 4.f;
         self.scrollLayer.frame = self.bounds;
 
         CGRect thresholdLineRect = CGRectMake(0, self.frame.size.height - [self renderDurationTargetMilliseconds], self.frame.size.width, 1);
-        self.thresholdLayer.path = CGPathCreateWithRect(thresholdLineRect, nil);
+        
+        {
+            CGPathRef path = CGPathCreateWithRect(thresholdLineRect, nil);        
+            self.thresholdLayer.path = path;
+            CGPathRelease(path);
+        }
     }
 }
 

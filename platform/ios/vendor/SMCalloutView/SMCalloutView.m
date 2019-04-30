@@ -554,13 +554,18 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
         stretch.toValue = presenting ? @1.0 : @0.0;
         animation = stretch;
     }
-    
+
+    NSAssert(animation, @"There should be an animation");
+
     // CAAnimation is KVC compliant, so we can store whether we're presenting for lookup in our delegate methods
     [animation setValue:@(presenting) forKey:@"presenting"];
     
     animation.fillMode = kCAFillModeForwards;
     animation.removedOnCompletion = NO;
-    return animation;
+    
+    // Cast as non-null to mute static analysis warning as documented at
+    // https://clang-analyzer.llvm.org/faq.html#decide_nullability
+    return (CAAnimation * _Nonnull)animation;
 }
 
 - (void)layoutSubviews {
