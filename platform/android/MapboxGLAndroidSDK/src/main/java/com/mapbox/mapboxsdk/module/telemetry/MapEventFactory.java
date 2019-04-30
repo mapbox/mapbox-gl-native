@@ -36,8 +36,8 @@ class MapEventFactory {
                                                                    @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
                                                                      to = MapboxConstants.MAXIMUM_ZOOM) Double maxZoom,
                                                                    String styleURL,
-                                                                   int sizeOfResourcesCompleted,
-                                                                   int numberOfTilesCompleted,
+                                                                   long sizeOfResourcesCompleted,
+                                                                   long numberOfTilesCompleted,
                                                                    @OfflineRegion.DownloadState int state) {
 
     OfflineDownloadEndEvent offlineEvent =

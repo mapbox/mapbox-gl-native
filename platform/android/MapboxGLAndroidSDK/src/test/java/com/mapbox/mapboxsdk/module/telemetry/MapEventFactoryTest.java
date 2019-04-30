@@ -38,8 +38,8 @@ public class MapEventFactoryTest {
   private static final Double MIN_ZOOM = 1.0;
   private static final Double MAX_ZOOM = 10.0;
   private static final String STYLE_URL = "style url";
-  private static final int SIZE_OF_RESOURCES_COMPLETED = 100;
-  private static final int NUMBER_OF_TILE_COMPLETED = 1000;
+  private static final long SIZE_OF_RESOURCES_COMPLETED = 100;
+  private static final long NUMBER_OF_TILE_COMPLETED = 1000;
   private static final int STATE = OfflineRegion.STATE_ACTIVE;
   private static final String SESSION_ID = "001";
 

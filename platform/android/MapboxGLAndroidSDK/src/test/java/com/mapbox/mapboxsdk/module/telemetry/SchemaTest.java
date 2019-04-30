@@ -41,6 +41,29 @@ public class SchemaTest {
     unpackSchemas();
   }
 
+  private static ByteArrayInputStream getFileBytes() throws IOException {
+    InputStream inputStream = SchemaTest.class.getClassLoader().getResourceAsStream("mobile-event-schemas.jsonl.gz");
+    byte[] byteOut = IOUtils.toByteArray(inputStream);
+
+    return new ByteArrayInputStream(byteOut);
+  }
+
+  private static void unpackSchemas() throws IOException {
+    ByteArrayInputStream bais = getFileBytes();
+    GZIPInputStream gzis = new GZIPInputStream(bais);
+    InputStreamReader reader = new InputStreamReader(gzis);
+    BufferedReader in = new BufferedReader(reader);
+
+    schemaArray = new ArrayList<>();
+
+    Gson gson = new Gson();
+    String readed;
+    while ((readed = in.readLine()) != null) {
+      JsonObject schema = gson.fromJson(readed, JsonObject.class);
+      schemaArray.add(schema);
+    }
+  }
+
   @Test
   public void checkMapClickEventSize() {
     JsonObject schema = grabSchema(MAP_CLICK);
@@ -189,7 +212,8 @@ public class SchemaTest {
 
   private void typesMatch(JsonObject schema, String type) {
     if (type.equalsIgnoreCase("int") || type.equalsIgnoreCase("integer")
-      || type.equalsIgnoreCase("double") || type.equalsIgnoreCase("float")) {
+      || type.equalsIgnoreCase("double") || type.equalsIgnoreCase("float")
+      || type.equalsIgnoreCase("long")) {
       type = "number";
     }
 
@@ -208,29 +232,6 @@ public class SchemaTest {
     } else {
       JsonArray arrayOfTypes = schema.getAsJsonArray("type");
       assertTrue(arrayOfTypes.contains(jsonElement));
-    }
-  }
-
-  private static ByteArrayInputStream getFileBytes() throws IOException {
-    InputStream inputStream = SchemaTest.class.getClassLoader().getResourceAsStream("mobile-event-schemas.jsonl.gz");
-    byte[] byteOut = IOUtils.toByteArray(inputStream);
-
-    return new ByteArrayInputStream(byteOut);
-  }
-
-  private static void unpackSchemas() throws IOException {
-    ByteArrayInputStream bais = getFileBytes();
-    GZIPInputStream gzis = new GZIPInputStream(bais);
-    InputStreamReader reader = new InputStreamReader(gzis);
-    BufferedReader in = new BufferedReader(reader);
-
-    schemaArray = new ArrayList<>();
-
-    Gson gson = new Gson();
-    String readed;
-    while ((readed = in.readLine()) != null) {
-      JsonObject schema = gson.fromJson(readed, JsonObject.class);
-      schemaArray.add(schema);
     }
   }
 

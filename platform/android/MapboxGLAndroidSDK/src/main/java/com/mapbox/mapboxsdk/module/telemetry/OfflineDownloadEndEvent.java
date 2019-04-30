@@ -17,8 +17,8 @@ public class OfflineDownloadEndEvent extends MapBaseEvent {
   private final String shapeForOfflineRegion;
   private String styleURL;
   private String state;
-  private int sizeOfResourcesCompleted;
-  private int numberOfTilesCompleted;
+  private long sizeOfResourcesCompleted;
+  private long numberOfTilesCompleted;
 
   OfflineDownloadEndEvent(PhoneState phoneState, String shapeForOfflineRegion,
                           @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
@@ -56,19 +56,19 @@ public class OfflineDownloadEndEvent extends MapBaseEvent {
     this.styleURL = styleURL;
   }
 
-  int getSizeOfResourcesCompleted() {
+  long getSizeOfResourcesCompleted() {
     return sizeOfResourcesCompleted;
   }
 
-  void setSizeOfResourcesCompleted(int sizeOfResourcesCompleted) {
+  void setSizeOfResourcesCompleted(long sizeOfResourcesCompleted) {
     this.sizeOfResourcesCompleted = sizeOfResourcesCompleted;
   }
 
-  int getNumberOfTilesCompleted() {
+  long getNumberOfTilesCompleted() {
     return numberOfTilesCompleted;
   }
 
-  void setNumberOfTilesCompleted(int numberOfTilesCompleted) {
+  void setNumberOfTilesCompleted(long numberOfTilesCompleted) {
     this.numberOfTilesCompleted = numberOfTilesCompleted;
   }
 
@@ -120,8 +120,8 @@ public class OfflineDownloadEndEvent extends MapBaseEvent {
     result = 31 * result + (shapeForOfflineRegion != null ? shapeForOfflineRegion.hashCode() : 0);
     result = 31 * result + (styleURL != null ? styleURL.hashCode() : 0);
     result = 31 * result + (state != null ? state.hashCode() : 0);
-    result = 31 * result + sizeOfResourcesCompleted;
-    result = 31 * result + numberOfTilesCompleted;
+    result = 31 * result + (int) (sizeOfResourcesCompleted ^ (sizeOfResourcesCompleted >>> 32));
+    result = 31 * result + (int) (numberOfTilesCompleted ^ (numberOfTilesCompleted >>> 32));
     return result;
   }
 
