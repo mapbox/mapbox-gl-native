@@ -9,6 +9,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a bug with jittery callout views when using sprite-based annotations. ([#14445](https://github.com/mapbox/mapbox-gl-native/pull/14445))
 * Improved `MGLLocationManager` optional protocol properties briding to Swift. ([#14477](https://github.com/mapbox/mapbox-gl-native/pull/14477))
 * Fixed a layout constraints crash on iOS 9 when a view is removed from its superview. ([#14529](https://github.com/mapbox/mapbox-gl-native/pull/14529))
+* Fixed a bug where some layers weren't rendering correctly after panning. ([#14527](https://github.com/mapbox/mapbox-gl-native/pull/14527))
 
 ## 4.10.0 - April 17, 2019
 
