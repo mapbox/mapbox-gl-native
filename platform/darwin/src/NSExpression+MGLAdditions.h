@@ -91,7 +91,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  */
 @property (class, nonatomic, readonly) NSExpression *featureAttributesVariableExpression;
 
-@property (class, nonatomic, readonly) NSExpression *featurePropertiesVariableExpression __attribute__((deprecated("Use -featureAttributesVariableExpression.")));
+@property (class, nonatomic, readonly) NSExpression *featurePropertiesVariableExpression __attribute__((deprecated("", "featureAttributesVariableExpression")));
 
 #pragma mark Creating Conditional Expressions
 
