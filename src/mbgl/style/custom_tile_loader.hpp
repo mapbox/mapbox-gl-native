@@ -6,6 +6,7 @@
 #include <mbgl/actor/actor_ref.hpp>
 
 #include <map>
+#include <mutex>
 
 namespace mbgl {
 
@@ -38,7 +39,7 @@ private:
     std::unordered_map<CanonicalTileID, std::vector<OverscaledIDFunctionTuple>> tileCallbackMap;
     // Keep around a cache of tile data to serve back for wrapped and over-zooomed tiles
     std::map<CanonicalTileID, std::unique_ptr<GeoJSON>> dataCache;
-
+    std::mutex dataMutex;
 };
 
 } // namespace style
