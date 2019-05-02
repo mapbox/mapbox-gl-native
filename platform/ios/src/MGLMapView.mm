@@ -108,6 +108,8 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     MGLUserTrackingStateBeginSignificantTransition,
     /// The map view has finished moving to the first reported user location.
     MGLUserTrackingStateChanged,
+    
+    MGLUserTrackingStateThreshold,
 };
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
@@ -5700,6 +5702,15 @@ public:
     {
         return;
     }
+    
+    CGPoint threshold = CGPointMake(20, 20);
+    if (self.userTrackingState != MGLUserTrackingStatePossible
+        && std::abs(currentPoint.x - correctPoint.x) <= threshold.x && std::abs(currentPoint.y - correctPoint.y) <= threshold.y
+        && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
+    {
+        self.userTrackingState = MGLUserTrackingStateThreshold;
+        return;
+    }
 
     if (self.userTrackingMode == MGLUserTrackingModeFollowWithCourse
         && CLLocationCoordinate2DIsValid(self.targetCoordinate))
@@ -6548,6 +6559,9 @@ public:
     else
     {
         userPoint = MGLPointRounded([self convertCoordinate:self.userLocation.coordinate toPointToView:self]);
+    }
+    if (self.userTrackingState == MGLUserTrackingStateThreshold) {
+        self.userTrackingState = MGLUserTrackingStateChanged;
     }
 
     if ( ! annotationView.superview)
