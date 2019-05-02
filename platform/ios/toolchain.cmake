@@ -89,14 +89,14 @@ set (CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a")
 
 
 # Point to the latest SDK.
-set (CMAKE_OSX_SYSROOT "iphoneos" CACHE string "Sysroot used for iOS support")
+set (CMAKE_OSX_SYSROOT "iphoneos" CACHE STRING "Sysroot used for iOS support")
 
 
 
-set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD)" CACHE string  "Build architecture for iOS")
+set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD)" CACHE STRING  "Build architecture for iOS")
 
 # Set the find root to the iOS developer roots and to user defined paths
-set (CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_IOS_SDK_ROOT} ${CMAKE_PREFIX_PATH} CACHE string  "iOS find search path root")
+set (CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_IOS_SDK_ROOT} ${CMAKE_PREFIX_PATH} CACHE STRING  "iOS find search path root")
 
 # default to searching for frameworks first
 set (CMAKE_FIND_FRAMEWORK FIRST)
