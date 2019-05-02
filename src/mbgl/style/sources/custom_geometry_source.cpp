@@ -14,7 +14,8 @@ namespace style {
 CustomGeometrySource::CustomGeometrySource(std::string id,
                                        const CustomGeometrySource::Options options)
     : Source(makeMutable<CustomGeometrySource::Impl>(std::move(id), options)),
-    loader(std::make_unique<Actor<CustomTileLoader>>(*sharedThreadPool(), options.fetchTileFunction, options.cancelTileFunction)) {
+    threadPool(sharedThreadPool()),
+    loader(std::make_unique<Actor<CustomTileLoader>>(*threadPool, options.fetchTileFunction, options.cancelTileFunction)) {
 }
 
 CustomGeometrySource::~CustomGeometrySource() = default;
