@@ -12,6 +12,7 @@ class OverscaledTileID;
 class CanonicalTileID;
 template <class T>
 class Actor;
+class ThreadPool;
 
 namespace style {
 
@@ -46,6 +47,7 @@ public:
     class Impl;
     const Impl& impl() const;
 private:
+    std::shared_ptr<ThreadPool> threadPool;
     std::unique_ptr<Actor<CustomTileLoader>> loader;
 };
 
