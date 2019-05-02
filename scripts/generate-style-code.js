@@ -92,6 +92,7 @@ function attributeUniformType(property, type) {
       'icon-halo-width': ['halo_width'],
       'line-gap-width': ['gapwidth'],
       'line-pattern': ['pattern_to', 'pattern_from'],
+      'line-floor-width': ['floorwidth'],
       'fill-pattern': ['pattern_to', 'pattern_from'],
       'fill-extrusion-pattern': ['pattern_to', 'pattern_from']
     }
@@ -196,6 +197,14 @@ const layerCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer.cpp.ej
 const propertiesHpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.hpp.ejs', 'utf8'), {strict: true});
 const propertiesCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.cpp.ejs', 'utf8'), {strict: true});
 
+// Add this mock property that our SDF line shader needs so that it gets added to the list of
+// "data driven" properties.
+spec.paint_line['line-floor-width'] = {
+  "type": "number",
+  "default": 1,
+  "property-type": "data-driven"
+};
+
 const layers = Object.keys(spec.layer.type.values).map((type) => {
   const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
     if (name !== 'visibility') {
@@ -224,11 +233,16 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
 for (const layer of layers) {
   const layerFileName = layer.type.replace('-', '_');
 
-  writeIfModified(`include/mbgl/style/layers/${layerFileName}_layer.hpp`, layerHpp(layer));
-  writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer.cpp`, layerCpp(layer));
-
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.hpp`, propertiesHpp(layer));
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.cpp`, propertiesCpp(layer));
+
+  // Remove our fake property for the external interace.
+  if (layer.type === 'line') {
+    layer.paintProperties = layer.paintProperties.filter(property => property.name !== 'line-floor-width');
+  }
+
+  writeIfModified(`include/mbgl/style/layers/${layerFileName}_layer.hpp`, layerHpp(layer));
+  writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer.cpp`, layerCpp(layer));
 }
 
 // Light
