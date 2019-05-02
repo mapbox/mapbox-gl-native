@@ -16,9 +16,9 @@ public class OfflineDownloadEndEvent extends MapBaseEvent {
   private final Double maxZoom;
   private final String shapeForOfflineRegion;
   private String styleURL;
+  private String state;
   private long sizeOfResourcesCompleted;
   private long numberOfTilesCompleted;
-  private int state;
 
   OfflineDownloadEndEvent(PhoneState phoneState, String shapeForOfflineRegion,
                           @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
@@ -72,12 +72,12 @@ public class OfflineDownloadEndEvent extends MapBaseEvent {
     this.numberOfTilesCompleted = numberOfTilesCompleted;
   }
 
-  int getState() {
+  String getState() {
     return state;
   }
 
   void setState(@OfflineRegion.DownloadState int state) {
-    this.state = state;
+    this.state = String.valueOf(state);
   }
 
   @Override
@@ -97,20 +97,20 @@ public class OfflineDownloadEndEvent extends MapBaseEvent {
     if (numberOfTilesCompleted != that.numberOfTilesCompleted) {
       return false;
     }
-    if (state != that.state) {
-      return false;
-    }
     if (minZoom != null ? !minZoom.equals(that.minZoom) : that.minZoom != null) {
       return false;
     }
     if (maxZoom != null ? !maxZoom.equals(that.maxZoom) : that.maxZoom != null) {
       return false;
     }
-    if (shapeForOfflineRegion != null ? !shapeForOfflineRegion.equals(that.shapeForOfflineRegion) :
-      that.shapeForOfflineRegion != null) {
+    if (shapeForOfflineRegion != null ? !shapeForOfflineRegion.equals(that.shapeForOfflineRegion)
+      : that.shapeForOfflineRegion != null) {
       return false;
     }
-    return styleURL != null ? styleURL.equals(that.styleURL) : that.styleURL == null;
+    if (styleURL != null ? !styleURL.equals(that.styleURL) : that.styleURL != null) {
+      return false;
+    }
+    return state != null ? state.equals(that.state) : that.state == null;
   }
 
   @Override
@@ -119,9 +119,9 @@ public class OfflineDownloadEndEvent extends MapBaseEvent {
     result = 31 * result + (maxZoom != null ? maxZoom.hashCode() : 0);
     result = 31 * result + (shapeForOfflineRegion != null ? shapeForOfflineRegion.hashCode() : 0);
     result = 31 * result + (styleURL != null ? styleURL.hashCode() : 0);
+    result = 31 * result + (state != null ? state.hashCode() : 0);
     result = 31 * result + (int) (sizeOfResourcesCompleted ^ (sizeOfResourcesCompleted >>> 32));
     result = 31 * result + (int) (numberOfTilesCompleted ^ (numberOfTilesCompleted >>> 32));
-    result = 31 * result + state;
     return result;
   }
 

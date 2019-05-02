@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
+import android.os.Bundle;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 
@@ -35,8 +36,8 @@ class MapEventFactory {
                                                                    @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
                                                                      to = MapboxConstants.MAXIMUM_ZOOM) Double maxZoom,
                                                                    String styleURL,
-                                                                   Long sizeOfResourcesCompleted,
-                                                                   Long numberOfTilesCompleted,
+                                                                   long sizeOfResourcesCompleted,
+                                                                   long numberOfTilesCompleted,
                                                                    @OfflineRegion.DownloadState int state) {
 
     OfflineDownloadEndEvent offlineEvent =
@@ -54,6 +55,11 @@ class MapEventFactory {
 
   static MapDragendEvent buildMapDragendEvent(@NonNull PhoneState phoneState, @NonNull MapState mapState) {
     return new MapDragendEvent(phoneState, mapState);
+  }
+
+  static PerformanceEvent buildPerformanceEvent(@NonNull PhoneState phoneState, @NonNull String sessionId,
+                                                @NonNull Bundle data) {
+    return new PerformanceEvent(phoneState, sessionId, data);
   }
 
 }

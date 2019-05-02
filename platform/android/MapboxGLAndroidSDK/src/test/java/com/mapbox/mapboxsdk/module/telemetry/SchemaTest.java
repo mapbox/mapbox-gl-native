@@ -31,6 +31,9 @@ public class SchemaTest {
   private static final String MAP_CLICK = "map.click";
   private static final String MAP_DRAG = "map.dragend";
   private static final String MAP_LOAD = "map.load";
+  private static final String MAP_PERFORMANCE = "mobile.performance_trace";
+  private static final String OFFLINE_DOWNLOAD_END = "map.offlineDownload.end";
+  private static final String OFFLINE_DOWNLOAD_START = "map.offlineDownload.start";
   private static ArrayList<JsonObject> schemaArray;
 
   @BeforeClass
@@ -38,8 +41,31 @@ public class SchemaTest {
     unpackSchemas();
   }
 
+  private static ByteArrayInputStream getFileBytes() throws IOException {
+    InputStream inputStream = SchemaTest.class.getClassLoader().getResourceAsStream("mobile-event-schemas.jsonl.gz");
+    byte[] byteOut = IOUtils.toByteArray(inputStream);
+
+    return new ByteArrayInputStream(byteOut);
+  }
+
+  private static void unpackSchemas() throws IOException {
+    ByteArrayInputStream bais = getFileBytes();
+    GZIPInputStream gzis = new GZIPInputStream(bais);
+    InputStreamReader reader = new InputStreamReader(gzis);
+    BufferedReader in = new BufferedReader(reader);
+
+    schemaArray = new ArrayList<>();
+
+    Gson gson = new Gson();
+    String readed;
+    while ((readed = in.readLine()) != null) {
+      JsonObject schema = gson.fromJson(readed, JsonObject.class);
+      schemaArray.add(schema);
+    }
+  }
+
   @Test
-  public void checkMapClickEventSize() throws Exception {
+  public void checkMapClickEventSize() {
     JsonObject schema = grabSchema(MAP_CLICK);
     List<Field> fields = grabClassFields(MapClickEvent.class);
 
@@ -47,7 +73,7 @@ public class SchemaTest {
   }
 
   @Test
-  public void checkMapClickEventFields() throws Exception {
+  public void checkMapClickEventFields() {
     JsonObject schema = grabSchema(MAP_CLICK);
     List<Field> fields = grabClassFields(MapClickEvent.class);
 
@@ -55,7 +81,7 @@ public class SchemaTest {
   }
 
   @Test
-  public void checkMapDragEndEventSize() throws Exception {
+  public void checkMapDragEndEventSize() {
     JsonObject schema = grabSchema(MAP_DRAG);
     List<Field> fields = grabClassFields(MapDragendEvent.class);
 
@@ -63,7 +89,7 @@ public class SchemaTest {
   }
 
   @Test
-  public void checkMapDragEndEventFields() throws Exception {
+  public void checkMapDragEndEventFields() {
     JsonObject schema = grabSchema(MAP_DRAG);
     List<Field> fields = grabClassFields(MapDragendEvent.class);
 
@@ -71,18 +97,65 @@ public class SchemaTest {
   }
 
   @Test
-  public void checkMapLoadEventSize() throws Exception {
-    JsonObject schema = grabSchema(MAP_LOAD);
-    List<Field> fields = grabClassFields(MapLoadEvent.class);
+  public void checkOfflineDownloadEndEventSize() {
+    JsonObject schema = grabSchema(OFFLINE_DOWNLOAD_END);
+    List<Field> fields = grabClassFields(OfflineDownloadEndEvent.class);
 
-    //FIXME: this assertion is invalid: we should introduce a concept of mandatory/optional field to schema validation
-    //assertEquals(schema.size(), fields.size());
+    assertEquals(schema.size(), fields.size());
   }
 
   @Test
-  public void checkMapLoadEventFields() throws Exception {
+  public void checkOfflineDownloadEndEventFields() {
+    JsonObject schema = grabSchema(OFFLINE_DOWNLOAD_END);
+    List<Field> fields = grabClassFields(OfflineDownloadEndEvent.class);
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkOfflineDownloadStartEventSize() {
+    JsonObject schema = grabSchema(OFFLINE_DOWNLOAD_START);
+    List<Field> fields = grabClassFields(OfflineDownloadStartEvent.class);
+
+    assertEquals(schema.size(), fields.size());
+  }
+
+  @Test
+  public void checkOfflineDownloadStartEventFields() {
+    JsonObject schema = grabSchema(OFFLINE_DOWNLOAD_START);
+    List<Field> fields = grabClassFields(OfflineDownloadStartEvent.class);
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkMapLoadEventSize() {
     JsonObject schema = grabSchema(MAP_LOAD);
     List<Field> fields = grabClassFields(MapLoadEvent.class);
+
+    assertEquals(schema.size(), fields.size());
+  }
+
+  @Test
+  public void checkMapLoadEventFields() {
+    JsonObject schema = grabSchema(MAP_LOAD);
+    List<Field> fields = grabClassFields(MapLoadEvent.class);
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkPerformanceEventSize() {
+    JsonObject schema = grabSchema(MAP_PERFORMANCE);
+    List<Field> fields = grabClassFields(PerformanceEvent.class);
+
+    assertEquals(schema.size(), fields.size());
+  }
+
+  @Test
+  public void checkPerformanceEventFields() {
+    JsonObject schema = grabSchema(MAP_PERFORMANCE);
+    List<Field> fields = grabClassFields(PerformanceEvent.class);
 
     schemaContainsFields(schema, fields);
   }
@@ -139,14 +212,17 @@ public class SchemaTest {
 
   private void typesMatch(JsonObject schema, String type) {
     if (type.equalsIgnoreCase("int") || type.equalsIgnoreCase("integer")
-      || type.equalsIgnoreCase("double") || type.equalsIgnoreCase("float")) {
+      || type.equalsIgnoreCase("double") || type.equalsIgnoreCase("float")
+      || type.equalsIgnoreCase("long")) {
       type = "number";
     }
 
-    if (type.contains("[]")) {
+    if (type.contains("[]") || type.equalsIgnoreCase("list")) {
       type = "array";
     }
-
+    if (type.equalsIgnoreCase("jsonobject")) {
+      type = "object";
+    }
     Class<? extends JsonElement> typeClass = schema.get("type").getClass();
     JsonElement jsonElement = new JsonParser().parse(type.toLowerCase());
 
@@ -156,29 +232,6 @@ public class SchemaTest {
     } else {
       JsonArray arrayOfTypes = schema.getAsJsonArray("type");
       assertTrue(arrayOfTypes.contains(jsonElement));
-    }
-  }
-
-  private static ByteArrayInputStream getFileBytes() throws IOException {
-    InputStream inputStream = SchemaTest.class.getClassLoader().getResourceAsStream("mobile-event-schemas.jsonl.gz");
-    byte[] byteOut = IOUtils.toByteArray(inputStream);
-
-    return new ByteArrayInputStream(byteOut);
-  }
-
-  private static void unpackSchemas() throws IOException {
-    ByteArrayInputStream bais = getFileBytes();
-    GZIPInputStream gzis = new GZIPInputStream(bais);
-    InputStreamReader reader = new InputStreamReader(gzis);
-    BufferedReader in = new BufferedReader(reader);
-
-    schemaArray = new ArrayList<>();
-
-    Gson gson = new Gson();
-    String readed;
-    while ((readed = in.readLine()) != null) {
-      JsonObject schema = gson.fromJson(readed, JsonObject.class);
-      schemaArray.add(schema);
     }
   }
 
