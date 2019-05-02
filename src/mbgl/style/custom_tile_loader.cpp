@@ -11,6 +11,7 @@ CustomTileLoader::CustomTileLoader(const TileFunction& fetchTileFn, const TileFu
 }
 
 void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<CustomGeometryTile> tileRef) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto cachedTileData = dataCache.find(tileID.canonical);
     if (cachedTileData != dataCache.end()) {
         tileRef.invoke(&CustomGeometryTile::setTileData, *(cachedTileData->second));
@@ -34,12 +35,14 @@ void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<Custom
 }
 
 void CustomTileLoader::cancelTile(const OverscaledTileID& tileID) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     if (tileCallbackMap.find(tileID.canonical) != tileCallbackMap.end()) {
         invokeTileCancel(tileID.canonical);
     }
 }
 
 void CustomTileLoader::removeTile(const OverscaledTileID& tileID) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto tileCallbacks = tileCallbackMap.find(tileID.canonical);
     if (tileCallbacks == tileCallbackMap.end()) return;
     for (auto iter = tileCallbacks->second.begin(); iter != tileCallbacks->second.end(); iter++) {
@@ -56,10 +59,10 @@ void CustomTileLoader::removeTile(const OverscaledTileID& tileID) {
 }
 
 void CustomTileLoader::setTileData(const CanonicalTileID& tileID, const GeoJSON& data) {
-
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto iter = tileCallbackMap.find(tileID);
     if (iter == tileCallbackMap.end()) return;
-    auto dataPtr = std::make_unique<mapbox::geojson::geojson>(std::move(data));
+    auto dataPtr = std::make_unique<mapbox::geojson::geojson>(data);
     for (auto tuple : iter->second) {
         auto actor = std::get<2>(tuple);
         actor.invoke(&CustomGeometryTile::setTileData, *dataPtr);
@@ -68,6 +71,7 @@ void CustomTileLoader::setTileData(const CanonicalTileID& tileID, const GeoJSON&
 }
 
 void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     auto tileCallbacks = tileCallbackMap.find(tileID);
     if (tileCallbacks == tileCallbackMap.end()) { return; }
     for (auto& iter : tileCallbacks->second) {
@@ -80,8 +84,8 @@ void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
 }
 
 void CustomTileLoader::invalidateRegion(const LatLngBounds& bounds, Range<uint8_t> ) {
+    std::lock_guard<std::mutex> guard(dataMutex);
     std::map<uint8_t, util::TileRange> tileRanges;
-
     for (auto& idtuple : tileCallbackMap) {
         auto zoom = idtuple.first.z;
         auto tileRange = tileRanges.find(zoom);
