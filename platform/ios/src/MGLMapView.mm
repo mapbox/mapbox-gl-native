@@ -2481,7 +2481,7 @@ public:
     }];
     [attributionController addAction:telemetryAction];
     
-    NSString *cancelTitle = NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"Cancel");
+    NSString *cancelTitle = NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"Title of button for dismissing attribution action sheet");
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle
                                                            style:UIAlertActionStyleCancel
                                                          handler:NULL];
