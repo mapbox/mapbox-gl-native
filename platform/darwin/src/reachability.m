@@ -100,6 +100,8 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     {
         id reachability = [[self alloc] initWithReachabilityRef:ref];
 
+        CFRelease(ref);
+        
         return reachability;
     }
 
@@ -113,6 +115,8 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     {
         id reachability = [[self alloc] initWithReachabilityRef:ref];
 
+        CFRelease(ref);
+        
         return reachability;
     }
 
@@ -149,13 +153,13 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
     self = [super init];
     if (self != nil)
     {
-        self.reachableOnWWAN = YES;
-        self.reachabilityRef = ref;
+        _reachableOnWWAN = YES;
+        _reachabilityRef = CFRetain(ref);
 
         // We need to create a serial queue.
         // We allocate this once for the lifetime of the notifier.
 
-        self.reachabilitySerialQueue = dispatch_queue_create("com.tonymillion.reachability", NULL);
+        _reachabilitySerialQueue = dispatch_queue_create("com.tonymillion.reachability", NULL);
     }
 
     return self;
@@ -165,15 +169,15 @@ static void TMReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkRea
 {
     [self stopNotifier];
 
-    if(self.reachabilityRef)
+    if(_reachabilityRef)
     {
-        CFRelease(self.reachabilityRef);
-        self.reachabilityRef = nil;
+        CFRelease(_reachabilityRef);
+        _reachabilityRef = nil;
     }
 
-    self.reachableBlock          = nil;
-    self.unreachableBlock        = nil;
-    self.reachabilitySerialQueue = nil;
+    _reachableBlock          = nil;
+    _unreachableBlock        = nil;
+    _reachabilitySerialQueue = nil;
 }
 
 #pragma mark - Notifier Methods
