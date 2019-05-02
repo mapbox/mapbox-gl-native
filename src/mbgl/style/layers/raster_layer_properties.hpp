@@ -14,23 +14,11 @@
 namespace mbgl {
 namespace style {
 
-struct RasterOpacity : PaintProperty<float> {
-    static float defaultValue() { return 1; }
-};
-
-struct RasterHueRotate : PaintProperty<float> {
-    static float defaultValue() { return 0; }
-};
-
-struct RasterBrightnessMin : PaintProperty<float> {
-    static float defaultValue() { return 0; }
-};
-
 struct RasterBrightnessMax : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct RasterSaturation : PaintProperty<float> {
+struct RasterBrightnessMin : PaintProperty<float> {
     static float defaultValue() { return 0; }
 };
 
@@ -38,23 +26,35 @@ struct RasterContrast : PaintProperty<float> {
     static float defaultValue() { return 0; }
 };
 
-struct RasterResampling : PaintProperty<RasterResamplingType> {
-    static RasterResamplingType defaultValue() { return RasterResamplingType::Linear; }
-};
-
 struct RasterFadeDuration : PaintProperty<float> {
     static float defaultValue() { return 300; }
 };
 
+struct RasterHueRotate : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
+struct RasterOpacity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
+struct RasterResampling : PaintProperty<RasterResamplingType> {
+    static RasterResamplingType defaultValue() { return RasterResamplingType::Linear; }
+};
+
+struct RasterSaturation : PaintProperty<float> {
+    static float defaultValue() { return 0; }
+};
+
 class RasterPaintProperties : public Properties<
-    RasterOpacity,
-    RasterHueRotate,
-    RasterBrightnessMin,
     RasterBrightnessMax,
-    RasterSaturation,
+    RasterBrightnessMin,
     RasterContrast,
+    RasterFadeDuration,
+    RasterHueRotate,
+    RasterOpacity,
     RasterResampling,
-    RasterFadeDuration
+    RasterSaturation
 > {};
 
 class RasterLayerProperties final : public LayerProperties {

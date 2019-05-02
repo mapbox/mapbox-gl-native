@@ -14,37 +14,37 @@
 namespace mbgl {
 namespace style {
 
-struct HillshadeIlluminationDirection : PaintProperty<float> {
-    static float defaultValue() { return 335; }
-};
-
-struct HillshadeIlluminationAnchor : PaintProperty<HillshadeIlluminationAnchorType> {
-    static HillshadeIlluminationAnchorType defaultValue() { return HillshadeIlluminationAnchorType::Viewport; }
+struct HillshadeAccentColor : PaintProperty<Color> {
+    static Color defaultValue() { return Color::black(); }
 };
 
 struct HillshadeExaggeration : PaintProperty<float> {
     static float defaultValue() { return 0.5; }
 };
 
-struct HillshadeShadowColor : PaintProperty<Color> {
-    static Color defaultValue() { return Color::black(); }
-};
-
 struct HillshadeHighlightColor : PaintProperty<Color> {
     static Color defaultValue() { return Color::white(); }
 };
 
-struct HillshadeAccentColor : PaintProperty<Color> {
+struct HillshadeIlluminationAnchor : PaintProperty<HillshadeIlluminationAnchorType> {
+    static HillshadeIlluminationAnchorType defaultValue() { return HillshadeIlluminationAnchorType::Viewport; }
+};
+
+struct HillshadeIlluminationDirection : PaintProperty<float> {
+    static float defaultValue() { return 335; }
+};
+
+struct HillshadeShadowColor : PaintProperty<Color> {
     static Color defaultValue() { return Color::black(); }
 };
 
 class HillshadePaintProperties : public Properties<
-    HillshadeIlluminationDirection,
-    HillshadeIlluminationAnchor,
+    HillshadeAccentColor,
     HillshadeExaggeration,
-    HillshadeShadowColor,
     HillshadeHighlightColor,
-    HillshadeAccentColor
+    HillshadeIlluminationAnchor,
+    HillshadeIlluminationDirection,
+    HillshadeShadowColor
 > {};
 
 class HillshadeLayerProperties final : public LayerProperties {

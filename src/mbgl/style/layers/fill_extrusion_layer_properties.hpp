@@ -14,12 +14,24 @@
 namespace mbgl {
 namespace style {
 
-struct FillExtrusionOpacity : PaintProperty<float> {
-    static float defaultValue() { return 1; }
+struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::base, uniforms::base> {
+    static float defaultValue() { return 0; }
 };
 
 struct FillExtrusionColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
+};
+
+struct FillExtrusionHeight : DataDrivenPaintProperty<float, attributes::height, uniforms::height> {
+    static float defaultValue() { return 0; }
+};
+
+struct FillExtrusionOpacity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
+struct FillExtrusionPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
+    static std::string defaultValue() { return ""; }
 };
 
 struct FillExtrusionTranslate : PaintProperty<std::array<float, 2>> {
@@ -30,30 +42,18 @@ struct FillExtrusionTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct FillExtrusionPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
-    static std::string defaultValue() { return ""; }
-};
-
-struct FillExtrusionHeight : DataDrivenPaintProperty<float, attributes::height, uniforms::height> {
-    static float defaultValue() { return 0; }
-};
-
-struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::base, uniforms::base> {
-    static float defaultValue() { return 0; }
-};
-
 struct FillExtrusionVerticalGradient : PaintProperty<bool> {
     static bool defaultValue() { return true; }
 };
 
 class FillExtrusionPaintProperties : public Properties<
-    FillExtrusionOpacity,
+    FillExtrusionBase,
     FillExtrusionColor,
+    FillExtrusionHeight,
+    FillExtrusionOpacity,
+    FillExtrusionPattern,
     FillExtrusionTranslate,
     FillExtrusionTranslateAnchor,
-    FillExtrusionPattern,
-    FillExtrusionHeight,
-    FillExtrusionBase,
     FillExtrusionVerticalGradient
 > {};
 

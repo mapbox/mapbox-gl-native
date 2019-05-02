@@ -25,6 +25,24 @@ public:
 
     // Paint properties
 
+    static ColorRampPropertyValue getDefaultHeatmapColor();
+    const ColorRampPropertyValue& getHeatmapColor() const;
+    void setHeatmapColor(const ColorRampPropertyValue&);
+    void setHeatmapColorTransition(const TransitionOptions&);
+    TransitionOptions getHeatmapColorTransition() const;
+
+    static PropertyValue<float> getDefaultHeatmapIntensity();
+    const PropertyValue<float>& getHeatmapIntensity() const;
+    void setHeatmapIntensity(const PropertyValue<float>&);
+    void setHeatmapIntensityTransition(const TransitionOptions&);
+    TransitionOptions getHeatmapIntensityTransition() const;
+
+    static PropertyValue<float> getDefaultHeatmapOpacity();
+    const PropertyValue<float>& getHeatmapOpacity() const;
+    void setHeatmapOpacity(const PropertyValue<float>&);
+    void setHeatmapOpacityTransition(const TransitionOptions&);
+    TransitionOptions getHeatmapOpacityTransition() const;
+
     static PropertyValue<float> getDefaultHeatmapRadius();
     const PropertyValue<float>& getHeatmapRadius() const;
     void setHeatmapRadius(const PropertyValue<float>&);
@@ -36,24 +54,6 @@ public:
     void setHeatmapWeight(const PropertyValue<float>&);
     void setHeatmapWeightTransition(const TransitionOptions&);
     TransitionOptions getHeatmapWeightTransition() const;
-
-    static PropertyValue<float> getDefaultHeatmapIntensity();
-    const PropertyValue<float>& getHeatmapIntensity() const;
-    void setHeatmapIntensity(const PropertyValue<float>&);
-    void setHeatmapIntensityTransition(const TransitionOptions&);
-    TransitionOptions getHeatmapIntensityTransition() const;
-
-    static ColorRampPropertyValue getDefaultHeatmapColor();
-    const ColorRampPropertyValue& getHeatmapColor() const;
-    void setHeatmapColor(const ColorRampPropertyValue&);
-    void setHeatmapColorTransition(const TransitionOptions&);
-    TransitionOptions getHeatmapColorTransition() const;
-
-    static PropertyValue<float> getDefaultHeatmapOpacity();
-    const PropertyValue<float>& getHeatmapOpacity() const;
-    void setHeatmapOpacity(const PropertyValue<float>&);
-    void setHeatmapOpacityTransition(const TransitionOptions&);
-    TransitionOptions getHeatmapOpacityTransition() const;
 
     // Private implementation
 

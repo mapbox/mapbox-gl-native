@@ -18,18 +18,18 @@ struct BackgroundColor : PaintProperty<Color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct BackgroundPattern : CrossFadedPaintProperty<std::string> {
-    static std::string defaultValue() { return ""; }
-};
-
 struct BackgroundOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
+struct BackgroundPattern : CrossFadedPaintProperty<std::string> {
+    static std::string defaultValue() { return ""; }
+};
+
 class BackgroundPaintProperties : public Properties<
     BackgroundColor,
-    BackgroundPattern,
-    BackgroundOpacity
+    BackgroundOpacity,
+    BackgroundPattern
 > {};
 
 class BackgroundLayerProperties final : public LayerProperties {

@@ -30,17 +30,17 @@ public:
     void setBackgroundColorTransition(const TransitionOptions&);
     TransitionOptions getBackgroundColorTransition() const;
 
-    static PropertyValue<std::string> getDefaultBackgroundPattern();
-    const PropertyValue<std::string>& getBackgroundPattern() const;
-    void setBackgroundPattern(const PropertyValue<std::string>&);
-    void setBackgroundPatternTransition(const TransitionOptions&);
-    TransitionOptions getBackgroundPatternTransition() const;
-
     static PropertyValue<float> getDefaultBackgroundOpacity();
     const PropertyValue<float>& getBackgroundOpacity() const;
     void setBackgroundOpacity(const PropertyValue<float>&);
     void setBackgroundOpacityTransition(const TransitionOptions&);
     TransitionOptions getBackgroundOpacityTransition() const;
+
+    static PropertyValue<std::string> getDefaultBackgroundPattern();
+    const PropertyValue<std::string>& getBackgroundPattern() const;
+    void setBackgroundPattern(const PropertyValue<std::string>&);
+    void setBackgroundPatternTransition(const TransitionOptions&);
+    TransitionOptions getBackgroundPatternTransition() const;
 
     // Private implementation
 

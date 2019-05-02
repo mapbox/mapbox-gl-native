@@ -24,11 +24,11 @@ public:
 
     // Paint properties
 
-    static PropertyValue<float> getDefaultCircleRadius();
-    const PropertyValue<float>& getCircleRadius() const;
-    void setCircleRadius(const PropertyValue<float>&);
-    void setCircleRadiusTransition(const TransitionOptions&);
-    TransitionOptions getCircleRadiusTransition() const;
+    static PropertyValue<float> getDefaultCircleBlur();
+    const PropertyValue<float>& getCircleBlur() const;
+    void setCircleBlur(const PropertyValue<float>&);
+    void setCircleBlurTransition(const TransitionOptions&);
+    TransitionOptions getCircleBlurTransition() const;
 
     static PropertyValue<Color> getDefaultCircleColor();
     const PropertyValue<Color>& getCircleColor() const;
@@ -36,35 +36,11 @@ public:
     void setCircleColorTransition(const TransitionOptions&);
     TransitionOptions getCircleColorTransition() const;
 
-    static PropertyValue<float> getDefaultCircleBlur();
-    const PropertyValue<float>& getCircleBlur() const;
-    void setCircleBlur(const PropertyValue<float>&);
-    void setCircleBlurTransition(const TransitionOptions&);
-    TransitionOptions getCircleBlurTransition() const;
-
     static PropertyValue<float> getDefaultCircleOpacity();
     const PropertyValue<float>& getCircleOpacity() const;
     void setCircleOpacity(const PropertyValue<float>&);
     void setCircleOpacityTransition(const TransitionOptions&);
     TransitionOptions getCircleOpacityTransition() const;
-
-    static PropertyValue<std::array<float, 2>> getDefaultCircleTranslate();
-    const PropertyValue<std::array<float, 2>>& getCircleTranslate() const;
-    void setCircleTranslate(const PropertyValue<std::array<float, 2>>&);
-    void setCircleTranslateTransition(const TransitionOptions&);
-    TransitionOptions getCircleTranslateTransition() const;
-
-    static PropertyValue<TranslateAnchorType> getDefaultCircleTranslateAnchor();
-    const PropertyValue<TranslateAnchorType>& getCircleTranslateAnchor() const;
-    void setCircleTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
-    void setCircleTranslateAnchorTransition(const TransitionOptions&);
-    TransitionOptions getCircleTranslateAnchorTransition() const;
-
-    static PropertyValue<CirclePitchScaleType> getDefaultCirclePitchScale();
-    const PropertyValue<CirclePitchScaleType>& getCirclePitchScale() const;
-    void setCirclePitchScale(const PropertyValue<CirclePitchScaleType>&);
-    void setCirclePitchScaleTransition(const TransitionOptions&);
-    TransitionOptions getCirclePitchScaleTransition() const;
 
     static PropertyValue<AlignmentType> getDefaultCirclePitchAlignment();
     const PropertyValue<AlignmentType>& getCirclePitchAlignment() const;
@@ -72,11 +48,17 @@ public:
     void setCirclePitchAlignmentTransition(const TransitionOptions&);
     TransitionOptions getCirclePitchAlignmentTransition() const;
 
-    static PropertyValue<float> getDefaultCircleStrokeWidth();
-    const PropertyValue<float>& getCircleStrokeWidth() const;
-    void setCircleStrokeWidth(const PropertyValue<float>&);
-    void setCircleStrokeWidthTransition(const TransitionOptions&);
-    TransitionOptions getCircleStrokeWidthTransition() const;
+    static PropertyValue<CirclePitchScaleType> getDefaultCirclePitchScale();
+    const PropertyValue<CirclePitchScaleType>& getCirclePitchScale() const;
+    void setCirclePitchScale(const PropertyValue<CirclePitchScaleType>&);
+    void setCirclePitchScaleTransition(const TransitionOptions&);
+    TransitionOptions getCirclePitchScaleTransition() const;
+
+    static PropertyValue<float> getDefaultCircleRadius();
+    const PropertyValue<float>& getCircleRadius() const;
+    void setCircleRadius(const PropertyValue<float>&);
+    void setCircleRadiusTransition(const TransitionOptions&);
+    TransitionOptions getCircleRadiusTransition() const;
 
     static PropertyValue<Color> getDefaultCircleStrokeColor();
     const PropertyValue<Color>& getCircleStrokeColor() const;
@@ -89,6 +71,24 @@ public:
     void setCircleStrokeOpacity(const PropertyValue<float>&);
     void setCircleStrokeOpacityTransition(const TransitionOptions&);
     TransitionOptions getCircleStrokeOpacityTransition() const;
+
+    static PropertyValue<float> getDefaultCircleStrokeWidth();
+    const PropertyValue<float>& getCircleStrokeWidth() const;
+    void setCircleStrokeWidth(const PropertyValue<float>&);
+    void setCircleStrokeWidthTransition(const TransitionOptions&);
+    TransitionOptions getCircleStrokeWidthTransition() const;
+
+    static PropertyValue<std::array<float, 2>> getDefaultCircleTranslate();
+    const PropertyValue<std::array<float, 2>>& getCircleTranslate() const;
+    void setCircleTranslate(const PropertyValue<std::array<float, 2>>&);
+    void setCircleTranslateTransition(const TransitionOptions&);
+    TransitionOptions getCircleTranslateTransition() const;
+
+    static PropertyValue<TranslateAnchorType> getDefaultCircleTranslateAnchor();
+    const PropertyValue<TranslateAnchorType>& getCircleTranslateAnchor() const;
+    void setCircleTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
+    void setCircleTranslateAnchorTransition(const TransitionOptions&);
+    TransitionOptions getCircleTranslateAnchorTransition() const;
 
     // Private implementation
 

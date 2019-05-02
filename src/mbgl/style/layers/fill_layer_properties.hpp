@@ -18,16 +18,20 @@ struct FillAntialias : PaintProperty<bool> {
     static bool defaultValue() { return true; }
 };
 
-struct FillOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
-    static float defaultValue() { return 1; }
-};
-
 struct FillColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
 };
 
+struct FillOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
+    static float defaultValue() { return 1; }
+};
+
 struct FillOutlineColor : DataDrivenPaintProperty<Color, attributes::outline_color, uniforms::outline_color> {
     static Color defaultValue() { return {}; }
+};
+
+struct FillPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
+    static std::string defaultValue() { return ""; }
 };
 
 struct FillTranslate : PaintProperty<std::array<float, 2>> {
@@ -38,18 +42,14 @@ struct FillTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct FillPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
-    static std::string defaultValue() { return ""; }
-};
-
 class FillPaintProperties : public Properties<
     FillAntialias,
-    FillOpacity,
     FillColor,
+    FillOpacity,
     FillOutlineColor,
+    FillPattern,
     FillTranslate,
-    FillTranslateAnchor,
-    FillPattern
+    FillTranslateAnchor
 > {};
 
 class FillLayerProperties final : public LayerProperties {

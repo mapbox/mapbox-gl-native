@@ -50,32 +50,6 @@ TransitionOptions Light::getAnchorTransition() const {
     return impl->properties.template get<LightAnchor>().options;
 }
 
-Position Light::getDefaultPosition() {
-    return LightPosition::defaultValue();
-}
-
-PropertyValue<Position> Light::getPosition() const {
-    return impl->properties.template get<LightPosition>().value;
-}
-
-void Light::setPosition(PropertyValue<Position> property) {
-    auto impl_ = mutableImpl();
-    impl_->properties.template get<LightPosition>().value = property;
-    impl = std::move(impl_);
-    observer->onLightChanged(*this);
-}
-
-void Light::setPositionTransition(const TransitionOptions& options) {
-    auto impl_ = mutableImpl();
-    impl_->properties.template get<LightPosition>().options = options;
-    impl = std::move(impl_);
-    observer->onLightChanged(*this);
-}
-
-TransitionOptions Light::getPositionTransition() const {
-    return impl->properties.template get<LightPosition>().options;
-}
-
 Color Light::getDefaultColor() {
     return LightColor::defaultValue();
 }
@@ -126,6 +100,32 @@ void Light::setIntensityTransition(const TransitionOptions& options) {
 
 TransitionOptions Light::getIntensityTransition() const {
     return impl->properties.template get<LightIntensity>().options;
+}
+
+Position Light::getDefaultPosition() {
+    return LightPosition::defaultValue();
+}
+
+PropertyValue<Position> Light::getPosition() const {
+    return impl->properties.template get<LightPosition>().value;
+}
+
+void Light::setPosition(PropertyValue<Position> property) {
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightPosition>().value = property;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
+}
+
+void Light::setPositionTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<LightPosition>().options = options;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
+}
+
+TransitionOptions Light::getPositionTransition() const {
+    return impl->properties.template get<LightPosition>().options;
 }
 
 

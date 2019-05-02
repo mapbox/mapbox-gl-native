@@ -24,17 +24,11 @@ public:
 
     // Paint properties
 
-    static PropertyValue<float> getDefaultHillshadeIlluminationDirection();
-    const PropertyValue<float>& getHillshadeIlluminationDirection() const;
-    void setHillshadeIlluminationDirection(const PropertyValue<float>&);
-    void setHillshadeIlluminationDirectionTransition(const TransitionOptions&);
-    TransitionOptions getHillshadeIlluminationDirectionTransition() const;
-
-    static PropertyValue<HillshadeIlluminationAnchorType> getDefaultHillshadeIlluminationAnchor();
-    const PropertyValue<HillshadeIlluminationAnchorType>& getHillshadeIlluminationAnchor() const;
-    void setHillshadeIlluminationAnchor(const PropertyValue<HillshadeIlluminationAnchorType>&);
-    void setHillshadeIlluminationAnchorTransition(const TransitionOptions&);
-    TransitionOptions getHillshadeIlluminationAnchorTransition() const;
+    static PropertyValue<Color> getDefaultHillshadeAccentColor();
+    const PropertyValue<Color>& getHillshadeAccentColor() const;
+    void setHillshadeAccentColor(const PropertyValue<Color>&);
+    void setHillshadeAccentColorTransition(const TransitionOptions&);
+    TransitionOptions getHillshadeAccentColorTransition() const;
 
     static PropertyValue<float> getDefaultHillshadeExaggeration();
     const PropertyValue<float>& getHillshadeExaggeration() const;
@@ -42,23 +36,29 @@ public:
     void setHillshadeExaggerationTransition(const TransitionOptions&);
     TransitionOptions getHillshadeExaggerationTransition() const;
 
-    static PropertyValue<Color> getDefaultHillshadeShadowColor();
-    const PropertyValue<Color>& getHillshadeShadowColor() const;
-    void setHillshadeShadowColor(const PropertyValue<Color>&);
-    void setHillshadeShadowColorTransition(const TransitionOptions&);
-    TransitionOptions getHillshadeShadowColorTransition() const;
-
     static PropertyValue<Color> getDefaultHillshadeHighlightColor();
     const PropertyValue<Color>& getHillshadeHighlightColor() const;
     void setHillshadeHighlightColor(const PropertyValue<Color>&);
     void setHillshadeHighlightColorTransition(const TransitionOptions&);
     TransitionOptions getHillshadeHighlightColorTransition() const;
 
-    static PropertyValue<Color> getDefaultHillshadeAccentColor();
-    const PropertyValue<Color>& getHillshadeAccentColor() const;
-    void setHillshadeAccentColor(const PropertyValue<Color>&);
-    void setHillshadeAccentColorTransition(const TransitionOptions&);
-    TransitionOptions getHillshadeAccentColorTransition() const;
+    static PropertyValue<HillshadeIlluminationAnchorType> getDefaultHillshadeIlluminationAnchor();
+    const PropertyValue<HillshadeIlluminationAnchorType>& getHillshadeIlluminationAnchor() const;
+    void setHillshadeIlluminationAnchor(const PropertyValue<HillshadeIlluminationAnchorType>&);
+    void setHillshadeIlluminationAnchorTransition(const TransitionOptions&);
+    TransitionOptions getHillshadeIlluminationAnchorTransition() const;
+
+    static PropertyValue<float> getDefaultHillshadeIlluminationDirection();
+    const PropertyValue<float>& getHillshadeIlluminationDirection() const;
+    void setHillshadeIlluminationDirection(const PropertyValue<float>&);
+    void setHillshadeIlluminationDirectionTransition(const TransitionOptions&);
+    TransitionOptions getHillshadeIlluminationDirectionTransition() const;
+
+    static PropertyValue<Color> getDefaultHillshadeShadowColor();
+    const PropertyValue<Color>& getHillshadeShadowColor() const;
+    void setHillshadeShadowColor(const PropertyValue<Color>&);
+    void setHillshadeShadowColorTransition(const TransitionOptions&);
+    TransitionOptions getHillshadeShadowColorTransition() const;
 
     // Private implementation
 

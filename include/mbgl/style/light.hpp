@@ -23,12 +23,6 @@ public:
     void setAnchorTransition(const TransitionOptions&);
     TransitionOptions getAnchorTransition() const;
 
-    static Position getDefaultPosition();
-    PropertyValue<Position> getPosition() const;
-    void setPosition(PropertyValue<Position>);
-    void setPositionTransition(const TransitionOptions&);
-    TransitionOptions getPositionTransition() const;
-
     static Color getDefaultColor();
     PropertyValue<Color> getColor() const;
     void setColor(PropertyValue<Color>);
@@ -40,6 +34,12 @@ public:
     void setIntensity(PropertyValue<float>);
     void setIntensityTransition(const TransitionOptions&);
     TransitionOptions getIntensityTransition() const;
+
+    static Position getDefaultPosition();
+    PropertyValue<Position> getPosition() const;
+    void setPosition(PropertyValue<Position>);
+    void setPositionTransition(const TransitionOptions&);
+    TransitionOptions getPositionTransition() const;
 
     class Impl;
     Immutable<Impl> impl;
