@@ -69,8 +69,6 @@ typedef void (^NetworkUnreachable)(MGLReachability * reachability);
 +(instancetype)reachabilityWithAddress:(void *)hostAddress;
 +(instancetype)reachabilityForLocalWiFi;
 
--(instancetype)initWithReachabilityRef:(SCNetworkReachabilityRef)ref;
-
 -(BOOL)startNotifier;
 -(void)stopNotifier;
 
