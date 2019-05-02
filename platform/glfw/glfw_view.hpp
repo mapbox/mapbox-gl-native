@@ -84,6 +84,7 @@ private:
     void addRandomCustomPointAnnotations(int count);
     void addAnimatedAnnotation();
     void updateAnimatedAnnotations();
+    void toggleCustomSource();
 
     void clearAnnotations();
     void popAnnotation();
