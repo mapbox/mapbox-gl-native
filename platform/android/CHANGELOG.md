@@ -16,6 +16,14 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ### Docs
  - Clear up LocationComponent's z-index positioning docs and add "layer-above" option [#14497](https://github.com/mapbox/mapbox-gl-native/pull/14497)
 
+## 7.4.0-beta.3 - May 2, 2019
+### Features
+- Less strict rules for adding render layers to sources [#14540](https://github.com/mapbox/mapbox-gl-native/pull/14540)
+- Store type of renderable segment when sorting symbols by key [#14517](https://github.com/mapbox/mapbox-gl-native/pull/14517)
+
+### Build
+ - Bump gestures library to v0.4.2 [#14524](https://github.com/mapbox/mapbox-gl-native/pull/14524)
+
 ## 7.4.0-beta.2 - April 23, 2019
 ### Features
  - Enable/Disable SKU token handling [#14476](https://github.com/mapbox/mapbox-gl-native/pull/14476)
