@@ -7,7 +7,7 @@
 /* No comment provided by engineer. */
 "API_CLIENT_400_REASON" = "The status code was %ld";
 
-/* No comment provided by engineer. */
+/* Title of button for dismissing attribution action sheet */
 "CANCEL" = "キャンセル";
 
 /* Accessibility hint */

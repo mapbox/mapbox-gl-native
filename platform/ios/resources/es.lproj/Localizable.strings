@@ -7,7 +7,7 @@
 /* No comment provided by engineer. */
 "API_CLIENT_400_REASON" = "El código de estado fue %ld";
 
-/* No comment provided by engineer. */
+/* Title of button for dismissing attribution action sheet */
 "CANCEL" = "Cancelar";
 
 /* Accessibility hint for closing the selected annotation’s callout view and returning to the map */

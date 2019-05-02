@@ -7,7 +7,7 @@
 /* No comment provided by engineer. */
 "API_CLIENT_400_REASON" = "상태 코드 %ld";
 
-/* No comment provided by engineer. */
+/* Title of button for dismissing attribution action sheet */
 "CANCEL" = "취소";
 
 /* Accessibility hint for closing the selected annotation’s callout view and returning to the map */

@@ -1,7 +1,7 @@
 /* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Afficher plus d’informations";
 
-/* No comment provided by engineer. */
+/* Title of button for dismissing attribution action sheet */
 "CANCEL" = "Annuler";
 
 /* Accessibility hint for closing the selected annotation’s callout view and returning to the map */

@@ -7,7 +7,7 @@
 /* No comment provided by engineer. */
 "API_CLIENT_400_REASON" = "סטטוס הקוד היה %ld";
 
-/* No comment provided by engineer. */
+/* Title of button for dismissing attribution action sheet */
 "CANCEL" = "ביטול";
 
 /* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
