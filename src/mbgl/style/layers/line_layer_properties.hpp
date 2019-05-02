@@ -54,11 +54,6 @@ struct LineWidth : DataDrivenPaintProperty<float, attributes::width, uniforms::w
     static float defaultValue() { return 1; }
 };
 
-struct LineFloorWidth : DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
-    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
-    static float defaultValue() { return 1.0f; }
-};
-
 struct LineGapWidth : DataDrivenPaintProperty<float, attributes::gapwidth, uniforms::gapwidth> {
     static float defaultValue() { return 0; }
 };
@@ -82,6 +77,11 @@ struct LinePattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::
 struct LineGradient : ColorRampProperty {
 };
 
+struct LineFloorWidth : DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
+    static float defaultValue() { return 1; }
+    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
+};
+
 class LineLayoutProperties : public Properties<
     LineCap,
     LineJoin,
@@ -95,13 +95,13 @@ class LinePaintProperties : public Properties<
     LineTranslate,
     LineTranslateAnchor,
     LineWidth,
-    LineFloorWidth,
     LineGapWidth,
     LineOffset,
     LineBlur,
     LineDasharray,
     LinePattern,
-    LineGradient
+    LineGradient,
+    LineFloorWidth
 > {};
 
 class LineLayerProperties final : public LayerProperties {

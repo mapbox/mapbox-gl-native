@@ -33,19 +33,15 @@ struct <%- camelize(property.name) %> : ColorRampProperty {
 <%   } else { -%>
 struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %> {
     static <%- evaluatedType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
+<% if (property.name === 'line-floor-width') { -%>
+    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
+<% } -%>
 <% if (isOverridable(property)) { -%>
     static constexpr const char *name() { return "<%- property.name %>"; }
     static constexpr auto expressionType() { return expression::type::<%- expressionType(property) %>{}; };
     template<typename T> static bool hasOverride(const T& t) { return !!t.<%- camelizeWithLeadingLowercase(property.name) %>; };
 <% } -%>
 };
-<% if (property.name === 'line-width') { -%>
-
-struct LineFloorWidth : DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
-    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
-    static float defaultValue() { return 1.0f; }
-};
-<% } -%>
 <%   } -%>
 
 <% } -%>
@@ -61,9 +57,6 @@ class <%- camelize(type) %>LayoutProperties : public Properties<
 class <%- camelize(type) %>PaintProperties : public Properties<
 <% for (const property of paintProperties.slice(0, -1)) { -%>
     <%- camelize(property.name) %>,
-<% if (property.name === 'line-width') { -%>
-    LineFloorWidth,
-<% } -%>
 <% } -%>
     <%- camelize(paintProperties.slice(-1)[0].name) %>
 > {};
