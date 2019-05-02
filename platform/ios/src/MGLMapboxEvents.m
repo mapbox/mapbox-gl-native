@@ -145,9 +145,7 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
             [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
         }
 
-        if (MGLAccountManager.isAccountsSDKEnabled) {
-            [[self sharedInstance] eventsManager].skuId = MBXAccountsMapsSKUIDMaps;
-        }
+        [[self sharedInstance] eventsManager].skuId = MBXAccountsMapsSKUIDMaps;
         
         [self flush];
     });
