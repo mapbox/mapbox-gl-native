@@ -792,6 +792,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([curveType isEqualToString:@"cubic-bezier"]) {
                 curveParameters = @[@"literal", [interpolationOptions subarrayWithRange:NSMakeRange(1, 4)]];
             }
+            else {
+                curveParameters = [NSNull null];
+            }
             NSExpression *curveParameterExpression = [NSExpression expressionWithMGLJSONObject:curveParameters];
             argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSExpression *inputExpression = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];

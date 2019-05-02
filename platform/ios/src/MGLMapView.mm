@@ -2481,7 +2481,7 @@ public:
     }];
     [attributionController addAction:telemetryAction];
     
-    NSString *cancelTitle = NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"Cancel");
+    NSString *cancelTitle = NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"Title of button for dismissing attribution action sheet");
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle
                                                            style:UIAlertActionStyleCancel
                                                          handler:NULL];
@@ -3873,9 +3873,9 @@ public:
 {
     if (!_mbglMap)
     {
-        return nil;
+        return self.residualCamera;
     }
-    
+
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     mbgl::CameraOptions cameraOptions = self.mbglMap.cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
@@ -3886,7 +3886,7 @@ public:
 {
     if (!_mbglMap)
     {
-        return nil;
+        return self.residualCamera;
     }
 
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
@@ -3903,7 +3903,7 @@ public:
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(UIEdgeInsets)insets {
     if (!_mbglMap)
     {
-        return nil;
+        return self.residualCamera;
     }
 
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
@@ -3921,7 +3921,7 @@ public:
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets {
     if (!_mbglMap)
     {
-        return nil;
+        return self.residualCamera;
     }
 
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
@@ -3936,7 +3936,7 @@ public:
 {
     if (!_mbglMap)
     {
-        return nil;
+        return self.residualCamera;
     }
 
     mbgl::CameraOptions mapCamera = self.mbglMap.getCameraOptions();
