@@ -34,12 +34,40 @@ struct LineRoundLimit : LayoutProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct LineOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
-    static float defaultValue() { return 1; }
+struct LineBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
+    static float defaultValue() { return 0; }
 };
 
 struct LineColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
+};
+
+struct LineDasharray : CrossFadedPaintProperty<std::vector<float>> {
+    static std::vector<float> defaultValue() { return {  }; }
+};
+
+struct LineFloorWidth : DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
+    static float defaultValue() { return 1; }
+    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
+};
+
+struct LineGapWidth : DataDrivenPaintProperty<float, attributes::gapwidth, uniforms::gapwidth> {
+    static float defaultValue() { return 0; }
+};
+
+struct LineGradient : ColorRampProperty {
+};
+
+struct LineOffset : DataDrivenPaintProperty<float, attributes::offset, uniforms::offset> {
+    static float defaultValue() { return 0; }
+};
+
+struct LineOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
+    static float defaultValue() { return 1; }
+};
+
+struct LinePattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
+    static std::string defaultValue() { return ""; }
 };
 
 struct LineTranslate : PaintProperty<std::array<float, 2>> {
@@ -54,34 +82,6 @@ struct LineWidth : DataDrivenPaintProperty<float, attributes::width, uniforms::w
     static float defaultValue() { return 1; }
 };
 
-struct LineGapWidth : DataDrivenPaintProperty<float, attributes::gapwidth, uniforms::gapwidth> {
-    static float defaultValue() { return 0; }
-};
-
-struct LineOffset : DataDrivenPaintProperty<float, attributes::offset, uniforms::offset> {
-    static float defaultValue() { return 0; }
-};
-
-struct LineBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
-    static float defaultValue() { return 0; }
-};
-
-struct LineDasharray : CrossFadedPaintProperty<std::vector<float>> {
-    static std::vector<float> defaultValue() { return {  }; }
-};
-
-struct LinePattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::pattern_to, uniforms::pattern_to, attributes::pattern_from, uniforms::pattern_from> {
-    static std::string defaultValue() { return ""; }
-};
-
-struct LineGradient : ColorRampProperty {
-};
-
-struct LineFloorWidth : DataDrivenPaintProperty<float, attributes::floorwidth, uniforms::floorwidth> {
-    static float defaultValue() { return 1; }
-    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
-};
-
 class LineLayoutProperties : public Properties<
     LineCap,
     LineJoin,
@@ -90,18 +90,18 @@ class LineLayoutProperties : public Properties<
 > {};
 
 class LinePaintProperties : public Properties<
-    LineOpacity,
+    LineBlur,
     LineColor,
+    LineDasharray,
+    LineFloorWidth,
+    LineGapWidth,
+    LineGradient,
+    LineOffset,
+    LineOpacity,
+    LinePattern,
     LineTranslate,
     LineTranslateAnchor,
-    LineWidth,
-    LineGapWidth,
-    LineOffset,
-    LineBlur,
-    LineDasharray,
-    LinePattern,
-    LineGradient,
-    LineFloorWidth
+    LineWidth
 > {};
 
 class LineLayerProperties final : public LayerProperties {

@@ -30,23 +30,29 @@ public:
     void setFillAntialiasTransition(const TransitionOptions&);
     TransitionOptions getFillAntialiasTransition() const;
 
-    static PropertyValue<float> getDefaultFillOpacity();
-    const PropertyValue<float>& getFillOpacity() const;
-    void setFillOpacity(const PropertyValue<float>&);
-    void setFillOpacityTransition(const TransitionOptions&);
-    TransitionOptions getFillOpacityTransition() const;
-
     static PropertyValue<Color> getDefaultFillColor();
     const PropertyValue<Color>& getFillColor() const;
     void setFillColor(const PropertyValue<Color>&);
     void setFillColorTransition(const TransitionOptions&);
     TransitionOptions getFillColorTransition() const;
 
+    static PropertyValue<float> getDefaultFillOpacity();
+    const PropertyValue<float>& getFillOpacity() const;
+    void setFillOpacity(const PropertyValue<float>&);
+    void setFillOpacityTransition(const TransitionOptions&);
+    TransitionOptions getFillOpacityTransition() const;
+
     static PropertyValue<Color> getDefaultFillOutlineColor();
     const PropertyValue<Color>& getFillOutlineColor() const;
     void setFillOutlineColor(const PropertyValue<Color>&);
     void setFillOutlineColorTransition(const TransitionOptions&);
     TransitionOptions getFillOutlineColorTransition() const;
+
+    static PropertyValue<std::string> getDefaultFillPattern();
+    const PropertyValue<std::string>& getFillPattern() const;
+    void setFillPattern(const PropertyValue<std::string>&);
+    void setFillPatternTransition(const TransitionOptions&);
+    TransitionOptions getFillPatternTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultFillTranslate();
     const PropertyValue<std::array<float, 2>>& getFillTranslate() const;
@@ -59,12 +65,6 @@ public:
     void setFillTranslateAnchor(const PropertyValue<TranslateAnchorType>&);
     void setFillTranslateAnchorTransition(const TransitionOptions&);
     TransitionOptions getFillTranslateAnchorTransition() const;
-
-    static PropertyValue<std::string> getDefaultFillPattern();
-    const PropertyValue<std::string>& getFillPattern() const;
-    void setFillPattern(const PropertyValue<std::string>&);
-    void setFillPatternTransition(const TransitionOptions&);
-    TransitionOptions getFillPatternTransition() const;
 
     // Private implementation
 

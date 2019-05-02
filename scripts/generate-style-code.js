@@ -197,6 +197,8 @@ const layerCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer.cpp.ej
 const propertiesHpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.hpp.ejs', 'utf8'), {strict: true});
 const propertiesCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.cpp.ejs', 'utf8'), {strict: true});
 
+const collator = new Intl.Collator("en-US");
+
 // Add this mock property that our SDF line shader needs so that it gets added to the list of
 // "data driven" properties.
 spec.paint_line['line-floor-width'] = {
@@ -214,11 +216,19 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
     return memo;
   }, []);
 
+  // JSON doesn't have a defined order. We're going to sort them alphabetically
+  // to get a deterministic order.
+  layoutProperties.sort((a, b) => collator.compare(a.name, b.name));
+
   const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
     spec[`paint_${type}`][name].name = name;
     memo.push(spec[`paint_${type}`][name]);
     return memo;
   }, []);
+
+  // JSON doesn't have a defined order. We're going to sort them alphabetically
+  // to get a deterministic order.
+  paintProperties.sort((a, b) => collator.compare(a.name, b.name));
 
   return {
     type: type,
@@ -253,6 +263,10 @@ const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {
   memo.push(property);
   return memo;
 }, []);
+
+// JSON doesn't have a defined order. We're going to sort them alphabetically
+// to get a deterministic order.
+lightProperties.sort((a, b) => collator.compare(a.name, b.name));
 
 const lightHpp = ejs.compile(fs.readFileSync('include/mbgl/style/light.hpp.ejs', 'utf8'), {strict: true});
 const lightCpp = ejs.compile(fs.readFileSync('src/mbgl/style/light.cpp.ejs', 'utf8'), {strict: true});

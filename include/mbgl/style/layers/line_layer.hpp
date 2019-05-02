@@ -45,17 +45,53 @@ public:
 
     // Paint properties
 
-    static PropertyValue<float> getDefaultLineOpacity();
-    const PropertyValue<float>& getLineOpacity() const;
-    void setLineOpacity(const PropertyValue<float>&);
-    void setLineOpacityTransition(const TransitionOptions&);
-    TransitionOptions getLineOpacityTransition() const;
+    static PropertyValue<float> getDefaultLineBlur();
+    const PropertyValue<float>& getLineBlur() const;
+    void setLineBlur(const PropertyValue<float>&);
+    void setLineBlurTransition(const TransitionOptions&);
+    TransitionOptions getLineBlurTransition() const;
 
     static PropertyValue<Color> getDefaultLineColor();
     const PropertyValue<Color>& getLineColor() const;
     void setLineColor(const PropertyValue<Color>&);
     void setLineColorTransition(const TransitionOptions&);
     TransitionOptions getLineColorTransition() const;
+
+    static PropertyValue<std::vector<float>> getDefaultLineDasharray();
+    const PropertyValue<std::vector<float>>& getLineDasharray() const;
+    void setLineDasharray(const PropertyValue<std::vector<float>>&);
+    void setLineDasharrayTransition(const TransitionOptions&);
+    TransitionOptions getLineDasharrayTransition() const;
+
+    static PropertyValue<float> getDefaultLineGapWidth();
+    const PropertyValue<float>& getLineGapWidth() const;
+    void setLineGapWidth(const PropertyValue<float>&);
+    void setLineGapWidthTransition(const TransitionOptions&);
+    TransitionOptions getLineGapWidthTransition() const;
+
+    static ColorRampPropertyValue getDefaultLineGradient();
+    const ColorRampPropertyValue& getLineGradient() const;
+    void setLineGradient(const ColorRampPropertyValue&);
+    void setLineGradientTransition(const TransitionOptions&);
+    TransitionOptions getLineGradientTransition() const;
+
+    static PropertyValue<float> getDefaultLineOffset();
+    const PropertyValue<float>& getLineOffset() const;
+    void setLineOffset(const PropertyValue<float>&);
+    void setLineOffsetTransition(const TransitionOptions&);
+    TransitionOptions getLineOffsetTransition() const;
+
+    static PropertyValue<float> getDefaultLineOpacity();
+    const PropertyValue<float>& getLineOpacity() const;
+    void setLineOpacity(const PropertyValue<float>&);
+    void setLineOpacityTransition(const TransitionOptions&);
+    TransitionOptions getLineOpacityTransition() const;
+
+    static PropertyValue<std::string> getDefaultLinePattern();
+    const PropertyValue<std::string>& getLinePattern() const;
+    void setLinePattern(const PropertyValue<std::string>&);
+    void setLinePatternTransition(const TransitionOptions&);
+    TransitionOptions getLinePatternTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultLineTranslate();
     const PropertyValue<std::array<float, 2>>& getLineTranslate() const;
@@ -74,42 +110,6 @@ public:
     void setLineWidth(const PropertyValue<float>&);
     void setLineWidthTransition(const TransitionOptions&);
     TransitionOptions getLineWidthTransition() const;
-
-    static PropertyValue<float> getDefaultLineGapWidth();
-    const PropertyValue<float>& getLineGapWidth() const;
-    void setLineGapWidth(const PropertyValue<float>&);
-    void setLineGapWidthTransition(const TransitionOptions&);
-    TransitionOptions getLineGapWidthTransition() const;
-
-    static PropertyValue<float> getDefaultLineOffset();
-    const PropertyValue<float>& getLineOffset() const;
-    void setLineOffset(const PropertyValue<float>&);
-    void setLineOffsetTransition(const TransitionOptions&);
-    TransitionOptions getLineOffsetTransition() const;
-
-    static PropertyValue<float> getDefaultLineBlur();
-    const PropertyValue<float>& getLineBlur() const;
-    void setLineBlur(const PropertyValue<float>&);
-    void setLineBlurTransition(const TransitionOptions&);
-    TransitionOptions getLineBlurTransition() const;
-
-    static PropertyValue<std::vector<float>> getDefaultLineDasharray();
-    const PropertyValue<std::vector<float>>& getLineDasharray() const;
-    void setLineDasharray(const PropertyValue<std::vector<float>>&);
-    void setLineDasharrayTransition(const TransitionOptions&);
-    TransitionOptions getLineDasharrayTransition() const;
-
-    static PropertyValue<std::string> getDefaultLinePattern();
-    const PropertyValue<std::string>& getLinePattern() const;
-    void setLinePattern(const PropertyValue<std::string>&);
-    void setLinePatternTransition(const TransitionOptions&);
-    TransitionOptions getLinePatternTransition() const;
-
-    static ColorRampPropertyValue getDefaultLineGradient();
-    const ColorRampPropertyValue& getLineGradient() const;
-    void setLineGradient(const ColorRampPropertyValue&);
-    void setLineGradientTransition(const TransitionOptions&);
-    TransitionOptions getLineGradientTransition() const;
 
     // Private implementation
 

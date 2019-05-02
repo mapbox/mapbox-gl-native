@@ -14,6 +14,17 @@
 namespace mbgl {
 namespace style {
 
+struct HeatmapColor : ColorRampProperty {
+};
+
+struct HeatmapIntensity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
+struct HeatmapOpacity : PaintProperty<float> {
+    static float defaultValue() { return 1; }
+};
+
 struct HeatmapRadius : DataDrivenPaintProperty<float, attributes::radius, uniforms::radius> {
     static float defaultValue() { return 30; }
 };
@@ -22,23 +33,12 @@ struct HeatmapWeight : DataDrivenPaintProperty<float, attributes::weight, unifor
     static float defaultValue() { return 1; }
 };
 
-struct HeatmapIntensity : PaintProperty<float> {
-    static float defaultValue() { return 1; }
-};
-
-struct HeatmapColor : ColorRampProperty {
-};
-
-struct HeatmapOpacity : PaintProperty<float> {
-    static float defaultValue() { return 1; }
-};
-
 class HeatmapPaintProperties : public Properties<
-    HeatmapRadius,
-    HeatmapWeight,
-    HeatmapIntensity,
     HeatmapColor,
-    HeatmapOpacity
+    HeatmapIntensity,
+    HeatmapOpacity,
+    HeatmapRadius,
+    HeatmapWeight
 > {};
 
 class HeatmapLayerProperties final : public LayerProperties {

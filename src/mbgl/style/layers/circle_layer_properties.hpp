@@ -14,40 +14,28 @@
 namespace mbgl {
 namespace style {
 
-struct CircleRadius : DataDrivenPaintProperty<float, attributes::radius, uniforms::radius> {
-    static float defaultValue() { return 5; }
+struct CircleBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
+    static float defaultValue() { return 0; }
 };
 
 struct CircleColor : DataDrivenPaintProperty<Color, attributes::color, uniforms::color> {
     static Color defaultValue() { return Color::black(); }
 };
 
-struct CircleBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
-    static float defaultValue() { return 0; }
-};
-
 struct CircleOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniforms::opacity> {
     static float defaultValue() { return 1; }
-};
-
-struct CircleTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
-};
-
-struct CircleTranslateAnchor : PaintProperty<TranslateAnchorType> {
-    static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
-};
-
-struct CirclePitchScale : PaintProperty<CirclePitchScaleType> {
-    static CirclePitchScaleType defaultValue() { return CirclePitchScaleType::Map; }
 };
 
 struct CirclePitchAlignment : PaintProperty<AlignmentType> {
     static AlignmentType defaultValue() { return AlignmentType::Viewport; }
 };
 
-struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::stroke_width, uniforms::stroke_width> {
-    static float defaultValue() { return 0; }
+struct CirclePitchScale : PaintProperty<CirclePitchScaleType> {
+    static CirclePitchScaleType defaultValue() { return CirclePitchScaleType::Map; }
+};
+
+struct CircleRadius : DataDrivenPaintProperty<float, attributes::radius, uniforms::radius> {
+    static float defaultValue() { return 5; }
 };
 
 struct CircleStrokeColor : DataDrivenPaintProperty<Color, attributes::stroke_color, uniforms::stroke_color> {
@@ -58,18 +46,30 @@ struct CircleStrokeOpacity : DataDrivenPaintProperty<float, attributes::stroke_o
     static float defaultValue() { return 1; }
 };
 
+struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::stroke_width, uniforms::stroke_width> {
+    static float defaultValue() { return 0; }
+};
+
+struct CircleTranslate : PaintProperty<std::array<float, 2>> {
+    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+};
+
+struct CircleTranslateAnchor : PaintProperty<TranslateAnchorType> {
+    static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
+};
+
 class CirclePaintProperties : public Properties<
-    CircleRadius,
-    CircleColor,
     CircleBlur,
+    CircleColor,
     CircleOpacity,
-    CircleTranslate,
-    CircleTranslateAnchor,
-    CirclePitchScale,
     CirclePitchAlignment,
-    CircleStrokeWidth,
+    CirclePitchScale,
+    CircleRadius,
     CircleStrokeColor,
-    CircleStrokeOpacity
+    CircleStrokeOpacity,
+    CircleStrokeWidth,
+    CircleTranslate,
+    CircleTranslateAnchor
 > {};
 
 class CircleLayerProperties final : public LayerProperties {

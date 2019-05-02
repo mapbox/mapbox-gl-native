@@ -24,17 +24,11 @@ public:
 
     // Paint properties
 
-    static PropertyValue<float> getDefaultRasterOpacity();
-    const PropertyValue<float>& getRasterOpacity() const;
-    void setRasterOpacity(const PropertyValue<float>&);
-    void setRasterOpacityTransition(const TransitionOptions&);
-    TransitionOptions getRasterOpacityTransition() const;
-
-    static PropertyValue<float> getDefaultRasterHueRotate();
-    const PropertyValue<float>& getRasterHueRotate() const;
-    void setRasterHueRotate(const PropertyValue<float>&);
-    void setRasterHueRotateTransition(const TransitionOptions&);
-    TransitionOptions getRasterHueRotateTransition() const;
+    static PropertyValue<float> getDefaultRasterBrightnessMax();
+    const PropertyValue<float>& getRasterBrightnessMax() const;
+    void setRasterBrightnessMax(const PropertyValue<float>&);
+    void setRasterBrightnessMaxTransition(const TransitionOptions&);
+    TransitionOptions getRasterBrightnessMaxTransition() const;
 
     static PropertyValue<float> getDefaultRasterBrightnessMin();
     const PropertyValue<float>& getRasterBrightnessMin() const;
@@ -42,23 +36,29 @@ public:
     void setRasterBrightnessMinTransition(const TransitionOptions&);
     TransitionOptions getRasterBrightnessMinTransition() const;
 
-    static PropertyValue<float> getDefaultRasterBrightnessMax();
-    const PropertyValue<float>& getRasterBrightnessMax() const;
-    void setRasterBrightnessMax(const PropertyValue<float>&);
-    void setRasterBrightnessMaxTransition(const TransitionOptions&);
-    TransitionOptions getRasterBrightnessMaxTransition() const;
-
-    static PropertyValue<float> getDefaultRasterSaturation();
-    const PropertyValue<float>& getRasterSaturation() const;
-    void setRasterSaturation(const PropertyValue<float>&);
-    void setRasterSaturationTransition(const TransitionOptions&);
-    TransitionOptions getRasterSaturationTransition() const;
-
     static PropertyValue<float> getDefaultRasterContrast();
     const PropertyValue<float>& getRasterContrast() const;
     void setRasterContrast(const PropertyValue<float>&);
     void setRasterContrastTransition(const TransitionOptions&);
     TransitionOptions getRasterContrastTransition() const;
+
+    static PropertyValue<float> getDefaultRasterFadeDuration();
+    const PropertyValue<float>& getRasterFadeDuration() const;
+    void setRasterFadeDuration(const PropertyValue<float>&);
+    void setRasterFadeDurationTransition(const TransitionOptions&);
+    TransitionOptions getRasterFadeDurationTransition() const;
+
+    static PropertyValue<float> getDefaultRasterHueRotate();
+    const PropertyValue<float>& getRasterHueRotate() const;
+    void setRasterHueRotate(const PropertyValue<float>&);
+    void setRasterHueRotateTransition(const TransitionOptions&);
+    TransitionOptions getRasterHueRotateTransition() const;
+
+    static PropertyValue<float> getDefaultRasterOpacity();
+    const PropertyValue<float>& getRasterOpacity() const;
+    void setRasterOpacity(const PropertyValue<float>&);
+    void setRasterOpacityTransition(const TransitionOptions&);
+    TransitionOptions getRasterOpacityTransition() const;
 
     static PropertyValue<RasterResamplingType> getDefaultRasterResampling();
     const PropertyValue<RasterResamplingType>& getRasterResampling() const;
@@ -66,11 +66,11 @@ public:
     void setRasterResamplingTransition(const TransitionOptions&);
     TransitionOptions getRasterResamplingTransition() const;
 
-    static PropertyValue<float> getDefaultRasterFadeDuration();
-    const PropertyValue<float>& getRasterFadeDuration() const;
-    void setRasterFadeDuration(const PropertyValue<float>&);
-    void setRasterFadeDurationTransition(const TransitionOptions&);
-    TransitionOptions getRasterFadeDurationTransition() const;
+    static PropertyValue<float> getDefaultRasterSaturation();
+    const PropertyValue<float>& getRasterSaturation() const;
+    void setRasterSaturation(const PropertyValue<float>&);
+    void setRasterSaturationTransition(const TransitionOptions&);
+    TransitionOptions getRasterSaturationTransition() const;
 
     // Private implementation
 
