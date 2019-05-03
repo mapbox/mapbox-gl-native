@@ -1724,8 +1724,6 @@ public:
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MMEEventGesturePanStart forRecognizer:pan];
-
         self.userTrackingMode = MGLUserTrackingModeNone;
 
         [self notifyGestureDidBegin];
@@ -1766,17 +1764,6 @@ public:
         }
 
         [self notifyGestureDidEndWithDrift:drift];
-
-        // metrics: pan end
-        CGPoint pointInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
-        CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
-        int zoom = round([self zoomLevel]);
-
-        [MGLMapboxEvents pushEvent:MMEEventTypeMapDragEnd withAttributes:@{
-            MMEEventKeyLatitude: @(panCoordinate.latitude),
-            MMEEventKeyLongitude: @(panCoordinate.longitude),
-            MMEEventKeyZoomLevel: @(zoom)
-        }];
     }
 
 }
@@ -1794,8 +1781,6 @@ public:
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MMEEventGesturePinchStart forRecognizer:pinch];
-
         self.scale = powf(2, [self zoomLevel]);
 
         [self notifyGestureDidBegin];
@@ -1898,8 +1883,6 @@ public:
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MMEEventGestureRotateStart forRecognizer:rotate];
-
         self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
 
         if (self.userTrackingMode != MGLUserTrackingModeNone)
@@ -1990,8 +1973,6 @@ public:
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
     if (singleTap.state != UIGestureRecognizerStateRecognized) return;
-
-    [self trackGestureEvent:MMEEventGestureSingleTap forRecognizer:singleTap];
 
     if (self.mapViewProxyAccessibilityElement.accessibilityElementIsFocused)
     {
@@ -2096,8 +2077,6 @@ public:
 
     if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
     {
-        [self trackGestureEvent:MMEEventGestureDoubleTap forRecognizer:doubleTap];
-
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
         self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(center), MGLDurationFromTimeInterval(MGLAnimationDuration));
 
@@ -2136,8 +2115,6 @@ public:
 
     if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
     {
-        [self trackGestureEvent:MMEEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
-
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
         self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(center), MGLDurationFromTimeInterval(MGLAnimationDuration));
 
@@ -2160,8 +2137,6 @@ public:
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MMEEventGestureQuickZoom forRecognizer:quickZoom];
-
         self.scale = powf(2, [self zoomLevel]);
 
         self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
@@ -2207,7 +2182,6 @@ public:
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
         initialPitch = *self.mbglMap.getCameraOptions().pitch;
-        [self trackGestureEvent:MMEEventGesturePitchStart forRecognizer:twoFingerDrag];
         [self notifyGestureDidBegin];
     }
 
@@ -2408,20 +2382,6 @@ public:
     CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
     
     return degrees;
-}
-
-- (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(UIGestureRecognizer *)recognizer
-{
-    CGPoint pointInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
-    CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
-    int zoom = round([self zoomLevel]);
-
-    [MGLMapboxEvents pushEvent:MMEEventTypeMapTap withAttributes:@{
-        MMEEventKeyLatitude: @(gestureCoordinate.latitude),
-        MMEEventKeyLongitude: @(gestureCoordinate.longitude),
-        MMEEventKeyZoomLevel: @(zoom),
-        MMEEventKeyGestureID: gestureID
-    }];
 }
 
 #pragma mark - Attribution -
