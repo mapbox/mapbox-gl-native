@@ -80,6 +80,7 @@ public class FileUtils {
     @Override
     protected Boolean doInBackground(File... files) {
       try {
+        Thread.sleep(3000);
         return files[0].canWrite();
       } catch (Exception ex) {
         return false;
@@ -88,6 +89,7 @@ public class FileUtils {
 
     @Override
     protected void onCancelled() {
+      Logger.e(TAG, "On cancelled.");
       OnCheckFileWritePermissionListener localListener = listener;
       listener = null;
       localListener.onError();
@@ -95,6 +97,7 @@ public class FileUtils {
 
     @Override
     protected void onPostExecute(Boolean result) {
+      Logger.e(TAG, "On postExecute.");
       OnCheckFileWritePermissionListener localListener = listener;
       listener = null;
       if (result) {

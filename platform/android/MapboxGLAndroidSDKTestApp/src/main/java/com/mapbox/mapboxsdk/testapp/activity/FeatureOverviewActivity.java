@@ -8,10 +8,14 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureAdapter;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureSectionAdapter;
@@ -43,6 +47,18 @@ public class FeatureOverviewActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_feature_overview);
+
+    FileSource.setResourcesCachePath(this, Environment.getExternalStorageDirectory().getPath(), new FileSource.ResourcesCachePathChangeCallback() {
+      @Override
+      public void onSuccess(String path) {
+        Logger.e(FileSource.TAG, "Path updated:" + path);
+      }
+
+      @Override
+      public void onError(String message) {
+        Logger.e(FileSource.TAG, "Error updated:" + message);
+      }
+    });
 
     recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));

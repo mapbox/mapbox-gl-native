@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class FileSource {
 
-  private static final String TAG = "Mbgl-FileSource";
+  public static final String TAG = "Mbgl-FileSource";
   private static final String MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH = "fileSourceResourcesCachePath";
   private static final Lock resourcesCachePathLoaderLock = new ReentrantLock();
   private static final Lock internalCachePathLoaderLock = new ReentrantLock();
@@ -291,18 +291,18 @@ public class FileSource {
           final ResourcesCachePathChangeCallback callback = callbackWeakReference.get();
 
           if (callback == null) {
-            Logger.w(TAG, "Lost callback reference.");
+            Logger.e(TAG, "Lost callback reference.");
             return;
           } else if (context == null) {
             String lostContextMessage = "Lost context reference.";
-            Logger.w(TAG, lostContextMessage);
+            Logger.e(TAG, lostContextMessage);
             callback.onError(lostContextMessage);
             return;
           }
 
           // verify fileSource's activation again after the async task returns
           if (getInstance(context).isActivated()) {
-            Logger.w(TAG, fileSourceActivatedMessage);
+            Logger.e(TAG, fileSourceActivatedMessage);
             callback.onError(fileSourceActivatedMessage);
           } else {
             final SharedPreferences.Editor editor =
