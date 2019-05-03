@@ -225,7 +225,8 @@ public class OfflineManager {
    */
   public void mergeOfflineRegions(@NonNull String path, @NonNull final MergeOfflineRegionsCallback callback) {
     final File src = new File(path);
-    new FileUtils.CheckFileReadPermissionTask(new FileUtils.OnCheckFileReadPermissionListener() {
+    final FileUtils.OnCheckFileReadPermissionListener fileReadPermissionListener =
+      new FileUtils.OnCheckFileReadPermissionListener() {
       @Override
       public void onReadPermissionGranted() {
         new FileUtils.CheckFileWritePermissionTask(new FileUtils.OnCheckFileWritePermissionListener() {
@@ -250,18 +251,19 @@ public class OfflineManager {
         // path not readable, abort
         callback.onError("Secondary database needs to be located in a readable path.");
       }
-    }).execute(src);
+    };
+    new FileUtils.CheckFileReadPermissionTask(fileReadPermissionListener).execute(src);
   }
 
   private static final class CopyTempDatabaseFileTask extends AsyncTask<Object, Void, Object> {
     @NonNull
     private final WeakReference<OfflineManager> offlineManagerWeakReference;
     @NonNull
-    private final WeakReference<MergeOfflineRegionsCallback> callbackWeakReference;
+    private MergeOfflineRegionsCallback callback;
 
     CopyTempDatabaseFileTask(OfflineManager offlineManager, MergeOfflineRegionsCallback callback) {
       this.offlineManagerWeakReference = new WeakReference<>(offlineManager);
-      this.callbackWeakReference = new WeakReference<>(callback);
+      this.callback = callback;
     }
 
     @Override
@@ -279,17 +281,16 @@ public class OfflineManager {
 
     @Override
     protected void onPostExecute(Object object) {
-      MergeOfflineRegionsCallback callback = callbackWeakReference.get();
-      if (callback != null) {
-        OfflineManager offlineManager = offlineManagerWeakReference.get();
-        if (object instanceof File && offlineManager != null) {
-          // successfully copied the file, perform merge
-          File dst = (File) object;
-          offlineManager.mergeOfflineDatabaseFiles(dst, callback, true);
-        } else if (object instanceof String) {
-          // error occurred
-          callback.onError((String) object);
-        }
+      MergeOfflineRegionsCallback localCallback = callback;
+      callback = null;
+      OfflineManager offlineManager = offlineManagerWeakReference.get();
+      if (object instanceof File && offlineManager != null) {
+        // successfully copied the file, perform merge
+        File dst = (File) object;
+        offlineManager.mergeOfflineDatabaseFiles(dst, localCallback, true);
+      } else if (object instanceof String) {
+        // error occurred
+        localCallback.onError((String) object);
       }
     }
   }
