@@ -21,6 +21,7 @@ class CircleProgram : public Program<
         uniforms::matrix,
         uniforms::scale_with_map,
         uniforms::extrude_scale,
+        uniforms::device_pixel_ratio,
         uniforms::camera_to_center_distance,
         uniforms::pitch_with_map>,
     TypeList<>,

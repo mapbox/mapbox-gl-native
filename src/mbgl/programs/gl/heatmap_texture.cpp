@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<HeatmapTextureProgram> {
     static constexpr const char* name = "heatmap_texture";
     static constexpr const uint8_t hash[8] = { 0x9f, 0xc7, 0x56, 0xb2, 0x9e, 0x8f, 0x15, 0xff };
-    static constexpr const auto vertexOffset = 9491;
-    static constexpr const auto fragmentOffset = 9671;
+    static constexpr const auto vertexOffset = 9535;
+    static constexpr const auto fragmentOffset = 9715;
 };
 
 constexpr const char* ShaderSource<HeatmapTextureProgram>::name;

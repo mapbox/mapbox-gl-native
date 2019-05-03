@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<HillshadePrepareProgram> {
     static constexpr const char* name = "hillshade_prepare";
     static constexpr const uint8_t hash[8] = { 0xe6, 0x01, 0xf2, 0xbb, 0xa0, 0x77, 0x1d, 0xeb };
-    static constexpr const auto vertexOffset = 27653;
-    static constexpr const auto fragmentOffset = 27946;
+    static constexpr const auto vertexOffset = 27698;
+    static constexpr const auto fragmentOffset = 27991;
 };
 
 constexpr const char* ShaderSource<HillshadePrepareProgram>::name;

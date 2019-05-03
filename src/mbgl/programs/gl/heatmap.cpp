@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<HeatmapProgram> {
     static constexpr const char* name = "heatmap";
-    static constexpr const uint8_t hash[8] = { 0xab, 0x97, 0x81, 0x5c, 0xa2, 0x88, 0xaa, 0x7e };
-    static constexpr const auto vertexOffset = 7983;
-    static constexpr const auto fragmentOffset = 9030;
+    static constexpr const uint8_t hash[8] = { 0xe5, 0xa4, 0x9c, 0x31, 0x01, 0xe5, 0x4a, 0xe0 };
+    static constexpr const auto vertexOffset = 8026;
+    static constexpr const auto fragmentOffset = 9074;
 };
 
 constexpr const char* ShaderSource<HeatmapProgram>::name;
@@ -40,6 +40,16 @@ Context::createProgram<gl::Context>(const ProgramParameters& programParameters) 
 // Uncompressed source of heatmap.vertex.glsl:
 /*
 
+uniform mat4 u_matrix;
+uniform float u_extrude_scale;
+uniform float u_opacity;
+uniform float u_intensity;
+
+attribute vec2 a_pos;
+
+varying vec2 v_extrude;
+
+
 #ifndef HAS_UNIFORM_u_weight
 uniform lowp float u_weight_t;
 attribute highp vec2 a_weight;
@@ -56,15 +66,6 @@ attribute mediump vec2 a_radius;
 uniform mediump float u_radius;
 #endif
 
-
-uniform mat4 u_matrix;
-uniform float u_extrude_scale;
-uniform float u_opacity;
-uniform float u_intensity;
-
-attribute vec2 a_pos;
-
-varying vec2 v_extrude;
 
 // Effective "0" in the kernel density texture to adjust the kernel size to;
 // this empirically chosen number minimizes artifacts on overlapping kernels
@@ -124,6 +125,10 @@ void main(void) {
 
 // Uncompressed source of heatmap.fragment.glsl:
 /*
+uniform highp float u_intensity;
+
+varying vec2 v_extrude;
+
 
 #ifndef HAS_UNIFORM_u_weight
 varying highp float weight;
@@ -131,9 +136,6 @@ varying highp float weight;
 uniform highp float u_weight;
 #endif
 
-
-uniform highp float u_intensity;
-varying vec2 v_extrude;
 
 // Gaussian kernel coefficient: 1 / sqrt(2 * PI)
 #define GAUSS_COEF 0.3989422804014327

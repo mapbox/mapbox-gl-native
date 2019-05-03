@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('flow-remove-types/register');
+require('@mapbox/flow-remove-types/register');
 
 const path = require('path');
 const outputPath = 'src/mbgl/programs';

@@ -83,6 +83,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
                         tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
                         tile.id.pixelsToTileUnits(1, parameters.state.getZoom()) }}
                     : parameters.pixelsToGLUnits ),
+                uniforms::device_pixel_ratio::Value( parameters.pixelRatio ),
                 uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() ),
                 uniforms::pitch_with_map::Value( pitchWithMap )
             },

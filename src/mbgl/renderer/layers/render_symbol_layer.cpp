@@ -157,7 +157,7 @@ void drawIcon(const DrawFn& draw,
     if (bucket.sdfIcons) {
         if (values.hasHalo) {
             draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                SymbolSDFIconProgram::layoutUniformValues(false, false, values, iconSize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+                SymbolSDFIconProgram::layoutUniformValues(false, false, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                 bucket.icon,
                 iconSegments,
                 bucket.iconSizeBinder,
@@ -171,7 +171,7 @@ void drawIcon(const DrawFn& draw,
 
         if (values.hasFill) {
             draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                SymbolSDFIconProgram::layoutUniformValues(false, false, values, iconSize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+                SymbolSDFIconProgram::layoutUniformValues(false, false, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                 bucket.icon,
                 iconSegments,
                 bucket.iconSizeBinder,
@@ -302,7 +302,7 @@ void drawText(const DrawFn& draw,
 
     if (values.hasHalo) {
         draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
             bucket.text,
             textSegments,
             bucket.textSizeBinder,
@@ -316,7 +316,7 @@ void drawText(const DrawFn& draw,
 
     if (values.hasFill) {
         draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
             bucket.text,
             textSegments,
             bucket.textSizeBinder,

@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<SymbolIconProgram> {
     static constexpr const char* name = "symbol_icon";
-    static constexpr const uint8_t hash[8] = { 0x96, 0x0c, 0xef, 0xec, 0x37, 0x23, 0xf9, 0xb1 };
-    static constexpr const auto vertexOffset = 49728;
-    static constexpr const auto fragmentOffset = 52382;
+    static constexpr const uint8_t hash[8] = { 0xf3, 0x81, 0x62, 0xe8, 0x24, 0x49, 0xc6, 0x8f };
+    static constexpr const auto vertexOffset = 50079;
+    static constexpr const auto fragmentOffset = 52727;
 };
 
 constexpr const char* ShaderSource<SymbolIconProgram>::name;
@@ -56,6 +56,18 @@ uniform bool u_rotate_symbol;
 uniform highp float u_aspect_ratio;
 uniform float u_fade_change;
 
+uniform mat4 u_matrix;
+uniform mat4 u_label_plane_matrix;
+uniform mat4 u_coord_matrix;
+
+uniform bool u_is_text;
+uniform bool u_pitch_with_map;
+
+uniform vec2 u_texsize;
+
+varying vec2 v_tex;
+varying float v_fade_opacity;
+
 
 #ifndef HAS_UNIFORM_u_opacity
 uniform lowp float u_opacity_t;
@@ -65,18 +77,6 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
-
-uniform mat4 u_matrix;
-uniform mat4 u_label_plane_matrix;
-uniform mat4 u_gl_coord_matrix;
-
-uniform bool u_is_text;
-uniform bool u_pitch_with_map;
-
-uniform vec2 u_texsize;
-
-varying vec2 v_tex;
-varying float v_fade_opacity;
 
 void main() {
     
@@ -137,7 +137,7 @@ void main() {
     mat2 rotation_matrix = mat2(angle_cos, -1.0 * angle_sin, angle_sin, angle_cos);
 
     vec4 projected_pos = u_label_plane_matrix * vec4(a_projected_pos.xy, 0.0, 1.0);
-    gl_Position = u_gl_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 32.0 * fontScale), 0.0, 1.0);
+    gl_Position = u_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 32.0 * fontScale), 0.0, 1.0);
 
     v_tex = a_tex / u_texsize;
     vec2 fade_opacity = unpack_opacity(a_fade_opacity);
@@ -151,6 +151,9 @@ void main() {
 /*
 uniform sampler2D u_texture;
 
+varying vec2 v_tex;
+varying float v_fade_opacity;
+
 
 #ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
@@ -158,9 +161,6 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
-
-varying vec2 v_tex;
-varying float v_fade_opacity;
 
 void main() {
     

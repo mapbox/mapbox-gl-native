@@ -159,7 +159,7 @@ typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
 typedef NS_ENUM(NSUInteger, MGLSymbolZOrder) {
     /**
      If `MGLSymbolStyleLayer.symbolSortKey` is set, sort based on that.
-     Otherwise sort symbols by their position relative to the viewport.
+     Otherwise sort symbols by their y-position relative to the viewport.
      */
     MGLSymbolZOrderAuto,
     /**
@@ -1075,7 +1075,7 @@ MGL_EXPORT
  * Constant `MGLSymbolZOrder` values
  * Any of the following constant string values:
    * `auto`: If `symbol-sort-key` is set, sort based on that. Otherwise sort
- symbols by their position relative to the viewport.
+ symbols by their y-position relative to the viewport.
    * `viewport-y`: Specify this z order if symbols’ appearance relies on lower
  features overlapping higher features. For example, symbols with a pin-like
  appearance would require this z order.
@@ -1499,6 +1499,9 @@ MGL_EXPORT
  two-dimensional `textOffset`.
  
  This property is measured in ems.
+ 
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `textOffset` is set to `nil`.
  Otherwise, it is ignored.

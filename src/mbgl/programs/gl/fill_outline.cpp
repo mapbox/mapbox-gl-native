@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillOutlineProgram> {
     static constexpr const char* name = "fill_outline";
-    static constexpr const uint8_t hash[8] = { 0x56, 0x65, 0x69, 0x4b, 0x70, 0x2d, 0x3d, 0xc4 };
-    static constexpr const auto vertexOffset = 13678;
-    static constexpr const auto fragmentOffset = 14503;
+    static constexpr const uint8_t hash[8] = { 0x51, 0x25, 0x43, 0x9d, 0x41, 0x73, 0xe1, 0xbb };
+    static constexpr const auto vertexOffset = 13722;
+    static constexpr const auto fragmentOffset = 14547;
 };
 
 constexpr const char* ShaderSource<FillOutlineProgram>::name;
@@ -89,6 +89,8 @@ void main() {
 
 // Uncompressed source of fill_outline.fragment.glsl:
 /*
+varying vec2 v_pos;
+
 
 #ifndef HAS_UNIFORM_u_outline_color
 varying highp vec4 outline_color;
@@ -103,8 +105,6 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
-
-varying vec2 v_pos;
 
 void main() {
     

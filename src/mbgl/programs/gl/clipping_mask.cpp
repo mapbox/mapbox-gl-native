@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<ClippingMaskProgram> {
     static constexpr const char* name = "clipping_mask";
     static constexpr const uint8_t hash[8] = { 0x3e, 0x17, 0xc2, 0x3a, 0x1f, 0xf0, 0xa8, 0xa3 };
-    static constexpr const auto vertexOffset = 7848;
-    static constexpr const auto fragmentOffset = 7944;
+    static constexpr const auto vertexOffset = 7891;
+    static constexpr const auto fragmentOffset = 7987;
 };
 
 constexpr const char* ShaderSource<ClippingMaskProgram>::name;

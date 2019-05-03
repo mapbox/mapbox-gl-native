@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<SymbolSDFTextProgram> {
     static constexpr const char* name = "symbol_sdf_text";
-    static constexpr const uint8_t hash[8] = { 0x13, 0xfc, 0x05, 0x2a, 0xd1, 0x93, 0xfb, 0x7d };
-    static constexpr const auto vertexOffset = 52787;
-    static constexpr const auto fragmentOffset = 56827;
+    static constexpr const uint8_t hash[8] = { 0x4b, 0x0b, 0x5f, 0x6b, 0xa9, 0xec, 0x84, 0x19 };
+    static constexpr const auto vertexOffset = 53132;
+    static constexpr const auto fragmentOffset = 57166;
 };
 
 constexpr const char* ShaderSource<SymbolSDFTextProgram>::name;
@@ -57,6 +57,20 @@ uniform bool u_is_size_zoom_constant;
 uniform bool u_is_size_feature_constant;
 uniform highp float u_size_t; // used to interpolate between zoom stops when size is a composite function
 uniform highp float u_size; // used when size is both zoom and feature constant
+uniform mat4 u_matrix;
+uniform mat4 u_label_plane_matrix;
+uniform mat4 u_coord_matrix;
+uniform bool u_is_text;
+uniform bool u_pitch_with_map;
+uniform highp float u_pitch;
+uniform bool u_rotate_symbol;
+uniform highp float u_aspect_ratio;
+uniform highp float u_camera_to_center_distance;
+uniform float u_fade_change;
+uniform vec2 u_texsize;
+
+varying vec2 v_data0;
+varying vec3 v_data1;
 
 
 #ifndef HAS_UNIFORM_u_fill_color
@@ -103,23 +117,6 @@ varying lowp float halo_blur;
 uniform lowp float u_halo_blur;
 #endif
 
-
-uniform mat4 u_matrix;
-uniform mat4 u_label_plane_matrix;
-uniform mat4 u_gl_coord_matrix;
-
-uniform bool u_is_text;
-uniform bool u_pitch_with_map;
-uniform highp float u_pitch;
-uniform bool u_rotate_symbol;
-uniform highp float u_aspect_ratio;
-uniform highp float u_camera_to_center_distance;
-uniform float u_fade_change;
-
-uniform vec2 u_texsize;
-
-varying vec2 v_data0;
-varying vec3 v_data1;
 
 void main() {
     
@@ -215,7 +212,7 @@ void main() {
     mat2 rotation_matrix = mat2(angle_cos, -1.0 * angle_sin, angle_sin, angle_cos);
 
     vec4 projected_pos = u_label_plane_matrix * vec4(a_projected_pos.xy, 0.0, 1.0);
-    gl_Position = u_gl_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 32.0 * fontScale), 0.0, 1.0);
+    gl_Position = u_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 32.0 * fontScale), 0.0, 1.0);
     float gamma_scale = gl_Position.w;
 
     vec2 tex = a_tex / u_texsize;
@@ -232,9 +229,16 @@ void main() {
 // Uncompressed source of symbol_sdf_text.fragment.glsl:
 /*
 #define SDF_PX 8.0
-#define EDGE_GAMMA 0.105/DEVICE_PIXEL_RATIO
 
 uniform bool u_is_halo;
+uniform sampler2D u_texture;
+uniform highp float u_gamma_scale;
+uniform lowp float u_device_pixel_ratio;
+uniform bool u_is_text;
+
+varying vec2 v_data0;
+varying vec3 v_data1;
+
 
 #ifndef HAS_UNIFORM_u_fill_color
 varying highp vec4 fill_color;
@@ -271,13 +275,6 @@ uniform lowp float u_halo_blur;
 #endif
 
 
-uniform sampler2D u_texture;
-uniform highp float u_gamma_scale;
-uniform bool u_is_text;
-
-varying vec2 v_data0;
-varying vec3 v_data1;
-
 void main() {
     
 #ifdef HAS_UNIFORM_u_fill_color
@@ -304,6 +301,8 @@ void main() {
     lowp float halo_blur = u_halo_blur;
 #endif
 
+
+    float EDGE_GAMMA = 0.105 / u_device_pixel_ratio;
 
     vec2 tex = v_data0.xy;
     float gamma_scale = v_data1.x;

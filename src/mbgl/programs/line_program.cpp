@@ -23,6 +23,7 @@ Values makeValues(const style::LinePaintProperties::PossiblyEvaluated& propertie
                   const RenderTile& tile,
                   const TransformState& state,
                   const std::array<float, 2>& pixelsToGLUnits,
+                  const float pixelRatio,
                   Args&&... args) {
 
     return Values {
@@ -32,7 +33,8 @@ Values makeValues(const style::LinePaintProperties::PossiblyEvaluated& propertie
                                   state)
         ),
         uniforms::ratio::Value( 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) ),
-        uniforms::gl_units_to_pixels::Value({ {1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1]} }),
+        uniforms::units_to_pixels::Value({ {1.0f / pixelsToGLUnits[0], 1.0f / pixelsToGLUnits[1]} }),
+        uniforms::device_pixel_ratio::Value( pixelRatio ),
         std::forward<Args>(args)...
     };
 }
@@ -41,12 +43,14 @@ LineProgram::LayoutUniformValues
 LineProgram::layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated& properties,
                                  const RenderTile& tile,
                                  const TransformState& state,
-                                 const std::array<float, 2>& pixelsToGLUnits) {
+                                 const std::array<float, 2>& pixelsToGLUnits,
+                                 const float pixelRatio) {
     return makeValues<LineProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
-        pixelsToGLUnits
+        pixelsToGLUnits,
+        pixelRatio
     );
 }
 
@@ -78,6 +82,7 @@ LineSDFProgram::layoutUniformValues(const style::LinePaintProperties::PossiblyEv
         tile,
         state,
         pixelsToGLUnits,
+        pixelRatio,
         uniforms::patternscale_a::Value( scaleA ),
         uniforms::patternscale_b::Value( scaleB ),
         uniforms::tex_y_a::Value( posA.y ),
@@ -92,9 +97,9 @@ LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
     const RenderTile& tile,
     const TransformState& state,
     const std::array<float, 2>& pixelsToGLUnits,
+    const float pixelRatio,
     const Size atlasSize,
-    const CrossfadeParameters& crossfade,
-    const float pixelRatio) {
+    const CrossfadeParameters& crossfade) {
 
     const auto tileRatio = 1 / tile.id.pixelsToTileUnits(1, state.getIntegerZoom());
 
@@ -103,6 +108,7 @@ LinePatternProgram::LayoutUniformValues LinePatternProgram::layoutUniformValues(
         tile,
         state,
         pixelsToGLUnits,
+        pixelRatio,
         uniforms::scale::Value ({ {pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale} }),
         uniforms::texsize::Value( atlasSize ),
         uniforms::fade::Value( crossfade.t )
@@ -113,12 +119,14 @@ LineGradientProgram::LayoutUniformValues LineGradientProgram::layoutUniformValue
     const style::LinePaintProperties::PossiblyEvaluated& properties,
     const RenderTile& tile,
     const TransformState& state,
-    const std::array<float, 2>& pixelsToGLUnits) {
+    const std::array<float, 2>& pixelsToGLUnits,
+    const float pixelRatio) {
     return makeValues<LineGradientProgram::LayoutUniformValues>(
         properties,
         tile,
         state,
-        pixelsToGLUnits
+        pixelsToGLUnits,
+        pixelRatio
     );
 }
 
