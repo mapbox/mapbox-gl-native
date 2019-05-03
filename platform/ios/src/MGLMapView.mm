@@ -3589,7 +3589,7 @@ public:
         latLngs.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
     
-    CLLocationDirection cameraDirection = direction >= 0 ? direction : 0;
+    CLLocationDirection cameraDirection = direction >= 0 ? direction : self.direction;
 
     mbgl::CameraOptions cameraOptions = self.mbglMap.cameraForLatLngs(latLngs, padding, cameraDirection);
 
