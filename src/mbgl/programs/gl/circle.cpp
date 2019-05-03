@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<CircleProgram> {
     static constexpr const char* name = "circle";
-    static constexpr const uint8_t hash[8] = { 0xf0, 0x3e, 0x18, 0xb7, 0x75, 0xb2, 0xde, 0xa9 };
+    static constexpr const uint8_t hash[8] = { 0x1d, 0x47, 0x35, 0xbb, 0x94, 0x3d, 0x93, 0xca };
     static constexpr const auto vertexOffset = 2927;
-    static constexpr const auto fragmentOffset = 6093;
+    static constexpr const auto fragmentOffset = 6135;
 };
 
 constexpr const char* ShaderSource<CircleProgram>::name;
@@ -43,9 +43,12 @@ uniform mat4 u_matrix;
 uniform bool u_scale_with_map;
 uniform bool u_pitch_with_map;
 uniform vec2 u_extrude_scale;
+uniform lowp float u_device_pixel_ratio;
 uniform highp float u_camera_to_center_distance;
 
 attribute vec2 a_pos;
+
+varying vec3 v_data;
 
 
 #ifndef HAS_UNIFORM_u_color
@@ -110,8 +113,6 @@ varying lowp float stroke_opacity;
 uniform lowp float u_stroke_opacity;
 #endif
 
-
-varying vec3 v_data;
 
 void main(void) {
     
@@ -196,7 +197,7 @@ void main(void) {
     // This is a minimum blur distance that serves as a faux-antialiasing for
     // the circle. since blur is a ratio of the circle's size and the intent is
     // to keep the blur at roughly 1px, the two are inversely related.
-    lowp float antialiasblur = 1.0 / DEVICE_PIXEL_RATIO / (radius + stroke_width);
+    lowp float antialiasblur = 1.0 / u_device_pixel_ratio / (radius + stroke_width);
 
     v_data = vec3(extrude.x, extrude.y, antialiasblur);
 }
@@ -205,6 +206,8 @@ void main(void) {
 
 // Uncompressed source of circle.fragment.glsl:
 /*
+varying vec3 v_data;
+
 
 #ifndef HAS_UNIFORM_u_color
 varying highp vec4 color;
@@ -254,8 +257,6 @@ varying lowp float stroke_opacity;
 uniform lowp float u_stroke_opacity;
 #endif
 
-
-varying vec3 v_data;
 
 void main() {
     

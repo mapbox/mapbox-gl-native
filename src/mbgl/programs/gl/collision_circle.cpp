@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<CollisionCircleProgram> {
     static constexpr const char* name = "collision_circle";
     static constexpr const uint8_t hash[8] = { 0x99, 0x2e, 0xad, 0x8c, 0xd3, 0x88, 0xae, 0x82 };
-    static constexpr const auto vertexOffset = 10858;
-    static constexpr const auto fragmentOffset = 11774;
+    static constexpr const auto vertexOffset = 10902;
+    static constexpr const auto fragmentOffset = 11818;
 };
 
 constexpr const char* ShaderSource<CollisionCircleProgram>::name;

@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LinePatternProgram> {
     static constexpr const char* name = "line_pattern";
-    static constexpr const uint8_t hash[8] = { 0x73, 0xa0, 0x59, 0x46, 0x57, 0xa5, 0x60, 0x25 };
-    static constexpr const auto vertexOffset = 37569;
-    static constexpr const auto fragmentOffset = 40890;
+    static constexpr const uint8_t hash[8] = { 0x14, 0x72, 0xee, 0xac, 0x1f, 0xc7, 0xf6, 0x82 };
+    static constexpr const auto vertexOffset = 37768;
+    static constexpr const auto fragmentOffset = 41123;
 };
 
 constexpr const char* ShaderSource<LinePatternProgram>::name;
@@ -51,16 +51,13 @@ Context::createProgram<gl::Context>(const ProgramParameters& programParameters) 
 // long distances for long segments. Use this value to unscale the distance.
 #define LINE_DISTANCE_SCALE 2.0
 
-// the distance over which the line edge fades out.
-// Retina devices need a smaller distance to avoid aliasing.
-#define ANTIALIASING 1.0 / DEVICE_PIXEL_RATIO / 2.0
-
 attribute vec4 a_pos_normal;
 attribute vec4 a_data;
 
 uniform mat4 u_matrix;
-uniform vec2 u_gl_units_to_pixels;
+uniform vec2 u_units_to_pixels;
 uniform mediump float u_ratio;
+uniform lowp float u_device_pixel_ratio;
 
 varying vec2 v_normal;
 varying vec2 v_width2;
@@ -179,6 +176,10 @@ void main() {
 #endif
 
 
+    // the distance over which the line edge fades out.
+    // Retina devices need a smaller distance to avoid aliasing.
+    float ANTIALIASING = 1.0 / u_device_pixel_ratio / 2.0;
+
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
     float a_linesofar = (floor(a_data.z / 4.0) + a_data.w * 64.0) * LINE_DISTANCE_SCALE;
@@ -216,7 +217,7 @@ void main() {
 
     // calculate how much the perspective view squishes or stretches the extrude
     float extrude_length_without_perspective = length(dist);
-    float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_gl_units_to_pixels);
+    float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_units_to_pixels);
     v_gamma_scale = extrude_length_without_perspective / extrude_length_with_perspective;
 
     v_linesofar = a_linesofar;
@@ -227,6 +228,7 @@ void main() {
 
 // Uncompressed source of line_pattern.fragment.glsl:
 /*
+uniform lowp float u_device_pixel_ratio;
 uniform vec2 u_texsize;
 uniform float u_fade;
 uniform mediump vec4 u_scale;
@@ -312,7 +314,7 @@ void main() {
     // Calculate the antialiasing fade factor. This is either when fading in
     // the line in case of an offset line (v_width2.t) or when fading out
     // (v_width2.s)
-    float blur2 = (blur + 1.0 / DEVICE_PIXEL_RATIO) * v_gamma_scale;
+    float blur2 = (blur + 1.0 / u_device_pixel_ratio) * v_gamma_scale;
     float alpha = clamp(min(dist - (v_width2.t - blur2), v_width2.s - dist) / blur2, 0.0, 1.0);
 
     float x_a = mod(v_linesofar / pattern_size_a.x, 1.0);

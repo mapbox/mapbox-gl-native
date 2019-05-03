@@ -150,9 +150,9 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      tile,
                      parameters.state,
                      parameters.pixelsToGLUnits,
+                     parameters.pixelRatio,
                      texsize,
-                     crossfade,
-                     parameters.pixelRatio),
+                     crossfade),
                      posA,
                      posB,
                      LinePatternProgram::TextureBindings{
@@ -168,7 +168,8 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     evaluated,
                     tile,
                     parameters.state,
-                    parameters.pixelsToGLUnits),
+                    parameters.pixelsToGLUnits,
+                    parameters.pixelRatio),
                     {},
                     {},
                     LineGradientProgram::TextureBindings{
@@ -180,7 +181,8 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      evaluated,
                      tile,
                      parameters.state,
-                     parameters.pixelsToGLUnits),
+                     parameters.pixelsToGLUnits,
+                     parameters.pixelRatio),
                  {},
                  {},
                  LineProgram::TextureBindings{});

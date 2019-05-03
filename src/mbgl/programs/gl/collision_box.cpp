@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<CollisionBoxProgram> {
     static constexpr const char* name = "collision_box";
     static constexpr const uint8_t hash[8] = { 0xcb, 0x6a, 0x9b, 0xd1, 0x1f, 0x31, 0xf8, 0x5b };
-    static constexpr const auto vertexOffset = 9956;
-    static constexpr const auto fragmentOffset = 10635;
+    static constexpr const auto vertexOffset = 10000;
+    static constexpr const auto fragmentOffset = 10679;
 };
 
 constexpr const char* ShaderSource<CollisionBoxProgram>::name;

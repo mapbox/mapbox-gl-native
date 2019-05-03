@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LineProgram> {
     static constexpr const char* name = "line";
-    static constexpr const uint8_t hash[8] = { 0x44, 0x46, 0x9e, 0x59, 0x02, 0xbb, 0xaa, 0xae };
-    static constexpr const auto vertexOffset = 30313;
-    static constexpr const auto fragmentOffset = 33237;
+    static constexpr const uint8_t hash[8] = { 0x02, 0xe9, 0x14, 0x54, 0x14, 0xe4, 0xbc, 0x11 };
+    static constexpr const auto vertexOffset = 30358;
+    static constexpr const auto fragmentOffset = 33316;
 };
 
 constexpr const char* ShaderSource<LineProgram>::name;
@@ -39,12 +39,6 @@ Context::createProgram<gl::Context>(const ProgramParameters& programParameters) 
 
 // Uncompressed source of line.vertex.glsl:
 /*
-
-
-// the distance over which the line edge fades out.
-// Retina devices need a smaller distance to avoid aliasing.
-#define ANTIALIASING 1.0 / DEVICE_PIXEL_RATIO / 2.0
-
 // floor(127 / 2) == 63.0
 // the maximum allowed miter limit is 2.0 at the moment. the extrude normal is
 // stored in a byte (-128..127). we scale regular normals up to length 63, but
@@ -58,7 +52,8 @@ attribute vec4 a_data;
 
 uniform mat4 u_matrix;
 uniform mediump float u_ratio;
-uniform vec2 u_gl_units_to_pixels;
+uniform vec2 u_units_to_pixels;
+uniform lowp float u_device_pixel_ratio;
 
 varying vec2 v_normal;
 varying vec2 v_width2;
@@ -161,6 +156,10 @@ void main() {
 #endif
 
 
+    // the distance over which the line edge fades out.
+    // Retina devices need a smaller distance to avoid aliasing.
+    float ANTIALIASING = 1.0 / u_device_pixel_ratio / 2.0;
+
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
 
@@ -199,7 +198,7 @@ void main() {
 
     // calculate how much the perspective view squishes or stretches the extrude
     float extrude_length_without_perspective = length(dist);
-    float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_gl_units_to_pixels);
+    float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_units_to_pixels);
     v_gamma_scale = extrude_length_without_perspective / extrude_length_with_perspective;
 
     v_width2 = vec2(outset, inset);
@@ -209,6 +208,12 @@ void main() {
 
 // Uncompressed source of line.fragment.glsl:
 /*
+uniform lowp float u_device_pixel_ratio;
+
+varying vec2 v_width2;
+varying vec2 v_normal;
+varying float v_gamma_scale;
+
 
 #ifndef HAS_UNIFORM_u_color
 varying highp vec4 color;
@@ -230,10 +235,6 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
-
-varying vec2 v_width2;
-varying vec2 v_normal;
-varying float v_gamma_scale;
 
 void main() {
     
@@ -258,7 +259,7 @@ void main() {
     // Calculate the antialiasing fade factor. This is either when fading in
     // the line in case of an offset line (v_width2.t) or when fading out
     // (v_width2.s)
-    float blur2 = (blur + 1.0 / DEVICE_PIXEL_RATIO) * v_gamma_scale;
+    float blur2 = (blur + 1.0 / u_device_pixel_ratio) * v_gamma_scale;
     float alpha = clamp(min(dist - (v_width2.t - blur2), v_width2.s - dist) / blur2, 0.0, 1.0);
 
     gl_FragColor = color * (alpha * opacity);

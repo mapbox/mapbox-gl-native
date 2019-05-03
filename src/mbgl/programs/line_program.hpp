@@ -23,7 +23,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, tex_y_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float, sdfgamma);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, patternscale_a);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, patternscale_b);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, gl_units_to_pixels);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, units_to_pixels);
 } // namespace uniforms
 
 using LineLayoutAttributes = TypeList<
@@ -37,7 +37,8 @@ class LineProgram : public Program<
     TypeList<
         uniforms::matrix,
         uniforms::ratio,
-        uniforms::gl_units_to_pixels>,
+        uniforms::units_to_pixels,
+        uniforms::device_pixel_ratio>,
     TypeList<>,
     style::LinePaintProperties>
 {
@@ -93,7 +94,8 @@ public:
     layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
-                        const std::array<float, 2>& pixelsToGLUnits);
+                        const std::array<float, 2>& pixelsToGLUnits,
+                        const float pixelRatio);
 };
 
 class LinePatternProgram : public Program<
@@ -103,7 +105,8 @@ class LinePatternProgram : public Program<
     TypeList<
         uniforms::matrix,
         uniforms::ratio,
-        uniforms::gl_units_to_pixels,
+        uniforms::units_to_pixels,
+        uniforms::device_pixel_ratio,
         uniforms::scale,
         uniforms::texsize,
         uniforms::fade>,
@@ -119,9 +122,9 @@ public:
                         const RenderTile&,
                         const TransformState&,
                         const std::array<float, 2>& pixelsToGLUnits,
+                        const float pixelRatio,
                         Size atlasSize,
-                        const CrossfadeParameters& crossfade,
-                        const float pixelRatio);
+                        const CrossfadeParameters& crossfade);
 };
 
 class LineSDFProgram : public Program<
@@ -131,7 +134,8 @@ class LineSDFProgram : public Program<
     TypeList<
         uniforms::matrix,
         uniforms::ratio,
-        uniforms::gl_units_to_pixels,
+        uniforms::units_to_pixels,
+        uniforms::device_pixel_ratio,
         uniforms::patternscale_a,
         uniforms::patternscale_b,
         uniforms::tex_y_a,
@@ -164,7 +168,8 @@ class LineGradientProgram : public Program<
     TypeList<
         uniforms::matrix,
         uniforms::ratio,
-        uniforms::gl_units_to_pixels>,
+        uniforms::units_to_pixels,
+        uniforms::device_pixel_ratio>,
     TypeList<
         textures::image>,
     style::LinePaintProperties>
@@ -176,7 +181,8 @@ public:
     layoutUniformValues(const style::LinePaintProperties::PossiblyEvaluated&,
                         const RenderTile&,
                         const TransformState&,
-                        const std::array<float, 2>& pixelsToGLUnits);
+                        const std::array<float, 2>& pixelsToGLUnits,
+                        const float pixelRatio);
 };
 
 using LineLayoutVertex = LineProgram::LayoutVertex;

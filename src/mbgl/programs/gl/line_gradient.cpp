@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LineGradientProgram> {
     static constexpr const char* name = "line_gradient";
-    static constexpr const uint8_t hash[8] = { 0xee, 0xdd, 0x10, 0x3d, 0x1a, 0x21, 0x26, 0x25 };
-    static constexpr const auto vertexOffset = 34063;
-    static constexpr const auto fragmentOffset = 36782;
+    static constexpr const uint8_t hash[8] = { 0x0f, 0xa3, 0xae, 0x1c, 0x38, 0xf2, 0x60, 0x54 };
+    static constexpr const auto vertexOffset = 34185;
+    static constexpr const auto fragmentOffset = 36938;
 };
 
 constexpr const char* ShaderSource<LineGradientProgram>::name;
@@ -43,10 +43,6 @@ Context::createProgram<gl::Context>(const ProgramParameters& programParameters) 
 // the attribute conveying progress along a line is scaled to [0, 2^15)
 #define MAX_LINE_DISTANCE 32767.0
 
-// the distance over which the line edge fades out.
-// Retina devices need a smaller distance to avoid aliasing.
-#define ANTIALIASING 1.0 / DEVICE_PIXEL_RATIO / 2.0
-
 // floor(127 / 2) == 63.0
 // the maximum allowed miter limit is 2.0 at the moment. the extrude normal is
 // stored in a byte (-128..127). we scale regular normals up to length 63, but
@@ -60,7 +56,8 @@ attribute vec4 a_data;
 
 uniform mat4 u_matrix;
 uniform mediump float u_ratio;
-uniform vec2 u_gl_units_to_pixels;
+uniform lowp float u_device_pixel_ratio;
+uniform vec2 u_units_to_pixels;
 
 varying vec2 v_normal;
 varying vec2 v_width2;
@@ -147,6 +144,10 @@ void main() {
 #endif
 
 
+    // the distance over which the line edge fades out.
+    // Retina devices need a smaller distance to avoid aliasing.
+    float ANTIALIASING = 1.0 / u_device_pixel_ratio / 2.0;
+
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
 
@@ -185,7 +186,7 @@ void main() {
 
     // calculate how much the perspective view squishes or stretches the extrude
     float extrude_length_without_perspective = length(dist);
-    float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_gl_units_to_pixels);
+    float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_units_to_pixels);
     v_gamma_scale = extrude_length_without_perspective / extrude_length_with_perspective;
 
     v_width2 = vec2(outset, inset);
@@ -195,6 +196,13 @@ void main() {
 
 // Uncompressed source of line_gradient.fragment.glsl:
 /*
+uniform lowp float u_device_pixel_ratio;
+uniform sampler2D u_image;
+
+varying vec2 v_width2;
+varying vec2 v_normal;
+varying float v_gamma_scale;
+varying highp float v_lineprogress;
 
 
 #ifndef HAS_UNIFORM_u_blur
@@ -210,13 +218,6 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
-
-uniform sampler2D u_image;
-
-varying vec2 v_width2;
-varying vec2 v_normal;
-varying float v_gamma_scale;
-varying highp float v_lineprogress;
 
 void main() {
     
@@ -236,7 +237,7 @@ void main() {
     // Calculate the antialiasing fade factor. This is either when fading in
     // the line in case of an offset line (v_width2.t) or when fading out
     // (v_width2.s)
-    float blur2 = (blur + 1.0 / DEVICE_PIXEL_RATIO) * v_gamma_scale;
+    float blur2 = (blur + 1.0 / u_device_pixel_ratio) * v_gamma_scale;
     float alpha = clamp(min(dist - (v_width2.t - blur2), v_width2.s - dist) / blur2, 0.0, 1.0);
 
     // For gradient lines, v_lineprogress is the ratio along the entire line,
