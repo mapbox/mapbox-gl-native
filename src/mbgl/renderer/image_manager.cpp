@@ -1,4 +1,5 @@
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
@@ -35,6 +36,10 @@ bool ImageManager::isLoaded() const {
 
 void ImageManager::addImage(Immutable<style::Image::Impl> image_) {
     assert(images.find(image_->id) == images.end());
+    // Increase cache size if requested image was provided.
+    if (requestedImages.find(image_->id) != requestedImages.end()) {
+        requestedImagesCacheSize += image_->image.bytes();
+    }
     images.emplace(image_->id, std::move(image_));
 }
 
@@ -46,6 +51,12 @@ bool ImageManager::updateImage(Immutable<style::Image::Impl> image_) {
     auto sizeChanged = oldImage->second->image.size != image_->image.size;
 
     if (sizeChanged) {
+        // Update cache size if requested image size has changed.
+        if (requestedImages.find(image_->id) != requestedImages.end()) {
+            int64_t diff = image_->image.bytes() - oldImage->second->image.bytes();
+            assert(static_cast<int64_t>(requestedImagesCacheSize + diff) >= 0ll);
+            requestedImagesCacheSize += diff;
+        }
         updatedImageVersions.erase(image_->id);
     } else {
         updatedImageVersions[image_->id]++;
@@ -58,9 +69,16 @@ bool ImageManager::updateImage(Immutable<style::Image::Impl> image_) {
 }
 
 void ImageManager::removeImage(const std::string& id) {
-    assert(images.find(id) != images.end());
-    images.erase(id);
-    requestedImages.erase(id);
+    auto it = images.find(id);
+    assert(it != images.end());
+    // Reduce cache size for requested images.
+    auto requestedIt = requestedImages.find(it->second->id);
+    if (requestedIt != requestedImages.end()) {
+        assert(requestedImagesCacheSize >= it->second->image.bytes());
+        requestedImagesCacheSize -= it->second->image.bytes();
+        requestedImages.erase(requestedIt);
+    }
+    images.erase(it);
     removePattern(id);
 }
 
@@ -102,12 +120,7 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
         for (const auto& dependency : pair.first) {
             if (images.find(dependency.first) == images.end()) {
                 hasAllDependencies = false;
-            } else {
-                // Associate requestor with an image that was provided by the client.
-                auto it = requestedImages.find(dependency.first);
-                if (it != requestedImages.end()) {
-                    it->second.emplace(&requestor);
-                }
+                break;
             }
         }
 
@@ -141,57 +154,67 @@ void ImageManager::notifyIfMissingImageAdded() {
 }
 
 void ImageManager::reduceMemoryUse() {
-    for (auto it = requestedImages.cbegin(); it != requestedImages.cend();) {
-        if (it->second.empty() && images.find(it->first) != images.end()) {
-            images.erase(it->first);
-            removePattern(it->first);
-            it = requestedImages.erase(it);
-        } else {
-            ++it;
+    std::vector<std::string> unusedIDs;
+    unusedIDs.reserve(requestedImages.size());
+
+    for (const auto& pair : requestedImages) {
+        if (pair.second.empty() && images.find(pair.first) != images.end()) {
+            unusedIDs.push_back(pair.first);
         }
+    }
+
+    if (!unusedIDs.empty()) {
+        observer->onRemoveUnusedStyleImages(unusedIDs);
+    }
+}
+
+void ImageManager::reduceMemoryUseIfCacheSizeExceedsLimit() {
+    if (requestedImagesCacheSize > util::DEFAULT_ON_DEMAND_IMAGES_CACHE_SIZE) {
+        reduceMemoryUse();
     }
 }
 
 void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageRequestPair& pair) {
-    unsigned int missing = 0;
+    std::vector<std::string> missingImages;
+    missingImages.reserve(pair.first.size());
     for (const auto& dependency : pair.first) {
-        auto it = images.find(dependency.first);
-        if (it == images.end()) {
-            missing++;
-            requestedImages[dependency.first].emplace(&requestor);
+        if (images.find(dependency.first) == images.end()) {
+            missingImages.push_back(dependency.first);
         }
     }
 
-    if (missing > 0) {
+    if (!missingImages.empty()) {
         ImageRequestor* requestorPtr = &requestor;
 
         auto emplaced = missingImageRequestors.emplace(requestorPtr, MissingImageRequestPair { pair, {} });
         assert(emplaced.second);
 
+        for (const auto& missingImage : missingImages) {
+            assert(observer != nullptr);
+            requestedImages[missingImage].emplace(&requestor);
+            auto callback = std::make_unique<ActorCallback>(
+                *Scheduler::GetCurrent(),
+                [this, requestorPtr, missingImage] {
+                    auto requestorIt = missingImageRequestors.find(requestorPtr);
+                    if (requestorIt != missingImageRequestors.end()) {
+                        assert(requestorIt->second.callbacks.find(missingImage) != requestorIt->second.callbacks.end());
+                        requestorIt->second.callbacks.erase(missingImage);
+                    }
+            });
+
+            auto actorRef = callback->self();
+            emplaced.first->second.callbacks.emplace(missingImage, std::move(callback));
+            observer->onStyleImageMissing(missingImage, [actorRef] {
+                actorRef.invoke(&Callback::operator());
+            });
+        }
+    } else {
+        // Associate requestor with an image that was provided by the client.
         for (const auto& dependency : pair.first) {
-            auto it = images.find(dependency.first);
-            if (it == images.end()) {
-                assert(observer != nullptr);
-                auto callback = std::make_unique<ActorCallback>(
-                        *Scheduler::GetCurrent(),
-                        [this, requestorPtr, imageId = dependency.first] {
-                            auto requestorIt = missingImageRequestors.find(requestorPtr);
-                            if (requestorIt != missingImageRequestors.end()) {
-                                assert(requestorIt->second.callbacks.find(imageId) != requestorIt->second.callbacks.end());
-                                requestorIt->second.callbacks.erase(imageId);
-                            }
-                        });
-
-                auto actorRef = callback->self();
-                emplaced.first->second.callbacks.emplace(dependency.first, std::move(callback));
-                observer->onStyleImageMissing(dependency.first, [actorRef]() {
-                    actorRef.invoke(&Callback::operator());
-                });
-
+            if (requestedImages.find(dependency.first) != requestedImages.end()) {
+                requestedImages[dependency.first].emplace(&requestor);
             }
         }
-
-    } else {
         notify(requestor, pair);
     }
 }
