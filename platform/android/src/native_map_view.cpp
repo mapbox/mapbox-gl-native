@@ -271,6 +271,20 @@ void NativeMapView::onStyleImageMissing(const std::string& imageId) {
     }
 }
 
+bool NativeMapView::onCanRemoveUnusedStyleImage(const std::string& imageId) {
+    assert(vm != nullptr);
+
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto& javaClass = jni::Class<NativeMapView>::Singleton(*_env);
+    static auto onCanRemoveUnusedStyleImage = javaClass.GetMethod<jboolean (jni::String)>(*_env, "onCanRemoveUnusedStyleImage");
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        return weakReference.Call(*_env, onCanRemoveUnusedStyleImage, jni::Make<jni::String>(*_env, imageId));
+    }
+
+    return true;
+}
+
 // JNI Methods //
 
 void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {

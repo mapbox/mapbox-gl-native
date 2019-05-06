@@ -33,6 +33,8 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
   private final List<MapView.OnSourceChangedListener> onSourceChangedListenerList = new CopyOnWriteArrayList<>();
   private final List<MapView.OnStyleImageMissingListener> onStyleImageMissingListenerList
     = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnCanRemoveUnusedStyleImageListener> onCanRemoveUnusedStyleImageListenerList
+    = new CopyOnWriteArrayList<>();
 
   @Override
   public void onCameraWillChange(boolean animated) {
@@ -230,6 +232,29 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     }
   }
 
+  @Override
+  public boolean onCanRemoveUnusedStyleImage(String imageId) {
+    if (onCanRemoveUnusedStyleImageListenerList.isEmpty()) {
+      return true;
+    }
+
+    try {
+      if (!onCanRemoveUnusedStyleImageListenerList.isEmpty()) {
+        boolean canRemove = true;
+        for (MapView.OnCanRemoveUnusedStyleImageListener listener : onCanRemoveUnusedStyleImageListenerList) {
+          canRemove &= listener.onCanRemoveUnusedStyleImage(imageId);
+        }
+
+        return canRemove;
+      }
+    } catch (Throwable err) {
+      Logger.e(TAG, "Exception in onCanRemoveUnusedStyleImage", err);
+      throw err;
+    }
+
+    return true;
+  }
+
   void addOnCameraWillChangeListener(MapView.OnCameraWillChangeListener listener) {
     onCameraWillChangeListenerList.add(listener);
   }
@@ -342,6 +367,14 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     onStyleImageMissingListenerList.remove(listener);
   }
 
+  void addOnCanRemoveUnusedStyleImageListener(MapView.OnCanRemoveUnusedStyleImageListener listener) {
+    onCanRemoveUnusedStyleImageListenerList.add(listener);
+  }
+
+  void removeOnCanRemoveUnusedStyleImageListener(MapView.OnCanRemoveUnusedStyleImageListener listener) {
+    onCanRemoveUnusedStyleImageListenerList.remove(listener);
+  }
+
   void clear() {
     onCameraWillChangeListenerList.clear();
     onCameraIsChangingListenerList.clear();
@@ -357,5 +390,6 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     onDidFinishLoadingStyleListenerList.clear();
     onSourceChangedListenerList.clear();
     onStyleImageMissingListenerList.clear();
+    onCanRemoveUnusedStyleImageListenerList.clear();
   }
 }
