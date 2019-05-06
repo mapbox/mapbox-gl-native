@@ -762,4 +762,8 @@ void Renderer::Impl::onStyleImageMissing(const std::string& id, std::function<vo
     observer->onStyleImageMissing(id, std::move(done));
 }
 
+void Renderer::Impl::onRemoveUnusedStyleImages(const std::vector<std::string>& unusedImageIDs) {
+    observer->onRemoveUnusedStyleImages(unusedImageIDs);
+}
+
 } // namespace mbgl

@@ -179,4 +179,12 @@ void Map::Impl::onStyleImageMissing(const std::string& id, std::function<void()>
     onUpdate();
 }
 
+void Map::Impl::onRemoveUnusedStyleImages(const std::vector<std::string>& unusedImageIDs) {
+    for (const auto& unusedImageID : unusedImageIDs) {
+        if (observer.onCanRemoveUnusedStyleImage(unusedImageID)) {
+            style->removeImage(unusedImageID);
+        }
+    }
+}
+
 } // namespace mbgl
