@@ -69,6 +69,7 @@ public:
     void onDidFinishLoadingStyle() override;
     void onSourceChanged(mbgl::style::Source&) override;
     void onStyleImageMissing(const std::string&) override;
+    bool onCanRemoveUnusedStyleImage(const std::string&) override;
 
     // JNI //
 

@@ -54,6 +54,10 @@ public:
         delegate.invoke(&RendererObserver::onStyleImageMissing, id, done);
     }
 
+    void onRemoveUnusedStyleImages(const std::vector<std::string>& ids) override {
+        delegate.invoke(&RendererObserver::onRemoveUnusedStyleImages, ids);
+    }
+
 private:
     std::shared_ptr<Mailbox> mailbox;
     ActorRef<RendererObserver> delegate;
