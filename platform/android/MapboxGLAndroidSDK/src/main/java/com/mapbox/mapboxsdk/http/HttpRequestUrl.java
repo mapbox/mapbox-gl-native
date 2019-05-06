@@ -24,7 +24,7 @@ public class HttpRequestUrl {
       } else {
         resourceUrl = resourceUrl + "&";
       }
-      resourceUrl = resourceUrl + "events=true&sku=" + Mapbox.getSkuToken();
+      resourceUrl = resourceUrl + "sku=" + Mapbox.getSkuToken();
     }
     return resourceUrl;
   }
