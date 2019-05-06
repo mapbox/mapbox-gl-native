@@ -20,7 +20,6 @@ import com.mapbox.mapboxsdk.utils.FileUtils;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -270,9 +269,9 @@ public class FileSource {
    * @param path     the new database path
    * @param callback the callback to obtain the result
    */
-  public static void setResourcesCachePath(@NonNull Context context,
+  public static void setResourcesCachePath(final Context context,
                                            @NonNull final String path,
-                                           @NonNull ResourcesCachePathChangeCallback callback) {
+                                           final ResourcesCachePathChangeCallback callback) {
     final String fileSourceActivatedMessage = "Cannot set path, file source is activated."
       + " Make sure that the map or a resources download is not running.";
     if (getInstance(context).isActivated()) {
@@ -282,14 +281,9 @@ public class FileSource {
       // no need to change the path
       callback.onSuccess(path);
     } else {
-      final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
-      final WeakReference<ResourcesCachePathChangeCallback> callbackWeakReference = new WeakReference<>(callback);
       new FileUtils.CheckFileWritePermissionTask(new FileUtils.OnCheckFileWritePermissionListener() {
         @Override
         public void onWritePermissionGranted() {
-          final Context context = contextWeakReference.get();
-          final ResourcesCachePathChangeCallback callback = callbackWeakReference.get();
-
           if (callback == null) {
             Logger.w(TAG, "Lost callback reference.");
             return;
@@ -316,7 +310,6 @@ public class FileSource {
 
         @Override
         public void onError() {
-          final ResourcesCachePathChangeCallback callback = callbackWeakReference.get();
           if (callback != null) {
             String message = "Path is not writable: " + path;
             Logger.e(TAG, message);

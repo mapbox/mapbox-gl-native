@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -21,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.nio.channels.FileChannel;
 
 /**
@@ -227,42 +227,43 @@ public class OfflineManager {
     final File src = new File(path);
     final FileUtils.OnCheckFileReadPermissionListener fileReadPermissionListener =
       new FileUtils.OnCheckFileReadPermissionListener() {
-      @Override
-      public void onReadPermissionGranted() {
-        new FileUtils.CheckFileWritePermissionTask(new FileUtils.OnCheckFileWritePermissionListener() {
-          @Override
-          public void onWritePermissionGranted() {
-            // path writable, merge and update schema in place if necessary
-            mergeOfflineDatabaseFiles(src, callback, false);
-          }
+        @Override
+        public void onReadPermissionGranted() {
+          new FileUtils.CheckFileWritePermissionTask(new FileUtils.OnCheckFileWritePermissionListener() {
+            @Override
+            public void onWritePermissionGranted() {
+              // path writable, merge and update schema in place if necessary
+              mergeOfflineDatabaseFiles(src, callback, false);
+            }
 
-          @Override
-          public void onError() {
-            // path not writable, copy the the file to temp directory, then merge and update schema on a copy if
-            // necessary
-            File dst = new File(FileSource.getInternalCachePath(context), src.getName());
-            new CopyTempDatabaseFileTask(OfflineManager.this, callback).execute(src, dst);
-          }
-        }).execute(src);
-      }
+            @Override
+            public void onError() {
+              // path not writable, copy the the file to temp directory, then merge and update schema on a copy if
+              // necessary
+              File dst = new File(FileSource.getInternalCachePath(context), src.getName());
+              new CopyTempDatabaseFileTask(OfflineManager.this, callback).execute(src, dst);
+            }
+          }).execute(src);
+        }
 
-      @Override
-      public void onError() {
-        // path not readable, abort
-        callback.onError("Secondary database needs to be located in a readable path.");
-      }
-    };
+        @Override
+        public void onError() {
+          // path not readable, abort
+          callback.onError("Secondary database needs to be located in a readable path.");
+        }
+      };
     new FileUtils.CheckFileReadPermissionTask(fileReadPermissionListener).execute(src);
   }
 
   private static final class CopyTempDatabaseFileTask extends AsyncTask<Object, Void, Object> {
+    // Safe to retain as it enforces only retaining the Application context
     @NonNull
-    private final WeakReference<OfflineManager> offlineManagerWeakReference;
-    @NonNull
+    private final OfflineManager offlineManager;
+    @Nullable
     private MergeOfflineRegionsCallback callback;
 
-    CopyTempDatabaseFileTask(OfflineManager offlineManager, MergeOfflineRegionsCallback callback) {
-      this.offlineManagerWeakReference = new WeakReference<>(offlineManager);
+    CopyTempDatabaseFileTask(@NonNull OfflineManager offlineManager, @Nullable MergeOfflineRegionsCallback callback) {
+      this.offlineManager = offlineManager;
       this.callback = callback;
     }
 
@@ -283,8 +284,7 @@ public class OfflineManager {
     protected void onPostExecute(Object object) {
       MergeOfflineRegionsCallback localCallback = callback;
       callback = null;
-      OfflineManager offlineManager = offlineManagerWeakReference.get();
-      if (object instanceof File && offlineManager != null) {
+      if (object instanceof File) {
         // successfully copied the file, perform merge
         File dst = (File) object;
         offlineManager.mergeOfflineDatabaseFiles(dst, localCallback, true);
