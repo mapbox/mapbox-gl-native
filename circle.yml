@@ -1148,7 +1148,7 @@ jobs:
 # ------------------------------------------------------------------------------
   qt5-macos-debug:
     macos:
-      xcode: "9.3.0"
+      xcode: "9.3.1"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
