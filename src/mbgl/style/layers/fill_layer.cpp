@@ -23,7 +23,6 @@ const LayerTypeInfo* FillLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::NotRequired,
           LayerTypeInfo::Layout::Required,
-          LayerTypeInfo::Clipping::Required,
           LayerTypeInfo::FadingTiles::NotRequired
         };
     return &typeInfo;

@@ -25,7 +25,6 @@ let layerCapabilities = {};
 let defaults = { caps: { 'Source':   'NotRequired',
                          'Pass3D':   'NotRequired',
                          'Layout':   'NotRequired',
-                         'Clipping': 'NotRequired',
                          'FadingTiles': 'NotRequired'
                  },
                  require: function(cap) {
@@ -45,7 +44,6 @@ let defaults = { caps: { 'Source':   'NotRequired',
 layerCapabilities['background']     = defaults.finalize();
 layerCapabilities['fill']           = defaults.require('Source')
                                               .require('Layout')
-                                              .require('Clipping')
                                               .finalize();
 layerCapabilities['fill-extrusion'] = defaults.require('Source')
                                               .require('Pass3D')
