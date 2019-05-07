@@ -8,6 +8,7 @@ import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.mapboxsdk.R
 import com.mapbox.mapboxsdk.camera.CameraPosition
+import com.mapbox.mapboxsdk.location.LocationComponentConstants.TRANSITION_ANIMATION_DURATION_MS
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -174,7 +175,7 @@ class LocationComponentTest {
 
     val callback = ArgumentCaptor.forClass(OnLocationCameraTransitionListener::class.java)
     locationComponent.setCameraMode(CameraMode.TRACKING, listener)
-    verify(locationCameraController).setCameraMode(eq(CameraMode.TRACKING), any(), callback.capture())
+    verify(locationCameraController).setCameraMode(eq(CameraMode.TRACKING), any(), eq(TRANSITION_ANIMATION_DURATION_MS), isNull(), isNull(), isNull(), callback.capture())
     callback.value.onLocationCameraTransitionFinished(CameraMode.TRACKING)
 
     verify(listener).onLocationCameraTransitionFinished(CameraMode.TRACKING)
@@ -192,10 +193,28 @@ class LocationComponentTest {
 
     val callback = ArgumentCaptor.forClass(OnLocationCameraTransitionListener::class.java)
     locationComponent.setCameraMode(CameraMode.TRACKING, listener)
-    verify(locationCameraController).setCameraMode(eq(CameraMode.TRACKING), any(), callback.capture())
+    verify(locationCameraController).setCameraMode(eq(CameraMode.TRACKING), any(), eq(TRANSITION_ANIMATION_DURATION_MS), isNull(), isNull(), isNull(), callback.capture())
     callback.value.onLocationCameraTransitionCanceled(CameraMode.TRACKING)
 
     verify(listener).onLocationCameraTransitionCanceled(CameraMode.TRACKING)
+    verify(locationAnimatorCoordinator).resetAllCameraAnimations(CameraPosition.DEFAULT, false)
+  }
+
+  @Test
+  fun transitionCustomFinishedTest() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    val listener = mock(OnLocationCameraTransitionListener::class.java)
+
+    val callback = ArgumentCaptor.forClass(OnLocationCameraTransitionListener::class.java)
+    locationComponent.setCameraMode(CameraMode.TRACKING, 1200, 14.0, 13.0, 45.0, listener)
+    verify(locationCameraController).setCameraMode(eq(CameraMode.TRACKING), any(), eq(1200L), eq(14.0), eq(13.0), eq(45.0), callback.capture())
+    callback.value.onLocationCameraTransitionFinished(CameraMode.TRACKING)
+
+    verify(listener).onLocationCameraTransitionFinished(CameraMode.TRACKING)
     verify(locationAnimatorCoordinator).resetAllCameraAnimations(CameraPosition.DEFAULT, false)
   }
 
