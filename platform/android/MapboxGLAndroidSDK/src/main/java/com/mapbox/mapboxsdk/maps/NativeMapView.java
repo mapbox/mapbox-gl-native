@@ -1045,7 +1045,6 @@ final class NativeMapView implements NativeMap {
 
   @Keep
   private void onStyleImageMissing(String imageId) {
-    Logger.e(TAG, "OnStyleImageMissing: " + imageId);
     if (stateCallback != null) {
       stateCallback.onStyleImageMissing(imageId);
     }
