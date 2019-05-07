@@ -13,7 +13,6 @@ namespace {
       LayerTypeInfo::Source::NotRequired,
       LayerTypeInfo::Pass3D::NotRequired,
       LayerTypeInfo::Layout::NotRequired,
-      LayerTypeInfo::Clipping::NotRequired,
       LayerTypeInfo::FadingTiles::NotRequired };
 }  // namespace
 

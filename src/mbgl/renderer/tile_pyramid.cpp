@@ -255,7 +255,6 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
                                                            : static_cast<bool>(tile.getBucket(*layerProperties->baseImpl));
             if (layerRenderableInTile) {
                 renderTile.used = true;
-                renderTile.needsClipping = (renderTile.needsClipping || typeInfo->clipping == LayerTypeInfo::Clipping::Required);
             }
         }
     }
