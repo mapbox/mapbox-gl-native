@@ -32,4 +32,8 @@
     <item android:id="@+id/action_component_throttling_disabled"
         android:title="Disable animation throttling"
         app:showAsAction="never"/>
+
+    <item android:id="@+id/action_component_animate_while_tracking"
+        android:title="Animate while tracking"
+        app:showAsAction="never"/>
 </menu>

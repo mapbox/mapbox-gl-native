@@ -21,6 +21,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.mapbox.mapboxsdk.location.LocationComponentConstants.TRANSITION_ANIMATION_DURATION_MS;
+
 final class LocationCameraController {
 
   @CameraMode.Mode
@@ -87,10 +89,12 @@ final class LocationCameraController {
   }
 
   void setCameraMode(@CameraMode.Mode int cameraMode) {
-    setCameraMode(cameraMode, null, null);
+    setCameraMode(cameraMode, null, TRANSITION_ANIMATION_DURATION_MS, null, null, null, null);
   }
 
   void setCameraMode(@CameraMode.Mode final int cameraMode, @Nullable Location lastLocation,
+                     long transitionDuration,
+                     @Nullable Double zoom, @Nullable Double bearing, @Nullable Double tilt,
                      @Nullable OnLocationCameraTransitionListener internalTransitionListener) {
     final boolean wasTracking = isLocationTracking();
     this.cameraMode = cameraMode;
@@ -101,7 +105,8 @@ final class LocationCameraController {
 
     adjustGesturesThresholds();
     notifyCameraTrackingChangeListener(wasTracking);
-    transitionToCurrentLocation(wasTracking, lastLocation, internalTransitionListener);
+    transitionToCurrentLocation(
+      wasTracking, lastLocation, transitionDuration, zoom, bearing, tilt, internalTransitionListener);
   }
 
   /**
@@ -109,13 +114,26 @@ final class LocationCameraController {
    * Notifies an internal listener when the transition's finished to invalidate animators and notify external listeners.
    */
   private void transitionToCurrentLocation(boolean wasTracking, Location lastLocation,
+                                           long transitionDuration,
+                                           Double zoom, Double bearing, Double tilt,
                                            final OnLocationCameraTransitionListener internalTransitionListener) {
     if (!wasTracking && isLocationTracking() && lastLocation != null) {
       isTransitioning = true;
       LatLng target = new LatLng(lastLocation);
+
       CameraPosition.Builder builder = new CameraPosition.Builder().target(target);
-      if (isLocationBearingTracking()) {
-        builder.bearing(cameraMode == CameraMode.TRACKING_GPS_NORTH ? 0 : lastLocation.getBearing());
+      if (zoom != null) {
+        builder.zoom(zoom);
+      }
+      if (tilt != null) {
+        builder.tilt(tilt);
+      }
+      if (bearing != null) {
+        builder.bearing(bearing);
+      } else {
+        if (isLocationBearingTracking()) {
+          builder.bearing(cameraMode == CameraMode.TRACKING_GPS_NORTH ? 0 : lastLocation.getBearing());
+        }
       }
 
       CameraUpdate update = CameraUpdateFactory.newCameraPosition(builder.build());
@@ -145,7 +163,7 @@ final class LocationCameraController {
       } else {
         mapboxMap.animateCamera(
           update,
-          (int) LocationComponentConstants.TRANSITION_ANIMATION_DURATION_MS,
+          (int) transitionDuration,
           callback);
       }
     } else {

@@ -43,6 +43,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_F
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_INTERVAL_MILLIS;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_TRACKING_TILT_ANIM_DURATION;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_TRACKING_ZOOM_ANIM_DURATION;
+import static com.mapbox.mapboxsdk.location.LocationComponentConstants.TRANSITION_ANIMATION_DURATION_MS;
 
 /**
  * The Location Component provides location awareness to your mobile application. Enabling this
@@ -524,7 +525,6 @@ public final class LocationComponent {
    * @param cameraMode one of the modes found in {@link CameraMode}
    */
   public void setCameraMode(@CameraMode.Mode int cameraMode) {
-    checkActivationState();
     setCameraMode(cameraMode, null);
   }
 
@@ -550,8 +550,45 @@ public final class LocationComponent {
    */
   public void setCameraMode(@CameraMode.Mode int cameraMode,
                             @Nullable OnLocationCameraTransitionListener transitionListener) {
+    setCameraMode(cameraMode, TRANSITION_ANIMATION_DURATION_MS, null, null, null, transitionListener);
+  }
+
+  /**
+   * Sets the camera mode, which determines how the map camera will track the rendered location.
+   * <p>
+   * When camera is transitioning to a new mode, it will reject inputs like {@link #zoomWhileTracking(double)} or
+   * {@link #tiltWhileTracking(double)}.
+   * Use {@link OnLocationCameraTransitionListener} to listen for the transition state.
+   * <p>
+   * Set values of zoom, bearing and tilt that the camera will transition to. If null is passed to any of those,
+   * current value will be used for that parameter instead.
+   * If the camera is already tracking, provided values are ignored.
+   * <p>
+   * <ul>
+   * <li>{@link CameraMode#NONE}: No camera tracking</li>
+   * <li>{@link CameraMode#NONE_COMPASS}: Camera does not track location, but does track compass bearing</li>
+   * <li>{@link CameraMode#NONE_GPS}: Camera does not track location, but does track GPS bearing</li>
+   * <li>{@link CameraMode#TRACKING}: Camera tracks the user location</li>
+   * <li>{@link CameraMode#TRACKING_COMPASS}: Camera tracks the user location, with bearing provided by a compass</li>
+   * <li>{@link CameraMode#TRACKING_GPS}: Camera tracks the user location, with normalized bearing</li>
+   * <li>{@link CameraMode#TRACKING_GPS_NORTH}: Camera tracks the user location, with bearing always set to north</li>
+   * </ul>
+   *
+   * @param cameraMode         one of the modes found in {@link CameraMode}
+   * @param transitionDuration duration of the transition in milliseconds
+   * @param zoom               target zoom, set to null to use current camera position
+   * @param bearing            target bearing, set to null to use current camera position
+   * @param tilt               target tilt, set to null to use current camera position
+   * @param transitionListener callback that's going to be invoked when the transition animation finishes
+   */
+  public void setCameraMode(@CameraMode.Mode int cameraMode,
+                            long transitionDuration,
+                            @Nullable Double zoom, @Nullable Double bearing, @Nullable Double tilt,
+                            @Nullable OnLocationCameraTransitionListener transitionListener) {
     checkActivationState();
-    locationCameraController.setCameraMode(cameraMode, lastLocation, new CameraTransitionListener(transitionListener));
+    locationCameraController.setCameraMode(
+      cameraMode, lastLocation, transitionDuration, zoom, bearing, tilt,
+      new CameraTransitionListener(transitionListener));
     updateCompassListenerState(true);
   }
 
