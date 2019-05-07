@@ -309,6 +309,9 @@ void Style::Impl::onSpriteError(std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
     observer->onResourceError(error);
+    // Unblock rendering tiles (even though sprite request has failed).
+    spriteLoaded = true;
+    observer->onUpdate();
 }
 
 void Style::Impl::onLayerChanged(Layer& layer) {
