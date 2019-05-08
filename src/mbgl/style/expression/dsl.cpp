@@ -52,51 +52,51 @@ std::unique_ptr<Expression> literal(std::initializer_list<const char *> value) {
 
 std::unique_ptr<Expression> assertion(type::Type type,
                                       std::unique_ptr<Expression> value,
-                                      optional<std::unique_ptr<Expression>> def) {
+                                      std::unique_ptr<Expression> def) {
     std::vector<std::unique_ptr<Expression>> v  = vec(std::move(value));
     if (def) {
-        v.push_back(std::move(*def));
+        v.push_back(std::move(def));
     }
     return std::make_unique<Assertion>(type, std::move(v));
 }
 
 std::unique_ptr<Expression> number(std::unique_ptr<Expression> value,
-                                   optional<std::unique_ptr<Expression>> def) {
+                                   std::unique_ptr<Expression> def) {
     return assertion(type::Number, std::move(value), std::move(def));
 }
 
 std::unique_ptr<Expression> string(std::unique_ptr<Expression> value,
-                                   optional<std::unique_ptr<Expression>> def) {
+                                   std::unique_ptr<Expression> def) {
     return assertion(type::String, std::move(value), std::move(def));
 }
 
 std::unique_ptr<Expression> boolean(std::unique_ptr<Expression> value,
-                                    optional<std::unique_ptr<Expression>> def) {
+                                    std::unique_ptr<Expression> def) {
     return assertion(type::Boolean, std::move(value), std::move(def));
 }
 
 std::unique_ptr<Expression> coercion(type::Type type,
                                      std::unique_ptr<Expression> value,
-                                     optional<std::unique_ptr<Expression>> def) {
+                                     std::unique_ptr<Expression> def) {
     std::vector<std::unique_ptr<Expression>> v = vec(std::move(value));
     if (def) {
-        v.push_back(std::move(*def));
+        v.push_back(std::move(def));
     }
     return std::make_unique<Coercion>(type, std::move(v));
 }
 
 std::unique_ptr<Expression> toColor(std::unique_ptr<Expression> value,
-                                    optional<std::unique_ptr<Expression>> def) {
+                                    std::unique_ptr<Expression> def) {
     return coercion(type::Color, std::move(value), std::move(def));
 }
 
 std::unique_ptr<Expression> toString(std::unique_ptr<Expression> value,
-                                     optional<std::unique_ptr<Expression>> def) {
+                                     std::unique_ptr<Expression> def) {
     return coercion(type::String, std::move(value), std::move(def));
 }
 
 std::unique_ptr<Expression> toFormatted(std::unique_ptr<Expression> value,
-                                        optional<std::unique_ptr<Expression>> def) {
+                                        std::unique_ptr<Expression> def) {
     return coercion(type::Formatted, std::move(value), std::move(def));
 }
     

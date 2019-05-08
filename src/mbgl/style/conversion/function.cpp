@@ -452,7 +452,7 @@ template <class T>
 std::unique_ptr<Expression> categorical(type::Type type,
                                         const std::string& property,
                                         std::map<T, std::unique_ptr<Expression>> branches,
-                                        optional<std::unique_ptr<Expression>> def) {
+                                        std::unique_ptr<Expression> def) {
     std::unordered_map<T, std::shared_ptr<Expression>> convertedBranches;
     for (auto& b : branches) {
         convertedBranches[b.first] = std::move(b.second);
@@ -460,14 +460,14 @@ std::unique_ptr<Expression> categorical(type::Type type,
     return std::make_unique<Match<T>>(type,
                                       get(literal(property)),
                                       std::move(convertedBranches),
-                                      def ? std::move(*def) : error("replaced with default"));
+                                      def ? std::move(def) : error("replaced with default"));
 }
 
 template <>
 std::unique_ptr<Expression> categorical<bool>(type::Type type,
                                               const std::string& property,
                                               std::map<bool, std::unique_ptr<Expression>> branches,
-                                              optional<std::unique_ptr<Expression>> def) {
+                                              std::unique_ptr<Expression> def) {
     auto it = branches.find(true);
     std::unique_ptr<Expression> trueCase = it == branches.end() ?
         error("replaced with default") :
@@ -483,13 +483,13 @@ std::unique_ptr<Expression> categorical<bool>(type::Type type,
     convertedBranches.emplace_back(eq(get(literal(property)), literal(Value(false))), std::move(falseCase));
 
     return std::make_unique<Case>(type, std::move(convertedBranches),
-                                  def ? std::move(*def) : error("replaced with default"));
+                                  def ? std::move(def) : error("replaced with default"));
 }
 
 static std::unique_ptr<Expression> numberOrDefault(type::Type type,
                                                    std::unique_ptr<Expression> get,
                                                    std::unique_ptr<Expression> expr,
-                                                   optional<std::unique_ptr<Expression>> def) {
+                                                   std::unique_ptr<Expression> def) {
     if (!def) {
         return expr;
     }
@@ -497,14 +497,14 @@ static std::unique_ptr<Expression> numberOrDefault(type::Type type,
     std::vector<Case::Branch> branches;
     branches.emplace_back(eq(compound("typeof", std::move(get)), literal("number")),
                           std::move(expr));
-    return std::make_unique<Case>(type, std::move(branches), std::move(*def));
+    return std::make_unique<Case>(type, std::move(branches), std::move(def));
 }
 
 static optional<std::unique_ptr<Expression>> convertIntervalFunction(type::Type type,
                                                                      const Convertible& value,
                                                                      Error& error,
                                                                      std::function<std::unique_ptr<Expression> (bool)> makeInput,
-                                                                     optional<std::unique_ptr<Expression>> def,
+                                                                     std::unique_ptr<Expression> def,
                                                                      bool convertTokens = false) {
     auto stops = convertStops(type, value, error, convertTokens);
     if (!stops) {
@@ -522,7 +522,7 @@ static optional<std::unique_ptr<Expression>> convertExponentialFunction(type::Ty
                                                                         const Convertible& value,
                                                                         Error& error,
                                                                         std::function<std::unique_ptr<Expression> (bool)> makeInput,
-                                                                        optional<std::unique_ptr<Expression>> def,
+                                                                        std::unique_ptr<Expression> def,
                                                                         bool convertTokens = false) {
     auto stops = convertStops(type, value, error, convertTokens);
     if (!stops) {
@@ -543,7 +543,7 @@ static optional<std::unique_ptr<Expression>> convertCategoricalFunction(type::Ty
                                                                         const Convertible& value,
                                                                         Error& err,
                                                                         const std::string& property,
-                                                                        optional<std::unique_ptr<Expression>> def) {
+                                                                        std::unique_ptr<Expression> def) {
     auto stopsValue = objectMember(value, "stops");
     if (!stopsValue) {
         err.message = "function value must specify stops";
@@ -709,12 +709,15 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
         }
     }
 
-    auto defaultExpr = [&]() -> optional<std::unique_ptr<Expression>> {
+    auto defaultExpr = [&]() -> std::unique_ptr<Expression> {
         auto member = objectMember(value, "default");
         if (member) {
-            return convertLiteral(type, *member, err);
+            auto literal = convertLiteral(type, *member, err);
+            if (literal) {
+                return std::move(*literal);
+            }
         }
-        return {};
+        return nullptr;
     };
 
     if (!objectMember(value, "property")) {
