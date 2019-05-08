@@ -4,12 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.mapbox.android.accounts.v1.MapboxAccounts;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.SessionInterval;
 import com.mapbox.android.telemetry.TelemetryEnabler;
+import com.mapbox.android.telemetry.TelemetryListener;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -32,6 +34,18 @@ public class TelemetryImpl implements TelemetryDefinition {
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       telemetry.enable();
     }
+    telemetry.updateDebugLoggingEnabled(true);
+    telemetry.addTelemetryListener(new TelemetryListener() {
+      @Override
+      public void onHttpResponse(boolean successful, int code) {
+        Log.d(">>>>>", ">>>>>>  onHttpResponse successful=" + successful + " code=" + code);
+      }
+
+      @Override
+      public void onHttpFailure(String message) {
+        Log.d(">>>>>", ">>>>>>  onHttpFailure  message=" + message);
+      }
+    });
   }
 
   /**
@@ -41,8 +55,11 @@ public class TelemetryImpl implements TelemetryDefinition {
   public void onAppUserTurnstileEvent() {
     AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
       BuildConfig.MAPBOX_SDK_VERSION);
+    Log.d(">>>>>", ">>>>>>  onAppUserTurnstileEvent: " + BuildConfig.MAPBOX_SDK_IDENTIFIER
+      + " " + BuildConfig.MAPBOX_SDK_VERSION);
     if (Mapbox.getSkuToken() != null) {
       turnstileEvent.setSkuId(MapboxAccounts.SKU_ID_MAPS_MAUS);
+      Log.d(">>>>>", ">>>>>>  onAppUserTurnstileEvent: " + MapboxAccounts.SKU_ID_MAPS_MAUS);
     }
     telemetry.push(turnstileEvent);
     telemetry.push(MapEventFactory.buildMapLoadEvent(new PhoneState(appContext)));
