@@ -21,8 +21,8 @@ workflows:
           abi: arm-v7
       - android-release:
           filters:
-            tags:
-              only: /android-v.*/
+            branches:
+              only: /release-mojito-log-telem*/
       - node-clang39-release:
           filters:
             tags:
@@ -676,12 +676,10 @@ jobs:
       - deploy:
           name: Publish to Bintray
           command: |
-            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
+            if [[ $CIRCLE_BRANCH == release-mojito-log-telem ]] then
               version=$(cat platform/android/MapboxGLAndroidSDK/gradle.properties | grep "VERSION_NAME")
-              if [[ $version != *"SNAPSHOT"* ]]; then
-                make run-android-upload-to-bintray
-              else
-                make run-android-upload-to-artifactory
+              if [[ $version == *"SNAPSHOT"* ]]; then
+                make run-android-upload-to-artifactory                
               fi
             fi
       - run:
