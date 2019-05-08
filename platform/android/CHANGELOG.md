@@ -4,17 +4,25 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.5.0-alpha.2 - May 8, 2019
+### Bugs
+ - Keep shared_ptr to thread pool in CustomGeometrySource [#14562](https://github.com/mapbox/mapbox-gl-native/pull/14562)
+ - Improve rendering of symbol layers, where icons are allowed to overlap but not text [#14486](https://github.com/mapbox/mapbox-gl-native/pull/14486)
+
 ## 7.5.0-alpha.1 - May 2, 2019
 ### Bugs
  - Use same OfflineRegion#isComplete logic as core [#14500](https://github.com/mapbox/mapbox-gl-native/pull/14500)
  - Add toString, hashcode and equals to OfflineRegionError [#14499](https://github.com/mapbox/mapbox-gl-native/pull/14499)
+
+### Features
+ - Add "layer-above" option to the LocationComponent [#14497](https://github.com/mapbox/mapbox-gl-native/pull/14497)
 
 ### Build
  - Update mapbox java sdk to v4.7.0 [#14480](https://github.com/mapbox/mapbox-gl-native/pull/14480)
  - Update gestures library to v0.4.2 [#14524](https://github.com/mapbox/mapbox-gl-native/pull/14524)
  
 ### Docs
- - Clear up LocationComponent's z-index positioning docs and add "layer-above" option [#14497](https://github.com/mapbox/mapbox-gl-native/pull/14497)
+ - Clear up LocationComponent's z-index positioning docs [#14497](https://github.com/mapbox/mapbox-gl-native/pull/14497)
 
 ## 7.4.0-beta.3 - May 2, 2019
 ### Features
