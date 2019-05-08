@@ -97,16 +97,16 @@ NS_ASSUME_NONNULL_BEGIN
  renders this feature. For example, if you display features in an
  `MGLShapeSource` using an `MGLCircleStyleLayer`, you can assign a `halfway`
  attribute to each of the source’s features, then set
- `MGLCircleStyleLayer.circleRadius` to an `MGLStyleValue` object with an
- interpolation mode of `MGLInterpolationModeIdentity` and an attribute name of
- `halfway`.
+ `MGLCircleStyleLayer.circleRadius` to an expression for the key path `halfway`.
  
- The `MGLSymbolStyleLayer.textField` and `MGLSymbolStyleLayer.iconImageName`
+ The `MGLSymbolStyleLayer.text` and `MGLSymbolStyleLayer.iconImageName`
  properties allow you to use attributes yet another way. For example, to label
  features in an `MGLShapeSource` object by their names, you can assign a `name`
  attribute to each of the source’s features, then set
- `MGLSymbolStyleLayer.textField` to an `MGLStyleValue` object containing the
- raw string value `{name}`.
+ `MGLSymbolStyleLayer.text` to an expression for the constant string value
+ `{name}`. See the
+ <a href="../predicates-and-expressions.html">Predicates and Expressions</a>
+ guide for more information about expressions.
 
  In vector tiles loaded by `MGLVectorTileSource` objects, the keys and values of
  each feature’s attribute dictionary are determined by the source. Each
@@ -141,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#types-color">CSS string representation</a>
  when the feature is added to an `MGLShapeSource`. This can be convenient when
  using the attribute to supply a value for a color-typed layout or paint
- attribute via the `MGLInterpolationModeIdentity` interpolation mode.
+ attribute via a key path expression.
 
  Note that while it is possible to change this value on feature
  instances obtained from `-[MGLMapView visibleFeaturesAtPoint:]` and related
