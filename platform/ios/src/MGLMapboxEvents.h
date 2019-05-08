@@ -8,6 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)sharedInstance;
 
 + (void)setupWithAccessToken:(NSString *)accessToken;
++ (void)setAccessToken:(NSString *)accessToken;
 + (void)pushTurnstileEvent;
 + (void)pushEvent:(NSString *)event withAttributes:(MMEMapboxEventAttributes *)attributeDictionary;
 + (void)flush;

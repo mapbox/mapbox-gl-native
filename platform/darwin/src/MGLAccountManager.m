@@ -91,7 +91,7 @@ static BOOL _MGLAccountsSDKEnabled;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
     dispatch_async(dispatch_get_main_queue(), ^{
-        [MGLMapboxEvents setupWithAccessToken:accessToken];
+        [MGLMapboxEvents setAccessToken:accessToken];
     });
 #endif
 }

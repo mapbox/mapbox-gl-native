@@ -121,6 +121,10 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
     }
 }
 
++ (void)setAccessToken:(NSString *)accessToken {
+    [[[self sharedInstance] eventsManager] setAccessToken:accessToken];
+}
+
 + (void)setupWithAccessToken:(NSString *)accessToken {
     int64_t delayTime = 0;
     
