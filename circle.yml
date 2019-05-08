@@ -676,7 +676,7 @@ jobs:
       - deploy:
           name: Publish to Bintray
           command: |
-            if [[ $CIRCLE_BRANCH == release-mojito-log-telem ]] then
+            if [[ $CIRCLE_BRANCH == release-mojito-log-telem ]]; then
               version=$(cat platform/android/MapboxGLAndroidSDK/gradle.properties | grep "VERSION_NAME")
               if [[ $version == *"SNAPSHOT"* ]]; then
                 make run-android-upload-to-artifactory                
