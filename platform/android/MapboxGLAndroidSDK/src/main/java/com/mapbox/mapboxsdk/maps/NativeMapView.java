@@ -573,7 +573,7 @@ final class NativeMapView implements NativeMap {
 
   @Override
   public void onLowMemory() {
-    if (checkState("onLowMemory")) {
+    if (checkState("onLowMemory") || !mapRenderer.hasSurface()) {
       return;
     }
     nativeOnLowMemory();
