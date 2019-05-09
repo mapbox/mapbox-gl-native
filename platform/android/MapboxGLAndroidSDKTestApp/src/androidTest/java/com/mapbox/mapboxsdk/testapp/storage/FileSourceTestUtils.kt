@@ -33,14 +33,13 @@ class FileSourceTestUtils(private val activity: Activity) {
     val latch = CountDownLatch(1)
     activity.runOnUiThread {
       FileSource.setResourcesCachePath(
-        activity,
         path,
         object : FileSource.ResourcesCachePathChangeCallback {
-          override fun onSuccess(path: String?) {
+          override fun onSuccess(path: String) {
             latch.countDown()
           }
 
-          override fun onError(message: String?) {
+          override fun onError(message: String) {
             Assert.fail("Resource path change failed - path: $path, message: $message")
           }
         })
