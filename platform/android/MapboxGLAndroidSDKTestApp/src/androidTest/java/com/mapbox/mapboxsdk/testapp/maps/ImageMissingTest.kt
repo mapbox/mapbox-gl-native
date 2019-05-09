@@ -22,12 +22,19 @@ class ImageMissingTest {
   var rule = ActivityTestRule(EspressoTestActivity::class.java)
 
   private lateinit var mapView: MapView
-  private val latch = CountDownLatch(1)
+  private val latch = CountDownLatch(2)
 
   @Test
   fun testMissingImage() {
     rule.runOnUiThread {
-      initMap().addOnStyleImageMissingListener {
+      initMap(styleJson).addOnStyleImageMissingListener {
+        assertEquals("missing-icon", it)
+        latch.countDown()
+      }
+    }
+
+    rule.runOnUiThread {
+      initMap(styleJsonInvalidSprite).addOnStyleImageMissingListener {
         assertEquals("missing-icon", it)
         latch.countDown()
       }
@@ -38,9 +45,9 @@ class ImageMissingTest {
     }
   }
 
-  private fun initMap(): MapView {
+  private fun initMap(style :String): MapView {
     mapView = rule.activity.findViewById(R.id.mapView)
-    mapView.getMapAsync { it.setStyle(Style.Builder().fromJson(styleJson)) }
+    mapView.getMapAsync { it.setStyle(Style.Builder().fromJson(style)) }
     return mapView
   }
 
@@ -50,6 +57,49 @@ class ImageMissingTest {
       "version": 8,
       "name": "Mapbox Streets",
       "sprite": "mapbox://sprites/mapbox/streets-v8",
+      "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+      "sources": {
+        "point": {
+          "type": "geojson",
+          "data": {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Point",
+              "coordinates": [0, 0]
+            }
+          }
+        }
+      },
+      "layers": [{
+        "id": "bg",
+        "type": "background",
+        "paint": {
+          "background-color": "#f00"
+        }
+      }, {
+        "id": "point",
+        "type": "circle",
+        "source": "point",
+        "paint": {
+          "circle-radius": 100
+        }
+      }, {
+        "id": "icon",
+        "type": "symbol",
+        "source": "point",
+        "layout": {
+          "icon-image": "missing-icon"
+        }
+      }]
+    }
+          """
+
+    private const val styleJsonInvalidSprite = """
+    {
+      "version": 8,
+      "name": "Mapbox Streets",
+      "sprite": "mapbox://sprites/mapbox/invalid",
       "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
       "sources": {
         "point": {
