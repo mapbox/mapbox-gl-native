@@ -36,6 +36,16 @@ public final class Utils {
     return heading;
   }
 
+  /**
+   * Normalizes an angle to be in the [0, 360] range.
+   *
+   * @param angle the provided angle
+   * @return the normalized angle
+   */
+  public static float normalize(float angle) {
+    return (angle % 360 + 360) % 360;
+  }
+
   static Bitmap generateShadow(Drawable drawable, float elevation) {
     int width = drawable.getIntrinsicWidth();
     int height = drawable.getIntrinsicHeight();
