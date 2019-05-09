@@ -32,6 +32,8 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
 
   private lateinit var offlineManager: OfflineManager
 
+  private val callback = PathChangeCallback(this)
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_change_resources_cache_path)
@@ -50,18 +52,23 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
     Toast.makeText(this, "Current path: $path", Toast.LENGTH_LONG).show()
   }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    callback.onActivityDestroy()
+  }
+
   override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
     listView.onItemClickListener = null
     val path: String = adapter.getItem(position) as String
-    FileSource.setResourcesCachePath(this, path, this)
+    FileSource.setResourcesCachePath(path, callback)
   }
 
-  override fun onError(message: String?) {
+  override fun onError(message: String) {
     listView.onItemClickListener = this
     Toast.makeText(this, "Error: $message", Toast.LENGTH_LONG).show()
   }
 
-  override fun onSuccess(path: String?) {
+  override fun onSuccess(path: String) {
     listView.onItemClickListener = this
     Toast.makeText(this, "New path: $path", Toast.LENGTH_LONG).show()
 
@@ -116,6 +123,21 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
       }
     }
     return paths
+  }
+
+  private class PathChangeCallback(private var activity: ChangeResourcesCachePathActivity?) : FileSource.ResourcesCachePathChangeCallback {
+
+    override fun onSuccess(path: String) {
+      activity?.onSuccess(path)
+    }
+
+    override fun onError(message: String) {
+      activity?.onError(message)
+    }
+
+    fun onActivityDestroy() {
+      activity = null
+    }
   }
 
   class PathAdapter(private val context: Context, private val paths: List<String>) : BaseAdapter() {
