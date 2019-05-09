@@ -28,8 +28,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SchemaTest {
-  private static final String MAP_CLICK = "map.click";
-  private static final String MAP_DRAG = "map.dragend";
   private static final String MAP_LOAD = "map.load";
   private static final String MAP_PERFORMANCE = "mobile.performance_trace";
   private static final String OFFLINE_DOWNLOAD_END = "map.offlineDownload.end";
@@ -62,38 +60,6 @@ public class SchemaTest {
       JsonObject schema = gson.fromJson(readed, JsonObject.class);
       schemaArray.add(schema);
     }
-  }
-
-  @Test
-  public void checkMapClickEventSize() {
-    JsonObject schema = grabSchema(MAP_CLICK);
-    List<Field> fields = grabClassFields(MapClickEvent.class);
-
-    assertEquals(schema.size(), fields.size());
-  }
-
-  @Test
-  public void checkMapClickEventFields() {
-    JsonObject schema = grabSchema(MAP_CLICK);
-    List<Field> fields = grabClassFields(MapClickEvent.class);
-
-    schemaContainsFields(schema, fields);
-  }
-
-  @Test
-  public void checkMapDragEndEventSize() {
-    JsonObject schema = grabSchema(MAP_DRAG);
-    List<Field> fields = grabClassFields(MapDragendEvent.class);
-
-    assertEquals(schema.size(), fields.size());
-  }
-
-  @Test
-  public void checkMapDragEndEventFields() {
-    JsonObject schema = grabSchema(MAP_DRAG);
-    List<Field> fields = grabClassFields(MapDragendEvent.class);
-
-    schemaContainsFields(schema, fields);
   }
 
   @Test
@@ -287,19 +253,6 @@ public class SchemaTest {
         fields.add(field);
       }
     }
-    return fields;
-  }
-
-  private List<Field> removeField(List<Field> fields, String fieldName) {
-    for (Field field : new ArrayList<>(fields)) {
-      String thisField = String.valueOf(field);
-      String[] fieldArray = thisField.split("\\.");
-      String simpleField = fieldArray[fieldArray.length - 1];
-      if (simpleField.equalsIgnoreCase(fieldName)) {
-        fields.remove(field);
-      }
-    }
-
     return fields;
   }
 

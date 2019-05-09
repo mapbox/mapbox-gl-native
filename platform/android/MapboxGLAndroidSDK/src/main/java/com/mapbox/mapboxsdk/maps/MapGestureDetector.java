@@ -11,21 +11,16 @@ import android.support.annotation.Nullable;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.Constants;
-import com.mapbox.android.gestures.MoveGestureDetector;
-import com.mapbox.android.gestures.MultiFingerTapGestureDetector;
-import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardGestureDetector;
+import com.mapbox.android.gestures.MultiFingerTapGestureDetector;
+import com.mapbox.android.gestures.MoveGestureDetector;
+import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
-import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.constants.TelemetryConstants;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.util.ArrayList;
@@ -332,8 +327,6 @@ final class MapGestureDetector {
         notifyOnMapClickListeners(tapPoint);
       }
 
-      sendTelemetryEvent(TelemetryConstants.SINGLE_TAP, new PointF(motionEvent.getX(), motionEvent.getY()));
-
       return true;
     }
 
@@ -368,7 +361,6 @@ final class MapGestureDetector {
 
         zoomInAnimated(zoomFocalPoint, false);
 
-        sendTelemetryEvent(TelemetryConstants.DOUBLE_TAP, new PointF(motionEvent.getX(), motionEvent.getY()));
         return true;
       }
 
@@ -430,7 +422,6 @@ final class MapGestureDetector {
       }
 
       cancelTransitionsIfRequired();
-      sendTelemetryEvent(TelemetryConstants.PAN, detector.getFocalPoint());
       notifyOnMoveBeginListeners(detector);
       return true;
     }
@@ -496,8 +487,6 @@ final class MapGestureDetector {
             + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
         );
       }
-
-      sendTelemetryEvent(TelemetryConstants.PINCH, getScaleFocalPoint(detector));
 
       notifyOnScaleBeginListeners(detector);
 
@@ -608,8 +597,6 @@ final class MapGestureDetector {
         gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
         gesturesManager.getStandardScaleGestureDetector().interrupt();
       }
-
-      sendTelemetryEvent(TelemetryConstants.ROTATION, getRotateFocalPoint(detector));
 
       notifyOnRotateBeginListeners(detector);
 
@@ -725,8 +712,6 @@ final class MapGestureDetector {
 
       cancelTransitionsIfRequired();
 
-      sendTelemetryEvent(TelemetryConstants.PITCH, detector.getFocalPoint());
-
       // disabling move gesture during shove
       gesturesManager.getMoveGestureDetector().setEnabled(false);
 
@@ -774,8 +759,6 @@ final class MapGestureDetector {
 
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-
-      sendTelemetryEvent(TelemetryConstants.TWO_FINGER_TAP, detector.getFocalPoint());
 
       PointF zoomFocalPoint;
       // Single finger double tap
@@ -888,20 +871,6 @@ final class MapGestureDetector {
       && (!uiSettings.isZoomGesturesEnabled() || !gesturesManager.getStandardScaleGestureDetector().isInProgress())
       && (!uiSettings.isRotateGesturesEnabled() || !gesturesManager.getRotateGestureDetector().isInProgress())
       && (!uiSettings.isTiltGesturesEnabled() || !gesturesManager.getShoveGestureDetector().isInProgress());
-  }
-
-  private void sendTelemetryEvent(String eventType, @NonNull PointF focalPoint) {
-    TelemetryDefinition telemetry = Mapbox.getTelemetry();
-    if (telemetry != null) {
-      CameraPosition cameraPosition = transform.getCameraPosition();
-      if (cameraPosition != null) {
-        double zoom = cameraPosition.zoom;
-        if (isZoomValid(zoom)) {
-          LatLng latLng = projection.fromScreenLocation(focalPoint);
-          telemetry.onGestureInteraction(eventType, latLng.getLatitude(), latLng.getLongitude(), zoom);
-        }
-      }
-    }
   }
 
   private boolean isZoomValid(double mapZoom) {

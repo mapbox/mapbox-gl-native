@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.constants;
 
+@Deprecated
 public class TelemetryConstants {
 
   public static final String TWO_FINGER_TAP = "TwoFingerTap";

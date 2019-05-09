@@ -55,18 +55,20 @@ public class TelemetryImpl implements TelemetryDefinition {
    * @param latitude  the latitude value of the gesture focal point
    * @param longitude the longitude value of the gesture focal point
    * @param zoom      current zoom of the map
+   * @deprecated since 7.5.0, this event is no longer supported
    */
+  @Deprecated
   @Override
   public void onGestureInteraction(String eventType, double latitude, double longitude,
                                    @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
                                      to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
-    MapState state = new MapState(latitude, longitude, zoom);
-    state.setGesture(eventType);
-    telemetry.push(MapEventFactory.buildMapClickEvent(new PhoneState(appContext), state));
+    //no-op
   }
 
   /**
    * Set the end-user selected state to participate or opt-out in telemetry collection.
+   *
+   * @param enabledTelemetry true if enabled, false otherwise
    */
   @Override
   public void setUserTelemetryRequestState(boolean enabledTelemetry) {
@@ -100,6 +102,11 @@ public class TelemetryImpl implements TelemetryDefinition {
     return telemetry.updateSessionIdRotationInterval(new SessionInterval(interval));
   }
 
+  /**
+   * Register an offline region creation event.
+   *
+   * @param offlineDefinition the offline region definition
+   */
   @Override
   public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
     telemetry.push(MapEventFactory.buildOfflineDownloadStartEvent(new PhoneState(appContext),
@@ -110,6 +117,11 @@ public class TelemetryImpl implements TelemetryDefinition {
     );
   }
 
+  /**
+   * Register a performance event
+   *
+   * @param data performance event data
+   */
   @Override
   public void onPerformanceEvent(Bundle data) {
     if (data == null) {
