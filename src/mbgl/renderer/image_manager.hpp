@@ -15,6 +15,9 @@
 
 namespace mbgl {
 
+template <class T>
+class Actor;
+
 namespace gfx {
 class Context;
 } // namespace gfx
@@ -66,9 +69,11 @@ private:
     bool loaded = false;
 
     std::map<ImageRequestor*, ImageRequestPair> requestors;
+    using Callback = std::function<void()>;
+    using ActorCallback = Actor<Callback>;
     struct MissingImageRequestPair {
         ImageRequestPair pair;
-        unsigned int callbacksRemaining;
+        std::map<std::string, std::unique_ptr<ActorCallback>> callbacks;
     };
     std::map<ImageRequestor*, MissingImageRequestPair> missingImageRequestors;
     ImageMap images;
