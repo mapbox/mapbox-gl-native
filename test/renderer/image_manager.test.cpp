@@ -117,6 +117,7 @@ public:
 };
 
 TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
+    util::RunLoop runLoop;
     ImageManager imageManager;
     StubImageRequestor requestor;
     bool notified = false;
@@ -132,11 +133,15 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
     ImageDependencies dependencies;
     dependencies.emplace("one", ImageType::Icon);
     imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+    runLoop.runOnce();
+
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
+    runLoop.runOnce();
     ASSERT_FALSE(notified);
     imageManager.notifyIfMissingImageAdded();
+    runLoop.runOnce();
     ASSERT_TRUE(notified);
 }
 
@@ -169,6 +174,7 @@ class StubImageManagerObserver : public ImageManagerObserver {
 };
 
 TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
+    util::RunLoop runLoop;
     ImageManager imageManager;
     StubImageRequestor requestor;
     StubImageManagerObserver observer;
@@ -185,16 +191,19 @@ TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
     ImageDependencies dependencies;
     dependencies.emplace("pre", ImageType::Icon);
     imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 0);
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_FALSE(notified);
 
     imageManager.notifyIfMissingImageAdded();
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_TRUE(notified);
@@ -202,6 +211,7 @@ TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
 }
 
 TEST(ImageManager, OnStyleImageMissingAfterSpriteLoaded) {
+    util::RunLoop runLoop;
     ImageManager imageManager;
     StubImageRequestor requestor;
     StubImageManagerObserver observer;
@@ -218,16 +228,19 @@ TEST(ImageManager, OnStyleImageMissingAfterSpriteLoaded) {
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
+    runLoop.runOnce();
 
     uint64_t imageCorrelationID = 0;
     ImageDependencies dependencies;
     dependencies.emplace("after", ImageType::Icon);
     imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_FALSE(notified);
 
     imageManager.notifyIfMissingImageAdded();
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_TRUE(notified);
