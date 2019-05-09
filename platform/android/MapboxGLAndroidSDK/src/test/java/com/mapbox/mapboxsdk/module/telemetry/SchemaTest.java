@@ -262,6 +262,7 @@ public class SchemaTest {
         schema.remove("owner");
         schema.remove("locationAuthorization");
         schema.remove("locationEnabled");
+        schema.remove("skuId");
         //temporary need to work out a solution to include this data
         schema.remove("platform");
 
