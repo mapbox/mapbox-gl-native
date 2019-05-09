@@ -1,4 +1,6 @@
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/renderer/image_manager_observer.hpp>
@@ -128,7 +130,7 @@ void ImageManager::removeRequestor(ImageRequestor& requestor) {
 
 void ImageManager::notifyIfMissingImageAdded() {
     for (auto it = missingImageRequestors.begin(); it != missingImageRequestors.end();) {
-        if (it->second.callbacksRemaining == 0) {
+        if (it->second.callbacks.empty()) {
             notify(*it->first, it->second.pair);
             it = missingImageRequestors.erase(it);
         } else {
@@ -162,19 +164,29 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
     if (missing > 0) {
         ImageRequestor* requestorPtr = &requestor;
 
-        missingImageRequestors.emplace(requestorPtr, MissingImageRequestPair { std::move(pair), missing });
+        auto emplaced = missingImageRequestors.emplace(requestorPtr, MissingImageRequestPair { pair, {} });
+        assert(emplaced.second);
 
         for (const auto& dependency : pair.first) {
             auto it = images.find(dependency.first);
             if (it == images.end()) {
                 assert(observer != nullptr);
-                observer->onStyleImageMissing(dependency.first, [this, requestorPtr]() {
-                    auto requestorIt = missingImageRequestors.find(requestorPtr);
-                    if (requestorIt != missingImageRequestors.end()) {
-                        assert(requestorIt->second.callbacksRemaining > 0);
-                        requestorIt->second.callbacksRemaining--;
-                    }
+                auto callback = std::make_unique<ActorCallback>(
+                        *Scheduler::GetCurrent(),
+                        [this, requestorPtr, imageId = dependency.first] {
+                            auto requestorIt = missingImageRequestors.find(requestorPtr);
+                            if (requestorIt != missingImageRequestors.end()) {
+                                assert(requestorIt->second.callbacks.find(imageId) != requestorIt->second.callbacks.end());
+                                requestorIt->second.callbacks.erase(imageId);
+                            }
+                        });
+
+                auto actorRef = callback->self();
+                emplaced.first->second.callbacks.emplace(dependency.first, std::move(callback));
+                observer->onStyleImageMissing(dependency.first, [actorRef]() mutable {
+                    actorRef.invoke(&Callback::operator());
                 });
+
             }
         }
 

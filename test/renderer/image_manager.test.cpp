@@ -119,6 +119,7 @@ public:
 };
 
 TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
+    util::RunLoop runLoop;
     ImageManager imageManager;
     StubImageRequestor requestor(imageManager);
     bool notified = false;
@@ -134,11 +135,15 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
     ImageDependencies dependencies;
     dependencies.emplace("one", ImageType::Icon);
     imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+    runLoop.runOnce();
+
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
+    runLoop.runOnce();
     ASSERT_FALSE(notified);
     imageManager.notifyIfMissingImageAdded();
+    runLoop.runOnce();
     ASSERT_TRUE(notified);
 }
 
@@ -173,6 +178,7 @@ class StubImageManagerObserver : public ImageManagerObserver {
 };
 
 TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
+    util::RunLoop runLoop;
     ImageManager imageManager;
     StubImageRequestor requestor(imageManager);
     StubImageManagerObserver observer;
@@ -189,16 +195,19 @@ TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
     ImageDependencies dependencies;
     dependencies.emplace("pre", ImageType::Icon);
     imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 0);
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_FALSE(notified);
 
     imageManager.notifyIfMissingImageAdded();
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_TRUE(notified);
@@ -206,6 +215,7 @@ TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
 }
 
 TEST(ImageManager, OnStyleImageMissingAfterSpriteLoaded) {
+    util::RunLoop runLoop;
     ImageManager imageManager;
     StubImageRequestor requestor(imageManager);
     StubImageManagerObserver observer;
@@ -222,22 +232,26 @@ TEST(ImageManager, OnStyleImageMissingAfterSpriteLoaded) {
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
+    runLoop.runOnce();
 
     uint64_t imageCorrelationID = 0;
     ImageDependencies dependencies;
     dependencies.emplace("after", ImageType::Icon);
     imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_FALSE(notified);
 
     imageManager.notifyIfMissingImageAdded();
+    runLoop.runOnce();
 
     EXPECT_EQ(observer.count, 1);
     ASSERT_TRUE(notified);
 }
 
 TEST(ImageManager, ReduceMemoryUsage) {
+    util::RunLoop runLoop;
     ImageManager imageManager;
     StubImageManagerObserver observer;
 
@@ -247,17 +261,20 @@ TEST(ImageManager, ReduceMemoryUsage) {
 
     imageManager.setObserver(&observer);
     imageManager.setLoaded(true);
+    runLoop.runOnce();
 
     // Single requestor
     {
         std::unique_ptr<StubImageRequestor> requestor = std::make_unique<StubImageRequestor>(imageManager);
         imageManager.getImages(*requestor, std::make_pair(ImageDependencies{{"missing", ImageType::Icon}}, 0ull));
+        runLoop.runOnce();
         EXPECT_EQ(observer.count, 1);
         ASSERT_FALSE(imageManager.getImage("missing") == nullptr);
     }
 
     // Reduce memory usage and check that unused image was deleted.
     imageManager.reduceMemoryUse();
+    runLoop.runOnce();
     ASSERT_TRUE(imageManager.getImage("missing") == nullptr);
 
     // Multiple requestors
@@ -266,12 +283,14 @@ TEST(ImageManager, ReduceMemoryUsage) {
         std::unique_ptr<StubImageRequestor> requestor2 = std::make_unique<StubImageRequestor>(imageManager);
         imageManager.getImages(*requestor1, std::make_pair(ImageDependencies{{"missing", ImageType::Icon}}, 0ull));
         imageManager.getImages(*requestor2, std::make_pair(ImageDependencies{{"missing", ImageType::Icon}}, 1ull));
+        runLoop.runOnce();
         EXPECT_EQ(observer.count, 2);
         ASSERT_FALSE(imageManager.getImage("missing") == nullptr);
     }
 
     // Reduce memory usage and check that unused image was deleted when all requestors are destructed.
     imageManager.reduceMemoryUse();
+    runLoop.runOnce();
     ASSERT_TRUE(imageManager.getImage("missing") == nullptr);
 
     // Multiple requestors, check that image resource is not destroyed if there is at least 1 requestor that uses it.
@@ -280,16 +299,19 @@ TEST(ImageManager, ReduceMemoryUsage) {
         std::unique_ptr<StubImageRequestor> requestor1 = std::make_unique<StubImageRequestor>(imageManager);
         imageManager.getImages(*requestor, std::make_pair(ImageDependencies{{"missing", ImageType::Icon}}, 0ull));
         imageManager.getImages(*requestor1, std::make_pair(ImageDependencies{{"missing", ImageType::Icon}}, 1ull));
+        runLoop.runOnce();
         EXPECT_EQ(observer.count, 3);
         ASSERT_FALSE(imageManager.getImage("missing") == nullptr);
     }
 
     // Reduce memory usage and check that requested image is not destructed.
     imageManager.reduceMemoryUse();
+    runLoop.runOnce();
     ASSERT_FALSE(imageManager.getImage("missing") == nullptr);
 
     // Release last requestor and check if resource was released after reduceMemoryUse().
     requestor.reset();
     imageManager.reduceMemoryUse();
+    runLoop.runOnce();
     ASSERT_TRUE(imageManager.getImage("missing") == nullptr);
 }
