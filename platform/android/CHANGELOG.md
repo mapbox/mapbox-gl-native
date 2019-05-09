@@ -7,7 +7,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ## 7.5.0-alpha.2 - May 8, 2019
 ### Bugs
  - Keep shared_ptr to thread pool in CustomGeometrySource [#14562](https://github.com/mapbox/mapbox-gl-native/pull/14562)
- - Improve rendering of symbol layers, where icons are allowed to overlap but not text [#14486](https://github.com/mapbox/mapbox-gl-native/pull/14486)
+ - Changed placement order of symbols to match the viewport-y order when the `PropertyValue#symbolZOrder` is set to `SYMBOL_Z_ORDER_VIEWPORT_Y`, improving collision detection and rendering of symbol layers when icons are allowed to overlap but not text. [#14486](https://github.com/mapbox/mapbox-gl-native/pull/14486)
 
 ## 7.5.0-alpha.1 - May 2, 2019
 ### Bugs
