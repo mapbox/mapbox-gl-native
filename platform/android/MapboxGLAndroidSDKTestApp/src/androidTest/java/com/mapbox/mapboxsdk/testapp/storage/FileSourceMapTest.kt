@@ -36,12 +36,12 @@ open class FileSourceMapTest {
   fun changeResourcesPathWhileMapVisible() {
     val latch = CountDownLatch(1)
     rule.activity.runOnUiThread {
-      FileSource.setResourcesCachePath(rule.activity, fileSourceTestUtils.testPath, object : FileSource.ResourcesCachePathChangeCallback {
-        override fun onSuccess(path: String?) {
+      FileSource.setResourcesCachePath(fileSourceTestUtils.testPath, object : FileSource.ResourcesCachePathChangeCallback {
+        override fun onSuccess(path: String) {
           Assert.fail("Requested resources change while the map is running should fail")
         }
 
-        override fun onError(message: String?) {
+        override fun onError(message: String) {
           Assert.assertEquals("Cannot set path, file source is activated."
             + " Make sure that the map or a resources download is not running.", message)
           latch.countDown()
