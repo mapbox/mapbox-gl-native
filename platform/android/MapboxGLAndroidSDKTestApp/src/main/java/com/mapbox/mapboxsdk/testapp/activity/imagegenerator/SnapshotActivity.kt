@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.imagegenerator
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.mapbox.mapboxsdk.log.Logger
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -17,12 +18,11 @@ class SnapshotActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private lateinit var mapboxMap: MapboxMap
 
-  private val idleListener = object : MapView.OnDidBecomeIdleListener {
-    override fun onDidBecomeIdle() {
-      mapView.removeOnDidBecomeIdleListener(this)
+  private val idleListener = MapView.OnDidFinishRenderingFrameListener { fully ->
+    if (fully) {
+      Logger.v(TAG, LOG_MESSAGE)
       mapboxMap.snapshot { snapshot ->
         imageView.setImageBitmap(snapshot)
-        mapView.addOnDidBecomeIdleListener(this)
       }
     }
   }
@@ -36,7 +36,7 @@ class SnapshotActivity : AppCompatActivity(), OnMapReadyCallback {
 
   override fun onMapReady(map: MapboxMap) {
     mapboxMap = map
-    mapboxMap.setStyle(Style.Builder().fromUrl(Style.OUTDOORS)) { mapView.addOnDidBecomeIdleListener(idleListener) }
+    mapboxMap.setStyle(Style.Builder().fromUrl(Style.OUTDOORS)) { mapView.addOnDidFinishRenderingFrameListener(idleListener) }
   }
 
   override fun onStart() {
@@ -74,7 +74,12 @@ class SnapshotActivity : AppCompatActivity(), OnMapReadyCallback {
 
   public override fun onDestroy() {
     super.onDestroy()
-    mapView.removeOnDidBecomeIdleListener(idleListener)
+    mapView.removeOnDidFinishRenderingFrameListener(idleListener)
     mapView.onDestroy()
+  }
+
+  companion object {
+    const val TAG ="Mbgl-SnapshotActivity"
+    const val LOG_MESSAGE = "OnSnapshot"
   }
 }

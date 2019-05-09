@@ -937,6 +937,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   /**
    * Interface definition for a callback to be invoked when the map has entered the idle state.
    * <p>
+   * Calling {@link MapboxMap#snapshot(MapboxMap.SnapshotReadyCallback)} from this callback
+   * will result in recursive execution. Use {@link OnDidFinishRenderingFrameListener} instead.
+   * </p>
+   * <p>
    * {@link MapView#addOnDidBecomeIdleListener(OnDidBecomeIdleListener)}
    * </p>
    */
