@@ -6,9 +6,7 @@ import android.os.Bundle;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.BuildConfig;
-import com.mapbox.mapboxsdk.constants.TelemetryConstants;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,9 +22,6 @@ import static org.mockito.Mockito.when;
 
 public class MapEventFactoryTest {
   private static final float FONT_SCALE = 1.f;
-  private static final double LATITUDE = 10.0;
-  private static final double LONGITUDE = 11.0;
-  private static final double ZOOM = 10.0;
   private static final int BATTERY_LEVEL = 50;
   private static final String CARRIER = "carrier";
   private static final String NETWORK_TYPE = "network";
@@ -43,13 +38,11 @@ public class MapEventFactoryTest {
   private static final int STATE = OfflineRegion.STATE_ACTIVE;
   private static final String SESSION_ID = "001";
 
-  private MapState mapState;
   private PhoneState phoneState;
   private Gson gson = new Gson();
 
   @Before
   public void setUp() {
-    mapState = new MapState(LATITUDE, LONGITUDE, ZOOM);
     phoneState = new PhoneState();
     phoneState.setAccessibilityFontScale(FONT_SCALE);
     phoneState.setBatteryLevel(BATTERY_LEVEL);
@@ -60,26 +53,6 @@ public class MapEventFactoryTest {
     phoneState.setPluggedIn(PLUGIN);
     phoneState.setResolution(RESOLUTION);
     phoneState.setWifi(WIFI);
-  }
-
-  @Test
-  public void testClickEvent() {
-    mapState.setGesture(TelemetryConstants.DOUBLE_TAP);
-    MapClickEvent mapClickEvent = MapEventFactory.buildMapClickEvent(phoneState, mapState);
-    assertEquals(LATITUDE, mapClickEvent.getLat(), 0);
-    assertEquals(LONGITUDE, mapClickEvent.getLng(), 0);
-    assertEquals(ZOOM, mapClickEvent.getZoom(), 0);
-    assertEquals(BATTERY_LEVEL, mapClickEvent.getBatteryLevel());
-    assertEquals(CARRIER, mapClickEvent.getCarrier());
-    assertEquals(NETWORK_TYPE, mapClickEvent.getCellularNetworkType());
-    assertEquals(CREATED, mapClickEvent.getCreated());
-    assertEquals(TelemetryConstants.DOUBLE_TAP, mapClickEvent.getGesture());
-    assertEquals("Landscape", mapClickEvent.getOrientation());
-    assertEquals(PLUGIN, mapClickEvent.isPluggedIn());
-    assertEquals(WIFI, mapClickEvent.isWifi());
-    String json = gson.toJson(mapClickEvent);
-    MapClickEvent event = gson.fromJson(json, MapClickEvent.class);
-    assertEquals(mapClickEvent, event);
   }
 
   @Test
@@ -101,24 +74,6 @@ public class MapEventFactoryTest {
     String json = gson.toJson(mapLoadEvent);
     MapLoadEvent event = gson.fromJson(json, MapLoadEvent.class);
     assertEquals(mapLoadEvent, event);
-  }
-
-  @Test
-  public void testMapDraggedEvent() {
-    MapDragendEvent mapDraggedEvent = MapEventFactory.buildMapDragendEvent(phoneState, mapState);
-    assertEquals(LATITUDE, mapDraggedEvent.getLat(), 0);
-    assertEquals(LONGITUDE, mapDraggedEvent.getLng(), 0);
-    assertEquals(ZOOM, mapDraggedEvent.getZoom(), 0);
-    assertEquals(BATTERY_LEVEL, mapDraggedEvent.getBatteryLevel());
-    assertEquals(CARRIER, mapDraggedEvent.getCarrier());
-    assertEquals(NETWORK_TYPE, mapDraggedEvent.getCellularNetworkType());
-    assertEquals(CREATED, mapDraggedEvent.getCreated());
-    assertEquals("Landscape", mapDraggedEvent.getOrientation());
-    assertEquals(PLUGIN, mapDraggedEvent.isPluggedIn());
-    assertEquals(WIFI, mapDraggedEvent.isWifi());
-    String json = gson.toJson(mapDraggedEvent);
-    MapDragendEvent event = gson.fromJson(json, MapDragendEvent.class);
-    assertEquals(mapDraggedEvent, event);
   }
 
   @Test

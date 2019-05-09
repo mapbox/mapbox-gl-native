@@ -49,14 +49,6 @@ class MapEventFactory {
     return offlineEvent;
   }
 
-  static MapClickEvent buildMapClickEvent(@NonNull PhoneState phoneState, @NonNull MapState mapState) {
-    return new MapClickEvent(phoneState, mapState);
-  }
-
-  static MapDragendEvent buildMapDragendEvent(@NonNull PhoneState phoneState, @NonNull MapState mapState) {
-    return new MapDragendEvent(phoneState, mapState);
-  }
-
   static PerformanceEvent buildPerformanceEvent(@NonNull PhoneState phoneState, @NonNull String sessionId,
                                                 @NonNull Bundle data) {
     return new PerformanceEvent(phoneState, sessionId, data);
