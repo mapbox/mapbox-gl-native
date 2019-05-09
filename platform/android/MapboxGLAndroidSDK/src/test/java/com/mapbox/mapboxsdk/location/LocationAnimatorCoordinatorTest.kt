@@ -119,6 +119,108 @@ class LocationAnimatorCoordinatorTest {
   }
 
   @Test
+  fun feedNewLocation_animatorValue_correctRotation_1() {
+    val location = Location("")
+    location.latitude = 51.0
+    location.longitude = 17.0
+    location.bearing = 0f
+
+    val animator = mockk<MapboxFloatAnimator>(relaxed = true)
+    every { animator.animatedValue } returns 270f
+    locationAnimatorCoordinator.animatorArray.put(ANIMATOR_LAYER_GPS_BEARING, animator)
+
+    locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
+
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    assertEquals(360f, layerBearingTarget)
+  }
+
+  @Test
+  fun feedNewLocation_animatorValue_correctRotation_2() {
+    val location = Location("")
+    location.latitude = 51.0
+    location.longitude = 17.0
+    location.bearing = 90f
+
+    val animator = mockk<MapboxFloatAnimator>(relaxed = true)
+    every { animator.animatedValue } returns 280f
+    locationAnimatorCoordinator.animatorArray.put(ANIMATOR_LAYER_GPS_BEARING, animator)
+
+    locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
+
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    assertEquals(450f, layerBearingTarget)
+  }
+
+  @Test
+  fun feedNewLocation_animatorValue_correctRotation_3() {
+    val location = Location("")
+    location.latitude = 51.0
+    location.longitude = 17.0
+    location.bearing = 300f
+
+    val animator = mockk<MapboxFloatAnimator>(relaxed = true)
+    every { animator.animatedValue } returns 450f
+    locationAnimatorCoordinator.animatorArray.put(ANIMATOR_LAYER_GPS_BEARING, animator)
+
+    locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
+
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    assertEquals(-60f, layerBearingTarget)
+  }
+
+  @Test
+  fun feedNewLocation_animatorValue_correctRotation_4() {
+    val location = Location("")
+    location.latitude = 51.0
+    location.longitude = 17.0
+    location.bearing = 350f
+
+    val animator = mockk<MapboxFloatAnimator>(relaxed = true)
+    every { animator.animatedValue } returns 10f
+    locationAnimatorCoordinator.animatorArray.put(ANIMATOR_LAYER_GPS_BEARING, animator)
+
+    locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
+
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    assertEquals(-10f, layerBearingTarget)
+  }
+
+  @Test
+  fun feedNewLocation_animatorValue_correctRotation_5() {
+    val location = Location("")
+    location.latitude = 51.0
+    location.longitude = 17.0
+    location.bearing = 90f
+
+    val animator = mockk<MapboxFloatAnimator>(relaxed = true)
+    every { animator.animatedValue } returns -280f
+    locationAnimatorCoordinator.animatorArray.put(ANIMATOR_LAYER_GPS_BEARING, animator)
+
+    locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
+
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    assertEquals(90f, layerBearingTarget)
+  }
+
+  @Test
+  fun feedNewLocation_animatorValue_correctRotation_6() {
+    val location = Location("")
+    location.latitude = 51.0
+    location.longitude = 17.0
+    location.bearing = 270f
+
+    val animator = mockk<MapboxFloatAnimator>(relaxed = true)
+    every { animator.animatedValue } returns -350f
+    locationAnimatorCoordinator.animatorArray.put(ANIMATOR_LAYER_GPS_BEARING, animator)
+
+    locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
+
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    assertEquals(-90f, layerBearingTarget)
+  }
+
+  @Test
   fun feedNewLocation_isNorth_animatorsAreCreated() {
     val location = Location("")
     location.latitude = 51.0

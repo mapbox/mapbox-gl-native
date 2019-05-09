@@ -196,6 +196,9 @@ final class LocationAnimatorCoordinator {
                                     float previousBearing, float targetBearing) {
     createNewLatLngAnimator(ANIMATOR_LAYER_LATLNG, previousLatLng, targetLatLng);
 
+    // Because Location bearing values are normalized to [0, 360]
+    // we need to do the same for the previous bearing value to determine the shortest path
+    previousBearing = Utils.normalize(previousBearing);
     float normalizedLayerBearing = Utils.shortestRotation(targetBearing, previousBearing);
     createNewFloatAnimator(ANIMATOR_LAYER_GPS_BEARING, previousBearing, normalizedLayerBearing);
   }
