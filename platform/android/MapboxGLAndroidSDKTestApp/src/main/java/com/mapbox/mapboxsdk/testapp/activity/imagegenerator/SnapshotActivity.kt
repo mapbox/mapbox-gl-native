@@ -18,11 +18,15 @@ class SnapshotActivity : AppCompatActivity(), OnMapReadyCallback {
 
   private lateinit var mapboxMap: MapboxMap
 
-  private val idleListener = MapView.OnDidFinishRenderingFrameListener { fully ->
-    if (fully) {
-      Logger.v(TAG, LOG_MESSAGE)
-      mapboxMap.snapshot { snapshot ->
-        imageView.setImageBitmap(snapshot)
+  private val idleListener = object : MapView.OnDidFinishRenderingFrameListener {
+    override fun onDidFinishRenderingFrame(fully: Boolean) {
+      if (fully) {
+        mapView.removeOnDidFinishRenderingFrameListener(this)
+        Logger.v(TAG, LOG_MESSAGE)
+        mapboxMap.snapshot { snapshot ->
+          imageView.setImageBitmap(snapshot)
+          mapView.addOnDidFinishRenderingFrameListener(this)
+        }
       }
     }
   }
