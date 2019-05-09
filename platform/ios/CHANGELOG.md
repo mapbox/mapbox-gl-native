@@ -12,9 +12,9 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an Interface Builder crash when using an `MGLMapView` in a storyboard. ([#14379](https://github.com/mapbox/mapbox-gl-native/pull/14379))
 * Fix a bug that wrong position of attribution dialog after rotation. ([#14185](https://github.com/mapbox/mapbox-gl-native/pull/14185))
 * Fixed a bug with jittery callout views when using sprite-based annotations. ([#14445](https://github.com/mapbox/mapbox-gl-native/pull/14445))
-* Improved `MGLLocationManager` optional protocol properties briding to Swift. ([#14477](https://github.com/mapbox/mapbox-gl-native/pull/14477))
+* Improved `MGLLocationManager` optional protocol properties bridging to Swift. ([#14477](https://github.com/mapbox/mapbox-gl-native/pull/14477))
 * Fixed a layout constraints crash on iOS 9 when a view is removed from its superview. ([#14529](https://github.com/mapbox/mapbox-gl-native/pull/14529))
-* Fixed a bug where some layers weren't rendering correctly after panning. ([#14527](https://github.com/mapbox/mapbox-gl-native/pull/14527))
+* Fixed a bug where some layers weren’t rendering correctly after panning. ([#14527](https://github.com/mapbox/mapbox-gl-native/pull/14527))
 
 ## 4.10.0 - April 17, 2019
 
@@ -50,7 +50,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a bug where setting `MGLMapView.userTrackingMode` to `MGLUserTrackingModeFollowWithHeading` or `MGLUserTrackingModeFollowWithCourse` would be ignored if the user’s location was not already available. ([#13849](https://github.com/mapbox/mapbox-gl-native/pull/13849))
 * Improved tilt gesture performance. ([#13902](https://github.com/mapbox/mapbox-gl-native/pull/13902))
 * Fixed a bug where `layoutSubviews` was always called on device rotation, regardless of the application's or top-most view controller's supported orientations. ([#13900](https://github.com/mapbox/mapbox-gl-native/pull/13900))
-* Added `MGLNetworkConfiguration` class to customize the SDK's `NSURLSessionConfiguration` object. ([#11447](https://github.com/mapbox/mapbox-gl-native/pull/13886))
+* Added `MGLNetworkConfiguration` class to customize the SDK's `NSURLSessionConfiguration` object. ([#13886](https://github.com/mapbox/mapbox-gl-native/pull/13886))
 
 ## 4.8.0 - January 30, 2019
 
