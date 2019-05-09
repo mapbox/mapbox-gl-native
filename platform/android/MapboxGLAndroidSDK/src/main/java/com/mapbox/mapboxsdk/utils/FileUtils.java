@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.log.Logger;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
 public class FileUtils {
 
@@ -14,13 +13,16 @@ public class FileUtils {
 
   /**
    * Task checking whether app's process can read a file.
+   * <p>
+   * The callback reference is <b>strongly kept</b> throughout the process,
+   * so it needs to be wrapped in a weak reference or released on the client side if necessary.
    */
   public static class CheckFileReadPermissionTask extends AsyncTask<File, Void, Boolean> {
     @NonNull
-    private final WeakReference<OnCheckFileReadPermissionListener> listenerWeakReference;
+    private final OnCheckFileReadPermissionListener listener;
 
-    public CheckFileReadPermissionTask(OnCheckFileReadPermissionListener listener) {
-      this.listenerWeakReference = new WeakReference<>(listener);
+    public CheckFileReadPermissionTask(@NonNull OnCheckFileReadPermissionListener listener) {
+      this.listener = listener;
     }
 
     @Override
@@ -34,21 +36,15 @@ public class FileUtils {
 
     @Override
     protected void onCancelled() {
-      OnCheckFileReadPermissionListener listener = listenerWeakReference.get();
-      if (listener != null) {
-        listener.onError();
-      }
+      listener.onError();
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-      OnCheckFileReadPermissionListener listener = listenerWeakReference.get();
-      if (listener != null) {
-        if (result) {
-          listener.onReadPermissionGranted();
-        } else {
-          listener.onError();
-        }
+      if (result) {
+        listener.onReadPermissionGranted();
+      } else {
+        listener.onError();
       }
     }
   }
@@ -71,13 +67,16 @@ public class FileUtils {
 
   /**
    * Task checking whether app's process can write to a file.
+   * <p>
+   * The callback reference is <b>strongly kept</b> throughout the process,
+   * so it needs to be wrapped in a weak reference or released on the client side if necessary.
    */
   public static class CheckFileWritePermissionTask extends AsyncTask<File, Void, Boolean> {
     @NonNull
-    private final WeakReference<OnCheckFileWritePermissionListener> listenerWeakReference;
+    private final OnCheckFileWritePermissionListener listener;
 
-    public CheckFileWritePermissionTask(OnCheckFileWritePermissionListener listener) {
-      this.listenerWeakReference = new WeakReference<>(listener);
+    public CheckFileWritePermissionTask(@NonNull OnCheckFileWritePermissionListener listener) {
+      this.listener = listener;
     }
 
     @Override
@@ -91,21 +90,15 @@ public class FileUtils {
 
     @Override
     protected void onCancelled() {
-      OnCheckFileWritePermissionListener listener = listenerWeakReference.get();
-      if (listener != null) {
-        listener.onError();
-      }
+      listener.onError();
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-      OnCheckFileWritePermissionListener listener = listenerWeakReference.get();
-      if (listener != null) {
-        if (result) {
-          listener.onWritePermissionGranted();
-        } else {
-          listener.onError();
-        }
+      if (result) {
+        listener.onWritePermissionGranted();
+      } else {
+        listener.onError();
       }
     }
   }
