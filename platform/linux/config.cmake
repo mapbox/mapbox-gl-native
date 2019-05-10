@@ -55,6 +55,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/src/mbgl/util/thread_local.cpp
         PRIVATE platform/default/src/mbgl/text/unaccent.cpp
         PRIVATE platform/default/include/mbgl/text/unaccent.hpp
+        PRIVATE platform/default/src/mbgl/util/thread_pool_provider.cpp
         PRIVATE platform/default/src/mbgl/util/utf.cpp
 
         # Image handling

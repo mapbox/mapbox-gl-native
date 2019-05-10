@@ -37,6 +37,7 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/default/src/mbgl/text/collator.cpp
     PRIVATE platform/default/src/mbgl/text/unaccent.cpp
     PRIVATE platform/default/include/mbgl/text/unaccent.hpp
+    PRIVATE platform/default/src/mbgl/util/thread_pool_provider.cpp
 
     #Layer manager
     PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp

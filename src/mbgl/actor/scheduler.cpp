@@ -1,6 +1,7 @@
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/thread_local.hpp>
 #include <mbgl/util/thread_pool.hpp>
+#include <mbgl/util/thread_pool_provider.hpp>
 
 namespace mbgl {
 
@@ -28,7 +29,7 @@ std::shared_ptr<Scheduler> Scheduler::GetBackground() {
     std::shared_ptr<Scheduler> scheduler = weak.lock();
 
     if (!scheduler) {
-        weak = scheduler = std::make_shared<ThreadPool>(4);
+        weak = scheduler = getThreadPool();
     }
 
     return scheduler;

@@ -15,7 +15,8 @@
         "platform/default/src/mbgl/text/bidi.cpp",
         "platform/default/src/mbgl/util/png_writer.cpp",
         "platform/default/src/mbgl/util/thread_local.cpp",
-        "platform/default/src/mbgl/util/utf.cpp"
+        "platform/default/src/mbgl/util/utf.cpp",
+        "platform/default/src/mbgl/util/thread_pool_provider.cpp"
     ],
     "public_headers": {
         "mbgl/storage/reachability.h": "platform/darwin/include/mbgl/storage/reachability.h",
