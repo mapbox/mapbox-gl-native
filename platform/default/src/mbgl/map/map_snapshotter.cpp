@@ -81,7 +81,7 @@ MapSnapshotter::Impl::Impl(std::shared_ptr<Scheduler> scheduler_,
 }
 
 void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback) {
-    map.renderStill([this, callback = std::move(callback)] (std::exception_ptr error) mutable {
+    map.renderStill([this, callback = std::move(callback)] (std::exception_ptr error) {
 
         // Create lambda that captures the current transform state
         // and can be used to translate for geographic to screen

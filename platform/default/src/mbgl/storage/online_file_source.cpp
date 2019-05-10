@@ -79,7 +79,7 @@ public:
             // Request the ResourceTransform actor a new url and replace the resource url with the
             // transformed one before proceeding to schedule the request.
             resourceTransform->invoke(&ResourceTransform::transform, request->resource.kind,
-                std::move(request->resource.url), [ref = request->actor()](const std::string&& url) mutable {
+                std::move(request->resource.url), [ref = request->actor()](const std::string&& url) {
                     ref.invoke(&OnlineFileRequest::setTransformedURL, std::move(url));
                 });
         } else {

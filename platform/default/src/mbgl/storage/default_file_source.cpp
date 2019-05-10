@@ -97,7 +97,7 @@ public:
     }
 
     void request(AsyncRequest* req, Resource resource, ActorRef<FileSourceRequest> ref) {
-        auto callback = [ref] (const Response& res) mutable {
+        auto callback = [ref] (const Response& res) {
             ref.invoke(&FileSourceRequest::setResponse, res);
         };
 
@@ -145,7 +145,7 @@ public:
             // Get from the online file source
             if (resource.hasLoadingMethod(Resource::LoadingMethod::Network)) {
                 MBGL_TIMING_START(watch);
-                tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
+                tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) {
                     this->offlineDatabase->put(resource, onlineResponse);
                     if (resource.kind == Resource::Kind::Tile) {
                         // onlineResponse.data will be null if data not modified
@@ -259,7 +259,7 @@ void DefaultFileSource::setResourceCachePath(const std::string& path) {
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
     auto req = std::make_unique<FileSourceRequest>(std::move(callback));
 
-    req->onCancel([fs = impl->actor(), req = req.get()] () mutable { fs.invoke(&Impl::cancel, req); });
+    req->onCancel([fs = impl->actor(), req = req.get()] () { fs.invoke(&Impl::cancel, req); });
 
     impl->actor().invoke(&Impl::request, req.get(), resource, req->actor());
 
