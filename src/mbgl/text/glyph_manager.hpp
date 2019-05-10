@@ -4,7 +4,6 @@
 #include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/text/local_glyph_rasterizer.hpp>
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/immutable.hpp>
 
@@ -19,21 +18,25 @@ class Response;
 
 class GlyphRequestor {
 public:
-    virtual ~GlyphRequestor() = default;
     virtual void onGlyphsAvailable(GlyphMap) = 0;
+
+protected:
+    virtual ~GlyphRequestor() = default;
 };
 
-class GlyphManager : public util::noncopyable {
+class GlyphManager {
 public:
-    GlyphManager(FileSource&, std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>(optional<std::string>()));
+    GlyphManager(const GlyphManager&) = delete;
+    GlyphManager& operator=(const GlyphManager&) = delete;
+    explicit GlyphManager(std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>(optional<std::string>()));
     ~GlyphManager();
 
     // Workers send a `getGlyphs` message to the main thread once they have determined
     // their `GlyphDependencies`. If all glyphs are already locally available, GlyphManager
     // will provide them to the requestor immediately. Otherwise, it makes a request on the
-    // FileSource is made for each range neeed, and notifies the observer when all are
+    // FileSource is made for each range needed, and notifies the observer when all are
     // complete.
-    void getGlyphs(GlyphRequestor&, GlyphDependencies);
+    void getGlyphs(GlyphRequestor&, GlyphDependencies, FileSource&);
     void removeRequestor(GlyphRequestor&);
 
     void setURL(const std::string& url) {
@@ -47,8 +50,6 @@ public:
 
 private:
     Glyph generateLocalSDF(const FontStack& fontStack, GlyphID glyphID);
-
-    FileSource& fileSource;
     std::string glyphURL;
 
     struct GlyphRequest {
@@ -64,7 +65,7 @@ private:
 
     std::unordered_map<FontStack, Entry, FontStackHasher> entries;
 
-    void requestRange(GlyphRequest&, const FontStack&, const GlyphRange&);
+    void requestRange(GlyphRequest&, const FontStack&, const GlyphRange&, FileSource& fileSource);
     void processResponse(const Response&, const FontStack&, const GlyphRange&);
     void notify(GlyphRequestor&, const GlyphDependencies&);
     
