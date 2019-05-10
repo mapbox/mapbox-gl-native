@@ -85,6 +85,7 @@
         "platform/android/src/thread.cpp",
         "platform/android/src/timer.cpp",
         "platform/android/src/unaccent.cpp",
+        "platform/android/src/android_thread_pool_provider.cpp",
         "platform/default/src/mbgl/gl/headless_backend.cpp",
         "platform/default/src/mbgl/gl/headless_frontend.cpp",
         "platform/default/src/mbgl/map/map_snapshotter.cpp",
