@@ -54,6 +54,7 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              parameters.mode,
              parameters.pixelRatio,
              parameters.debugOptions & MapDebugOptions::Collision),
+      fileSource(parameters.fileSource),
       glyphManager(parameters.glyphManager),
       imageManager(parameters.imageManager),
       mode(parameters.mode),
@@ -156,7 +157,7 @@ void GeometryTile::onGlyphsAvailable(GlyphMap glyphs) {
 }
 
 void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
-    glyphManager.getGlyphs(*this, std::move(glyphDependencies));
+    glyphManager.getGlyphs(*this, std::move(glyphDependencies), fileSource);
 }
 
 void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) {

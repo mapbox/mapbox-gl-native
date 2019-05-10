@@ -11,15 +11,14 @@ namespace mbgl {
 
 static GlyphManagerObserver nullObserver;
 
-GlyphManager::GlyphManager(FileSource& fileSource_, std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
-    : fileSource(fileSource_),
-      observer(&nullObserver),
+GlyphManager::GlyphManager(std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
+    : observer(&nullObserver),
       localGlyphRasterizer(std::move(localGlyphRasterizer_)) {
 }
 
 GlyphManager::~GlyphManager() = default;
 
-void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDependencies) {
+void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDependencies, FileSource& fileSource) {
     auto dependencies = std::make_shared<GlyphDependencies>(std::move(glyphDependencies));
 
     // Figure out which glyph ranges need to be fetched. For each range that does need to
@@ -47,7 +46,7 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
             if (it == entry.ranges.end() || !it->second.parsed) {
                 GlyphRequest& request = entry.ranges[range];
                 request.requestors[&requestor] = dependencies;
-                requestRange(request, fontStack, range);
+                requestRange(request, fontStack, range, fileSource);
             }
         }
     }
@@ -65,7 +64,7 @@ Glyph GlyphManager::generateLocalSDF(const FontStack& fontStack, GlyphID glyphID
     return local;
 }
 
-void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStack, const GlyphRange& range) {
+void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStack, const GlyphRange& range, FileSource& fileSource) {
     if (request.req) {
         return;
     }

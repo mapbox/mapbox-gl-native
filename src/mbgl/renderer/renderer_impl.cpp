@@ -47,6 +47,7 @@ Renderer::Impl::Impl(gfx::RendererBackend& backend_,
     , pixelRatio(pixelRatio_)
     , programCacheDir(std::move(programCacheDir_))
     , localFontFamily(std::move(localFontFamily_))
+    , glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(localFontFamily)))
     , imageManager(std::make_unique<ImageManager>())
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
@@ -54,6 +55,7 @@ Renderer::Impl::Impl(gfx::RendererBackend& backend_,
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
     , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {
+    glyphManager->setObserver(this);
     imageManager->setObserver(this);
 }
 
@@ -77,12 +79,7 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
-    if (!glyphManager) {
-        glyphManager = std::make_unique<GlyphManager>(updateParameters.fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily));
-        glyphManager->setObserver(this);
-    }
     const bool isMapModeContinuous = updateParameters.mode == MapMode::Continuous;
-
     if (!isMapModeContinuous) {
         // Reset zoom history state.
         zoomHistory.first = true;

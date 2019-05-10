@@ -28,7 +28,7 @@ public:
     style::Style style { fileSource, 1 };
     AnnotationManager annotationManager { style };
     ImageManager imageManager;
-    GlyphManager glyphManager { fileSource };
+    GlyphManager glyphManager;
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
 
     TileParameters tileParameters {

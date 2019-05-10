@@ -57,7 +57,7 @@ public:
     Style style { fileSource, 1 };
     AnnotationManager annotationManager { style };
     ImageManager imageManager;
-    GlyphManager glyphManager { fileSource };
+    GlyphManager glyphManager;
 
     TileParameters tileParameters {
         1.0,

@@ -108,6 +108,7 @@ private:
     std::shared_ptr<Mailbox> mailbox;
     Actor<GeometryTileWorker> worker;
 
+    FileSource& fileSource;
     GlyphManager& glyphManager;
     ImageManager& imageManager;
 
