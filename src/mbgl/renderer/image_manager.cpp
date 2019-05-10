@@ -183,7 +183,7 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
 
                 auto actorRef = callback->self();
                 emplaced.first->second.callbacks.emplace(dependency.first, std::move(callback));
-                observer->onStyleImageMissing(dependency.first, [actorRef]() mutable {
+                observer->onStyleImageMissing(dependency.first, [actorRef]() {
                     actorRef.invoke(&Callback::operator());
                 });
 
