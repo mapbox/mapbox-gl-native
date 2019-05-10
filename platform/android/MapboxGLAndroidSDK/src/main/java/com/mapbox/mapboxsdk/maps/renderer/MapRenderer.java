@@ -9,6 +9,8 @@ import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -32,7 +34,7 @@ public abstract class MapRenderer implements MapRendererScheduler {
   private long nativePtr = 0;
   private double expectedRenderTime = 0;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
-  protected boolean hasSurface;
+  protected AtomicBoolean hasSurface = new AtomicBoolean();
 
   public MapRenderer(@NonNull Context context, String localIdeographFontFamily) {
     float pixelRatio = context.getResources().getDisplayMetrics().density;
@@ -165,6 +167,6 @@ public abstract class MapRenderer implements MapRendererScheduler {
    * @return returns if renderer has a surface, false otherwise
    */
   public boolean hasSurface() {
-    return hasSurface;
+    return hasSurface.get();
   }
 }

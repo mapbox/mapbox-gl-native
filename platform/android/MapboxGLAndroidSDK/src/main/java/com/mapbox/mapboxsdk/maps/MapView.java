@@ -503,7 +503,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   @UiThread
   public void onLowMemory() {
-    if (nativeMapView != null && !destroyed) {
+    if (nativeMapView != null && mapboxMap != null && !destroyed ) {
       nativeMapView.onLowMemory();
     }
   }
