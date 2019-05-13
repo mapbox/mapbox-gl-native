@@ -337,8 +337,8 @@ commands:
     - run:
         name: Install Node macOS dependencies
         command: |
-          brew install node@6
-          brew link node@6 --force --overwrite
+          brew install node@8
+          brew link node@8 --force --overwrite
 
   install-qt-macos-dependencies:
     steps:
@@ -747,7 +747,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "10.2.0"
+      xcode: "10.2.1"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
