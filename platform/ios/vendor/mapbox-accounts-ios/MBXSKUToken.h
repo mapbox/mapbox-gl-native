@@ -2,13 +2,27 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *const MBXAccountsMapsSKUIDMaps;
-extern NSString *const MBXAccountsNavigationSKUIDMaps;
+typedef NS_ENUM(NSInteger, MBXAccountsSKUID) {
+    MBXAccountsSKUIDMaps,
+    MBXAccountsSKUIDNavigation
+};
+
+typedef NS_ENUM(NSInteger, MBXAccountsSKUType) {
+    MBXAccountsSKUTypeUser,
+    MBXAccountsSKUTypeSession
+};
 
 @interface MBXSKUToken : NSObject
 
-@property (class, nonatomic, readonly) NSString *mapsToken;
-@property (class, nonatomic, readonly) NSString *navigationToken;
+/**
+ Generates a token for the given identifier and type.
+ 
+ @param skuId   The sku identifier, e.g. maps or navigation.
+ @param type    The type of token, e.g. user or session.
+ 
+ @return A SKU token for use with API requests.
+ */
++ (NSString *)tokenForSKUID:(MBXAccountsSKUID)skuId type:(MBXAccountsSKUType)type;
 
 @end
 

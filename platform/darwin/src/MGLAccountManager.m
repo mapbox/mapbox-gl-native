@@ -42,7 +42,7 @@ static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
     }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    self.skuToken = MBXSKUToken.mapsToken;
+    self.skuToken = [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser];
 #endif
 }
 
@@ -108,7 +108,11 @@ static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
 }
 
 + (NSString *)skuToken {
-    return [MGLAccountManager.sharedManager isSKUTokenExpired] ? MBXSKUToken.mapsToken : MGLAccountManager.sharedManager.skuToken;
+    if ([MGLAccountManager.sharedManager isSKUTokenExpired]) {
+        return [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser];
+    } else {
+        return MGLAccountManager.sharedManager.skuToken;
+    }
 }
 
 - (BOOL)isSKUTokenExpired {
