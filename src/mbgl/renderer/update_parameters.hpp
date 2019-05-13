@@ -34,7 +34,7 @@ public:
     const Immutable<std::vector<Immutable<style::Layer::Impl>>> layers;
 
     AnnotationManager& annotationManager;
-    FileSource& fileSource;
+    std::shared_ptr<FileSource> fileSource;
 
     const uint8_t prefetchZoomDelta;
     

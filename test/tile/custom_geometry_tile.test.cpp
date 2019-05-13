@@ -22,10 +22,10 @@ using namespace mbgl::style;
 
 class CustomTileTest {
 public:
-    FakeFileSource fileSource;
+    std::shared_ptr<FileSource> fileSource = std::make_shared<FakeFileSource>();
     TransformState transformState;
     util::RunLoop loop;
-    style::Style style { fileSource, 1 };
+    style::Style style { *fileSource, 1 };
     AnnotationManager annotationManager { style };
     ImageManager imageManager;
     GlyphManager glyphManager;

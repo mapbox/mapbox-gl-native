@@ -63,7 +63,7 @@ void Map::Impl::onUpdate() {
         style->impl->getSourceImpls(),
         style->impl->getLayerImpls(),
         annotationManager,
-        *fileSource,
+        fileSource,
         prefetchZoomDelta,
         bool(stillImageRequest),
         crossSourceCollisions
