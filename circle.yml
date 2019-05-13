@@ -15,10 +15,10 @@ workflows:
       - android-arm-template:
           name: android-gnustl-arm-v7
           stl: gnustl_shared
-          firebase_device_id: "flo"
-          firebase_device_os: "21"
+          firebase_device_id: "Nexus4"
+          firebase_device_os: "19"
           image: android-ndk-r17c:1d5db0eb34
-          abi: arm-v7
+          abi: x86-64
       - android-release:
           filters:
             tags:
