@@ -105,6 +105,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousShowSnapshots,
     MBXSettingsMiscellaneousMissingIcon,
     MBXSettingsMiscellaneousShouldLimitCameraChanges,
+    MBXSettingsMiscellaneousSetContentInsets,
     MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousOrnamentsPlacement,
     MBXSettingsMiscellaneousPrintLogFile,
@@ -209,6 +210,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) BOOL shouldLimitCameraChanges;
 @property (nonatomic) BOOL randomWalk;
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
+@property (nonatomic) NSMutableArray<UIView *> *contentInsetsOverlays;
 
 @end
 
@@ -219,6 +221,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @implementation MBXViewController
 {
     BOOL _isTouringWorld;
+    BOOL _contentInsetsEnabled;
+    UIEdgeInsets _originalContentInsets;
 }
 
 #pragma mark - Setup & Teardown
@@ -475,6 +479,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 @"Show Snapshots",
                 @"Missing Icon",
                 [NSString stringWithFormat:@"%@ Camera Changes", (_shouldLimitCameraChanges ? @"Unlimit" : @"Limit")],
+                [NSString stringWithFormat:@"Turn %@ Content Insets", (_contentInsetsEnabled ? @"Off" : @"On")],
                 @"View Route Simulation",
                 @"Ornaments Placement",
             ]];
@@ -736,6 +741,61 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     self.shouldLimitCameraChanges = !self.shouldLimitCameraChanges;
                     if (self.shouldLimitCameraChanges) {
                         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(39.748947, -104.995882) zoomLevel:10 direction:0 animated:NO];
+                    }
+                    break;
+                }
+                case MBXSettingsMiscellaneousSetContentInsets:
+                {
+                    if (!_contentInsetsEnabled) {
+                        _originalContentInsets = [self.mapView contentInset];
+                    }
+                    _contentInsetsEnabled = !_contentInsetsEnabled;
+                    self.automaticallyAdjustsScrollViewInsets = !_contentInsetsEnabled;
+                    UIEdgeInsets contentInsets = self.mapView.bounds.size.width > self.mapView.bounds.size.height
+                        ? UIEdgeInsetsMake(_originalContentInsets.top, 0.5 * self.mapView.bounds.size.width, _originalContentInsets.bottom, 0.0)
+                        : UIEdgeInsetsMake(0.25 * self.mapView.bounds.size.height, 0.0, _originalContentInsets.bottom, 0.25 * self.mapView.bounds.size.width);
+                    if (_contentInsetsEnabled) {
+                        if (!self.contentInsetsOverlays)
+                            self.contentInsetsOverlays = [NSMutableArray array];
+                        if (![self.contentInsetsOverlays count]) {
+                            UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.mapView.bounds.size.width, contentInsets.top)];
+                            view.backgroundColor = [UIColor colorWithRed:0.0 green:0.3 blue:0.3 alpha:0.5];
+                            [self.contentInsetsOverlays addObject:view];
+                            [self.view addSubview:view];
+                            view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, contentInsets.left, self.mapView.bounds.size.height)];
+                            view.backgroundColor = [UIColor colorWithRed:0.0 green:0.3 blue:0.3 alpha:0.5];
+                            [self.contentInsetsOverlays addObject:view];
+                            [self.view addSubview:view];
+                            view = [[UIView alloc]initWithFrame:CGRectMake(self.mapView.bounds.size.width - contentInsets.right, 0, contentInsets.right, self.mapView.bounds.size.height)];
+                            view.backgroundColor = [UIColor colorWithRed:0.0 green:0.3 blue:0.3 alpha:0.5];
+                            [self.contentInsetsOverlays addObject:view];
+                            [self.view addSubview:view];
+                            view = [[UIView alloc]initWithFrame:CGRectMake(0, self.mapView.bounds.size.height - contentInsets.bottom, self.mapView.bounds.size.width, self.mapView.bounds.size.height)];
+                            view.backgroundColor = [UIColor colorWithRed:0.0 green:0.3 blue:0.3 alpha:0.5];
+                            [self.contentInsetsOverlays addObject:view];
+                            [self.view addSubview:view];
+                        }
+                        [self.view bringSubviewToFront:self.contentInsetsOverlays[0]];
+                        [self.view bringSubviewToFront:self.contentInsetsOverlays[1]];
+                        [self.view bringSubviewToFront:self.contentInsetsOverlays[2]];
+                        [self.view bringSubviewToFront:self.contentInsetsOverlays[3]];
+
+                        // Denver streets parallel to cardinal directions help illustrate
+                        // viewport center offset when edge insets are set.
+                        MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(39.72707, -104.9986)
+                                                                              acrossDistance:100
+                                                                                       pitch:60
+                                                                                     heading:0];
+                        __weak typeof(self) weakSelf = self;
+                        [self.mapView setCamera:camera withDuration:0.3 animationTimingFunction:nil completionHandler:^{
+                            [weakSelf.mapView setContentInset:contentInsets animated:TRUE];
+                        }];
+                    } else {
+                        [self.view sendSubviewToBack:self.contentInsetsOverlays[0]];
+                        [self.view sendSubviewToBack:self.contentInsetsOverlays[1]];
+                        [self.view sendSubviewToBack:self.contentInsetsOverlays[2]];
+                        [self.view sendSubviewToBack:self.contentInsetsOverlays[3]];
+                        [self.mapView setContentInset:_originalContentInsets animated:TRUE];
                     }
                     break;
                 }
@@ -2003,6 +2063,23 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     }
     self.mapView.userTrackingMode = nextMode;
     [sender setAccessibilityValue:nextAccessibilityValue];
+}
+
+#pragma mark - UIViewDelegate
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    if (_contentInsetsEnabled)
+    {
+        _contentInsetsEnabled = NO;
+        self.automaticallyAdjustsScrollViewInsets = YES;
+        [self.mapView setContentInset:UIEdgeInsetsZero];
+    }
+    while (self.contentInsetsOverlays && [self.contentInsetsOverlays count]) {
+        [[self.contentInsetsOverlays lastObject] removeFromSuperview];
+        [self.contentInsetsOverlays removeLastObject];
+    }
 }
 
 #pragma mark - MGLMapViewDelegate

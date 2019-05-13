@@ -348,25 +348,28 @@ std::pair<float,float> CollisionIndex::projectAnchor(const mat4& posMatrix, cons
 std::pair<Point<float>,float> CollisionIndex::projectAndGetPerspectiveRatio(const mat4& posMatrix, const Point<float>& point) const {
     vec4 p = {{ point.x, point.y, 0, 1 }};
     matrix::transformMat4(p, p, posMatrix);
+    auto offset = transformState.getCenterOffset();
+    auto size = transformState.getSize();
     return std::make_pair(
         Point<float>(
-            (((p[0]  / p[3] + 1) / 2) * transformState.getSize().width) + viewportPadding,
-            (((-p[1] / p[3] + 1) / 2) * transformState.getSize().height) + viewportPadding
+            (((p[0] / p[3] + 1) / 2) * size.width) + viewportPadding + offset.x,
+            (((-p[1] / p[3] + 1) / 2) * size.height) + viewportPadding + offset.y
         ),
         // See perspective ratio comment in symbol_sdf.vertex
         // We're doing collision detection in viewport space so we need
         // to scale down boxes in the distance
-        0.5 + 0.5 * (transformState.getCameraToCenterDistance() / p[3])
+        0.5 + 0.5 * transformState.getCameraToCenterDistance() / p[3]
     );
 }
 
 Point<float> CollisionIndex::projectPoint(const mat4& posMatrix, const Point<float>& point) const {
     vec4 p = {{ point.x, point.y, 0, 1 }};
     matrix::transformMat4(p, p, posMatrix);
-    return Point<float>(
-        (((p[0]  / p[3] + 1) / 2) * transformState.getSize().width) + viewportPadding,
-        (((-p[1] / p[3] + 1) / 2) * transformState.getSize().height) + viewportPadding
-    );
+    auto offset = transformState.getCenterOffset();
+    auto size = transformState.getSize();
+    return Point<float> {
+        static_cast<float>((((p[0] / p[3] + 1) / 2) * size.width) + viewportPadding + offset.x),
+        static_cast<float>((((-p[1] / p[3] + 1) / 2) * size.height) + viewportPadding + offset.y) };
 }
 
 } // namespace mbgl

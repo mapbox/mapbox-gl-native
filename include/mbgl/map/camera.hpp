@@ -16,7 +16,7 @@ namespace mbgl {
     */
 struct CameraOptions {
     CameraOptions& withCenter(const optional<LatLng>& o) { center = o; return *this; }
-    CameraOptions& withPadding(const EdgeInsets& p) { padding = p; return *this; }
+    CameraOptions& withPadding(const optional<EdgeInsets>& p) { padding = p; return *this; }
     CameraOptions& withAnchor(const optional<ScreenCoordinate>& o) { anchor = o; return *this; }
     CameraOptions& withZoom(const optional<double>& o) { zoom = o; return *this; }
     CameraOptions& withBearing(const optional<double>& o) { bearing = o; return *this; }
@@ -27,7 +27,7 @@ struct CameraOptions {
 
     /** Padding around the interior of the view that affects the frame of
         reference for `center`. */
-    EdgeInsets padding;
+    optional<EdgeInsets> padding;
 
     /** Point of reference for `zoom` and `angle`, assuming an origin at the
         top-left corner of the view. */
