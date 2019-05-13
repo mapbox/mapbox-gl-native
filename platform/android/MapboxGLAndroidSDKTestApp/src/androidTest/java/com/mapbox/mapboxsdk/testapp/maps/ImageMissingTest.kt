@@ -7,6 +7,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
 import junit.framework.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,7 +23,12 @@ class ImageMissingTest {
   var rule = ActivityTestRule(EspressoTestActivity::class.java)
 
   private lateinit var mapView: MapView
-  private val latch = CountDownLatch(2)
+  private lateinit var latch: CountDownLatch
+
+  @Before
+  fun setup() {
+    latch = CountDownLatch(1)
+  }
 
   @Test
   fun testMissingImage() {
@@ -33,6 +39,13 @@ class ImageMissingTest {
       }
     }
 
+    if (!latch.await(5, TimeUnit.SECONDS)) {
+      throw TimeoutException()
+    }
+  }
+
+  @Test
+  fun testMissingImage_invalidSprite() {
     rule.runOnUiThread {
       initMap(styleJsonInvalidSprite).addOnStyleImageMissingListener {
         assertEquals("missing-icon", it)
@@ -40,12 +53,12 @@ class ImageMissingTest {
       }
     }
 
-    if(!latch.await(5, TimeUnit.SECONDS)){
+    if (!latch.await(5, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }
 
-  private fun initMap(style :String): MapView {
+  private fun initMap(style: String): MapView {
     mapView = rule.activity.findViewById(R.id.mapView)
     mapView.getMapAsync { it.setStyle(Style.Builder().fromJson(style)) }
     return mapView
@@ -99,7 +112,7 @@ class ImageMissingTest {
     {
       "version": 8,
       "name": "Mapbox Streets",
-      "sprite": "mapbox://sprites/mapbox/invalid",
+      "sprite": "asset://sprites/mapbox/invalid",
       "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
       "sources": {
         "point": {
