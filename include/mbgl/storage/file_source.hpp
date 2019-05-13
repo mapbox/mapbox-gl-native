@@ -4,9 +4,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/resource.hpp>
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/async_request.hpp>
-#include <mbgl/util/optional.hpp>
 
 #include <functional>
 #include <memory>
@@ -16,8 +14,10 @@ namespace mbgl {
 class ResourceOptions;
 class ResourceTransform;
 
-class FileSource : private util::noncopyable {
+class FileSource {
 public:
+    FileSource(const FileSource&) = delete;
+    FileSource& operator=(const FileSource&) = delete;
     virtual ~FileSource() = default;
 
     using Callback = std::function<void (Response)>;
@@ -37,12 +37,14 @@ public:
         return false;
     }
 
-    // Factory for creating a platform-specific file source.
-    static std::shared_ptr<FileSource> createPlatformFileSource(const ResourceOptions&);
-
     // Singleton for obtaining the shared platform-specific file source. A single instance of a file source is provided
     // for each unique combination of a Mapbox API base URL, access token, cache path and platform context.
     static std::shared_ptr<FileSource> getSharedFileSource(const ResourceOptions&);
+
+protected:
+    FileSource() = default;
+    // Factory for creating a platform-specific file source.
+    static std::shared_ptr<FileSource> createPlatformFileSource(const ResourceOptions&);
 };
 
 } // namespace mbgl
