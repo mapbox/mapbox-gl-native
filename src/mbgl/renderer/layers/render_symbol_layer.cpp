@@ -617,8 +617,7 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 }
 
 void RenderSymbolLayer::setRenderTiles(RenderTiles tiles, const TransformState& state) {
-    auto filterFn = [](auto& tile){ return !tile.tile.isRenderable(); };
-    renderTiles = RenderLayer::filterRenderTiles(std::move(tiles), filterFn);
+    renderTiles = std::move(tiles);
     // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
     // on top of each other, with lower symbols being drawn on top of higher symbols.
     std::sort(renderTiles.begin(), renderTiles.end(), [&state](const auto& a, const auto& b) {

@@ -174,9 +174,7 @@ bool CrossTileSymbolIndex::addLayer(const RenderLayerSymbolInterface& symbolInte
     layerIndex.handleWrapJump(lng);
 
     for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
-        if (!renderTile.tile.isRenderable()) {
-            continue;
-        }
+        assert(renderTile.tile.isRenderable());
 
         auto bucket = symbolInterface.getSymbolBucket(renderTile);
         if (!bucket) {
