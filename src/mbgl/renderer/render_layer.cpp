@@ -40,8 +40,7 @@ bool RenderLayer::supportsZoom(float zoom) const {
 }
 
 void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState&) {
-    auto filterFn = [](auto& tile){ return !tile.tile.isRenderable() || tile.tile.holdForFade(); };
-    renderTiles = filterRenderTiles(std::move(tiles), filterFn);
+    renderTiles = filterRenderTiles(std::move(tiles));
 }
 
 const RenderLayerSymbolInterface* RenderLayer::getSymbolInterface() const {
@@ -52,16 +51,16 @@ optional<Color> RenderLayer::getSolidBackground() const {
     return nullopt;
 }
 
-RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles, FilterFunctionPtr filterFn) const {
-    assert(filterFn != nullptr);
+RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
     RenderTiles filtered;
 
     for (auto& tileRef : tiles) {
-        auto& tile = tileRef.get();
-        if (filterFn(tile)) {
+        auto& tile = tileRef.get().tile;
+        assert(tile.isRenderable());
+        if (tile.holdForFade()) {
             continue;
         }
-        filtered.emplace_back(tile);
+        filtered.emplace_back(tileRef);
     }
     return filtered;
 }

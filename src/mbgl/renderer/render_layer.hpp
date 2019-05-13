@@ -92,9 +92,6 @@ protected:
     // in the console to inform the developer.
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
-    using FilterFunctionPtr = bool (*)(RenderTile&);
-    RenderTiles filterRenderTiles(RenderTiles, FilterFunctionPtr) const;
-
 protected:
     // Stores current set of tiles to be rendered for this layer.
     std::vector<std::reference_wrapper<RenderTile>> renderTiles;
@@ -104,6 +101,7 @@ protected:
     RenderPass passes = RenderPass::None;
 
 private:
+    RenderTiles filterRenderTiles(RenderTiles) const;
     // Some layers may not render correctly on some hardware when the vertex attribute limit of
     // that GPU is exceeded. More attributes are used when adding many data driven paint properties
     // to a layer.
