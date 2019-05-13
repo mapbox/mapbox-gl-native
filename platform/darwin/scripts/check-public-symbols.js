@@ -18,7 +18,7 @@ function hasMissingSymbols(os) {
   let umbrellaPath = `platform/${os.toLowerCase()}/src/Mapbox.h`;
   let docArgs = ['doc', '--objc', umbrellaPath, '--',
                  '-x', 'objective-c', '-I', 'platform/darwin/src/', '-isysroot', sysroot];
-  let docStr = execFileSync('sourcekitten', docArgs).toString().trim();
+  let docStr = execFileSync('sourcekitten', docArgs, { maxBuffer: Infinity }).toString().trim();
   let docJson = JSON.parse(docStr);
   _.forEach(docJson, function (result) {
     _.forEach(result, function (structure, path) {
