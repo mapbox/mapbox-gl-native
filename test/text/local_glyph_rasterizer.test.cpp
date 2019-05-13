@@ -43,9 +43,9 @@ public:
     MapAdapter map { frontend, MapObserver::nullObserver(), fileSource,
                   MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
-    void checkRendering(const char * name) {
+    void checkRendering(const char * name, double imageMatchPixelsThreshold = 0.05, double pixelMatchThreshold = 0.1) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
-                         frontend.render(map), 0.05, 0.1);
+                         frontend.render(map), imageMatchPixelsThreshold, pixelMatchThreshold);
     }
 };
 
@@ -85,6 +85,50 @@ TEST(LocalGlyphRasterizer, NoLocal) {
         return response;
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
-    test.checkRendering("no_local");
+    test.checkRendering("no_local", 0.001, 0.1);
 }
 
+TEST(LocalGlyphRasterizer, NoLocalWithContentInsets) {
+    // Expectations: content insets imply rendering to offsetted viewport center.
+    // Rendered text should be on the same offset and keep the same size as
+    // with no offset.
+    LocalGlyphRasterizerTest test({});
+
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+    auto viewSize = test.frontend.getSize();
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+
+    // Expected image was created using center offset as in the line below - content insets,
+    // with no pitch defined, should produce the same output.
+    // test.map.moveBy({ viewSize.width * 0.25, 0 });
+
+    test.map.jumpTo(CameraOptions().withPadding(EdgeInsets { 0, viewSize.width * 0.25 * 2, 0, 0 }));
+    test.checkRendering("no_local_with_content_insets", 0.001, 0.1);
+}
+
+TEST(LocalGlyphRasterizer, NoLocalWithContentInsetsAndPitch) {
+    // Expectations: content insets imply rendering to offsetted viewport center.
+    // Rendered text should be on the same offset and keep the same size as
+    // with no offset.
+    LocalGlyphRasterizerTest test({});
+
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+    auto viewSize = test.frontend.getSize();
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+
+    // Expected image was verified using no-padding render, offsetted to right
+    // using bitmap editor.
+
+    test.map.jumpTo(CameraOptions().withPitch(45).withPadding(EdgeInsets { 0, viewSize.width * 0.4, 0, 0 }));
+    test.checkRendering("no_local_with_content_insets_and_pitch", 0.001, 0.1);
+}

@@ -62,6 +62,10 @@ public:
     void setMaxZoom(double);
     double getMaxZoom() const;
 
+    // Viewport center offset, from [size.width / 2, size.height / 2], defined
+    // by |edgeInsets| in screen coordinates, with top left origin.
+    ScreenCoordinate getCenterOffset() const;
+
     // Rotation
     float getBearing() const;
     float getFieldOfView() const;
@@ -136,6 +140,8 @@ private:
     double xSkew = 0.0;
     double ySkew = 1.0;
     bool axonometric = false;
+
+    EdgeInsets edgeInsets;
 
     // cache values for spherical mercator math
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;

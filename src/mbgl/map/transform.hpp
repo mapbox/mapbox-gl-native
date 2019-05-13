@@ -47,8 +47,7 @@ public:
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
     void moveBy(const ScreenCoordinate& offset, const AnimationOptions& = {});
-    LatLng getLatLng(const EdgeInsets& = {}, LatLng::WrapMode = LatLng::Wrapped) const;
-    ScreenCoordinate getScreenCoordinate(const EdgeInsets& = {}) const;
+    LatLng getLatLng(LatLng::WrapMode = LatLng::Wrapped) const;
 
     // Bounds
 
@@ -105,7 +104,7 @@ public:
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
-    LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Wrapped) const;
 
 private:
     MapObserver& observer;

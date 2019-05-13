@@ -66,7 +66,7 @@ Values makeValues(const bool isText,
     const bool pitchWithMap = values.pitchAlignment == style::AlignmentType::Map;
     const bool rotateWithMap = values.rotationAlignment == style::AlignmentType::Map;
 
-    // Line label rotation happens in `updateLineLabels`
+    // Line label rotation happens in `updateLineLabels`/`reprojectLineLabels``
     // Pitched point labels are automatically rotated by the labelPlaneMatrix projection
     // Unpitched point labels need to have their rotation applied after projection
     const bool rotateInShader = rotateWithMap && !pitchWithMap && !alongLine;
