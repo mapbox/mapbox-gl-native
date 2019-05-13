@@ -2,6 +2,8 @@
 
 #include <mbgl/map/mode.hpp>
 
+#include <memory>
+
 namespace mbgl {
 
 class TransformState;
@@ -15,7 +17,7 @@ public:
     const float pixelRatio;
     const MapDebugOptions debugOptions;
     const TransformState& transformState;
-    FileSource& fileSource;
+    std::shared_ptr<FileSource> fileSource;
     const MapMode mode;
     AnnotationManager& annotationManager;
     ImageManager& imageManager;

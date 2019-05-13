@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/tile/tile.hpp>
 
@@ -13,8 +12,10 @@ class Tileset;
 class TileParameters;
 
 template <typename T>
-class TileLoader : private util::noncopyable {
+class TileLoader {
 public:
+    TileLoader(const TileLoader&) = delete;
+    TileLoader& operator=(const TileLoader&) = delete;
     TileLoader(T&,
                const OverscaledTileID&,
                const TileParameters&,
@@ -50,7 +51,7 @@ private:
     T& tile;
     TileNecessity necessity;
     Resource resource;
-    FileSource& fileSource;
+    std::shared_ptr<FileSource> fileSource;
     std::unique_ptr<AsyncRequest> request;
 };
 
