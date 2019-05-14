@@ -242,10 +242,10 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
             dataTaskWithRequest:req
               completionHandler:^(NSData* data, NSURLResponse* res, NSError* error) {
                 if (error && [error code] == NSURLErrorCancelled) {
-                    [[MGLNetworkConfiguration sharedManager] cancelDownloadEvent:res.URL.relativePath];
+                    [[MGLNetworkConfiguration sharedManager] cancelDownloadEventForResponse:res];
                     return;
                 }
-                [[MGLNetworkConfiguration sharedManager] stopDownloadEvent:res.URL.relativePath];
+                [[MGLNetworkConfiguration sharedManager] stopDownloadEventForResponse:res];
                 Response response;
                 using Error = Response::Error;
 

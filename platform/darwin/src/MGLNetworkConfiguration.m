@@ -1,5 +1,7 @@
 #import "MGLNetworkConfiguration_Private.h"
 
+#include <mbgl/storage/reachability.h>
+
 static NSString * const MGLStartTime = @"start_time";
 static NSString * const MGLResourceType = @"resource_type";
 NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
@@ -68,25 +70,30 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
     }
 }
 
-- (void)stopDownloadEvent:(NSString *)urlString {
-    [self sendEventForURL:urlString withAction:nil];
+- (void)stopDownloadEventForResponse:(NSURLResponse *)response {
+    [self sendEventForURLResponse:response withAction:nil];
 }
 
-- (void)cancelDownloadEvent:(NSString *)urlString {
-    [self sendEventForURL:urlString withAction:@"cancel"];
+- (void)cancelDownloadEventForResponse:(NSURLResponse *)response {
+    [self sendEventForURLResponse:response withAction:@"cancel"];
 }
 
-- (void)sendEventForURL:(NSString *)urlString withAction:(NSString *)action
+- (void)sendEventForURLResponse:(NSURLResponse *)response withAction:(NSString *)action
 {
-    if (urlString && [self.events objectForKey:urlString]) {
-        NSDictionary *eventAttributes = [self eventAttributesForURL:urlString withAction:action];
-        [self.metricsDelegate networkConfiguration:self didGenerateMetricEvent:eventAttributes];
-        [self.events removeObjectForKey:urlString];
+    if ([response isKindOfClass:[NSURLResponse class]]) {
+        NSString *urlString = response.URL.relativePath;
+        if (urlString && [self.events objectForKey:urlString]) {
+            NSDictionary *eventAttributes = [self eventAttributesForURL:response withAction:action];
+            [self.metricsDelegate networkConfiguration:self didGenerateMetricEvent:eventAttributes];
+            [self.events removeObjectForKey:urlString];
+        }
     }
+    
 }
 
-- (NSDictionary *)eventAttributesForURL:(NSString *)urlString withAction:(NSString *)action
+- (NSDictionary *)eventAttributesForURL:(NSURLResponse *)response withAction:(NSString *)action
 {
+    NSString *urlString = response.URL.relativePath;
     NSDictionary *parameters = [self.events objectForKey:urlString];
     NSDate *startDate = [parameters objectForKey:MGLStartTime];
     NSDate *endDate = [NSDate date];
@@ -96,17 +103,28 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
     NSString *createdDate = [iso8601Formatter stringFromDate:[NSDate date]];
     
     NSMutableArray *attributes = [NSMutableArray array];
-    [attributes addObject:@{ @"name" : @"resource" , @"value" : urlString }];
+    [attributes addObject:@{ @"name" : @"requestUrl" , @"value" : urlString }];
     [attributes addObject:@{ @"name" : MGLResourceType , @"value" : [parameters objectForKey:MGLResourceType] }];
+    
+    if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+        NSInteger responseCode = [(NSHTTPURLResponse *)response statusCode];
+        [attributes addObject:@{ @"name" : @"responseCode", @"value" : @(responseCode)}];
+    }
+    
+    BOOL isWIFIOn = [[MGLReachability reachabilityWithHostName:response.URL.host] isReachableViaWiFi];
+    [attributes addObject:@{ @"name" : @"wifiOn", @"value" : @(isWIFIOn)}];
+    
     if (action) {
         [attributes addObject:@{ @"name" : @"action" , @"value" : action }];
     }
-
+    
+    double elapsedTimeInMS = elapsedTime * 1000.0;
+    
     return @{
              @"event" : kMGLDownloadPerformanceEvent,
              @"created" : createdDate,
              @"sessionId" : [NSUUID UUID].UUIDString,
-             @"counters" : @[ @{ @"name" : @"elapsed_time" , @"value" : @(elapsedTime) } ],
+             @"counters" : @[ @{ @"name" : @"elapsedMS" , @"value" : @(elapsedTimeInMS) } ],
              @"attributes" : attributes
              };
 }
