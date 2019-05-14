@@ -17,8 +17,8 @@ extern NSString * const kMGLDownloadPerformanceEvent;
 @property (nonatomic, weak) id<MGLNetworkConfigurationMetricsDelegate> metricsDelegate;
 
 - (void)startDownloadEvent:(NSString *)urlString type:(NSString *)resourceType;
-- (void)stopDownloadEvent:(NSString *)urlString;
-- (void)cancelDownloadEvent:(NSString *)urlString;
+- (void)stopDownloadEventForResponse:(NSURLResponse *)response;
+- (void)cancelDownloadEventForResponse:(NSURLResponse *)response;
 
 @end
 
