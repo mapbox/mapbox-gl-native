@@ -1,7 +1,6 @@
 #import "MGLMapboxEvents.h"
 #import "MBXSKUToken.h"
 #import "NSBundle+MGLAdditions.h"
-#import "MGLAccountManager_Private.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"mapbox-maps-ios";
 static NSString * const MGLMapboxAccountType = @"MGLMapboxAccountType";
@@ -145,9 +144,7 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
             [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
         }
 
-        if (MGLAccountManager.isAccountsSDKEnabled) {
-            [[self sharedInstance] eventsManager].skuId = MBXAccountsMapsSKUIDMaps;
-        }
+        [[MGLMapboxEvents sharedInstance] eventsManager].skuId = MBXAccountsSKUIDMaps;
         
         [self flush];
     });
