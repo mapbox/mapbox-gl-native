@@ -539,9 +539,6 @@ jobs:
           name: Initialize vendor submodules
           command: git submodule update --init platform/android/vendor
       - run:
-          name: Android nitpick
-          command: make run-android-nitpick
-      - run:
           name: Check code style
           command: make android-check
       - run:
