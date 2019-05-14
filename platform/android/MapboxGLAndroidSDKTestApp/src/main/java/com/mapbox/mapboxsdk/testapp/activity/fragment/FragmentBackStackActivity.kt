@@ -3,9 +3,9 @@ package com.mapbox.mapboxsdk.testapp.activity.fragment
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.mapbox.mapboxsdk.maps.MapFragment
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.maps.SupportMapFragment
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.utils.NavUtils
 import kotlinx.android.synthetic.main.activity_backstack_fragment.*
@@ -15,13 +15,13 @@ import kotlinx.android.synthetic.main.activity_backstack_fragment.*
  */
 class FragmentBackStackActivity : AppCompatActivity() {
 
-  private lateinit var mapFragment: SupportMapFragment
+  private lateinit var mapFragment: MapFragment
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_backstack_fragment)
 
-    mapFragment = SupportMapFragment.newInstance()
+    mapFragment = MapFragment.newInstance()
     mapFragment.getMapAsync { initMap(it) }
 
     supportFragmentManager.beginTransaction().apply {

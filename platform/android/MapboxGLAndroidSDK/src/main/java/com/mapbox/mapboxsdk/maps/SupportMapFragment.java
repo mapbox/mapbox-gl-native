@@ -28,7 +28,9 @@ import java.util.List;
  * </p>
  *
  * @see #getMapAsync(OnMapReadyCallback)
+ * @deprecated Starting with Android Pie, Android SDK fragments are deprecated. Use {@MapFragment} instead.
  */
+@Deprecated
 public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
 
   private final List<OnMapReadyCallback> mapReadyCallbackList = new ArrayList<>();

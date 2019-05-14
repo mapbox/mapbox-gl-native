@@ -15,10 +15,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.maps.MapFragment
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.maps.SupportMapFragment
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_recyclerview.*
 
@@ -115,7 +114,7 @@ class NestedViewPagerActivity : AppCompatActivity() {
                 when (position) {
                     0 -> {
                         options.camera(CameraPosition.Builder().target(LatLng(34.920526, 102.634774)).zoom(3.0).build())
-                        val fragment = SupportMapFragment.newInstance(options)
+                        val fragment = MapFragment.newInstance(options)
                         fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.MAPBOX_STREETS) }
                         return fragment
                     }
@@ -124,7 +123,7 @@ class NestedViewPagerActivity : AppCompatActivity() {
                     }
                     2 -> {
                         options.camera(CameraPosition.Builder().target(LatLng(62.326440, 92.764913)).zoom(3.0).build())
-                        val fragment = SupportMapFragment.newInstance(options)
+                        val fragment = MapFragment.newInstance(options)
                         fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.DARK) }
                         return fragment                    }
                     3 -> {
@@ -132,7 +131,7 @@ class NestedViewPagerActivity : AppCompatActivity() {
                     }
                     4 -> {
                         options.camera(CameraPosition.Builder().target(LatLng(-25.007786, 133.623852)).zoom(3.0).build())
-                        val fragment = SupportMapFragment.newInstance(options)
+                        val fragment = MapFragment.newInstance(options)
                         fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
                         return fragment                    }
                     5 -> {

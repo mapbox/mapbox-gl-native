@@ -36,12 +36,12 @@ public class MapFragmentActivity extends AppCompatActivity implements MapFragmen
     MapFragment mapFragment;
     if (savedInstanceState == null) {
       mapFragment = MapFragment.newInstance(createFragmentOptions());
-      getFragmentManager()
+      getSupportFragmentManager()
         .beginTransaction()
         .add(R.id.fragment_container, mapFragment, TAG)
         .commit();
     } else {
-      mapFragment = (MapFragment) getFragmentManager().findFragmentByTag(TAG);
+      mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag(TAG);
     }
     mapFragment.getMapAsync(this);
   }
