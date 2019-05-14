@@ -10,8 +10,6 @@
 #import "MBXSKUToken.h"
 #endif
 
-static BOOL _MGLAccountsSDKEnabled;
-
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
@@ -21,6 +19,7 @@ static BOOL _MGLAccountsSDKEnabled;
 @property (atomic) NSString *skuToken;
 @property (atomic) NSDate *skuTokenExpiration;
 #endif
+
 @end
 
 @implementation MGLAccountManager
@@ -33,7 +32,7 @@ static BOOL _MGLAccountsSDKEnabled;
     if (accessToken.length) {
         self.accessToken = accessToken;
     }
-
+    
     NSString *apiBaseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAPIBaseURL"];
     
     // If apiBaseURL is not a valid URL, [NSURL URLWithString:] will be `nil`.
@@ -42,17 +41,7 @@ static BOOL _MGLAccountsSDKEnabled;
     }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    // TODO: Use MGL_OBJC_DYNAMIC_CAST (that requires moving the macro, where it
-    // doesn't require a C++ header)
-    NSNumber *accountsSDKNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAccountsSDKEnabled"];
-    if ([accountsSDKNumber isKindOfClass:[NSNumber class]]) {
-        _MGLAccountsSDKEnabled = ((NSNumber*)accountsSDKNumber).boolValue;
-    }
-    
-    if (self.isAccountsSDKEnabled) {
-        self.skuToken = MBXSKUToken.mapsToken;
-    }
-
+    self.skuToken = [MBXSKUToken skuToken];
 #endif
 }
 
@@ -112,31 +101,15 @@ static BOOL _MGLAccountsSDKEnabled;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
-+ (BOOL)isAccountsSDKEnabled {
-    return _MGLAccountsSDKEnabled;
-}
-
 + (void)setSkuToken:(NSString *)skuToken {
-    if (MGLAccountManager.isAccountsSDKEnabled) {
-        NSTimeInterval oneHour = 60 * 60; // TODO: make this const
-        MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate dateWithTimeIntervalSinceNow:oneHour];
-        MGLAccountManager.sharedManager.skuToken = skuToken;
-    }
-    else {
-        MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate distantFuture];
-        MGLAccountManager.sharedManager.skuToken = nil;
-    }
+    NSTimeInterval oneHour = 60 * 60; // TODO: make this const
+    MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate dateWithTimeIntervalSinceNow:oneHour];
+
+    MGLAccountManager.sharedManager.skuToken = skuToken;
 }
 
 + (NSString *)skuToken {
-    if (MGLAccountManager.isAccountsSDKEnabled) {
-        return [MGLAccountManager.sharedManager isSKUTokenExpired] ?
-            MBXSKUToken.mapsToken :
-            MGLAccountManager.sharedManager.skuToken;
-    }
-    else {
-        return nil;
-    }
+    return [MGLAccountManager.sharedManager isSKUTokenExpired] ? [MBXSKUToken skuToken] : MGLAccountManager.sharedManager.skuToken;
 }
 
 - (BOOL)isSKUTokenExpired {

@@ -2,13 +2,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *const MBXAccountsMapsSKUIDMaps;
-extern NSString *const MBXAccountsNavigationSKUIDMaps;
+extern NSString *const MBXAccountsSKUIDMaps;
 
 @interface MBXSKUToken : NSObject
 
-@property (class, nonatomic, readonly) NSString *mapsToken;
-@property (class, nonatomic, readonly) NSString *navigationToken;
++ (NSString *)skuToken;
 
 @end
 
