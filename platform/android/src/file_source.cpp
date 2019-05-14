@@ -77,10 +77,25 @@ void FileSource::setResourceTransform(jni::JNIEnv& env, const jni::Object<FileSo
     }
 }
 
-void FileSource::setResourceCachePath(jni::JNIEnv& env, const jni::String& path) {
+void FileSource::setResourceCachePath(jni::JNIEnv& env, const jni::String& path,
+                                      const jni::Object<FileSource::ResourcesCachePathChangeCallback>& _callback) {
+    if (pathChangeCallback) {
+        FileSource::ResourcesCachePathChangeCallback::onError(env, _callback, jni::Make<jni::String>(env, "Another resources cache path change is in progress"));
+        return;
+    }
+
     std::string newPath = jni::Make<std::string>(env, path);
     mapbox::sqlite::setTempPath(newPath);
-    fileSource->setResourceCachePath(newPath + DATABASE_FILE);
+
+    auto global = jni::NewGlobal<jni::EnvAttachingDeleter>(env, _callback);
+    pathChangeCallback = std::make_unique<Actor<PathChangeCallback>>(*Scheduler::GetCurrent(),
+            [this, callback = std::make_shared<decltype(global)>(std::move(global)), newPath] {
+                android::UniqueEnv _env = android::AttachEnv();
+                FileSource::ResourcesCachePathChangeCallback::onSuccess(*_env, *callback, jni::Make<jni::String>(*_env, newPath));
+                pathChangeCallback.reset();
+            });
+
+    fileSource->setResourceCachePath(newPath + DATABASE_FILE, pathChangeCallback->self());
 }
 
 void FileSource::resume(jni::JNIEnv&) {
@@ -123,11 +138,32 @@ mbgl::ResourceOptions FileSource::getSharedResourceOptions(jni::JNIEnv& env, con
     return fileSource->resourceOptions.clone();
 }
 
+// FileSource::ResourcesCachePathChangeCallback //
+
+void FileSource::ResourcesCachePathChangeCallback::onSuccess(jni::JNIEnv& env,
+                                                             const jni::Object<FileSource::ResourcesCachePathChangeCallback>& callback,
+                                                             const jni::String& path) {
+    static auto& javaClass = jni::Class<FileSource::ResourcesCachePathChangeCallback>::Singleton(env);
+    static auto method = javaClass.GetMethod<void (jni::String)>(env, "onSuccess");
+
+    callback.Call(env, method, path);
+}
+
+void FileSource::ResourcesCachePathChangeCallback::onError(jni::JNIEnv& env,
+                                                             const jni::Object<FileSource::ResourcesCachePathChangeCallback>& callback,
+                                                             const jni::String& message) {
+    static auto& javaClass = jni::Class<FileSource::ResourcesCachePathChangeCallback>::Singleton(env);
+    static auto method = javaClass.GetMethod<void (jni::String)>(env, "onError");
+
+    callback.Call(env, method, message);
+}
+
 void FileSource::registerNative(jni::JNIEnv& env) {
-    // Ensure the class for ResourceTransformCallback is cached. If it's requested for the
+    // Ensure the classes are cached. If they're requested for the
     // first time on a background thread, Android's class loader heuristics will fail.
     // https://developer.android.com/training/articles/perf-jni#faq_FindClass
     jni::Class<ResourceTransformCallback>::Singleton(env);
+    jni::Class<ResourcesCachePathChangeCallback>::Singleton(env);
 
     static auto& javaClass = jni::Class<FileSource>::Singleton(env);
 

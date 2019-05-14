@@ -312,8 +312,7 @@ public class FileSource {
               Context.MODE_PRIVATE).edit();
           editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path);
           editor.apply();
-          setResourcesCachePath(applicationContext, path);
-          callback.onSuccess(path);
+          internalSetResourcesCachePath(applicationContext, path, callback);
         }
 
         @Override
@@ -326,11 +325,26 @@ public class FileSource {
     }
   }
 
-  private static void setResourcesCachePath(@NonNull Context context, @NonNull String path) {
-    resourcesCachePathLoaderLock.lock();
-    resourcesCachePath = path;
-    resourcesCachePathLoaderLock.unlock();
-    getInstance(context).setResourceCachePath(path);
+  private static void internalSetResourcesCachePath(@NonNull Context context, @NonNull String path,
+                                                    @NonNull final ResourcesCachePathChangeCallback callback) {
+    final FileSource fileSource = getInstance(context);
+    fileSource.setResourceCachePath(path, new ResourcesCachePathChangeCallback() {
+      @Override
+      public void onSuccess(@NonNull String path) {
+        fileSource.deactivate();
+        resourcesCachePathLoaderLock.lock();
+        resourcesCachePath = path;
+        resourcesCachePathLoaderLock.unlock();
+        callback.onSuccess(path);
+      }
+
+      @Override
+      public void onError(@NonNull String message) {
+        fileSource.deactivate();
+        callback.onError(message);
+      }
+    });
+    fileSource.activate();
   }
 
   private static boolean isPathWritable(String path) {
@@ -388,7 +402,7 @@ public class FileSource {
   public native void setResourceTransform(final ResourceTransformCallback callback);
 
   @Keep
-  private native void setResourceCachePath(String path);
+  private native void setResourceCachePath(String path, ResourcesCachePathChangeCallback callback);
 
   @Keep
   private native void initialize(String accessToken, String cachePath, AssetManager assetManager);
