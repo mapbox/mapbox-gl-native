@@ -572,6 +572,18 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     loop.run();
 }
 
+TEST(DefaultFileSource, SetResourceCachePath) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Actor<PathChangeCallback> callback(loop, [&]() -> void {
+        loop.stop();
+    });
+
+    fs.setResourceCachePath("./new_offline.db", callback.self());
+    loop.run();
+}
+
 // Test that a stale cache file that has must-revalidate set will trigger a response.
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
     util::RunLoop loop;
