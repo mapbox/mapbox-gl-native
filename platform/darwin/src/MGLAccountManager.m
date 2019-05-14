@@ -1,26 +1,26 @@
 #import "MGLAccountManager_Private.h"
 #import "NSBundle+MGLAdditions.h"
-
 #if TARGET_OS_OSX
 #import "NSProcessInfo+MGLAdditions.h"
 #endif
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
-#import "MBXSKUToken.h"
-#endif
 
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
 @property (nonatomic) NSURL *apiBaseURL;
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-@property (atomic) NSString *skuToken;
-@property (atomic) NSDate *skuTokenExpiration;
-#endif
+@end
+#else
+@interface MGLAccountManager ()
+
+@property (atomic) NSString *accessToken;
+@property (nonatomic) NSURL *apiBaseURL;
 
 @end
+#endif
 
 @implementation MGLAccountManager
 
@@ -39,10 +39,6 @@
     if (apiBaseURL.length && [NSURL URLWithString:apiBaseURL]) {
         [self setAPIBaseURL:[NSURL URLWithString:apiBaseURL]];
     }
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    self.skuToken = [MBXSKUToken skuToken];
-#endif
 }
 
 + (instancetype)sharedManager {
@@ -96,27 +92,5 @@
 + (NSURL *)apiBaseURL {
     return [MGLAccountManager sharedManager].apiBaseURL;
 }
-
-#pragma mark - SKU Tokens
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-
-+ (void)setSkuToken:(NSString *)skuToken {
-    NSTimeInterval oneHour = 60 * 60; // TODO: make this const
-    MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate dateWithTimeIntervalSinceNow:oneHour];
-
-    MGLAccountManager.sharedManager.skuToken = skuToken;
-}
-
-+ (NSString *)skuToken {
-    return [MGLAccountManager.sharedManager isSKUTokenExpired] ? [MBXSKUToken skuToken] : MGLAccountManager.sharedManager.skuToken;
-}
-
-- (BOOL)isSKUTokenExpired {
-    NSTimeInterval secondsUntilExpiration = [MGLAccountManager.sharedManager.skuTokenExpiration timeIntervalSinceDate:NSDate.date];
-    return secondsUntilExpiration < 0;
-}
-
-#endif
 
 @end
