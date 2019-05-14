@@ -10,10 +10,15 @@ import java.util.concurrent.CountDownLatch
 class FileSourceTestUtils(private val activity: Activity) {
   val originalPath = FileSource.getResourcesCachePath(activity)
   val testPath = "$originalPath/test"
+  val testPath2 = "$originalPath/test2"
+
+  private val paths = listOf(testPath, testPath2)
 
   fun setup() {
-    val testFile = File(testPath)
-    testFile.mkdirs()
+    for (path in paths) {
+      val testFile = File(path)
+      testFile.mkdirs()
+    }
   }
 
   @WorkerThread
@@ -22,25 +27,29 @@ class FileSourceTestUtils(private val activity: Activity) {
     if (currentPath != originalPath) {
       changePath(originalPath)
     }
-    val testFile = File(testPath)
-    if (testFile.exists()) {
-      testFile.deleteRecursively()
+
+    for (path in paths) {
+      val testFile = File(path)
+      if (testFile.exists()) {
+        testFile.deleteRecursively()
+      }
     }
   }
 
   @WorkerThread
-  fun changePath(path: String) {
+  fun changePath(requestedPath: String) {
     val latch = CountDownLatch(1)
     activity.runOnUiThread {
       FileSource.setResourcesCachePath(
-        path,
+        requestedPath,
         object : FileSource.ResourcesCachePathChangeCallback {
           override fun onSuccess(path: String) {
+            Assert.assertEquals(requestedPath, path)
             latch.countDown()
           }
 
           override fun onError(message: String) {
-            Assert.fail("Resource path change failed - path: $path, message: $message")
+            Assert.fail("Resource path change failed - path: $requestedPath, message: $message")
           }
         })
     }

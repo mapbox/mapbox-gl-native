@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.storage
 
-import android.os.Handler
 import android.support.test.annotation.UiThreadTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
@@ -10,6 +9,7 @@ import org.junit.*
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class FileSourceStandaloneTest {
@@ -55,19 +55,57 @@ class FileSourceStandaloneTest {
     fileSourceTestUtils.changePath(fileSourceTestUtils.testPath)
     Assert.assertEquals(fileSourceTestUtils.testPath, FileSource.getResourcesCachePath(rule.activity))
 
-    // workaround for https://github.com/mapbox/mapbox-gl-native/issues/14334
-    val latch = CountDownLatch(1)
-    rule.activity.runOnUiThread {
-      fileSource.activate()
-      Handler().postDelayed({
-        fileSource.deactivate()
-        latch.countDown()
-      }, 2000)
-    }
-    latch.await()
-
     fileSourceTestUtils.changePath(fileSourceTestUtils.originalPath)
     Assert.assertEquals(fileSourceTestUtils.originalPath, FileSource.getResourcesCachePath(rule.activity))
+  }
+
+  @Test
+  fun overridePathChangeCallTest() {
+    val firstLatch = CountDownLatch(1)
+    val secondLatch = CountDownLatch(1)
+    rule.activity.runOnUiThread {
+      FileSource.setResourcesCachePath(
+        fileSourceTestUtils.testPath,
+        object : FileSource.ResourcesCachePathChangeCallback {
+          override fun onSuccess(path: String) {
+            Assert.assertEquals(fileSourceTestUtils.testPath, path)
+            firstLatch.countDown()
+          }
+
+          override fun onError(message: String) {
+            Assert.fail("First attempt should succeed.")
+          }
+        })
+
+      FileSource.setResourcesCachePath(
+        fileSourceTestUtils.testPath2,
+        object : FileSource.ResourcesCachePathChangeCallback {
+          override fun onSuccess(path: String) {
+            Assert.fail("Second attempt should fail because first one is in progress.")
+          }
+
+          override fun onError(message: String) {
+            Assert.assertEquals("Another resources cache path change is in progress", message)
+            secondLatch.countDown()
+          }
+        })
+    }
+
+    if (!secondLatch.await(5, TimeUnit.SECONDS)) {
+      rule.runOnUiThread {
+        // if we fail to call a callback, the file source is not going to be deactivated
+        fileSource.deactivate()
+      }
+      Assert.fail("Second attempt should fail.")
+    }
+
+    if (!firstLatch.await(5, TimeUnit.SECONDS)) {
+      rule.runOnUiThread {
+        // if we fail to call a callback, the file source is not going to be deactivated
+        fileSource.deactivate()
+      }
+      Assert.fail("First attempt should succeed.")
+    }
   }
 
   @After

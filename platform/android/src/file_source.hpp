@@ -11,6 +11,7 @@ namespace mbgl {
 
 template <typename T> class Actor;
 class ResourceTransform;
+using mbgl::PathChangeCallback;
 
 namespace android {
 
@@ -28,6 +29,18 @@ public:
         static std::string onURL(jni::JNIEnv&, const jni::Object<FileSource::ResourceTransformCallback>&, int, std::string);
     };
 
+    struct ResourcesCachePathChangeCallback {
+        static constexpr auto Name() { return "com/mapbox/mapboxsdk/storage/FileSource$ResourcesCachePathChangeCallback";}
+
+        static void onSuccess(jni::JNIEnv&,
+                              const jni::Object<FileSource::ResourcesCachePathChangeCallback>&,
+                              const jni::String&);
+
+        static void onError(jni::JNIEnv&,
+                              const jni::Object<FileSource::ResourcesCachePathChangeCallback>&,
+                              const jni::String&);
+    };
+
     FileSource(jni::JNIEnv&, const jni::String&, const jni::String&, const jni::Object<AssetManager>&);
 
     ~FileSource();
@@ -40,7 +53,7 @@ public:
 
     void setResourceTransform(jni::JNIEnv&, const jni::Object<FileSource::ResourceTransformCallback>&);
 
-    void setResourceCachePath(jni::JNIEnv&, const jni::String&);
+    void setResourceCachePath(jni::JNIEnv&, const jni::String&, const jni::Object<FileSource::ResourcesCachePathChangeCallback>&);
 
     void resume(jni::JNIEnv&);
 
@@ -59,6 +72,7 @@ private:
     optional<int> activationCounter;
     mbgl::ResourceOptions resourceOptions;
     std::unique_ptr<Actor<ResourceTransform>> resourceTransform;
+    std::unique_ptr<Actor<PathChangeCallback>> pathChangeCallback;
     std::shared_ptr<mbgl::DefaultFileSource> fileSource;
 };
 
