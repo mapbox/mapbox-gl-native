@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.mapbox.android.accounts.v1.MapboxAccounts;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.SessionInterval;
@@ -21,8 +21,9 @@ import java.util.UUID;
 
 public class TelemetryImpl implements TelemetryDefinition {
 
-  private final MapboxTelemetry telemetry;
-  private final Context appContext;
+  @Nullable
+  private MapboxTelemetry telemetry;
+  private Context appContext;
 
   public TelemetryImpl() {
     appContext = Mapbox.getApplicationContext();
@@ -41,7 +42,6 @@ public class TelemetryImpl implements TelemetryDefinition {
   public void onAppUserTurnstileEvent() {
     AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
       BuildConfig.MAPBOX_SDK_VERSION);
-    turnstileEvent.setSkuId(MapboxAccounts.SKU_ID_MAPS_MAUS);
     telemetry.push(turnstileEvent);
     telemetry.push(MapEventFactory.buildMapLoadEvent(new PhoneState(appContext)));
   }

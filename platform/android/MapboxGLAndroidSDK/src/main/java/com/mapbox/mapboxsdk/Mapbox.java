@@ -34,8 +34,6 @@ public final class Mapbox {
   private String accessToken;
   @Nullable
   private TelemetryDefinition telemetry;
-  @Nullable
-  private AccountsManager accounts;
 
   /**
    * Get an instance of Mapbox.
@@ -58,7 +56,6 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken);
       if (isAccessTokenValid(accessToken)) {
         initializeTelemetry();
-        INSTANCE.accounts = new AccountsManager();
       }
       ConnectivityReceiver.instance(appContext);
     }
@@ -88,16 +85,6 @@ public final class Mapbox {
     validateMapbox();
     INSTANCE.accessToken = accessToken;
     FileSource.getInstance(getApplicationContext()).setAccessToken(accessToken);
-  }
-
-  /**
-   * Returns a SKU token, refreshed if necessary. This method is meant for internal SDK
-   * usage only.
-   *
-   * @return the SKU token
-   */
-  public static String getSkuToken() {
-    return INSTANCE.accounts.getSkuToken();
   }
 
   /**
