@@ -46,8 +46,11 @@ public:
         onlineFileSource.setResourceTransform(std::move(transform));
     }
 
-    void setResourceCachePath(const std::string& path) {
+    void setResourceCachePath(const std::string& path, optional<ActorRef<PathChangeCallback>>&& callback) {
         offlineDatabase->changePath(path);
+        if (callback) {
+            callback->invoke(&PathChangeCallback::operator());
+        }
     }
 
     void listRegions(std::function<void (expected<OfflineRegions, std::exception_ptr>)> callback) {
@@ -252,8 +255,8 @@ void DefaultFileSource::setResourceTransform(optional<ActorRef<ResourceTransform
     impl->actor().invoke(&Impl::setResourceTransform, std::move(transform));
 }
 
-void DefaultFileSource::setResourceCachePath(const std::string& path) {
-    impl->actor().invoke(&Impl::setResourceCachePath, path);
+void DefaultFileSource::setResourceCachePath(const std::string& path, optional<ActorRef<PathChangeCallback>>&& callback) {
+    impl->actor().invoke(&Impl::setResourceCachePath, path, std::move(callback));
 }
 
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
