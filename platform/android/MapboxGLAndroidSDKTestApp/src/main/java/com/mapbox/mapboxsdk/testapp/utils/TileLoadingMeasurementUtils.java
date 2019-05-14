@@ -4,9 +4,13 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringDef;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -18,6 +22,8 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.module.http.HttpRequestUtil;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -82,6 +88,14 @@ public class TileLoadingMeasurementUtils {
 
     private static String metadata = null;
 
+    @StringDef( {CONNECTION_NONE, CONNECTION_CELLULAR, CONNECTION_WIFI})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface ConnectionState {
+    }
+    private static final String CONNECTION_NONE = "none";
+    private static final String CONNECTION_CELLULAR = "cellular";
+    private static final String CONNECTION_WIFI = "wifi";
+
     @Override
     public Response intercept(Chain chain) throws IOException {
       Request request = chain.request();
@@ -100,6 +114,8 @@ public class TileLoadingMeasurementUtils {
       String request = getUrl(response.request());
       attributes.add(new Attribute<>("requestUrl", request));
       attributes.add(new Attribute<>("responseCode", String.valueOf(response.code())));
+      attributes.add(
+              new Attribute<>("connectionState", getConnectionState()));
 
       List<Attribute<Long>> counters = new ArrayList();
       counters.add(new Attribute<>("elapsedMS", elapsedMs));
@@ -153,6 +169,39 @@ public class TileLoadingMeasurementUtils {
       int width = metrics.widthPixels;
       int height = metrics.heightPixels;
       return "{" + width + "," + height + "}";
+    }
+
+    @ConnectionState
+    private static String getConnectionState() {
+      Context appContext = Mapbox.getApplicationContext();
+      ConnectivityManager connectivityManager =
+              (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (connectivityManager != null) {
+          NetworkCapabilities capabilities =
+                  connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+          if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+              return CONNECTION_WIFI;
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+              return CONNECTION_CELLULAR;
+            }
+          }
+        }
+      } else {
+        if (connectivityManager != null) {
+          NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+          if (activeNetwork != null) {
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+              return CONNECTION_WIFI;
+            } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+              return CONNECTION_CELLULAR;
+            }
+          }
+        }
+      }
+      return CONNECTION_NONE;
     }
   }
 
