@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.style.layers;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 /**
  * Custom layer.

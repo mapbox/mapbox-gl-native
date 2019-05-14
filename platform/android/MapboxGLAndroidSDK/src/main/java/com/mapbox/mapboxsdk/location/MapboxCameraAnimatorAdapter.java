@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.location;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 

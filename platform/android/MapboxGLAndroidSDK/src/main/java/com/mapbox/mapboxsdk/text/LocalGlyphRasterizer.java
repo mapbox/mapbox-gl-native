@@ -6,9 +6,9 @@ import android.graphics.Paint;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
 
 /**
  * LocalGlyphRasterizer is the Android-specific platform implementation used

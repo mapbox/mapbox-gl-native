@@ -16,7 +16,7 @@ class KeepDetectorTest {
       .files(java("""
         |package foo;
         |
-        |import android.support.annotation.Keep;
+        |import androidx.annotation.Keep;
         |
         |@Keep
         |class TestClass {

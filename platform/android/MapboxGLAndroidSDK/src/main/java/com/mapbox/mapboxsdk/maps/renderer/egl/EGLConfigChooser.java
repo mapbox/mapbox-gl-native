@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.maps.renderer.egl;
 
 import android.opengl.GLSurfaceView;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.log.Logger;
 

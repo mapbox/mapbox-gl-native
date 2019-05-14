@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.activity;
 
-import android.support.annotation.CallSuper;
-import android.support.annotation.UiThread;
-import android.support.test.rule.ActivityTestRule;
+import androidx.annotation.CallSuper;
+import androidx.annotation.UiThread;
+import androidx.test.rule.ActivityTestRule;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

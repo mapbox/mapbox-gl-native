@@ -3,8 +3,8 @@ package com.mapbox.mapboxsdk.integration
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-import android.support.test.InstrumentationRegistry
-import android.support.test.uiautomator.*
+import androidx.test.InstrumentationRegistry
+import androidx.test.uiautomator.*
 import org.junit.Before
 
 const val TIMEOUT_UI_SEARCH_WAIT = 5000L

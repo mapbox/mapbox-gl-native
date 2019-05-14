@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.FloatRange;
-import android.support.annotation.NonNull;
+import androidx.annotation.FloatRange;
+import androidx.annotation.NonNull;
 
 import com.mapbox.android.accounts.v1.MapboxAccounts;
 import com.mapbox.android.telemetry.AppUserTurnstile;

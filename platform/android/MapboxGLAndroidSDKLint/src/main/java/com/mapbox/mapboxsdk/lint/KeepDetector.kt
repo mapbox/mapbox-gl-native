@@ -69,7 +69,7 @@ class KeepDetector : Detector(), SourceCodeScanner, FileScanner {
     }
 
     private fun hasKeepAnnotation(uAnnotated: UAnnotated): Boolean {
-      return uAnnotated.findAnnotation("android.support.annotation.Keep") != null
+      return uAnnotated.findAnnotation("androidx.annotation.Keep") != null
     }
   }
 }

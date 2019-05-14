@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.test.annotation.UiThreadTest;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.annotation.UiThreadTest;
+import androidx.test.runner.AndroidJUnit4;
 import com.mapbox.mapboxsdk.Mapbox;
 import org.junit.Test;
 import org.junit.runner.RunWith;

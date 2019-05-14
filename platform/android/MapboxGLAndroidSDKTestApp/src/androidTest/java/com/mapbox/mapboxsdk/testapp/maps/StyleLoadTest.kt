@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.maps
 
-import android.support.test.espresso.UiController
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.espresso.UiController
+import androidx.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style

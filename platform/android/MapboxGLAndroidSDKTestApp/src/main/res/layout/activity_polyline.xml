@@ -14,7 +14,7 @@
         app:mapbox_cameraTargetLng="7.573781"
         app:mapbox_cameraZoom="4" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

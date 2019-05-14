@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.offline;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 /**
  * A region's status includes its active/inactive state as well as counts

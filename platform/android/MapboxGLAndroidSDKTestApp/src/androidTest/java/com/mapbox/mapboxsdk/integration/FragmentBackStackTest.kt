@@ -1,12 +1,12 @@
 package com.mapbox.mapboxsdk.integration
 
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
-import android.support.test.uiautomator.By
-import android.support.test.uiautomator.SearchCondition
-import android.support.test.uiautomator.UiSelector
-import android.support.test.uiautomator.Until
+import androidx.test.filters.LargeTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.runner.AndroidJUnit4
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.SearchCondition
+import androidx.test.uiautomator.UiSelector
+import androidx.test.uiautomator.Until
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.activity.fragment.FragmentBackStackActivity
 import com.mapbox.mapboxsdk.testapp.activity.maplayout.SimpleMapActivity

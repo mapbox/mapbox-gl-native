@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity;
 
-import android.support.annotation.UiThread;
+import androidx.annotation.UiThread;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;

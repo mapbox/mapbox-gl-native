@@ -2,7 +2,7 @@
 
 package com.mapbox.mapboxsdk.style.layers;
 
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.types.Formatted;

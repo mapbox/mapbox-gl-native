@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.storage
 
 import android.app.Activity
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.mapbox.mapboxsdk.storage.FileSource
 import junit.framework.Assert
 import java.io.File

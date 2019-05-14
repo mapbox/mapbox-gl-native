@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.location;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.model.customlayer;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 @Keep
 public class ExampleCustomLayer {
