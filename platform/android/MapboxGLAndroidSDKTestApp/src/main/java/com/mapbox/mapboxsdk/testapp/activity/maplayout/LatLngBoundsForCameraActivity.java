@@ -9,19 +9,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import com.mapbox.mapboxsdk.annotations.PolygonOptions;
+import com.mapbox.geojson.Point;
+import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
 
 /**
  * Test activity showcasing restricting user gestures to a bounds around Iceland, almost worldview and IDL.
  */
 public class LatLngBoundsForCameraActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+  private static final String FILL_SOURCE_ID = "fill_source_id";
+  private static final String FILL_LAYER_ID = "fill_layer_id";
 
   private static final LatLngBounds ICELAND_BOUNDS = new LatLngBounds.Builder()
     .include(new LatLng(66.852863, -25.985652))
@@ -40,6 +52,7 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
 
   private MapView mapView;
   private MapboxMap mapboxMap;
+  private GeoJsonSource geoJsonSource;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +67,20 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    mapboxMap.setStyle(Style.SATELLITE_STREETS);
+
+    geoJsonSource = new GeoJsonSource(FILL_SOURCE_ID);
+    FillLayer fillLayer = new FillLayer(FILL_LAYER_ID, FILL_SOURCE_ID)
+      .withProperties(
+        fillOpacity(0.25f),
+        fillColor(Color.RED)
+      );
+
+    mapboxMap.setStyle(new Style.Builder()
+      .fromUrl(Style.SATELLITE_STREETS)
+      .withSource(geoJsonSource)
+      .withLayer(fillLayer)
+    );
+
     mapboxMap.setMinZoomPreference(2);
     mapboxMap.getUiSettings().setFlingVelocityAnimationEnabled(false);
     showCrosshair();
@@ -86,15 +112,20 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
   }
 
   private void showBoundsArea(LatLngBounds bounds) {
-    mapboxMap.clear();
-    PolygonOptions boundsArea = new PolygonOptions()
-      .add(bounds.getNorthWest())
-      .add(bounds.getNorthEast())
-      .add(bounds.getSouthEast())
-      .add(bounds.getSouthWest());
-    boundsArea.alpha(0.25f);
-    boundsArea.fillColor(Color.RED);
-    mapboxMap.addPolygon(boundsArea);
+    List<Point> points = new ArrayList<>();
+    points.add(convertToPoint(bounds.getNorthWest()));
+    points.add(convertToPoint(bounds.getNorthEast()));
+    points.add(convertToPoint(bounds.getSouthEast()));
+    points.add(convertToPoint(bounds.getSouthWest()));
+    points.add(convertToPoint(bounds.getNorthWest()));
+
+    List<List<Point>> polygon = new ArrayList<>();
+    polygon.add(points);
+    geoJsonSource.setGeoJson(Polygon.fromLngLats(polygon));
+  }
+
+  private Point convertToPoint(LatLng northWest) {
+    return Point.fromLngLat(northWest.getLongitude(), northWest.getLatitude());
   }
 
   private void showCrosshair() {

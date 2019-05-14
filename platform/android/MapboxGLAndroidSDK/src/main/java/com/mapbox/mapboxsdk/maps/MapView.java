@@ -10,7 +10,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v4.util.LongSparseArray;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -23,7 +22,6 @@ import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.location.LocationComponent;
@@ -157,24 +155,13 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView, this);
     UiSettings uiSettings = new UiSettings(proj, focalInvalidator, compassView, attrView, logoView, getPixelRatio());
-    LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
-    IconManager iconManager = new IconManager(nativeMapView);
-    Annotations annotations = new AnnotationContainer(nativeMapView, annotationsArray);
-    Markers markers = new MarkerContainer(nativeMapView, annotationsArray, iconManager);
-    Polygons polygons = new PolygonContainer(nativeMapView, annotationsArray);
-    Polylines polylines = new PolylineContainer(nativeMapView, annotationsArray);
-    ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(nativeMapView, annotationsArray);
-    AnnotationManager annotationManager = new AnnotationManager(this, annotationsArray, iconManager,
-      annotations, markers, polygons, polylines, shapeAnnotations);
     Transform transform = new Transform(this, nativeMapView, cameraDispatcher);
 
     // MapboxMap
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener, cameraDispatcher);
-    mapboxMap.injectAnnotationManager(annotationManager);
 
     // user input
-    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
-      annotationManager, cameraDispatcher);
+    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, cameraDispatcher);
     mapKeyListener = new MapKeyListener(transform, uiSettings, mapGestureDetector);
 
     // compass
@@ -1158,17 +1145,13 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   private class MapCallback implements OnDidFinishLoadingStyleListener,
-    OnDidFinishRenderingFrameListener, OnDidFinishLoadingMapListener,
-    OnCameraIsChangingListener, OnCameraDidChangeListener, OnDidFailLoadingMapListener {
+    OnDidFinishRenderingFrameListener, OnDidFailLoadingMapListener {
 
     private final List<OnMapReadyCallback> onMapReadyCallbackList = new ArrayList<>();
 
     MapCallback() {
       addOnDidFinishLoadingStyleListener(this);
       addOnDidFinishRenderingFrameListener(this);
-      addOnDidFinishLoadingMapListener(this);
-      addOnCameraIsChangingListener(this);
-      addOnCameraDidChangeListener(this);
       addOnDidFailLoadingMapListener(this);
     }
 
@@ -1203,9 +1186,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       onMapReadyCallbackList.clear();
       removeOnDidFinishLoadingStyleListener(this);
       removeOnDidFinishRenderingFrameListener(this);
-      removeOnDidFinishLoadingMapListener(this);
-      removeOnCameraIsChangingListener(this);
-      removeOnCameraDidChangeListener(this);
       removeOnDidFailLoadingMapListener(this);
     }
 
@@ -1227,27 +1207,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     public void onDidFinishRenderingFrame(boolean fully) {
       if (mapboxMap != null) {
         mapboxMap.onUpdateFullyRendered();
-      }
-    }
-
-    @Override
-    public void onDidFinishLoadingMap() {
-      if (mapboxMap != null) {
-        mapboxMap.onUpdateRegionChange();
-      }
-    }
-
-    @Override
-    public void onCameraIsChanging() {
-      if (mapboxMap != null) {
-        mapboxMap.onUpdateRegionChange();
-      }
-    }
-
-    @Override
-    public void onCameraDidChange(boolean animated) {
-      if (mapboxMap != null) {
-        mapboxMap.onUpdateRegionChange();
       }
     }
   }

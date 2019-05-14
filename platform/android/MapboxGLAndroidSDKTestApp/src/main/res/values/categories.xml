@@ -2,7 +2,6 @@
 <resources>
     <string name="category">category</string>
     <string name="category_basic">_Basic</string>
-    <string name="category_annotation">Annotation</string>
     <string name="category_camera">Camera</string>
     <string name="category_custom_layer">Custom Layer</string>
     <string name="category_fragment">Fragment</string>

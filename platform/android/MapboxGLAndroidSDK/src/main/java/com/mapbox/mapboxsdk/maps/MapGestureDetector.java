@@ -40,7 +40,6 @@ final class MapGestureDetector {
   private final Transform transform;
   private final Projection projection;
   private final UiSettings uiSettings;
-  private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
 
   // new map touch API
@@ -88,8 +87,7 @@ final class MapGestureDetector {
   private Handler animationsTimeoutHandler = new Handler();
 
   MapGestureDetector(@Nullable Context context, Transform transform, Projection projection, UiSettings uiSettings,
-                     AnnotationManager annotationManager, CameraChangeDispatcher cameraChangeDispatcher) {
-    this.annotationManager = annotationManager;
+                     CameraChangeDispatcher cameraChangeDispatcher) {
     this.transform = transform;
     this.projection = projection;
     this.uiSettings = uiSettings;
@@ -315,18 +313,7 @@ final class MapGestureDetector {
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-      PointF tapPoint = new PointF(motionEvent.getX(), motionEvent.getY());
-      boolean tapHandled = annotationManager.onTap(tapPoint);
-
-      if (!tapHandled) {
-        if (uiSettings.isDeselectMarkersOnTap()) {
-          // deselect any selected marker
-          annotationManager.deselectMarkers();
-        }
-
-        notifyOnMapClickListeners(tapPoint);
-      }
-
+      notifyOnMapClickListeners(new PointF(motionEvent.getX(), motionEvent.getY()));
       return true;
     }
 

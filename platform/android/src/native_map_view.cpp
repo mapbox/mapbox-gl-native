@@ -535,37 +535,6 @@ jni::Local<jni::Object<CameraPosition>> NativeMapView::getCameraPosition(jni::JN
     return CameraPosition::New(env, map->getCameraOptions(insets));
 }
 
-void NativeMapView::updateMarker(jni::JNIEnv& env, jni::jlong markerId, jni::jdouble lat, jni::jdouble lon, const jni::String& jid) {
-    if (markerId == -1) {
-        return;
-    }
-
-    std::string iconId = jni::Make<std::string>(env, jid);
-    // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
-    map->updateAnnotation(markerId, mbgl::SymbolAnnotation { mbgl::Point<double>(lon, lat), iconId });
-}
-
-jni::Local<jni::Array<jni::jlong>> NativeMapView::addMarkers(jni::JNIEnv& env, const jni::Array<jni::Object<Marker>>& jmarkers) {
-    jni::NullCheck(env, &jmarkers);
-    std::size_t len = jmarkers.Length(env);
-
-    std::vector<jni::jlong> ids;
-    ids.reserve(len);
-
-    for (std::size_t i = 0; i < len; i++) {
-        auto marker = jmarkers.Get(env, i);
-        ids.push_back(map->addAnnotation(mbgl::SymbolAnnotation {
-            Marker::getPosition(env, marker),
-            Marker::getIconId(env, marker)
-        }));
-    }
-
-    auto result = jni::Array<jni::jlong>::New(env, len);
-    result.SetRegion<std::vector<jni::jlong>>(env, 0, ids);
-
-    return result;
-}
-
 void NativeMapView::onLowMemory(JNIEnv&) {
     rendererFrontend->reduceMemoryUse();
 }
@@ -612,92 +581,6 @@ jni::Local<jni::Object<LatLng>> NativeMapView::latLngForPixel(JNIEnv& env, jfloa
     return LatLng::New(env, map->latLngForPixel(mbgl::ScreenCoordinate(x, y)));
 }
 
-jni::Local<jni::Array<jlong>> NativeMapView::addPolylines(JNIEnv& env, const jni::Array<jni::Object<Polyline>>& polylines) {
-    NullCheck(env, &polylines);
-    std::size_t len = polylines.Length(env);
-
-    std::vector<jni::jlong> ids;
-    ids.reserve(len);
-
-    for (std::size_t i = 0; i < len; i++) {
-        mbgl::LineAnnotation annotation = Polyline::toAnnotation(env, polylines.Get(env, i));
-        ids.push_back(map->addAnnotation(annotation));
-    }
-
-    auto result = jni::Array<jni::jlong>::New(env, len);
-    result.SetRegion<std::vector<jni::jlong>>(env, 0, ids);
-
-    return result;
-}
-
-
-jni::Local<jni::Array<jlong>> NativeMapView::addPolygons(JNIEnv& env, const jni::Array<jni::Object<Polygon>>& polygons) {
-    NullCheck(env, &polygons);
-    std::size_t len = polygons.Length(env);
-
-    std::vector<jni::jlong> ids;
-    ids.reserve(len);
-
-    for (std::size_t i = 0; i < len; i++) {
-        mbgl::FillAnnotation annotation = Polygon::toAnnotation(env, polygons.Get(env, i));
-        ids.push_back(map->addAnnotation(annotation));
-    }
-
-    auto result = jni::Array<jni::jlong>::New(env, len);
-    result.SetRegion<std::vector<jni::jlong>>(env, 0, ids);
-
-    return result;
-}
-
-void NativeMapView::updatePolyline(JNIEnv& env, jlong polylineId, const jni::Object<Polyline>& polyline) {
-    mbgl::LineAnnotation annotation = Polyline::toAnnotation(env, polyline);
-    map->updateAnnotation(polylineId, annotation);
-}
-
-void NativeMapView::updatePolygon(JNIEnv& env, jlong polygonId, const jni::Object<Polygon>& polygon) {
-    mbgl::FillAnnotation annotation = Polygon::toAnnotation(env, polygon);
-    map->updateAnnotation(polygonId, annotation);
-}
-
-void NativeMapView::removeAnnotations(JNIEnv& env, const jni::Array<jlong>& ids) {
-    NullCheck(env, &ids);
-    std::size_t len = ids.Length(env);
-    auto elements = jni::GetArrayElements(env, *ids);
-    jlong* jids = std::get<0>(elements).get();
-
-    for (std::size_t i = 0; i < len; i++) {
-        if(jids[i] == -1L) {
-          continue;
-        }
-        map->removeAnnotation(jids[i]);
-    }
-}
-
-void NativeMapView::addAnnotationIcon(JNIEnv& env, const jni::String& symbol, jint w, jint h, jfloat scale, const jni::Array<jbyte>& jpixels) {
-    const std::string symbolName = jni::Make<std::string>(env, symbol);
-
-    NullCheck(env, &jpixels);
-    std::size_t size = jpixels.Length(env);
-
-    mbgl::PremultipliedImage premultipliedImage({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
-    if (premultipliedImage.bytes() != uint32_t(size)) {
-        throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
-    }
-
-    jni::GetArrayRegion(env, *jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
-    map->addAnnotationImage(std::make_unique<mbgl::style::Image>(
-        symbolName, std::move(premultipliedImage), float(scale)));
-}
-
-void NativeMapView::removeAnnotationIcon(JNIEnv& env, const jni::String& symbol) {
-    const std::string symbolName = jni::Make<std::string>(env, symbol);
-    map->removeAnnotationImage(symbolName);
-}
-
-jdouble NativeMapView::getTopOffsetPixelsForAnnotationSymbol(JNIEnv& env, const jni::String& symbolName) {
-    return map->getTopOffsetPixelsForAnnotationImage(jni::Make<std::string>(env, symbolName));
-}
-
 jni::Local<jni::Object<TransitionOptions>> NativeMapView::getTransitionOptions(JNIEnv& env) {
     const auto transitionOptions = map->getStyle().getTransitionOptions();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.duration.value_or(mbgl::Duration::zero())).count();
@@ -713,47 +596,6 @@ void NativeMapView::setTransitionOptions(JNIEnv& env, const jni::Object<Transiti
             TransitionOptions::isEnablePlacementTransitions(env, options)
     );
     map->getStyle().setTransitionOptions(transitionOptions);
-}
-
-jni::Local<jni::Array<jlong>> NativeMapView::queryPointAnnotations(JNIEnv& env, const jni::Object<RectF>& rect) {
-    using namespace mbgl::style;
-    using namespace mbgl::style::conversion;
-
-    // Convert input
-    mbgl::ScreenBox box = {
-        { RectF::getLeft(env, rect), RectF::getTop(env, rect) },
-        { RectF::getRight(env, rect), RectF::getBottom(env, rect) },
-    };
-
-    // Assume only points for now
-    mbgl::AnnotationIDs ids = rendererFrontend->queryPointAnnotations(box);
-
-    // Convert result
-    std::vector<jlong> longIds(ids.begin(), ids.end());
-    auto result = jni::Array<jni::jlong>::New(env, ids.size());
-    result.SetRegion<std::vector<jni::jlong>>(env, 0, longIds);
-
-    return result;
-}
-
-jni::Local<jni::Array<jlong>> NativeMapView::queryShapeAnnotations(JNIEnv& env, const jni::Object<RectF>& rect) {
-    using namespace mbgl::style;
-    using namespace mbgl::style::conversion;
-
-    // Convert input
-    mbgl::ScreenBox box = {
-         {RectF::getLeft(env, rect),  RectF::getTop(env, rect)},
-         {RectF::getRight(env, rect), RectF::getBottom(env, rect)},
-    };
-
-    mbgl::AnnotationIDs ids = rendererFrontend->queryShapeAnnotations(box);
-
-    // Convert result
-    std::vector<jlong> longIds(ids.begin(), ids.end());
-    auto result = jni::Array<jni::jlong>::New(env, ids.size());
-    result.SetRegion<std::vector<jni::jlong>>(env, 0, longIds);
-
-    return result;
 }
 
 jni::Local<jni::Array<jni::Object<geojson::Feature>>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
@@ -1086,8 +928,6 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getContentPadding, "nativeGetContentPadding"),
             METHOD(&NativeMapView::scheduleSnapshot, "nativeTakeSnapshot"),
             METHOD(&NativeMapView::getCameraPosition, "nativeGetCameraPosition"),
-            METHOD(&NativeMapView::updateMarker, "nativeUpdateMarker"),
-            METHOD(&NativeMapView::addMarkers, "nativeAddMarkers"),
             METHOD(&NativeMapView::setDebug, "nativeSetDebug"),
             METHOD(&NativeMapView::cycleDebugOptions, "nativeCycleDebugOptions"),
             METHOD(&NativeMapView::getDebug, "nativeGetDebug"),
@@ -1098,18 +938,8 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::pixelForLatLng, "nativePixelForLatLng"),
             METHOD(&NativeMapView::latLngForProjectedMeters, "nativeLatLngForProjectedMeters"),
             METHOD(&NativeMapView::latLngForPixel, "nativeLatLngForPixel"),
-            METHOD(&NativeMapView::addPolylines, "nativeAddPolylines"),
-            METHOD(&NativeMapView::addPolygons, "nativeAddPolygons"),
-            METHOD(&NativeMapView::updatePolyline, "nativeUpdatePolyline"),
-            METHOD(&NativeMapView::updatePolygon, "nativeUpdatePolygon"),
-            METHOD(&NativeMapView::removeAnnotations, "nativeRemoveAnnotations"),
-            METHOD(&NativeMapView::addAnnotationIcon, "nativeAddAnnotationIcon"),
-            METHOD(&NativeMapView::removeAnnotationIcon, "nativeRemoveAnnotationIcon"),
-            METHOD(&NativeMapView::getTopOffsetPixelsForAnnotationSymbol, "nativeGetTopOffsetPixelsForAnnotationSymbol"),
             METHOD(&NativeMapView::getTransitionOptions, "nativeGetTransitionOptions"),
             METHOD(&NativeMapView::setTransitionOptions, "nativeSetTransitionOptions"),
-            METHOD(&NativeMapView::queryPointAnnotations, "nativeQueryPointAnnotations"),
-            METHOD(&NativeMapView::queryShapeAnnotations, "nativeQueryShapeAnnotations"),
             METHOD(&NativeMapView::queryRenderedFeaturesForPoint, "nativeQueryRenderedFeaturesForPoint"),
             METHOD(&NativeMapView::queryRenderedFeaturesForBox, "nativeQueryRenderedFeaturesForBox"),
             METHOD(&NativeMapView::getLight, "nativeGetLight"),

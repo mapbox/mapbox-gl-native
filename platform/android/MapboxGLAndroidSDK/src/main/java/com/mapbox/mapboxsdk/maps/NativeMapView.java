@@ -14,10 +14,6 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.MapStrictMode;
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.Polygon;
-import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.exceptions.CalledFromWorkerThreadException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -433,137 +429,6 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public long addMarker(Marker marker) {
-    if (checkState("addMarker")) {
-      return 0;
-    }
-    Marker[] markers = {marker};
-    return nativeAddMarkers(markers)[0];
-  }
-
-  @Override
-  @NonNull
-  public long[] addMarkers(@NonNull List<Marker> markers) {
-    if (checkState("addMarkers")) {
-      return new long[] {};
-    }
-    return nativeAddMarkers(markers.toArray(new Marker[markers.size()]));
-  }
-
-  @Override
-  public long addPolyline(Polyline polyline) {
-    if (checkState("addPolyline")) {
-      return 0;
-    }
-    Polyline[] polylines = {polyline};
-    return nativeAddPolylines(polylines)[0];
-  }
-
-  @Override
-  @NonNull
-  public long[] addPolylines(@NonNull List<Polyline> polylines) {
-    if (checkState("addPolylines")) {
-      return new long[] {};
-    }
-    return nativeAddPolylines(polylines.toArray(new Polyline[polylines.size()]));
-  }
-
-  @Override
-  public long addPolygon(Polygon polygon) {
-    if (checkState("addPolygon")) {
-      return 0;
-    }
-    Polygon[] polygons = {polygon};
-    return nativeAddPolygons(polygons)[0];
-  }
-
-  @Override
-  @NonNull
-  public long[] addPolygons(@NonNull List<Polygon> polygons) {
-    if (checkState("addPolygons")) {
-      return new long[] {};
-    }
-    return nativeAddPolygons(polygons.toArray(new Polygon[polygons.size()]));
-  }
-
-  @Override
-  public void updateMarker(@NonNull Marker marker) {
-    if (checkState("updateMarker")) {
-      return;
-    }
-    LatLng position = marker.getPosition();
-    Icon icon = marker.getIcon();
-    nativeUpdateMarker(marker.getId(), position.getLatitude(), position.getLongitude(), icon.getId());
-  }
-
-  @Override
-  public void updatePolygon(@NonNull Polygon polygon) {
-    if (checkState("updatePolygon")) {
-      return;
-    }
-    nativeUpdatePolygon(polygon.getId(), polygon);
-  }
-
-  @Override
-  public void updatePolyline(@NonNull Polyline polyline) {
-    if (checkState("updatePolyline")) {
-      return;
-    }
-    nativeUpdatePolyline(polyline.getId(), polyline);
-  }
-
-  @Override
-  public void removeAnnotation(long id) {
-    if (checkState("removeAnnotation")) {
-      return;
-    }
-    long[] ids = {id};
-    removeAnnotations(ids);
-  }
-
-  @Override
-  public void removeAnnotations(long[] ids) {
-    if (checkState("removeAnnotations")) {
-      return;
-    }
-    nativeRemoveAnnotations(ids);
-  }
-
-  @Override
-  @NonNull
-  public long[] queryPointAnnotations(RectF rect) {
-    if (checkState("queryPointAnnotations") || !mapRenderer.hasSurface()) {
-      return new long[] {};
-    }
-    return nativeQueryPointAnnotations(rect);
-  }
-
-  @Override
-  @NonNull
-  public long[] queryShapeAnnotations(RectF rectF) {
-    if (checkState("queryShapeAnnotations") || !mapRenderer.hasSurface()) {
-      return new long[] {};
-    }
-    return nativeQueryShapeAnnotations(rectF);
-  }
-
-  @Override
-  public void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels) {
-    if (checkState("addAnnotationIcon")) {
-      return;
-    }
-    nativeAddAnnotationIcon(symbol, width, height, scale, pixels);
-  }
-
-  @Override
-  public void removeAnnotationIcon(String symbol) {
-    if (checkState("removeAnnotationIcon")) {
-      return;
-    }
-    nativeRemoveAnnotationIcon(symbol);
-  }
-
-  @Override
   public void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
     if (checkState("setVisibleCoordinateBounds")) {
       return;
@@ -661,14 +526,6 @@ final class NativeMapView implements NativeMap {
       return new LatLng();
     }
     return nativeLatLngForPixel(pixel.x / pixelRatio, pixel.y / pixelRatio);
-  }
-
-  @Override
-  public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
-    if (checkState("getTopOffsetPixelsForAnnotationSymbol")) {
-      return 0;
-    }
-    return nativeGetTopOffsetPixelsForAnnotationSymbol(symbolName);
   }
 
   @Override
@@ -1179,38 +1036,6 @@ final class NativeMapView implements NativeMap {
   private native void nativeResetNorth();
 
   @Keep
-  private native void nativeUpdateMarker(long markerId, double lat, double lon, String iconId);
-
-  @NonNull
-  @Keep
-  private native long[] nativeAddMarkers(Marker[] markers);
-
-  @NonNull
-  @Keep
-  private native long[] nativeAddPolylines(Polyline[] polylines);
-
-  @NonNull
-  @Keep
-  private native long[] nativeAddPolygons(Polygon[] polygons);
-
-  @Keep
-  private native void nativeRemoveAnnotations(long[] id);
-
-  @NonNull
-  @Keep
-  private native long[] nativeQueryPointAnnotations(RectF rect);
-
-  @NonNull
-  @Keep
-  private native long[] nativeQueryShapeAnnotations(RectF rect);
-
-  @Keep
-  private native void nativeAddAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels);
-
-  @Keep
-  private native void nativeRemoveAnnotationIcon(String symbol);
-
-  @Keep
   private native void nativeSetVisibleCoordinateBounds(LatLng[] coordinates, RectF padding,
                                                        double direction, long duration);
 
@@ -1338,12 +1163,6 @@ final class NativeMapView implements NativeMap {
   @NonNull
   @Keep
   private native Bitmap nativeGetImage(String name);
-
-  @Keep
-  private native void nativeUpdatePolygon(long polygonId, Polygon polygon);
-
-  @Keep
-  private native void nativeUpdatePolyline(long polylineId, Polyline polyline);
 
   @Keep
   private native void nativeTakeSnapshot();

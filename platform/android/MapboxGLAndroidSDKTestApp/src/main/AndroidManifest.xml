@@ -26,79 +26,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.infowindow.InfoWindowActivity"
-            android:description="@string/description_info_window"
-            android:label="@string/activity_info_window">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_infowindow" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.infowindow.InfoWindowAdapterActivity"
-            android:description="@string/description_info_window_adapter"
-            android:label="@string/activity_infowindow_adapter">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_infowindow" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.infowindow.DynamicInfoWindowAdapterActivity"
-            android:description="@string/description_dynamic_info_window_adapter"
-            android:label="@string/activity_dynamic_infowindow_adapter">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_infowindow" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.BulkMarkerActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:description="@string/description_add_bulk_markers"
-            android:label="@string/activity_add_bulk_markers">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.AnimatedSymbolLayerActivity"
+            android:name=".activity.style.AnimatedSymbolLayerActivity"
             android:description="@string/description_animated_symbollayer"
             android:label="@string/activity_animated_symbollayer">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_style" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.DynamicMarkerChangeActivity"
-            android:description="@string/description_dynamic_marker"
-            android:label="@string/activity_dynamic_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.PressForMarkerActivity"
-            android:description="@string/description_press_for_marker"
-            android:label="@string/activity_press_for_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
@@ -223,28 +156,6 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_custom_layer" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.PolygonActivity"
-            android:description="@string/description_polygon"
-            android:label="@string/activity_polygon">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.PolylineActivity"
-            android:description="@string/description_polyline"
-            android:label="@string/activity_polyline">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />

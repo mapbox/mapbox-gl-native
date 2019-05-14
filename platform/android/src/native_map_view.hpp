@@ -7,9 +7,6 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/storage/network_status.hpp>
 
-#include "annotation/marker.hpp"
-#include "annotation/polygon.hpp"
-#include "annotation/polyline.hpp"
 #include "graphics/pointf.hpp"
 #include "graphics/rectf.hpp"
 #include "geojson/feature.hpp"
@@ -146,10 +143,6 @@ public:
 
     jni::Local<jni::Object<CameraPosition>> getCameraPosition(jni::JNIEnv&);
 
-    void updateMarker(jni::JNIEnv&, jni::jlong, jni::jdouble, jni::jdouble, const jni::String&);
-
-    jni::Local<jni::Array<jni::jlong>> addMarkers(jni::JNIEnv&, const jni::Array<jni::Object<Marker>>&);
-
     void onLowMemory(JNIEnv& env);
 
     void setDebug(JNIEnv&, jni::jboolean);
@@ -170,29 +163,9 @@ public:
 
     jni::Local<jni::Object<LatLng>> latLngForPixel(JNIEnv&, jfloat, jfloat);
 
-    jni::Local<jni::Array<jlong>> addPolylines(JNIEnv&, const jni::Array<jni::Object<Polyline>>&);
-
-    jni::Local<jni::Array<jlong>> addPolygons(JNIEnv&, const jni::Array<jni::Object<Polygon>>&);
-
-    void updatePolyline(JNIEnv&, jlong, const jni::Object<Polyline>&);
-
-    void updatePolygon(JNIEnv&, jlong, const jni::Object<Polygon>&);
-
-    void removeAnnotations(JNIEnv&, const jni::Array<jlong>&);
-
-    void addAnnotationIcon(JNIEnv&, const jni::String&, jint, jint, jfloat, const jni::Array<jbyte>&);
-
-    void removeAnnotationIcon(JNIEnv&, const jni::String&);
-
-    jni::jdouble getTopOffsetPixelsForAnnotationSymbol(JNIEnv&, const jni::String&);
-
     jni::Local<jni::Object<TransitionOptions>> getTransitionOptions(JNIEnv&);
 
     void setTransitionOptions(JNIEnv&, const jni::Object<TransitionOptions>&);
-
-    jni::Local<jni::Array<jlong>> queryPointAnnotations(JNIEnv&, const jni::Object<RectF>&);
-
-    jni::Local<jni::Array<jlong>> queryShapeAnnotations(JNIEnv&, const jni::Object<RectF>&);
 
     jni::Local<jni::Array<jni::Object<geojson::Feature>>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
                                                                    const jni::Array<jni::String>&,

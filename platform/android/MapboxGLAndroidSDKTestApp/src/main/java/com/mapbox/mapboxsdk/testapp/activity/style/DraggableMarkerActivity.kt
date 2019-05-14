@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.style
 import android.graphics.PointF
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
 import android.view.View
@@ -11,7 +12,6 @@ import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -21,6 +21,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.testapp.R
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_draggable_marker.*
 
 /**
@@ -68,10 +69,13 @@ class DraggableMarkerActivity : AppCompatActivity() {
     mapView.getMapAsync { mapboxMap ->
       this.mapboxMap = mapboxMap
 
+      val markerDrawable = ResourcesCompat.getDrawable(resources, R.drawable.mapbox_marker_icon, theme)
+      val markerBitmap = BitmapUtils.getBitmapFromDrawable(markerDrawable)
+
       mapboxMap.setStyle(
         Style.Builder()
           .fromUrl(Style.MAPBOX_STREETS)
-          .withImage(markerImageId, IconFactory.getInstance(this).defaultMarker().bitmap)
+          .withImage(markerImageId, markerBitmap!!)
           .withSource(source)
           .withLayer(layer)
       )

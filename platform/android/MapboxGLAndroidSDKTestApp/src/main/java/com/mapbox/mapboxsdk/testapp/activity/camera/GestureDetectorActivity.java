@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,28 +20,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.FontCache;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
@@ -48,16 +52,17 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class GestureDetectorActivity extends AppCompatActivity {
 
   private static final int MAX_NUMBER_OF_ALERTS = 30;
+  private static final String SYMBOL_LAYER_ID = "symbol-layer-id";
+  private static final String SYMBOL_SOURCE_ID = "symbol-source-id";
 
   private MapView mapView;
   private MapboxMap mapboxMap;
   private RecyclerView recyclerView;
   private GestureAlertsAdapter gestureAlertsAdapter;
-
   private AndroidGesturesManager gesturesManager;
+  private GeoJsonSource geoJsonSource;
+  private SymbolLayer symbolLayer;
 
-  @Nullable
-  private Marker marker;
   @Nullable
   private LatLng focalPointLatLng;
 
@@ -70,7 +75,23 @@ public class GestureDetectorActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       GestureDetectorActivity.this.mapboxMap = mapboxMap;
-      mapboxMap.setStyle(Style.MAPBOX_STREETS);
+
+      geoJsonSource = new GeoJsonSource(SYMBOL_SOURCE_ID);
+      symbolLayer = new SymbolLayer(SYMBOL_LAYER_ID, SYMBOL_SOURCE_ID)
+        .withProperties(
+          iconImage("marker")
+        );
+
+      Bitmap marker = BitmapUtils.getBitmapFromDrawable(
+        ResourcesCompat.getDrawable(getResources(), R.drawable.mapbox_marker_icon, getTheme())
+      );
+
+      mapboxMap.setStyle(new Style.Builder()
+        .fromUrl(Style.MAPBOX_STREETS)
+        .withSource(geoJsonSource)
+        .withLayer(symbolLayer)
+        .withImage("marker", marker)
+      );
       initializeMap();
     });
 
@@ -266,7 +287,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
   private void fixedFocalPointEnabled(boolean enabled) {
     if (enabled) {
       focalPointLatLng = new LatLng(51.50325, -0.12968);
-      marker = mapboxMap.addMarker(new MarkerOptions().position(focalPointLatLng));
+      geoJsonSource.setGeoJson(Point.fromLngLat(focalPointLatLng.getLongitude(), focalPointLatLng.getLatitude()));
       mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(focalPointLatLng, 16),
         new MapboxMap.CancelableCallback() {
           @Override
@@ -280,9 +301,8 @@ public class GestureDetectorActivity extends AppCompatActivity {
           }
         });
     } else {
-      if (marker != null) {
-        mapboxMap.removeMarker(marker);
-        marker = null;
+      if (focalPointLatLng != null) {
+        geoJsonSource.setGeoJson("");
       }
       focalPointLatLng = null;
       mapboxMap.getUiSettings().setFocalPoint(null);

@@ -26,7 +26,6 @@ import timber.log.Timber;
 public class MapSnapshotterMarkerActivity extends AppCompatActivity implements MapSnapshotter.SnapshotReadyCallback {
 
   private MapSnapshotter mapSnapshotter;
-  private MapSnapshot mapSnapshot;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +37,6 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
       .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
         public void onGlobalLayout() {
-          //noinspection deprecation
           container.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
           Timber.i("Starting snapshot");
@@ -65,7 +63,7 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
   @Override
   public void onSnapshotReady(MapSnapshot snapshot) {
     Timber.i("Snapshot ready");
-    ImageView imageView = (ImageView) findViewById(R.id.snapshot_image);
+    ImageView imageView = findViewById(R.id.snapshot_image);
     Bitmap image = addMarker(snapshot);
     imageView.setImageBitmap(image);
     imageView.setOnTouchListener((v, event) -> {
@@ -80,7 +78,7 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
 
   private Bitmap addMarker(MapSnapshot snapshot) {
     Canvas canvas = new Canvas(snapshot.getBitmap());
-    Bitmap marker = BitmapFactory.decodeResource(getResources(), R.drawable.mapbox_marker_icon_default, null);
+    Bitmap marker = BitmapFactory.decodeResource(getResources(), R.drawable.mapbox_marker_icon, null);
     // Dom toren
     PointF markerLocation = snapshot.pixelForLatLng(new LatLng(52.090649433011315, 5.121310651302338));
     canvas.drawBitmap(marker,

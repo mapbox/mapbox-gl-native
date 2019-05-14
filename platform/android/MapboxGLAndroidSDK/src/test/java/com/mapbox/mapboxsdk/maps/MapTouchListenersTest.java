@@ -1,14 +1,12 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
-
 import android.support.annotation.Nullable;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +30,7 @@ public class MapTouchListenersTest {
     Projection projection = mock(Projection.class);
     when(projection.fromScreenLocation(pointF)).thenReturn(latLng);
     mapGestureDetector = new MapGestureDetector(null,
-      null, projection, null, null, null);
+      null, projection, null, null);
   }
 
   @Test

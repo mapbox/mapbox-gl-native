@@ -1,40 +1,38 @@
 package com.mapbox.mapboxsdk.testapp.activity.feature;
 
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
-import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
-import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-
+import timber.log.Timber;
 
 import java.util.List;
 import java.util.Map;
 
-import timber.log.Timber;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 
 /**
  * Test activity showcasing using the query rendered features API to query feature properties on Map click.
  */
 public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 
-  public MapView mapView;
+  private static final String SYMBOL_SOURCE_ID = "symbol-source-id";
+  private static final String SYMBOL_LAYER_ID = "symbol-source-id";
+
+  private MapView mapView;
   private MapboxMap mapboxMap;
-  private Marker marker;
+  private GeoJsonSource geoJsonSource;
+  private SymbolLayer symbolLayer;
 
   private MapboxMap.OnMapClickListener mapClickListener = new MapboxMap.OnMapClickListener() {
     @Override
@@ -50,14 +48,19 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       // Debug output
       debugOutput(features);
 
-      // Remove any previous markers
-      if (marker != null) {
-        mapboxMap.removeMarker(marker);
-      }
+      geoJsonSource.setGeoJson(Feature.fromGeometry(Point.fromLngLat(point.getLongitude(), point.getLatitude())));
 
-      // Add a marker on the clicked point
-      marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
-      mapboxMap.selectMarker(marker);
+      StringBuilder stringBuilder = new StringBuilder();
+      if (!features.isEmpty()) {
+        stringBuilder.append(String.format("Found %s features\n", features.size()));
+        Feature feature = features.get(0);
+        for (Map.Entry<String, JsonElement> prop : feature.properties().entrySet()) {
+          stringBuilder.append(String.format("%s: %s\n", prop.getKey(), prop.getValue()));
+        }
+      } else {
+        stringBuilder.append("No features here");
+      }
+      symbolLayer.setProperties(textField(stringBuilder.toString()));
       return true;
     }
   };
@@ -68,15 +71,13 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     setContentView(R.layout.activity_query_features_point);
 
     // Initialize map as normal
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
         QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
-
-        // Add custom window adapter
-        addCustomInfoWindowAdapter(mapboxMap);
-
+        style.addSource(geoJsonSource = new GeoJsonSource(SYMBOL_SOURCE_ID));
+        style.addLayer(symbolLayer = new SymbolLayer(SYMBOL_LAYER_ID, SYMBOL_SOURCE_ID));
         // Add a click listener
         mapboxMap.addOnMapClickListener(mapClickListener);
       });
@@ -101,41 +102,6 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
         Timber.i("Got NULL feature");
       }
     }
-  }
-
-  private void addCustomInfoWindowAdapter(MapboxMap mapboxMap) {
-    mapboxMap.setInfoWindowAdapter(new MapboxMap.InfoWindowAdapter() {
-
-      private TextView row(String text) {
-        TextView view = new TextView(QueryRenderedFeaturesPropertiesActivity.this);
-        view.setText(text);
-        return view;
-      }
-
-      @Override
-      public View getInfoWindow(@NonNull Marker marker) {
-        CustomMarker customMarker = (CustomMarker) marker;
-        LinearLayout view = new LinearLayout(QueryRenderedFeaturesPropertiesActivity.this);
-        view.setOrientation(LinearLayout.VERTICAL);
-        view.setBackgroundColor(Color.WHITE);
-
-        if (customMarker.features.size() > 0) {
-          view.addView(row(String.format("Found %s features", customMarker.features.size())));
-          Feature feature = customMarker.features.get(0);
-          for (Map.Entry<String, JsonElement> prop : feature.properties().entrySet()) {
-            view.addView(row(String.format("%s: %s", prop.getKey(), prop.getValue())));
-          }
-        } else {
-          view.addView(row("No features here"));
-        }
-
-        return view;
-      }
-    });
-  }
-
-  public MapboxMap getMapboxMap() {
-    return mapboxMap;
   }
 
   @Override
@@ -181,64 +147,5 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  private static class CustomMarker extends Marker {
-
-    private final List<Feature> features;
-
-    CustomMarker(BaseMarkerOptions baseMarkerOptions, List<Feature> features) {
-      super(baseMarkerOptions);
-      this.features = features;
-    }
-  }
-
-  private static class CustomMarkerOptions extends BaseMarkerOptions<CustomMarker, CustomMarkerOptions> {
-
-
-    private List<Feature> features;
-
-    public CustomMarkerOptions features(List<Feature> features) {
-      this.features = features;
-      return this;
-    }
-
-    CustomMarkerOptions() {
-    }
-
-    private CustomMarkerOptions(Parcel in) {
-      // Should implement this
-    }
-
-    @Override
-    public CustomMarkerOptions getThis() {
-      return this;
-    }
-
-    @Override
-    public CustomMarker getMarker() {
-      return new CustomMarker(this, features);
-    }
-
-    public static final Parcelable.Creator<CustomMarkerOptions> CREATOR =
-      new Parcelable.Creator<CustomMarkerOptions>() {
-        public CustomMarkerOptions createFromParcel(Parcel in) {
-          return new CustomMarkerOptions(in);
-        }
-
-        public CustomMarkerOptions[] newArray(int size) {
-          return new CustomMarkerOptions[size];
-        }
-      };
-
-    @Override
-    public int describeContents() {
-      return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-      // Should implement this
-    }
   }
 }

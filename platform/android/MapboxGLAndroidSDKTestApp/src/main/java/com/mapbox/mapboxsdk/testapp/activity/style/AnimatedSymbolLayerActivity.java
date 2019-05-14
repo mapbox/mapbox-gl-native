@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.activity.annotation;
+package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

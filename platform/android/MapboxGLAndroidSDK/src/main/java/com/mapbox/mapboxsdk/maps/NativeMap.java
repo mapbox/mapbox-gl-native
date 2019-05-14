@@ -8,9 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.Polygon;
-import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -217,47 +214,6 @@ interface NativeMap {
   void setGestureInProgress(boolean inProgress);
 
   float getPixelRatio();
-
-  //
-  // Deprecated Annotations API
-  //
-
-  long addMarker(Marker marker);
-
-  @NonNull
-  long[] addMarkers(@NonNull List<Marker> markers);
-
-  long addPolyline(Polyline polyline);
-
-  @NonNull
-  long[] addPolylines(@NonNull List<Polyline> polylines);
-
-  long addPolygon(Polygon polygon);
-
-  @NonNull
-  long[] addPolygons(@NonNull List<Polygon> polygons);
-
-  void updateMarker(@NonNull Marker marker);
-
-  void updatePolygon(@NonNull Polygon polygon);
-
-  void updatePolyline(@NonNull Polyline polyline);
-
-  void removeAnnotation(long id);
-
-  void removeAnnotations(long[] ids);
-
-  double getTopOffsetPixelsForAnnotationSymbol(String symbolName);
-
-  void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels);
-
-  void removeAnnotationIcon(String symbol);
-
-  @NonNull
-  long[] queryPointAnnotations(RectF rectF);
-
-  @NonNull
-  long[] queryShapeAnnotations(RectF rectF);
 
   @NonNull
   RectF getDensityDependantRectangle(RectF rectangle);

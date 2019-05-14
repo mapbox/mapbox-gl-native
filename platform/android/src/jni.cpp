@@ -2,9 +2,6 @@
 
 #include <mbgl/util/logging.hpp>
 
-#include "annotation/marker.hpp"
-#include "annotation/polygon.hpp"
-#include "annotation/polyline.hpp"
 #include "bitmap.hpp"
 #include "bitmap_factory.hpp"
 #include "connectivity_listener.hpp"
@@ -144,11 +141,6 @@ void registerNatives(JavaVM *vm) {
     gson::JsonElement::registerNative(env);
     gson::JsonObject::registerNative(env);
     gson::JsonPrimitive::registerNative(env);
-
-    //Annotation
-    Marker::registerNative(env);
-    Polygon::registerNative(env);
-    Polyline::registerNative(env);
 
     // Map
     MapRenderer::registerNative(env);

@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -109,23 +108,17 @@ public class MapPaddingActivity extends AppCompatActivity {
       .build();
 
     mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    mapboxMap.addMarker(new MarkerOptions().title("Center map").position(bangalore));
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-
-      case R.id.action_bangalore:
-        if (mapboxMap != null) {
-          moveToBangalore();
-        }
-        return true;
-
-      default:
-        return super.onOptionsItemSelected(item);
+    if (item.getItemId() == R.id.action_bangalore) {
+      if (mapboxMap != null) {
+        moveToBangalore();
+      }
+      return true;
     }
+    return super.onOptionsItemSelected(item);
   }
-
 }
 

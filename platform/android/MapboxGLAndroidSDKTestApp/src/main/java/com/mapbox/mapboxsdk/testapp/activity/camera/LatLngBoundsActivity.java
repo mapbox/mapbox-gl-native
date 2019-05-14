@@ -1,23 +1,31 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.view.LockableBottomSheetBehavior;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
  * Test activity showcasing using the LatLngBounds camera API.
@@ -43,6 +51,9 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   private static final int ANIMATION_DURATION_SHORT = 250;
   private static final int BOUNDS_PADDING_DIVIDER_SMALL = 3;
   private static final int BOUNDS_PADDING_DIVIDER_LARGE = 9;
+  private static final String SYMBOL_SOURCE_ID = "source=id";
+  private static final String SYMBOL_LAYER_ID = "layer=id";
+  private static final String ICON_ID = "marker";
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -60,6 +71,18 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   private void initMapView(Bundle savedInstanceState) {
     mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
+
+    mapView.addOnStyleImageMissingListener(id -> {
+      if (mapboxMap != null && id.equals(ICON_ID)) {
+        mapboxMap.getStyle(style -> {
+          Bitmap marker = BitmapUtils.getBitmapFromDrawable(
+            ResourcesCompat.getDrawable(getResources(), R.drawable.mapbox_marker_icon, getTheme())
+          );
+          assert marker != null;
+          style.addImage(id, marker);
+        });
+      }
+    });
     mapView.getMapAsync(map -> {
       mapboxMap = map;
       disableGestures();
@@ -81,9 +104,15 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   }
 
   private void addMarkers() {
+    final List<Feature> features = new ArrayList<>();
     for (LatLng location : LOCATIONS) {
-      mapboxMap.addMarker(new MarkerOptions().position(location));
+      features.add(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
     }
+
+    mapboxMap.getStyle(style -> {
+      style.addSource(new GeoJsonSource(SYMBOL_SOURCE_ID, FeatureCollection.fromFeatures(features)));
+      style.addLayer(new SymbolLayer(SYMBOL_LAYER_ID, SYMBOL_SOURCE_ID).withProperties(iconImage("marker")));
+    });
   }
 
   private void initFab() {
