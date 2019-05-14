@@ -927,7 +927,9 @@ jobs:
       - run:
           name: Get iOS code coverage
           command: |
+            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
               platform/ios/scripts/ios-code-coverage.sh CI
+            fi
       - run:
           name: Lint plist files
           command: make ios-lint
