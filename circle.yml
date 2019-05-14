@@ -18,7 +18,7 @@ workflows:
           firebase_device_id: "Nexus4"
           firebase_device_os: "19"
           image: android-ndk-r17c:1d5db0eb34
-          abi: x86-64
+          abi: x86
       - android-release:
           filters:
             tags:
