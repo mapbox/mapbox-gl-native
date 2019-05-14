@@ -57,8 +57,12 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderVectorSource::startRender(PaintParameters& parameters) {
-    tilePyramid.startRender(parameters);
+void RenderVectorSource::upload(gfx::UploadPass& parameters) {
+    tilePyramid.upload(parameters);
+}
+
+void RenderVectorSource::prepare(PaintParameters& parameters) {
+    tilePyramid.prepare(parameters);
 }
 
 void RenderVectorSource::finishRender(PaintParameters& parameters) {

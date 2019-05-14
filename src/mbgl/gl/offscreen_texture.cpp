@@ -25,6 +25,7 @@ public:
 
     void bind() override {
         if (!framebuffer) {
+            assert(!texture);
             texture = context.createTexture(size, gfx::TexturePixelType::RGBA, type);
             if (depth) {
                 framebuffer = context.createFramebuffer(*texture, *depth);

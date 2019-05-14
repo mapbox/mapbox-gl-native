@@ -3,6 +3,7 @@
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/upload_parameters.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/shaping.hpp>
@@ -13,8 +14,10 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/text/placement.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
+#include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -112,6 +115,122 @@ struct RenderableSegment {
     }
 };
 
+void uploadIcon(gfx::UploadPass& uploadPass,
+                UploadParameters& uploadParameters,
+                const RenderTile& tile,
+                const LayerRenderData& renderData) {
+    assert(tile.tile.kind == Tile::Kind::Geometry);
+    auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
+    const auto& layout = bucket.layout;
+
+    const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
+                           layout.get<IconRotationAlignment>() == AlignmentType::Map;
+
+    if (alongLine) {
+        const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
+        reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols, tile.matrix,
+                            iconPropertyValues(evaluated, layout), tile, *bucket.iconSizeBinder,
+                            uploadParameters.state);
+
+        uploadPass.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer,
+                                      std::move(bucket.icon.dynamicVertices));
+    }
+}
+
+void uploadText(gfx::UploadPass& uploadPass,
+                UploadParameters& uploadParameters,
+                const RenderTile& tile,
+                const LayerRenderData& renderData,
+                bool& hasVariablePlacement) {
+    assert(tile.tile.kind == Tile::Kind::Geometry);
+    auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
+    const auto& layout = bucket.layout;
+
+    const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
+        layout.get<TextRotationAlignment>() == AlignmentType::Map;
+
+    if (alongLine) {
+        const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
+        reprojectLineLabels(bucket.text.dynamicVertices,
+                            bucket.text.placedSymbols,
+                            tile.matrix,
+                            textPropertyValues(evaluated, layout),
+                            tile,
+                            *bucket.textSizeBinder,
+                            uploadParameters.state);
+
+        uploadPass.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+    } else if (!layout.get<TextVariableAnchor>().empty()) {
+        bucket.text.dynamicVertices.clear();
+
+        hasVariablePlacement = false;
+
+        const auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(uploadParameters.state.getZoom());
+        const float tileScale = std::pow(2, uploadParameters.state.getZoom() - tile.tile.id.overscaledZ);
+        const bool rotateWithMap = layout.get<TextRotationAlignment>() == AlignmentType::Map;
+        const bool pitchWithMap = layout.get<TextPitchAlignment>() == AlignmentType::Map;
+        const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, uploadParameters.state.getZoom());
+        const auto labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, uploadParameters.state, pixelsToTileUnits);
+
+        for (const PlacedSymbol& symbol : bucket.text.placedSymbols) {
+            optional<VariableOffset> variableOffset;
+            if (!symbol.hidden && symbol.crossTileID != 0u) {
+                auto it = uploadParameters.variableOffsets.find(symbol.crossTileID);
+                if (it != uploadParameters.variableOffsets.end()) {
+                    hasVariablePlacement |= true;
+                    variableOffset = it->second;
+                }
+            }
+
+            if (!variableOffset) {
+                // These symbols are from a justification that is not being used, or a label that wasn't placed
+                // so we don't need to do the extra math to figure out what incremental shift to apply.
+                hideGlyphs(symbol.glyphOffsets.size(), bucket.text.dynamicVertices);
+            } else {
+                const Point<float> tileAnchor = symbol.anchorPoint;
+                const auto projectedAnchor = project(tileAnchor, pitchWithMap ? tile.matrix : labelPlaneMatrix);
+                const float perspectiveRatio = 0.5f + 0.5f * (uploadParameters.state.getCameraToCenterDistance() / projectedAnchor.second);
+                float renderTextSize = evaluateSizeForFeature(partiallyEvaluatedSize, symbol) * perspectiveRatio / util::ONE_EM;
+                if (pitchWithMap) {
+                    // Go from size in pixels to equivalent size in tile units
+                    renderTextSize *= bucket.tilePixelRatio / tileScale;
+                }
+
+                auto shift = calculateVariableRenderShift(
+                        (*variableOffset).anchor,
+                        (*variableOffset).width,
+                        (*variableOffset).height,
+                        (*variableOffset).radialOffset,
+                        (*variableOffset).textBoxScale,
+                        renderTextSize);
+
+                // Usual case is that we take the projected anchor and add the pixel-based shift
+                // calculated above. In the (somewhat weird) case of pitch-aligned text, we add an equivalent
+                // tile-unit based shift to the anchor before projecting to the label plane.
+                Point<float> shiftedAnchor;
+                if (pitchWithMap) {
+                    shiftedAnchor = project(Point<float>(tileAnchor.x + shift.x, tileAnchor.y + shift.y),
+                                            labelPlaneMatrix).first;
+                } else {
+                    if (rotateWithMap) {
+                        auto rotated = util::rotate(shift, -uploadParameters.state.getPitch());
+                        shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
+                                                    projectedAnchor.first.y + rotated.y);
+                    } else {
+                        shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
+                                                    projectedAnchor.first.y + shift.y);
+                    }
+                }
+
+                for (std::size_t i = 0; i < symbol.glyphOffsets.size(); i++) {
+                    addDynamicAttributes(shiftedAnchor, 0, bucket.text.dynamicVertices);
+                }
+            }
+        }
+        uploadPass.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+    }
+}
+
 template <typename DrawFn>
 void drawIcon(const DrawFn& draw,
               const RenderTile& tile,
@@ -129,18 +248,6 @@ void drawIcon(const DrawFn& draw,
 
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
         layout.get<IconRotationAlignment>() == AlignmentType::Map;
-
-    if (alongLine) {
-        reprojectLineLabels(bucket.icon.dynamicVertices,
-                            bucket.icon.placedSymbols,
-                            tile.matrix,
-                            values,
-                            tile,
-                            *bucket.iconSizeBinder,
-                            parameters.state);
-
-        parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
-    }
 
     const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
     const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
@@ -206,7 +313,8 @@ void drawText(const DrawFn& draw,
               const LayerRenderData& renderData,
               SegmentsWrapper textSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
-              const PaintParameters& parameters) {
+              const PaintParameters& parameters,
+              bool hasVariablePlacement) {
     assert(tile.tile.kind == Tile::Kind::Geometry);
     auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
@@ -218,94 +326,15 @@ void drawText(const DrawFn& draw,
 
     auto values = textPropertyValues(evaluated, layout);
     const auto& paintPropertyValues = RenderSymbolLayer::textPaintProperties(evaluated);
-    bool hasVariablePacement = false;
 
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
         layout.get<TextRotationAlignment>() == AlignmentType::Map;
-
-    if (alongLine) {
-        reprojectLineLabels(bucket.text.dynamicVertices,
-                            bucket.text.placedSymbols,
-                            tile.matrix,
-                            values,
-                            tile,
-                            *bucket.textSizeBinder,
-                            parameters.state);
-
-        parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
-    } else if (!layout.get<TextVariableAnchor>().empty()) {
-        bucket.text.dynamicVertices.clear();
-
-        const auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(parameters.state.getZoom());
-        const float tileScale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
-        const bool rotateWithMap = layout.get<TextRotationAlignment>() == AlignmentType::Map;
-        const bool pitchWithMap = layout.get<TextPitchAlignment>() == AlignmentType::Map;
-        const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, parameters.state.getZoom());
-        const auto labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, parameters.state, pixelsToTileUnits);
-
-        for (const PlacedSymbol& symbol : bucket.text.placedSymbols) {
-            optional<VariableOffset> variableOffset;
-            if (!symbol.hidden && symbol.crossTileID != 0u) {
-                auto it = parameters.variableOffsets.get().find(symbol.crossTileID);
-                if (it != parameters.variableOffsets.get().end()) {
-                    variableOffset = it->second;
-                    hasVariablePacement |= true;
-                }
-            }
-
-            if (!variableOffset) {
-                // These symbols are from a justification that is not being used, or a label that wasn't placed
-                // so we don't need to do the extra math to figure out what incremental shift to apply.
-                hideGlyphs(symbol.glyphOffsets.size(), bucket.text.dynamicVertices);
-            } else {
-                const Point<float> tileAnchor = symbol.anchorPoint;
-                const auto projectedAnchor = project(tileAnchor, pitchWithMap ? tile.matrix : labelPlaneMatrix);
-                const float perspectiveRatio = 0.5f + 0.5f * (parameters.state.getCameraToCenterDistance() / projectedAnchor.second);
-                float renderTextSize = evaluateSizeForFeature(partiallyEvaluatedSize, symbol) * perspectiveRatio / util::ONE_EM;
-                if (pitchWithMap) {
-                    // Go from size in pixels to equivalent size in tile units
-                    renderTextSize *= bucket.tilePixelRatio / tileScale;
-                }
-
-                auto shift = calculateVariableRenderShift(
-                        (*variableOffset).anchor,
-                        (*variableOffset).width,
-                        (*variableOffset).height,
-                        (*variableOffset).radialOffset,
-                        (*variableOffset).textBoxScale,
-                        renderTextSize);
-
-                // Usual case is that we take the projected anchor and add the pixel-based shift
-                // calculated above. In the (somewhat weird) case of pitch-aligned text, we add an equivalent
-                // tile-unit based shift to the anchor before projecting to the label plane.
-                Point<float> shiftedAnchor;
-                if (pitchWithMap) {
-                    shiftedAnchor = project(Point<float>(tileAnchor.x + shift.x, tileAnchor.y + shift.y),
-                                            labelPlaneMatrix).first;
-                } else {
-                    if (rotateWithMap) {
-                        auto rotated = util::rotate(shift, -parameters.state.getPitch());
-                        shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
-                                                    projectedAnchor.first.y + rotated.y);
-                    } else {
-                        shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
-                                                    projectedAnchor.first.y + shift.y);
-                    }
-                }
-
-                for (std::size_t i = 0; i < symbol.glyphOffsets.size(); i++) {
-                    addDynamicAttributes(shiftedAnchor, 0, bucket.text.dynamicVertices);
-                }
-            }
-        }
-        parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
-    }
 
     const Size texsize = geometryTile.glyphAtlasTexture->size;
 
     if (values.hasHalo) {
         draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePlacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
             bucket.text,
             textSegments,
             bucket.textSizeBinder,
@@ -320,7 +349,7 @@ void drawText(const DrawFn& draw,
 
     if (values.hasFill) {
         draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+            SymbolSDFTextProgram::layoutUniformValues(true, hasVariablePlacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
             bucket.text,
             textSegments,
             bucket.textSizeBinder,
@@ -370,7 +399,8 @@ void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters)
 
     passes = ((evaluated.get<style::IconOpacity>().constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
               || (evaluated.get<style::TextOpacity>().constantOr(1) > 0 && hasTextOpacity && textSize > 0))
-             ? RenderPass::Translucent : RenderPass::None;
+             ? RenderPass::Translucent | RenderPass::Upload : RenderPass::None;
+
     evaluatedProperties = std::move(properties);
 }
 
@@ -396,6 +426,24 @@ const std::vector<std::reference_wrapper<RenderTile>>& RenderSymbolLayer::getRen
 
 SymbolBucket* RenderSymbolLayer::getSymbolBucket(const RenderTile& renderTile) const {
     return renderTile.tile.getBucket<SymbolBucket>(*baseImpl);
+}
+
+void RenderSymbolLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& uploadParameters) {
+    for (const RenderTile& tile : renderTiles) {
+        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        if (!renderData) {
+            continue;
+        }
+
+        auto& bucket = static_cast<SymbolBucket&>(*renderData->bucket);
+        if (bucket.hasIconData()) {
+            uploadIcon(uploadPass, uploadParameters, tile, *renderData);
+        }
+
+        if (bucket.hasTextData()) {
+            uploadText(uploadPass, uploadParameters, tile, *renderData, hasVariablePlacement);
+        }
+    }
 }
 
 void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
@@ -504,7 +552,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             if (sortFeaturesByKey) {
                 addRenderables(bucket.text.segments, true /*isText*/);
             } else {
-                drawText(draw, tile, *renderData, std::ref(bucket.text.segments), bucketPaintProperties, parameters);
+                drawText(draw, tile, *renderData, std::ref(bucket.text.segments), bucketPaintProperties, parameters, hasVariablePlacement);
             }
         }
 
@@ -518,7 +566,6 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 {{
                     parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
                     parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
-                    
                 }};
             parameters.programs.getSymbolLayerPrograms().collisionBox.draw(
                 parameters.context,
@@ -555,7 +602,6 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 {{
                     parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
                     parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
-                    
                 }};
 
             parameters.programs.getSymbolLayerPrograms().collisionCircle.draw(
@@ -588,7 +634,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     if (sortFeaturesByKey) {
         for (auto& renderable : renderableSegments) {
             if (renderable.isText) {
-                drawText(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
+                drawText(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters, hasVariablePlacement);
             } else {
                 drawIcon(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
             }

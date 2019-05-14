@@ -123,8 +123,12 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderGeoJSONSource::startRender(PaintParameters& parameters) {
-    tilePyramid.startRender(parameters);
+void RenderGeoJSONSource::upload(gfx::UploadPass& parameters) {
+    tilePyramid.upload(parameters);
+}
+
+void RenderGeoJSONSource::prepare(PaintParameters& parameters) {
+    tilePyramid.prepare(parameters);
 }
 
 void RenderGeoJSONSource::finishRender(PaintParameters& parameters) {

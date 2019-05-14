@@ -1,7 +1,7 @@
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/programs/raster_program.hpp>
-#include <mbgl/gfx/context.hpp>
+#include <mbgl/gfx/upload_pass.hpp>
 #include <mbgl/util/id.hpp>
 
 namespace mbgl {
@@ -20,16 +20,16 @@ RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_)
 
 RasterBucket::~RasterBucket() = default;
 
-void RasterBucket::upload(gfx::Context& context) {
+void RasterBucket::upload(gfx::UploadPass& uploadPass) {
     if (!hasData()) {
         return;
     }
     if (!texture) {
-        texture = context.createTexture(*image);
+        texture = uploadPass.createTexture(*image);
     }
     if (!segments.empty()) {
-        vertexBuffer = context.createVertexBuffer(std::move(vertices));
-        indexBuffer = context.createIndexBuffer(std::move(indices));
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        indexBuffer = uploadPass.createIndexBuffer(std::move(indices));
     }
     uploaded = true;
 }

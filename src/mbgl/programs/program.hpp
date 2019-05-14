@@ -2,6 +2,7 @@
 
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gfx/uniform.hpp>
+#include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/program_parameters.hpp>

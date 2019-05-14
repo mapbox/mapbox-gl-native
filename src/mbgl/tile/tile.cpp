@@ -1,6 +1,5 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>

@@ -1,5 +1,6 @@
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/gfx/context.hpp>
+#include <mbgl/gfx/upload_pass.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 
 namespace mbgl {
@@ -49,12 +50,7 @@ static gfx::VertexVector<HeatmapTextureLayoutVertex> heatmapTextureVertices() {
 }
 
 RenderStaticData::RenderStaticData(gfx::Context& context, float pixelRatio, const optional<std::string>& programCacheDir)
-    : tileVertexBuffer(context.createVertexBuffer(tileVertices())),
-      rasterVertexBuffer(context.createVertexBuffer(rasterVertices())),
-      heatmapTextureVertexBuffer(context.createVertexBuffer(heatmapTextureVertices())),
-      quadTriangleIndexBuffer(context.createIndexBuffer(quadTriangleIndices())),
-      tileBorderIndexBuffer(context.createIndexBuffer(tileLineStripIndices())),
-      programs(context, ProgramParameters { pixelRatio, false, programCacheDir })
+    : programs(context, ProgramParameters { pixelRatio, false, programCacheDir })
 #ifndef NDEBUG
     , overdrawPrograms(context, ProgramParameters { pixelRatio, true, programCacheDir })
 #endif
@@ -63,6 +59,17 @@ RenderStaticData::RenderStaticData(gfx::Context& context, float pixelRatio, cons
     tileBorderSegments.emplace_back(0, 0, 4, 5);
     rasterSegments.emplace_back(0, 0, 4, 6);
     heatmapTextureSegments.emplace_back(0, 0, 4, 6);
+}
+
+void RenderStaticData::upload(gfx::UploadPass& uploadPass) {
+    if (!uploaded) {
+        tileVertexBuffer = uploadPass.createVertexBuffer(tileVertices());
+        rasterVertexBuffer = uploadPass.createVertexBuffer(rasterVertices());
+        heatmapTextureVertexBuffer = uploadPass.createVertexBuffer(heatmapTextureVertices());
+        quadTriangleIndexBuffer = uploadPass.createIndexBuffer(quadTriangleIndices());
+        tileBorderIndexBuffer = uploadPass.createIndexBuffer(tileLineStripIndices());
+        uploaded = true;
+    }
 }
 
 } // namespace mbgl

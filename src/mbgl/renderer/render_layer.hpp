@@ -13,6 +13,7 @@ namespace mbgl {
 class Bucket;
 class TransitionParameters;
 class PropertyEvaluationParameters;
+class UploadParameters;
 class PaintParameters;
 class RenderSource;
 class RenderLayerSymbolInterface;
@@ -62,6 +63,7 @@ public:
     // Checks whether the given zoom is inside this layer zoom range.
     bool supportsZoom(float zoom) const;
 
+    virtual void upload(gfx::UploadPass&, UploadParameters&) {}
     virtual void render(PaintParameters&, RenderSource*) = 0;
 
     // Check wether the given geometry intersects

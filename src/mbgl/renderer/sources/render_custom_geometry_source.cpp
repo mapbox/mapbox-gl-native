@@ -47,8 +47,12 @@ void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_
                        });
 }
 
-void RenderCustomGeometrySource::startRender(PaintParameters& parameters) {
-    tilePyramid.startRender(parameters);
+void RenderCustomGeometrySource::upload(gfx::UploadPass& uploadPass) {
+    tilePyramid.upload(uploadPass);
+}
+
+void RenderCustomGeometrySource::prepare(PaintParameters& parameters) {
+    tilePyramid.prepare(parameters);
 }
 
 void RenderCustomGeometrySource::finishRender(PaintParameters& parameters) {

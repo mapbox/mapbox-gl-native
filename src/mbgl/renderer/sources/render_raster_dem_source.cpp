@@ -126,9 +126,13 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
     RenderSource::onTileChanged(tile);
 }
 
-void RenderRasterDEMSource::startRender(PaintParameters& parameters) {
+void RenderRasterDEMSource::upload(gfx::UploadPass& parameters) {
+    tilePyramid.upload(parameters);
+}
+
+void RenderRasterDEMSource::prepare(PaintParameters& parameters) {
     algorithm::updateTileMasks(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(parameters);
+    tilePyramid.prepare(parameters);
 }
 
 void RenderRasterDEMSource::finishRender(PaintParameters& parameters) {

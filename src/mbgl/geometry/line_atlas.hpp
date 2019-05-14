@@ -11,7 +11,7 @@
 namespace mbgl {
 
 namespace gfx {
-class Context;
+class UploadPass;
 } // namespace gfx
 
 class LinePatternPos {
@@ -32,11 +32,11 @@ public:
     ~LineAtlas();
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    gfx::TextureBinding textureBinding(gfx::Context&);
+    gfx::TextureBinding textureBinding();
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gfx::Context&);
+    void upload(gfx::UploadPass&);
 
     LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
     LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);

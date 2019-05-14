@@ -17,8 +17,7 @@ PaintParameters::PaintParameters(gfx::Context& context_,
                     const EvaluatedLight& evaluatedLight_,
                     RenderStaticData& staticData_,
                     ImageManager& imageManager_,
-                    LineAtlas& lineAtlas_,
-                    Placement::VariableOffsets variableOffsets_)
+                    LineAtlas& lineAtlas_)
     : context(context_),
     backend(backend_),
     encoder(context.createCommandEncoder()),
@@ -31,7 +30,6 @@ PaintParameters::PaintParameters(gfx::Context& context_,
     debugOptions(updateParameters.debugOptions),
     timePoint(updateParameters.timePoint),
     pixelRatio(pixelRatio_),
-    variableOffsets(variableOffsets_),
 #ifndef NDEBUG
     programs((debugOptions & MapDebugOptions::Overdraw) ? staticData_.overdrawPrograms : staticData_.programs)
 #else
@@ -135,7 +133,7 @@ void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_w
             },
             gfx::ColorMode::disabled(),
             gfx::CullFaceMode::disabled(),
-            staticData.quadTriangleIndexBuffer,
+            *staticData.quadTriangleIndexBuffer,
             staticData.tileTriangleSegments,
             program.computeAllUniformValues(
                 ClippingMaskProgram::LayoutUniformValues {
@@ -146,7 +144,7 @@ void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_w
                 state.getZoom()
             ),
             program.computeAllAttributeBindings(
-                staticData.tileVertexBuffer,
+                *staticData.tileVertexBuffer,
                 paintAttributeData,
                 properties
             ),

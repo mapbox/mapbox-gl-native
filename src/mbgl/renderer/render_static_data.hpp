@@ -14,18 +14,21 @@
 namespace mbgl {
 namespace gfx {
 class Context;
+class UploadPass;
 } // namespace gfx
 
 class RenderStaticData {
 public:
     RenderStaticData(gfx::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
 
-    gfx::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>> tileVertexBuffer;
-    gfx::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
-    gfx::VertexBuffer<HeatmapTextureLayoutVertex> heatmapTextureVertexBuffer;
+    void upload(gfx::UploadPass&);
 
-    gfx::IndexBuffer quadTriangleIndexBuffer;
-    gfx::IndexBuffer tileBorderIndexBuffer;
+    optional<gfx::VertexBuffer<gfx::Vertex<PositionOnlyLayoutAttributes>>> tileVertexBuffer;
+    optional<gfx::VertexBuffer<RasterLayoutVertex>> rasterVertexBuffer;
+    optional<gfx::VertexBuffer<HeatmapTextureLayoutVertex>> heatmapTextureVertexBuffer;
+
+    optional<gfx::IndexBuffer> quadTriangleIndexBuffer;
+    optional<gfx::IndexBuffer> tileBorderIndexBuffer;
 
     SegmentVector<BackgroundAttributes> tileTriangleSegments;
     SegmentVector<DebugAttributes> tileBorderSegments;
@@ -34,6 +37,7 @@ public:
 
     optional<gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>> depthRenderbuffer;
     bool has3D = false;
+    bool uploaded = false;
     Size backendSize;
 
     Programs programs;

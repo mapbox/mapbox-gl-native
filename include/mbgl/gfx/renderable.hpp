@@ -23,6 +23,7 @@ protected:
     Renderable(const Size size_, std::unique_ptr<RenderableResource> resource_)
         : size(size_), resource(std::move(resource_)) {
     }
+    virtual ~Renderable() = default;
 
 public:
     Size getSize() const {
@@ -34,6 +35,8 @@ public:
         assert(resource);
         return static_cast<T&>(*resource);
     }
+
+    virtual void wait() {}
 
 protected:
     Size size;

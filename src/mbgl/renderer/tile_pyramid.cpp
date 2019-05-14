@@ -40,9 +40,15 @@ bool TilePyramid::isLoaded() const {
     return true;
 }
 
-void TilePyramid::startRender(PaintParameters& parameters) {
+void TilePyramid::upload(gfx::UploadPass& parameters) {
     for (auto& tile : renderTiles) {
-        tile.startRender(parameters);
+        tile.upload(parameters);
+    }
+}
+
+void TilePyramid::prepare(PaintParameters& parameters) {
+    for (auto& tile : renderTiles) {
+        tile.prepare(parameters);
     }
 }
 

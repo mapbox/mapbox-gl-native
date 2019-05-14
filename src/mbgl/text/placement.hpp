@@ -105,8 +105,8 @@ public:
     void setStale();
     
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
-    using VariableOffsets = std::reference_wrapper<const std::unordered_map<uint32_t, VariableOffset>>;
-    VariableOffsets getVariableOffsets() const { return std::cref(variableOffsets); }
+    using VariableOffsets = std::unordered_map<uint32_t, VariableOffset>;
+    const VariableOffsets& getVariableOffsets() const { return variableOffsets; }
 
 private:
     void placeLayerBucket(

@@ -18,8 +18,7 @@ void ShaderDeleter::operator()(ShaderID id) const {
 }
 
 void BufferDeleter::operator()(BufferID id) const {
-    assert(context);
-    context->abandonedBuffers.push_back(id);
+    context.abandonedBuffers.push_back(id);
 }
 
 void TextureDeleter::operator()(TextureID id) const {

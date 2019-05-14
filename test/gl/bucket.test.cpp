@@ -56,7 +56,9 @@ TEST(Buckets, CircleBucket) {
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_TRUE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 }
@@ -76,7 +78,9 @@ TEST(Buckets, FillBucket) {
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 }
 
@@ -100,7 +104,9 @@ TEST(Buckets, LineBucket) {
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 }
 
@@ -134,7 +140,9 @@ TEST(Buckets, SymbolBucket) {
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 }
 
@@ -150,7 +158,9 @@ TEST(Buckets, RasterBucket) {
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
-    bucket.upload(context);
+    auto commandEncoder = context.createCommandEncoder();
+    auto uploadPass = commandEncoder->createUploadPass("upload");
+    bucket.upload(*uploadPass);
     ASSERT_FALSE(bucket.needsUpload());
 
     bucket.clear();

@@ -20,20 +20,17 @@
 
 namespace mbgl {
 
-class DebugBucket;
 class LayerRenderData;
 class TransformState;
 class TileObserver;
 class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
-
 class CollisionIndex;
 
-namespace gl {
-class Context;
-} // namespace gl
-
+namespace gfx {
+class UploadPass;
+} // namespace gfx
 
 class Tile {
 public:
@@ -55,7 +52,7 @@ public:
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel();
 
-    virtual void upload(gfx::Context&) = 0;
+    virtual void upload(gfx::UploadPass&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
     virtual const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const {
         assert(false);
@@ -140,9 +137,6 @@ public:
     OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;
-
-    // Contains the tile ID string for painting debug information.
-    std::unique_ptr<DebugBucket> debugBucket;
 
 protected:
     bool triedOptional = false;

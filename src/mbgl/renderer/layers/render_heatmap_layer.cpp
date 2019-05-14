@@ -41,7 +41,7 @@ void RenderHeatmapLayer::evaluate(const PropertyEvaluationParameters& parameters
         unevaluated.evaluate(parameters));
 
     passes = (properties->evaluated.get<style::HeatmapOpacity>() > 0)
-            ? (RenderPass::Translucent | RenderPass::Pass3D)
+            ? (RenderPass::Translucent | RenderPass::Pass3D | RenderPass::Upload)
             : RenderPass::None;
 
     evaluatedProperties = std::move(properties);
@@ -55,6 +55,13 @@ bool RenderHeatmapLayer::hasCrossfade() const {
     return false;
 }
 
+void RenderHeatmapLayer::upload(gfx::UploadPass& uploadPass, UploadParameters&) {
+    if (!colorRampTexture) {
+        colorRampTexture =
+            uploadPass.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
+    }
+}
+
 void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
@@ -64,9 +71,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto& viewportSize = parameters.staticData.backendSize;
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
 
-        if (!colorRampTexture) {
-            colorRampTexture = parameters.context.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
-        }
+        assert(colorRampTexture);
 
         if (!renderTexture || renderTexture->getSize() != size) {
             renderTexture.reset();
@@ -101,7 +106,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
             auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap;
-       
+
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 HeatmapProgram::LayoutUniformValues {
                     uniforms::intensity::Value( evaluated.get<style::HeatmapIntensity>() ),
@@ -159,7 +164,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.state.getZoom()
         );
         const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            parameters.staticData.heatmapTextureVertexBuffer,
+            *parameters.staticData.heatmapTextureVertexBuffer,
             paintAttributeData,
             properties
         );
@@ -174,7 +179,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gfx::CullFaceMode::disabled(),
-            parameters.staticData.quadTriangleIndexBuffer,
+            *parameters.staticData.quadTriangleIndexBuffer,
             parameters.staticData.heatmapTextureSegments,
             allUniformValues,
             allAttributeBindings,

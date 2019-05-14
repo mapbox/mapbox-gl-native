@@ -9,7 +9,7 @@
 namespace mbgl {
 
 namespace gfx {
-class Context;
+class UploadPass;
 } // namespace gfx
 
 class RenderLayer;
@@ -33,7 +33,7 @@ public:
 
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
-    virtual void upload(gfx::Context&) = 0;
+    virtual void upload(gfx::UploadPass&) = 0;
 
     virtual bool hasData() const = 0;
 
