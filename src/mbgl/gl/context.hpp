@@ -8,6 +8,7 @@
 #include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
+#include <mbgl/gfx/texture.hpp>
 #include <mbgl/gfx/draw_mode.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gfx/stencil_mode.hpp>
@@ -41,6 +42,8 @@ public:
     ~Context() override;
     Context(const Context&) = delete;
     Context& operator=(const Context& other) = delete;
+
+    std::unique_ptr<gfx::CommandEncoder> createCommandEncoder() override;
 
     void initializeExtensions(const std::function<gl::ProcAddress(const char*)>&);
 
@@ -189,21 +192,15 @@ private:
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
 
-    std::unique_ptr<gfx::VertexBufferResource> createVertexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
-    void updateVertexBufferResource(gfx::VertexBufferResource&, const void* data, std::size_t size) override;
-    std::unique_ptr<gfx::IndexBufferResource> createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType) override;
-    void updateIndexBufferResource(gfx::IndexBufferResource&, const void* data, std::size_t size) override;
-
-    std::unique_ptr<gfx::TextureResource> createTextureResource(Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
-    void updateTextureResource(gfx::TextureResource&, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
-    void updateTextureResourceSub(gfx::TextureResource&, const uint16_t xOffset, const uint16_t yOffset, Size, const void* data, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
-
     std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
         Size, gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
     std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
         Size,
         gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
         gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
+
+    std::unique_ptr<gfx::TextureResource>
+        createTextureResource(Size, gfx::TexturePixelType, gfx::TextureChannelDataType) override;
 
     std::unique_ptr<gfx::RenderbufferResource> createRenderbufferResource(gfx::RenderbufferPixelType, Size size) override;
 
@@ -217,8 +214,6 @@ private:
 
     VertexArray createVertexArray();
     bool supportsVertexArrays() const;
-
-    std::unique_ptr<gfx::CommandEncoder> createCommandEncoder() override;
 
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;

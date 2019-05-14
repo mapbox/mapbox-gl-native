@@ -10,8 +10,8 @@
 namespace mbgl {
 
 namespace gfx {
-    class Texture;
-    class Context;
+class UploadPass;
+class Texture;
 } // namespace gfx
 
 class ImageManager;
@@ -60,9 +60,9 @@ public:
     ImagePositions iconPositions;
     ImagePositions patternPositions;
 
-    void patchUpdatedImages(gfx::Context&, gfx::Texture&, const ImageManager&);
+    void patchUpdatedImages(gfx::UploadPass&, gfx::Texture&, const ImageManager&);
 private:
-    void patchUpdatedImage(gfx::Context&, gfx::Texture&, ImagePosition& position, const ImageManager& imageManager, const std::string& name, uint16_t version);
+    void patchUpdatedImage(gfx::UploadPass&, gfx::Texture&, ImagePosition& position, const ImageManager& imageManager, const std::string& name, uint16_t version);
 };
 
 ImageAtlas makeImageAtlas(const ImageMap&, const ImageMap&, const std::unordered_map<std::string, uint32_t>& versionMap);

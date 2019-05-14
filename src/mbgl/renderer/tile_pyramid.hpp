@@ -43,7 +43,8 @@ public:
                 optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
-    void startRender(PaintParameters&);
+    void upload(gfx::UploadPass&);
+    void prepare(PaintParameters&);
     void finishRender(PaintParameters&);
 
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();

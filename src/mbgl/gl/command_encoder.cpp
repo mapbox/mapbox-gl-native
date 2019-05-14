@@ -1,4 +1,5 @@
 #include <mbgl/gl/command_encoder.hpp>
+#include <mbgl/gl/upload_pass.hpp>
 #include <mbgl/gl/render_pass.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/renderable_resource.hpp>
@@ -13,6 +14,11 @@ namespace gl {
 CommandEncoder::~CommandEncoder() {
     const auto debugGroup(createDebugGroup("cleanup"));
     context.performCleanup();
+}
+
+std::unique_ptr<gfx::UploadPass>
+CommandEncoder::createUploadPass(const char* name) {
+    return std::make_unique<gl::UploadPass>(*this, name);
 }
 
 std::unique_ptr<gfx::RenderPass>

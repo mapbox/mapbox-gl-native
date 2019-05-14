@@ -162,7 +162,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 parameters.state.getZoom()
             );
             const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-                parameters.staticData.rasterVertexBuffer,
+                *parameters.staticData.rasterVertexBuffer,
                 paintAttributeData,
                 properties
             );
@@ -177,7 +177,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 gfx::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 gfx::CullFaceMode::disabled(),
-                parameters.staticData.quadTriangleIndexBuffer,
+                *parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.rasterSegments,
                 allUniformValues,
                 allAttributeBindings,
@@ -204,8 +204,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             } else {
                 // Draw the full tile.
                 draw(parameters.matrixForTile(tile.id, true),
-                     parameters.staticData.rasterVertexBuffer,
-                     parameters.staticData.quadTriangleIndexBuffer,
+                     *parameters.staticData.rasterVertexBuffer,
+                     *parameters.staticData.quadTriangleIndexBuffer,
                      parameters.staticData.rasterSegments,
                      tile.id,
                      HillshadeProgram::TextureBindings{

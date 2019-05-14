@@ -2,6 +2,7 @@
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/gfx/upload_pass.hpp>
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/renderer/image_manager_observer.hpp>
 
@@ -285,18 +286,19 @@ Size ImageManager::getPixelSize() const {
     };
 }
 
-void ImageManager::upload(gfx::Context& context) {
+void ImageManager::upload(gfx::UploadPass& uploadPass) {
     if (!atlasTexture) {
-        atlasTexture = context.createTexture(atlasImage);
+        atlasTexture = uploadPass.createTexture(atlasImage);
     } else if (dirty) {
-        context.updateTexture(*atlasTexture, atlasImage);
+        uploadPass.updateTexture(*atlasTexture, atlasImage);
     }
 
     dirty = false;
 }
 
-gfx::TextureBinding ImageManager::textureBinding(gfx::Context& context) {
-    upload(context);
+gfx::TextureBinding ImageManager::textureBinding() {
+    assert(atlasTexture);
+    assert(!dirty);
     return { atlasTexture->getResource(), gfx::TextureFilterType::Linear };
 }
 

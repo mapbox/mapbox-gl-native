@@ -54,7 +54,7 @@ public:
                  const float tilePixelRatio);
     ~SymbolBucket() override;
 
-    void upload(gfx::Context&) override;
+    void upload(gfx::UploadPass&) override;
     bool hasData() const override;
     bool supportsLayer(const style::Layer::Impl&) const override;
     bool hasTextData() const;

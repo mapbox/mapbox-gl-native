@@ -7,7 +7,6 @@
 #include <mbgl/gfx/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/text/placement.hpp>
 
 #include <array>
 #include <map>
@@ -41,8 +40,7 @@ public:
                     const EvaluatedLight&,
                     RenderStaticData&,
                     ImageManager&,
-                    LineAtlas&,
-                    Placement::VariableOffsets);
+                    LineAtlas&);
     ~PaintParameters();
 
     gfx::Context& context;
@@ -63,7 +61,6 @@ public:
     TimePoint timePoint;
 
     float pixelRatio;
-    Placement::VariableOffsets variableOffsets;
     std::array<float, 2> pixelsToGLUnits;
 
     Programs& programs;

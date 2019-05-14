@@ -6,6 +6,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/upload_parameters.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
@@ -16,6 +17,7 @@
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/gfx/renderer_backend.hpp>
+#include <mbgl/gfx/upload_pass.hpp>
 #include <mbgl/gfx/render_pass.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/gfx/context.hpp>
@@ -347,8 +349,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
+    auto& context = backend.getContext();
+
+    // Blocks execution until the renderable is available.
+    backend.getDefaultRenderable().wait();
+
     PaintParameters parameters {
-        backend.getContext(),
+        context,
         pixelRatio,
         backend,
         updateParameters,
@@ -356,25 +363,51 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         *staticData,
         *imageManager,
         *lineAtlas,
-        placement->getVariableOffsets()
     };
 
     parameters.symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
 
+    // TODO: move this pass to before the PaintParameters initialization
+    // - PREPARE PASS -------------------------------------------------------------------------------
+    // Runs an initialization pass for all sources.
+    {
+        // Update all matrices and generate data that we should upload to the GPU.
+        for (const auto& entry : renderSources) {
+            if (entry.second->isEnabled()) {
+                entry.second->prepare(parameters);
+            }
+        }
+    }
+
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
-        const auto debugGroup(parameters.encoder->createDebugGroup("upload"));
+        const auto uploadPass = parameters.encoder->createUploadPass("upload");
 
-        parameters.imageManager.upload(parameters.context);
-        parameters.lineAtlas.upload(parameters.context);
-        
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
             if (entry.second->isEnabled()) {
-                entry.second->startRender(parameters);
+                entry.second->upload(*uploadPass);
             }
         }
+
+        UploadParameters uploadParameters{
+            updateParameters.transformState,
+            placement->getVariableOffsets(),
+            *imageManager,
+            *lineAtlas,
+        };
+
+        for (auto& renderItem : renderItems) {
+            RenderLayer& renderLayer = renderItem.layer;
+            if (renderLayer.hasRenderPass(RenderPass::Upload)) {
+                renderLayer.upload(*uploadPass, uploadParameters);
+            }
+        }
+
+        staticData->upload(*uploadPass);
+        imageManager->upload(*uploadPass);
+        lineAtlas->upload(*uploadPass);
     }
 
     // - 3D PASS -------------------------------------------------------------------------------------

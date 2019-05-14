@@ -1,5 +1,4 @@
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
-#include <mbgl/programs/fill_program.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/string.hpp>
@@ -16,17 +15,13 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
                          const bool complete_,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_,
-                         MapDebugOptions debugMode_,
-                         gfx::Context& context)
+                         MapDebugOptions debugMode_)
     : renderable(renderable_),
       complete(complete_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_),
       drawScopeID("__debug/" + util::toHex(util::nextID())) {
-
-    gfx::VertexVector<FillLayoutVertex> vertices;
-    gfx::IndexVector<gfx::Lines> indices;
 
     auto addText = [&] (const std::string& text, double left, double baseline, double scale) {
         for (uint8_t c : text) {
@@ -77,10 +72,12 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
     }
 
     segments.emplace_back(0, 0, vertices.elements(), indices.elements());
+}
 
+void DebugBucket::upload(gfx::UploadPass& uploadPass) {
     if (!vertices.empty()) {
-        vertexBuffer = context.createVertexBuffer(std::move(vertices));
-        indexBuffer = context.createIndexBuffer(std::move(indices));
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        indexBuffer = uploadPass.createIndexBuffer(std::move(indices));
     }
 }
 

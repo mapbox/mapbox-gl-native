@@ -6,16 +6,23 @@
 #include <mbgl/renderer/tile_mask.hpp>
 
 #include <array>
+#include <memory>
 
 namespace mbgl {
+
+namespace gfx {
+class UploadPass;
+} // namespace gfx
 
 class Tile;
 class TransformState;
 class PaintParameters;
+class DebugBucket;
 
 class RenderTile final {
 public:
-    RenderTile(UnwrappedTileID id_, Tile& tile_) : id(std::move(id_)), tile(tile_) {}
+    RenderTile(UnwrappedTileID, Tile&);
+    ~RenderTile();
     RenderTile(const RenderTile&) = delete;
     RenderTile(RenderTile&&) = default;
     RenderTile& operator=(const RenderTile&) = delete;
@@ -26,6 +33,8 @@ public:
     mat4 matrix;
     mat4 nearClippedMatrix;
     bool used = false;
+    // Contains the tile ID string for painting debug information.
+    std::unique_ptr<DebugBucket> debugBucket;
 
     mat4 translatedMatrix(const std::array<float, 2>& translate,
                           style::TranslateAnchorType anchor,
@@ -36,7 +45,8 @@ public:
                               const TransformState&) const;
 
     void setMask(TileMask&&);
-    void startRender(PaintParameters&);
+    void upload(gfx::UploadPass&);
+    void prepare(PaintParameters&);
     void finishRender(PaintParameters&);
 
     mat4 translateVtxMatrix(const mat4& tileMatrix,

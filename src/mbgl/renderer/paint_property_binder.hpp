@@ -3,6 +3,7 @@
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/gfx/uniform.hpp>
 #include <mbgl/gfx/attribute.hpp>
+#include <mbgl/gfx/upload_pass.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/util/literal.hpp>
 #include <mbgl/util/type_list.hpp>
@@ -99,7 +100,7 @@ public:
                                       std::size_t length, const ImagePositions&,
                                       const optional<PatternDependency>&,
                                       const style::expression::Value&) = 0;
-    virtual void upload(gfx::Context& context) = 0;
+    virtual void upload(gfx::UploadPass&) = 0;
     virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) = 0;
     virtual std::tuple<ExpandToType<As, optional<gfx::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
     virtual std::tuple<ExpandToType<As, float>...> interpolationFactor(float currentZoom) const = 0;
@@ -118,7 +119,7 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
-    void upload(gfx::Context&) override {}
+    void upload(gfx::UploadPass&) override {}
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
 
     std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
@@ -145,7 +146,7 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
-    void upload(gfx::Context&) override {}
+    void upload(gfx::UploadPass&) override {}
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, const CrossfadeParameters&) override {
         if (!posA || !posB) {
@@ -196,8 +197,8 @@ public:
         }
     }
 
-    void upload(gfx::Context& context) override {
-        vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
+    void upload(gfx::UploadPass& uploadPass) override {
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertexVector));
     }
 
     std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
@@ -260,8 +261,8 @@ public:
         }
     }
 
-    void upload(gfx::Context& context) override {
-        vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
+    void upload(gfx::UploadPass& uploadPass) override {
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertexVector));
     }
 
     std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
@@ -352,10 +353,10 @@ public:
         }
     }
 
-    void upload(gfx::Context& context) override {
-        patternToVertexBuffer = context.createVertexBuffer(std::move(patternToVertexVector));
-        zoomInVertexBuffer = context.createVertexBuffer(std::move(zoomInVertexVector));
-        zoomOutVertexBuffer = context.createVertexBuffer(std::move(zoomOutVertexVector));
+    void upload(gfx::UploadPass& uploadPass) override {
+        patternToVertexBuffer = uploadPass.createVertexBuffer(std::move(patternToVertexVector));
+        zoomInVertexBuffer = uploadPass.createVertexBuffer(std::move(zoomInVertexVector));
+        zoomOutVertexBuffer = uploadPass.createVertexBuffer(std::move(zoomOutVertexVector));
     }
 
     std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {
@@ -492,9 +493,9 @@ public:
         });
     }
 
-    void upload(gfx::Context& context) {
+    void upload(gfx::UploadPass& uploadPass) {
         util::ignore({
-            (binders.template get<Ps>()->upload(context), 0)...
+            (binders.template get<Ps>()->upload(uploadPass), 0)...
         });
     }
 

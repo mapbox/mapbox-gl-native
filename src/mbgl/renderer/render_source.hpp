@@ -27,6 +27,10 @@ class RenderSourceObserver;
 class TileParameters;
 class CollisionIndex;
 
+namespace gfx {
+class UploadPass;
+} // namespace gfx
+
 class RenderSource : protected TileObserver {
 public:
     static std::unique_ptr<RenderSource> create(Immutable<style::Source::Impl>);
@@ -55,7 +59,8 @@ public:
                         bool needsRelayout,
                         const TileParameters&) = 0;
 
-    virtual void startRender(PaintParameters&) = 0;
+    virtual void upload(gfx::UploadPass&) = 0;
+    virtual void prepare(PaintParameters&) = 0;
     virtual void finishRender(PaintParameters&) = 0;
 
     // Returns a list of RenderTiles, sorted by tile id.

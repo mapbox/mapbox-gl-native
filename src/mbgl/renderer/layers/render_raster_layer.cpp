@@ -175,8 +175,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             } else {
                 // Draw the full tile.
                 draw(parameters.matrixForTile(tile.id, true),
-                     parameters.staticData.rasterVertexBuffer,
-                     parameters.staticData.quadTriangleIndexBuffer,
+                     *parameters.staticData.rasterVertexBuffer,
+                     *parameters.staticData.quadTriangleIndexBuffer,
                      parameters.staticData.rasterSegments,
                      RasterProgram::TextureBindings{
                          textures::image0::Value{ bucket.texture->getResource(), filter },

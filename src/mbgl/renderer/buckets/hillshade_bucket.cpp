@@ -26,18 +26,18 @@ DEMData& HillshadeBucket::getDEMData() {
     return demdata;
 }
 
-void HillshadeBucket::upload(gfx::Context& context) {
+void HillshadeBucket::upload(gfx::UploadPass& uploadPass) {
     if (!hasData()) {
         return;
     }
 
 
     const PremultipliedImage* image = demdata.getImage();
-    dem = context.createTexture(*image);
+    dem = uploadPass.createTexture(*image);
 
     if (!segments.empty()) {
-        vertexBuffer = context.createVertexBuffer(std::move(vertices));
-        indexBuffer = context.createIndexBuffer(std::move(indices));
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        indexBuffer = uploadPass.createIndexBuffer(std::move(indices));
     }
     uploaded = true;
 }

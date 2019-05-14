@@ -6,7 +6,6 @@ namespace mbgl {
 namespace gl {
 
 class Context;
-class RenderPass;
 
 class CommandEncoder final : public gfx::CommandEncoder {
 public:
@@ -15,8 +14,10 @@ public:
 
     ~CommandEncoder() override;
 
+    friend class UploadPass;
     friend class RenderPass;
 
+    std::unique_ptr<gfx::UploadPass> createUploadPass(const char* name) override;
     std::unique_ptr<gfx::RenderPass> createRenderPass(const char* name, const gfx::RenderPassDescriptor&) override;
     void present(gfx::Renderable&) override;
 

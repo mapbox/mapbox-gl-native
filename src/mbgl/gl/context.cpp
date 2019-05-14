@@ -1,8 +1,6 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/enum.hpp>
 #include <mbgl/gl/renderer_backend.hpp>
-#include <mbgl/gl/vertex_buffer_resource.hpp>
-#include <mbgl/gl/index_buffer_resource.hpp>
 #include <mbgl/gl/texture_resource.hpp>
 #include <mbgl/gl/renderbuffer_resource.hpp>
 #include <mbgl/gl/draw_scope_resource.hpp>
@@ -222,41 +220,6 @@ void Context::verifyProgramLinkage(ProgramID program_) {
     throw std::runtime_error("program failed to link");
 }
 
-std::unique_ptr<gfx::VertexBufferResource>
-Context::createVertexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
-    BufferID id = 0;
-    MBGL_CHECK_ERROR(glGenBuffers(1, &id));
-    UniqueBuffer result { std::move(id), { this } };
-    vertexBuffer = result;
-    MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, size, data, Enum<gfx::BufferUsageType>::to(usage)));
-    return std::make_unique<gl::VertexBufferResource>(std::move(result));
-}
-
-void Context::updateVertexBufferResource(gfx::VertexBufferResource& resource, const void* data, std::size_t size) {
-    vertexBuffer = static_cast<gl::VertexBufferResource&>(resource).buffer;
-    MBGL_CHECK_ERROR(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
-}
-
-std::unique_ptr<gfx::IndexBufferResource>
-Context::createIndexBufferResource(const void* data, std::size_t size, const gfx::BufferUsageType usage) {
-    BufferID id = 0;
-    MBGL_CHECK_ERROR(glGenBuffers(1, &id));
-    UniqueBuffer result { std::move(id), { this } };
-    bindVertexArray = 0;
-    globalVertexArrayState.indexBuffer = result;
-    MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, Enum<gfx::BufferUsageType>::to(usage)));
-    return std::make_unique<gl::IndexBufferResource>(std::move(result));
-}
-
-void Context::updateIndexBufferResource(gfx::IndexBufferResource& resource, const void* data, std::size_t size) {
-    // Be sure to unbind any existing vertex array object before binding the index buffer
-    // so that we don't mess up another VAO
-    bindVertexArray = 0;
-    globalVertexArrayState.indexBuffer = static_cast<gl::IndexBufferResource&>(resource).buffer;
-    MBGL_CHECK_ERROR(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, data));
-}
-
-
 UniqueTexture Context::createUniqueTexture() {
     if (pooledTextures.empty()) {
         pooledTextures.resize(TextureMax);
@@ -337,6 +300,32 @@ UniqueFramebuffer Context::createFramebuffer() {
     FramebufferID id = 0;
     MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
     return UniqueFramebuffer{ std::move(id), { this } };
+}
+
+std::unique_ptr<gfx::TextureResource> Context::createTextureResource(
+    const Size size, const gfx::TexturePixelType format, const gfx::TextureChannelDataType type) {
+    auto obj = createUniqueTexture();
+    std::unique_ptr<gfx::TextureResource> resource =
+        std::make_unique<gl::TextureResource>(std::move(obj));
+
+    // Always use texture unit 0 for manipulating it.
+    activeTextureUnit = 0;
+    texture[0] = static_cast<gl::TextureResource&>(*resource).texture;
+
+    // Creates an empty texture with the specified size and format.
+    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, Enum<gfx::TexturePixelType>::to(format),
+                                  size.width, size.height, 0,
+                                  Enum<gfx::TexturePixelType>::to(format),
+                                  Enum<gfx::TextureChannelDataType>::to(type), nullptr));
+
+    // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
+    // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
+    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+    return resource;
 }
 
 std::unique_ptr<gfx::RenderbufferResource>
@@ -504,55 +493,6 @@ Context::createFramebuffer(const gfx::Texture& color,
                                                depthResource.renderbuffer));
     checkFramebuffer();
     return { depth.getSize(), std::move(fbo) };
-}
-
-std::unique_ptr<gfx::TextureResource>
-Context::createTextureResource(const Size size,
-                               const void* data,
-                               gfx::TexturePixelType format,
-                               gfx::TextureChannelDataType type) {
-    auto obj = createUniqueTexture();
-    std::unique_ptr<gfx::TextureResource> resource = std::make_unique<gl::TextureResource>(std::move(obj));
-    pixelStoreUnpack = { 1 };
-    updateTextureResource(*resource, size, data, format, type);
-    // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
-    // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
-    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-    MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    return resource;
-}
-
-void Context::updateTextureResource(gfx::TextureResource& resource,
-                                    const Size size,
-                                    const void* data,
-                                    gfx::TexturePixelType format,
-                                    gfx::TextureChannelDataType type) {
-    // Always use texture unit 0 for manipulating it.
-    activeTextureUnit = 0;
-    texture[0] = static_cast<gl::TextureResource&>(resource).texture;
-    MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, Enum<gfx::TexturePixelType>::to(format),
-                                  size.width, size.height, 0,
-                                  Enum<gfx::TexturePixelType>::to(format),
-                                  Enum<gfx::TextureChannelDataType>::to(type), data));
-}
-
-void Context::updateTextureResourceSub(gfx::TextureResource& resource,
-                                       const uint16_t xOffset,
-                                       const uint16_t yOffset,
-                                       const Size size,
-                                       const void* data,
-                                       gfx::TexturePixelType format,
-                                       gfx::TextureChannelDataType type) {
-    // Always use texture unit 0 for manipulating it.
-    activeTextureUnit = 0;
-    texture[0] = static_cast<const gl::TextureResource&>(resource).texture;
-    MBGL_CHECK_ERROR(glTexSubImage2D(GL_TEXTURE_2D, 0,
-                                  xOffset, yOffset,
-                                  size.width, size.height,
-                                  Enum<gfx::TexturePixelType>::to(format),
-                                  Enum<gfx::TextureChannelDataType>::to(type), data));
 }
 
 std::unique_ptr<gfx::OffscreenTexture>

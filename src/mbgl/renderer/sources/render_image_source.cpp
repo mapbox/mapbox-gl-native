@@ -31,7 +31,13 @@ bool RenderImageSource::isLoaded() const {
     return !!bucket;
 }
 
-void RenderImageSource::startRender(PaintParameters& parameters) {
+void RenderImageSource::upload(gfx::UploadPass& uploadPass) {
+    if (bucket->needsUpload()) {
+        bucket->upload(uploadPass);
+    }
+}
+
+void RenderImageSource::prepare(PaintParameters& parameters) {
     if (!isLoaded()) {
         return;
     }
@@ -44,10 +50,6 @@ void RenderImageSource::startRender(PaintParameters& parameters) {
         parameters.state.matrixFor(matrix, tileId);
         matrix::multiply(matrix, parameters.alignedProjMatrix, matrix);
         matrices.push_back(matrix);
-    }
-
-    if (bucket->needsUpload()) {
-        bucket->upload(parameters.context);
     }
 }
 
@@ -70,7 +72,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             gfx::StencilMode::disabled(),
             gfx::ColorMode::unblended(),
             gfx::CullFaceMode::disabled(),
-            parameters.staticData.tileBorderIndexBuffer,
+            *parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
             programInstance.computeAllUniformValues(
                 DebugProgram::LayoutUniformValues {
@@ -82,7 +84,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
                 parameters.state.getZoom()
             ),
             programInstance.computeAllAttributeBindings(
-                parameters.staticData.tileVertexBuffer,
+                *parameters.staticData.tileVertexBuffer,
                 paintAttributeData,
                 properties
             ),

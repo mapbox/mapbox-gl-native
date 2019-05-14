@@ -19,7 +19,7 @@ template <class T>
 class Actor;
 
 namespace gfx {
-class Context;
+class UploadPass;
 } // namespace gfx
 
 class ImageRequestor;
@@ -83,8 +83,8 @@ private:
 public:
     optional<ImagePosition> getPattern(const std::string& name);
 
-    gfx::TextureBinding textureBinding(gfx::Context&);
-    void upload(gfx::Context&);
+    gfx::TextureBinding textureBinding();
+    void upload(gfx::UploadPass&);
 
     Size getPixelSize() const;
 

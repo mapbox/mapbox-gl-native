@@ -121,13 +121,13 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
     }
 }
 
-void FillBucket::upload(gfx::Context& context) {
-    vertexBuffer = context.createVertexBuffer(std::move(vertices));
-    lineIndexBuffer = context.createIndexBuffer(std::move(lines));
-    triangleIndexBuffer = context.createIndexBuffer(std::move(triangles));
+void FillBucket::upload(gfx::UploadPass& uploadPass) {
+    vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+    lineIndexBuffer = uploadPass.createIndexBuffer(std::move(lines));
+    triangleIndexBuffer = uploadPass.createIndexBuffer(std::move(triangles));
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.upload(context);
+        pair.second.upload(uploadPass);
     }
 
     uploaded = true;

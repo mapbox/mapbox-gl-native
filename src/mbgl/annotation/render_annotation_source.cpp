@@ -47,8 +47,12 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderAnnotationSource::startRender(PaintParameters& parameters) {
-    tilePyramid.startRender(parameters);
+void RenderAnnotationSource::upload(gfx::UploadPass& uploadPass) {
+    tilePyramid.upload(uploadPass);
+}
+
+void RenderAnnotationSource::prepare(PaintParameters& parameters) {
+    tilePyramid.prepare(parameters);
 }
 
 void RenderAnnotationSource::finishRender(PaintParameters& parameters) {

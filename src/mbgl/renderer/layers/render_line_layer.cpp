@@ -2,6 +2,7 @@
 #include <mbgl/renderer/buckets/line_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/upload_parameters.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -46,7 +47,7 @@ void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0
               && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
               && evaluated.get<style::LineWidth>().constantOr(1.0) > 0)
-             ? RenderPass::Translucent : RenderPass::None;
+             ? RenderPass::Translucent | RenderPass::Upload : RenderPass::None;
     evaluatedProperties = std::move(properties);
 }
 
@@ -56,6 +57,38 @@ bool RenderLineLayer::hasTransition() const {
 
 bool RenderLineLayer::hasCrossfade() const {
     return getCrossfade<LineLayerProperties>(evaluatedProperties).t != 1;
+}
+
+void RenderLineLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& uploadParameters) {
+    for (const RenderTile& tile : renderTiles) {
+        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        if (!renderData) {
+            continue;
+        }
+        auto& bucket = static_cast<LineBucket&>(*renderData->bucket);
+        const auto& evaluated = getEvaluated<LineLayerProperties>(renderData->layerProperties);
+
+        if (!evaluated.get<LineDasharray>().from.empty()) {
+            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
+                ? LinePatternCap::Round : LinePatternCap::Square;
+            // Ensures that the dash data gets added and uploaded to the atlas.
+            uploadParameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
+            uploadParameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+
+        } else if (!unevaluated.get<LinePattern>().isUndefined()) {
+            const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
+            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
+
+            // Ensures that the pattern gets added and uplodated to the atlas.
+            geometryTile.getPattern(linePatternValue.from);
+            geometryTile.getPattern(linePatternValue.to);
+
+        } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
+            if (!colorRampTexture) {
+                colorRampTexture = uploadPass.createTexture(colorRamp);
+            }
+        }
+    }
 }
 
 void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
@@ -133,12 +166,12 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      {},
                      {},
                      LineSDFProgram::TextureBindings{
-                         parameters.lineAtlas.textureBinding(parameters.context),
+                         parameters.lineAtlas.textureBinding(),
                      });
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
-            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);            
+            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
             const Size texsize = geometryTile.iconAtlasTexture->size;
 
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
@@ -159,9 +192,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                          textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
                      });
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
-            if (!colorRampTexture) {
-                colorRampTexture = parameters.context.createTexture(colorRamp);
-            }
+            assert(colorRampTexture);
 
             draw(parameters.programs.getLineLayerPrograms().lineGradient,
                  LineGradientProgram::layoutUniformValues(

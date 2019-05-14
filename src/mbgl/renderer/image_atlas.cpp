@@ -1,4 +1,5 @@
 #include <mbgl/renderer/image_atlas.hpp>
+#include <mbgl/gfx/upload_pass.hpp>
 #include <mbgl/gfx/context.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 
@@ -52,26 +53,26 @@ const mapbox::Bin& _packImage(mapbox::ShelfPack& pack, const style::Image::Impl&
     return bin;
 }
 
-void ImageAtlas::patchUpdatedImages(gfx::Context& context, gfx::Texture& atlasTexture, const ImageManager& imageManager) {
+void ImageAtlas::patchUpdatedImages(gfx::UploadPass& uploadPass, gfx::Texture& atlasTexture, const ImageManager& imageManager) {
     for (auto& updatedImageVersion : imageManager.updatedImageVersions) {
         auto iconPosition = iconPositions.find(updatedImageVersion.first);
         if (iconPosition != iconPositions.end()) {
-            patchUpdatedImage(context, atlasTexture, iconPosition->second, imageManager, updatedImageVersion.first, updatedImageVersion.second);
+            patchUpdatedImage(uploadPass, atlasTexture, iconPosition->second, imageManager, updatedImageVersion.first, updatedImageVersion.second);
         }
         auto patternPosition = patternPositions.find(updatedImageVersion.first);
         if (patternPosition != patternPositions.end()) {
-            patchUpdatedImage(context, atlasTexture, patternPosition->second, imageManager, updatedImageVersion.first, updatedImageVersion.second);
+            patchUpdatedImage(uploadPass, atlasTexture, patternPosition->second, imageManager, updatedImageVersion.first, updatedImageVersion.second);
         }
     }
 }
 
-void ImageAtlas::patchUpdatedImage(gfx::Context& context, gfx::Texture& atlasTexture, ImagePosition& position, const ImageManager& imageManager, const std::string& name, uint16_t version) {
+void ImageAtlas::patchUpdatedImage(gfx::UploadPass& uploadPass, gfx::Texture& atlasTexture, ImagePosition& position, const ImageManager& imageManager, const std::string& name, uint16_t version) {
     if (position.version == version) return;
 
     auto updatedImage = imageManager.getImage(name);
     if (updatedImage == nullptr) return;
 
-    context.updateTextureSub(atlasTexture, updatedImage->image, position.textureRect.x, position.textureRect.y);
+    uploadPass.updateTextureSub(atlasTexture, updatedImage->image, position.textureRect.x, position.textureRect.y);
     position.version = version;
 }
 
