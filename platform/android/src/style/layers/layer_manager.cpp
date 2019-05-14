@@ -163,10 +163,6 @@ LayerManager* LayerManager::get() noexcept {
     return android::LayerManagerAndroid::get();
 }
 
-#if defined(MBGL_LAYER_LINE_DISABLE_ALL) || defined(MBGL_LAYER_SYMBOL_DISABLE_ALL) || defined(MBGL_LAYER_FILL_DISABLE_ALL)
 const bool LayerManager::annotationsEnabled = false;
-#else
-const bool LayerManager::annotationsEnabled = true;
-#endif
 
 } // namespace mbgl
