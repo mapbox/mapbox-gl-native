@@ -26,33 +26,14 @@ class ViewPagerActivity : AppCompatActivity() {
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
     super.onRestoreInstanceState(savedInstanceState)
-
     val currentPosition = viewPager.currentItem
-    var mapFragment: SupportMapFragment
-
-    if (Math.abs(0 - currentPosition) <= 1) {
-      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 0) as SupportMapFragment
-      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.MAPBOX_STREETS) }
-    }
-
-    if (Math.abs(1 - currentPosition) <= 1) {
-      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 1) as SupportMapFragment
-      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.DARK) }
-    }
-
-    if (Math.abs(2 - currentPosition) <= 1) {
-      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 2) as SupportMapFragment
-      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
-    }
-
-    if (Math.abs(3 - currentPosition) <= 1) {
-      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 3) as SupportMapFragment
-      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
-    }
-
-    if (Math.abs(4 - currentPosition) <= 1) {
-      mapFragment = viewPager.adapter?.instantiateItem(viewPager, 4) as SupportMapFragment
-      mapFragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
+    val offscreenLimit = viewPager.offscreenPageLimit
+    for (i in currentPosition - offscreenLimit..currentPosition + offscreenLimit) {
+      if (i < 0 || i > viewPager.adapter?.count ?: 0) {
+        continue
+      }
+      val mapFragment = viewPager.adapter?.instantiateItem(viewPager, i) as SupportMapFragment
+      mapFragment.getMapAsync(i)
     }
   }
 
@@ -63,37 +44,34 @@ class ViewPagerActivity : AppCompatActivity() {
     }
 
     override fun getItem(position: Int): Fragment? {
-      var fragment: SupportMapFragment? = null
       val options = MapboxMapOptions()
       options.textureMode(true)
+      options.camera(
+        CameraPosition.Builder()
+          .zoom(3.0)
+          .target(
+            when (position) {
+              0 -> {
+                LatLng(34.920526, 102.634774)
+              }
+              1 -> {
+                LatLng(62.326440, 92.764913)
+              }
+              2 -> {
+                LatLng(-25.007786, 133.623852)
+              }
+              3 -> {
+                LatLng(62.326440, 92.764913)
+              }
+              else -> {
+                LatLng(34.920526, 102.634774)
+              }
+            }
+          )
+          .build())
 
-      when (position) {
-        0 -> {
-          options.camera(CameraPosition.Builder().target(LatLng(34.920526, 102.634774)).zoom(3.0).build())
-          fragment = SupportMapFragment.newInstance(options)
-          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.MAPBOX_STREETS) }
-        }
-        1 -> {
-          options.camera(CameraPosition.Builder().target(LatLng(62.326440, 92.764913)).zoom(3.0).build())
-          fragment = SupportMapFragment.newInstance(options)
-          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.DARK) }
-        }
-        2 -> {
-          options.camera(CameraPosition.Builder().target(LatLng(-25.007786, 133.623852)).zoom(3.0).build())
-          fragment = SupportMapFragment.newInstance(options)
-          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
-        }
-        3 -> {
-          options.camera(CameraPosition.Builder().target(LatLng(62.326440, 92.764913)).zoom(3.0).build())
-          fragment = SupportMapFragment.newInstance(options)
-          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.LIGHT) }
-        }
-        4 -> {
-          options.camera(CameraPosition.Builder().target(LatLng(34.920526, 102.634774)).zoom(3.0).build())
-          fragment = SupportMapFragment.newInstance(options)
-          fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.TRAFFIC_NIGHT) }
-        }
-      }
+      val fragment = SupportMapFragment.newInstance(options)
+      fragment.getMapAsync(position)
       return fragment
     }
 
@@ -102,8 +80,22 @@ class ViewPagerActivity : AppCompatActivity() {
     }
 
     companion object {
-
-      private val NUM_ITEMS = 5
+      private const val NUM_ITEMS = 5
     }
+  }
+}
+
+fun SupportMapFragment.getMapAsync(index: Int) {
+  this.getMapAsync {
+    it.setStyle(
+      when (index) {
+        0 -> Style.MAPBOX_STREETS
+        1 -> Style.DARK
+        2 -> Style.SATELLITE
+        3 -> Style.LIGHT
+        4 -> Style.TRAFFIC_NIGHT
+        else -> Style.MAPBOX_STREETS
+      }
+    )
   }
 }
