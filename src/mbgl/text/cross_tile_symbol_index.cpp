@@ -164,36 +164,21 @@ bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint
 
 CrossTileSymbolIndex::CrossTileSymbolIndex() = default;
 
-bool CrossTileSymbolIndex::addLayer(const RenderLayerSymbolInterface& symbolInterface, float lng) {
-
-    auto& layerIndex = layerIndexes[symbolInterface.layerID()];
+bool CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) {
+    auto& layerIndex = layerIndexes[layer.getID()];
 
     bool symbolBucketsChanged = false;
     std::unordered_set<uint32_t> currentBucketIDs;
 
     layerIndex.handleWrapJump(lng);
 
-    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
-        assert(renderTile.tile.isRenderable());
-
-        auto bucket = symbolInterface.getSymbolBucket(renderTile);
-        if (!bucket) {
-            continue;
-        }
-        SymbolBucket& symbolBucket = *bucket;
-
-        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
-            // Only add this layer if it's the "group leader" for the bucket
-            continue;
-        }
-
-        if (!symbolBucket.bucketInstanceId) {
-            symbolBucket.bucketInstanceId = ++maxBucketInstanceId;
-        }
-
-        const bool bucketAdded = layerIndex.addBucket(renderTile.tile.id, symbolBucket, maxCrossTileID);
-        symbolBucketsChanged = symbolBucketsChanged || bucketAdded;
-        currentBucketIDs.insert(symbolBucket.bucketInstanceId);
+    for (const auto& item : layer.getPlacementData()) {
+        RenderTile& renderTile = item.tile;
+        Bucket& bucket = item.bucket;
+        auto result = bucket.registerAtCrossTileIndex(layerIndex, renderTile.tile.id, maxCrossTileID);
+        assert(result.first != 0u);
+        symbolBucketsChanged = symbolBucketsChanged || result.second;
+        currentBucketIDs.insert(result.first);
     }
 
     if (layerIndex.removeStaleBuckets(currentBucketIDs)) {

@@ -69,7 +69,7 @@ private:
     void upload(gfx::UploadPass&, UploadParameters&) override;
     void render(PaintParameters&, RenderSource*) override;
     void setRenderTiles(RenderTiles, const TransformState&) override;
-
+    
     // RenderLayerSymbolInterface overrides
     const RenderLayerSymbolInterface* getSymbolInterface() const override;
     const std::string& layerID() const override;

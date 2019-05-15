@@ -19,11 +19,18 @@ class RenderSource;
 class RenderLayerSymbolInterface;
 class RenderTile;
 class TransformState;
+class GeometryTile;
 
 class LayerRenderData {
 public:
     std::shared_ptr<Bucket> bucket;
     Immutable<style::LayerProperties> layerProperties;
+};
+
+class LayerPlacementData {
+public:
+    std::reference_wrapper<Bucket> bucket;
+    std::reference_wrapper<RenderTile> tile;
 };
 
 class RenderLayer {
@@ -79,6 +86,10 @@ public:
     using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     virtual void setRenderTiles(RenderTiles, const TransformState&);
 
+    const std::vector<LayerPlacementData>& getPlacementData() const { 
+        return placementData; 
+    }
+
     // Latest evaluated properties.
     Immutable<style::LayerProperties> evaluatedProperties;
     // Private implementation
@@ -96,11 +107,13 @@ protected:
 
 protected:
     // Stores current set of tiles to be rendered for this layer.
-    std::vector<std::reference_wrapper<RenderTile>> renderTiles;
+    RenderTiles renderTiles;
 
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
+
+    std::vector<LayerPlacementData> placementData;
 
 private:
     RenderTiles filterRenderTiles(RenderTiles) const;

@@ -681,6 +681,15 @@ void RenderSymbolLayer::setRenderTiles(RenderTiles tiles, const TransformState& 
 
         return std::tie(b.get().id.canonical.z, par.y, par.x) < std::tie(a.get().id.canonical.z, pbr.y, pbr.x);
     });
+
+    placementData.clear();
+    for (RenderTile& renderTile : renderTiles) {
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*baseImpl);
+        if (bucket && bucket->bucketLeaderID == getID()) {
+            // Only place this layer if it's the "group leader" for the bucket
+            placementData.push_back({*bucket, renderTile});
+        }
+    }
 }
 
 } // namespace mbgl

@@ -2,11 +2,15 @@
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 
 namespace mbgl {
 
 using namespace style;
+namespace {
+    std::atomic<uint32_t> maxBucketInstanceId;
+} // namespace
 
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
                            const std::map<std::string, Immutable<style::LayerProperties>>& paintProperties_,
@@ -27,7 +31,8 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       symbolInstances(std::move(symbolInstances_)),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
-      tilePixelRatio(tilePixelRatio_) {
+      tilePixelRatio(tilePixelRatio_),
+      bucketInstanceId(++maxBucketInstanceId) {
 
     for (const auto& pair : paintProperties_) {
         const auto& evaluated = getEvaluated<SymbolLayerProperties>(pair.second);
@@ -237,6 +242,11 @@ bool SymbolBucket::hasFormatSectionOverrides() const {
         hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
     }
     return *hasFormatSectionOverrides_;
+}
+
+std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbolLayerIndex& index, const OverscaledTileID& tileID, uint32_t& maxCrossTileID) {
+    bool added = index.addBucket(tileID, *this, maxCrossTileID);
+    return std::make_pair(bucketInstanceId, added);
 }
 
 } // namespace mbgl
