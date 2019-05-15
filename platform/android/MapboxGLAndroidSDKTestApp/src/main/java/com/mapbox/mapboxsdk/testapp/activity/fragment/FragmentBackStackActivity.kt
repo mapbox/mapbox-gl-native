@@ -45,8 +45,12 @@ class FragmentBackStackActivity : AppCompatActivity() {
   }
 
   override fun onBackPressed() {
-    // activity uses singleInstance for testing purposes
-    // code below provides a default navigation when using the app
-    NavUtils.navigateHome(this)
+    if (supportFragmentManager.backStackEntryCount == 0) {
+      // activity uses singleInstance for testing purposes
+      // code below provides a default navigation when using the app
+      NavUtils.navigateHome(this)
+    } else {
+      super.onBackPressed()
+    }
   }
 }
