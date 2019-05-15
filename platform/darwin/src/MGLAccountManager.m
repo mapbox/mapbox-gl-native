@@ -50,7 +50,7 @@ static BOOL _MGLAccountsSDKEnabled;
     }
     
     if (self.isAccountsSDKEnabled) {
-        self.skuToken = MBXSKUToken.mapsToken;
+        self.skuToken = [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser];
     }
 
 #endif
@@ -131,7 +131,7 @@ static BOOL _MGLAccountsSDKEnabled;
 + (NSString *)skuToken {
     if (MGLAccountManager.isAccountsSDKEnabled) {
         return [MGLAccountManager.sharedManager isSKUTokenExpired] ?
-            MBXSKUToken.mapsToken :
+            [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser] :
             MGLAccountManager.sharedManager.skuToken;
     }
     else {
