@@ -13,6 +13,8 @@ class UploadPass;
 } // namespace gfx
 
 class RenderLayer;
+class CrossTileSymbolLayerIndex;
+class OverscaledTileID;
 class PatternDependency;
 using PatternLayerMap = std::map<std::string, PatternDependency>;
 
@@ -48,7 +50,15 @@ public:
     // Implementations of this class check at least that this bucket has
     // the same layer type with the given layer, but extra checks are also
     // possible.
-    virtual bool supportsLayer(const style::Layer::Impl&) const = 0;
+    virtual bool supportsLayer(const style::Layer::Impl&) const = 0;    
+    // The following methods are implemented by buckets that require cross-tile indexing and placement.
+
+    // Returns a pair, the first element of which is a bucket cross-tile id
+    // on success call; `0` otherwise. The second element is `true` if
+    // the bucket was originally registered; `false` otherwise.
+    virtual std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const OverscaledTileID&, uint32_t&) {
+        return std::make_pair(0u, false);
+    }
 
 protected:
     Bucket() = default;
