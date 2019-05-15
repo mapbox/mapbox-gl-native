@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
  method returns `YES`, the viewport of the map will transition to the new camera. Note that the new camera cannot be modified.
  @param reason The reason for the camera change.
  @return A Boolean value indicating whether the map view should stay at
- `oldCamera` or change to `newCamera`.
+ `oldCamera` or transition to `newCamera`.
 
  @note If this method is implemented `-mapView:shouldChangeFromCamera:toCamera:` will not be called.
  */
