@@ -312,12 +312,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         bool symbolBucketsChanged = false;
         const bool placementChanged = !placement->stillRecent(updateParameters.timePoint);
         std::set<std::string> usedSymbolLayers;
-
+        mat4 projMatrix;
         if (placementChanged) {
             placement = std::make_unique<Placement>(
                 updateParameters.transformState, updateParameters.mode,
                 updateParameters.transitionOptions, updateParameters.crossSourceCollisions,
                 std::move(placement));
+            updateParameters.transformState.getProjMatrix(projMatrix);
         }
 
         for (auto it = symbolLayers.rbegin(); it != symbolLayers.rend(); ++it) {
@@ -326,8 +327,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             if (placementChanged) {
                 usedSymbolLayers.insert(symbolLayer.getID());
-                mat4 projMatrix;
-                updateParameters.transformState.getProjMatrix(projMatrix);
                 placement->placeLayer(*symbolLayer.getSymbolInterface(), projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
         }
