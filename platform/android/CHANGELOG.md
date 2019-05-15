@@ -3,6 +3,14 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+## 7.4.0 - May 15, 2019
+### Features
+- Revert SKU token logic [#14594](https://github.com/mapbox/mapbox-gl-native/pull/14594)
+
+### Bugs
+- Keep strong references to the FileSource/OfflineManager operations callbacks [#14601](https://github.com/mapbox/mapbox-gl-native/pull/14601)
+- Failed sprite requests do not block tiles rendering [#14605](https://github.com/mapbox/mapbox-gl-native/pull/14605)
+- Remove missing image log [#14600](https://github.com/mapbox/mapbox-gl-native/pull/14600)
 
 ## 7.5.0-alpha.2 - May 8, 2019
 ### Bugs
