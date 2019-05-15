@@ -129,15 +129,20 @@ class DownloadRegionActivity : AppCompatActivity(), OfflineRegion.OfflineRegionO
 
   override fun onStatusChanged(status: OfflineRegionStatus) {
     if (status.isComplete) {
-      val statusText = "Completed"
-      logMessage("SUCCESS! $statusText")
-      download_status.text = statusText
-      offlineRegion?.setObserver(null)
+      "Completed".let {
+        logMessage("SUCCESS! $it")
+        download_status.text = it
+      }
+      fab.setImageResource(R.drawable.ic_play_arrow_black_24dp)
       handler.removeCallbacksAndMessages(null)
+      offlineRegion?.setObserver(null)
+      offlineRegion?.setDownloadState(OfflineRegion.STATE_INACTIVE)
     } else {
       val statusText = "Downloaded ${status.completedResourceCount}/${status.requiredResourceCount}"
-      Timber.d(statusText)
-      download_status.text = statusText
+      statusText.let {
+        logMessage(it)
+        download_status.text = it
+      }
 
       if (status.completedResourceCount > status.requiredResourceCount &&
         previousCompletedResourceCount <= status.requiredResourceCount) {
