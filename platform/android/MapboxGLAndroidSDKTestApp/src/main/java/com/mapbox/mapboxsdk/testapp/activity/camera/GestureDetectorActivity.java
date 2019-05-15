@@ -238,7 +238,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
         return true;
       case R.id.menu_gesture_animation:
         uiSettings.setScaleVelocityAnimationEnabled(!uiSettings.isScaleVelocityAnimationEnabled());
-        uiSettings.setRotateVelocityAnimationEnabled(!uiSettings.isRotateGesturesEnabled());
+        uiSettings.setRotateVelocityAnimationEnabled(!uiSettings.isRotateVelocityAnimationEnabled());
         uiSettings.setFlingVelocityAnimationEnabled(!uiSettings.isFlingVelocityAnimationEnabled());
         return true;
       case R.id.menu_gesture_rotate:
