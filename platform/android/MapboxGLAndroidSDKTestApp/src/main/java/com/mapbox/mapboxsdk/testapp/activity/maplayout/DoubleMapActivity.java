@@ -152,7 +152,9 @@ public class DoubleMapActivity extends AppCompatActivity {
     public void onSaveInstanceState(@NonNull Bundle outState) {
       super.onSaveInstanceState(outState);
       mapView.onSaveInstanceState(outState);
-      mapViewMini.onSaveInstanceState(outState);
+      // Mini map view is not interactive in this case, so we shouldn't save the instance.
+      // If we'd like to support state saving for both maps, they'd have to be kept in separate fragments.
+      //mapViewMini.onSaveInstanceState(outState);
     }
   }
 }
