@@ -66,10 +66,10 @@ NS_ASSUME_NONNULL_BEGIN
  gesture is recognized. If this method returns `NO`, the map view’s camera
  continues to be this camera.
  @param newCamera The expected camera after the gesture completes. If this
- method returns `YES`, this camera becomes the map view’s camera.
+ method returns `YES`, the viewport of the map will transition to the new camera. Note that the new camera cannot be modified.
  @param reason The reason for the camera change.
  @return A Boolean value indicating whether the map view should stay at
- `oldCamera` or change to `newCamera`.
+ `oldCamera` or transition to `newCamera`.
 
  @note If this method is implemented `-mapView:shouldChangeFromCamera:toCamera:` will not be called.
  */
