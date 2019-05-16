@@ -632,7 +632,6 @@
         "mbgl/renderer/layers/render_fill_layer.hpp": "src/mbgl/renderer/layers/render_fill_layer.hpp",
         "mbgl/renderer/layers/render_heatmap_layer.hpp": "src/mbgl/renderer/layers/render_heatmap_layer.hpp",
         "mbgl/renderer/layers/render_hillshade_layer.hpp": "src/mbgl/renderer/layers/render_hillshade_layer.hpp",
-        "mbgl/renderer/layers/render_layer_symbol_interface.hpp": "src/mbgl/renderer/layers/render_layer_symbol_interface.hpp",
         "mbgl/renderer/layers/render_line_layer.hpp": "src/mbgl/renderer/layers/render_line_layer.hpp",
         "mbgl/renderer/layers/render_raster_layer.hpp": "src/mbgl/renderer/layers/render_raster_layer.hpp",
         "mbgl/renderer/layers/render_symbol_layer.hpp": "src/mbgl/renderer/layers/render_symbol_layer.hpp",

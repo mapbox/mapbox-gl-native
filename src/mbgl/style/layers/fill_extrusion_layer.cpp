@@ -23,7 +23,8 @@ const LayerTypeInfo* FillExtrusionLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::Required,
           LayerTypeInfo::Layout::Required,
-          LayerTypeInfo::FadingTiles::NotRequired
+          LayerTypeInfo::FadingTiles::NotRequired,
+          LayerTypeInfo::CrossTileIndex::NotRequired
         };
     return &typeInfo;
 }

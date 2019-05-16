@@ -16,7 +16,6 @@ class PropertyEvaluationParameters;
 class UploadParameters;
 class PaintParameters;
 class RenderSource;
-class RenderLayerSymbolInterface;
 class RenderTile;
 class TransformState;
 class GeometryTile;
@@ -58,8 +57,8 @@ public:
     // Returns true if the layer has a pattern property and is actively crossfading.
     virtual bool hasCrossfade() const = 0;
 
-    // Returns instance of RenderLayerSymbolInterface if RenderLayer supports it.
-    virtual const RenderLayerSymbolInterface* getSymbolInterface() const;
+    // Returns true is the layer is subject to placement.
+    bool needsPlacement() const;
 
     const std::string& getID() const;
 

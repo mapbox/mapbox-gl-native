@@ -156,7 +156,8 @@ void FeatureIndex::addFeature(
             assert(geometryTileFeature);
         }
 
-        if (!renderLayer->getSymbolInterface() &&
+        bool needsCrossTileIndex = renderLayer->baseImpl->getTypeInfo()->crossTileIndex == style::LayerTypeInfo::CrossTileIndex::Required;
+        if (!needsCrossTileIndex &&
              !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, transformState, pixelsToTileUnits, posMatrix)) {
             continue;
         }

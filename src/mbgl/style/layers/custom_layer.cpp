@@ -13,7 +13,8 @@ namespace {
       LayerTypeInfo::Source::NotRequired,
       LayerTypeInfo::Pass3D::NotRequired,
       LayerTypeInfo::Layout::NotRequired,
-      LayerTypeInfo::FadingTiles::NotRequired };
+      LayerTypeInfo::FadingTiles::NotRequired,
+      LayerTypeInfo::CrossTileIndex::NotRequired };
 }  // namespace
 
 CustomLayer::CustomLayer(const std::string& layerID,

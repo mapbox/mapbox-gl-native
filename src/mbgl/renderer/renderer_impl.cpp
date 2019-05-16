@@ -224,7 +224,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     };
 
     std::set<RenderItem> renderItems;
-    std::vector<std::reference_wrapper<RenderLayer>> symbolLayers;
+    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
     auto renderItemsEmplaceHint = renderItems.begin();
 
     // Update all sources and initialize renderItems.
@@ -298,8 +298,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
         RenderLayer& renderLayer = renderItem.layer;
         renderLayer.setRenderTiles(renderItem.source->getRenderTiles(), updateParameters.transformState);
-        if (const RenderLayerSymbolInterface* symbolLayer = renderLayer.getSymbolInterface()) {
-            symbolLayers.push_back(renderLayer);
+        if (renderLayer.needsPlacement()) {
+            layersNeedPlacement.emplace_back(renderLayer);
         }
     }
 
@@ -321,13 +321,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             updateParameters.transformState.getProjMatrix(projMatrix);
         }
 
-        for (auto it = symbolLayers.rbegin(); it != symbolLayers.rend(); ++it) {
-            const RenderLayer& symbolLayer = *it;
-            if (crossTileSymbolIndex.addLayer(symbolLayer, updateParameters.transformState.getLatLng().longitude())) symbolBucketsChanged = true;
+        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+            const RenderLayer& layer = *it;
+            if (crossTileSymbolIndex.addLayer(layer, updateParameters.transformState.getLatLng().longitude())) symbolBucketsChanged = true;
 
             if (placementChanged) {
-                usedSymbolLayers.insert(symbolLayer.getID());
-                placement->placeLayer(symbolLayer, projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
+                usedSymbolLayers.insert(layer.getID());
+                placement->placeLayer(layer, projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
@@ -340,9 +340,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         if (placementChanged || symbolBucketsChanged) {
-            for (auto it = symbolLayers.rbegin(); it != symbolLayers.rend(); ++it) {
-                const RenderLayer& symbolLayer = *it;
-                placement->updateLayerOpacities(symbolLayer);
+            for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+                placement->updateLayerOpacities(*it);
             }
         }
     }

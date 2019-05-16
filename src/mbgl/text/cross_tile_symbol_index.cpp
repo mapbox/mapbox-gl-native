@@ -1,7 +1,6 @@
 #include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
-#include <mbgl/renderer/layers/render_layer_symbol_interface.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/tile.hpp>
 

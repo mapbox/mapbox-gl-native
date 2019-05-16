@@ -21,6 +21,11 @@ void RenderLayer::transition(const TransitionParameters& parameters, Immutable<s
     transition(parameters);
 }
 
+bool RenderLayer::needsPlacement() const {
+    return baseImpl->getTypeInfo()->crossTileIndex == style::LayerTypeInfo::CrossTileIndex::Required
+           && !placementData.empty();
+}
+
 const std::string& RenderLayer::getID() const {
     return baseImpl->id;
 }
@@ -41,10 +46,6 @@ bool RenderLayer::supportsZoom(float zoom) const {
 
 void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState&) {
     renderTiles = filterRenderTiles(std::move(tiles));
-}
-
-const RenderLayerSymbolInterface* RenderLayer::getSymbolInterface() const {
-    return nullptr;
 }
 
 optional<Color> RenderLayer::getSolidBackground() const {
