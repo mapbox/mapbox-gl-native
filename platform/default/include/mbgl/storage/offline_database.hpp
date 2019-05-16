@@ -51,6 +51,13 @@ public:
     // Return value is (inserted, stored size)
     std::pair<bool, uint64_t> put(const Resource&, const Response&);
 
+    // Force Mapbox GL Native to revalidate tiles stored in the ambient
+    // cache with the tile server before using them, making sure they
+    // are the latest version. This is more efficient than cleaning the
+    // cache because if the tile is considered valid after the server
+    // lookup, it will not get downloaded again.
+    std::exception_ptr invalidateTileCache();
+
     expected<OfflineRegions, std::exception_ptr> listRegions();
 
     expected<OfflineRegion, std::exception_ptr> createRegion(const OfflineRegionDefinition&,
@@ -63,6 +70,7 @@ public:
     updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
     std::exception_ptr deleteRegion(OfflineRegion&&);
+    std::exception_ptr invalidateRegion(int64_t regionID);
 
     // Return value is (response, stored size)
     optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
