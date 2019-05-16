@@ -146,7 +146,7 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
         }
 
         if (MGLAccountManager.isAccountsSDKEnabled) {
-            [[self sharedInstance] eventsManager].skuId = MBXAccountsMapsSKUIDMaps;
+            [[self sharedInstance] eventsManager].skuId = MBXAccountsSKUIDMaps;
         }
         
         [self flush];
