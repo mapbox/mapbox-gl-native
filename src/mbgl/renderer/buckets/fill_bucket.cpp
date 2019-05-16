@@ -137,10 +137,6 @@ bool FillBucket::hasData() const {
     return !triangleSegments.empty() || !lineSegments.empty();
 }
 
-bool FillBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::FillLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 float FillBucket::getQueryRadius(const RenderLayer& layer) const {
     const auto& evaluated = getEvaluated<FillLayerProperties>(layer.evaluatedProperties);
     const std::array<float, 2>& translate = evaluated.get<FillTranslate>();

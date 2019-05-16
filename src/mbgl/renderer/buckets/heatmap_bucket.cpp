@@ -39,10 +39,6 @@ bool HeatmapBucket::hasData() const {
     return !segments.empty();
 }
 
-bool HeatmapBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::HeatmapLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
                                const GeometryCollection& geometry,
                                const ImagePositions&,

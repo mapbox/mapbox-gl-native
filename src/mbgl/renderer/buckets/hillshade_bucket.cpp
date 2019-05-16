@@ -114,9 +114,5 @@ bool HillshadeBucket::hasData() const {
     return demdata.getImage()->valid();
 }
 
-bool HillshadeBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::HillshadeLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 
 } // namespace mbgl

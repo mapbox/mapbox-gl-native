@@ -180,10 +180,6 @@ bool FillExtrusionBucket::hasData() const {
     return !triangleSegments.empty();
 }
 
-bool FillExtrusionBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::FillExtrusionLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
     const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(layer.evaluatedProperties);
     const std::array<float, 2>& translate = evaluated.get<FillExtrusionTranslate>();

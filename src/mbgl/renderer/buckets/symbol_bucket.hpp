@@ -58,7 +58,6 @@ public:
 
     void upload(gfx::UploadPass&) override;
     bool hasData() const override;
-    bool supportsLayer(const style::Layer::Impl&) const override;
     std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const OverscaledTileID&, uint32_t& maxCrossTileID) override;
     bool hasTextData() const;
     bool hasIconData() const;

@@ -112,9 +112,5 @@ bool RasterBucket::hasData() const {
     return !!image;
 }
 
-bool RasterBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::RasterLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 
 } // namespace mbgl

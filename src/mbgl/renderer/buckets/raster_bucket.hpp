@@ -20,7 +20,6 @@ public:
 
     void upload(gfx::UploadPass&) override;
     bool hasData() const override;
-    bool supportsLayer(const style::Layer::Impl&) const override;
 
     void clear();
     void setImage(std::shared_ptr<PremultipliedImage>);

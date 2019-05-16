@@ -46,11 +46,7 @@ public:
     bool needsUpload() const {
         return hasData() && !uploaded;
     }
-    // Returns true if this bucket fits the given layer; returns false otherwise.
-    // Implementations of this class check at least that this bucket has
-    // the same layer type with the given layer, but extra checks are also
-    // possible.
-    virtual bool supportsLayer(const style::Layer::Impl&) const = 0;    
+   
     // The following methods are implemented by buckets that require cross-tile indexing and placement.
 
     // Returns a pair, the first element of which is a bucket cross-tile id
