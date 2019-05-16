@@ -3,14 +3,34 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+
+## 8.0.0-beta.1 - May 16, 2019
+
+### Features
+ - Option to provide custom values for location camera transition [#14606](https://github.com/mapbox/mapbox-gl-native/pull/14606)
+ 
+### Bugs
+ - Expose trackingGesturesManagement attribute [#14659](https://github.com/mapbox/mapbox-gl-native/pull/14659)
+ - Harden onLowMemory call, use atomic boolean for thread safe management of the render surface [#14622](https://github.com/mapbox/mapbox-gl-native/pull/14622) 
+ - Normalize previous rotation values of the location animator [#14626](https://github.com/mapbox/mapbox-gl-native/pull/14626)
+
+### Performance
+ - Remove telemetry gesture event handling code [#14627](https://github.com/mapbox/mapbox-gl-native/pull/14627)
+ 
+### Localisation
+ - Pull in Polish translation and updates to Czech and Hungarian [#14679](https://github.com/mapbox/mapbox-gl-native/pull/14679) 
+
+### Docs
+ - Add javadoc to highlight incompatible onIdle event with snapshot api [#14621](https://github.com/mapbox/mapbox-gl-native/pull/14621)
+ 
 ## 7.4.0 - May 15, 2019
 ### Features
-- Revert SKU token logic [#14594](https://github.com/mapbox/mapbox-gl-native/pull/14594)
+ - Revert SKU token logic [#14594](https://github.com/mapbox/mapbox-gl-native/pull/14594)
 
 ### Bugs
-- Keep strong references to the FileSource/OfflineManager operations callbacks [#14601](https://github.com/mapbox/mapbox-gl-native/pull/14601)
-- Failed sprite requests do not block tiles rendering [#14605](https://github.com/mapbox/mapbox-gl-native/pull/14605)
-- Remove missing image log [#14600](https://github.com/mapbox/mapbox-gl-native/pull/14600)
+ - Keep strong references to the FileSource/OfflineManager operations callbacks [#14601](https://github.com/mapbox/mapbox-gl-native/pull/14601)
+ - Failed sprite requests do not block tiles rendering [#14605](https://github.com/mapbox/mapbox-gl-native/pull/14605)
+ - Remove missing image log [#14600](https://github.com/mapbox/mapbox-gl-native/pull/14600)
 
 ## 7.5.0-alpha.2 - May 8, 2019
 ### Bugs
