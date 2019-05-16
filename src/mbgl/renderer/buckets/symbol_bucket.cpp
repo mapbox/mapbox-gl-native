@@ -4,6 +4,7 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/placement.hpp>
 
 namespace mbgl {
 
@@ -243,6 +244,15 @@ bool SymbolBucket::hasFormatSectionOverrides() const {
 std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbolLayerIndex& index, const OverscaledTileID& tileID, uint32_t& maxCrossTileID) {
     bool added = index.addBucket(tileID, *this, maxCrossTileID);
     return std::make_pair(bucketInstanceId, added);
+}
+
+uint32_t SymbolBucket::place(Placement& placement, const BucketPlacementParameters& params, std::set<uint32_t>& seenIds) {
+    placement.placeLayerBucket(*this, params, seenIds);
+    return bucketInstanceId;
+}
+
+void SymbolBucket::updateOpacities(Placement& placement, std::set<uint32_t>& seenIds) {
+    placement.updateBucketOpacities(*this, seenIds);
 }
 
 } // namespace mbgl
