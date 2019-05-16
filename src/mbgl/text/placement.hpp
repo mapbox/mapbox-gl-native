@@ -10,7 +10,6 @@
 
 namespace mbgl {
 
-class RenderLayerSymbolInterface;
 class SymbolBucket;
 class SymbolInstance;
 

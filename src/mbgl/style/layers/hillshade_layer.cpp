@@ -23,7 +23,8 @@ const LayerTypeInfo* HillshadeLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::Required,
           LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::FadingTiles::NotRequired
+          LayerTypeInfo::FadingTiles::NotRequired,
+          LayerTypeInfo::CrossTileIndex::NotRequired
         };
     return &typeInfo;
 }

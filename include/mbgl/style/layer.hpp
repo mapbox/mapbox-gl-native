@@ -49,6 +49,12 @@ struct LayerTypeInfo {
      * requires rendering on fading tiles. Contains \c FadingTiles::NotRequired otherwise.
      */
     const enum class FadingTiles { Required, NotRequired } fadingTiles;
+
+    /**
+     * @brief contains \c CrossTileIndex::Required if the corresponding layer type
+     * requires cross-tile indexing and placement. Contains \c CrossTileIndex::NotRequired otherwise.
+     */
+    const enum class CrossTileIndex { Required, NotRequired } crossTileIndex;
 };
 
 /**

@@ -25,7 +25,8 @@ let layerCapabilities = {};
 let defaults = { caps: { 'Source':   'NotRequired',
                          'Pass3D':   'NotRequired',
                          'Layout':   'NotRequired',
-                         'FadingTiles': 'NotRequired'
+                         'FadingTiles': 'NotRequired',
+                         'CrossTileIndex': 'NotRequired'
                  },
                  require: function(cap) {
                              let copy = Object.assign({}, this);
@@ -55,6 +56,7 @@ layerCapabilities['hillshade']      = defaults.require('Source')
 layerCapabilities['symbol']         = defaults.require('Source')
                                               .require('Layout')
                                               .require('FadingTiles')
+                                              .require('CrossTileIndex')
                                               .finalize();
 layerCapabilities['circle']         = defaults.require('Source').finalize();
 layerCapabilities['line']           = layerCapabilities['fill'];

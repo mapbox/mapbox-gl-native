@@ -412,22 +412,6 @@ bool RenderSymbolLayer::hasCrossfade() const {
     return false;
 }
 
-const std::string& RenderSymbolLayer::layerID() const {
-    return RenderLayer::getID();
-}
-
-const RenderLayerSymbolInterface* RenderSymbolLayer::getSymbolInterface() const {
-    return this;
-}
-
-const std::vector<std::reference_wrapper<RenderTile>>& RenderSymbolLayer::getRenderTiles() const {
-    return renderTiles;
-}
-
-SymbolBucket* RenderSymbolLayer::getSymbolBucket(const RenderTile& renderTile) const {
-    return renderTile.tile.getBucket<SymbolBucket>(*baseImpl);
-}
-
 void RenderSymbolLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& uploadParameters) {
     for (const RenderTile& tile : renderTiles) {
         const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
@@ -670,17 +654,18 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 
 void RenderSymbolLayer::setRenderTiles(RenderTiles tiles, const TransformState& state) {
     renderTiles = std::move(tiles);
+    const auto comp = [bearing = state.getBearing()](const RenderTile& a, const RenderTile& b) {
+        Point<float> pa(a.id.canonical.x, a.id.canonical.y);
+        Point<float> pb(b.id.canonical.x, b.id.canonical.y);
+
+        auto par = util::rotate(pa, bearing);
+        auto pbr = util::rotate(pb, bearing);
+
+        return std::tie(b.id.canonical.z, par.y, par.x) < std::tie(a.id.canonical.z, pbr.y, pbr.x);
+    };
     // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
     // on top of each other, with lower symbols being drawn on top of higher symbols.
-    std::sort(renderTiles.begin(), renderTiles.end(), [&state](const auto& a, const auto& b) {
-        Point<float> pa(a.get().id.canonical.x, a.get().id.canonical.y);
-        Point<float> pb(b.get().id.canonical.x, b.get().id.canonical.y);
-
-        auto par = util::rotate(pa, state.getBearing());
-        auto pbr = util::rotate(pb, state.getBearing());
-
-        return std::tie(b.get().id.canonical.z, par.y, par.x) < std::tie(a.get().id.canonical.z, pbr.y, pbr.x);
-    });
+    std::sort(renderTiles.begin(), renderTiles.end(), comp);
 
     placementData.clear();
     for (RenderTile& renderTile : renderTiles) {

@@ -2,7 +2,6 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/layers/render_layer_symbol_interface.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
@@ -53,7 +52,7 @@ public:
 
 } // namespace style
 
-class RenderSymbolLayer final: public RenderLayer, public RenderLayerSymbolInterface {
+class RenderSymbolLayer final: public RenderLayer {
 public:
     explicit RenderSymbolLayer(Immutable<style::SymbolLayer::Impl>);
     ~RenderSymbolLayer() override;
@@ -69,12 +68,6 @@ private:
     void upload(gfx::UploadPass&, UploadParameters&) override;
     void render(PaintParameters&, RenderSource*) override;
     void setRenderTiles(RenderTiles, const TransformState&) override;
-    
-    // RenderLayerSymbolInterface overrides
-    const RenderLayerSymbolInterface* getSymbolInterface() const override;
-    const std::string& layerID() const override;
-    const std::vector<std::reference_wrapper<RenderTile>>& getRenderTiles() const override;
-    SymbolBucket* getSymbolBucket(const RenderTile&) const override;
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;
