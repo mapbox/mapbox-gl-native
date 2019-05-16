@@ -1,26 +1,21 @@
 #pragma once
 
-#include <mbgl/gfx/renderable.hpp>
+#include <mbgl/gfx/headless_backend.hpp>
 #include <mbgl/gl/renderer_backend.hpp>
-
 #include <memory>
 #include <functional>
 
 namespace mbgl {
 namespace gl {
 
-class HeadlessBackend final : public gl::RendererBackend, public gfx::Renderable {
+class HeadlessBackend final : public gl::RendererBackend, public gfx::HeadlessBackend {
 public:
     HeadlessBackend(Size = { 256, 256 }, gfx::ContextMode = gfx::ContextMode::Unique);
     ~HeadlessBackend() override;
-
-    gfx::Renderable& getDefaultRenderable() override;
-
-    Size getFramebufferSize() const;
     void updateAssumedState() override;
-
-    void setSize(Size);
-    PremultipliedImage readStillImage();
+    gfx::Renderable& getDefaultRenderable() override;
+    PremultipliedImage readStillImage() override;
+    RendererBackend* getRendererBackend() override;
 
     class Impl {
     public:
@@ -41,8 +36,6 @@ private:
 
 private:
     std::unique_ptr<Impl> impl;
-
-    float pixelRatio;
     bool active = false;
 };
 

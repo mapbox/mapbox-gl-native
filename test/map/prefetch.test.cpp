@@ -4,7 +4,7 @@
 #include <mbgl/test/map_adapter.hpp>
 
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>

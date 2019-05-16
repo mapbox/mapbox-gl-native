@@ -2,7 +2,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/map_adapter.hpp>
 
-#include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>

@@ -13,7 +13,7 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;

@@ -64,8 +64,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/src/mbgl/util/png_reader.cpp
 
         # Headless view
-        PRIVATE platform/default/src/mbgl/gl/headless_frontend.cpp
-        PRIVATE platform/default/include/mbgl/gl/headless_frontend.hpp
+        PRIVATE platform/default/src/mbgl/gfx/headless_frontend.cpp
+        PRIVATE platform/default/include/mbgl/gfx/headless_frontend.hpp
+        PRIVATE platform/default/src/mbgl/gfx/headless_backend.cpp
+        PRIVATE platform/default/include/mbgl/gfx/headless_backend.hpp
         PRIVATE platform/default/src/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/include/mbgl/gl/headless_backend.hpp
 

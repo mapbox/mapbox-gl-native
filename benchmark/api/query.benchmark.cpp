@@ -2,7 +2,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>

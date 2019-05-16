@@ -2,7 +2,7 @@
 
 #include <mbgl/map/camera.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
-#include <mbgl/gl/headless_backend.hpp>
+#include <mbgl/gfx/headless_backend.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -13,10 +13,6 @@ namespace mbgl {
 class Renderer;
 class Map;
 class TransformState;
-
-namespace gfx {
-class RendererBackend;
-} // namespace gfx
 
 class HeadlessFrontend : public RendererFrontend {
 public:
@@ -58,7 +54,7 @@ private:
     Size size;
     float pixelRatio;
 
-    gl::HeadlessBackend backend;
+    std::unique_ptr<gfx::HeadlessBackend> backend;
     util::AsyncTask asyncInvalidate;
 
     std::unique_ptr<Renderer> renderer;
