@@ -87,6 +87,18 @@ private:
     uint16_t maxGroupID;
     bool crossSourceCollisions;
 };
+
+class BucketPlacementParameters {
+public:
+    const mat4& posMatrix;
+    const mat4& textLabelPlaneMatrix;
+    const mat4& iconLabelPlaneMatrix;
+    float scale;
+    float pixelRatio;
+    bool showCollisionBoxes;
+    bool holdingForFade;
+    const CollisionGroups::CollisionGroup& collisionGroup;
+};
     
 class Placement {
 public:
@@ -108,17 +120,11 @@ public:
     const VariableOffsets& getVariableOffsets() const { return variableOffsets; }
 
 private:
+    friend SymbolBucket;
     void placeLayerBucket(
             SymbolBucket&,
-            const mat4& posMatrix,
-            const mat4& textLabelPlaneMatrix,
-            const mat4& iconLabelPlaneMatrix,
-            const float scale,
-            const float pixelRatio,
-            const bool showCollisionBoxes,
-            std::unordered_set<uint32_t>& seenCrossTileIDs,
-            const bool holdingForFade,
-            const CollisionGroups::CollisionGroup& collisionGroup);
+            const BucketPlacementParameters&,
+            std::set<uint32_t>& seenCrossTileIDs);
 
     void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
     void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&);

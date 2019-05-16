@@ -17,6 +17,8 @@ class CrossTileSymbolLayerIndex;
 class OverscaledTileID;
 class PatternDependency;
 using PatternLayerMap = std::map<std::string, PatternDependency>;
+class Placement;
+class BucketPlacementParameters;
 
 class Bucket {
 public:
@@ -55,6 +57,9 @@ public:
     virtual std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const OverscaledTileID&, uint32_t&) {
         return std::make_pair(0u, false);
     }
+    // Places this bucket to the given placement. Returns bucket cross-tile id on success call; `0` otherwise.
+    virtual uint32_t place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) { return 0u; }
+    virtual void updateOpacities(Placement&, std::set<uint32_t>&) {}
 
 protected:
     Bucket() = default;
