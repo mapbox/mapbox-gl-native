@@ -10,6 +10,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+@Ignore("mapbox-gl-native#14691")
 public class SchemaTest {
   private static final String MAP_LOAD = "map.load";
   private static final String MAP_PERFORMANCE = "mobile.performance_trace";
