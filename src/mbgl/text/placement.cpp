@@ -72,27 +72,17 @@ Placement::Placement(const TransformState& state_, MapMode mapMode_, style::Tran
     }
 }
 
-void Placement::placeLayer(const RenderLayerSymbolInterface& symbolInterface, const mat4& projMatrix, bool showCollisionBoxes) {
+void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, bool showCollisionBoxes) {
 
     std::unordered_set<uint32_t> seenCrossTileIDs;
 
-    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
-        assert(renderTile.tile.isRenderable());
+    for (const auto& item : layer.getPlacementData()) {
+        RenderTile& renderTile = item.tile;
         assert(renderTile.tile.kind == Tile::Kind::Geometry);
         auto& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
 
-        auto bucket = symbolInterface.getSymbolBucket(renderTile);
-        if (!bucket) {
-            continue;
-        }
-        SymbolBucket& symbolBucket = *bucket;
-
-        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
-            // Only place this layer if it's the "group leader" for the bucket
-            continue;
-        }
-
-        auto& layout = symbolBucket.layout;
+        Bucket& bucket = item.bucket;
+        auto& symbolBucket = static_cast<SymbolBucket&>(bucket);
 
         const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
 
@@ -104,14 +94,14 @@ void Placement::placeLayer(const RenderLayerSymbolInterface& symbolInterface, co
         matrix::multiply(posMatrix, projMatrix, posMatrix);
 
         mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
-                layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
-                layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map,
+                item.pitchWithMap,
+                item.rotateWithMap,
                 state,
                 pixelsToTileUnits);
 
         mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
-                layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
-                layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map,
+                item.pitchWithMap,
+                item.rotateWithMap,
                 state,
                 pixelsToTileUnits);
         
@@ -406,21 +396,12 @@ void Placement::commit(TimePoint now) {
     fadeStartTime = placementChanged ? commitTime : prevPlacement->fadeStartTime;
 }
 
-void Placement::updateLayerOpacities(const RenderLayerSymbolInterface& symbolInterface) {
+void Placement::updateLayerOpacities(const RenderLayer& layer) {
     std::set<uint32_t> seenCrossTileIDs;
-    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
-        assert(renderTile.tile.isRenderable());
+    for (const auto& item : layer.getPlacementData()) {
+        Bucket& bucket = item.bucket;
+        auto& symbolBucket = static_cast<SymbolBucket&>(bucket);
 
-        auto bucket = symbolInterface.getSymbolBucket(renderTile);
-        if (!bucket) {
-            continue;
-        }
-        SymbolBucket& symbolBucket = *bucket;
-
-        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
-            // Only update opacities this layer if it's the "group leader" for the bucket
-            continue;
-        }
         updateBucketOpacities(symbolBucket, seenCrossTileIDs);
     }
 }

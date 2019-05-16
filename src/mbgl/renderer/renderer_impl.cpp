@@ -327,7 +327,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             if (placementChanged) {
                 usedSymbolLayers.insert(symbolLayer.getID());
-                placement->placeLayer(*symbolLayer.getSymbolInterface(), projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
+                placement->placeLayer(symbolLayer, projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
@@ -342,7 +342,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (placementChanged || symbolBucketsChanged) {
             for (auto it = symbolLayers.rbegin(); it != symbolLayers.rend(); ++it) {
                 const RenderLayer& symbolLayer = *it;
-                placement->updateLayerOpacities(*symbolLayer.getSymbolInterface());
+                placement->updateLayerOpacities(symbolLayer);
             }
         }
     }

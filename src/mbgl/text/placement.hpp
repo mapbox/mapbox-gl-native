@@ -92,9 +92,9 @@ private:
 class Placement {
 public:
     Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, std::unique_ptr<Placement> prevPlacementOrNull = nullptr);
-    void placeLayer(const RenderLayerSymbolInterface&, const mat4&, bool showCollisionBoxes);
+    void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
     void commit(TimePoint);
-    void updateLayerOpacities(const RenderLayerSymbolInterface&);
+    void updateLayerOpacities(const RenderLayer&);
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
 
