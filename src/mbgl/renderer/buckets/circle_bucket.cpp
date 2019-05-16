@@ -39,10 +39,6 @@ bool CircleBucket::hasData() const {
     return !segments.empty();
 }
 
-bool CircleBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::CircleLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 void CircleBucket::addFeature(const GeometryTileFeature& feature,
                                  const GeometryCollection& geometry,
                                  const ImagePositions&,

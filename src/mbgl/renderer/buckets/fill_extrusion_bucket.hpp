@@ -31,8 +31,6 @@ public:
 
     bool hasData() const override;
 
-    bool supportsLayer(const style::Layer::Impl&) const override;
-
     void upload(gfx::UploadPass&) override;
 
     float getQueryRadius(const RenderLayer&) const override;

@@ -523,10 +523,6 @@ bool LineBucket::hasData() const {
     return !segments.empty();
 }
 
-bool LineBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::LineLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 template <class Property>
 static float get(const LinePaintProperties::PossiblyEvaluated& evaluated, const std::string& id, const std::map<std::string, LineProgram::Binders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(id);

@@ -27,7 +27,6 @@ public:
     void upload(gfx::UploadPass&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
-    bool supportsLayer(const style::Layer::Impl&) const override;
 
     gfx::VertexVector<HeatmapLayoutVertex> vertices;
     gfx::IndexVector<gfx::Triangles> triangles;

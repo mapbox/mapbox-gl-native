@@ -133,10 +133,6 @@ bool SymbolBucket::hasData() const {
     return hasTextData() || hasIconData() || hasCollisionBoxData();
 }
 
-bool SymbolBucket::supportsLayer(const style::Layer::Impl& impl) const {
-    return style::SymbolLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
-}
-
 bool SymbolBucket::hasTextData() const {
     return !text.segments.empty();
 }
