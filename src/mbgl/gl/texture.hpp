@@ -32,12 +32,6 @@ public:
             concat_literals<&string_literal<'u', '_'>::value, &Ts::name>::value())... };
     }
 
-    template <class BinaryProgram>
-    void loadNamedLocations(const BinaryProgram& program) {
-        state = State{ program.textureLocation(
-            concat_literals<&string_literal<'u', '_'>::value, &Ts::name>::value())... };
-    }
-
     NamedUniformLocations getNamedLocations() const {
         return NamedUniformLocations{ { concat_literals<&string_literal<'u', '_'>::value, &Ts::name>::value(),
                                         state.template get<Ts>().location }... };

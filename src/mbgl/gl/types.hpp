@@ -38,8 +38,6 @@ constexpr bool operator!=(const PixelStorageType& a, const PixelStorageType& b) 
     return a.alignment != b.alignment;
 }
 
-using BinaryProgramFormat = uint32_t;
-
 enum class UniformDataType : uint32_t {
     Float = 0x1406,
     FloatVec2 = 0x8B50,

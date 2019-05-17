@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/gfx/context.hpp>
-#include <mbgl/gl/features.hpp>
 #include <mbgl/gl/object.hpp>
 #include <mbgl/gl/state.hpp>
 #include <mbgl/gl/value.hpp>
@@ -33,7 +32,6 @@ class RendererBackend;
 namespace extension {
 class VertexArray;
 class Debugging;
-class ProgramBinary;
 } // namespace extension
 
 class Context final : public gfx::Context {
@@ -51,17 +49,9 @@ public:
 
     UniqueShader createShader(ShaderType type, const std::initializer_list<const char*>& sources);
     UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader, const char* location0AttribName);
-    UniqueProgram createProgram(BinaryProgramFormat binaryFormat, const std::string& binaryProgram);
     void verifyProgramLinkage(ProgramID);
     void linkProgram(ProgramID);
     UniqueTexture createUniqueTexture();
-
-#if MBGL_HAS_BINARY_PROGRAMS
-    bool supportsProgramBinaries() const;
-#else
-    constexpr static bool supportsProgramBinaries() { return false; }
-#endif
-    optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     Framebuffer createFramebuffer(const gfx::Renderbuffer<gfx::RenderbufferPixelType::RGBA>&,
                                   const gfx::Renderbuffer<gfx::RenderbufferPixelType::DepthStencil>&);
@@ -140,9 +130,6 @@ private:
 
     std::unique_ptr<extension::Debugging> debugging;
     std::unique_ptr<extension::VertexArray> vertexArray;
-#if MBGL_HAS_BINARY_PROGRAMS
-    std::unique_ptr<extension::ProgramBinary> programBinary;
-#endif
 
 public:
     State<value::ActiveTextureUnit> activeTextureUnit;

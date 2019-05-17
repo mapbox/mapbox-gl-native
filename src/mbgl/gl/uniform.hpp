@@ -82,11 +82,6 @@ public:
         state = State{ gl::uniformLocation(id, concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value())... };
     }
 
-    template <class BinaryProgram>
-    void loadNamedLocations(const BinaryProgram& program) {
-        state = State{ UniformState<typename Us::Value>(program.uniformLocation(concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value()))... };
-    }
-
     NamedUniformLocations getNamedLocations() const {
         return NamedUniformLocations{ { concat_literals<&string_literal<'u', '_'>::value, &Us::name>::value(), state.template get<Us>().location }... };
     }

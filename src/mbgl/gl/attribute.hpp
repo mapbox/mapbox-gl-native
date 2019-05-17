@@ -31,12 +31,6 @@ private:
 public:
     AttributeLocations() = default;
 
-    template <class BinaryProgram>
-    AttributeLocations(const BinaryProgram& program)
-        : locations{ program.attributeLocation(
-              concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... } {
-    }
-
     void queryLocations(const ProgramID& id) {
         locations = Locations{
             queryLocation(id, concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... };
