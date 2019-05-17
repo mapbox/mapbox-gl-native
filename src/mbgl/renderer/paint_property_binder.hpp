@@ -324,7 +324,7 @@ public:
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t length, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies, const style::expression::Value&) override {
     
-        if (patternDependencies->mid.empty())  {
+        if (!patternDependencies || patternDependencies->mid.empty())  {
             // Unlike other propperties with expressions that evaluate to null, the default value for `*-pattern` properties is an empty
             // string and will not have a valid entry in patternPositions. We still need to populate the attribute buffers to avoid crashes
             // when we try to draw the layer because we don't know at draw time if all features were evaluated to valid pattern dependencies.
@@ -354,19 +354,29 @@ public:
     }
 
     void upload(gfx::UploadPass& uploadPass) override {
-        patternToVertexBuffer = uploadPass.createVertexBuffer(std::move(patternToVertexVector));
-        zoomInVertexBuffer = uploadPass.createVertexBuffer(std::move(zoomInVertexVector));
-        zoomOutVertexBuffer = uploadPass.createVertexBuffer(std::move(zoomOutVertexVector));
+        if (!patternToVertexVector.empty()) {
+            assert(!zoomInVertexVector.empty());
+            assert(!zoomOutVertexVector.empty());
+            patternToVertexBuffer = uploadPass.createVertexBuffer(std::move(patternToVertexVector));
+            zoomInVertexBuffer = uploadPass.createVertexBuffer(std::move(zoomInVertexVector));
+            zoomOutVertexBuffer = uploadPass.createVertexBuffer(std::move(zoomOutVertexVector));
+        }
     }
 
     std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>{
-                gfx::attributeBinding(*patternToVertexBuffer),
-                gfx::attributeBinding(crossfade.fromScale == 2 ? *zoomInVertexBuffer : *zoomOutVertexBuffer)
-            };
+            if (patternToVertexBuffer) {
+                assert(zoomInVertexBuffer);
+                assert(zoomOutVertexBuffer);
+                return std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>{
+                    gfx::attributeBinding(*patternToVertexBuffer),
+                    gfx::attributeBinding(crossfade.fromScale == 2 ? *zoomInVertexBuffer : *zoomOutVertexBuffer)
+                };
+            }
+
+            return std::tuple<optional<gfx::AttributeBinding>, optional<gfx::AttributeBinding>>{{}, {}};
         }
     }
 
