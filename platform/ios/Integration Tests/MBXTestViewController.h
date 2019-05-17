@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) UIViewController *viewController;
 @property (nonatomic) UITabBarController *tabController;
+@property (nonatomic) NSInteger counter;
 @end
 
 NS_ASSUME_NONNULL_END
