@@ -4,7 +4,12 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
-## 8.0.0-beta.1 - May 16, 2019
+## 6.8.2 - May 17, 2019
+
+### Bugs
+ - Avoid binary shader load race condition with using multiple maps, disable binary shaders [#14298](https://github.com/mapbox/mapbox-gl-native/pull/14298)
+
+## 7.5.0-beta.1 - May 17, 2019
 
 ### Features
  - Option to provide custom values for location camera transition [#14606](https://github.com/mapbox/mapbox-gl-native/pull/14606)
