@@ -436,6 +436,9 @@
 		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		9C188C4F2242C95A0022FA55 /* MMEDate.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMEDate.m */; };
 		9C188C502242C96F0022FA55 /* MMEDate.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC51FE05D6F00C1BD0D /* MMEDate.h */; };
+		A46E4C9E228CE392009CAD5B /* MBXTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A46E4C9C228CB74B009CAD5B /* MBXTestViewController.m */; };
+		A46E4C9F228CE5FD009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
+		A46E4CA2228F4D6B009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
 		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC1B0916221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
 		AC1B0917221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
@@ -1102,6 +1105,9 @@
 		96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapViewDirectionTests.mm; sourceTree = "<group>"; };
 		96F017292118FBAE00892778 /* MGLMapView_Experimental.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Experimental.h; sourceTree = "<group>"; };
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
+		A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = IntegrationTest.storyboard; sourceTree = "<group>"; };
+		A46E4C9B228CB74B009CAD5B /* MBXTestViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXTestViewController.h; sourceTree = "<group>"; };
+		A46E4C9C228CB74B009CAD5B /* MBXTestViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXTestViewController.m; sourceTree = "<group>"; };
 		A4F3FB1C2254865900A30170 /* missing_icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = missing_icon.json; sourceTree = "<group>"; };
 		AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLLocationManager+MMEMobileEvents.h"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.h"; sourceTree = "<group>"; };
 		AC1B0915221CA14C00DB56C8 /* CLLocationManager+MMEMobileEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CLLocationManager+MMEMobileEvents.m"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.m"; sourceTree = "<group>"; };
@@ -1474,6 +1480,8 @@
 				16376B0B1FFD9DAF0000563E /* Info.plist */,
 				CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */,
 				CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */,
+				A46E4C9B228CB74B009CAD5B /* MBXTestViewController.h */,
+				A46E4C9C228CB74B009CAD5B /* MBXTestViewController.m */,
 				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
 				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
 				CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */,
@@ -1491,6 +1499,7 @@
 				16376B321FFDB4B40000563E /* AppDelegate.m */,
 				16376B3A1FFDB4B40000563E /* Assets.xcassets */,
 				16376B3C1FFDB4B40000563E /* LaunchScreen.storyboard */,
+				A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */,
 				16376B3F1FFDB4B40000563E /* Info.plist */,
 				16376B401FFDB4B40000563E /* main.m */,
 			);
@@ -2905,6 +2914,7 @@
 			files = (
 				16376B471FFDB92B0000563E /* one-liner.json in Resources */,
 				1F8A59F821653275004DFE75 /* sideload_sat.db in Resources */,
+				A46E4C9F228CE5FD009CAD5B /* IntegrationTest.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2912,6 +2922,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A46E4CA2228F4D6B009CAD5B /* IntegrationTest.storyboard in Resources */,
 				16376B3E1FFDB4B40000563E /* LaunchScreen.storyboard in Resources */,
 				16376B3B1FFDB4B40000563E /* Assets.xcassets in Resources */,
 			);
@@ -3047,6 +3058,7 @@
 				CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */,
 				CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */,
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
+				A46E4C9E228CE392009CAD5B /* MBXTestViewController.m in Sources */,
 				077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */,
 				CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */,
 				CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */,
