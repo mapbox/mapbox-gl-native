@@ -283,7 +283,7 @@ MGL_EXPORT
  The <a href="https://docs.mapbox.com/help/glossary/style-url/">style URL</a> associated
  with the style.
  */
-@property (readonly, strong, nullable) NSURL *URL;
+@property (nonatomic, strong, nullable) NSURL *URL;
 
 #pragma mark Managing Sources
 

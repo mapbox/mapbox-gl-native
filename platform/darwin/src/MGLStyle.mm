@@ -83,7 +83,6 @@ const MGLExceptionName MGLRedundantSourceIdentifierException = @"MGLRedundantSou
 
 @property (nonatomic, readonly, weak) MGLMapView *mapView;
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
-@property (readwrite, strong, nullable) NSURL *URL;
 @property (nonatomic, readwrite, strong) NSMutableDictionary<NSString *, MGLOpenGLStyleLayer *> *openGLLayers;
 @property (nonatomic) NSMutableDictionary<NSString *, NSDictionary<NSObject *, MGLTextLanguage *> *> *localizedLayersByIdentifier;
 
@@ -98,7 +97,6 @@ const MGLExceptionName MGLRedundantSourceIdentifierException = @"MGLRedundantSou
         [self commonInit];
 
         self.URL = styleURL;
-        _URL = styleURL;
     }
 
     return self;
