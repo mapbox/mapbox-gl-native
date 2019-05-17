@@ -14,7 +14,7 @@ import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_recyclerview.*
 
 /**
- * TestActivity showcasing how to integrate a GLSurfaceView MapView in a RecyclerView.
+ * TestActivity showcasing how to integrate multiple GLSurfaceView MapViews in a RecyclerView.
  * <p>
  * It requires calling the correct lifecycle methods when detaching and attaching the View to
  * the RecyclerView with onViewAttachedToWindow and onViewDetachedFromWindow.
@@ -27,13 +27,7 @@ open class GLSurfaceRecyclerViewActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_recyclerview)
     recyclerView.layoutManager = LinearLayoutManager(this)
-    recyclerView.adapter = ItemAdapter(this, LayoutInflater.from(this), savedInstanceState)
-  }
-
-  override fun onSaveInstanceState(outState: Bundle?) {
-    super.onSaveInstanceState(outState)
-    // to save state, we need to call MapView#onSaveInstanceState
-    (recyclerView.adapter as ItemAdapter).onSaveInstanceState(outState)
+    recyclerView.adapter = ItemAdapter(this, LayoutInflater.from(this))
   }
 
   override fun onLowMemory() {
@@ -52,15 +46,15 @@ open class GLSurfaceRecyclerViewActivity : AppCompatActivity() {
     return R.layout.item_map_gl
   }
 
-  class ItemAdapter(private val activity: GLSurfaceRecyclerViewActivity, private val inflater: LayoutInflater, val savedInstanceState: Bundle?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+  class ItemAdapter(private val activity: GLSurfaceRecyclerViewActivity, private val inflater: LayoutInflater) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val items = listOf(
-      "one", "two", "three", MapItem(), "four", "five", "six", "seven", "eight", "nine", "ten",
+      "one", "two", "three", MapItem(Style.MAPBOX_STREETS), "four", "five", MapItem(Style.DARK), "seven", "eight", "nine", "ten",
       "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen",
       "nineteen", "twenty", "twenty-one"
     )
 
-    private var mapHolder: MapHolder? = null
+    private var mapHolders: MutableList<MapHolder> = mutableListOf()
 
     companion object {
       const val TYPE_MAP = 0
@@ -70,9 +64,9 @@ open class GLSurfaceRecyclerViewActivity : AppCompatActivity() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
       return if (viewType == TYPE_MAP) {
         val mapView = inflater.inflate(activity.getMapItemLayoutId(), parent, false) as MapView
-        mapView.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.MAPBOX_STREETS) }
-        mapHolder = MapHolder(mapView, savedInstanceState)
-        return mapHolder as MapHolder
+        val mapHolder = MapHolder(mapView)
+        mapHolders.add(mapHolder)
+        return mapHolder
       } else {
         TextHolder(inflater.inflate(android.R.layout.simple_list_item_1, parent, false) as TextView)
       }
@@ -101,9 +95,10 @@ open class GLSurfaceRecyclerViewActivity : AppCompatActivity() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-      if (holder.itemViewType == TYPE_TEXT) {
-        val textHolder = holder as TextHolder
-        textHolder.bind(items[position] as String)
+      if (holder is TextHolder) {
+        holder.bind(items[position] as String)
+      } else if (holder is MapHolder) {
+        holder.bind(items[position] as MapItem)
       }
     }
 
@@ -115,34 +110,38 @@ open class GLSurfaceRecyclerViewActivity : AppCompatActivity() {
       }
     }
 
-    fun onSaveInstanceState(savedInstanceState: Bundle?) {
-      savedInstanceState?.let {
-        mapHolder?.mapView?.onSaveInstanceState(it)
-      }
-    }
-
     fun onLowMemory() {
-      mapHolder?.mapView?.onLowMemory()
+      for (mapHolder in mapHolders) {
+        mapHolder.mapView.onLowMemory()
+      }
     }
 
     fun onDestroy() {
-      mapHolder?.mapView?.let {
-        it.onPause()
-        it.onStop()
-        it.onDestroy()
+      for (mapHolder in mapHolders) {
+        mapHolder.mapView.let {
+          it.onPause()
+          it.onStop()
+          it.onDestroy()
+        }
       }
     }
 
-    class MapItem
-    class MapHolder(val mapView: MapView, bundle: Bundle?) : RecyclerView.ViewHolder(mapView) {
+    data class MapItem(val style: String)
+    class MapHolder(val mapView: MapView) : RecyclerView.ViewHolder(mapView) {
+
       init {
-        mapView.onCreate(bundle)
+        // unfortunately, if there are multiple maps hosted in one activity, state saving is not possible
+        mapView.onCreate(null)
         mapView.setOnTouchListener { view, motionEvent ->
           // Disallow the touch request for recyclerView scroll
           view.parent.requestDisallowInterceptTouchEvent(true)
           mapView.onTouchEvent(motionEvent)
           true
         }
+      }
+
+      fun bind(mapItem: MapItem) {
+        mapView.getMapAsync { mapboxMap -> mapboxMap.setStyle(mapItem.style) }
       }
     }
 
