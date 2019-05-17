@@ -88,7 +88,7 @@ RendererBackend* HeadlessBackend::getRendererBackend() {
 
 #ifndef OVERRIDE_HEADLESS_BACKEND_FACTORY
 // Default factory implementation.
-std::unique_ptr<gfx::HeadlessBackend> gfx::HeadlessBackend::makeBackend(Size size, gfx::ContextMode contextMode) {
+std::unique_ptr<gfx::HeadlessBackend> gfx::HeadlessBackend::make(Size size, gfx::ContextMode contextMode) {
     return std::make_unique<gl::HeadlessBackend>(size, contextMode);
 }
 #endif
