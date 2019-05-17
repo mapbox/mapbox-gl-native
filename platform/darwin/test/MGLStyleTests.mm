@@ -29,7 +29,8 @@
 
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) styleURL:styleURL];
+    MGLStyle *mapStyle = [[MGLStyle alloc] initWithURL:styleURL];
+    self.mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) style:mapStyle];
     self.mapView.delegate = self;
     if (!self.mapView.style) {
         _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];

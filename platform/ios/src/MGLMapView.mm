@@ -355,7 +355,20 @@ public:
         MGLLogInfo(@"Starting %@ initialization.", NSStringFromClass([self class]));
         MGLLogDebug(@"Initializing frame: %@ styleURL: %@", NSStringFromCGRect(frame), styleURL);
         [self commonInit];
-        self.styleURL = styleURL;
+        MGLStyle *style = [[MGLStyle alloc] initWithURL:styleURL];
+        self.styleURL = style.URL;
+        MGLLogInfo(@"Finalizing %@ initialization.", NSStringFromClass([self class]));
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame style:(nullable MGLStyle *)style {
+    if (self = [super initWithFrame:frame])
+    {
+        MGLLogInfo(@"Starting %@ initialization.", NSStringFromClass([self class]));
+        MGLLogDebug(@"Initializing frame: %@ style: %@", NSStringFromCGRect(frame), style);
+        [self commonInit];
+        self.style = style;
         MGLLogInfo(@"Finalizing %@ initialization.", NSStringFromClass([self class]));
     }
     return self;

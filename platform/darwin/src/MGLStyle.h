@@ -61,6 +61,28 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantSourceIdentifier
 MGL_EXPORT
 @interface MGLStyle : NSObject
 
+#pragma mark Creating Instances
+
+/**
+ Initializes and returns a new map style with a given URL.
+
+ @param styleURL The URL used to initialize a map style,
+ which must point to a JSON object that conforms to the
+ <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/">Mapbox Style Specification</a>.
+*/
+- (instancetype)initWithURL:(NSURL *)styleURL;
+
+/**
+ Initializes and returns a new map style with a given data object.
+
+ @param data String data containing JSON that conforms to the
+ <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/">Mapbox Style Specification</a> .
+ @param encoding The encoding used by `data`.
+ @param outError Upon return, if an error has occurred, a pointer to an
+ `NSError` object describing the error. Pass in `NULL` to ignore any error.
+*/
+- (instancetype)initWithData:(NSData *)data encoding:(NSStringEncoding)encoding error:(NSError * _Nullable *)outError;
+
 #pragma mark Accessing Default Styles
 
 /**
@@ -256,6 +278,12 @@ MGL_EXPORT
  You can customize the style’s name in Mapbox Studio.
  */
 @property (readonly, copy, nullable) NSString *name;
+
+/**
+ The <a href="https://docs.mapbox.com/help/glossary/style-url/">style URL</a> associated
+ with the style.
+ */
+@property (readonly, strong, nullable) NSURL *URL;
 
 #pragma mark Managing Sources
 

@@ -217,6 +217,17 @@ MGL_EXPORT
  */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
 
+
+/**
+ Initializes and returns a newly allocated map view with the specified frame
+ and style.
+
+ @param frame The frame for the view, measured in points.
+ @param style The style to display. Specify `nil` for the default style.
+ @return An initialized map view.
+*/
+- (instancetype)initWithFrame:(CGRect)frame style:(nullable MGLStyle *)style;
+
 #pragma mark Accessing the Delegate
 
 /**

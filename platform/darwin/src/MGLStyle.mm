@@ -14,6 +14,8 @@
 #import "MGLBackgroundStyleLayer.h"
 #import "MGLOpenGLStyleLayer.h"
 #import "MGLStyleLayerManager.h"
+#import "MGLRendererConfiguration.h"
+#import "MGLOfflineStorage_Private.h"
 
 #import "MGLSource.h"
 #import "MGLSource_Private.h"
@@ -38,6 +40,8 @@
 #include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/style/sources/raster_dem_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/storage/resource_options.hpp>
+#include <mbgl/storage/file_source.hpp>
 
 #import "NSDate+MGLAdditions.h"
 
@@ -79,13 +83,57 @@ const MGLExceptionName MGLRedundantSourceIdentifierException = @"MGLRedundantSou
 
 @property (nonatomic, readonly, weak) MGLMapView *mapView;
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
-@property (readonly, copy, nullable) NSURL *URL;
+@property (readwrite, strong, nullable) NSURL *URL;
 @property (nonatomic, readwrite, strong) NSMutableDictionary<NSString *, MGLOpenGLStyleLayer *> *openGLLayers;
 @property (nonatomic) NSMutableDictionary<NSString *, NSDictionary<NSObject *, MGLTextLanguage *> *> *localizedLayersByIdentifier;
 
 @end
 
 @implementation MGLStyle
+
+#pragma mark Creating instances
+
+- (instancetype)initWithURL:(NSURL *)styleURL {
+    if (self = [super init]) {
+        [self commonInit];
+
+        self.URL = styleURL;
+        _URL = styleURL;
+    }
+
+    return self;
+}
+
+- (instancetype)initWithData:(NSData *)data encoding:(NSStringEncoding)encoding error:(NSError * _Nullable *)outError {
+    if (self = [super init]) {
+        [self commonInit];
+        NSString *string = [[NSString alloc] initWithData:data encoding:encoding];
+        if (!string) {
+            if (outError) {
+                *outError = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeLoadStyleFailed userInfo:nil];
+            }
+            return nil;
+        }
+
+        _rawStyle->loadJSON(string.UTF8String);
+    }
+
+    return self;
+}
+
+- (void)commonInit {
+    MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
+
+    mbgl::ResourceOptions resourceOptions;
+
+    resourceOptions.withCachePath([[MGLOfflineStorage sharedOfflineStorage] mbglCachePath])
+                   .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
+
+    auto fileSource = mbgl::FileSource::getSharedFileSource(resourceOptions);
+    auto style = std::make_unique<mbgl::style::Style>(*fileSource, config.scaleFactor);
+
+    _rawStyle = &*style;
+}
 
 #pragma mark Default style URLs
 
