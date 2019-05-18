@@ -49,7 +49,8 @@ public:
                  const std::initializer_list<const char*>& fragmentSource)
             : program(context.createProgram(
                   context.createShader(ShaderType::Vertex, vertexSource),
-                  context.createShader(ShaderType::Fragment, fragmentSource))) {
+                  context.createShader(ShaderType::Fragment, fragmentSource),
+                  attributeLocations.getFirstAttribName())) {
             attributeLocations.queryLocations(program);
             uniformStates.queryLocations(program);
             // Texture units are specified via uniforms as well, so we need query their locations

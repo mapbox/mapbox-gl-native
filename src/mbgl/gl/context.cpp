@@ -169,11 +169,17 @@ UniqueShader Context::createShader(ShaderType type, const std::initializer_list<
     throw std::runtime_error("shader failed to compile");
 }
 
-UniqueProgram Context::createProgram(ShaderID vertexShader, ShaderID fragmentShader) {
+UniqueProgram Context::createProgram(ShaderID vertexShader, ShaderID fragmentShader, const char* location0AttribName) {
     UniqueProgram result { MBGL_CHECK_ERROR(glCreateProgram()), { this } };
 
     MBGL_CHECK_ERROR(glAttachShader(result, vertexShader));
     MBGL_CHECK_ERROR(glAttachShader(result, fragmentShader));
+
+    // It is important to have attribute at position 0 enabled: conveniently,
+    // position attribute is always first and always enabled. The integrity of
+    // this assumption is verified in AttributeLocations::queryLocations and
+    // AttributeLocations::getFirstAttribName.
+    MBGL_CHECK_ERROR(glBindAttribLocation(result, 0, location0AttribName));
 
     linkProgram(result);
 

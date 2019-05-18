@@ -50,7 +50,7 @@ public:
     void enableDebugging();
 
     UniqueShader createShader(ShaderType type, const std::initializer_list<const char*>& sources);
-    UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader);
+    UniqueProgram createProgram(ShaderID vertexShader, ShaderID fragmentShader, const char* location0AttribName);
     UniqueProgram createProgram(BinaryProgramFormat binaryFormat, const std::string& binaryProgram);
     void verifyProgramLinkage(ProgramID);
     void linkProgram(ProgramID);
