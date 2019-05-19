@@ -2,7 +2,6 @@
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/raster_program.hpp>
@@ -73,7 +72,18 @@ static std::array<float, 3> spinWeights(float spin) {
     return spin_weights;
 }
 
-void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source) {
+void RenderRasterLayer::prepare(const LayerPrepareParameters& params) {
+    RenderLayer::prepare(params);
+    auto* imageSource = params.source->as<RenderImageSource>();
+    if (imageSource && imageSource->isLoaded()) {
+        assert(imageSource->isEnabled());
+        assert(imageSource->sharedData.bucket);
+        assert(imageSource->sharedData.matrices);
+        imageData = imageSource->sharedData;
+    }
+}
+
+void RenderRasterLayer::render(PaintParameters& parameters) {
     if (parameters.pass != RenderPass::Translucent)
         return;
     const auto& evaluated = static_cast<const RasterLayerProperties&>(*evaluatedProperties).evaluated;
@@ -132,22 +142,20 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
 
     const gfx::TextureFilterType filter = evaluated.get<RasterResampling>() == RasterResamplingType::Nearest ? gfx::TextureFilterType::Nearest : gfx::TextureFilterType::Linear;
 
-    if (auto* imageSource = source->as<RenderImageSource>()) {
-        if (imageSource->isEnabled() && imageSource->isLoaded() && !imageSource->bucket->needsUpload()) {
-            RasterBucket& bucket = *imageSource->bucket;
-            assert(bucket.texture);
+    if (imageData && !imageData->bucket->needsUpload()) {
+        RasterBucket& bucket = *imageData->bucket;
+        assert(bucket.texture);
 
-            for (auto matrix_ : imageSource->matrices) {
-                draw(matrix_,
-                     *bucket.vertexBuffer,
-                     *bucket.indexBuffer,
-                     bucket.segments,
-                     RasterProgram::TextureBindings{
-                         textures::image0::Value{ bucket.texture->getResource(), filter },
-                         textures::image1::Value{ bucket.texture->getResource(), filter },
-                     },
-                     bucket.drawScopeID);
-            }
+        for (const auto& matrix_ : *imageData->matrices) {
+            draw(matrix_,
+                *bucket.vertexBuffer,
+                *bucket.indexBuffer,
+                bucket.segments,
+                RasterProgram::TextureBindings{
+                    textures::image0::Value{ bucket.texture->getResource(), filter },
+                    textures::image1::Value{ bucket.texture->getResource(), filter },
+                },
+                bucket.drawScopeID);
         }
     } else {
         for (const RenderTile& tile : renderTiles) {

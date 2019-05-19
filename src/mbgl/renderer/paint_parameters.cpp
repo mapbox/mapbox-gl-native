@@ -30,7 +30,7 @@ PaintParameters::PaintParameters(gfx::Context& context_,
                     gfx::RendererBackend& backend_,
                     const UpdateParameters& updateParameters,
                     const EvaluatedLight& evaluatedLight_,
-		    const TransformParameters& transformParams_,
+                    const TransformParameters& transformParams_,
                     RenderStaticData& staticData_,
                     ImageManager& imageManager_,
                     LineAtlas& lineAtlas_)

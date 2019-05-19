@@ -65,14 +65,17 @@ bool RenderHillshadeLayer::hasCrossfade() const {
     return false;
 }
 
-void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src) {
+void RenderHillshadeLayer::prepare(const LayerPrepareParameters& params) {
+    RenderLayer::prepare(params);
+    if (auto* demsrc = params.source->as<RenderRasterDEMSource>()) {
+        maxzoom = demsrc->getMaxZoom();
+    }
+}
+
+void RenderHillshadeLayer::render(PaintParameters& parameters) {
     if (parameters.pass != RenderPass::Translucent && parameters.pass != RenderPass::Pass3D)
         return;
-    const auto& evaluated = static_cast<const HillshadeLayerProperties&>(*evaluatedProperties).evaluated;
-    auto* demsrc = static_cast<RenderRasterDEMSource*>(src);
-    const uint8_t TERRAIN_RGB_MAXZOOM = 15;
-    const uint8_t maxzoom = demsrc != nullptr ? demsrc->getMaxZoom() : TERRAIN_RGB_MAXZOOM;
-
+    const auto& evaluated = static_cast<const HillshadeLayerProperties&>(*evaluatedProperties).evaluated;  
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,
                      const auto& indexBuffer,

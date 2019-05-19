@@ -28,12 +28,12 @@ const style::ImageSource::Impl& RenderImageSource::impl() const {
 }
 
 bool RenderImageSource::isLoaded() const {
-    return !!bucket;
+    return !!sharedData.bucket;
 }
 
 void RenderImageSource::upload(gfx::UploadPass& uploadPass) {
-    if (bucket->needsUpload()) {
-        bucket->upload(uploadPass);
+    if (sharedData.bucket->needsUpload()) {
+        sharedData.bucket->upload(uploadPass);
     }
 }
 
@@ -42,14 +42,13 @@ void RenderImageSource::prepare(const SourcePrepareParameters& parameters) {
         return;
     }
 
-    matrices.clear();
+    sharedData.matrices = std::make_shared<std::vector<mat4>>(tileIds.size(), mat4());
     const auto& transformParams = parameters.transform;
-    for (auto& tileId : tileIds) {
-        mat4 matrix;
+    for (size_t i = 0u; i < tileIds.size(); ++i) {
+        mat4& matrix = (*sharedData.matrices)[i];
         matrix::identity(matrix);
-        transformParams.state.matrixFor(matrix, tileId);
+        transformParams.state.matrixFor(matrix, tileIds[i]);
         matrix::multiply(matrix, transformParams.alignedProjMatrix, matrix);
-        matrices.push_back(matrix);
     }
 }
 
@@ -63,7 +62,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
 
     auto& programInstance = parameters.programs.debug;
 
-    for (auto matrix : matrices) {
+    for (auto matrix : *sharedData.matrices) {
         programInstance.draw(
             parameters.context,
             *parameters.renderPass,
@@ -194,29 +193,29 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         auto gc = TileCoordinate::toGeometryCoordinate(tileIds[0], tileCoords);
         geomCoords.push_back(gc);
     }
-    if (!bucket) {
-        bucket = std::make_unique<RasterBucket>(image);
+    if (!sharedData.bucket) {
+        sharedData.bucket = std::make_unique<RasterBucket>(image);
     } else {
-        bucket->clear();
-        if (image != bucket->image) {
-            bucket->setImage(image);
+        sharedData.bucket->clear();
+        if (image != sharedData.bucket->image) {
+            sharedData.bucket->setImage(image);
         }
     }
 
     // Set Bucket Vertices, Indices, and segments
-    bucket->vertices.emplace_back(
+    sharedData.bucket->vertices.emplace_back(
         RasterProgram::layoutVertex({ geomCoords[0].x, geomCoords[0].y }, { 0, 0 }));
-    bucket->vertices.emplace_back(
+    sharedData.bucket->vertices.emplace_back(
         RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { util::EXTENT, 0 }));
-    bucket->vertices.emplace_back(
+    sharedData.bucket->vertices.emplace_back(
         RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, util::EXTENT }));
-    bucket->vertices.emplace_back(
+    sharedData.bucket->vertices.emplace_back(
         RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { util::EXTENT, util::EXTENT }));
 
-    bucket->indices.emplace_back(0, 1, 2);
-    bucket->indices.emplace_back(1, 2, 3);
+    sharedData.bucket->indices.emplace_back(0, 1, 2);
+    sharedData.bucket->indices.emplace_back(1, 2, 3);
 
-    bucket->segments.emplace_back(0, 0, 4, 6);
+    sharedData.bucket->segments.emplace_back(0, 0, 4, 6);
 }
 
 void RenderImageSource::dumpDebugLogs() const {

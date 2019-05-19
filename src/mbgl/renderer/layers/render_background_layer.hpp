@@ -18,7 +18,7 @@ private:
     bool hasCrossfade() const override;
     optional<Color> getSolidBackground() const override;
     void upload(gfx::UploadPass&, UploadParameters&) override;
-    void render(PaintParameters&, RenderSource*) override;
+    void render(PaintParameters&) override;
 
     // Paint properties
     style::BackgroundPaintProperties::Unevaluated unevaluated;

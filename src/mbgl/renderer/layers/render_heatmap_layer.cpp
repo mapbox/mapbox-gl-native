@@ -62,7 +62,7 @@ void RenderHeatmapLayer::upload(gfx::UploadPass& uploadPass, UploadParameters&) 
     }
 }
 
-void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderHeatmapLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
