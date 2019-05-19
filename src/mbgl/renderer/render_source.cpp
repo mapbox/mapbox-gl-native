@@ -55,6 +55,8 @@ RenderSource::RenderSource(Immutable<style::Source::Impl> impl)
       observer(&nullObserver) {
 }
 
+RenderSource::~RenderSource() = default;
+
 void RenderSource::setObserver(RenderSourceObserver* observer_) {
     observer = observer_;
 }

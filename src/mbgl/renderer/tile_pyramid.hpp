@@ -25,6 +25,7 @@ class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class TileParameters;
+class SourcePrepareParameters;
 
 class TilePyramid {
 public:
@@ -44,7 +45,7 @@ public:
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
     void upload(gfx::UploadPass&);
-    void prepare(PaintParameters&);
+    void prepare(const SourcePrepareParameters&);
     void finishRender(PaintParameters&);
 
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
