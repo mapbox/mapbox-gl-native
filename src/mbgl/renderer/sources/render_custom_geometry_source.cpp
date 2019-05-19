@@ -51,7 +51,7 @@ void RenderCustomGeometrySource::upload(gfx::UploadPass& uploadPass) {
     tilePyramid.upload(uploadPass);
 }
 
-void RenderCustomGeometrySource::prepare(PaintParameters& parameters) {
+void RenderCustomGeometrySource::prepare(const SourcePrepareParameters& parameters) {
     tilePyramid.prepare(parameters);
 }
 

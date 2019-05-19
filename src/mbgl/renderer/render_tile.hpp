@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/style/types.hpp>
@@ -18,6 +19,7 @@ class Tile;
 class TransformState;
 class PaintParameters;
 class DebugBucket;
+class SourcePrepareParameters;
 
 class RenderTile final {
 public:
@@ -46,7 +48,7 @@ public:
 
     void setMask(TileMask&&);
     void upload(gfx::UploadPass&);
-    void prepare(PaintParameters&);
+    void prepare(const SourcePrepareParameters&);
     void finishRender(PaintParameters&);
 
     mat4 translateVtxMatrix(const mat4& tileMatrix,

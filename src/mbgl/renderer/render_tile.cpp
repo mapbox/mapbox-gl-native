@@ -1,6 +1,8 @@
 #include <mbgl/renderer/render_tile.hpp>
+
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -70,7 +72,7 @@ void RenderTile::upload(gfx::UploadPass& uploadPass) {
     }
 }
 
-void RenderTile::prepare(PaintParameters& parameters) {
+void RenderTile::prepare(const SourcePrepareParameters& parameters) {
     if (parameters.debugOptions != MapDebugOptions::NoDebug &&
         (!debugBucket || debugBucket->renderable != tile.isRenderable() ||
          debugBucket->complete != tile.isComplete() ||
@@ -86,10 +88,11 @@ void RenderTile::prepare(PaintParameters& parameters) {
 
     // Calculate two matrices for this tile: matrix is the standard tile matrix; nearClippedMatrix
     // clips the near plane to 100 to save depth buffer precision
-    parameters.state.matrixFor(matrix, id);
-    parameters.state.matrixFor(nearClippedMatrix, id);
-    matrix::multiply(matrix, parameters.projMatrix, matrix);
-    matrix::multiply(nearClippedMatrix, parameters.nearClippedProjMatrix, nearClippedMatrix);
+    const auto& transform = parameters.transform;
+    transform.state.matrixFor(matrix, id);
+    transform.state.matrixFor(nearClippedMatrix, id);
+    matrix::multiply(matrix, transform.projMatrix, matrix);
+    matrix::multiply(nearClippedMatrix, transform.nearClippedProjMatrix, nearClippedMatrix);
 }
 
 void RenderTile::finishRender(PaintParameters& parameters) {

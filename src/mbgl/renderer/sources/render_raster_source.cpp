@@ -61,7 +61,7 @@ void RenderRasterSource::upload(gfx::UploadPass& parameters) {
     tilePyramid.upload(parameters);
 }
 
-void RenderRasterSource::prepare(PaintParameters& parameters) {
+void RenderRasterSource::prepare(const SourcePrepareParameters& parameters) {
     algorithm::updateTileMasks(tilePyramid.getRenderTiles());
     tilePyramid.prepare(parameters);
 }

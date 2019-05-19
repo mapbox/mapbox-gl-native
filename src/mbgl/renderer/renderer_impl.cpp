@@ -291,6 +291,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     observer->onWillStartRenderingFrame();
 
+    TransformParameters transformParams(updateParameters.transformState);
+
+    // Update all matrices and generate data that we should upload to the GPU.
+    for (const auto& entry : renderSources) {
+        if (entry.second->isEnabled()) {
+            entry.second->prepare({transformParams, updateParameters.debugOptions});
+        }
+    }
+
     // Set render tiles to the render items.
     for (auto& renderItem : renderItems) {
         if (!renderItem.source) {
@@ -312,13 +321,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         bool symbolBucketsChanged = false;
         const bool placementChanged = !placement->stillRecent(updateParameters.timePoint);
         std::set<std::string> usedSymbolLayers;
-        mat4 projMatrix;
         if (placementChanged) {
             placement = std::make_unique<Placement>(
                 updateParameters.transformState, updateParameters.mode,
                 updateParameters.transitionOptions, updateParameters.crossSourceCollisions,
                 std::move(placement));
-            updateParameters.transformState.getProjMatrix(projMatrix);
         }
 
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
@@ -327,7 +334,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             if (placementChanged) {
                 usedSymbolLayers.insert(layer.getID());
-                placement->placeLayer(layer, projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
+                placement->placeLayer(layer, transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
@@ -357,24 +364,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         backend,
         updateParameters,
         renderLight.getEvaluated(),
+        transformParams,
         *staticData,
         *imageManager,
         *lineAtlas,
     };
 
     parameters.symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
-
-    // TODO: move this pass to before the PaintParameters initialization
-    // - PREPARE PASS -------------------------------------------------------------------------------
-    // Runs an initialization pass for all sources.
-    {
-        // Update all matrices and generate data that we should upload to the GPU.
-        for (const auto& entry : renderSources) {
-            if (entry.second->isEnabled()) {
-                entry.second->prepare(parameters);
-            }
-        }
-    }
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.

@@ -10,11 +10,27 @@
 
 namespace mbgl {
 
+TransformParameters::TransformParameters(const TransformState& state_)
+    : state(state_) {
+    // Update the default matrices to the current viewport dimensions.
+    state.getProjMatrix(projMatrix);
+
+    // Also compute a projection matrix that aligns with the current pixel grid, taking into account
+    // odd viewport sizes.
+    state.getProjMatrix(alignedProjMatrix, 1, true);
+
+    // Calculate a second projection matrix with the near plane clipped to 100 so as
+    // not to waste lots of depth buffer precision on very close empty space, for layer
+    // types (fill-extrusion) that use the depth buffer to emulate real-world space.
+    state.getProjMatrix(nearClippedProjMatrix, 100);
+}
+
 PaintParameters::PaintParameters(gfx::Context& context_,
                     float pixelRatio_,
                     gfx::RendererBackend& backend_,
                     const UpdateParameters& updateParameters,
                     const EvaluatedLight& evaluatedLight_,
+		    const TransformParameters& transformParams_,
                     RenderStaticData& staticData_,
                     ImageManager& imageManager_,
                     LineAtlas& lineAtlas_)
@@ -23,6 +39,7 @@ PaintParameters::PaintParameters(gfx::Context& context_,
     encoder(context.createCommandEncoder()),
     state(updateParameters.transformState),
     evaluatedLight(evaluatedLight_),
+    transformParams(transformParams_),
     staticData(staticData_),
     imageManager(imageManager_),
     lineAtlas(lineAtlas_),
@@ -36,18 +53,6 @@ PaintParameters::PaintParameters(gfx::Context& context_,
     programs(staticData_.programs)
 #endif
 {
-    // Update the default matrices to the current viewport dimensions.
-    state.getProjMatrix(projMatrix);
-
-    // Also compute a projection matrix that aligns with the current pixel grid, taking into account
-    // odd viewport sizes.
-    state.getProjMatrix(alignedProjMatrix, 1, true);
-
-    // Calculate a second projection matrix with the near plane clipped to 100 so as
-    // not to waste lots of depth buffer precision on very close empty space, for layer
-    // types (fill-extrusion) that use the depth buffer to emulate real-world space.
-    state.getProjMatrix(nearClippedProjMatrix, 100);
-
     pixelsToGLUnits = {{ 2.0f  / state.getSize().width, -2.0f / state.getSize().height }};
 
     if (state.getViewportMode() == ViewportMode::FlippedY) {
@@ -60,7 +65,7 @@ PaintParameters::~PaintParameters() = default;
 mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID, bool aligned) const {
     mat4 matrix;
     state.matrixFor(matrix, tileID);
-    matrix::multiply(matrix, aligned ? alignedProjMatrix : projMatrix, matrix);
+    matrix::multiply(matrix, aligned ? transformParams.alignedProjMatrix : transformParams.projMatrix, matrix);
     return matrix;
 }
 

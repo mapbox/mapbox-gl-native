@@ -31,6 +31,16 @@ class CommandEncoder;
 class RenderPass;
 } // namespace gfx
 
+
+class TransformParameters {
+public:
+    TransformParameters(const TransformState&);
+    mat4 projMatrix;
+    mat4 alignedProjMatrix;
+    mat4 nearClippedProjMatrix;
+    const TransformState& state;
+};
+
 class PaintParameters {
 public:
     PaintParameters(gfx::Context&,
@@ -38,6 +48,7 @@ public:
                     gfx::RendererBackend&,
                     const UpdateParameters&,
                     const EvaluatedLight&,
+                    const TransformParameters&,
                     RenderStaticData&,
                     ImageManager&,
                     LineAtlas&);
@@ -50,6 +61,7 @@ public:
 
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;
+    const TransformParameters& transformParams;
 
     RenderStaticData& staticData;
     ImageManager& imageManager;
@@ -70,10 +82,6 @@ public:
     gfx::ColorMode colorModeForRenderPass() const;
 
     mat4 matrixForTile(const UnwrappedTileID&, bool aligned = false) const;
-
-    mat4 projMatrix;
-    mat4 alignedProjMatrix;
-    mat4 nearClippedProjMatrix;
 
     // Stencil handling
 public:

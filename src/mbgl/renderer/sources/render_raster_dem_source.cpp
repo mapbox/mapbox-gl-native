@@ -130,7 +130,7 @@ void RenderRasterDEMSource::upload(gfx::UploadPass& parameters) {
     tilePyramid.upload(parameters);
 }
 
-void RenderRasterDEMSource::prepare(PaintParameters& parameters) {
+void RenderRasterDEMSource::prepare(const SourcePrepareParameters& parameters) {
     algorithm::updateTileMasks(tilePyramid.getRenderTiles());
     tilePyramid.prepare(parameters);
 }
