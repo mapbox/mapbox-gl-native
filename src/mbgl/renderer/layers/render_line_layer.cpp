@@ -91,7 +91,7 @@ void RenderLineLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& uplo
     }
 }
 
-void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderLineLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }

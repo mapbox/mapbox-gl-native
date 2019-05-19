@@ -18,10 +18,12 @@ private:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
 
-    void render(PaintParameters&, RenderSource* src) override;
+    void render(PaintParameters&) override;
+    void prepare(const LayerPrepareParameters&) override;
 
     // Paint properties
     style::HillshadePaintProperties::Unevaluated unevaluated;
+    uint8_t maxzoom = util::TERRAIN_RGB_MAXZOOM;
 
     const std::array<float, 2> getLatRange(const UnwrappedTileID& id);
     const std::array<float, 2> getLight(const PaintParameters& parameters);

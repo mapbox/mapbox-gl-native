@@ -52,7 +52,7 @@ bool RenderCircleLayer::hasCrossfade() const {
     return false;
 }
 
-void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderCircleLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }

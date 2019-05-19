@@ -61,6 +61,8 @@ constexpr int DEFAULT_RATE_LIMIT_TIMEOUT = 5;
 
 constexpr const char* API_BASE_URL = "https://api.mapbox.com";
 
+constexpr uint8_t TERRAIN_RGB_MAXZOOM = 15;
+
 } // namespace util
 
 namespace debug {

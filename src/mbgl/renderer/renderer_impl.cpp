@@ -424,7 +424,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             RenderLayer& renderLayer = it->layer;
             if (renderLayer.hasRenderPass(parameters.pass)) {
                 const auto layerDebugGroup(parameters.encoder->createDebugGroup(renderLayer.getID().c_str()));
-                renderLayer.render(parameters, it->source);
+                renderLayer.render(parameters);
             }
         }
     }
@@ -458,7 +458,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             RenderLayer& renderLayer = it->layer;
             if (renderLayer.hasRenderPass(parameters.pass)) {
                 const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderLayer.getID().c_str()));
-                renderLayer.render(parameters, it->source);
+                renderLayer.render(parameters);
             }
         }
     }
@@ -475,7 +475,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             RenderLayer& renderLayer = it->layer;
             if (renderLayer.hasRenderPass(parameters.pass)) {
                 const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderLayer.getID().c_str()));
-                renderLayer.render(parameters, it->source);
+                renderLayer.render(parameters);
             }
         }
     }

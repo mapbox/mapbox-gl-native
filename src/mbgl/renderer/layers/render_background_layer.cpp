@@ -61,7 +61,7 @@ void RenderBackgroundLayer::upload(gfx::UploadPass&, UploadParameters& parameter
     }
 }
 
-void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderBackgroundLayer::render(PaintParameters& parameters) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
 

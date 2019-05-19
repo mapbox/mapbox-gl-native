@@ -431,7 +431,7 @@ void RenderSymbolLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& up
     }
 }
 
-void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderSymbolLayer::render(PaintParameters& parameters) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
