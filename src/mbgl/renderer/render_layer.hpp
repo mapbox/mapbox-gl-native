@@ -34,6 +34,12 @@ public:
     bool rotateWithMap;
 };
 
+class LayerPrepareParameters {
+public:
+    RenderSource* source;
+    const TransformState& state;
+};
+
 class RenderLayer {
 protected:
     RenderLayer(Immutable<style::LayerProperties>);
@@ -84,8 +90,7 @@ public:
             const float,
             const mat4&) const { return false; };
 
-    using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
-    virtual void setRenderTiles(RenderTiles, const TransformState&);
+    virtual void prepare(const LayerPrepareParameters&);
 
     const std::vector<LayerPlacementData>& getPlacementData() const { 
         return placementData; 
@@ -107,6 +112,7 @@ protected:
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
 protected:
+    using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     // Stores current set of tiles to be rendered for this layer.
     RenderTiles renderTiles;
 
