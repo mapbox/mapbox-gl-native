@@ -300,13 +300,12 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-    // Set render tiles to the render items.
     for (auto& renderItem : renderItems) {
         if (!renderItem.source) {
             continue;
         }
         RenderLayer& renderLayer = renderItem.layer;
-        renderLayer.setRenderTiles(renderItem.source->getRenderTiles(), updateParameters.transformState);
+        renderLayer.prepare({renderItem.source, updateParameters.transformState});
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }

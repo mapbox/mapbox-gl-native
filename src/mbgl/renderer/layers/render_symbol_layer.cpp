@@ -2,6 +2,7 @@
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/upload_parameters.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
@@ -652,9 +653,9 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
     };
 }
 
-void RenderSymbolLayer::setRenderTiles(RenderTiles tiles, const TransformState& state) {
-    renderTiles = std::move(tiles);
-    const auto comp = [bearing = state.getBearing()](const RenderTile& a, const RenderTile& b) {
+void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
+    renderTiles = params.source->getRenderTiles();
+    const auto comp = [bearing = params.state.getBearing()](const RenderTile& a, const RenderTile& b) {
         Point<float> pa(a.id.canonical.x, a.id.canonical.y);
         Point<float> pb(b.id.canonical.x, b.id.canonical.y);
 

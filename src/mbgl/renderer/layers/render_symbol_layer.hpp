@@ -67,7 +67,7 @@ private:
     bool hasCrossfade() const override;
     void upload(gfx::UploadPass&, UploadParameters&) override;
     void render(PaintParameters&, RenderSource*) override;
-    void setRenderTiles(RenderTiles, const TransformState&) override;
+    void prepare(const LayerPrepareParameters&) override;
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;

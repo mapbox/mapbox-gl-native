@@ -1,5 +1,6 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layer.hpp>
@@ -44,8 +45,9 @@ bool RenderLayer::supportsZoom(float zoom) const {
     return baseImpl->minZoom <= zoom && baseImpl->maxZoom >= zoom;
 }
 
-void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState&) {
-    renderTiles = filterRenderTiles(std::move(tiles));
+void RenderLayer::prepare(const LayerPrepareParameters& params) {
+    assert(params.source);
+    renderTiles = filterRenderTiles(params.source->getRenderTiles());
 }
 
 optional<Color> RenderLayer::getSolidBackground() const {
