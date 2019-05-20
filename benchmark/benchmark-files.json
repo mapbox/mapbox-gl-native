@@ -10,6 +10,7 @@
         "benchmark/parse/tile_mask.benchmark.cpp",
         "benchmark/parse/vector_tile.benchmark.cpp",
         "benchmark/src/mbgl/benchmark/benchmark.cpp",
+        "benchmark/storage/offline_database.benchmark.cpp",
         "benchmark/util/dtoa.benchmark.cpp",
         "benchmark/util/tilecover.benchmark.cpp"
     ],
