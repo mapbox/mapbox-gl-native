@@ -43,9 +43,9 @@
 
     UIView *superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];
     [superView addSubview:self.mapView];
-    UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    [window addSubview:superView];
-    [window makeKeyAndVisible];
+    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    [self.window addSubview:superView];
+    [self.window makeKeyAndVisible];
 
     if (!self.mapView.style) {
         [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
