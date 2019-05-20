@@ -49,15 +49,10 @@ public:
                  const std::initializer_list<const char*>& fragmentSource)
             : program(context.createProgram(
                   context.createShader(ShaderType::Vertex, vertexSource),
-                  context.createShader(ShaderType::Fragment, fragmentSource))),
-              attributeLocations(context, program) {
-            // Re-link program after manually binding only active attributes in Attributes::queryLocations
-            context.linkProgram(program);
-
-            // We have to re-initialize the uniforms state from the bindings as the uniform locations
-            // get shifted on some implementations
+                  context.createShader(ShaderType::Fragment, fragmentSource),
+                  attributeLocations.getFirstAttribName())) {
+            attributeLocations.queryLocations(program);
             uniformStates.queryLocations(program);
-
             // Texture units are specified via uniforms as well, so we need query their locations
             textureStates.queryLocations(program);
         }

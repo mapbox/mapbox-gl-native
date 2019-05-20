@@ -2,18 +2,12 @@
 
 #include <mbgl/gfx/attribute.hpp>
 #include <mbgl/gl/types.hpp>
-#include <mbgl/util/ignore.hpp>
+#include <mbgl/programs/attributes.hpp>
 #include <mbgl/util/literal.hpp>
-#include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <cstddef>
 #include <vector>
-#include <set>
-#include <functional>
 #include <string>
-#include <array>
-#include <limits>
 
 namespace mbgl {
 namespace gl {
@@ -21,9 +15,7 @@ namespace gl {
 using AttributeBindingArray = std::vector<optional<gfx::AttributeBinding>>;
 using NamedAttributeLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
-class Context;
-void bindAttributeLocation(Context&, ProgramID, AttributeLocation, const char * name);
-std::set<std::string> getActiveAttributes(ProgramID);
+optional<AttributeLocation> queryLocation(ProgramID id, const char* name);
 
 template <class>
 class AttributeLocations;
@@ -37,29 +29,28 @@ private:
     Locations locations;
 
 public:
-    AttributeLocations(Context& context, const ProgramID& id)
-        : locations([&] {
-              std::set<std::string> activeAttributes = getActiveAttributes(id);
-
-              AttributeLocation location = 0;
-              auto maybeBindLocation = [&](const char* name) -> optional<AttributeLocation> {
-                  if (activeAttributes.count(name)) {
-                      bindAttributeLocation(context, id, location, name);
-                      return location++;
-                  } else {
-                      return {};
-                  }
-              };
-
-              return Locations{ maybeBindLocation(
-                  concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... };
-          }()) {
-    }
+    AttributeLocations() = default;
 
     template <class BinaryProgram>
     AttributeLocations(const BinaryProgram& program)
         : locations{ program.attributeLocation(
               concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... } {
+    }
+
+    void queryLocations(const ProgramID& id) {
+        locations = Locations{
+            queryLocation(id, concat_literals<&string_literal<'a', '_'>::value, &As::name>::value())... };
+        using TypeOfFirst = typename std::tuple_element<0, std::tuple<As...>>::type;
+        auto first = locations.template get<TypeOfFirst>();
+        assert(first && first.value() == 0);
+    }
+
+    static constexpr const char* getFirstAttribName() {
+        // Static assert that attribute list starts with position: we bind it on location 0.
+        using TypeOfFirst = typename std::tuple_element<0, std::tuple<As...>>::type;
+        static_assert(std::is_same<attributes::pos, TypeOfFirst>::value || std::is_same<attributes::pos_offset, TypeOfFirst>::value ||
+                      std::is_same<attributes::pos_normal, TypeOfFirst>::value, "Program must start with position related attribute.");
+        return concat_literals<&string_literal<'a', '_'>::value, TypeOfFirst::name>::value();
     }
 
     NamedAttributeLocations getNamedLocations() const {
