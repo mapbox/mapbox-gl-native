@@ -9,7 +9,7 @@
     [super setUp];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"IntegrationTest" bundle:[NSBundle mainBundle]];
 
-    // Keep an eye on how well this plays with other tests that use other root view controllers
+    // Keep an eye on how well this plays with other tests that use other root view controllers.
     [self.window setRootViewController:(UITabBarController *)[storyboard instantiateViewControllerWithIdentifier:@"TabController"]];
     
     self.tabController = (UITabBarController *)self.window.rootViewController;
