@@ -187,14 +187,12 @@ bool CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) {
 }
 
 void CrossTileSymbolIndex::pruneUnusedLayers(const std::set<std::string>& usedLayers) {
-    std::vector<std::string> unusedLayers;
-    for (auto layerIndex : layerIndexes) {
-        if (usedLayers.find(layerIndex.first) == usedLayers.end()) {
-            unusedLayers.push_back(layerIndex.first);
+    for (auto it = layerIndexes.begin(); it != layerIndexes.end();) {
+        if (usedLayers.find(it->first) == usedLayers.end()) {
+            it = layerIndexes.erase(it);
+        } else {
+            ++it;
         }
-    }
-    for (auto unusedLayer : unusedLayers) {
-        layerIndexes.erase(unusedLayer);
     }
 }
 
