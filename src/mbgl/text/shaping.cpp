@@ -9,8 +9,12 @@
 #include <list>
 #include <cmath>
 
-namespace mbgl {
+namespace {
+    // Zero width space that is used to suggest break points for Japanese labels.
+    char16_t ZWSP = u'\u200b';
+} // namespace
 
+namespace mbgl {
 
 // static
 AnchorAlignment AnchorAlignment::getAnchorAlignment(style::SymbolAnchorType anchor) {
@@ -159,12 +163,13 @@ float calculateBadness(const float lineWidth, const float targetWidth, const flo
     return raggedness + std::pow(penalty, 2);
 }
 
-float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
+float calculatePenalty(char16_t codePoint, char16_t nextCodePoint, bool penalizableIdeographicBreak) {
     float penalty = 0;
     // Force break on newline
     if (codePoint == 0x0a) {
         penalty -= 10000;
     }
+
     // Penalize open parenthesis at end of line
     if (codePoint == 0x28 || codePoint == 0xff08) {
         penalty += 50;
@@ -174,7 +179,13 @@ float calculatePenalty(char16_t codePoint, char16_t nextCodePoint) {
     if (nextCodePoint == 0x29 || nextCodePoint == 0xff09) {
         penalty += 50;
     }
-    
+
+    // Penalize breaks between characters that allow ideographic breaking because
+    // they are less preferable than breaks at spaces (or zero width spaces)
+    if (penalizableIdeographicBreak) {
+        penalty += 150;
+    }
+
     return penalty;
 }
 
@@ -241,7 +252,9 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
     
     std::list<PotentialBreak> potentialBreaks;
     float currentX = 0;
-    
+    // Find first occurance of zero width space (ZWSP) character.
+    const bool hasServerSuggestedBreaks = logicalInput.rawText().find_first_of(ZWSP) !=  std::string::npos;
+
     for (std::size_t i = 0; i < logicalInput.length(); i++) {
         const SectionOptions& section = logicalInput.getSection(i);
         char16_t codePoint = logicalInput.getCharCodeAt(i);
@@ -256,11 +269,15 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
         
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
-        if ((i < logicalInput.length() - 1) &&
-            (util::i18n::allowsWordBreaking(codePoint) || util::i18n::allowsIdeographicBreaking(codePoint))) {
-            potentialBreaks.push_back(evaluateBreak(i+1, currentX, targetWidth, potentialBreaks,
-                                                    calculatePenalty(codePoint, logicalInput.getCharCodeAt(i+1)),
-                                                    false));
+        if (i < logicalInput.length() - 1) {
+            const bool allowsIdeographicBreak = util::i18n::allowsIdeographicBreaking(codePoint);
+            if (allowsIdeographicBreak || util::i18n::allowsWordBreaking(codePoint)) {
+                const bool penalizableIdeographicBreak = allowsIdeographicBreak && hasServerSuggestedBreaks;
+                const std::size_t nextIndex = i + 1;
+                potentialBreaks.push_back(evaluateBreak(nextIndex, currentX, targetWidth, potentialBreaks,
+                                                        calculatePenalty(codePoint, logicalInput.getCharCodeAt(nextIndex), penalizableIdeographicBreak),
+                                                        false));
+            }
         }
     }
     
