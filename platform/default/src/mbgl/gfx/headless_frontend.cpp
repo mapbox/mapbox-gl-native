@@ -1,4 +1,4 @@
-#include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_state.hpp>
@@ -24,11 +24,11 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
                                    const optional<std::string> localFontFamily)
     : size(size_),
     pixelRatio(pixelRatio_),
-    backend({ static_cast<uint32_t>(size.width * pixelRatio),
-              static_cast<uint32_t>(size.height * pixelRatio) }, contextMode),
+    backend(gfx::HeadlessBackend::make( { static_cast<uint32_t>(size.width * pixelRatio),
+                                          static_cast<uint32_t>(size.height * pixelRatio) }, contextMode)),
     asyncInvalidate([this] {
         if (renderer && updateParameters) {
-            gfx::BackendScope guard { backend };
+            gfx::BackendScope guard { *getBackend() };
 
             // onStyleImageMissing might be called during a render. The user implemented method
             // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.
@@ -38,7 +38,7 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
             renderer->render(*updateParameters_);
         }
     }),
-    renderer(std::make_unique<Renderer>(backend, pixelRatio, programCacheDir, localFontFamily)) {
+    renderer(std::make_unique<Renderer>(*getBackend(), pixelRatio, programCacheDir, localFontFamily)) {
 }
 
 HeadlessFrontend::~HeadlessFrontend() = default;
@@ -68,7 +68,7 @@ Renderer* HeadlessFrontend::getRenderer() {
 }
 
 gfx::RendererBackend* HeadlessFrontend::getBackend() {
-    return &backend;
+    return backend->getRendererBackend();
 }
 
 CameraOptions HeadlessFrontend::getCameraOptions() {
@@ -121,13 +121,13 @@ LatLng HeadlessFrontend::latLngForPixel(const ScreenCoordinate& point) {
 void HeadlessFrontend::setSize(Size size_) {
     if (size != size_) {
         size = size_;
-        backend.setSize({ static_cast<uint32_t>(size_.width * pixelRatio),
-                          static_cast<uint32_t>(size_.height * pixelRatio) });
+        backend->setSize({ static_cast<uint32_t>(size_.width * pixelRatio),
+                           static_cast<uint32_t>(size_.height * pixelRatio) });
     }
 }
 
 PremultipliedImage HeadlessFrontend::readStillImage() {
-    return backend.readStillImage();
+    return backend->readStillImage();
 }
 
 PremultipliedImage HeadlessFrontend::render(Map& map) {
@@ -137,7 +137,7 @@ PremultipliedImage HeadlessFrontend::render(Map& map) {
         if (error) {
             std::rethrow_exception(error);
         } else {
-            result = backend.readStillImage();
+            result = backend->readStillImage();
         }
     });
 

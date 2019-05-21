@@ -85,8 +85,9 @@
         "platform/android/src/thread.cpp",
         "platform/android/src/timer.cpp",
         "platform/android/src/unaccent.cpp",
+        "platform/default/src/mbgl/gfx/headless_backend.cpp",
+        "platform/default/src/mbgl/gfx/headless_frontend.cpp",
         "platform/default/src/mbgl/gl/headless_backend.cpp",
-        "platform/default/src/mbgl/gl/headless_frontend.cpp",
         "platform/default/src/mbgl/map/map_snapshotter.cpp",
         "platform/default/src/mbgl/text/bidi.cpp",
         "platform/default/src/mbgl/util/png_writer.cpp",
@@ -96,8 +97,9 @@
     ],
     "public_headers": {
         "jni/string_conversion.hpp": "platform/default/include/jni/string_conversion.hpp",
+        "mbgl/gfx/headless_backend.hpp": "platform/default/include/mbgl/gfx/headless_backend.hpp",
+        "mbgl/gfx/headless_frontend.hpp": "platform/default/include/mbgl/gfx/headless_frontend.hpp",
         "mbgl/gl/headless_backend.hpp": "platform/default/include/mbgl/gl/headless_backend.hpp",
-        "mbgl/gl/headless_frontend.hpp": "platform/default/include/mbgl/gl/headless_frontend.hpp",
         "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp",
         "mbgl/text/unaccent.hpp": "platform/default/include/mbgl/text/unaccent.hpp"
     },

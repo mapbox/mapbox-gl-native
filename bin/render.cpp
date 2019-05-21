@@ -4,7 +4,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/default_styles.hpp>
 
-#include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
 
 #include <args.hxx>
