@@ -1,4 +1,5 @@
 #include <mbgl/util/platform.hpp>
+#include <mbgl/platform/thread.hpp>
 #include <mbgl/util/logging.hpp>
 
 #include <string>
@@ -31,6 +32,12 @@ void makeThreadLowPriority() {
     if (sched_setscheduler(0, SCHED_IDLE, &param) != 0) {
         Log::Warning(Event::General, "Couldn't set thread scheduling policy");
     }
+}
+
+void attachThread() {
+}
+
+void detachThread() {
 }
 
 } // namespace platform

@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
 #include <mbgl/util/platform.hpp>
+#include <mbgl/platform/thread.hpp>
 
 #include <pthread.h>
 
@@ -21,6 +22,12 @@ void setCurrentThreadName(const std::string& name) {
 
 void makeThreadLowPriority() {
     [[NSThread currentThread] setThreadPriority:0.0];
+}
+
+void attachThread() {
+}
+
+void detachThread() {
 }
 
 }

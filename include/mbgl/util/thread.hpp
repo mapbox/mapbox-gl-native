@@ -6,6 +6,7 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/platform/thread.hpp>
 
 #include <cassert>
 #include <future>
@@ -55,6 +56,7 @@ public:
         ] () mutable {
             platform::setCurrentThreadName(name);
             platform::makeThreadLowPriority();
+            platform::attachThread();
 
             util::RunLoop loop_(util::RunLoop::Type::New);
             loop = &loop_;
@@ -67,6 +69,7 @@ public:
             (void) establishedActor;
             
             loop = nullptr;
+            platform::detachThread();
         });
     }
 
