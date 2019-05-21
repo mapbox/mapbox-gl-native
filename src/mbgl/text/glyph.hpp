@@ -88,8 +88,6 @@ class Shaping {
     float right = 0;
     WritingModeType writingMode;
     std::size_t lineCount = 0u;
-    std::string text = {};
-
     explicit operator bool() const { return !positionedGlyphs.empty(); }
 };
 
