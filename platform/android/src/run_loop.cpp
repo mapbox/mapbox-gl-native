@@ -81,9 +81,6 @@ private:
 };
 
 RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
-    using namespace mbgl::android;
-    detach = attach_jni_thread(theJVM, &env, platform::getCurrentThreadName());
-
     loop = ALooper_prepare(0);
     assert(loop);
 
@@ -129,9 +126,6 @@ RunLoop::Impl::~Impl() {
     }
 
     ALooper_release(loop);
-
-    using namespace mbgl::android;
-    detach_jni_thread(theJVM, &env, detach);
 }
 
 void RunLoop::Impl::wake() {

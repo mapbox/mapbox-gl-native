@@ -5,10 +5,16 @@
 #include <sys/prctl.h>
 #include <sys/resource.h>
 
+#include <cassert>
+#include "jni.hpp"
+
 // Implementation based on Chromium's platform_thread_android.cc.
 
 namespace mbgl {
 namespace platform {
+
+thread_local static JNIEnv* env;
+thread_local static bool detach;
 
 std::string getCurrentThreadName() {
     char name[32] = "unknown";
@@ -35,9 +41,15 @@ void makeThreadLowPriority() {
 }
 
 void attachThread() {
+    using namespace android;
+    assert(env == nullptr);
+    detach = attach_jni_thread(theJVM, &env, platform::getCurrentThreadName());
 }
 
 void detachThread() {
+    using namespace android;
+    assert(env);
+    detach_jni_thread(theJVM, &env, detach);
 }
 
 } // namespace platform
