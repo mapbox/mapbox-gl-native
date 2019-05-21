@@ -1,5 +1,6 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/platform/thread.hpp>
 
 #include <sys/prctl.h>
 #include <sys/resource.h>
@@ -31,6 +32,12 @@ void makeThreadLowPriority() {
     // Supposedly would set the priority for the whole process, but
     // on Linux/Android it only sets for the current thread.
     setpriority(PRIO_PROCESS, 0, 19);
+}
+
+void attachThread() {
+}
+
+void detachThread() {
 }
 
 } // namespace platform

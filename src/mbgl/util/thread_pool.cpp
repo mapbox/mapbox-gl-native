@@ -2,6 +2,7 @@
 
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/platform/thread.hpp>
 
 namespace mbgl {
 
@@ -11,6 +12,7 @@ ThreadPool::ThreadPool(std::size_t count) {
     for (std::size_t i = 0; i < count; ++i) {
         threads.emplace_back([this, i]() {
             platform::setCurrentThreadName(std::string{ "Worker " } + util::toString(i + 1));
+            platform::attachThread();
 
             while (true) {
                 std::unique_lock<std::mutex> lock(mutex);
@@ -20,6 +22,7 @@ ThreadPool::ThreadPool(std::size_t count) {
                 });
 
                 if (terminate) {
+                    platform::detachThread();
                     return;
                 }
 

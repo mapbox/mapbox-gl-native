@@ -1,4 +1,5 @@
 #include <mbgl/util/platform.hpp>
+#include <mbgl/platform/thread.hpp>
 
 #include <string>
 
@@ -13,6 +14,12 @@ void setCurrentThreadName(const std::string&) {
 }
 
 void makeThreadLowPriority() {
+}
+
+void attachThread() {
+}
+
+void detachThread() {
 }
 
 } // namespace platform
