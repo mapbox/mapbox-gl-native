@@ -2,7 +2,6 @@
 
 #import "MGLAttributionButton.h"
 #import "MGLCompassCell.h"
-#import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
 #import "MGLRendererFrontend.h"
 #import "MGLRendererConfiguration.h"
@@ -33,8 +32,6 @@
 #import <mbgl/storage/reachability.h>
 #import <mbgl/style/image.hpp>
 #import <mbgl/renderer/renderer.hpp>
-#import <mbgl/gl/renderer_backend.hpp>
-#import <mbgl/gl/renderable_resource.hpp>
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/storage/resource_options.hpp>
 #import <mbgl/math/wrap.hpp>
@@ -49,6 +46,7 @@
 #import <unordered_map>
 #import <unordered_set>
 
+#import "MGLMapView+Impl.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
@@ -60,10 +58,6 @@
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "MGLLoggingConfiguration_Private.h"
 
-#import <QuartzCore/QuartzCore.h>
-#import <OpenGL/gl.h>
-
-class MGLMapViewImpl;
 class MGLAnnotationContext;
 
 /// Distance from the edge of the view to ornament views (logo, attribution, etc.).
@@ -160,7 +154,7 @@ public:
 @implementation MGLMapView {
     /// Cross-platform map view controller.
     mbgl::Map *_mbglMap;
-    MGLMapViewImpl *_mbglView;
+    std::unique_ptr<MGLMapViewImpl> _mbglView;
     std::unique_ptr<MGLRenderFrontend> _rendererFrontend;
 
     NSPanGestureRecognizer *_panGestureRecognizer;
@@ -267,7 +261,7 @@ public:
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // Set up cross-platform controllers and resources.
-    _mbglView = new MGLMapViewImpl(self);
+    _mbglView = MGLMapViewImpl::Create(self);
 
     // Delete the pre-offline ambient cache at
     // ~/Library/Caches/com.mapbox.MapboxGL/cache.db.
@@ -282,9 +276,9 @@ public:
 
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, config.cacheDir, config.localFontFamilyName);
+    auto renderer = std::make_unique<mbgl::Renderer>(_mbglView->getRendererBackend(), config.scaleFactor, config.cacheDir, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
-    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
+    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, _mbglView->getRendererBackend(), true);
 
     mbgl::MapOptions mapOptions;
     mapOptions.withMapMode(mbgl::MapMode::Continuous)
@@ -299,10 +293,6 @@ public:
                    .withAssetPath([NSBundle mainBundle].resourceURL.path.UTF8String);
 
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, mapOptions, resourceOptions);
-
-    // Install the OpenGL layer. Interface Builder’s synchronous drawing means
-    // we can’t display a map, so don’t even bother to have a map layer.
-    self.layer = _isTargetingInterfaceBuilder ? [CALayer layer] : [MGLOpenGLLayer layer];
 
     // Notify map object when network reachability status changes.
     _reachability = [MGLReachability reachabilityForInternetConnection];
@@ -550,10 +540,7 @@ public:
         delete _mbglMap;
         _mbglMap = nullptr;
     }
-    if (_mbglView) {
-        delete _mbglView;
-        _mbglView = nullptr;
-    }
+    _mbglView.reset();
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__unused NSDictionary *)change context:(void *)context {
@@ -718,8 +705,7 @@ public:
 }
 
 - (CGLContextObj)context {
-    MGLOpenGLLayer *layer = _isTargetingInterfaceBuilder ? nil : (MGLOpenGLLayer *)self.layer;
-    return layer.openGLContext.CGLContextObj;
+    return _mbglView->getCGLContextObj();
 }
 
 - (void)setFrame:(NSRect)frame {
@@ -820,7 +806,11 @@ public:
     }
 }
 
-- (void)setNeedsGLDisplay {
+- (BOOL)isTargetingInterfaceBuilder {
+    return _isTargetingInterfaceBuilder;
+}
+
+- (void)setNeedsRerender {
     MGLAssertIsMainThread();
 
     [self.layer setNeedsDisplay];
@@ -987,7 +977,7 @@ public:
 
 - (void)print:(__unused id)sender {
     _isPrinting = YES;
-    [self setNeedsGLDisplay];
+    [self setNeedsRerender];
 }
 
 - (void)printWithImage:(NSImage *)image {
@@ -3036,177 +3026,6 @@ public:
         options |= mbgl::MapDebugOptions::DepthBuffer;
     }
     _mbglMap->setDebug(options);
-}
-
-class MGLMapViewImpl;
-
-class MGLMapViewRenderable final : public mbgl::gl::RenderableResource {
-public:
-    MGLMapViewRenderable(MGLMapViewImpl& backend_) : backend(backend_) {
-    }
-
-    void bind() override;
-
-private:
-    MGLMapViewImpl& backend;
-};
-
-/// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::gl::RendererBackend,
-                       public mbgl::gfx::Renderable,
-                       public mbgl::MapObserver {
-public:
-    MGLMapViewImpl(MGLMapView* nativeView_)
-        : mbgl::gl::RendererBackend(mbgl::gfx::ContextMode::Unique),
-          mbgl::gfx::Renderable(nativeView_.framebufferSize,
-                                std::make_unique<MGLMapViewRenderable>(*this)),
-          nativeView(nativeView_) {
-    }
-
-    void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
-        bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;
-        [nativeView cameraWillChangeAnimated:animated];
-    }
-
-    void onCameraIsChanging() override {
-        [nativeView cameraIsChanging];
-    }
-
-    void onCameraDidChange(mbgl::MapObserver::CameraChangeMode mode) override {
-        bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;
-        [nativeView cameraDidChangeAnimated:animated];
-    }
-
-    void onWillStartLoadingMap() override {
-        [nativeView mapViewWillStartLoadingMap];
-    }
-
-    void onDidFinishLoadingMap() override {
-        [nativeView mapViewDidFinishLoadingMap];
-    }
-
-    void onDidFailLoadingMap(mbgl::MapLoadError mapError, const std::string& what) override {
-        NSString *description;
-        MGLErrorCode code;
-        switch (mapError) {
-            case mbgl::MapLoadError::StyleParseError:
-                code = MGLErrorCodeParseStyleFailed;
-                description = NSLocalizedStringWithDefaultValue(@"PARSE_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style is corrupted.", @"User-friendly error description");
-                break;
-            case mbgl::MapLoadError::StyleLoadError:
-                code = MGLErrorCodeLoadStyleFailed;
-                description = NSLocalizedStringWithDefaultValue(@"LOAD_STYLE_FAILED_DESC", nil, nil, @"The map failed to load because the style can't be loaded.", @"User-friendly error description");
-                break;
-            case mbgl::MapLoadError::NotFoundError:
-                code = MGLErrorCodeNotFound;
-                description = NSLocalizedStringWithDefaultValue(@"STYLE_NOT_FOUND_DESC", nil, nil, @"The map failed to load because the style can’t be found or is incompatible.", @"User-friendly error description");
-                break;
-            default:
-                code = MGLErrorCodeUnknown;
-                description = NSLocalizedStringWithDefaultValue(@"LOAD_MAP_FAILED_DESC", nil, nil, @"The map failed to load because an unknown error occurred.", @"User-friendly error description");
-        }
-        NSDictionary *userInfo = @{
-            NSLocalizedDescriptionKey: description,
-            NSLocalizedFailureReasonErrorKey: @(what.c_str()),
-        };
-        NSError *error = [NSError errorWithDomain:MGLErrorDomain code:code userInfo:userInfo];
-        [nativeView mapViewDidFailLoadingMapWithError:error];
-    }
-
-    void onWillStartRenderingFrame() override {
-        [nativeView mapViewWillStartRenderingFrame];
-    }
-
-    void onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode) override {
-        bool fullyRendered = mode == mbgl::MapObserver::RenderMode::Full;
-        [nativeView mapViewDidFinishRenderingFrameFullyRendered:fullyRendered];
-    }
-
-    void onWillStartRenderingMap() override {
-        [nativeView mapViewWillStartRenderingMap];
-    }
-
-    void onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode) override {
-        bool fullyRendered = mode == mbgl::MapObserver::RenderMode::Full;
-        [nativeView mapViewDidFinishRenderingMapFullyRendered:fullyRendered];
-    }
-    
-    void onDidBecomeIdle() override {
-        [nativeView mapViewDidBecomeIdle];
-    }
-
-    void onDidFinishLoadingStyle() override {
-        [nativeView mapViewDidFinishLoadingStyle];
-    }
-
-    void onSourceChanged(mbgl::style::Source& source) override {
-        NSString *identifier = @(source.getID().c_str());
-        MGLSource * nativeSource = [nativeView.style sourceWithIdentifier:identifier];
-        [nativeView sourceDidChange:nativeSource];
-    }
-
-    mbgl::gl::ProcAddress getExtensionFunctionPointer(const char* name) override {
-        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
-        if (!framework) {
-            throw std::runtime_error("Failed to load OpenGL framework.");
-        }
-
-        CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-        void *symbol = CFBundleGetFunctionPointerForName(framework, str);
-        CFRelease(str);
-
-        return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
-    }
-
-    mbgl::gfx::Renderable& getDefaultRenderable() override {
-        return *this;
-    }
-
-    void activate() override {
-        if (activationCount++) {
-            return;
-        }
-
-        MGLOpenGLLayer *layer = (MGLOpenGLLayer *)nativeView.layer;
-        [layer.openGLContext makeCurrentContext];
-    }
-
-    void deactivate() override {
-        if (--activationCount) {
-            return;
-        }
-
-        [NSOpenGLContext clearCurrentContext];
-    }
-
-    void updateAssumedState() override {
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
-        assumeFramebufferBinding(fbo);
-        assumeViewport(0, 0, nativeView.framebufferSize);
-    }
-
-    void restoreFramebufferBinding() {
-        setFramebufferBinding(fbo);
-        setViewport(0, 0, nativeView.framebufferSize);
-    }
-
-    mbgl::PremultipliedImage readStillImage() {
-        return readFramebuffer(nativeView.framebufferSize);
-    }
-
-private:
-    /// Cocoa map view that this adapter bridges to.
-    __weak MGLMapView *nativeView = nullptr;
-
-    /// The current framebuffer of the NSOpenGLLayer we are painting to.
-    GLint fbo = 0;
-
-    /// The reference counted count of activation calls
-    NSUInteger activationCount = 0;
-};
-
-void MGLMapViewRenderable::bind() {
-    backend.restoreFramebufferBinding();
 }
 
 @end

@@ -181,6 +181,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style;
 
+- (nullable NSImage *)mapView:(MGLMapView *)mapView didFailToLoadImage:(NSString *)imageName;
+
 #pragma mark Managing the Appearance of Annotations
 
 /**

@@ -191,7 +191,7 @@ private:
  causing the `-drawInMapView:withContext:` method to be called.
  */
 - (void)setNeedsDisplay {
-    [self.style.mapView setNeedsGLDisplay];
+    [self.style.mapView setNeedsRerender];
 }
 
 @end

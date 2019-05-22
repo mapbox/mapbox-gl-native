@@ -1,10 +1,12 @@
 #import "MGLAnnotationView.h"
 #import "MGLAnnotationView_Private.h"
 #import "MGLMapView_Private.h"
+#import "MGLCalloutView.h"
 #import "MGLAnnotation.h"
 #import "MGLLoggingConfiguration_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
+#import "NSValue+MGLAdditions.h"
 
 #include <mbgl/util/constants.hpp>
 
