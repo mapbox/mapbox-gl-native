@@ -70,6 +70,7 @@
         "test/text/language_tag.test.cpp",
         "test/text/local_glyph_rasterizer.test.cpp",
         "test/text/quads.test.cpp",
+        "test/text/shaping.test.cpp",
         "test/text/tagged_string.test.cpp",
         "test/tile/custom_geometry_tile.test.cpp",
         "test/tile/geojson_tile.test.cpp",
