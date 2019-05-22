@@ -58,7 +58,7 @@ void RenderCircleLayer::render(PaintParameters& parameters) {
     }
 
     for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
         if (!renderData) {
             continue;
         }

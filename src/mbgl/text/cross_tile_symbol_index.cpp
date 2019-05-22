@@ -174,7 +174,7 @@ bool CrossTileSymbolIndex::addLayer(const RenderLayer& layer, float lng) {
     for (const auto& item : layer.getPlacementData()) {
         RenderTile& renderTile = item.tile;
         Bucket& bucket = item.bucket;
-        auto result = bucket.registerAtCrossTileIndex(layerIndex, renderTile.tile.id, maxCrossTileID);
+        auto result = bucket.registerAtCrossTileIndex(layerIndex, renderTile.getOverscaledTileID(), maxCrossTileID);
         assert(result.first != 0u);
         symbolBucketsChanged = symbolBucketsChanged || result.second;
         currentBucketIDs.insert(result.first);

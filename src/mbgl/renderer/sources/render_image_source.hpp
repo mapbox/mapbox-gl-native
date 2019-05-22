@@ -24,6 +24,8 @@ public:
     void upload(gfx::UploadPass&) final;
     void prepare(const SourcePrepareParameters&) final;
     void finishRender(PaintParameters&) final;
+    void updateFadingTiles() final {}
+    bool hasFadingTiles() const final { return false; }
 
     void update(Immutable<style::Source::Impl>,
                 const std::vector<Immutable<style::LayerProperties>>&,

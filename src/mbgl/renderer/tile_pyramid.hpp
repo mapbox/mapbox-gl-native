@@ -71,6 +71,9 @@ public:
     const std::map<OverscaledTileID, std::unique_ptr<Tile>>& getTiles() const { return tiles; }
     void clearAll();
 
+    void updateFadingTiles();
+    bool hasFadingTiles() const { return fadingTiles; }
+
 private:
     void addRenderTile(const UnwrappedTileID& tileID, Tile& tile);
 
@@ -82,6 +85,8 @@ private:
     TileObserver* observer = nullptr;
 
     float prevLng = 0;
+
+    bool fadingTiles = false;
 };
 
 } // namespace mbgl

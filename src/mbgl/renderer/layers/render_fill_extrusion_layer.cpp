@@ -115,7 +115,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
         // Draw solid color extrusions
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_) {
             for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
                 if (!renderData) {
                     continue;
                 }
@@ -160,15 +160,13 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
         const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_) {
             for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
                 if (!renderData) {
                     continue;
                 }
                 auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
-
-                auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
-                optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
-                optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
+                optional<ImagePosition> patternPosA = tile.getPattern(fillPatternValue.from);
+                optional<ImagePosition> patternPosB = tile.getPattern(fillPatternValue.to);
 
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern,
@@ -181,7 +179,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
                                                   parameters.state),
-                        geometryTile.iconAtlasTexture->size,
+                        tile.getIconAtlasTexture()->size,
                         crossfade,
                         tile.id,
                         parameters.state,
@@ -193,7 +191,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
                     patternPosA,
                     patternPosB,
                     FillExtrusionPatternProgram::TextureBindings{
-                        textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
+                        textures::image::Value{ tile.getIconAtlasTexture()->getResource(), gfx::TextureFilterType::Linear },
                     }
                 );
             }

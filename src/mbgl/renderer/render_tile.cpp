@@ -8,6 +8,7 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/math.hpp>
 
 namespace mbgl {
@@ -58,6 +59,37 @@ mat4 RenderTile::translatedClipMatrix(const std::array<float, 2>& translation,
                                       TranslateAnchorType anchor,
                                       const TransformState& state) const {
     return translateVtxMatrix(nearClippedMatrix, translation, anchor, state, false);
+}
+
+const OverscaledTileID& RenderTile::getOverscaledTileID() const { return tile.id; }
+bool RenderTile::holdForFade() const { return tile.holdForFade(); }
+
+Bucket* RenderTile::getBucket(const style::Layer::Impl& impl) const {
+    return tile.getBucket(impl);
+}
+
+const LayerRenderData* RenderTile::getLayerRenderData(const style::Layer::Impl& impl) const {
+    return tile.getLayerRenderData(impl);
+}
+
+optional<ImagePosition> RenderTile::getPattern(const std::string& pattern) const {
+    assert(tile.kind == Tile::Kind::Geometry);
+    return static_cast<const GeometryTile&>(tile).getPattern(pattern);
+}
+
+const optional<gfx::Texture>& RenderTile::getGlyphAtlasTexture() const {
+    assert(tile.kind == Tile::Kind::Geometry);
+    return static_cast<const GeometryTile&>(tile).glyphAtlasTexture;
+}
+
+const optional<gfx::Texture>& RenderTile::getIconAtlasTexture() const {
+    assert(tile.kind == Tile::Kind::Geometry);
+    return static_cast<const GeometryTile&>(tile).iconAtlasTexture;
+}
+
+std::shared_ptr<FeatureIndex> RenderTile::getFeatureIndex() const {
+    assert(tile.kind == Tile::Kind::Geometry);
+    return static_cast<const GeometryTile&>(tile).getFeatureIndex();
 }
 
 void RenderTile::setMask(TileMask&& mask) {

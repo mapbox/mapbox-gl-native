@@ -21,6 +21,8 @@ public:
     void upload(gfx::UploadPass&) final;
     void prepare(const SourcePrepareParameters&) final;
     void finishRender(PaintParameters&) final;
+    void updateFadingTiles() final;
+    bool hasFadingTiles() const final;
 
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
 

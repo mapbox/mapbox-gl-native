@@ -111,8 +111,6 @@ void drawIcon(const DrawFn& draw,
               SegmentsWrapper iconSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
               const PaintParameters& parameters) {
-    assert(tile.tile.kind == Tile::Kind::Geometry);
-    auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
     const auto& layout = bucket.layout;
@@ -125,14 +123,14 @@ void drawIcon(const DrawFn& draw,
     const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
     const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
-    const gfx::TextureBinding textureBinding{ geometryTile.iconAtlasTexture->getResource(),
+    const gfx::TextureBinding textureBinding{ tile.getIconAtlasTexture()->getResource(),
                                             bucket.sdfIcons ||
                                                     parameters.state.isChanging() ||
                                                     iconScaled || iconTransformed
                                                 ? gfx::TextureFilterType::Linear
                                                 : gfx::TextureFilterType::Nearest };
 
-    const Size iconSize = geometryTile.iconAtlasTexture->size;
+    const Size& iconSize = tile.getIconAtlasTexture()->size;
 
     if (bucket.sdfIcons) {
         if (values.hasHalo) {
@@ -187,13 +185,11 @@ void drawText(const DrawFn& draw,
               SegmentsWrapper textSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
               const PaintParameters& parameters) {
-    assert(tile.tile.kind == Tile::Kind::Geometry);
-    auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
     const auto& layout = bucket.layout;
 
-    const gfx::TextureBinding textureBinding{ geometryTile.glyphAtlasTexture->getResource(),
+    const gfx::TextureBinding textureBinding{ tile.getGlyphAtlasTexture()->getResource(),
                                               gfx::TextureFilterType::Linear };
 
     auto values = textPropertyValues(evaluated, layout);
@@ -202,7 +198,7 @@ void drawText(const DrawFn& draw,
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
         layout.get<TextRotationAlignment>() == AlignmentType::Map;
 
-    const Size texsize = geometryTile.glyphAtlasTexture->size;
+    const Size& texsize = tile.getGlyphAtlasTexture()->size;
 
     if (values.hasHalo) {
         draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
@@ -363,7 +359,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
     };
 
     for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
         if (!renderData) {
             continue;
         }
@@ -399,7 +395,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
             static const CollisionBoxProgram::Binders paintAttributeData(properties, 0);
 
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
-            const float scale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
+            const float scale = std::pow(2, parameters.state.getZoom() - tile.getOverscaledTileID().overscaledZ);
             std::array<float,2> extrudeScale =
                 {{
                     parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
@@ -435,7 +431,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
             static const CollisionBoxProgram::Binders paintAttributeData(properties, 0);
 
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
-            const float scale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
+            const float scale = std::pow(2, parameters.state.getZoom() - tile.getOverscaledTileID().overscaledZ);
             std::array<float,2> extrudeScale =
                 {{
                     parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
@@ -453,7 +449,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
                 CollisionCircleProgram::LayoutUniformValues {
                     uniforms::matrix::Value( tile.matrix ),
                     uniforms::extrude_scale::Value( extrudeScale ),
-                    uniforms::overscale_factor::Value( float(tile.tile.id.overscaleFactor()) ),
+                    uniforms::overscale_factor::Value( float(tile.getOverscaledTileID().overscaleFactor()) ),
                     uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
                 },
                 *bucket.collisionCircle.vertexBuffer,
@@ -523,7 +519,7 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
 
     placementData.clear();
     for (RenderTile& renderTile : renderTiles) {
-        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*baseImpl);
+        auto* bucket = static_cast<SymbolBucket*>(renderTile.getBucket(*baseImpl));
         if (bucket && bucket->bucketLeaderID == getID()) {
             auto& layout = bucket->layout;
             bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;

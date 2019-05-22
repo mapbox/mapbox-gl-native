@@ -340,7 +340,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (placementChanged) {
             placement->commit(updateParameters.timePoint);
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-            updateFadingTiles();
+            for (const auto& entry : renderSources) {
+                entry.second->updateFadingTiles();
+            }
         } else {
             placement->setStale();
         }
@@ -699,25 +701,14 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     if (placement->hasTransitions(timePoint)) {
         return true;
     }
-    
-    if (fadingTiles) {
-        return true;
+
+    for (const auto& entry : renderSources) {
+        if (entry.second->hasFadingTiles()) {
+            return true;
+        }
     }
 
     return false;
-}
-
-void Renderer::Impl::updateFadingTiles() {
-    fadingTiles = false;
-    for (auto& source : renderSources) {
-        for (auto& renderTile : source.second->getRenderTiles()) {
-            Tile& tile = renderTile.get().tile;
-            if (tile.holdForFade()) {
-                fadingTiles = true;
-                tile.performedFadePlacement();
-            }
-        }
-    }
 }
 
 bool Renderer::Impl::isLoaded() const {

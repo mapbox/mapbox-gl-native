@@ -71,7 +71,8 @@ public:
     virtual void upload(gfx::UploadPass&) = 0;
     virtual void prepare(const SourcePrepareParameters&) = 0;
     virtual void finishRender(PaintParameters&) = 0;
-
+    virtual void updateFadingTiles() = 0;
+    virtual bool hasFadingTiles() const = 0;
     // Returns a list of RenderTiles, sorted by tile id.
     virtual std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() = 0;
 
