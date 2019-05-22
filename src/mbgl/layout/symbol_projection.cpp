@@ -361,15 +361,13 @@ namespace mbgl {
 
 
     void reprojectLineLabels(gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>>& dynamicVertexArray, const std::vector<PlacedSymbol>& placedSymbols,
-			const mat4& posMatrix, const style::SymbolPropertyValues& values,
+			const mat4& posMatrix, bool pitchWithMap, bool rotateWithMap, bool keepUpright,
             const RenderTile& tile, const SymbolSizeBinder& sizeBinder, const TransformState& state) {
 
         const ZoomEvaluatedSize partiallyEvaluatedSize = sizeBinder.evaluateForZoom(state.getZoom());
 
         const std::array<double, 2> clippingBuffer = {{ 256.0 / state.getSize().width * 2.0 + 1.0, 256.0 / state.getSize().height * 2.0 + 1.0 }};
-        
-        const bool pitchWithMap = values.pitchAlignment == style::AlignmentType::Map;
-        const bool rotateWithMap = values.rotationAlignment == style::AlignmentType::Map;
+
         const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1, state.getZoom());
 
         const mat4 labelPlaneMatrix = getLabelPlaneMatrix(posMatrix, pitchWithMap,
@@ -405,19 +403,19 @@ namespace mbgl {
             const float perspectiveRatio = 0.5 + 0.5 * (cameraToAnchorDistance / state.getCameraToCenterDistance());
 
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedSize, placedSymbol);
-            const float pitchScaledFontSize = values.pitchAlignment == style::AlignmentType::Map ?
+            const float pitchScaledFontSize = pitchWithMap ?
                 fontSize * perspectiveRatio :
                 fontSize / perspectiveRatio;
             
             const Point<float> anchorPoint = project(placedSymbol.anchorPoint, labelPlaneMatrix).first;
 
-            PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint, state.getSize().aspectRatio());
+            PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint, state.getSize().aspectRatio());
             
             useVertical = placeUnflipped == PlacementResult::UseVertical;
 
             if (placeUnflipped == PlacementResult::NotEnoughRoom || useVertical ||
                 (placeUnflipped == PlacementResult::NeedsFlipping &&
-                 placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, true /*flipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint, state.getSize().aspectRatio()) == PlacementResult::NotEnoughRoom)) {
+                 placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, true /*flipped*/, keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint, state.getSize().aspectRatio()) == PlacementResult::NotEnoughRoom)) {
                 hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
             }
         }

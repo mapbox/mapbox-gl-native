@@ -65,7 +65,6 @@ private:
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
-    void upload(gfx::UploadPass&, UploadParameters&) override;
     void render(PaintParameters&) override;
     void prepare(const LayerPrepareParameters&) override;
 
@@ -76,7 +75,6 @@ private:
     float textSize = 16.0f;
 
     bool hasFormatSectionOverrides = false;
-    bool hasVariablePlacement = false;
 };
 
 } // namespace mbgl

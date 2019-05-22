@@ -396,10 +396,110 @@ void Placement::commit(TimePoint now) {
     fadeStartTime = placementChanged ? commitTime : prevPlacement->fadeStartTime;
 }
 
-void Placement::updateLayerOpacities(const RenderLayer& layer) {
+void Placement::updateLayerBuckets(const RenderLayer& layer, bool updateOpacities) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
-        item.bucket.get().updateOpacities(*this, seenCrossTileIDs);
+        item.bucket.get().updateVertices(*this, updateOpacities, item.tile, seenCrossTileIDs);
+    }
+}
+
+namespace {
+Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float width, float height, float radialOffset, float textBoxScale, float renderTextSize) {
+    AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
+    float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
+    float shiftY = -(alignment.verticalAlign - 0.5f) * height;
+    Point<float> offset = SymbolLayout::evaluateRadialOffset(anchor, radialOffset);
+    return { (shiftX / textBoxScale + offset.x) * renderTextSize,
+             (shiftY / textBoxScale + offset.y) * renderTextSize };
+}
+} // namespace
+
+void Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTile& tile) {
+    using namespace style;
+    const auto& layout = bucket.layout;
+    const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
+    if (alongLine) {
+        if (bucket.hasIconData() && layout.get<IconRotationAlignment>() == AlignmentType::Map) {                    
+            const bool pitchWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
+            const bool keepUpright = layout.get<style::IconKeepUpright>();
+            reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols,
+                tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
+                tile, *bucket.iconSizeBinder, state);
+        }
+
+        if (bucket.hasTextData() && layout.get<TextRotationAlignment>() == AlignmentType::Map) {
+            const bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
+            const bool keepUpright = layout.get<style::TextKeepUpright>();
+            reprojectLineLabels(bucket.text.dynamicVertices, bucket.text.placedSymbols,
+                tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
+                tile, *bucket.textSizeBinder, state);
+        }
+    } else if (!layout.get<TextVariableAnchor>().empty() && bucket.hasTextData()) {
+        bucket.text.dynamicVertices.clear();
+        bucket.hasVariablePlacement = false;
+
+        const auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
+        const float tileScale = std::pow(2, state.getZoom() - tile.tile.id.overscaledZ);
+        const bool rotateWithMap = layout.get<TextRotationAlignment>() == AlignmentType::Map;
+        const bool pitchWithMap = layout.get<TextPitchAlignment>() == AlignmentType::Map;
+        const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, state.getZoom());
+        const auto labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
+
+        for (const PlacedSymbol& symbol : bucket.text.placedSymbols) {
+            optional<VariableOffset> variableOffset;
+            if (!symbol.hidden && symbol.crossTileID != 0u) {
+                auto it = variableOffsets.find(symbol.crossTileID);
+                if (it != variableOffsets.end()) {
+                    bucket.hasVariablePlacement = true;
+                    variableOffset = it->second;
+                }
+            }
+
+            if (!variableOffset) {
+                // These symbols are from a justification that is not being used, or a label that wasn't placed
+                // so we don't need to do the extra math to figure out what incremental shift to apply.
+                hideGlyphs(symbol.glyphOffsets.size(), bucket.text.dynamicVertices);
+            } else {
+                const Point<float> tileAnchor = symbol.anchorPoint;
+                const auto projectedAnchor = project(tileAnchor, pitchWithMap ? tile.matrix : labelPlaneMatrix);
+                const float perspectiveRatio = 0.5f + 0.5f * (state.getCameraToCenterDistance() / projectedAnchor.second);
+                float renderTextSize = evaluateSizeForFeature(partiallyEvaluatedSize, symbol) * perspectiveRatio / util::ONE_EM;
+                if (pitchWithMap) {
+                    // Go from size in pixels to equivalent size in tile units
+                    renderTextSize *= bucket.tilePixelRatio / tileScale;
+                }
+
+                auto shift = calculateVariableRenderShift(
+                        (*variableOffset).anchor,
+                        (*variableOffset).width,
+                        (*variableOffset).height,
+                        (*variableOffset).radialOffset,
+                        (*variableOffset).textBoxScale,
+                        renderTextSize);
+
+                // Usual case is that we take the projected anchor and add the pixel-based shift
+                // calculated above. In the (somewhat weird) case of pitch-aligned text, we add an equivalent
+                // tile-unit based shift to the anchor before projecting to the label plane.
+                Point<float> shiftedAnchor;
+                if (pitchWithMap) {
+                    shiftedAnchor = project(Point<float>(tileAnchor.x + shift.x, tileAnchor.y + shift.y),
+                                            labelPlaneMatrix).first;
+                } else {
+                    if (rotateWithMap) {
+                        auto rotated = util::rotate(shift, -state.getPitch());
+                        shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
+                                                    projectedAnchor.first.y + rotated.y);
+                    } else {
+                        shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
+                                                    projectedAnchor.first.y + shift.y);
+                    }
+                }
+
+                for (std::size_t i = 0; i < symbol.glyphOffsets.size(); ++i) {
+                    addDynamicAttributes(shiftedAnchor, 0, bucket.text.dynamicVertices);
+                }
+            }
+        }
     }
 }
 
@@ -559,7 +659,6 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
         }
     }
 
-    bucket.updateOpacity();
     bucket.sortFeatures(state.getBearing());
     auto retainedData = retainedQueryData.find(bucket.bucketInstanceId);
     if (retainedData != retainedQueryData.end()) {

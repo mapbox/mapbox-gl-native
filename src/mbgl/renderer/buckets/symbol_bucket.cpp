@@ -10,7 +10,7 @@ namespace mbgl {
 
 using namespace style;
 namespace {
-    std::atomic<uint32_t> maxBucketInstanceId;
+std::atomic<uint32_t> maxBucketInstanceId;
 } // namespace
 
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
@@ -62,7 +62,11 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
         }
 
         if (!dynamicUploaded) {
-            text.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(text.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!text.dynamicVertexBuffer) {
+                text.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(text.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            } else {
+                uploadPass.updateVertexBuffer(*text.dynamicVertexBuffer, std::move(text.dynamicVertices));
+            }
         }
         if (!placementChangesUploaded) {
             if (!text.opacityVertexBuffer) {
@@ -84,7 +88,11 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
             uploadPass.updateIndexBuffer(*icon.indexBuffer, std::move(icon.triangles));
         }
         if (!dynamicUploaded) {
-            icon.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(icon.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!icon.dynamicVertexBuffer) {
+                icon.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(icon.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            } else {
+                uploadPass.updateVertexBuffer(*icon.dynamicVertexBuffer, std::move(icon.dynamicVertices));
+            }
         }
         if (!placementChangesUploaded) {
             if (!icon.opacityVertexBuffer) {
@@ -148,11 +156,6 @@ bool SymbolBucket::hasCollisionBoxData() const {
 
 bool SymbolBucket::hasCollisionCircleData() const {
     return !collisionCircle.segments.empty();
-}
-
-void SymbolBucket::updateOpacity() {
-    placementChangesUploaded = false;
-    uploaded = false;
 }
 
 void addPlacedSymbol(gfx::IndexVector<gfx::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
@@ -242,8 +245,8 @@ bool SymbolBucket::hasFormatSectionOverrides() const {
 }
 
 std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbolLayerIndex& index, const OverscaledTileID& tileID, uint32_t& maxCrossTileID) {
-    bool added = index.addBucket(tileID, *this, maxCrossTileID);
-    return std::make_pair(bucketInstanceId, added);
+    bool firstTimeAdded = index.addBucket(tileID, *this, maxCrossTileID);
+    return std::make_pair(bucketInstanceId, firstTimeAdded);
 }
 
 uint32_t SymbolBucket::place(Placement& placement, const BucketPlacementParameters& params, std::set<uint32_t>& seenIds) {
@@ -251,8 +254,14 @@ uint32_t SymbolBucket::place(Placement& placement, const BucketPlacementParamete
     return bucketInstanceId;
 }
 
-void SymbolBucket::updateOpacities(Placement& placement, std::set<uint32_t>& seenIds) {
-    placement.updateBucketOpacities(*this, seenIds);
+void SymbolBucket::updateVertices(Placement& placement, bool updateOpacities, const RenderTile& tile, std::set<uint32_t>& seenIds) {
+    if (updateOpacities) {
+        placement.updateBucketOpacities(*this, seenIds);
+        placementChangesUploaded = false;
+    }
+    placement.updateBucketDynamicVertices(*this, tile);
+    dynamicUploaded = false;
+    uploaded = false;
 }
 
 } // namespace mbgl
