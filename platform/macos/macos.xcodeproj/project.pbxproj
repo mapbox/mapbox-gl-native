@@ -95,6 +95,10 @@
 		556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D51E1D07E400E2C41B /* MGLVersionNumber.m */; };
 		558DE7A61E56161C00C7916D /* MGLFoundation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 558DE7A41E56161C00C7916D /* MGLFoundation_Private.h */; };
 		558DE7A71E56161C00C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE7A51E56161C00C7916D /* MGLFoundation.mm */; };
+		5591AC6A2298361600FF9ADF /* MGLMapView+Impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 5591AC682298361600FF9ADF /* MGLMapView+Impl.h */; };
+		5591AC6B2298361600FF9ADF /* MGLMapView+Impl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5591AC692298361600FF9ADF /* MGLMapView+Impl.mm */; };
+		55CAF6322294407F00F17770 /* MGLMapView+OpenGL.h in Headers */ = {isa = PBXBuildFile; fileRef = 55CAF6312294407F00F17770 /* MGLMapView+OpenGL.h */; };
+		55CAF6342294409B00F17770 /* MGLMapView+OpenGL.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55CAF6332294409B00F17770 /* MGLMapView+OpenGL.mm */; };
 		55CF7533213EDADF00ED86C4 /* libicu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55CF7532213EDADF00ED86C4 /* libicu.a */; };
 		55D120A31F7906E6004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
 		55D120A51F790A0C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
@@ -416,6 +420,10 @@
 		556660D51E1D07E400E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
 		558DE7A41E56161C00C7916D /* MGLFoundation_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFoundation_Private.h; sourceTree = "<group>"; };
 		558DE7A51E56161C00C7916D /* MGLFoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFoundation.mm; sourceTree = "<group>"; };
+		5591AC682298361600FF9ADF /* MGLMapView+Impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLMapView+Impl.h"; sourceTree = "<group>"; };
+		5591AC692298361600FF9ADF /* MGLMapView+Impl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLMapView+Impl.mm"; sourceTree = "<group>"; };
+		55CAF6312294407F00F17770 /* MGLMapView+OpenGL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MGLMapView+OpenGL.h"; sourceTree = "<group>"; };
+		55CAF6332294409B00F17770 /* MGLMapView+OpenGL.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLMapView+OpenGL.mm"; sourceTree = "<group>"; };
 		55CF7532213EDADF00ED86C4 /* libicu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libicu.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-filesource.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -1262,6 +1270,10 @@
 				DAE6C3A01CC31E9400DB3429 /* MGLMapView.h */,
 				DAE6C3AC1CC31EF300DB3429 /* MGLMapView_Private.h */,
 				DAE6C3AD1CC31EF300DB3429 /* MGLMapView.mm */,
+				5591AC682298361600FF9ADF /* MGLMapView+Impl.h */,
+				5591AC692298361600FF9ADF /* MGLMapView+Impl.mm */,
+				55CAF6332294409B00F17770 /* MGLMapView+OpenGL.mm */,
+				55CAF6312294407F00F17770 /* MGLMapView+OpenGL.h */,
 				DAE6C3A11CC31E9400DB3429 /* MGLMapView+IBAdditions.h */,
 				DAE6C3AE1CC31EF300DB3429 /* MGLMapView+IBAdditions.mm */,
 				DAE6C3A21CC31E9400DB3429 /* MGLMapViewDelegate.h */,
@@ -1357,6 +1369,7 @@
 				35C5D8491D6DD66D00E95907 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
 				9250B8C32073C69100EF338C /* MGLShapeOfflineRegion.h in Headers */,
 				747ABE67219B2C3200523B67 /* MGLSymbolStyleLayer_Private.h in Headers */,
+				55CAF6322294407F00F17770 /* MGLMapView+OpenGL.h in Headers */,
 				DD0902B31DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				DAE6C3621CC31E0400DB3429 /* MGLOverlay.h in Headers */,
 				DAE6C3651CC31E0400DB3429 /* MGLPolyline.h in Headers */,
@@ -1367,6 +1380,7 @@
 				DA8F25B21D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
 				55335DF9212EC542000CE5F8 /* NSImage+MGLAdditions.h in Headers */,
 				1F7454A31ECFB00300021D39 /* MGLLight_Private.h in Headers */,
+				5591AC6A2298361600FF9ADF /* MGLMapView+Impl.h in Headers */,
 				359819591E02F611008FC139 /* NSCoder+MGLAdditions.h in Headers */,
 				DAE6C38E1CC31E2A00DB3429 /* MGLOfflineStorage_Private.h in Headers */,
 				747ABE61219B2C0000523B67 /* MGLLineStyleLayer_Private.h in Headers */,
@@ -1638,6 +1652,7 @@
 				1FCCEC53222EF9FE00302E3B /* MGLSDKMetricsManager.m in Sources */,
 				DAE6C3981CC31E2A00DB3429 /* NSBundle+MGLAdditions.m in Sources */,
 				DAE6C3B71CC31EF300DB3429 /* MGLMapView.mm in Sources */,
+				55CAF6342294409B00F17770 /* MGLMapView+OpenGL.mm in Sources */,
 				40B77E461DB11BCD003DA2FE /* NSArray+MGLAdditions.mm in Sources */,
 				DAE6C38C1CC31E2A00DB3429 /* MGLOfflinePack.mm in Sources */,
 				35D65C5B1D65AD5500722C23 /* NSDate+MGLAdditions.mm in Sources */,
@@ -1697,6 +1712,7 @@
 				DAD165751CF4CD7A001FF4B9 /* MGLShapeCollection.mm in Sources */,
 				92FC0AE6207CDD8D007B6B54 /* MGLShapeOfflineRegion.mm in Sources */,
 				35C5D8481D6DD66D00E95907 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
+				5591AC6B2298361600FF9ADF /* MGLMapView+Impl.mm in Sources */,
 				DA35A2AE1CCA091800E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DACA8623201920BE00E9693A /* MGLRasterDEMSource.mm in Sources */,
 				DA8F258C1D51CA540010E6B5 /* MGLLineStyleLayer.mm in Sources */,

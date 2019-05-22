@@ -2,6 +2,7 @@
 #include <mbgl/util/logging.hpp>
 
 #include <OpenGL/OpenGL.h>
+#include <Foundation/NSString.h>
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <string>
@@ -92,12 +93,8 @@ public:
             throw std::runtime_error("Failed to load OpenGL framework.");
         }
 
-        CFStringRef str =
-            CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
-        CFRelease(str);
-
-        return reinterpret_cast<gl::ProcAddress>(symbol);
+        return reinterpret_cast<gl::ProcAddress>(CFBundleGetFunctionPointerForName(
+            framework, (__bridge CFStringRef)[NSString stringWithUTF8String:name]));
     }
 
     void activateContext() final {
