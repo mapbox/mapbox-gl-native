@@ -19,6 +19,7 @@ class PatternDependency;
 using PatternLayerMap = std::map<std::string, PatternDependency>;
 class Placement;
 class BucketPlacementParameters;
+class RenderTile;
 
 class Bucket {
 public:
@@ -59,7 +60,7 @@ public:
     }
     // Places this bucket to the given placement. Returns bucket cross-tile id on success call; `0` otherwise.
     virtual uint32_t place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) { return 0u; }
-    virtual void updateOpacities(Placement&, std::set<uint32_t>&) {}
+    virtual void updateVertices(Placement&, bool /*updateOpacities*/, const RenderTile&, std::set<uint32_t>&) {}
 
 protected:
     Bucket() = default;

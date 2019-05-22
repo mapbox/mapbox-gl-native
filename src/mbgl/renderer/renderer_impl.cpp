@@ -345,10 +345,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             placement->setStale();
         }
 
-        if (placementChanged || symbolBucketsChanged) {
-            for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-                placement->updateLayerOpacities(*it);
-            }
+        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+            placement->updateLayerBuckets(*it, placementChanged || symbolBucketsChanged);
         }
     }
 
@@ -385,7 +383,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         UploadParameters uploadParameters{
             updateParameters.transformState,
-            placement->getVariableOffsets(),
             *imageManager,
             *lineAtlas,
         };

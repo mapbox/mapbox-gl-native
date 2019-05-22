@@ -47,7 +47,7 @@ namespace mbgl {
     PointAndCameraDistance project(const Point<float>& point, const mat4& matrix);
 
     void reprojectLineLabels(gfx::VertexVector<gfx::Vertex<SymbolDynamicLayoutAttributes>>&, const std::vector<PlacedSymbol>&,
-            const mat4& posMatrix, const style::SymbolPropertyValues&,
+            const mat4& posMatrix, bool pitchWithMap, bool rotateWithMap, bool keepUpright,
             const RenderTile&, const SymbolSizeBinder& sizeBinder, const TransformState&);
     
     optional<std::pair<PlacedGlyph, PlacedGlyph>> placeFirstAndLastGlyph(const float fontScale,
