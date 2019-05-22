@@ -93,8 +93,6 @@ private:
     void onStyleImageMissing(const std::string&, std::function<void()>) override;
     void onRemoveUnusedStyleImages(const std::vector<std::string>&) final;
 
-    void updateFadingTiles();
-
     friend class Renderer;
 
     gfx::RendererBackend& backend;
@@ -132,7 +130,6 @@ private:
     std::unique_ptr<Placement> placement;
 
     bool contextLost = false;
-    bool fadingTiles = false;
 };
 
 } // namespace mbgl

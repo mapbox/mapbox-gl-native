@@ -76,7 +76,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
     if (unevaluated.get<FillPattern>().isUndefined()) {
         parameters.renderTileClippingMasks(renderTiles);
         for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
             if (!renderData) {
                 continue;
             }
@@ -163,7 +163,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
         parameters.renderTileClippingMasks(renderTiles);
 
         for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
             if (!renderData) {
                 continue;
             }
@@ -172,9 +172,8 @@ void RenderFillLayer::render(PaintParameters& parameters) {
             const auto& crossfade = getCrossfade<FillLayerProperties>(renderData->layerProperties);
 
             const auto& fillPatternValue = evaluated.get<FillPattern>().constantOr(Faded<std::basic_string<char>>{"", ""});
-            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
-            optional<ImagePosition> patternPosA = geometryTile.getPattern(fillPatternValue.from);
-            optional<ImagePosition> patternPosB = geometryTile.getPattern(fillPatternValue.to);
+            optional<ImagePosition> patternPosA = tile.getPattern(fillPatternValue.from);
+            optional<ImagePosition> patternPosB = tile.getPattern(fillPatternValue.to);
 
             auto draw = [&] (auto& programInstance,
                              const auto& drawMode,
@@ -191,7 +190,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),
                         parameters.backend.getDefaultRenderable().getSize(),
-                        geometryTile.iconAtlasTexture->size,
+                        tile.getIconAtlasTexture()->size,
                         crossfade,
                         tile.id,
                         parameters.state,
@@ -233,7 +232,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                      *bucket.triangleIndexBuffer,
                      bucket.triangleSegments,
                      FillPatternProgram::TextureBindings{
-                         textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
+                         textures::image::Value{ tile.getIconAtlasTexture()->getResource(), gfx::TextureFilterType::Linear },
                      });
             }
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
@@ -243,7 +242,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments,
                      FillOutlinePatternProgram::TextureBindings{
-                         textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
+                         textures::image::Value{ tile.getIconAtlasTexture()->getResource(), gfx::TextureFilterType::Linear },
                      });
             }
         }

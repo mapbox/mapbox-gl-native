@@ -70,6 +70,14 @@ void RenderRasterSource::finishRender(PaintParameters& parameters) {
     tilePyramid.finishRender(parameters);
 }
 
+void RenderRasterSource::updateFadingTiles() {
+    tilePyramid.updateFadingTiles();
+}
+
+bool RenderRasterSource::hasFadingTiles() const {
+    return tilePyramid.hasFadingTiles();
+}
+
 std::vector<std::reference_wrapper<RenderTile>> RenderRasterSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }

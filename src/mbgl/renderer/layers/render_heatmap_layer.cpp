@@ -94,7 +94,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
             "heatmap texture", { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
 
         for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
             if (!renderData) {
                 continue;
             }

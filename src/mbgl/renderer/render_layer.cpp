@@ -57,13 +57,11 @@ optional<Color> RenderLayer::getSolidBackground() const {
 RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
     RenderTiles filtered;
 
-    for (auto& tileRef : tiles) {
-        auto& tile = tileRef.get().tile;
-        assert(tile.isRenderable());
+    for (RenderTile& tile : tiles) {
         if (tile.holdForFade()) {
             continue;
         }
-        filtered.emplace_back(tileRef);
+        filtered.emplace_back(tile);
     }
     return filtered;
 }

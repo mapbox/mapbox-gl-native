@@ -139,6 +139,14 @@ void RenderRasterDEMSource::finishRender(PaintParameters& parameters) {
     tilePyramid.finishRender(parameters);
 }
 
+void RenderRasterDEMSource::updateFadingTiles() {
+    tilePyramid.updateFadingTiles();
+}
+
+bool RenderRasterDEMSource::hasFadingTiles() const {
+    return tilePyramid.hasFadingTiles();
+}
+
 std::vector<std::reference_wrapper<RenderTile>> RenderRasterDEMSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }

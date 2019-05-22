@@ -87,7 +87,7 @@ public:
     void markRenderedIdeal() override;
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
-    const optional<ImagePosition> getPattern(const std::string& pattern);
+    const optional<ImagePosition> getPattern(const std::string& pattern) const;
     const std::shared_ptr<FeatureIndex> getFeatureIndex() const { return latestFeatureIndex; }
     
     const std::string sourceID;

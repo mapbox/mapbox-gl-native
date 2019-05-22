@@ -168,12 +168,12 @@ void GeometryTile::getImages(ImageRequestPair pair) {
     imageManager.getImages(*this, std::move(pair));
 }
 
-const optional<ImagePosition> GeometryTile::getPattern(const std::string& pattern) {
+const optional<ImagePosition> GeometryTile::getPattern(const std::string& pattern) const {
     auto it = iconAtlas.patternPositions.find(pattern);
     if (it !=  iconAtlas.patternPositions.end()) {
         return it->second;
     }
-    return {};
+    return nullopt;
 }
 
 void GeometryTile::upload(gfx::UploadPass& uploadPass) {

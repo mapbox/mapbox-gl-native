@@ -135,6 +135,14 @@ void RenderGeoJSONSource::finishRender(PaintParameters& parameters) {
     tilePyramid.finishRender(parameters);
 }
 
+void RenderGeoJSONSource::updateFadingTiles() {
+    tilePyramid.updateFadingTiles();
+}
+
+bool RenderGeoJSONSource::hasFadingTiles() const {
+    return tilePyramid.hasFadingTiles();
+}
+
 std::vector<std::reference_wrapper<RenderTile>> RenderGeoJSONSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }

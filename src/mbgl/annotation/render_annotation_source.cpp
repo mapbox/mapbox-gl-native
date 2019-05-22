@@ -59,6 +59,14 @@ void RenderAnnotationSource::finishRender(PaintParameters& parameters) {
     tilePyramid.finishRender(parameters);
 }
 
+void RenderAnnotationSource::updateFadingTiles() {
+    tilePyramid.updateFadingTiles();
+}
+
+bool RenderAnnotationSource::hasFadingTiles() const {
+    return tilePyramid.hasFadingTiles();
+}
+
 std::vector<std::reference_wrapper<RenderTile>> RenderAnnotationSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }

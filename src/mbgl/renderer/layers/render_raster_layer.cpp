@@ -159,11 +159,11 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
         }
     } else {
         for (const RenderTile& tile : renderTiles) {
-            auto bucket_ = tile.tile.getBucket<RasterBucket>(*baseImpl);
+            auto* bucket_ = tile.getBucket(*baseImpl);
             if (!bucket_) {
                 continue;
             }
-            RasterBucket& bucket = *bucket_;
+            auto& bucket = static_cast<RasterBucket&>(*bucket_);
 
             if (!bucket.hasData())
                 continue;

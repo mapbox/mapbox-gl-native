@@ -61,7 +61,7 @@ bool RenderLineLayer::hasCrossfade() const {
 
 void RenderLineLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& uploadParameters) {
     for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
         if (!renderData) {
             continue;
         }
@@ -77,11 +77,10 @@ void RenderLineLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& uplo
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
-            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
 
             // Ensures that the pattern gets added and uplodated to the atlas.
-            geometryTile.getPattern(linePatternValue.from);
-            geometryTile.getPattern(linePatternValue.to);
+            tile.getPattern(linePatternValue.from);
+            tile.getPattern(linePatternValue.to);
 
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             if (!colorRampTexture) {
@@ -99,7 +98,7 @@ void RenderLineLayer::render(PaintParameters& parameters) {
     parameters.renderTileClippingMasks(renderTiles);
 
     for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
         if (!renderData) {
             continue;
         }
@@ -171,11 +170,10 @@ void RenderLineLayer::render(PaintParameters& parameters) {
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
-            auto& geometryTile = static_cast<GeometryTile&>(tile.tile);
-            const Size texsize = geometryTile.iconAtlasTexture->size;
+            const Size& texsize = tile.getIconAtlasTexture()->size;
 
-            optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
-            optional<ImagePosition> posB = geometryTile.getPattern(linePatternValue.to);
+            optional<ImagePosition> posA = tile.getPattern(linePatternValue.from);
+            optional<ImagePosition> posB = tile.getPattern(linePatternValue.to);
 
             draw(parameters.programs.getLineLayerPrograms().linePattern,
                  LinePatternProgram::layoutUniformValues(
@@ -189,7 +187,7 @@ void RenderLineLayer::render(PaintParameters& parameters) {
                      posA,
                      posB,
                      LinePatternProgram::TextureBindings{
-                         textures::image::Value{ geometryTile.iconAtlasTexture->getResource(), gfx::TextureFilterType::Linear },
+                         textures::image::Value{ tile.getIconAtlasTexture()->getResource(), gfx::TextureFilterType::Linear },
                      });
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             assert(colorRampTexture);

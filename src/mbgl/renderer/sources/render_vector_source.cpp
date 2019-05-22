@@ -69,6 +69,14 @@ void RenderVectorSource::finishRender(PaintParameters& parameters) {
     tilePyramid.finishRender(parameters);
 }
 
+void RenderVectorSource::updateFadingTiles() {
+    tilePyramid.updateFadingTiles();
+}
+
+bool RenderVectorSource::hasFadingTiles() const {
+    return tilePyramid.hasFadingTiles();
+}
+
 std::vector<std::reference_wrapper<RenderTile>> RenderVectorSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }

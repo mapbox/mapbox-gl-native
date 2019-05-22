@@ -59,6 +59,14 @@ void RenderCustomGeometrySource::finishRender(PaintParameters& parameters) {
     tilePyramid.finishRender(parameters);
 }
 
+void RenderCustomGeometrySource::updateFadingTiles() {
+    tilePyramid.updateFadingTiles();
+}
+
+bool RenderCustomGeometrySource::hasFadingTiles() const {
+    return tilePyramid.hasFadingTiles();
+}
+
 std::vector<std::reference_wrapper<RenderTile>> RenderCustomGeometrySource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }

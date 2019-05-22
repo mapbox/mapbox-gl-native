@@ -242,12 +242,15 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         pair.second->setShowCollisionBoxes(parameters.debugOptions & MapDebugOptions::Collision);
     }
 
+    fadingTiles = false;
+
     // Initialize render tiles fields and update the tile contained layer render data.
     for (RenderTile& renderTile : renderTiles) {
         Tile& tile = renderTile.tile;
         assert(tile.isRenderable());
 
         const bool holdForFade = tile.holdForFade();
+        fadingTiles = (fadingTiles || holdForFade);
         for (const auto& layerProperties : layers) {
             const auto* typeInfo = layerProperties->baseImpl->getTypeInfo();
             if (holdForFade && typeInfo->fadingTiles == LayerTypeInfo::FadingTiles::NotRequired) {
@@ -399,6 +402,15 @@ void TilePyramid::addRenderTile(const UnwrappedTileID& tileID, Tile& tile) {
     auto it = std::lower_bound(renderTiles.begin(), renderTiles.end(), tileID,
         [](const RenderTile& a, const UnwrappedTileID& id) { return a.id < id; });
     renderTiles.emplace(it, tileID, tile);
+}
+
+void TilePyramid::updateFadingTiles() {
+    for (auto& renderTile : renderTiles) {
+        Tile& tile = renderTile.tile;
+        if (tile.holdForFade()) {
+            tile.performedFadePlacement();
+        }
+    }
 }
 
 } // namespace mbgl

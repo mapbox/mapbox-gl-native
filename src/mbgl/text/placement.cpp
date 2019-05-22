@@ -77,14 +77,12 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
 
     for (const auto& item : layer.getPlacementData()) {
         RenderTile& renderTile = item.tile;
-        assert(renderTile.tile.kind == Tile::Kind::Geometry);
-        auto& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
         Bucket& bucket = item.bucket;
 
         const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
-
-        const float scale = std::pow(2, state.getZoom() - geometryTile.id.overscaledZ);
-        const float textPixelRatio = (util::tileSize * geometryTile.id.overscaleFactor()) / util::EXTENT;
+        const OverscaledTileID& overscaledID = renderTile.getOverscaledTileID();
+        const float scale = std::pow(2, state.getZoom() - overscaledID.overscaledZ);
+        const float textPixelRatio = (util::tileSize * overscaledID.overscaleFactor()) / util::EXTENT;
 
         mat4 posMatrix;
         state.matrixFor(posMatrix, renderTile.id);
@@ -102,7 +100,7 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
                 state,
                 pixelsToTileUnits);
 
-        const auto& collisionGroup = collisionGroups.get(geometryTile.sourceID);
+        const auto& collisionGroup = collisionGroups.get(layer.baseImpl->source);
         BucketPlacementParameters params{
                 posMatrix,
                 textLabelPlaneMatrix,
@@ -110,7 +108,7 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
                 scale,
                 textPixelRatio,
                 showCollisionBoxes,
-                renderTile.tile.holdForFade(),
+                renderTile.holdForFade(),
                 collisionGroup};
         auto bucketInstanceId = bucket.place(*this, params, seenCrossTileIDs);
         assert(bucketInstanceId != 0u);
@@ -119,9 +117,7 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
         // matching FeatureIndex/data for querying purposes
         retainedQueryData.emplace(std::piecewise_construct,
                                   std::forward_as_tuple(bucketInstanceId),
-                                  std::forward_as_tuple(bucketInstanceId, geometryTile.getFeatureIndex(), geometryTile.id));
-        
-
+                                  std::forward_as_tuple(bucketInstanceId, renderTile.getFeatureIndex(), overscaledID));
     }
 }
 
@@ -439,7 +435,7 @@ void Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTi
         bucket.hasVariablePlacement = false;
 
         const auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
-        const float tileScale = std::pow(2, state.getZoom() - tile.tile.id.overscaledZ);
+        const float tileScale = std::pow(2, state.getZoom() - tile.getOverscaledTileID().overscaledZ);
         const bool rotateWithMap = layout.get<TextRotationAlignment>() == AlignmentType::Map;
         const bool pitchWithMap = layout.get<TextPitchAlignment>() == AlignmentType::Map;
         const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, state.getZoom());
