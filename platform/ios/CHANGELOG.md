@@ -2,10 +2,19 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 4.12.0
+## 5.0.0 - May 22, 2019
+
+This release improves how monthly active users are counted. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://www.mapbox.com/52219) and ([#14421](https://github.com/mapbox/mapbox-gl-native/pull/14421)).
+
+There are no breaking API changes in this release.
+
+### Styles and rendering
+
+* Changed placement order of `MGLSymbolStyleLayer` to match the viewport-y order when `MGLSymbolStyleLayer.symbolZOrder` is set to `MGLSymbolZOrderViewportY`, allowing icons to overlap but not text. ([#14486](https://github.com/mapbox/mapbox-gl-native/pull/14486))
+
+### Other changes
 
 * Fixed an issue where `-[MGLMapView setVisibleCoordinates:count:edgePadding:direction:duration:animationTimingFunction:completionHandler:]` interpreted a negative `direction` as due north instead of maintaining the current direction. ([#14575](https://github.com/mapbox/mapbox-gl-native/pull/14575))
-* Changed placement order of `MGLSymbolStyleLayer` to match the viewport-y order when `MGLSymbolStyleLayer.symbolZOrder` is set to `MGLSymbolZOrderViewportY`, allowing icons to overlap but not text. ([#14486](https://github.com/mapbox/mapbox-gl-native/pull/14486))
 
 ## 4.11.0 - May 15, 2019
 
@@ -23,7 +32,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a bug that caused incorrect positioning of the attribution dialog after rotation. ([#14185](https://github.com/mapbox/mapbox-gl-native/pull/14185))
 * Improved `MGLLocationManager` optional protocol properties bridging to Swift. ([#14477](https://github.com/mapbox/mapbox-gl-native/pull/14477))
 * Fixed a layout constraints crash on iOS 9 when a view is removed from its superview. ([#14529](https://github.com/mapbox/mapbox-gl-native/pull/14529))
-
 
 ## 4.10.0 - April 17, 2019
 
@@ -52,7 +60,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added `MGLOrnamentPosition` enum and margin properties to customize scale bar, compass, logo, and attribution position within the map view. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
 * Added an `MGLMapView.prefetchesTiles` property to configure lower-resolution tile prefetching behavior. ([#14031](https://github.com/mapbox/mapbox-gl-native/pull/14031))
 * Speculatively fixed a performance issue seen on iOS 12.2, when an `MGLMapView` is repeatedly removed and re-added in a view hierarchy. ([#14264](https://github.com/mapbox/mapbox-gl-native/pull/14264))
-
 
 ## 4.9.0 - February 27, 2019
 
