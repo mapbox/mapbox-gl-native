@@ -3,6 +3,8 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+## 8.0.0 - May 22, 2019
+ - This release improves the method for counting monthly active users. By upgrading to this release, you are opting into the changes outlined [in this blog post](https://www.mapbox.com/52219). [#14404](https://github.com/mapbox/mapbox-gl-native/pull/14404)
 
 ## 6.8.2 - May 17, 2019
 
