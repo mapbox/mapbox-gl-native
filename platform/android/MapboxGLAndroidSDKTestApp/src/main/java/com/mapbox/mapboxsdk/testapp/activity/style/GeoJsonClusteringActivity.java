@@ -21,11 +21,11 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import timber.log.Timber;
 
-import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,7 +98,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
             BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp))), true
           )
         );
-      } catch (IOException exception) {
+      } catch (URISyntaxException exception) {
         Timber.e(exception);
       }
 
@@ -133,10 +133,8 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     }
   }
 
-  private GeoJsonSource createClusterSource() throws IOException {
-    String earthQuakes = GeoParseUtil.loadStringFromAssets(this, "earthquakes.geojson");
-    FeatureCollection featureCollection = FeatureCollection.fromJson(earthQuakes);
-    return new GeoJsonSource("earthquakes", featureCollection, new GeoJsonOptions()
+  private GeoJsonSource createClusterSource() throws URISyntaxException {
+    return new GeoJsonSource("earthquakes", new URI("asset://earthquakes.geojson"), new GeoJsonOptions()
       .withCluster(true)
       .withClusterMaxZoom(14)
       .withClusterRadius(50)

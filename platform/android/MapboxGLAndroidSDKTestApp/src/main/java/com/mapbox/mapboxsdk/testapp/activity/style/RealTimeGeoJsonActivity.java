@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -12,11 +11,10 @@ import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import timber.log.Timber;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
@@ -54,12 +52,12 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
 
     mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
       @Override
-      public void onStyleLoaded(Style style) {
+      public void onStyleLoaded(@NonNull Style style) {
         // add source
         try {
-          style.addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URL(URL_GEOJSON_SOURCE)));
-        } catch (MalformedURLException malformedUrlException) {
-          Timber.e(malformedUrlException, "Invalid URL");
+          style.addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URI(URL_GEOJSON_SOURCE)));
+        } catch (URISyntaxException malformedUriException) {
+          Timber.e(malformedUriException, "Invalid URL");
         }
 
         // add layer

@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -10,11 +9,10 @@ import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import timber.log.Timber;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity;
@@ -66,14 +64,14 @@ public class HeatmapLayerActivity extends AppCompatActivity {
           .withLayerAbove(createHeatmapLayer(), "waterway-label")
           .withLayerBelow(createCircleLayer(), HEATMAP_LAYER_ID)
         );
-      } catch (MalformedURLException exception) {
+      } catch (URISyntaxException exception) {
         Timber.e(exception);
       }
     });
   }
 
-  private GeoJsonSource createEarthquakeSource() throws MalformedURLException {
-    return new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL));
+  private GeoJsonSource createEarthquakeSource() throws URISyntaxException {
+    return new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URI(EARTHQUAKE_SOURCE_URL));
   }
 
   private HeatmapLayer createHeatmapLayer() {

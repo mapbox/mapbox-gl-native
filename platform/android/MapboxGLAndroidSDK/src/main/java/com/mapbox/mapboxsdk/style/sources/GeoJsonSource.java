@@ -10,6 +10,7 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +81,7 @@ public class GeoJsonSource extends Source {
    */
   public GeoJsonSource(String id, @Nullable String geoJson, GeoJsonOptions options) {
     super();
-    if (geoJson == null || geoJson.startsWith("http")) {
+    if (geoJson == null || geoJson.startsWith("http") || geoJson.startsWith("asset") || geoJson.startsWith("file")) {
       throw new IllegalArgumentException("Expected a raw json body");
     }
     initialize(id, options);
@@ -92,7 +93,9 @@ public class GeoJsonSource extends Source {
    *
    * @param id  the source id
    * @param url remote json file
+   * @deprecated use {@link #GeoJsonSource(String, URI)} instead
    */
+  @Deprecated
   public GeoJsonSource(String id, URL url) {
     super();
     initialize(id, null);
@@ -105,11 +108,38 @@ public class GeoJsonSource extends Source {
    * @param id      the source id
    * @param url     remote json file
    * @param options options
+   * @deprecated use {@link #GeoJsonSource(String, URI, GeoJsonOptions)} instead
    */
+  @Deprecated
   public GeoJsonSource(String id, URL url, GeoJsonOptions options) {
     super();
     initialize(id, options);
     nativeSetUrl(url.toExternalForm());
+  }
+
+  /**
+   * Create a GeoJsonSource from a geo json file
+   *
+   * @param id  the source id
+   * @param uri unique resource identifier
+   */
+  public GeoJsonSource(String id, URI uri) {
+    super();
+    initialize(id, null);
+    nativeSetUrl(uri.toString());
+  }
+
+  /**
+   * Create a GeoJsonSource from a geo json file and non-default GeoJsonOptions
+   *
+   * @param id      the source id
+   * @param uri     remote json file
+   * @param options options
+   */
+  public GeoJsonSource(String id, URI uri, GeoJsonOptions options) {
+    super();
+    initialize(id, options);
+    nativeSetUrl(uri.toString());
   }
 
   /**
@@ -247,20 +277,44 @@ public class GeoJsonSource extends Source {
    * Updates the url
    *
    * @param url the GeoJSON FeatureCollection url
+   * @deprecated use {@link #setUri(URI)} instead
    */
+  @Deprecated
   public void setUrl(@NonNull URL url) {
     checkThread();
     setUrl(url.toExternalForm());
   }
 
   /**
+   * Updates the uri
+   *
+   * @param url the GeoJSON FeatureCollection uri
+   */
+  public void setUri(@NonNull URI url) {
+    checkThread();
+    setUrl(url.toString());
+  }
+
+  /**
    * Updates the url
    *
    * @param url the GeoJSON FeatureCollection url
+   * @deprecated use {@link #setUri(String)} instead
    */
+  @Deprecated
   public void setUrl(String url) {
     checkThread();
     nativeSetUrl(url);
+  }
+
+  /**
+   * Updates the url
+   *
+   * @param uri the GeoJSON FeatureCollection uri
+   */
+  public void setUri(String uri) {
+    checkThread();
+    nativeSetUrl(uri);
   }
 
   /**

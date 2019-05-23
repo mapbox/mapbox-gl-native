@@ -9,11 +9,11 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.geometry.LatLngQuad;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import java.net.URI;
 import java.net.URL;
 
 
@@ -45,11 +45,26 @@ public class ImageSource extends Source {
    * @param id          The source id
    * @param coordinates The Latitude and Longitude of the four corners of the image
    * @param url         remote json file
+   * @deprecated use {@link ImageSource#ImageSource(String, LatLngQuad, URI)} instead
    */
+  @Deprecated
   public ImageSource(String id, LatLngQuad coordinates, @NonNull URL url) {
     super();
     initialize(id, coordinates);
     setUrl(url);
+  }
+
+  /**
+   * Create an ImageSource from coordinates and an image URL
+   *
+   * @param id          The source id
+   * @param coordinates The Latitude and Longitude of the four corners of the image
+   * @param uri         json file uri
+   */
+  public ImageSource(String id, LatLngQuad coordinates, @NonNull URI uri) {
+    super();
+    initialize(id, coordinates);
+    setUri(uri);
   }
 
   /**
@@ -82,7 +97,9 @@ public class ImageSource extends Source {
    * Updates the source image url
    *
    * @param url An Image url
+   * @deprecated use {@link #setUri(URI)} instead
    */
+  @Deprecated
   public void setUrl(@NonNull URL url) {
     setUrl(url.toExternalForm());
   }
@@ -91,10 +108,31 @@ public class ImageSource extends Source {
    * Updates the source image url
    *
    * @param url An image url
+   * @deprecated use {@link #setUri(String)} instead
    */
+  @Deprecated
   public void setUrl(String url) {
     checkThread();
     nativeSetUrl(url);
+  }
+
+  /**
+   * Updates the source image uri
+   *
+   * @param uri An Image url
+   */
+  public void setUri(@NonNull URI uri) {
+    setUrl(uri.toString());
+  }
+
+  /**
+   * Updates the source image uri
+   *
+   * @param uri An image uri
+   */
+  public void setUri(String uri) {
+    checkThread();
+    nativeSetUrl(uri);
   }
 
   /**

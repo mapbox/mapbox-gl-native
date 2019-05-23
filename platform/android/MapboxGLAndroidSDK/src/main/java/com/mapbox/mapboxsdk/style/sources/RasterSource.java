@@ -4,6 +4,7 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -29,33 +30,43 @@ public class RasterSource extends Source {
    *
    * @param id  the source id
    * @param url the source url
+   * @deprecated use {@link #RasterSource(String, URI)} instead
    */
   public RasterSource(String id, URL url) {
     this(id, url.toExternalForm());
   }
 
-
   /**
-   * Create the raster source from an URL
+   * Create the raster source from an URI
    *
    * @param id  the source id
-   * @param url the source url
+   * @param uri the source uri
    */
-  public RasterSource(String id, String url) {
+  public RasterSource(String id, URI uri) {
+    this(id, uri.toString());
+  }
+
+  /**
+   * Create the raster source from an URI
+   *
+   * @param id  the source id
+   * @param uri the source uri
+   */
+  public RasterSource(String id, String uri) {
     super();
-    initialize(id, url, DEFAULT_TILE_SIZE);
+    initialize(id, uri, DEFAULT_TILE_SIZE);
   }
 
   /**
    * Create the raster source from an URL with a specific tile size
    *
    * @param id       the source id
-   * @param url      the source url
+   * @param uri      the source url
    * @param tileSize the tile size
    */
-  public RasterSource(String id, String url, int tileSize) {
+  public RasterSource(String id, String uri, int tileSize) {
     super();
-    initialize(id, url, tileSize);
+    initialize(id, uri, tileSize);
   }
 
   /**
