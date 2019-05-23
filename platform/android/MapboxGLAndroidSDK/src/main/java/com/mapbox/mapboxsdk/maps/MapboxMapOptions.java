@@ -84,7 +84,9 @@ public class MapboxMapOptions implements Parcelable {
 
   /**
    * Creates a new MapboxMapOptions object.
+   * @deprecated Use {@link #createFromAttributes(Context, AttributeSet)} instead.
    */
+  @Deprecated
   public MapboxMapOptions() {
   }
 

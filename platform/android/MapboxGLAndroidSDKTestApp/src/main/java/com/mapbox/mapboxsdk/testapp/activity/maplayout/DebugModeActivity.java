@@ -101,7 +101,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   }
 
   protected MapboxMapOptions setupMapboxMapOptions() {
-    return new MapboxMapOptions();
+    return MapboxMapOptions.createFromAttributes(this, null);
   }
 
   @Override

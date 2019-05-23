@@ -114,7 +114,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     setContentView(R.layout.activity_symbollayer);
 
     // Create map configuration
-    MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+    MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(this, null);
     mapboxMapOptions.camera(new CameraPosition.Builder().target(
       new LatLng(52.35273, 4.91638))
       .zoom(13)

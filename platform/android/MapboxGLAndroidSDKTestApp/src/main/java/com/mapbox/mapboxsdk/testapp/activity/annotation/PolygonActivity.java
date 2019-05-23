@@ -55,7 +55,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
     super.onCreate(savedInstanceState);
 
     // configure inital map state
-    MapboxMapOptions options = new MapboxMapOptions()
+    MapboxMapOptions options = MapboxMapOptions.createFromAttributes(this, null)
       .attributionTintColor(RED_COLOR)
       .compassFadesWhenFacingNorth(false)
       .camera(new CameraPosition.Builder()
