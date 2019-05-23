@@ -11,9 +11,6 @@ build/
 *.so
 *.apk
 
-# Lib assets
-MapboxGLAndroidSDK/src/main/assets/
-
 # Local settings
 local.properties
 gradle/configuration.gradle
