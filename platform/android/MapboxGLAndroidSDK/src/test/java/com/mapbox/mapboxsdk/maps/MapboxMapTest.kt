@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps
 
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.constants.MapboxConstants
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions
@@ -23,12 +24,15 @@ class MapboxMapTest {
 
   private lateinit var cameraChangeDispatcher: CameraChangeDispatcher
 
+  private lateinit var developerAnimationListener: MapboxMap.OnDeveloperAnimationListener
+
   @Before
   fun setup() {
     cameraChangeDispatcher = spyk()
+    developerAnimationListener = mockk(relaxed = true)
     nativeMapView = mockk(relaxed = true)
     transform = mockk(relaxed = true)
-    mapboxMap = MapboxMap(nativeMapView, transform, mockk(relaxed = true), null, null, cameraChangeDispatcher)
+    mapboxMap = MapboxMap(nativeMapView, transform, mockk(relaxed = true), null, null, cameraChangeDispatcher, listOf(developerAnimationListener))
     every { nativeMapView.isDestroyed } returns false
     every { nativeMapView.nativePtr } returns 5
     mapboxMap.injectLocationComponent(spyk())
@@ -51,6 +55,50 @@ class MapboxMapTest {
     val update = CameraUpdateFactory.newCameraPosition(expected)
     mapboxMap.moveCamera(update, callback)
     verify { transform.moveCamera(mapboxMap, update, callback) }
+    verify { developerAnimationListener.onDeveloperAnimationStarted() }
+  }
+
+  @Test
+  fun testEaseCamera() {
+    val callback = mockk<MapboxMap.CancelableCallback>()
+    val target = LatLng(1.0, 2.0)
+    val expected = CameraPosition.Builder().target(target).build()
+    val update = CameraUpdateFactory.newCameraPosition(expected)
+    mapboxMap.easeCamera(update, callback)
+    verify { transform.easeCamera(mapboxMap, update, MapboxConstants.ANIMATION_DURATION, true, callback) }
+    verify { developerAnimationListener.onDeveloperAnimationStarted() }
+  }
+
+  @Test
+  fun testAnimateCamera() {
+    val callback = mockk<MapboxMap.CancelableCallback>()
+    val target = LatLng(1.0, 2.0)
+    val expected = CameraPosition.Builder().target(target).build()
+    val update = CameraUpdateFactory.newCameraPosition(expected)
+    mapboxMap.animateCamera(update, callback)
+    verify { transform.animateCamera(mapboxMap, update, MapboxConstants.ANIMATION_DURATION, callback) }
+    verify { developerAnimationListener.onDeveloperAnimationStarted() }
+  }
+
+  @Test
+  fun testScrollBy() {
+    mapboxMap.scrollBy(100f, 200f)
+    verify { nativeMapView.moveBy(100.0, 200.0, 0) }
+    verify { developerAnimationListener.onDeveloperAnimationStarted() }
+  }
+
+  @Test
+  fun testResetNorth() {
+    mapboxMap.resetNorth()
+    verify { transform.resetNorth() }
+    verify { developerAnimationListener.onDeveloperAnimationStarted() }
+  }
+
+  @Test
+  fun testFocalBearing() {
+    mapboxMap.setFocalBearing(35.0, 100f, 200f, 1000)
+    verify { transform.setBearing(35.0, 100f, 200f, 1000) }
+    verify { developerAnimationListener.onDeveloperAnimationStarted() }
   }
 
   @Test

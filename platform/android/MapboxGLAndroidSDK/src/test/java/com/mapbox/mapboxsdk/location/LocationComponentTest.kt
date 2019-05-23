@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.location
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
+import android.location.Location
 import android.os.Looper
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineRequest
@@ -13,6 +14,7 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.maps.Transform
 import io.mockk.mockk
 import org.junit.Assert
 import org.junit.Before
@@ -33,6 +35,9 @@ class LocationComponentTest {
 
   @Mock
   private lateinit var mapboxMap: MapboxMap
+
+  @Mock
+  private lateinit var transform: Transform
 
   @Mock
   private lateinit var context: Context
@@ -70,10 +75,13 @@ class LocationComponentTest {
   @Mock
   private lateinit var style: Style
 
+  private lateinit var developerAnimationListeners: List<MapboxMap.OnDeveloperAnimationListener>
+
   @Before
   fun before() {
     MockitoAnnotations.initMocks(this)
-    locationComponent = LocationComponent(mapboxMap, currentListener, lastListener, locationLayerController, locationCameraController, locationAnimatorCoordinator, staleStateManager, compassEngine, locationEngineProvider)
+    developerAnimationListeners = mutableListOf()
+    locationComponent = LocationComponent(mapboxMap, transform, developerAnimationListeners, currentListener, lastListener, locationLayerController, locationCameraController, locationAnimatorCoordinator, staleStateManager, compassEngine, locationEngineProvider)
     doReturn(locationEngine).`when`(locationEngineProvider).getBestLocationEngine(context, false)
     doReturn(style).`when`(mapboxMap).style
   }
@@ -351,6 +359,7 @@ class LocationComponentTest {
     `when`(locationLayerController.isConsumingCompass).thenReturn(true)
     locationComponent.renderMode = RenderMode.COMPASS
     locationComponent.isLocationComponentEnabled = false
+
     locationComponent.onStartLoadingMap()
     locationComponent.onFinishLoadingStyle()
     verify(compassEngine).addCompassListener(any(CompassListener::class.java))
@@ -376,5 +385,15 @@ class LocationComponentTest {
     `when`(locationLayerController.isConsumingCompass).thenReturn(true)
     locationComponent.renderMode = RenderMode.COMPASS
     verify(compassEngine, never()).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun developerAnimationCalled() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+    for (listener in developerAnimationListeners) {
+      listener.onDeveloperAnimationStarted()
+    }
+    verify(locationCameraController).setCameraMode(eq(CameraMode.NONE), isNull<Location>(), eq(TRANSITION_ANIMATION_DURATION_MS), isNull<Double>(), isNull<Double>(), isNull<Double>(), any())
   }
 }

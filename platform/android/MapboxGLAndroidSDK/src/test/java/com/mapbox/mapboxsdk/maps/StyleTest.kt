@@ -28,7 +28,7 @@ class StyleTest {
     @Before
     fun setup() {
         nativeMapView = mockk(relaxed = true)
-        mapboxMap = MapboxMap(nativeMapView, null, null, null, null, null)
+        mapboxMap = MapboxMap(nativeMapView, null, null, null, null, null, null)
         every { nativeMapView.isDestroyed } returns false
         mapboxMap.injectLocationComponent(spyk())
     }

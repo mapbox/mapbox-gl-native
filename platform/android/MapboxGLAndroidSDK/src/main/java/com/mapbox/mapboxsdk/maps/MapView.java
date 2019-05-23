@@ -169,7 +169,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     Transform transform = new Transform(this, nativeMapView, cameraDispatcher);
 
     // MapboxMap
-    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener, cameraDispatcher);
+    List<MapboxMap.OnDeveloperAnimationListener> developerAnimationListeners = new ArrayList<>();
+    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener, cameraDispatcher,
+      developerAnimationListeners);
     mapboxMap.injectAnnotationManager(annotationManager);
 
     // user input
@@ -182,7 +184,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     compassView.setOnClickListener(createCompassClickListener(cameraDispatcher));
 
     // LocationComponent
-    mapboxMap.injectLocationComponent(new LocationComponent(mapboxMap));
+    mapboxMap.injectLocationComponent(new LocationComponent(mapboxMap, transform, developerAnimationListeners));
 
     // inject widgets with MapboxMap
     attrView.setOnClickListener(attributionClickListener = new AttributionClickListener(context, mapboxMap));
