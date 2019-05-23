@@ -704,6 +704,7 @@
 		DAF25713201901C100367EF5 /* MGLHillshadeStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHillshadeStyleLayer.mm; sourceTree = "<group>"; };
 		DAF25714201901C200367EF5 /* MGLHillshadeStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHillshadeStyleLayer.h; sourceTree = "<group>"; };
 		DAF2571D201902A500367EF5 /* MGLHillshadeStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHillshadeStyleLayerTests.mm; sourceTree = "<group>"; };
+		DAF99A3222968C7B004AD6A8 /* Mapbox GL.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Mapbox GL.entitlements"; sourceTree = "<group>"; };
 		DAFBD0D51E3FA969000CD6BF /* zh-Hant */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		DAFBD0D61E3FA983000CD6BF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		DAFEB3702093ACBF00A86A83 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -875,6 +876,7 @@
 		DA839E891CC2E3400062CAFB = {
 			isa = PBXGroup;
 			children = (
+				DAF99A3222968C7B004AD6A8 /* Mapbox GL.entitlements */,
 				DA839E941CC2E3400062CAFB /* Demo App */,
 				DAE6C3291CC30DB200DB3429 /* SDK */,
 				DAE6C3371CC30DB200DB3429 /* SDK Tests */,
@@ -1505,6 +1507,11 @@
 					DA839E911CC2E3400062CAFB = {
 						CreatedOnToolsVersion = 7.3;
 						LastSwiftMigration = 0920;
+						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
+						};
 					};
 					DAAA17961CE13BAE00731EFE = {
 						CreatedOnToolsVersion = 7.3.1;

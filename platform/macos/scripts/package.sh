@@ -61,6 +61,7 @@ if [[ ${BUILDTYPE} == Release ]]; then
         CURRENT_SHORT_VERSION=${SHORT_VERSION} \
         CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
         CURRENT_COMMIT_HASH=${HASH} \
+        ENABLE_HARDENED_RUNTIME=YES \
         ${CI_XCCONFIG} \
         -derivedDataPath ${DERIVED_DATA} \
         -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
@@ -98,6 +99,7 @@ if [[ ${BUILDTYPE} == Release ]]; then
     
     step "Exporting Mapbox GL.app"
     xcodebuild \
+        ENABLE_HARDENED_RUNTIME=YES \
         ${CI_XCCONFIG} \
         -exportArchive \
         -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
