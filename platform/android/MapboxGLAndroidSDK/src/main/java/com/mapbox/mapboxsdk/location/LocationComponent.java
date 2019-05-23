@@ -31,9 +31,11 @@ import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraIdleListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.maps.Transform;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -96,6 +98,8 @@ public final class LocationComponent {
 
   @NonNull
   private final MapboxMap mapboxMap;
+  @NonNull
+  private final Transform transform;
   private Style style;
   private LocationComponentOptions options;
   @NonNull
@@ -179,19 +183,26 @@ public final class LocationComponent {
    * <p>
    * To get the component object use {@link MapboxMap#getLocationComponent()}.
    */
-  public LocationComponent(@NonNull MapboxMap mapboxMap) {
+  public LocationComponent(@NonNull MapboxMap mapboxMap,
+                           @NonNull Transform transform,
+                           @NonNull List<MapboxMap.OnDeveloperAnimationListener> developerAnimationListeners) {
     this.mapboxMap = mapboxMap;
+    this.transform = transform;
+    developerAnimationListeners.add(developerAnimationListener);
   }
 
   // used for creating a spy
   LocationComponent() {
     //noinspection ConstantConditions
     mapboxMap = null;
+    transform = null;
   }
 
   @VisibleForTesting
   LocationComponent(@NonNull MapboxMap mapboxMap,
-                    @NonNull LocationEngineCallback<LocationEngineResult> currentlistener,
+                    @NonNull Transform transform,
+                    @NonNull List<MapboxMap.OnDeveloperAnimationListener> developerAnimationListeners,
+                    @NonNull LocationEngineCallback<LocationEngineResult> currentListener,
                     @NonNull LocationEngineCallback<LocationEngineResult> lastListener,
                     @NonNull LocationLayerController locationLayerController,
                     @NonNull LocationCameraController locationCameraController,
@@ -200,7 +211,9 @@ public final class LocationComponent {
                     @NonNull CompassEngine compassEngine,
                     @NonNull InternalLocationEngineProvider internalLocationEngineProvider) {
     this.mapboxMap = mapboxMap;
-    this.currentLocationEngineListener = currentlistener;
+    this.transform = transform;
+    developerAnimationListeners.add(developerAnimationListener);
+    this.currentLocationEngineListener = currentListener;
     this.lastLocationEngineListener = lastListener;
     this.locationLayerController = locationLayerController;
     this.locationCameraController = locationCameraController;
@@ -1204,7 +1217,7 @@ public final class LocationComponent {
     locationLayerController = new LocationLayerController(mapboxMap, style, sourceProvider, featureProvider,
       bitmapProvider, options, renderModeChangedListener);
     locationCameraController = new LocationCameraController(
-      context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+      context, mapboxMap, transform, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
 
     locationAnimatorCoordinator = new LocationAnimatorCoordinator(
       mapboxMap.getProjection(),
@@ -1534,6 +1547,17 @@ public final class LocationComponent {
       }
     }
   };
+
+  @NonNull
+  private final MapboxMap.OnDeveloperAnimationListener developerAnimationListener =
+    new MapboxMap.OnDeveloperAnimationListener() {
+      @Override
+      public void onDeveloperAnimationStarted() {
+        if (isComponentInitialized && isEnabled) {
+          setCameraMode(CameraMode.NONE);
+        }
+      }
+    };
 
   static class InternalLocationEngineProvider {
     LocationEngine getBestLocationEngine(@NonNull Context context, boolean background) {
