@@ -788,14 +788,14 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                                                                                      heading:0];
                         __weak typeof(self) weakSelf = self;
                         [self.mapView setCamera:camera withDuration:0.3 animationTimingFunction:nil completionHandler:^{
-                            [weakSelf.mapView setContentInset:contentInsets animated:TRUE];
+                            [weakSelf.mapView setContentInset:contentInsets animated:YES];
                         }];
                     } else {
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[0]];
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[1]];
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[2]];
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[3]];
-                        [self.mapView setContentInset:_originalContentInsets animated:TRUE];
+                        [self.mapView setContentInset:_originalContentInsets animated:YES];
                     }
                     break;
                 }

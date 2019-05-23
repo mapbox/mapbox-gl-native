@@ -1079,7 +1079,7 @@ public:
     if (self.userTrackingMode == MGLUserTrackingModeNone)
     {
         // Don’t call -setCenterCoordinate:, which resets the user tracking mode.
-        [self _setCenterCoordinate:self.centerCoordinate edgePadding:contentInset zoomLevel:self.zoomLevel direction:self.direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
+        [self _setCenterCoordinate:self.centerCoordinate edgePadding:contentInset zoomLevel:self.zoomLevel direction:self.direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:nil];
         _contentInset = contentInset;
     }
     else
@@ -1088,7 +1088,7 @@ public:
         [self didUpdateLocationWithUserTrackingAnimated:animated];
     }
 
-    // Compass, logo and attribution button constraints needs to be updated.
+    // Compass, logo and attribution button constraints needs to be updated.z
     [self installConstraints];
 }
 
@@ -3290,7 +3290,7 @@ public:
                 zoomLevel,
                 direction,
                 MGLStringFromBOOL(animated));
-    [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated completionHandler:NULL];
+    [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated completionHandler:nil];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
@@ -3554,7 +3554,7 @@ public:
     }
     
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
-    if ([self.camera isEqualToMapCamera:camera])
+    if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, insets))
     {
         if (completion)
         {
@@ -3671,7 +3671,7 @@ public:
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function
 {
     MGLLogDebug(@"Setting camera: %@ duration: %f animationTimingFunction: %@", camera, duration, function);
-    [self setCamera:camera withDuration:duration animationTimingFunction:function completionHandler:NULL];
+    [self setCamera:camera withDuration:duration animationTimingFunction:function completionHandler:nil];
 }
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
@@ -3707,7 +3707,7 @@ public:
         };
     }
     
-    if ([self.camera isEqualToMapCamera:camera])
+    if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, edgePadding))
     {
         if (completion)
         {
@@ -3778,7 +3778,7 @@ public:
         };
     }
     
-    if ([self.camera isEqualToMapCamera:camera])
+    if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, insets))
     {
         if (completion)
         {
@@ -3884,7 +3884,7 @@ public:
         return self.residualCamera;
     }
 
-    mbgl::CameraOptions mapCamera = self.mbglMap.getCameraOptions(cameraOptions.padding.value_or(mbgl::EdgeInsets()));
+    mbgl::CameraOptions mapCamera = self.mbglMap.getCameraOptions();
     CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : *mapCamera.center);
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
     CLLocationDirection direction = cameraOptions.bearing ? mbgl::util::wrap(*cameraOptions.bearing, 0., 360.) : self.direction;
@@ -5678,7 +5678,7 @@ public:
                      direction:self.directionByFollowingWithCourse
                       duration:animated ? MGLUserLocationAnimationDuration : 0
        animationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]
-             completionHandler:NULL];
+             completionHandler:nil];
 }
 
 /// Changes the viewport based on a significant location update, such as the

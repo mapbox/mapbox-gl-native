@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+### Styles and rendering
+
+* Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MGLMapView contentInset](https://docs.mapbox.com/ios/api/maps/5.0.0/Classes/MGLMapView.html#/c:objc(cs)MGLMapView(py)contentInset). ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
+
 ## 5.0.0 - May 22, 2019
 
 This release improves how monthly active users are counted. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://www.mapbox.com/52219) and [#14421](https://github.com/mapbox/mapbox-gl-native/pull/14421).
