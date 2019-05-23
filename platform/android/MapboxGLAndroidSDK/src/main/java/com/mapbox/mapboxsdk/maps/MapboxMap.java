@@ -837,7 +837,7 @@ public final class MapboxMap {
       nativeMapView.setStyleJson(builder.getJson());
     } else {
       // user didn't provide a `from` component, load a blank style instead
-      nativeMapView.setStyleJson("{}");
+      nativeMapView.setStyleJson(Style.EMPTY_JSON);
     }
   }
 
