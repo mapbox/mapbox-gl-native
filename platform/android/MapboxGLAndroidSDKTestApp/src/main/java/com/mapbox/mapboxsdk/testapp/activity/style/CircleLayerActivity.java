@@ -7,38 +7,36 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
-import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import timber.log.Timber;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 
 /**
@@ -87,8 +85,8 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
 
   private void addBusStopSource(Style style) {
     try {
-      source = new GeoJsonSource(SOURCE_ID, new URL(URL_BUS_ROUTES));
-    } catch (MalformedURLException exception) {
+      source = new GeoJsonSource(SOURCE_ID, new URI(URL_BUS_ROUTES));
+    } catch (URISyntaxException exception) {
       Timber.e(exception, "That's not an url... ");
     }
     style.addSource(source);
@@ -140,14 +138,14 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     try {
       mapboxMap.getStyle().addSource(
         new GeoJsonSource(SOURCE_ID_CLUSTER,
-          new URL(URL_BUS_ROUTES),
+          new URI(URL_BUS_ROUTES),
           new GeoJsonOptions()
             .withCluster(true)
             .withClusterMaxZoom(14)
             .withClusterRadius(50)
         )
       );
-    } catch (MalformedURLException malformedUrlException) {
+    } catch (URISyntaxException malformedUrlException) {
       Timber.e(malformedUrlException, "That's not an url... ");
     }
 

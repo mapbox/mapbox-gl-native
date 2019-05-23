@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.net.Uri;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,20 +38,32 @@ public class VectorSource extends Source {
    *
    * @param id  the source id
    * @param url the TileJSON resource url
+   * @deprecated use {@link #VectorSource(String, Uri)} instead
    */
+  @Deprecated
   public VectorSource(String id, URL url) {
     this(id, url.toExternalForm());
   }
 
   /**
-   * Create a vector source from a remote url
+   * Create a vector source from a uri pointing to a TileJSON resource
    *
    * @param id  the source id
-   * @param url the url
+   * @param uri the TileJSON resource url
    */
-  public VectorSource(String id, String url) {
+  public VectorSource(String id, Uri uri) {
+    this(id, uri.toString());
+  }
+
+  /**
+   * Create a vector source from a uri
+   *
+   * @param id  the source id
+   * @param uri the uri
+   */
+  public VectorSource(String id, String uri) {
     super();
-    initialize(id, url);
+    initialize(id, uri);
   }
 
   /**
@@ -83,9 +96,20 @@ public class VectorSource extends Source {
 
   /**
    * @return The url or null
+   * @deprecated use {@link #getUri()} instead
    */
   @Nullable
+  @Deprecated
   public String getUrl() {
+    checkThread();
+    return nativeGetUrl();
+  }
+
+  /**
+   * @return The uri or null
+   */
+  @Nullable
+  public String getUri() {
     checkThread();
     return nativeGetUrl();
   }
