@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -21,7 +22,7 @@ class ViewPagerActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_viewpager)
-    viewPager.adapter = MapFragmentAdapter(supportFragmentManager)
+    viewPager.adapter = MapFragmentAdapter(this, supportFragmentManager)
   }
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -37,14 +38,14 @@ class ViewPagerActivity : AppCompatActivity() {
     }
   }
 
-  internal class MapFragmentAdapter(fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
+  internal class MapFragmentAdapter(private val context: Context, fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
 
     override fun getCount(): Int {
       return NUM_ITEMS
     }
 
     override fun getItem(position: Int): Fragment? {
-      val options = MapboxMapOptions()
+      val options = MapboxMapOptions.createFromAttributes(context, null)
       options.textureMode(true)
       options.camera(
         CameraPosition.Builder()

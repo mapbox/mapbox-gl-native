@@ -79,7 +79,7 @@ public class BottomSheetActivity extends AppCompatActivity {
     int fragmentCount = fragmentManager.getBackStackEntryCount();
 
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-    MainMapFragment mainMapFragment = MainMapFragment.newInstance(fragmentCount);
+    MainMapFragment mainMapFragment = MainMapFragment.newInstance(this, fragmentCount);
     if (fragmentCount == 0) {
       fragmentTransaction.add(R.id.fragment_container, mainMapFragment, TAG_MAIN_FRAGMENT);
     } else {
@@ -104,7 +104,7 @@ public class BottomSheetActivity extends AppCompatActivity {
 
   private void addBottomSheetMapFragment() {
     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-    fragmentTransaction.add(R.id.fragment_container_bottom, BottomSheetFragment.newInstance(), TAG_BOTTOM_FRAGMENT);
+    fragmentTransaction.add(R.id.fragment_container_bottom, BottomSheetFragment.newInstance(this), TAG_BOTTOM_FRAGMENT);
     fragmentTransaction.commit();
   }
 
@@ -128,12 +128,12 @@ public class BottomSheetActivity extends AppCompatActivity {
 
     private MapView map;
 
-    public static MainMapFragment newInstance(int mapCounter) {
+    public static MainMapFragment newInstance(Context context, int mapCounter) {
       MainMapFragment mapFragment = new MainMapFragment();
       Bundle bundle = new Bundle();
       bundle.putInt("mapcounter", mapCounter);
       mapFragment.setArguments(bundle);
-      MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+      MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(context, null);
       mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
       return mapFragment;
     }
@@ -209,9 +209,9 @@ public class BottomSheetActivity extends AppCompatActivity {
 
     private MapView map;
 
-    public static BottomSheetFragment newInstance() {
+    public static BottomSheetFragment newInstance(Context context) {
       BottomSheetFragment mapFragment = new BottomSheetFragment();
-      MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+      MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(context, null);
       mapboxMapOptions.renderSurfaceOnTop(true);
       mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
       return mapFragment;

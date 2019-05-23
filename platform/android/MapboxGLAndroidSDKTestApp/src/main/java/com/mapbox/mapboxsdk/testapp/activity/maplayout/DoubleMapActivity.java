@@ -39,7 +39,7 @@ public class DoubleMapActivity extends AppCompatActivity {
     setContentView(R.layout.activity_map_fragment);
 
     if (savedInstanceState == null) {
-      MapboxMapOptions options = new MapboxMapOptions();
+      MapboxMapOptions options = MapboxMapOptions.createFromAttributes(this, null);
       options.camera(new CameraPosition.Builder()
         .target(MACHU_PICCHU)
         .zoom(ZOOM_IN)

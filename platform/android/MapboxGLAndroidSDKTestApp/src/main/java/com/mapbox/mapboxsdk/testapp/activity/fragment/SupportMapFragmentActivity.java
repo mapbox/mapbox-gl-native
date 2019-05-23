@@ -48,7 +48,7 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements Map
   }
 
   private MapboxMapOptions createFragmentOptions() {
-    MapboxMapOptions options = new MapboxMapOptions();
+    MapboxMapOptions options = MapboxMapOptions.createFromAttributes(this, null);
 
     options.scrollGesturesEnabled(false);
     options.zoomGesturesEnabled(false);

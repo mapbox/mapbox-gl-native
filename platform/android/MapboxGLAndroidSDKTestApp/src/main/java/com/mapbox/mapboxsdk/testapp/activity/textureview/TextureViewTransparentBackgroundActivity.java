@@ -39,7 +39,7 @@ public class TextureViewTransparentBackgroundActivity extends AppCompatActivity 
   }
 
   private void setupMapView(Bundle savedInstanceState) {
-    MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+    MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(this, null);
     mapboxMapOptions.translucentTextureSurface(true);
     mapboxMapOptions.textureMode(true);
     mapboxMapOptions.camera(new CameraPosition.Builder()
