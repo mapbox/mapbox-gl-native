@@ -70,9 +70,8 @@ mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID, bool aligned)
 }
 
 gfx::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gfx::DepthMaskType mask) const {
-    float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
-    float farDepth = nearDepth + depthRangeSize;
-    return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { nearDepth, farDepth } };
+    float depth = depthRangeSize + ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
+    return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { depth, depth } };
 }
 
 gfx::DepthMode PaintParameters::depthModeFor3D() const {
