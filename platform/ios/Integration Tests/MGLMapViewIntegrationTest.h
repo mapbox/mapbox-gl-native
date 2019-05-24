@@ -1,6 +1,7 @@
 #import <XCTest/XCTest.h>
 #import <Mapbox/Mapbox.h>
 #import "MGLTestUtility.h"
+#import "MBXTestMapView.h"
 
 #define MGLTestFail(myself, ...) \
     _XCTPrimitiveFail(myself, __VA_ARGS__)
@@ -26,7 +27,7 @@
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) UIWindow *window;
-@property (nonatomic) MGLMapView *mapView;
+@property (nonatomic) MBXTestMapView *mapView;
 @property (nonatomic) MGLStyle *style;
 @property (nonatomic) XCTestExpectation *styleLoadingExpectation;
 @property (nonatomic) XCTestExpectation *renderFinishedExpectation;

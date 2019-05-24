@@ -161,6 +161,13 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
         [MGLMapboxEvents pushTurnstileEvent];
 #endif
+        
+#ifndef swift(version:)
+        NSLog(@"HI I'M OBJECTIVE-C");
+#else
+        NSLog(@"HI I'M SWIFT");
+#endif
+        
     }
     return self;
 }

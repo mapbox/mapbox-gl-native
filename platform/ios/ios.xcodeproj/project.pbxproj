@@ -439,6 +439,7 @@
 		A46E4C9E228CE392009CAD5B /* MGLTabBarControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */; };
 		A46E4C9F228CE5FD009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
 		A46E4CA2228F4D6B009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
+		A4EE317022973F2E006A8F2F /* MBXTestMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = A4EE316F22973F2E006A8F2F /* MBXTestMapView.m */; };
 		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC1B0916221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
 		AC1B0917221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
@@ -1108,6 +1109,8 @@
 		A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = IntegrationTest.storyboard; sourceTree = "<group>"; };
 		A46E4C9B228CB74B009CAD5B /* MGLTabBarControllerTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTabBarControllerTests.h; sourceTree = "<group>"; };
 		A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTabBarControllerTests.m; sourceTree = "<group>"; };
+		A4EE316E22973F2E006A8F2F /* MBXTestMapView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXTestMapView.h; sourceTree = "<group>"; };
+		A4EE316F22973F2E006A8F2F /* MBXTestMapView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXTestMapView.m; sourceTree = "<group>"; };
 		A4F3FB1C2254865900A30170 /* missing_icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = missing_icon.json; sourceTree = "<group>"; };
 		AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLLocationManager+MMEMobileEvents.h"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.h"; sourceTree = "<group>"; };
 		AC1B0915221CA14C00DB56C8 /* CLLocationManager+MMEMobileEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CLLocationManager+MMEMobileEvents.m"; path = "../vendor/mapbox-events-ios/MapboxMobileEvents/CLLocationManager+MMEMobileEvents.m"; sourceTree = "<group>"; };
@@ -1482,12 +1485,14 @@
 				CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */,
 				A46E4C9B228CB74B009CAD5B /* MGLTabBarControllerTests.h */,
 				A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */,
-				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
 				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
+				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
 				CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */,
 				CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */,
 				077061DB215DA11F000FEF62 /* MGLTestLocationManager.h */,
 				077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */,
+				A4EE316E22973F2E006A8F2F /* MBXTestMapView.h */,
+				A4EE316F22973F2E006A8F2F /* MBXTestMapView.m */,
 			);
 			path = "Integration Tests";
 			sourceTree = "<group>";
@@ -2691,6 +2696,7 @@
 				16376B2C1FFDB4B40000563E /* Frameworks */,
 				16376B2D1FFDB4B40000563E /* Resources */,
 				CAA69DA6206DCD0E007279CD /* Embed Frameworks */,
+				A4EE316D2294B528006A8F2F /* Insert Mapbox access token */,
 			);
 			buildRules = (
 			);
@@ -3042,6 +3048,25 @@
 			shellPath = /bin/sh;
 			shellScript = "$SRCROOT/app/insert_access_token.sh\n";
 		};
+		A4EE316D2294B528006A8F2F /* Insert Mapbox access token */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Insert Mapbox access token";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "$SRCROOT/app/insert_access_token.sh\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -3069,6 +3094,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4EE317022973F2E006A8F2F /* MBXTestMapView.m in Sources */,
 				16376B411FFDB4B40000563E /* main.m in Sources */,
 				16376B331FFDB4B40000563E /* AppDelegate.m in Sources */,
 			);

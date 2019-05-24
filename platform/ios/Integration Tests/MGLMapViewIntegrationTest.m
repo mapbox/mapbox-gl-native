@@ -1,9 +1,5 @@
 #import "MGLMapViewIntegrationTest.h"
 
-@interface MGLMapView (MGLMapViewIntegrationTest)
-- (void)updateFromDisplayLink:(CADisplayLink *)displayLink;
-@end
-
 @implementation MGLMapViewIntegrationTest
 
 - (void)invokeTest {
@@ -27,7 +23,7 @@
         printf("warning: MAPBOX_ACCESS_TOKEN env var is required for this test - skipping.\n");
         return nil;
     }
-
+    NSLog(@"%@", accessToken);
     [MGLAccountManager setAccessToken:accessToken];
     return accessToken;
 }
@@ -35,10 +31,10 @@
 - (void)setUp {
     [super setUp];
 
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
+//    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
 
-    self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
+    self.mapView = [[MBXTestMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
     self.mapView.delegate = self;
 
     UIView *superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];
