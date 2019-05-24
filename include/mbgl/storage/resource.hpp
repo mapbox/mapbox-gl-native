@@ -29,6 +29,11 @@ public:
         Low
     };
 
+    enum class Usage : bool {
+        Online,
+        Offline
+    };
+
     struct TileData {
         std::string urlTemplate;
         uint8_t pixelRatio;
@@ -60,6 +65,7 @@ public:
     }
 
     void setPriority(Priority p) { priority = p; }
+    void setUsage(Usage u) { usage = u; }
 
     bool hasLoadingMethod(LoadingMethod method);
 
@@ -83,6 +89,7 @@ public:
 
     Kind kind;
     LoadingMethod loadingMethod;
+    Usage usage{ Usage::Online };
     Priority priority;
     std::string url;
 

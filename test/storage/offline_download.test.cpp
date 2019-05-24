@@ -740,7 +740,7 @@ TEST(OfflineDownload, Deactivate) {
 }
 
 
-TEST(OfflineDownload, AllOfflineRequestsHaveLowPriority) {
+TEST(OfflineDownload, AllOfflineRequestsHaveLowPriorityAndOfflineUsage) {
     OfflineTest test;
     auto region = test.createRegion();
     ASSERT_TRUE(region);
@@ -751,36 +751,43 @@ TEST(OfflineDownload, AllOfflineRequestsHaveLowPriority) {
 
     test.fileSource.styleResponse = [&] (const Resource& resource) {
         EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
         return test.response("style.json");
     };
 
     test.fileSource.spriteImageResponse = [&] (const Resource& resource) {
         EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
         return test.response("sprite.png");
     };
 
     test.fileSource.imageResponse = [&] (const Resource& resource) {
         EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
         return test.response("radar.gif");
     };
 
     test.fileSource.spriteJSONResponse = [&] (const Resource& resource) {
         EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
         return test.response("sprite.json");
     };
 
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
         return test.response("glyph.pbf");
     };
 
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
         return test.response("streets.json");
     };
 
     test.fileSource.tileResponse = [&] (const Resource& resource) {
         EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
         return test.response("0-0-0.vector.pbf");
     };
 
