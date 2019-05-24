@@ -58,17 +58,21 @@ public:
             platform::makeThreadLowPriority();
             platform::attachThread();
 
-            util::RunLoop loop_(util::RunLoop::Type::New);
-            loop = &loop_;
-            EstablishedActor<Object> establishedActor(loop_, object, std::move(capturedArgs));
+            // narrowing the scope to release the Object before we detach the thread
+            {
+                util::RunLoop loop_(util::RunLoop::Type::New);
+                loop = &loop_;
+                EstablishedActor<Object> establishedActor(loop_, object, std::move(capturedArgs));
 
-            runningPromise.set_value();
-            
-            loop->run();
-            
-            (void) establishedActor;
-            
-            loop = nullptr;
+                runningPromise.set_value();
+
+                loop->run();
+
+                (void) establishedActor;
+
+                loop = nullptr;
+            }
+
             platform::detachThread();
         });
     }
