@@ -62,7 +62,7 @@ private:
     std::deque<Resource> resourcesRemaining;
     std::list<std::tuple<Resource, Response>> buffer;
 
-    void queueResource(Resource);
+    void queueResource(Resource&&);
     void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);
 };
 
