@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  integers.
 
  The default value for this option is 512. Version 4 of the
- <a href="https://www.mapbox.com/api-documentation/maps/#maps">Mapbox Maps API</a>
+ <a href="https://docs.mapbox.com/api/maps/#raster-tiles">Mapbox Raster Tiles API</a>
  requires a value of 256, as do many third-party tile servers, so consult your
  provider’s documentation for the correct value.
 

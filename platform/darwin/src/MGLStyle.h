@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  as of the date on which this SDK was published. You can use this constant to
  ascertain the style used by `MGLMapView` and `MGLTilePyramidOfflineRegion` when
  no style URL is specified. Consult the
- <a href="https://www.mapbox.com/api-documentation/maps/#styles">Mapbox Styles API documentation</a>
+ <a href="https://docs.mapbox.com/api/maps/#styles">Mapbox Styles API documentation</a>
  for the most up-to-date style versioning information.
 
  @warning The value of this constant may change in a future release of the SDK.
