@@ -114,7 +114,7 @@ public:
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
 private:
     friend SymbolBucket;
-    void placeLayerBucket(
+    void placeBucket(
             SymbolBucket&,
             const BucketPlacementParameters&,
             std::set<uint32_t>& seenCrossTileIDs);

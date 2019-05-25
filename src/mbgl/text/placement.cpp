@@ -97,7 +97,7 @@ Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor, float
 }
 } // namespace
 
-void Placement::placeLayerBucket(
+void Placement::placeBucket(
         SymbolBucket& bucket,
         const BucketPlacementParameters& params,
         std::set<uint32_t>& seenCrossTileIDs) {
