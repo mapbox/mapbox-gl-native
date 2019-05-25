@@ -90,14 +90,10 @@ private:
 
 class BucketPlacementParameters {
 public:
-    const mat4& posMatrix;
-    const mat4& textLabelPlaneMatrix;
-    const mat4& iconLabelPlaneMatrix;
-    float scale;
-    float pixelRatio;
+    const RenderTile& tile;
+    const mat4& projMatrix;
+    std::string sourceId;
     bool showCollisionBoxes;
-    bool holdingForFade;
-    const CollisionGroups::CollisionGroup& collisionGroup;
 };
     
 class Placement {

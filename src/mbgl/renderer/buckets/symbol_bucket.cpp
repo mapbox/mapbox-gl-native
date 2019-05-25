@@ -249,9 +249,8 @@ std::pair<uint32_t, bool> SymbolBucket::registerAtCrossTileIndex(CrossTileSymbol
     return std::make_pair(bucketInstanceId, firstTimeAdded);
 }
 
-uint32_t SymbolBucket::place(Placement& placement, const BucketPlacementParameters& params, std::set<uint32_t>& seenIds) {
+void SymbolBucket::place(Placement& placement, const BucketPlacementParameters& params, std::set<uint32_t>& seenIds) {
     placement.placeLayerBucket(*this, params, seenIds);
-    return bucketInstanceId;
 }
 
 void SymbolBucket::updateVertices(Placement& placement, bool updateOpacities, const RenderTile& tile, std::set<uint32_t>& seenIds) {
