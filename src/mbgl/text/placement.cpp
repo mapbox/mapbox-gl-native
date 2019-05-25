@@ -72,52 +72,15 @@ Placement::Placement(const TransformState& state_, MapMode mapMode_, style::Tran
 }
 
 void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, bool showCollisionBoxes) {
-
     std::set<uint32_t> seenCrossTileIDs;
-
     for (const auto& item : layer.getPlacementData()) {
-        RenderTile& renderTile = item.tile;
         Bucket& bucket = item.bucket;
-
-        const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
-        const OverscaledTileID& overscaledID = renderTile.getOverscaledTileID();
-        const float scale = std::pow(2, state.getZoom() - overscaledID.overscaledZ);
-        const float textPixelRatio = (util::tileSize * overscaledID.overscaleFactor()) / util::EXTENT;
-
-        mat4 posMatrix;
-        state.matrixFor(posMatrix, renderTile.id);
-        matrix::multiply(posMatrix, projMatrix, posMatrix);
-
-        mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
-                item.pitchWithMap,
-                item.rotateWithMap,
-                state,
-                pixelsToTileUnits);
-
-        mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
-                item.pitchWithMap,
-                item.rotateWithMap,
-                state,
-                pixelsToTileUnits);
-
-        const auto& collisionGroup = collisionGroups.get(layer.baseImpl->source);
         BucketPlacementParameters params{
-                posMatrix,
-                textLabelPlaneMatrix,
-                iconLabelPlaneMatrix,
-                scale,
-                textPixelRatio,
-                showCollisionBoxes,
-                renderTile.holdForFade(),
-                collisionGroup};
-        auto bucketInstanceId = bucket.place(*this, params, seenCrossTileIDs);
-        assert(bucketInstanceId != 0u);
-        
-        // As long as this placement lives, we have to hold onto this bucket's
-        // matching FeatureIndex/data for querying purposes
-        retainedQueryData.emplace(std::piecewise_construct,
-                                  std::forward_as_tuple(bucketInstanceId),
-                                  std::forward_as_tuple(bucketInstanceId, renderTile.getFeatureIndex(), overscaledID));
+                item.tile,
+                projMatrix,
+                layer.baseImpl->source,
+                showCollisionBoxes};
+        bucket.place(*this, params, seenCrossTileIDs);
     }
 }
 
@@ -138,19 +101,42 @@ void Placement::placeLayerBucket(
         SymbolBucket& bucket,
         const BucketPlacementParameters& params,
         std::set<uint32_t>& seenCrossTileIDs) {
+    const auto& layout = bucket.layout;
+    const auto& renderTile = params.tile;
+    const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
+    const OverscaledTileID& overscaledID = renderTile.getOverscaledTileID();
+    const float scale = std::pow(2, state.getZoom() - overscaledID.overscaledZ);
+    const float pixelRatio = (util::tileSize * overscaledID.overscaleFactor()) / util::EXTENT;
 
+    mat4 posMatrix;
+    state.matrixFor(posMatrix, renderTile.id);
+    matrix::multiply(posMatrix, params.projMatrix, posMatrix);
+
+    mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
+            layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
+            layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map,
+            state,
+            pixelsToTileUnits);
+
+    mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
+            layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
+            layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map,
+            state,
+            pixelsToTileUnits);
+
+    const auto& collisionGroup = collisionGroups.get(params.sourceId);
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
     optional<CollisionTileBoundaries> avoidEdges;
     if (mapMode == MapMode::Tile &&
-        (bucket.layout.get<style::SymbolAvoidEdges>() ||
-         bucket.layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
-        avoidEdges = collisionIndex.projectTileBoundaries(params.posMatrix);
+        (layout.get<style::SymbolAvoidEdges>() ||
+         layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
+        avoidEdges = collisionIndex.projectTileBoundaries(posMatrix);
     }
     
-    const bool textAllowOverlap = bucket.layout.get<style::TextAllowOverlap>();
-    const bool iconAllowOverlap = bucket.layout.get<style::IconAllowOverlap>();
+    const bool textAllowOverlap = layout.get<style::TextAllowOverlap>();
+    const bool iconAllowOverlap = layout.get<style::IconAllowOverlap>();
     // This logic is similar to the "defaultOpacityState" logic below in updateBucketOpacities
     // If we know a symbol is always supposed to show, force it to be marked visible even if
     // it wasn't placed into the collision index (because some or all of it was outside the range
@@ -165,18 +151,18 @@ void Placement::placeLayerBucket(
     //  This is the reverse of our normal policy of "fade in on pan", but should look like any other
     //  collision and hopefully not be too noticeable.
     // See https://github.com/mapbox/mapbox-gl-native/issues/12683
-    const bool alwaysShowText = textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || bucket.layout.get<style::IconOptional>());
-    const bool alwaysShowIcon = iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || bucket.layout.get<style::TextOptional>());
-    std::vector<style::TextVariableAnchorType> variableTextAnchors = bucket.layout.get<style::TextVariableAnchor>();
-    const bool rotateWithMap = bucket.layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
-    const bool pitchWithMap = bucket.layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
+    const bool alwaysShowText = textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || layout.get<style::IconOptional>());
+    const bool alwaysShowIcon = iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || layout.get<style::TextOptional>());
+    std::vector<style::TextVariableAnchorType> variableTextAnchors = layout.get<style::TextVariableAnchor>();
+    const bool rotateWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
+    const bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
 
-    const bool zOrderByViewportY = bucket.layout.get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY;
+    const bool zOrderByViewportY = layout.get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY;
 
     auto placeSymbol = [&] (SymbolInstance& symbolInstance) {
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) != 0u) return;
 
-        if (params.holdingForFade) {
+        if (renderTile.holdForFade()) {
             // Mark all symbols from this tile as "not placed", but don't add to seenCrossTileIDs, because we don't
             // know yet if we have a duplicate in a parent tile that _should_ be placed.
             placements.emplace(symbolInstance.crossTileID, JointPlacement(false, false, false));
@@ -193,11 +179,11 @@ void Placement::placeLayerBucket(
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
             if (variableTextAnchors.empty()) {
                 auto placed = collisionIndex.placeFeature(textCollisionFeature, {},
-                        params.posMatrix, params.textLabelPlaneMatrix, params.pixelRatio,
-                        placedSymbol, params.scale, fontSize,
-                        bucket.layout.get<style::TextAllowOverlap>(),
+                        posMatrix, textLabelPlaneMatrix, pixelRatio,
+                        placedSymbol, scale, fontSize,
+                        layout.get<style::TextAllowOverlap>(),
                         pitchWithMap,
-                        params.showCollisionBoxes, avoidEdges, params.collisionGroup.second);
+                        params.showCollisionBoxes, avoidEdges, collisionGroup.second);
                 placeText = placed.first;
                 offscreen &= placed.second;
             } else if (!textCollisionFeature.alongLine && !textCollisionFeature.boxes.empty()) {
@@ -232,11 +218,11 @@ void Placement::placeLayerBucket(
                     }
 
                     auto placed = collisionIndex.placeFeature(textCollisionFeature, shift,
-                                                                params.posMatrix, mat4(), params.pixelRatio,
-                                                                placedSymbol, params.scale, fontSize,
-                                                                bucket.layout.get<style::TextAllowOverlap>(),
+                                                                posMatrix, mat4(), pixelRatio,
+                                                                placedSymbol, scale, fontSize,
+                                                                layout.get<style::TextAllowOverlap>(),
                                                                 pitchWithMap,
-                                                                params.showCollisionBoxes, avoidEdges, params.collisionGroup.second);
+                                                                params.showCollisionBoxes, avoidEdges, collisionGroup.second);
 
                     if (placed.first) {
                         assert(symbolInstance.crossTileID != 0u);
@@ -287,17 +273,17 @@ void Placement::placeLayerBucket(
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
 
             auto placed = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature, {},
-                    params.posMatrix, params.iconLabelPlaneMatrix, params.pixelRatio,
-                    placedSymbol, params.scale, fontSize,
-                    bucket.layout.get<style::IconAllowOverlap>(),
+                    posMatrix, iconLabelPlaneMatrix, pixelRatio,
+                    placedSymbol, scale, fontSize,
+                    layout.get<style::IconAllowOverlap>(),
                     pitchWithMap,
-                    params.showCollisionBoxes, avoidEdges, params.collisionGroup.second);
+                    params.showCollisionBoxes, avoidEdges, collisionGroup.second);
             placeIcon = placed.first;
             offscreen &= placed.second;
         }
 
-        const bool iconWithoutText = !symbolInstance.hasText || bucket.layout.get<style::TextOptional>();
-        const bool textWithoutIcon = !symbolInstance.hasIcon || bucket.layout.get<style::IconOptional>();
+        const bool iconWithoutText = !symbolInstance.hasText || layout.get<style::TextOptional>();
+        const bool textWithoutIcon = !symbolInstance.hasIcon || layout.get<style::IconOptional>();
 
         // combine placements for icon and text
         if (!iconWithoutText && !textWithoutIcon) {
@@ -309,11 +295,11 @@ void Placement::placeLayerBucket(
         }
 
         if (placeText) {
-            collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, params.collisionGroup.first);
+            collisionIndex.insertFeature(symbolInstance.textCollisionFeature, layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
         }
 
         if (placeIcon) {
-            collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, params.collisionGroup.first);
+            collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
         }
 
         assert(symbolInstance.crossTileID != 0);
@@ -341,6 +327,12 @@ void Placement::placeLayerBucket(
     }
 
     bucket.justReloaded = false;
+
+    // As long as this placement lives, we have to hold onto this bucket's
+    // matching FeatureIndex/data for querying purposes
+    retainedQueryData.emplace(std::piecewise_construct,
+                                std::forward_as_tuple(bucket.bucketInstanceId),
+                                std::forward_as_tuple(bucket.bucketInstanceId, renderTile.getFeatureIndex(), overscaledID));
 }
 
 void Placement::commit(TimePoint now) {

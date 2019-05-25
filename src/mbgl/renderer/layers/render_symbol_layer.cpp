@@ -521,12 +521,8 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
     for (RenderTile& renderTile : renderTiles) {
         auto* bucket = static_cast<SymbolBucket*>(renderTile.getBucket(*baseImpl));
         if (bucket && bucket->bucketLeaderID == getID()) {
-            auto& layout = bucket->layout;
-            bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
-            bool rotateWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
-
             // Only place this layer if it's the "group leader" for the bucket
-            placementData.push_back({*bucket, renderTile, pitchWithMap, rotateWithMap});
+            placementData.push_back({*bucket, renderTile});
         }
     }
 }

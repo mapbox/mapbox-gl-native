@@ -18,7 +18,6 @@ class PaintParameters;
 class RenderSource;
 class RenderTile;
 class TransformState;
-class GeometryTile;
 
 class LayerRenderData {
 public:
@@ -30,8 +29,6 @@ class LayerPlacementData {
 public:
     std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<RenderTile> tile;
-    bool pitchWithMap;
-    bool rotateWithMap;
 };
 
 class LayerPrepareParameters {
