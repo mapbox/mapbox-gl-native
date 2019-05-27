@@ -50,6 +50,9 @@ void RenderCustomLayer::markContextDestroyed() {
     contextDestroyed = true;
 }
 
+void RenderCustomLayer::prepare(const LayerPrepareParameters&) {
+}
+
 void RenderCustomLayer::render(PaintParameters& paintParameters) {
     if (host != impl(baseImpl).host) {
         //If the context changed, deinitialize the previous one before initializing the new one.
