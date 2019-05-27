@@ -558,7 +558,7 @@ final class MapGestureDetector {
     }
 
     private double getNewZoom(float scaleFactor, boolean quickZoom) {
-      double zoomBy = Math.log(scaleFactor) / Math.log(Math.PI / 2);
+      double zoomBy = (Math.log(scaleFactor) / Math.log(Math.PI / 2)) * 0.65;
       if (quickZoom) {
         // clamp scale factors we feed to core #7514
         boolean negative = zoomBy < 0;
