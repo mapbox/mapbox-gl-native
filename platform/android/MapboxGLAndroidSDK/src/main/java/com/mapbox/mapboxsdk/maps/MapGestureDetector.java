@@ -11,13 +11,14 @@ import android.support.annotation.Nullable;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
+
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.Constants;
+import com.mapbox.android.gestures.MoveGestureDetector;
+import com.mapbox.android.gestures.MultiFingerTapGestureDetector;
+import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardGestureDetector;
-import com.mapbox.android.gestures.MultiFingerTapGestureDetector;
-import com.mapbox.android.gestures.MoveGestureDetector;
-import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.ZOOM_RATE;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
@@ -558,7 +560,7 @@ final class MapGestureDetector {
     }
 
     private double getNewZoom(float scaleFactor, boolean quickZoom) {
-      double zoomBy = (Math.log(scaleFactor) / Math.log(Math.PI / 2)) * 0.65;
+      double zoomBy = (Math.log(scaleFactor) / Math.log(Math.PI / 2)) * ZOOM_RATE * uiSettings.getZoomRate();
       if (quickZoom) {
         // clamp scale factors we feed to core #7514
         boolean negative = zoomBy < 0;

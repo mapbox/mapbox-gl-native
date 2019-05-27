@@ -399,4 +399,17 @@ public class UiSettingsTest {
     assertEquals("All gestures check should return false", false,
         uiSettings.areAllGesturesEnabled());
   }
+
+  @Test
+  public void testZoomRateDefaultValue() {
+    assertEquals("Default zoom rate should be 1.0f", 1.0f,
+      uiSettings.getZoomRate(), 0);
+  }
+
+  @Test
+  public void testZoomRate() {
+    uiSettings.setZoomRate(0.83f);
+    assertEquals("Zoom rate should be 0.83f", 0.83f,
+      uiSettings.getZoomRate(), 0);
+  }
 }
