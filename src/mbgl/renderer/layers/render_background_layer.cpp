@@ -38,9 +38,6 @@ void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &paramet
 
     passes = properties->evaluated.get<style::BackgroundOpacity>() > 0 ? RenderPass::Translucent
                                                                        : RenderPass::None;
-    if (passes != RenderPass::None && !properties->evaluated.get<style::BackgroundPattern>().to.empty()) {
-        passes |= RenderPass::Upload;
-    }
     evaluatedProperties = std::move(properties);
 }
 
@@ -50,15 +47,6 @@ bool RenderBackgroundLayer::hasTransition() const {
 
 bool RenderBackgroundLayer::hasCrossfade() const {
     return getCrossfade<BackgroundLayerProperties>(evaluatedProperties).t != 1;
-}
-
-void RenderBackgroundLayer::upload(gfx::UploadPass&, UploadParameters& parameters) {
-    const auto& evaluated = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).evaluated;
-    if (!evaluated.get<BackgroundPattern>().to.empty()) {
-        // Ensures that the texture gets added and uploaded to the atlas.
-        parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);
-        parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().to);
-    }
 }
 
 void RenderBackgroundLayer::render(PaintParameters& parameters) {
@@ -150,6 +138,15 @@ optional<Color> RenderBackgroundLayer::getSolidBackground() const {
     }
 
     return { evaluated.get<BackgroundColor>() * evaluated.get<BackgroundOpacity>() };
+}
+
+void RenderBackgroundLayer::prepare(const LayerPrepareParameters& params) {
+    const auto& evaluated = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).evaluated;
+    if (!evaluated.get<BackgroundPattern>().to.empty()) {
+        // Ensures that the texture gets added and uploaded to the atlas.
+        params.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);
+        params.imageManager.getPattern(evaluated.get<BackgroundPattern>().to);
+    }
 }
 
 } // namespace mbgl

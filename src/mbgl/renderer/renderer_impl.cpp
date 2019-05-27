@@ -301,11 +301,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     for (auto& renderItem : renderItems) {
-        if (!renderItem.source) {
-            continue;
-        }
         RenderLayer& renderLayer = renderItem.layer;
-        renderLayer.prepare({renderItem.source, updateParameters.transformState});
+        renderLayer.prepare({renderItem.source, *imageManager, updateParameters.transformState});
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
@@ -385,7 +382,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         UploadParameters uploadParameters{
             updateParameters.transformState,
-            *imageManager,
             *lineAtlas,
         };
 

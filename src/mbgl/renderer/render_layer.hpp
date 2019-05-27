@@ -34,6 +34,7 @@ public:
 class LayerPrepareParameters {
 public:
     RenderSource* source;
+    ImageManager& imageManager;
     const TransformState& state;
 };
 
