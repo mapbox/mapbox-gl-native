@@ -37,7 +37,25 @@ public class RasterSource extends Source {
   }
 
   /**
-   * Create the raster source from an URI
+   * Create the raster source from an URI.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id  the source id
    * @param uri the source uri
@@ -47,7 +65,25 @@ public class RasterSource extends Source {
   }
 
   /**
-   * Create the raster source from an URI
+   * Create the raster source from an URI.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id  the source id
    * @param uri the source uri
@@ -58,10 +94,28 @@ public class RasterSource extends Source {
   }
 
   /**
-   * Create the raster source from an URL with a specific tile size
+   * Create the raster source from an URI with a specific tile size.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id       the source id
-   * @param uri      the source url
+   * @param uri      the source uri
    * @param tileSize the tile size
    */
   public RasterSource(String id, String uri, int tileSize) {
@@ -94,9 +148,22 @@ public class RasterSource extends Source {
 
   /**
    * @return The url or null
+   * @deprecated use {@link #getUri()} instead
    */
   @Nullable
+  @Deprecated
   public String getUrl() {
+    checkThread();
+    return nativeGetUrl();
+  }
+
+  /**
+   * Get the source URI.
+   *
+   * @return The uri or null
+   */
+  @Nullable
+  public String getUri() {
     checkThread();
     return nativeGetUrl();
   }

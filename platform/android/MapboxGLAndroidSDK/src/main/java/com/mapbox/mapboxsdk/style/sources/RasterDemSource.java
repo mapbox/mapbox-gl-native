@@ -40,7 +40,25 @@ public class RasterDemSource extends Source {
   }
 
   /**
-   * Create the raster dem source from an URI
+   * Create the raster dem source from an URI.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id  the source id
    * @param uri the source uri
@@ -51,6 +69,24 @@ public class RasterDemSource extends Source {
 
   /**
    * Create the raster dem source from an URI
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id  the source id
    * @param uri the source uri
@@ -62,6 +98,24 @@ public class RasterDemSource extends Source {
 
   /**
    * Create the raster source from an URL with a specific tile size
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id       the source id
    * @param uri     the source url
@@ -107,6 +161,8 @@ public class RasterDemSource extends Source {
   }
 
   /**
+   * Get the source URI.
+   *
    * @return The uri or null
    */
   @Nullable

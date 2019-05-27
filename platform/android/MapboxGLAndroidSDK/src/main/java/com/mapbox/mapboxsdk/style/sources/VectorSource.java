@@ -46,17 +46,53 @@ public class VectorSource extends Source {
   }
 
   /**
-   * Create a vector source from a uri pointing to a TileJSON resource
+   * Create a vector source from an URI.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id  the source id
-   * @param uri the TileJSON resource url
+   * @param uri the TileJSON resource uri
    */
   public VectorSource(String id, Uri uri) {
     this(id, uri.toString());
   }
 
   /**
-   * Create a vector source from a uri
+   * Create a vector source from an URI.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id  the source id
    * @param uri the uri
@@ -67,7 +103,7 @@ public class VectorSource extends Source {
   }
 
   /**
-   * Create a vector source from a tilset
+   * Create a vector source from a tileset
    *
    * @param id      the source id
    * @param tileSet the tileset
@@ -106,6 +142,8 @@ public class VectorSource extends Source {
   }
 
   /**
+   * Get the source URI.
+   *
    * @return The uri or null
    */
   @Nullable
