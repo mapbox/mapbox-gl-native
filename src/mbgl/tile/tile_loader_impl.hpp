@@ -23,7 +23,6 @@ TileLoader<T>::TileLoader(T& tile_,
         id.canonical.y,
         id.canonical.z,
         tileset.scheme,
-        Resource::Priority::Regular,
         Resource::LoadingMethod::CacheOnly)),
       fileSource(parameters.fileSource) {
     assert(!request);
