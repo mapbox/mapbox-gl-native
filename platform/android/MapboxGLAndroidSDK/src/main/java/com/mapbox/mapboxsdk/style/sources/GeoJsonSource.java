@@ -118,7 +118,25 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Create a GeoJsonSource from a geo json file
+   * Create a GeoJsonSource from a geo json URI
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id  the source id
    * @param uri unique resource identifier
@@ -130,7 +148,25 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Create a GeoJsonSource from a geo json file and non-default GeoJsonOptions
+   * Create a GeoJsonSource from a geo json URI and non-default GeoJsonOptions
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id      the source id
    * @param uri     remote json file
@@ -286,13 +322,30 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Updates the uri
+   * Updates the URI of the source.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
-   * @param url the GeoJSON FeatureCollection uri
+   * @param uri the GeoJSON FeatureCollection uri
    */
-  public void setUri(@NonNull URI url) {
-    checkThread();
-    setUrl(url.toString());
+  public void setUri(@NonNull URI uri) {
+    setUri(uri.toString());
   }
 
   /**
@@ -308,7 +361,25 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Updates the url
+   * Updates the URI of the source.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param uri the GeoJSON FeatureCollection uri
    */
@@ -319,9 +390,21 @@ public class GeoJsonSource extends Source {
 
   /**
    * @return The url or null
+   * @deprecated use {@link #getUri()} instead
    */
   @Nullable
   public String getUrl() {
+    checkThread();
+    return nativeGetUrl();
+  }
+
+  /**
+   * Get the URI of the source.
+   *
+   * @return The uri or null
+   */
+  @Nullable
+  public String getUri() {
     checkThread();
     return nativeGetUrl();
   }

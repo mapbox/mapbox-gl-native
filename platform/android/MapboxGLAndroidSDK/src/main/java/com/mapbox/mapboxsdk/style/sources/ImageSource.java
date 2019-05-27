@@ -55,7 +55,25 @@ public class ImageSource extends Source {
   }
 
   /**
-   * Create an ImageSource from coordinates and an image URL
+   * Create an ImageSource from coordinates and an image URI
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param id          The source id
    * @param coordinates The Latitude and Longitude of the four corners of the image
@@ -74,7 +92,7 @@ public class ImageSource extends Source {
    * @param coordinates The Latitude and Longitude of the four corners of the image
    * @param bitmap      A Bitmap image
    */
-  public ImageSource(String id, LatLngQuad coordinates, @NonNull android.graphics.Bitmap bitmap) {
+  public ImageSource(String id, LatLngQuad coordinates, @NonNull Bitmap bitmap) {
     super();
     initialize(id, coordinates);
     setImage(bitmap);
@@ -117,16 +135,53 @@ public class ImageSource extends Source {
   }
 
   /**
-   * Updates the source image uri
+   * Updates the source image URI.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
-   * @param uri An Image url
+   * @param uri An Image uri
    */
   public void setUri(@NonNull URI uri) {
-    setUrl(uri.toString());
+    checkThread();
+    nativeSetUrl(uri.toString());
   }
 
   /**
-   * Updates the source image uri
+   * Updates the source image URI.
+   * <p>
+   * An URI is a combination of a protocol and a resource path.
+   * The following URI protocol schemes are supported:
+   * </p>
+   * <ul>
+   * <li>http://</li>
+   * <ul>
+   * <li>load resources using HyperText Transfer Protocol</li>
+   * </ul>
+   * <li>file://</li>
+   * <ul>
+   * <li>load resources from the Android file system</li>
+   * </ul>
+   * <li>asset://</li>
+   * <ul>
+   * <li>load resources from the binary packaged assets folder</li>
+   * </ul>
+   * </ul>
    *
    * @param uri An image uri
    */
@@ -164,9 +219,22 @@ public class ImageSource extends Source {
 
   /**
    * @return The url or null
+   * @deprecated use {@link #getUri()} instead
    */
+  @Deprecated
   @Nullable
   public String getUrl() {
+    checkThread();
+    return nativeGetUrl();
+  }
+
+  /**
+   * Get the source URI.
+   *
+   * @return The uri or null
+   */
+  @Nullable
+  public String getUri() {
     checkThread();
     return nativeGetUrl();
   }
