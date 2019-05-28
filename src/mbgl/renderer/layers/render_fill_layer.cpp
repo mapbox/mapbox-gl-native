@@ -190,7 +190,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),
                         parameters.backend.getDefaultRenderable().getSize(),
-                        tile.getIconAtlasTexture()->size,
+                        tile.getIconAtlasTexture().size,
                         crossfade,
                         tile.id,
                         parameters.state,
@@ -232,7 +232,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                      *bucket.triangleIndexBuffer,
                      bucket.triangleSegments,
                      FillPatternProgram::TextureBindings{
-                         textures::image::Value{ tile.getIconAtlasTexture()->getResource(), gfx::TextureFilterType::Linear },
+                         textures::image::Value{ tile.getIconAtlasTexture().getResource(), gfx::TextureFilterType::Linear },
                      });
             }
             if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
@@ -242,7 +242,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments,
                      FillOutlinePatternProgram::TextureBindings{
-                         textures::image::Value{ tile.getIconAtlasTexture()->getResource(), gfx::TextureFilterType::Linear },
+                         textures::image::Value{ tile.getIconAtlasTexture().getResource(), gfx::TextureFilterType::Linear },
                      });
             }
         }
