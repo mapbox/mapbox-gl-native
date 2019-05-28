@@ -1,20 +1,14 @@
 
 #import "MBXTestMapView.h"
 
-@interface MGLMapView
+@interface MGLMapView ()
 - (void)updateFromDisplayLink:(CADisplayLink*)displayLink;
 @end
+
 @implementation MBXTestMapView
 
 - (void)updateFromDisplayLink:(CADisplayLink*)displayLink {
-    
-    dispatch_block_t update = ^{
-        [super updateFromDisplayLink:displayLink];
-    };
-
-    NSLog(@"UPDATING");
-    update();
-
+    [super updateFromDisplayLink:displayLink];
 }
 
 - (void)didMoveToWindow {

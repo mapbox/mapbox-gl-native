@@ -36,20 +36,20 @@
             counter++;
             NSLog(@"%li", counter);
             self.tabController.selectedIndex = counter % 2;
-            if (counter > 30) {
+            if (counter >= 31) {
                 // time call to updateDisplayLink to see if it takes longer that
                 
                 // subclass MGLMapView
                 [repeatingTimer invalidate];
-                MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(20, 20) altitude:100 pitch:0 heading:0];
-                [self.mapView flyToCamera:camera withDuration:5 completionHandler:^{
-                    NSLog(@"all done");
-                    [expectation fulfill];
+                
+                // I get an exception here because it is called multiple times
+                [self measureBlock:^{
                     [self.mapView updateFromDisplayLink:nil];
+//                    [expectation fulfill];
                 }];
             }
         }];
-    
+
     
     [self waitForExpectations:@[expectation] timeout:10];
     
