@@ -89,10 +89,6 @@ android {
 
                     targets "mapbox-gl"
 
-                    if (defaultPublishConfig.equalsIgnoreCase("debug")) {
-                        targets "example-custom-layer"
-                    }
-
                     if (project.hasProperty("mapbox.with_test")) {
                         targets "mbgl-test"
                     }
