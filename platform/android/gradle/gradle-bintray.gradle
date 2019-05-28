@@ -16,7 +16,6 @@ publishing {
             version this.version
 
             afterEvaluate {
-                artifact("$buildDir/outputs/aar/mapbox-android-sdk-release.aar")
                 artifact(androidSourcesJar)
                 artifact(androidJavadocsJar)
             }
