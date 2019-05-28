@@ -34,13 +34,14 @@ final class MapKeyListener {
   }
 
   /**
-   * Called when the user presses a key, alse called for repeated keys held down.
+   * Called when the user presses a key, also called for repeated keys held down.
    *
    * @param keyCode the id of the pressed key
    * @param event   the related key event
-   * @return true if the wevent is handled
+   * @return true if the event is handled
    */
   boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
+
     // If the user has held the scroll key down for a while then accelerate
     // the scroll speed
     double scrollDist = event.getRepeatCount() >= 5 ? 50.0 : 10.0;
@@ -86,8 +87,13 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        // Move up
-        transform.moveBy(0.0, scrollDist, 0 /*no animation*/);
+        if (event.isShiftPressed()) {
+          // decrease pitch value
+          mapGestureDetector.pitchCameraDownAnimated(true);
+        } else {
+          // Move up
+          transform.moveBy(0.0, scrollDist, 0 /*no animation*/);
+        }
         return true;
 
       case KeyEvent.KEYCODE_DPAD_DOWN:
@@ -98,8 +104,13 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        // Move down
-        transform.moveBy(0.0, -scrollDist, 0 /*no animation*/);
+        if (event.isShiftPressed()) {
+          // decrease pitch value
+          mapGestureDetector.pitchCameraUpAnimated(true);
+        } else {
+          // Move down
+          transform.moveBy(0.0, -scrollDist, 0 /*no animation*/);
+        }
         return true;
 
       default:
@@ -116,6 +127,7 @@ final class MapKeyListener {
    * @return true if event is handled
    */
   boolean onKeyLongPress(int keyCode, KeyEvent event) {
+
     // Check which key was pressed via hardware/real key code
     switch (keyCode) {
       // Tell the system to track these keys for long presses on
@@ -127,8 +139,7 @@ final class MapKeyListener {
         }
 
         // Zoom out
-        PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        mapGestureDetector.zoomOutAnimated(focalPoint, true);
+        zoomMapCameraIn();
         return true;
 
       default:
@@ -162,9 +173,7 @@ final class MapKeyListener {
           return false;
         }
 
-        // Zoom in
-        PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        mapGestureDetector.zoomInAnimated(focalPoint, true);
+        zoomMapCameraIn();
         return true;
     }
 
@@ -190,8 +199,7 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        // Scroll the map
-        transform.moveBy(-10.0 * event.getX(), -10.0 * event.getY(), 0 /*no animation*/);
+        zoomMapCameraIn();
         return true;
 
       // Trackball was pushed in so start tracking and tell system we are
@@ -217,9 +225,7 @@ final class MapKeyListener {
 
         // Only handle if we have not already long pressed
         if (currentTrackballLongPressTimeOut != null) {
-          // Zoom in
-          PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-          mapGestureDetector.zoomInAnimated(focalPoint, true);
+          zoomMapCameraIn();
         }
         return true;
 
@@ -267,5 +273,14 @@ final class MapKeyListener {
         currentTrackballLongPressTimeOut = null;
       }
     }
+  }
+
+  /**
+   * Zooms the map camera in. Used at several places within this class.
+   */
+  private void zoomMapCameraIn() {
+    // Zoom in
+    PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+    mapGestureDetector.zoomInAnimated(focalPoint, true);
   }
 }

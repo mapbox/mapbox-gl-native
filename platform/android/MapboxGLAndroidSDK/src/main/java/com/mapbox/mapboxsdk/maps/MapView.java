@@ -131,20 +131,20 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
-    view.setNextFocusForwardId(R.id.logoView);
-    view.setNextFocusRightId(R.id.logoView);
+    view.setNextFocusForwardId(R.id.compassView);
+    view.setNextFocusRightId(R.id.compassView);
     view.setNextFocusLeftId(R.id.attributionView);
     compassView = view.findViewById(R.id.compassView);
+    compassView.setNextFocusForwardId(R.id.attributionView);
+    compassView.setNextFocusRightId(R.id.attributionView);
+    compassView.setNextFocusLeftId(view.getId());
     logoView = view.findViewById(R.id.logoView);
     logoView.setImageDrawable(BitmapUtils.getDrawableFromRes(getContext(), R.drawable.mapbox_logo_icon));
-    logoView.setNextFocusForwardId(R.id.attributionView);
-    logoView.setNextFocusRightId(R.id.attributionView);
-    logoView.setNextFocusLeftId(view.getId());
     attrView = view.findViewById(R.id.attributionView);
     attrView.setImageDrawable(BitmapUtils.getDrawableFromRes(getContext(), R.drawable.mapbox_info_bg_selector));
     attrView.setNextFocusForwardId(view.getId());
-    attrView.setNextFocusRightId(view.getId());
-    attrView.setNextFocusLeftId(R.id.logoView);
+    attrView.setNextFocusRightId(R.id.compassView);
+    attrView.setNextFocusLeftId(view.getId());
 
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
