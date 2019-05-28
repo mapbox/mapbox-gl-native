@@ -31,22 +31,31 @@
     // TODO: Add animated map transition, or call setNeedGLDisplay if animation
         __block NSInteger counter = 0;
         
-        NSTimer *repeatingTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+        __block NSTimer *repeatingTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 repeats:YES block:^(NSTimer * _Nonnull timer) {
             
             counter++;
             NSLog(@"%li", counter);
             self.tabController.selectedIndex = counter % 2;
-            if (counter >= 31) {
+            if (counter > 41) {
                 // time call to updateDisplayLink to see if it takes longer that
                 
                 // subclass MGLMapView
                 [repeatingTimer invalidate];
+                repeatingTimer = nil;
+                
+                MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:CLLocationCoordinate2DMake(10, 10) altitude:100 pitch:0 heading:0];
+                [self.mapView flyToCamera:camera withDuration:4 completionHandler:^{
+                    [expectation fulfill];
+                }];
                 
                 // I get an exception here because it is called multiple times
-                [self measureBlock:^{
-                    [self.mapView updateFromDisplayLink:nil];
-//                    [expectation fulfill];
-                }];
+//                [self measureBlock:^{
+//                [self measureMetrics:@[XCTPerformanceMetric_WallClockTime] automaticallyStartMeasuring:NO forBlock:^{
+//                    [self startMeasuring];
+//                    [self.mapView updateFromDisplayLink:nil];
+                
+//                    [self stopMeasuring];
+//                }];
             }
         }];
 
