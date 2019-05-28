@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
+        classpath 'com.android.tools.build:gradle:3.4.1'
         classpath dependenciesList.licensesPlugin
         classpath dependenciesList.kotlinPlugin
         classpath dependenciesList.bintrayPlugin
@@ -24,7 +24,7 @@ allprojects {
         // For publishing Maps SDK files to Bintray
         maven { url 'https://mapbox.bintray.com/mapbox' }
         // Snapshot repository
-        // maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+        // maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
     }
 }
 
