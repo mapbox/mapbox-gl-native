@@ -1067,25 +1067,24 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         }
     }
     
+    // Create array of coordinates.
     CLLocationCoordinate2D visibleCoordinates[4] = {
         self.mapView.visibleCoordinateBounds.ne,
         CLLocationCoordinate2DMake(self.mapView.visibleCoordinateBounds.ne.latitude, self.mapView.visibleCoordinateBounds.sw.longitude),
         self.mapView.visibleCoordinateBounds.sw,
         CLLocationCoordinate2DMake(self.mapView.visibleCoordinateBounds.sw.latitude, self.mapView.visibleCoordinateBounds.ne.longitude)
     };
+    
     NSUInteger numberOfCoordinates = sizeof(visibleCoordinates) / sizeof(CLLocationCoordinate2D);
     MGLPolygon *shape = [MGLPolygon polygonWithCoordinates:visibleCoordinates count:numberOfCoordinates];
+    
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"visible-coord" shape:shape options:nil];
     [self.mapView.style addSource:shapeSource];
     
     MGLFillStyleLayer *shapeLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"visible-coord" source:shapeSource];
     shapeLayer.fillOpacity = [NSExpression expressionForConstantValue:@0.5];
-    MGLStyleLayer *annotLayer = [self.mapView.style layerWithIdentifier:@"com.mapbox.annotations.points"];
-    if (annotLayer) {
-        [self.mapView.style insertLayer:shapeLayer belowLayer:annotLayer];
-    } else {
-        [self.mapView.style addLayer:shapeLayer];
-    }
+    
+    [self.mapView.style addLayer:shapeLayer];
 }
 
 - (void)styleWaterLayer
