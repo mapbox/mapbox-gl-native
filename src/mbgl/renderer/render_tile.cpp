@@ -77,14 +77,16 @@ optional<ImagePosition> RenderTile::getPattern(const std::string& pattern) const
     return static_cast<const GeometryTile&>(tile).getPattern(pattern);
 }
 
-const optional<gfx::Texture>& RenderTile::getGlyphAtlasTexture() const {
+const gfx::Texture& RenderTile::getGlyphAtlasTexture() const {
     assert(tile.kind == Tile::Kind::Geometry);
-    return static_cast<const GeometryTile&>(tile).glyphAtlasTexture;
+    assert(static_cast<const GeometryTile&>(tile).glyphAtlasTexture);
+    return *(static_cast<const GeometryTile&>(tile).glyphAtlasTexture);
 }
 
-const optional<gfx::Texture>& RenderTile::getIconAtlasTexture() const {
+const gfx::Texture& RenderTile::getIconAtlasTexture() const {
     assert(tile.kind == Tile::Kind::Geometry);
-    return static_cast<const GeometryTile&>(tile).iconAtlasTexture;
+    assert(static_cast<const GeometryTile&>(tile).iconAtlasTexture);
+    return *(static_cast<const GeometryTile&>(tile).iconAtlasTexture);
 }
 
 std::shared_ptr<FeatureIndex> RenderTile::getFeatureIndex() const {

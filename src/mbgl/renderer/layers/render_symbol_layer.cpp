@@ -123,14 +123,14 @@ void drawIcon(const DrawFn& draw,
     const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
     const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
-    const gfx::TextureBinding textureBinding{ tile.getIconAtlasTexture()->getResource(),
+    const gfx::TextureBinding textureBinding{ tile.getIconAtlasTexture().getResource(),
                                             bucket.sdfIcons ||
                                                     parameters.state.isChanging() ||
                                                     iconScaled || iconTransformed
                                                 ? gfx::TextureFilterType::Linear
                                                 : gfx::TextureFilterType::Nearest };
 
-    const Size& iconSize = tile.getIconAtlasTexture()->size;
+    const Size& iconSize = tile.getIconAtlasTexture().size;
 
     if (bucket.sdfIcons) {
         if (values.hasHalo) {
@@ -189,7 +189,7 @@ void drawText(const DrawFn& draw,
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
     const auto& layout = bucket.layout;
 
-    const gfx::TextureBinding textureBinding{ tile.getGlyphAtlasTexture()->getResource(),
+    const gfx::TextureBinding textureBinding{ tile.getGlyphAtlasTexture().getResource(),
                                               gfx::TextureFilterType::Linear };
 
     auto values = textPropertyValues(evaluated, layout);
@@ -198,7 +198,7 @@ void drawText(const DrawFn& draw,
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
         layout.get<TextRotationAlignment>() == AlignmentType::Map;
 
-    const Size& texsize = tile.getGlyphAtlasTexture()->size;
+    const Size& texsize = tile.getGlyphAtlasTexture().size;
 
     if (values.hasHalo) {
         draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,

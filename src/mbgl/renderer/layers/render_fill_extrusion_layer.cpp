@@ -179,7 +179,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
                                                   parameters.state),
-                        tile.getIconAtlasTexture()->size,
+                        tile.getIconAtlasTexture().size,
                         crossfade,
                         tile.id,
                         parameters.state,
@@ -191,7 +191,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
                     patternPosA,
                     patternPosB,
                     FillExtrusionPatternProgram::TextureBindings{
-                        textures::image::Value{ tile.getIconAtlasTexture()->getResource(), gfx::TextureFilterType::Linear },
+                        textures::image::Value{ tile.getIconAtlasTexture().getResource(), gfx::TextureFilterType::Linear },
                     }
                 );
             }

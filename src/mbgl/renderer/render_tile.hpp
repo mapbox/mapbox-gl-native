@@ -57,8 +57,8 @@ public:
     Bucket* getBucket(const style::Layer::Impl&) const;
     const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const;
     optional<ImagePosition> getPattern(const std::string& pattern) const;
-    const optional<gfx::Texture>& getGlyphAtlasTexture() const;
-    const optional<gfx::Texture>& getIconAtlasTexture() const;
+    const gfx::Texture& getGlyphAtlasTexture() const;
+    const gfx::Texture& getIconAtlasTexture() const;
     std::shared_ptr<FeatureIndex> getFeatureIndex() const;
 
     void setMask(TileMask&&);
