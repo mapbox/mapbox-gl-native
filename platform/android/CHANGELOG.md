@@ -8,6 +8,30 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
  - Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MapboxMap setPadding](https://docs.mapbox.com/android/api/map-sdk/8.0.0/com/mapbox/mapboxsdk/maps/MapboxMap.html#setPadding-int-int-int-int-). [#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664)
 
+
+## 8.1.0-alpha.1 - May 29, 2019
+
+### Bugs
+- Return color string values in the [0-255] range [#14233](https://github.com/mapbox/mapbox-gl-native/pull/14233)
+- Resume file source to complete resources cache path change [#14546](https://github.com/mapbox/mapbox-gl-native/pull/14546)
+- Remove binary shader support [#14707](https://github.com/mapbox/mapbox-gl-native/pull/14707)
+- Deprecate MapboxMapOptions empty constructor [#14748](https://github.com/mapbox/mapbox-gl-native/pull/14748)
+
+
+### Features
+- Break location camera tracking when a developer invoked animation starts [#14745](https://github.com/mapbox/mapbox-gl-native/pull/14745)
+- Use URI instead of URL to enable asset loading [#14750](https://github.com/mapbox/mapbox-gl-native/pull/14750)
+- Option to change the zoom rate. Decrease the default zoom rate by 35% [#14774](https://github.com/mapbox/mapbox-gl-native/pull/14774)
+- Provide API to control eviction of cached images [#14610](https://github.com/mapbox/mapbox-gl-native/pull/14610)
+- Android specific thread pool that keeps threads attached to JVM [#14450](https://github.com/mapbox/mapbox-gl-native/pull/14450)
+- Asymmetric viewport when edge insets are specified [#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664)
+
+### Build
+- Update maven publishing script to enable aar packaging [#14778](https://github.com/mapbox/mapbox-gl-native/pull/14778)
+
+### Docs
+ - Document that elevation(0) turns off the location shadow [#14723](https://github.com/mapbox/mapbox-gl-native/pull/14723)
+
 ## 8.0.0 - May 22, 2019
  - This release improves the method for counting monthly active users. By upgrading to this release, you are opting into the changes outlined [in this blog post](https://www.mapbox.com/52219). [#14404](https://github.com/mapbox/mapbox-gl-native/pull/14404)
 
