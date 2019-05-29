@@ -26,6 +26,7 @@
         "test/programs/symbol_program.test.cpp",
         "test/renderer/backend_scope.test.cpp",
         "test/renderer/image_manager.test.cpp",
+        "test/renderer/pattern_atlas.test.cpp",
         "test/sprite/sprite_loader.test.cpp",
         "test/sprite/sprite_parser.test.cpp",
         "test/src/mbgl/test/fixture_log_observer.cpp",

@@ -29,6 +29,7 @@ class SourceQueryOptions;
 class GlyphManager;
 class ImageManager;
 class LineAtlas;
+class PatternAtlas;
 class CrossTileSymbolIndex;
 
 namespace gfx {
@@ -116,6 +117,7 @@ private:
     std::unique_ptr<GlyphManager> glyphManager;
     std::unique_ptr<ImageManager> imageManager;
     std::unique_ptr<LineAtlas> lineAtlas;
+    std::unique_ptr<PatternAtlas> patternAtlas;
     std::unique_ptr<RenderStaticData> staticData;
 
     Immutable<std::vector<Immutable<style::Image::Impl>>> imageImpls;
