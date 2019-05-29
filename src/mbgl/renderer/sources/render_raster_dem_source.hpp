@@ -1,16 +1,14 @@
 #pragma once
 
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/tile_pyramid.hpp>
+#include <mbgl/renderer/sources/render_tile_source.hpp>
 #include <mbgl/style/sources/raster_source_impl.hpp>
+#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 
-class RenderRasterDEMSource : public RenderSource {
+class RenderRasterDEMSource final : public RenderTileSource {
 public:
-    RenderRasterDEMSource(Immutable<style::RasterSource::Impl>);
-
-    bool isLoaded() const final;
+    explicit RenderRasterDEMSource(Immutable<style::RasterSource::Impl>);
 
     void update(Immutable<style::Source::Impl>,
                 const std::vector<Immutable<style::LayerProperties>>&,
@@ -18,40 +16,27 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    void upload(gfx::UploadPass&) final;
-    void prepare(const SourcePrepareParameters&) final;
-    void finishRender(PaintParameters&) final;
-    void updateFadingTiles() final;
-    bool hasFadingTiles() const final;
-
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
+    void prepare(const SourcePrepareParameters&) override;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
                           const std::vector<const RenderLayer*>& layers,
                           const RenderedQueryOptions& options,
-                          const mat4& projMatrix) const final;
+                          const mat4& projMatrix) const override;
 
     std::vector<Feature>
-    querySourceFeatures(const SourceQueryOptions&) const final;
+    querySourceFeatures(const SourceQueryOptions&) const override;
 
-    void reduceMemoryUse() final;
-    void dumpDebugLogs() const final;
-
-    uint8_t getMaxZoom() const {
-        return maxzoom;
-    };
+    uint8_t getMaxZoom() const { return maxzoom; }
 
 private:
     const style::RasterSource::Impl& impl() const;
 
-    TilePyramid tilePyramid;
     optional<Tileset> tileset;
-    uint8_t maxzoom = 15;
+    uint8_t maxzoom = util::TERRAIN_RGB_MAXZOOM;
 
-protected:
-    void onTileChanged(Tile&) final;
+    void onTileChanged(Tile&) override;
 };
 
 template <>
