@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -98,6 +100,22 @@ public class GeoJsonSourceTests extends EspressoTest {
       assertEquals(1, mapboxMap.queryRenderedFeatures(
         mapboxMap.getProjection().toScreenLocation(
           new LatLng(55, 20)), "layer").size());
+    });
+  }
+
+  @Test
+  public void testClearCollectionDuringConversion() {
+    // https://github.com/mapbox/mapbox-gl-native/issues/14565
+    validateTestSetup();
+    MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
+      for (int j = 0; j < 1000; j++) {
+        List<Feature> features = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+          features.add(Feature.fromGeometry(Point.fromLngLat(0, 0)));
+        }
+        mapboxMap.getStyle().addSource(new GeoJsonSource("source" + j, FeatureCollection.fromFeatures(features)));
+        features.clear();
+      }
     });
   }
 

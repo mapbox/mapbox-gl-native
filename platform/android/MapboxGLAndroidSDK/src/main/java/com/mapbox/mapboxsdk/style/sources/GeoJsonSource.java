@@ -285,14 +285,21 @@ public class GeoJsonSource extends Source {
    * Updates the GeoJson. The update is performed asynchronously,
    * so the data won't be immediately visible or available to query when this method returns.
    *
-   * @param features the GeoJSON FeatureCollection
+   * @param featureCollection the GeoJSON FeatureCollection
    */
-  public void setGeoJson(FeatureCollection features) {
+  public void setGeoJson(FeatureCollection featureCollection) {
     if (detached) {
       return;
     }
     checkThread();
-    nativeSetFeatureCollection(features);
+
+    List<Feature> features = featureCollection.features();
+    if (features != null) {
+      List<Feature> featuresCopy = new ArrayList<>(features);
+      nativeSetFeatureCollection(FeatureCollection.fromFeatures(featuresCopy));
+    } else {
+      nativeSetFeatureCollection(featureCollection);
+    }
   }
 
   /**
@@ -445,7 +452,7 @@ public class GeoJsonSource extends Source {
    * </p>
    *
    * @param cluster cluster from which to retrieve leaves from
-   * @param limit  limit is the number of points to return
+   * @param limit   limit is the number of points to return
    * @param offset  offset is the amount of points to skip (for pagination)
    * @return a list of features for the underlying leaves
    */
@@ -497,10 +504,10 @@ public class GeoJsonSource extends Source {
   private native Feature[] querySourceFeatures(Object[] filter);
 
   @Keep
-  private native Feature[]  nativeGetClusterChildren(Feature feature);
+  private native Feature[] nativeGetClusterChildren(Feature feature);
 
   @Keep
-  private native Feature[]  nativeGetClusterLeaves(Feature feature, long limit, long offset);
+  private native Feature[] nativeGetClusterLeaves(Feature feature, long limit, long offset);
 
   @Keep
   private native int nativeGetClusterExpansionZoom(Feature feature);
