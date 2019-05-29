@@ -3429,9 +3429,12 @@ public:
             });
         };
     }
-    
+
+    // Padding is baked in adjusted camera center (in cameraForLatLngs) and
+    // cameraOptions.padding at this point is (0, 0, 0, 0) and we don't need to
+    // check if cameraOptions.contentInsets are equal to contentInsets.
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
-    if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, insets))
+    if ([self.camera isEqualToMapCamera:camera])
     {
         if (completion)
         {
