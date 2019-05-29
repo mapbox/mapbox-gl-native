@@ -10,16 +10,11 @@ namespace mbgl {
 using namespace style;
 
 RenderRasterDEMSource::RenderRasterDEMSource(Immutable<style::RasterSource::Impl> impl_)
-    : RenderSource(impl_) {
-    tilePyramid.setObserver(this);
+    : RenderTileSource(std::move(impl_)) {
 }
 
 const style::RasterSource::Impl& RenderRasterDEMSource::impl() const {
     return static_cast<const style::RasterSource::Impl&>(*baseImpl);
-}
-
-bool RenderRasterDEMSource::isLoaded() const {
-    return tilePyramid.isLoaded();
 }
 
 void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
@@ -123,32 +118,12 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
             }
         }
     }
-    RenderSource::onTileChanged(tile);
-}
-
-void RenderRasterDEMSource::upload(gfx::UploadPass& parameters) {
-    tilePyramid.upload(parameters);
+    RenderTileSource::onTileChanged(tile);
 }
 
 void RenderRasterDEMSource::prepare(const SourcePrepareParameters& parameters) {
     algorithm::updateTileMasks(tilePyramid.getRenderTiles());
-    tilePyramid.prepare(parameters);
-}
-
-void RenderRasterDEMSource::finishRender(PaintParameters& parameters) {
-    tilePyramid.finishRender(parameters);
-}
-
-void RenderRasterDEMSource::updateFadingTiles() {
-    tilePyramid.updateFadingTiles();
-}
-
-bool RenderRasterDEMSource::hasFadingTiles() const {
-    return tilePyramid.hasFadingTiles();
-}
-
-std::vector<std::reference_wrapper<RenderTile>> RenderRasterDEMSource::getRenderTiles() {
-    return tilePyramid.getRenderTiles();
+    RenderTileSource::prepare(parameters);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
@@ -157,19 +132,12 @@ RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString&,
                                           const std::vector<const RenderLayer*>&,
                                           const RenderedQueryOptions&,
                                           const mat4&) const {
-    return std::unordered_map<std::string, std::vector<Feature>> {};
+    return std::unordered_map<std::string, std::vector<Feature>>{};
 }
 
 std::vector<Feature> RenderRasterDEMSource::querySourceFeatures(const SourceQueryOptions&) const {
     return {};
 }
 
-void RenderRasterDEMSource::reduceMemoryUse() {
-    tilePyramid.reduceMemoryUse();
-}
-
-void RenderRasterDEMSource::dumpDebugLogs() const {
-    tilePyramid.dumpDebugLogs();
-}
 
 } // namespace mbgl

@@ -8,16 +8,11 @@ namespace mbgl {
 using namespace style;
 
 RenderRasterSource::RenderRasterSource(Immutable<style::RasterSource::Impl> impl_)
-    : RenderSource(impl_) {
-    tilePyramid.setObserver(this);
+    : RenderTileSource(std::move(impl_)) {
 }
 
 const style::RasterSource::Impl& RenderRasterSource::impl() const {
     return static_cast<const style::RasterSource::Impl&>(*baseImpl);
-}
-
-bool RenderRasterSource::isLoaded() const {
-    return tilePyramid.isLoaded();
 }
 
 void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
@@ -57,29 +52,9 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderRasterSource::upload(gfx::UploadPass& parameters) {
-    tilePyramid.upload(parameters);
-}
-
 void RenderRasterSource::prepare(const SourcePrepareParameters& parameters) {
     algorithm::updateTileMasks(tilePyramid.getRenderTiles());
-    tilePyramid.prepare(parameters);
-}
-
-void RenderRasterSource::finishRender(PaintParameters& parameters) {
-    tilePyramid.finishRender(parameters);
-}
-
-void RenderRasterSource::updateFadingTiles() {
-    tilePyramid.updateFadingTiles();
-}
-
-bool RenderRasterSource::hasFadingTiles() const {
-    return tilePyramid.hasFadingTiles();
-}
-
-std::vector<std::reference_wrapper<RenderTile>> RenderRasterSource::getRenderTiles() {
-    return tilePyramid.getRenderTiles();
+    RenderTileSource::prepare(parameters);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
@@ -88,19 +63,12 @@ RenderRasterSource::queryRenderedFeatures(const ScreenLineString&,
                                           const std::vector<const RenderLayer*>&,
                                           const RenderedQueryOptions&,
                                           const mat4&) const {
-    return std::unordered_map<std::string, std::vector<Feature>> {};
+    return std::unordered_map<std::string, std::vector<Feature>>{};
 }
 
 std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOptions&) const {
     return {};
 }
 
-void RenderRasterSource::reduceMemoryUse() {
-    tilePyramid.reduceMemoryUse();
-}
-
-void RenderRasterSource::dumpDebugLogs() const {
-    tilePyramid.dumpDebugLogs();
-}
 
 } // namespace mbgl

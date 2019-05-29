@@ -1,48 +1,33 @@
 #pragma once
 
-#include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/tile_pyramid.hpp>
+#include <mbgl/renderer/sources/render_tile_source.hpp>
 #include <mbgl/style/sources/raster_source_impl.hpp>
 
 namespace mbgl {
 
-class RenderRasterSource : public RenderSource {
+class RenderRasterSource final : public RenderTileSource {
 public:
-    RenderRasterSource(Immutable<style::RasterSource::Impl>);
-
-    bool isLoaded() const final;
+    explicit RenderRasterSource(Immutable<style::RasterSource::Impl>);
 
     void update(Immutable<style::Source::Impl>,
                 const std::vector<Immutable<style::LayerProperties>>&,
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&) final;
-
-    void upload(gfx::UploadPass&) final;
     void prepare(const SourcePrepareParameters&) final;
-    void finishRender(PaintParameters&) final;
-    void updateFadingTiles() final;
-    bool hasFadingTiles() const final;
-
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
                           const std::vector<const RenderLayer*>& layers,
                           const RenderedQueryOptions& options,
-                          const mat4& projMatrix) const final;
+                          const mat4& projMatrix) const override;
 
     std::vector<Feature>
-    querySourceFeatures(const SourceQueryOptions&) const final;
-
-    void reduceMemoryUse() final;
-    void dumpDebugLogs() const final;
+    querySourceFeatures(const SourceQueryOptions&) const override;
 
 private:
     const style::RasterSource::Impl& impl() const;
-
-    TilePyramid tilePyramid;
     optional<Tileset> tileset;
 };
 

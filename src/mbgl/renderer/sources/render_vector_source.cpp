@@ -8,16 +8,11 @@ namespace mbgl {
 using namespace style;
 
 RenderVectorSource::RenderVectorSource(Immutable<style::VectorSource::Impl> impl_)
-    : RenderSource(impl_) {
-    tilePyramid.setObserver(this);
+    : RenderTileSource(impl_) {
 }
 
 const style::VectorSource::Impl& RenderVectorSource::impl() const {
     return static_cast<const style::VectorSource::Impl&>(*baseImpl);
-}
-
-bool RenderVectorSource::isLoaded() const {
-    return tilePyramid.isLoaded();
 }
 
 void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
@@ -55,51 +50,6 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<VectorTile>(tileID, impl().id, parameters, *tileset);
                        });
-}
-
-void RenderVectorSource::upload(gfx::UploadPass& parameters) {
-    tilePyramid.upload(parameters);
-}
-
-void RenderVectorSource::prepare(const SourcePrepareParameters& parameters) {
-    tilePyramid.prepare(parameters);
-}
-
-void RenderVectorSource::finishRender(PaintParameters& parameters) {
-    tilePyramid.finishRender(parameters);
-}
-
-void RenderVectorSource::updateFadingTiles() {
-    tilePyramid.updateFadingTiles();
-}
-
-bool RenderVectorSource::hasFadingTiles() const {
-    return tilePyramid.hasFadingTiles();
-}
-
-std::vector<std::reference_wrapper<RenderTile>> RenderVectorSource::getRenderTiles() {
-    return tilePyramid.getRenderTiles();
-}
-
-std::unordered_map<std::string, std::vector<Feature>>
-RenderVectorSource::queryRenderedFeatures(const ScreenLineString& geometry,
-                                          const TransformState& transformState,
-                                          const std::vector<const RenderLayer*>& layers,
-                                          const RenderedQueryOptions& options,
-                                          const mat4& projMatrix) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
-}
-
-std::vector<Feature> RenderVectorSource::querySourceFeatures(const SourceQueryOptions& options) const {
-    return tilePyramid.querySourceFeatures(options);
-}
-
-void RenderVectorSource::reduceMemoryUse() {
-    tilePyramid.reduceMemoryUse();
-}
-
-void RenderVectorSource::dumpDebugLogs() const {
-    tilePyramid.dumpDebugLogs();
 }
 
 } // namespace mbgl
