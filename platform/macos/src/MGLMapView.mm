@@ -1198,7 +1198,7 @@ public:
         };
     }
     
-    if ([self.camera isEqualToMapCamera:camera]) {
+    if ([self.camera isEqualToMapCamera:camera] && NSEdgeInsetsEqual(edgePadding, NSEdgeInsetsZero)) {
         if (completion) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 completion();
@@ -1311,7 +1311,7 @@ public:
     }
     
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
-    if ([self.camera isEqualToMapCamera:camera]) {
+    if ([self.camera isEqualToMapCamera:camera] && NSEdgeInsetsEqual(insets, NSEdgeInsetsZero)) {
         return;
     }
 
