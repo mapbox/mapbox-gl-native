@@ -18,6 +18,7 @@ import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
@@ -69,7 +70,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.TRANSITIO
  * </strong>
  * <p>
  * Using this component requires you to request permission beforehand manually or using
- * {@link com.mapbox.android.core.permissions.PermissionsManager}. Either
+ * {@link PermissionsManager}. Either
  * {@code ACCESS_COARSE_LOCATION} or {@code ACCESS_FINE_LOCATION} permissions can be requested for
  * this component to work as expected.
  * <p>
@@ -868,7 +869,7 @@ public final class LocationComponent {
    * <pre>
    * {@code
    * mapboxMap.addOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
-   *   @Override
+   *   {@literal @}Override
    *   public void onCameraIdle() {
    *     double zoom = mapboxMap.getCameraPosition().zoom;
    *     int maxAnimationFps;
