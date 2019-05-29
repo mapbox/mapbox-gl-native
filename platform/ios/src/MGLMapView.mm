@@ -1088,7 +1088,7 @@ public:
         [self didUpdateLocationWithUserTrackingAnimated:animated];
     }
 
-    // Compass, logo and attribution button constraints needs to be updated.z
+    // Compass, logo and attribution button constraints needs to be updated.
     [self installConstraints];
 }
 
