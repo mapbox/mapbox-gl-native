@@ -4,7 +4,7 @@
 
 ### Styles and rendering
 
-* Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MGLMapView contentInset](https://docs.mapbox.com/ios/api/maps/5.0.0/Classes/MGLMapView.html#/c:objc(cs)MGLMapView(py)contentInset).  ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
+* Setting `MGLMapView.contentInset` now moves the map’s focal point to the center of the content frame after insetting. ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
 
 ## 0.14.0 - May 22, 2018
 
