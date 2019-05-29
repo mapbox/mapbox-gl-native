@@ -276,6 +276,10 @@ global.propertyValueDoc = function (property, value) {
             return '{@link Property#' + `${propertyValue}` + '}';
         } else if (str.substr(offset - 4, 3) !== 'CSS' && symbol[0].toUpperCase() != symbol[0]) {
             // Property 'enums'
+            if (symbol === 'symbol-sort-key') {
+               return 'symbol sort key';
+            }
+
             symbol = snakeCaseUpper(symbol);
             return '{@link ' + symbol + '}';
         } else {

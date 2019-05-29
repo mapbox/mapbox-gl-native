@@ -336,9 +336,9 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * Set the opacity of the accuracy view to a value from 0 to 1, where 0 means the accuracy view is
    * completely transparent and 1 means the view is completely opaque.
+   * References style attribute R.styleable#LocationComponent_accuracyAlpha
    *
    * @return the opacity of the accuracy view
-   * @attr ref R.styleable#LocationComponent_accuracyAlpha
    */
   public float accuracyAlpha() {
     return accuracyAlpha;
@@ -346,9 +346,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Solid color to use as the accuracy view color property.
+   * References style attribute R.styleable#LocationComponent_accuracyColor
    *
    * @return the color of the accuracy view
-   * @attr ref R.styleable#LocationComponent_accuracyColor
    */
   @ColorInt
   public int accuracyColor() {
@@ -357,9 +357,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the drawable used for the stale background icon.
+   * References style attribute R.styleable#LocationComponent_backgroundDrawableStale
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationComponent_backgroundDrawableStale
    */
   @DrawableRes
   public int backgroundDrawableStale() {
@@ -384,9 +384,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the drawable used for the stale foreground icon.
+   * References style attribute R.styleable#LocationComponent_foregroundDrawableStale
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationComponent_foregroundDrawableStale
    */
   @DrawableRes
   public int foregroundDrawableStale() {
@@ -411,9 +411,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the drawable used for the navigation state icon.
+   * References style attribute R.styleable#LocationComponent_gpsDrawable
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationComponent_gpsDrawable
    */
   @DrawableRes
   public int gpsDrawable() {
@@ -438,9 +438,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Supply a Drawable that is to be rendered on top of all of the content in the Location LayerComponent layer stack.
+   * References style attribute R.styleable#LocationComponent_foregroundDrawable
    *
    * @return the drawable resource used for the foreground layer
-   * @attr ref R.styleable#LocationComponent_foregroundDrawable
    */
   @DrawableRes
   public int foregroundDrawable() {
@@ -465,9 +465,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the drawable used for the background state icon.
+   * References style attribute R.styleable#LocationComponent_backgroundDrawable
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationComponent_backgroundDrawable
    */
   @DrawableRes
   public int backgroundDrawable() {
@@ -492,9 +492,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the drawable used for the bearing icon.
+   * References style attribute R.styleable#LocationComponent_bearingDrawable
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationComponent_bearingDrawable
    */
   @DrawableRes
   public int bearingDrawable() {
@@ -519,9 +519,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the bearing icon color as an integer.
+   * References style attribute R.styleable#LocationComponent_bearingTintColor
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationComponent_bearingTintColor
    */
   @ColorInt
   @Nullable
@@ -531,9 +531,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the foreground color as an integer.
+   * References style attribute R.styleable#LocationComponent_foregroundTintColor
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationComponent_foregroundTintColor
    */
   @ColorInt
   @Nullable
@@ -543,9 +543,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the background color as an integer.
+   * References style attribute R.styleable#LocationComponent_backgroundTintColor
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationComponent_backgroundTintColor
    */
   @ColorInt
   @Nullable
@@ -555,9 +555,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the foreground stale color as an integer.
+   * References style attribute R.styleable#LocationComponent_foregroundStaleTintColor
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationComponent_foregroundStaleTintColor
    */
   @ColorInt
   @Nullable
@@ -567,9 +567,9 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * Defines the background stale color as an integer.
+   * References style attribute R.styleable#LocationComponent_backgroundStaleTintColor
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationComponent_backgroundStaleTintColor
    */
   @ColorInt
   @Nullable
@@ -580,9 +580,9 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * Sets the base elevation of this view, in pixels. To turn off the shadow that appears under
    * the location icon, set the elevation to 0.
+   * References style attribute R.styleable#LocationComponent_elevation
    *
    * @return the elevation currently set for the location component icon
-   * @attr ref R.styleable#LocationComponent_elevation
    */
   @Dimension
   public float elevation() {
@@ -592,9 +592,9 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * Enable or disable to stale state mode. This mode indicates to the user that the location being
    * displayed on the map hasn't been updated in a specific amount of time.
+   * References style attribute R.styleable#LocationComponent_enableStaleState
    *
    * @return whether the stale state mode is enabled or not
-   * @attr ref R.styleable#LocationComponent_enableStaleState
    */
   public boolean enableStaleState() {
     return enableStaleState;
@@ -604,10 +604,10 @@ public class LocationComponentOptions implements Parcelable {
    * Set the delay before the location icon becomes stale. The timer begins approximately when a new
    * location update comes in and using this defined time, if an update hasn't occured by the end,
    * the location is considered stale.
+   * References style attribute R.styleable#LocationComponent_staleStateDelay
    *
    * @return the duration in milliseconds which it should take before the location is
    * considered stale
-   * @attr ref R.styleable#LocationComponent_staleStateDelay
    */
   public long staleStateTimeout() {
     return staleStateTimeout;
@@ -1199,10 +1199,10 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Set the opacity of the accuracy view to a value from 0 to 1, where 0 means the accuracy view
      * is completely transparent and 1 means the view is completely opaque.
+     * References style attribute R.styleable#LocationComponent_accuracyAlpha
      *
      * @param accuracyAlpha the opacity of the accuracy view
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_accuracyAlpha
      */
     @NonNull
     public LocationComponentOptions.Builder accuracyAlpha(float accuracyAlpha) {
@@ -1212,10 +1212,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Solid color to use as the accuracy view color property.
+     * References style attribute R.styleable#LocationComponent_accuracyColor
      *
      * @param accuracyColor the color of the accuracy view
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_accuracyColor
      */
     @NonNull
     public LocationComponentOptions.Builder accuracyColor(int accuracyColor) {
@@ -1225,10 +1225,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the drawable used for the stale background icon.
+     * References style attribute R.styleable#LocationComponent_backgroundDrawableStale
      *
      * @param backgroundDrawableStale the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_backgroundDrawableStale
      */
     @NonNull
     public LocationComponentOptions.Builder backgroundDrawableStale(int backgroundDrawableStale) {
@@ -1256,10 +1256,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the drawable used for the stale foreground icon.
+     * References style attribute R.styleable#LocationComponent_foregroundDrawableStale
      *
      * @param foregroundDrawableStale the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_foregroundDrawableStale
      */
     @NonNull
     public LocationComponentOptions.Builder foregroundDrawableStale(int foregroundDrawableStale) {
@@ -1287,10 +1287,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the drawable used for the navigation state icon.
+     * References style attribute R.styleable#LocationComponent_gpsDrawable
      *
      * @param gpsDrawable the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_gpsDrawable
      */
     @NonNull
     public LocationComponentOptions.Builder gpsDrawable(int gpsDrawable) {
@@ -1318,10 +1318,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Supply a Drawable that is to be rendered on top of all of the content in the Location Component layer stack.
+     * References style attribute R.styleable#LocationComponent_foregroundDrawable
      *
      * @param foregroundDrawable the drawable resource used for the foreground layer
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_foregroundDrawable
      */
     @NonNull
     public LocationComponentOptions.Builder foregroundDrawable(int foregroundDrawable) {
@@ -1349,10 +1349,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the drawable used for the background state icon.
+     * References style attribute R.styleable#LocationComponent_backgroundDrawable
      *
      * @param backgroundDrawable the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_backgroundDrawable
      */
     @NonNull
     public LocationComponentOptions.Builder backgroundDrawable(int backgroundDrawable) {
@@ -1380,10 +1380,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the drawable used for the bearing icon.
+     * References style attribute R.styleable#LocationComponent_bearingDrawable
      *
      * @param bearingDrawable the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_bearingDrawable
      */
     @NonNull
     public LocationComponentOptions.Builder bearingDrawable(int bearingDrawable) {
@@ -1411,10 +1411,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the bearing icon color as an integer.
+     * References style attribute R.styleable#LocationComponent_bearingTintColor
      *
      * @param bearingTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_bearingTintColor
      */
     @NonNull
     public LocationComponentOptions.Builder bearingTintColor(@Nullable Integer bearingTintColor) {
@@ -1424,10 +1424,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the foreground color as an integer.
+     * References style attribute R.styleable#LocationComponent_foregroundTintColor
      *
      * @param foregroundTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_foregroundTintColor
      */
     @NonNull
     public LocationComponentOptions.Builder foregroundTintColor(@Nullable Integer foregroundTintColor) {
@@ -1437,10 +1437,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the background color as an integer.
+     * References style attribute R.styleable#LocationComponent_backgroundTintColor
      *
      * @param backgroundTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_backgroundTintColor
      */
     @NonNull
     public LocationComponentOptions.Builder backgroundTintColor(@Nullable Integer backgroundTintColor) {
@@ -1450,10 +1450,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the foreground stale color as an integer.
+     * References style attribute R.styleable#LocationComponent_foregroundStaleTintColor
      *
      * @param foregroundStaleTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_foregroundStaleTintColor
      */
     @NonNull
     public LocationComponentOptions.Builder foregroundStaleTintColor(@Nullable Integer foregroundStaleTintColor) {
@@ -1463,10 +1463,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Defines the background stale color as an integer.
+     * References style attribute R.styleable#LocationComponent_backgroundStaleTintColor
      *
      * @param backgroundStaleTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_backgroundStaleTintColor
      */
     @NonNull
     public LocationComponentOptions.Builder backgroundStaleTintColor(@Nullable Integer backgroundStaleTintColor) {
@@ -1476,10 +1476,10 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Sets the base elevation of this view, in pixels.
+     * References style attribute R.styleable#LocationComponent_elevation
      *
      * @param elevation the elevation currently set for the location icon
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_elevation
      */
     @NonNull
     public LocationComponentOptions.Builder elevation(float elevation) {
@@ -1490,10 +1490,10 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Enable or disable to stale state mode. This mode indicates to the user that the location
      * being displayed on the map hasn't been updated in a specific amount of time.
+     * References style attribute R.styleable#LocationComponent_enableStaleState
      *
      * @param enabled whether the stale state mode is enabled or not
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_enableStaleState
      */
     @NonNull
     public LocationComponentOptions.Builder enableStaleState(boolean enabled) {
@@ -1505,11 +1505,11 @@ public class LocationComponentOptions implements Parcelable {
      * Set the timeout before the location icon becomes stale. The timer begins approximately when a
      * new location update comes in and using this defined time, if an update hasn't occurred by the
      * end, the location is considered stale.
+     * References style attribute R.styleable#LocationComponent_staleStateTimeout
      *
      * @param timeout the duration in milliseconds which it should take before the location is
      *                considered stale
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationComponent_staleStateTimeout
      */
     @NonNull
     public LocationComponentOptions.Builder staleStateTimeout(long timeout) {

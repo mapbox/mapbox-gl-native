@@ -151,7 +151,7 @@ public class LocationComponentActivationOptions {
      * Deliver your own {@link LocationEngine} to the LocationComponent.
      * <p>
      * The true/false
-     * {@link LocationComponentActivationOptions#builder(Context, Style)#useDefaultLocationEngine}
+     * {@link LocationComponentActivationOptions.Builder#useDefaultLocationEngine()}
      * activation option is ignored when a non-null {@link LocationEngine} is set via
      * this `locationEngine()` method.
      *

@@ -651,6 +651,9 @@ jobs:
       - run:
           name: Build release Test App
           command: make android
+      - run:
+          name: Generate javadoc
+          command: make android-javadoc
       - save-dependencies: { gradle: true }
       - run:
           name: gzip debugable .so files
