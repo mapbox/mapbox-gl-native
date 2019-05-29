@@ -20,6 +20,7 @@ class Programs;
 class TransformState;
 class ImageManager;
 class LineAtlas;
+class PatternAtlas;
 class UnwrappedTileID;
 class RenderSource;
 class RenderTile;
@@ -50,8 +51,8 @@ public:
                     const EvaluatedLight&,
                     const TransformParameters&,
                     RenderStaticData&,
-                    ImageManager&,
-                    LineAtlas&);
+                    LineAtlas&,
+                    PatternAtlas&);
     ~PaintParameters();
 
     gfx::Context& context;
@@ -64,8 +65,8 @@ public:
     const TransformParameters& transformParams;
 
     RenderStaticData& staticData;
-    ImageManager& imageManager;
     LineAtlas& lineAtlas;
+    PatternAtlas& patternAtlas;
 
     RenderPass pass = RenderPass::Opaque;
     MapMode mapMode;

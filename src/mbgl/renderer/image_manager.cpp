@@ -1,15 +1,18 @@
 #include <mbgl/renderer/image_manager.hpp>
-#include <mbgl/util/constants.hpp>
+
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
-#include <mbgl/util/logging.hpp>
-#include <mbgl/gfx/upload_pass.hpp>
-#include <mbgl/gfx/context.hpp>
 #include <mbgl/renderer/image_manager_observer.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
 static ImageManagerObserver nullObserver;
+
+ImageManager::ImageManager() = default;
+
+ImageManager::~ImageManager() = default;
 
 void ImageManager::setObserver(ImageManagerObserver* observer_) {
     observer = observer_ ? observer_ : &nullObserver;
@@ -62,7 +65,6 @@ bool ImageManager::updateImage(Immutable<style::Image::Impl> image_) {
         updatedImageVersions[image_->id]++;
     }
 
-    removePattern(image_->id);
     oldImage->second = std::move(image_);
 
     return sizeChanged;
@@ -79,22 +81,6 @@ void ImageManager::removeImage(const std::string& id) {
         requestedImages.erase(requestedIt);
     }
     images.erase(it);
-    removePattern(id);
-}
-
-void ImageManager::removePattern(const std::string& id) {
-    auto it = patterns.find(id);
-    if (it != patterns.end()) {
-        // Clear pattern from the atlas image.
-        const uint32_t x = it->second.bin->x;
-        const uint32_t y = it->second.bin->y;
-        const uint32_t w = it->second.bin->w;
-        const uint32_t h = it->second.bin->h;
-        PremultipliedImage::clear(atlasImage, { x, y }, { w, h });
-
-        shelfPack.unref(*it->second.bin);
-        patterns.erase(it);
-    }
 }
 
 const style::Image::Impl* ImageManager::getImage(const std::string& id) const {
@@ -241,88 +227,6 @@ void ImageManager::notify(ImageRequestor& requestor, const ImageRequestPair& pai
 
 void ImageManager::dumpDebugLogs() const {
     Log::Info(Event::General, "ImageManager::loaded: %d", loaded);
-}
-
-// When copied into the atlas texture, image data is padded by one pixel on each side. Icon
-// images are padded with fully transparent pixels, while pattern images are padded with a
-// copy of the image data wrapped from the opposite side. In both cases, this ensures the
-// correct behavior of GL_LINEAR texture sampling mode.
-static constexpr uint16_t padding = 1;
-
-static mapbox::ShelfPack::ShelfPackOptions shelfPackOptions() {
-    mapbox::ShelfPack::ShelfPackOptions options;
-    options.autoResize = true;
-    return options;
-}
-
-ImageManager::ImageManager()
-    : shelfPack(64, 64, shelfPackOptions()) {
-}
-
-ImageManager::~ImageManager() = default;
-
-optional<ImagePosition> ImageManager::getPattern(const std::string& id) {
-    auto it = patterns.find(id);
-    if (it != patterns.end()) {
-        return it->second.position;
-    }
-
-    const style::Image::Impl* image = getImage(id);
-    if (!image) {
-        return {};
-    }
-
-    const uint16_t width = image->image.size.width + padding * 2;
-    const uint16_t height = image->image.size.height + padding * 2;
-
-    mapbox::Bin* bin = shelfPack.packOne(-1, width, height);
-    if (!bin) {
-        return {};
-    }
-
-    atlasImage.resize(getPixelSize());
-
-    const PremultipliedImage& src = image->image;
-
-    const uint32_t x = bin->x + padding;
-    const uint32_t y = bin->y + padding;
-    const uint32_t w = src.size.width;
-    const uint32_t h = src.size.height;
-
-    PremultipliedImage::copy(src, atlasImage, { 0, 0 }, { x, y }, { w, h });
-
-    // Add 1 pixel wrapped padding on each side of the image.
-    PremultipliedImage::copy(src, atlasImage, { 0, h - 1 }, { x, y - 1 }, { w, 1 }); // T
-    PremultipliedImage::copy(src, atlasImage, { 0,     0 }, { x, y + h }, { w, 1 }); // B
-    PremultipliedImage::copy(src, atlasImage, { w - 1, 0 }, { x - 1, y }, { 1, h }); // L
-    PremultipliedImage::copy(src, atlasImage, { 0,     0 }, { x + w, y }, { 1, h }); // R
-
-    dirty = true;
-
-    return patterns.emplace(id, Pattern { bin, { *bin, *image } }).first->second.position;
-}
-
-Size ImageManager::getPixelSize() const {
-    return Size {
-        static_cast<uint32_t>(shelfPack.width()),
-        static_cast<uint32_t>(shelfPack.height())
-    };
-}
-
-void ImageManager::upload(gfx::UploadPass& uploadPass) {
-    if (!atlasTexture) {
-        atlasTexture = uploadPass.createTexture(atlasImage);
-    } else if (dirty) {
-        uploadPass.updateTexture(*atlasTexture, atlasImage);
-    }
-
-    dirty = false;
-}
-
-gfx::TextureBinding ImageManager::textureBinding() {
-    assert(atlasTexture);
-    assert(!dirty);
-    return { atlasTexture->getResource(), gfx::TextureFilterType::Linear };
 }
 
 ImageRequestor::ImageRequestor(ImageManager& imageManager_) : imageManager(imageManager_) {

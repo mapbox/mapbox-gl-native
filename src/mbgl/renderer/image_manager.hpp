@@ -1,16 +1,9 @@
 #pragma once
 
 #include <mbgl/style/image_impl.hpp>
-#include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/immutable.hpp>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/gfx/texture.hpp>
-#include <mbgl/renderer/image_manager_observer.hpp>
 
-#include <mapbox/shelf-pack.hpp>
-
-#include <set>
+#include <map>
 #include <string>
 
 namespace mbgl {
@@ -22,21 +15,17 @@ namespace gfx {
 class UploadPass;
 } // namespace gfx
 
+class ImageManagerObserver;
 class ImageRequestor;
 
-/*
-    ImageManager does two things:
-
-        1. Tracks requests for icon images from tile workers and sends responses when the requests are fulfilled.
-        2. Builds a texture atlas for pattern images.
-
-    These are disparate responsibilities and should eventually be handled by different classes. When we implement
-    data-driven support for `*-pattern`, we'll likely use per-bucket pattern atlases, and that would be a good time
-    to refactor this.
-*/
-class ImageManager : public util::noncopyable {
+/**
+ * @brief tracks requests for icon images from tile workers and sends responses when the requests are fulfilled.
+ */
+class ImageManager {
 public:
     ImageManager();
+    ImageManager(const ImageManager&) = delete;
+    ImageManager& operator=(const ImageManager&) = delete;
     ~ImageManager();
 
     void setObserver(ImageManagerObserver*);
@@ -80,32 +69,6 @@ private:
     ImageMap images;
 
     ImageManagerObserver* observer = nullptr;
-
-// Pattern stuff
-public:
-    optional<ImagePosition> getPattern(const std::string& name);
-
-    gfx::TextureBinding textureBinding();
-    void upload(gfx::UploadPass&);
-
-    Size getPixelSize() const;
-
-    // Only for use in tests.
-    const PremultipliedImage& getAtlasImage() const {
-        return atlasImage;
-    }
-
-private:
-    struct Pattern {
-        mapbox::Bin* bin;
-        ImagePosition position;
-    };
-
-    mapbox::ShelfPack shelfPack;
-    std::unordered_map<std::string, Pattern> patterns;
-    PremultipliedImage atlasImage;
-    mbgl::optional<gfx::Texture> atlasTexture;
-    bool dirty = true;
 };
 
 class ImageRequestor {

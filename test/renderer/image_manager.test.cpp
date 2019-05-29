@@ -28,51 +28,10 @@ TEST(ImageManager, Basic) {
                               util::read_file("test/fixtures/annotations/emerald.json"));
     for (auto& image : images) {
         imageManager.addImage(image->baseImpl);
+        auto* stored = imageManager.getImage(image->getID());
+        ASSERT_TRUE(stored);
+        EXPECT_EQ(image->getImage().size, stored->image.size);
     }
-
-    auto metro = *imageManager.getPattern("metro");
-    EXPECT_EQ(1, metro.tl()[0]);
-    EXPECT_EQ(1, metro.tl()[1]);
-    EXPECT_EQ(19, metro.br()[0]);
-    EXPECT_EQ(19, metro.br()[1]);
-    EXPECT_EQ(18, metro.displaySize()[0]);
-    EXPECT_EQ(18, metro.displaySize()[1]);
-    EXPECT_EQ(1.0f, metro.pixelRatio);
-    EXPECT_EQ(imageManager.getPixelSize(), imageManager.getAtlasImage().size);
-
-    test::checkImage("test/fixtures/image_manager/basic", imageManager.getAtlasImage());
-}
-
-TEST(ImageManager, Updates) {
-    ImageManager imageManager;
-
-    PremultipliedImage imageA({ 16, 12 });
-    imageA.fill(255);
-    imageManager.addImage(makeMutable<style::Image::Impl>("one", std::move(imageA), 1));
-
-    auto a = *imageManager.getPattern("one");
-    EXPECT_EQ(1, a.tl()[0]);
-    EXPECT_EQ(1, a.tl()[1]);
-    EXPECT_EQ(17, a.br()[0]);
-    EXPECT_EQ(13, a.br()[1]);
-    EXPECT_EQ(16, a.displaySize()[0]);
-    EXPECT_EQ(12, a.displaySize()[1]);
-    EXPECT_EQ(1.0f, a.pixelRatio);
-    test::checkImage("test/fixtures/image_manager/updates_before", imageManager.getAtlasImage());
-
-    PremultipliedImage imageB({ 5, 5 });
-    imageA.fill(200);
-    imageManager.updateImage(makeMutable<style::Image::Impl>("one", std::move(imageB), 1));
-
-    auto b = *imageManager.getPattern("one");
-    EXPECT_EQ(1, b.tl()[0]);
-    EXPECT_EQ(1, b.tl()[1]);
-    EXPECT_EQ(6, b.br()[0]);
-    EXPECT_EQ(6, b.br()[1]);
-    EXPECT_EQ(5, b.displaySize()[0]);
-    EXPECT_EQ(5, b.displaySize()[1]);
-    EXPECT_EQ(1.0f, b.pixelRatio);
-    test::checkImage("test/fixtures/image_manager/updates_after", imageManager.getAtlasImage());
 }
 
 TEST(ImageManager, AddRemove) {

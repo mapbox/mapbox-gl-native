@@ -18,6 +18,7 @@ class PaintParameters;
 class RenderSource;
 class RenderTile;
 class TransformState;
+class PatternAtlas;
 
 class LayerRenderData {
 public:
@@ -35,6 +36,7 @@ class LayerPrepareParameters {
 public:
     RenderSource* source;
     ImageManager& imageManager;
+    PatternAtlas& patternAtlas;
     const TransformState& state;
 };
 

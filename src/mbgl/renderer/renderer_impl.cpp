@@ -7,6 +7,7 @@
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/upload_parameters.hpp>
+#include <mbgl/renderer/pattern_atlas.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
@@ -52,6 +53,7 @@ Renderer::Impl::Impl(gfx::RendererBackend& backend_,
     , glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(localFontFamily)))
     , imageManager(std::make_unique<ImageManager>())
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
+    , patternAtlas(std::make_unique<PatternAtlas>())
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
@@ -143,6 +145,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Remove removed images from sprite atlas.
     for (const auto& entry : imageDiff.removed) {
         imageManager->removeImage(entry.first);
+        patternAtlas->removePattern(entry.first);
     }
 
     // Add added images to sprite atlas.
@@ -152,7 +155,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Update changed images.
     for (const auto& entry : imageDiff.changed) {
-        hasImageDiff = imageManager->updateImage(entry.second.after) || hasImageDiff;
+        if (imageManager->updateImage(entry.second.after)) {
+            patternAtlas->removePattern(entry.first);
+            hasImageDiff = true;
+        }
     }
 
     imageManager->notifyIfMissingImageAdded();
@@ -302,7 +308,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     for (auto& renderItem : renderItems) {
         RenderLayer& renderLayer = renderItem.layer;
-        renderLayer.prepare({renderItem.source, *imageManager, updateParameters.transformState});
+        renderLayer.prepare({renderItem.source, *imageManager, *patternAtlas, updateParameters.transformState});
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
@@ -362,8 +368,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderLight.getEvaluated(),
         transformParams,
         *staticData,
-        *imageManager,
         *lineAtlas,
+        *patternAtlas
     };
 
     parameters.symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
@@ -393,8 +399,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         staticData->upload(*uploadPass);
-        imageManager->upload(*uploadPass);
         lineAtlas->upload(*uploadPass);
+        patternAtlas->upload(*uploadPass);
     }
 
     // - 3D PASS -------------------------------------------------------------------------------------
