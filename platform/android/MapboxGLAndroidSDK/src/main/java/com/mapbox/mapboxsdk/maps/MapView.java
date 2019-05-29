@@ -79,6 +79,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private PointF focalPoint;
   private ImageView attrView;
   private ImageView logoView;
+  private View view;
 
   @Nullable
   private MapGestureDetector mapGestureDetector;
@@ -130,7 +131,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapboxMapOptions = options;
 
     // inflate view
-    View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
+    view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
     view.setNextFocusForwardId(R.id.compassView);
     view.setNextFocusRightId(R.id.compassView);
     view.setNextFocusLeftId(R.id.attributionView);
@@ -186,7 +187,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapboxMap.injectAnnotationManager(annotationManager);
 
     // user input
-    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
+    mapGestureDetector = new MapGestureDetector(view, context, transform, proj, uiSettings,
       annotationManager, cameraDispatcher);
     mapKeyListener = new MapKeyListener(transform, uiSettings, mapGestureDetector);
 

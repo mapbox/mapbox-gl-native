@@ -9,6 +9,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
+import com.mapbox.mapboxsdk.log.Logger;
+
 /**
  * Manages key events on a MapView.
  * <p>
@@ -41,7 +43,6 @@ final class MapKeyListener {
    * @return true if the event is handled
    */
   boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
-
     // If the user has held the scroll key down for a while then accelerate
     // the scroll speed
     double scrollDist = event.getRepeatCount() >= 5 ? 50.0 : 10.0;
@@ -88,10 +89,10 @@ final class MapKeyListener {
         transform.cancelTransitions();
 
         if (event.isShiftPressed()) {
-          // decrease pitch value
-          mapGestureDetector.pitchCameraDownAnimated(true);
+          // Increase map camera pitch value
+          transform.setTilt(transform.getTilt() + 1);
         } else {
-          // Move up
+          // Move map target up
           transform.moveBy(0.0, scrollDist, 0 /*no animation*/);
         }
         return true;
@@ -105,10 +106,10 @@ final class MapKeyListener {
         transform.cancelTransitions();
 
         if (event.isShiftPressed()) {
-          // decrease pitch value
-          mapGestureDetector.pitchCameraUpAnimated(true);
+          // Decrease map camera pitch value
+          transform.setTilt(transform.getTilt() - 1);
         } else {
-          // Move down
+          // Move map target up
           transform.moveBy(0.0, -scrollDist, 0 /*no animation*/);
         }
         return true;
@@ -127,7 +128,6 @@ final class MapKeyListener {
    * @return true if event is handled
    */
   boolean onKeyLongPress(int keyCode, KeyEvent event) {
-
     // Check which key was pressed via hardware/real key code
     switch (keyCode) {
       // Tell the system to track these keys for long presses on
@@ -279,7 +279,6 @@ final class MapKeyListener {
    * Zooms the map camera in. Used at several places within this class.
    */
   private void zoomMapCameraIn() {
-    // Zoom in
     PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
     mapGestureDetector.zoomInAnimated(focalPoint, true);
   }
