@@ -37,6 +37,12 @@ public class MapboxConstants {
    */
   public static final boolean DEFAULT_MEASURE_TILE_DOWNLOAD_ON = false;
 
+  public static final String KEY_PREFERENCE_SKU_TOKEN = "com.mapbox.mapboxsdk.accounts.skutoken";
+
+  public static final String KEY_META_DATA_MANAGE_SKU_TOKEN = "com.mapbox.ManageSkuToken";
+
+  public static final boolean DEFAULT_MANAGE_SKU_TOKEN = true;
+
   /**
    * Unmeasured state
    */
