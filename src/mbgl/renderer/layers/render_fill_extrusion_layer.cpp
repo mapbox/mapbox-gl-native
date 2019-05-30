@@ -134,7 +134,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
                                                   parameters.state),
                         parameters.state,
                         evaluated.get<FillExtrusionOpacity>(),
-                        parameters.evaluatedLight
+                        parameters.evaluatedLight,
+                        evaluated.get<FillExtrusionVerticalGradient>()
                     ),
                     {},
                     {},
@@ -188,7 +189,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
                         evaluated.get<FillExtrusionOpacity>(),
                         -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
                         parameters.pixelRatio,
-                        parameters.evaluatedLight
+                        parameters.evaluatedLight,
+                        evaluated.get<FillExtrusionVerticalGradient>()
                     ),
                     patternPosA,
                     patternPosB,
