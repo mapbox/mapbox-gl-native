@@ -24,6 +24,7 @@ namespace uniforms {
 MBGL_DEFINE_UNIFORM_VECTOR(float, 3, lightpos);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 3, lightcolor);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    lightintensity);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    vertical_gradient);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    height_factor);
 } // namespace uniforms
 
@@ -36,7 +37,8 @@ using FillExtrusionUniforms = TypeList<
     uniforms::opacity,
     uniforms::lightcolor,
     uniforms::lightpos,
-    uniforms::lightintensity>;
+    uniforms::lightintensity,
+    uniforms::vertical_gradient>;
 
 using FillExtrusionPatternUniforms = TypeList<
     uniforms::matrix,
@@ -49,7 +51,8 @@ using FillExtrusionPatternUniforms = TypeList<
     uniforms::height_factor,
     uniforms::lightcolor,
     uniforms::lightpos,
-    uniforms::lightintensity>;
+    uniforms::lightintensity,
+    uniforms::vertical_gradient>;
 
 class FillExtrusionProgram : public Program<
     FillExtrusionProgram,
@@ -83,7 +86,7 @@ public:
     }
 
     static LayoutUniformValues
-    layoutUniformValues(mat4, const TransformState&, const float opacity, const EvaluatedLight&);
+    layoutUniformValues(mat4, const TransformState&, const float opacity, const EvaluatedLight&, const float verticalGradient);
 };
 
 class FillExtrusionPatternProgram : public Program<
@@ -106,7 +109,8 @@ public:
                                                    const float opacity,
                                                    const float heightFactor,
                                                    const float pixelRatio,
-                                                   const EvaluatedLight&);
+                                                   const EvaluatedLight&,
+                                                   const float verticalGradient);
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;
