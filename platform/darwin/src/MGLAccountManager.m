@@ -10,17 +10,12 @@
 #import "MBXSKUToken.h"
 #endif
 
-static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
 
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
 @property (nonatomic) NSURL *apiBaseURL;
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-@property (atomic) NSString *skuToken;
-@property (atomic) NSDate *skuTokenExpiration;
-#endif
 @end
 
 @implementation MGLAccountManager
@@ -40,10 +35,6 @@ static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
     if (apiBaseURL.length && [NSURL URLWithString:apiBaseURL]) {
         [self setAPIBaseURL:[NSURL URLWithString:apiBaseURL]];
     }
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    self.skuToken = [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser];
-#endif
 }
 
 + (instancetype)sharedManager {
@@ -102,20 +93,13 @@ static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
-+ (void)setSkuToken:(NSString *)skuToken {
-    MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate dateWithTimeIntervalSinceNow:MGLAccountManagerSKUTokenLifespan];
-    MGLAccountManager.sharedManager.skuToken = skuToken;
-}
-
 + (NSString *)skuToken {
-    return [MGLAccountManager.sharedManager isSKUTokenExpired] ?
-        [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser] :
-        MGLAccountManager.sharedManager.skuToken;
-}
-
-- (BOOL)isSKUTokenExpired {
-    NSTimeInterval secondsUntilExpiration = [MGLAccountManager.sharedManager.skuTokenExpiration timeIntervalSinceNow];
-    return secondsUntilExpiration < 0;
+    Class mbx = NSClassFromString(@"MBXAccounts");
+    if ([mbx respondsToSelector:@selector(skuToken)]) {
+        return [mbx valueForKeyPath:@"skuToken"];
+    }
+ 
+    return [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser];
 }
 
 #endif
