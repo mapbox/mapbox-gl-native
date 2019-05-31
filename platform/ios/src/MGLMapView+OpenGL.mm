@@ -28,6 +28,14 @@
 
 @end
 
+namespace {
+CGFloat contentScaleFactor() {
+    return [UIScreen instancesRespondToSelector:@selector(nativeScale)]
+        ? [[UIScreen mainScreen] nativeScale]
+        : [[UIScreen mainScreen] scale];
+}
+} // namespace
+
 class MGLMapViewOpenGLRenderableResource final : public mbgl::gl::RenderableResource {
 public:
     MGLMapViewOpenGLRenderableResource(MGLMapViewOpenGLImpl& backend_)
@@ -124,9 +132,7 @@ void MGLMapViewOpenGLImpl::createView() {
     resource.glView = [[GLKView alloc] initWithFrame:mapView.bounds context:resource.context];
     resource.glView.delegate = resource.delegate;
     resource.glView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    resource.glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)]
-                                    ? [[UIScreen mainScreen] nativeScale]
-                                    : [[UIScreen mainScreen] scale];
+    resource.glView.contentScaleFactor = contentScaleFactor();
     resource.glView.contentMode = UIViewContentModeCenter;
     resource.glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     resource.glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
@@ -137,7 +143,6 @@ void MGLMapViewOpenGLImpl::createView() {
     eaglLayer.presentsWithTransaction = NO;
 
     [mapView insertSubview:resource.glView atIndex:0];
-    size = resource.framebufferSize();
 }
 
 UIView* MGLMapViewOpenGLImpl::getView() {
@@ -245,6 +250,12 @@ void MGLMapViewOpenGLImpl::restoreFramebufferBinding() {
 UIImage* MGLMapViewOpenGLImpl::snapshot() {
     auto& resource = getResource<MGLMapViewOpenGLRenderableResource>();
     return resource.glView.snapshot;
+}
+
+void MGLMapViewOpenGLImpl::layoutChanged() {
+    const auto scaleFactor = contentScaleFactor();
+    size = { static_cast<uint32_t>(mapView.bounds.size.width * scaleFactor),
+             static_cast<uint32_t>(mapView.bounds.size.height * scaleFactor) };
 }
 
 EAGLContext* MGLMapViewOpenGLImpl::getEAGLContext() {

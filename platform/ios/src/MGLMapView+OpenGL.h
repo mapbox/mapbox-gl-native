@@ -55,5 +55,6 @@ public:
     UIView* getView() override;
     void deleteView() override;
     UIImage* snapshot() override;
+    void layoutChanged() override;
     // End implementation of MGLMapViewImpl
 };
