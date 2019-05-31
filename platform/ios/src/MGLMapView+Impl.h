@@ -48,6 +48,9 @@ public:
     // the rendering context and reduce memory while in the background.
     virtual UIImage* snapshot() = 0;
 
+    // Called when UIView's layout has changed.
+    virtual void layoutChanged() {};
+
     // Called by the view delegate when it's time to render.
     void render();
 

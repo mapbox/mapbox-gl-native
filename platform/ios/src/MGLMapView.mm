@@ -946,6 +946,10 @@ public:
 
     [self adjustContentInset];
 
+    if (_mbglView) {
+        _mbglView->layoutChanged();
+    }
+
     if (_mbglMap) {
         self.mbglMap.setSize([self size]);
     }
