@@ -2715,7 +2715,6 @@
 				DA1DC9471CB6C1C2006E619F /* Frameworks */,
 				DA1DC9481CB6C1C2006E619F /* Resources */,
 				DA4A269A1CB6F5D3000B7809 /* Embed Frameworks */,
-				074A7F0B2277BD67001A62D1 /* Insert Mapbox Access Token */,
 			);
 			buildRules = (
 			);
@@ -3009,25 +3008,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		074A7F0B2277BD67001A62D1 /* Insert Mapbox Access Token */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
-			);
-			name = "Insert Mapbox Access Token";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "$SRCROOT/app/insert_access_token.sh\n";
-		};
 		07796BA2227908CB0059CAF1 /* Insert Mapbox Access Token */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

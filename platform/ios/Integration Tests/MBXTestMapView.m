@@ -11,10 +11,4 @@
     [super updateFromDisplayLink:displayLink];
 }
 
-- (void)didMoveToWindow {
-    [super didMoveToWindow];
-    NSLog(@"MOVING TO WINDOW");
-}
-
-
 @end

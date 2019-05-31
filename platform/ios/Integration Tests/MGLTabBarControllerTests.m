@@ -43,7 +43,6 @@
                 [expectation fulfill];
             }];
             
-            // Need to check
             [self measureBlock:^{
                 [self.mapView updateFromDisplayLink:nil];
             }];

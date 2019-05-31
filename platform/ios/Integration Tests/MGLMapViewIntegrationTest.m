@@ -32,7 +32,7 @@
 - (void)setUp {
     [super setUp];
 
-//    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
+    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
 
     self.mapView = [[MBXTestMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
