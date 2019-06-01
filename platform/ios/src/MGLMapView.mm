@@ -3569,10 +3569,7 @@ public:
 
     MGLLogDebug(@"Setting camera: %@ duration: %f animationTimingFunction: %@ edgePadding: %@ completionHandler: %@", camera, duration, function, NSStringFromUIEdgeInsets(edgePadding), completion);
     
-    edgePadding = UIEdgeInsetsMake(edgePadding.top + self.contentInset.top,
-                                   edgePadding.left + self.contentInset.left,
-                                   edgePadding.bottom + self.contentInset.bottom,
-                                   edgePadding.right + self.contentInset.right);
+    edgePadding = MGLEdgeInsetsInsetEdgeInset(edgePadding, self.contentInset);
 
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
