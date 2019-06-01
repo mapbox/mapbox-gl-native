@@ -6234,6 +6234,14 @@ public:
     }
 }
 
+- (BOOL)shouldRemoveStyleImage:(NSString *)imageName {
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldRemoveStyleImage:)]) {
+        return [self.delegate mapView:self shouldRemoveStyleImage:imageName];
+    }
+    
+    return YES;
+}
+
 - (void)updateUserLocationAnnotationView
 {
     [self updateUserLocationAnnotationViewAnimatedWithDuration:0];

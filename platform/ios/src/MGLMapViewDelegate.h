@@ -277,6 +277,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable UIImage *)mapView:(MGLMapView *)mapView didFailToLoadImage:(NSString *)imageName;
 
+/**
+ Asks the delegate whether the map view should evict cached images.
+ 
+ This method is called in two scenarios: when the cumulative size of unused images
+ goes over the cache size or when the image's requesting tile is destroyed.
+ 
+ @param mapView The map view that is evicting the image.
+ @param imageName The image name that is going to be removed.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView shouldRemoveStyleImage:(NSString *)imageName;
+
 #pragma mark Tracking User Location
 
 /**
