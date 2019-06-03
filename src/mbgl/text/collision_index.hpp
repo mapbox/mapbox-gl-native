@@ -42,6 +42,8 @@ public:
     
     CollisionTileBoundaries projectTileBoundaries(const mat4& posMatrix) const;
 
+    const TransformState& getTransformState() const { return transformState; }
+
 private:
     bool isOffscreen(const CollisionBox&) const;
     bool isInsideGrid(const CollisionBox&) const;

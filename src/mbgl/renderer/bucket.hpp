@@ -18,6 +18,7 @@ class OverscaledTileID;
 class PatternDependency;
 using PatternLayerMap = std::map<std::string, PatternDependency>;
 class Placement;
+class TransformState;
 class BucketPlacementParameters;
 class RenderTile;
 
@@ -60,7 +61,7 @@ public:
     }
     // Places this bucket to the given placement.
     virtual void place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) {}
-    virtual void updateVertices(Placement&, bool /*updateOpacities*/, const RenderTile&, std::set<uint32_t>&) {}
+    virtual void updateVertices(Placement&, bool /*updateOpacities*/, const TransformState&, const RenderTile&, std::set<uint32_t>&) {}
 
 protected:
     Bucket() = default;

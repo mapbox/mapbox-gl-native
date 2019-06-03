@@ -101,7 +101,7 @@ public:
     Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, std::unique_ptr<Placement> prevPlacementOrNull = nullptr);
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
     void commit(TimePoint);
-    void updateLayerBuckets(const RenderLayer&, bool updateOpacities);
+    void updateLayerBuckets(const RenderLayer&, const TransformState&,  bool updateOpacities);
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
 
@@ -119,13 +119,12 @@ private:
             const BucketPlacementParameters&,
             std::set<uint32_t>& seenCrossTileIDs);
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
-    bool updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTile& tile);
-    void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
+    bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile);
+    void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&);
     void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&);
 
     CollisionIndex collisionIndex;
 
-    TransformState state;
     MapMode mapMode;
     style::TransitionOptions transitionOptions;
 

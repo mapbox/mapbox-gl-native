@@ -348,7 +348,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            placement->updateLayerBuckets(*it, placementChanged || symbolBucketsChanged);
+            placement->updateLayerBuckets(*it, updateParameters.transformState, placementChanged || symbolBucketsChanged);
         }
     }
 

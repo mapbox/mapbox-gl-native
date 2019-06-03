@@ -253,14 +253,14 @@ void SymbolBucket::place(Placement& placement, const BucketPlacementParameters& 
     placement.placeBucket(*this, params, seenIds);
 }
 
-void SymbolBucket::updateVertices(Placement& placement, bool updateOpacities, const RenderTile& tile, std::set<uint32_t>& seenIds) {
+void SymbolBucket::updateVertices(Placement& placement, bool updateOpacities, const TransformState& state, const RenderTile& tile, std::set<uint32_t>& seenIds) {
     if (updateOpacities) {
-        placement.updateBucketOpacities(*this, seenIds);
+        placement.updateBucketOpacities(*this, state, seenIds);
         placementChangesUploaded = false;
         uploaded = false;
     }
 
-    if (placement.updateBucketDynamicVertices(*this, tile)) {
+    if (placement.updateBucketDynamicVertices(*this, state, tile)) {
         dynamicUploaded = false;
         uploaded = false;
     }
