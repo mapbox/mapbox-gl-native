@@ -10,6 +10,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.LongSparseArray;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -1065,6 +1066,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   void setMapboxMap(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
+  }
+
+  @VisibleForTesting
+  @Nullable
+  MapRenderer getMapRenderer() {
+    return mapRenderer;
   }
 
   private class FocalPointInvalidator implements FocalPointChangeListener {
