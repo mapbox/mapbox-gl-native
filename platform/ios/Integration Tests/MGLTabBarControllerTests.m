@@ -1,6 +1,11 @@
 
-#import "MGLTabBarControllerTests.h"
-// Will lack of access token impact CADisplayLink being called?
+#import "MGLMapViewIntegrationTest.h"
+
+@interface MGLTabBarControllerTests : MGLMapViewIntegrationTest
+
+@property (nonatomic) UIViewController *viewController;
+@property (nonatomic) UITabBarController *tabController;
+@end
 
 @implementation MGLTabBarControllerTests
 
@@ -9,6 +14,7 @@
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"IntegrationTest" bundle:[NSBundle mainBundle]];
     [self.window setRootViewController:(UITabBarController *)[storyboard instantiateViewControllerWithIdentifier:@"TabController"]];
     
+    // Access the tab controller from the story board, then access one of the childViewControllers.
     self.tabController = (UITabBarController *)self.window.rootViewController;
     self.viewController = self.tabController.childViewControllers[0];
     
@@ -49,6 +55,7 @@
         }
     }];
     
+    // This delays the test completion so that the tabs can switch repeatedly.
     [self waitForExpectations:@[expectation] timeout:10];
 }
 
