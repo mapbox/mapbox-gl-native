@@ -34,7 +34,7 @@ public:
     RenderTile(const RenderTile&) = delete;
     RenderTile(RenderTile&&) = default;
     RenderTile& operator=(const RenderTile&) = delete;
-    RenderTile& operator=(RenderTile&&) = default;
+    RenderTile& operator=(RenderTile&&) = delete;
 
     UnwrappedTileID id;
     mat4 matrix;

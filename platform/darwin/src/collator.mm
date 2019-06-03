@@ -31,7 +31,7 @@ public:
         // https://developer.apple.com/documentation/foundation/nsstring/1414561-compare
         NSRange compareRange = NSMakeRange(0, nsLhs.length);
 
-        return [nsLhs compare:nsRhs options:options range:compareRange locale:locale];
+        return static_cast<int>([nsLhs compare:nsRhs options:options range:compareRange locale:locale]);
     }
 
     std::string resolvedLocale() const {
