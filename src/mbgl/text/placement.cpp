@@ -402,17 +402,20 @@ Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float 
 }
 } // namespace
 
-void Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTile& tile) {
+bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTile& tile) {
     using namespace style;
     const auto& layout = bucket.layout;
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
+    bool result = false;
+
     if (alongLine) {
-        if (bucket.hasIconData() && layout.get<IconRotationAlignment>() == AlignmentType::Map) {                    
+        if (bucket.hasIconData() && layout.get<IconRotationAlignment>() == AlignmentType::Map) {
             const bool pitchWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
             const bool keepUpright = layout.get<style::IconKeepUpright>();
             reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols,
                 tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
                 tile, *bucket.iconSizeBinder, state);
+            result = true;
         }
 
         if (bucket.hasTextData() && layout.get<TextRotationAlignment>() == AlignmentType::Map) {
@@ -421,6 +424,7 @@ void Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTi
             reprojectLineLabels(bucket.text.dynamicVertices, bucket.text.placedSymbols,
                 tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
                 tile, *bucket.textSizeBinder, state);
+            result = true;
         }
     } else if (!layout.get<TextVariableAnchor>().empty() && bucket.hasTextData()) {
         bucket.text.dynamicVertices.clear();
@@ -488,7 +492,11 @@ void Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTi
                 }
             }
         }
+
+        result = true;
     }
+
+    return result;
 }
 
 void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& seenCrossTileIDs) {

@@ -118,8 +118,8 @@ private:
             SymbolBucket&,
             const BucketPlacementParameters&,
             std::set<uint32_t>& seenCrossTileIDs);
-
-    void updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTile& tile);
+    // Returns `true` if bucket vertices were updated; returns `false` otherwise.
+    bool updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTile& tile);
     void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
     void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&);
 
