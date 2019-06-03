@@ -9,7 +9,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MapboxMap setPadding](https://docs.mapbox.com/android/api/map-sdk/8.0.0/com/mapbox/mapboxsdk/maps/MapboxMap.html#setPadding-int-int-int-int-). [#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664)
 
 
-## 8.1.0-alpha.1 - May 29, 2019
+## 8.1.0-alpha.1 - June 3, 2019
 
 ### Bugs
 - Return color string values in the [0-255] range [#14233](https://github.com/mapbox/mapbox-gl-native/pull/14233)
@@ -28,6 +28,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ### Build
 - Update maven publishing script to enable aar packaging [#14778](https://github.com/mapbox/mapbox-gl-native/pull/14778)
+- Do not try to package duplicate files in the publication [#14822](https://github.com/mapbox/mapbox-gl-native/pull/14822)
 
 ### Docs
  - Document that elevation(0) turns off the location shadow [#14723](https://github.com/mapbox/mapbox-gl-native/pull/14723)
