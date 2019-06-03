@@ -60,7 +60,6 @@ const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& s
 
 Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions, std::unique_ptr<Placement> prevPlacement_)
     : collisionIndex(state_)
-    , state(state_)
     , mapMode(mapMode_)
     , transitionOptions(std::move(transitionOptions_))
     , collisionGroups(crossSourceCollisions)
@@ -103,6 +102,7 @@ void Placement::placeBucket(
         std::set<uint32_t>& seenCrossTileIDs) {
     const auto& layout = bucket.layout;
     const auto& renderTile = params.tile;
+    const auto& state = collisionIndex.getTransformState();
     const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
     const OverscaledTileID& overscaledID = renderTile.getOverscaledTileID();
     const float scale = std::pow(2, state.getZoom() - overscaledID.overscaledZ);
@@ -384,10 +384,10 @@ void Placement::commit(TimePoint now) {
     fadeStartTime = placementChanged ? commitTime : prevPlacement->fadeStartTime;
 }
 
-void Placement::updateLayerBuckets(const RenderLayer& layer, bool updateOpacities) {
+void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
-        item.bucket.get().updateVertices(*this, updateOpacities, item.tile, seenCrossTileIDs);
+        item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
     }
 }
 
@@ -402,7 +402,7 @@ Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float 
 }
 } // namespace
 
-bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTile& tile) {
+bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const TransformState& state, const RenderTile& tile) {
     using namespace style;
     const auto& layout = bucket.layout;
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
@@ -499,7 +499,7 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const RenderTi
     return result;
 }
 
-void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& seenCrossTileIDs) {
+void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState& state, std::set<uint32_t>& seenCrossTileIDs) {
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
@@ -597,7 +597,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
             }
         };
 
-        auto updateCollisionTextBox = [this, &bucket, &symbolInstance, variablePlacement, rotateWithMap, pitchWithMap](const auto& feature, const bool placed) {
+        auto updateCollisionTextBox = [this, &bucket, &symbolInstance, &state, variablePlacement, rotateWithMap, pitchWithMap](const auto& feature, const bool placed) {
             if (feature.alongLine) {
                 return;
             }
