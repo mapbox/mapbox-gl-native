@@ -1,5 +1,4 @@
 #import "MGLMapViewIntegrationTest.h"
-//
 
 @implementation MGLMapViewIntegrationTest
 
@@ -24,7 +23,6 @@
         printf("warning: MAPBOX_ACCESS_TOKEN env var is required for this test - skipping.\n");
         return nil;
     }
-    NSLog(@"%@", accessToken);
     [MGLAccountManager setAccessToken:accessToken];
     return accessToken;
 }

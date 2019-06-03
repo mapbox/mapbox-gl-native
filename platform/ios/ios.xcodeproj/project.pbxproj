@@ -1107,7 +1107,6 @@
 		96F017292118FBAE00892778 /* MGLMapView_Experimental.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Experimental.h; sourceTree = "<group>"; };
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = IntegrationTest.storyboard; sourceTree = "<group>"; };
-		A46E4C9B228CB74B009CAD5B /* MGLTabBarControllerTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTabBarControllerTests.h; sourceTree = "<group>"; };
 		A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTabBarControllerTests.m; sourceTree = "<group>"; };
 		A4EE316E22973F2E006A8F2F /* MBXTestMapView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXTestMapView.h; sourceTree = "<group>"; };
 		A4EE316F22973F2E006A8F2F /* MBXTestMapView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXTestMapView.m; sourceTree = "<group>"; };
@@ -1483,7 +1482,6 @@
 				16376B0B1FFD9DAF0000563E /* Info.plist */,
 				CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */,
 				CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */,
-				A46E4C9B228CB74B009CAD5B /* MGLTabBarControllerTests.h */,
 				A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */,
 				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
 				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
