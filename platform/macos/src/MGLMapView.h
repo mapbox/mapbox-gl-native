@@ -325,7 +325,8 @@ MGL_EXPORT IB_DESIGNABLE
 
  /**
  Moves the viewpoint to a different location with respect to the map with an
- optional transition duration and timing function.
+ optional transition duration and timing function, and optionally some additional
+ padding on each side.
  
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition

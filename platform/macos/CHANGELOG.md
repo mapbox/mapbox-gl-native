@@ -6,6 +6,10 @@
 
 * Setting `MGLMapView.contentInset` now moves the map’s focal point to the center of the content frame after insetting. ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
 
+### Other changes
+
+* The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInsets` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
+
 ## 0.14.0 - May 22, 2018
 
 ### Styles and rendering

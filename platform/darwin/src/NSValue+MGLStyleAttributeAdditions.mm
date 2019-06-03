@@ -1,11 +1,9 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLLight.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLGeometry_Private.h"
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
-    #define MGLEdgeInsets UIEdgeInsets
-#else
-    #define MGLEdgeInsets NSEdgeInsets
 #endif
 
 @implementation NSValue (MGLStyleAttributeAdditions)
