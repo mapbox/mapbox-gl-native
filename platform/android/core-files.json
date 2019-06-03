@@ -81,6 +81,7 @@
         "platform/android/src/style/value.cpp",
         "platform/android/src/text/collator.cpp",
         "platform/android/src/text/local_glyph_rasterizer.cpp",
+        "platform/android/src/text/format_number.cpp",
         "platform/android/src/gl_functions.cpp",
         "platform/android/src/thread.cpp",
         "platform/android/src/timer.cpp",

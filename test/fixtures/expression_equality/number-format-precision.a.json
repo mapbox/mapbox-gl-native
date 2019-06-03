@@ -1,0 +1,10 @@
+[
+  "number-format",
+  987654321.23456789,
+  {
+    "locale": "en-US",
+    "min-fraction-digits": 15,
+    "max-fraction-digits": 20
+  }
+]
+
