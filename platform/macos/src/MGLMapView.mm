@@ -654,6 +654,11 @@ public:
     self.styleURL = styleURL;
 }
 
+- (void)setPrefetchesTiles:(BOOL)prefetchesTiles
+{
+    _mbglMap->setPrefetchZoomDelta(prefetchesTiles ? mbgl::util::DEFAULT_PREFETCH_ZOOM_DELTA : 0);
+}
+
 - (mbgl::Map *)mbglMap {
     return _mbglMap;
 }
