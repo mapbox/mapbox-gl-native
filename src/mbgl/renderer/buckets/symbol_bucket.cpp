@@ -257,10 +257,13 @@ void SymbolBucket::updateVertices(Placement& placement, bool updateOpacities, co
     if (updateOpacities) {
         placement.updateBucketOpacities(*this, seenIds);
         placementChangesUploaded = false;
+        uploaded = false;
     }
-    placement.updateBucketDynamicVertices(*this, tile);
-    dynamicUploaded = false;
-    uploaded = false;
+
+    if (placement.updateBucketDynamicVertices(*this, tile)) {
+        dynamicUploaded = false;
+        uploaded = false;
+    }
 }
 
 } // namespace mbgl
