@@ -142,7 +142,8 @@ enum class Kind : int32_t {
     All,
     Comparison,
     FormatExpression,
-    FormatSectionOverride
+    FormatSectionOverride,
+    NumberFormat
 };
 
 class Expression {

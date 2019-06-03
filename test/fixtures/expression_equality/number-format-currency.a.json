@@ -1,0 +1,9 @@
+[
+  "number-format",
+  123456.789,
+  {
+    "locale": "de-DE",
+    "currency": "EUR"
+  }
+]
+
