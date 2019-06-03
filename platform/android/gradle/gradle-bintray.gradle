@@ -47,7 +47,7 @@ publishing {
 bintray {
     user = mapboxBintrayUser
     key = mapboxBintrayApiKey
-    publications = ['MapboxMapsSdkPublication']
+    publications('MapboxMapsSdkPublication')
     pkg {
         repo = project.ext.mapboxBintrayRepoName
         name = project.ext.mapboxArtifactId
@@ -104,11 +104,6 @@ tasks.withType(Javadoc) {
     options.addStringOption('encoding', 'UTF-8')
     options.addStringOption('docencoding', 'UTF-8')
     options.addStringOption('charset', 'UTF-8')
-}
-
-artifacts {
-    archives androidSourcesJar
-    archives androidJavadocsJar
 }
 
 afterEvaluate { project ->
