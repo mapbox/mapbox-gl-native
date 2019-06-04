@@ -81,17 +81,23 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-    super.onSurfaceCreated(gl, config);
+    synchronized (lock) {
+      super.onSurfaceCreated(gl, config);
+    }
   }
 
   @Override
   protected void onSurfaceDestroyed() {
-    super.onSurfaceDestroyed();
+    synchronized (lock) {
+      super.onSurfaceDestroyed();
+    }
   }
 
   @Override
   public void onSurfaceChanged(GL10 gl, int width, int height) {
-    super.onSurfaceChanged(gl, width, height);
+    synchronized (lock) {
+      super.onSurfaceChanged(gl, width, height);
+    }
   }
 
   @Override

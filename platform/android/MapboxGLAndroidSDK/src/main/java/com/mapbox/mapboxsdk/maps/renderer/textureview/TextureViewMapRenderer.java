@@ -53,7 +53,9 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   protected void onSurfaceChanged(GL10 gl, int width, int height) {
-    super.onSurfaceChanged(gl, width, height);
+    synchronized (lock) {
+      super.onSurfaceChanged(gl, width, height);
+    }
   }
 
   /**
