@@ -532,7 +532,7 @@ final class NativeMapView implements NativeMap {
   @Override
   @NonNull
   public long[] queryPointAnnotations(RectF rect) {
-    if (checkState("queryPointAnnotations") || !mapRenderer.hasSurface()) {
+    if (checkState("queryPointAnnotations")) {
       return new long[] {};
     }
     return nativeQueryPointAnnotations(rect);
@@ -541,7 +541,7 @@ final class NativeMapView implements NativeMap {
   @Override
   @NonNull
   public long[] queryShapeAnnotations(RectF rectF) {
-    if (checkState("queryShapeAnnotations") || !mapRenderer.hasSurface()) {
+    if (checkState("queryShapeAnnotations")) {
       return new long[] {};
     }
     return nativeQueryShapeAnnotations(rectF);
@@ -573,7 +573,7 @@ final class NativeMapView implements NativeMap {
 
   @Override
   public void onLowMemory() {
-    if (checkState("onLowMemory") || !mapRenderer.hasSurface()) {
+    if (checkState("onLowMemory")) {
       return;
     }
     nativeOnLowMemory();
@@ -890,7 +890,7 @@ final class NativeMapView implements NativeMap {
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
                                              @Nullable String[] layerIds,
                                              @Nullable Expression filter) {
-    if (checkState("queryRenderedFeatures") || !mapRenderer.hasSurface()) {
+    if (checkState("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForPoint(coordinates.x / pixelRatio,
@@ -903,7 +903,7 @@ final class NativeMapView implements NativeMap {
   public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
                                              @Nullable String[] layerIds,
                                              @Nullable Expression filter) {
-    if (checkState("queryRenderedFeatures") || !mapRenderer.hasSurface()) {
+    if (checkState("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForBox(
