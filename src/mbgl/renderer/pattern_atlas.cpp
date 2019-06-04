@@ -6,10 +6,9 @@ namespace mbgl {
 
 namespace {
 
-// When copied into the atlas texture, image data is padded by one pixel on each side. Icon
-// images are padded with fully transparent pixels, while pattern images are padded with a
-// copy of the image data wrapped from the opposite side. In both cases, this ensures the
-// correct behavior of GL_LINEAR texture sampling mode.
+// When copied into the atlas texture, image data is padded by one pixel on each side.
+// Pattern images are padded with a copy of the image data wrapped from the opposite side.
+// This ensures the correct behavior of GL_LINEAR texture sampling mode.
 const uint16_t padding = 1;
 
 mapbox::ShelfPack::ShelfPackOptions shelfPackOptions() {

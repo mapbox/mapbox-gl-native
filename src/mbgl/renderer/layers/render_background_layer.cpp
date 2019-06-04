@@ -154,7 +154,8 @@ void addPatternIfNeeded(const std::string& id, const LayerPrepareParameters& par
 void RenderBackgroundLayer::prepare(const LayerPrepareParameters& params) {
     const auto& evaluated = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).evaluated;
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
-        // Ensures that the texture gets added and uploaded to the atlas.
+        // Ensures that the pattern bitmap gets copied to atlas bitmap. 
+        // Atlas bitmap is uploaded to atlas texture in upload.
         addPatternIfNeeded(evaluated.get<BackgroundPattern>().from, params);
         addPatternIfNeeded(evaluated.get<BackgroundPattern>().to, params);
     }
