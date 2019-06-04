@@ -23,7 +23,7 @@ class StyleBuilderTest {
         val expected = Style.MAPBOX_STREETS
         val builder = Style.Builder()
         builder.fromUrl(expected)
-        assertEquals(expected, builder.url)
+        assertEquals(expected, builder.uri)
     }
 
     @Test

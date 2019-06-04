@@ -156,7 +156,7 @@ public class BottomSheetActivity extends AppCompatActivity {
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
       mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.760545, -122.436055), 15));
       mapboxMap.setStyle(
-        new Style.Builder().fromUrl(
+        new Style.Builder().fromUri(
           STYLES[Math.min(Math.max(getArguments().getInt("mapcounter"), 0), STYLES.length - 1)]
         )
       );

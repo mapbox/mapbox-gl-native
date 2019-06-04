@@ -26,8 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import timber.log.Timber;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -223,7 +221,7 @@ public class RuntimeStyleTests extends EspressoTest {
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       VectorSource source = new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
       mapboxMap.getStyle().addSource(source);
-      assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+      assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUri());
     });
   }
 
@@ -233,23 +231,19 @@ public class RuntimeStyleTests extends EspressoTest {
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       RasterSource source = new RasterSource("my-source", "mapbox://mapbox.mapbox-terrain-v2");
       mapboxMap.getStyle().addSource(source);
-      assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUrl());
+      assertEquals("mapbox://mapbox.mapbox-terrain-v2", source.getUri());
     });
   }
 
   @Test
-  public void testGeoJsonSourceUrlGetter() throws MalformedURLException {
+  public void testGeoJsonSourceUrlGetter() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       GeoJsonSource source = new GeoJsonSource("my-source");
       mapboxMap.getStyle().addSource(source);
-      assertNull(source.getUrl());
-      try {
-        source.setUrl(new URL("http://mapbox.com/my-file.json"));
-      } catch (MalformedURLException exception) {
-        fail();
-      }
-      assertEquals("http://mapbox.com/my-file.json", source.getUrl());
+      assertNull(source.getUri());
+      source.setUri("http://mapbox.com/my-file.json");
+      assertEquals("http://mapbox.com/my-file.json", source.getUri());
     });
   }
 

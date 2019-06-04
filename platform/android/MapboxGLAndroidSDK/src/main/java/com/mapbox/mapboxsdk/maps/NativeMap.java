@@ -102,10 +102,10 @@ interface NativeMap {
   // Style API
   //
 
-  void setStyleUrl(String url);
+  void setStyleUri(String url);
 
   @NonNull
-  String getStyleUrl();
+  String getStyleUri();
 
   void setStyleJson(String newStyleJson);
 

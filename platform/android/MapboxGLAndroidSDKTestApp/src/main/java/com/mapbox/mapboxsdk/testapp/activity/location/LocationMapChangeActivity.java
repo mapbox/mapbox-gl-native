@@ -36,7 +36,7 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
 
     stylesFab.setOnClickListener(v -> {
       if (mapboxMap != null) {
-        mapboxMap.setStyle(new Style.Builder().fromUrl(Utils.getNextStyle()));
+        mapboxMap.setStyle(new Style.Builder().fromUri(Utils.getNextStyle()));
       }
     });
 
@@ -74,7 +74,7 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    mapboxMap.setStyle(new Style.Builder().fromUrl(Utils.getNextStyle()),
+    mapboxMap.setStyle(new Style.Builder().fromUri(Utils.getNextStyle()),
       style -> activateLocationComponent(style));
   }
 

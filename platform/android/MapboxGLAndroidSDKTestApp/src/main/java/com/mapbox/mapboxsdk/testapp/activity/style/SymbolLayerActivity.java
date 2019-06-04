@@ -175,7 +175,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     shuffleMapboxSign();
 
     mapboxMap.setStyle(new Style.Builder()
-      .fromUrl("asset://streets.json")
+      .fromUri("asset://streets.json")
       .withImage("Car", Objects.requireNonNull(carBitmap), false)
       .withSources(markerSource, mapboxSignSource)
       .withLayers(markerSymbolLayer, mapboxSignSymbolLayer)

@@ -94,7 +94,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
       mapboxMap.setStyle(
         new Style.Builder()
-          .fromUrl(Style.MAPBOX_STREETS)
+          .fromUri(Style.MAPBOX_STREETS)
           // set custom transition
           .withTransition(new TransitionOptions(250, 50)), style -> styleLoaded = true
       );
@@ -497,7 +497,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void styleFillFilterLayer() {
-    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://fill_filter_style.json"));
+    mapboxMap.setStyle(new Style.Builder().fromUri("asset://fill_filter_style.json"));
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(31, -100), 3));
 
     Handler handler = new Handler(getMainLooper());
@@ -525,7 +525,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void styleLineFilterLayer() {
-    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://line_filter_style.json"));
+    mapboxMap.setStyle(new Style.Builder().fromUri("asset://line_filter_style.json"));
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
 
     Handler handler = new Handler(getMainLooper());
@@ -553,7 +553,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void styleNumericFillLayer() {
-    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://numeric_filter_style.json"));
+    mapboxMap.setStyle(new Style.Builder().fromUri("asset://numeric_filter_style.json"));
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
 
     Handler handler = new Handler(getMainLooper());

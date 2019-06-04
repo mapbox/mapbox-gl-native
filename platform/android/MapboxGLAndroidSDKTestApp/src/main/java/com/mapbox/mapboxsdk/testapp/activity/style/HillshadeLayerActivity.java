@@ -36,7 +36,7 @@ public class HillshadeLayerActivity extends AppCompatActivity {
       RasterDemSource rasterDemSource = new RasterDemSource(SOURCE_ID, SOURCE_URL);
       HillshadeLayer hillshadeLayer = new HillshadeLayer(LAYER_ID, SOURCE_ID);
       mapboxMap.setStyle(new Style.Builder()
-        .fromUrl(Style.MAPBOX_STREETS)
+        .fromUri(Style.MAPBOX_STREETS)
         .withLayerBelow(hillshadeLayer, LAYER_BELOW_ID)
         .withSource(rasterDemSource)
       );

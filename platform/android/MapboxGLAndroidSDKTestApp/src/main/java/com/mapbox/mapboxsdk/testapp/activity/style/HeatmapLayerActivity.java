@@ -59,7 +59,7 @@ public class HeatmapLayerActivity extends AppCompatActivity {
 
       try {
         mapboxMap.setStyle(new Style.Builder()
-          .fromUrl(Style.DARK)
+          .fromUri(Style.DARK)
           .withSource(createEarthquakeSource())
           .withLayerAbove(createHeatmapLayer(), "waterway-label")
           .withLayerBelow(createCircleLayer(), HEATMAP_LAYER_ID)

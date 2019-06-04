@@ -80,7 +80,7 @@ public class OfflineActivity extends AppCompatActivity
     mapView.getMapAsync(mapboxMap -> {
       Timber.d("Map is ready");
       OfflineActivity.this.mapboxMap = mapboxMap;
-      mapboxMap.setStyle(new Style.Builder().fromUrl(STYLE_URL));
+      mapboxMap.setStyle(new Style.Builder().fromUri(STYLE_URL));
       // Set initial position to UNHQ in NYC
       mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
         new CameraPosition.Builder()

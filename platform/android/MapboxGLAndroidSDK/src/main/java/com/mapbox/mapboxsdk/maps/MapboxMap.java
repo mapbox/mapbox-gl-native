@@ -704,7 +704,7 @@ public final class MapboxMap {
     moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     setMinZoomPreference(minZoom);
     setMaxZoomPreference(maxZoom);
-    setStyle(new Style.Builder().fromUrl(definition.getStyleURL()), callback);
+    setStyle(new Style.Builder().fromUri(definition.getStyleURL()), callback);
   }
 
   //
@@ -793,7 +793,7 @@ public final class MapboxMap {
    * @see Style
    */
   public void setStyle(@Style.StyleUrl String style, final Style.OnStyleLoaded callback) {
-    this.setStyle(new Style.Builder().fromUrl(style), callback);
+    this.setStyle(new Style.Builder().fromUri(style), callback);
   }
 
   /**
@@ -831,8 +831,8 @@ public final class MapboxMap {
     }
 
     style = builder.build(nativeMapView);
-    if (!TextUtils.isEmpty(builder.getUrl())) {
-      nativeMapView.setStyleUrl(builder.getUrl());
+    if (!TextUtils.isEmpty(builder.getUri())) {
+      nativeMapView.setStyleUri(builder.getUri());
     } else if (!TextUtils.isEmpty(builder.getJson())) {
       nativeMapView.setStyleJson(builder.getJson());
     } else {

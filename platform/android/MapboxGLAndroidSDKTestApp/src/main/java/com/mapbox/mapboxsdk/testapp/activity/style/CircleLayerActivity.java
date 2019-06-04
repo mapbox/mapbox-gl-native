@@ -213,7 +213,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void loadNewStyle() {
-    mapboxMap.setStyle(new Style.Builder().fromUrl(getNextStyle()));
+    mapboxMap.setStyle(new Style.Builder().fromUri(getNextStyle()));
   }
 
   private void addBusStop() {

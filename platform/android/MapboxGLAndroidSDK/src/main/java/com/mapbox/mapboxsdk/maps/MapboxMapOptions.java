@@ -11,9 +11,9 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -70,7 +70,7 @@ public class MapboxMapOptions implements Parcelable {
   private boolean zMediaOverlay = false;
   private String localIdeographFontFamily = "sans-serif";
 
-  private String apiBaseUrl;
+  private String apiBaseUri;
 
   private boolean textureMode;
   private boolean translucentTextureSurface;
@@ -84,6 +84,7 @@ public class MapboxMapOptions implements Parcelable {
 
   /**
    * Creates a new MapboxMapOptions object.
+   *
    * @deprecated Use {@link #createFromAttributes(Context, AttributeSet)} instead.
    */
   @Deprecated
@@ -123,7 +124,7 @@ public class MapboxMapOptions implements Parcelable {
     doubleTapGesturesEnabled = in.readByte() != 0;
     quickZoomGesturesEnabled = in.readByte() != 0;
 
-    apiBaseUrl = in.readString();
+    apiBaseUri = in.readString();
     textureMode = in.readByte() != 0;
     translucentTextureSurface = in.readByte() != 0;
     prefetchesTiles = in.readByte() != 0;
@@ -148,7 +149,15 @@ public class MapboxMapOptions implements Parcelable {
     TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.mapbox_MapView, 0, 0);
     try {
       mapboxMapOptions.camera(new CameraPosition.Builder(typedArray).build());
+
+      // deprecated
       mapboxMapOptions.apiBaseUrl(typedArray.getString(R.styleable.mapbox_MapView_mapbox_apiBaseUrl));
+
+      String baseUri = typedArray.getString(R.styleable.mapbox_MapView_mapbox_apiBaseUri);
+      if (!TextUtils.isEmpty(baseUri)) {
+        // override deprecated property if a value of the new type was provided
+        mapboxMapOptions.apiBaseUri(baseUri);
+      }
 
       mapboxMapOptions.zoomGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiZoomGestures, true));
@@ -246,10 +255,24 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @param apiBaseUrl The base of our API endpoint
    * @return This
+   * @deprecated use {@link #apiBaseUri} instead
    */
+  @Deprecated
   @NonNull
   public MapboxMapOptions apiBaseUrl(String apiBaseUrl) {
-    this.apiBaseUrl = apiBaseUrl;
+    this.apiBaseUri = apiBaseUrl;
+    return this;
+  }
+
+  /**
+   * Specifies the URI used for API endpoint.
+   *
+   * @param apiBaseUri The base of our API endpoint
+   * @return This
+   */
+  @NonNull
+  public MapboxMapOptions apiBaseUri(String apiBaseUri) {
+    this.apiBaseUri = apiBaseUri;
     return this;
   }
 
@@ -660,9 +683,20 @@ public class MapboxMapOptions implements Parcelable {
    * Get the current configured API endpoint base URL.
    *
    * @return Base URL to be used API endpoint.
+   * @deprecated use {@link #getApiBaseUri()} instead
    */
+  @Deprecated
   public String getApiBaseUrl() {
-    return apiBaseUrl;
+    return apiBaseUri;
+  }
+
+  /**
+   * Get the current configured API endpoint base URI.
+   *
+   * @return Base URI to be used API endpoint.
+   */
+  public String getApiBaseUri() {
+    return apiBaseUri;
   }
 
   /**
@@ -953,7 +987,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (doubleTapGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (quickZoomGesturesEnabled ? 1 : 0));
 
-    dest.writeString(apiBaseUrl);
+    dest.writeString(apiBaseUri);
     dest.writeByte((byte) (textureMode ? 1 : 0));
     dest.writeByte((byte) (translucentTextureSurface ? 1 : 0));
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
@@ -1044,7 +1078,7 @@ public class MapboxMapOptions implements Parcelable {
       return false;
     }
 
-    if (apiBaseUrl != null ? !apiBaseUrl.equals(options.apiBaseUrl) : options.apiBaseUrl != null) {
+    if (apiBaseUri != null ? !apiBaseUri.equals(options.apiBaseUri) : options.apiBaseUri != null) {
       return false;
     }
     if (prefetchesTiles != options.prefetchesTiles) {
@@ -1095,7 +1129,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (zoomGesturesEnabled ? 1 : 0);
     result = 31 * result + (doubleTapGesturesEnabled ? 1 : 0);
     result = 31 * result + (quickZoomGesturesEnabled ? 1 : 0);
-    result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
+    result = 31 * result + (apiBaseUri != null ? apiBaseUri.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (translucentTextureSurface ? 1 : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
