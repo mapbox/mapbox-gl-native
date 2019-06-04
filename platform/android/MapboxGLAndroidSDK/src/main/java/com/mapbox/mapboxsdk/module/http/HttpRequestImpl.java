@@ -53,7 +53,7 @@ public class HttpRequestImpl implements HttpRequest {
 
   @Override
   public void executeRequest(HttpResponder httpRequest, long nativePtr, @NonNull String resourceUrl,
-                             @NonNull String etag, @NonNull String modified) {
+                             @NonNull String etag, @NonNull String modified, boolean offlineUsage) {
     OkHttpCallback callback = new OkHttpCallback(httpRequest);
     try {
       HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
@@ -63,7 +63,7 @@ public class HttpRequestImpl implements HttpRequest {
       }
 
       final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
-      resourceUrl = HttpRequestUrl.buildResourceUrl(host, resourceUrl, httpUrl.querySize());
+      resourceUrl = HttpRequestUrl.buildResourceUrl(host, resourceUrl, httpUrl.querySize(), offlineUsage);
 
       final Request.Builder builder = new Request.Builder()
         .url(resourceUrl)
