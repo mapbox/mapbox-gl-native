@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+* Fixed a crash caused by incorrect `MGLMapViewImpl` renderable size. ([#14810](https://github.com/mapbox/mapbox-gl-native/pull/14810))
+
 ## 5.1.0
 
 ### Styles and rendering
