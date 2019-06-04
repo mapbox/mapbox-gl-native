@@ -9,6 +9,7 @@ namespace mbgl {
     class Renderer;
 }
 
+class MGLMapViewImpl;
 @class MGLSource;
 
 /// Minimum size of an annotation’s accessibility element.
@@ -56,6 +57,9 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const _Nonnull MGLUnderlyingMapUna
 
 /** Empties the in-memory tile cache. */
 - (void)didReceiveMemoryWarning;
+
+/** Returns an instance of MGLMapView implementation. Used for integration testing. */
+- (nonnull MGLMapViewImpl *) viewImpl;
 
 - (void)pauseRendering:(nonnull NSNotification *)notification;
 - (void)resumeRendering:(nonnull NSNotification *)notification;

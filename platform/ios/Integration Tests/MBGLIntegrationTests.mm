@@ -1,4 +1,8 @@
 #import "MGLMapViewIntegrationTest.h"
+#import "MGLMapView_Private.h"
+#import "MGLMapView+Impl.h"
+
+#include <mbgl/gfx/renderable.hpp>
 
 @interface MBGLIntegrationTests : MGLMapViewIntegrationTest
 @end
@@ -196,6 +200,52 @@
         [self waitForMapViewToBeRendered];
     }
     XCTAssertNil(weakLayer);
+}
+
+- (void)testMGLMapViewImplHasCorrectSize {
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+    [self.mapView setStyleURL:styleURL];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(9.6315313, 52.4133574) animated:NO];
+    [self waitForExpectations:@[self.styleLoadingExpectation] timeout:1];
+
+    MGLMapViewImpl *mapViewImpl = [self.mapView viewImpl];
+    CGFloat scaleFactor = [UIScreen mainScreen].scale;
+    mbgl::Size renderableSize = mapViewImpl->getRendererBackend().getDefaultRenderable().getSize();
+    mbgl::Size viewSize = {
+        static_cast<uint32_t>(self.mapView.bounds.size.width * scaleFactor),
+        static_cast<uint32_t>(self.mapView.bounds.size.height * scaleFactor)
+    };
+
+    // Test that mapView and default renderable have the same size.
+    XCTAssertTrue(renderableSize == viewSize);
+
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(9.6315313, 52.4133574),
+        CLLocationCoordinate2DMake(24.9410248, 60.1733244)};
+
+    MGLPointCollectionFeature *points = [MGLPointCollectionFeature pointCollectionWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0])];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"heatmap" shape:points options:nil];
+    [self.style addSource:source];
+
+    MGLHeatmapStyleLayer *heatmapLayer = [[MGLHeatmapStyleLayer alloc] initWithIdentifier:@"lineLayer" source:source];
+    [self.style addLayer:heatmapLayer];
+
+    // Test that heatmap layer can create a texture and be successfully rendered.
+    [self waitForMapViewToBeRendered];
+
+    // Resize frame of the view.
+    [self.mapView setFrame: CGRect{self.mapView.bounds.origin, {256, 256}}];
+
+    // Force sync re-layout.
+    [self.mapView layoutIfNeeded];
+
+    // Test that mapView and default renderable have the same size after re-layout.
+    renderableSize = mapViewImpl->getRendererBackend().getDefaultRenderable().getSize();
+    viewSize = { static_cast<uint32_t>(self.mapView.bounds.size.width * scaleFactor),
+                 static_cast<uint32_t>(self.mapView.bounds.size.height * scaleFactor) };
+    XCTAssertTrue(renderableSize == viewSize);
+    [self waitForMapViewToBeRendered];
 }
 
 @end

@@ -22,7 +22,7 @@
 		07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
 		07D8C6FF1F67562C00381808 /* MGLComputedShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */; };
 		07D947531F67488E00E37934 /* MGLComputedShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */; };
-		16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */; };
+		16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 16376B091FFD9DAF0000563E /* MBGLIntegrationTests.mm */; };
 		16376B331FFDB4B40000563E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B321FFDB4B40000563E /* AppDelegate.m */; };
 		16376B3B1FFDB4B40000563E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16376B3A1FFDB4B40000563E /* Assets.xcassets */; };
 		16376B3E1FFDB4B40000563E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16376B3C1FFDB4B40000563E /* LaunchScreen.storyboard */; };
@@ -832,7 +832,7 @@
 		07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLComputedShapeSourceTests.m; path = ../../darwin/test/MGLComputedShapeSourceTests.m; sourceTree = "<group>"; };
 		07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource_Private.h; sourceTree = "<group>"; };
 		16376B071FFD9DAF0000563E /* integration.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = integration.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBGLIntegrationTests.m; sourceTree = "<group>"; };
+		16376B091FFD9DAF0000563E /* MBGLIntegrationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MBGLIntegrationTests.mm; sourceTree = "<group>"; };
 		16376B0B1FFD9DAF0000563E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		16376B2F1FFDB4B40000563E /* Integration Test Harness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Integration Test Harness.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		16376B311FFDB4B40000563E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1470,7 +1470,7 @@
 				CA6914B320E67F07002DB0EE /* Annotations */,
 				CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */,
 				CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */,
-				16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */,
+				16376B091FFD9DAF0000563E /* MBGLIntegrationTests.mm */,
 				16376B0B1FFD9DAF0000563E /* Info.plist */,
 				CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */,
 				CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */,
@@ -3041,7 +3041,7 @@
 				CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */,
 				CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */,
 				CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */,
-				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
+				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.mm in Sources */,
 				CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */,
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
 				CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */,
