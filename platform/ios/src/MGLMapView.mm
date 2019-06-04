@@ -776,6 +776,11 @@ public:
     self.lastSnapshotImage = nil;
 }
 
+- (MGLMapViewImpl *)viewImpl
+{
+    return _mbglView.get();
+}
+
 #pragma mark - Layout -
 
 + (BOOL)requiresConstraintBasedLayout
