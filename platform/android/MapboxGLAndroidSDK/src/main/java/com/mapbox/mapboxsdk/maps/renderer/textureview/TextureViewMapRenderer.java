@@ -43,7 +43,6 @@ public class TextureViewMapRenderer extends MapRenderer {
   @Override
   protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
     super.onSurfaceCreated(gl, config);
-    hasSurface.set(true);
   }
 
   /**
@@ -59,7 +58,6 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   protected void onSurfaceDestroyed() {
-    hasSurface.set(false);
     super.onSurfaceDestroyed();
   }
 

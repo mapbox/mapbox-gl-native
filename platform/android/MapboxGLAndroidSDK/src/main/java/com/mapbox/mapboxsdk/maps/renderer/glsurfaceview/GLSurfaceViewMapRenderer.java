@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps.renderer.glsurfaceview;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.support.annotation.NonNull;
-import android.view.SurfaceHolder;
 
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
@@ -22,10 +21,10 @@ import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceView.Renderer {
 
   @NonNull
-  private final GLSurfaceView glSurfaceView;
+  private final MapboxGLSurfaceView glSurfaceView;
 
   public GLSurfaceViewMapRenderer(Context context,
-                                  GLSurfaceView glSurfaceView,
+                                  MapboxGLSurfaceView glSurfaceView,
                                   String localIdeographFontFamily) {
     super(context, localIdeographFontFamily);
     this.glSurfaceView = glSurfaceView;
@@ -34,18 +33,13 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
     glSurfaceView.setRenderer(this);
     glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
     glSurfaceView.setPreserveEGLContextOnPause(true);
-    glSurfaceView.getHolder().addCallback(new SurfaceHolderCallbackAdapter() {
-
+    glSurfaceView.setDetachedListener(new MapboxGLSurfaceView.OnGLSurfaceViewDetachedListener() {
       @Override
-      public void surfaceCreated(SurfaceHolder holder) {
-        super.surfaceCreated(holder);
-        hasSurface.set(true);
-      }
-
-      @Override
-      public void surfaceDestroyed(SurfaceHolder holder) {
-        super.surfaceDestroyed(holder);
-        hasSurface.set(false);
+      public void onGLSurfaceViewDetached() {
+        // because the GL thread is destroyed when the view is detached from window,
+        // we need to ensure releasing the native renderer as well.
+        // This avoids releasing it only when the view is being recreated, which is already on a new GL thread,
+        // and leads to JNI crashes like https://github.com/mapbox/mapbox-gl-native/issues/14618
         nativeReset();
       }
     });
@@ -103,9 +97,6 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
    */
   @Override
   public void requestRender() {
-    if (!hasSurface.get()) {
-      return;
-    }
     glSurfaceView.requestRender();
   }
 
