@@ -7,9 +7,12 @@
 
     <public name="mapbox_AlertDialogStyle" type="style" />
 
+    <!--DEPRECATED-->
+    <public name="mapbox_apiBaseUrl" type="attr" />
+
     <!-- Exposed attrs.xml -->
     <!--Configuration-->
-    <public name="mapbox_apiBaseUrl" type="attr" />
+    <public name="mapbox_apiBaseUri" type="attr" />
     <public name="mapbox_localIdeographFontFamily" type="attr" />
     <public name="mapbox_cross_source_collisions" type="attr" />
     <public name="mapbox_pixelRatio"  type="float" />

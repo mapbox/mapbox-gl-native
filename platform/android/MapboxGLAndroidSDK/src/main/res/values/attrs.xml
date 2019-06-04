@@ -2,8 +2,11 @@
     <!-- these are public -->
     <declare-styleable name="mapbox_MapView">
 
-        <!--Configuration-->
+        <!--DEPRECATED use mapbox_apiBaseUri instead -->
         <attr name="mapbox_apiBaseUrl" format="string"/>
+
+        <!--Configuration-->
+        <attr name="mapbox_apiBaseUri" format="string"/>
         <attr name="mapbox_localIdeographFontFamily" format="string"/>
         <attr name="mapbox_cross_source_collisions" format="boolean"/>
 

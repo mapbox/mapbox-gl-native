@@ -49,7 +49,7 @@ public class StyleLoaderTest extends EspressoTest {
         mapView.onResume();
 
         String actual = mapboxMap.getStyle().getJson();
-        assertEquals("Style URL should be empty", "", mapboxMap.getStyle().getUrl());
+        assertEquals("Style URL should be empty", "", mapboxMap.getStyle().getUri());
         assertEquals("Style json should match", expected, actual);
       } catch (IOException exception) {
         exception.printStackTrace();

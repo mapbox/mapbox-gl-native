@@ -116,7 +116,7 @@ public class StyleFileActivity extends AppCompatActivity {
       // Actual file:// usage
       MapboxMap mapboxMap = this.mapboxMap.get();
       if (mapboxMap != null) {
-        mapboxMap.setStyle(new Style.Builder().fromUrl("file://" + cacheStyleFile.getAbsolutePath()));
+        mapboxMap.setStyle(new Style.Builder().fromUri("file://" + cacheStyleFile.getAbsolutePath()));
       }
     }
 

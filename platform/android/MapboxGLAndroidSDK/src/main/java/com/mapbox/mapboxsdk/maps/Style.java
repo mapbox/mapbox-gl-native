@@ -59,11 +59,24 @@ public class Style {
    * Returns the current style url.
    *
    * @return the style url
+   * @deprecated use {@link #getUri()} instead
    */
   @NonNull
+  @Deprecated
   public String getUrl() {
     validateState("getUrl");
-    return nativeMap.getStyleUrl();
+    return nativeMap.getStyleUri();
+  }
+
+  /**
+   * Returns the current style uri.
+   *
+   * @return the style uri
+   */
+  @NonNull
+  public String getUri() {
+    validateState("getUri");
+    return nativeMap.getStyleUri();
   }
 
   /**
@@ -600,7 +613,7 @@ public class Style {
     private final List<ImageWrapper> images = new ArrayList<>();
 
     private TransitionOptions transitionOptions;
-    private String styleUrl;
+    private String styleUri;
     private String styleJson;
 
     /**
@@ -637,17 +650,60 @@ public class Style {
      * @param url The URL of the map style
      * @return this
      * @see Style
+     * @deprecated use {@link #fromUri(String)} instead
      */
+    @Deprecated
     @NonNull
     public Builder fromUrl(@NonNull String url) {
-      this.styleUrl = url;
+      this.styleUri = url;
+      return this;
+    }
+
+    /**
+     * <p>
+     * Will loads a new map style asynchronous from the specified URI.
+     * </p>
+     * {@code uri} can take the following forms:
+     * <ul>
+     * <li>{@code Style#StyleUrl}: load one of the bundled styles in {@link Style}.</li>
+     * <li>{@code mapbox://styles/<user>/<style>}:
+     * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
+     * {@code user} is your username. {@code style} is the ID of your custom
+     * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
+     * <li>{@code http://...} or {@code https://...}:
+     * loads the style over the Internet from any web server.</li>
+     * <li>{@code asset://...}:
+     * loads the style from the APK {@code assets/} directory.
+     * This is used to load a style bundled with your app.</li>
+     * <li>{@code file://...}:
+     * loads the style from a file path. This is used to load a style from disk.
+     * </li>
+     * </li>
+     * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
+     * </ul>
+     * <p>
+     * This method is asynchronous and will return before the style finishes loading.
+     * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
+     * callback or use {@link MapboxMap#setStyle(String, OnStyleLoaded)} instead.
+     * </p>
+     * If the style fails to load or an invalid style URI is set, the map view will become blank.
+     * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+     * will be triggered.
+     *
+     * @param uri The URI of the map style
+     * @return this
+     * @see Style
+     */
+    @NonNull
+    public Builder fromUri(@NonNull String uri) {
+      this.styleUri = uri;
       return this;
     }
 
     /**
      * Will load a new map style from a json string.
      * <p>
-     * If the style fails to load or an invalid style URL is set, the map view will become blank.
+     * If the style fails to load or an invalid style URI is set, the map view will become blank.
      * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
      * will be triggered.
      * </p>
@@ -876,8 +932,8 @@ public class Style {
       return this;
     }
 
-    String getUrl() {
-      return styleUrl;
+    String getUri() {
+      return styleUri;
     }
 
     String getJson() {

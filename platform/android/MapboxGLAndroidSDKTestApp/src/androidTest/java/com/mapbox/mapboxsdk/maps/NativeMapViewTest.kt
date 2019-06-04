@@ -52,8 +52,8 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testSetStyleUrl() {
         val expected = Style.DARK
-        nativeMapView.styleUrl = expected
-        val actual = nativeMapView.styleUrl
+        nativeMapView.styleUri = expected
+        val actual = nativeMapView.styleUri
         assertEquals("Style URL should match", expected, actual)
     }
 

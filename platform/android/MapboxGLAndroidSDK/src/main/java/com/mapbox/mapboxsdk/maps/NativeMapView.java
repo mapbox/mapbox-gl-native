@@ -171,8 +171,8 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setStyleUrl(String url) {
-    if (checkState("setStyleUrl")) {
+  public void setStyleUri(String url) {
+    if (checkState("setStyleUri")) {
       return;
     }
     nativeSetStyleUrl(url);
@@ -180,8 +180,8 @@ final class NativeMapView implements NativeMap {
 
   @Override
   @NonNull
-  public String getStyleUrl() {
-    if (checkState("getStyleUrl")) {
+  public String getStyleUri() {
+    if (checkState("getStyleUri")) {
       return "";
     }
     return nativeGetStyleUrl();

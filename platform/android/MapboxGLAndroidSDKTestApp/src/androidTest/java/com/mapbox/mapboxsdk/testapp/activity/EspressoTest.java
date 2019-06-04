@@ -22,7 +22,7 @@ public class EspressoTest extends BaseTest {
   @UiThread
   @Override
   protected void initMap(MapboxMap mapboxMap) {
-    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://streets.json"));
+    mapboxMap.setStyle(new Style.Builder().fromUri("asset://streets.json"));
     super.initMap(mapboxMap);
   }
 }

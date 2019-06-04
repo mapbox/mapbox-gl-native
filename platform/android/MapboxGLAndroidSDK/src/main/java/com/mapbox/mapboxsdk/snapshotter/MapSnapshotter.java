@@ -93,7 +93,7 @@ public class MapSnapshotter {
     private float pixelRatio = 1;
     private int width;
     private int height;
-    private String styleUrl = Style.MAPBOX_STREETS;
+    private String styleUri = Style.MAPBOX_STREETS;
     private String styleJson;
     private LatLngBounds region;
     private CameraPosition cameraPosition;
@@ -114,12 +114,12 @@ public class MapSnapshotter {
     }
 
     /**
-     * @param url The style URL to use
+     * @param uri The style URI to use
      * @return the mutated {@link Options}
      */
     @NonNull
-    public Options withStyle(String url) {
-      this.styleUrl = url;
+    public Options withStyle(String uri) {
+      this.styleUri = uri;
       return this;
     }
 
@@ -198,9 +198,23 @@ public class MapSnapshotter {
      *
      * @param apiBaseUrl The base of our API endpoint
      * @return the mutated {@link Options}
+     * @deprecated use {@link  #withApiBaseUri(String)} instead
      */
+    @Deprecated
     @NonNull
     public Options withApiBaseUrl(String apiBaseUrl) {
+      this.apiBaseUrl = apiBaseUrl;
+      return this;
+    }
+
+    /**
+     * Specifies the URI used for API endpoint.
+     *
+     * @param apiBaseUri The base of our API endpoint
+     * @return the mutated {@link Options}
+     */
+    @NonNull
+    public Options withApiBaseUri(String apiBaseUri) {
       this.apiBaseUrl = apiBaseUrl;
       return this;
     }
@@ -236,9 +250,18 @@ public class MapSnapshotter {
 
     /**
      * @return the style url
+     * @deprecated use {@link #getStyleUri()} instead
      */
+    @Deprecated
     public String getStyleUrl() {
-      return styleUrl;
+      return styleUri;
+    }
+
+    /**
+     * @return the style uri
+     */
+    public String getStyleUri() {
+      return styleUri;
     }
 
     /**
@@ -259,9 +282,19 @@ public class MapSnapshotter {
 
     /**
      * @return The base of our API endpoint
+     * @deprecated use {@link #getApiBaseUri()} instead
      */
     @Nullable
+    @Deprecated
     public String getApiBaseUrl() {
+      return apiBaseUrl;
+    }
+
+    /**
+     * @return The base of our API endpoint
+     */
+    @Nullable
+    public String getApiBaseUri() {
       return apiBaseUrl;
     }
   }
@@ -289,7 +322,7 @@ public class MapSnapshotter {
     String programCacheDir = FileSource.getInternalCachePath(context);
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
-      options.height, options.styleUrl, options.styleJson, options.region, options.cameraPosition,
+      options.height, options.styleUri, options.styleJson, options.region, options.cameraPosition,
       options.showLogo, programCacheDir, options.localIdeographFontFamily);
   }
 

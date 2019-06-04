@@ -69,7 +69,7 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   }
 
   private void loadStyle() {
-    mapboxMap.setStyle(new Style.Builder().fromUrl(Style.MAPBOX_STREETS), style -> {
+    mapboxMap.setStyle(new Style.Builder().fromUri(Style.MAPBOX_STREETS), style -> {
       addMarkers();
       initFab();
     });

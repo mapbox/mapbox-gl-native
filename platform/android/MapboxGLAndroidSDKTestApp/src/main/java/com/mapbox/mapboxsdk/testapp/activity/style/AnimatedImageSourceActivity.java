@@ -57,7 +57,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
     final ImageSource imageSource = new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0);
     final RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
     map.setStyle(new Style.Builder()
-        .fromUrl(Style.MAPBOX_STREETS)
+        .fromUri(Style.MAPBOX_STREETS)
         .withSource(imageSource)
         .withLayer(layer), style -> {
         runnable = new RefreshImageRunnable(imageSource, handler);
