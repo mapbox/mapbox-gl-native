@@ -8,6 +8,21 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
  - Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MapboxMap setPadding](https://docs.mapbox.com/android/api/map-sdk/8.0.0/com/mapbox/mapboxsdk/maps/MapboxMap.html#setPadding-int-int-int-int-). [#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664)
 
+## 8.1.0-alpha.2 - June 6, 2019
+
+### Bugs
+- Reset the native renderer only when the GL thread exits [#14841](https://github.com/mapbox/mapbox-gl-native/pull/14841)
+- Copy features array before passing them to core [#14804](https://github.com/mapbox/mapbox-gl-native/pull/14804)
+- Improve test stability [#14853](https://github.com/mapbox/mapbox-gl-native/pull/14853)
+
+### Features
+- Rename URL API to URI [#14836](https://github.com/mapbox/mapbox-gl-native/pull/14836)
+
+### Build
+- Bumping Android telemetry to 4.5.1 [#14874](https://github.com/mapbox/mapbox-gl-native/pull/14874)
+
+### Docs
+- Add external links to javadoc generation, fix warnings [#14792](https://github.com/mapbox/mapbox-gl-native/pull/14792)
 
 ## 8.1.0-alpha.1 - June 3, 2019
 
