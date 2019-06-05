@@ -39,7 +39,7 @@ class ImageMissingTest {
       }
     }
 
-    if (!latch.await(5, TimeUnit.SECONDS)) {
+    if (!latch.await(10, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }
@@ -53,7 +53,7 @@ class ImageMissingTest {
       }
     }
 
-    if (!latch.await(5, TimeUnit.SECONDS)) {
+    if (!latch.await(10, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }
