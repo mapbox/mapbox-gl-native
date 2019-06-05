@@ -20,8 +20,6 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 @property BOOL useExternalAccountManager;
-@property id externalAccountsClass;
-@property SEL externalSKUTokenMethod;
 #endif
 
 @end
@@ -50,8 +48,6 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
     SEL externalSKUTokenMethod = NSSelectorFromString(MGLAccountManagerExternalMethodName);
     if (externalAccountsClass != nil && [externalAccountsClass respondsToSelector:externalSKUTokenMethod]) {
         MGLAccountManager.sharedManager.useExternalAccountManager = YES;
-        MGLAccountManager.sharedManager.externalAccountsClass = externalAccountsClass;
-        MGLAccountManager.sharedManager.externalSKUTokenMethod = externalSKUTokenMethod;
     }
 #endif
 }
@@ -113,9 +109,13 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
 + (NSString *)skuToken {
-    return MGLAccountManager.sharedManager.useExternalAccountManager ?
-        [MGLAccountManager.sharedManager.externalAccountsClass performSelector:MGLAccountManager.sharedManager.externalSKUTokenMethod] :
-        MBXSKUToken.skuToken;
+    if (MGLAccountManager.sharedManager.useExternalAccountManager) {
+        id externalAccountsClass = NSClassFromString(MGLAccountManagerExternalClassName);
+        SEL externalSKUTokenMethod = NSSelectorFromString(MGLAccountManagerExternalMethodName);
+        return ((NSString *(*)(id, SEL))[externalAccountsClass methodForSelector:externalSKUTokenMethod])(externalAccountsClass, externalSKUTokenMethod);
+    } else {
+        return MBXSKUToken.skuToken;
+    }
 }
 
 #endif
