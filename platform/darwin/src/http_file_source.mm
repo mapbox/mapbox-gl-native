@@ -196,23 +196,44 @@ HTTPFileSource::HTTPFileSource()
 
 HTTPFileSource::~HTTPFileSource() = default;
 
+MGL_EXPORT
+NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountType) {
+    
+    NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
+    
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+    if (accountType == 0 &&
+        ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
+        NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+        NSURLQueryItem *accountsQueryItem = [NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken];
+        
+        NSMutableArray *queryItems = [NSMutableArray arrayWithObject:accountsQueryItem];
+        
+        // offline here
+        if (resource.usage == Resource::Usage::Offline) {
+            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"offline" value:@"true"]];
+        }
+        
+        if (components.queryItems) {
+            [queryItems addObjectsFromArray:components.queryItems];
+        }
+        
+        components.queryItems = queryItems;
+        url = components.URL;
+    }
+#else
+    (void)accountType;
+#endif
+    return url;
+}
+    
 std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
     auto request = std::make_unique<HTTPRequest>(callback);
     auto shared = request->shared; // Explicit copy so that it also gets copied into the completion handler block below.
 
     @autoreleasepool {
-        NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
+        NSURL *url = resourceURLWithAccountType(resource, impl->accountType);
         MGLLogDebug(@"Requesting URI: %@", url.relativePath);
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-        if (impl->accountType == 0 &&
-            ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
-            NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
-            NSURLQueryItem *accountsQueryItem = [NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken];
-            components.queryItems = components.queryItems ? [components.queryItems arrayByAddingObject:accountsQueryItem] : @[accountsQueryItem];
-            url = components.URL;
-        }
-#endif
 
         NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
         if (resource.priorEtag) {
