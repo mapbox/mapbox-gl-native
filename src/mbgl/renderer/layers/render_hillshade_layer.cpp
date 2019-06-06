@@ -120,7 +120,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
             allUniformValues,
             allAttributeBindings,
             textureBindings,
-            getID()
+            getID() + "/" + util::toString(id)
         );
     };
 
@@ -187,7 +187,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
                 HillshadePrepareProgram::TextureBindings{
                     textures::image::Value{ bucket.dem->getResource() },
                 },
-                getID()
+                getID() + "/p/" + util::toString(tile.id)
             );
             bucket.texture = std::move(view->getTexture());
             bucket.setPrepared(true);
