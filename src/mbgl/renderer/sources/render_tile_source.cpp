@@ -1,4 +1,6 @@
 #include <mbgl/renderer/sources/render_tile_source.hpp>
+
+#include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/vector_tile.hpp>
@@ -19,15 +21,23 @@ bool RenderTileSource::isLoaded() const {
 }
 
 void RenderTileSource::upload(gfx::UploadPass& parameters) {
-    tilePyramid.upload(parameters);
+    for (auto& tile : renderTiles) {
+        tile.upload(parameters);
+    }
 }
 
 void RenderTileSource::prepare(const SourcePrepareParameters& parameters) {
-    tilePyramid.prepare(parameters);
+    renderTiles.clear();
+    for (auto& entry : tilePyramid.getRenderTiles()) {
+        renderTiles.emplace_back(entry.first, entry.second);
+        renderTiles.back().prepare(parameters);
+    }
 }
 
 void RenderTileSource::finishRender(PaintParameters& parameters) {
-    tilePyramid.finishRender(parameters);
+    for (auto& tile : renderTiles) {
+        tile.finishRender(parameters);
+    }
 }
 
 void RenderTileSource::updateFadingTiles() {
@@ -39,7 +49,7 @@ bool RenderTileSource::hasFadingTiles() const {
 }
 
 std::vector<std::reference_wrapper<RenderTile>> RenderTileSource::getRenderTiles() {
-    return tilePyramid.getRenderTiles();
+    return { renderTiles.begin(), renderTiles.end() };
 }
 
 std::unordered_map<std::string, std::vector<Feature>>

@@ -130,7 +130,7 @@ void RenderTile::prepare(const SourcePrepareParameters& parameters) {
 }
 
 void RenderTile::finishRender(PaintParameters& parameters) {
-    if (!used || parameters.debugOptions == MapDebugOptions::NoDebug)
+    if (!tile.usedByRenderedLayers || parameters.debugOptions == MapDebugOptions::NoDebug)
         return;
 
     static const style::Properties<>::PossiblyEvaluated properties {};
