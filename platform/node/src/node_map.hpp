@@ -71,8 +71,6 @@ public:
 
     void release();
     void cancel();
-    void ref();
-    void unref();
 
     static RenderOptions ParseOptions(v8::Local<v8::Object>);
 

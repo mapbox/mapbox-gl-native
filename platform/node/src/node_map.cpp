@@ -544,7 +544,9 @@ void NodeMap::renderFinished() {
             },
             img.data.get()
         ).ToLocalChecked();
-        img.data.release();
+        if (!pixels.IsEmpty()) {
+            img.data.release();
+        }
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
@@ -645,14 +647,6 @@ void NodeMap::cancel() {
 
     error = std::make_exception_ptr(std::runtime_error("Canceled"));
     renderFinished();
-}
-
-void NodeMap::ref() {
-    Ref();
-}
-
-void NodeMap::unref() {
-    Unref();
 }
 
 void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {

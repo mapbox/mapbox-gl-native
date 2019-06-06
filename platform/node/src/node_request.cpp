@@ -5,14 +5,14 @@
 
 #include <cmath>
 
+#include <iostream>
+
 namespace node_mbgl {
 
 NodeRequest::NodeRequest(
-    NodeMap * target_,
     mbgl::FileSource::Callback callback_,
     NodeAsyncRequest* asyncRequest_)
-    : target(target_),
-    callback(std::move(callback_)),
+    : callback(std::move(callback_)),
     asyncRequest(asyncRequest_) {
         asyncRequest->request = this;
 }
@@ -44,13 +44,12 @@ void NodeRequest::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto callback = reinterpret_cast<mbgl::FileSource::Callback*>(info[1].As<v8::External>()->Value());
     auto asyncRequest = reinterpret_cast<NodeAsyncRequest*>(info[2].As<v8::External>()->Value());
 
-    auto request = new NodeRequest(target, *callback, asyncRequest);
+    auto request = new NodeRequest(*callback, asyncRequest);
 
     request->Wrap(info.This());
     request->Ref();
     Nan::Set(info.This(), Nan::New("url").ToLocalChecked(), info[3]);
     Nan::Set(info.This(), Nan::New("kind").ToLocalChecked(), info[4]);
-    target->ref();
     v8::Local<v8::Value> argv[] = { info.This() };
     request->asyncResource->runInAsyncScope(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(), "request", 1, argv);
     info.GetReturnValue().Set(info.This());
@@ -61,9 +60,9 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
 
     // Move out of the object so callback() can only be fired once.
     auto callback = std::move(request->callback);
+    request->callback = {};
     if (!callback) {
         request->unref();
-        request->target->unref();
         return info.GetReturnValue().SetUndefined();
     }
 
@@ -88,7 +87,6 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
         );
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
         request->unref();
-        request->target->unref();
         return Nan::ThrowTypeError("Second argument must be a response object");
     } else {
         auto res = Nan::To<v8::Object>(info[1]).ToLocalChecked();
@@ -123,7 +121,6 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
                 );
             } else {
                 request->unref();
-                request->target->unref();
                 return Nan::ThrowTypeError("Response data must be a Buffer");
             }
         }
@@ -132,7 +129,6 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
     // Send the response object to the NodeFileSource object
     callback(response);
     request->unref();
-    request->target->unref();
     info.GetReturnValue().SetUndefined();
 }
 
@@ -149,7 +145,9 @@ NodeAsyncRequest::~NodeAsyncRequest() {
     if (request) {
         // Remove the callback function because the AsyncRequest was
         // canceled and we are no longer interested in the result.
-        request->callback = {};
+        if (request->callback) {
+            request->callback = {};
+        }
         request->asyncRequest = nullptr;
     }
 }
