@@ -72,7 +72,7 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
 - (std::string)localFontFamilyName {
     NSString *fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
 
-    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : std::string("PingFang");
+    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : std::string("Helvetica");
 }
 
 @end
