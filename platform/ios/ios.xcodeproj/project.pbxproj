@@ -473,6 +473,7 @@
 		9C6E284522A982670056B7BE /* MMEUINavigation.h in Headers */ = {isa = PBXBuildFile; fileRef = 406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */; };
 		9C6E284622A982670056B7BE /* MMEUniqueIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */; };
 		9C6E284722A982670056B7BE /* MMEDispatchManager.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F552140696B00537748 /* MMEDispatchManager.h */; };
+		9C6E284922A984120056B7BE /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 9C6E284822A984120056B7BE /* Makefile */; };
 		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC46EB59225E600A0039C013 /* MMECertPin.h in Headers */ = {isa = PBXBuildFile; fileRef = AC46EB57225E60090039C013 /* MMECertPin.h */; };
 		AC46EB5A225E600A0039C013 /* MMECertPin.h in Headers */ = {isa = PBXBuildFile; fileRef = AC46EB57225E60090039C013 /* MMECertPin.h */; };
@@ -1136,6 +1137,35 @@
 		9C6E281222A97FDB0056B7BE /* CLLocationManager+MMEMobileEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocationManager+MMEMobileEvents.m"; sourceTree = "<group>"; };
 		9C6E282922A980E50056B7BE /* MGLMapboxEvents.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLMapboxEvents.h; path = src/MGLMapboxEvents.h; sourceTree = SOURCE_ROOT; };
 		9C6E282A22A980E50056B7BE /* MGLMapboxEvents.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLMapboxEvents.m; path = src/MGLMapboxEvents.m; sourceTree = SOURCE_ROOT; };
+		9C6E284822A984120056B7BE /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = "<group>"; };
+		9C6E284B22A984710056B7BE /* install-packaging-dependencies.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-packaging-dependencies.sh"; sourceTree = "<group>"; };
+		9C6E284C22A984710056B7BE /* ios-code-coverage.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "ios-code-coverage.sh"; sourceTree = "<group>"; };
+		9C6E284D22A984710056B7BE /* release-notes-github.md.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = "release-notes-github.md.ejs"; sourceTree = "<group>"; };
+		9C6E284E22A984710056B7BE /* document.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = document.sh; sourceTree = "<group>"; };
+		9C6E284F22A984710056B7BE /* check-events-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "check-events-symbols.sh"; sourceTree = "<group>"; };
+		9C6E285022A984710056B7BE /* deploy-packages.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "deploy-packages.sh"; sourceTree = "<group>"; };
+		9C6E285122A984710056B7BE /* publish.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = publish.sh; sourceTree = "<group>"; };
+		9C6E285222A984710056B7BE /* validate-framework-zip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "validate-framework-zip.sh"; sourceTree = "<group>"; };
+		9C6E285322A984710056B7BE /* metrics.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = metrics.sh; sourceTree = "<group>"; };
+		9C6E285422A984710056B7BE /* package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = package.sh; sourceTree = "<group>"; };
+		9C6E285522A984710056B7BE /* trigger-external-deploy-steps.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "trigger-external-deploy-steps.sh"; sourceTree = "<group>"; };
+		9C6E285622A984710056B7BE /* release-notes-jazzy.md.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = "release-notes-jazzy.md.ejs"; sourceTree = "<group>"; };
+		9C6E285722A984710056B7BE /* deploy-snapshot.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "deploy-snapshot.sh"; sourceTree = "<group>"; };
+		9C6E285822A984710056B7BE /* release-notes.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "release-notes.js"; sourceTree = "<group>"; };
+		9C6E285A22A9849E0056B7BE /* install-packaging-dependencies.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-packaging-dependencies.sh"; sourceTree = "<group>"; };
+		9C6E285B22A9849E0056B7BE /* ios-code-coverage.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "ios-code-coverage.sh"; sourceTree = "<group>"; };
+		9C6E285C22A9849E0056B7BE /* release-notes-github.md.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = "release-notes-github.md.ejs"; sourceTree = "<group>"; };
+		9C6E285D22A9849E0056B7BE /* document.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = document.sh; sourceTree = "<group>"; };
+		9C6E285E22A9849E0056B7BE /* check-events-symbols.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "check-events-symbols.sh"; sourceTree = "<group>"; };
+		9C6E285F22A9849E0056B7BE /* deploy-packages.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "deploy-packages.sh"; sourceTree = "<group>"; };
+		9C6E286022A9849E0056B7BE /* publish.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = publish.sh; sourceTree = "<group>"; };
+		9C6E286122A9849E0056B7BE /* validate-framework-zip.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "validate-framework-zip.sh"; sourceTree = "<group>"; };
+		9C6E286222A9849E0056B7BE /* metrics.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = metrics.sh; sourceTree = "<group>"; };
+		9C6E286322A9849E0056B7BE /* package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = package.sh; sourceTree = "<group>"; };
+		9C6E286422A9849E0056B7BE /* trigger-external-deploy-steps.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "trigger-external-deploy-steps.sh"; sourceTree = "<group>"; };
+		9C6E286522A9849E0056B7BE /* release-notes-jazzy.md.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = "release-notes-jazzy.md.ejs"; sourceTree = "<group>"; };
+		9C6E286622A9849E0056B7BE /* deploy-snapshot.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "deploy-snapshot.sh"; sourceTree = "<group>"; };
+		9C6E286722A9849E0056B7BE /* release-notes.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "release-notes.js"; sourceTree = "<group>"; };
 		A4F3FB1C2254865900A30170 /* missing_icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = missing_icon.json; sourceTree = "<group>"; };
 		AC46EB57225E60090039C013 /* MMECertPin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMECertPin.h; sourceTree = "<group>"; };
 		AC46EB58225E60090039C013 /* MMECertPin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMECertPin.m; sourceTree = "<group>"; };
@@ -1843,6 +1873,48 @@
 			path = Categories;
 			sourceTree = "<group>";
 		};
+		9C6E284A22A984710056B7BE /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				9C6E284B22A984710056B7BE /* install-packaging-dependencies.sh */,
+				9C6E284C22A984710056B7BE /* ios-code-coverage.sh */,
+				9C6E284D22A984710056B7BE /* release-notes-github.md.ejs */,
+				9C6E284E22A984710056B7BE /* document.sh */,
+				9C6E284F22A984710056B7BE /* check-events-symbols.sh */,
+				9C6E285022A984710056B7BE /* deploy-packages.sh */,
+				9C6E285122A984710056B7BE /* publish.sh */,
+				9C6E285222A984710056B7BE /* validate-framework-zip.sh */,
+				9C6E285322A984710056B7BE /* metrics.sh */,
+				9C6E285422A984710056B7BE /* package.sh */,
+				9C6E285522A984710056B7BE /* trigger-external-deploy-steps.sh */,
+				9C6E285622A984710056B7BE /* release-notes-jazzy.md.ejs */,
+				9C6E285722A984710056B7BE /* deploy-snapshot.sh */,
+				9C6E285822A984710056B7BE /* release-notes.js */,
+			);
+			path = scripts;
+			sourceTree = "<group>";
+		};
+		9C6E285922A9849E0056B7BE /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				9C6E285A22A9849E0056B7BE /* install-packaging-dependencies.sh */,
+				9C6E285B22A9849E0056B7BE /* ios-code-coverage.sh */,
+				9C6E285C22A9849E0056B7BE /* release-notes-github.md.ejs */,
+				9C6E285D22A9849E0056B7BE /* document.sh */,
+				9C6E285E22A9849E0056B7BE /* check-events-symbols.sh */,
+				9C6E285F22A9849E0056B7BE /* deploy-packages.sh */,
+				9C6E286022A9849E0056B7BE /* publish.sh */,
+				9C6E286122A9849E0056B7BE /* validate-framework-zip.sh */,
+				9C6E286222A9849E0056B7BE /* metrics.sh */,
+				9C6E286322A9849E0056B7BE /* package.sh */,
+				9C6E286422A9849E0056B7BE /* trigger-external-deploy-steps.sh */,
+				9C6E286522A9849E0056B7BE /* release-notes-jazzy.md.ejs */,
+				9C6E286622A9849E0056B7BE /* deploy-snapshot.sh */,
+				9C6E286722A9849E0056B7BE /* release-notes.js */,
+			);
+			path = scripts;
+			sourceTree = "<group>";
+		};
 		CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1863,6 +1935,7 @@
 		DA1DC9411CB6C1C2006E619F = {
 			isa = PBXGroup;
 			children = (
+				9C6E284A22A984710056B7BE /* scripts */,
 				402E9DE21CD3A56500FD4519 /* Playground */,
 				DA1DC94C1CB6C1C2006E619F /* Demo App */,
 				DABCABA91CB80692000A7C39 /* Benchmarking App */,
@@ -1873,6 +1946,7 @@
 				DA1DC9921CB6DF24006E619F /* Frameworks */,
 				DAC07C951CBB2CAD000CB309 /* Configuration */,
 				DA1DC94B1CB6C1C2006E619F /* Products */,
+				9C6E285922A9849E0056B7BE /* scripts */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2181,6 +2255,7 @@
 		DAC07C951CBB2CAD000CB309 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				9C6E284822A984120056B7BE /* Makefile */,
 				DA35A2D11CCAB25200E826B2 /* jazzy.yml */,
 				55D8C9941D0F133500F42F10 /* config.xcconfig */,
 			);
@@ -3147,6 +3222,7 @@
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
 				1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */,
 				3E6465D62065767A00685536 /* LimeGreenStyleLayer.m in Sources */,
+				9C6E284922A984120056B7BE /* Makefile in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
