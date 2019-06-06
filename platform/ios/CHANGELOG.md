@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 * Fixed a crash caused by incorrect `MGLMapViewImpl` renderable size. ([#14810](https://github.com/mapbox/mapbox-gl-native/pull/14810))
+* Change default CJK glyphs font from "PingFang" to "Helvetica" ([#14810](https://github.com/mapbox/mapbox-gl-native/pull/14862))
 
 ## 5.1.0
 
