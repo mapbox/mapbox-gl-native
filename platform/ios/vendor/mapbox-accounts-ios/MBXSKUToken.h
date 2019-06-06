@@ -3,25 +3,33 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString *MBXAccountsSKUID NS_TYPED_ENUM;
-FOUNDATION_EXTERN const MBXAccountsSKUID MBXAccountsSKUIDMaps;
-FOUNDATION_EXTERN const MBXAccountsSKUID MBXAccountsSKUIDNavigation;
+FOUNDATION_EXTERN const MBXAccountsSKUID MBXAccountsSKUIDMapsUser;
+FOUNDATION_EXTERN const MBXAccountsSKUID MBXAccountsSKUIDNavigationUser;
+FOUNDATION_EXTERN const MBXAccountsSKUID MBXAccountsSKUIDNavigationSession;
 
-typedef NS_ENUM(NSInteger, MBXAccountsSKUType) {
-    MBXAccountsSKUTypeUser,
-    MBXAccountsSKUTypeSession
-};
 
 @interface MBXSKUToken : NSObject
 
 /**
- Generates a token for the given identifier and type.
+ Activates a specific SKU identifier.
  
- @param skuId   The sku identifier, e.g. maps or navigation.
- @param type    The type of token, e.g. user or session.
+ Defaults to `MBXAccountsSKUIDMapsUser`.
  
- @return A SKU token for use with API requests.
+ See https://www.mapbox.com/pricing/ for more information
  */
-+ (NSString *)tokenForSKUID:(MBXAccountsSKUID)skuId type:(MBXAccountsSKUType)type NS_SWIFT_NAME(token(for:type:));
++ (void)activateSKUID:(MBXAccountsSKUID)skuId;
+
+/**
+ Resets the current session. Calling this method has no effect unless the type
+ of the SKU id is of kind session.
+ */
++ (void)resetSession;
+
+/**
+ Returns the current SKU token. `+[MBXSKUToken activateSKUID:]` must be called
+ before accessing this property unless an `MBXAccountsSKUIDMapsUser` token is preferred.
+ */
+@property (class, nonatomic, readonly) NSString *skuToken;
 
 @end
 

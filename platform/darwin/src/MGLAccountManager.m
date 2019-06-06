@@ -8,9 +8,10 @@
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
 #import "MBXSKUToken.h"
-#endif
 
-static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
+static NSString * const MGLAccountManagerExternalClassName = @"MBXAccounts";
+static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
+#endif
 
 @interface MGLAccountManager ()
 
@@ -18,9 +19,9 @@ static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
 @property (nonatomic) NSURL *apiBaseURL;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-@property (atomic) NSString *skuToken;
-@property (atomic) NSDate *skuTokenExpiration;
+@property BOOL useExternalAccountManager;
 #endif
+
 @end
 
 @implementation MGLAccountManager
@@ -42,7 +43,12 @@ static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
     }
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    self.skuToken = [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser];
+    // Check if we should use an external accounts library (e.g., provided by navigation)
+    id externalAccountsClass = NSClassFromString(MGLAccountManagerExternalClassName);
+    SEL externalSKUTokenMethod = NSSelectorFromString(MGLAccountManagerExternalMethodName);
+    if (externalAccountsClass != nil && [externalAccountsClass respondsToSelector:externalSKUTokenMethod]) {
+        MGLAccountManager.sharedManager.useExternalAccountManager = YES;
+    }
 #endif
 }
 
@@ -102,20 +108,14 @@ static const NSTimeInterval MGLAccountManagerSKUTokenLifespan = 3600;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
-+ (void)setSkuToken:(NSString *)skuToken {
-    MGLAccountManager.sharedManager.skuTokenExpiration = [NSDate dateWithTimeIntervalSinceNow:MGLAccountManagerSKUTokenLifespan];
-    MGLAccountManager.sharedManager.skuToken = skuToken;
-}
-
 + (NSString *)skuToken {
-    return [MGLAccountManager.sharedManager isSKUTokenExpired] ?
-        [MBXSKUToken tokenForSKUID:MBXAccountsSKUIDMaps type:MBXAccountsSKUTypeUser] :
-        MGLAccountManager.sharedManager.skuToken;
-}
-
-- (BOOL)isSKUTokenExpired {
-    NSTimeInterval secondsUntilExpiration = [MGLAccountManager.sharedManager.skuTokenExpiration timeIntervalSinceNow];
-    return secondsUntilExpiration < 0;
+    if (MGLAccountManager.sharedManager.useExternalAccountManager) {
+        id externalAccountsClass = NSClassFromString(MGLAccountManagerExternalClassName);
+        SEL externalSKUTokenMethod = NSSelectorFromString(MGLAccountManagerExternalMethodName);
+        return ((NSString *(*)(id, SEL))[externalAccountsClass methodForSelector:externalSKUTokenMethod])(externalAccountsClass, externalSKUTokenMethod);
+    } else {
+        return MBXSKUToken.skuToken;
+    }
 }
 
 #endif
