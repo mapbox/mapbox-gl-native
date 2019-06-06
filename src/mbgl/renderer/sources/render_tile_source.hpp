@@ -39,6 +39,7 @@ public:
 
 protected:
     TilePyramid tilePyramid;
+    std::vector<RenderTile> renderTiles;
 };
 
 } // namespace mbgl
