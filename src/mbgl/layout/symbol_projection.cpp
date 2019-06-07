@@ -319,7 +319,11 @@ namespace mbgl {
                 const float glyphOffsetX = symbol.glyphOffsets[glyphIndex];
                 // Since first and last glyph fit on the line, we're sure that the rest of the glyphs can be placed
                 auto placedGlyph = placeGlyphAlongLine(glyphOffsetX * fontScale, lineOffsetX, lineOffsetY, flip, projectedAnchorPoint, symbol.anchorPoint, symbol.segment, symbol.line, symbol.tileDistances, labelPlaneMatrix, false);
-                placedGlyphs.push_back(*placedGlyph);
+                if (placedGlyph) {
+                    placedGlyphs.push_back(*placedGlyph);
+                } else {
+                    placedGlyphs.emplace_back(Point<float>{-INFINITY, -INFINITY}, 0.0f, nullopt);
+                }
             }
             placedGlyphs.push_back(firstAndLastGlyph->second);
         } else if (symbol.glyphOffsets.size() == 1) {

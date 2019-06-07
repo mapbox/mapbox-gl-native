@@ -32,6 +32,7 @@ public:
     optional<std::string> icon;
     float sortKey = 0.0f;
     std::size_t index;
+    bool allowsVerticalWritingMode = false;
 };
 
 } // namespace mbgl

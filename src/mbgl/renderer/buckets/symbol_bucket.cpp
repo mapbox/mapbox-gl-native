@@ -23,7 +23,9 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_,
-                           float tilePixelRatio_)
+                           float tilePixelRatio_,
+                           bool allowVerticalPlacement_,
+                           std::vector<style::TextWritingModeType> placementModes_)
     : layout(std::move(layout_)),
       bucketLeaderID(std::move(bucketName_)),
       sdfIcons(sdfIcons_),
@@ -39,7 +41,9 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
       tilePixelRatio(tilePixelRatio_),
-      bucketInstanceId(++maxBucketInstanceId) {
+      bucketInstanceId(++maxBucketInstanceId),
+      allowVerticalPlacement(allowVerticalPlacement_),
+      placementModes(std::move(placementModes_)) {
 
     for (const auto& pair : paintProperties_) {
         const auto& evaluated = getEvaluated<SymbolLayerProperties>(pair.second);

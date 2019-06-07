@@ -29,7 +29,8 @@ struct SymbolInstanceSharedData {
                             const float layoutTextSize,
                             const style::SymbolPlacementType textPlacement,
                             const std::array<float, 2>& textOffset,
-                            const GlyphPositions& positions);
+                            const GlyphPositions& positions,
+                            bool allowVerticalPlacement);
     bool empty() const;
     GeometryCoordinates line;
     // Note: When singleLine == true, only `rightJustifiedGlyphQuads` is populated.
@@ -59,7 +60,8 @@ public:
                    std::u16string key,
                    const float overscaling,
                    const float rotate,
-                   float radialTextOffset);
+                   float radialTextOffset,
+                   bool allowVerticalPlacement);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -85,6 +87,7 @@ public:
 
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
+    optional<CollisionFeature> verticalTextCollisionFeature = nullopt;
     WritingModeType writingModes;
     std::size_t layoutFeatureIndex; // Index into the set of features included at layout time
     std::size_t dataFeatureIndex;   // Index into the underlying tile data feature set
