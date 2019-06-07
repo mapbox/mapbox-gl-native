@@ -52,6 +52,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const std::array<float, 2> textOffset,
                           const style::SymbolLayoutProperties::Evaluated&,
                           style::SymbolPlacementType placement,
-                          const GlyphPositions& positions);
+                          const GlyphPositions& positions,
+                          bool allowVerticalPlacement);
 
 } // namespace mbgl

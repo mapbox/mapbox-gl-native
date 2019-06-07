@@ -8,6 +8,7 @@ void TaggedString::addSection(const std::u16string& sectionText, double scale, F
     styledText.first += sectionText;
     sections.emplace_back(scale, fontStack, std::move(textColor));
     styledText.second.resize(styledText.first.size(), sections.size() - 1);
+    supportsVerticalWritingMode = nullopt;
 }
 
 void TaggedString::trim() {
@@ -35,6 +36,13 @@ double TaggedString::getMaxScale() const {
 void TaggedString::verticalizePunctuation() {
     // Relies on verticalization changing characters in place so that style indices don't need updating
     styledText.first = util::i18n::verticalizePunctuation(styledText.first);
+}
+
+bool TaggedString::allowsVerticalWritingMode() {
+    if (!supportsVerticalWritingMode) {
+        supportsVerticalWritingMode = util::i18n::allowsVerticalWritingMode(rawText());
+    }
+    return *supportsVerticalWritingMode;
 }
 
 } // namespace mbgl

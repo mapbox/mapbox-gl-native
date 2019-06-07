@@ -292,12 +292,8 @@ void shapeLines(Shaping& shaping,
                 const style::TextJustifyType textJustify,
                 const WritingModeType writingMode,
                 const GlyphMap& glyphMap) {
-    
-    // the y offset *should* be part of the font metadata
-    const int32_t yOffset = -17;
-    
     float x = 0;
-    float y = yOffset;
+    float y = Shaping::yOffset;
     
     float maxLineLength = 0;
 
@@ -342,7 +338,7 @@ void shapeLines(Shaping& shaping,
                 shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
+                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
                 x += util::ONE_EM * section.scale + spacing;
             }
         }
@@ -364,7 +360,7 @@ void shapeLines(Shaping& shaping,
 
     align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
           lineHeight, lines.size());
-    const float height = y - yOffset;
+    const float height = y - Shaping::yOffset;
 
     // Calculate the bounding box
     shaping.top += -anchorAlign.verticalAlign * height;

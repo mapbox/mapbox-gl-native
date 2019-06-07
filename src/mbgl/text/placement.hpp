@@ -12,6 +12,7 @@ namespace mbgl {
 
 class SymbolBucket;
 class SymbolInstance;
+enum class PlacedSymbolOrientation : bool;
 
 class OpacityState {
 public:
@@ -122,7 +123,8 @@ private:
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
     bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&);
-    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&);
+    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&, style::TextWritingModeType orientation);
+    void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, SymbolInstance&);
 
     CollisionIndex collisionIndex;
 
@@ -135,6 +137,7 @@ private:
     std::unordered_map<uint32_t, JointPlacement> placements;
     std::unordered_map<uint32_t, JointOpacityState> opacities;
     std::unordered_map<uint32_t, VariableOffset> variableOffsets;
+    std::unordered_map<uint32_t, style::TextWritingModeType> placedOrientations;
 
     bool stale = false;
     
