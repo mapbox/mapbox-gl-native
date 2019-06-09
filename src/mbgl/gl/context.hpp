@@ -181,10 +181,6 @@ private:
 
     std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
         Size, gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
-    std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
-        Size,
-        gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
-        gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
 
     std::unique_ptr<gfx::TextureResource>
         createTextureResource(Size, gfx::TexturePixelType, gfx::TextureChannelDataType) override;

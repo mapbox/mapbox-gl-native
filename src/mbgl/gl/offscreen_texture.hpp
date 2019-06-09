@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/gfx/offscreen_texture.hpp>
-#include <mbgl/gfx/renderbuffer.hpp>
+#include <mbgl/gfx/types.hpp>
 
 namespace mbgl {
 namespace gl {
@@ -12,10 +12,6 @@ class OffscreenTexture final : public gfx::OffscreenTexture {
 public:
     OffscreenTexture(gl::Context&,
                      Size size,
-                     gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
-    OffscreenTexture(gl::Context&,
-                     Size size,
-                     gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
                      gfx::TextureChannelDataType type = gfx::TextureChannelDataType::UnsignedByte);
 
     bool isRenderable() override;
