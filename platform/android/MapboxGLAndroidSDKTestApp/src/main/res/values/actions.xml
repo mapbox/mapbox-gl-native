@@ -90,4 +90,5 @@
     <string name="zoom_to_4">Zoom to 4</string>
     <string name="restrict_almost_worldview">Restrict almost worldview</string>
     <string name="restrict_across_idl">Restrict across IDL</string>
+    <string name="restrict_reset">Reset bounds</string>
 </resources>
