@@ -28,7 +28,7 @@ void RenderTileSource::upload(gfx::UploadPass& parameters) {
 
 void RenderTileSource::prepare(const SourcePrepareParameters& parameters) {
     renderTiles.clear();
-    for (auto& entry : tilePyramid.getRenderTiles()) {
+    for (auto& entry : tilePyramid.getRenderedTiles()) {
         renderTiles.emplace_back(entry.first, entry.second);
         renderTiles.back().prepare(parameters);
     }
@@ -48,7 +48,7 @@ bool RenderTileSource::hasFadingTiles() const {
     return tilePyramid.hasFadingTiles();
 }
 
-std::vector<std::reference_wrapper<RenderTile>> RenderTileSource::getRenderTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderTileSource::getRenderedTiles() {
     return { renderTiles.begin(), renderTiles.end() };
 }
 

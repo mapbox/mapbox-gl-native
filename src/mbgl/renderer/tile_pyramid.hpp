@@ -43,7 +43,7 @@ public:
                 optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
-    const std::map<UnwrappedTileID, std::reference_wrapper<Tile>>& getRenderTiles() const { return renderTiles; }
+    const std::map<UnwrappedTileID, std::reference_wrapper<Tile>>& getRenderedTiles() const { return renderTiles; }
     Tile* getTile(const OverscaledTileID&);
 
     void handleWrapJump(float lng);

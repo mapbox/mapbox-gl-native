@@ -52,7 +52,7 @@ void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<RasterDEMTile>(tileID, parameters, *tileset);
                        });
-    algorithm::updateTileMasks(tilePyramid.getRenderTiles());
+    algorithm::updateTileMasks(tilePyramid.getRenderedTiles());
 }
 
 void RenderRasterDEMSource::onTileChanged(Tile& tile){
