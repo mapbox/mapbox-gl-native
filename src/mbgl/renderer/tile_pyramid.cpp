@@ -314,7 +314,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
         const UnwrappedTileID& id = entry.first;
         Tile& tile = entry.second;
 
-        const float scale = std::pow(2, transformState.getZoom() - id.canonical.z);
+        const float scale = transformState.getScale() / (1 << id.canonical.z); // equivalent to std::pow(2, transformState.getZoom() - id.canonical.z);
         auto queryPadding = maxPitchScaleFactor * tile.getQueryPadding(layers) * util::EXTENT / util::tileSize / scale;
 
         GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(id, box.min);
