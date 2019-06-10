@@ -36,10 +36,10 @@ public:
         const double scale = std::pow(2.0, tileID.canonical.z);
         auto zoomed = TileCoordinate { point, 0 }.zoomTo(tileID.canonical.z);
         return {
-            int16_t(util::clamp<int64_t>((zoomed.p.x - tileID.canonical.x - tileID.wrap * scale) * util::EXTENT,
+            int16_t(util::clamp<int64_t>(::round((zoomed.p.x - tileID.canonical.x - tileID.wrap * scale) * util::EXTENT),
                         std::numeric_limits<int16_t>::min(),
                         std::numeric_limits<int16_t>::max())),
-            int16_t(util::clamp<int64_t>((zoomed.p.y - tileID.canonical.y) * util::EXTENT,
+            int16_t(util::clamp<int64_t>(::round((zoomed.p.y - tileID.canonical.y) * util::EXTENT),
                         std::numeric_limits<int16_t>::min(),
                         std::numeric_limits<int16_t>::max()))
         };
