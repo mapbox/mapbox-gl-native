@@ -624,6 +624,26 @@ std::exception_ptr OfflineDatabase::invalidateTileCache() try {
     return std::current_exception();
 }
 
+std::exception_ptr OfflineDatabase::clearTileCache() try {
+    // clang-format off
+    mapbox::sqlite::Query query{ getStatement(
+        "DELETE FROM tiles "
+        "WHERE id NOT IN ("
+        "    SELECT tile_id FROM region_tiles"
+        ")"
+    ) };
+    // clang-format on
+
+    query.run();
+
+    db->exec("PRAGMA incremental_vacuum");
+
+    return nullptr;
+} catch (const mapbox::sqlite::Exception& ex) {
+    handleError(ex, "clear tile cache");
+    return std::current_exception();
+}
+
 std::exception_ptr OfflineDatabase::invalidateRegion(int64_t regionID) try {
     {
         // clang-format off
