@@ -33,7 +33,7 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final {
+    std::vector<std::reference_wrapper<RenderTile>> getRenderedTiles() final {
         return {};
     }
 

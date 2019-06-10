@@ -47,7 +47,7 @@ bool RenderLayer::supportsZoom(float zoom) const {
 
 void RenderLayer::prepare(const LayerPrepareParameters& params) {
     assert(params.source);
-    renderTiles = filterRenderTiles(params.source->getRenderTiles());
+    renderTiles = filterRenderTiles(params.source->getRenderedTiles());
 }
 
 optional<Color> RenderLayer::getSolidBackground() const {
