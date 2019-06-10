@@ -58,6 +58,11 @@ public:
     // lookup, it will not get downloaded again.
     std::exception_ptr invalidateTileCache();
 
+    // Clear the tile cache, freeing resources. This operation can be
+    // potentially slow because it will trigger a VACUUM on SQLite,
+    // forcing the database to move pages on the filesystem.
+    std::exception_ptr clearTileCache();
+
     expected<OfflineRegions, std::exception_ptr> listRegions();
 
     expected<OfflineRegion, std::exception_ptr> createRegion(const OfflineRegionDefinition&,
