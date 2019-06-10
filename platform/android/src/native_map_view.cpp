@@ -314,7 +314,7 @@ void NativeMapView::setLatLngBounds(jni::JNIEnv& env, const jni::Object<mbgl::an
     if (jBounds) {
         bounds.withLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds));
     } else {
-        bounds.withLatLngBounds(mbgl::LatLngBounds::world());
+        bounds.withLatLngBounds(mbgl::LatLngBounds::unbounded());
     }
     map->setBounds(bounds);
 }
