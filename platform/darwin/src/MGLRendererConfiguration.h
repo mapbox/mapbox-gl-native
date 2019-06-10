@@ -26,11 +26,11 @@ MGL_EXPORT
 /** The name of the font family to use for client-side text rendering.
 
  Currently only used for CJK glyphs. Changing this at run time is not currently
- supported. Enable client-side rendering of CJK glyphs by setting
- `MGLIdeographicFontFamilyName` in your containing app's Info.plist to a value
- which will be available at run time. Default font for local ideograph font family
- is "PingFang". */
-@property (nonatomic, readonly) std::string localFontFamilyName;
+ supported. Enable client-side rendering of CJK glyphs and use `Helvetica` by default.
+ Set `MGLIdeographicFontFamilyName` in your containing app's Info.plist to a value
+ which will be available at run time.
+ Set `MGLIdeographicFontFamilyName` to `NULL` for using your custom remote font.*/
+@property (nonatomic, readonly) mbgl::optional<std::string> localFontFamilyName;
 
 /**
  A Boolean value indicating whether symbol layers may enable per-source symbol
