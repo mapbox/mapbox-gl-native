@@ -28,6 +28,7 @@ void RenderTileSource::upload(gfx::UploadPass& parameters) {
 
 void RenderTileSource::prepare(const SourcePrepareParameters& parameters) {
     renderTiles.clear();
+    renderTiles.reserve(tilePyramid.getRenderedTiles().size());
     for (auto& entry : tilePyramid.getRenderedTiles()) {
         renderTiles.emplace_back(entry.first, entry.second);
         renderTiles.back().prepare(parameters);
