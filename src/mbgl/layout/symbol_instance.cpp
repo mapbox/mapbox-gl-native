@@ -81,7 +81,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::size_t dataFeatureIndex_,
                                std::u16string key_,
                                const float overscaling,
-                               const float rotate,
+                               const float iconRotation,
+                               const float textRotation,
                                float radialTextOffset_,
                                bool allowVerticalPlacement) :
     sharedData(std::move(sharedData_)),
@@ -91,8 +92,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     hasIcon(shapedIcon),
     // Create the collision features that will be used to check whether this symbol instance can be placed
     // As a collision approximation, we can use either the vertical or any of the horizontal versions of the feature
-    textCollisionFeature(sharedData->line, anchor, getAnyShaping(shapedTextOrientations), textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, rotate),
-    iconCollisionFeature(sharedData->line, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature, rotate),
+    textCollisionFeature(sharedData->line, anchor, getAnyShaping(shapedTextOrientations), textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation),
+    iconCollisionFeature(sharedData->line, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature, iconRotation),
     writingModes(WritingModeType::None),
     layoutFeatureIndex(layoutFeatureIndex_),
     dataFeatureIndex(dataFeatureIndex_),
@@ -105,7 +106,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
 
     if (allowVerticalPlacement && shapedTextOrientations.vertical) {
         const float verticalPointLabelAngle = 90.0f;
-        verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, rotate + verticalPointLabelAngle);
+        verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation + verticalPointLabelAngle);
     }
 
     rightJustifiedGlyphQuadsSize = sharedData->rightJustifiedGlyphQuads.size();
