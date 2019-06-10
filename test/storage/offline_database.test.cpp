@@ -29,6 +29,17 @@ static void deleteDatabaseFiles() {
     util::deleteFile(filename + "-journal"s);
 }
 
+static std::shared_ptr<std::string> randomString(size_t size) {
+    auto result = std::make_shared<std::string>(size, 0);
+    std::mt19937 random;
+
+    for (size_t i = 0; i < size; i++) {
+        (*result)[i] = random();
+    }
+
+    return result;
+}
+
 static FixtureLog::Message error(ResultCode code, const char* message) {
     return { EventSeverity::Error, Event::Database, static_cast<int64_t>(code), message };
 }
@@ -593,6 +604,34 @@ TEST(OfflineDatabase, Invalidate) {
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
+TEST(OfflineDatabase, ClearTileCache) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+
+    {
+        OfflineDatabase dbCreate(filename);
+    }
+
+    size_t initialSize = util::read_file(filename).size();
+
+    {
+        Response response;
+        response.data = randomString(.5 * 1024 * 1024);
+
+        OfflineDatabase db(filename);
+
+        for (unsigned i = 0; i < 100; ++i) {
+            const Resource tile = Resource::tile("mapbox://tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(tile, response);
+        }
+
+        db.clearTileCache();
+    }
+
+    EXPECT_EQ(initialSize, util::read_file(filename).size());
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
 TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
     FixtureLog log;
     OfflineDatabase db(":memory:");
@@ -636,17 +675,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
     thread2.join();
 
     EXPECT_EQ(0u, log.uncheckedCount());
-}
-
-static std::shared_ptr<std::string> randomString(size_t size) {
-    auto result = std::make_shared<std::string>(size, 0);
-    std::mt19937 random;
-
-    for (size_t i = 0; i < size; i++) {
-        (*result)[i] = random();
-    }
-
-    return result;
 }
 
 TEST(OfflineDatabase, PutReturnsSize) {
