@@ -122,7 +122,7 @@ TEST(Buckets, SymbolBucket) {
     std::vector<SymbolInstance> symbolInstances;
 
     gl::Context context{ backend };
-    SymbolBucket bucket { std::move(layout), {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), 1.0f };
+    SymbolBucket bucket { std::move(layout), {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), 1.0f, false, {}};
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());
