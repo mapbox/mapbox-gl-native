@@ -112,13 +112,16 @@ static const CGFloat kAnnotationScale = 0.125f;
     // Also note, that at this point, the internal mechanism that determines if
     // an annotation view is offscreen and should be put back in the reuse queue
     // will have run, and `viewForAnnotation` may return nil
-    
-    [self.mapView selectAnnotation:point moveIntoView:moveIntoView animateSelection:animateSelection];
+
+    XCTestExpectation *selectionCompleted = [self expectationWithDescription:@"Selection completed"];
+    [self.mapView selectAnnotation:point moveIntoView:moveIntoView animateSelection:animateSelection completionHandler:^{
+        [selectionCompleted fulfill];
+    }];
 
     // Animated selection takes MGLAnimationDuration (0.3 seconds), so wait a little
     // longer. We don't need to wait as long if we're not animated (but we do
     // want the runloop to tick over)
-    [self waitFor:animateSelection ? 0.4: 0.05];
+    [self waitForExpectations:@[selectionCompleted] timeout:animateSelection ? 0.4: 0.05];
 
     UIView *annotationViewAfterSelection =  [self.mapView viewForAnnotation:point];
     CLLocationCoordinate2D mapCenterAfterSelection = self.mapView.centerCoordinate;
