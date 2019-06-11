@@ -474,7 +474,6 @@
 		9C6E284522A982670056B7BE /* MMEUINavigation.h in Headers */ = {isa = PBXBuildFile; fileRef = 406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */; };
 		9C6E284622A982670056B7BE /* MMEUniqueIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */; };
 		9C6E284722A982670056B7BE /* MMEDispatchManager.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F552140696B00537748 /* MMEDispatchManager.h */; };
-		9C6E284922A984120056B7BE /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 9C6E284822A984120056B7BE /* Makefile */; };
 		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC46EB59225E600A0039C013 /* MMECertPin.h in Headers */ = {isa = PBXBuildFile; fileRef = AC46EB57225E60090039C013 /* MMECertPin.h */; };
 		AC46EB5A225E600A0039C013 /* MMECertPin.h in Headers */ = {isa = PBXBuildFile; fileRef = AC46EB57225E60090039C013 /* MMECertPin.h */; };
@@ -3193,7 +3192,6 @@
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
 				1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */,
 				3E6465D62065767A00685536 /* LimeGreenStyleLayer.m in Sources */,
-				9C6E284922A984120056B7BE /* Makefile in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
