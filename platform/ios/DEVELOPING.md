@@ -146,9 +146,16 @@ You can provide an optional and custom [`xcconfig`](https://help.apple.com/xcode
 
 ## Testing
 
-`make ios-test` builds and runs unit tests of cross-platform code as well as the SDK.
+`make ios-test` builds and runs unit tests of cross-platform code and of the SDK. Other types of tests available include:
 
-To instead run the cross-platform tests in Xcode instead of on the command line:
+* `make ios-integration-test` runs UI tests from the "Integration Test Harness" scheme.
+* `make ios-sanitize` runs unit tests from the "CI" scheme with the Thread Sanitizer and Undefined Behavior Sanitizer enabled.
+* `make ios-sanitize-address` runs unit tests from the "CI" scheme with the Address Sanitizer enabled.
+* `make ios-static-analyzer` runs unit tests from the "CI" scheme with the Static Analyzer enabled.
+
+These commands are run by default on a single Simulator. To enable legacy iOS versions and more device types, add `MORE_SIMULATORS=1`.
+
+To run the cross-platform tests in Xcode instead of on the command line:
 
 1. Run `make iproj` to set up the workspace.
 1. Change the scheme to “test (platform project)” and press Command-R to run core unit tests.

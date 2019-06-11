@@ -213,9 +213,25 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	-derivedDataPath $(IOS_OUTPUT_PATH) \
 	-configuration $(BUILDTYPE) -sdk iphonesimulator \
-	-destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8' \
 	-workspace $(IOS_WORK_PATH) \
 	-jobs $(JOBS)
+
+ifneq ($(MORE_SIMULATORS),)
+	IOS_XCODEBUILD_SIM += -parallel-testing-enabled YES \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xs Max' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xr' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPad Pro (11-inch)' \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone 7' \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone X' \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPad Air 2,' \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone SE' \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone 7 Plus' \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPad Air' \
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s Plus' \
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s' \
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPad 2'
+endif
 
 ifneq ($(CI),)
 	IOS_XCODEBUILD_SIM += -xcconfig platform/darwin/ci.xcconfig
@@ -264,6 +280,12 @@ ios-sanitize-address: $(IOS_PROJ_PATH)
 .PHONY: ios-static-analyzer
 ios-static-analyzer: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) analyze -scheme 'CI' test $(XCPRETTY)
+
+.PHONY: ios-install-simulators
+ios-install-simulators:
+	xcversion simulators --install="iOS 11.4" || true
+	xcversion simulators --install="iOS 10.3.1" || true
+	xcversion simulators --install="iOS 9.3" || true
 
 .PHONY: ios-check-events-symbols
 ios-check-events-symbols:
