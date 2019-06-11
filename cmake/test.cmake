@@ -22,6 +22,7 @@ target_include_directories(mbgl-test
     PRIVATE test/include
     PRIVATE test/src
     PRIVATE platform/default/include
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/compilerchecks
 )
 
 target_link_libraries(mbgl-test PRIVATE

@@ -5,6 +5,7 @@ add_library(mbgl-core STATIC ${MBGL_CORE_FILES})
 target_include_directories(mbgl-core
     PUBLIC include
     PRIVATE src
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/compilerchecks
 )
 
 target_link_libraries(mbgl-core PRIVATE

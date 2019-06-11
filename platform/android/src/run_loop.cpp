@@ -1,7 +1,6 @@
 #include "run_loop_impl.hpp"
 
 #include <mbgl/util/platform.hpp>
-#include <mbgl/util/thread_local.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/actor/scheduler.hpp>

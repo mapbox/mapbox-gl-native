@@ -2,6 +2,21 @@
 
 #include <type_traits>
 
+#ifdef DETECT_THREAD_LOCAL
+#include "thread_local_compiler_detection.h"
+#endif
+
+#ifdef __APPLE__
+# include <TargetConditionals.h>
+# include <Availability.h>
+# if defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_9_0
+#   undef MB_COMPILER_CXX_THREAD_LOCAL
+# endif
+# if defined(__i386__) && defined(TARGET_OS_SIMULATOR)
+#   undef MB_COMPILER_CXX_THREAD_LOCAL
+# endif
+#endif
+
 namespace mbgl {
 namespace util {
 namespace impl {
@@ -15,7 +30,9 @@ protected:
     void set(void*);
 
 private:
+#ifndef MB_COMPILER_CXX_THREAD_LOCAL
     std::aligned_storage_t<sizeof(void*), alignof(void*)> storage;
+#endif
 };
 
 } // namespace impl

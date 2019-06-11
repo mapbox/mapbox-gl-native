@@ -4,8 +4,6 @@
 
 namespace mbgl {
 
-util::ThreadLocal<Scheduler> g_currentScheduler;
-
 static auto& current() {
     static util::ThreadLocal<Scheduler> scheduler;
     return scheduler;

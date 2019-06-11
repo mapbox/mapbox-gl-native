@@ -1,6 +1,5 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/thread_local.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
 #include <uv.h>
