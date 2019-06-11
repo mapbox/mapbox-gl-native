@@ -4,7 +4,6 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
@@ -287,14 +286,14 @@ public class GeoJsonSource extends Source {
    *
    * @param featureCollection the GeoJSON FeatureCollection
    */
-  public void setGeoJson(FeatureCollection featureCollection) {
+  public void setGeoJson(@Nullable FeatureCollection featureCollection) {
     if (detached) {
       return;
     }
     checkThread();
 
-    List<Feature> features = featureCollection.features();
-    if (features != null) {
+    if (featureCollection != null && featureCollection.features() != null) {
+      List<Feature> features = featureCollection.features();
       List<Feature> featuresCopy = new ArrayList<>(features);
       nativeSetFeatureCollection(FeatureCollection.fromFeatures(featuresCopy));
     } else {
