@@ -6,7 +6,7 @@
 #include <cstring>
 #include <cstdio>
 #include <chrono>
-#include <experimental/optional>
+#include <optional.hpp>
 
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/logging.hpp>

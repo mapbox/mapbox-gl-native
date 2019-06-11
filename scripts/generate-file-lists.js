@@ -136,6 +136,7 @@ generateFileList('vendor/geometry.hpp-files.json', 'vendor/geometry.hpp', vendor
 generateFileList('vendor/icu-files.json', 'vendor/icu', vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
 generateFileList('vendor/jni.hpp-files.json', 'vendor/jni.hpp', vendorRegex, [ "include/**/*.hpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/kdbush.hpp-files.json', 'vendor/kdbush.hpp', vendorRegex, [ "include/*.hpp" ]);
+generateFileList('vendor/optional-files.json', 'vendor/optional', vendorRegex, [ "optional.hpp" ]);
 generateFileList('vendor/pixelmatch-cpp-files.json', 'vendor/pixelmatch-cpp', vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/polylabel-files.json', 'vendor/polylabel', vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/protozero-files.json', 'vendor/protozero', vendorRegex, [ "include/**/*.hpp" ]);
