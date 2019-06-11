@@ -27,9 +27,10 @@ void Renderer::setObserver(RendererObserver* observer) {
 
 void Renderer::render(const std::shared_ptr<UpdateParameters>& updateParameters) {
     assert(updateParameters);
+    auto frame_start = Clock::now();
     if (auto renderTree = impl->orchestrator.createRenderTree(updateParameters)) {
         renderTree->prepare();
-        impl->render(*renderTree);
+        impl->render(*renderTree, frame_start);
     }
 }
 

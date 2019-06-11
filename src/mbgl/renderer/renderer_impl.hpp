@@ -27,7 +27,7 @@ private:
 
     void setObserver(RendererObserver*);
 
-    void render(const RenderTree&);
+    void render(const RenderTree&, TimePoint frame_start);
 
     void reduceMemoryUse();
 
