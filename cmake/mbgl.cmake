@@ -219,6 +219,9 @@ function(initialize_xcode_cxx_build_settings target)
     # Make all build configurations debuggable — except Release.
     set_xcode_property(${target} GCC_GENERATE_DEBUGGING_SYMBOLS $<$<NOT:$<CONFIG:Release>>:YES>)
 
+    # -Wunguarded-availability
+    set_xcode_property(${target} CLANG_WARN_UNGUARDED_AVAILABILITY YES_AGGRESSIVE)
+
     if (DEFINED ENV{CI})
         set_xcode_property(${target} COMPILER_INDEX_STORE_ENABLE NO)
     endif()
