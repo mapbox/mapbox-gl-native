@@ -76,7 +76,7 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
         return mbgl::optional<std::string>();
     }
     
-    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : std::string("Helvetica");
+    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : std::string([[UIFont systemFontOfSize:0 weight:UIFontWeightRegular].familyName UTF8String]);
 }
 
 @end
