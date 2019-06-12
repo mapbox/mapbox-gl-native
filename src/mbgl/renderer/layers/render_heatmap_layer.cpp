@@ -55,7 +55,7 @@ bool RenderHeatmapLayer::hasCrossfade() const {
     return false;
 }
 
-void RenderHeatmapLayer::upload(gfx::UploadPass& uploadPass, UploadParameters&) {
+void RenderHeatmapLayer::upload(gfx::UploadPass& uploadPass) {
     if (!colorRampTexture) {
         colorRampTexture =
             uploadPass.createTexture(colorRamp, gfx::TextureChannelDataType::UnsignedByte);
