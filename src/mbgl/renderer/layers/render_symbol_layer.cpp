@@ -262,7 +262,7 @@ void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters)
 
     passes = ((evaluated.get<style::IconOpacity>().constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
               || (evaluated.get<style::TextOpacity>().constantOr(1) > 0 && hasTextOpacity && textSize > 0))
-             ? RenderPass::Translucent | RenderPass::Upload : RenderPass::None;
+             ? RenderPass::Translucent : RenderPass::None;
 
     evaluatedProperties = std::move(properties);
 }

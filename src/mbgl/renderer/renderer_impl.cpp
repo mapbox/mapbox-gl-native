@@ -387,10 +387,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         for (auto& renderItem : renderItems) {
-            RenderLayer& renderLayer = renderItem.layer;
-            if (renderLayer.hasRenderPass(RenderPass::Upload)) {
-                renderLayer.upload(*uploadPass);
-            }
+            renderItem.layer.get().upload(*uploadPass);
         }
 
         staticData->upload(*uploadPass);

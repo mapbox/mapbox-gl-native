@@ -41,7 +41,7 @@ void RenderHeatmapLayer::evaluate(const PropertyEvaluationParameters& parameters
         unevaluated.evaluate(parameters));
 
     passes = (properties->evaluated.get<style::HeatmapOpacity>() > 0)
-            ? (RenderPass::Translucent | RenderPass::Pass3D | RenderPass::Upload)
+            ? (RenderPass::Translucent | RenderPass::Pass3D)
             : RenderPass::None;
 
     evaluatedProperties = std::move(properties);
