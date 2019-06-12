@@ -3,6 +3,7 @@
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/renderer/render_light.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gfx/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
@@ -39,7 +40,7 @@ public:
     mat4 projMatrix;
     mat4 alignedProjMatrix;
     mat4 nearClippedProjMatrix;
-    const TransformState& state;
+    const TransformState state;
 };
 
 class PaintParameters {
@@ -47,8 +48,10 @@ public:
     PaintParameters(gfx::Context&,
                     float pixelRatio,
                     gfx::RendererBackend&,
-                    const UpdateParameters&,
                     const EvaluatedLight&,
+                    MapMode,
+                    MapDebugOptions,
+                    TimePoint,
                     const TransformParameters&,
                     RenderStaticData&,
                     LineAtlas&,
@@ -60,9 +63,9 @@ public:
     std::unique_ptr<gfx::CommandEncoder> encoder;
     std::unique_ptr<gfx::RenderPass> renderPass;
 
+    TransformParameters transformParams;
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;
-    const TransformParameters& transformParams;
 
     RenderStaticData& staticData;
     LineAtlas& lineAtlas;
