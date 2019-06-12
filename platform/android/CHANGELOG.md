@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+### Bugs
+ - Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation [#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884) 
+
 ### Styles and rendering
 
  - Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MapboxMap setPadding](https://docs.mapbox.com/android/api/map-sdk/8.0.0/com/mapbox/mapboxsdk/maps/MapboxMap.html#setPadding-int-int-int-int-). [#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664)

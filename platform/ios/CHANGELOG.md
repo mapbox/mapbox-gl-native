@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 * Fixed a crash caused by incorrect `MGLMapViewImpl` renderable size. ([#14810](https://github.com/mapbox/mapbox-gl-native/pull/14810))
+* Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 
 ## 5.1.0
 
