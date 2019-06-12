@@ -24,11 +24,6 @@ function basicMinify(src) {
 }
 
 for (const key in shaders) {
-    // Rename a_*_t uniforms to u_*_t. This is a workaround until we can use
-    // https://github.com/mapbox/mapbox-gl-js/pull/8055, which is blocked by
-    // https://github.com/mapbox/mapbox-gl-native/issues/13984
-    shaders[key].vertexSource = shaders[key].vertexSource.replace(/\ba_(\w+)_t\b/mg, 'u_$1_t');
-
     const hash = crypto.createHash('sha1');
 
     const vertex = concatenated.length;
