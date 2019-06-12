@@ -96,6 +96,8 @@ public:
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup() override;
 
+    void reduceMemoryUsage() override;
+
     // Drain pools and remove abandoned objects, in preparation for destroying the store.
     // Only call this while the OpenGL context is exclusive to this thread.
     void reset();

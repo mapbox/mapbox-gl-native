@@ -38,6 +38,9 @@ public:
     // Called at the end of a frame.
     virtual void performCleanup() = 0;
 
+    // Called when the app receives a memory warning and before it goes to the background.
+    virtual void reduceMemoryUsage() = 0;
+
 public:
     virtual std::unique_ptr<OffscreenTexture>
         createOffscreenTexture(Size,
