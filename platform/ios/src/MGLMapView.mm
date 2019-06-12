@@ -1709,6 +1709,10 @@ public:
 {
     if ( ! self.isRotateEnabled) return;
 
+    if ( self.mbglMap.isScaling() && abs(rotate.rotation) < 2 ) {
+        NSLog(@"ROTATION: %f", rotate.rotation);
+        return;
+    }
     [self cancelTransitions];
 
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
