@@ -682,7 +682,13 @@ void Context::performCleanup() {
                                                abandonedRenderbuffers.data()));
         abandonedRenderbuffers.clear();
     }
+}
 
+void Context::reduceMemoryUsage() {
+    performCleanup();
+
+    // Ensure that all pending actions are executed to ensure that they happen before the app goes
+    // to the background.
     MBGL_CHECK_ERROR(glFinish());
 }
 

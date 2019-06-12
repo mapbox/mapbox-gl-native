@@ -666,7 +666,7 @@ void Renderer::Impl::reduceMemoryUse() {
     for (const auto& entry : renderSources) {
         entry.second->reduceMemoryUse();
     }
-    backend.getContext().performCleanup();
+    backend.getContext().reduceMemoryUsage();
     imageManager->reduceMemoryUse();
     observer->onInvalidate();
 }
