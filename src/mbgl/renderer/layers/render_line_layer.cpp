@@ -47,7 +47,7 @@ void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0
               && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
               && evaluated.get<style::LineWidth>().constantOr(1.0) > 0)
-             ? RenderPass::Translucent | RenderPass::Upload : RenderPass::None;
+             ? RenderPass::Translucent : RenderPass::None;
     evaluatedProperties = std::move(properties);
 }
 
