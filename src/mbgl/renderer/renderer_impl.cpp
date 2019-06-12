@@ -308,7 +308,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     for (auto& renderItem : renderItems) {
         RenderLayer& renderLayer = renderItem.layer;
-        renderLayer.prepare({renderItem.source, *imageManager, *patternAtlas, updateParameters.transformState});
+        renderLayer.prepare({renderItem.source, *imageManager, *patternAtlas, *lineAtlas, updateParameters.transformState});
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
@@ -386,15 +386,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
 
-        UploadParameters uploadParameters{
-            updateParameters.transformState,
-            *lineAtlas,
-        };
-
         for (auto& renderItem : renderItems) {
             RenderLayer& renderLayer = renderItem.layer;
             if (renderLayer.hasRenderPass(RenderPass::Upload)) {
-                renderLayer.upload(*uploadPass, uploadParameters);
+                renderLayer.upload(*uploadPass);
             }
         }
 

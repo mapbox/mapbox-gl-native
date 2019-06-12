@@ -19,6 +19,7 @@ class RenderSource;
 class RenderTile;
 class TransformState;
 class PatternAtlas;
+class LineAtlas;
 
 class LayerRenderData {
 public:
@@ -37,6 +38,7 @@ public:
     RenderSource* source;
     ImageManager& imageManager;
     PatternAtlas& patternAtlas;
+    LineAtlas& lineAtlas;
     const TransformState& state;
 };
 
@@ -77,7 +79,7 @@ public:
     // Checks whether the given zoom is inside this layer zoom range.
     bool supportsZoom(float zoom) const;
 
-    virtual void upload(gfx::UploadPass&, UploadParameters&) {}
+    virtual void upload(gfx::UploadPass&) {}
     virtual void render(PaintParameters&) = 0;
 
     // Check wether the given geometry intersects

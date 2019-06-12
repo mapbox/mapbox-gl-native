@@ -59,34 +59,27 @@ bool RenderLineLayer::hasCrossfade() const {
     return getCrossfade<LineLayerProperties>(evaluatedProperties).t != 1;
 }
 
-void RenderLineLayer::upload(gfx::UploadPass& uploadPass, UploadParameters& uploadParameters) {
+void RenderLineLayer::prepare(const LayerPrepareParameters& params) {
+    RenderLayer::prepare(params);
     for (const RenderTile& tile : renderTiles) {
         const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
-        if (!renderData) {
-            continue;
-        }
-        auto& bucket = static_cast<LineBucket&>(*renderData->bucket);
+        if (!renderData) continue;
+
         const auto& evaluated = getEvaluated<LineLayerProperties>(renderData->layerProperties);
+        if (evaluated.get<LineDasharray>().from.empty()) continue;
 
-        if (!evaluated.get<LineDasharray>().from.empty()) {
-            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
-                ? LinePatternCap::Round : LinePatternCap::Square;
-            // Ensures that the dash data gets added and uploaded to the atlas.
-            uploadParameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
-            uploadParameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+        auto& bucket = static_cast<LineBucket&>(*renderData->bucket);
+        const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
+            ? LinePatternCap::Round : LinePatternCap::Square;
+        // Ensures that the dash data gets added to the atlas.
+        params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
+        params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+    }
+}
 
-        } else if (!unevaluated.get<LinePattern>().isUndefined()) {
-            const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
-
-            // Ensures that the pattern gets added and uplodated to the atlas.
-            tile.getPattern(linePatternValue.from);
-            tile.getPattern(linePatternValue.to);
-
-        } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
-            if (!colorRampTexture) {
-                colorRampTexture = uploadPass.createTexture(colorRamp);
-            }
-        }
+void RenderLineLayer::upload(gfx::UploadPass& uploadPass) {
+    if (!unevaluated.get<LineGradient>().getValue().isUndefined() && !colorRampTexture) {
+        colorRampTexture = uploadPass.createTexture(colorRamp);
     }
 }
 
