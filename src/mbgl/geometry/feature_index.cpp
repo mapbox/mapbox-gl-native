@@ -32,7 +32,7 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
             envelope.min.y < util::EXTENT &&
             envelope.max.x >= 0 &&
             envelope.max.y >= 0) {
-            grid.insert(IndexedSubfeature(index, sourceLayerName, bucketLeaderID, featureSortIndex++),
+            grid.insert(IndexedSubfeature(index, sourceLayerName, bucketLeaderID, featureSortIndex),
                         {convertPoint<float>(envelope.min), convertPoint<float>(envelope.max)});
         }
     }
