@@ -1,17 +1,36 @@
 package com.mapbox.mapboxsdk;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.lang.reflect.Field;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class MapboxInjector {
 
-  public static void inject(Context context, String accessToken) {
+  private static final String FIELD_INSTANCE = "INSTANCE";
+  private static final String FIELD_ACCOUNTS = "accounts";
+
+  public static void inject(@NonNull Context context, @NonNull String accessToken) {
+    inject(context, accessToken, null);
+  }
+
+  public static void inject(@NonNull Context context, @NonNull String accessToken, @Nullable String skuToken) {
     Mapbox mapbox = new Mapbox(context, accessToken);
     try {
-      Field field = Mapbox.class.getDeclaredField("INSTANCE");
-      field.setAccessible(true);
-      field.set(mapbox, mapbox);
+      Field instance = Mapbox.class.getDeclaredField(FIELD_INSTANCE);
+      instance.setAccessible(true);
+      instance.set(mapbox, mapbox);
+
+      Field accounts = Mapbox.class.getDeclaredField(FIELD_ACCOUNTS);
+      accounts.setAccessible(true);
+
+      AccountsManager manager = mock(AccountsManager.class);
+      when(manager.getSkuToken()).thenReturn(skuToken);
+      accounts.set(mapbox, manager);
     } catch (Exception exception) {
       throw new AssertionError();
     }
@@ -19,7 +38,7 @@ public class MapboxInjector {
 
   public static void clear() {
     try {
-      Field field = Mapbox.class.getDeclaredField("INSTANCE");
+      Field field = Mapbox.class.getDeclaredField(FIELD_INSTANCE);
       field.setAccessible(true);
       field.set(field, null);
     } catch (Exception exception) {

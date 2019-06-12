@@ -81,14 +81,17 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
 
     static auto& javaClass = jni::Class<HTTPRequest>::Singleton(env);
     static auto constructor =
-        javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String>(env);
+        javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String, jni::jboolean>(env);
 
     javaRequest = jni::NewGlobal(env,
         javaClass.New(env, constructor,
             reinterpret_cast<jlong>(this),
             jni::Make<jni::String>(env, resource.url),
             jni::Make<jni::String>(env, etagStr),
-            jni::Make<jni::String>(env, modifiedStr)));
+            jni::Make<jni::String>(env, modifiedStr),
+            (jboolean) (resource_.usage == Resource::Usage::Offline)
+        )
+    );
 }
 
 HTTPRequest::~HTTPRequest() {
