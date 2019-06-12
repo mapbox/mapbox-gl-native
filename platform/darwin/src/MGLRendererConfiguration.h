@@ -26,7 +26,9 @@ MGL_EXPORT
 /** The name of the font family to use for client-side text rendering.
 
  Currently only used for CJK glyphs. Changing this at run time is not currently
- supported. Enable client-side rendering of CJK glyphs and use `Helvetica` by default.
+ supported. By default, client-side rendering is enabled for CJK glyphs using Apple
+ system default font.
+ 
  Set `MGLIdeographicFontFamilyName` in your containing app's Info.plist to a value
  which will be available at run time, e.g. "PingFang".
  Set `MGLIdeographicFontFamilyName` to `NULL` for using your custom remote font.*/
