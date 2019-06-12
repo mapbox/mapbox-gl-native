@@ -76,7 +76,14 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
         return mbgl::optional<std::string>();
     }
     
-    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : std::string([[UIFont systemFontOfSize:0 weight:UIFontWeightRegular].familyName UTF8String]);
+    std::string systemFontFamilyName;
+#if TARGET_OS_IPHONE
+    systemFontFamilyName = std::string([[UIFont systemFontOfSize:0 weight:UIFontWeightRegular].familyName UTF8String]);
+#else
+    systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:UIFontWeightRegular].familyName UTF8String]);
+#endif
+    
+    return fontFamilyName ? std::string([fontFamilyName UTF8String]):systemFontFamilyName;
 }
 
 @end
