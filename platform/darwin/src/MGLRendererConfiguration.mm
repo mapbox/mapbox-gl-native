@@ -83,7 +83,7 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:NSFontWeightRegular].familyName UTF8String]);
 #endif
     
-    return fontFamilyName ? std::string([fontFamilyName UTF8String]):systemFontFamilyName;
+    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
 }
 
 @end
