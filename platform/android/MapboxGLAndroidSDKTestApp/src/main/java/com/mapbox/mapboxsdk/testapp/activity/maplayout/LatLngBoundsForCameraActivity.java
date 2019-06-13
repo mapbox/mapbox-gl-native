@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.Menu;
@@ -76,25 +77,30 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
       case R.id.menu_action_cross_idl:
         setupBounds(CROSS_IDL_BOUNDS);
         return true;
+      case R.id.menu_action_reset:
+        setupBounds(null);
+        return true;
     }
     return super.onOptionsItemSelected(item);
   }
 
-  private void setupBounds(LatLngBounds bounds) {
+  private void setupBounds(@Nullable LatLngBounds bounds) {
     mapboxMap.setLatLngBoundsForCameraTarget(bounds);
     showBoundsArea(bounds);
   }
 
-  private void showBoundsArea(LatLngBounds bounds) {
+  private void showBoundsArea(@Nullable LatLngBounds bounds) {
     mapboxMap.clear();
-    PolygonOptions boundsArea = new PolygonOptions()
-      .add(bounds.getNorthWest())
-      .add(bounds.getNorthEast())
-      .add(bounds.getSouthEast())
-      .add(bounds.getSouthWest());
-    boundsArea.alpha(0.25f);
-    boundsArea.fillColor(Color.RED);
-    mapboxMap.addPolygon(boundsArea);
+    if (bounds != null) {
+      PolygonOptions boundsArea = new PolygonOptions()
+        .add(bounds.getNorthWest())
+        .add(bounds.getNorthEast())
+        .add(bounds.getSouthEast())
+        .add(bounds.getSouthWest());
+      boundsArea.alpha(0.25f);
+      boundsArea.fillColor(Color.RED);
+      mapboxMap.addPolygon(boundsArea);
+    }
   }
 
   private void showCrosshair() {

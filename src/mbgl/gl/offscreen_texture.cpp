@@ -15,23 +15,11 @@ public:
         assert(!size.isEmpty());
     }
 
-    OffscreenTextureResource(gl::Context& context_,
-                             const Size size_,
-                             gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>& depth_,
-                             const gfx::TextureChannelDataType type_)
-        : context(context_), size(size_), depth(&depth_), type(type_) {
-        assert(!size.isEmpty());
-    }
-
     void bind() override {
         if (!framebuffer) {
             assert(!texture);
             texture = context.createTexture(size, gfx::TexturePixelType::RGBA, type);
-            if (depth) {
-                framebuffer = context.createFramebuffer(*texture, *depth);
-            } else {
-                framebuffer = context.createFramebuffer(*texture);
-            }
+            framebuffer = context.createFramebuffer(*texture);
         } else {
             context.bindFramebuffer = framebuffer->framebuffer;
         }
@@ -56,7 +44,6 @@ private:
     gl::Context& context;
     const Size size;
     optional<gfx::Texture> texture;
-    gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>* depth = nullptr;
     const gfx::TextureChannelDataType type;
     optional<gl::Framebuffer> framebuffer;
 };
@@ -65,15 +52,6 @@ OffscreenTexture::OffscreenTexture(gl::Context& context,
                                    const Size size_,
                                    const gfx::TextureChannelDataType type)
     : gfx::OffscreenTexture(size, std::make_unique<OffscreenTextureResource>(context, size_, type)) {
-}
-
-OffscreenTexture::OffscreenTexture(
-    gl::Context& context,
-    const Size size_,
-    gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>& renderbuffer,
-    const gfx::TextureChannelDataType type)
-    : gfx::OffscreenTexture(
-          size, std::make_unique<OffscreenTextureResource>(context, size_, renderbuffer, type)) {
 }
 
 bool OffscreenTexture::isRenderable() {

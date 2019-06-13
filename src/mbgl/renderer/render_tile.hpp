@@ -39,7 +39,6 @@ public:
     UnwrappedTileID id;
     mat4 matrix;
     mat4 nearClippedMatrix;
-    bool used = false;
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;
 
@@ -72,7 +71,6 @@ public:
                             const TransformState& state,
                             const bool inViewportPixelUnits) const;
 private:
-    friend class TilePyramid;
     Tile& tile;
 };
 

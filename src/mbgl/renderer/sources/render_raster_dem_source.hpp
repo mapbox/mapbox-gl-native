@@ -16,8 +16,6 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    void prepare(const SourcePrepareParameters&) override;
-
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,

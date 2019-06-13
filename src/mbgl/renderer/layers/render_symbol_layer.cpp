@@ -493,7 +493,7 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 }
 
 void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
-    renderTiles = params.source->getRenderTiles();
+    renderTiles = params.source->getRenderedTiles();
     const auto comp = [bearing = params.state.getBearing()](const RenderTile& a, const RenderTile& b) {
         Point<float> pa(a.id.canonical.x, a.id.canonical.y);
         Point<float> pb(b.id.canonical.x, b.id.canonical.y);

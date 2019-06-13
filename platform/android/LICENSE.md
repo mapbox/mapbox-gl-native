@@ -117,9 +117,9 @@ License: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ===========================================================================
 
-Mapbox GL uses portions of the ReLinker.  
-URL: [https://github.com/KeepSafe/ReLinker](https://github.com/KeepSafe/ReLinker)  
-License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Mapbox GL uses portions of the SoLoader.  
+URL: [https://github.com/facebook/soloader](https://github.com/facebook/soloader)  
+License: [BSD License](https://github.com/facebook/soloader/blob/master/LICENSE)
 
 ===========================================================================
 

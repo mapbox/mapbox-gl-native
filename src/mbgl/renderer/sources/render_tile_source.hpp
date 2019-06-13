@@ -22,7 +22,7 @@ public:
     void updateFadingTiles() override;
     bool hasFadingTiles() const override;
 
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() override;
+    std::vector<std::reference_wrapper<RenderTile>> getRenderedTiles() override;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
@@ -39,6 +39,7 @@ public:
 
 protected:
     TilePyramid tilePyramid;
+    std::vector<RenderTile> renderTiles;
 };
 
 } // namespace mbgl

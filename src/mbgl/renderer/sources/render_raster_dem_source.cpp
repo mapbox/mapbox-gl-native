@@ -52,6 +52,7 @@ void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<RasterDEMTile>(tileID, parameters, *tileset);
                        });
+    algorithm::updateTileMasks(tilePyramid.getRenderedTiles());
 }
 
 void RenderRasterDEMSource::onTileChanged(Tile& tile){
@@ -119,11 +120,6 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
         }
     }
     RenderTileSource::onTileChanged(tile);
-}
-
-void RenderRasterDEMSource::prepare(const SourcePrepareParameters& parameters) {
-    algorithm::updateTileMasks(tilePyramid.getRenderTiles());
-    RenderTileSource::prepare(parameters);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>

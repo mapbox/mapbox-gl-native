@@ -13,7 +13,7 @@ public:
     Value(jni::JNIEnv&, const jni::Object<>&);
 
     Value(Value&&)                 = default;
-    Value& operator=(Value&&)      = default;
+    Value& operator=(Value&&)      = delete;
 
     Value(const Value&)            = delete;
     Value& operator=(const Value&) = delete;

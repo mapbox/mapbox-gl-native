@@ -58,7 +58,7 @@ public:
     uint32_t overscaleFactor() const;
     OverscaledTileID scaledTo(uint8_t z) const;
     UnwrappedTileID toUnwrapped() const;
-    OverscaledTileID unwrapTo(int16_t wrap);
+    OverscaledTileID unwrapTo(int16_t wrap) const;
 
     uint8_t overscaledZ;
     int16_t wrap;
@@ -85,7 +85,7 @@ public:
     std::array<UnwrappedTileID, 4> children() const;
     OverscaledTileID overscaleTo(uint8_t z) const;
     float pixelsToTileUnits(float pixelValue, float zoom) const;
-    UnwrappedTileID unwrapTo(int16_t wrap);
+    UnwrappedTileID unwrapTo(int16_t wrap) const;
 
     int16_t wrap;
     CanonicalTileID canonical;
@@ -194,7 +194,7 @@ inline UnwrappedTileID OverscaledTileID::toUnwrapped() const {
     return { wrap, canonical };
 }
 
-inline OverscaledTileID OverscaledTileID::unwrapTo(int16_t newWrap) {
+inline OverscaledTileID OverscaledTileID::unwrapTo(int16_t newWrap) const {
     return { overscaledZ, newWrap, canonical };
 }
 
@@ -222,7 +222,7 @@ inline bool UnwrappedTileID::operator<(const UnwrappedTileID& rhs) const {
     return std::tie(wrap, canonical) < std::tie(rhs.wrap, rhs.canonical);
 }
 
-inline UnwrappedTileID UnwrappedTileID::unwrapTo(int16_t newWrap) {
+inline UnwrappedTileID UnwrappedTileID::unwrapTo(int16_t newWrap) const {
     return { newWrap, canonical };
 }
 

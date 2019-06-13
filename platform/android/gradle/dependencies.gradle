@@ -8,7 +8,7 @@ ext {
 
     versions = [
             mapboxServices  : '4.8.0',
-            mapboxTelemetry : '4.4.1',
+            mapboxTelemetry : '4.5.1',
             mapboxCore      : '1.3.0',
             mapboxGestures  : '0.4.2',
             mapboxAccounts  : '0.2.0',
@@ -31,12 +31,11 @@ ext {
             androidPublish  : '3.6.2',
             lint            : '26.1.4',
             gms             : '16.0.0',
-            reLinker        : '1.3.1',
+            soLoader        : '0.6.0',
             jacoco          : '0.8.3'
     ]
 
     dependenciesList = [
-            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
             mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
             mapboxAndroidGestures  : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
@@ -68,7 +67,7 @@ ext {
             okhttp3                : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
             leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",
             leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${versions.leakCanary}",
-            reLinker               : "com.getkeepsafe.relinker:relinker:${versions.reLinker}",
+            soLoader               : "com.facebook.soloader:soloader:${versions.soLoader}",
 
             kotlinLib              : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
             kotlinPlugin           : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",

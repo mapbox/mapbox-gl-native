@@ -96,6 +96,8 @@ public:
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup() override;
 
+    void reduceMemoryUsage() override;
+
     // Drain pools and remove abandoned objects, in preparation for destroying the store.
     // Only call this while the OpenGL context is exclusive to this thread.
     void reset();
@@ -181,10 +183,6 @@ private:
 
     std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
         Size, gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
-    std::unique_ptr<gfx::OffscreenTexture> createOffscreenTexture(
-        Size,
-        gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>&,
-        gfx::TextureChannelDataType = gfx::TextureChannelDataType::UnsignedByte) override;
 
     std::unique_ptr<gfx::TextureResource>
         createTextureResource(Size, gfx::TexturePixelType, gfx::TextureChannelDataType) override;

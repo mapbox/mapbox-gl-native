@@ -131,12 +131,16 @@ public:
     OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;
+    // Indicates whether this tile is used for the currently visible layers on the map.
+    // Re-initialized at every source update.
+    bool usedByRenderedLayers = false;
 
 protected:
     bool triedOptional = false;
     bool renderable = false;
     bool pending = false;
     bool loaded = false;
+
 
     TileObserver* observer = nullptr;
 };

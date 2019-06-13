@@ -437,13 +437,6 @@ Context::createOffscreenTexture(const Size size, const gfx::TextureChannelDataTy
     return std::make_unique<gl::OffscreenTexture>(*this, size, type);
 }
 
-std::unique_ptr<gfx::OffscreenTexture>
-Context::createOffscreenTexture(const Size size,
-                                gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>& depth,
-                                gfx::TextureChannelDataType type) {
-    return std::make_unique<gl::OffscreenTexture>(*this, size, depth, type);
-}
-
 std::unique_ptr<gfx::DrawScopeResource> Context::createDrawScopeResource() {
     return std::make_unique<gl::DrawScopeResource>(createVertexArray());
 }
@@ -689,7 +682,13 @@ void Context::performCleanup() {
                                                abandonedRenderbuffers.data()));
         abandonedRenderbuffers.clear();
     }
+}
 
+void Context::reduceMemoryUsage() {
+    performCleanup();
+
+    // Ensure that all pending actions are executed to ensure that they happen before the app goes
+    // to the background.
     MBGL_CHECK_ERROR(glFinish());
 }
 

@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LineGradientProgram> {
     static constexpr const char* name = "line_gradient";
-    static constexpr const uint8_t hash[8] = { 0x0f, 0xa3, 0xae, 0x1c, 0x38, 0xf2, 0x60, 0x54 };
-    static constexpr const auto vertexOffset = 34185;
-    static constexpr const auto fragmentOffset = 36938;
+    static constexpr const uint8_t hash[8] = { 0x3f, 0xba, 0xc6, 0x33, 0xcd, 0x86, 0xa2, 0xe8 };
+    static constexpr const auto vertexOffset = 34224;
+    static constexpr const auto fragmentOffset = 37016;
 };
 
 constexpr const char* ShaderSource<LineGradientProgram>::name;
@@ -51,7 +51,7 @@ Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programPara
 // #define scale 63.0
 #define scale 0.015873016
 
-attribute vec4 a_pos_normal;
+attribute vec2 a_pos_normal;
 attribute vec4 a_data;
 
 uniform mat4 u_matrix;
@@ -153,11 +153,13 @@ void main() {
 
     v_lineprogress = (floor(a_data.z / 4.0) + a_data.w * 64.0) * 2.0 / MAX_LINE_DISTANCE;
 
-    vec2 pos = a_pos_normal.xy;
+    vec2 pos = floor(a_pos_normal * 0.5);
 
     // x is 1 if it's a round cap, 0 otherwise
     // y is 1 if the normal points up, and -1 if it points down
-    mediump vec2 normal = a_pos_normal.zw;
+    // We store these in the least significant bit of a_pos_normal
+    mediump vec2 normal = a_pos_normal - 2.0 * pos;
+    normal.y = normal.y * 2.0 - 1.0;
     v_normal = normal;
 
     // these transformations used to be applied in the JS and native code bases.

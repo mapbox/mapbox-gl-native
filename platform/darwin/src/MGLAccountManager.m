@@ -18,10 +18,6 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
 @property (atomic) NSString *accessToken;
 @property (nonatomic) NSURL *apiBaseURL;
 
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-@property BOOL useExternalAccountManager;
-#endif
-
 @end
 
 @implementation MGLAccountManager
@@ -41,15 +37,6 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
     if (apiBaseURL.length && [NSURL URLWithString:apiBaseURL]) {
         [self setAPIBaseURL:[NSURL URLWithString:apiBaseURL]];
     }
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    // Check if we should use an external accounts library (e.g., provided by navigation)
-    id externalAccountsClass = NSClassFromString(MGLAccountManagerExternalClassName);
-    SEL externalSKUTokenMethod = NSSelectorFromString(MGLAccountManagerExternalMethodName);
-    if (externalAccountsClass != nil && [externalAccountsClass respondsToSelector:externalSKUTokenMethod]) {
-        MGLAccountManager.sharedManager.useExternalAccountManager = YES;
-    }
-#endif
 }
 
 + (instancetype)sharedManager {
@@ -109,13 +96,13 @@ static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
 + (NSString *)skuToken {
-    if (MGLAccountManager.sharedManager.useExternalAccountManager) {
-        id externalAccountsClass = NSClassFromString(MGLAccountManagerExternalClassName);
-        SEL externalSKUTokenMethod = NSSelectorFromString(MGLAccountManagerExternalMethodName);
-        return ((NSString *(*)(id, SEL))[externalAccountsClass methodForSelector:externalSKUTokenMethod])(externalAccountsClass, externalSKUTokenMethod);
-    } else {
-        return MBXSKUToken.skuToken;
+    Class mbx = NSClassFromString(MGLAccountManagerExternalClassName);
+    
+    if ([mbx respondsToSelector:NSSelectorFromString(MGLAccountManagerExternalMethodName)]) {
+        return (NSString *)[mbx valueForKeyPath:MGLAccountManagerExternalMethodName];
     }
+    
+    return MBXSKUToken.skuToken;
 }
 
 #endif

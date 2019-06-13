@@ -9,4 +9,8 @@
             android:id="@+id/menu_action_cross_idl"
             android:title="@string/restrict_across_idl"
             app:showAsAction="never"/>
+    <item
+            android:id="@+id/menu_action_reset"
+            android:title="@string/restrict_reset"
+            app:showAsAction="never"/>
 </menu>

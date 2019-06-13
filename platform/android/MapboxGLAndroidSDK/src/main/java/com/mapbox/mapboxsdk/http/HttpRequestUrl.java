@@ -15,9 +15,10 @@ public class HttpRequestUrl {
    * @param host        the host used as endpoint
    * @param resourceUrl the resource to download
    * @param querySize   the query size of the resource request
+   * @param offline     the type of resource, either offline or online
    * @return the adapted resource url
    */
-  public static String buildResourceUrl(@NonNull String host, String resourceUrl, int querySize) {
+  public static String buildResourceUrl(@NonNull String host, String resourceUrl, int querySize, boolean offline) {
     if (isValidMapboxEndpoint(host)) {
       if (querySize == 0) {
         resourceUrl = resourceUrl + "?";
@@ -25,6 +26,10 @@ public class HttpRequestUrl {
         resourceUrl = resourceUrl + "&";
       }
       resourceUrl = resourceUrl + "sku=" + Mapbox.getSkuToken();
+
+      if (offline) {
+        resourceUrl = resourceUrl + "&offline=true";
+      }
     }
     return resourceUrl;
   }

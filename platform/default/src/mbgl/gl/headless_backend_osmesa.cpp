@@ -6,6 +6,7 @@
 #include <cassert>
 
 namespace mbgl {
+namespace gl {
 
 class OSMesaBackendImpl : public HeadlessBackend::Impl {
 public:
@@ -44,4 +45,5 @@ void HeadlessBackend::createImpl() {
     impl = std::make_unique<OSMesaBackendImpl>();
 }
 
+} // namespace gl
 } // namespace mbgl

@@ -1,12 +1,13 @@
 package com.mapbox.mapboxsdk.module.loader;
 
-import android.content.Context;
-import com.getkeepsafe.relinker.ReLinker;
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.LibraryLoaderProvider;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.log.Logger;
+
+import static com.facebook.soloader.SoLoader.init;
+import static com.facebook.soloader.SoLoader.loadLibrary;
 
 /**
  * Concrete implementation of a native library loader.
@@ -23,35 +24,25 @@ public class LibraryLoaderProviderImpl implements LibraryLoaderProvider {
    */
   @Override
   public LibraryLoader getDefaultLibraryLoader() {
-    return new ReLinkerLibraryLoader();
+    return new SoLibraryLoader();
   }
 
   /**
    * Concrete implementation of a LibraryLoader using ReLinker.
    */
-  private static class ReLinkerLibraryLoader extends LibraryLoader {
+  private static class SoLibraryLoader extends LibraryLoader {
+
+    private static final String TAG = "SoLibraryLoader";
 
     @Override
     public void load(String name) {
       try {
-        Context context = Mapbox.getApplicationContext();
-        ReLinker.log(new LibraryLogger()).loadLibrary(context, name);
+        // nativeExopackage = false, https://buck.build/article/exopackage.html
+        init(Mapbox.getApplicationContext(), false);
+        loadLibrary(name);
       } catch (MapboxConfigurationException exception) {
-        Logger.e(LibraryLogger.TAG, "Couldn't load so file with relinker, application context missing, "
+        Logger.e(TAG, "Couldn't load so file with relinker, application context missing, "
           + "call Mapbox.getInstance(Context context, String accessToken) first");
-      }
-    }
-
-    /**
-     * Relinker library loader logger.
-     */
-    private static class LibraryLogger implements ReLinker.Logger {
-
-      private static final String TAG = "Mbgl-LibraryLoader";
-
-      @Override
-      public void log(String message) {
-        Logger.d(TAG, message);
       }
     }
   }

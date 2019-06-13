@@ -206,7 +206,7 @@ int strcasecompare(const char *first, const char *second)
 ** signed long to signed int
 */
 
-int curlx_sltosi(long slnum)
+int mbgl_curlx_sltosi(long slnum)
 {
   return slnum > INT_MAX ? INT_MAX : slnum < INT_MIN ? INT_MIN : (int)slnum;
 }
@@ -545,7 +545,7 @@ static int parsedate(const char *date, time_t *output)
           return PARSEDATE_FAIL;
 #endif
 
-        val = curlx_sltosi(lval);
+        val = mbgl_curlx_sltosi(lval);
 
         if((tzoff == -1) &&
            ((end - date) == 4) &&

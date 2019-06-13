@@ -13,7 +13,7 @@ dependencies {
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.okhttp3
-    implementation dependenciesList.reLinker
+    implementation dependenciesList.soLoader
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.mockk

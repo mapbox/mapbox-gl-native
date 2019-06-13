@@ -20,7 +20,6 @@ namespace mbgl {
 
 class PaintParameters;
 class TransformState;
-class RenderTile;
 class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
@@ -44,11 +43,7 @@ public:
                 optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
-    void upload(gfx::UploadPass&);
-    void prepare(const SourcePrepareParameters&);
-    void finishRender(PaintParameters&);
-
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
+    const std::map<UnwrappedTileID, std::reference_wrapper<Tile>>& getRenderedTiles() const { return renderTiles; }
     Tile* getTile(const OverscaledTileID&);
 
     void handleWrapJump(float lng);
@@ -80,8 +75,7 @@ private:
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     TileCache cache;
 
-    std::list<RenderTile> renderTiles;
-
+    std::map<UnwrappedTileID, std::reference_wrapper<Tile>> renderTiles; // Sorted by tile id.
     TileObserver* observer = nullptr;
 
     float prevLng = 0;

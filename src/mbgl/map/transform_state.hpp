@@ -54,6 +54,9 @@ public:
     uint8_t getIntegerZoom() const;
     double getZoomFraction() const;
 
+    // Scale
+    double getScale() const { return scale; }
+
     // Bounds
     void setLatLngBounds(LatLngBounds);
     LatLngBounds getLatLngBounds() const;

@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 
     // Geometry
     args::Group geoJSONGroup(argumentParser, "GeoJson geometry:", args::Group::Validators::AllOrNone);
-    args::ValueFlag<std::string> geometryValue(geoJSONGroup, "file", "GeoJSON file containing the region geometry", {"geojson"});
+    args::ValueFlag<std::string> geometryValue(geoJSONGroup, "file", "GeoJSON Feature file containing the region geometry (can't be a FeatureCollection)", {"geojson"});
 
     args::ValueFlag<double> minZoomValue(argumentParser, "number", "Min zoom level", {"minZoom"});
     args::ValueFlag<double> maxZoomValue(argumentParser, "number", "Max zoom level", {"maxZoom"});

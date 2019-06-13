@@ -10,17 +10,13 @@ namespace mbgl {
 using namespace style;
 
 RenderAnnotationSource::RenderAnnotationSource(Immutable<AnnotationSource::Impl> impl_)
-    : RenderSource(impl_) {
+    : RenderTileSource(std::move(impl_)) {
     assert(LayerManager::annotationsEnabled);
     tilePyramid.setObserver(this);
 }
 
 const AnnotationSource::Impl& RenderAnnotationSource::impl() const {
     return static_cast<const AnnotationSource::Impl&>(*baseImpl);
-}
-
-bool RenderAnnotationSource::isLoaded() const {
-    return tilePyramid.isLoaded();
 }
 
 void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
@@ -47,30 +43,6 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderAnnotationSource::upload(gfx::UploadPass& uploadPass) {
-    tilePyramid.upload(uploadPass);
-}
-
-void RenderAnnotationSource::prepare(const SourcePrepareParameters& parameters) {
-    tilePyramid.prepare(parameters);
-}
-
-void RenderAnnotationSource::finishRender(PaintParameters& parameters) {
-    tilePyramid.finishRender(parameters);
-}
-
-void RenderAnnotationSource::updateFadingTiles() {
-    tilePyramid.updateFadingTiles();
-}
-
-bool RenderAnnotationSource::hasFadingTiles() const {
-    return tilePyramid.hasFadingTiles();
-}
-
-std::vector<std::reference_wrapper<RenderTile>> RenderAnnotationSource::getRenderTiles() {
-    return tilePyramid.getRenderTiles();
-}
-
 std::unordered_map<std::string, std::vector<Feature>>
 RenderAnnotationSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                               const TransformState& transformState,
@@ -84,12 +56,5 @@ std::vector<Feature> RenderAnnotationSource::querySourceFeatures(const SourceQue
     return {};
 }
 
-void RenderAnnotationSource::reduceMemoryUse() {
-    tilePyramid.reduceMemoryUse();
-}
-
-void RenderAnnotationSource::dumpDebugLogs() const {
-    tilePyramid.dumpDebugLogs();
-}
 
 } // namespace mbgl
