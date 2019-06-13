@@ -95,7 +95,7 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
                 return std::string([name UTF8String]);
             }
 #else
-            if([[NSFont familyNames] containsObject:name]){
+            if([[[NSFontManager sharedFontManager] availableFontFamilies] containsObject:name]){
                 return std::string([name UTF8String]);
             }
 #endif
