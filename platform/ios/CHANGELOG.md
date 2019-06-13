@@ -2,20 +2,19 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-* Fixed a crash caused by incorrect `MGLMapViewImpl` renderable size. ([#14810](https://github.com/mapbox/mapbox-gl-native/pull/14810))
-* Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
-
 ## 5.1.0
 
 ### Styles and rendering
 
 * Setting `MGLMapView.contentInset` now moves the map’s focal point to the center of the content frame after insetting. ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
+* Fixed a rendering performance regression when rendering polylines. ([#14851](https://github.com/mapbox/mapbox-gl-native/pull/14851))
+* Fixed a rendering performance regression introduced in 4.11.0. ([#14907](https://github.com/mapbox/mapbox-gl-native/pull/14907))
+* Fixed an issue where symbols underneath opaque fill layers could be incorrectly drawn above such layers. ([#14839](https://github.com/mapbox/mapbox-gl-native/pull/14839))
 
 ### Other changes
 
 * The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInset` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
+* Fixed a feature querying bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 
 ## 5.0.0 - May 22, 2019
 
@@ -36,6 +35,7 @@ There are no breaking API changes in this release.
 ### Styles and rendering
 
 * Fixed a bug where some layers weren’t rendering correctly after panning. ([#14527](https://github.com/mapbox/mapbox-gl-native/pull/14527))
+* Speculatively fixed a rare background crash when receiving a memory warning. ([#14383](https://github.com/mapbox/mapbox-gl-native/pull/14383))
 
 ### Annotations
 
