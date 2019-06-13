@@ -20,7 +20,7 @@ be a local file URL, an HTTP URL, or an HTTPS URL.
 
 Once you’ve added the GeoJSON file to the map via an `MGLShapeSource` object,
 you can configure the appearance of its data and control what data is visible
-using `MGLStyleLayer` objects, you can
+using `MGLStyleLayer` objects. You can also
 [access the data programmatically](#extracting-geojson-data-from-the-map).
 
 ## Converting GeoJSON data into shape objects
