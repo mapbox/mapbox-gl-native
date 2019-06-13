@@ -36,7 +36,8 @@ MGL_EXPORT
  font family names. Once the front ones are unavaiable, it will fallback to others until
  using default system font.
  
- Set `MGLIdeographicFontFamilyName` to `NULL` for using your custom remote font.*/
+ Set `MGLIdeographicFontFamilyName` to `NULL` for using your custom remote font.
+ */
 @property (nonatomic, readonly) mbgl::optional<std::string> localFontFamilyName;
 
 /**

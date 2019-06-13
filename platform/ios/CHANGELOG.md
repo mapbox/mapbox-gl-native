@@ -5,7 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 * Fixed a crash caused by incorrect `MGLMapViewImpl` renderable size. ([#14810](https://github.com/mapbox/mapbox-gl-native/pull/14810))
-* By default, client-side rendering is enabled for CJK glyphs using Apple system default font. Set `MGLIdeographicFontFamilyName` to `NULL`  in `info.plist` for using custom remote CJK glyphs font([#14862](https://github.com/mapbox/mapbox-gl-native/pull/14862))
+* Fixed an issue that caused the map to ignore the remote fonts for CJK Kanji glyphs. Added ability to specify an array of fonts for fallbacks for local ideographic font family.([#14862](https://github.com/mapbox/mapbox-gl-native/pull/14862))
 
 ## 5.1.0
 
