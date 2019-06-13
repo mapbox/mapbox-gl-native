@@ -70,11 +70,6 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
 }
 
 - (mbgl::optional<std::string>)localFontFamilyName {
-    NSString *fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
-    
-    if([fontFamilyName isEqualToString:@"NULL"]){
-        return mbgl::optional<std::string>();
-    }
     
     std::string systemFontFamilyName;
 #if TARGET_OS_IPHONE
@@ -82,8 +77,31 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
 #else
     systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:NSFontWeightRegular].familyName UTF8String]);
 #endif
-    
-    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
+
+    id fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
+    if([fontFamilyName isKindOfClass:[NSString class]])
+    {
+        if([fontFamilyName isEqualToString:@"NULL"]){
+            return mbgl::optional<std::string>();
+        }
+        
+        return fontFamilyName ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
+    }
+    //Ability to specify an array of fonts for fallbacks for `localIdeographicFontFamily`
+    else if ([fontFamilyName isKindOfClass:[NSArray class]]){
+        for(NSString *name in fontFamilyName){
+#if TARGET_OS_IPHONE
+            if([[UIFont familyNames] containsObject:name]){
+                return std::string([name UTF8String]);
+            }
+#else
+            if([[NSFont familyNames] containsObject:name]){
+                return std::string([name UTF8String]);
+            }
+#endif
+        }
+    }
+    return systemFontFamilyName;
 }
 
 @end
