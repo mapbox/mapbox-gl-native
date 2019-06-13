@@ -22,6 +22,12 @@
 
 #include <utility>
 
+#if defined(TARGET_IPHONE_SIMULATOR) && defined(__i386__)
+__declspec(thread) unsigned test = 0;
+#else
+thread_local unsigned test = 0;
+#endif
+
 namespace mbgl {
 
 using namespace style;
@@ -62,6 +68,8 @@ void Map::renderStill(StillImageCallback callback) {
     impl->stillImageRequest = std::make_unique<StillImageRequest>(std::move(callback));
 
     impl->onUpdate();
+
+    test++;
 }
 
 void Map::renderStill(const CameraOptions& camera, MapDebugOptions debugOptions, StillImageCallback callback) {
