@@ -97,3 +97,6 @@
 [submodule "vendor/mvt-fixtures"]
 	path = vendor/mvt-fixtures
 	url = https://github.com/mapbox/mvt-fixtures.git
+[submodule "vendor/mapbox-gl-styles"]
+	path = vendor/mapbox-gl-styles
+	url = https://github.com/mapbox/mapbox-gl-styles.git
