@@ -6,7 +6,7 @@
 namespace mbgl {
 
 std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
-    auto fileSource = std::make_shared<DefaultFileSource>(options.cachePath(), options.assetPath());
+    auto fileSource = std::make_shared<DefaultFileSource>(options.cachePath(), options.assetPath(), options.supportsCacheOnlyRequests());
     fileSource->setAccessToken(options.accessToken());
     fileSource->setAPIBaseURL(options.baseURL());
     return fileSource;

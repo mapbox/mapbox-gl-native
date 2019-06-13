@@ -224,16 +224,21 @@ private:
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
 };
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& assetPath)
-    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetPath)) {
+DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& assetPath, bool supportCacheOnlyRequests_)
+    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetPath), supportCacheOnlyRequests_) {
 }
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath, std::unique_ptr<FileSource>&& assetFileSource_)
+DefaultFileSource::DefaultFileSource(const std::string& cachePath, std::unique_ptr<FileSource>&& assetFileSource_, bool supportCacheOnlyRequests_)
         : assetFileSource(std::move(assetFileSource_))
-        , impl(std::make_unique<util::Thread<Impl>>("DefaultFileSource", assetFileSource, cachePath)) {
+        , impl(std::make_unique<util::Thread<Impl>>("DefaultFileSource", assetFileSource, cachePath))
+        , supportCacheOnlyRequests(supportCacheOnlyRequests_) {
 }
 
 DefaultFileSource::~DefaultFileSource() = default;
+
+bool DefaultFileSource::supportsCacheOnlyRequests() const {
+    return supportCacheOnlyRequests;
+}
 
 void DefaultFileSource::setAPIBaseURL(const std::string& baseURL) {
     impl->actor().invoke(&Impl::setAPIBaseURL, baseURL);

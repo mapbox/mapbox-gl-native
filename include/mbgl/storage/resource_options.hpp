@@ -97,6 +97,21 @@ public:
     uint64_t maximumCacheSize() const;
 
     /**
+     * @brief Sets whether to support cache-only requests.
+     *
+     * @return Whether or not cache-only requests are supported.
+     */
+    bool supportsCacheOnlyRequests() const;
+
+    /**
+     * @brief Gets the previously set (or default) support for cache-only requests.
+     *
+     * @param Whether or not cache-only requests are supported.
+     * @return reference to ResourceOptions for chaining options together.
+     */
+    ResourceOptions& withCacheOnlyRequestsSupport(bool);
+
+    /**
      * @brief Sets the platform context. A platform context is usually an object
      * that assists the creation of a file source.
      *
