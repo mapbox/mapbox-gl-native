@@ -23,20 +23,11 @@ using PathChangeCallback = std::function<void ()>;
 
 class DefaultFileSource : public FileSource {
 public:
-    /*
-     * The maximumCacheSize parameter is a limit applied to non-offline resources only,
-     * i.e. resources added to the database for the "ambient use" caching functionality.
-     * There is no size limit for offline resources. If a user never creates any offline
-     * regions, we want the database to remain fairly small (order tens or low hundreds
-     * of megabytes).
-     */
-    DefaultFileSource(const std::string& cachePath, const std::string& assetPath);
-    DefaultFileSource(const std::string& cachePath, std::unique_ptr<FileSource>&& assetFileSource);
+    DefaultFileSource(const std::string& cachePath, const std::string& assetPath, bool supportCacheOnlyRequests = true);
+    DefaultFileSource(const std::string& cachePath, std::unique_ptr<FileSource>&& assetFileSource, bool supportCacheOnlyRequests = true);
     ~DefaultFileSource() override;
 
-    bool supportsCacheOnlyRequests() const override {
-        return true;
-    }
+    bool supportsCacheOnlyRequests() const override;
 
     void setAPIBaseURL(const std::string&);
     std::string getAPIBaseURL();
@@ -253,6 +244,8 @@ private:
 
     std::mutex cachedAccessTokenMutex;
     std::string cachedAccessToken;
+
+    const bool supportCacheOnlyRequests;
 };
 
 } // namespace mbgl
