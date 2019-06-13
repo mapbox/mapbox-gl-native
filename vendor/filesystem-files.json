@@ -1,0 +1,13 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "ghc/filesystem.hpp": "vendor/filesystem/include/ghc/filesystem.hpp",
+        "ghc/fs_fwd.hpp": "vendor/filesystem/include/ghc/fs_fwd.hpp",
+        "ghc/fs_impl.hpp": "vendor/filesystem/include/ghc/fs_impl.hpp",
+        "ghc/fs_std.hpp": "vendor/filesystem/include/ghc/fs_std.hpp",
+        "ghc/fs_std_fwd.hpp": "vendor/filesystem/include/ghc/fs_std_fwd.hpp",
+        "ghc/fs_std_impl.hpp": "vendor/filesystem/include/ghc/fs_std_impl.hpp"
+    },
+    "private_headers": {}
+}

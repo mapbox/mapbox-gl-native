@@ -100,3 +100,6 @@
 [submodule "vendor/mapbox-gl-styles"]
 	path = vendor/mapbox-gl-styles
 	url = https://github.com/mapbox/mapbox-gl-styles.git
+[submodule "vendor/filesystem"]
+	path = vendor/filesystem
+	url = https://github.com/gulrak/filesystem.git
