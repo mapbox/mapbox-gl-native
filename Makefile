@@ -552,12 +552,6 @@ qt-docs:
 .PHONY: test-node
 test-node: node
 	npm test
-	npm run test-suite
-
-.PHONY: test-node-recycle-map
-test-node-recycle-map: node
-	npm test
-	npm run test-render -- --recycle-map --shuffle
 	npm run test-query
 	npm run test-expressions
 

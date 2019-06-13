@@ -43,6 +43,7 @@ workflows:
           name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
       - linux-doxygen
+      - linux-render-tests
       - ios-debug
       - ios-release-template:
           name: ios-release
@@ -53,6 +54,7 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug
+      - macos-render-tests
       - qt5-linux-gcc5-release
       - qt5-macos-debug
   nightly:
@@ -241,11 +243,25 @@ commands:
           sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
 
 
+  configure-cmake:
+    steps:
+    - run:
+        name: CMake configuration step
+        command: |
+          mkdir -p build
+          cd build
+          cmake -DWITH_CXX11ABI=${WITH_CXX11ABI:0} -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
+          cd ..
   build-node:
     steps:
     - run:
         name: Build node
         command: make node-all
+  build-mbgl-render-test:
+    steps:
+    - run:
+        name: Build mbgl-render-test
+        command: cmake --build build --config ${BUILDTYPE} --target mbgl-render-test -- -j${JOBS}
   build-linux:
     steps:
     - run:
@@ -371,18 +387,25 @@ commands:
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node
 
-  run-node-linux-tests-recycle-map:
+  run-macos-render-tests:
+    steps:
+    - run:
+        name: Run render tests (mbgl-render-test)
+        command: |
+          build/mbgl-render-test --recycle-map --shuffle
+        no_output_timeout: 2m
+
+  run-linux-render-tests:
     parameters:
       node_version:
         type: string
         default: v8
     steps:
     - run:
-        name: Run node tests (recycling the map object)
+        name: Run render tests (mbgl-render-test)
         command: |
-          . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
           xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v make test-node-recycle-map
+            logbt -- apitrace trace --api=egl -v build/mbgl-render-test --recycle-map --shuffle
 
   run-unit-tests:
     steps:
@@ -408,16 +431,10 @@ commands:
         when: on_success
         command: platform/node/scripts/publish.sh
 
-
   upload-render-tests:
     steps:
     - store_artifacts:
         path: mapbox-gl-js/test/integration/render-tests/index.html
-        destination: render-tests
-  upload-render-tests-recycle-map:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/render-tests/index-recycle-map.html
         destination: render-tests
 
   collect-xcode-build-logs:
@@ -728,7 +745,6 @@ jobs:
       - save-dependencies
       - run-node-linux-tests
       - publish-node-package
-      - upload-render-tests
 
 # ------------------------------------------------------------------------------
   node-gcc8-debug:
@@ -745,9 +761,7 @@ jobs:
       - install-dependencies
       - build-node
       - save-dependencies
-      - run-node-linux-tests-recycle-map
       - publish-node-package
-      - upload-render-tests-recycle-map
 
 # ------------------------------------------------------------------------------
   node-macos-release:
@@ -764,7 +778,6 @@ jobs:
       - save-dependencies
       - run-node-macos-tests
       - publish-node-package
-      - upload-render-tests
       - collect-xcode-build-logs
       - upload-xcode-build-logs
 
@@ -910,6 +923,25 @@ jobs:
           command: |
               platform/linux/ninja -C "build/linux-$(uname -m)/Debug" doxygen_coverage
               scripts/publish_doxygen_coverage.js "build/linux-$(uname -m)/Debug/doxygen-coverage.json"
+
+# ------------------------------------------------------------------------------
+  linux-render-tests:
+    docker:
+      - image: mbgl/linux-clang-7:a5a3c52107
+    resource_class: large
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: RelWithDebInfo
+      WITH_EGL: 1
+    steps:
+      - install-dependencies
+      - configure-cmake
+      - build-mbgl-render-test
+      - run-linux-render-tests
+      - save-dependencies
+      - upload-render-tests
 
 # ------------------------------------------------------------------------------
   ios-debug:
@@ -1119,6 +1151,23 @@ jobs:
           destination: test/fixtures
       - collect-xcode-build-logs
       - upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
+  macos-render-tests:
+    macos:
+      xcode: "10.2.1"
+    environment:
+      BUILDTYPE: RelWithDebInfo
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      JOBS: 2
+    steps:
+      - install-macos-dependencies
+      - install-dependencies
+      - configure-cmake
+      - build-mbgl-render-test
+      - save-dependencies
+      - run-macos-render-tests
+      - upload-render-tests
 
 # ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
