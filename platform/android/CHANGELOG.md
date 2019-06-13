@@ -11,6 +11,16 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
  - Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MapboxMap setPadding](https://docs.mapbox.com/android/api/map-sdk/8.0.0/com/mapbox/mapboxsdk/maps/MapboxMap.html#setPadding-int-int-int-int-). [#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664)
 
+## 8.1.0-beta.1 - June 13, 2019
+
+### Bugs
+ - Fix compilation warning with updated clang [#14865](https://github.com/mapbox/mapbox-gl-native/pull/14865)
+ - Fix reset behavior for setLatLngBoundsForCameraTarget [#14882](https://github.com/mapbox/mapbox-gl-native/pull/14882)
+
+### Features
+ - Change library loader to soloader [#14890](https://github.com/mapbox/mapbox-gl-native/pull/14890)
+ -  Add resource usage to HttpRequest, add offline query param [#14837](https://github.com/mapbox/mapbox-gl-native/pull/14837)
+
 ## 8.0.1 - June 11, 2019
 
 ### Bugs
