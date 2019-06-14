@@ -13,9 +13,8 @@
 
 namespace mbgl {
 
-OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
-    : path(std::move(path_)),
-      maximumCacheSize(maximumCacheSize_) {
+OfflineDatabase::OfflineDatabase(std::string path_)
+    : path(std::move(path_)) {
     try {
         initialize();
     } catch (const util::IOException& ex) {
@@ -86,6 +85,19 @@ void OfflineDatabase::cleanup() {
     } catch (const mapbox::sqlite::Exception& ex) {
         handleError(ex, "close database");
     }
+}
+
+bool OfflineDatabase::disabled() {
+    if (maximumAmbientCacheSize) {
+        return false;
+    }
+
+    auto regions = listRegions();
+    if (regions && !regions.value().empty()) {
+        return false;
+    }
+
+    return true;
 }
 
 void OfflineDatabase::handleError(const mapbox::sqlite::Exception& ex, const char* action) {
@@ -177,6 +189,10 @@ mapbox::sqlite::Statement& OfflineDatabase::getStatement(const char* sql) {
 }
 
 optional<Response> OfflineDatabase::get(const Resource& resource) try {
+    if (disabled()) {
+        return nullopt;
+    }
+
     auto result = getInternal(resource);
     return result ? optional<Response>{ result->first } : nullopt;
 } catch (const util::IOException& ex) {
@@ -209,6 +225,11 @@ std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const R
     if (!db) {
         initialize();
     }
+
+    if (disabled()) {
+        return { false, 0 };
+    }
+
     mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
     auto result = putInternal(resource, response, true);
     transaction.commit();
@@ -1120,7 +1141,7 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
 
     // The addition of pageSize is a fudge factor to account for non `data` column
     // size, and because pages can get fragmented on the database.
-    while (usedSize() + neededFreeSize + pageSize > maximumCacheSize) {
+    while (usedSize() + neededFreeSize + pageSize > maximumAmbientCacheSize) {
         // clang-format off
         mapbox::sqlite::Query accessedQuery{ getStatement(
             "SELECT max(accessed) "
@@ -1185,6 +1206,29 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     }
 
     return true;
+}
+
+std::exception_ptr OfflineDatabase::setMaximumAmbientCacheSize(uint64_t size) {
+    uint64_t previousMaximumAmbientCacheSize = maximumAmbientCacheSize;
+
+    try {
+        maximumAmbientCacheSize = size;
+
+        uint64_t databaseSize = getPragma<int64_t>("PRAGMA page_size")
+            * getPragma<int64_t>("PRAGMA page_count");
+
+        if (databaseSize > maximumAmbientCacheSize) {
+            evict(0);
+            db->exec("VACUUM");
+        }
+
+        return nullptr;
+    } catch (const mapbox::sqlite::Exception& ex) {
+        maximumAmbientCacheSize = previousMaximumAmbientCacheSize;
+        handleError(ex, "set maximum ambient cache size");
+
+        return std::current_exception();
+    }
 }
 
 void OfflineDatabase::setOfflineMapboxTileCountLimit(uint64_t limit) {

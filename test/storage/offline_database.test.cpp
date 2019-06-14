@@ -318,7 +318,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
     deleteDatabaseFiles();
     util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
 
-    OfflineDatabase db(filename, mapbox::sqlite::ReadOnly);
+    OfflineDatabase db(filename);
 
     Resource resource = Resource::style("mapbox://styles/mapbox/satellite-v9");
     ASSERT_TRUE(db.get(resource));
@@ -755,7 +755,8 @@ TEST(OfflineDatabase, PutReturnsSize) {
 
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
 
     Response response;
     response.data = randomString(1024);
@@ -773,7 +774,9 @@ TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
 
 TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, true };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -793,7 +796,8 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
 
 TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
 
     Response big;
     big.data = randomString(1024 * 100);
@@ -849,7 +853,9 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
 
 TEST(OfflineDatabase, HasRegionResource) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, true };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -873,7 +879,9 @@ TEST(OfflineDatabase, HasRegionResource) {
 
 TEST(OfflineDatabase, HasRegionResourceTile) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, false };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -968,7 +976,9 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
 
 TEST(OfflineDatabase, BatchInsertion) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, true };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -993,8 +1003,10 @@ TEST(OfflineDatabase, BatchInsertion) {
 
 TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
     db.setOfflineMapboxTileCountLimit(1);
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, false };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -1031,7 +1043,9 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v2.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions();
         ASSERT_TRUE(regions);
         for (auto& region : regions.value()) {
@@ -1053,7 +1067,9 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v3.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
@@ -1072,7 +1088,9 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v4.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
@@ -1098,7 +1116,9 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v5.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
@@ -1126,7 +1146,8 @@ TEST(OfflineDatabase, DowngradeSchema) {
     util::copyFile(filename, "test/fixtures/offline_database/v999.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
     }
 
     EXPECT_EQ(6, databaseUserVersion(filename));

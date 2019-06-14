@@ -20,10 +20,10 @@ namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
-    Impl(std::shared_ptr<FileSource> assetFileSource_, std::string cachePath, uint64_t maximumCacheSize)
+    Impl(std::shared_ptr<FileSource> assetFileSource_, std::string cachePath)
             : assetFileSource(std::move(assetFileSource_))
             , localFileSource(std::make_unique<LocalFileSource>())
-            , offlineDatabase(std::make_unique<OfflineDatabase>(cachePath, maximumCacheSize)) {
+            , offlineDatabase(std::make_unique<OfflineDatabase>(std::move(cachePath))) {
     }
 
     void setAPIBaseURL(const std::string& url) {
@@ -196,6 +196,10 @@ public:
         callback(offlineDatabase->clearAmbientCache());
     }
 
+    void setMaximumAmbientCacheSize(uint64_t size, std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->setMaximumAmbientCacheSize(size));
+    }
+
 private:
     expected<OfflineDownload*, std::exception_ptr> getDownload(int64_t regionID) {
         auto it = downloads.find(regionID);
@@ -220,17 +224,13 @@ private:
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
 };
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath,
-                                     const std::string& assetPath,
-                                     uint64_t maximumCacheSize)
-    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetPath), maximumCacheSize) {
+DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& assetPath)
+    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetPath)) {
 }
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath,
-                                     std::unique_ptr<FileSource>&& assetFileSource_,
-                                     uint64_t maximumCacheSize)
+DefaultFileSource::DefaultFileSource(const std::string& cachePath, std::unique_ptr<FileSource>&& assetFileSource_)
         : assetFileSource(std::move(assetFileSource_))
-        , impl(std::make_unique<util::Thread<Impl>>("DefaultFileSource", assetFileSource, cachePath, maximumCacheSize)) {
+        , impl(std::make_unique<util::Thread<Impl>>("DefaultFileSource", assetFileSource, cachePath)) {
 }
 
 DefaultFileSource::~DefaultFileSource() = default;
@@ -349,6 +349,10 @@ void DefaultFileSource::invalidateAmbientCache(std::function<void (std::exceptio
 
 void DefaultFileSource::clearAmbientCache(std::function<void (std::exception_ptr)> callback) {
     impl->actor().invoke(&Impl::clearAmbientCache, std::move(callback));
+}
+
+void DefaultFileSource::setMaximumAmbientCacheSize(uint64_t size, std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::setMaximumAmbientCacheSize, size, std::move(callback));
 }
 
 // For testing only:
