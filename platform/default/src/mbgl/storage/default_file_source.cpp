@@ -188,12 +188,12 @@ public:
         callback(offlineDatabase->resetDatabase());
     }
 
-    void invalidateTileCache(std::function<void (std::exception_ptr)> callback) {
-        callback(offlineDatabase->invalidateTileCache());
+    void invalidateAmbientCache(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->invalidateAmbientCache());
     }
 
-    void clearTileCache(std::function<void (std::exception_ptr)> callback) {
-        callback(offlineDatabase->clearTileCache());
+    void clearAmbientCache(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->clearAmbientCache());
     }
 
 private:
@@ -343,12 +343,12 @@ void DefaultFileSource::resetDatabase(std::function<void (std::exception_ptr)> c
     impl->actor().invoke(&Impl::resetDatabase, std::move(callback));
 }
 
-void DefaultFileSource::invalidateTileCache(std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::invalidateTileCache, callback);
+void DefaultFileSource::invalidateAmbientCache(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::invalidateAmbientCache, std::move(callback));
 }
 
-void DefaultFileSource::clearTileCache(std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::clearTileCache, callback);
+void DefaultFileSource::clearAmbientCache(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::clearAmbientCache, std::move(callback));
 }
 
 // For testing only:
