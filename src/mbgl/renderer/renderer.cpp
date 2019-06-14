@@ -24,29 +24,30 @@ Renderer::~Renderer() {
 }
 
 void Renderer::markContextLost() {
-    impl->markContextLost();
+    impl->orchestrator.markContextLost();
 }
 
 void Renderer::setObserver(RendererObserver* observer) {
     impl->setObserver(observer);
+    impl->orchestrator.setObserver(observer);
 }
 
 void Renderer::render(const UpdateParameters& updateParameters) {
-    if (auto renderTree = impl->createRenderTree(updateParameters)) {
+    if (auto renderTree = impl->orchestrator.createRenderTree(updateParameters)) {
         impl->render(*renderTree);
     }
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
-    return impl->queryRenderedFeatures(geometry, options);
+    return impl->orchestrator.queryRenderedFeatures(geometry, options);
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenCoordinate& point, const RenderedQueryOptions& options) const {
-    return impl->queryRenderedFeatures({ point }, options);
+    return impl->orchestrator.queryRenderedFeatures({ point }, options);
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenBox& box, const RenderedQueryOptions& options) const {
-    return impl->queryRenderedFeatures(
+    return impl->orchestrator.queryRenderedFeatures(
             {
                     box.min,
                     {box.max.x, box.min.y},
@@ -72,7 +73,7 @@ AnnotationIDs Renderer::queryShapeAnnotations(const ScreenBox& box) const {
     if (!LayerManager::annotationsEnabled) {
         return {};
     }
-    auto features = impl->queryShapeAnnotations({
+    auto features = impl->orchestrator.queryShapeAnnotations({
         box.min,
         {box.max.x, box.min.y},
         box.max,
@@ -99,7 +100,7 @@ AnnotationIDs Renderer::getAnnotationIDs(const std::vector<Feature>& features) c
 }
 
 std::vector<Feature> Renderer::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) const {
-    return impl->querySourceFeatures(sourceID, options);
+    return impl->orchestrator.querySourceFeatures(sourceID, options);
 }
 
 FeatureExtensionValue Renderer::queryFeatureExtensions(const std::string& sourceID,
@@ -107,16 +108,16 @@ FeatureExtensionValue Renderer::queryFeatureExtensions(const std::string& source
                                                        const std::string& extension,
                                                        const std::string& extensionField,
                                                        const optional<std::map<std::string, Value>>& args) const {
-    return impl->queryFeatureExtensions(sourceID, feature, extension, extensionField, args);
+    return impl->orchestrator.queryFeatureExtensions(sourceID, feature, extension, extensionField, args);
 }
 
 void Renderer::dumpDebugLogs() {
-    impl->dumpDebugLogs();
+    impl->orchestrator.dumpDebugLogs();
 }
 
 void Renderer::reduceMemoryUse() {
-    gfx::BackendScope guard { impl->backend };
     impl->reduceMemoryUse();
+    impl->orchestrator.reduceMemoryUse();
 }
 
 } // namespace mbgl
