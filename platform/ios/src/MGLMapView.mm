@@ -1620,6 +1620,14 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGesturePinch;
 
+    // jk - this stops the map from rotating at all
+//    if ( self.rotateEnabled ) {
+//        self.currentRotation += self.rotate.rotation;
+//        if ( std::abs(self.currentRotation) < 20 ) {
+//            self.rotate.rotation = 0;
+//        }
+//    }
+    
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         self.scale = powf(2, [self zoomLevel]);
@@ -1734,9 +1742,10 @@ public:
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
         
-        // jk - once it does start rotating, it'd jumpy
-        self.currentRotation += rotate.rotation;
-        if ( abs(self.currentRotation) < 20 ) {
+//        // jk - once it does start rotating, it'd jumpy. Also, this happens whenever I rotate, not just when zooming.
+        self.currentRotation += self.rotate.rotation;
+        NSLog(@"PINCH: %f", self.scale);
+        if ( std::abs(self.currentRotation) < 20 && std::abs(self.scale) > 20 ) {
             NSLog(@"ROTATION: %f", rotate.rotation);
             return;
         }
