@@ -5,6 +5,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/sqlite3.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <random>
 
@@ -127,5 +128,69 @@ BENCHMARK_F(OfflineDatabase, GetTile)(benchmark::State& state) {
     while (state.KeepRunning()) {
         auto res = db.get(Resource::tile("mapbox://tile_ambient" + util::toString(dis(gen)), 1, 0, 0, 0, Tileset::Scheme::XYZ));
         assert(res != nullopt);
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, AddTilesToFullDatabase)(benchmark::State& state) {
+    using namespace mbgl;
+
+    Log::setObserver(std::make_unique<Log::NullObserver>());
+    db.setMaximumAmbientCacheSize(50 * 1024 * 5);
+
+    while (state.KeepRunning()) {
+        const Resource ambient = Resource::tile("mapbox://AddTilesToFullDatabase" +
+                util::toString(state.iterations()), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.put(ambient, response);
+    }
+
+    Log::removeObserver();
+}
+
+BENCHMARK_F(OfflineDatabase, AddTilesToDisabledDatabase)(benchmark::State& state) {
+    using namespace mbgl;
+
+    auto regions = db.listRegions().value();
+    if (!regions.empty()) {
+        db.deleteRegion(std::move(regions[0]));
+    }
+
+    // Disables the ambient cache.
+    db.setMaximumAmbientCacheSize(0);
+
+    while (state.KeepRunning()) {
+        const Resource ambient = Resource::tile("mapbox://AddTilesToFullDatabase" +
+                util::toString(state.iterations()), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.put(ambient, response);
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, GetTileFromDisabledDatabase)(benchmark::State& state) {
+    using namespace mbgl;
+
+    auto regions = db.listRegions().value();
+    if (!regions.empty()) {
+        db.deleteRegion(std::move(regions[0]));
+    }
+
+    // Disables the ambient cache.
+    db.setMaximumAmbientCacheSize(0);
+
+    while (state.KeepRunning()) {
+        auto res = db.get(Resource::tile("mapbox://tile_ambient", 1, 0, 0, 0, Tileset::Scheme::XYZ));
+        assert(res == nullopt);
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, ResizeDatabase)(benchmark::State& state) {
+    uint64_t size = 25 * 1024 * 1024;
+
+    while (state.KeepRunning()) {
+        db.setMaximumAmbientCacheSize(size);
+
+        size -= response.data->size();
+
+        if (size < response.data->size()) {
+            size = 25 * 1024 * 1024;
+        }
     }
 }
