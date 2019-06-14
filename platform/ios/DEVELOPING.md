@@ -140,6 +140,10 @@ To add an example code listing to the documentation for a class or class member:
 
 [SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
 
+### Customizing compilation settings
+
+You can provide an optional and custom [`xcconfig`](https://help.apple.com/xcode/mac/current/#/dev745c5c974) file named `platform/darwin/developer.xcconfig` to set custom build options. This file is ignored by git. These custom settings apply to all configurations (`Debug`, `Release`, `RelWithDebInfo`), but do **not** apply to the core `mbgl` files. This mechanism allows you to try different compiler settings (for example when testing an Xcode beta).
+
 ## Testing
 
 `make ios-test` builds and runs unit tests of cross-platform code as well as the SDK.
