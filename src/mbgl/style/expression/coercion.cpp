@@ -25,7 +25,7 @@ EvaluationResult toNumber(const Value& v) {
         [](const std::string& s) -> optional<double> {
             try {
                 return util::stof(s);
-            } catch (const std::exception&) {
+            } catch (...) {
                 return optional<double>();
             }
         },
