@@ -80,6 +80,7 @@ template optional<PropertyValue<TextJustifyType>> Converter<PropertyValue<TextJu
 template optional<PropertyValue<TextTransformType>> Converter<PropertyValue<TextTransformType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<TranslateAnchorType>> Converter<PropertyValue<TranslateAnchorType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<mbgl::style::expression::Formatted>> Converter<PropertyValue<mbgl::style::expression::Formatted>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
+template optional<PropertyValue<std::vector<TextWritingModeType>>> Converter<PropertyValue<std::vector<TextWritingModeType>>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 
 } // namespace conversion
 } // namespace style
