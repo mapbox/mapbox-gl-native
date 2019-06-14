@@ -701,6 +701,22 @@ void SymbolLayer::setTextVariableAnchor(const PropertyValue<std::vector<TextVari
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+PropertyValue<std::vector<TextWritingModeType>> SymbolLayer::getDefaultTextWritingMode() {
+    return TextWritingMode::defaultValue();
+}
+
+const PropertyValue<std::vector<TextWritingModeType>>& SymbolLayer::getTextWritingMode() const {
+    return impl().layout.get<TextWritingMode>();
+}
+
+void SymbolLayer::setTextWritingMode(const PropertyValue<std::vector<TextWritingModeType>>& value) {
+    if (value == getTextWritingMode())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<TextWritingMode>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 
 // Paint properties
 
@@ -1387,6 +1403,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         TextSize,
         TextTransform,
         TextVariableAnchor,
+        TextWritingMode,
     };
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
         { "icon-allow-overlap", static_cast<uint8_t>(Property::IconAllowOverlap) },
@@ -1428,7 +1445,8 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         { "text-rotation-alignment", static_cast<uint8_t>(Property::TextRotationAlignment) },
         { "text-size", static_cast<uint8_t>(Property::TextSize) },
         { "text-transform", static_cast<uint8_t>(Property::TextTransform) },
-        { "text-variable-anchor", static_cast<uint8_t>(Property::TextVariableAnchor) }
+        { "text-variable-anchor", static_cast<uint8_t>(Property::TextVariableAnchor) },
+        { "text-writing-mode", static_cast<uint8_t>(Property::TextWritingMode) }
     });
 
     const auto it = properties.find(name.c_str());
@@ -1759,6 +1777,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         }
         
         setTextVariableAnchor(*typedValue);
+        return nullopt;
+        
+    }
+    
+    if (property == Property::TextWritingMode) {
+        Error error;
+        optional<PropertyValue<std::vector<TextWritingModeType>>> typedValue = convert<PropertyValue<std::vector<TextWritingModeType>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setTextWritingMode(*typedValue);
         return nullopt;
         
     }
