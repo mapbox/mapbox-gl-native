@@ -515,6 +515,140 @@ TEST(OfflineDatabase, GetRegionDefinition) {
     );
 }
 
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MaximumAmbientCacheSize)) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+
+    auto databaseSize = [] {
+        return util::read_file(filename).size();
+    };
+
+    {
+        OfflineDatabase db(filename);
+    }
+
+    size_t initialSize = util::read_file(filename).size();
+    size_t maximumSize = 50 * 1024 * 1024;
+
+    Response response;
+    response.data = randomString(100 * 1024);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 50 MB
+
+        OfflineTilePyramidRegionDefinition definition{ "mapbox://style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
+        OfflineRegionMetadata metadata{{ 1, 2, 3 }};
+
+        auto region = db.createRegion(definition, metadata);
+
+        // Add 100 MB of resources (50/50 ambient/region)
+        for (unsigned i = 0; i < 250; ++i) {
+            const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(ambientTile, response);
+
+            const Resource ambientStyle = Resource::style("mapbox://ambient_style_" + std::to_string(i));
+            db.put(ambientStyle, response);
+
+            const Resource regionTile = Resource::tile("mapbox://region_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.putRegionResource(region->getID(), regionTile, response);
+
+            const Resource regionStyle = Resource::style("mapbox://region_style_" + std::to_string(i));
+            db.putRegionResource(region->getID(), regionStyle, response);
+        }
+    }
+
+    // We are adding about 50 MB of "region" data and 50 MB,
+    // of "ambient" data. The effective size of the ambient
+    // cache will be zero here because it will try to make
+    // room for the region data.
+    EXPECT_GE(databaseSize(), maximumSize);
+    EXPECT_LE(databaseSize(), 60 * 1024 * 1024);
+
+    maximumSize = 30 * 1024 * 1024;
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 30 MB
+    }
+
+    // Setting a new size to the ambient cache should have no
+    // effect because it is all taken by offline region anyway.
+    EXPECT_GE(databaseSize(), maximumSize);
+    EXPECT_LE(databaseSize(), 60 * 1024 * 1024);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 30 MB
+        db.deleteRegion(std::move(db.listRegions().value()[0]));
+    }
+
+    // After deleting the offline region, the data will migrate
+    // to the ambient cache, respecting the size defined.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), maximumSize / 2);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize * 2); // 60 MB
+    }
+
+    // Doubling the size should have no effect if
+    // we don't and new tiles and if the ambient cache
+    // is already under the maximum size.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), maximumSize / 2);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 30 MB
+
+        // Add ~50 MB in ambient cache data.
+        for (unsigned i = 0; i < 250; ++i) {
+            const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(ambientTile, response);
+
+            const Resource ambientStyle = Resource::style("mapbox://ambient_style_" + std::to_string(i));
+            db.put(ambientStyle, response);
+        }
+    }
+
+    // Only ambient cache now, so it should respect
+    // the established size.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), maximumSize / 2);
+
+    maximumSize = 20 * 1024 * 1024;
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 20 MB
+    }
+
+    // Should shrink again.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), initialSize);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
+        for (unsigned i = 0; i < 5; ++i) {
+            const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(ambientTile, response);
+            ASSERT_FALSE(db.get(ambientTile));
+
+            const Resource ambientStyle = Resource::style("mapbox://ambient_style_" + std::to_string(i));
+            db.put(ambientStyle, response);
+            ASSERT_FALSE(db.get(ambientStyle));
+        }
+    }
+
+    // Setting the size to zero should effectively
+    // clear the cache now.
+    EXPECT_EQ(initialSize, util::read_file(filename).size());
+}
+
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
     FixtureLog log;
     deleteDatabaseFiles();
