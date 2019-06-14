@@ -2,6 +2,7 @@
 
 #include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
+#include <mbgl/renderer/render_tree.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
@@ -31,7 +32,9 @@ void Renderer::setObserver(RendererObserver* observer) {
 }
 
 void Renderer::render(const UpdateParameters& updateParameters) {
-    impl->render(updateParameters);
+    if (auto renderTree = impl->createRenderTree(updateParameters)) {
+        impl->render(*renderTree);
+    }
 }
 
 std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
