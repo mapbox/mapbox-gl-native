@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
     });
 
     view->setResetCacheCallback([fileSource] () {
-        fileSource->resetCache([](std::exception_ptr ex) {
+        fileSource->resetDatabase([](std::exception_ptr ex) {
             if (ex) {
                 mbgl::Log::Error(mbgl::Event::Database, "Failed to reset cache:: %s", mbgl::util::toString(ex).c_str());
             }
