@@ -30,13 +30,14 @@ MGL_EXPORT
  system default font.
  
  Set `MGLIdeographicFontFamilyName` in your containing app's Info.plist to a string
- value which will be available at run time, e.g. "PingFang TC".
+ value for using your specific local font which will be available at run time,
+ e.g. "PingFang TC".
  
  Set `MGLIdeographicFontFamilyName` in your containing app's Info.plist to a array of
  font family names. Once the front ones are unavaiable, it will fallback to others until
  using default system font.
  
- Set `MGLIdeographicFontFamilyName` to `NULL` for using your custom remote font.
+ Set `MGLIdeographicFontFamilyName` to a Boolean value `NO` for using your custom remote font.
  */
 @property (nonatomic, readonly) mbgl::optional<std::string> localFontFamilyName;
 

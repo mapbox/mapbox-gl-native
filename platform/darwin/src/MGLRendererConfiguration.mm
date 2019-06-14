@@ -79,11 +79,13 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
 #endif
 
     id fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
-    if([fontFamilyName isKindOfClass:[NSString class]])
+    
+    if([fontFamilyName isKindOfClass:[NSNumber class]] && ![fontFamilyName boolValue])
     {
-        if([fontFamilyName isEqualToString:@"NULL"]){
-            return mbgl::optional<std::string>();
-        }
+        return mbgl::optional<std::string>();
+    }
+    else if([fontFamilyName isKindOfClass:[NSString class]])
+    {
         return fontFamilyName ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
     }
     //Ability to specify an array of fonts for fallbacks for `localIdeographicFontFamily`
