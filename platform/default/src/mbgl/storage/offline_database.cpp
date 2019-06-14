@@ -1195,7 +1195,7 @@ bool OfflineDatabase::exceedsOfflineMapboxTileCountLimit(const Resource& resourc
         && offlineMapboxTileCountLimitExceeded();
 }
 
-std::exception_ptr OfflineDatabase::resetCache() try {
+std::exception_ptr OfflineDatabase::resetDatabase() try {
     removeExisting();
     initialize();
     return nullptr;

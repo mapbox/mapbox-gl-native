@@ -44,7 +44,7 @@ public:
     ~OfflineDatabase();
 
     void changePath(const std::string&);
-    std::exception_ptr resetCache();
+    std::exception_ptr resetDatabase();
 
     optional<Response> get(const Resource&);
 

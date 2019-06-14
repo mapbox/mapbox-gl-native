@@ -184,8 +184,8 @@ public:
         offlineDatabase->put(resource, response);
     }
 
-    void resetCache(std::function<void (std::exception_ptr)> callback) {
-        callback(offlineDatabase->resetCache());
+    void resetDatabase(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->resetDatabase());
     }
 
     void invalidateTileCache(std::function<void (std::exception_ptr)> callback) {
@@ -339,8 +339,8 @@ void DefaultFileSource::put(const Resource& resource, const Response& response) 
     impl->actor().invoke(&Impl::put, resource, response);
 }
 
-void DefaultFileSource::resetCache(std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::resetCache, callback);
+void DefaultFileSource::resetDatabase(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::resetDatabase, std::move(callback));
 }
 
 void DefaultFileSource::invalidateTileCache(std::function<void (std::exception_ptr)> callback) {

@@ -1474,7 +1474,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithDiskFull)) {
 }
 #endif // __QT__
 
-TEST(OfflineDatabse, ChangePath) {
+TEST(OfflineDatabase, ChangePath) {
     std::string newPath("test/fixtures/offline_database/test.db");
     OfflineDatabase db(":memory:");
     db.changePath(newPath);
@@ -1482,13 +1482,13 @@ TEST(OfflineDatabse, ChangePath) {
     util::deleteFile(newPath);
 }
 
-TEST(OfflineDatabse, resetCache) {
+TEST(OfflineDatabase, ResetDatabase) {
     FixtureLog log;
     deleteDatabaseFiles();
     util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
 
     OfflineDatabase db(filename);
-    auto result = db.resetCache();
+    auto result = db.resetDatabase();
     EXPECT_FALSE(result);
 
     auto regions = db.listRegions().value();
