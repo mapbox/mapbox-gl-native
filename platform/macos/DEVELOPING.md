@@ -114,6 +114,10 @@ make darwin-update-examples
 
 [SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
 
+### Customizing compilation settings
+
+You can provide an optional and custom [`xcconfig`](https://help.apple.com/xcode/mac/current/#/dev745c5c974) file named `platform/darwin/developer.xcconfig` to set custom build options. This file is ignored by git. These custom settings apply to all configurations (`Debug`, `Release`), but do **not** apply to the core `mbgl` files. This mechanism allows you to try different compiler settings (for example when testing an Xcode beta).
+
 ## Testing
 
 `make macos-test` builds and runs unit tests of cross-platform code as well as the SDK.
