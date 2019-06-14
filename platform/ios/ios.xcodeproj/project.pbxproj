@@ -439,7 +439,7 @@
 		A46E4C9E228CE392009CAD5B /* MGLTabBarControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */; };
 		A46E4C9F228CE5FD009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
 		A46E4CA2228F4D6B009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
-		A489BDC322B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A489BDC222B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m */; };
+		A489BDC522B444F30026931C /* MGLStyleLoadingIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A489BDC222B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m */; };
 		A4EE317022973F2E006A8F2F /* MBXTestMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = A4EE316F22973F2E006A8F2F /* MBXTestMapView.m */; };
 		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC1B0916221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
@@ -2829,13 +2829,14 @@
 				TargetAttributes = {
 					16376B061FFD9DAF0000563E = {
 						CreatedOnToolsVersion = 9.2;
+						DevelopmentTeam = 85826LGZGV;
 						LastSwiftMigration = 0940;
 						ProvisioningStyle = Automatic;
 						TestTargetID = DA1DC9491CB6C1C2006E619F;
 					};
 					16376B2E1FFDB4B40000563E = {
 						CreatedOnToolsVersion = 9.2;
-						DevelopmentTeam = GJZR2MEM28;
+						DevelopmentTeam = 85826LGZGV;
 						ProvisioningStyle = Automatic;
 					};
 					DA1DC9491CB6C1C2006E619F = {
@@ -3059,7 +3060,7 @@
 				CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */,
 				CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */,
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
-				A489BDC322B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m in Sources */,
+				A489BDC522B444F30026931C /* MGLStyleLoadingIntegrationTests.m in Sources */,
 				CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */,
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
 				CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */,
@@ -3633,6 +3634,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = "Integration Tests/Info.plist";
@@ -3664,6 +3666,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = "Integration Tests/Info.plist";
@@ -3692,11 +3695,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GJZR2MEM28;
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "Integration Test Harness/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-Test-Harness";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-Test-Harnessm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -3717,11 +3720,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GJZR2MEM28;
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "Integration Test Harness/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-Test-Harness";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-Test-Harnessm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -3966,6 +3969,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = "Integration Tests/Info.plist";
@@ -3994,11 +3998,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GJZR2MEM28;
+				DEVELOPMENT_TEAM = 85826LGZGV;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "Integration Test Harness/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-Test-Harness";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-Test-Harnessm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

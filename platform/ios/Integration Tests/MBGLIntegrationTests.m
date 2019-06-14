@@ -141,62 +141,8 @@
     XCTAssertNil(weakLayer);
 }
 
-- (void)testOpenGLLayerDoesNotLeakWhenStyleChanged {
-    __weak MGLOpenGLStyleLayer *weakLayer;
-
-    @autoreleasepool {
-        {
-            MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
-            weakLayer = layer;
-            [self.style insertLayer:layer atIndex:0];
-            layer = nil;
-        }
-    }
-
-    XCTAssertNotNil(weakLayer);
-
-    [self waitForMapViewToBeRendered];
-
-    MGLStyleLayer *layer2 = [self.mapView.style layerWithIdentifier:@"gl-layer"];
-
-    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-    self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-    [self.mapView setStyleURL:styleURL];
-    [self waitForExpectations:@[self.styleLoadingExpectation] timeout:10];
-
-    // At this point the C++ CustomLayer will have been destroyed, and the rawLayer pointer has been NULLed
-    XCTAssert(weakLayer == layer2);
-    XCTAssertNotNil(weakLayer);
-
-    // Asking the style for the layer should return nil
-    MGLStyleLayer *layer3 = [self.mapView.style layerWithIdentifier:@"gl-layer"];
-    XCTAssertNil(layer3);
-}
 
 
-- (void)testOpenGLLayerDoesNotLeakWhenMapViewDeallocs {
-    __weak id weakLayer;
- 
-    @autoreleasepool {
-
-        NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-        MGLMapView *mapView2 = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
-        mapView2.delegate = self;
-
-        XCTAssertNil(mapView2.style);
-
-        self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-        [self waitForExpectationsWithTimeout:10 handler:nil];
-
-        MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
-        weakLayer = layer;
-        [mapView2.style insertLayer:layer atIndex:0];
-        layer = nil;
-
-        [self waitForMapViewToBeRendered];
-    }
-    XCTAssertNil(weakLayer);
-}
 
 @end
 

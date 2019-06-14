@@ -9,6 +9,10 @@
 
 - (void)setUp {
     [super setUp];
+    
+    self.mapView = [[MBXTestMapView alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    self.mapView.delegate = self;
+    
     if (!self.mapView.style) {
         [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
     }
