@@ -195,24 +195,30 @@ public:
     void resetDatabase(std::function<void (std::exception_ptr)>);
 
     /*
-     * Forces revalidation of tiles in the ambient cache.
+     * Forces revalidation of the ambient cache.
      *
-     * Forces Mapbox GL Native to revalidate tiles stored in the ambient
+     * Forces Mapbox GL Native to revalidate resources stored in the ambient
      * cache with the tile server before using them, making sure they
      * are the latest version. This is more efficient than cleaning the
-     * cache because if the tile is considered valid after the server
+     * cache because if the resource is considered valid after the server
      * lookup, it will not get downloaded again.
+     *
+     * Resources overlapping with offline regions will not be affected
+     * by this call.
      */
-    void invalidateTileCache(std::function<void (std::exception_ptr)>);
+    void invalidateAmbientCache(std::function<void (std::exception_ptr)>);
 
     /*
-     * Erase tiles from the ambient cache, freeing storage space.
+     * Erase resources from the ambient cache, freeing storage space.
      *
-     * Erases the tile cache, freeing resources. This operation can be
+     * Erases the ambient cache, freeing resources. This operation can be
      * potentially slow because it will trigger a VACUUM on SQLite,
      * forcing the database to move pages on the filesystem.
+     *
+     * Resources overlapping with offline regions will not be affected
+     * by this call.
      */
-    void clearTileCache(std::function<void (std::exception_ptr)>);
+    void clearAmbientCache(std::function<void (std::exception_ptr)>);
 
     // For testing only.
     void setOnlineStatus(bool);

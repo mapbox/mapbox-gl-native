@@ -26,7 +26,7 @@ public:
     void resetAmbientTiles() {
         using namespace mbgl;
 
-        db.clearTileCache();
+        db.clearAmbientCache();
 
         for (unsigned i = 0; i < tileCount; ++i) {
             const Resource ambient = Resource::tile("mapbox://tile_ambient" + util::toString(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
@@ -82,13 +82,13 @@ BENCHMARK_F(OfflineDatabase, InsertTileRegion)(benchmark::State& state) {
         db.putRegionResource(regionID, offline, response);
     }
 }
-BENCHMARK_F(OfflineDatabase, InvalidateTileCache)(benchmark::State& state) {
+BENCHMARK_F(OfflineDatabase, InvalidateAmbientCache)(benchmark::State& state) {
     while (state.KeepRunning()) {
-        db.invalidateTileCache();
+        db.invalidateAmbientCache();
     }
 }
 
-BENCHMARK_F(OfflineDatabase, ClearTileCache)(benchmark::State& state) {
+BENCHMARK_F(OfflineDatabase, ClearAmbientCache)(benchmark::State& state) {
     while (state.KeepRunning()) {
         resetAmbientTiles();
     }

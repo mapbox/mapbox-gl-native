@@ -604,9 +604,9 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     return true;
 }
 
-std::exception_ptr OfflineDatabase::invalidateTileCache() try {
+std::exception_ptr OfflineDatabase::invalidateAmbientCache() try {
     // clang-format off
-    mapbox::sqlite::Query query{ getStatement(
+    mapbox::sqlite::Query tileQuery{ getStatement(
         "UPDATE tiles "
         "SET expires = 0, must_revalidate = 1 "
         "WHERE id NOT IN ("
@@ -615,16 +615,29 @@ std::exception_ptr OfflineDatabase::invalidateTileCache() try {
     ) };
     // clang-format on
 
-    query.run();
+    tileQuery.run();
+
+    // clang-format off
+    mapbox::sqlite::Query resourceQuery{ getStatement(
+        "UPDATE resources "
+        "SET expires = 0, must_revalidate = 1 "
+        "WHERE id NOT IN ("
+        "    SELECT resource_id FROM region_resources"
+        ")"
+    ) };
+    // clang-format on
+
+    resourceQuery.run();
+
     return nullptr;
 } catch (const mapbox::sqlite::Exception& ex) {
-    handleError(ex, "invalidate tile cache");
+    handleError(ex, "invalidate ambient cache");
     return std::current_exception();
 }
 
-std::exception_ptr OfflineDatabase::clearTileCache() try {
+std::exception_ptr OfflineDatabase::clearAmbientCache() try {
     // clang-format off
-    mapbox::sqlite::Query query{ getStatement(
+    mapbox::sqlite::Query tileQuery{ getStatement(
         "DELETE FROM tiles "
         "WHERE id NOT IN ("
         "    SELECT tile_id FROM region_tiles"
@@ -632,20 +645,31 @@ std::exception_ptr OfflineDatabase::clearTileCache() try {
     ) };
     // clang-format on
 
-    query.run();
+    tileQuery.run();
+
+    // clang-format off
+    mapbox::sqlite::Query resourceQuery{ getStatement(
+        "DELETE FROM resources "
+        "WHERE id NOT IN ("
+        "    SELECT resource_id FROM region_resources"
+        ")"
+    ) };
+    // clang-format on
+
+    resourceQuery.run();
 
     db->exec("VACUUM");
 
     return nullptr;
 } catch (const mapbox::sqlite::Exception& ex) {
-    handleError(ex, "clear tile cache");
+    handleError(ex, "clear ambient cache");
     return std::current_exception();
 }
 
 std::exception_ptr OfflineDatabase::invalidateRegion(int64_t regionID) try {
     {
         // clang-format off
-        mapbox::sqlite::Query query{ getStatement(
+        mapbox::sqlite::Query tileQuery{ getStatement(
             "UPDATE tiles "
             "SET expires = 0, must_revalidate = 1 "
             "WHERE id IN ("
@@ -654,8 +678,21 @@ std::exception_ptr OfflineDatabase::invalidateRegion(int64_t regionID) try {
         ) };
         // clang-format on
 
-        query.bind(1, regionID);
-        query.run();
+        tileQuery.bind(1, regionID);
+        tileQuery.run();
+
+        // clang-format off
+        mapbox::sqlite::Query resourceQuery{ getStatement(
+            "UPDATE resources "
+            "SET expires = 0, must_revalidate = 1 "
+            "WHERE id IN ("
+            "    SELECT resource_id FROM region_resources WHERE region_id = ?"
+            ")"
+        ) };
+        // clang-format on
+
+        resourceQuery.bind(1, regionID);
+        resourceQuery.run();
     }
 
     assert(db);

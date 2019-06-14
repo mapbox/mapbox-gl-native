@@ -56,12 +56,12 @@ public:
     // are the latest version. This is more efficient than cleaning the
     // cache because if the tile is considered valid after the server
     // lookup, it will not get downloaded again.
-    std::exception_ptr invalidateTileCache();
+    std::exception_ptr invalidateAmbientCache();
 
     // Clear the tile cache, freeing resources. This operation can be
     // potentially slow because it will trigger a VACUUM on SQLite,
     // forcing the database to move pages on the filesystem.
-    std::exception_ptr clearTileCache();
+    std::exception_ptr clearAmbientCache();
 
     expected<OfflineRegions, std::exception_ptr> listRegions();
 
