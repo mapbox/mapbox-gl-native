@@ -515,7 +515,7 @@ TEST(OfflineDatabase, GetRegionDefinition) {
     );
 }
 
-TEST(OfflineDatabase, DeleteRegion) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
     FixtureLog log;
     deleteDatabaseFiles();
 
@@ -627,7 +627,7 @@ TEST(OfflineDatabase, Invalidate) {
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
-TEST(OfflineDatabase, ClearTileCache) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ClearTileCache)) {
     FixtureLog log;
     deleteDatabaseFiles();
 
