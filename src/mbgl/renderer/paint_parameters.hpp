@@ -63,7 +63,7 @@ public:
     std::unique_ptr<gfx::CommandEncoder> encoder;
     std::unique_ptr<gfx::RenderPass> renderPass;
 
-    TransformParameters transformParams;
+    const TransformParameters& transformParams;
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;
 

@@ -648,6 +648,7 @@
         "mbgl/renderer/render_source_observer.hpp": "src/mbgl/renderer/render_source_observer.hpp",
         "mbgl/renderer/render_static_data.hpp": "src/mbgl/renderer/render_static_data.hpp",
         "mbgl/renderer/render_tile.hpp": "src/mbgl/renderer/render_tile.hpp",
+        "mbgl/renderer/render_tree.hpp": "src/mbgl/renderer/render_tree.hpp",
         "mbgl/renderer/renderer_impl.hpp": "src/mbgl/renderer/renderer_impl.hpp",
         "mbgl/renderer/sources/render_custom_geometry_source.hpp": "src/mbgl/renderer/sources/render_custom_geometry_source.hpp",
         "mbgl/renderer/sources/render_geojson_source.hpp": "src/mbgl/renderer/sources/render_geojson_source.hpp",

@@ -5,6 +5,7 @@
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/renderer/render_tree.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/upload_parameters.hpp>
 #include <mbgl/renderer/pattern_atlas.hpp>
@@ -40,6 +41,67 @@ static RendererObserver& nullObserver() {
     static RendererObserver observer;
     return observer;
 }
+
+class LayerRenderItem final : public RenderItem {
+public:
+    LayerRenderItem(RenderLayer& layer_, RenderSource* source_, uint32_t index_)
+        : layer(layer_), source(source_), index(index_) {}
+    bool operator<(const LayerRenderItem& other) const { return index < other.index; }
+    std::reference_wrapper<RenderLayer> layer;
+    RenderSource* source;
+
+private:
+    bool hasRenderPass(RenderPass pass) const override { return layer.get().hasRenderPass(pass); }
+    void upload(gfx::UploadPass& pass) const override { layer.get().upload(pass); }
+    void render(PaintParameters& parameters) const override { layer.get().render(parameters); }
+    const std::string& getName() const override { return layer.get().getID(); } 
+
+    uint32_t index;
+};
+
+class SourceRenderItem final : public RenderItem { 
+public:
+    explicit SourceRenderItem(RenderSource& source_) 
+        : source(source_) {}
+
+private:
+    bool hasRenderPass(RenderPass) const override { return false; }
+    void upload(gfx::UploadPass& pass) const override { source.get().upload(pass); }
+    void render(PaintParameters& parameters) const override { source.get().finishRender(parameters); }
+    const std::string& getName() const override { return source.get().baseImpl->id; } 
+
+    std::reference_wrapper<RenderSource> source;
+};
+
+class RenderTreeImpl final : public RenderTree {
+public:
+    RenderTreeImpl(std::unique_ptr<RenderTreeParameters> parameters_,
+                   std::set<LayerRenderItem> layerRenderItems_,
+                   std::vector<SourceRenderItem> sourceRenderItems_,
+                   LineAtlas& lineAtlas_,
+                   PatternAtlas& patternAtlas_)
+        : RenderTree(std::move(parameters_)),
+          layerRenderItems(std::move(layerRenderItems_)),
+          sourceRenderItems(std::move(sourceRenderItems_)),
+          lineAtlas(lineAtlas_),
+          patternAtlas(patternAtlas_) {
+    }
+
+    RenderItems getLayerRenderItems() const override {
+        return { layerRenderItems.begin(), layerRenderItems.end() };
+    }
+    RenderItems getSourceRenderItems() const override {
+        return { sourceRenderItems.begin(), sourceRenderItems.end() };
+    }
+    LineAtlas& getLineAtlas() const override { return lineAtlas; }
+    PatternAtlas& getPatternAtlas() const override { return patternAtlas; }
+
+    std::set<LayerRenderItem> layerRenderItems;
+    std::vector<SourceRenderItem> sourceRenderItems;
+    std::reference_wrapper<LineAtlas> lineAtlas;
+    std::reference_wrapper<PatternAtlas> patternAtlas;
+};
+
 
 Renderer::Impl::Impl(gfx::RendererBackend& backend_,
                      float pixelRatio_,
@@ -82,14 +144,13 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
     observer = observer_ ? observer_ : &nullObserver();
 }
 
-void Renderer::Impl::render(const UpdateParameters& updateParameters) {
+std::unique_ptr<RenderTree> Renderer::Impl::createRenderTree(const UpdateParameters& updateParameters) {
     const bool isMapModeContinuous = updateParameters.mode == MapMode::Continuous;
     if (!isMapModeContinuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
     }
 
-    assert(gfx::BackendScope::exists());
     if (LayerManager::annotationsEnabled) {
         updateParameters.annotationManager.updateData();
     }
@@ -197,7 +258,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-
     const SourceDifference sourceDiff = diffSources(sourceImpls, updateParameters.sources);
     sourceImpls = updateParameters.sources;
 
@@ -214,27 +274,19 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
     transformState = updateParameters.transformState;
 
-    if (!staticData) {
-        staticData = std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio, programCacheDir);
-    }
+    // Create parameters for the render tree.
+    auto renderTreeParameters = std::make_unique<RenderTreeParameters>(
+        updateParameters.transformState,
+        updateParameters.mode,
+        updateParameters.debugOptions,
+        updateParameters.timePoint,
+        renderLight.getEvaluated());
 
-    Color backgroundColor;
-
-    struct RenderItem {
-        RenderItem(RenderLayer& layer_, RenderSource* source_, uint32_t index_)
-            : layer(layer_), source(source_), index(index_) {}
-        std::reference_wrapper<RenderLayer> layer;
-        RenderSource* source;
-        uint32_t index;
-        bool operator<(const RenderItem& other) const { return index < other.index; }
-    };
-
-    std::set<RenderItem> renderItems;
+    std::set<LayerRenderItem> layerRenderItems;
     std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
-    auto renderItemsEmplaceHint = renderItems.begin();
+    auto renderItemsEmplaceHint = layerRenderItems.begin();
 
     // Update all sources and initialize renderItems.
-    staticData->has3D = false;
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
         std::vector<Immutable<LayerProperties>> filteredLayersForSource;
@@ -251,7 +303,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             const auto* layerInfo = layerImpl->getTypeInfo();
             const bool layerNeedsRendering = layer->needsRendering();
             const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
-            staticData->has3D = (staticData->has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
+            renderTreeParameters->has3D = (renderTreeParameters->has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
@@ -260,7 +312,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                         filteredLayersForSource.push_back(layer->evaluatedProperties);
                         if (zoomFitsLayer) {
                             sourceNeedsRendering = true;
-                            renderItemsEmplaceHint = renderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
+                            renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
                         }
                     }
                 }
@@ -272,11 +324,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 if (!backend.contextIsShared() && layerImpl.get() == layerImpls->at(0).get()) {
                     const auto& solidBackground = layer->getSolidBackground();
                     if (solidBackground) {
-                        backgroundColor = *solidBackground;
+                        renderTreeParameters->backgroundColor = *solidBackground;
                         continue; // This layer is shown with background color, and it shall not be added to render items. 
                     }
                 }
-                renderItemsEmplaceHint = renderItems.emplace_hint(renderItemsEmplaceHint, *layer, nullptr, index);
+                renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, nullptr, index);
             }
         }
         source->update(sourceImpl,
@@ -286,27 +338,21 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                        tileParameters);
     }
 
-    const bool loaded = updateParameters.styleLoaded && isLoaded();
-    if (!isMapModeContinuous && !loaded) {
-        return;
+    renderTreeParameters->loaded = updateParameters.styleLoaded && isLoaded();
+    if (!isMapModeContinuous && !renderTreeParameters->loaded) {
+        return nullptr;
     }
 
-    if (renderState == RenderState::Never) {
-        observer->onWillStartRenderingMap();
-    }
-
-    observer->onWillStartRenderingFrame();
-
-    TransformParameters transformParams(updateParameters.transformState);
-
+    std::vector<SourceRenderItem> sourceRenderItems;
     // Update all matrices and generate data that we should upload to the GPU.
     for (const auto& entry : renderSources) {
         if (entry.second->isEnabled()) {
-            entry.second->prepare({transformParams, updateParameters.debugOptions});
+            entry.second->prepare({renderTreeParameters->transformParams, updateParameters.debugOptions});
+            sourceRenderItems.emplace_back(*entry.second);
         }
     }
 
-    for (auto& renderItem : renderItems) {
+    for (auto& renderItem : layerRenderItems) {
         RenderLayer& renderLayer = renderItem.layer;
         renderLayer.prepare({renderItem.source, *imageManager, *patternAtlas, *lineAtlas, updateParameters.transformState});
         if (renderLayer.needsPlacement()) {
@@ -336,7 +382,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             if (placementChanged) {
                 usedSymbolLayers.insert(layer.getID());
-                placement->placeLayer(layer, transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
+                placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
@@ -353,7 +399,37 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
             placement->updateLayerBuckets(*it, updateParameters.transformState, placementChanged || symbolBucketsChanged);
         }
+
+        renderTreeParameters->symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
     }
+
+    renderTreeParameters->needsRepaint = isMapModeContinuous && hasTransitions(updateParameters.timePoint);
+    if (!renderTreeParameters->needsRepaint && renderTreeParameters->loaded) {
+        // Notify observer about unused images when map is fully loaded
+        // and there are no ongoing transitions.
+        imageManager->reduceMemoryUseIfCacheSizeExceedsLimit();
+    }
+
+    return std::make_unique<RenderTreeImpl>(
+        std::move(renderTreeParameters),
+        std::move(layerRenderItems),
+        std::move(sourceRenderItems),
+        *lineAtlas,
+        *patternAtlas);
+}
+
+void Renderer::Impl::render(const RenderTree& renderTree) {
+    if (renderState == RenderState::Never) {
+        observer->onWillStartRenderingMap();
+    }
+
+    observer->onWillStartRenderingFrame();
+    const auto& renderTreeParameters = renderTree.getParameters();
+
+    if (!staticData) {
+        staticData = std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio, programCacheDir);
+    }
+    staticData->has3D = renderTreeParameters.has3D;
 
     auto& context = backend.getContext();
 
@@ -364,17 +440,19 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         context,
         pixelRatio,
         backend,
-        renderLight.getEvaluated(),
-        updateParameters.mode,
-        updateParameters.debugOptions,
-        updateParameters.timePoint,
-        transformParams,
+        renderTreeParameters.light,
+        renderTreeParameters.mapMode,
+        renderTreeParameters.debugOptions,
+        renderTreeParameters.timePoint,
+        renderTreeParameters.transformParams,
         *staticData,
-        *lineAtlas,
-        *patternAtlas
+        renderTree.getLineAtlas(),
+        renderTree.getPatternAtlas()
     };
 
-    parameters.symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
+    parameters.symbolFadeChange = renderTreeParameters.symbolFadeChange;
+    const auto& sourceRenderItems = renderTree.getSourceRenderItems();
+    const auto& layerRenderItems = renderTree.getLayerRenderItems();
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
@@ -382,19 +460,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         const auto uploadPass = parameters.encoder->createUploadPass("upload");
 
         // Update all clipping IDs + upload buckets.
-        for (const auto& entry : renderSources) {
-            if (entry.second->isEnabled()) {
-                entry.second->upload(*uploadPass);
-            }
+        for (const RenderItem& item : sourceRenderItems) {
+            item.upload(*uploadPass);
         }
-
-        for (auto& renderItem : renderItems) {
-            renderItem.layer.get().upload(*uploadPass);
+        for (const RenderItem& item : layerRenderItems) {
+            item.upload(*uploadPass);
         }
-
         staticData->upload(*uploadPass);
-        lineAtlas->upload(*uploadPass);
-        patternAtlas->upload(*uploadPass);
+        renderTree.getLineAtlas().upload(*uploadPass);
+        renderTree.getPatternAtlas().upload(*uploadPass);
     }
 
     // - 3D PASS -------------------------------------------------------------------------------------
@@ -413,13 +487,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
         parameters.staticData.depthRenderbuffer->setShouldClear(true);
 
-        uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
-        for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
+        uint32_t i = static_cast<uint32_t>(layerRenderItems.size()) - 1;
+        for (auto it = layerRenderItems.begin(); it != layerRenderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
-            RenderLayer& renderLayer = it->layer;
-            if (renderLayer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.encoder->createDebugGroup(renderLayer.getID().c_str()));
-                renderLayer.render(parameters);
+            const RenderItem& renderItem = it->get();
+            if (renderItem.hasRenderPass(parameters.pass)) {
+                const auto layerDebugGroup(parameters.encoder->createDebugGroup(renderItem.getName().c_str()));
+                renderItem.render(parameters);
             }
         }
     }
@@ -432,14 +506,14 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
             color = Color::black();
         } else if (!backend.contextIsShared()) {
-            color = backgroundColor;
+            color = renderTreeParameters.backgroundColor;
         }
         parameters.renderPass = parameters.encoder->createRenderPass("main buffer", { parameters.backend.getDefaultRenderable(), color, 1, 0 });
     }
 
     // Actually render the layers
 
-    parameters.depthRangeSize = 1 - (renderItems.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
+    parameters.depthRangeSize = 1 - (layerRenderItems.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
@@ -448,12 +522,12 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         const auto debugGroup(parameters.renderPass->createDebugGroup("opaque"));
 
         uint32_t i = 0;
-        for (auto it = renderItems.rbegin(); it != renderItems.rend(); ++it, ++i) {
+        for (auto it = layerRenderItems.rbegin(); it != layerRenderItems.rend(); ++it, ++i) {
             parameters.currentLayer = i;
-            RenderLayer& renderLayer = it->layer;
-            if (renderLayer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderLayer.getID().c_str()));
-                renderLayer.render(parameters);
+            const RenderItem& renderItem = it->get();
+            if (renderItem.hasRenderPass(parameters.pass)) {
+                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderItem.getName().c_str()));
+                renderItem.render(parameters);
             }
         }
     }
@@ -464,13 +538,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.pass = RenderPass::Translucent;
         const auto debugGroup(parameters.renderPass->createDebugGroup("translucent"));
 
-        uint32_t i = static_cast<uint32_t>(renderItems.size()) - 1;
-        for (auto it = renderItems.begin(); it != renderItems.end(); ++it, --i) {
+        uint32_t i = static_cast<uint32_t>(layerRenderItems.size()) - 1;
+        for (auto it = layerRenderItems.begin(); it != layerRenderItems.end(); ++it, --i) {
             parameters.currentLayer = i;
-            RenderLayer& renderLayer = it->layer;
-            if (renderLayer.hasRenderPass(parameters.pass)) {
-                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderLayer.getID().c_str()));
-                renderLayer.render(parameters);
+            const RenderItem& renderItem = it->get();
+            if (renderItem.hasRenderPass(parameters.pass)) {
+                const auto layerDebugGroup(parameters.renderPass->createDebugGroup(renderItem.getName().c_str()));
+                renderItem.render(parameters);
             }
         }
     }
@@ -484,10 +558,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // This guarantees that we have at least one function per tile called.
         // When only rendering layers via the stylesheet, it's possible that we don't
         // ever visit a tile during rendering.
-        for (const auto& entry : renderSources) {
-            if (entry.second->isEnabled()) {
-                entry.second->finishRender(parameters);
-            }
+        for (const RenderItem& renderItem : sourceRenderItems) {           
+            renderItem.render(parameters);
         }
     }
 
@@ -503,30 +575,24 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Ends the RenderPass
     parameters.renderPass.reset();
-
-    if (updateParameters.mode == MapMode::Continuous) {
+    const bool isMapModeContinuous = renderTreeParameters.mapMode == MapMode::Continuous;
+    if (isMapModeContinuous) {
         parameters.encoder->present(parameters.backend.getDefaultRenderable());
     }
 
     // CommandEncoder destructor submits render commands.
     parameters.encoder.reset();
 
-
-    const bool needsRepaint = isMapModeContinuous && hasTransitions(parameters.timePoint);
     observer->onDidFinishRenderingFrame(
-        loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-        needsRepaint
+        renderTreeParameters.loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
+        renderTreeParameters.needsRepaint
     );
 
-    if (!loaded) {
+    if (!renderTreeParameters.loaded) {
         renderState = RenderState::Partial;
     } else if (renderState != RenderState::Fully) {
         renderState = RenderState::Fully;
         observer->onDidFinishRenderingMap();
-    } else if (!needsRepaint) {
-        // Notify observer about unused images when map is fully loaded
-        // and there are no ongoing transitions.
-        imageManager->reduceMemoryUseIfCacheSizeExceedsLimit();
     }
 }
 

@@ -31,6 +31,7 @@ class ImageManager;
 class LineAtlas;
 class PatternAtlas;
 class CrossTileSymbolIndex;
+class RenderTree;
 
 namespace gfx {
 class RendererBackend;
@@ -52,7 +53,8 @@ public:
 
     void setObserver(RendererObserver*);
 
-    void render(const UpdateParameters&);
+    std::unique_ptr<RenderTree> createRenderTree(const UpdateParameters&);
+    void render(const RenderTree&);
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&) const;
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;
