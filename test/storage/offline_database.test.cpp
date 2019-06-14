@@ -29,6 +29,17 @@ static void deleteDatabaseFiles() {
     util::deleteFile(filename + "-journal"s);
 }
 
+static std::shared_ptr<std::string> randomString(size_t size) {
+    auto result = std::make_shared<std::string>(size, 0);
+    std::mt19937 random;
+
+    for (size_t i = 0; i < size; i++) {
+        (*result)[i] = random();
+    }
+
+    return result;
+}
+
 static FixtureLog::Message error(ResultCode code, const char* message) {
     return { EventSeverity::Error, Event::Database, static_cast<int64_t>(code), message };
 }
@@ -506,23 +517,46 @@ TEST(OfflineDatabase, GetRegionDefinition) {
 
 TEST(OfflineDatabase, DeleteRegion) {
     FixtureLog log;
-    OfflineDatabase db(":memory:");
-    OfflineTilePyramidRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
-    OfflineRegionMetadata metadata {{ 1, 2, 3 }};
-    auto region = db.createRegion(definition, metadata);
-    ASSERT_TRUE(region);
+    deleteDatabaseFiles();
 
-    Response response;
-    response.noContent = true;
+    {
+        OfflineDatabase dbCreate(filename);
+    }
 
-    db.putRegionResource(region->getID(), Resource::style("http://example.com/"), response);
-    db.putRegionResource(region->getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
+    size_t initialSize = util::read_file(filename).size();
 
-    db.deleteRegion(std::move(*region));
+    {
+        Response response;
+        response.data = randomString(.5 * 1024 * 1024);
 
-    auto regions = db.listRegions().value();
-    ASSERT_EQ(0u, regions.size());
+        OfflineDatabase db(filename);
 
+        OfflineTilePyramidRegionDefinition definition{ "mapbox://style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
+        OfflineRegionMetadata metadata{{ 1, 2, 3 }};
+
+        auto region = db.createRegion(definition, metadata);
+
+        for (unsigned i = 0; i < 100; ++i) {
+            const Resource tile = Resource::tile("mapbox://tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.putRegionResource(region->getID(), tile, response);
+        }
+
+        db.deleteRegion(std::move(*region));
+
+        auto regions = db.listRegions().value();
+        ASSERT_EQ(0u, regions.size());
+
+        // The tiles from the offline region will migrate to the
+        // ambient cache and shrink the database to the maximum
+        // size defined by default.
+        EXPECT_LE(util::read_file(filename).size(), util::DEFAULT_MAX_CACHE_SIZE);
+
+        // After clearing the cache, the size of the database
+        // should get back to the original size.
+        db.clearTileCache();
+    }
+
+    EXPECT_EQ(initialSize, util::read_file(filename).size());
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
@@ -593,6 +627,34 @@ TEST(OfflineDatabase, Invalidate) {
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
+TEST(OfflineDatabase, ClearTileCache) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+
+    {
+        OfflineDatabase dbCreate(filename);
+    }
+
+    size_t initialSize = util::read_file(filename).size();
+
+    {
+        Response response;
+        response.data = randomString(.5 * 1024 * 1024);
+
+        OfflineDatabase db(filename);
+
+        for (unsigned i = 0; i < 100; ++i) {
+            const Resource tile = Resource::tile("mapbox://tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(tile, response);
+        }
+
+        db.clearTileCache();
+    }
+
+    EXPECT_EQ(initialSize, util::read_file(filename).size());
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
 TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
     FixtureLog log;
     OfflineDatabase db(":memory:");
@@ -629,6 +691,10 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
         for (auto i = 0; i < 100; i++) {
             db2.put(fixture::resource, fixture::response);
             EXPECT_TRUE(bool(db2.get(fixture::resource)));
+
+            if (i == 50) {
+                db2.clearTileCache();
+            }
         }
     });
 
@@ -636,17 +702,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
     thread2.join();
 
     EXPECT_EQ(0u, log.uncheckedCount());
-}
-
-static std::shared_ptr<std::string> randomString(size_t size) {
-    auto result = std::make_shared<std::string>(size, 0);
-    std::mt19937 random;
-
-    for (size_t i = 0; i < size; i++) {
-        (*result)[i] = random();
-    }
-
-    return result;
 }
 
 TEST(OfflineDatabase, PutReturnsSize) {

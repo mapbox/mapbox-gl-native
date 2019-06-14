@@ -6,23 +6,40 @@
 #include <mbgl/storage/sqlite3.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <random>
+
 class OfflineDatabase : public benchmark::Fixture {
 public:
     void SetUp(const ::benchmark::State&) override {
-        using namespace mbgl;
         using namespace std::chrono_literals;
 
-        const unsigned tileCount = 10000;
-        db.setOfflineMapboxTileCountLimit(tileCount * 2);
+        db.setOfflineMapboxTileCountLimit(100000);
 
-        Response response;
-        response.noContent = true;
+        response.data = std::make_shared<std::string>(50 * 1024, 0);
         response.mustRevalidate = false;
-        response.expires = util::now() + 1h;
+        response.expires = mbgl::util::now() + 1h;
+
+        resetAmbientTiles();
+        resetRegion();
+    }
+
+    void resetAmbientTiles() {
+        using namespace mbgl;
+
+        db.clearTileCache();
 
         for (unsigned i = 0; i < tileCount; ++i) {
             const Resource ambient = Resource::tile("mapbox://tile_ambient" + util::toString(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
             db.put(ambient, response);
+        }
+    }
+
+    void resetRegion() {
+        using namespace mbgl;
+
+        auto regions = db.listRegions().value();
+        if (!regions.empty()) {
+            db.deleteRegion(std::move(regions[0]));
         }
 
         OfflineTilePyramidRegionDefinition definition{ "mapbox://style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
@@ -37,18 +54,78 @@ public:
         }
     }
 
+    mbgl::Response response;
     mbgl::OfflineDatabase db{":memory:"};
-    int64_t regionID;
+
+    const unsigned tileCount = 100;
+    int64_t regionID = 0;
 };
 
 BENCHMARK_F(OfflineDatabase, InvalidateRegion)(benchmark::State& state) {
-    for (auto _ : state) {
+    while (state.KeepRunning()) {
         db.invalidateRegion(regionID);
     }
 }
 
+BENCHMARK_F(OfflineDatabase, DeleteRegion)(benchmark::State& state) {
+    while (state.KeepRunning()) {
+        resetRegion();
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, InsertTileRegion)(benchmark::State& state) {
+    using namespace mbgl;
+
+    while (state.KeepRunning()) {
+        const Resource offline = Resource::tile("mapbox://InsertTileRegion" +
+                util::toString(state.iterations()), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.putRegionResource(regionID, offline, response);
+    }
+}
 BENCHMARK_F(OfflineDatabase, InvalidateTileCache)(benchmark::State& state) {
-    for (auto _ : state) {
+    while (state.KeepRunning()) {
         db.invalidateTileCache();
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, ClearTileCache)(benchmark::State& state) {
+    while (state.KeepRunning()) {
+        resetAmbientTiles();
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, InsertTileCache)(benchmark::State& state) {
+    using namespace mbgl;
+
+    while (state.KeepRunning()) {
+        const Resource ambient = Resource::tile("mapbox://InsertTileCache" +
+                util::toString(state.iterations()), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.put(ambient, response);
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, InsertBigTileCache)(benchmark::State& state) {
+    using namespace mbgl;
+
+    Response big;
+    big.data = std::make_shared<std::string>(util::DEFAULT_MAX_CACHE_SIZE / 100, 0);
+
+    while (state.KeepRunning()) {
+        const Resource ambient = Resource::tile("mapbox://InsertTileCache" +
+                util::toString(state.iterations()), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.put(ambient, big);
+    }
+}
+
+BENCHMARK_F(OfflineDatabase, GetTile)(benchmark::State& state) {
+    using namespace mbgl;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, tileCount - 1);
+
+    while (state.KeepRunning()) {
+        auto res = db.get(Resource::tile("mapbox://tile_ambient" + util::toString(dis(gen)), 1, 0, 0, 0, Tileset::Scheme::XYZ));
+        assert(res != nullopt);
     }
 }

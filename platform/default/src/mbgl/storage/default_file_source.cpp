@@ -87,6 +87,10 @@ public:
         callback(offlineDatabase->deleteRegion(std::move(region)));
     }
 
+    void invalidateRegion(int64_t regionID, std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->invalidateRegion(regionID));
+    }
+
     void setRegionObserver(int64_t regionID, std::unique_ptr<OfflineRegionObserver> observer) {
         if (auto download = getDownload(regionID)) {
             download.value()->setObserver(std::move(observer));
@@ -182,6 +186,14 @@ public:
 
     void resetCache(std::function<void (std::exception_ptr)> callback) {
         callback(offlineDatabase->resetCache());
+    }
+
+    void invalidateTileCache(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->invalidateTileCache());
+    }
+
+    void clearTileCache(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->clearTileCache());
     }
 
 private:
@@ -295,6 +307,10 @@ void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region, std::functio
     impl->actor().invoke(&Impl::deleteRegion, std::move(region), callback);
 }
 
+void DefaultFileSource::invalidateOfflineRegion(OfflineRegion& region, std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::invalidateRegion, region.getID(), callback);
+}
+
 void DefaultFileSource::setOfflineRegionObserver(OfflineRegion& region, std::unique_ptr<OfflineRegionObserver> observer) {
     impl->actor().invoke(&Impl::setRegionObserver, region.getID(), std::move(observer));
 }
@@ -325,6 +341,14 @@ void DefaultFileSource::put(const Resource& resource, const Response& response) 
 
 void DefaultFileSource::resetCache(std::function<void (std::exception_ptr)> callback) {
     impl->actor().invoke(&Impl::resetCache, callback);
+}
+
+void DefaultFileSource::invalidateTileCache(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::invalidateTileCache, callback);
+}
+
+void DefaultFileSource::clearTileCache(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::clearTileCache, callback);
 }
 
 // For testing only:

@@ -129,7 +129,6 @@ void OfflineDatabase::removeOldCacheTable() {
 
 void OfflineDatabase::createSchema() {
     assert(db);
-    db->exec("PRAGMA auto_vacuum = INCREMENTAL");
     db->exec("PRAGMA journal_mode = DELETE");
     db->exec("PRAGMA synchronous = FULL");
     mapbox::sqlite::Transaction transaction(*db);
@@ -140,7 +139,6 @@ void OfflineDatabase::createSchema() {
 
 void OfflineDatabase::migrateToVersion3() {
     assert(db);
-    db->exec("PRAGMA auto_vacuum = INCREMENTAL");
     db->exec("VACUUM");
     db->exec("PRAGMA user_version = 3");
 }
@@ -624,6 +622,26 @@ std::exception_ptr OfflineDatabase::invalidateTileCache() try {
     return std::current_exception();
 }
 
+std::exception_ptr OfflineDatabase::clearTileCache() try {
+    // clang-format off
+    mapbox::sqlite::Query query{ getStatement(
+        "DELETE FROM tiles "
+        "WHERE id NOT IN ("
+        "    SELECT tile_id FROM region_tiles"
+        ")"
+    ) };
+    // clang-format on
+
+    query.run();
+
+    db->exec("VACUUM");
+
+    return nullptr;
+} catch (const mapbox::sqlite::Exception& ex) {
+    handleError(ex, "clear tile cache");
+    return std::current_exception();
+}
+
 std::exception_ptr OfflineDatabase::invalidateRegion(int64_t regionID) try {
     {
         // clang-format off
@@ -791,7 +809,7 @@ std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
 
     evict(0);
     assert(db);
-    db->exec("PRAGMA incremental_vacuum");
+    db->exec("VACUUM");
 
     // Ensure that the cached offlineTileCount value is recalculated.
     offlineMapboxTileCount = {};
@@ -1050,11 +1068,11 @@ T OfflineDatabase::getPragma(const char* sql) {
 // less than the maximum cache size. Returns false if this condition cannot be
 // satisfied.
 //
-// SQLite database never shrinks in size unless we call VACCUM. We here
+// SQLite database never shrinks in size unless we call VACUUM. We here
 // are monitoring the soft limit (i.e. number of free pages in the file)
 // and as it approaches to the hard limit (i.e. the actual file size) we
 // delete an arbitrary number of old cache entries. The free pages approach saves
-// us from calling VACCUM or keeping a running total, which can be costly.
+// us from calling VACUUM or keeping a running total, which can be costly.
 bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
     uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");

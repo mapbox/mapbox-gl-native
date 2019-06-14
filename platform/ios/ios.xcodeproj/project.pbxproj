@@ -14,6 +14,8 @@
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
 		074A7F0D2277C093001A62D1 /* insert_access_token.sh in Resources */ = {isa = PBXBuildFile; fileRef = 074A7F0C2277C093001A62D1 /* insert_access_token.sh */; };
 		074A7F0E2277C093001A62D1 /* insert_access_token.sh in Resources */ = {isa = PBXBuildFile; fileRef = 074A7F0C2277C093001A62D1 /* insert_access_token.sh */; };
+		075AF842227B6762008D7A4C /* MBXState.m in Sources */ = {isa = PBXBuildFile; fileRef = 075AF841227B6762008D7A4C /* MBXState.m */; };
+		075AF845227B67C6008D7A4C /* MBXStateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 075AF844227B67C6008D7A4C /* MBXStateManager.m */; };
 		076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076171C22139C70900668A35 /* MGLMapViewTests.m */; };
 		076171C72141A91700668A35 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 076171C62141A91700668A35 /* Settings.bundle */; };
 		077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */; };
@@ -854,6 +856,10 @@
 		071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLImageSourceTests.m; path = ../../darwin/test/MGLImageSourceTests.m; sourceTree = "<group>"; };
 		074A7F0C2277C093001A62D1 /* insert_access_token.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = insert_access_token.sh; sourceTree = "<group>"; };
+		075AF840227B6762008D7A4C /* MBXState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXState.h; sourceTree = "<group>"; };
+		075AF841227B6762008D7A4C /* MBXState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXState.m; sourceTree = "<group>"; };
+		075AF843227B67C5008D7A4C /* MBXStateManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXStateManager.h; sourceTree = "<group>"; };
+		075AF844227B67C6008D7A4C /* MBXStateManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXStateManager.m; sourceTree = "<group>"; };
 		076171C22139C70900668A35 /* MGLMapViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLMapViewTests.m; path = ../../darwin/test/MGLMapViewTests.m; sourceTree = "<group>"; };
 		076171C62141A91700668A35 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = app/Settings.bundle; sourceTree = SOURCE_ROOT; };
 		077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTestLocationManager.m; sourceTree = "<group>"; };
@@ -1969,6 +1975,10 @@
 				076171C62141A91700668A35 /* Settings.bundle */,
 				9604FC341F313A5E003EEA02 /* Fixtures */,
 				DA1DC94D1CB6C1C2006E619F /* Supporting Files */,
+				075AF840227B6762008D7A4C /* MBXState.h */,
+				075AF841227B6762008D7A4C /* MBXState.m */,
+				075AF843227B67C5008D7A4C /* MBXStateManager.h */,
+				075AF844227B67C6008D7A4C /* MBXStateManager.m */,
 			);
 			name = "Demo App";
 			path = app;
@@ -3186,7 +3196,9 @@
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
 				6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
+				075AF845227B67C6008D7A4C /* MBXStateManager.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
+				075AF842227B6762008D7A4C /* MBXState.m in Sources */,
 				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,

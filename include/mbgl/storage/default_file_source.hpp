@@ -145,6 +145,14 @@ public:
     void deleteOfflineRegion(OfflineRegion&&, std::function<void (std::exception_ptr)>);
 
     /*
+     * Invalidate all the tiles from an offline region forcing Mapbox GL to revalidate
+     * the tiles with the server before using. This is more efficient than deleting the
+     * offline region and downloading it again because if the data on the cache matches
+     * the server, no new data gets transmitted.
+     */
+    void invalidateOfflineRegion(OfflineRegion&, std::function<void (std::exception_ptr)>);
+
+    /*
      * Changing or bypassing this limit without permission from Mapbox is prohibited
      * by the Mapbox Terms of Service.
      */
@@ -185,6 +193,26 @@ public:
      * to re-execute a user-provided callback on the main thread.
      */
     void resetCache(std::function<void (std::exception_ptr)>);
+
+    /*
+     * Forces revalidation of tiles in the ambient cache.
+     *
+     * Forces Mapbox GL Native to revalidate tiles stored in the ambient
+     * cache with the tile server before using them, making sure they
+     * are the latest version. This is more efficient than cleaning the
+     * cache because if the tile is considered valid after the server
+     * lookup, it will not get downloaded again.
+     */
+    void invalidateTileCache(std::function<void (std::exception_ptr)>);
+
+    /*
+     * Erase tiles from the ambient cache, freeing storage space.
+     *
+     * Erases the tile cache, freeing resources. This operation can be
+     * potentially slow because it will trigger a VACUUM on SQLite,
+     * forcing the database to move pages on the filesystem.
+     */
+    void clearTileCache(std::function<void (std::exception_ptr)>);
 
     // For testing only.
     void setOnlineStatus(bool);
