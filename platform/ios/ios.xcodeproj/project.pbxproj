@@ -439,6 +439,7 @@
 		A46E4C9E228CE392009CAD5B /* MGLTabBarControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */; };
 		A46E4C9F228CE5FD009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
 		A46E4CA2228F4D6B009CAD5B /* IntegrationTest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */; };
+		A489BDC322B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A489BDC222B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m */; };
 		A4EE317022973F2E006A8F2F /* MBXTestMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = A4EE316F22973F2E006A8F2F /* MBXTestMapView.m */; };
 		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC1B0916221CA14D00DB56C8 /* CLLocationManager+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = AC1B0914221CA14500DB56C8 /* CLLocationManager+MMEMobileEvents.h */; };
@@ -1108,6 +1109,7 @@
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		A46E4C99228CB731009CAD5B /* IntegrationTest.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = IntegrationTest.storyboard; sourceTree = "<group>"; };
 		A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTabBarControllerTests.m; sourceTree = "<group>"; };
+		A489BDC222B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLoadingIntegrationTests.m; sourceTree = "<group>"; };
 		A4EE316E22973F2E006A8F2F /* MBXTestMapView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXTestMapView.h; sourceTree = "<group>"; };
 		A4EE316F22973F2E006A8F2F /* MBXTestMapView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXTestMapView.m; sourceTree = "<group>"; };
 		A4F3FB1C2254865900A30170 /* missing_icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = missing_icon.json; sourceTree = "<group>"; };
@@ -1485,6 +1487,7 @@
 				A46E4C9C228CB74B009CAD5B /* MGLTabBarControllerTests.m */,
 				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
 				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
+				A489BDC222B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m */,
 				CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */,
 				CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */,
 				077061DB215DA11F000FEF62 /* MGLTestLocationManager.h */,
@@ -3056,6 +3059,7 @@
 				CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */,
 				CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */,
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
+				A489BDC322B2D3B20026931C /* MGLStyleLoadingIntegrationTests.m in Sources */,
 				CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */,
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
 				CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */,

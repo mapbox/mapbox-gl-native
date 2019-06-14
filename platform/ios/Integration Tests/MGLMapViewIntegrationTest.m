@@ -42,13 +42,9 @@
     [self.window addSubview:superView];
     [self.window makeKeyAndVisible];
 
-    if (!self.mapView.style) {
-        [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
-    }
 }
 
 - (void)tearDown {
-    self.styleLoadingExpectation = nil;
     self.renderFinishedExpectation = nil;
     self.mapView = nil;
     self.style = nil;
@@ -65,13 +61,6 @@
     }
     
     return nil;
-}
-
-- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
-    XCTAssertNotNil(mapView.style);
-    XCTAssertEqual(mapView.style, style);
-
-    [self.styleLoadingExpectation fulfill];
 }
 
 - (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(__unused BOOL)fullyRendered {
@@ -119,12 +108,6 @@
 }
 
 #pragma mark - Utilities
-
-- (void)waitForMapViewToFinishLoadingStyleWithTimeout:(NSTimeInterval)timeout {
-    XCTAssertNil(self.styleLoadingExpectation);
-    self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-    [self waitForExpectations:@[self.styleLoadingExpectation] timeout:timeout];
-}
 
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout {
     XCTAssertNil(self.renderFinishedExpectation);
