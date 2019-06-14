@@ -82,6 +82,7 @@
         "test/tile/tile_id.test.cpp",
         "test/tile/vector_tile.test.cpp",
         "test/util/async_task.test.cpp",
+        "test/util/compiler.test.cpp",
         "test/util/dtoa.test.cpp",
         "test/util/geo.test.cpp",
         "test/util/grid_index.test.cpp",
