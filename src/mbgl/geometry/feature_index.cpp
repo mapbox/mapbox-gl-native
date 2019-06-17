@@ -47,7 +47,7 @@ void FeatureIndex::query(
         const double scale,
         const RenderedQueryOptions& queryOptions,
         const UnwrappedTileID& tileID,
-        const std::vector<const RenderLayer*>& layers,
+        const std::unordered_map<std::string, const RenderLayer*>& layers,
         const float additionalQueryPadding) const {
     
     if (!tileData) {
@@ -81,7 +81,7 @@ void FeatureIndex::query(
 std::unordered_map<std::string, std::vector<Feature>>
 FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolFeatures,
                                    const RenderedQueryOptions& queryOptions,
-                                   const std::vector<const RenderLayer*>& layers,
+                                   const std::unordered_map<std::string, const RenderLayer*>& layers,
                                    const OverscaledTileID& tileID,
                                    const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
@@ -123,30 +123,23 @@ void FeatureIndex::addFeature(
     const IndexedSubfeature& indexedFeature,
     const RenderedQueryOptions& options,
     const CanonicalTileID& tileID,
-    const std::vector<const RenderLayer*>& layers,
+    const std::unordered_map<std::string, const RenderLayer*>& layers,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
     const float pixelsToTileUnits,
     const mat4& posMatrix) const {
-
-    auto getRenderLayer = [&] (const std::string& layerID) -> const RenderLayer* {
-        for (const auto& layer : layers) {
-            if (layer->getID() == layerID) {
-                return layer;
-            }
-        }
-        return nullptr;
-    };
 
     // Lazily calculated.
     std::unique_ptr<GeometryTileLayer> sourceLayer;
     std::unique_ptr<GeometryTileFeature> geometryTileFeature;
 
     for (const std::string& layerID : bucketLayerIDs.at(indexedFeature.bucketLeaderID)) {
-        const RenderLayer* renderLayer = getRenderLayer(layerID);
-        if (!renderLayer) {
+        const auto it = layers.find(layerID);
+        if (it == layers.end()) {
             continue;
         }
+
+        const RenderLayer* renderLayer = it->second;
 
         if (!geometryTileFeature) {
             sourceLayer = tileData->getLayer(indexedFeature.sourceLayerName);
