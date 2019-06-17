@@ -16,6 +16,7 @@ target_sources(mbgl-glfw
 )
 
 target_include_directories(mbgl-glfw
+    PRIVATE platform/glfw
     PRIVATE platform/default/include
 )
 

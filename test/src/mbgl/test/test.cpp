@@ -7,6 +7,8 @@
 
 #include <args.hxx>
 
+#include <cstdlib>
+
 namespace mbgl {
 
 int runTests(int argc, char *argv[]) {
@@ -20,6 +22,12 @@ int runTests(int argc, char *argv[]) {
     args::ValueFlag<std::string> backendValue(argumentParser, "Backend", "Rendering backend", {"backend"});
 
     argumentParser.ParseCLI(argc, argv);
+
+    if (backendValue) {
+        mbgl::gfx::Backend::SetType(args::get(backendValue));
+    } else if (const char* backendEnv = std::getenv("MAPBOX_RENDER_BACKEND")) {
+        mbgl::gfx::Backend::SetType(backendEnv);
+    }
 
     return RUN_ALL_TESTS();
 }

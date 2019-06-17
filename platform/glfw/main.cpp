@@ -92,11 +92,17 @@ int main(int argc, char *argv[]) {
         mbgl::Log::Info(mbgl::Event::General, "BENCHMARK MODE: Some optimizations are disabled.");
     }
 
+    if (backendValue) {
+        mbgl::gfx::Backend::SetType(args::get(backendValue));
+    } else if (const char* backendEnv = std::getenv("MAPBOX_RENDER_BACKEND")) {
+        mbgl::gfx::Backend::SetType(backendEnv);
+    }
+
     GLFWView backend(fullscreen, benchmark);
     view = &backend;
 
     // Set access token if present
-    std::string token(getenv("MAPBOX_ACCESS_TOKEN") ?: "");
+    std::string token(std::getenv("MAPBOX_ACCESS_TOKEN") ?: "");
     if (token.empty()) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
     }

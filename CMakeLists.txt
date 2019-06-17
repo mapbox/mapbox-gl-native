@@ -207,6 +207,11 @@ if(WITH_NODEJS AND COMMAND mbgl_platform_node)
     include(cmake/node.cmake)
 endif()
 
+file(GLOB MBGL_MODULES LIST_DIRECTORIES false modules/*/config.cmake)
+foreach(MBGL_MODULE_CONFIG IN LISTS MBGL_MODULES)
+    include(${MBGL_MODULES})
+endforeach()
+
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     set_xcconfig_target_properties(mbgl-core)
     set_xcconfig_target_properties(mbgl-filesource)

@@ -22,6 +22,8 @@ macro(mbgl_platform_core)
     )
 
     target_include_directories(mbgl-core
+        PRIVATE platform/macos/src
+        PRIVATE platform/darwin/src
         PUBLIC platform/darwin/include
         PUBLIC platform/default/include
     )

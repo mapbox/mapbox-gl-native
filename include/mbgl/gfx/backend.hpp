@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <string>
 
 namespace mbgl {
 namespace gfx {
@@ -19,6 +20,10 @@ public:
         if (Value(value) != value) {
             abort(); // SetType must be called prior to any GetType calls.
         }
+    }
+
+    static void SetType(const std::string&) {
+        SetType(DefaultType);
     }
 
     static Type GetType() {

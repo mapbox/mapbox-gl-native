@@ -77,6 +77,9 @@ commands:
   npm-install:
     steps:
     - run:
+        name: Setup NPM registry
+        command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - run:
         name: npm install
         command: npm install --ignore-scripts
   prepare-environment:
@@ -171,6 +174,18 @@ commands:
         keys:
           - 'gradle/v1/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
           - 'gradle/v1'
+  install-module:
+    parameters:
+      module:
+        type: string
+    steps:
+      - run:
+          name: Checkout 'modules/<< parameters.module >>'
+          command: git submodule update --init modules/<< parameters.module >>
+      - run:
+          name: Install dependencies for 'modules/<< parameters.module >>'
+          working_directory: modules/<< parameters.module >>
+          command: npm install --verbose --ignore-scripts
 
 
   install-dependencies:

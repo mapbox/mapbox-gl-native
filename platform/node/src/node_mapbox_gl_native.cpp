@@ -19,8 +19,7 @@ void SetBackendType(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("Requires a render backend name");
     }
 
-    const std::string backendName { *Nan::Utf8String(info[0]) };
-    (void)backendName;
+    mbgl::gfx::Backend::SetType(*Nan::Utf8String(info[0]));
 }
 
 void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) {

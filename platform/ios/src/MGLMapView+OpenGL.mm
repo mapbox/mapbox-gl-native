@@ -3,10 +3,23 @@
 #import "MGLMapView+OpenGL.h"
 
 #include <mbgl/gl/renderable_resource.hpp>
+#include <mbgl/gfx/backend.hpp>
 
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
 #import <QuartzCore/CAEAGLLayer.h>
+
+namespace mbgl {
+namespace gfx {
+
+template <>
+std::unique_ptr<MGLMapViewImpl>
+Backend::Create<gfx::Backend::Type::OpenGL>(MGLMapView* nativeView) {
+    return std::make_unique<MGLMapViewOpenGLImpl>(nativeView);
+}
+
+} // namespace gfx
+} // namespace mbgl
 
 @interface MGLMapViewImplDelegate : NSObject <GLKViewDelegate>
 @end

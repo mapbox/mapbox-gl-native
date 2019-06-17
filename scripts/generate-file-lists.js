@@ -7,7 +7,7 @@ const xcode = require('xcode');
 
 require('./style-code');
 
-const classifier = /^(?:(?:(?:platform|vendor)\/(?:(?!include|src).)*\/|(?:test|benchmark)\/)?(?:(include|src)\/)?)?(.+\.h(?:pp|xx)?)$/;
+const classifier = /^(?:(?:(?:platform|vendor|modules)\/(?:(?!include|src).)*\/|(?:test|benchmark)\/)?(?:(include|src)\/)?)?(.+\.h(?:pp|xx)?)$/;
 
 function generateFileList(filename, roots, regex, patterns) {
     writeFileList(
@@ -149,3 +149,9 @@ generateFileList('vendor/supercluster.hpp-files.json', [ 'vendor/supercluster.hp
 generateFileList('vendor/unique_resource-files.json', [ 'vendor/unique_resource' ], vendorRegex, [ "unique_resource.hpp" ]);
 generateFileList('vendor/vector-tile-files.json', [ 'vendor/vector-tile' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/wagyu-files.json', [ 'vendor/wagyu' ], vendorRegex, [ "include/**/*.hpp" ]);
+
+fs.readdirSync('modules')
+    .filter(dir => fs.statSync(path.join('modules', dir)).isDirectory())
+    .forEach(dir => generateFileList(path.join('modules', dir, 'module-files.json'),
+                                     [ path.join('modules', dir) ], vendorRegex,
+                                     [ "include/*.hpp", "src/*.cpp", "src/*.mm", "src/*.hpp" ]));

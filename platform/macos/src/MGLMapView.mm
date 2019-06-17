@@ -23,6 +23,7 @@
 #import "MGLAnnotationImage.h"
 #import "MGLMapViewDelegate.h"
 #import "MGLImageSource.h"
+#import "MGLTileSource.h"
 
 #import <mbgl/map/map.hpp>
 #import <mbgl/map/map_options.hpp>
@@ -57,6 +58,8 @@
 #import "NSImage+MGLAdditions.h"
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "MGLLoggingConfiguration_Private.h"
+
+#import <QuartzCore/QuartzCore.h>
 
 class MGLAnnotationContext;
 
@@ -653,6 +656,8 @@ public:
     _mbglMap->getStyle().loadURL("");
     self.styleURL = styleURL;
 }
+
+@dynamic prefetchesTiles;
 
 - (void)setPrefetchesTiles:(BOOL)prefetchesTiles
 {

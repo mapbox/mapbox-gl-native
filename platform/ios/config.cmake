@@ -23,6 +23,8 @@ macro(mbgl_platform_core)
     target_sources_from_file(mbgl-core PRIVATE platform/ios/core-files.json)
 
     target_include_directories(mbgl-core
+        PRIVATE platform/ios/src
+        PRIVATE platform/darwin/src
         PUBLIC platform/darwin/include
         PUBLIC platform/default/include
     )

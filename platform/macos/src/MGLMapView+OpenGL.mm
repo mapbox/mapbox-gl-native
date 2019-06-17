@@ -2,8 +2,21 @@
 #import "MGLOpenGLLayer.h"
 
 #include <mbgl/gl/renderable_resource.hpp>
+#include <mbgl/gfx/backend.hpp>
 
 #import <OpenGL/gl.h>
+
+namespace mbgl {
+namespace gfx {
+
+template <>
+std::unique_ptr<MGLMapViewImpl>
+Backend::Create<gfx::Backend::Type::OpenGL>(MGLMapView* nativeView) {
+    return std::make_unique<MGLMapViewOpenGLImpl>(nativeView);
+}
+
+} // namespace gfx
+} // namespace mbgl
 
 class MGLMapViewOpenGLRenderableResource final : public mbgl::gl::RenderableResource {
 public:

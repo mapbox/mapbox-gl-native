@@ -3,8 +3,27 @@
 #import "MGLStyle_Private.h"
 #import "NSBundle+MGLAdditions.h"
 
+#include <mbgl/gfx/backend.hpp>
+
+NSString* const MGLMapboxRenderBackendDefaultsKey = @"MGLMapboxRenderBackend";
+
 std::unique_ptr<MGLMapViewImpl> MGLMapViewImpl::Create(MGLMapView* nativeView) {
-    return std::make_unique<MGLMapViewOpenGLImpl>(nativeView);
+    static dispatch_once_t onceToken;
+    dispatch_once (&onceToken, ^{
+        NSString* backend = [NSProcessInfo processInfo].environment[@"MAPBOX_RENDER_BACKEND"];
+        if (backend) {
+            [[NSUserDefaults standardUserDefaults] setObject:backend
+                                                      forKey:MGLMapboxRenderBackendDefaultsKey];
+        } else {
+            backend = [[NSUserDefaults standardUserDefaults]
+                stringForKey:MGLMapboxRenderBackendDefaultsKey];
+        }
+        if (backend) {
+            mbgl::gfx::Backend::SetType([backend UTF8String]);
+        }
+    });
+
+    return mbgl::gfx::Backend::Create<MGLMapViewImpl, MGLMapView*>(nativeView);
 }
 
 MGLMapViewImpl::MGLMapViewImpl(MGLMapView* nativeView_) : mapView(nativeView_) {
