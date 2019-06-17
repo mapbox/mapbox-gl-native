@@ -213,24 +213,59 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	-derivedDataPath $(IOS_OUTPUT_PATH) \
 	-configuration $(BUILDTYPE) -sdk iphonesimulator \
-	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8' \
 	-workspace $(IOS_WORK_PATH) \
 	-jobs $(JOBS)
 
 ifneq ($(MORE_SIMULATORS),)
-	IOS_XCODEBUILD_SIM += -parallel-testing-enabled YES \
+	IOS_LATEST = true
+	IOS_11 = true
+	IOS_10 = true
+	IOS_9 = true
+endif
+
+ifdef IOS_LATEST
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8' \
 	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xs Max' \
 	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xr' \
-	-destination 'platform=iOS Simulator,OS=latest,name=iPad Pro (11-inch)' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPad Pro (11-inch)'
+endif
+
+ifdef IOS_11
+	IOS_XCODEBUILD_SIM += \
 	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone 7' \
 	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone X' \
-	-destination 'platform=iOS Simulator,OS=11.4,name=iPad Air 2,' \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPad (5th generation)'
+endif
+
+ifdef IOS_10
+	IOS_XCODEBUILD_SIM += \
 	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone SE' \
 	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone 7 Plus' \
-	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPad Air' \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPad Pro (9.7-inch)'
+endif
+
+ifdef IOS_9
+	IOS_XCODEBUILD_SIM += \
 	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s Plus' \
 	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s' \
-	-destination 'platform=iOS Simulator,OS=9.3,name=iPad 2'
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPad Air 2'
+endif
+
+# If IOS_XCODEBUILD_SIM does not contain a simulator destination, add the default.
+ifeq (, $(findstring destination, $(IOS_XCODEBUILD_SIM)))
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8'
+else
+	IOS_XCODEBUILD_SIM += -parallel-testing-enabled YES
+endif
+
+ifneq ($(ONLY_TESTING),)
+	IOS_XCODEBUILD_SIM += -only-testing:$(ONLY_TESTING)
+endif
+
+ifneq ($(SKIP_TESTING),)
+	IOS_XCODEBUILD_SIM += -skip-testing:$(SKIP_TESTING)
 endif
 
 ifneq ($(CI),)

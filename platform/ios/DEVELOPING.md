@@ -153,7 +153,11 @@ You can provide an optional and custom [`xcconfig`](https://help.apple.com/xcode
 * `make ios-sanitize-address` runs unit tests from the "CI" scheme with the Address Sanitizer enabled.
 * `make ios-static-analyzer` runs unit tests from the "CI" scheme with the Static Analyzer enabled.
 
-These commands are run by default on a single Simulator. To enable legacy iOS versions and more device types, add `MORE_SIMULATORS=1`.
+These commands are run by default on a single Simulator. To enable legacy iOS versions and more device types, add `MORE_SIMULATORS=YES`. Use `IOS_LATEST=YES`, `IOS_11=YES`, etc. to test on specific iOS versions.
+
+To only run a specific test or class of tests, add `ONLY_TESTING=test/MGLNameOfTestClass/testNameOfTest`.
+
+To skip a specific test or class of tests, add `SKIP_TESTING=test/MGLNameOfTestClass/testNameOfTest`.
 
 To run the cross-platform tests in Xcode instead of on the command line:
 
