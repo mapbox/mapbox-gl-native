@@ -18,7 +18,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fix reset behavior for setLatLngBoundsForCameraTarget [#14882](https://github.com/mapbox/mapbox-gl-native/pull/14882)
 
 ### Features
- - Change library loader to soloader [#14890](https://github.com/mapbox/mapbox-gl-native/pull/14890)
  -  Add resource usage to HttpRequest, add offline query param [#14837](https://github.com/mapbox/mapbox-gl-native/pull/14837)
 
 ## 8.0.1 - June 11, 2019
