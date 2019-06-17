@@ -285,35 +285,16 @@
 }
 
 - (void)testAddFileContent {
-
-    NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentDir = [documentPaths objectAtIndex:0];
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    
-    BOOL directoryExists = [fileManager fileExistsAtPath:documentDir];
-    if (!directoryExists) {
-        [fileManager createDirectoryAtPath:documentDir withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-    
+
     // Valid database
-    {
+    [XCTContext runActivityNamed:@"Valid database" block:^(id<XCTActivity> activity) {
         NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"sideload_sat" ofType:@"db"]];
-        NSString *filePath = [documentDir stringByAppendingPathComponent:@"sideload_sat.db"];
-      
-        BOOL databaseExists = [fileManager fileExistsAtPath:filePath];
-        if (databaseExists) {
-            [fileManager removeItemAtPath:filePath error:nil];
-        }
-        
+
         NSError *error;
-        [fileManager moveItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
-        NSDictionary *atributes = @{ NSFilePosixPermissions: @0777 };
-        error = nil;
-        [fileManager setAttributes:atributes ofItemAtPath:filePath error:&error];
-        XCTAssertNil(error, @"Changing the file's permissions:%@ should not return an error.", filePath);
-        error = nil;
-        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:filePath error:&error];
-        
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:resourceURL.path error:&error];
+        XCTAssertNil(error, @"Getting the file's permissions:%@ should not return an error.", resourceURL.path);
+
         NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
         long long fileSize = [fileSizeNumber longLongValue];
         long long databaseFileSize = 73728;
@@ -330,7 +311,7 @@
         
         XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
-        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+        [os addContentsOfURL:resourceURL withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
             XCTAssertNotNil(fileURL, @"The fileURL should not be nil.");
             XCTAssertNotNil(packs, @"Adding the contents of the sideload_sat.db should update one pack.");
             XCTAssertNil(error, @"Adding contents to a file should not return an error.");
@@ -342,58 +323,37 @@
         [self waitForExpectationsWithTimeout:10 handler:nil];
         // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
         XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of sideload_sat.db should add one pack.");
+    }];
 
-    }
     // Invalid database type
-    {
+    [XCTContext runActivityNamed:@"Invalid database type" block:^(id<XCTActivity> activity) {
         NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"one-liner" ofType:@"json"]];
-        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentDir = [documentPaths objectAtIndex:0];
-        NSString *filePath = [documentDir stringByAppendingPathComponent:@"on-liner-copy.json"];
-        NSFileManager *fileManager = [NSFileManager defaultManager];
 
-        BOOL exists = [fileManager fileExistsAtPath:filePath];
-        if (exists) {
-            [fileManager removeItemAtPath:filePath error:nil];
-        }
-
-        NSError *error;
-        [fileManager copyItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
-        
         XCTestExpectation *invalidFileCompletionHandlerExpectation = [self expectationWithDescription:@"invalid content database completion handler"];
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
-        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+        [os addContentsOfFile:resourceURL.path withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
             XCTAssertNotNil(error, @"Passing an invalid offline database file should return an error.");
             XCTAssertNil(packs, @"Passing an invalid offline database file should not add packs to the offline database.");
             [invalidFileCompletionHandlerExpectation fulfill];
         }];
         [self waitForExpectationsWithTimeout:10 handler:nil];
-    }
-    // File non existent
-    {
-        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentDir = [documentPaths objectAtIndex:0];
-        NSString *filePath = [documentDir stringByAppendingPathComponent:@"nonexistent.db"];
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        
-        BOOL exists = [fileManager fileExistsAtPath:filePath];
-        if (exists) {
-            [fileManager removeItemAtPath:filePath error:nil];
-        }
-        
-        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
-        XCTAssertThrowsSpecificNamed([os addContentsOfFile:filePath withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid database file is passed.");
+    }];
 
-    }
+    // File non-existent
+    [XCTContext runActivityNamed:@"File non-existent" block:^(id<XCTActivity> activity) {
+        NSURL *resourceURL = [NSURL URLWithString:@"nonexistent.db"];
+
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        XCTAssertThrowsSpecificNamed([os addContentsOfURL:resourceURL withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid database file is passed.");
+    }];
+
     // URL to a non-file
-    {
+    [XCTContext runActivityNamed:@"URL to a non-file" block:^(id<XCTActivity> activity) {
         NSURL *resourceURL = [NSURL URLWithString:@"https://www.mapbox.com"];
         
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
         XCTAssertThrowsSpecificNamed([os addContentsOfURL:resourceURL withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid URL file is passed.");
-        
-    }
-    
+    }];
 }
 
 - (void)testPutResourceForURL {
