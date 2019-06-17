@@ -595,6 +595,8 @@ jobs:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.xml
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj
 
 # ------------------------------------------------------------------------------
   android-release:
