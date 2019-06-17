@@ -67,7 +67,7 @@ public:
             const double scale,
             const RenderedQueryOptions& options,
             const UnwrappedTileID&,
-            const std::vector<const RenderLayer*>&,
+            const std::unordered_map<std::string, const RenderLayer*>&,
             const float additionalQueryPadding) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
@@ -82,7 +82,7 @@ public:
     std::unordered_map<std::string, std::vector<Feature>> lookupSymbolFeatures(
            const std::vector<IndexedSubfeature>& symbolFeatures,
            const RenderedQueryOptions& options,
-           const std::vector<const RenderLayer*>& layers,
+           const std::unordered_map<std::string, const RenderLayer*>& layers,
            const OverscaledTileID& tileID,
            const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const;
 
@@ -92,7 +92,7 @@ private:
             const IndexedSubfeature&,
             const RenderedQueryOptions& options,
             const CanonicalTileID&,
-            const std::vector<const RenderLayer*>&,
+            const std::unordered_map<std::string, const RenderLayer*>&,
             const GeometryCoordinates& queryGeometry,
             const TransformState& transformState,
             const float pixelsToTileUnits,
