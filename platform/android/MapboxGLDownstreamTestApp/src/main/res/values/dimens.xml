@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="component_navigation_bottomsheet_height">96dp</dimen>
+    <dimen name="component_navigation_route_camera_padding">200dp</dimen>
+</resources>

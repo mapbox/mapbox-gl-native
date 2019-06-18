@@ -44,11 +44,11 @@ android {
 
 dependencies {
     api(project(':MapboxGLAndroidSDK'))
-    implementation("com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.37.0-20190424.195829-5") {
+    implementation("com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.40.0") {
         exclude group: 'com.mapbox.mapboxsdk', module: 'mapbox-android-sdk'
         exclude group: 'com.mapbox.mapboxsdk', module: 'mapbox-android-navigation'
     }
-    implementation "com.mapbox.mapboxsdk:mapbox-android-navigation:0.37.0-20190424.195804-5"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-navigation:0.40.0"
 
     // Butter Knife
     implementation "com.jakewharton:butterknife:8.8.1"
