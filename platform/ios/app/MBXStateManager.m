@@ -3,6 +3,8 @@
 #import "MBXState.h"
 #import "MBXViewController.h"
 
+static NSString * const MBXStateManagerMapStateKey = @"mapStateKey";
+
 @interface MBXStateManager()
 
 @property (strong, nonatomic) MBXState *currentState;
@@ -22,20 +24,19 @@
 }
 
 - (MBXState*)currentState {
-    NSData *encodedMapState = [[NSUserDefaults standardUserDefaults] objectForKey:@"mapStateKey"];
-    MBXState *currentState = (MBXState *)[NSKeyedUnarchiver unarchiveObjectWithData: encodedMapState];
+    NSData *encodedMapState = [[NSUserDefaults standardUserDefaults] objectForKey:MBXStateManagerMapStateKey];
+    MBXState *currentState = (MBXState *)[NSKeyedUnarchiver unarchiveObjectWithData:encodedMapState];
 
     return currentState;
 }
 
 - (void)saveState:(MBXState*)mapState {
     NSData *encodedMapState = [NSKeyedArchiver archivedDataWithRootObject:mapState];
-    [[NSUserDefaults standardUserDefaults] setObject:encodedMapState forKey:@"mapStateKey"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[NSUserDefaults standardUserDefaults] setObject:encodedMapState forKey:MBXStateManagerMapStateKey];
 }
 
 - (void)resetState {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"mapStateKey"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:MBXStateManagerMapStateKey];
 }
 
 
