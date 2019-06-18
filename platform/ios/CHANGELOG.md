@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## Master
+
+* Exclude CJK resources from offline download by default. ([#14176](https://github.com/mapbox/mapbox-gl-native/pull/14176))
+
 ## 5.1.0
 
 ### Styles and rendering
