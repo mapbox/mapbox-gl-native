@@ -697,6 +697,104 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
+TEST(OfflineDatabase, MapboxTileLimitExceeded) {
+    FixtureLog log;
+
+    uint64_t limit = 60;
+
+    OfflineDatabase db(":memory:");
+    db.setOfflineMapboxTileCountLimit(limit);
+
+    Response response;
+    response.data = randomString(4096);
+
+    auto insertAmbientTile = [&](unsigned i) {
+        const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.put(ambientTile, response);
+    };
+
+    auto insertRegionTile = [&](int64_t regionID, unsigned i) {
+        const Resource tile = Resource::tile("mapbox://region_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.putRegionResource(regionID, tile, response);
+    };
+
+    OfflineTilePyramidRegionDefinition definition1{ "mapbox://style1", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
+    OfflineRegionMetadata metadata1{{ 1, 2, 3 }};
+
+    OfflineTilePyramidRegionDefinition definition2{ "mapbox://style2", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
+    OfflineRegionMetadata metadata2{{ 1, 2, 3 }};
+
+    auto region1 = db.createRegion(definition1, metadata1);
+    auto region2 = db.createRegion(definition2, metadata2);
+
+    // Fine because tile limit only affects offline region.
+    for (unsigned i = 0; i < limit * 2; ++i) {
+        insertAmbientTile(i);
+    }
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), 0);
+
+    // Fine because this region is under the tile limit.
+    for (unsigned i = 0; i < limit - 10; ++i) {
+        insertRegionTile(region1->getID(), i);
+    }
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), limit - 10);
+
+    // Fine because this region + the previous is at the limit.
+    for (unsigned i = limit; i < limit + 10; ++i) {
+        insertRegionTile(region2->getID(), i);
+    }
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), limit);
+
+    // Full.
+    ASSERT_THROW(insertRegionTile(region1->getID(), 200), MapboxTileLimitExceededException);
+    ASSERT_THROW(insertRegionTile(region2->getID(), 201), MapboxTileLimitExceededException);
+
+    // These tiles are already on respective
+    // regions.
+    insertRegionTile(region1->getID(), 0);
+    insertRegionTile(region2->getID(), 60);
+
+    // Should be fine, ambient tile.
+    insertAmbientTile(333);
+
+    // Also fine, not Mapbox.
+    const Resource notMapboxTile = Resource::tile("foobar://region_tile", 1, 0, 0, 0, Tileset::Scheme::XYZ);
+    db.putRegionResource(region1->getID(), notMapboxTile, response);
+
+    // These tiles are not on the region they are
+    // being added to, but exist on another region,
+    // so they do not add to the total size.
+    insertRegionTile(region2->getID(), 0);
+    insertRegionTile(region1->getID(), 60);
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), limit);
+
+    // The tile 1 belongs to two regions and will
+    // still count as resource.
+    db.deleteRegion(std::move(*region2));
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), 51);
+
+    // Add new tiles to the region 1. We are adding
+    // 10, which would blow up the limit if it wasn't
+    // for the fact that tile 60 is already on the
+    // database and will not count.
+    for (unsigned i = limit; i < limit + 10; ++i) {
+        insertRegionTile(region1->getID(), i);
+    }
+
+    // Full again.
+    ASSERT_THROW(insertRegionTile(region1->getID(), 202), MapboxTileLimitExceededException);
+
+    db.deleteRegion(std::move(*region1));
+
+    ASSERT_EQ(0u, db.listRegions().value().size());
+    ASSERT_EQ(0u, log.uncheckedCount());
+}
+
 TEST(OfflineDatabase, Invalidate) {
     using namespace std::chrono_literals;
 
