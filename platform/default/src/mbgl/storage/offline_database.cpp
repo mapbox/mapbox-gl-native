@@ -964,12 +964,12 @@ void OfflineDatabase::putRegionResources(int64_t regionID,
 }
 
 uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Resource& resource, const Response& response) {
-    if (exceedsOfflineMapboxTileCountLimit(resource)) {
-        throw MapboxTileLimitExceededException();
-    }
-
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
+
+    if (previouslyUnused && exceedsOfflineMapboxTileCountLimit(resource)) {
+        throw MapboxTileLimitExceededException();
+    }
 
     if (offlineMapboxTileCount
         && resource.kind == Resource::Kind::Tile
@@ -1004,15 +1004,14 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
         insertQuery.bind(6, tile.z);
         insertQuery.run();
 
-        if (insertQuery.changes() == 0) {
-            return false;
-        }
+        bool notOnThisRegion = insertQuery.changes() != 0;
 
         // clang-format off
         mapbox::sqlite::Query selectQuery{ getStatement(
             "SELECT region_id "
             "FROM region_tiles, tiles "
             "WHERE region_id   != ?1 "
+            "  AND tile_id      = id "
             "  AND url_template = ?2 "
             "  AND pixel_ratio  = ?3 "
             "  AND x            = ?4 "
@@ -1027,7 +1026,10 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
         selectQuery.bind(4, tile.x);
         selectQuery.bind(5, tile.y);
         selectQuery.bind(6, tile.z);
-        return !selectQuery.run();
+
+        bool notOnOtherRegion = !selectQuery.run();
+
+        return notOnThisRegion && notOnOtherRegion;
     } else {
         // clang-format off
         mapbox::sqlite::Query insertQuery{ getStatement(
