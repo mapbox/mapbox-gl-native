@@ -4,6 +4,7 @@
 
 * Added an `MGLMapView.prefetchesTiles` property to configure lower-resolution tile prefetching behavior. ([#14816](https://github.com/mapbox/mapbox-gl-native/pull/14816))
 * Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
+* Exclude CJK resources from offline download by default. ([#14176](https://github.com/mapbox/mapbox-gl-native/pull/14176))
 
 ### Styles and rendering
 
