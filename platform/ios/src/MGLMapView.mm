@@ -1015,8 +1015,7 @@ public:
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
-    MGLLogDebug(@"Setting contentInset: %@", NSStringFromUIEdgeInsets(contentInset));
-    [self setContentInset:contentInset animated:NO];
+    [self setContentInset:contentInset animated:NO completionHandler:nil];
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated
@@ -1546,7 +1545,7 @@ public:
     self.mbglMap.setGestureInProgress(false);
     if (self.userTrackingState == MGLUserTrackingStateBegan)
     {
-        [self setUserTrackingMode:MGLUserTrackingModeNone animated:NO];
+        [self setUserTrackingMode:MGLUserTrackingModeNone animated:NO completionHandler:nil];
     }
     
     [self cancelTransitions];
@@ -3327,14 +3326,12 @@ public:
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds
 {
-    MGLLogDebug(@"Setting visibleCoordinateBounds: %@", MGLStringFromCoordinateBounds(bounds));
     [self setVisibleCoordinateBounds:bounds animated:NO];
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting visibleCoordinateBounds: %@ animated: %@", MGLStringFromCoordinateBounds(bounds), MGLStringFromBOOL(animated));
-    [self setVisibleCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero animated:animated];
+    [self setVisibleCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero animated:animated completionHandler:nil];
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
@@ -4671,7 +4668,6 @@ public:
 
 - (void)setSelectedAnnotations:(NSArray<id <MGLAnnotation>> *)selectedAnnotations
 {
-    MGLLogDebug(@"Selecting: %lu annotations", selectedAnnotations.count);
     if ( ! selectedAnnotations.count) return;
 
     id <MGLAnnotation> firstAnnotation = selectedAnnotations[0];
@@ -4680,7 +4676,7 @@ public:
 
     if ([firstAnnotation isKindOfClass:[MGLMultiPoint class]]) return;
 
-    [self selectAnnotation:firstAnnotation animated:YES];
+    [self selectAnnotation:firstAnnotation animated:YES completionHandler:nil];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
@@ -5100,14 +5096,13 @@ public:
 
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated
 {
-    MGLLogDebug(@"Showing: %lu annotations animated: %@", annotations.count, MGLStringFromBOOL(animated));
     CGFloat maximumPadding = 100;
     CGFloat yPadding = (self.frame.size.height / 5 <= maximumPadding) ? (self.frame.size.height / 5) : maximumPadding;
     CGFloat xPadding = (self.frame.size.width / 5 <= maximumPadding) ? (self.frame.size.width / 5) : maximumPadding;
 
     UIEdgeInsets edgeInsets = UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
 
-    [self showAnnotations:annotations edgePadding:edgeInsets animated:animated];
+    [self showAnnotations:annotations edgePadding:edgeInsets animated:animated completionHandler:nil];
 }
 
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
@@ -5306,7 +5301,7 @@ public:
             [self.delegate mapViewDidStopLocatingUser:self];
         }
 
-        [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES];
+        [self setUserTrackingMode:MGLUserTrackingModeNone animated:YES completionHandler:nil];
 
         [self.userLocationAnnotationView removeFromSuperview];
         self.userLocationAnnotationView = nil;
@@ -5346,8 +5341,7 @@ public:
 
 - (void)setUserTrackingMode:(MGLUserTrackingMode)mode
 {
-    MGLLogDebug(@"Setting userTrackingMode: %lu", mode);
-    [self setUserTrackingMode:mode animated:YES];
+    [self setUserTrackingMode:mode animated:YES completionHandler:nil];
 }
 
 - (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated
@@ -5448,8 +5442,7 @@ public:
 
 - (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate
 {
-    MGLLogDebug(@"Setting targetCoordinate: %@", MGLStringFromCLLocationCoordinate2D(targetCoordinate));
-    [self setTargetCoordinate:targetCoordinate animated:YES];
+    [self setTargetCoordinate:targetCoordinate animated:YES completionHandler:nil];
 }
 
 - (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate animated:(BOOL)animated

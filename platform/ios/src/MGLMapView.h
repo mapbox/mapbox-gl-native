@@ -503,7 +503,7 @@ MGL_EXPORT
 @property (nonatomic, assign) MGLUserTrackingMode userTrackingMode;
 
 /**
- Sets the mode used to track the user location, with an optional transition.
+ Deprecated. Sets the mode used to track the user location, with an optional transition.
  
  To specify a completion handler to execute after the animation finishes, use
  the `-setUserTrackingMode:animated:completionHandler:` method.
@@ -515,7 +515,7 @@ MGL_EXPORT
     affects the initial transition; subsequent changes to the user location or
     heading are always animated.
  */
-- (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
+- (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated __attribute__((deprecated("Use `-setUserTrackingMode:animated:completionHandler:` instead.")));
 
 /**
  Sets the mode used to track the user location, with an optional transition and
@@ -609,8 +609,8 @@ MGL_EXPORT
 @property (nonatomic, assign) CLLocationCoordinate2D targetCoordinate;
 
 /**
- Sets the geographic coordinate that is the subject of observation as the user
- location is being tracked, with an optional transition animation.
+ Deprecated. Sets the geographic coordinate that is the subject of observation as
+ the user location is being tracked, with an optional transition animation.
 
  By default, the target coordinate is set to an invalid coordinate, indicating
  that there is no target. In course tracking mode, the target forms one of two
@@ -629,7 +629,7 @@ MGL_EXPORT
  @param animated If `YES`, the map animates to fit the target within the map
     view. If `NO`, the map fits the target instantaneously.
  */
-- (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate animated:(BOOL)animated;
+- (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate animated:(BOOL)animated __attribute__((deprecated("Use `-setTargetCoordinate:animated:completionHandler:` instead.")));
 
 /**
  Sets the geographic coordinate that is the subject of observation as the user
@@ -934,8 +934,8 @@ MGL_EXPORT
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated;
 
 /**
- Changes the receiver’s viewport to fit the given coordinate bounds with some
- additional padding on each side.
+ Deprecated. Changes the receiver’s viewport to fit the given coordinate bounds with
+ some additional padding on each side.
 
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
@@ -951,7 +951,7 @@ MGL_EXPORT
  @param animated Specify `YES` to animate the change by smoothly scrolling and
     zooming or `NO` to immediately display the given bounds.
  */
-- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated __attribute__((deprecated("Use `-setVisibleCoordinateBounds:edgePadding:animated:completionHandler:` instead.")));
 
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds with some
@@ -1028,8 +1028,8 @@ MGL_EXPORT
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated;
 
 /**
- Sets the visible region so that the map displays the specified annotations with
- the specified amount of padding on each side.
+ Deprecated. Sets the visible region so that the map displays the specified
+ annotations with the specified amount of padding on each side.
 
  Calling this method updates the value in the `visibleCoordinateBounds` property
  and potentially other properties to reflect the new map region.
@@ -1043,7 +1043,7 @@ MGL_EXPORT
  @param animated `YES` if you want the map region change to be animated, or `NO`
     if you want the map to display the new region immediately without animations.
  */
-- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated __attribute__((deprecated("Use `-showAnnotations:edgePadding:animated:completionHandler:` instead.")));
 
 /**
  Sets the visible region so that the map displays the specified annotations with
@@ -1316,8 +1316,8 @@ MGL_EXPORT
 @property (nonatomic, assign) UIEdgeInsets contentInset;
 
 /**
- Sets the distance from the edges of the map view’s frame to the edges of the
- map view’s logical viewport with an optional transition animation.
+ Deprecated. Sets the distance from the edges of the map view’s frame to the edges
+ of the map view’s logical viewport with an optional transition animation.
 
  When the value of this property is equal to `UIEdgeInsetsZero`, viewport
  properties such as `centerCoordinate` assume a viewport that matches the map
@@ -1337,7 +1337,7 @@ MGL_EXPORT
     the content inset or `NO` if you want the map to inset the content
     immediately.
  */
-- (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated;
+- (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated __attribute__((deprecated("Use `-setContentInset:animated:completionHandler:` instead.")));
 
 /**
  Sets the distance from the edges of the map view’s frame to the edges of the
@@ -1443,7 +1443,7 @@ MGL_EXPORT
  */
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
 
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((unavailable("Use -metersPerPointAtLatitude:.")));
+- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((unavailable("Use `-metersPerPointAtLatitude:`.")));
 
 #pragma mark Annotating the Map
 
@@ -1601,7 +1601,7 @@ MGL_EXPORT
 @property (nonatomic, copy) NSArray<id <MGLAnnotation>> *selectedAnnotations;
 
 /**
- Selects an annotation and displays its callout view.
+ Deprecated. Selects an annotation and displays its callout view.
 
  The `animated` parameter determines whether the selection is animated including whether the map is
  panned to bring the annotation into view, specifically:
@@ -1622,7 +1622,7 @@ MGL_EXPORT
  @note In versions prior to `4.0.0` selecting an offscreen annotation did not
  change the camera.
  */
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated __attribute__((deprecated("Use `-selectAnnotation:animated:completionHandler:` instead.")));
 
 /**
  Selects an annotation and displays its callout view with an optional completion
@@ -1941,9 +1941,9 @@ MGL_EXPORT
  */
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
 
-@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((unavailable("Use -debugMask and -setDebugMask:.")));
+@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((unavailable("Use `-debugMask` and `-setDebugMask:`.")));
 
-- (void)toggleDebug __attribute__((unavailable("Use -setDebugMask:.")));
+- (void)toggleDebug __attribute__((unavailable("Use `-setDebugMask:`.")));
 
 - (void)emptyMemoryCache __attribute__((unavailable));
 

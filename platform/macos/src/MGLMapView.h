@@ -626,8 +626,8 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, assign) NSEdgeInsets contentInsets;
 
 /**
- Sets the distance from the edges of the map view’s frame to the edges of the
- map view’s logical viewport, with an optional transition animation.
+ Deprecated. Sets the distance from the edges of the map view’s frame to the
+ edges of the map view’s logical viewport, with an optional transition animation.
 
  When the value of this property is equal to `NSEdgeInsetsZero`, viewport
  properties such as `centerCoordinate` assume a viewport that matches the map
@@ -646,7 +646,7 @@ MGL_EXPORT IB_DESIGNABLE
     the content insets or `NO` if you want the map to inset the content
     immediately.
  */
-- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated;
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated __attribute__((deprecated("Use `-setContentInsets:animated:completionHandler:` instead.")));
 
 /**
  Sets the distance from the edges of the map view’s frame to the edges of the

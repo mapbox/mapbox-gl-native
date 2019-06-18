@@ -1431,8 +1431,7 @@ public:
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets {
-    MGLLogDebug(@"Setting contentInset: %@", MGLStringFromNSEdgeInsets(contentInsets));
-    [self setContentInsets:contentInsets animated:NO];
+    [self setContentInsets:contentInsets animated:NO completionHandler:nil];
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated {

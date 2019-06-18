@@ -480,12 +480,12 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     MGLTestLocationManager *locationManager = [[MGLTestLocationManager alloc] init];
     self.mapView.locationManager = locationManager;
 
-    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO];
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO completionHandler:nil];
     CGRect originalFrame = [self.mapView viewForAnnotation:self.mapView.userLocation].frame;
     
     // Temporarily disable location tracking so we can save the value of
     // the originalFrame in memory
-    [self.mapView setUserTrackingMode:MGLUserTrackingModeNone animated:NO];
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeNone animated:NO completionHandler:nil];
     
     CGPoint offset = CGPointMake(20, 20);
     
@@ -493,7 +493,7 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
         return offset;;
     };
     
-    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO];
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO completionHandler:nil];
     CGRect offsetFrame = [self.mapView viewForAnnotation:self.mapView.userLocation].frame;
     
     XCTAssertEqual(originalFrame.origin.x + offset.x, offsetFrame.origin.x);

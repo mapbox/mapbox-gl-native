@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
   * `-[MGLMapView setTargetCoordinate:animated:completionHandler:]`
   * `-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]`
   * `-[MGLMapView selectAnnotation:animated:completionHandler:]`
+* Deprecated variants of the above methods without completion handlers. ([#14959](https://github.com/mapbox/mapbox-gl-native/pull/14959))
 
 ## 5.1.0 - June 19, 2019
 

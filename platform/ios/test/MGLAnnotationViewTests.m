@@ -134,7 +134,7 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
             XCTAssertNil(_mapView.selectedAnnotations.firstObject, @"There should be no selected annotation");
 
             // First selection
-            [_mapView selectAnnotation:annotation animated:NO];
+            [_mapView selectAnnotation:annotation animated:NO completionHandler:nil];
             selectionCount++;
 
             XCTAssert(_mapView.selectedAnnotations.count == 1, @"There should only be 1 selected annotation");
@@ -190,7 +190,7 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     XCTAssert(MGLCoordinateInCoordinateBounds(point.coordinate, coordinateBounds), @"The test point should be within the visible map view");
 
     // Select on screen annotation (DO NOT ADD FIRST).
-    [self.mapView selectAnnotation:point animated:YES];
+    [self.mapView selectAnnotation:point animated:YES completionHandler:nil];
 
     // Expect - the camera NOT to move.
     MGLCameraChangeReason reasonAfter = self.mapView.cameraChangeReasonBitmask;
@@ -235,7 +235,7 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     
     XCTAssert(self.mapView.selectedAnnotations.count == 0, @"There should be 0 selected annotations");
     
-    [self.mapView selectAnnotation:point animated:NO];
+    [self.mapView selectAnnotation:point animated:NO completionHandler:nil];
     
     XCTAssert(self.mapView.selectedAnnotations.count == 0, @"There should be 0 selected annotations");
 }
