@@ -49,10 +49,19 @@ var layers = Object.keys(spec.layer.type.values).map((type) => {
 });
 
 // Process all layer properties
+const uniqueArrayEnum = (prop, enums) => {
+  if (prop.value !== 'enum') return false;
+  const enumsEqual = (val1, val2) => val1.length === val1.length && val1.every((val, i) => val === val2[i]);
+  return enums.filter(e => enumsEqual(Object.keys(prop.values).sort(), Object.keys(e.values).sort())).length == 0;
+};
+
 const layoutProperties = _(layers).map('layoutProperties').flatten().value();
 const paintProperties = _(layers).map('paintProperties').flatten().value();
 const allProperties = _(layoutProperties).union(paintProperties).union(lightProperties).value();
-const enumProperties = _(allProperties).filter({'type': 'enum'}).value();
+let allEnumProperties = _(allProperties).filter({'type': 'enum'}).value();
+const uniqueArrayEnumProperties = _(allProperties).filter({'type': 'array'}).filter(prop => uniqueArrayEnum(prop, allEnumProperties)).value();
+const enumProperties = _(allEnumProperties).union(uniqueArrayEnumProperties).value();
+
 
 global.propertyType = function propertyType(property) {
   switch (property.type) {

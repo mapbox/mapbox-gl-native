@@ -2376,6 +2376,26 @@ public class PropertyFactory {
   }
 
   /**
+   * The property allows control over a symbol's orientation. Note that the property values act as a hint, so that a symbol whose language doesn’t support the provided orientation will be laid out in its natural orientation. Example: English point symbol will be rendered horizontally even if array value contains single 'vertical' enum value. The order of elements in an array define priority order for the placement of an orientation variant.
+   *
+   * @param value a String[] value
+   * @return property wrapper around String[]
+   */
+  public static PropertyValue<String[]> textWritingMode(String[] value) {
+    return new LayoutPropertyValue<>("text-writing-mode", value);
+  }
+
+  /**
+   * The property allows control over a symbol's orientation. Note that the property values act as a hint, so that a symbol whose language doesn’t support the provided orientation will be laid out in its natural orientation. Example: English point symbol will be rendered horizontally even if array value contains single 'vertical' enum value. The order of elements in an array define priority order for the placement of an orientation variant.
+   *
+   * @param value a String[] value
+   * @return property wrapper around String[]
+   */
+  public static PropertyValue<Expression> textWritingMode(Expression value) {
+    return new LayoutPropertyValue<>("text-writing-mode", value);
+  }
+
+  /**
    * Rotates the text clockwise.
    *
    * @param value a Float value
