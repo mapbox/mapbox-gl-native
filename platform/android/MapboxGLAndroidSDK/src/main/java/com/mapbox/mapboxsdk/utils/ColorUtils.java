@@ -124,14 +124,16 @@ public class ColorUtils {
    */
   @ColorInt
   public static int rgbaToColor(@NonNull String value) {
-    Pattern c = Pattern.compile("rgba?\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,?\\s*(\\d+\\.?\\d*)?\\s*\\)");
+    // we need to accept and floor float values as well, as those can come from core
+    Pattern c = Pattern.compile("rgba?\\s*\\(\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,"
+      + "?\\s*(\\d+\\.?\\d*)?\\s*\\)");
     Matcher m = c.matcher(value);
     if (m.matches() && m.groupCount() == 3) {
-      return Color.rgb(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)),
-        Integer.parseInt(m.group(3)));
+      return Color.rgb((int) Float.parseFloat(m.group(1)), (int) Float.parseFloat(m.group(2)),
+        (int) Float.parseFloat(m.group(3)));
     } else if (m.matches() && m.groupCount() == 4) {
-      return Color.argb((int) (Float.parseFloat(m.group(4)) * 255), Integer.parseInt(m.group(1)),
-        Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)));
+      return Color.argb((int) (Float.parseFloat(m.group(4)) * 255), (int) Float.parseFloat(m.group(1)),
+        (int) Float.parseFloat(m.group(2)), (int) Float.parseFloat(m.group(3)));
     } else {
       throw new ConversionException("Not a valid rgb/rgba value");
     }
