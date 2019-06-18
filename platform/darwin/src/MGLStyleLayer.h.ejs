@@ -19,7 +19,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 <% for (const property of layoutProperties) { -%>
-<% if (property.type == "enum") { -%>
+<% if (definesEnum(property, layoutProperties)) { -%>
 /**
 <%- propertyDoc(property.name, property, type, 'enum').wrap(80, 1) %>
 
@@ -38,7 +38,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 <% } -%>
 <% } -%>
 <% for (const property of paintProperties) { -%>
-<% if (property.type == "enum") { -%>
+<% if (definesEnum(property, paintProperties)) { -%>
 /**
 <%- propertyDoc(property.name, property, type, 'enum').wrap(80, 1) %>
 

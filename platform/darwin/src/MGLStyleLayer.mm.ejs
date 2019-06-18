@@ -25,7 +25,7 @@ namespace mbgl {
 
 <% if (layoutProperties.length) { -%>
 <% for (const property of layoutProperties) { -%>
-<% if (property.type == "enum") { -%>
+<% if (definesEnum(property, layoutProperties)) { -%>
     MBGL_DEFINE_ENUM(MGL<%- camelize(property.name) %>, {
 <% for (const value in property.values) { -%>
         { MGL<%- camelize(property.name) %><%- camelize(value) %>, "<%-value%>" },
@@ -37,7 +37,7 @@ namespace mbgl {
 <% } -%>
 <% if (paintProperties.length) { -%>
 <% for (const property of paintProperties) { -%>
-<% if (property.type == "enum") { -%>
+<% if (definesEnum(property, paintProperties)) { -%>
     MBGL_DEFINE_ENUM(MGL<%- camelize(property.name) %>, {
 <% for (const value in property.values) { -%>
         { MGL<%- camelize(property.name) %><%- camelize(value) %>, "<%-value%>" },
