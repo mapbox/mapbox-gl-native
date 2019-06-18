@@ -38,6 +38,7 @@ void RunLoop::run() {
 }
 
 void RunLoop::runOnce() {
+    wake();
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, false);
 }
 
