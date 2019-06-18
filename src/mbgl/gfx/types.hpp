@@ -136,7 +136,6 @@ enum CullFaceWindingType : uint8_t {
 enum class BufferUsageType : uint8_t {
     StreamDraw,
     StaticDraw,
-    DynamicDraw,
 };
 
 enum class TexturePixelType : uint8_t {
