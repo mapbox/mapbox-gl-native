@@ -201,6 +201,11 @@ namespace android {
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextMaxAngle()));
     }
 
+    jni::Local<jni::Object<>> SymbolLayer::getTextWritingMode(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextWritingMode()));
+    }
+
     jni::Local<jni::Object<>> SymbolLayer::getTextRotate(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         return std::move(*convert<jni::Local<jni::Object<>>>(env, toSymbolLayer(layer).getTextRotate()));
@@ -534,6 +539,7 @@ namespace android {
             METHOD(&SymbolLayer::getTextVariableAnchor, "nativeGetTextVariableAnchor"),
             METHOD(&SymbolLayer::getTextAnchor, "nativeGetTextAnchor"),
             METHOD(&SymbolLayer::getTextMaxAngle, "nativeGetTextMaxAngle"),
+            METHOD(&SymbolLayer::getTextWritingMode, "nativeGetTextWritingMode"),
             METHOD(&SymbolLayer::getTextRotate, "nativeGetTextRotate"),
             METHOD(&SymbolLayer::getTextPadding, "nativeGetTextPadding"),
             METHOD(&SymbolLayer::getTextKeepUpright, "nativeGetTextKeepUpright"),
