@@ -96,6 +96,11 @@ namespace mbgl {
         { MGLTextTransformLowercase, "lowercase" },
     });
 
+    MBGL_DEFINE_ENUM(MGLTextWritingMode, {
+        { MGLTextWritingModeHorizontal, "horizontal" },
+        { MGLTextWritingModeVertical, "vertical" },
+    });
+
     MBGL_DEFINE_ENUM(MGLIconTranslationAnchor, {
         { MGLIconTranslationAnchorMap, "map" },
         { MGLIconTranslationAnchorViewport, "viewport" },
@@ -1023,6 +1028,24 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::vector<mbgl::style::SymbolAnchorType>, NSArray<NSValue *> *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toExpression(propertyValue);
 }
 
+- (void)setTextWritingMode:(NSExpression *)textWritingMode {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting textWritingMode: %@", textWritingMode);
+
+    auto mbglValue = MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingMode>().toPropertyValue<mbgl::style::PropertyValue<std::vector<mbgl::style::TextWritingModeType>>>(textWritingMode, false);
+    self.rawLayer->setTextWritingMode(mbglValue);
+}
+
+- (NSExpression *)textWritingMode {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getTextWritingMode();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultTextWritingMode();
+    }
+    return MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingMode>().toExpression(propertyValue);
+}
+
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setIconColor:(NSExpression *)iconColor {
@@ -1597,6 +1620,16 @@ namespace mbgl {
     MGLTextTransform textTransform;
     [self getValue:&textTransform];
     return textTransform;
+}
+
++ (NSValue *)valueWithMGLTextWritingMode:(MGLTextWritingMode)textWritingMode {
+    return [NSValue value:&textWritingMode withObjCType:@encode(MGLTextWritingMode)];
+}
+
+- (MGLTextWritingMode)MGLTextWritingModeValue {
+    MGLTextWritingMode textWritingMode;
+    [self getValue:&textWritingMode];
+    return textWritingMode;
 }
 
 + (NSValue *)valueWithMGLIconTranslationAnchor:(MGLIconTranslationAnchor)iconTranslationAnchor {

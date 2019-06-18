@@ -79,6 +79,28 @@ global.camelizeWithLeadingLowercase = function (str) {
     });
 };
 
+// Returns true only if property is an enum or if it is an array
+// property with uniquely defined enum.
+global.definesEnum = function(property, allProperties) {
+    if (property.type === "enum") {
+        return true;
+    }
+
+    if (property.type === 'array' && property.value === 'enum') {
+        const uniqueArrayEnum = (prop, enums) => {
+            if (prop.value !== 'enum') return false;
+            const enumsEqual = (val1, val2) => val1.length === val1.length && val1.every((val, i) => val === val2[i]);
+            return enums.filter(e => enumsEqual(Object.keys(prop.values).sort(), Object.keys(e.values).sort())).length == 0;
+        };
+
+        const allEnumProperties = _(allProperties).filter({'type': 'enum'}).value();
+        const uniqueArrayEnumProperties = _(allProperties).filter({'type': 'array'}).filter(prop => uniqueArrayEnum(prop, allEnumProperties)).value();
+        return _(uniqueArrayEnumProperties).filter({'name': property.name}).value().length != 0;
+    }
+
+    return false;
+}
+
 global.objCName = function (property) {
     return camelizeWithLeadingLowercase(property.name);
 };
@@ -144,6 +166,8 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
                 }
                 case 'anchor':
                     return `@"{'top','bottom'}"`;
+                case 'mode':
+                    return `@"{'horizontal','vertical'}"`;
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -194,6 +218,8 @@ global.mbglTestValue = function (property, layerType) {
                     return '{ 1, 1 }';
                 case 'anchor':
                     return '{ mbgl::style::SymbolAnchorType::Top, mbgl::style::SymbolAnchorType::Bottom }';
+                case 'mode':
+                    return '{ mbgl::style::TextWritingModeType::Horizontal, mbgl::style::TextWritingModeType::Vertical }';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -213,6 +239,8 @@ global.mbglExpressionTestValue = function (property, layerType) {
             switch (arrayType(property)) {
                 case 'anchor':
                     return `{"top", "bottom"}`;
+                case 'mode':
+                    return `{"horizontal", "vertical"}`;
                 default:
                     break;
             }
@@ -439,6 +467,8 @@ global.describeType = function (property) {
                     return '`MGLSphericalPosition`';
                 case 'anchor':
                     return '`MGLTextAnchor` array';
+                case 'mode':
+                    return '`MGLTextWritingMode` array';
                 default:
                     return 'array';
             }
@@ -568,6 +598,7 @@ global.propertyType = function (property) {
                 case 'translate':
                     return 'NSValue *';
                 case 'anchor':
+                case 'mode':
                     return 'NSArray<NSValue *> *';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
@@ -615,6 +646,8 @@ global.valueTransformerArguments = function (property) {
                     return ['std::array<float, 2>', objCType];
                 case 'anchor':
                     return ['std::vector<mbgl::style::SymbolAnchorType>', objCType, 'mbgl::style::SymbolAnchorType', 'MGLTextAnchor'];
+                case 'mode':
+                    return ['std::vector<mbgl::style::TextWritingModeType>', objCType, 'mbgl::style::TextWritingModeType', 'MGLTextWritingMode'];
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -666,6 +699,8 @@ global.mbglType = function(property) {
                     return 'mbgl::style::Position';
                 case 'anchor':
                     return 'std::vector<mbgl::style::SymbolAnchorType>';
+                case 'mode':
+                    return 'std::vector<mbgl::style::TextWritingModeType>';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -773,7 +808,7 @@ var renamedPropertiesByLayerType = {};
 
 for (var layer of layers) {
     layer.properties = _.concat(layer.layoutProperties, layer.paintProperties);
-    let enumProperties = _.filter(layer.properties, prop => prop.type === 'enum');
+    let enumProperties = _.filter(layer.properties, prop => definesEnum(prop, layer.properties));
     if (enumProperties.length) {
         layer.enumProperties = enumProperties;
     }

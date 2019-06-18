@@ -2074,6 +2074,50 @@
         XCTAssertThrowsSpecificNamed(layer.textVariableAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
+    // text-writing-mode
+    {
+        XCTAssertTrue(rawLayer->getTextWritingMode().isUndefined(),
+                      @"text-writing-mode should be unset initially.");
+        NSExpression *defaultExpression = layer.textWritingMode;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"{'horizontal','vertical'}"];
+        layer.textWritingMode = constantExpression;
+        mbgl::style::PropertyValue<std::vector<mbgl::style::TextWritingModeType>> propertyValue = { { mbgl::style::TextWritingModeType::Horizontal, mbgl::style::TextWritingModeType::Vertical } };
+        XCTAssertEqual(rawLayer->getTextWritingMode(), propertyValue,
+                       @"Setting textWritingMode to a constant value expression should update text-writing-mode.");
+        XCTAssertEqualObjects(layer.textWritingMode, constantExpression,
+                              @"textWritingMode should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"{'horizontal','vertical'}"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.textWritingMode = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<std::vector<mbgl::style::TextWritingModeType>>(
+                step(zoom(), literal({"horizontal", "vertical"}), 18.0, literal({"horizontal", "vertical"}))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getTextWritingMode(), propertyValue,
+                       @"Setting textWritingMode to a camera expression should update text-writing-mode.");
+        XCTAssertEqualObjects(layer.textWritingMode, functionExpression,
+                              @"textWritingMode should round-trip camera expressions.");
+
+
+        layer.textWritingMode = nil;
+        XCTAssertTrue(rawLayer->getTextWritingMode().isUndefined(),
+                      @"Unsetting textWritingMode should return text-writing-mode to the default value.");
+        XCTAssertEqualObjects(layer.textWritingMode, defaultExpression,
+                              @"textWritingMode should return the default value after being unset.");
+
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.textWritingMode = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.textWritingMode = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+    }
+
     // icon-color
     {
         XCTAssertTrue(rawLayer->getIconColor().isUndefined(),
@@ -3084,6 +3128,7 @@
     [self testPropertyName:@"text-rotation-alignment" isBoolean:NO];
     [self testPropertyName:@"text-transform" isBoolean:NO];
     [self testPropertyName:@"text-variable-anchor" isBoolean:NO];
+    [self testPropertyName:@"text-writing-mode" isBoolean:NO];
     [self testPropertyName:@"icon-color" isBoolean:NO];
     [self testPropertyName:@"icon-halo-blur" isBoolean:NO];
     [self testPropertyName:@"icon-halo-color" isBoolean:NO];
@@ -3148,6 +3193,8 @@
     XCTAssertEqual([NSValue valueWithMGLTextTransform:MGLTextTransformNone].MGLTextTransformValue, MGLTextTransformNone);
     XCTAssertEqual([NSValue valueWithMGLTextTransform:MGLTextTransformUppercase].MGLTextTransformValue, MGLTextTransformUppercase);
     XCTAssertEqual([NSValue valueWithMGLTextTransform:MGLTextTransformLowercase].MGLTextTransformValue, MGLTextTransformLowercase);
+    XCTAssertEqual([NSValue valueWithMGLTextWritingMode:MGLTextWritingModeHorizontal].MGLTextWritingModeValue, MGLTextWritingModeHorizontal);
+    XCTAssertEqual([NSValue valueWithMGLTextWritingMode:MGLTextWritingModeVertical].MGLTextWritingModeValue, MGLTextWritingModeVertical);
     XCTAssertEqual([NSValue valueWithMGLIconTranslationAnchor:MGLIconTranslationAnchorMap].MGLIconTranslationAnchorValue, MGLIconTranslationAnchorMap);
     XCTAssertEqual([NSValue valueWithMGLIconTranslationAnchor:MGLIconTranslationAnchorViewport].MGLIconTranslationAnchorValue, MGLIconTranslationAnchorViewport);
     XCTAssertEqual([NSValue valueWithMGLTextTranslationAnchor:MGLTextTranslationAnchorMap].MGLTextTranslationAnchorValue, MGLTextTranslationAnchorMap);

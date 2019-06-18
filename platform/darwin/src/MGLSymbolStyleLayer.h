@@ -317,6 +317,30 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 };
 
 /**
+ The property allows to control an orientation of a symbol. Note, that the
+ property values act as a hint, so that Symbols whose language doesn't support
+ provided orientation, will be laid out in their natural orientation. Example:
+ English point symbol will be rendered horizontally even if `"textWritingMode":
+ ["vertical"]` is set. The order of elements in an array define priority order
+ for the placement of an orientation variant.
+
+ Values of this type are used in the `MGLSymbolStyleLayer.textWritingMode`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLTextWritingMode) {
+    /**
+     If a text's language supports horizontal writing mode, symbols with point
+     placement would be laid out horizontally.
+     */
+    MGLTextWritingModeHorizontal,
+    /**
+     If a text's language supports vertical writing mode, symbols with point
+     placement would be laid out vertically.
+     */
+    MGLTextWritingModeVertical,
+};
+
+/**
  Controls the frame of reference for `MGLSymbolStyleLayer.iconTranslation`.
 
  Values of this type are used in the `MGLSymbolStyleLayer.iconTranslationAnchor`
@@ -1646,6 +1670,38 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) NSExpression *textVariableAnchor;
 
+/**
+ The property allows to control an orientation of a symbol. Note, that the
+ property values act as a hint, so that Symbols whose language doesn't support
+ provided orientation, will be laid out in their natural orientation. Example:
+ English point symbol will be rendered horizontally even if `"textWritingMode":
+ ["vertical"]` is set. The order of elements in an array define priority order
+ for the placement of an orientation variant.
+ 
+ This property is only applied to the style if `text` is non-`nil`, and
+ `symbolPlacement` is set to an expression that evaluates to or
+ `MGLSymbolPlacementPoint`. Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `MGLTextWritingMode` array values
+ * Constant array, whose each element is any of the following constant string
+ values:
+   * `horizontal`: If a text's language supports horizontal writing mode,
+ symbols with point placement would be laid out horizontally.
+   * `vertical`: If a text's language supports vertical writing mode, symbols
+ with point placement would be laid out vertically.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *textWritingMode;
+
 #pragma mark - Accessing the Paint Attributes
 
 #if TARGET_OS_IPHONE
@@ -2381,6 +2437,19 @@ MGL_EXPORT
  The `MGLTextTransform` enumeration representation of the value.
  */
 @property (readonly) MGLTextTransform MGLTextTransformValue;
+
+/**
+ Creates a new value object containing the given `MGLTextWritingMode` enumeration.
+
+ @param textWritingMode The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextWritingMode:(MGLTextWritingMode)textWritingMode;
+
+/**
+ The `MGLTextWritingMode` enumeration representation of the value.
+ */
+@property (readonly) MGLTextWritingMode MGLTextWritingModeValue;
 
 /**
  Creates a new value object containing the given `MGLIconTranslationAnchor` enumeration.
