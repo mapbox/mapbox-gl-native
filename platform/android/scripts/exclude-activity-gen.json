@@ -51,5 +51,6 @@
   "FragmentBackStackActivity",
   "ChildFragmentMapInDialogActivity",
   "PerformanceMeasurementActivity",
-  "DownloadRegionActivity"
+  "DownloadRegionActivity",
+  "CacheManagementActivity"
 ]

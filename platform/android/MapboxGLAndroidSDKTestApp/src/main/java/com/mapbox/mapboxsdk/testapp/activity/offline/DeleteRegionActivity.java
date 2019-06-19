@@ -12,7 +12,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -25,7 +24,8 @@ import java.util.List;
 /**
  * Test activity showing integration of deleting an OfflineRegion.
  */
-public class DeleteRegionActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class DeleteRegionActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,
+  AdapterView.OnItemLongClickListener {
 
   private OfflineRegionAdapter adapter;
 
@@ -34,10 +34,11 @@ public class DeleteRegionActivity extends AppCompatActivity implements AdapterVi
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_offline_region_delete);
 
-    ListView listView = (ListView) findViewById(R.id.listView);
+    ListView listView = findViewById(R.id.listView);
     listView.setAdapter(adapter = new OfflineRegionAdapter(this));
     listView.setEmptyView(findViewById(android.R.id.empty));
     listView.setOnItemClickListener(this);
+    listView.setOnItemLongClickListener(this);
   }
 
   @Override
@@ -56,6 +57,23 @@ public class DeleteRegionActivity extends AppCompatActivity implements AdapterVi
     builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
     builder.show();
+  }
+
+  @Override
+  public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    final OfflineRegion region = adapter.getItem(position);
+    region.invalidate(new OfflineRegion.OfflineRegionInvalidateCallback() {
+      @Override
+      public void onInvalidate() {
+        Toast.makeText(DeleteRegionActivity.this, "Invalidate region success", Toast.LENGTH_SHORT).show();
+      }
+
+      @Override
+      public void onError(String error) {
+        Toast.makeText(DeleteRegionActivity.this, "Error:" + error, Toast.LENGTH_LONG).show();
+      }
+    });
+    return true;
   }
 
   private void delete(OfflineRegion region) {

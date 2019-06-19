@@ -37,6 +37,15 @@ public:
         static void onDelete(jni::JNIEnv&, const jni::Object<OfflineRegionDeleteCallback>&);
     };
 
+    class OfflineRegionInvalidateCallback {
+    public:
+        static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionInvalidateCallback"; };
+
+        static void onError(jni::JNIEnv&, const jni::Object<OfflineRegionInvalidateCallback>&, std::exception_ptr);
+
+        static void onInvalidate(jni::JNIEnv&, const jni::Object<OfflineRegionInvalidateCallback>&);
+    };
+
     class OfflineRegionUpdateMetadataCallback {
     public:
         static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionUpdateMetadataCallback"; };
@@ -61,6 +70,8 @@ public:
     void getOfflineRegionStatus(jni::JNIEnv&, const jni::Object<OfflineRegion::OfflineRegionStatusCallback>&);
 
     void deleteOfflineRegion(jni::JNIEnv&, const jni::Object<OfflineRegionDeleteCallback>&);
+
+    void invalidateOfflineRegion(jni::JNIEnv&, const jni::Object<OfflineRegionInvalidateCallback>&);
 
     void updateOfflineRegionMetadata(jni::JNIEnv&, const jni::Array<jni::jbyte>&, const jni::Object<OfflineRegionUpdateMetadataCallback>&);
 

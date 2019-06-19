@@ -119,6 +119,24 @@ void OfflineRegion::deleteOfflineRegion(jni::JNIEnv& env_, const jni::Object<Off
     });
 }
 
+void OfflineRegion::invalidateOfflineRegion(jni::JNIEnv& env_, const jni::Object<OfflineRegionInvalidateCallback>& callback_) {
+    auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
+
+    fileSource->invalidateOfflineRegion(*region, [
+        //Ensure the object is not gc'd in the meanwhile
+        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
+    ](std::exception_ptr error) mutable {
+        // Reattach, the callback comes from a different thread
+        android::UniqueEnv env = android::AttachEnv();
+
+        if (error) {
+            OfflineRegionInvalidateCallback::onError(*env, *callback, error);
+        } else {
+            OfflineRegionInvalidateCallback::onInvalidate(*env, *callback);
+        }
+    });
+}
+
 void OfflineRegion::updateOfflineRegionMetadata(jni::JNIEnv& env_, const jni::Array<jni::jbyte>& jMetadata, const jni::Object<OfflineRegionUpdateMetadataCallback>& callback_) {
     auto metadata = OfflineRegion::metadata(env_, jMetadata);
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
@@ -182,6 +200,7 @@ void OfflineRegion::registerNative(jni::JNIEnv& env) {
     jni::Class<OfflineRegionStatusCallback>::Singleton(env);
     jni::Class<OfflineRegionDeleteCallback>::Singleton(env);
     jni::Class<OfflineRegionUpdateMetadataCallback>::Singleton(env);
+    jni::Class<OfflineRegionInvalidateCallback>::Singleton(env);
 
     static auto& javaClass = jni::Class<OfflineRegion>::Singleton(env);
 
@@ -195,6 +214,7 @@ void OfflineRegion::registerNative(jni::JNIEnv& env) {
         METHOD(&OfflineRegion::setOfflineRegionDownloadState, "setOfflineRegionDownloadState"),
         METHOD(&OfflineRegion::getOfflineRegionStatus, "getOfflineRegionStatus"),
         METHOD(&OfflineRegion::deleteOfflineRegion, "deleteOfflineRegion"),
+        METHOD(&OfflineRegion::invalidateOfflineRegion, "invalidateOfflineRegion"),
         METHOD(&OfflineRegion::updateOfflineRegionMetadata, "updateOfflineRegionMetadata")
     );
 }
@@ -258,6 +278,22 @@ void OfflineRegion::OfflineRegionUpdateMetadataCallback::onUpdate(jni::JNIEnv& e
     static auto method = javaClass.GetMethod<void (jni::Array<jni::jbyte>)>(env, "onUpdate");
 
     callback.Call(env, method, OfflineRegion::metadata(env, std::move(*metadata)));
+}
+
+// OfflineRegionInvalidateCallback //
+
+void OfflineRegion::OfflineRegionInvalidateCallback::onError(jni::JNIEnv& env,
+                                                          const jni::Object<OfflineRegion::OfflineRegionInvalidateCallback>& callback,
+                                                          std::exception_ptr error) {
+    static auto& javaClass = jni::Class<OfflineRegion::OfflineRegionInvalidateCallback>::Singleton(env);
+    static auto method = javaClass.GetMethod<void (jni::String)>(env, "onError");
+    callback.Call(env, method, jni::Make<jni::String>(env, mbgl::util::toString(error)));
+}
+
+void OfflineRegion::OfflineRegionInvalidateCallback::onInvalidate(jni::JNIEnv& env, const jni::Object<OfflineRegion::OfflineRegionInvalidateCallback>& callback) {
+    static auto& javaClass = jni::Class<OfflineRegion::OfflineRegionInvalidateCallback>::Singleton(env);
+    static auto method = javaClass.GetMethod<void ()>(env, "onInvalidate");
+    callback.Call(env, method);
 }
 
 } // namespace android
