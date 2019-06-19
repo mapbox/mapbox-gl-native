@@ -973,6 +973,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - install-module: { module: metal }
       - build-ios-test
       - check-public-symbols
       - run:
@@ -1015,6 +1016,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - install-module: { module: metal }
       - run:
           name: Build and run SDK unit tests with thread and undefined behavior sanitizers
           command: make ios-sanitize
@@ -1039,6 +1041,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - install-module: { module: metal }
       - run:
           name: Build and run SDK unit tests with address sanitizer
           command: make ios-sanitize-address
@@ -1059,6 +1062,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - install-module: { module: metal }
       - run:
           name: Build and run SDK unit tests with the static analyzer
           command: make ios-static-analyzer
@@ -1079,6 +1083,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - install-module: { module: metal }
       - install-ios-packaging-dependencies
       - run:
           name: Build dynamic framework for device and simulator
@@ -1174,9 +1179,11 @@ jobs:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
       HOMEBREW_NO_INSTALL_CLEANUP: 1
+      MAPBOX_RENDER_BACKEND: opengl
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - install-module: { module: metal }
       - build-macos-test
       - check-public-symbols
       - run:

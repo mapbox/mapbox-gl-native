@@ -8,7 +8,7 @@ const os = require('os');
 function checkGeneratedFiles(name, scripts) {
   var files = [];
 
-  scripts.forEach(function(script) {
+  scripts.filter(fs.existsSync).forEach(function(script) {
     child_process.execSync(script);
     const list = path.join(path.dirname(script), path.basename(script, path.extname(script)) + '.list');
     files.push(list);
@@ -46,5 +46,5 @@ if (!mode || mode == 'android') {
   checkGeneratedFiles('Android', ['platform/android/scripts/generate-style-code.js']);
 }
 if ((!mode || mode == 'darwin') && os.platform() == 'darwin') {
-  checkGeneratedFiles('Darwin', ['platform/darwin/scripts/generate-style-code.js', 'platform/darwin/scripts/update-examples.js']);
+  checkGeneratedFiles('Darwin', ['platform/darwin/scripts/generate-style-code.js', 'platform/darwin/scripts/update-examples.js', 'modules/metal/scripts/generate-metal-shaders.js']);
 }

@@ -100,3 +100,6 @@
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest.git
+[submodule "modules/metal"]
+	path = modules/metal
+	url = git@github.com:mapbox/mapbox-maps-metal.git
