@@ -344,8 +344,10 @@ final class MapGestureDetector {
       }
 
       if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
-        // re-enabled the move detector
-        gesturesManager.getMoveGestureDetector().setEnabled(true);
+        if (executeDoubleTap) {
+          // re-enable the move detector only if we did not start the quickzoom, otherwise, re-enable in the #onScaleEnd
+          gesturesManager.getMoveGestureDetector().setEnabled(true);
+        }
 
         if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled() || !executeDoubleTap) {
           return false;
@@ -512,6 +514,13 @@ final class MapGestureDetector {
 
     @Override
     public void onScaleEnd(@NonNull StandardScaleGestureDetector detector, float velocityX, float velocityY) {
+      if (quickZoom) {
+        // re-enabled the move detector only if the quickzoom happened
+        // we need to split the responsibility of re-enabling the move detector,
+        // because the double tap event (where the detector is disabled) can be canceled without warning (see #14598)
+        gesturesManager.getMoveGestureDetector().setEnabled(true);
+      }
+
       if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
         // resetting default angle threshold
         gesturesManager.getRotateGestureDetector().setAngleThreshold(
