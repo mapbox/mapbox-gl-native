@@ -468,7 +468,7 @@ global.describeType = function (property) {
                 case 'anchor':
                     return '`MGLTextAnchor` array';
                 case 'mode':
-                    return '`MGLTextWritingMode` array';
+                    return '`MGLTextWritingModes` array';
                 default:
                     return 'array';
             }
@@ -647,7 +647,7 @@ global.valueTransformerArguments = function (property) {
                 case 'anchor':
                     return ['std::vector<mbgl::style::SymbolAnchorType>', objCType, 'mbgl::style::SymbolAnchorType', 'MGLTextAnchor'];
                 case 'mode':
-                    return ['std::vector<mbgl::style::TextWritingModeType>', objCType, 'mbgl::style::TextWritingModeType', 'MGLTextWritingMode'];
+                    return ['std::vector<mbgl::style::TextWritingModeType>', objCType, 'mbgl::style::TextWritingModeType', 'MGLTextWritingModes'];
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }

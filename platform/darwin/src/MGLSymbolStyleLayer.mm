@@ -96,9 +96,9 @@ namespace mbgl {
         { MGLTextTransformLowercase, "lowercase" },
     });
 
-    MBGL_DEFINE_ENUM(MGLTextWritingMode, {
-        { MGLTextWritingModeHorizontal, "horizontal" },
-        { MGLTextWritingModeVertical, "vertical" },
+    MBGL_DEFINE_ENUM(MGLTextWritingModes, {
+        { MGLTextWritingModesHorizontal, "horizontal" },
+        { MGLTextWritingModesVertical, "vertical" },
     });
 
     MBGL_DEFINE_ENUM(MGLIconTranslationAnchor, {
@@ -1028,22 +1028,29 @@ namespace mbgl {
     return MGLStyleValueTransformer<std::vector<mbgl::style::SymbolAnchorType>, NSArray<NSValue *> *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toExpression(propertyValue);
 }
 
-- (void)setTextWritingMode:(NSExpression *)textWritingMode {
+- (void)setTextWritingModes:(NSExpression *)textWritingModes {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting textWritingMode: %@", textWritingMode);
+    MGLLogDebug(@"Setting textWritingModes: %@", textWritingModes);
 
-    auto mbglValue = MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingMode>().toPropertyValue<mbgl::style::PropertyValue<std::vector<mbgl::style::TextWritingModeType>>>(textWritingMode, false);
+    auto mbglValue = MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingModes>().toPropertyValue<mbgl::style::PropertyValue<std::vector<mbgl::style::TextWritingModeType>>>(textWritingModes, false);
     self.rawLayer->setTextWritingMode(mbglValue);
 }
 
-- (NSExpression *)textWritingMode {
+- (NSExpression *)textWritingModes {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getTextWritingMode();
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultTextWritingMode();
     }
-    return MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingMode>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingModes>().toExpression(propertyValue);
+}
+
+- (void)setTextWritingMode:(NSExpression *)textWritingMode {
+}
+
+- (NSExpression *)textWritingMode {
+    return self.textWritingModes;
 }
 
 #pragma mark - Accessing the Paint Attributes
@@ -1622,14 +1629,14 @@ namespace mbgl {
     return textTransform;
 }
 
-+ (NSValue *)valueWithMGLTextWritingMode:(MGLTextWritingMode)textWritingMode {
-    return [NSValue value:&textWritingMode withObjCType:@encode(MGLTextWritingMode)];
++ (NSValue *)valueWithMGLTextWritingModes:(MGLTextWritingModes)textWritingModes {
+    return [NSValue value:&textWritingModes withObjCType:@encode(MGLTextWritingModes)];
 }
 
-- (MGLTextWritingMode)MGLTextWritingModeValue {
-    MGLTextWritingMode textWritingMode;
-    [self getValue:&textWritingMode];
-    return textWritingMode;
+- (MGLTextWritingModes)MGLTextWritingModesValue {
+    MGLTextWritingModes textWritingModes;
+    [self getValue:&textWritingModes];
+    return textWritingModes;
 }
 
 + (NSValue *)valueWithMGLIconTranslationAnchor:(MGLIconTranslationAnchor)iconTranslationAnchor {
