@@ -2049,6 +2049,8 @@ public:
 {
     if ( ! self.isPitchEnabled) return;
 
+    if (twoFingerDrag.numberOfTouches != 2) return;
+
     [self cancelTransitions];
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureTilt;

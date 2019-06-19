@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 5.2.0
+
+* Fixed an issue where the two-finger tilt gesture would continue after lifting one finger. ([#14969](https://github.com/mapbox/mapbox-gl-native/pull/14969))
+
 ## 5.1.0 - June 19, 2019
 
 ### Styles and rendering
