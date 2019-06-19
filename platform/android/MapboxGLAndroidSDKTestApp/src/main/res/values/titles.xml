@@ -50,6 +50,7 @@
     <string name="activity_map_visibility">Visibility Map</string>
     <string name="activity_map_in_dialog">Dialog with map</string>
     <string name="activity_url_transform">Url transform</string>
+    <string name="activity_cache_management">Cache management</string>
     <string name="activity_restricted_bounds">Restrict camera to a bounds</string>
     <string name="activity_fill_extrusion_layer">Fill extrusions</string>
     <string name="activity_building_fill_extrusion_layer">Building layer</string>
