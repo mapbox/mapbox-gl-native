@@ -293,7 +293,7 @@
 
         NSError *error;
         NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:resourceURL.path error:&error];
-        XCTAssertNil(error, @"Getting the file's permissions:%@ should not return an error.", resourceURL.path);
+        XCTAssertNil(error, @"Getting the file's attributes should not return an error. (%@)", resourceURL.path);
 
         NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
         long long fileSize = [fileSizeNumber longLongValue];
@@ -339,8 +339,8 @@
         [self waitForExpectationsWithTimeout:10 handler:nil];
     }];
 
-    // File non-existent
-    [XCTContext runActivityNamed:@"File non-existent" block:^(id<XCTActivity> activity) {
+    // File does not exist
+    [XCTContext runActivityNamed:@"File does not exist" block:^(id<XCTActivity> activity) {
         NSURL *resourceURL = [NSURL URLWithString:@"nonexistent.db"];
 
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
