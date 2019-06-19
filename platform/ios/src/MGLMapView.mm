@@ -1719,7 +1719,13 @@ public:
     if ( ! self.isRotateEnabled) return;
 
     [self cancelTransitions];
-
+ // jk - Detect which gesture is happening more/simulataneously
+    // jk - this makes the annotations rotation while the map does not.
+    self.currentRotation += self.rotate.rotation;
+    if ( std::abs(self.currentRotation) < 30 ) {
+        [rotate reset];
+        rotate.delaysTouchesBegan = YES;
+    }
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
     MGLMapCamera *oldCamera = self.camera;
 
@@ -1740,18 +1746,24 @@ public:
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        
-//        // jk - once it does start rotating, it'd jumpy. Also, this happens whenever I rotate, not just when zooming.
-        self.currentRotation += self.rotate.rotation;
-        if ( std::abs(self.currentRotation) < 50 && [self.activeGestureRecognizers containsObject:self.pinch]) {
-            NSLog(@"ROTATION: %f", rotate.rotation);
-            return;
+        if (self.mbglMap.isRotating()) {
+            NSLog(@"MAP IS SCALING JK");
         }
+        /* jk - once map view does start rotating, it is jumpy. Also, this happens whenever I rotate, not just when zooming.
+         The delay should only happen if a rotate starts while zooming.
+        */
+//        self.currentRotation += self.rotate.rotation;
+//        if ( std::abs(self.currentRotation) < 3 && [self.activeGestureRecognizers containsObject:self.pinch]) {
+//            NSLog(@"ROTATION: %f", rotate.rotation);
+//            rotate.delaysTouchesBegan = YES;
+//            return;
+//        }
         
         CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
 
         // constrain to +/-30 degrees when merely rotating like Apple does
         //
+        
         if ( ! self.isRotationAllowed && std::abs(self.pinch.scale) < 10)
         {
             newDegrees = fminf(newDegrees,  30);
