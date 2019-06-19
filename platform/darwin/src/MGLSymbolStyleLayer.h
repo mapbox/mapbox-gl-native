@@ -324,20 +324,20 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
  ["vertical"]` is set. The order of elements in an array define priority order
  for the placement of an orientation variant.
 
- Values of this type are used in the `MGLSymbolStyleLayer.textWritingMode`
+ Values of this type are used in the `MGLSymbolStyleLayer.textWritingModes`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLTextWritingMode) {
+typedef NS_ENUM(NSUInteger, MGLTextWritingModes) {
     /**
      If a text's language supports horizontal writing mode, symbols with point
      placement would be laid out horizontally.
      */
-    MGLTextWritingModeHorizontal,
+    MGLTextWritingModesHorizontal,
     /**
      If a text's language supports vertical writing mode, symbols with point
      placement would be laid out vertically.
      */
-    MGLTextWritingModeVertical,
+    MGLTextWritingModesVertical,
 };
 
 /**
@@ -1682,9 +1682,13 @@ MGL_EXPORT
  `symbolPlacement` is set to an expression that evaluates to or
  `MGLSymbolPlacementPoint`. Otherwise, it is ignored.
  
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-writing-mode"><code>text-writing-mode</code></a>
+ layout property in the Mapbox Style Specification.
+ 
  You can set this property to an expression containing any of the following:
  
- * Constant `MGLTextWritingMode` array values
+ * Constant `MGLTextWritingModes` array values
  * Constant array, whose each element is any of the following constant string
  values:
    * `horizontal`: If a text's language supports horizontal writing mode,
@@ -1700,7 +1704,10 @@ MGL_EXPORT
  `$zoomLevel` variable or applying interpolation or step functions to feature
  attributes.
  */
-@property (nonatomic, null_resettable) NSExpression *textWritingMode;
+@property (nonatomic, null_resettable) NSExpression *textWritingModes;
+
+
+@property (nonatomic, null_resettable) NSExpression *textWritingMode __attribute__((unavailable("Use textWritingModes instead.")));
 
 #pragma mark - Accessing the Paint Attributes
 
@@ -2439,17 +2446,17 @@ MGL_EXPORT
 @property (readonly) MGLTextTransform MGLTextTransformValue;
 
 /**
- Creates a new value object containing the given `MGLTextWritingMode` enumeration.
+ Creates a new value object containing the given `MGLTextWritingModes` enumeration.
 
- @param textWritingMode The value for the new object.
+ @param textWritingModes The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLTextWritingMode:(MGLTextWritingMode)textWritingMode;
++ (instancetype)valueWithMGLTextWritingModes:(MGLTextWritingModes)textWritingModes;
 
 /**
- The `MGLTextWritingMode` enumeration representation of the value.
+ The `MGLTextWritingModes` enumeration representation of the value.
  */
-@property (readonly) MGLTextWritingMode MGLTextWritingModeValue;
+@property (readonly) MGLTextWritingModes MGLTextWritingModesValue;
 
 /**
  Creates a new value object containing the given `MGLIconTranslationAnchor` enumeration.
