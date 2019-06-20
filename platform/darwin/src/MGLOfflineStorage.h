@@ -358,9 +358,7 @@ MGL_EXPORT
  Forces cache tiles to be invalidated and updated from the tile server. This ensures that the
  */
 
-- (void)invalidateAmbientCache {
-    
-}
+- (void)invalidateAmbientCache;
 
 /*
  Inserts the provided resource into the ambient cache.

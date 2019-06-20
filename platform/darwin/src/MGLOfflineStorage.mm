@@ -490,8 +490,13 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 - (void)setMaximumAmbientCacheSize:(uint64_t)cacheSize {
     
-    if ( ! cacheSize > 0 ) { /* give a warning*/ } ;
+    if ( ! (cacheSize > 0) ) { /* give a warning*/ } ;
     _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, nil); // I should do something with the std::exception_ptr here but i don't know what
+}
+
+- (void)invalidateAmbientCache {
+    _mbglFileSource->invalidateAmbientCache(nil);
+    // Do something with the std::exception_ptr here
 }
 
 #pragma mark -
