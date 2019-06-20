@@ -214,7 +214,7 @@
 <% for (let property of enumProperties) { -%>
 <% for (let value in property.values) { -%>
 <% if (property.values.hasOwnProperty(value)) { -%>
-    XCTAssertEqual([NSValue valueWithMGL<%- camelize(property.name) %>:MGL<%- camelize(property.name) %><%- camelize(value) %>].MGL<%- camelize(property.name) %>Value, MGL<%- camelize(property.name) %><%- camelize(value) %>);
+    XCTAssertEqual([NSValue valueWithMGL<%- camelize(enumName(property)) %>:MGL<%- camelize(enumName(property)) %><%- camelize(value) %>].MGL<%- camelize(enumName(property)) %>Value, MGL<%- camelize(enumName(property)) %><%- camelize(value) %>);
 <% } -%>
 <% } -%>
 <% } -%>

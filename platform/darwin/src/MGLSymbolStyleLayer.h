@@ -317,27 +317,27 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 };
 
 /**
- The property allows to control an orientation of a symbol. Note, that the
- property values act as a hint, so that Symbols whose language doesn't support
- provided orientation, will be laid out in their natural orientation. Example:
- English point symbol will be rendered horizontally even if `"textWritingMode":
- ["vertical"]` is set. The order of elements in an array define priority order
- for the placement of an orientation variant.
+ The property allows to control an orientation of a symbol. Note that the
+ property values act as a hint, so that a symbol whose language doesn’t support
+ the provided orientation will be laid out in its natural orientation. Example:
+ English point symbol will be rendered horizontally even if array value contains
+ single 'vertical' enum value. The order of elements in an array define priority
+ order for the placement of an orientation variant.
 
  Values of this type are used in the `MGLSymbolStyleLayer.textWritingModes`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLTextWritingModes) {
+typedef NS_ENUM(NSUInteger, MGLTextWritingMode) {
     /**
      If a text's language supports horizontal writing mode, symbols with point
      placement would be laid out horizontally.
      */
-    MGLTextWritingModesHorizontal,
+    MGLTextWritingModeHorizontal,
     /**
      If a text's language supports vertical writing mode, symbols with point
      placement would be laid out vertically.
      */
-    MGLTextWritingModesVertical,
+    MGLTextWritingModeVertical,
 };
 
 /**
@@ -1671,12 +1671,12 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *textVariableAnchor;
 
 /**
- The property allows to control an orientation of a symbol. Note, that the
- property values act as a hint, so that Symbols whose language doesn't support
- provided orientation, will be laid out in their natural orientation. Example:
- English point symbol will be rendered horizontally even if `"textWritingMode":
- ["vertical"]` is set. The order of elements in an array define priority order
- for the placement of an orientation variant.
+ The property allows to control an orientation of a symbol. Note that the
+ property values act as a hint, so that a symbol whose language doesn’t support
+ the provided orientation will be laid out in its natural orientation. Example:
+ English point symbol will be rendered horizontally even if array value contains
+ single 'vertical' enum value. The order of elements in an array define priority
+ order for the placement of an orientation variant.
  
  This property is only applied to the style if `text` is non-`nil`, and
  `symbolPlacement` is set to an expression that evaluates to or
@@ -1688,7 +1688,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant `MGLTextWritingModes` array values
+ * Constant `MGLTextWritingMode` array values
  * Constant array, whose each element is any of the following constant string
  values:
    * `horizontal`: If a text's language supports horizontal writing mode,
@@ -2446,17 +2446,17 @@ MGL_EXPORT
 @property (readonly) MGLTextTransform MGLTextTransformValue;
 
 /**
- Creates a new value object containing the given `MGLTextWritingModes` enumeration.
+ Creates a new value object containing the given `MGLTextWritingMode` enumeration.
 
  @param textWritingModes The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLTextWritingModes:(MGLTextWritingModes)textWritingModes;
++ (instancetype)valueWithMGLTextWritingMode:(MGLTextWritingMode)textWritingModes;
 
 /**
- The `MGLTextWritingModes` enumeration representation of the value.
+ The `MGLTextWritingMode` enumeration representation of the value.
  */
-@property (readonly) MGLTextWritingModes MGLTextWritingModesValue;
+@property (readonly) MGLTextWritingMode MGLTextWritingModeValue;
 
 /**
  Creates a new value object containing the given `MGLIconTranslationAnchor` enumeration.

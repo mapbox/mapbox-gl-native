@@ -3193,8 +3193,8 @@
     XCTAssertEqual([NSValue valueWithMGLTextTransform:MGLTextTransformNone].MGLTextTransformValue, MGLTextTransformNone);
     XCTAssertEqual([NSValue valueWithMGLTextTransform:MGLTextTransformUppercase].MGLTextTransformValue, MGLTextTransformUppercase);
     XCTAssertEqual([NSValue valueWithMGLTextTransform:MGLTextTransformLowercase].MGLTextTransformValue, MGLTextTransformLowercase);
-    XCTAssertEqual([NSValue valueWithMGLTextWritingModes:MGLTextWritingModesHorizontal].MGLTextWritingModesValue, MGLTextWritingModesHorizontal);
-    XCTAssertEqual([NSValue valueWithMGLTextWritingModes:MGLTextWritingModesVertical].MGLTextWritingModesValue, MGLTextWritingModesVertical);
+    XCTAssertEqual([NSValue valueWithMGLTextWritingMode:MGLTextWritingModeHorizontal].MGLTextWritingModeValue, MGLTextWritingModeHorizontal);
+    XCTAssertEqual([NSValue valueWithMGLTextWritingMode:MGLTextWritingModeVertical].MGLTextWritingModeValue, MGLTextWritingModeVertical);
     XCTAssertEqual([NSValue valueWithMGLIconTranslationAnchor:MGLIconTranslationAnchorMap].MGLIconTranslationAnchorValue, MGLIconTranslationAnchorMap);
     XCTAssertEqual([NSValue valueWithMGLIconTranslationAnchor:MGLIconTranslationAnchorViewport].MGLIconTranslationAnchorValue, MGLIconTranslationAnchorViewport);
     XCTAssertEqual([NSValue valueWithMGLTextTranslationAnchor:MGLTextTranslationAnchorMap].MGLTextTranslationAnchorValue, MGLTextTranslationAnchorMap);

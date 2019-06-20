@@ -5,6 +5,7 @@ const fs = require('fs');
 const ejs = require('ejs');
 const _ = require('lodash');
 const colorParser = require('csscolorparser');
+const assert = require('assert');
 
 require('../../../scripts/style-code');
 
@@ -19,34 +20,56 @@ delete spec.layout_circle["circle-sort-key"]
 delete spec.layout_line["line-sort-key"]
 delete spec.layout_fill["fill-sort-key"]
 
+class ConventionOverride {
+    constructor(val) {
+        if (typeof val === 'string') {
+            this.name_ = val;
+            this.enumName_ = null;
+        } else if (val instanceof Object) {
+            this.name_ = val.name;
+            this.enumName_ = val.enumName;
+        } else {
+            assert(false);
+        }
+    }
+
+    set name(name_) { this.name_ = name_; }
+    get name() { return this.name_; }
+    get enumName() { return this.enumName_ || this.name_; }
+}
+
 // Rename properties and keep `original` for use with setters and getters
 _.forOwn(cocoaConventions, function (properties, kind) {
-    _.forOwn(properties, function (newName, oldName) {
+    _.forOwn(properties, function (newConvention, oldName) {
+        let conventionOverride = new ConventionOverride(newConvention);
         let property = spec[kind][oldName];
-        if (newName.startsWith('is-')) {
-            property.getter = newName;
-            newName = newName.substr(3);
+        if (conventionOverride.name.startsWith('is-')) {
+            property.getter = conventionOverride.name;
+            conventionOverride.name = conventionOverride.name.substr(3);
         }
-        if (newName !== oldName) {
+
+        // Override enum name based on style-spec-cocoa-conventions-v8.json
+        property.enumName = conventionOverride.enumName;
+
+        if (conventionOverride.name !== oldName) {
             property.original = oldName;
+            delete spec[kind][oldName];
+            spec[kind][conventionOverride.name] = property;
         }
-        delete spec[kind][oldName];
-        spec[kind][newName] = property;
 
         // Update cross-references to this property in other properties'
         // documentation and requirements.
         let renameCrossReferences = function (property, name) {
-            property.doc = property.doc.replace(new RegExp('`' + oldName + '`', 'g'), '`' + newName + '`');
+            property.doc = property.doc.replace(new RegExp('`' + oldName + '`', 'g'), '`' + conventionOverride.name + '`');
             let requires = property.requires || [];
             for (let i = 0; i < requires.length; i++) {
                 if (requires[i] === oldName) {
-                    property.requires[i] = newName;
+                    property.requires[i] = conventionOverride.name;
                 }
                 if (typeof requires[i] !== 'string') {
-                    let prop = name;
                     _.forOwn(requires[i], function (values, name, require) {
                         if (name === oldName) {
-                            require[newName] = values;
+                            require[conventionOverride.name] = values;
                             delete require[name];
                         }
                     });
@@ -468,7 +491,7 @@ global.describeType = function (property) {
                 case 'anchor':
                     return '`MGLTextAnchor` array';
                 case 'mode':
-                    return '`MGLTextWritingModes` array';
+                    return '`MGLTextWritingMode` array';
                 default:
                     return 'array';
             }
@@ -573,6 +596,10 @@ global.originalPropertyName = function (property) {
     return property.original || property.name;
 };
 
+global.enumName = function (property) {
+    return property.enumName || property.name;
+};
+
 global.propertyType = function (property) {
     switch (property.type) {
         case 'boolean':
@@ -647,7 +674,7 @@ global.valueTransformerArguments = function (property) {
                 case 'anchor':
                     return ['std::vector<mbgl::style::SymbolAnchorType>', objCType, 'mbgl::style::SymbolAnchorType', 'MGLTextAnchor'];
                 case 'mode':
-                    return ['std::vector<mbgl::style::TextWritingModeType>', objCType, 'mbgl::style::TextWritingModeType', 'MGLTextWritingModes'];
+                    return ['std::vector<mbgl::style::TextWritingModeType>', objCType, 'mbgl::style::TextWritingModeType', 'MGLTextWritingMode'];
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
