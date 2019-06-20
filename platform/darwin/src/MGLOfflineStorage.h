@@ -341,6 +341,27 @@ MGL_EXPORT
  */
 @property (nonatomic, readonly) unsigned long long countOfBytesCompleted;
 
+
+#pragma mark - Managing Ambient Cache
+
+
+// JK FINISH DOC
+/*
+ Sets the maximum ambient cache size in megabytes. The default maximum cache size is _ MB. To disable ambient caching, set the maximum ambient cache size to 0.
+ 
+ This method should be called before using the database.
+ */
+
+- (void)setMaximumAmbientCacheSize:(uint64_t)cacheSize;
+
+/*
+ Forces cache tiles to be invalidated and updated from the tile server. This ensures that the
+ */
+
+- (void)invalidateAmbientCache {
+    
+}
+
 /*
  Inserts the provided resource into the ambient cache.
  

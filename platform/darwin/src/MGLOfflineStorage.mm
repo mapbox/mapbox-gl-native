@@ -486,6 +486,14 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
 }
 
+#pragma mark - Ambient Cache management
+
+- (void)setMaximumAmbientCacheSize:(uint64_t)cacheSize {
+    
+    if ( ! cacheSize > 0 ) { /* give a warning*/ } ;
+    _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, nil); // I should do something with the std::exception_ptr here but i don't know what
+}
+
 #pragma mark -
 
 - (unsigned long long)countOfBytesCompleted {
