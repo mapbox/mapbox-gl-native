@@ -409,7 +409,7 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             doc += '* Any of the following constant string values:\n';
             doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
         } else if (property.type === 'array' && property.value === 'enum') {
-            doc += '* Constant array, whose each element is any of the following constant string values:\n';
+            doc += '* Constant array, in which each element is any of the following constant string values:\n';
             doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
         }
         if (property.type === 'formatted') {

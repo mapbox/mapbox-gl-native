@@ -317,9 +317,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 };
 
 /**
- The property allows to control an orientation of a symbol. Note that the
- property values act as a hint, so that a symbol whose language doesn’t support
- the provided orientation will be laid out in its natural orientation. Example:
+ The property allows control over a symbol's orientation. Note that the property
+ values act as a hint, so that a symbol whose language doesn’t support the
+ provided orientation will be laid out in its natural orientation. Example:
  English point symbol will be rendered horizontally even if array value contains
  single 'vertical' enum value. The order of elements in an array define priority
  order for the placement of an orientation variant.
@@ -1644,7 +1644,7 @@ MGL_EXPORT
  You can set this property to an expression containing any of the following:
  
  * Constant `MGLTextAnchor` array values
- * Constant array, whose each element is any of the following constant string
+ * Constant array, in which each element is any of the following constant string
  values:
    * `center`: The center of the text is placed closest to the anchor.
    * `left`: The left side of the text is placed closest to the anchor.
@@ -1671,9 +1671,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *textVariableAnchor;
 
 /**
- The property allows to control an orientation of a symbol. Note that the
- property values act as a hint, so that a symbol whose language doesn’t support
- the provided orientation will be laid out in its natural orientation. Example:
+ The property allows control over a symbol's orientation. Note that the property
+ values act as a hint, so that a symbol whose language doesn’t support the
+ provided orientation will be laid out in its natural orientation. Example:
  English point symbol will be rendered horizontally even if array value contains
  single 'vertical' enum value. The order of elements in an array define priority
  order for the placement of an orientation variant.
@@ -1689,7 +1689,7 @@ MGL_EXPORT
  You can set this property to an expression containing any of the following:
  
  * Constant `MGLTextWritingMode` array values
- * Constant array, whose each element is any of the following constant string
+ * Constant array, in which each element is any of the following constant string
  values:
    * `horizontal`: If a text's language supports horizontal writing mode,
  symbols with point placement would be laid out horizontally.
