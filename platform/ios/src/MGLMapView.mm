@@ -2062,6 +2062,12 @@ public:
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
     {
+        if (twoFingerDrag.numberOfTouches != 2)
+        {
+            twoFingerDrag.state = UIGestureRecognizerStateEnded;
+            return;
+        }
+
         CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
         CGFloat slowdown = 2.0;
 
