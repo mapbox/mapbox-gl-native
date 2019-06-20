@@ -41,7 +41,7 @@ typedef struct PanTestData {
 } PanTestData;
 
 #define PAN_TEST_TERMINATOR {{FLT_MAX, FLT_MAX}, NO, NO, NO, NO, NO}
-static const CGFloat kAnnotationScale = 0.125f;
+static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
 
 - (void)internalTestOffscreenSelectionTitle:(NSString*)title withTestData:(PanTestData)test animateSelection:(BOOL)animateSelection {
     
@@ -61,7 +61,7 @@ static const CGFloat kAnnotationScale = 0.125f;
     
     NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
     CGSize size = self.mapView.bounds.size;
-    CGSize annotationSize = CGSizeMake(floor(size.width*kAnnotationScale), floor(size.height*kAnnotationScale));
+    CGSize annotationSize = CGSizeMake(floor(size.width*kAnnotationRelativeScale.x), floor(size.height*kAnnotationRelativeScale.y));
     
     self.viewForAnnotation = ^MGLAnnotationView*(MGLMapView *view, id<MGLAnnotation> annotation) {
         
@@ -79,7 +79,7 @@ static const CGFloat kAnnotationScale = 0.125f;
     };
     
     // Coordinate for annotation screen coordinate
-    CGPoint annotationPoint = CGPointMake(relativeCoordinate.x * size.width, relativeCoordinate.y * size.height);
+    CGPoint annotationPoint = CGPointMake(floor(relativeCoordinate.x * size.width), floor(relativeCoordinate.y * size.height)   );
     CLLocationCoordinate2D coordinate = [self.mapView convertPoint:annotationPoint toCoordinateFromView:self.mapView];
     
     MGLPointAnnotation *point = [[MGLPointAnnotation alloc] init];
@@ -128,7 +128,7 @@ static const CGFloat kAnnotationScale = 0.125f;
     // may be nil, which is expected.
     BOOL (^CGRectContainsRectWithAccuracy)(CGRect, CGRect, CGFloat) = ^(CGRect rect1, CGRect rect2, CGFloat accuracy) {
         CGRect expandedRect1 = CGRectInset(rect1, -accuracy, -accuracy);
-        return CGRectContainsRect(expandedRect1, rect2);
+        return (BOOL)CGRectContainsRect(expandedRect1, rect2);
     };
     
     CGFloat epsilon = 0.00001;
@@ -151,9 +151,8 @@ static const CGFloat kAnnotationScale = 0.125f;
             UIView *calloutView = self.mapView.calloutViewForSelectedAnnotation;
             XCTAssertNotNil(calloutView);
             
-            // If kAnnotationScale == 0.25, then the following assert can fail.
-            // This is really a warning (see https://github.com/mapbox/mapbox-gl-native/issues/13744 )
-            // If you need this NOT to fail the tests, consider replacing with MGLTestWarning
+            // This can fail if the callout view's width is < the annotations. This is really a warning, so
+            // if you need this NOT to fail the tests, consider replacing with MGLTestWarning
             XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, 0.25),
                       @"Expect contains:%d, Mapview:%@ annotation:%@ callout:%@",
                       expectCalloutToBeFullyOnscreen,
@@ -320,6 +319,8 @@ static const CGFloat kAnnotationScale = 0.125f;
     // | Onscreen            | Yes          | Yes                                   | Yes, but *only* to ensure callout is fully visible |
     //
 
+    CGFloat offset = kAnnotationRelativeScale.x * 0.5f;
+    
     PanTestData tests[] = {
         //  Coord           showsCallout    impl margins?   moveIntoView    expectMapToPan  calloutOnScreen
         //  Offscreen
@@ -341,9 +342,10 @@ static const CGFloat kAnnotationScale = 0.125f;
         //  Expects to move, because although onscreen, callout would not be.
         //  However, if the scale is 0.25, then expectToPan should be NO, because
         //  of the width of the annotation
-        //
-        //  Coord                     showsCallout  impl margins?   moveIntoView    expectMapToPan                  calloutOnScreen
-        {   {kAnnotationScale, 0.5f}, YES,          YES,            YES,            (kAnnotationScale == 0.125f),   YES },
+
+        //  Coord                   showsCallout  impl margins?   moveIntoView    expectMapToPan    calloutOnScreen
+        {   {offset, 0.5f},         YES,          YES,            YES,            YES,              YES },
+        {   {1.0 - offset, 0.5f},   YES,          YES,            YES,            YES,              YES },
 
         PAN_TEST_TERMINATOR
     };
