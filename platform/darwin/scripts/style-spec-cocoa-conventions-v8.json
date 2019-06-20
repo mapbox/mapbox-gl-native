@@ -19,7 +19,7 @@
     "text-optional": "is-text-optional",
     "text-rotate": "text-rotation",
     "text-size": "text-font-size",
-    "text-writing-mode": "text-writing-modes"
+    "text-writing-mode": {"name": "text-writing-modes", "enumName": "text-writing-mode"}
   },
   "paint_circle": {
     "circle-pitch-scale": "circle-scale-alignment",

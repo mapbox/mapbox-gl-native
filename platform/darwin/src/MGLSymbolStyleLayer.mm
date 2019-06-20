@@ -96,9 +96,9 @@ namespace mbgl {
         { MGLTextTransformLowercase, "lowercase" },
     });
 
-    MBGL_DEFINE_ENUM(MGLTextWritingModes, {
-        { MGLTextWritingModesHorizontal, "horizontal" },
-        { MGLTextWritingModesVertical, "vertical" },
+    MBGL_DEFINE_ENUM(MGLTextWritingMode, {
+        { MGLTextWritingModeHorizontal, "horizontal" },
+        { MGLTextWritingModeVertical, "vertical" },
     });
 
     MBGL_DEFINE_ENUM(MGLIconTranslationAnchor, {
@@ -1032,7 +1032,7 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting textWritingModes: %@", textWritingModes);
 
-    auto mbglValue = MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingModes>().toPropertyValue<mbgl::style::PropertyValue<std::vector<mbgl::style::TextWritingModeType>>>(textWritingModes, false);
+    auto mbglValue = MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingMode>().toPropertyValue<mbgl::style::PropertyValue<std::vector<mbgl::style::TextWritingModeType>>>(textWritingModes, false);
     self.rawLayer->setTextWritingMode(mbglValue);
 }
 
@@ -1043,7 +1043,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultTextWritingMode();
     }
-    return MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingModes>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<std::vector<mbgl::style::TextWritingModeType>, NSArray<NSValue *> *, mbgl::style::TextWritingModeType, MGLTextWritingMode>().toExpression(propertyValue);
 }
 
 - (void)setTextWritingMode:(NSExpression *)textWritingMode {
@@ -1629,12 +1629,12 @@ namespace mbgl {
     return textTransform;
 }
 
-+ (NSValue *)valueWithMGLTextWritingModes:(MGLTextWritingModes)textWritingModes {
-    return [NSValue value:&textWritingModes withObjCType:@encode(MGLTextWritingModes)];
++ (NSValue *)valueWithMGLTextWritingMode:(MGLTextWritingMode)textWritingModes {
+    return [NSValue value:&textWritingModes withObjCType:@encode(MGLTextWritingMode)];
 }
 
-- (MGLTextWritingModes)MGLTextWritingModesValue {
-    MGLTextWritingModes textWritingModes;
+- (MGLTextWritingMode)MGLTextWritingModeValue {
+    MGLTextWritingMode textWritingModes;
     [self getValue:&textWritingModes];
     return textWritingModes;
 }
