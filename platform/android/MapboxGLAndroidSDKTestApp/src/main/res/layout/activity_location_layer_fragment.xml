@@ -10,6 +10,18 @@
         android:layout_height="match_parent"/>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/shifter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/accent"
+        app:layout_constraintBottom_toTopOf="@+id/fab"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/ic_add" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

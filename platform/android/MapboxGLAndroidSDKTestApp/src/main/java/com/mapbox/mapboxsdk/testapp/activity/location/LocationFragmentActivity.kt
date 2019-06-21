@@ -13,18 +13,21 @@ import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.geojson.Point
+import com.mapbox.geojson.shifter.CoordinateShifter
+import com.mapbox.geojson.shifter.CoordinateShifterManager
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.modes.CameraMode.TRACKING
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_location_layer_fragment.*
+import java.util.ArrayList
 
 class LocationFragmentActivity : AppCompatActivity() {
   private lateinit var permissionsManager: PermissionsManager
-
+  private var shift = false
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_location_layer_fragment)
@@ -41,6 +44,18 @@ class LocationFragmentActivity : AppCompatActivity() {
         this.onBackPressed()
       }
     }
+
+    shifter.setOnClickListener{
+      if(!shift) {
+        Toast.makeText(this, "Shifter is on.",Toast.LENGTH_LONG).show()
+        CoordinateShifterManager.setCoordinateShifter(coordinateShifter())
+      }else{
+        Toast.makeText(this, "Shifter is off.",Toast.LENGTH_LONG).show()
+        CoordinateShifterManager.setCoordinateShifter(null)
+      }
+      shift = !shift
+    }
+
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
     if (PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -74,6 +89,41 @@ class LocationFragmentActivity : AppCompatActivity() {
     }
   }
 
+  private fun coordinateShifter(): CoordinateShifter {
+    return object : CoordinateShifter {
+      override fun shiftLonLat(lon: Double, lat: Double): List<Double> {
+        return shift(lon, lat)
+      }
+
+      override fun shiftLonLatAlt(lon: Double, lat: Double, altitude: Double): List<Double> {
+        val shiftedLongLat = shift(lon, lat)
+        shiftedLongLat.add(altitude)
+        return shiftedLongLat
+      }
+
+      override fun unshiftPoint(shiftedPoint: Point): List<Double> {
+        val shiftedCoordinates = ArrayList<Double>(2)
+        shiftedCoordinates.add(shiftedPoint.longitude())
+        shiftedCoordinates.add(shiftedPoint.latitude())
+        return shiftedCoordinates
+      }
+
+      override fun unshiftPoint(shiftedCoordinates: List<Double>): List<Double> {
+        // Left empty on purpose
+        return shiftedCoordinates
+      }
+
+      private fun shift(lon: Double, lat: Double): MutableList<Double> {
+        val shiftedCoordinates = ArrayList<Double>(3)
+        val shiftedLon = lon + 0.5
+        val shiftedLat = lat + 0.5
+        shiftedCoordinates.add(shiftedLon)
+        shiftedCoordinates.add(shiftedLat)
+        return shiftedCoordinates
+      }
+    }
+  }
+
   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -100,6 +150,7 @@ class LocationFragmentActivity : AppCompatActivity() {
       mapView.onCreate(savedInstanceState)
       mapView.getMapAsync {
         mapboxMap = it
+        mapboxMap.setMinZoomPreference(12.0)
         it.setStyle(Style.MAPBOX_STREETS) { style ->
           val component = mapboxMap.locationComponent
 
@@ -110,12 +161,13 @@ class LocationFragmentActivity : AppCompatActivity() {
 
           component.isLocationComponentEnabled = true
           component.locationEngine?.getLastLocation(this)
+          component.cameraMode = TRACKING
         }
       }
     }
 
     override fun onSuccess(result: LocationEngineResult?) {
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(result?.lastLocation), 12.0))
+//        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(result?.lastLocation), 12.0))
     }
 
     override fun onFailure(exception: Exception) {
@@ -155,6 +207,7 @@ class LocationFragmentActivity : AppCompatActivity() {
     override fun onDestroyView() {
       super.onDestroyView()
       mapView.onDestroy()
+      CoordinateShifterManager.setCoordinateShifter(null)
     }
   }
 
