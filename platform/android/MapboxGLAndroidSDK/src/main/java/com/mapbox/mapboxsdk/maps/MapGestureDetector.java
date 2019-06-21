@@ -321,9 +321,8 @@ final class MapGestureDetector implements View.OnKeyListener {
           // Get the vertical scroll amount, one click = 1
           float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 
-          // Scale the map by the appropriate power of two factor. The map camera target doesn't
-          // change when scrolling in or out.
-          transform.zoomBy(scrollDist, new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2));
+          // Scale the map by the appropriate power of two factor.
+          transform.zoomBy(scrollDist, new PointF(event.getX(), event.getY()));
           return true;
 
         default:
