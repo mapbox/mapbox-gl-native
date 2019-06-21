@@ -396,4 +396,59 @@ class LocationComponentTest {
     }
     verify(locationCameraController).setCameraMode(eq(CameraMode.NONE), isNull<Location>(), eq(TRANSITION_ANIMATION_DURATION_MS), isNull<Double>(), isNull<Double>(), isNull<Double>(), any())
   }
+
+  @Test
+  fun internal_cameraTrackingChangedListener_onCameraTrackingDismissed() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+
+    val cameraChangeListener: OnCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener::class.java)
+    locationComponent.addOnCameraTrackingChangedListener(cameraChangeListener)
+
+    locationComponent.cameraTrackingChangedListener.onCameraTrackingDismissed()
+
+    verify(cameraChangeListener).onCameraTrackingDismissed()
+  }
+
+  @Test
+  fun internal_cameraTrackingChangedListener_onCameraTrackingChanged() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+
+    val cameraValueListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    val layerValueListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    `when`(locationCameraController.animationListeners).thenReturn(setOf(cameraValueListener))
+    `when`(locationLayerController.animationListeners).thenReturn(setOf(layerValueListener))
+    val cameraChangeListener: OnCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener::class.java)
+    locationComponent.addOnCameraTrackingChangedListener(cameraChangeListener)
+
+    locationComponent.cameraTrackingChangedListener.onCameraTrackingChanged(CameraMode.TRACKING_GPS)
+
+    verify(locationAnimatorCoordinator).cancelZoomAnimation()
+    verify(locationAnimatorCoordinator).cancelTiltAnimation()
+    verify(locationAnimatorCoordinator).updateAnimatorListenerHolders(eq(setOf(cameraValueListener, layerValueListener)))
+    verify(locationAnimatorCoordinator).resetAllCameraAnimations(any(), anyBoolean())
+    verify(locationAnimatorCoordinator).resetAllLayerAnimations()
+    verify(cameraChangeListener).onCameraTrackingChanged(CameraMode.TRACKING_GPS)
+  }
+
+  @Test
+  fun internal_renderModeChangedListener_onRenderModeChanged() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+
+    val cameraListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    val layerListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    `when`(locationCameraController.animationListeners).thenReturn(setOf(cameraListener))
+    `when`(locationLayerController.animationListeners).thenReturn(setOf(layerListener))
+    val renderChangeListener: OnRenderModeChangedListener = mock(OnRenderModeChangedListener::class.java)
+    locationComponent.addOnRenderModeChangedListener(renderChangeListener)
+
+    locationComponent.renderModeChangedListener.onRenderModeChanged(RenderMode.NORMAL)
+
+    verify(locationAnimatorCoordinator).updateAnimatorListenerHolders(eq(setOf(cameraListener, layerListener)))
+    verify(locationAnimatorCoordinator).resetAllCameraAnimations(any(), anyBoolean())
+    verify(locationAnimatorCoordinator).resetAllLayerAnimations()
+    verify(renderChangeListener).onRenderModeChanged(RenderMode.NORMAL)
+  }
 }
