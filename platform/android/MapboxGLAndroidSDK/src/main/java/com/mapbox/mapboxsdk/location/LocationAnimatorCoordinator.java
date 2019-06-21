@@ -347,6 +347,34 @@ final class LocationAnimatorCoordinator {
     createNewFloatAnimator(ANIMATOR_CAMERA_COMPASS_BEARING, previousCameraBearing, normalizedCameraBearing);
   }
 
+  void resetAllLayerAnimations() {
+    MapboxLatLngAnimator latLngAnimator = (MapboxLatLngAnimator) animatorArray.get(ANIMATOR_LAYER_LATLNG);
+    MapboxFloatAnimator gpsBearingAnimator = (MapboxFloatAnimator) animatorArray.get(ANIMATOR_LAYER_GPS_BEARING);
+    MapboxFloatAnimator compassBearingAnimator =
+      (MapboxFloatAnimator) animatorArray.get(ANIMATOR_LAYER_COMPASS_BEARING);
+
+    if (latLngAnimator != null && gpsBearingAnimator != null) {
+      LatLng currentLatLng = (LatLng) latLngAnimator.getAnimatedValue();
+      LatLng currentLatLngTarget = latLngAnimator.getTarget();
+      createNewLatLngAnimator(ANIMATOR_LAYER_LATLNG, currentLatLng, currentLatLngTarget);
+
+      float currentGpsBearing = (float) gpsBearingAnimator.getAnimatedValue();
+      float currentGpsBearingTarget = gpsBearingAnimator.getTarget();
+      createNewFloatAnimator(ANIMATOR_LAYER_GPS_BEARING, currentGpsBearing, currentGpsBearingTarget);
+
+      playAnimators(getAnimationDuration(), ANIMATOR_LAYER_LATLNG, ANIMATOR_LAYER_GPS_BEARING);
+    }
+
+    if (compassBearingAnimator != null) {
+      float currentLayerBearing = getPreviousLayerCompassBearing();
+      float currentLayerBearingTarget = compassBearingAnimator.getTarget();
+      createNewFloatAnimator(ANIMATOR_LAYER_COMPASS_BEARING, currentLayerBearing, currentLayerBearingTarget);
+      playAnimators(
+        compassAnimationEnabled ? COMPASS_UPDATE_RATE_MS : 0,
+        ANIMATOR_LAYER_COMPASS_BEARING);
+    }
+  }
+
   void cancelZoomAnimation() {
     cancelAnimator(ANIMATOR_ZOOM);
   }
