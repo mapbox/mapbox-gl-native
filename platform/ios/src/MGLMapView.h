@@ -504,6 +504,9 @@ MGL_EXPORT
 
 /**
  Sets the mode used to track the user location, with an optional transition.
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-setUserTrackingMode:animated:completionHandler:` method.
 
  @param mode The mode used to track the user location.
  @param animated If `YES`, there is an animated transition from the current
@@ -513,6 +516,20 @@ MGL_EXPORT
     heading are always animated.
  */
 - (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
+
+/**
+ Sets the mode used to track the user location, with an optional transition and
+ completion handler.
+
+ @param mode The mode used to track the user location.
+ @param animated If `YES`, there is an animated transition from the current
+    viewport to a viewport that results from the change to `mode`. If `NO`, the
+    map view instantaneously changes to the new viewport. This parameter only
+    affects the initial transition; subsequent changes to the user location or
+    heading are always animated.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 /**
  The vertical alignment of the user location annotation within the receiver. The
@@ -604,12 +621,37 @@ MGL_EXPORT
 
  This method has no effect if the `userTrackingMode` property is set to a value
  other than `MGLUserTrackingModeFollowWithCourse`.
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-setTargetCoordinate:animated:completionHandler:` method.
 
  @param targetCoordinate The target coordinate to fit within the viewport.
  @param animated If `YES`, the map animates to fit the target within the map
     view. If `NO`, the map fits the target instantaneously.
  */
 - (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate animated:(BOOL)animated;
+
+/**
+ Sets the geographic coordinate that is the subject of observation as the user
+ location is being tracked, with an optional transition animation and completion
+ handler.
+
+ By default, the target coordinate is set to an invalid coordinate, indicating
+ that there is no target. In course tracking mode, the target forms one of two
+ foci in the viewport, the other being the user location annotation. Typically,
+ the target is set to a destination or waypoint in a real-time navigation scene.
+ As the user annotation moves toward the target, the map automatically zooms in
+ to fit both foci optimally within the viewport.
+
+ This method has no effect if the `userTrackingMode` property is set to a value
+ other than `MGLUserTrackingModeFollowWithCourse`.
+
+ @param targetCoordinate The target coordinate to fit within the viewport.
+ @param animated If `YES`, the map animates to fit the target within the map
+    view. If `NO`, the map fits the target instantaneously.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 #pragma mark Configuring How the User Interacts with the Map
 
@@ -892,8 +934,28 @@ MGL_EXPORT
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated;
 
 /**
- Changes the receiver’s viewport to fit the given coordinate bounds and
- optionally some additional padding on each side.
+ Changes the receiver’s viewport to fit the given coordinate bounds with some
+ additional padding on each side.
+
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-setVisibleCoordinateBounds:edgePadding:animated:completionHandler:` method.
+
+ @param bounds The bounds that the viewport will show in its entirety.
+ @param insets The minimum padding (in screen points) that will be visible
+    around the given coordinate bounds.
+ @param animated Specify `YES` to animate the change by smoothly scrolling and
+    zooming or `NO` to immediately display the given bounds.
+ */
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+
+/**
+ Changes the receiver’s viewport to fit the given coordinate bounds with some
+ additional padding on each side, optionally calling a completion handler.
 
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
@@ -905,12 +967,13 @@ MGL_EXPORT
     around the given coordinate bounds.
  @param animated Specify `YES` to animate the change by smoothly scrolling and
     zooming or `NO` to immediately display the given bounds.
+ @param completion The block executed after the animation finishes.
  */
-- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 /**
- Changes the receiver’s viewport to fit all of the given coordinates and
- optionally some additional padding on each side.
+ Changes the receiver’s viewport to fit all of the given coordinates with some
+ additional padding on each side.
 
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
@@ -928,8 +991,8 @@ MGL_EXPORT
 - (void)setVisibleCoordinates:(const CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
 
 /**
- Changes the receiver’s viewport to fit all of the given coordinates and
- optionally some additional padding on each side.
+ Changes the receiver’s viewport to fit all of the given coordinates with some
+ additional padding on each side, optionally calling a completion handler.
 
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
@@ -970,6 +1033,9 @@ MGL_EXPORT
 
  Calling this method updates the value in the `visibleCoordinateBounds` property
  and potentially other properties to reflect the new map region.
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-showAnnotations:edgePadding:animated:completionHandler:` method.
 
  @param annotations The annotations that you want to be visible in the map.
  @param insets The minimum padding (in screen points) around the edges of the
@@ -978,6 +1044,23 @@ MGL_EXPORT
     if you want the map to display the new region immediately without animations.
  */
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+
+/**
+ Sets the visible region so that the map displays the specified annotations with
+ the specified amount of padding on each side and an optional completion
+ handler.
+
+ Calling this method updates the value in the `visibleCoordinateBounds` property
+ and potentially other properties to reflect the new map region.
+
+ @param annotations The annotations that you want to be visible in the map.
+ @param insets The minimum padding (in screen points) around the edges of the
+    map view to keep clear of annotations.
+ @param animated `YES` if you want the map region change to be animated, or `NO`
+    if you want the map to display the new region immediately without animations.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 /**
  A camera representing the current viewpoint of the map.
@@ -1117,8 +1200,8 @@ MGL_EXPORT
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds;
 
 /**
- Returns the camera that best fits the given coordinate bounds, optionally with
- some additional padding on each side.
+ Returns the camera that best fits the given coordinate bounds with some
+ additional padding on each side.
 
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
  @param insets The minimum padding (in screen points) that would be visible
@@ -1135,8 +1218,9 @@ MGL_EXPORT
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
 /**
- Returns the camera that best fits the given coordinate bounds, with the specified camera,
- optionally with some additional padding on each side.
+ Returns the camera that best fits the given coordinate bounds with some
+ additional padding on each side, matching an existing camera as much as
+ possible.
 
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
@@ -1155,8 +1239,8 @@ MGL_EXPORT
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
 /**
- Returns the camera that best fits the given shape, with the specified camera,
- optionally with some additional padding on each side.
+ Returns the camera that best fits the given shape with some additional padding
+ on each side, matching an existing camera as much as possible.
 
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
@@ -1164,8 +1248,8 @@ MGL_EXPORT
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
  @return A camera object centered on the shape's center with zoom level as high
-    (close to the ground) as possible while still including the entire shape. The
-    initial camera's pitch and direction will be honored.
+    (close to the ground) as possible while still including the entire shape.
+    The initial camera's pitch and direction will be honored.
 
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
@@ -1174,16 +1258,17 @@ MGL_EXPORT
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(UIEdgeInsets)insets;
 
 /**
- Returns the camera that best fits the given shape, with the specified direction,
- optionally with some additional padding on each side.
+ Returns the camera that best fits the given shape with some additional padding
+ on each side while looking in the specified direction.
 
  @param shape The shape to fit to the receiver’s viewport.
- @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param direction The direction of the viewport, measured in degrees clockwise
+    from true north.
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
  @return A camera object centered on the shape's center with zoom level as high
-    (close to the ground) as possible while still including the entire shape. The
-    camera object uses the current pitch.
+    (close to the ground) as possible while still including the entire shape.
+    The camera object uses the current pitch.
 
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
@@ -1192,7 +1277,7 @@ MGL_EXPORT
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets;
 
 /**
- Returns the point in this view’s coordinate system on which to "anchor" in
+ Returns the point in this view’s coordinate system on which to “anchor” in
  response to a user-initiated gesture.
 
  For example, a pinch-to-zoom gesture would anchor the map at the midpoint of
@@ -1243,6 +1328,9 @@ MGL_EXPORT
  When the map view’s superview is an instance of `UIViewController` whose
  `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
  property may be overridden at any time.
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-setContentInset:animated:completionHandler:` method.
 
  @param contentInset The new values to inset the content by.
  @param animated Specify `YES` if you want the map view to animate the change to
@@ -1250,6 +1338,29 @@ MGL_EXPORT
     immediately.
  */
 - (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated;
+
+/**
+ Sets the distance from the edges of the map view’s frame to the edges of the
+ map view’s logical viewport with an optional transition animation and
+ completion handler.
+
+ When the value of this property is equal to `UIEdgeInsetsZero`, viewport
+ properties such as `centerCoordinate` assume a viewport that matches the map
+ view’s frame. Otherwise, those properties are inset, excluding part of the
+ frame from the viewport. For instance, if the only the top edge is inset, the
+ map center is effectively shifted downward.
+
+ When the map view’s superview is an instance of `UIViewController` whose
+ `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
+ property may be overridden at any time.
+
+ @param contentInset The new values to inset the content by.
+ @param animated Specify `YES` if you want the map view to animate the change to
+    the content inset or `NO` if you want the map to inset the content
+    immediately.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 #pragma mark Converting Geographic Coordinates
 
@@ -1501,6 +1612,9 @@ MGL_EXPORT
  | `YES`            | The annotation is selected, and the callout is presented. If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
 
  Note that a selection initiated by a single tap gesture is always animated.
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-selectAnnotation:animated:completionHandler:` method.
 
  @param annotation The annotation object to select.
  @param animated If `YES`, the annotation and callout view are animated on-screen.
@@ -1511,15 +1625,40 @@ MGL_EXPORT
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
 /**
- :nodoc:
- Selects an annotation and displays its callout view. This method should be
- considered "alpha" and as such is liable to change.
+ Selects an annotation and displays its callout view with an optional completion
+ handler.
+
+ The `animated` parameter determines whether the selection is animated including whether the map is
+ panned to bring the annotation into view, specifically:
+
+ | `animated` parameter | Effect |
+ |------------------|--------|
+ | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout into view. The presentation of the callout is NOT animated. |
+ | `YES`            | The annotation is selected, and the callout is presented. If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
+
+ Note that a selection initiated by a single tap gesture is always animated.
 
  @param annotation The annotation object to select.
- @param moveIntoView If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
- @param animateSelection If `YES`, the annotation's selection state and callout view's presentation are animated.
+ @param animated If `YES`, the annotation and callout view are animated on-screen.
+ @param completion The block executed after the animation finishes.
+
+ @note In versions prior to `4.0.0` selecting an offscreen annotation did not
+ change the camera.
  */
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveIntoView:(BOOL)moveIntoView animateSelection:(BOOL)animateSelection;
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
+
+/**
+ :nodoc:
+ Selects an annotation and displays its callout view with an optional completion
+ handler. This method should be considered "alpha" and as such is subject to
+ change.
+
+ @param annotation The annotation object to select.
+ @param moveIntoView If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport.
+ @param animateSelection If `YES`, the annotation's selection state and callout view's presentation are animated.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveIntoView:(BOOL)moveIntoView animateSelection:(BOOL)animateSelection completionHandler:(nullable void (^)(void))completion;
 
 /**
  Deselects an annotation and hides its callout view.
