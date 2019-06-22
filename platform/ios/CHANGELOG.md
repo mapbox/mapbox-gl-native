@@ -5,6 +5,13 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## 5.2.0
 
 * Fixed an issue where the two-finger tilt gesture would continue after lifting one finger. ([#14969](https://github.com/mapbox/mapbox-gl-native/pull/14969))
+* Added variants of several animated `MGLMapView` methods that accept completion handlers ([#14381](https://github.com/mapbox/mapbox-gl-native/pull/14381)):
+  * `-[MGLMapView setVisibleCoordinateBounds:edgePadding:animated:completionHandler:]`
+  * `-[MGLMapView setContentInset:animated:completionHandler:]`
+  * `-[MGLMapView setUserTrackingMode:animated:completionHandler:]`
+  * `-[MGLMapView setTargetCoordinate:animated:completionHandler:]`
+  * `-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]`
+  * `-[MGLMapView selectAnnotation:animated:completionHandler:]`
 
 ## 5.1.0 - June 19, 2019
 
@@ -21,16 +28,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInset` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
 * Fixed a feature querying bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
-
-### Other changes
-
-* Added variants of several animated `MGLMapView` methods that accept completion handlers ([#14381](https://github.com/mapbox/mapbox-gl-native/pull/14381)):
-  * `-[MGLMapView setVisibleCoordinateBounds:edgePadding:animated:completionHandler:]`
-  * `-[MGLMapView setContentInset:animated:completionHandler:]`
-  * `-[MGLMapView setUserTrackingMode:animated:completionHandler:]`
-  * `-[MGLMapView setTargetCoordinate:animated:completionHandler:]`
-  * `-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]`
-  * `-[MGLMapView selectAnnotation:animated:completionHandler:]`
 
 ## 5.0.0 - May 22, 2019
 
