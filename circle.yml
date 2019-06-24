@@ -15,8 +15,8 @@ workflows:
       - android-arm-template:
           name: android-gnustl-arm-v7
           stl: gnustl_shared
-          firebase_device_id: "htc_m8"
-          firebase_device_os: "19"
+          firebase_device_id: "flo"
+          firebase_device_os: "21"
           image: android-ndk-r17c:1d5db0eb34
           abi: arm-v7
       - android-release:
