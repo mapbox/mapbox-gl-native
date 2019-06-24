@@ -352,13 +352,15 @@ MGL_EXPORT
  This method should be called before using the database.
  */
 
-- (void)setMaximumAmbientCacheSize:(uint64_t)cacheSize;
+- (void)setMaximumAmbientCacheSize:(void (^)(unsigned long cacheSize, NSError * _Nullable error))completion;
 
 /*
  Forces cache tiles to be invalidated and updated from the tile server. This ensures that the
  */
 
 - (void)invalidateAmbientCache;
+
+- (void)clearAmbientCache;
 
 /*
  Inserts the provided resource into the ambient cache.

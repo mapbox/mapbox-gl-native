@@ -488,17 +488,32 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 #pragma mark - Ambient Cache management
 
-- (void)setMaximumAmbientCacheSize:(uint64_t)cacheSize {
+
+void maxCacheSizeCallback(std::exception_ptr result) {
     
-    if ( ! (cacheSize > 0) ) { /* give a warning*/ } ;
-    _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, nil); // I should do something with the std::exception_ptr here but i don't know what
+    
+    
+    //    if ( ! (cacheSize > 0) ) { /* give a warning*/ } ;
+   
+    //
+        // ERROR: Too few arguments to function call, expected 2,
 }
+
+- (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError *))callback {
+
+    
+    _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, maxCacheSizeCallback);
+
+    }
 
 - (void)invalidateAmbientCache {
     _mbglFileSource->invalidateAmbientCache(nil);
     // Do something with the std::exception_ptr here
 }
 
+- (void)clearAmbientCache {
+    
+}
 #pragma mark -
 
 - (unsigned long long)countOfBytesCompleted {
