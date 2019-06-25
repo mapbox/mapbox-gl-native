@@ -18,8 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  The `object` is the `MGLOfflinePack` object whose progress changed. The
  `userInfo` dictionary contains the pack’s current state in the
- `MGLOfflinePackStateUserInfoKey` key and details about the pack’s current
- progress in the `MGLOfflinePackProgressUserInfoKey` key. You may also consult
+ `MGLOfflinePackUserInfoKeyState` key and details about the pack’s current
+ progress in the `MGLOfflinePackUserInfoKeyProgress` key. You may also consult
  the `MGLOfflinePack.state` and `MGLOfflinePack.progress` properties, which
  provide the same values.
 
@@ -43,7 +43,7 @@ FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChan
 
  The `object` is the `MGLOfflinePack` object that encountered the error. The
  `userInfo` dictionary contains the error object in the
- `MGLOfflinePackErrorUserInfoKey` key.
+ `MGLOfflinePackUserInfoKeyError` key.
  */
 FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
 
@@ -53,7 +53,7 @@ FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotific
 
  The `object` is the `MGLOfflinePack` object that reached the tile limit in the
  course of downloading. The `userInfo` dictionary contains the tile limit in the
- `MGLOfflinePackMaximumCountUserInfoKey` key.
+ `MGLOfflinePackUserInfoKeyMaximumCount` key.
 
  Once this limit is reached, no instance of `MGLOfflinePack` can download
  additional tiles from Mapbox APIs until already downloaded tiles are removed by
@@ -75,8 +75,6 @@ typedef NSString *MGLOfflinePackUserInfoKey NS_EXTENSIBLE_STRING_ENUM;
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState;
 
-FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyState")));
-
 /**
  The key for an `NSValue` object that indicates an offline pack’s current
  progress. This key is used in the `userInfo` dictionary of an
@@ -86,8 +84,6 @@ FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __a
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress;
 
-FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyProgress")));
-
 /**
  The key for an `NSError` object that is encountered in the course of
  downloading an offline pack. This key is used in the `userInfo` dictionary of
@@ -95,8 +91,6 @@ FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey 
  `MGLErrorDomain`. See `MGLErrorCode` for possible error codes.
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError;
-
-FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyError")));
 
 /**
  The key for an `NSNumber` object that indicates the maximum number of
@@ -107,8 +101,6 @@ FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __a
  limit.
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount;
-
-FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackMaximumCountUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyMaximumCount")));
 
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnsupportedRegionTypeException;
 

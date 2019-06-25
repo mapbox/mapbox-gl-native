@@ -253,8 +253,6 @@ MGL_EXPORT
  */
 @property (nonatomic, readonly, nullable) MGLStyle *style;
 
-@property (nonatomic, readonly) NSArray<NSURL *> *bundledStyleURLs __attribute__((unavailable("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
-
 /**
  URL of the style currently displayed in the receiver.
 
@@ -422,14 +420,6 @@ MGL_EXPORT
  The default value of this property is `YES`.
  */
 @property (nonatomic, assign) BOOL prefetchesTiles;
-
-@property (nonatomic) NSArray<NSString *> *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
-
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
-
-- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
-
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Displaying the User’s Location
 
@@ -1443,8 +1433,6 @@ MGL_EXPORT
  */
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
 
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((unavailable("Use `-metersPerPointAtLatitude:`.")));
-
 #pragma mark Annotating the Map
 
 /**
@@ -1940,12 +1928,6 @@ MGL_EXPORT
  released software for performance and aesthetic reasons.
  */
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
-
-@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((unavailable("Use `-debugMask` and `-setDebugMask:`.")));
-
-- (void)toggleDebug __attribute__((unavailable("Use `-setDebugMask:`.")));
-
-- (void)emptyMemoryCache __attribute__((unavailable));
 
 @end
 
