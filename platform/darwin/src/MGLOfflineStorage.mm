@@ -48,7 +48,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 @property (nonatomic) std::shared_ptr<mbgl::DefaultFileSource> mbglFileSource;
 @property (nonatomic) std::string mbglCachePath;
 @property (nonatomic, getter=isPaused) BOOL paused;
-
 @end
 
 @implementation MGLOfflineStorage {
@@ -431,7 +430,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         completion(nil);
         return;
     }
-
     _mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
@@ -488,27 +486,37 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 #pragma mark - Ambient Cache management
 
+- (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable error))completion {
 
-void maxCacheSizeCallback(std::exception_ptr result) {
-    
-    
-    
-    //    if ( ! (cacheSize > 0) ) { /* give a warning*/ } ;
-   
-    //
-        // ERROR: Too few arguments to function call, expected 2,
+    _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
+        NSError *error;
+        if (exception) {
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+                                                                               }];
+        }
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+                completion(error);
+            });
+        }
+    });
 }
 
-- (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError *))callback {
-
-    
-    _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, maxCacheSizeCallback);
-
-    }
-
-- (void)invalidateAmbientCache {
-    _mbglFileSource->invalidateAmbientCache(nil);
-    // Do something with the std::exception_ptr here
+- (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion {
+    _mbglFileSource->invalidateAmbientCache([&, completion](std::exception_ptr exception){
+        NSError *error;
+        if (exception) {
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+                                                                               }];
+        }
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+                completion(error);
+            });
+        }
+    });
 }
 
 - (void)clearAmbientCache {
