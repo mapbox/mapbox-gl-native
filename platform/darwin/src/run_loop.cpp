@@ -25,7 +25,6 @@ RunLoop::RunLoop(Type)
 }
 
 RunLoop::~RunLoop() {
-    assert(Scheduler::GetCurrent());
     Scheduler::SetCurrent(nullptr);
 }
 
