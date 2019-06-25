@@ -9,7 +9,6 @@ import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 import android.view.animation.LinearInterpolator;
 
-import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -91,10 +90,7 @@ final class LocationAnimatorCoordinator {
     targetCameraBearing = checkGpsNorth(isGpsNorth, targetCameraBearing);
 
     updateLayerAnimators(previousLayerLatLng, targetLatLng, previousLayerBearing, targetLayerBearing);
-
-    Point p = Point.fromLngLat(targetLatLng.getLongitude(), targetLatLng.getLatitude());
-    updateCameraAnimators(previousCameraLatLng, previousCameraBearing, new LatLng(p.latitude(),p.longitude()),
-      targetCameraBearing);
+    updateCameraAnimators(previousCameraLatLng, previousCameraBearing, targetLatLng, targetCameraBearing);
 
     boolean snap = immediateAnimation(projection, previousCameraLatLng, targetLatLng)
       || immediateAnimation(projection, previousLayerLatLng, targetLatLng);

@@ -77,6 +77,7 @@
     <string name="description_location_map_change">Change map\'s style while location is displayed</string>
     <string name="description_location_modes">Showcases location render and tracking modes</string>
     <string name="description_location_fragment">Uses LocationComponent in a Fragment</string>
+    <string name="description_location_shift">Uses LocationComponent with shift</string>
     <string name="description_location_manual">Force location updates and don\'t rely on the engine</string>
     <string name="description_location_activation_builder">Use LocationComponentActivationOptions to set options</string>
     <string name="description_recyclerview_textureview">Show multiple TextureView MapViews as recyclerView items</string>

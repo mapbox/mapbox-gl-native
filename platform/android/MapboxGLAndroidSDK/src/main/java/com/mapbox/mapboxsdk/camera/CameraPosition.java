@@ -8,6 +8,8 @@ import android.support.annotation.Keep;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -168,7 +170,7 @@ public final class CameraPosition implements Parcelable {
    * Builder for composing CameraPosition objects.
    */
   public static final class Builder {
-
+    private boolean needShift = true;
     private double bearing = -1;
     @Nullable
     private LatLng target = null;
@@ -221,6 +223,8 @@ public final class CameraPosition implements Parcelable {
      */
     public Builder(@Nullable CameraUpdateFactory.CameraPositionUpdate update) {
       super();
+      // The location in update is shifted before, so no need to shift again.
+      needShift = false;
       if (update != null) {
         bearing = update.getBearing();
         target = update.getTarget();
@@ -236,6 +240,8 @@ public final class CameraPosition implements Parcelable {
      */
     public Builder(@Nullable CameraUpdateFactory.ZoomUpdate update) {
       super();
+      // The location in update is shifted before, so no need to shift again.
+      needShift = false;
       if (update != null) {
         this.zoom = update.getZoom();
       }
@@ -312,6 +318,10 @@ public final class CameraPosition implements Parcelable {
      * @return CameraPosition
      */
     public CameraPosition build() {
+      if (needShift && target != null) {
+        Point point = Point.fromLngLat(target.getLongitude(), target.getLatitude());
+        this.target = new LatLng(point.latitude(), point.longitude());
+      }
       return new CameraPosition(target, zoom, tilt, bearing);
     }
   }
