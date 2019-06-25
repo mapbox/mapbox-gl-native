@@ -5,6 +5,7 @@ import android.graphics.PointF
 import android.support.test.InstrumentationRegistry
 import android.support.test.annotation.UiThreadTest
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
@@ -19,7 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class NativeMapViewTest {
+class NativeMapViewTest : AppCenter() {
 
     private lateinit var nativeMapView: NativeMap
 

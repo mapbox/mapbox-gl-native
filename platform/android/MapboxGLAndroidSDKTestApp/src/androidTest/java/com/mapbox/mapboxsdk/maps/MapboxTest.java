@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.support.test.annotation.UiThreadTest;
 import android.support.test.runner.AndroidJUnit4;
+
+import com.mapbox.mapboxsdk.AppCenter;
 import com.mapbox.mapboxsdk.Mapbox;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +13,7 @@ import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class MapboxTest {
+public class MapboxTest extends AppCenter {
 
   private static final String ACCESS_TOKEN = "pk.0000000001";
   private static final String ACCESS_TOKEN_2 = "pk.0000000002";

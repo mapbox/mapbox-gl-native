@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.maps
 
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
-class ImageMissingTest {
+class ImageMissingTest : AppCenter(){
 
   @Rule
   @JvmField
