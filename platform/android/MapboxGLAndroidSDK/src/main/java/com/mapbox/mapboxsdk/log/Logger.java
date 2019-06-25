@@ -1,7 +1,12 @@
 package com.mapbox.mapboxsdk.log;
 
+import android.support.annotation.IntDef;
 import android.support.annotation.Keep;
 import android.util.Log;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 
 /**
  * Logger for the Mapbox Maps SDK for Android
@@ -68,6 +73,22 @@ public final class Logger {
 
   private static volatile LoggerDefinition logger = DEFAULT;
 
+  @LogLevel
+  private static int logLevel;
+
+  /**
+   * Set the verbosity of the Logger.
+   * <p>
+   * This configuration can be used to have more granular control over which logs are emitted by the
+   * Mapbox Maps SDK for Android.
+   * </p>
+   *
+   * @param logLevel the verbosity level
+   */
+  public static void setVerbosity(@LogLevel int logLevel) {
+    Logger.logLevel = logLevel;
+  }
+
   /**
    * Replace the current used logger definition.
    *
@@ -85,7 +106,9 @@ public final class Logger {
    * @param msg The message you would like logged.
    */
   public static void v(String tag, String msg) {
-    logger.v(tag, msg);
+    if (logLevel <= VERBOSE) {
+      logger.v(tag, msg);
+    }
   }
 
   /**
@@ -97,7 +120,9 @@ public final class Logger {
    * @param tr  An exception to log
    */
   public static void v(String tag, String msg, Throwable tr) {
-    logger.v(tag, msg, tr);
+    if (logLevel <= VERBOSE) {
+      logger.v(tag, msg, tr);
+    }
   }
 
   /**
@@ -108,7 +133,9 @@ public final class Logger {
    * @param msg The message you would like logged.
    */
   public static void d(String tag, String msg) {
-    logger.d(tag, msg);
+    if (logLevel <= DEBUG) {
+      logger.d(tag, msg);
+    }
   }
 
   /**
@@ -120,7 +147,9 @@ public final class Logger {
    * @param tr  An exception to log
    */
   public static void d(String tag, String msg, Throwable tr) {
-    logger.d(tag, msg, tr);
+    if (logLevel <= DEBUG) {
+      logger.d(tag, msg, tr);
+    }
   }
 
   /**
@@ -131,7 +160,9 @@ public final class Logger {
    * @param msg The message you would like logged.
    */
   public static void i(String tag, String msg) {
-    logger.i(tag, msg);
+    if (logLevel <= INFO) {
+      logger.i(tag, msg);
+    }
   }
 
   /**
@@ -143,7 +174,9 @@ public final class Logger {
    * @param tr  An exception to log
    */
   public static void i(String tag, String msg, Throwable tr) {
-    logger.i(tag, msg, tr);
+    if (logLevel <= INFO) {
+      logger.i(tag, msg, tr);
+    }
   }
 
   /**
@@ -154,7 +187,9 @@ public final class Logger {
    * @param msg The message you would like logged.
    */
   public static void w(String tag, String msg) {
-    logger.w(tag, msg);
+    if (logLevel <= WARN) {
+      logger.w(tag, msg);
+    }
   }
 
   /**
@@ -166,7 +201,9 @@ public final class Logger {
    * @param tr  An exception to log
    */
   public static void w(String tag, String msg, Throwable tr) {
-    logger.w(tag, msg, tr);
+    if (logLevel <= WARN) {
+      logger.w(tag, msg, tr);
+    }
   }
 
   /**
@@ -177,7 +214,9 @@ public final class Logger {
    * @param msg The message you would like logged.
    */
   public static void e(String tag, String msg) {
-    logger.e(tag, msg);
+    if (logLevel <= ERROR) {
+      logger.e(tag, msg);
+    }
   }
 
   /**
@@ -189,7 +228,9 @@ public final class Logger {
    * @param tr  An exception to log
    */
   public static void e(String tag, String msg, Throwable tr) {
-    logger.e(tag, msg, tr);
+    if (logLevel <= ERROR) {
+      logger.e(tag, msg, tr);
+    }
   }
 
   /**
@@ -220,5 +261,61 @@ public final class Logger {
       default:
         throw new UnsupportedOperationException();
     }
+  }
+
+  /**
+   * Priority constant for the println method; use Logger.v
+   * <p>
+   * This log level will print all logs.
+   * </p>
+   */
+  public static final int VERBOSE = Log.VERBOSE;
+
+  /**
+   * Priority constant for the println method; use Logger.d.
+   * <p>
+   * This log level will print all logs except verbose.
+   * </p>
+   */
+  public static final int DEBUG = Log.DEBUG;
+
+  /**
+   * Priority constant for the println method; use Logger.i.
+   * <p>
+   * This log level will print all logs except verbose and debug.
+   * </p>
+   */
+  public static final int INFO = Log.INFO;
+
+  /**
+   * Priority constant for the println method; use Logger.w.
+   * <p>
+   * This log level will print only warn and error logs.
+   * </p>
+   */
+  public static final int WARN = Log.WARN;
+
+  /**
+   * Priority constant for the println method; use Logger.e.
+   * <p>
+   * This log level will print only error logs.
+   * </p>
+   */
+  public static final int ERROR = Log.ERROR;
+
+  /**
+   * Priority constant for the println method.
+   * <p>
+   * This log level won't print any logs.
+   * </p>
+   */
+  public static final int NONE = 99;
+
+  /**
+   * Log level indicates which logs are allowed to be emitted by the Mapbox Maps SDK for Android.
+   */
+  @IntDef( {VERBOSE, DEBUG, INFO, WARN, ERROR, NONE})
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface LogLevel {
   }
 }
