@@ -24,6 +24,7 @@ dependencies {
 
 android {
     compileSdkVersion androidVersions.compileSdkVersion
+    ndkVersion androidVersions.ndkVersion
 
     defaultConfig {
         minSdkVersion androidVersions.minSdkVersion

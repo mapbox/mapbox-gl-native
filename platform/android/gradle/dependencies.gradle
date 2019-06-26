@@ -4,6 +4,7 @@ ext {
             minSdkVersion    : 14,
             targetSdkVersion : 27,
             compileSdkVersion: 27,
+            ndkVersion       : "20.0.5594570"
     ]
 
     versions = [
