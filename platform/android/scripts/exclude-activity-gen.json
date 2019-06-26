@@ -38,6 +38,7 @@
   "RenderTestActivity",
   "SymbolLayerActivity",
   "LocationFragmentActivity",
+  "LocationShiftActivity",
   "MergeOfflineRegionsActivity",
   "NestedViewPagerActivity",
   "DebugModeActivity",
