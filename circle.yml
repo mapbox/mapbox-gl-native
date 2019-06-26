@@ -530,7 +530,7 @@ jobs:
         default: "c++_static"
       image:
         type: string
-        default: android-ndk-r19:8e91a7ebab
+        default: android-ndk-r20:7b7c4b42cf
       firebase_device_id:
         type: string
         default: sailfish
