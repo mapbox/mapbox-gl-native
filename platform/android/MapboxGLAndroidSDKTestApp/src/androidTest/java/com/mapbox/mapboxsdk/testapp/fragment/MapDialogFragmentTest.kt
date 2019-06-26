@@ -7,6 +7,7 @@ import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.action.WaitAction
 import com.mapbox.mapboxsdk.testapp.activity.maplayout.MapInDialogActivity
@@ -20,7 +21,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MapDialogFragmentTest {
+class MapDialogFragmentTest : AppCenter() {
 
     @get:Rule
     var activityRule: ActivityTestRule<MapInDialogActivity> = ActivityTestRule(MapInDialogActivity::class.java)

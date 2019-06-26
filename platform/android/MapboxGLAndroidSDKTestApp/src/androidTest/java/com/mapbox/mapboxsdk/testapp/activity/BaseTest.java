@@ -3,6 +3,8 @@ package com.mapbox.mapboxsdk.testapp.activity;
 import android.support.annotation.CallSuper;
 import android.support.annotation.UiThread;
 import android.support.test.rule.ActivityTestRule;
+
+import com.mapbox.mapboxsdk.AppCenter;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -22,7 +24,7 @@ import static junit.framework.TestCase.assertTrue;
 /**
  * Base class for all Activity test hooking into an existing Activity that will load style.
  */
-public abstract class BaseTest {
+public abstract class BaseTest extends AppCenter {
 
   private static final int WAIT_TIMEOUT = 30; //seconds
 
@@ -46,7 +48,7 @@ public abstract class BaseTest {
   @After
   @CallSuper
   public void afterTest() {
-    // override to add logic
+    super.afterTest();
   }
 
   @UiThread

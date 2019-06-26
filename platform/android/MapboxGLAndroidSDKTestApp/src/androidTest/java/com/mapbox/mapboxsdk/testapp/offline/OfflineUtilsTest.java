@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.offline;
 
 import android.support.test.runner.AndroidJUnit4;
+
+import com.mapbox.mapboxsdk.AppCenter;
 import com.mapbox.mapboxsdk.testapp.utils.OfflineUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +15,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class OfflineUtilsTest {
+public class OfflineUtilsTest extends AppCenter {
 
   private static final String REGION_NAME = "hello world";
   private static final String CONVERTED_REGION_NAME = "{\"FIELD_REGION_NAME\":\"hello world\"}";

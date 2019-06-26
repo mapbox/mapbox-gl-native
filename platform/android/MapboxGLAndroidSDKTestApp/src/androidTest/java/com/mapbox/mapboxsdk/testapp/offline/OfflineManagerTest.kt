@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.offline
 import android.content.Context
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.storage.FileSource
@@ -18,7 +19,7 @@ import java.util.concurrent.CountDownLatch
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
-class OfflineManagerTest {
+class OfflineManagerTest : AppCenter() {
 
   companion object {
     private const val TEST_DB_FILE_NAME = "offline_test.db"

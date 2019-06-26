@@ -7,6 +7,8 @@ import android.support.test.espresso.IdlingResourceTimeoutException;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
+
+import com.mapbox.mapboxsdk.AppCenter;
 import com.mapbox.mapboxsdk.testapp.activity.render.RenderTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.SnapshotterIdlingResource;
 import org.junit.After;
@@ -28,7 +30,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  * Instrumentation render tests
  */
 @RunWith(AndroidJUnit4.class)
-public class RenderTest {
+public class RenderTest extends AppCenter {
 
   private static final int RENDER_TEST_TIMEOUT = 30;
   private SnapshotterIdlingResource idlingResource;
