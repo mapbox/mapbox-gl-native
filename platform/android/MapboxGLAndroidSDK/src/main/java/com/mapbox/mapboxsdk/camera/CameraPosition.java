@@ -9,11 +9,13 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.mapbox.geojson.Point;
+import com.mapbox.geojson.shifter.CoordinateShifterManager;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
+
+import java.util.List;
 
 /**
  * Resembles the position, angle, zoom and tilt of the user's viewpoint.
@@ -170,7 +172,7 @@ public final class CameraPosition implements Parcelable {
    * Builder for composing CameraPosition objects.
    */
   public static final class Builder {
-    private boolean needShift = true;
+    private boolean needShift = false;
     private double bearing = -1;
     @Nullable
     private LatLng target = null;
@@ -223,8 +225,6 @@ public final class CameraPosition implements Parcelable {
      */
     public Builder(@Nullable CameraUpdateFactory.CameraPositionUpdate update) {
       super();
-      // The location in update is shifted before, so no need to shift again.
-      needShift = false;
       if (update != null) {
         bearing = update.getBearing();
         target = update.getTarget();
@@ -240,8 +240,6 @@ public final class CameraPosition implements Parcelable {
      */
     public Builder(@Nullable CameraUpdateFactory.ZoomUpdate update) {
       super();
-      // The location in update is shifted before, so no need to shift again.
-      needShift = false;
       if (update != null) {
         this.zoom = update.getZoom();
       }
@@ -276,6 +274,7 @@ public final class CameraPosition implements Parcelable {
      */
     @NonNull
     public Builder target(LatLng location) {
+      needShift = true;
       this.target = location;
       return this;
     }
@@ -319,10 +318,15 @@ public final class CameraPosition implements Parcelable {
      */
     public CameraPosition build() {
       if (needShift && target != null) {
-        Point point = Point.fromLngLat(target.getLongitude(), target.getLatitude());
-        this.target = new LatLng(point.latitude(), point.longitude());
+        //todo: add check after https://github.com/mapbox/mapbox-java/issues/1057 is resolved.
+        List<Double> shifted = CoordinateShifterManager.getCoordinateShifter()
+          .shiftLonLat(target.getLongitude(), target.getLatitude());
+        if (shifted != null && shifted.size() > 1) {
+          target.setLongitude(shifted.get(0));
+          target.setLatitude(shifted.get(1));
+        }
       }
-      return new CameraPosition(target, zoom, tilt, bearing);
+      return new CameraPosition(this.target, zoom, tilt, bearing);
     }
   }
 }
