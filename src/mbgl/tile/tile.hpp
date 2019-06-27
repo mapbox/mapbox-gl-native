@@ -58,10 +58,16 @@ public:
         assert(false);
         return nullptr;
     }
-    // Updates the contained layer render data with the given properties.
+    // Notifies this tile of the updated layer properties.
+    //
+    // Tile implementation should update the contained layer
+    // render data with the given properties.
+    // 
     // Returns `true` if the corresponding render layer data is present in this tile (and i.e. it
     // was succesfully updated); returns `false` otherwise.
-    virtual bool updateLayerProperties(const Immutable<style::LayerProperties>&) { return true; }
+    virtual bool layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) { 
+        return bool(getBucket(*layerProperties->baseImpl));
+    }
     virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::LayerProperties>>&) {}
     virtual void setMask(TileMask&&) {}
