@@ -47,7 +47,7 @@ public:
     void upload(gfx::UploadPass&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
     const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const override;
-    bool updateLayerProperties(const Immutable<style::LayerProperties>&) override;
+    bool layerPropertiesUpdated(const Immutable<style::LayerProperties>&) override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

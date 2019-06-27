@@ -212,13 +212,14 @@ const LayerRenderData* GeometryTile::getLayerRenderData(const style::Layer::Impl
     return that->getMutableLayerRenderData(layerImpl);
 }
 
-bool GeometryTile::updateLayerProperties(const Immutable<style::LayerProperties>& layerProperties) {
+bool GeometryTile::layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) {
     LayerRenderData* renderData = getMutableLayerRenderData(*layerProperties->baseImpl);
     if (!renderData) {
         return false;
     }
 
-    if (renderData->layerProperties != layerProperties) {
+    if (renderData->layerProperties != layerProperties &&
+        renderData->layerProperties->constantsMask() == layerProperties->constantsMask()) {
         renderData->layerProperties = layerProperties;
     }
 
