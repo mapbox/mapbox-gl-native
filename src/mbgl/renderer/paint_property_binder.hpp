@@ -544,18 +544,6 @@ public:
         return binders.template get<P>()->statistics;
     }
 
-    using Bitset = std::bitset<sizeof...(Ps)>;
-
-    template <class EvaluatedProperties>
-    static Bitset constants(const EvaluatedProperties& currentProperties) {
-        Bitset result;
-        util::ignore({
-            result.set(TypeIndex<Ps, Ps...>::value,
-                       currentProperties.template get<Ps>().isConstant())...
-        });
-        return result;
-    }
-
 private:
     Binders binders;
 };
