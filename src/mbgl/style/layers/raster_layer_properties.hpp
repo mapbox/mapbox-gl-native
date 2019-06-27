@@ -65,6 +65,8 @@ public:
         RasterPaintProperties::PossiblyEvaluated);
     ~RasterLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const RasterLayer::Impl& layerImpl() const;
     // Data members.
     RasterPaintProperties::PossiblyEvaluated evaluated;

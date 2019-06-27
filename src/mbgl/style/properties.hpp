@@ -9,6 +9,8 @@
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/util/ignore.hpp>
 
+#include <bitset>
+
 namespace mbgl {
 
 class GeometryTileFeature;
@@ -102,6 +104,22 @@ struct IsDataDriven : std::integral_constant<bool, P::IsDataDriven> {};
 template <class P>
 struct IsOverridable : std::integral_constant<bool, P::IsOverridable> {};
 
+template <class Ps>
+struct ConstantsMask;
+
+template <class... Ps>
+struct ConstantsMask<TypeList<Ps...>> {
+    template <class Properties>
+    static unsigned long getMask(const Properties& properties) {
+        std::bitset<sizeof... (Ps)> result;
+        util::ignore({
+            result.set(TypeIndex<Ps, Ps...>::value,
+                       properties.template get<Ps>().isConstant())...
+        });
+        return result.to_ulong();
+    }
+};
+
 template <class... Ps>
 class Properties {
 public:
@@ -171,6 +189,10 @@ public:
             return Evaluated {
                 evaluate<Ps>(z, feature)...
             };
+        }
+
+        unsigned long constantsMask() const {
+            return ConstantsMask<DataDrivenProperties>::getMask(*this);
         }
     };
 

@@ -19,6 +19,10 @@ SymbolLayerProperties::SymbolLayerProperties(
 
 SymbolLayerProperties::~SymbolLayerProperties() = default;
 
+unsigned long SymbolLayerProperties::constantsMask() const {
+    return evaluated.constantsMask();
+}
+
 const SymbolLayer::Impl& SymbolLayerProperties::layerImpl() const {
     return static_cast<const SymbolLayer::Impl&>(*baseImpl);
 }

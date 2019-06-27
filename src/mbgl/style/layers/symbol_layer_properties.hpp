@@ -341,6 +341,8 @@ public:
         SymbolPaintProperties::PossiblyEvaluated);
     ~SymbolLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const SymbolLayer::Impl& layerImpl() const;
     // Data members.
     SymbolPaintProperties::PossiblyEvaluated evaluated;

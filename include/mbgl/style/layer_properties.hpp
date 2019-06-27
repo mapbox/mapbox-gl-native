@@ -13,7 +13,8 @@ namespace style {
 class LayerProperties {
 public:
     virtual ~LayerProperties() = default;
-
+    // Returns constants mask for the data-driven properties.
+    virtual unsigned long constantsMask() const { return 0u; }
     Immutable<Layer::Impl> baseImpl;
 
 protected:

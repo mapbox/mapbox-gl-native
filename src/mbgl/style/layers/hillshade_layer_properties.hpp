@@ -55,6 +55,8 @@ public:
         HillshadePaintProperties::PossiblyEvaluated);
     ~HillshadeLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const HillshadeLayer::Impl& layerImpl() const;
     // Data members.
     HillshadePaintProperties::PossiblyEvaluated evaluated;
