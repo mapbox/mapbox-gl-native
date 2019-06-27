@@ -443,21 +443,33 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             });
         }
     });
+
 }
 
-- (void)invalidateOfflineRegion:(MGLShapeOfflineRegion *)region withCompletionHandler:(void (^)(NSError * _Nullable))completion {
+- (void)invalidateOfflineRegion:(id <MGLOfflineRegion>)region withCompletionHandler:(void (^)(NSError * _Nullable))completion {
     if (!completion) { return; }
-    const mbgl::OfflineRegionDefinition mbglRegionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
-    // JK - I need to convert the MGLOfflineRegion to an OfflineRegion
-
-//    _mbglFileSource->invalidateOfflineRegion(std::move *region, [&, completion](std::exception_ptr exception) {
-//        NSError *error;
-//        if (error) {
-//            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-//
-//                                                                               }];
-//        }
+    
+    if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
+        [NSException raise:MGLUnsupportedRegionTypeException
+                    format:@"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
+        return;
+    }
+    
+//    const mbgl::OfflineRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
+//    _mbglFileSource->createOfflineRegion(regionDefinition, nil, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
 //    });
+//    // JK - I need to convert the MGLOfflineRegion to an OfflineRegion. :ohno:
+//    mbgl::OfflineRegion offlineRegion = const_cast<mbgl::OfflineRegion>(region);
+    MGLShapeOfflineRegion *weakCopy = region;
+    
+    _mbglFileSource->invalidateOfflineRegion(weakCopy, [&, completion](std::exception_ptr exception) {
+        NSError *error;
+        if (error) {
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+
+                                                                               }];
+        }
+    });
 }
 - (void)reloadPacks {
     MGLLogInfo(@"Reloading packs.");
