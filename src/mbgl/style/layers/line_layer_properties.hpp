@@ -113,6 +113,8 @@ public:
         LinePaintProperties::PossiblyEvaluated);
     ~LineLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const LineLayer::Impl& layerImpl() const;
     // Data members.
     CrossfadeParameters crossfade;
