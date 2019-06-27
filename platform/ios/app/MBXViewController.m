@@ -1787,40 +1787,44 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 // Getting a bad access exception
 - (void)invalidateAmbientCache {
-    __block NSString *path = [self getCachePath];
-    NSFileManager *manager = [NSFileManager defaultManager];
-    unsigned long long fileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
-    NSLog(@"CACHE SIZE: %llu", fileSize);
-    
+    unsigned long long fileSize = [self getCacheSize];
+    NSLog(@"STARTING WITH CACHE SIZE: %llu", fileSize);
     [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
-        NSLog(@"Ambient cache has been reloaded!");
-        path = [self getCachePath];
-        unsigned long long newFileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
-        NSLog(@"CACHE SIZE: %llu", newFileSize);
+        unsigned long long newFileSize = [self getCacheSize];
+        NSLog(@"\nAmbient cache has been reloaded!CACHE SIZE: %llu", newFileSize);
     }];
 }
 
 - (void)resetDatabase {
-    
+    CFTimeInterval start = CACurrentMediaTime();
+    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
+        if (!error) {
+            CFTimeInterval end = CACurrentMediaTime();
+            CFTimeInterval difference = end - start;
+            NSLog(@"clearDatabase\nStarted: %f\nEnded: %f\nTotal Time: %f", start, end, difference);
+        }
+    }];
 }
 
 - (void)clearAmbientCache {
     // Access the cache.db file
-    __block NSString *path = [self getCachePath];
-    NSFileManager *manager = [NSFileManager defaultManager];
-    unsigned long long fileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
+    unsigned long long fileSize = [self getCacheSize];
     NSLog(@"CACHE SIZE: %llu", fileSize);
+    CFTimeInterval start = CACurrentMediaTime();
     [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletion:^(NSError * _Nullable error) {
-        NSLog(@"DONE");
-        path = [self getCachePath];
-        unsigned long long newFileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
+        unsigned long long newFileSize = [self getCacheSize];
         NSLog(@"CACHE SIZE: %llu", newFileSize);
+        CFTimeInterval end = CACurrentMediaTime();
+        CFTimeInterval difference = end - start;
+        NSLog(@"clearAmbientCache\nStarted: %f\nEnded: %f\nTotal Time: %f", start, end, difference);
     }];
 }
 
-// This method is used to access the cache database file.
-- (NSString *)getCachePath {
-    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+// This method is used to access the cache database file, then get the file size.
+- (unsigned long long)getCacheSize {
+    
+    NSFileManager *manager = [NSFileManager defaultManager];
+    NSURL *cacheDirectoryURL = [manager URLForDirectory:NSApplicationSupportDirectory
                                                                       inDomain:NSUserDomainMask
                                                              appropriateForURL:nil
                                                                         create:YES
@@ -1832,7 +1836,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox/cache.db"];
 //    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@""];
-    return cacheDirectoryURL.path;
+    NSString *path = cacheDirectoryURL.path;
+    return [[manager attributesOfItemAtPath:path error:nil] fileSize];
 }
 
 #pragma mark - Random World Tour

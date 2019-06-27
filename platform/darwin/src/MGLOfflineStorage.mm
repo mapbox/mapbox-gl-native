@@ -553,6 +553,23 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         });
     });
 }
+
+- (void)resetDatabaseWithCompletionHandler:(void (^)(NSError *_Nullable error))completion {
+    if (!completion) { return; };
+    NSError *error;
+    _mbglFileSource->resetDatabase([&, completion](std::exception_ptr exception) {
+        if (exception) {
+            error = [NSError errorWithDomain:MGLErrorDomain
+                                        code:-1 userInfo:@{
+                                                           NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+                                                           }];
+        }
+        dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+            completion(error);
+        });
+
+    });
+}
 #pragma mark -
 
 - (unsigned long long)countOfBytesCompleted {

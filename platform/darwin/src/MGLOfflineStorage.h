@@ -347,10 +347,11 @@ MGL_EXPORT
 
 // JK FINISH DOC
 /*
- Sets the maximum ambient cache size in megabytes. The default maximum cache size is _ MB. To disable ambient caching, set the maximum ambient cache size to 0.
+ Sets the maximum ambient cache size in megabytes. The default maximum cache size is _ MB. To disable ambient caching, set the maximum ambient cache size to 0. Setting the maximum ambient cache size does not impact the maximum size for offline packs.
  
  This method should be called before using the database.
  */
+
 - (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError *_Nullable error))completion;
 
 /*
@@ -360,6 +361,8 @@ MGL_EXPORT
 - (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
 
 - (void)clearAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
+
+- (void)resetDatabaseWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 /*
  Inserts the provided resource into the ambient cache.
