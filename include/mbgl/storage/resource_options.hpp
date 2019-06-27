@@ -106,10 +106,10 @@ public:
     /**
      * @brief Gets the previously set (or default) support for cache-only requests.
      *
-     * @param Whether or not cache-only requests are supported.
+     * @param cacheOnly Whether or not cache-only requests are supported.
      * @return reference to ResourceOptions for chaining options together.
      */
-    ResourceOptions& withCacheOnlyRequestsSupport(bool);
+    ResourceOptions& withCacheOnlyRequestsSupport(bool cacheOnly);
 
     /**
      * @brief Sets the platform context. A platform context is usually an object
