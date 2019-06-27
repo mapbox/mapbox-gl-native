@@ -445,6 +445,20 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     });
 }
 
+- (void)invalidateOfflineRegion:(MGLShapeOfflineRegion *)region withCompletionHandler:(void (^)(NSError * _Nullable))completion {
+    if (!completion) { return; }
+    const mbgl::OfflineRegionDefinition mbglRegionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
+    // JK - I need to convert the MGLOfflineRegion to an OfflineRegion
+
+//    _mbglFileSource->invalidateOfflineRegion(std::move *region, [&, completion](std::exception_ptr exception) {
+//        NSError *error;
+//        if (error) {
+//            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+//
+//                                                                               }];
+//        }
+//    });
+}
 - (void)reloadPacks {
     MGLLogInfo(@"Reloading packs.");
     [self getPacksWithCompletionHandler:^(NSArray<MGLOfflinePack *> *packs, __unused NSError * _Nullable error) {
@@ -486,41 +500,58 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 #pragma mark - Ambient Cache management
 
-- (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable error))completion {
+- (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable))completion {
 
     _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
+        if (!completion) { return; }
+        
         NSError *error;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-                                                                               }];
+            error = [NSError errorWithDomain:MGLErrorDomain
+                                        code:-1
+                                    userInfo:@{
+                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+                                               }
+                     ];
         }
-        if (completion) {
-            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
-                completion(error);
-            });
-        }
+        dispatch_async(dispatch_get_main_queue(), ^ {
+            completion(error);
+        });
     });
 }
 
-- (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion {
+- (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable))completion {
     _mbglFileSource->invalidateAmbientCache([&, completion](std::exception_ptr exception){
+        if (!completion) { return; }
+        
         NSError *error;
         if (exception) {
+            // Convert std::exception_ptr to an NSError.
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
                                                                                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                                                                                }];
         }
-        if (completion) {
-            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
-                completion(error);
-            });
-        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^ {
+            completion(error);
+        });
     });
 }
 
-- (void)clearAmbientCache {
-    
+- (void)clearAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion {
+    _mbglFileSource->clearAmbientCache([&, completion](std::exception_ptr exception){
+        if (!completion) { return; }
+        NSError *error;
+        if (exception) {
+            error = [NSError errorWithDomain:MGLErrorDomain
+                                          code:-1 userInfo:@{
+                                                                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+                                                                               }];
+        }
+        dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+            completion(error);
+        });
+    });
 }
 #pragma mark -
 

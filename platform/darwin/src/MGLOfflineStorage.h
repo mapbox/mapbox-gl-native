@@ -359,7 +359,7 @@ MGL_EXPORT
 
 - (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
 
-- (void)clearAmbientCache;
+- (void)clearAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
 
 /*
  Inserts the provided resource into the ambient cache.

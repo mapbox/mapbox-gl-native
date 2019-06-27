@@ -110,8 +110,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousSetContentInsets,
     MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousOrnamentsPlacement,
+    MBXSettingsMiscellaneousInvalidateAmbientCache,
+    MBXSettingsMiscellaneousClearDatabase,
+    MBXSettingsMiscellaneousResetAmbientCache,
     MBXSettingsMiscellaneousPrintLogFile,
-    MBXSettingsMiscellaneousDeleteLogFile
+    MBXSettingsMiscellaneousDeleteLogFile,
 };
 
 // Utility methods
@@ -439,6 +442,9 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 [NSString stringWithFormat:@"Turn %@ Content Insets", (_contentInsetsEnabled ? @"Off" : @"On")],
                 @"View Route Simulation",
                 @"Ornaments Placement",
+                @"Invalidate Ambient Cache",
+                @"Clear Database",
+                @"Reset Ambient Cache",
             ]];
 
             if (self.currentState.debugLoggingEnabled)
@@ -766,6 +772,20 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     MBXOrnamentsViewController *ornamentsViewController = [[MBXOrnamentsViewController alloc] init];
                     [self.navigationController pushViewController:ornamentsViewController animated:YES];
+                    break;
+                }
+                case MBXSettingsMiscellaneousInvalidateAmbientCache:
+                {
+                    [self invalidateAmbientCache];
+                    break;
+                }
+                case MBXSettingsMiscellaneousClearDatabase:
+                {
+                    [self resetDatabase];
+                    break;
+                }
+                case MBXSettingsMiscellaneousResetAmbientCache: {
+                    [self clearAmbientCache];
                     break;
                 }
                 default:
@@ -1763,6 +1783,56 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", [dateFormatter stringFromDate:[NSDate date]]]];
 
     return filePath;
+}
+
+// Getting a bad access exception
+- (void)invalidateAmbientCache {
+    __block NSString *path = [self getCachePath];
+    NSFileManager *manager = [NSFileManager defaultManager];
+    unsigned long long fileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
+    NSLog(@"CACHE SIZE: %llu", fileSize);
+    
+    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+        NSLog(@"Ambient cache has been reloaded!");
+        path = [self getCachePath];
+        unsigned long long newFileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
+        NSLog(@"CACHE SIZE: %llu", newFileSize);
+    }];
+}
+
+- (void)resetDatabase {
+    
+}
+
+- (void)clearAmbientCache {
+    // Access the cache.db file
+    __block NSString *path = [self getCachePath];
+    NSFileManager *manager = [NSFileManager defaultManager];
+    unsigned long long fileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
+    NSLog(@"CACHE SIZE: %llu", fileSize);
+    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+        NSLog(@"DONE");
+        path = [self getCachePath];
+        unsigned long long newFileSize = [[manager attributesOfItemAtPath:path error:nil] fileSize];
+        NSLog(@"CACHE SIZE: %llu", newFileSize);
+    }];
+}
+
+// This method is used to access the cache database file.
+- (NSString *)getCachePath {
+    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+                                                                      inDomain:NSUserDomainMask
+                                                             appropriateForURL:nil
+                                                                        create:YES
+                                                                         error:nil];
+    
+    NSBundle *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    
+    // Can I do this in
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox/cache.db"];
+//    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@""];
+    return cacheDirectoryURL.path;
 }
 
 #pragma mark - Random World Tour
