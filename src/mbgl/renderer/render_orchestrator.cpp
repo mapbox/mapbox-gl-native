@@ -241,11 +241,16 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     }
 
     // Update layers for class and zoom changes.
+    std::unordered_set<std::string> constantsMaskChanged;
     for (const auto& entry : renderLayers) {
         RenderLayer& layer = *entry.second;
         const bool layerAddedOrChanged = layerDiff.added.count(entry.first) || layerDiff.changed.count(entry.first);
         if (layerAddedOrChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
+            auto previousMask = layer.evaluatedProperties->constantsMask();
             layer.evaluate(evaluationParameters);
+            if (previousMask != layer.evaluatedProperties->constantsMask()) {
+                constantsMaskChanged.insert(layer.getID());
+            }
         }
     }
 
@@ -298,7 +303,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
-                    sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || hasLayoutDifference(layerDiff, layerImpl->id));
+                    sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || constantsMaskChanged.count(layerImpl->id) || hasLayoutDifference(layerDiff, layerImpl->id));
                     if (layerNeedsRendering) {
                         filteredLayersForSource.push_back(layer->evaluatedProperties);
                         if (zoomFitsLayer) {
