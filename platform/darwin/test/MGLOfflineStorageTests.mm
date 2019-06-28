@@ -413,4 +413,23 @@
     CFRunLoopRun();
 }
 
+- (void)testInvalidateAmbientCache {
+    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+    }];
+}
+
+- (void)testClearCache {
+    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+    }];
+}
+
+- (void)testResetDatabase {
+    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+    }];
+}
+
+
 @end

@@ -452,6 +452,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     mbgl::OfflineRegion& region = *pack.mbglOfflineRegion;
     NSError *error;
     if (!pack.mbglOfflineRegion) {
+        
         completion(nil);
         return; }
 
@@ -461,6 +462,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                                                                                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                                                                                }];
         }
+    });
+    dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+        completion(error);
     });
 }
 
