@@ -446,31 +446,47 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 }
 
-- (void)invalidateOfflineRegion:(id <MGLOfflineRegion>)region withCompletionHandler:(void (^)(NSError * _Nullable))completion {
-    if (!completion) { return; }
-    
-    if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
-        [NSException raise:MGLUnsupportedRegionTypeException
-                    format:@"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
-        return;
-    }
-    
-//    const mbgl::OfflineRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
-//    _mbglFileSource->createOfflineRegion(regionDefinition, nil, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
-//    });
-//    // JK - I need to convert the MGLOfflineRegion to an OfflineRegion. :ohno:
-//    mbgl::OfflineRegion offlineRegion = const_cast<mbgl::OfflineRegion>(region);
-    MGLShapeOfflineRegion *weakCopy = region;
-    
-    _mbglFileSource->invalidateOfflineRegion(weakCopy, [&, completion](std::exception_ptr exception) {
-        NSError *error;
-        if (error) {
+- (void)invalidateOfflineRegionForPack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion {
+    const mbgl::OfflineRegion *region = pack.mbglOfflineRegion;
+    const mbgl::OfflineRegion&& regionRef = &pack.mbglOfflineRegion;
+    NSError *error;
+    if (!region) {
+        completion(nil);
+        return; }
+    _mbglFileSource->invalidateOfflineRegion(regionRef, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
+        if (mbglOfflineRegion) {
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-
+                                                                               
                                                                                }];
         }
     });
+    
 }
+//- (void)invalidateOfflineRegion:(id <MGLOfflineRegion>)region withCompletionHandler:(void (^)(NSError * _Nullable))completion {
+//    if (!completion) { return; }
+//
+//    if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
+//        [NSException raise:MGLUnsupportedRegionTypeException
+//                    format:@"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
+//        return;
+//    }
+//
+////    const mbgl::OfflineRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
+////    _mbglFileSource->createOfflineRegion(regionDefinition, nil, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
+////    });
+////    // JK - I need to convert the MGLOfflineRegion to an OfflineRegion. :ohno:
+////    mbgl::OfflineRegion offlineRegion = const_cast<mbgl::OfflineRegion>(region);
+//    MGLShapeOfflineRegion *weakCopy = region;
+//
+//    _mbglFileSource->invalidateOfflineRegion(weakCopy, [&, completion](std::exception_ptr exception) {
+//        NSError *error;
+//        if (error) {
+//            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+//
+//                                                                               }];
+//        }
+//    });
+//}
 - (void)reloadPacks {
     MGLLogInfo(@"Reloading packs.");
     [self getPacksWithCompletionHandler:^(NSArray<MGLOfflinePack *> *packs, __unused NSError * _Nullable error) {
