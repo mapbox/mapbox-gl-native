@@ -20,6 +20,7 @@ gradle/configuration.gradle
 
 # Token file
 MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+MapboxGLAndroidSDKMonkeyRunner/src/main/res/values/developer-config.xml
 
 # Capture files
 captures/

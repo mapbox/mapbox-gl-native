@@ -1,0 +1,21 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply from: "${rootDir}/gradle/gradle-config.gradle"
+
+android {
+    compileSdkVersion androidVersions.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.mapbox.mapboxsdk.testapp.monkey"
+        minSdkVersion androidVersions.minSdkVersion
+        targetSdkVersion androidVersions.targetSdkVersion
+        versionCode 1
+        versionName "0.0.1"
+    }
+}
+
+dependencies {
+    implementation project(':MapboxGLAndroidSDK')
+    implementation dependenciesList.kotlinLib
+}
