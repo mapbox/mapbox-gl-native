@@ -443,7 +443,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 @"View Route Simulation",
                 @"Ornaments Placement",
                 @"Invalidate Ambient Cache",
-                @"Clear Database",
+                @"Reset Database",
                 @"Reset Ambient Cache",
             ]];
 
@@ -1801,7 +1801,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         if (!error) {
             CFTimeInterval end = CACurrentMediaTime();
             CFTimeInterval difference = end - start;
-            NSLog(@"clearDatabase\nStarted: %f\nEnded: %f\nTotal Time: %f", start, end, difference);
+            NSLog(@"resetDatabase\nStarted: %f\nEnded: %f\nTotal Time: %f", start, end, difference);
         }
     }];
 }

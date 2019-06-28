@@ -201,6 +201,33 @@
     pack = nil;
 }
 
+- (void)testInvalidateAmbientCache {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect cache to be invalidated without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:30 handler:nil];
+}
+
+- (void)testClearCache {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect cache to be cleared without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testResetDatabase {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect database to be reset without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
 - (void)testBackupExclusion {
     NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
                                                                       inDomain:NSUserDomainMask
@@ -412,24 +439,5 @@
     
     CFRunLoopRun();
 }
-
-- (void)testInvalidateAmbientCache {
-    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
-        XCTAssertNil(error);
-    }];
-}
-
-- (void)testClearCache {
-    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletion:^(NSError * _Nullable error) {
-        XCTAssertNil(error);
-    }];
-}
-
-- (void)testResetDatabase {
-    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
-        XCTAssertNil(error);
-    }];
-}
-
 
 @end
