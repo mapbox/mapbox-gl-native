@@ -22,8 +22,13 @@ std::string rfc1123(Timestamp timestamp) {
     std::time_t time = std::chrono::system_clock::to_time_t(timestamp);
     std::tm info;
     _gmtime(&time, &info);
-    char buffer[30];
-    snprintf(buffer, 30, "%s, %02d %s %4d %02d:%02d:%02d GMT", week[info.tm_wday], info.tm_mday,
+
+    // Buffer size 30 is OK assuming the year has 4 digits. However, In theory, it might have
+    // more digits. Under gcc 8.3.0 with -Os optimization flag, there is compiler warning
+    // complaining about the buffer size might be too small. Inceasing the buffer to 32 fixes
+    // the warning.
+    char buffer[32];
+    snprintf(buffer, 32, "%s, %02d %s %4d %02d:%02d:%02d GMT", week[info.tm_wday], info.tm_mday,
              months[info.tm_mon], 1900 + info.tm_year, info.tm_hour, info.tm_min, info.tm_sec);
     return buffer;
 }
