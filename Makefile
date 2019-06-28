@@ -292,9 +292,13 @@ iproj: $(IOS_PROJ_PATH)
 	xed $(IOS_WORK_PATH)
 
 .PHONY: ios-lint
-ios-lint:
+ios-lint: ios-pod-lint
 	find platform/ios/framework -type f -name '*.plist' | xargs plutil -lint
 	find platform/ios/app -type f -name '*.plist' | xargs plutil -lint
+
+.PHONY: ios-pod-lint
+ios-pod-lint:
+	./platform/ios/scripts/lint-podspecs.js
 
 .PHONY: ios-test
 ios-test: $(IOS_PROJ_PATH)

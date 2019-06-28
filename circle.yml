@@ -959,7 +959,7 @@ jobs:
           name: Check symbol namespacing for mapbox-events-ios
           command: make ios-check-events-symbols
       - run:
-          name: Lint plist files
+          name: Lint podspecs and plist files
           command: make ios-lint
       - run:
           name: Nitpick Darwin code generation
