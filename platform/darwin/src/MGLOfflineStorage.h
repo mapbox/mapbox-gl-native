@@ -303,6 +303,7 @@ MGL_EXPORT
  */
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(nullable MGLOfflinePackRemovalCompletionHandler)completion;
 
+- (void)invalidateOfflineRegionForPack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion;
 /**
  Forcibly, asynchronously reloads the `packs` property. At some point after this
  method is called, the pointer values of the `MGLOfflinePack` objects in the
