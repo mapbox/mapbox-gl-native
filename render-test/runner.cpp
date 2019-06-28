@@ -123,8 +123,11 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
 
     // wait
     if (operationArray[0].GetString() == waitOp) {
-        frontend.render(map);
-
+        try {
+            frontend.render(map);
+        } catch (const std::exception&) {
+            return false;
+        }
     // sleep
     } else if (operationArray[0].GetString() == sleepOp) {
         mbgl::util::Timer sleepTimer;
@@ -400,7 +403,14 @@ bool TestRunner::run(TestMetadata& metadata) {
         return false;
     }
 
-    return checkImage(frontend.render(map), metadata);
+    mbgl::PremultipliedImage image;
+    try {
+        image = frontend.render(map);
+    } catch (const std::exception&) {
+        return false;
+    }
+
+    return checkImage(std::move(image), metadata);
 }
 
 void TestRunner::reset() {
