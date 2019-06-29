@@ -65,9 +65,13 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 }
 
 - (void)startDownloadEvent:(NSString *)urlString type:(NSString *)resourceType {
-    if (urlString && ![self.events objectForKey:urlString]) {
-        [self.events setObject:@{ MGLStartTime: [NSDate date], MGLResourceType: resourceType } forKey:urlString];
+    NSString *retainedUrlString = urlString;
+    NSString *retainedResourceType = resourceType;
+    if (retainedUrlString && !self.events[retainedUrlString]) {
+        self.events[retainedUrlString] = @{ MGLStartTime: [NSDate date], MGLResourceType: retainedResourceType };
     }
+    retainedUrlString = nil;
+    retainedResourceType = nil;
 }
 
 - (void)stopDownloadEventForResponse:(NSURLResponse *)response {
@@ -80,15 +84,16 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 
 - (void)sendEventForURLResponse:(NSURLResponse *)response withAction:(NSString *)action
 {
-    if ([response isKindOfClass:[NSURLResponse class]]) {
-        NSString *urlString = response.URL.relativePath;
+    NSURLResponse *retainedResponse = response;
+    if ([retainedResponse isKindOfClass:[NSURLResponse class]]) {
+        NSString *urlString = retainedResponse.URL.relativePath;
         if (urlString && [self.events objectForKey:urlString]) {
-            NSDictionary *eventAttributes = [self eventAttributesForURL:response withAction:action];
+            NSDictionary *eventAttributes = [self eventAttributesForURL:retainedResponse withAction:action];
             [self.metricsDelegate networkConfiguration:self didGenerateMetricEvent:eventAttributes];
             [self.events removeObjectForKey:urlString];
         }
     }
-    
+    retainedResponse = nil;
 }
 
 - (NSDictionary *)eventAttributesForURL:(NSURLResponse *)response withAction:(NSString *)action
