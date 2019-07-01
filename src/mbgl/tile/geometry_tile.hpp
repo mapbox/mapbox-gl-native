@@ -23,6 +23,7 @@ class SourceQueryOptions;
 class TileParameters;
 class GlyphAtlas;
 class ImageAtlas;
+class TileAtlasTextures;
 
 class GeometryTile : public Tile, public GlyphRequestor, public ImageRequestor {
 public:
@@ -35,6 +36,7 @@ public:
     void setError(std::exception_ptr);
     void setData(std::unique_ptr<const GeometryTileData>);
 
+    std::unique_ptr<TileRenderData> createRenderData() override;
     void setLayers(const std::vector<Immutable<style::LayerProperties>>&) override;
     void setShowCollisionBoxes(const bool showCollisionBoxes) override;
 
@@ -44,9 +46,6 @@ public:
     void getGlyphs(GlyphDependencies);
     void getImages(ImageRequestPair);
 
-    void upload(gfx::UploadPass&) override;
-    Bucket* getBucket(const style::Layer::Impl&) const override;
-    const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const override;
     bool layerPropertiesUpdated(const Immutable<style::LayerProperties>&) override;
 
     void queryRenderedFeatures(
@@ -72,6 +71,8 @@ public:
         optional<AlphaImage> glyphAtlasImage;
         ImageAtlas iconAtlas;
 
+        LayerRenderData* getLayerRenderData(const style::Layer::Impl&);
+
         LayoutResult(std::unordered_map<std::string, LayerRenderData> renderData_,
                      std::unique_ptr<FeatureIndex> featureIndex_,
                      optional<AlphaImage> glyphAtlasImage_,
@@ -89,14 +90,13 @@ public:
     void markRenderedIdeal() override;
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
-    const optional<ImagePosition> getPattern(const std::string& pattern) const;
     const std::shared_ptr<FeatureIndex> getFeatureIndex() const;
     
     const std::string sourceID;
     
 protected:
     const GeometryTileData* getData() const;
-    LayerRenderData* getMutableLayerRenderData(const style::Layer::Impl&);
+    LayerRenderData* getLayerRenderData(const style::Layer::Impl&);
 
 private:
     void markObsolete();
@@ -114,6 +114,7 @@ private:
     uint64_t correlationID = 0;
 
     std::shared_ptr<LayoutResult> layoutResult;
+    std::shared_ptr<TileAtlasTextures> atlasTextures;
 
     const MapMode mode;
     
@@ -127,9 +128,6 @@ private:
     };
 
     FadeState fadeState = FadeState::Loaded;
-public:
-    optional<gfx::Texture> glyphAtlasTexture;
-    optional<gfx::Texture> iconAtlasTexture;
 };
 
 } // namespace mbgl

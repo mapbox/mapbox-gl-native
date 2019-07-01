@@ -15,21 +15,21 @@ namespace style {
 class Layer;
 } // namespace style
 
-class RasterTile : public Tile {
+class RasterTile final : public Tile {
 public:
     RasterTile(const OverscaledTileID&,
                    const TileParameters&,
                    const Tileset&);
     ~RasterTile() override;
 
+    std::unique_ptr<TileRenderData> createRenderData() override;
     void setNecessity(TileNecessity) final;
 
     void setError(std::exception_ptr);
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
     void setData(std::shared_ptr<const std::string> data);
 
-    void upload(gfx::UploadPass&) override;
-    Bucket* getBucket(const style::Layer::Impl&) const override;
+    bool layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) override;
 
     void setMask(TileMask&&) override;
 
@@ -46,7 +46,7 @@ private:
 
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
-    std::unique_ptr<RasterBucket> bucket;
+    std::shared_ptr<RasterBucket> bucket;
 };
 
 } // namespace mbgl

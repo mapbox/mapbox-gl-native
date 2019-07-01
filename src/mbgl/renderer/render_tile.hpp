@@ -4,10 +4,9 @@
 #include <mbgl/gfx/texture.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/renderer/tile_mask.hpp>
 
 #include <array>
 #include <memory>
@@ -26,6 +25,7 @@ class PaintParameters;
 class DebugBucket;
 class SourcePrepareParameters;
 class FeatureIndex;
+class TileRenderData;
 
 class RenderTile final {
 public:
@@ -70,6 +70,9 @@ public:
                             const bool inViewportPixelUnits) const;
 private:
     Tile& tile;
+    // The following members are reset at placement stage.
+    std::unique_ptr<TileRenderData> renderData;
+    bool needsRendering = false;
 };
 
 } // namespace mbgl
