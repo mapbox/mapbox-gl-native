@@ -112,6 +112,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     initialize(context, options == null ? MapboxMapOptions.createFromAttributes(context, null) : options);
   }
 
+  @UiThread
+  public MapView(@NonNull Context context, @Nullable AttributeSet attrs, @NonNull MapboxMapOptions options) {
+    super(context, attrs);
+    initialize(context, options);
+  }
+
   @CallSuper
   @UiThread
   protected void initialize(@NonNull final Context context, @NonNull final MapboxMapOptions options) {
