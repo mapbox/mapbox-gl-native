@@ -18,10 +18,97 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/renderer/tile_render_data.hpp>
 
 namespace mbgl {
 
+LayerRenderData* GeometryTile::LayoutResult::getLayerRenderData(const style::Layer::Impl& layerImpl) {
+    auto it = layerRenderData.find(layerImpl.id);
+    if (it == layerRenderData.end()) {
+        return nullptr;
+    }
+    LayerRenderData& result = it->second;
+    if (result.layerProperties->baseImpl->getTypeInfo() != layerImpl.getTypeInfo()) {
+        // Layer data might be outdated, see issue #12432.
+        return nullptr;
+    }
+    return &result;   
+}
+
+class GeometryTileRenderData final : public TileRenderData {
+public:
+    GeometryTileRenderData(
+        std::shared_ptr<GeometryTile::LayoutResult> layoutResult_,
+        std::shared_ptr<TileAtlasTextures> atlasTextures_,
+        ImageManager& imageManager_)
+        : TileRenderData(std::move(atlasTextures_))
+        , layoutResult(std::move(layoutResult_))
+        , imageManager(imageManager_) {
+    }
+
+private:
+    // TileRenderData overrides.
+    optional<ImagePosition> getPattern(const std::string&) const override;
+    const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const override;
+    Bucket* getBucket(const style::Layer::Impl&) const override;
+    void upload(gfx::UploadPass&) override;
+
+    std::shared_ptr<GeometryTile::LayoutResult> layoutResult;
+    ImageManager& imageManager;
+};
+
 using namespace style;
+
+optional<ImagePosition> GeometryTileRenderData::getPattern(const std::string& pattern) const {
+    if (layoutResult) {
+        const auto& iconAtlas = layoutResult->iconAtlas;
+        auto it = iconAtlas.patternPositions.find(pattern);
+        if (it != iconAtlas.patternPositions.end()) {
+            return it->second;
+        }
+    }
+    return nullopt;
+}
+
+void GeometryTileRenderData::upload(gfx::UploadPass& uploadPass) {
+    if (!layoutResult) return;
+
+    auto uploadFn = [&] (Bucket& bucket) {
+        if (bucket.needsUpload()) {
+            bucket.upload(uploadPass);
+        }
+    };
+
+    for (auto& entry : layoutResult->layerRenderData) {
+        uploadFn(*entry.second.bucket);
+    }
+
+    assert(atlasTextures);
+
+    if (layoutResult->glyphAtlasImage) {
+        atlasTextures->glyph = uploadPass.createTexture(*layoutResult->glyphAtlasImage);
+        layoutResult->glyphAtlasImage = {};
+    }
+
+    if (layoutResult->iconAtlas.image.valid()) {
+        atlasTextures->icon = uploadPass.createTexture(layoutResult->iconAtlas.image);
+        layoutResult->iconAtlas.image = {};
+    }
+
+    if (atlasTextures->icon) {
+        layoutResult->iconAtlas.patchUpdatedImages(uploadPass, *atlasTextures->icon, imageManager);
+    }
+}
+
+Bucket* GeometryTileRenderData::getBucket(const Layer::Impl& layer) const {
+    const LayerRenderData* data = getLayerRenderData(layer);
+    return data ? data->bucket.get() : nullptr; 
+}
+
+const LayerRenderData* GeometryTileRenderData::getLayerRenderData(const style::Layer::Impl& layerImpl) const {
+    return layoutResult ? layoutResult->getLayerRenderData(layerImpl) : nullptr;
+}
+
 
 /*
    Correlation between GeometryTile and GeometryTileWorker is safeguarded by two
@@ -88,6 +175,9 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     worker.self().invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
 }
 
+std::unique_ptr<TileRenderData> GeometryTile::createRenderData() {
+    return std::make_unique<GeometryTileRenderData>(layoutResult, atlasTextures, imageManager);
+}
 
 void GeometryTile::setLayers(const std::vector<Immutable<LayerProperties>>& layers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
@@ -131,6 +221,9 @@ void GeometryTile::onLayout(std::shared_ptr<LayoutResult> result, const uint64_t
     }
 
     layoutResult = std::move(result);
+    if (!atlasTextures) {
+    	atlasTextures = std::make_shared<TileAtlasTextures>();
+    }
     
     observer->onTileChanged(*this);
 }
@@ -159,61 +252,12 @@ void GeometryTile::getImages(ImageRequestPair pair) {
     imageManager.getImages(*this, std::move(pair));
 }
 
-const optional<ImagePosition> GeometryTile::getPattern(const std::string& pattern) const {
-    if (layoutResult) {
-        const auto& iconAtlas = layoutResult->iconAtlas;
-        auto it = iconAtlas.patternPositions.find(pattern);
-        if (it != iconAtlas.patternPositions.end()) {
-            return it->second;
-        }
-    }
-    return nullopt;
-}
-
 const std::shared_ptr<FeatureIndex> GeometryTile::getFeatureIndex() const {
     return layoutResult ? layoutResult->featureIndex : nullptr;
 }
 
-void GeometryTile::upload(gfx::UploadPass& uploadPass) {
-    if (!layoutResult) return;
-
-    auto uploadFn = [&] (Bucket& bucket) {
-        if (bucket.needsUpload()) {
-            bucket.upload(uploadPass);
-        }
-    };
-
-    for (auto& entry : layoutResult->layerRenderData) {
-        uploadFn(*entry.second.bucket);
-    }
-
-    if (layoutResult->glyphAtlasImage) {
-        glyphAtlasTexture = uploadPass.createTexture(*layoutResult->glyphAtlasImage);
-        layoutResult->glyphAtlasImage = {};
-    }
-
-    if (layoutResult->iconAtlas.image.valid()) {
-        iconAtlasTexture = uploadPass.createTexture(layoutResult->iconAtlas.image);
-        layoutResult->iconAtlas.image = {};
-    }
-
-    if (iconAtlasTexture) {
-        layoutResult->iconAtlas.patchUpdatedImages(uploadPass, *iconAtlasTexture, imageManager);
-    }
-}
-
-Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
-    const LayerRenderData* data = getLayerRenderData(layer);
-    return data ? data->bucket.get() : nullptr; 
-}
-
-const LayerRenderData* GeometryTile::getLayerRenderData(const style::Layer::Impl& layerImpl) const {
-    auto* that = const_cast<GeometryTile*>(this);
-    return that->getMutableLayerRenderData(layerImpl);
-}
-
 bool GeometryTile::layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) {
-    LayerRenderData* renderData = getMutableLayerRenderData(*layerProperties->baseImpl);
+    LayerRenderData* renderData = getLayerRenderData(*layerProperties->baseImpl);
     if (!renderData) {
         return false;
     }
@@ -233,27 +277,16 @@ const GeometryTileData* GeometryTile::getData() const {
     return layoutResult->featureIndex->getData();
 }
 
-LayerRenderData* GeometryTile::getMutableLayerRenderData(const style::Layer::Impl& layerImpl) {
-    if (!layoutResult) return nullptr;
-    auto& layerIdToLayerRenderData = layoutResult->layerRenderData;
-    auto it = layerIdToLayerRenderData.find(layerImpl.id);
-    if (it == layerIdToLayerRenderData.end()) {
-        return nullptr;
-    }
-    LayerRenderData& result = it->second;
-    if (result.layerProperties->baseImpl->getTypeInfo() != layerImpl.getTypeInfo()) {
-        // Layer data might be outdated, see issue #12432.
-        return nullptr;
-    }
-    return &result;   
+LayerRenderData* GeometryTile::getLayerRenderData(const style::Layer::Impl& layerImpl) {
+    return layoutResult ? layoutResult->getLayerRenderData(layerImpl) : nullptr;
 }
 
 float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {
     float queryPadding = 0;
     for (const RenderLayer* layer : layers) {
-        auto bucket = getBucket(*layer->baseImpl);
-        if (bucket && bucket->hasData()) {
-            queryPadding = std::max(queryPadding, bucket->getQueryRadius(*layer));
+        const LayerRenderData* data = getLayerRenderData(*layer->baseImpl);
+        if (data && data->bucket && data->bucket->hasData()) {
+            queryPadding = std::max(queryPadding, data->bucket->getQueryRadius(*layer));
         }
     }
     return queryPadding;
