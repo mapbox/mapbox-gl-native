@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Offline maps
 
 * Fixed an issue where offline regions could report the wrong number of tiles. ([#14958](https://github.com/mapbox/mapbox-gl-native/pull/14958))
+* Fixed an issue that may cause a crash when downloading a list of `MGLOfflinePack` objects. ([#15029](https://github.com/mapbox/mapbox-gl-native/pull/15029))
 
 ### Packaging
 
