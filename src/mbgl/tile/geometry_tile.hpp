@@ -67,8 +67,8 @@ public:
 
     class LayoutResult {
     public:
-        std::unordered_map<std::string, LayerRenderData> renderData;
-        std::unique_ptr<FeatureIndex> featureIndex;
+        std::unordered_map<std::string, LayerRenderData> layerRenderData;
+        std::shared_ptr<FeatureIndex> featureIndex;
         optional<AlphaImage> glyphAtlasImage;
         ImageAtlas iconAtlas;
 
@@ -76,12 +76,12 @@ public:
                      std::unique_ptr<FeatureIndex> featureIndex_,
                      optional<AlphaImage> glyphAtlasImage_,
                      ImageAtlas iconAtlas_)
-            : renderData(std::move(renderData_)),
+            : layerRenderData(std::move(renderData_)),
               featureIndex(std::move(featureIndex_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlas(std::move(iconAtlas_)) {}
     };
-    void onLayout(LayoutResult, uint64_t correlationID);
+    void onLayout(std::shared_ptr<LayoutResult>, uint64_t correlationID);
 
     void onError(std::exception_ptr, uint64_t correlationID);
 
@@ -90,15 +90,12 @@ public:
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
     const optional<ImagePosition> getPattern(const std::string& pattern) const;
-    const std::shared_ptr<FeatureIndex> getFeatureIndex() const { return latestFeatureIndex; }
+    const std::shared_ptr<FeatureIndex> getFeatureIndex() const;
     
     const std::string sourceID;
     
 protected:
-    const GeometryTileData* getData() {
-        return latestFeatureIndex ? latestFeatureIndex->getData() : nullptr;
-    }
-
+    const GeometryTileData* getData() const;
     LayerRenderData* getMutableLayerRenderData(const style::Layer::Impl&);
 
 private:
@@ -116,12 +113,7 @@ private:
 
     uint64_t correlationID = 0;
 
-    std::unordered_map<std::string, LayerRenderData> layerIdToLayerRenderData;
-    
-    std::shared_ptr<FeatureIndex> latestFeatureIndex;
-
-    optional<AlphaImage> glyphAtlasImage;
-    ImageAtlas iconAtlas;
+    std::shared_ptr<LayoutResult> layoutResult;
 
     const MapMode mode;
     
