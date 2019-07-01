@@ -39,9 +39,14 @@ bool TilePyramid::isLoaded() const {
     return true;
 }
 
-Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
+Tile* TilePyramid::getTile(const OverscaledTileID& tileID) {
     auto it = tiles.find(tileID);
     return it == tiles.end() ? cache.get(tileID) : it->second.get();
+}
+
+const Tile* TilePyramid::getRenderedTile(const UnwrappedTileID& tileID) const {
+    auto it = renderedTiles.find(tileID);
+    return it != renderedTiles.end() ? &it->second.get() : nullptr;
 }
 
 void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& layers,
@@ -68,7 +73,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         }
 
         tiles.clear();
-        renderTiles.clear();
+        renderedTiles.clear();
 
         return;
     }
@@ -153,7 +158,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         return tiles.emplace(tileID, std::move(tile)).first->second.get();
     };
 
-    auto previouslyRenderedTiles = std::move(renderTiles);
+    auto previouslyRenderedTiles = std::move(renderedTiles);
 
     auto renderTileFn = [&](const UnwrappedTileID& tileID, Tile& tile) {
         addRenderTile(tileID, tile);
@@ -161,7 +166,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         tile.markRenderedIdeal();
     };
 
-    renderTiles.clear();
+    renderedTiles.clear();
 
     if (!panTiles.empty()) {
         algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn,
@@ -219,7 +224,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
     fadingTiles = false;
 
     // Initialize renderable tiles and update the contained layer render data.
-    for (auto& entry : renderTiles) {
+    for (auto& entry : renderedTiles) {
         Tile& tile = entry.second;
         assert(tile.isRenderable());
         tile.usedByRenderedLayers = false;
@@ -268,11 +273,11 @@ void TilePyramid::handleWrapJump(float lng) {
         }
         tiles = std::move(newTiles);
 
-        for (auto& tile : renderTiles) {
+        for (auto& tile : renderedTiles) {
             UnwrappedTileID newID = tile.first.unwrapTo(tile.first.wrap + wrapDelta);
             newRenderTiles.emplace(newID, tile.second);
         }
-        renderTiles = std::move(newRenderTiles);
+        renderedTiles = std::move(newRenderTiles);
     }
 }
 
@@ -283,7 +288,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
                                            const RenderedQueryOptions& options,
                                            const mat4& projMatrix) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
-    if (renderTiles.empty() || geometry.empty()) {
+    if (renderedTiles.empty() || geometry.empty()) {
         return result;
     }
 
@@ -301,7 +306,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
             std::tie(b.canonical.z, b.canonical.y, b.wrap, b.canonical.x);
     };
 
-    std::map<UnwrappedTileID, std::reference_wrapper<Tile>, decltype(cmp)> sortedTiles{renderTiles.begin(), renderTiles.end(), cmp};
+    std::map<UnwrappedTileID, std::reference_wrapper<Tile>, decltype(cmp)> sortedTiles{renderedTiles.begin(), renderedTiles.end(), cmp};
 
     auto maxPitchScaleFactor = transformState.maxPitchScaleFactor();
 
@@ -369,17 +374,17 @@ void TilePyramid::dumpDebugLogs() const {
 
 void TilePyramid::clearAll() {
     tiles.clear();
-    renderTiles.clear();
+    renderedTiles.clear();
     cache.clear();
 }
 
 void TilePyramid::addRenderTile(const UnwrappedTileID& tileID, Tile& tile) {
     assert(tile.isRenderable());
-    renderTiles.emplace(tileID, tile);
+    renderedTiles.emplace(tileID, tile);
 }
 
 void TilePyramid::updateFadingTiles() {
-    for (auto& entry : renderTiles) {
+    for (auto& entry : renderedTiles) {
         Tile& tile = entry.second;
         if (tile.holdForFade()) {
             tile.performedFadePlacement();

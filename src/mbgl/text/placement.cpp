@@ -78,6 +78,7 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
                 item.tile,
                 projMatrix,
                 layer.baseImpl->source,
+                item.featureIndex,
                 showCollisionBoxes};
         bucket.place(*this, params, seenCrossTileIDs);
     }
@@ -332,7 +333,7 @@ void Placement::placeBucket(
     // matching FeatureIndex/data for querying purposes
     retainedQueryData.emplace(std::piecewise_construct,
                                 std::forward_as_tuple(bucket.bucketInstanceId),
-                                std::forward_as_tuple(bucket.bucketInstanceId, renderTile.getFeatureIndex(), overscaledID));
+                                std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
 }
 
 void Placement::commit(TimePoint now) {

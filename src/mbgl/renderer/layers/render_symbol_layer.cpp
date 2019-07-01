@@ -493,7 +493,7 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 }
 
 void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
-    renderTiles = params.source->getRenderedTiles();
+    renderTiles = params.source->getRenderTiles();
     const auto comp = [bearing = params.state.getBearing()](const RenderTile& a, const RenderTile& b) {
         Point<float> pa(a.id.canonical.x, a.id.canonical.y);
         Point<float> pb(b.id.canonical.x, b.id.canonical.y);
@@ -512,7 +512,10 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
         auto* bucket = static_cast<SymbolBucket*>(renderTile.getBucket(*baseImpl));
         if (bucket && bucket->bucketLeaderID == getID()) {
             // Only place this layer if it's the "group leader" for the bucket
-            placementData.push_back({*bucket, renderTile});
+            const Tile* tile = params.source->getRenderedTile(renderTile.id);
+            assert(tile);
+            assert(tile->kind == Tile::Kind::Geometry);
+            placementData.push_back({*bucket, renderTile, static_cast<const GeometryTile*>(tile)->getFeatureIndex()});
         }
     }
 }

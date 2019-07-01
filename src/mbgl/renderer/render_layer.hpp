@@ -31,6 +31,7 @@ class LayerPlacementData {
 public:
     std::reference_wrapper<Bucket> bucket;
     std::reference_wrapper<RenderTile> tile;
+    std::shared_ptr<FeatureIndex> featureIndex;
 };
 
 class LayerPrepareParameters {

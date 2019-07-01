@@ -89,15 +89,6 @@ const gfx::Texture& RenderTile::getIconAtlasTexture() const {
     return *(static_cast<const GeometryTile&>(tile).iconAtlasTexture);
 }
 
-std::shared_ptr<FeatureIndex> RenderTile::getFeatureIndex() const {
-    assert(tile.kind == Tile::Kind::Geometry);
-    return static_cast<const GeometryTile&>(tile).getFeatureIndex();
-}
-
-void RenderTile::setMask(TileMask&& mask) {
-    tile.setMask(std::move(mask));
-}
-
 void RenderTile::upload(gfx::UploadPass& uploadPass) {
     tile.upload(uploadPass);
 

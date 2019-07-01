@@ -49,8 +49,12 @@ bool RenderTileSource::hasFadingTiles() const {
     return tilePyramid.hasFadingTiles();
 }
 
-std::vector<std::reference_wrapper<RenderTile>> RenderTileSource::getRenderedTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderTileSource::getRenderTiles() {
     return { renderTiles.begin(), renderTiles.end() };
+}
+
+const Tile* RenderTileSource::getRenderedTile(const UnwrappedTileID& tileID) const {
+    return tilePyramid.getRenderedTile(tileID);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
