@@ -123,24 +123,15 @@ void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
     }
 }
 
-void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
+void GeometryTile::onLayout(std::shared_ptr<LayoutResult> result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    
-    layerIdToLayerRenderData = std::move(result.renderData);
-    
-    latestFeatureIndex = std::move(result.featureIndex);
 
-    if (result.glyphAtlasImage) {
-        glyphAtlasImage = std::move(*result.glyphAtlasImage);
-    }
-    if (result.iconAtlas.image.valid()) {
-        iconAtlas = std::move(result.iconAtlas);
-    }
-
+    layoutResult = std::move(result);
+    
     observer->onTileChanged(*this);
 }
 
@@ -169,36 +160,45 @@ void GeometryTile::getImages(ImageRequestPair pair) {
 }
 
 const optional<ImagePosition> GeometryTile::getPattern(const std::string& pattern) const {
-    auto it = iconAtlas.patternPositions.find(pattern);
-    if (it !=  iconAtlas.patternPositions.end()) {
-        return it->second;
+    if (layoutResult) {
+        const auto& iconAtlas = layoutResult->iconAtlas;
+        auto it = iconAtlas.patternPositions.find(pattern);
+        if (it != iconAtlas.patternPositions.end()) {
+            return it->second;
+        }
     }
     return nullopt;
 }
 
+const std::shared_ptr<FeatureIndex> GeometryTile::getFeatureIndex() const {
+    return layoutResult ? layoutResult->featureIndex : nullptr;
+}
+
 void GeometryTile::upload(gfx::UploadPass& uploadPass) {
+    if (!layoutResult) return;
+
     auto uploadFn = [&] (Bucket& bucket) {
         if (bucket.needsUpload()) {
             bucket.upload(uploadPass);
         }
     };
 
-    for (auto& entry : layerIdToLayerRenderData) {
+    for (auto& entry : layoutResult->layerRenderData) {
         uploadFn(*entry.second.bucket);
     }
 
-    if (glyphAtlasImage) {
-        glyphAtlasTexture = uploadPass.createTexture(*glyphAtlasImage);
-        glyphAtlasImage = {};
+    if (layoutResult->glyphAtlasImage) {
+        glyphAtlasTexture = uploadPass.createTexture(*layoutResult->glyphAtlasImage);
+        layoutResult->glyphAtlasImage = {};
     }
 
-    if (iconAtlas.image.valid()) {
-        iconAtlasTexture = uploadPass.createTexture(iconAtlas.image);
-        iconAtlas.image = {};
+    if (layoutResult->iconAtlas.image.valid()) {
+        iconAtlasTexture = uploadPass.createTexture(layoutResult->iconAtlas.image);
+        layoutResult->iconAtlas.image = {};
     }
 
     if (iconAtlasTexture) {
-        iconAtlas.patchUpdatedImages(uploadPass, *iconAtlasTexture, imageManager);
+        layoutResult->iconAtlas.patchUpdatedImages(uploadPass, *iconAtlasTexture, imageManager);
     }
 }
 
@@ -226,7 +226,16 @@ bool GeometryTile::layerPropertiesUpdated(const Immutable<style::LayerProperties
     return true;
 }
 
+const GeometryTileData* GeometryTile::getData() const {
+    if (!layoutResult || !layoutResult->featureIndex) {
+       return nullptr; 
+    }
+    return layoutResult->featureIndex->getData();
+}
+
 LayerRenderData* GeometryTile::getMutableLayerRenderData(const style::Layer::Impl& layerImpl) {
+    if (!layoutResult) return nullptr;
+    auto& layerIdToLayerRenderData = layoutResult->layerRenderData;
     auto it = layerIdToLayerRenderData.find(layerImpl.id);
     if (it == layerIdToLayerRenderData.end()) {
         return nullptr;
@@ -266,7 +275,7 @@ void GeometryTile::queryRenderedFeatures(
     transformState.matrixFor(posMatrix, id.toUnwrapped());
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-    latestFeatureIndex->query(result,
+    layoutResult->featureIndex->query(result,
                               queryGeometry,
                               transformState,
                               posMatrix,
