@@ -58,9 +58,7 @@ public:
     optional<ImagePosition> getPattern(const std::string& pattern) const;
     const gfx::Texture& getGlyphAtlasTexture() const;
     const gfx::Texture& getIconAtlasTexture() const;
-    std::shared_ptr<FeatureIndex> getFeatureIndex() const;
 
-    void setMask(TileMask&&);
     void upload(gfx::UploadPass&);
     void prepare(const SourcePrepareParameters&);
     void finishRender(PaintParameters&);
