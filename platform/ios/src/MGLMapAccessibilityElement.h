@@ -4,6 +4,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+FOUNDATION_EXTERN void MGLAccessibilityPostNotification(UIAccessibilityNotifications notification, __nullable id argument);
+
+
 @protocol MGLFeature;
 
 /// Unique identifier representing a single annotation in mbgl.

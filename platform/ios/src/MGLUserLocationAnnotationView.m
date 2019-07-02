@@ -5,8 +5,10 @@
 #import "MGLAnnotationView_Private.h"
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
+#import "MGLMapAccessibilityElement.h"
 #import "MGLCoordinateFormatter.h"
 #import "NSBundle+MGLAdditions.h"
+
 
 @interface MGLUserLocationAnnotationView()
 @property (nonatomic, weak, nullable) MGLMapView *mapView;
@@ -93,7 +95,7 @@
     [super setHidden:hidden];
     if (oldValue != hidden)
     {
-        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+        MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
     }
 }
 

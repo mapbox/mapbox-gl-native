@@ -1,6 +1,9 @@
 #import "MGLMapView_Private.h"
 #import "MGLMapView+Impl.h"
 
+#import <os/log.h>
+#import <os/signpost.h>
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/annotation/annotation.hpp>
@@ -69,6 +72,7 @@
 #import "MGLLocationManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
 #import "MMEConstants.h"
+#import "MGLSignpost.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -260,9 +264,26 @@ public:
 @property (nonatomic) MGLMapDebugMaskOptions residualDebugMask;
 @property (nonatomic, copy) NSURL *residualStyleURL;
 
+
+@property (atomic) BOOL generatingAccessibilityElements;
+@property (nonatomic) dispatch_queue_t accessibilityElementQueue;
+@property (nonatomic) UIBezierPath *cachedAccessibilityPath;
+@property (nonatomic, copy) NSString *cachedAccessibilityValue;
+@property (nonatomic) NSArray *cachedAccessibilityElements;
+
 - (mbgl::Map &)mbglMap;
 
 @end
+
+
+void MGLAccessibilityPostNotification(UIAccessibilityNotifications notification, __nullable id argument) {
+    [NSNotificationCenter.defaultCenter postNotificationName:@"MGLAccessibilityNotification"
+                                                      object:nil
+                                                    userInfo:@{ @"notification" : @(notification),
+                                                                @"argument" : argument ?: NSNull.null
+                                                                }];
+}
+
 
 @implementation MGLMapView
 {
@@ -429,6 +450,9 @@ public:
 - (void)commonInit
 {
     _opaque = NO;
+    
+    dispatch_queue_attr_t queueAttributes = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_BACKGROUND, 0);
+    _accessibilityElementQueue = dispatch_queue_create("com.mapbox.accessibility", queueAttributes);
 
     // setup accessibility
     //
@@ -481,6 +505,15 @@ public:
         self.dormant = YES;
     }
 
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(accessibilityNotification:)
+                                                 name:@"MGLAccessibilityNotification"
+                                               object:nil];
+
+    
+    
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reachabilityChanged:)
@@ -1823,8 +1856,8 @@ public:
             }
         }
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nextElement);
-
+        MGLAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nextElement);
+        
         return;
     }
 
@@ -2163,8 +2196,8 @@ public:
 
 - (void)calloutViewDidAppear:(UIView<MGLCalloutView> *)calloutView
 {
-    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
-    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, calloutView);
+    MGLAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
+    MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, calloutView);
     
     [self updatePresentsWithTransaction];
     
@@ -2580,62 +2613,63 @@ public:
 
 - (NSString *)accessibilityValue
 {
-    NSMutableArray *facts = [NSMutableArray array];
-    
-    double zoomLevel = round(self.zoomLevel + 1);
-    [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ZOOM", nil, nil, @"Zoom %dx.", @"Map accessibility value; {zoom level}"), (int)zoomLevel]];
-    
-    NSInteger annotationCount = self.accessibilityAnnotationCount;
-    if (annotationCount) {
-        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ANNOTATIONS", nil, nil, @"%ld annotation(s) visible.", @"Map accessibility value; {number of visible annotations}"), (long)self.accessibilityAnnotationCount]];
-    }
-    
-    NSArray *placeFeatures = self.visiblePlaceFeatures;
-    if (placeFeatures.count) {
-        NSMutableArray *placesArray = [NSMutableArray arrayWithCapacity:placeFeatures.count];
-        NSMutableSet *placesSet = [NSMutableSet setWithCapacity:placeFeatures.count];
-        for (id <MGLFeature> placeFeature in placeFeatures.reverseObjectEnumerator) {
-            NSString *name = [placeFeature attributeForKey:@"name"];
-            if (![placesSet containsObject:name]) {
-                [placesArray addObject:name];
-                [placesSet addObject:name];
-            }
-            if (placesArray.count >= 3) {
-                break;
-            }
-        }
-        NSString *placesString = [placesArray componentsJoinedByString:NSLocalizedStringWithDefaultValue(@"LIST_SEPARATOR", nil, nil, @", ", @"List separator")];
-        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_PLACES", nil, nil, @"Places visible: %@.", @"Map accessibility value; {list of visible places}"), placesString]];
-    }
-    
-    NSArray *roadFeatures = self.visibleRoadFeatures;
-    if (roadFeatures.count) {
-        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ROADS", nil, nil, @"%ld road(s) visible.", @"Map accessibility value; {number of visible roads}"), roadFeatures.count]];
-    }
-    
-    NSString *value = [facts componentsJoinedByString:@" "];
-    return value;
+    return self.cachedAccessibilityValue;
+//    NSMutableArray *facts = [NSMutableArray array];
+//
+//    double zoomLevel = round(self.zoomLevel + 1);
+//    [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ZOOM", nil, nil, @"Zoom %dx.", @"Map accessibility value; {zoom level}"), (int)zoomLevel]];
+//
+//    NSInteger annotationCount = self.accessibilityAnnotationCount;
+//    if (annotationCount) {
+//        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ANNOTATIONS", nil, nil, @"%ld annotation(s) visible.", @"Map accessibility value; {number of visible annotations}"), (long)self.accessibilityAnnotationCount]];
+//    }
+//
+//    NSArray *placeFeatures = self.visiblePlaceFeatures;
+//    if (placeFeatures.count) {
+//        NSMutableArray *placesArray = [NSMutableArray arrayWithCapacity:placeFeatures.count];
+//        NSMutableSet *placesSet = [NSMutableSet setWithCapacity:placeFeatures.count];
+//        for (id <MGLFeature> placeFeature in placeFeatures.reverseObjectEnumerator) {
+//            NSString *name = [placeFeature attributeForKey:@"name"];
+//            if (![placesSet containsObject:name]) {
+//                [placesArray addObject:name];
+//                [placesSet addObject:name];
+//            }
+//            if (placesArray.count >= 3) {
+//                break;
+//            }
+//        }
+//        NSString *placesString = [placesArray componentsJoinedByString:NSLocalizedStringWithDefaultValue(@"LIST_SEPARATOR", nil, nil, @", ", @"List separator")];
+//        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_PLACES", nil, nil, @"Places visible: %@.", @"Map accessibility value; {list of visible places}"), placesString]];
+//    }
+//
+//    NSArray *roadFeatures = self.visibleRoadFeatures;
+//    if (roadFeatures.count) {
+//        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ROADS", nil, nil, @"%ld road(s) visible.", @"Map accessibility value; {number of visible roads}"), roadFeatures.count]];
+//    }
+//
+//    NSString *value = [facts componentsJoinedByString:@" "];
+//    return value;
 }
 
-- (NSArray<id <MGLFeature>> *)visiblePlaceFeatures
-{
-    if (!_visiblePlaceFeatures)
-    {
-        NSArray *placeStyleLayerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
-        _visiblePlaceFeatures = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
-    }
-    return _visiblePlaceFeatures;
-}
-
-- (NSArray<id <MGLFeature>> *)visibleRoadFeatures
-{
-    if (!_visibleRoadFeatures)
-    {
-        NSArray *roadStyleLayerIdentifiers = [self.style.roadStyleLayers valueForKey:@"identifier"];
-        _visibleRoadFeatures = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
-    }
-    return _visibleRoadFeatures;
-}
+//- (NSArray<id <MGLFeature>> *)visiblePlaceFeatures
+//{
+//    if (!_visiblePlaceFeatures)
+//    {
+//        NSArray *placeStyleLayerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
+//        _visiblePlaceFeatures = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
+//    }
+//    return _visiblePlaceFeatures;
+//}
+//
+//- (NSArray<id <MGLFeature>> *)visibleRoadFeatures
+//{
+//    if (!_visibleRoadFeatures)
+//    {
+//        NSArray *roadStyleLayerIdentifiers = [self.style.roadStyleLayers valueForKey:@"identifier"];
+//        _visibleRoadFeatures = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
+//    }
+//    return _visibleRoadFeatures;
+//}
 
 - (CGRect)accessibilityFrame
 {
@@ -2652,35 +2686,360 @@ public:
 
 - (UIBezierPath *)accessibilityPath
 {
-    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.accessibilityFrame];
+    return self.cachedAccessibilityPath;
+}
 
-    // Exclude any visible annotation callout view.
-    if (self.calloutViewForSelectedAnnotation)
+- (void)accessibilityNotification:(NSNotification*)notification {
+    
+    NSNumber *notificationNumber = MGL_OBJC_DYNAMIC_CAST(notification.userInfo[@"notification"], NSNumber);
+    
+    if (!notificationNumber)
     {
-        UIBezierPath *calloutViewPath = [UIBezierPath bezierPathWithRect:self.calloutViewForSelectedAnnotation.frame];
-        [path appendPath:calloutViewPath];
+        return;
+    }
+    
+    UIAccessibilityNotifications note = (UIAccessibilityNotifications)notificationNumber.unsignedIntegerValue;
+    
+    id argument = notification.userInfo[@"argument"];
+    
+    if ([argument isKindOfClass:[NSNull class]])
+    {
+        argument = nil;
+    }
+    
+    if ((note == UIAccessibilityLayoutChangedNotification) &&
+        !self.generatingAccessibilityElements) {
+        
+        [self generateAccessibilityElements:argument];
+        
     }
 
-    return path;
+//    dispatch_async(self.accessibilityElementQueue, ^{
+//        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAccessibilityPostNotification(note, argument);
+//        });
+//    });
 }
+
+- (void)generateAccessibilityElements:(id)argument
+{
+    if (self.generatingAccessibilityElements)
+    {
+        MGLLogDebug(@"Already generating");
+        return;
+    }
+    
+    self.generatingAccessibilityElements = YES;
+    
+    os_signpost_id_t signpost = MGL_SIGNPOST_BEGIN("generate");
+    
+    __weak MGLMapView *weakSelf = self;
+    __weak UIView *weakCalloutViewForSelectedAnnotation = self.calloutViewForSelectedAnnotation;
+    __weak UIView *weakUserLocationAnnotationView       = self.userLocationAnnotationView;
+    __weak UIView *weakCompassView                      = self.compassView;
+    
+    BOOL calloutViewHasSuperView = (self.calloutViewForSelectedAnnotation.superview != nil);
+    
+    
+    CGFloat compassViewAlpha = self.compassView ? self.compassView.alpha : 0.0;
+    BOOL userLocationViewHidden = !self.userLocationAnnotationView || self.userLocationAnnotationView.isHidden;
+    BOOL attributionButtonHidden = !self.attributionButton || self.attributionButton.isHidden;
+    
+    
+    
+    __weak UIView *weakAttributionButton                = self.attributionButton;
+    CGRect bounds                                       = self.bounds;
+    
+    
+    
+    //    auto v_ptr = std::make_shared(v);
+    //    std::shared_ptr<std::vector<MGLAnnotationTag>> visibleAnnotations = std::move
+    MGL_SIGNPOST_BEGIN2(signpost, "visibleAnnotations");
+    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:bounds];
+    MGL_SIGNPOST_END(signpost, "visibleAnnotations");
+
+    // TODO: Can these two features be
+    
+    MGL_SIGNPOST_BEGIN2(signpost, "visiblePlace");
+    NSArray *placeStyleLayerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
+    NSArray *visiblePlaceFeatures = [self visibleFeaturesInRect:bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
+    MGL_SIGNPOST_END(signpost, "visiblePlace");
+
+    MGL_SIGNPOST_BEGIN2(signpost, "visibleRoad");
+
+    NSArray *roadStyleLayerIdentifiers = [self.style.roadStyleLayers valueForKey:@"identifier"];
+    NSArray *visibleRoadFeatures = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
+    MGL_SIGNPOST_END(signpost, "visibleRoad");
+
+    
+    CGRect accessibilityFrame = self.accessibilityFrame;
+    CGRect calloutViewForSelectedAnnotationFrame = weakCalloutViewForSelectedAnnotation.frame;
+    
+    
+    
+    CGPoint centerPoint = self.contentCenter;
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
+    
+    double zoomLevel = round(self.zoomLevel + 1);
+    
+    
+    
+    //    dispatch_async(self.accessibilityElementQueue, ^{
+    
+    MGLMapView *strongSelf = weakSelf;
+    
+    //        if (!strongSelf)
+    //        {
+    //            return;
+    //        }
+    
+    // Calculate accessibility path
+    UIBezierPath *accessibilityPath = [UIBezierPath bezierPathWithRect:accessibilityFrame];
+    
+    NSInteger numberOfAnnotations   = visibleAnnotations.size();
+    NSInteger numberOfPlaces        = visiblePlaceFeatures.count;
+    NSInteger numberOfRoads         = visibleRoadFeatures.count;
+    
+    MGL_SIGNPOST_BEGIN2(signpost, "annotations");
+
+    // Visible annotations
+    std::sort(visibleAnnotations.begin(), visibleAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+        CLLocationCoordinate2D coordinateA = [[strongSelf annotationWithTag:tagA] coordinate];
+        CLLocationCoordinate2D coordinateB = [[strongSelf annotationWithTag:tagB] coordinate];
+        CGPoint pointA = [strongSelf convertCoordinate:coordinateA toPointToView:strongSelf];
+        CGPoint pointB = [strongSelf convertCoordinate:coordinateB toPointToView:strongSelf];
+        CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+        CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+        return deltaA < deltaB;
+    });
+    
+    MGL_SIGNPOST_END(signpost, "annotations");
+    MGL_SIGNPOST_BEGIN2(signpost, "places");
+
+    // Places
+    NSArray *sortedPlaceFeatures = [visiblePlaceFeatures sortedArrayUsingComparator:^NSComparisonResult(id <MGLFeature> _Nonnull featureA, id <MGLFeature> _Nonnull featureB) {
+        CGPoint pointA = [strongSelf convertCoordinate:featureA.coordinate toPointToView:strongSelf];
+        CGPoint pointB = [strongSelf convertCoordinate:featureB.coordinate toPointToView:strongSelf];
+        CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+        CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+        return [@(deltaA) compare:@(deltaB)];
+    }];
+    
+    MGL_SIGNPOST_END(signpost, "places");
+    MGL_SIGNPOST_BEGIN2(signpost, "roads");
+
+    // Roads
+    NSArray *sortedRoadFeatures = [visibleRoadFeatures sortedArrayUsingComparator:^NSComparisonResult(id <MGLFeature> _Nonnull featureA, id <MGLFeature> _Nonnull featureB) {
+        CGPoint pointA = [strongSelf convertCoordinate:featureA.coordinate toPointToView:strongSelf];
+        CGPoint pointB = [strongSelf convertCoordinate:featureB.coordinate toPointToView:strongSelf];
+        CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+        CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+        return [@(deltaA) compare:@(deltaB)];
+    }];
+    
+    MGL_SIGNPOST_END(signpost, "roads");
+//    os_signpost_event_emit(_log, OS_SIGNPOST_INTERVAL_BEGIN, "roads");
+
+    // Elements
+    
+    NSArray *elements;
+    
+    MGLMapViewProxyAccessibilityElement *proxyElement;
+    
+    UIView *calloutViewForSelectedAnnotation = weakCalloutViewForSelectedAnnotation;
+    
+    
+    if (calloutViewHasSuperView) // might not be true at this point in time
+    {
+        // calloutViewForSelectedAnnotation
+        // mapViewProxyAccessibilityElement
+        
+        // Update the accessibility path
+        UIBezierPath *calloutViewPath = [UIBezierPath bezierPathWithRect:calloutViewForSelectedAnnotationFrame];
+        [accessibilityPath appendPath:calloutViewPath];
+        
+        proxyElement = [[MGLMapViewProxyAccessibilityElement alloc] initWithAccessibilityContainer :strongSelf];
+        proxyElement.accessibilityFrame = accessibilityFrame;
+        proxyElement.accessibilityPath = accessibilityPath;
+        
+        elements     = @[calloutViewForSelectedAnnotation, proxyElement];
+        
+    }
+    else
+    {
+        /* Look at everything...
+         * - compass
+         * - user location annotation view
+         * - annotations
+         * - place features
+         * - road features
+         * -
+         * - attribution button
+         */
+        
+        UIView *userLocationAnnotationView = weakUserLocationAnnotationView;
+        UIView *compassView = weakCompassView;
+        UIView *attributionButton = weakAttributionButton;
+        
+        NSInteger numberOfCompassViews  = compassView ? (compassViewAlpha > 0.0 ? 1 : 0) : 0;
+        
+        
+        
+        
+        NSInteger numberOfUserLocations = userLocationViewHidden ? 0 : 1;
+        NSInteger numberOfAttribution   = attributionButtonHidden ? 0 : 1;
+        
+        NSInteger numberOfElements = numberOfCompassViews + numberOfUserLocations + numberOfAnnotations + numberOfPlaces + numberOfRoads + numberOfAttribution;
+        
+        NSMutableArray *mutableElements = [NSMutableArray arrayWithCapacity:numberOfElements];
+        
+        MGL_SIGNPOST_BEGIN2(signpost,  "elements");
+
+        // 0
+        if (numberOfCompassViews == 1)
+        {
+            [mutableElements addObject:compassView];
+        }
+        
+        // User location
+        if (numberOfUserLocations == 1)
+        {
+            [mutableElements addObject:userLocationAnnotationView];
+        }
+        
+        // Annotaitons
+        MGL_SIGNPOST_BEGIN2(signpost,  "annotationElements");
+
+        for (auto it = visibleAnnotations.begin(); it != visibleAnnotations.end(); ++it)
+        {
+            id element = [strongSelf accessibilityElementForAnnotationWithTag:*it];
+            [mutableElements addObject:element];
+        }
+        MGL_SIGNPOST_END(signpost, "annotationElements");
+
+        
+        // Places
+        MGL_SIGNPOST_BEGIN2(signpost,  "placeElements");
+
+        for (id<MGLFeature> feature in sortedPlaceFeatures)
+        {
+            id element = [strongSelf accessibilityElementForPlaceFeature:feature];
+            [mutableElements addObject:element];
+        }
+        MGL_SIGNPOST_END(signpost, "placeElements");
+
+        // Roads
+        MGL_SIGNPOST_BEGIN2(signpost,  "roadElements");
+
+        for (id<MGLFeature> feature in sortedRoadFeatures)
+        {
+            id element = [strongSelf accessibilityElementForRoadFeature:feature];
+            [mutableElements addObject:element];
+        }
+        MGL_SIGNPOST_END(signpost, "roadElements");
+
+        // Attribution button
+        
+        if (numberOfAttribution == 1)
+        {
+            [mutableElements addObject:attributionButton];
+        }
+        
+        MGL_SIGNPOST_END(signpost, "elements");
+
+        
+        elements = mutableElements;
+    }
+    
+    // Create cached accessibilityValue
+    {
+        MGL_SIGNPOST_BEGIN2(signpost,  "cached");
+            
+        NSMutableArray *facts = [NSMutableArray array];
+        
+        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ZOOM", nil, nil, @"Zoom %dx.", @"Map accessibility value; {zoom level}"), (int)zoomLevel]];
+        
+        if (numberOfAnnotations > 0) {
+            [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ANNOTATIONS", nil, nil, @"%ld annotation(s) visible.", @"Map accessibility value; {number of visible annotations}"), (long)numberOfAnnotations]];
+        }
+        
+        if (numberOfPlaces > 0) {
+            NSMutableArray *placesArray = [NSMutableArray arrayWithCapacity:4];
+            NSMutableSet *placesSet = [NSMutableSet setWithCapacity:numberOfPlaces];
+            
+            for (id <MGLFeature> placeFeature in sortedPlaceFeatures.reverseObjectEnumerator) {
+                NSString *name = [placeFeature attributeForKey:@"name"];
+                if (![placesSet containsObject:name]) {
+                    [placesArray addObject:name];
+                    [placesSet addObject:name];
+                }
+                if (placesArray.count >= 3) {
+                    break;
+                }
+            }
+            NSString *placesString = [placesArray componentsJoinedByString:NSLocalizedStringWithDefaultValue(@"LIST_SEPARATOR", nil, nil, @", ", @"List separator")];
+            [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_PLACES", nil, nil, @"Places visible: %@.", @"Map accessibility value; {list of visible places}"), placesString]];
+        }
+        
+        if (numberOfRoads > 0) {
+            [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ROADS", nil, nil, @"%ld road(s) visible.", @"Map accessibility value; {number of visible roads}"), numberOfRoads]];
+        }
+        
+        self.cachedAccessibilityValue = [facts componentsJoinedByString:@" "];
+        
+        MGL_SIGNPOST_END(signpost, "cached");
+    }
+    
+    
+    
+    self.cachedAccessibilityElements = elements;
+    
+    strongSelf.generatingAccessibilityElements = NO;
+
+    MGL_SIGNPOST_END(signpost, "generate");
+    
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, argument);
+
+}
+
 
 - (NSInteger)accessibilityElementCount
 {
-    if (self.calloutViewForSelectedAnnotation)
-    {
-        return 2 /* calloutViewForSelectedAnnotation, mapViewProxyAccessibilityElement */;
-    }
-    return !!self.userLocationAnnotationView + self.accessibilityAnnotationCount + self.visiblePlaceFeatures.count + self.visibleRoadFeatures.count + 2 /* compass, attributionButton */;
+    return self.cachedAccessibilityElements.count;
+    
+//    if (self.calloutViewForSelectedAnnotation)
+//    {
+//        return 2 /* calloutViewForSelectedAnnotation, mapViewProxyAccessibilityElement */;
+//    }
+//    return !!self.userLocationAnnotationView + self.accessibilityAnnotationCount + self.visiblePlaceFeatures.count + self.visibleRoadFeatures.count + 2 /* compass, attributionButton */;
 }
 
-- (NSInteger)accessibilityAnnotationCount
-{
-    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
-    return visibleAnnotations.size();
-}
+//- (NSInteger)accessibilityAnnotationCount
+//{
+//    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
+//    return visibleAnnotations.size();
+//}
 
 - (id)accessibilityElementAtIndex:(NSInteger)index
 {
+    if (index < self.accessibilityElementCount)
+    {
+        return self.cachedAccessibilityElements[index];
+    }
+    
+    MGLAssert(NO, @"Index %ld not in recognized accessibility element ranges. ", (long)index);
+//              @"User location annotation range: %@; visible annotation range: %@; "
+//              @"visible place feature range: %@; visible road feature range: %@.",
+//              (long)index, NSStringFromRange(userLocationAnnotationRange),
+//              NSStringFromRange(visibleAnnotationRange), NSStringFromRange(visiblePlaceFeatureRange),
+//              NSStringFromRange(visibleRoadFeatureRange));
+    return nil;
+
+    
+    /*
     if (self.calloutViewForSelectedAnnotation)
     {
         if (index == 0)
@@ -2786,6 +3145,7 @@ public:
              NSStringFromRange(visibleAnnotationRange), NSStringFromRange(visiblePlaceFeatureRange),
              NSStringFromRange(visibleRoadFeatureRange));
     return nil;
+     */
 }
 
 /**
@@ -2793,6 +3153,7 @@ public:
  
  @param annotationTag Tag of the annotation represented by the accessibility element to return.
  */
+
 - (id)accessibilityElementForAnnotationWithTag:(MGLAnnotationTag)annotationTag
 {
     MGLAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %llu.", annotationTag);
@@ -2801,7 +3162,7 @@ public:
     
     // Let the annotation view serve as its own accessibility element.
     MGLAnnotationView *annotationView = annotationContext.annotationView;
-    if (annotationView && annotationView.superview)
+    if (annotationView)//asdf && annotationView.superview)
     {
         return annotationView;
     }
@@ -2941,6 +3302,11 @@ public:
 
 - (NSInteger)indexOfAccessibilityElement:(id)element
 {
+    return [self.cachedAccessibilityElements indexOfObject:element];
+    
+/*
+    
+    
     if (self.calloutViewForSelectedAnnotation)
     {
         return [@[self.calloutViewForSelectedAnnotation, self.mapViewProxyAccessibilityElement]
@@ -3066,6 +3432,7 @@ public:
     }
     
     return NSNotFound;
+ */
 }
 
 - (MGLMapViewProxyAccessibilityElement *)mapViewProxyAccessibilityElement
@@ -4101,7 +4468,7 @@ public:
         [self.delegate mapView:self didAddAnnotationViews:newAnnotationViews];
     }
 
-    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+    MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 - (void)updateAnnotationContainerViewWithAnnotationViews:(NSArray<MGLAnnotationView *> *)annotationViews
@@ -4324,7 +4691,8 @@ public:
     [self updatePresentsWithTransaction];
 
     [self didChangeValueForKey:@"annotations"];
-    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+    MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+
     if (_isChangingAnnotationLayers)
     {
         [self.style willChangeValueForKey:@"layers"];
@@ -5503,7 +5871,7 @@ public:
         self.userLocationAnnotationView.accessibilityElementIsFocused &&
         [UIApplication sharedApplication].applicationState == UIApplicationStateActive)
     {
-        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.userLocationAnnotationView);
+        MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.userLocationAnnotationView);
     }
 }
 
@@ -6037,7 +6405,7 @@ public:
                 _accessibilityValueAnnouncementIsPending = NO;
                 [self performSelector:@selector(announceAccessibilityValue) withObject:nil afterDelay:0.1];
             } else {
-                UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+                MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
             }
         }
 
@@ -6056,8 +6424,8 @@ public:
 
 - (void)announceAccessibilityValue
 {
-    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self.accessibilityValue);
-    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+    MGLAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self.accessibilityValue);
+    MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 - (void)mapViewWillStartLoadingMap {
@@ -6148,7 +6516,7 @@ public:
         return;
     }
     
-    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+    MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingMap:fullyRendered:)])
     {
