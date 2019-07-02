@@ -59,4 +59,5 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapView(_ mapView: MGLMapView, calloutViewControllerFor annotation: MGLAnnotation) -> NSViewController? { return nil }
 
+    func mapView(_ mapView: MGLMapView, shouldRemoveStyleImage imageName: String) -> Bool { return false }
 }

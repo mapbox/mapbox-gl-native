@@ -94,3 +94,8 @@ void MGLMapViewImpl::onSourceChanged(mbgl::style::Source& source) {
     MGLSource * nativeSource = [mapView.style sourceWithIdentifier:identifier];
     [mapView sourceDidChange:nativeSource];
 }
+
+bool MGLMapViewImpl::onCanRemoveUnusedStyleImage(const std::string &imageIdentifier) {
+    NSString *imageName = [NSString stringWithUTF8String:imageIdentifier.c_str()];
+    return [mapView shouldRemoveStyleImage:imageName];
+}

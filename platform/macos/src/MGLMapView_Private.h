@@ -45,6 +45,7 @@ namespace mbgl {
 - (void)mapViewDidBecomeIdle;
 - (void)mapViewDidFinishLoadingStyle;
 - (void)sourceDidChange:(nonnull MGLSource *)source;
+- (BOOL)shouldRemoveStyleImage:(nonnull NSString *)imageName;
 
 /// Asynchronously render a frame of the map.
 - (void)setNeedsRerender;

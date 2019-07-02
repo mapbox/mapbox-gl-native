@@ -98,4 +98,6 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
     func mapViewUserLocationAnchorPoint(_ mapView: MGLMapView) -> CGPoint { return CGPoint(x: 100, y: 100) }
     
     func mapView(_ mapView: MGLMapView, didFailToLoadImage imageName: String) -> UIImage? { return nil }
+    
+    func mapView(_ mapView: MGLMapView, shouldRemoveStyleImage imageName: String) -> Bool { return false }
 }

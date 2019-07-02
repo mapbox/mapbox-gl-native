@@ -18,6 +18,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Removed previously deprecated methods and properties that had been marked `unavailable`. ([#15000](https://github.com/mapbox/mapbox-gl-native/pull/15000))
 
+### Styles and rendering
+
+* Added the `-[MGLMapViewDelegate mapView:shouldRemoveStyleImage:]` method for optimizing style image caching. ([#14769](https://github.com/mapbox/mapbox-gl-native/pull/14769))
+
 ### Other changes
 
 * Added variants of several animated `MGLMapView` methods that accept completion handlers ([#14381](https://github.com/mapbox/mapbox-gl-native/pull/14381)):
