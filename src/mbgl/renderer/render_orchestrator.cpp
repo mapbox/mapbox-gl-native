@@ -343,7 +343,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     // Update all matrices and generate data that we should upload to the GPU.
     for (const auto& entry : renderSources) {
         if (entry.second->isEnabled()) {
-            entry.second->prepare({renderTreeParameters->transformParams, updateParameters.debugOptions});
+            entry.second->prepare({renderTreeParameters->transformParams, updateParameters.debugOptions, *imageManager});
             sourceRenderItems.emplace_back(*entry.second);
         }
     }
