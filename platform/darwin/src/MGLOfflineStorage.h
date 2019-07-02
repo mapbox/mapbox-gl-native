@@ -171,9 +171,8 @@ typedef NS_ENUM(NSUInteger, MGLResourceKind) {
 
 /**
  MGLOfflineStorage implements a singleton (shared object) that manages offline
- packs. All of this class’s instance methods are asynchronous, reflecting the
- fact that offline resources are stored in a database. The shared object
- maintains a canonical collection of offline packs in its `packs` property.
+ packs and ambient caching. All of this class’s instance methods are asynchronous,
+ reflecting the fact that offline resources are stored in a database. The shared object maintains a canonical collection of offline packs in its `packs` property.
  
  #### Related examples
  See the <a href="https://docs.mapbox.com/ios/maps/examples/offline-pack/">
@@ -303,7 +302,7 @@ MGL_EXPORT
  */
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(nullable MGLOfflinePackRemovalCompletionHandler)completion;
 
-- (void)invalidateOfflineRegionForPack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion;
+- (void)invalidatePack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion;
 /**
  Forcibly, asynchronously reloads the `packs` property. At some point after this
  method is called, the pointer values of the `MGLOfflinePack` objects in the
@@ -348,9 +347,9 @@ MGL_EXPORT
 
 // JK FINISH DOC
 /*
- Sets the maximum ambient cache size in megabytes. The default maximum cache size is _ MB. To disable ambient caching, set the maximum ambient cache size to 0. Setting the maximum ambient cache size does not impact the maximum size for offline packs.
+ Sets the maximum ambient cache size in megabytes. The default maximum cache size is 50 MB. To disable ambient caching, set the maximum ambient cache size to 0. Setting the maximum ambient cache size does not impact the maximum size for offline packs.
  
- This method should be called before using the database.
+ This method should be called before creating the database.
  */
 
 - (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError *_Nullable error))completion;

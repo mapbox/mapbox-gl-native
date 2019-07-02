@@ -1785,14 +1785,14 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     return filePath;
 }
 
-// Getting a bad access exception
 - (void)invalidateAmbientCache {
     unsigned long long fileSize = [self getCacheSize];
     NSLog(@"STARTING WITH CACHE SIZE: %llu", fileSize);
     [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
         unsigned long long newFileSize = [self getCacheSize];
-        NSLog(@"\nAmbient cache has been reloaded!CACHE SIZE: %llu", newFileSize);
+        NSLog(@"Ambient cache has been reloaded!\nCACHE SIZE: %llu", newFileSize);
     }];
+    [[MGLOfflineStorage sharedOfflineStorage] setMaximumAllowedMapboxTiles:40];
 }
 
 - (void)resetDatabase {
@@ -1831,11 +1831,9 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                                                                          error:nil];
     
     NSBundle *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    
-    // Can I do this in
-    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
-    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox/cache.db"];
-//    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@""];
+
+    NSString *urlString = [NSString stringWithFormat:@"%@/.mapbox/cache.db", bundleIdentifier];
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:urlString];
     NSString *path = cacheDirectoryURL.path;
     return [[manager attributesOfItemAtPath:path error:nil] fileSize];
 }

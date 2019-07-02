@@ -69,6 +69,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     return sharedOfflineStorage;
 }
 
+//- (NSInteger)maximumAmbientCacheSize {
+//    return _
+//}
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 - (void)pauseFileSource:(__unused NSNotification *)notification {
     if (self.isPaused) {
@@ -446,7 +449,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 }
 
-- (void)invalidateOfflineRegionForPack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion {
+- (void)invalidatePack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion {
     
     if (!completion) { return; }
     mbgl::OfflineRegion& region = *pack.mbglOfflineRegion;
