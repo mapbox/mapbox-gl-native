@@ -389,8 +389,14 @@ public:
     }
 
     NSString *styleURLString = @(self.mbglMap.getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
-    MGLAssert(styleURLString, @"Invalid style URL string %@", styleURLString);
-    return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
+
+    if (!styleURLString)
+    {
+        MGLLogInfo(@"Warning: Invalid style URL string %@", styleURLString);
+    }
+    
+    return styleURLString ? [NSURL URLWithString:styleURLString] :
+        [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
 }
 
 - (void)setStyleURL:(nullable NSURL *)styleURL
