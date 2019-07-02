@@ -28,6 +28,7 @@ class RenderSourceObserver;
 class TileParameters;
 class CollisionIndex;
 class TransformParameters;
+class ImageManager;
 
 namespace gfx {
 class UploadPass;
@@ -37,6 +38,7 @@ class SourcePrepareParameters {
 public:
     const TransformParameters& transform;
     const MapDebugOptions& debugOptions;
+    const ImageManager& imageManager;
 };
 
 class RenderSource : protected TileObserver {

@@ -103,6 +103,8 @@ void RenderTile::upload(gfx::UploadPass& uploadPass) {
 void RenderTile::prepare(const SourcePrepareParameters& parameters) {
     renderData = tile.createRenderData();
     assert(renderData);
+    renderData->prepare(parameters);
+
     needsRendering = tile.usedByRenderedLayers;
 
     if (parameters.debugOptions != MapDebugOptions::NoDebug &&

@@ -6,6 +6,7 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
@@ -19,6 +20,8 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/renderer/tile_render_data.hpp>
+
+#include <mbgl/gfx/upload_pass.hpp>
 
 namespace mbgl {
 
@@ -39,11 +42,9 @@ class GeometryTileRenderData final : public TileRenderData {
 public:
     GeometryTileRenderData(
         std::shared_ptr<GeometryTile::LayoutResult> layoutResult_,
-        std::shared_ptr<TileAtlasTextures> atlasTextures_,
-        ImageManager& imageManager_)
+        std::shared_ptr<TileAtlasTextures> atlasTextures_)
         : TileRenderData(std::move(atlasTextures_))
-        , layoutResult(std::move(layoutResult_))
-        , imageManager(imageManager_) {
+        , layoutResult(std::move(layoutResult_)) {
     }
 
 private:
@@ -52,9 +53,10 @@ private:
     const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
     void upload(gfx::UploadPass&) override;
+    void prepare(const SourcePrepareParameters&) override;
 
     std::shared_ptr<GeometryTile::LayoutResult> layoutResult;
-    ImageManager& imageManager;
+    std::vector<ImagePatch> imagePatches;
 };
 
 using namespace style;
@@ -95,9 +97,17 @@ void GeometryTileRenderData::upload(gfx::UploadPass& uploadPass) {
         layoutResult->iconAtlas.image = {};
     }
 
-    if (atlasTextures->icon) {
-        layoutResult->iconAtlas.patchUpdatedImages(uploadPass, *atlasTextures->icon, imageManager);
+    if (atlasTextures->icon && !imagePatches.empty()) {
+        for (const auto& imagePatch : imagePatches) { // patch updated images.
+            uploadPass.updateTextureSub(*atlasTextures->icon, imagePatch.image->image, imagePatch.textureRect.x, imagePatch.textureRect.y);
+        }
+        imagePatches.clear();
     }
+}
+
+void GeometryTileRenderData::prepare(const SourcePrepareParameters& parameters) {
+    if (!layoutResult) return;
+    imagePatches = layoutResult->iconAtlas.getImagePatchesAndUpdateVersions(parameters.imageManager);
 }
 
 Bucket* GeometryTileRenderData::getBucket(const Layer::Impl& layer) const {
@@ -176,7 +186,7 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
 }
 
 std::unique_ptr<TileRenderData> GeometryTile::createRenderData() {
-    return std::make_unique<GeometryTileRenderData>(layoutResult, atlasTextures, imageManager);
+    return std::make_unique<GeometryTileRenderData>(layoutResult, atlasTextures);
 }
 
 void GeometryTile::setLayers(const std::vector<Immutable<LayerProperties>>& layers) {

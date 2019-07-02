@@ -54,15 +54,23 @@ public:
 
 using ImagePositions = std::map<std::string, ImagePosition>;
 
+class ImagePatch {
+public:
+    ImagePatch(Immutable<style::Image::Impl> image_,
+               const Rect<uint16_t>& textureRect_)
+        : image(std::move(image_))
+        , textureRect(textureRect_) {}
+    Immutable<style::Image::Impl> image;
+    Rect<uint16_t> textureRect;
+};
+
 class ImageAtlas {
 public:
     PremultipliedImage image;
     ImagePositions iconPositions;
     ImagePositions patternPositions;
 
-    void patchUpdatedImages(gfx::UploadPass&, gfx::Texture&, const ImageManager&);
-private:
-    void patchUpdatedImage(gfx::UploadPass&, gfx::Texture&, ImagePosition& position, const ImageManager& imageManager, const std::string& name, uint16_t version);
+    std::vector<ImagePatch> getImagePatchesAndUpdateVersions(const ImageManager&);
 };
 
 ImageAtlas makeImageAtlas(const ImageMap&, const ImageMap&, const std::unordered_map<std::string, uint32_t>& versionMap);
