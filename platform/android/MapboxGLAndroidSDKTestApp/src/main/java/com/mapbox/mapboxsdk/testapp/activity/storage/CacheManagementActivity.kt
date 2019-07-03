@@ -5,7 +5,6 @@ import android.os.Looper
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import com.mapbox.mapboxsdk.offline.OfflineManager
-import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.R
 import junit.framework.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_cache_management.*

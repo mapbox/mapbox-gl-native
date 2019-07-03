@@ -36,7 +36,7 @@ class RemoveUnusedImagesTest : AppCenter() {
     rule.runOnUiThread {
       mapView = rule.activity.findViewById(R.id.mapView)
       mapView.getMapAsync {
-        mapboxMap = it;
+        mapboxMap = it
         mapboxMap.setStyle(Style.Builder().fromJson(styleJson))
       }
     }
@@ -47,7 +47,7 @@ class RemoveUnusedImagesTest : AppCenter() {
     var callbackLatch = CountDownLatch(2)
     rule.runOnUiThread {
       mapView.addOnStyleImageMissingListener {
-        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512,  Bitmap.Config.ARGB_8888))
+        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888))
       }
 
       // Remove layer and source, so that rendered tiles are no longer used, therefore, map must
@@ -69,7 +69,7 @@ class RemoveUnusedImagesTest : AppCenter() {
       }
     }
 
-    if(!latch.await(5, TimeUnit.SECONDS) && !callbackLatch.await(5, TimeUnit.SECONDS)){
+    if (!latch.await(5, TimeUnit.SECONDS) && !callbackLatch.await(5, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }
@@ -78,7 +78,7 @@ class RemoveUnusedImagesTest : AppCenter() {
   fun testRemoveUnusedImagesDefaultListener() {
     rule.runOnUiThread {
       mapView.addOnStyleImageMissingListener {
-        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512,  Bitmap.Config.ARGB_8888))
+        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888))
       }
 
       // Remove layer and source, so that rendered tiles are no longer used, thus
@@ -97,7 +97,7 @@ class RemoveUnusedImagesTest : AppCenter() {
       }
     }
 
-    if(!latch.await(5, TimeUnit.SECONDS)){
+    if (!latch.await(5, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }

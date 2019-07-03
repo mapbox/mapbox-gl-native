@@ -9,7 +9,6 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.testapp.R
-import com.mapbox.mapboxsdk.testapp.action.WaitAction
 import com.mapbox.mapboxsdk.testapp.activity.maplayout.MapInDialogActivity
 import org.junit.Ignore
 import org.junit.Rule

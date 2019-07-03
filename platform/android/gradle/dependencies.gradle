@@ -33,7 +33,8 @@ ext {
             gms             : '16.0.0',
             soLoader        : '0.6.0',
             jacoco          : '0.8.3',
-            appcenter       : '1.4'
+            appcenter       : '1.4',
+            ktlint          : '0.33.0'
     ]
 
     dependenciesList = [
@@ -82,6 +83,7 @@ ext {
             lint                   : "com.android.tools.lint:lint:${versions.lint}",
             lintApi                : "com.android.tools.lint:lint-api:${versions.lint}",
             lintChecks             : "com.android.tools.lint:lint-checks:${versions.lint}",
-            lintTests              : "com.android.tools.lint:lint-tests:${versions.lint}"
+            lintTests              : "com.android.tools.lint:lint-tests:${versions.lint}",
+            ktlint                 : "com.pinterest:ktlint:${versions.ktlint}"
     ]
 }
