@@ -12,6 +12,9 @@ namespace mbgl {
 class MGLMapViewImpl;
 @class MGLSource;
 
+/// Standard animation duration for UI elements.
+FOUNDATION_EXTERN const NSTimeInterval MGLAnimationDuration;
+
 /// Minimum size of an annotation’s accessibility element.
 FOUNDATION_EXTERN const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 

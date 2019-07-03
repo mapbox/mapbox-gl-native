@@ -302,6 +302,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             }
         }
     }];
+
+    self.mapView.compassView.compassVisibility = MGLOrnamentVisibilityAdaptive;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations
