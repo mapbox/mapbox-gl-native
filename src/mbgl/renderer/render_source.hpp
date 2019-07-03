@@ -29,6 +29,7 @@ class TileParameters;
 class CollisionIndex;
 class TransformParameters;
 class ImageManager;
+class ImageSourceRenderData;
 
 namespace gfx {
 class UploadPass;
@@ -77,9 +78,8 @@ public:
     virtual bool hasFadingTiles() const = 0;
     // Returns a list of RenderTiles, sorted by tile id.
     virtual std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() = 0;
-    virtual const Tile* getRenderedTile(const UnwrappedTileID&) const {
-        return nullptr;
-    }
+    virtual const ImageSourceRenderData* getImageRenderData() const { return nullptr; }
+    virtual const Tile* getRenderedTile(const UnwrappedTileID&) const { return nullptr; }
 
     virtual std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,

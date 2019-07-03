@@ -1,11 +1,12 @@
 #pragma once
 
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/style/layers/raster_layer_properties.hpp>
 
 namespace mbgl {
+
+class ImageSourceRenderData;
 
 class RenderRasterLayer final : public RenderLayer {
 public:
@@ -22,7 +23,7 @@ private:
 
     // Paint properties
     style::RasterPaintProperties::Unevaluated unevaluated;
-    optional<ImageLayerRenderData> imageData;
+    const ImageSourceRenderData* imageData = nullptr;
 };
 
 } // namespace mbgl
