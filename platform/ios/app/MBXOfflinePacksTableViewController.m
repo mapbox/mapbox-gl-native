@@ -126,6 +126,16 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+- (IBAction)refreshPacks:(id)sender {
+   
+    for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+        [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+            NSLog(@"Revalidated pack");
+        }];
+    }
+}
+
+
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
