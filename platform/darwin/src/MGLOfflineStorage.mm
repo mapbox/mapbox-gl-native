@@ -526,7 +526,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                                                }
                      ];
         }
-        dispatch_async(dispatch_get_main_queue(), ^ {
+        dispatch_sync(dispatch_get_main_queue(), ^ {
             completion(error);
         });
     });

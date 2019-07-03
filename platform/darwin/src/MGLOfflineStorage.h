@@ -302,6 +302,17 @@ MGL_EXPORT
  */
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(nullable MGLOfflinePackRemovalCompletionHandler)completion;
 
+/**
+ Forces the offline pack to revalidate its tiles with tiles from the server.
+ This is more efficient than deleting the offline pack and downloading it
+ again. If the data stored locally matches that on the server, new data will
+ not be downloaded.
+ 
+ @param pack The offline pack to be invalidated.
+ @param completion The completion handler to call once the pack has been
+ removed. This handler is executed asynchronously on the main queue.
+ */
+
 - (void)invalidatePack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion;
 /**
  Forcibly, asynchronously reloads the `packs` property. At some point after this
@@ -344,23 +355,64 @@ MGL_EXPORT
 
 #pragma mark - Managing Ambient Cache
 
-
-// JK FINISH DOC
-/*
- Sets the maximum ambient cache size in megabytes. The default maximum cache size is 50 MB. To disable ambient caching, set the maximum ambient cache size to 0. Setting the maximum ambient cache size does not impact the maximum size for offline packs.
+/**
+ Sets the maximum ambient cache size in megabytes. The default maximum cache
+ size is 50 MB. To disable ambient caching, set the maximum ambient cache size
+ to 0. Setting the maximum ambient cache size does not impact the maximum size
+ of offline packs.
  
- This method should be called before creating the database.
+ If you intend to use offline packs, this may limit the amount of space available
+ for ambient caching, with no impact on offline packs. If you set the maximum
+ ambient cache size to 30 MB and offline packs use 20 MB, there may only be 10 MB
+ reserved for the ambient cache.
+ 
+ This method should be called before the database is initialized.
+ 
+ This method is potentially expensive, as the ambient cache will trim cached data
+ to prevent the database from being larger than the specified amount.
+ 
+ @param cacheSize The maximum size in bytes for the ambient cache.
+ @param completion The completion handler to call once the maximum ambient cache size
+ has been set. This handler is executed synchronously on the main queue.
  */
 
 - (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError *_Nullable error))completion;
 
-/*
- Forces cache tiles to be invalidated and updated from the tile server. This ensures that the
+/**
+ Forces ambient cache tiles to be revalidated. The local tiles are checked
+ against those on the tile server to ensure that they are the latest version.
+ This is more efficient than cleaning the cache because valid local tiles will
+ not be downloaded again.
+ 
+ Resources shared with offline packs will not be affected by this method.
+ 
+ @param completion The completion handler to call once the ambient cache has
+ been revalidated. This handler is executed asynchronously on the main queue.
  */
 
 - (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
 
+/**
+ Erase resources from the ambient cache.
+ 
+ Resources that are shared with offline regions will not be affected by
+ this method.
+ 
+ @param completion The completion handler to call once the ambient cache has been
+ cleared. This handler is executed asynchronously on the main queue.
+ */
+
 - (void)clearAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
+
+/**
+ Delete the existing database, which includes both the ambient cache and offline packs,
+ then reinitialize it.
+ 
+ You typically do not need to call this method.
+ 
+ @param completion The completion handler to call once the pack has database has
+ been reset. This handler is executed asynchronously on the main queue.
+ */
 
 - (void)resetDatabaseWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
