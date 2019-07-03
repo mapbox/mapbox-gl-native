@@ -31,9 +31,4 @@ private:
     optional<Tileset> tileset;
 };
 
-template <>
-inline bool RenderSource::is<RenderRasterSource>() const {
-    return baseImpl->type == style::SourceType::Raster;
-}
-
 } // namespace mbgl
