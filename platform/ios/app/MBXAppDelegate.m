@@ -14,9 +14,9 @@
     [MGLLoggingConfiguration sharedConfiguration].loggingLevel = MGLLoggingLevelFault;
 #endif
 
-    [[MGLOfflineStorage sharedOfflineStorage] setMaximumAmbientCacheSize:30 withCallback:^(NSError * _Nullable error) {
+    [[MGLOfflineStorage sharedOfflineStorage] setMaximumAmbientCacheSize:30000000 withCallback:^(NSError * _Nullable error) {
         if (!error) {
-            NSLog(@"Maximum ambient cache size: 30");
+            NSLog(@"Maximum ambient cache size: 30000000");
         }
     }];
     [MGLMetricsManager sharedManager].delegate = self;

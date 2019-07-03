@@ -366,7 +366,7 @@ MGL_EXPORT
  ambient cache size to 30 MB and offline packs use 20 MB, there may only be 10 MB
  reserved for the ambient cache.
  
- This method should be called before the database is initialized.
+ This method should be called before the map and map style have been loade.
  
  This method is potentially expensive, as the ambient cache will trim cached data
  to prevent the database from being larger than the specified amount.
