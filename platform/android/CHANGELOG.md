@@ -4,10 +4,19 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 8.2.0-alpha.2 - July 3, 2019
+
 ### Bugs
  - Fixed style change transition regression caused by delayed setting of the updated layer properties [#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016)
+ 
+### Features
+ - Cache management API [#14962](https://github.com/mapbox/mapbox-gl-native/pull/14962)
+ - Include Hiragana and Katakana glyph ranges to LocalGlyphRasterizer [#15009](https://github.com/mapbox/mapbox-gl-native/pull/15009)
+ 
+### Build
+ - Update CI image with NDK r20 [#15005](https://github.com/mapbox/mapbox-gl-native/pull/15005)
 
-## 8.2.0 - June 26, 2019
+## 8.2.0-alpha.1 - June 26, 2019
 
 ### Bugs
  - Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation [#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884) 
