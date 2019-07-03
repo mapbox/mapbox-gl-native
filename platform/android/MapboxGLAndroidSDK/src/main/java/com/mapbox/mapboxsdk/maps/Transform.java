@@ -108,7 +108,8 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
     if (isValidCameraPosition(cameraPosition)) {
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
-      nativeMap.jumpTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.tilt, cameraPosition.bearing);
+      nativeMap.jumpTo(cameraPosition.getShiftedTarget(), cameraPosition.zoom, cameraPosition.tilt,
+        cameraPosition.bearing);
       cameraChangeDispatcher.onCameraIdle();
       invalidateCameraPosition();
       handler.post(new Runnable() {
@@ -134,8 +135,8 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
         cameraCancelableCallback = callback;
       }
       mapView.addOnCameraDidChangeListener(this);
-      nativeMap.easeTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing, cameraPosition.tilt,
-        durationMs, easingInterpolator);
+      nativeMap.easeTo(cameraPosition.getShiftedTarget(), cameraPosition.zoom, cameraPosition.bearing,
+        cameraPosition.tilt, durationMs, easingInterpolator);
     }
   }
 
@@ -154,7 +155,7 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
         cameraCancelableCallback = callback;
       }
       mapView.addOnCameraDidChangeListener(this);
-      nativeMap.flyTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing,
+      nativeMap.flyTo(cameraPosition.getShiftedTarget(), cameraPosition.zoom, cameraPosition.bearing,
         cameraPosition.tilt, durationMs);
     }
   }

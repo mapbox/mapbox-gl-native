@@ -87,6 +87,24 @@ public final class CameraPosition implements Parcelable {
   }
 
   /**
+   * Do shift for target location and get the shifted target.
+   *
+   * @return the shifted target.
+   */
+  public LatLng getShiftedTarget() {
+    if (target != null) {
+      //todo: add check after https://github.com/mapbox/mapbox-java/issues/1057 is resolved.
+      List<Double> shifted = CoordinateShifterManager.getCoordinateShifter()
+        .shiftLonLat(target.getLongitude(), target.getLatitude());
+      if (shifted != null && shifted.size() > 1) {
+        return new LatLng(shifted.get(1),shifted.get(0));
+      }
+    }
+    return new LatLng();
+
+  }
+
+  /**
    * Describe the kinds of special objects contained in this Parcelable's
    * marshalled representation.
    *
@@ -172,7 +190,6 @@ public final class CameraPosition implements Parcelable {
    * Builder for composing CameraPosition objects.
    */
   public static final class Builder {
-    private boolean needShift = false;
     private double bearing = -1;
     @Nullable
     private LatLng target = null;
@@ -274,7 +291,6 @@ public final class CameraPosition implements Parcelable {
      */
     @NonNull
     public Builder target(LatLng location) {
-      needShift = true;
       this.target = location;
       return this;
     }
@@ -317,15 +333,6 @@ public final class CameraPosition implements Parcelable {
      * @return CameraPosition
      */
     public CameraPosition build() {
-      if (needShift && target != null) {
-        //todo: add check after https://github.com/mapbox/mapbox-java/issues/1057 is resolved.
-        List<Double> shifted = CoordinateShifterManager.getCoordinateShifter()
-          .shiftLonLat(target.getLongitude(), target.getLatitude());
-        if (shifted != null && shifted.size() > 1) {
-          target.setLongitude(shifted.get(0));
-          target.setLatitude(shifted.get(1));
-        }
-      }
       return new CameraPosition(this.target, zoom, tilt, bearing);
     }
   }
