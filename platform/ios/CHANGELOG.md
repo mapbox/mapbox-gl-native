@@ -2,12 +2,6 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-### Styles and rendering
-
-* Fixed style change transition regression caused by delayed setting of the updated layer properties. ([#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016))
-
 ## 5.2.0
 
 ### Offline maps
@@ -17,10 +11,13 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Packaging
 
 * Removed previously deprecated methods and properties that had been marked `unavailable`. ([#15000](https://github.com/mapbox/mapbox-gl-native/pull/15000))
+* The downloaded zip file of this framework no longer contains a local podspec. ([#15027](https://github.com/mapbox/mapbox-gl-native/pull/15027))
 
 ### Styles and rendering
 
+* Hiragana and katakana are now included in the range of CJK glyphs that are rendered locally by default. ([#15009](https://github.com/mapbox/mapbox-gl-native/pull/15009))
 * Added the `-[MGLMapViewDelegate mapView:shouldRemoveStyleImage:]` method for optimizing style image caching. ([#14769](https://github.com/mapbox/mapbox-gl-native/pull/14769))
+* Fixed style change transition regression caused by delayed setting of the updated layer properties. ([#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016))
 
 ### Other changes
 
