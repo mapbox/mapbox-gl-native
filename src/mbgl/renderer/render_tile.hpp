@@ -59,9 +59,9 @@ public:
     const gfx::Texture& getGlyphAtlasTexture() const;
     const gfx::Texture& getIconAtlasTexture() const;
 
-    void upload(gfx::UploadPass&);
+    void upload(gfx::UploadPass&) const;
     void prepare(const SourcePrepareParameters&);
-    void finishRender(PaintParameters&);
+    void finishRender(PaintParameters&) const;
 
     mat4 translateVtxMatrix(const mat4& tileMatrix,
                             const std::array<float, 2>& translation,

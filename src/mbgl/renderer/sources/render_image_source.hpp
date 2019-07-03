@@ -9,14 +9,25 @@ namespace mbgl {
 
 class RasterBucket;
 
-class ImageSourceRenderData {
+class ImageSourceRenderData final : public RenderItem {
 public:
     ImageSourceRenderData(std::shared_ptr<RasterBucket> bucket_,
-                          std::vector<mat4> matrices_)
+                          std::vector<mat4> matrices_,
+                          std::string name_)
         : bucket(std::move(bucket_)),
-          matrices(std::move(matrices_)) {}
-    std::shared_ptr<RasterBucket> bucket;
-    std::vector<mat4> matrices;
+          matrices(std::move(matrices_)),
+          name(std::move(name_)) {}
+    ~ImageSourceRenderData() override;
+    const std::shared_ptr<RasterBucket> bucket;
+    const std::vector<mat4> matrices;
+
+private:
+    void upload(gfx::UploadPass&) const override;
+    void render(PaintParameters&) const override;
+    bool hasRenderPass(RenderPass) const override { return false; }
+    const std::string& getName() const override { return name; }
+
+    std::string name;
 };
 
 class RenderImageSource final : public RenderSource {
@@ -26,9 +37,8 @@ public:
 
     bool isLoaded() const final;
 
-    void upload(gfx::UploadPass&) final;
+    std::unique_ptr<RenderItem> createRenderItem() override;
     void prepare(const SourcePrepareParameters&) final;
-    void finishRender(PaintParameters&) final;
     void updateFadingTiles() final {}
     bool hasFadingTiles() const final { return false; }
 
@@ -38,9 +48,7 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final {
-        return {};
-    }
+    RenderTiles getRenderTiles() override { return {}; }
 
     const ImageSourceRenderData* getImageRenderData() const override { 
         return renderData.get();

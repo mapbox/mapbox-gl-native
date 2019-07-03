@@ -30,7 +30,7 @@ public:
 class LayerPlacementData {
 public:
     std::reference_wrapper<Bucket> bucket;
-    std::reference_wrapper<RenderTile> tile;
+    std::reference_wrapper<const RenderTile> tile;
     std::shared_ptr<FeatureIndex> featureIndex;
 };
 
@@ -42,6 +42,8 @@ public:
     LineAtlas& lineAtlas;
     const TransformState& state;
 };
+
+using RenderTiles = std::vector<std::reference_wrapper<const RenderTile>>;
 
 class RenderLayer {
 protected:
@@ -115,7 +117,6 @@ protected:
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
 protected:
-    using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     // Stores current set of tiles to be rendered for this layer.
     RenderTiles renderTiles;
 
