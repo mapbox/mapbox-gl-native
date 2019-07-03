@@ -7,7 +7,7 @@ import com.mapbox.mapboxsdk.style.layers.Layer
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-abstract class BaseLayerTest : AppCenter(){
+abstract class BaseLayerTest : AppCenter() {
     private lateinit var nativeMapView: NativeMap
 
     companion object {

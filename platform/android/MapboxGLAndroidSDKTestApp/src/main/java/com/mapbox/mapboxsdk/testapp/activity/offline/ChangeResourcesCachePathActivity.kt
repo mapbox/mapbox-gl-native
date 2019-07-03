@@ -74,7 +74,7 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
 
     offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
       override fun onList(offlineRegions: Array<out OfflineRegion>?) {
-        Logger.i(TAG, "Number of saved offline regions in the new path: ${offlineRegions?.size.toString()}")
+        Logger.i(TAG, "Number of saved offline regions in the new path: ${offlineRegions?.size}")
       }
 
       override fun onError(error: String?) {

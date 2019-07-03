@@ -95,7 +95,6 @@ class NativeMapViewTest : AppCenter() {
         assertEquals("Longitude should match", expected.longitude, actual.longitude, DELTA)
     }
 
-
     @Test
     @UiThreadTest
     fun testBearingDefault() {
@@ -160,7 +159,7 @@ class NativeMapViewTest : AppCenter() {
     @UiThreadTest
     fun testLatLngForPixel() {
         val expected = LATLNG_TEST
-        nativeMapView.setLatLng(LATLNG_TEST,0)
+        nativeMapView.setLatLng(LATLNG_TEST, 0)
         val actual = nativeMapView.latLngForPixel(
                 PointF((WIDTH / 2).toFloat(), (HEIGHT / 2).toFloat())
         )
@@ -367,11 +366,11 @@ class NativeMapViewTest : AppCenter() {
     class DummyRenderer(context: Context) : MapRenderer(context, null) {
 
         override fun requestRender() {
-            //no-op
+            // no-op
         }
 
         override fun queueEvent(runnable: Runnable?) {
-            //no-op
+            // no-op
         }
     }
 }

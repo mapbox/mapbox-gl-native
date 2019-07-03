@@ -85,5 +85,4 @@ class CacheTest {
     }
     countDownLatch.await()
   }
-
 }

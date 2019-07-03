@@ -287,7 +287,7 @@ class StyleTest {
 
     @Test
     fun testAddImage() {
-        val bitmap = Bitmap.createBitmap(1, 1,  Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
         val builder = Style.Builder().fromUrl(Style.SATELLITE).withImage("id", bitmap)
         mapboxMap.setStyle(builder)
         verify(exactly = 1) { nativeMapView.styleUri = Style.SATELLITE }

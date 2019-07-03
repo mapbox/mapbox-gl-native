@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.location.utils
 import android.support.test.espresso.IdlingResource
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
-import java.util.logging.Handler
 
 /**
  * Resource, that's idling until the provided style is loaded.

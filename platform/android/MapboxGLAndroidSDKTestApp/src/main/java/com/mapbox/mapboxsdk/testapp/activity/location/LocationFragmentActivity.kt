@@ -119,7 +119,7 @@ class LocationFragmentActivity : AppCompatActivity() {
     }
 
     override fun onFailure(exception: Exception) {
-      //noop
+      // noop
     }
 
     override fun onStart() {

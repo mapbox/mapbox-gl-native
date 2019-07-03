@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
-class ImageMissingTest : AppCenter(){
+class ImageMissingTest : AppCenter() {
 
   @Rule
   @JvmField

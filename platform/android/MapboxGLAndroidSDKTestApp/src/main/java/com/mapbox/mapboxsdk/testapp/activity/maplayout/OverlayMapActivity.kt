@@ -65,7 +65,7 @@ class OverlayMapActivity : AppCompatActivity() {
     class OverlayView(context: Context) : View(context) {
 
         private lateinit var paint: Paint
-        
+
         @SuppressLint("DrawAllocation") // only happens once
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
