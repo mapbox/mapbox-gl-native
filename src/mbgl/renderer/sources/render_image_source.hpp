@@ -2,21 +2,26 @@
 
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/render_tree.hpp>
 #include <mbgl/style/sources/image_source_impl.hpp>
 
 namespace mbgl {
 
 class RasterBucket;
 
-class ImageLayerRenderData {
+class ImageSourceRenderData {
 public:
+    ImageSourceRenderData(std::shared_ptr<RasterBucket> bucket_,
+                          std::vector<mat4> matrices_)
+        : bucket(std::move(bucket_)),
+          matrices(std::move(matrices_)) {}
     std::shared_ptr<RasterBucket> bucket;
-    std::shared_ptr<std::vector<mat4>> matrices;
+    std::vector<mat4> matrices;
 };
 
-class RenderImageSource : public RenderSource {
+class RenderImageSource final : public RenderSource {
 public:
-    RenderImageSource(Immutable<style::ImageSource::Impl>);
+    explicit RenderImageSource(Immutable<style::ImageSource::Impl>);
     ~RenderImageSource() override;
 
     bool isLoaded() const final;
@@ -37,6 +42,10 @@ public:
         return {};
     }
 
+    const ImageSourceRenderData* getImageRenderData() const override { 
+        return renderData.get();
+    }
+
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
@@ -54,7 +63,8 @@ private:
     friend class RenderRasterLayer;
     const style::ImageSource::Impl& impl() const;
 
-    ImageLayerRenderData sharedData;
+    std::shared_ptr<RasterBucket> bucket;
+    std::unique_ptr<ImageSourceRenderData> renderData;
     std::vector<UnwrappedTileID> tileIds;
 };
 
