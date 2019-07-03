@@ -68,9 +68,4 @@ private:
     std::vector<UnwrappedTileID> tileIds;
 };
 
-template <>
-inline bool RenderSource::is<RenderImageSource>() const {
-    return baseImpl->type == style::SourceType::Image;
-}
-
 } // namespace mbgl

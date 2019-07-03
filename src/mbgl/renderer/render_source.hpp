@@ -47,21 +47,6 @@ public:
     static std::unique_ptr<RenderSource> create(Immutable<style::Source::Impl>);
     virtual ~RenderSource();
 
-    // Check whether this source is of the given subtype.
-    template <class T>
-    bool is() const;
-
-    // Dynamically cast this source to the given subtype.
-    template <class T>
-    T* as() {
-        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
-    }
-
-    template <class T>
-    const T* as() const {
-        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
-    }
-
     bool isEnabled() const;
     virtual bool isLoaded() const = 0;
 
@@ -102,6 +87,8 @@ public:
     virtual void reduceMemoryUse() = 0;
 
     virtual void dumpDebugLogs() const = 0;
+
+    virtual uint8_t getMaxZoom() const;
 
     void setObserver(RenderSourceObserver*);
 

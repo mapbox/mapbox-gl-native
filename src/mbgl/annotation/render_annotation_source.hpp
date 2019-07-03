@@ -29,9 +29,4 @@ private:
     const AnnotationSource::Impl& impl() const;
 };
 
-template <>
-inline bool RenderSource::is<RenderAnnotationSource>() const {
-    return baseImpl->type == style::SourceType::Annotations;
-}
-
 } // namespace mbgl
