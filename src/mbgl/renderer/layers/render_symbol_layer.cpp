@@ -508,7 +508,7 @@ void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
     std::sort(renderTiles.begin(), renderTiles.end(), comp);
 
     placementData.clear();
-    for (RenderTile& renderTile : renderTiles) {
+    for (const RenderTile& renderTile : renderTiles) {
         auto* bucket = static_cast<SymbolBucket*>(renderTile.getBucket(*baseImpl));
         if (bucket && bucket->bucketLeaderID == getID()) {
             // Only place this layer if it's the "group leader" for the bucket

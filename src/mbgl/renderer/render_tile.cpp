@@ -91,7 +91,7 @@ const gfx::Texture& RenderTile::getIconAtlasTexture() const {
     return renderData->getIconAtlasTexture();
 }
 
-void RenderTile::upload(gfx::UploadPass& uploadPass) {
+void RenderTile::upload(gfx::UploadPass& uploadPass) const {
     assert(renderData);
     renderData->upload(uploadPass);
 
@@ -129,7 +129,7 @@ void RenderTile::prepare(const SourcePrepareParameters& parameters) {
     matrix::multiply(nearClippedMatrix, transform.nearClippedProjMatrix, nearClippedMatrix);
 }
 
-void RenderTile::finishRender(PaintParameters& parameters) {
+void RenderTile::finishRender(PaintParameters& parameters) const {
     if (!needsRendering || parameters.debugOptions == MapDebugOptions::NoDebug)
         return;
 

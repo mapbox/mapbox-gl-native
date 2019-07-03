@@ -30,6 +30,7 @@ class CollisionIndex;
 class TransformParameters;
 class ImageManager;
 class ImageSourceRenderData;
+class RenderItem;
 
 namespace gfx {
 class UploadPass;
@@ -41,6 +42,8 @@ public:
     const MapDebugOptions& debugOptions;
     const ImageManager& imageManager;
 };
+
+using RenderTiles = std::vector<std::reference_wrapper<const RenderTile>>;
 
 class RenderSource : protected TileObserver {
 public:
@@ -55,14 +58,14 @@ public:
                         bool needsRendering,
                         bool needsRelayout,
                         const TileParameters&) = 0;
-
-    virtual void upload(gfx::UploadPass&) = 0;
+    // Note: calling of this method might reset the contained render data.
+    virtual std::unique_ptr<RenderItem> createRenderItem() = 0;
+    // Creates the render data to be passed to the render item.
     virtual void prepare(const SourcePrepareParameters&) = 0;
-    virtual void finishRender(PaintParameters&) = 0;
     virtual void updateFadingTiles() = 0;
     virtual bool hasFadingTiles() const = 0;
     // Returns a list of RenderTiles, sorted by tile id.
-    virtual std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() = 0;
+    virtual RenderTiles getRenderTiles() = 0;
     virtual const ImageSourceRenderData* getImageRenderData() const { return nullptr; }
     virtual const Tile* getRenderedTile(const UnwrappedTileID&) const { return nullptr; }
 

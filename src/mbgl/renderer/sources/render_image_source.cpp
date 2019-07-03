@@ -17,55 +17,25 @@ namespace mbgl {
 
 using namespace style;
 
-RenderImageSource::RenderImageSource(Immutable<style::ImageSource::Impl> impl_)
-    : RenderSource(impl_) {
-}
+ImageSourceRenderData::~ImageSourceRenderData() = default;
 
-RenderImageSource::~RenderImageSource() = default;
-
-const style::ImageSource::Impl& RenderImageSource::impl() const {
-    return static_cast<const style::ImageSource::Impl&>(*baseImpl);
-}
-
-bool RenderImageSource::isLoaded() const {
-    return !!bucket;
-}
-
-void RenderImageSource::upload(gfx::UploadPass& uploadPass) {
-    if (bucket->needsUpload()) {
+void ImageSourceRenderData::upload(gfx::UploadPass& uploadPass) const {
+    if (bucket && bucket->needsUpload()) {
         bucket->upload(uploadPass);
     }
 }
 
-void RenderImageSource::prepare(const SourcePrepareParameters& parameters) {
-    if (!isLoaded()) {
+void ImageSourceRenderData::render(PaintParameters& parameters) const {
+    if (!bucket || !(parameters.debugOptions & MapDebugOptions::TileBorders)) {
         return;
     }
-
-    std::vector<mat4> matrices{tileIds.size(), mat4()};
-    const auto& transformParams = parameters.transform;
-    for (size_t i = 0u; i < tileIds.size(); ++i) {
-        mat4& matrix = matrices[i];
-        matrix::identity(matrix);
-        transformParams.state.matrixFor(matrix, tileIds[i]);
-        matrix::multiply(matrix, transformParams.alignedProjMatrix, matrix);
-    }
-
-    renderData = std::make_unique<ImageSourceRenderData>(bucket, std::move(matrices));
-}
-
-void RenderImageSource::finishRender(PaintParameters& parameters) {
-    if (!isLoaded() || !(parameters.debugOptions & MapDebugOptions::TileBorders)) {
-        return;
-    }
-    assert(renderData);
 
     static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::Binders paintAttributeData(properties, 0);
 
     auto& programInstance = parameters.programs.debug;
 
-    for (auto matrix : renderData->matrices) {
+    for (auto matrix : matrices) {
         programInstance.draw(
             parameters.context,
             *parameters.renderPass,
@@ -94,6 +64,43 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             "image"
         );
     }
+}
+
+RenderImageSource::RenderImageSource(Immutable<style::ImageSource::Impl> impl_)
+    : RenderSource(std::move(impl_)) {
+}
+
+RenderImageSource::~RenderImageSource() = default;
+
+const style::ImageSource::Impl& RenderImageSource::impl() const {
+    return static_cast<const style::ImageSource::Impl&>(*baseImpl);
+}
+
+bool RenderImageSource::isLoaded() const {
+    return !!bucket;
+}
+
+std::unique_ptr<RenderItem> RenderImageSource::createRenderItem() {
+    assert(renderData);
+    return std::move(renderData);
+}
+
+void RenderImageSource::prepare(const SourcePrepareParameters& parameters) {
+    assert(!renderData);
+    if (!isLoaded()) {
+        renderData = std::make_unique<ImageSourceRenderData>(bucket, std::vector<mat4>{}, baseImpl->id);
+        return;
+    }
+
+    std::vector<mat4> matrices{tileIds.size(), mat4()};
+    const auto& transformParams = parameters.transform;
+    for (size_t i = 0u; i < tileIds.size(); ++i) {
+        mat4& matrix = matrices[i];
+        matrix::identity(matrix);
+        transformParams.state.matrixFor(matrix, tileIds[i]);
+        matrix::multiply(matrix, transformParams.alignedProjMatrix, matrix);
+    }
+    renderData = std::make_unique<ImageSourceRenderData>(bucket, std::move(matrices), baseImpl->id);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>

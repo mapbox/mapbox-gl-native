@@ -54,10 +54,10 @@ optional<Color> RenderLayer::getSolidBackground() const {
     return nullopt;
 }
 
-RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
+RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
     RenderTiles filtered;
 
-    for (RenderTile& tile : tiles) {
+    for (const RenderTile& tile : tiles) {
         if (tile.holdForFade()) {
             continue;
         }
