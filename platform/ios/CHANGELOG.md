@@ -5,7 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 * Fixed a crash caused by incorrect `MGLMapViewImpl` renderable size. ([#14810](https://github.com/mapbox/mapbox-gl-native/pull/14810))
-* The `MGLIdeographicFontFamilyName` Info.plist key can now be set to an array of font family names to ensure correct font fallback behavior. It can also be set to a Boolean value of `NO` to force the SDK to typeset CJK characters in a remote font specified by `MGLSymbolStyleLayer.textFontNames`. ([#14862](https://github.com/mapbox/mapbox-gl-native/pull/14862))
+* The MGLIdeographicFontFamilyName Info.plist key now also accepts an array of font family names, to customize font fallback behavior. It can also be set to a Boolean value of NO to force the SDK to typeset CJK characters in a remote font specified by MGLSymbolStyleLayer.textFontNames. ([#14862](https://github.com/mapbox/mapbox-gl-native/pull/14862))
 * Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 
 ## 5.1.0
