@@ -6,10 +6,12 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
@@ -249,6 +251,37 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             mbgl::AnimationOptions animationOptions(mbgl::Seconds(10));
             view->map->flyTo(cameraOptions, animationOptions);
             nextPlace = nextPlace % places.size();
+        } break;
+        case GLFW_KEY_F: {
+            using namespace mbgl;
+            using namespace mbgl::style;
+            using namespace mbgl::style::expression::dsl;
+
+            auto source = std::make_unique<GeoJSONSource>("route");
+            source->setGeoJSON(mapbox::geojson::parse(mbgl::platform::glfw::route));
+
+            auto& style = view->map->getStyle();
+            style.addSource(std::move(source));
+
+            auto routeLayerCase = std::make_unique<LineLayer>("route-case", "route");
+            routeLayerCase->setLineColor(mbgl::Color{ 0.0, 1.0, 0.0, 1.0 });
+            routeLayerCase->setLineWidth(PropertyExpression<float>(get("width_case")));
+
+            style.addLayer(std::move(routeLayerCase));
+
+            auto routeLayer = std::make_unique<LineLayer>("route", "route");
+            routeLayer->setLineColor(mbgl::Color{ 1.0, 0.0, 0.0, 1.0 });
+            routeLayer->setLineWidth(PropertyExpression<float>(get("width")));
+
+            style.addLayer(std::move(routeLayer));
+
+            auto routeLabelLayer = std::make_unique<SymbolLayer>("route-label", "route");
+            routeLabelLayer->setTextField(PropertyExpression<expression::Formatted>(toFormatted(get("label"))));
+            routeLabelLayer->setSymbolPlacement(SymbolPlacementType::Line);
+            routeLabelLayer->setSymbolSpacing(2);
+
+            style.addLayer(std::move(routeLabelLayer));
+
         } break;
         case GLFW_KEY_R: {
             view->show3DExtrusions = true;
