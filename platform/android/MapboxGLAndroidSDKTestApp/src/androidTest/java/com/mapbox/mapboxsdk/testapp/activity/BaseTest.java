@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity;
 
+import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.support.annotation.UiThread;
 import android.support.test.rule.ActivityTestRule;
@@ -93,6 +94,10 @@ public abstract class BaseTest extends AppCenter {
       Timber.e("Timeout occurred for %s", testName.getMethodName());
       validateTestSetup();
     }
+  }
+
+  protected Context getContext() {
+    return rule.getActivity();
   }
 
 }
