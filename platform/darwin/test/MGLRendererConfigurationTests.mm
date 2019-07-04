@@ -93,4 +93,18 @@ static NSString * const MGLRendererConfigurationTests_collisionBehaviorKey = @"M
     }
 }
 
+- (void)testDefaultLocalFontFamilyName{
+    MGLRendererConfiguration *config = [[MGLRendererConfiguration alloc] init];
+    std::string localFontFamilyName = config.localFontFamilyName.value();
+    
+    std::string systemFontFamilyName;
+#if TARGET_OS_IPHONE
+    systemFontFamilyName = std::string([[UIFont systemFontOfSize:0 weight:UIFontWeightRegular].familyName UTF8String]);
+#else
+    systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:NSFontWeightRegular].familyName UTF8String]);
+#endif
+    
+    XCTAssert(localFontFamilyName == systemFontFamilyName);
+}
+
 @end
