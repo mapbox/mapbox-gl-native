@@ -10,6 +10,7 @@ public:
     std::string cachePath = ":memory:";
     std::string assetPath = ".";
     uint64_t maximumSize = mbgl::util::DEFAULT_MAX_CACHE_SIZE;
+    bool supportCacheOnlyRequests = true;
     void* platformContext = nullptr;
 };
 
@@ -66,6 +67,15 @@ ResourceOptions& ResourceOptions::withMaximumCacheSize(uint64_t size) {
 
 uint64_t ResourceOptions::maximumCacheSize() const {
     return impl_->maximumSize;
+}
+
+ResourceOptions& ResourceOptions::withCacheOnlyRequestsSupport(bool supportCacheOnlyRequests) {
+    impl_->supportCacheOnlyRequests = supportCacheOnlyRequests;
+    return *this;
+}
+
+bool ResourceOptions::supportsCacheOnlyRequests() const {
+    return impl_->supportCacheOnlyRequests;
 }
 
 ResourceOptions& ResourceOptions::withPlatformContext(void* context) {

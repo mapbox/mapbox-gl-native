@@ -82,7 +82,7 @@ The first argument passed to `map.render` is an options object, all keys are opt
 }
 ```
 
-When you are finished using a map object, you can call `map.release()` to permanently dispose the internal map resources. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granualar level than V8's garbage collector. Calling `map.release()` will prevent a map object from being used for any further render calls, but can be safely called as soon as the `map.render()` callback returns, as the returned pixel buffer will always be retained for the scope of the callback.
+When you are finished using a map object, you can call `map.release()` to permanently dispose the internal map resources. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granular level than V8's garbage collector. Calling `map.release()` will prevent a map object from being used for any further render calls, but can be safely called as soon as the `map.render()` callback returns, as the returned pixel buffer will always be retained for the scope of the callback.
 
 ## Implementing a file source
 

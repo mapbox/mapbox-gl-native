@@ -403,6 +403,12 @@ class LocationAnimatorCoordinatorTest {
   }
 
   @Test
+  fun resetAllLayerAnimations_empty() {
+    locationAnimatorCoordinator.resetAllLayerAnimations()
+    assertTrue(locationAnimatorCoordinator.animatorArray.size() == 0)
+  }
+
+  @Test
   fun addNewListener() {
     val listener = Mockito.mock(AnimationsValueChangeListener::class.java)
     val holder = AnimatorListenerHolder(RenderMode.NORMAL, listener)

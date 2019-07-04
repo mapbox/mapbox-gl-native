@@ -20,10 +20,10 @@ namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
-    Impl(std::shared_ptr<FileSource> assetFileSource_, std::string cachePath, uint64_t maximumCacheSize)
+    Impl(std::shared_ptr<FileSource> assetFileSource_, std::string cachePath)
             : assetFileSource(std::move(assetFileSource_))
             , localFileSource(std::make_unique<LocalFileSource>())
-            , offlineDatabase(std::make_unique<OfflineDatabase>(cachePath, maximumCacheSize)) {
+            , offlineDatabase(std::make_unique<OfflineDatabase>(std::move(cachePath))) {
     }
 
     void setAPIBaseURL(const std::string& url) {
@@ -184,16 +184,20 @@ public:
         offlineDatabase->put(resource, response);
     }
 
-    void resetCache(std::function<void (std::exception_ptr)> callback) {
-        callback(offlineDatabase->resetCache());
+    void resetDatabase(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->resetDatabase());
     }
 
-    void invalidateTileCache(std::function<void (std::exception_ptr)> callback) {
-        callback(offlineDatabase->invalidateTileCache());
+    void invalidateAmbientCache(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->invalidateAmbientCache());
     }
 
-    void clearTileCache(std::function<void (std::exception_ptr)> callback) {
-        callback(offlineDatabase->clearTileCache());
+    void clearAmbientCache(std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->clearAmbientCache());
+    }
+
+    void setMaximumAmbientCacheSize(uint64_t size, std::function<void (std::exception_ptr)> callback) {
+        callback(offlineDatabase->setMaximumAmbientCacheSize(size));
     }
 
 private:
@@ -220,20 +224,21 @@ private:
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
 };
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath,
-                                     const std::string& assetPath,
-                                     uint64_t maximumCacheSize)
-    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetPath), maximumCacheSize) {
+DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& assetPath, bool supportCacheOnlyRequests_)
+    : DefaultFileSource(cachePath, std::make_unique<AssetFileSource>(assetPath), supportCacheOnlyRequests_) {
 }
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath,
-                                     std::unique_ptr<FileSource>&& assetFileSource_,
-                                     uint64_t maximumCacheSize)
+DefaultFileSource::DefaultFileSource(const std::string& cachePath, std::unique_ptr<FileSource>&& assetFileSource_, bool supportCacheOnlyRequests_)
         : assetFileSource(std::move(assetFileSource_))
-        , impl(std::make_unique<util::Thread<Impl>>("DefaultFileSource", assetFileSource, cachePath, maximumCacheSize)) {
+        , impl(std::make_unique<util::Thread<Impl>>("DefaultFileSource", assetFileSource, cachePath))
+        , supportCacheOnlyRequests(supportCacheOnlyRequests_) {
 }
 
 DefaultFileSource::~DefaultFileSource() = default;
+
+bool DefaultFileSource::supportsCacheOnlyRequests() const {
+    return supportCacheOnlyRequests;
+}
 
 void DefaultFileSource::setAPIBaseURL(const std::string& baseURL) {
     impl->actor().invoke(&Impl::setAPIBaseURL, baseURL);
@@ -339,16 +344,20 @@ void DefaultFileSource::put(const Resource& resource, const Response& response) 
     impl->actor().invoke(&Impl::put, resource, response);
 }
 
-void DefaultFileSource::resetCache(std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::resetCache, callback);
+void DefaultFileSource::resetDatabase(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::resetDatabase, std::move(callback));
 }
 
-void DefaultFileSource::invalidateTileCache(std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::invalidateTileCache, callback);
+void DefaultFileSource::invalidateAmbientCache(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::invalidateAmbientCache, std::move(callback));
 }
 
-void DefaultFileSource::clearTileCache(std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::clearTileCache, callback);
+void DefaultFileSource::clearAmbientCache(std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::clearAmbientCache, std::move(callback));
+}
+
+void DefaultFileSource::setMaximumAmbientCacheSize(uint64_t size, std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::setMaximumAmbientCacheSize, size, std::move(callback));
 }
 
 // For testing only:

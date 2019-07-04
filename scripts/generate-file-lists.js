@@ -130,6 +130,7 @@ generateFileList('vendor/cheap-ruler-cpp-files.json', 'vendor/cheap-ruler-cpp', 
 generateFileList('vendor/earcut.hpp-files.json', 'vendor/earcut.hpp', vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/eternal-files.json', 'vendor/eternal', vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/expected-files.json', 'vendor/expected', vendorRegex, [ "include/expected.hpp" ]);
+generateFileList('vendor/filesystem-files.json', 'vendor/filesystem', vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/geojson-vt-cpp-files.json', 'vendor/geojson-vt-cpp', vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/geojson.hpp-files.json', 'vendor/geojson.hpp', vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/geometry.hpp-files.json', 'vendor/geometry.hpp', vendorRegex, [ "include/**/*.hpp" ]);

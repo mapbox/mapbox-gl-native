@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.offline
 import android.content.Context
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.storage.FileSource
@@ -18,7 +19,7 @@ import java.util.concurrent.CountDownLatch
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
-class OfflineManagerTest {
+class OfflineManagerTest : AppCenter() {
 
   companion object {
     private const val TEST_DB_FILE_NAME = "offline_test.db"
@@ -34,7 +35,7 @@ class OfflineManagerTest {
   @Test(timeout = 30_000)
   fun a_copyFileFromAssets() {
     val latch = CountDownLatch(1)
-    rule.runOnUiThread {
+    rule.activity.runOnUiThread {
       FileUtils.CopyFileFromAssetsTask(rule.activity, object : FileUtils.OnFileCopiedFromAssetsListener {
         override fun onFileCopiedFromAssets() {
           latch.countDown()
@@ -51,7 +52,7 @@ class OfflineManagerTest {
   @Test(timeout = 30_000)
   fun b_mergeRegion() {
     val latch = CountDownLatch(1)
-    rule.runOnUiThread {
+    rule.activity.runOnUiThread {
       OfflineManager.getInstance(context).mergeOfflineRegions(
         FileSource.getResourcesCachePath(rule.activity) + "/" + TEST_DB_FILE_NAME,
         object : OfflineManager.MergeOfflineRegionsCallback {
@@ -71,7 +72,7 @@ class OfflineManagerTest {
   @Test(timeout = 30_000)
   fun c_listRegion() {
     val latch = CountDownLatch(1)
-    rule.runOnUiThread {
+    rule.activity.runOnUiThread {
       OfflineManager.getInstance(context).listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
         override fun onList(offlineRegions: Array<out OfflineRegion>?) {
           assert(offlineRegions?.size == 1)
@@ -88,9 +89,26 @@ class OfflineManagerTest {
   }
 
   @Test(timeout = 30_000)
-  fun d_deleteRegion() {
+  fun d_invalidateRegion() {
     val latch = CountDownLatch(1)
-    rule.runOnUiThread {
+    rule.activity.runOnUiThread {
+      mergedRegion.invalidate(object : OfflineRegion.OfflineRegionInvalidateCallback {
+        override fun onInvalidate() {
+          latch.countDown()
+        }
+
+        override fun onError(error: String?) {
+          throw RuntimeException("Unable to delete region")
+        }
+      })
+    }
+    latch.await()
+  }
+
+  @Test(timeout = 30_000)
+  fun e_deleteRegion() {
+    val latch = CountDownLatch(1)
+    rule.activity.runOnUiThread {
       mergedRegion.delete(object : OfflineRegion.OfflineRegionDeleteCallback {
         override fun onDelete() {
           latch.countDown()

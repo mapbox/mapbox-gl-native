@@ -41,6 +41,8 @@ public:
         BackgroundPaintProperties::PossiblyEvaluated);
     ~BackgroundLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const BackgroundLayer::Impl& layerImpl() const;
     // Data members.
     CrossfadeParameters crossfade;

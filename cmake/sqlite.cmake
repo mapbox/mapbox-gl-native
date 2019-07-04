@@ -34,5 +34,14 @@ target_compile_definitions(sqlite
 target_compile_options(sqlite
     PRIVATE "-Wno-int-conversion"
     PRIVATE "-Wno-implicit-fallthrough"
-    PRIVATE "-Wno-cast-function-type"
 )
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
+        target_compile_options(sqlite PRIVATE "-Wno-cast-function-type")
+    else()
+        target_compile_options(sqlite PRIVATE "-Wno-bad-function-cast")
+    endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+    target_compile_options(sqlite PRIVATE "-Wno-cast-function-type")
+endif()

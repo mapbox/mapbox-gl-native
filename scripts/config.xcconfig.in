@@ -7,3 +7,5 @@ mbgl_core_LINK_LIBRARIES = "$<TARGET_PROPERTY:mbgl-core,XCODE_ATTRIBUTE_XCCONFIG
 // mbgl-filesource
 mbgl_filesource_INCLUDE_DIRECTORIES = "$<JOIN:$<TARGET_PROPERTY:mbgl-filesource,INTERFACE_INCLUDE_DIRECTORIES>," ">"
 mbgl_filesource_LINK_LIBRARIES = "$<TARGET_PROPERTY:mbgl-filesource,XCODE_ATTRIBUTE_XCCONFIG_LINK_LIBRARIES>"
+
+#include? "../../platform/darwin/developer.xcconfig"

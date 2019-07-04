@@ -55,6 +55,14 @@ public:
                             mbgl::OfflineRegions&);
     };
 
+    struct FileSourceCallback {
+        static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager$FileSourceCallback";}
+
+        static void onSuccess(jni::JNIEnv&, const jni::Object<OfflineManager::FileSourceCallback>&);
+
+        static void onError(jni::JNIEnv&, const jni::Object<OfflineManager::FileSourceCallback>&, const jni::String&);
+    };
+
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager"; };
 
     static void registerNative(jni::JNIEnv&);
@@ -85,6 +93,13 @@ public:
                             const jni::String& eTag,
                             jboolean mustRevalidate);
 
+    void resetDatabase(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
+
+    void invalidateAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
+
+    void clearAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
+
+    void setMaximumAmbientCacheSize(jni::JNIEnv&, const jni::jlong size, const jni::Object<FileSourceCallback>& callback_);
 
 private:
     std::shared_ptr<mbgl::DefaultFileSource> fileSource;

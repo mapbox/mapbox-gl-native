@@ -434,8 +434,16 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated;
 
 /**
- Changes the receiver’s viewport to fit the given coordinate bounds and
- optionally some additional padding on each side.
+ Changes the receiver’s viewport to fit the given coordinate bounds with some
+ additional padding on each side.
+
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-setVisibleCoordinateBounds:edgePadding:animated:completionHandler:` method.
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param insets The minimum padding (in screen points) that will be visible
@@ -444,6 +452,24 @@ MGL_EXPORT IB_DESIGNABLE
     zooming or `NO` to immediately display the given bounds.
  */
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated;
+
+/**
+ Changes the receiver’s viewport to fit the given coordinate bounds with some
+ additional padding on each side, optionally calling a completion handler.
+
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
+
+ @param bounds The bounds that the viewport will show in its entirety.
+ @param insets The minimum padding (in screen points) that will be visible
+    around the given coordinate bounds.
+ @param animated Specify `YES` to animate the change by smoothly scrolling and
+    zooming or `NO` to immediately display the given bounds.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 /**
  Sets the visible region so that the map displays the specified annotations.
@@ -465,6 +491,9 @@ MGL_EXPORT IB_DESIGNABLE
 
  Calling this method updates the value in the `visibleCoordinateBounds` property
  and potentially other properties to reflect the new map region.
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-showAnnotations:edgePadding:animated:completionHandler:` method.
 
  @param annotations The annotations that you want to be visible in the map.
  @param insets The minimum padding (in screen points) around the edges of the
@@ -473,6 +502,23 @@ MGL_EXPORT IB_DESIGNABLE
  if you want the map to display the new region immediately without animations.
  */
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated;
+
+/**
+ Sets the visible region so that the map displays the specified annotations with
+ the specified amount of padding on each side and an optional completion
+ handler.
+
+ Calling this method updates the value in the `visibleCoordinateBounds` property
+ and potentially other properties to reflect the new map region.
+
+ @param annotations The annotations that you want to be visible in the map.
+ @param insets The minimum padding (in screen points) around the edges of the
+    map view to keep clear of annotations.
+ @param animated `YES` if you want the map region change to be animated, or `NO`
+    if you want the map to display the new region immediately without animations.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 /**
  Returns the camera that best fits the given coordinate bounds.
@@ -486,8 +532,8 @@ MGL_EXPORT IB_DESIGNABLE
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds;
 
 /**
- Returns the camera that best fits the given coordinate bounds, optionally with
- some additional padding on each side.
+ Returns the camera that best fits the given coordinate bounds with some
+ additional padding on each side.
 
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
  @param insets The minimum padding (in screen points) that would be visible
@@ -500,8 +546,9 @@ MGL_EXPORT IB_DESIGNABLE
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets;
 
 /**
- Returns the camera that best fits the given coordinate bounds, with the specified camera,
- optionally with some additional padding on each side.
+ Returns the camera that best fits the given coordinate bounds with some
+ additional padding on each side, matching an existing camera as much as
+ possible.
  
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
@@ -516,8 +563,8 @@ MGL_EXPORT IB_DESIGNABLE
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets;
 
 /**
- Returns the camera that best fits the given shape, with the specified camera,
- optionally with some additional padding on each side.
+ Returns the camera that best fits the given shape with some additional padding
+ on each side, matching an existing camera as much as possible.
  
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
@@ -525,22 +572,23 @@ MGL_EXPORT IB_DESIGNABLE
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
  @return A camera object centered on the shape's center with zoom level as high
-    (close to the ground) as possible while still including the entire shape. The
-    initial camera's pitch and direction will be honored.
+    (close to the ground) as possible while still including the entire shape.
+    The initial camera's pitch and direction will be honored.
  */
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(NSEdgeInsets)insets;
 
 /**
- Returns the camera that best fits the given shape, with the specified direction,
- optionally with some additional padding on each side.
+ Returns the camera that best fits the given shape with some additional padding
+ on each side while looking in the specified direction.
 
  @param shape The shape to fit to the receiver’s viewport.
- @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param direction The direction of the viewport, measured in degrees clockwise
+    from true north.
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
- @return A camera object centered on the shape's center with zoom level as high 
-    (close to the ground) as possible while still including the entire shape. The
-    camera object uses the current pitch.
+ @return A camera object centered on the shape's center with zoom level as high
+    (close to the ground) as possible while still including the entire shape.
+    The camera object uses the current pitch.
  */
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets;
 
@@ -578,8 +626,8 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, assign) NSEdgeInsets contentInsets;
 
 /**
- Sets the distance from the edges of the map view’s frame to the edges of the
- map view’s logical viewport, with an optional transition animation.
+ Deprecated. Sets the distance from the edges of the map view’s frame to the
+ edges of the map view’s logical viewport, with an optional transition animation.
 
  When the value of this property is equal to `NSEdgeInsetsZero`, viewport
  properties such as `centerCoordinate` assume a viewport that matches the map
@@ -589,13 +637,38 @@ MGL_EXPORT IB_DESIGNABLE
 
  When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
  the value of this property may be overridden at any time.
+ 
+ To specify a completion handler to execute after the animation finishes, use
+ the `-setContentInsets:animated:completionHandler:` method.
 
  @param contentInsets The new values to inset the content by.
  @param animated Specify `YES` if you want the map view to animate the change to
     the content insets or `NO` if you want the map to inset the content
     immediately.
  */
-- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated;
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated __attribute__((deprecated("Use `-setContentInsets:animated:completionHandler:` instead.")));
+
+/**
+ Sets the distance from the edges of the map view’s frame to the edges of the
+ map view’s logical viewport with an optional transition animation and
+ completion handler.
+ 
+ When the value of this property is equal to `NSEdgeInsetsZero`, viewport
+ properties such as `centerCoordinate` assume a viewport that matches the map
+ view’s frame. Otherwise, those properties are inset, excluding part of the
+ frame from the viewport. For instance, if the only the top edge is inset, the
+ map center is effectively shifted downward.
+
+ When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
+ the value of this property may be overridden at any time.
+ 
+ @param contentInsets The new values to inset the content by.
+ @param animated Specify `YES` if you want the map view to animate the change to
+    the content insets or `NO` if you want the map to inset the content
+    immediately.
+ @param completion The block executed after the animation finishes.
+ */
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
 #pragma mark Configuring How the User Interacts with the Map
 
@@ -784,9 +857,6 @@ MGL_EXPORT IB_DESIGNABLE
  annotation is *not* centered within the viewport.
 
  @param annotation The annotation object to select.
-
- @note In versions prior to `4.0.0` selecting an offscreen annotation did not
- change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation;
 

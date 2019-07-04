@@ -978,6 +978,14 @@ public:
     self.needsDisplay = YES;
 }
 
+- (BOOL)shouldRemoveStyleImage:(NSString *)imageName {
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldRemoveStyleImage:)]) {
+        return [self.delegate mapView:self shouldRemoveStyleImage:imageName];
+    }
+    
+    return YES;
+}
+
 #pragma mark Printing
 
 - (void)print:(__unused id)sender {
@@ -1010,13 +1018,26 @@ public:
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
+    [self setCenterCoordinate:centerCoordinate animated:animated completionHandler:nil];
+}
+
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion {
     MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", MGLStringFromCLLocationCoordinate2D(centerCoordinate), MGLStringFromBOOL(animated));
+    mbgl::AnimationOptions animationOptions = MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0);
+    animationOptions.transitionFinishFn = ^() {
+        [self didChangeValueForKey:@"centerCoordinate"];
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion();
+            });
+        }
+    };
+    
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->easeTo(mbgl::CameraOptions()
                          .withCenter(MGLLatLngFromLocationCoordinate2D(centerCoordinate))
                          .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets)),
-                     MGLDurationFromTimeInterval(animated ? MGLAnimationDuration : 0));
-    [self didChangeValueForKey:@"centerCoordinate"];
+                     animationOptions);
 }
 
 - (void)offsetCenterCoordinateBy:(NSPoint)delta animated:(BOOL)animated {
@@ -1296,6 +1317,10 @@ public:
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated {
+    [self setVisibleCoordinateBounds:bounds edgePadding:insets animated:animated completionHandler:nil];
+}
+
+- (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion {
     _mbglMap->cancelTransitions();
 
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
@@ -1308,12 +1333,18 @@ public:
     
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
     if ([self.camera isEqualToMapCamera:camera]) {
+        completion();
         return;
     }
 
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
     animationOptions.transitionFinishFn = ^() {
         [self didChangeValueForKey:@"visibleCoordinateBounds"];
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion();
+            });
+        }
     };
     _mbglMap->easeTo(cameraOptions, animationOptions);
 }
@@ -1408,13 +1439,18 @@ public:
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets {
-    MGLLogDebug(@"Setting contentInset: %@", MGLStringFromNSEdgeInsets(contentInsets));
-    [self setContentInsets:contentInsets animated:NO];
+    [self setContentInsets:contentInsets animated:NO completionHandler:nil];
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated {
-    
+    [self setContentInsets:contentInsets animated:animated completionHandler:nil];
+}
+
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion {
     if (NSEdgeInsetsEqual(contentInsets, self.contentInsets)) {
+        if (completion) {
+            completion();
+        }
         return;
     }
     MGLLogDebug(@"Setting contentInset: %@ animated:", MGLStringFromNSEdgeInsets(contentInsets), MGLStringFromBOOL(animated));
@@ -1423,7 +1459,7 @@ public:
     // content insets.
     CLLocationCoordinate2D oldCenter = self.centerCoordinate;
     _contentInsets = contentInsets;
-    [self setCenterCoordinate:oldCenter animated:animated];
+    [self setCenterCoordinate:oldCenter animated:animated completionHandler:completion];
 }
 
 #pragma mark Mouse events and gestures
@@ -2465,25 +2501,31 @@ public:
 }
 
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated {
-    if ( ! annotations || ! annotations.count) return;
+    [self showAnnotations:annotations edgePadding:insets animated:animated completionHandler:nil];
+}
+
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion {
+    if (!annotations.count) {
+        if (completion) {
+            completion();
+        }
+        return;
+    }
 
     mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
 
-    for (id <MGLAnnotation> annotation in annotations)
-    {
-        if ([annotation conformsToProtocol:@protocol(MGLOverlay)])
-        {
+    for (id <MGLAnnotation> annotation in annotations) {
+        if ([annotation conformsToProtocol:@protocol(MGLOverlay)]) {
             bounds.extend(MGLLatLngBoundsFromCoordinateBounds(((id <MGLOverlay>)annotation).overlayBounds));
-        }
-        else
-        {
+        } else {
             bounds.extend(MGLLatLngFromLocationCoordinate2D(annotation.coordinate));
         }
     }
 
     [self setVisibleCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(bounds)
                          edgePadding:insets
-                            animated:animated];
+                            animated:animated
+                   completionHandler:completion];
 }
 
 /// Returns a popover detailing the annotation.

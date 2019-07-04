@@ -41,7 +41,7 @@ typedef struct PanTestData {
 } PanTestData;
 
 #define PAN_TEST_TERMINATOR {{FLT_MAX, FLT_MAX}, NO, NO, NO, NO, NO}
-static const CGFloat kAnnotationScale = 0.125f;
+static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
 
 - (void)internalTestOffscreenSelectionTitle:(NSString*)title withTestData:(PanTestData)test animateSelection:(BOOL)animateSelection {
     
@@ -61,7 +61,7 @@ static const CGFloat kAnnotationScale = 0.125f;
     
     NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
     CGSize size = self.mapView.bounds.size;
-    CGSize annotationSize = CGSizeMake(floor(size.width*kAnnotationScale), floor(size.height*kAnnotationScale));
+    CGSize annotationSize = CGSizeMake(floor(size.width*kAnnotationRelativeScale.x), floor(size.height*kAnnotationRelativeScale.y));
     
     self.viewForAnnotation = ^MGLAnnotationView*(MGLMapView *view, id<MGLAnnotation> annotation) {
         
@@ -79,7 +79,7 @@ static const CGFloat kAnnotationScale = 0.125f;
     };
     
     // Coordinate for annotation screen coordinate
-    CGPoint annotationPoint = CGPointMake(relativeCoordinate.x * size.width, relativeCoordinate.y * size.height);
+    CGPoint annotationPoint = CGPointMake(floor(relativeCoordinate.x * size.width), floor(relativeCoordinate.y * size.height)   );
     CLLocationCoordinate2D coordinate = [self.mapView convertPoint:annotationPoint toCoordinateFromView:self.mapView];
     
     MGLPointAnnotation *point = [[MGLPointAnnotation alloc] init];
@@ -112,13 +112,16 @@ static const CGFloat kAnnotationScale = 0.125f;
     // Also note, that at this point, the internal mechanism that determines if
     // an annotation view is offscreen and should be put back in the reuse queue
     // will have run, and `viewForAnnotation` may return nil
-    
-    [self.mapView selectAnnotation:point moveIntoView:moveIntoView animateSelection:animateSelection];
+
+    XCTestExpectation *selectionCompleted = [self expectationWithDescription:@"Selection completed"];
+    [self.mapView selectAnnotation:point moveIntoView:moveIntoView animateSelection:animateSelection completionHandler:^{
+        [selectionCompleted fulfill];
+    }];
 
     // Animated selection takes MGLAnimationDuration (0.3 seconds), so wait a little
     // longer. We don't need to wait as long if we're not animated (but we do
     // want the runloop to tick over)
-    [self waitFor:animateSelection ? 0.4: 0.05];
+    [self waitForExpectations:@[selectionCompleted] timeout:animateSelection ? 0.4: 0.05];
 
     UIView *annotationViewAfterSelection =  [self.mapView viewForAnnotation:point];
     CLLocationCoordinate2D mapCenterAfterSelection = self.mapView.centerCoordinate;
@@ -128,7 +131,7 @@ static const CGFloat kAnnotationScale = 0.125f;
     // may be nil, which is expected.
     BOOL (^CGRectContainsRectWithAccuracy)(CGRect, CGRect, CGFloat) = ^(CGRect rect1, CGRect rect2, CGFloat accuracy) {
         CGRect expandedRect1 = CGRectInset(rect1, -accuracy, -accuracy);
-        return CGRectContainsRect(expandedRect1, rect2);
+        return (BOOL)CGRectContainsRect(expandedRect1, rect2);
     };
     
     CGFloat epsilon = 0.00001;
@@ -151,9 +154,8 @@ static const CGFloat kAnnotationScale = 0.125f;
             UIView *calloutView = self.mapView.calloutViewForSelectedAnnotation;
             XCTAssertNotNil(calloutView);
             
-            // If kAnnotationScale == 0.25, then the following assert can fail.
-            // This is really a warning (see https://github.com/mapbox/mapbox-gl-native/issues/13744 )
-            // If you need this NOT to fail the tests, consider replacing with MGLTestWarning
+            // This can fail if the callout view's width is < the annotations. This is really a warning, so
+            // if you need this NOT to fail the tests, consider replacing with MGLTestWarning
             XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, 0.25),
                       @"Expect contains:%d, Mapview:%@ annotation:%@ callout:%@",
                       expectCalloutToBeFullyOnscreen,
@@ -320,6 +322,8 @@ static const CGFloat kAnnotationScale = 0.125f;
     // | Onscreen            | Yes          | Yes                                   | Yes, but *only* to ensure callout is fully visible |
     //
 
+    CGFloat offset = kAnnotationRelativeScale.x * 0.5f;
+    
     PanTestData tests[] = {
         //  Coord           showsCallout    impl margins?   moveIntoView    expectMapToPan  calloutOnScreen
         //  Offscreen
@@ -341,9 +345,10 @@ static const CGFloat kAnnotationScale = 0.125f;
         //  Expects to move, because although onscreen, callout would not be.
         //  However, if the scale is 0.25, then expectToPan should be NO, because
         //  of the width of the annotation
-        //
-        //  Coord                     showsCallout  impl margins?   moveIntoView    expectMapToPan                  calloutOnScreen
-        {   {kAnnotationScale, 0.5f}, YES,          YES,            YES,            (kAnnotationScale == 0.125f),   YES },
+
+        //  Coord                   showsCallout  impl margins?   moveIntoView    expectMapToPan    calloutOnScreen
+        {   {offset, 0.5f},         YES,          YES,            YES,            YES,              YES },
+        {   {1.0 - offset, 0.5f},   YES,          YES,            YES,            YES,              YES },
 
         PAN_TEST_TERMINATOR
     };
@@ -475,12 +480,12 @@ static const CGFloat kAnnotationScale = 0.125f;
     MGLTestLocationManager *locationManager = [[MGLTestLocationManager alloc] init];
     self.mapView.locationManager = locationManager;
 
-    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO];
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO completionHandler:nil];
     CGRect originalFrame = [self.mapView viewForAnnotation:self.mapView.userLocation].frame;
     
     // Temporarily disable location tracking so we can save the value of
     // the originalFrame in memory
-    [self.mapView setUserTrackingMode:MGLUserTrackingModeNone animated:NO];
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeNone animated:NO completionHandler:nil];
     
     CGPoint offset = CGPointMake(20, 20);
     
@@ -488,7 +493,7 @@ static const CGFloat kAnnotationScale = 0.125f;
         return offset;;
     };
     
-    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO];
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO completionHandler:nil];
     CGRect offsetFrame = [self.mapView viewForAnnotation:self.mapView.userLocation].frame;
     
     XCTAssertEqual(originalFrame.origin.x + offset.x, offsetFrame.origin.x);

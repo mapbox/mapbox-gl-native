@@ -213,9 +213,60 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	-derivedDataPath $(IOS_OUTPUT_PATH) \
 	-configuration $(BUILDTYPE) -sdk iphonesimulator \
-	-destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	-workspace $(IOS_WORK_PATH) \
 	-jobs $(JOBS)
+
+ifneq ($(MORE_SIMULATORS),)
+	IOS_LATEST = true
+	IOS_11 = true
+	IOS_10 = true
+	IOS_9 = true
+endif
+
+ifdef IOS_LATEST
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xs Max' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xr' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPad Pro (11-inch)'
+endif
+
+ifdef IOS_11
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone 7' \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone X' \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPad (5th generation)'
+endif
+
+ifdef IOS_10
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone SE' \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone 7 Plus' \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPad Pro (9.7-inch)'
+endif
+
+ifdef IOS_9
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s Plus' \
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s' \
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPad Air 2'
+endif
+
+# If IOS_XCODEBUILD_SIM does not contain a simulator destination, add the default.
+ifeq (, $(findstring destination, $(IOS_XCODEBUILD_SIM)))
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8'
+else
+	IOS_XCODEBUILD_SIM += -parallel-testing-enabled YES
+endif
+
+ifneq ($(ONLY_TESTING),)
+	IOS_XCODEBUILD_SIM += -only-testing:$(ONLY_TESTING)
+endif
+
+ifneq ($(SKIP_TESTING),)
+	IOS_XCODEBUILD_SIM += -skip-testing:$(SKIP_TESTING)
+endif
 
 ifneq ($(CI),)
 	IOS_XCODEBUILD_SIM += -xcconfig platform/darwin/ci.xcconfig
@@ -241,9 +292,13 @@ iproj: $(IOS_PROJ_PATH)
 	xed $(IOS_WORK_PATH)
 
 .PHONY: ios-lint
-ios-lint:
+ios-lint: ios-pod-lint
 	find platform/ios/framework -type f -name '*.plist' | xargs plutil -lint
 	find platform/ios/app -type f -name '*.plist' | xargs plutil -lint
+
+.PHONY: ios-pod-lint
+ios-pod-lint:
+	./platform/ios/scripts/lint-podspecs.js
 
 .PHONY: ios-test
 ios-test: $(IOS_PROJ_PATH)
@@ -264,6 +319,12 @@ ios-sanitize-address: $(IOS_PROJ_PATH)
 .PHONY: ios-static-analyzer
 ios-static-analyzer: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) analyze -scheme 'CI' test $(XCPRETTY)
+
+.PHONY: ios-install-simulators
+ios-install-simulators:
+	xcversion simulators --install="iOS 11.4" || true
+	xcversion simulators --install="iOS 10.3.1" || true
+	xcversion simulators --install="iOS 9.3" || true
 
 .PHONY: ios-check-events-symbols
 ios-check-events-symbols:
@@ -495,12 +556,6 @@ qt-docs:
 .PHONY: test-node
 test-node: node
 	npm test
-	npm run test-suite
-
-.PHONY: test-node-recycle-map
-test-node-recycle-map: node
-	npm test
-	npm run test-render -- --recycle-map --shuffle
 	npm run test-query
 	npm run test-expressions
 

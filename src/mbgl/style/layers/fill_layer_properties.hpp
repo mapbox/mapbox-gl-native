@@ -61,6 +61,8 @@ public:
         FillPaintProperties::PossiblyEvaluated);
     ~FillLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const FillLayer::Impl& layerImpl() const;
     // Data members.
     CrossfadeParameters crossfade;

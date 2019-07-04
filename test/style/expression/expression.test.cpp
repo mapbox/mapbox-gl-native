@@ -36,10 +36,8 @@ TEST(Expression, IsExpression) {
         // TODO:   "feature-state": https://github.com/mapbox/mapbox-gl-native/issues/12613
         // TODO: "interpolate-hcl": https://github.com/mapbox/mapbox-gl-native/issues/8720
         // TODO: "interpolate-lab": https://github.com/mapbox/mapbox-gl-native/issues/8720
-        // TODO: "number-format": https://github.com/mapbox/mapbox-gl-native/issues/13632
         // TODO: "accumulated": https://github.com/mapbox/mapbox-gl-native/issues/14043
-        if (name == "feature-state" || name == "interpolate-hcl" || name == "interpolate-lab" || name == "number-format" ||
-            name == "accumulated") {
+        if (name == "feature-state" || name == "interpolate-hcl" || name == "interpolate-lab" || name == "accumulated") {
             if (expression::isExpression(conversion::Convertible(expression))) {
                 ASSERT_TRUE(false) << "Expression name" << name << "is implemented - please update Expression.IsExpression test.";
             }

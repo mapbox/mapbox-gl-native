@@ -328,7 +328,7 @@
     NSLog(@"setCenterCoordinate: %0.4fs", stop1 - stop0);
     NSLog(@"flyToCamera: %0.4fs", stop2 - stop1);
 
-    XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
+    XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", (long)delegateCallCount); // Once for the setDirection and once for the reset north
 }
 
 #pragma mark - Pending tests

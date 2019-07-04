@@ -140,11 +140,26 @@ To add an example code listing to the documentation for a class or class member:
 
 [SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
 
+### Customizing compilation settings
+
+You can provide an optional and custom [`xcconfig`](https://help.apple.com/xcode/mac/current/#/dev745c5c974) file named `platform/darwin/developer.xcconfig` to set custom build options. This file is ignored by git. These custom settings apply to all configurations (`Debug`, `Release`, `RelWithDebInfo`), but do **not** apply to the core `mbgl` files. This mechanism allows you to try different compiler settings (for example when testing an Xcode beta).
+
 ## Testing
 
-`make ios-test` builds and runs unit tests of cross-platform code as well as the SDK.
+`make ios-test` builds and runs unit tests of cross-platform code and of the SDK. Other types of tests available include:
 
-To instead run the cross-platform tests in Xcode instead of on the command line:
+* `make ios-integration-test` runs UI tests from the "Integration Test Harness" scheme.
+* `make ios-sanitize` runs unit tests from the "CI" scheme with the Thread Sanitizer and Undefined Behavior Sanitizer enabled.
+* `make ios-sanitize-address` runs unit tests from the "CI" scheme with the Address Sanitizer enabled.
+* `make ios-static-analyzer` runs unit tests from the "CI" scheme with the Static Analyzer enabled.
+
+These commands are run by default on a single Simulator. To enable legacy iOS versions and more device types, add `MORE_SIMULATORS=YES`. Use `IOS_LATEST=YES`, `IOS_11=YES`, etc. to test on specific iOS versions.
+
+To only run a specific test or class of tests, add `ONLY_TESTING=test/MGLNameOfTestClass/testNameOfTest`.
+
+To skip a specific test or class of tests, add `SKIP_TESTING=test/MGLNameOfTestClass/testNameOfTest`.
+
+To run the cross-platform tests in Xcode instead of on the command line:
 
 1. Run `make iproj` to set up the workspace.
 1. Change the scheme to “test (platform project)” and press Command-R to run core unit tests.

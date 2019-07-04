@@ -32,7 +32,8 @@ ext {
             lint            : '26.1.4',
             gms             : '16.0.0',
             soLoader        : '0.6.0',
-            jacoco          : '0.8.3'
+            jacoco          : '0.8.3',
+            appcenter       : '1.4'
     ]
 
     dependenciesList = [
@@ -53,6 +54,7 @@ ext {
             testEspressoIntents    : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
             testEspressoContrib    : "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
             testUiAutomator        : "com.android.support.test.uiautomator:uiautomator-v18:${versions.uiAutomator}",
+            appCenter              : "com.microsoft.appcenter:espresso-test-extension:${versions.appcenter}",
             commonsIO              : 'commons-io:commons-io:2.5',
             supportAnnotations     : "com.android.support:support-annotations:${versions.supportLib}",
             supportAppcompatV7     : "com.android.support:appcompat-v7:${versions.supportLib}",

@@ -231,12 +231,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
             if (holdForFade && typeInfo->fadingTiles == LayerTypeInfo::FadingTiles::NotRequired) {
                 continue;
             }
-            // Update layer properties for complete tiles; for incomplete just check the presence.
-            bool layerRenderableInTile = tile.isComplete() ? tile.updateLayerProperties(layerProperties)
-                                                           : static_cast<bool>(tile.getBucket(*layerProperties->baseImpl));
-            if (layerRenderableInTile) {
-                tile.usedByRenderedLayers = true;
-            }
+            tile.usedByRenderedLayers |= tile.layerPropertiesUpdated(layerProperties);
         }
     }
 }

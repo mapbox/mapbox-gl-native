@@ -544,7 +544,9 @@ void NodeMap::renderFinished() {
             },
             img.data.get()
         ).ToLocalChecked();
-        img.data.release();
+        if (!pixels.IsEmpty()) {
+            img.data.release();
+        }
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
@@ -777,6 +779,11 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("Max height and width is 1024");
     }
 
+    bool sdf = false;
+    if (Nan::Get(optionObject, Nan::New("sdf").ToLocalChecked()).ToLocalChecked()->IsBoolean()) {
+        sdf = Nan::Get(optionObject, Nan::New("sdf").ToLocalChecked()).ToLocalChecked()->BooleanValue();
+    }
+
     float pixelRatio = Nan::Get(optionObject, Nan::New("pixelRatio").ToLocalChecked()).ToLocalChecked()->NumberValue();
     auto imageBuffer = Nan::To<v8::Object>(info[1]).ToLocalChecked()->ToObject();
     
@@ -792,7 +799,7 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     
     mbgl::UnassociatedImage cImage({ imageWidth, imageHeight}, std::move(data));
     mbgl::PremultipliedImage cPremultipliedImage = mbgl::util::premultiply(std::move(cImage));
-    nodeMap->map->getStyle().addImage(std::make_unique<mbgl::style::Image>(*Nan::Utf8String(info[0]), std::move(cPremultipliedImage), pixelRatio));
+    nodeMap->map->getStyle().addImage(std::make_unique<mbgl::style::Image>(*Nan::Utf8String(info[0]), std::move(cPremultipliedImage), pixelRatio, sdf));
 }
 
 void NodeMap::RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -1244,20 +1251,19 @@ std::unique_ptr<mbgl::AsyncRequest> NodeFileSource::request(const mbgl::Resource
     // *this while we're still executing code.
     nodeMap->handle();
 
+    auto asyncRequest = std::make_unique<node_mbgl::NodeAsyncRequest>();
+
     v8::Local<v8::Value> argv[] = {
         Nan::New<v8::External>(nodeMap),
-        Nan::New<v8::External>(&callback_)
+        Nan::New<v8::External>(&callback_),
+        Nan::New<v8::External>(asyncRequest.get()),
+        Nan::New(resource.url).ToLocalChecked(),
+        Nan::New<v8::Integer>(resource.kind)
     };
 
-    auto instance = Nan::NewInstance(Nan::New(node_mbgl::NodeRequest::constructor), 2, argv).ToLocalChecked();
+    Nan::NewInstance(Nan::New(node_mbgl::NodeRequest::constructor), 5, argv).ToLocalChecked();
 
-    Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
-    Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));
-
-    auto req = Nan::ObjectWrap::Unwrap<node_mbgl::NodeRequest>(instance);
-    req->Execute();
-
-    return std::make_unique<node_mbgl::NodeRequest::NodeAsyncRequest>(req);
+    return asyncRequest;
 }
 
 } // namespace node_mbgl
