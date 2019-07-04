@@ -772,8 +772,8 @@ android-ui-test: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
 #Run instrumentations tests on MicroSoft App Center
-.PHONY: android-test-app-center
-android-test-app-center:
+.PHONY: run-android-test-app-center
+run-android-test-app-center:
 	cd platform/android && appcenter test run espresso --app "mapboxcn-outlook.com/MapsSdk" --devices "mapboxcn-outlook.com/china" --app-path MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk  --test-series "master" --locale "en_US" --build-dir MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug
 
 # Uploads the compiled Android SDK to Bintray
