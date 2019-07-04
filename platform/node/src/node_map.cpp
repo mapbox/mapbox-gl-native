@@ -779,6 +779,11 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("Max height and width is 1024");
     }
 
+    bool sdf = false;
+    if (Nan::Get(optionObject, Nan::New("sdf").ToLocalChecked()).ToLocalChecked()->IsBoolean()) {
+        sdf = Nan::Get(optionObject, Nan::New("sdf").ToLocalChecked()).ToLocalChecked()->BooleanValue();
+    }
+
     float pixelRatio = Nan::Get(optionObject, Nan::New("pixelRatio").ToLocalChecked()).ToLocalChecked()->NumberValue();
     auto imageBuffer = Nan::To<v8::Object>(info[1]).ToLocalChecked()->ToObject();
     
@@ -794,7 +799,7 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     
     mbgl::UnassociatedImage cImage({ imageWidth, imageHeight}, std::move(data));
     mbgl::PremultipliedImage cPremultipliedImage = mbgl::util::premultiply(std::move(cImage));
-    nodeMap->map->getStyle().addImage(std::make_unique<mbgl::style::Image>(*Nan::Utf8String(info[0]), std::move(cPremultipliedImage), pixelRatio));
+    nodeMap->map->getStyle().addImage(std::make_unique<mbgl::style::Image>(*Nan::Utf8String(info[0]), std::move(cPremultipliedImage), pixelRatio, sdf));
 }
 
 void NodeMap::RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
