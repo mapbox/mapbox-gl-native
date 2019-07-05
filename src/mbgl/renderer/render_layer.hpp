@@ -1,10 +1,12 @@
 #pragma once
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
+#include <mbgl/renderer/render_tree.hpp>
 #include <mbgl/style/layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -43,7 +45,31 @@ public:
     const TransformState& state;
 };
 
+class LayerRenderItem;
 using RenderTiles = std::vector<std::reference_wrapper<const RenderTile>>;
+using LayerUploader = std::function<void(gfx::UploadPass&)>;
+using LayerRenderer = std::function<void(PaintParameters&, const LayerRenderItem&)>;
+
+class LayerRenderItem final : public RenderItem {
+public:
+    LayerRenderItem(RenderTiles, LayerRenderer, LayerUploader, Immutable<style::LayerProperties>, RenderPass);
+    ~LayerRenderItem();
+
+    RenderTiles renderTiles;
+    LayerRenderer renderer;
+    LayerUploader uploader; // optionally initialized.
+    Immutable<style::LayerProperties> evaluatedProperties;
+
+private:
+    bool hasRenderPass(RenderPass pass) const override { return bool(renderPass & pass); }
+    void upload(gfx::UploadPass& pass) const override { if (uploader) uploader(pass);}
+    void render(PaintParameters& parameters) const override {
+        assert(renderer);
+        renderer(parameters, *this);
+    }
+    const std::string& getName() const override { return evaluatedProperties->baseImpl->id; } 
+    RenderPass renderPass;
+};
 
 class RenderLayer {
 protected:
@@ -52,6 +78,7 @@ protected:
 public:
     virtual ~RenderLayer() = default;
 
+    LayerRenderItem createRenderItem();
     // Begin transitions for any properties that have changed since the last frame.
     virtual void transition(const TransitionParameters&) = 0;
 
@@ -112,6 +139,8 @@ public:
     virtual optional<Color> getSolidBackground() const;
 
 protected:
+    virtual LayerRenderer createRenderer();
+    virtual LayerUploader createUploader();
     // Checks whether the current hardware can render this layer. If it can't, we'll show a warning
     // in the console to inform the developer.
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);

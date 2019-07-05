@@ -12,6 +12,33 @@ namespace mbgl {
 
 using namespace style;
 
+LayerRenderItem::LayerRenderItem(RenderTiles renderTiles_, LayerRenderer renderer_, LayerUploader uploader_, Immutable<style::LayerProperties> evaluatedProperties_, RenderPass renderPass_)
+    : renderTiles(std::move(renderTiles_))
+    , renderer(std::move(renderer_))
+    , uploader(std::move(uploader_))
+    , evaluatedProperties(std::move(evaluatedProperties_))
+    , renderPass(renderPass_) {}
+
+LayerRenderItem::~LayerRenderItem() = default;
+
+LayerRenderItem RenderLayer::createRenderItem() {
+    return {
+        renderTiles,
+        createRenderer(),
+        createUploader(),
+        evaluatedProperties,
+        passes
+    };
+}
+
+LayerRenderer RenderLayer::createRenderer() {
+    return [this](PaintParameters& pass, const LayerRenderItem&){ render(pass); };
+}
+
+LayerUploader RenderLayer::createUploader() {
+    return [this](gfx::UploadPass& pass){ upload(pass); };
+}
+
 RenderLayer::RenderLayer(Immutable<style::LayerProperties> properties)
     : evaluatedProperties(std::move(properties)),
       baseImpl(evaluatedProperties->baseImpl) {

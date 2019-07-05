@@ -38,27 +38,20 @@ static RendererObserver& nullObserver() {
 
 namespace {
 
-class LayerRenderItem final : public RenderItem {
+class OrderedRenderLayerItem {
 public:
-    LayerRenderItem(RenderLayer& layer_, RenderSource* source_, uint32_t index_)
+    OrderedRenderLayerItem(RenderLayer& layer_, RenderSource* source_, uint32_t index_)
         : layer(layer_), source(source_), index(index_) {}
-    bool operator<(const LayerRenderItem& other) const { return index < other.index; }
+    bool operator<(const OrderedRenderLayerItem& other) const { return index < other.index; }
     std::reference_wrapper<RenderLayer> layer;
     RenderSource* source;
-
-private:
-    bool hasRenderPass(RenderPass pass) const override { return layer.get().hasRenderPass(pass); }
-    void upload(gfx::UploadPass& pass) const override { layer.get().upload(pass); }
-    void render(PaintParameters& parameters) const override { layer.get().render(parameters); }
-    const std::string& getName() const override { return layer.get().getID(); } 
-
     uint32_t index;
 };
 
 class RenderTreeImpl final : public RenderTree {
 public:
     RenderTreeImpl(std::unique_ptr<RenderTreeParameters> parameters_,
-                   std::set<LayerRenderItem> layerRenderItems_,
+                   std::vector<LayerRenderItem> layerRenderItems_,
                    std::vector<std::unique_ptr<RenderItem>> sourceRenderItems_,
                    LineAtlas& lineAtlas_,
                    PatternAtlas& patternAtlas_)
@@ -81,7 +74,7 @@ public:
     LineAtlas& getLineAtlas() const override { return lineAtlas; }
     PatternAtlas& getPatternAtlas() const override { return patternAtlas; }
 
-    std::set<LayerRenderItem> layerRenderItems;
+    std::vector<LayerRenderItem> layerRenderItems;
     std::vector<std::unique_ptr<RenderItem>> sourceRenderItems;
     std::reference_wrapper<LineAtlas> lineAtlas;
     std::reference_wrapper<PatternAtlas> patternAtlas;
@@ -267,9 +260,9 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         updateParameters.timePoint,
         renderLight.getEvaluated());
 
-    std::set<LayerRenderItem> layerRenderItems;
+    std::set<OrderedRenderLayerItem> orderedRenderLayers;
     std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
-    auto renderItemsEmplaceHint = layerRenderItems.begin();
+    auto emplaceHint = orderedRenderLayers.begin();
 
     // Update all sources and initialize renderItems.
     for (const auto& sourceImpl : *sourceImpls) {
@@ -297,7 +290,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                         filteredLayersForSource.push_back(layer->evaluatedProperties);
                         if (zoomFitsLayer) {
                             sourceNeedsRendering = true;
-                            renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
+                            emplaceHint = orderedRenderLayers.emplace_hint(emplaceHint, *layer, source, index);
                         }
                     }
                 }
@@ -313,7 +306,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                         continue; // This layer is shown with background color, and it shall not be added to render items. 
                     }
                 }
-                renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, nullptr, index);
+                emplaceHint = orderedRenderLayers.emplace_hint(emplaceHint, *layer, nullptr, index);
             }
         }
         source->update(sourceImpl,
@@ -335,9 +328,9 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
     }
 
-    for (auto& renderItem : layerRenderItems) {
-        RenderLayer& renderLayer = renderItem.layer;
-        renderLayer.prepare({renderItem.source, *imageManager, *patternAtlas, *lineAtlas, updateParameters.transformState});
+    for (auto& entry : orderedRenderLayers) {
+        RenderLayer& renderLayer = entry.layer;
+        renderLayer.prepare({entry.source, *imageManager, *patternAtlas, *lineAtlas, updateParameters.transformState});
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
@@ -393,11 +386,18 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         imageManager->reduceMemoryUseIfCacheSizeExceedsLimit();
     }
 
+    // Create render items and render tree.
     std::vector<std::unique_ptr<RenderItem>> sourceRenderItems;
     for (const auto& entry : renderSources) {
         if (entry.second->isEnabled()) {
             sourceRenderItems.emplace_back(entry.second->createRenderItem());
         }
+    }
+
+    std::vector<LayerRenderItem> layerRenderItems;
+    layerRenderItems.reserve(orderedRenderLayers.size());
+    for (auto& entry : orderedRenderLayers) {
+        layerRenderItems.emplace_back(entry.layer.get().createRenderItem());
     }
 
     return std::make_unique<RenderTreeImpl>(
