@@ -20,17 +20,193 @@ namespace mbgl {
 
 using namespace style;
 
+ColorRampRenderData::ColorRampRenderData(const style::ColorRampPropertyValue& value) 
+    : image({256, 1}) {
+    assert(!value.isUndefined());
+    const auto length = image.bytes();
+
+    for (uint32_t i = 0; i < length; i += 4) {
+        const auto color = value.evaluate(static_cast<double>(i) / length);
+        image.data[i] = std::floor(color.r * 255);
+        image.data[i + 1] = std::floor(color.g * 255);
+        image.data[i + 2] = std::floor(color.b * 255);
+        image.data[i + 3] = std::floor(color.a * 255);
+    }
+}
+
+void ColorRampRenderData::upload(gfx::UploadPass& uploadPass) {
+    if (!texture) {
+        texture = uploadPass.createTexture(image);
+    }
+}
+
 inline const LineLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
     return static_cast<const LineLayer::Impl&>(*impl);
 }
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
     : RenderLayer(makeMutable<LineLayerProperties>(std::move(_impl))),
-      unevaluated(impl(baseImpl).paint.untransitioned()),
-      colorRamp({256, 1}) {
+      unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
 
 RenderLineLayer::~RenderLineLayer() = default;
+
+LayerRenderer RenderLineLayer::createRenderer() {
+    const unsigned char kDrawPattern = 1 << 0;
+    const unsigned char kDrawGradient = 1 << 1;
+    // Minimize size of the catured parameters in order to
+    // avoid heap allocations at std::function construction.
+    unsigned char drawFlags = 0;
+
+    if (!unevaluated.get<LinePattern>().isUndefined()) {
+        drawFlags |= kDrawPattern;
+    } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
+        drawFlags |= kDrawGradient;
+    }
+
+    return [drawFlags, colorRampData = colorRamp](PaintParameters& parameters, const LayerRenderItem& renderItem) {
+        if (parameters.pass == RenderPass::Opaque) {
+            return;
+        }
+        const auto& renderTiles = renderItem.renderTiles;
+        const auto layerId = renderItem.evaluatedProperties->baseImpl->id;
+
+        parameters.renderTileClippingMasks(renderTiles);
+
+        for (const RenderTile& tile : renderTiles) {
+            const LayerRenderData* renderData = tile.getLayerRenderData(*renderItem.evaluatedProperties->baseImpl);
+            if (!renderData) {
+                continue;
+            }
+            auto& bucket = static_cast<LineBucket&>(*renderData->bucket);
+            const auto& evaluated = getEvaluated<LineLayerProperties>(renderData->layerProperties);
+            const auto& crossfade = getCrossfade<LineLayerProperties>(renderData->layerProperties);
+
+            const bool drawDash = !evaluated.get<LineDasharray>().from.empty();
+
+            auto draw = [&](auto& programInstance,
+                            auto&& uniformValues,
+                            const optional<ImagePosition>& patternPositionA,
+                            const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
+                const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(layerId);
+
+                paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
+
+                const auto allUniformValues = programInstance.computeAllUniformValues(
+                    std::move(uniformValues),
+                    paintPropertyBinders,
+                    evaluated,
+                    parameters.state.getZoom()
+                );
+                const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                    *bucket.vertexBuffer,
+                    paintPropertyBinders,
+                    evaluated
+                );
+
+                renderItem.checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+                programInstance.draw(
+                    parameters.context,
+                    *parameters.renderPass,
+                    gfx::Triangles(),
+                    parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
+                    parameters.stencilModeForClipping(tile.id),
+                    parameters.colorModeForRenderPass(),
+                    gfx::CullFaceMode::disabled(),
+                    *bucket.indexBuffer,
+                    bucket.segments,
+                    allUniformValues,
+                    allAttributeBindings,
+                    std::move(textureBindings),
+                    layerId
+                );
+            };
+
+            if (drawDash) {
+                const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
+                    ? LinePatternCap::Round : LinePatternCap::Square;
+                LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
+                LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+
+                draw(
+                    parameters.programs.getLineLayerPrograms().lineSDF,
+                    LineSDFProgram::layoutUniformValues(
+                        evaluated,
+                        parameters.pixelRatio,
+                        tile,
+                        parameters.state,
+                        parameters.pixelsToGLUnits,
+                        posA,
+                        posB,
+                        crossfade,
+                        parameters.lineAtlas.getSize().width),
+                        {},
+                        {},
+                        LineSDFProgram::TextureBindings{
+                            parameters.lineAtlas.textureBinding(),
+                        });
+
+            } else if (drawFlags & kDrawPattern) {
+                const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
+                const Size& texsize = tile.getIconAtlasTexture().size;
+
+                optional<ImagePosition> posA = tile.getPattern(linePatternValue.from);
+                optional<ImagePosition> posB = tile.getPattern(linePatternValue.to);
+
+                draw(parameters.programs.getLineLayerPrograms().linePattern,
+                    LinePatternProgram::layoutUniformValues(
+                        evaluated,
+                        tile,
+                        parameters.state,
+                        parameters.pixelsToGLUnits,
+                        parameters.pixelRatio,
+                        texsize,
+                        crossfade),
+                        posA,
+                        posB,
+                        LinePatternProgram::TextureBindings{
+                            textures::image::Value{ tile.getIconAtlasTexture().getResource(), gfx::TextureFilterType::Linear },
+                        });
+            } else if (drawFlags & kDrawGradient) {
+                assert(colorRampData);
+                assert(colorRampData->texture);
+                draw(parameters.programs.getLineLayerPrograms().lineGradient,
+                    LineGradientProgram::layoutUniformValues(
+                        evaluated,
+                        tile,
+                        parameters.state,
+                        parameters.pixelsToGLUnits,
+                        parameters.pixelRatio),
+                        {},
+                        {},
+                        LineGradientProgram::TextureBindings{
+                            textures::image::Value{ colorRampData->texture->getResource(), gfx::TextureFilterType::Linear },
+                        });
+            } else {
+                draw(parameters.programs.getLineLayerPrograms().line,
+                    LineProgram::layoutUniformValues(
+                        evaluated,
+                        tile,
+                        parameters.state,
+                        parameters.pixelsToGLUnits,
+                        parameters.pixelRatio),
+                    {},
+                    {},
+                    LineProgram::TextureBindings{});
+            }
+        }
+    };
+}
+
+LayerUploader RenderLineLayer::createUploader() {
+    if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
+        return [colorRampData = colorRamp] (gfx::UploadPass& uploadPass) {
+            if (colorRampData) colorRampData->upload(uploadPass);
+        };
+    }
+    return {};
+}
 
 void RenderLineLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
@@ -74,141 +250,6 @@ void RenderLineLayer::prepare(const LayerPrepareParameters& params) {
         // Ensures that the dash data gets added to the atlas.
         params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
         params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
-    }
-}
-
-void RenderLineLayer::upload(gfx::UploadPass& uploadPass) {
-    if (!unevaluated.get<LineGradient>().getValue().isUndefined() && !colorRampTexture) {
-        colorRampTexture = uploadPass.createTexture(colorRamp);
-    }
-}
-
-void RenderLineLayer::render(PaintParameters& parameters) {
-    if (parameters.pass == RenderPass::Opaque) {
-        return;
-    }
-
-    parameters.renderTileClippingMasks(renderTiles);
-
-    for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
-        if (!renderData) {
-            continue;
-        }
-        auto& bucket = static_cast<LineBucket&>(*renderData->bucket);
-        const auto& evaluated = getEvaluated<LineLayerProperties>(renderData->layerProperties);
-        const auto& crossfade = getCrossfade<LineLayerProperties>(renderData->layerProperties);
-
-        auto draw = [&](auto& programInstance,
-                        auto&& uniformValues,
-                        const optional<ImagePosition>& patternPositionA,
-                        const optional<ImagePosition>& patternPositionB, auto&& textureBindings) {
-            const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
-
-            paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
-
-            const auto allUniformValues = programInstance.computeAllUniformValues(
-                std::move(uniformValues),
-                paintPropertyBinders,
-                evaluated,
-                parameters.state.getZoom()
-            );
-            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-                *bucket.vertexBuffer,
-                paintPropertyBinders,
-                evaluated
-            );
-
-            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
-
-            programInstance.draw(
-                parameters.context,
-                *parameters.renderPass,
-                gfx::Triangles(),
-                parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
-                parameters.stencilModeForClipping(tile.id),
-                parameters.colorModeForRenderPass(),
-                gfx::CullFaceMode::disabled(),
-                *bucket.indexBuffer,
-                bucket.segments,
-                allUniformValues,
-                allAttributeBindings,
-                std::move(textureBindings),
-                getID()
-            );
-        };
-
-        if (!evaluated.get<LineDasharray>().from.empty()) {
-            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
-                ? LinePatternCap::Round : LinePatternCap::Square;
-            LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
-            LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
-
-            draw(parameters.programs.getLineLayerPrograms().lineSDF,
-                 LineSDFProgram::layoutUniformValues(
-                     evaluated,
-                     parameters.pixelRatio,
-                     tile,
-                     parameters.state,
-                     parameters.pixelsToGLUnits,
-                     posA,
-                     posB,
-                     crossfade,
-                     parameters.lineAtlas.getSize().width),
-                     {},
-                     {},
-                     LineSDFProgram::TextureBindings{
-                         parameters.lineAtlas.textureBinding(),
-                     });
-
-        } else if (!unevaluated.get<LinePattern>().isUndefined()) {
-            const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
-            const Size& texsize = tile.getIconAtlasTexture().size;
-
-            optional<ImagePosition> posA = tile.getPattern(linePatternValue.from);
-            optional<ImagePosition> posB = tile.getPattern(linePatternValue.to);
-
-            draw(parameters.programs.getLineLayerPrograms().linePattern,
-                 LinePatternProgram::layoutUniformValues(
-                     evaluated,
-                     tile,
-                     parameters.state,
-                     parameters.pixelsToGLUnits,
-                     parameters.pixelRatio,
-                     texsize,
-                     crossfade),
-                     posA,
-                     posB,
-                     LinePatternProgram::TextureBindings{
-                         textures::image::Value{ tile.getIconAtlasTexture().getResource(), gfx::TextureFilterType::Linear },
-                     });
-        } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
-            assert(colorRampTexture);
-
-            draw(parameters.programs.getLineLayerPrograms().lineGradient,
-                 LineGradientProgram::layoutUniformValues(
-                    evaluated,
-                    tile,
-                    parameters.state,
-                    parameters.pixelsToGLUnits,
-                    parameters.pixelRatio),
-                    {},
-                    {},
-                    LineGradientProgram::TextureBindings{
-                        textures::image::Value{ colorRampTexture->getResource(), gfx::TextureFilterType::Linear },
-                    });
-        } else {
-            draw(parameters.programs.getLineLayerPrograms().line,
-                 LineProgram::layoutUniformValues(
-                     evaluated,
-                     tile,
-                     parameters.state,
-                     parameters.pixelsToGLUnits,
-                     parameters.pixelRatio),
-                 {},
-                 {},
-                 LineProgram::TextureBindings{});
-        }
     }
 }
 
@@ -278,20 +319,7 @@ void RenderLineLayer::updateColorRamp() {
     if (colorValue.isUndefined()) {
         return;
     }
-
-    const auto length = colorRamp.bytes();
-
-    for (uint32_t i = 0; i < length; i += 4) {
-        const auto color = colorValue.evaluate(static_cast<double>(i) / length);
-        colorRamp.data[i] = std::floor(color.r * 255);
-        colorRamp.data[i + 1] = std::floor(color.g * 255);
-        colorRamp.data[i + 2] = std::floor(color.b * 255);
-        colorRamp.data[i + 3] = std::floor(color.a * 255);
-    }
-
-    if (colorRampTexture) {
-        colorRampTexture = nullopt;
-    }
+    colorRamp = std::make_shared<ColorRampRenderData>(colorValue);
 }
 
 float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {

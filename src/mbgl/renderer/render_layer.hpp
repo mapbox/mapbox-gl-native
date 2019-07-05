@@ -60,6 +60,7 @@ public:
     LayerUploader uploader; // optionally initialized.
     Immutable<style::LayerProperties> evaluatedProperties;
 
+    void checkRenderability(const PaintParameters&, uint32_t activeBindingCount) const;
 private:
     bool hasRenderPass(RenderPass pass) const override { return bool(renderPass & pass); }
     void upload(gfx::UploadPass& pass) const override { if (uploader) uploader(pass);}
@@ -69,6 +70,10 @@ private:
     }
     const std::string& getName() const override { return evaluatedProperties->baseImpl->id; } 
     RenderPass renderPass;
+    // Some layers may not render correctly on some hardware when the vertex attribute limit of
+    // that GPU is exceeded. More attributes are used when adding many data driven paint properties
+    // to a layer.
+    mutable bool hasRenderFailures = false;
 };
 
 class RenderLayer {

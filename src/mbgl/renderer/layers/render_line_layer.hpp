@@ -10,19 +10,33 @@
 
 namespace mbgl {
 
+namespace style {
+class ColorRampPropertyValue;
+} // namespace style
+
+class ColorRampRenderData {
+public:
+    explicit ColorRampRenderData(const style::ColorRampPropertyValue&);
+    void upload(gfx::UploadPass&);
+    const PremultipliedImage image;
+    optional<gfx::Texture> texture;
+};
+
 class RenderLineLayer final : public RenderLayer {
 public:
     explicit RenderLineLayer(Immutable<style::LineLayer::Impl>);
     ~RenderLineLayer() override;
 
 private:
+    // LayerRenderItem createRenderItem() override;
+    LayerRenderer createRenderer() override;
+    LayerUploader createUploader() override;
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void prepare(const LayerPrepareParameters&) override;
-    void upload(gfx::UploadPass&) override;
-    void render(PaintParameters&) override;
+    void render(PaintParameters&) override {}
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
@@ -38,8 +52,7 @@ private:
     float getLineWidth(const GeometryTileFeature&, const float) const;
     void updateColorRamp();
 
-    PremultipliedImage colorRamp;
-    optional<gfx::Texture> colorRampTexture;
+    std::shared_ptr<ColorRampRenderData> colorRamp;
 };
 
 } // namespace mbgl
