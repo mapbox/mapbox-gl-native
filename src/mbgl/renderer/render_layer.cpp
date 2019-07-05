@@ -63,7 +63,7 @@ LayerRenderer RenderLayer::createRenderer() {
 }
 
 LayerUploader RenderLayer::createUploader() {
-    return [this](gfx::UploadPass& pass){ upload(pass); };
+    return {};
 }
 
 RenderLayer::RenderLayer(Immutable<style::LayerProperties> properties)

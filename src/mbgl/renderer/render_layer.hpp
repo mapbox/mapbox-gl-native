@@ -57,7 +57,7 @@ public:
 
     RenderTiles renderTiles;
     LayerRenderer renderer;
-    LayerUploader uploader; // optionally initialized.
+    LayerUploader uploader;
     Immutable<style::LayerProperties> evaluatedProperties;
 
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount) const;
@@ -114,7 +114,6 @@ public:
     // Checks whether the given zoom is inside this layer zoom range.
     bool supportsZoom(float zoom) const;
 
-    virtual void upload(gfx::UploadPass&) {}
     virtual void render(PaintParameters&) = 0;
 
     // Check wether the given geometry intersects

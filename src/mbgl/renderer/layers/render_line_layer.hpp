@@ -17,7 +17,6 @@ public:
     ~RenderLineLayer() override;
 
 private:
-    // LayerRenderItem createRenderItem() override;
     LayerRenderer createRenderer() override;
     LayerUploader createUploader() override;
     void transition(const TransitionParameters&) override;
