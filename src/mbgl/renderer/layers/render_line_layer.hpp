@@ -6,21 +6,10 @@
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/layout/pattern_layout.hpp>
-#include <mbgl/gfx/texture.hpp>
 
 namespace mbgl {
 
-namespace style {
-class ColorRampPropertyValue;
-} // namespace style
-
-class ColorRampRenderData {
-public:
-    explicit ColorRampRenderData(const style::ColorRampPropertyValue&);
-    void upload(gfx::UploadPass&);
-    const PremultipliedImage image;
-    optional<gfx::Texture> texture;
-};
+class ColorRampRenderData;
 
 class RenderLineLayer final : public RenderLayer {
 public:

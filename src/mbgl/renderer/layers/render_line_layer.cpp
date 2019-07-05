@@ -1,5 +1,6 @@
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
+#include <mbgl/renderer/color_ramp_render_data.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/upload_parameters.hpp>
@@ -19,26 +20,6 @@
 namespace mbgl {
 
 using namespace style;
-
-ColorRampRenderData::ColorRampRenderData(const style::ColorRampPropertyValue& value) 
-    : image({256, 1}) {
-    assert(!value.isUndefined());
-    const auto length = image.bytes();
-
-    for (uint32_t i = 0; i < length; i += 4) {
-        const auto color = value.evaluate(static_cast<double>(i) / length);
-        image.data[i] = std::floor(color.r * 255);
-        image.data[i + 1] = std::floor(color.g * 255);
-        image.data[i + 2] = std::floor(color.b * 255);
-        image.data[i + 3] = std::floor(color.a * 255);
-    }
-}
-
-void ColorRampRenderData::upload(gfx::UploadPass& uploadPass) {
-    if (!texture) {
-        texture = uploadPass.createTexture(image);
-    }
-}
 
 inline const LineLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
     return static_cast<const LineLayer::Impl&>(*impl);
