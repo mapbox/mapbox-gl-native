@@ -130,11 +130,10 @@ void RenderFillLayer::render(PaintParameters& parameters) {
                 );
             };
 
-            // Only draw the fill when it's opaque and we're drawing opaque fragments,
-            // or when it's translucent and we're drawing translucent fragments.
-            if (bucket.triangleIndexBuffer &&
-              (evaluated.get<FillColor>().constantOr(Color()).a >= 1.0f &&
-               evaluated.get<FillOpacity>().constantOr(0) >= 1.0f) == (parameters.pass == RenderPass::Opaque)) {
+            auto fillRenderPass = (evaluated.get<FillColor>().constantOr(Color()).a >= 1.0f
+                && evaluated.get<FillOpacity>().constantOr(0) >= 1.0f
+                && parameters.currentLayer >= parameters.opaquePassCutoff) ? RenderPass::Opaque : RenderPass::Translucent;
+            if (bucket.triangleIndexBuffer && parameters.pass == fillRenderPass) {
                 draw(parameters.programs.getFillLayerPrograms().fill,
                      gfx::Triangles(),
                      parameters.depthModeForSublayer(1, parameters.pass == RenderPass::Opaque
