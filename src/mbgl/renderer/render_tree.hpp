@@ -47,6 +47,7 @@ public:
     TimePoint timePoint;
     EvaluatedLight light;
     bool has3D = false;
+    uint32_t opaquePassCutOff = 0;
     Color backgroundColor;
     float symbolFadeChange = 0.0f;
     bool needsRepaint = false;

@@ -66,6 +66,9 @@ public:
     // Returns true if the layer has a pattern property and is actively crossfading.
     virtual bool hasCrossfade() const = 0;
 
+    // Returns true if layer writes to depth buffer by drawing using PaintParameters::depthModeFor3D().
+    virtual bool is3D() const { return false; }
+
     // Returns true is the layer is subject to placement.
     bool needsPlacement() const;
 
