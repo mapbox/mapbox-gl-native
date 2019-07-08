@@ -33,6 +33,10 @@ class PatternAtlas;
 class CrossTileSymbolIndex;
 class RenderTree;
 
+namespace style {
+    class LayerProperties;
+} // namespace style
+
 class RenderOrchestrator final : public GlyphManagerObserver,
                                  public ImageManagerObserver,
                                  public RenderSourceObserver {
@@ -113,6 +117,10 @@ private:
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
+
+    // Vector with reserved capacity of layerImpls->size() to avoid reallocation
+    // on each frame.
+    std::vector<Immutable<style::LayerProperties>> filteredLayersForSource;
 };
 
 } // namespace mbgl

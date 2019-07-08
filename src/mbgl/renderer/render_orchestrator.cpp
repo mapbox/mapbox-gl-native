@@ -271,11 +271,17 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
     auto renderItemsEmplaceHint = layerRenderItems.begin();
 
+    // Reserve size for filteredLayersForSource if there are sources.
+    if (!sourceImpls->empty()) {
+        filteredLayersForSource.reserve(layerImpls->size());
+        if (filteredLayersForSource.capacity() > layerImpls->size()) {
+            filteredLayersForSource.shrink_to_fit();
+        }
+    }
+
     // Update all sources and initialize renderItems.
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
-        std::vector<Immutable<LayerProperties>> filteredLayersForSource;
-        filteredLayersForSource.reserve(layerImpls->size());
         bool sourceNeedsRendering = false;
         bool sourceNeedsRelayout = false;       
         
@@ -321,6 +327,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                        sourceNeedsRendering,
                        sourceNeedsRelayout,
                        tileParameters);
+        filteredLayersForSource.clear();
     }
 
     renderTreeParameters->loaded = updateParameters.styleLoaded && isLoaded();
