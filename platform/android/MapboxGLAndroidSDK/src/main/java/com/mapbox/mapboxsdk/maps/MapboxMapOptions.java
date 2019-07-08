@@ -14,6 +14,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -136,7 +137,18 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Creates a MapboxMapsOptions from the attribute set.s
+   * Creates a default MapboxMapsOptions from a given context.
+   *
+   * @param context Context related to a map view.
+   * @return the MapboxMapOptions created from attributes
+   */
+  @NonNull
+  public static MapboxMapOptions createFromAttributes(@NonNull Context context) {
+    return createFromAttributes(context, null);
+  }
+
+  /**
+   * Creates a MapboxMapsOptions from the attribute set.
    *
    * @param context Context related to a map view.
    * @param attrs   Attributeset containing configuration

@@ -105,7 +105,7 @@ class NestedViewPagerActivity : AppCompatActivity() {
         class MapPagerAdapter(private val context: Context, fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
 
             override fun getItem(position: Int): Fragment {
-                val options = MapboxMapOptions.createFromAttributes(context, null)
+                val options = MapboxMapOptions.createFromAttributes(context)
                 options.textureMode(true)
                 options.doubleTapGesturesEnabled(false)
                 options.rotateGesturesEnabled(false)
