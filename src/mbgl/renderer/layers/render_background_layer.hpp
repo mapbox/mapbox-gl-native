@@ -12,12 +12,12 @@ public:
     ~RenderBackgroundLayer() override;
 
 private:
+    LayerRenderer createRenderer() override;
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     optional<Color> getSolidBackground() const override;
-    void render(PaintParameters&) override;
     void prepare(const LayerPrepareParameters&) override;
 
     // Paint properties

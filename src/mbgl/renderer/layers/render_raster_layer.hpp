@@ -20,7 +20,6 @@ private:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void prepare(const LayerPrepareParameters&) override;
-    void render(PaintParameters&) override {}
 
     // Paint properties
     style::RasterPaintProperties::Unevaluated unevaluated;

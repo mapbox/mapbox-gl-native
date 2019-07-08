@@ -105,16 +105,11 @@ public:
 
     const std::string& getID() const;
 
-    // Checks whether this layer needs to be rendered in the given render pass.
-    bool hasRenderPass(RenderPass) const;
-
     // Checks whether this layer can be rendered.
     bool needsRendering() const;
 
     // Checks whether the given zoom is inside this layer zoom range.
     bool supportsZoom(float zoom) const;
-
-    virtual void render(PaintParameters&) = 0;
 
     // Check wether the given geometry intersects
     // with the feature
@@ -143,13 +138,9 @@ public:
     virtual optional<Color> getSolidBackground() const;
 
 protected:
-    virtual LayerRenderer createRenderer();
+    virtual LayerRenderer createRenderer() = 0;
     virtual LayerUploader createUploader();
-    // Checks whether the current hardware can render this layer. If it can't, we'll show a warning
-    // in the console to inform the developer.
-    void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
-protected:
     // Stores current set of tiles to be rendered for this layer.
     RenderTiles renderTiles;
 
@@ -161,10 +152,6 @@ protected:
 
 private:
     RenderTiles filterRenderTiles(RenderTiles) const;
-    // Some layers may not render correctly on some hardware when the vertex attribute limit of
-    // that GPU is exceeded. More attributes are used when adding many data driven paint properties
-    // to a layer.
-    bool hasRenderFailures = false;
 };
 
 } // namespace mbgl

@@ -11,14 +11,13 @@ public:
     ~RenderCustomLayer() override;
 
 private:
+    LayerRenderer createRenderer() override;
     void transition(const TransitionParameters&) override {}
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void markContextDestroyed() override;
     void prepare(const LayerPrepareParameters&) override;
-
-    void render(PaintParameters&) override;
 
     bool contextDestroyed = false;
     std::shared_ptr<style::CustomLayerHost> host;

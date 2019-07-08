@@ -58,10 +58,6 @@ void LayerRenderItem::checkRenderability(const PaintParameters& parameters,
     }
 }
 
-LayerRenderer RenderLayer::createRenderer() {
-    return [this](PaintParameters& pass, const LayerRenderItem&){ render(pass); };
-}
-
 LayerUploader RenderLayer::createUploader() {
     return {};
 }
@@ -83,10 +79,6 @@ bool RenderLayer::needsPlacement() const {
 
 const std::string& RenderLayer::getID() const {
     return baseImpl->id;
-}
-
-bool RenderLayer::hasRenderPass(RenderPass pass) const {
-    return bool(passes & pass);
 }
 
 bool RenderLayer::needsRendering() const {
@@ -122,33 +114,6 @@ RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
 
 void RenderLayer::markContextDestroyed() {
     // no-op
-}
-
-void RenderLayer::checkRenderability(const PaintParameters& parameters,
-                                     const uint32_t activeBindingCount) {
-    // Only warn once for every layer.
-    if (hasRenderFailures) {
-        return;
-    }
-
-    if (activeBindingCount > parameters.context.maximumVertexBindingCount) {
-        Log::Info(Event::OpenGL,
-                "The layer '%s' uses more data-driven properties than the current device "
-                "supports, and will have rendering errors. To ensure compatibility with this "
-                "device, use %d fewer data driven properties in this layer.",
-                getID().c_str(),
-                activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
-        hasRenderFailures = true;
-    } else if (activeBindingCount > parameters.context.minimumRequiredVertexBindingCount) {
-        Log::Info(Event::OpenGL,
-                "The layer '%s' uses more data-driven properties than some devices may support. "
-                "Though it will render correctly on this device, it may have rendering errors "
-                "on other devices. To ensure compatibility with all devices, use %d fewer "
-                "data-driven properties in this layer.",
-                getID().c_str(),
-                activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
-        hasRenderFailures = true;
-    }
 }
 
 } //namespace mbgl

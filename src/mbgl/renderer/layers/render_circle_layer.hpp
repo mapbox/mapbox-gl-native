@@ -9,14 +9,14 @@ namespace mbgl {
 class RenderCircleLayer final : public RenderLayer {
 public:
     explicit RenderCircleLayer(Immutable<style::CircleLayer::Impl>);
-    ~RenderCircleLayer() final = default;
+    ~RenderCircleLayer() override;
 
 private:
+    LayerRenderer createRenderer() override;
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
-    void render(PaintParameters&) override;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,

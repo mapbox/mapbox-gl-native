@@ -24,6 +24,77 @@ RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
       unevaluated(impl(baseImpl).paint.untransitioned()) {
 }
 
+RenderCircleLayer::~RenderCircleLayer() = default;
+
+LayerRenderer RenderCircleLayer::createRenderer() {
+    return [](PaintParameters& parameters, const LayerRenderItem& renderItem) {
+        if (parameters.pass == RenderPass::Opaque) {
+            return;
+        }
+        const auto& renderTiles = renderItem.renderTiles;
+        const auto& baseImpl = *renderItem.evaluatedProperties->baseImpl; 
+
+        for (const RenderTile& tile : renderTiles) {
+            const LayerRenderData* renderData = tile.getLayerRenderData(baseImpl);
+            if (!renderData) {
+                continue;
+            }
+            auto& bucket = static_cast<CircleBucket&>(*renderData->bucket);
+            const auto& evaluated = getEvaluated<CircleLayerProperties>(renderData->layerProperties);
+            const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
+            const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
+            const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(baseImpl.id);
+
+            auto& programInstance = parameters.programs.getCircleLayerPrograms().circle;
+    
+            const auto allUniformValues = programInstance.computeAllUniformValues(
+                CircleProgram::LayoutUniformValues {
+                    uniforms::matrix::Value(
+                        tile.translatedMatrix(evaluated.get<CircleTranslate>(),
+                                            evaluated.get<CircleTranslateAnchor>(),
+                                            parameters.state)
+                    ),
+                    uniforms::scale_with_map::Value( scaleWithMap ),
+                    uniforms::extrude_scale::Value( pitchWithMap
+                        ? std::array<float, 2> {{
+                            tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
+                            tile.id.pixelsToTileUnits(1, parameters.state.getZoom()) }}
+                        : parameters.pixelsToGLUnits ),
+                    uniforms::device_pixel_ratio::Value( parameters.pixelRatio ),
+                    uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() ),
+                    uniforms::pitch_with_map::Value( pitchWithMap )
+                },
+                paintPropertyBinders,
+                evaluated,
+                parameters.state.getZoom()
+            );
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                *bucket.vertexBuffer,
+                paintPropertyBinders,
+                evaluated
+            );
+
+            renderItem.checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+            programInstance.draw(
+                parameters.context,
+                *parameters.renderPass,
+                gfx::Triangles(),
+                parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
+                gfx::StencilMode::disabled(),
+                parameters.colorModeForRenderPass(),
+                gfx::CullFaceMode::disabled(),
+                *bucket.indexBuffer,
+                bucket.segments,
+                allUniformValues,
+                allAttributeBindings,
+                CircleProgram::TextureBindings{},
+                baseImpl.id
+            );
+        }
+    };
+}
+
 void RenderCircleLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
@@ -50,71 +121,6 @@ bool RenderCircleLayer::hasTransition() const {
 
 bool RenderCircleLayer::hasCrossfade() const {
     return false;
-}
-
-void RenderCircleLayer::render(PaintParameters& parameters) {
-    if (parameters.pass == RenderPass::Opaque) {
-        return;
-    }
-
-    for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
-        if (!renderData) {
-            continue;
-        }
-        auto& bucket = static_cast<CircleBucket&>(*renderData->bucket);
-        const auto& evaluated = getEvaluated<CircleLayerProperties>(renderData->layerProperties);
-        const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
-        const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
-        const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
-
-        auto& programInstance = parameters.programs.getCircleLayerPrograms().circle;
-   
-        const auto allUniformValues = programInstance.computeAllUniformValues(
-            CircleProgram::LayoutUniformValues {
-                uniforms::matrix::Value(
-                    tile.translatedMatrix(evaluated.get<CircleTranslate>(),
-                                          evaluated.get<CircleTranslateAnchor>(),
-                                          parameters.state)
-                ),
-                uniforms::scale_with_map::Value( scaleWithMap ),
-                uniforms::extrude_scale::Value( pitchWithMap
-                    ? std::array<float, 2> {{
-                        tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
-                        tile.id.pixelsToTileUnits(1, parameters.state.getZoom()) }}
-                    : parameters.pixelsToGLUnits ),
-                uniforms::device_pixel_ratio::Value( parameters.pixelRatio ),
-                uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() ),
-                uniforms::pitch_with_map::Value( pitchWithMap )
-            },
-            paintPropertyBinders,
-            evaluated,
-            parameters.state.getZoom()
-        );
-        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            *bucket.vertexBuffer,
-            paintPropertyBinders,
-            evaluated
-        );
-
-        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
-
-        programInstance.draw(
-            parameters.context,
-            *parameters.renderPass,
-            gfx::Triangles(),
-            parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
-            gfx::StencilMode::disabled(),
-            parameters.colorModeForRenderPass(),
-            gfx::CullFaceMode::disabled(),
-            *bucket.indexBuffer,
-            bucket.segments,
-            allUniformValues,
-            allAttributeBindings,
-            CircleProgram::TextureBindings{},
-            getID()
-        );
-    }
 }
 
 GeometryCoordinate projectPoint(const GeometryCoordinate& p, const mat4& posMatrix, const Size& size) {

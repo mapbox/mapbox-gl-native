@@ -66,7 +66,6 @@ private:
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
-    void render(PaintParameters&) override {}
     void prepare(const LayerPrepareParameters&) override;
 
     // Paint properties
