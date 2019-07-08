@@ -14,12 +14,13 @@ public:
     ~RenderRasterLayer() override;
 
 private:
+    LayerRenderer createRenderer() override;
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void prepare(const LayerPrepareParameters&) override;
-    void render(PaintParameters&) override;
+    void render(PaintParameters&) override {}
 
     // Paint properties
     style::RasterPaintProperties::Unevaluated unevaluated;
