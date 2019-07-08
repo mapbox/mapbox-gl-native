@@ -276,6 +276,7 @@ bool RenderSymbolLayer::hasCrossfade() const {
 }
 
 void RenderSymbolLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
@@ -348,7 +349,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
         );
     };
 
-    for (const RenderTile& tile : renderTiles) {
+    for (const RenderTile& tile : *renderTiles) {
         const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
         if (!renderData) {
             continue;
@@ -493,22 +494,11 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 }
 
 void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
-    renderTiles = params.source->getRenderTiles();
-    const auto comp = [bearing = params.state.getBearing()](const RenderTile& a, const RenderTile& b) {
-        Point<float> pa(a.id.canonical.x, a.id.canonical.y);
-        Point<float> pb(b.id.canonical.x, b.id.canonical.y);
-
-        auto par = util::rotate(pa, bearing);
-        auto pbr = util::rotate(pb, bearing);
-
-        return std::tie(b.id.canonical.z, par.y, par.x) < std::tie(a.id.canonical.z, pbr.y, pbr.x);
-    };
-    // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
-    // on top of each other, with lower symbols being drawn on top of higher symbols.
-    std::sort(renderTiles.begin(), renderTiles.end(), comp);
+    renderTiles = params.source->getRenderTilesSortedByYPosition();
+    assert(renderTiles);
 
     placementData.clear();
-    for (const RenderTile& renderTile : renderTiles) {
+    for (const RenderTile& renderTile : *renderTiles) {
         auto* bucket = static_cast<SymbolBucket*>(renderTile.getBucket(*baseImpl));
         if (bucket && bucket->bucketLeaderID == getID()) {
             // Only place this layer if it's the "group leader" for the bucket

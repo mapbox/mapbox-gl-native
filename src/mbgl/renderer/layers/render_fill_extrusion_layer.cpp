@@ -56,6 +56,7 @@ bool RenderFillExtrusionLayer::hasCrossfade() const {
 }
 
 void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass != RenderPass::Translucent) {
         return;
     }
@@ -115,7 +116,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
     if (unevaluated.get<FillExtrusionPattern>().isUndefined()) {
         // Draw solid color extrusions
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
-            for (const RenderTile& tile : renderTiles) {
+            for (const RenderTile& tile : *renderTiles) {
                 const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
                 if (!renderData) {
                     continue;
@@ -162,7 +163,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
         // Draw textured extrusions
         const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
-            for (const RenderTile& tile : renderTiles) {
+            for (const RenderTile& tile : *renderTiles) {
                 const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
                 if (!renderData) {
                     continue;

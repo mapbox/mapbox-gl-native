@@ -48,8 +48,6 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    RenderTiles getRenderTiles() override { return {}; }
-
     const ImageSourceRenderData* getImageRenderData() const override { 
         return renderData.get();
     }
