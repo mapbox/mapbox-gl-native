@@ -6,6 +6,7 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/tile/vector_tile.hpp>
+#include <mbgl/util/math.hpp>
 
 namespace mbgl {
 
@@ -56,6 +57,9 @@ std::unique_ptr<RenderItem> RenderTileSource::createRenderItem() {
 }
 
 void RenderTileSource::prepare(const SourcePrepareParameters& parameters) {
+    bearing = parameters.transform.state.getBearing();
+    filteredRenderTiles = nullptr;
+    renderTilesSortedByY = nullptr;
     auto tiles = makeMutable<std::vector<RenderTile>>();
     tiles->reserve(tilePyramid.getRenderedTiles().size());
     for (auto& entry : tilePyramid.getRenderedTiles()) {
@@ -73,8 +77,41 @@ bool RenderTileSource::hasFadingTiles() const {
     return tilePyramid.hasFadingTiles();
 }
 
-RenderTiles RenderTileSource::getRenderTiles() {
-    return { renderTiles->begin(), renderTiles->end() };
+RenderTiles RenderTileSource::getRenderTiles() const {
+    if (!filteredRenderTiles) {
+        auto result = std::make_shared<std::vector<std::reference_wrapper<const RenderTile>>>();
+        for (const auto& renderTile : *renderTiles) {
+            if (renderTile.holdForFade()) {
+                continue;
+            }
+            result->emplace_back(renderTile);
+        }
+        filteredRenderTiles = std::move(result);
+    }
+    return filteredRenderTiles;
+}
+
+RenderTiles RenderTileSource::getRenderTilesSortedByYPosition() const {
+    if (!renderTilesSortedByY) {
+        const auto comp = [bearing = this->bearing](const RenderTile& a, const RenderTile& b) {
+            Point<float> pa(a.id.canonical.x, a.id.canonical.y);
+            Point<float> pb(b.id.canonical.x, b.id.canonical.y);
+
+            auto par = util::rotate(pa, bearing);
+            auto pbr = util::rotate(pb, bearing);
+
+            return std::tie(b.id.canonical.z, par.y, par.x) < std::tie(a.id.canonical.z, pbr.y, pbr.x);
+        };
+
+        auto result = std::make_shared<std::vector<std::reference_wrapper<const RenderTile>>>();
+        result->reserve(renderTiles->size());
+        for (const auto& renderTile : *renderTiles) {
+            result->emplace_back(renderTile);
+        }
+        std::sort(result->begin(), result->end(), comp);
+        renderTilesSortedByY = std::move(result);
+    }
+    return renderTilesSortedByY;
 }
 
 const Tile* RenderTileSource::getRenderedTile(const UnwrappedTileID& tileID) const {

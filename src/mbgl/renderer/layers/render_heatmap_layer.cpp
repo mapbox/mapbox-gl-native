@@ -63,6 +63,7 @@ void RenderHeatmapLayer::upload(gfx::UploadPass& uploadPass) {
 }
 
 void RenderHeatmapLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
@@ -93,7 +94,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
         auto renderPass = parameters.encoder->createRenderPass(
             "heatmap texture", { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
 
-        for (const RenderTile& tile : renderTiles) {
+        for (const RenderTile& tile : *renderTiles) {
             const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
             if (!renderData) {
                 continue;

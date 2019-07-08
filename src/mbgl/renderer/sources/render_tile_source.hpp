@@ -21,7 +21,8 @@ public:
     void updateFadingTiles() override;
     bool hasFadingTiles() const override;
 
-    RenderTiles getRenderTiles() override;
+    RenderTiles getRenderTiles() const override;
+    RenderTiles getRenderTilesSortedByYPosition() const override;
     const Tile* getRenderedTile(const UnwrappedTileID&) const override;
 
     std::unordered_map<std::string, std::vector<Feature>>
@@ -40,6 +41,9 @@ public:
 protected:
     TilePyramid tilePyramid;
     Immutable<std::vector<RenderTile>> renderTiles;
+    mutable RenderTiles filteredRenderTiles;
+    mutable RenderTiles renderTilesSortedByY;
+    float bearing = 0.0f;      
 };
 
 } // namespace mbgl

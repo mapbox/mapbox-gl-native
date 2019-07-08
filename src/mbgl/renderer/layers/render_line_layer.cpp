@@ -61,7 +61,7 @@ bool RenderLineLayer::hasCrossfade() const {
 
 void RenderLineLayer::prepare(const LayerPrepareParameters& params) {
     RenderLayer::prepare(params);
-    for (const RenderTile& tile : renderTiles) {
+    for (const RenderTile& tile : *renderTiles) {
         const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
         if (!renderData) continue;
 
@@ -84,13 +84,14 @@ void RenderLineLayer::upload(gfx::UploadPass& uploadPass) {
 }
 
 void RenderLineLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
 
     parameters.renderTileClippingMasks(renderTiles);
 
-    for (const RenderTile& tile : renderTiles) {
+    for (const RenderTile& tile : *renderTiles) {
         const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
         if (!renderData) {
             continue;
