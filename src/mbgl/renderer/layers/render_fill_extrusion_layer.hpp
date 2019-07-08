@@ -3,7 +3,6 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
-#include <mbgl/gfx/offscreen_texture.hpp>
 
 namespace mbgl {
 
@@ -13,11 +12,12 @@ public:
     ~RenderFillExtrusionLayer() override;
 
 private:
+    LayerRenderer createRenderer() override;
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
-    void render(PaintParameters&) override;
+    void render(PaintParameters&) override {}
 
     bool queryIntersectsFeature(
         const GeometryCoordinates&,
@@ -29,8 +29,6 @@ private:
 
     // Paint properties
     style::FillExtrusionPaintProperties::Unevaluated unevaluated;
-
-    std::unique_ptr<gfx::OffscreenTexture> renderTexture;
 };
 
 } // namespace mbgl

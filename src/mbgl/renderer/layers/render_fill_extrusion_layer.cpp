@@ -31,6 +31,169 @@ RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusio
 
 RenderFillExtrusionLayer::~RenderFillExtrusionLayer() = default;
 
+LayerRenderer RenderFillExtrusionLayer::createRenderer() {
+    const bool drawPattern = !unevaluated.get<FillExtrusionPattern>().isUndefined();
+    return [drawPattern](PaintParameters& parameters, const LayerRenderItem& renderItem) {
+         if (parameters.pass != RenderPass::Translucent) {
+            return;
+        }
+        const auto& renderTiles = renderItem.renderTiles;
+        const auto& baseImpl = *renderItem.evaluatedProperties->baseImpl; 
+        const auto& evaluated = getEvaluated<FillExtrusionLayerProperties>(renderItem.evaluatedProperties);
+        const auto& crossfade = getCrossfade<FillExtrusionLayerProperties>(renderItem.evaluatedProperties);
+
+        if (evaluated.get<FillExtrusionOpacity>() == 0) {
+            return;
+        }
+
+        const auto depthMode = parameters.depthModeFor3D();
+
+        auto draw = [&](auto& programInstance,
+                        const auto& evaluated_,
+                        const auto& crossfade_,
+                        const gfx::StencilMode& stencilMode,
+                        const gfx::ColorMode& colorMode,
+                        const auto& tileBucket,
+                        const auto& uniformValues,
+                        const optional<ImagePosition>& patternPositionA,
+                        const optional<ImagePosition>& patternPositionB,
+                        const auto& textureBindings,
+                        const std::string& uniqueName) {
+            const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(baseImpl.id);
+            paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade_);
+
+            const auto allUniformValues = programInstance.computeAllUniformValues(
+                uniformValues,
+                paintPropertyBinders,
+                evaluated_,
+                parameters.state.getZoom()
+            );
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                *tileBucket.vertexBuffer,
+                paintPropertyBinders,
+                evaluated_
+            );
+
+            renderItem.checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+            programInstance.draw(
+                parameters.context,
+                *parameters.renderPass,
+                gfx::Triangles(),
+                depthMode,
+                stencilMode,
+                colorMode,
+                gfx::CullFaceMode::backCCW(),
+                *tileBucket.indexBuffer,
+                tileBucket.triangleSegments,
+                allUniformValues,
+                allAttributeBindings,
+                textureBindings,
+                baseImpl.id + "/" + uniqueName);
+        };
+
+        if (!drawPattern) {
+            // Draw solid color extrusions
+            auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
+                for (const RenderTile& tile : renderTiles) {
+                    const LayerRenderData* renderData = tile.getLayerRenderData(baseImpl);
+                    if (!renderData) {
+                        continue;
+                    }
+                    auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
+                    draw(
+                        parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion,
+                        evaluated,
+                        crossfade,
+                        stencilMode_,
+                        colorMode_,
+                        bucket,
+                        FillExtrusionProgram::layoutUniformValues(
+                            tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
+                                                    evaluated.get<FillExtrusionTranslateAnchor>(),
+                                                    parameters.state),
+                            parameters.state,
+                            evaluated.get<FillExtrusionOpacity>(),
+                            parameters.evaluatedLight,
+                            evaluated.get<FillExtrusionVerticalGradient>()
+                        ),
+                        {},
+                        {},
+                        FillExtrusionProgram::TextureBindings{},
+                        name
+                    );
+                }
+            };
+
+            if (evaluated.get<FillExtrusionOpacity>() == 1) {
+                // Draw opaque extrusions
+                drawTiles(gfx::StencilMode::disabled(), parameters.colorModeForRenderPass(), "color");
+            } else {
+                // Draw transparent buildings in two passes so that only the closest surface is drawn.
+                // First draw all the extrusions into only the depth buffer. No colors are drawn.
+                drawTiles(gfx::StencilMode::disabled(), gfx::ColorMode::disabled(), "depth");
+
+                // Then draw all the extrusions a second time, only coloring fragments if they have the
+                // same depth value as the closest fragment in the previous pass. Use the stencil buffer
+                // to prevent the second draw in cases where we have coincident polygons.
+                drawTiles(parameters.stencilModeFor3D(), parameters.colorModeForRenderPass(), "color");
+            }
+        } else {
+            // Draw textured extrusions
+            const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
+            auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
+                for (const RenderTile& tile : renderTiles) {
+                    const LayerRenderData* renderData = tile.getLayerRenderData(baseImpl);
+                    if (!renderData) {
+                        continue;
+                    }
+                    auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
+                    optional<ImagePosition> patternPosA = tile.getPattern(fillPatternValue.from);
+                    optional<ImagePosition> patternPosB = tile.getPattern(fillPatternValue.to);
+
+                    draw(
+                        parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern,
+                        evaluated,
+                        crossfade,
+                        stencilMode_,
+                        colorMode_,
+                        bucket,
+                        FillExtrusionPatternProgram::layoutUniformValues(
+                            tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
+                                                    evaluated.get<FillExtrusionTranslateAnchor>(),
+                                                    parameters.state),
+                            tile.getIconAtlasTexture().size,
+                            crossfade,
+                            tile.id,
+                            parameters.state,
+                            evaluated.get<FillExtrusionOpacity>(),
+                            -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
+                            parameters.pixelRatio,
+                            parameters.evaluatedLight,
+                            evaluated.get<FillExtrusionVerticalGradient>()
+                        ),
+                        patternPosA,
+                        patternPosB,
+                        FillExtrusionPatternProgram::TextureBindings{
+                            textures::image::Value{ tile.getIconAtlasTexture().getResource(), gfx::TextureFilterType::Linear },
+                        },
+                        name
+                    );
+                }
+            };
+
+            // Draw transparent buildings in two passes so that only the closest surface is drawn.
+            // First draw all the extrusions into only the depth buffer. No colors are drawn.
+            drawTiles(gfx::StencilMode::disabled(), gfx::ColorMode::disabled(), "depth");
+
+            // Then draw all the extrusions a second time, only coloring fragments if they have the
+            // same depth value as the closest fragment in the previous pass. Use the stencil buffer
+            // to prevent the second draw in cases where we have coincident polygons.
+            drawTiles(parameters.stencilModeFor3D(), parameters.colorModeForRenderPass(), "color");
+        }
+    };
+}
+
 void RenderFillExtrusionLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
 }
@@ -53,164 +216,6 @@ bool RenderFillExtrusionLayer::hasTransition() const {
 
 bool RenderFillExtrusionLayer::hasCrossfade() const {
     return getCrossfade<FillExtrusionLayerProperties>(evaluatedProperties).t != 1;
-}
-
-void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
-    if (parameters.pass != RenderPass::Translucent) {
-        return;
-    }
-
-    const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
-    const auto& crossfade = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).crossfade;
-    if (evaluated.get<FillExtrusionOpacity>() == 0) {
-        return;
-    }
-
-    const auto depthMode = parameters.depthModeFor3D();
-
-    auto draw = [&](auto& programInstance,
-                    const auto& evaluated_,
-                    const auto& crossfade_,
-                    const gfx::StencilMode& stencilMode,
-                    const gfx::ColorMode& colorMode,
-                    const auto& tileBucket,
-                    const auto& uniformValues,
-                    const optional<ImagePosition>& patternPositionA,
-                    const optional<ImagePosition>& patternPositionB,
-                    const auto& textureBindings,
-                    const std::string& uniqueName) {
-        const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(getID());
-        paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade_);
-
-        const auto allUniformValues = programInstance.computeAllUniformValues(
-            uniformValues,
-            paintPropertyBinders,
-            evaluated_,
-            parameters.state.getZoom()
-        );
-        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
-            *tileBucket.vertexBuffer,
-            paintPropertyBinders,
-            evaluated_
-        );
-
-        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
-
-        programInstance.draw(
-            parameters.context,
-            *parameters.renderPass,
-            gfx::Triangles(),
-            depthMode,
-            stencilMode,
-            colorMode,
-            gfx::CullFaceMode::backCCW(),
-            *tileBucket.indexBuffer,
-            tileBucket.triangleSegments,
-            allUniformValues,
-            allAttributeBindings,
-            textureBindings,
-            getID() + "/" + uniqueName);
-    };
-
-    if (unevaluated.get<FillExtrusionPattern>().isUndefined()) {
-        // Draw solid color extrusions
-        auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
-            for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
-                if (!renderData) {
-                    continue;
-                }
-                auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
-                draw(
-                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion,
-                    evaluated,
-                    crossfade,
-                    stencilMode_,
-                    colorMode_,
-                    bucket,
-                    FillExtrusionProgram::layoutUniformValues(
-                        tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
-                                                  evaluated.get<FillExtrusionTranslateAnchor>(),
-                                                  parameters.state),
-                        parameters.state,
-                        evaluated.get<FillExtrusionOpacity>(),
-                        parameters.evaluatedLight,
-                        evaluated.get<FillExtrusionVerticalGradient>()
-                    ),
-                    {},
-                    {},
-                    FillExtrusionProgram::TextureBindings{},
-                    name
-                );
-            }
-        };
-
-        if (evaluated.get<FillExtrusionOpacity>() == 1) {
-            // Draw opaque extrusions
-            drawTiles(gfx::StencilMode::disabled(), parameters.colorModeForRenderPass(), "color");
-        } else {
-            // Draw transparent buildings in two passes so that only the closest surface is drawn.
-            // First draw all the extrusions into only the depth buffer. No colors are drawn.
-            drawTiles(gfx::StencilMode::disabled(), gfx::ColorMode::disabled(), "depth");
-
-            // Then draw all the extrusions a second time, only coloring fragments if they have the
-            // same depth value as the closest fragment in the previous pass. Use the stencil buffer
-            // to prevent the second draw in cases where we have coincident polygons.
-            drawTiles(parameters.stencilModeFor3D(), parameters.colorModeForRenderPass(), "color");
-        }
-    } else {
-        // Draw textured extrusions
-        const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
-        auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
-            for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
-                if (!renderData) {
-                    continue;
-                }
-                auto& bucket = static_cast<FillExtrusionBucket&>(*renderData->bucket);
-                optional<ImagePosition> patternPosA = tile.getPattern(fillPatternValue.from);
-                optional<ImagePosition> patternPosB = tile.getPattern(fillPatternValue.to);
-
-                draw(
-                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern,
-                    evaluated,
-                    crossfade,
-                    stencilMode_,
-                    colorMode_,
-                    bucket,
-                    FillExtrusionPatternProgram::layoutUniformValues(
-                        tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
-                                                  evaluated.get<FillExtrusionTranslateAnchor>(),
-                                                  parameters.state),
-                        tile.getIconAtlasTexture().size,
-                        crossfade,
-                        tile.id,
-                        parameters.state,
-                        evaluated.get<FillExtrusionOpacity>(),
-                        -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
-                        parameters.pixelRatio,
-                        parameters.evaluatedLight,
-                        evaluated.get<FillExtrusionVerticalGradient>()
-                    ),
-                    patternPosA,
-                    patternPosB,
-                    FillExtrusionPatternProgram::TextureBindings{
-                        textures::image::Value{ tile.getIconAtlasTexture().getResource(), gfx::TextureFilterType::Linear },
-                    },
-                    name
-                );
-            }
-        };
-
-        // Draw transparent buildings in two passes so that only the closest surface is drawn.
-        // First draw all the extrusions into only the depth buffer. No colors are drawn.
-        drawTiles(gfx::StencilMode::disabled(), gfx::ColorMode::disabled(), "depth");
-
-        // Then draw all the extrusions a second time, only coloring fragments if they have the
-        // same depth value as the closest fragment in the previous pass. Use the stencil buffer
-        // to prevent the second draw in cases where we have coincident polygons.
-        drawTiles(parameters.stencilModeFor3D(), parameters.colorModeForRenderPass(), "color");
-    }
 }
 
 bool RenderFillExtrusionLayer::queryIntersectsFeature(
