@@ -48,7 +48,7 @@ jni::Local<jni::String> FileSource::getAccessToken(jni::JNIEnv& env) {
 }
 
 void FileSource::setAccessToken(jni::JNIEnv& env, const jni::String& token) {
-    fileSource->setAccessToken(jni::Make<std::string>(env, token));
+    fileSource->setAccessToken(token ? jni::Make<std::string>(env, token) : "");
 }
 
 void FileSource::setAPIBaseUrl(jni::JNIEnv& env, const jni::String& url) {
