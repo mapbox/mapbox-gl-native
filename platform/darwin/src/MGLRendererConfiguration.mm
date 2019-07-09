@@ -88,7 +88,7 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     {
         return fontFamilyName ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
     }
-    //Ability to specify an array of fonts for fallbacks for `localIdeographicFontFamily`
+    // Ability to specify an array of fonts for fallbacks for `localIdeographicFontFamily`
     else if ([fontFamilyName isKindOfClass:[NSArray class]]){
         for(NSString *name in fontFamilyName){
 #if TARGET_OS_IPHONE
