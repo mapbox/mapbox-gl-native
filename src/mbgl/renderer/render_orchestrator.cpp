@@ -342,15 +342,16 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
     }
 
-    uint32_t i = static_cast<uint32_t>(layerRenderItems.size()) - 1;
-    for (auto it = layerRenderItems.begin(); it != layerRenderItems.end(); ++it, --i) {
-        RenderLayer& renderLayer = it->layer;
-        renderLayer.prepare({it->source, *imageManager, *patternAtlas, *lineAtlas, updateParameters.transformState});
+    auto opaquePassCutOffEstimation = layerRenderItems.size();
+    for (auto& renderItem : layerRenderItems) {
+        RenderLayer& renderLayer = renderItem.layer;
+        renderLayer.prepare({renderItem.source, *imageManager, *patternAtlas, *lineAtlas, updateParameters.transformState});
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
         if (renderLayer.is3D() && renderTreeParameters->opaquePassCutOff == 0) {
-            renderTreeParameters->opaquePassCutOff = i;
+            --opaquePassCutOffEstimation;
+            renderTreeParameters->opaquePassCutOff = uint32_t(opaquePassCutOffEstimation);
         }
     }
     // Symbol placement.

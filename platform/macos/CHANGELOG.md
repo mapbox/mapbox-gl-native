@@ -5,6 +5,7 @@
 * Added an `MGLMapView.prefetchesTiles` property to configure lower-resolution tile prefetching behavior. ([#14816](https://github.com/mapbox/mapbox-gl-native/pull/14816))
 * Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 * Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers. ([#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930))
+* Fixed rendering layers after fill-extrusion regression caused by optimization of fill-extrusion rendering. ([#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065))
 
 ### Styles and rendering
 
