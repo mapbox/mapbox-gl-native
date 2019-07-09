@@ -178,6 +178,20 @@ static NSString * const MGLRendererConfigurationTests_collisionBehaviorKey = @"M
 #endif
         XCTAssertEqual(localFontFamilyName, systemFontFamilyName, @"Local font family name should match default system font name when setting an invalid font family names array");
     }
+    
+    // `MGLIdeographicFontFamilyName` set to an invalid value type: NSDictionary, NSNumber, NSData, etc.
+    {
+        dic = @{@"MGLIdeographicFontFamilyName": [@"test font 1" dataUsingEncoding:NSUTF8StringEncoding]};
+        std::string localFontFamilyName = ([config _localFontFamilyNameWithPropertyDictionary:dic]).value();
+        
+        std::string systemFontFamilyName;
+#if TARGET_OS_IPHONE
+        systemFontFamilyName = std::string([[UIFont systemFontOfSize:0 weight:UIFontWeightRegular].familyName UTF8String]);
+#else
+        systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:NSFontWeightRegular].familyName UTF8String]);
+#endif
+        XCTAssertEqual(localFontFamilyName, systemFontFamilyName, @"Local font family name should match default system font name when setting an invalid value type");
+    }
 }
 
 
