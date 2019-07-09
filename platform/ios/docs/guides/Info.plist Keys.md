@@ -40,4 +40,3 @@ Beginning in version 4.0, the SDK also performs collision detection between styl
 
 This property may also be set using `[[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"MGLCollisionBehaviorPre4_0"]`; it will override any value specified in the `Info.plist`.
 
-
