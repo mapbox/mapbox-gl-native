@@ -1,6 +1,7 @@
 #pragma once
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/style/layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -15,7 +16,6 @@ class TransitionParameters;
 class PropertyEvaluationParameters;
 class UploadParameters;
 class PaintParameters;
-class RenderSource;
 class RenderTile;
 class TransformState;
 class PatternAtlas;
@@ -42,8 +42,6 @@ public:
     LineAtlas& lineAtlas;
     const TransformState& state;
 };
-
-using RenderTiles = std::vector<std::reference_wrapper<const RenderTile>>;
 
 class RenderLayer {
 protected:
@@ -127,7 +125,6 @@ protected:
     std::vector<LayerPlacementData> placementData;
 
 private:
-    RenderTiles filterRenderTiles(RenderTiles) const;
     // Some layers may not render correctly on some hardware when the vertex attribute limit of
     // that GPU is exceeded. More attributes are used when adding many data driven paint properties
     // to a layer.

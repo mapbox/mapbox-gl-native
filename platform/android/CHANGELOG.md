@@ -4,6 +4,8 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+* Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers. ([#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930))
+
 ## 8.2.0-alpha.2 - July 3, 2019
 
 ### Bugs

@@ -5,6 +5,8 @@
 * Added an `MGLMapView.prefetchesTiles` property to configure lower-resolution tile prefetching behavior. ([#14816](https://github.com/mapbox/mapbox-gl-native/pull/14816))
 * Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 * The `MGLIdeographicFontFamilyName` Info.plist key now also accepts an array of font family names, to customize font fallback behavior. It can also be set to a Boolean value of `NO` to force the SDK to typeset CJK characters in a remote font specified by `MGLSymbolStyleLayer.textFontNames`. ([#14862](https://github.com/mapbox/mapbox-gl-native/pull/14862)) 
+* Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers. ([#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930))
+
 
 ### Styles and rendering
 

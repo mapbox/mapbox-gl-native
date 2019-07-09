@@ -52,7 +52,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
-            const std::vector<const RenderLayer*>& layers,
+            const std::unordered_map<std::string, const RenderLayer*>& layers,
             const RenderedQueryOptions& options,
             const mat4& projMatrix) override;
 
@@ -60,7 +60,7 @@ public:
         std::vector<Feature>& result,
         const SourceQueryOptions&) override;
 
-    float getQueryPadding(const std::vector<const RenderLayer*>&) override;
+    float getQueryPadding(const std::unordered_map<std::string, const RenderLayer*>&) override;
 
     void cancel() override;
 

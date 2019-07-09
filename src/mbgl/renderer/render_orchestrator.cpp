@@ -271,11 +271,17 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
     auto renderItemsEmplaceHint = layerRenderItems.begin();
 
+    // Reserve size for filteredLayersForSource if there are sources.
+    if (!sourceImpls->empty()) {
+        filteredLayersForSource.reserve(layerImpls->size());
+        if (filteredLayersForSource.capacity() > layerImpls->size()) {
+            filteredLayersForSource.shrink_to_fit();
+        }
+    }
+
     // Update all sources and initialize renderItems.
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
-        std::vector<Immutable<LayerProperties>> filteredLayersForSource;
-        filteredLayersForSource.reserve(layerImpls->size());
         bool sourceNeedsRendering = false;
         bool sourceNeedsRelayout = false;       
         
@@ -321,6 +327,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                        sourceNeedsRendering,
                        sourceNeedsRelayout,
                        tileParameters);
+        filteredLayersForSource.clear();
     }
 
     renderTreeParameters->loaded = updateParameters.styleLoaded && isLoaded();
@@ -409,16 +416,16 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
 }
 
 std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
-    std::vector<const RenderLayer*> layers;
+    std::unordered_map<std::string, const RenderLayer*> layers;
     if (options.layerIDs) {
         for (const auto& layerID : *options.layerIDs) {
             if (const RenderLayer* layer = getRenderLayer(layerID)) {
-                layers.emplace_back(layer);
+                layers.emplace(layer->getID(), layer);
             }
         }
     } else {
         for (const auto& entry : renderLayers) {
-            layers.emplace_back(entry.second.get());
+            layers.emplace(entry.second->getID(), entry.second.get());
         }
     }
 
@@ -427,9 +434,22 @@ std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineS
     
 void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, std::vector<Feature>>& resultsByLayer,
                                           const ScreenLineString& geometry,
-                                          const std::vector<const RenderLayer*>& layers,
+                                          const std::unordered_map<std::string, const RenderLayer*>& layers,
                                           const RenderedQueryOptions& options) const {
-    
+    const auto hasCrossTileIndex = [] (const auto& pair) {
+        return pair.second->baseImpl->getTypeInfo()->crossTileIndex == style::LayerTypeInfo::CrossTileIndex::Required;
+    };
+
+    std::unordered_map<std::string, const RenderLayer*> crossTileSymbolIndexLayers;
+    std::copy_if(layers.begin(),
+                 layers.end(),
+                 std::inserter(crossTileSymbolIndexLayers, crossTileSymbolIndexLayers.begin()),
+                 hasCrossTileIndex);
+
+    if (crossTileSymbolIndexLayers.empty()) {
+        return;
+    }
+
     auto renderedSymbols = placement->getCollisionIndex().queryRenderedSymbols(geometry);
     std::vector<std::reference_wrapper<const RetainedQueryData>> bucketQueryData;
     for (auto entry : renderedSymbols) {
@@ -447,7 +467,7 @@ void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, st
         auto& queryData = wrappedQueryData.get();
         auto bucketSymbols = queryData.featureIndex->lookupSymbolFeatures(renderedSymbols[queryData.bucketInstanceId],
                                                                           options,
-                                                                          layers,
+                                                                          crossTileSymbolIndexLayers,
                                                                           queryData.tileID,
                                                                           queryData.featureSortOrder);
         
@@ -458,10 +478,10 @@ void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, st
     }
 }
 
-std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options, const std::vector<const RenderLayer*>& layers) const {
+std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options, const std::unordered_map<std::string, const RenderLayer*>& layers) const {
     std::unordered_set<std::string> sourceIDs;
-    for (const RenderLayer* layer : layers) {
-        sourceIDs.emplace(layer->baseImpl->source);
+    for (const auto& pair : layers) {
+        sourceIDs.emplace(pair.second->baseImpl->source);
     }
 
     mat4 projMatrix;
@@ -484,13 +504,12 @@ std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineS
     }
 
     // Combine all results based on the style layer renderItems.
-    for (const auto& layerImpl : *layerImpls) {
-        const RenderLayer* layer = getRenderLayer(layerImpl->id);
-        if (!layer->needsRendering() || !layer->supportsZoom(zoomHistory.lastZoom)) {
+    for (const auto& pair : layers) {
+        if (!pair.second->needsRendering() || !pair.second->supportsZoom(zoomHistory.lastZoom)) {
             continue;
         }
 
-        auto it = resultsByLayer.find(layer->baseImpl->id);
+        auto it = resultsByLayer.find(pair.second->baseImpl->id);
         if (it != resultsByLayer.end()) {
             std::move(it->second.begin(), it->second.end(), std::back_inserter(result));
         }
@@ -501,13 +520,13 @@ std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineS
 
 std::vector<Feature> RenderOrchestrator::queryShapeAnnotations(const ScreenLineString& geometry) const {
     assert(LayerManager::annotationsEnabled);
-    std::vector<const RenderLayer*> shapeAnnotationLayers;
+    std::unordered_map<std::string, const RenderLayer*> shapeAnnotationLayers;
     RenderedQueryOptions options;
     for (const auto& layerImpl : *layerImpls) {
         if (std::mismatch(layerImpl->id.begin(), layerImpl->id.end(),
                           AnnotationManager::ShapeLayerID.begin(), AnnotationManager::ShapeLayerID.end()).second == AnnotationManager::ShapeLayerID.end()) {
             if (const RenderLayer* layer = getRenderLayer(layerImpl->id)) {
-                shapeAnnotationLayers.emplace_back(layer);
+                shapeAnnotationLayers.emplace(layer->getID(), layer);
             }
         }
     }

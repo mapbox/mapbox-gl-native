@@ -92,24 +92,25 @@ namespace {
 // Detects a difference in keys of renderTiles and tileClippingMaskIDs
 bool tileIDsIdentical(const RenderTiles& renderTiles,
                       const std::map<UnwrappedTileID, int32_t>& tileClippingMaskIDs) {
-    assert(std::is_sorted(renderTiles.begin(), renderTiles.end(),
+    assert(renderTiles);
+    assert(std::is_sorted(renderTiles->begin(), renderTiles->end(),
                           [](const RenderTile& a, const RenderTile& b) { return a.id < b.id; }));
-    if (renderTiles.size() != tileClippingMaskIDs.size()) {
+    if (renderTiles->size() != tileClippingMaskIDs.size()) {
         return false;
     }
-    return std::equal(renderTiles.begin(), renderTiles.end(), tileClippingMaskIDs.begin(),
+    return std::equal(renderTiles->begin(), renderTiles->end(), tileClippingMaskIDs.begin(),
                       [](const RenderTile& a, const auto& b) { return a.id == b.first; });
 }
 
 } // namespace
 
 void PaintParameters::renderTileClippingMasks(const RenderTiles& renderTiles) {
-    if (renderTiles.empty() || tileIDsIdentical(renderTiles, tileClippingMaskIDs)) {
+    if (!renderTiles || renderTiles->empty() || tileIDsIdentical(renderTiles, tileClippingMaskIDs)) {
         // The current stencil mask is for this source already; no need to draw another one.
         return;
     }
 
-    if (nextStencilID + renderTiles.size() > 256) {
+    if (nextStencilID + renderTiles->size() > 256) {
         // we'll run out of fresh IDs so we need to clear and start from scratch
         clearStencil();
     }
@@ -120,7 +121,7 @@ void PaintParameters::renderTileClippingMasks(const RenderTiles& renderTiles) {
     const style::Properties<>::PossiblyEvaluated properties {};
     const ClippingMaskProgram::Binders paintAttributeData(properties, 0);
 
-    for (const RenderTile& renderTile : renderTiles) {
+    for (const RenderTile& renderTile : *renderTiles) {
         const int32_t stencilID = nextStencilID++;
         tileClippingMaskIDs.emplace(renderTile.id, stencilID);
 
