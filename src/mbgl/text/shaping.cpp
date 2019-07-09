@@ -238,9 +238,8 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
 std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
                                           const float spacing,
                                           float maxWidth,
-                                          const WritingModeType writingMode,
                                           const GlyphMap& glyphMap) {
-    if (!maxWidth || writingMode != WritingModeType::Horizontal) {
+    if (!maxWidth) {
         return {};
     }
     
@@ -382,13 +381,13 @@ const Shaping getShaping(const TaggedString& formattedString,
     std::vector<TaggedString> reorderedLines;
     if (formattedString.sectionCount() == 1) {
         auto untaggedLines = bidi.processText(formattedString.rawText(),
-                                              determineLineBreaks(formattedString, spacing, maxWidth, writingMode, glyphs));
+                                              determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
         for (const auto& line : untaggedLines) {
             reorderedLines.emplace_back(line, formattedString.sectionAt(0));
         }
     } else {
         auto processedLines = bidi.processStyledText(formattedString.getStyledText(),
-                                                     determineLineBreaks(formattedString, spacing, maxWidth, writingMode, glyphs));
+                                                     determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
         for (const auto& line : processedLines) {
             reorderedLines.emplace_back(line, formattedString.getSections());
         }
