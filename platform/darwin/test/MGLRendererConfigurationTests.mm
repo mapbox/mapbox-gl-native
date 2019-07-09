@@ -104,7 +104,7 @@ static NSString * const MGLRendererConfigurationTests_collisionBehaviorKey = @"M
     systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:NSFontWeightRegular].familyName UTF8String]);
 #endif
     
-    XCTAssert(localFontFamilyName == systemFontFamilyName);
+    XCTAssertEqual(localFontFamilyName, systemFontFamilyName, @"Default local font family name should match default system font");
 }
 
 @end
