@@ -79,6 +79,11 @@ public class TelemetryImpl implements TelemetryDefinition {
     }
   }
 
+  @Override
+  public void disableTelemetrySession() {
+    telemetry.disable();
+  }
+
   /**
    * Set the debug logging state of telemetry.
    *

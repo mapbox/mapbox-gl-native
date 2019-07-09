@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.exceptions;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 /**
  * A MapboxConfigurationException is thrown by MapboxMap when the SDK hasn't been properly initialised.
@@ -21,5 +22,12 @@ public class MapboxConfigurationException extends RuntimeException {
       + "inflating or creating the view. The access token parameter is required when using a Mapbox service."
       + "\nPlease see https://www.mapbox.com/help/create-api-access-token/ to learn how to create one."
       + "\nMore information in this guide https://www.mapbox.com/help/first-steps-android-sdk/#access-tokens.");
+  }
+
+  /**
+   * Creates a Mapbox configuration exception thrown by MapboxMap when the SDK hasn't been properly initialised.
+   */
+  public MapboxConfigurationException(@NonNull String message) {
+    super(message);
   }
 }

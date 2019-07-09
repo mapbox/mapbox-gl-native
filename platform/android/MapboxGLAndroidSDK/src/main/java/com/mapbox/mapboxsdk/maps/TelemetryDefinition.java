@@ -33,6 +33,11 @@ public interface TelemetryDefinition {
   void setUserTelemetryRequestState(boolean enabled);
 
   /**
+   * Disables a started telemetry service for this session only.
+   */
+  void disableTelemetrySession();
+
+  /**
    * Set the end-user selected state to participate or opt-out in telemetry collection.
    */
   void setDebugLoggingEnabled(boolean debugLoggingEnabled);
