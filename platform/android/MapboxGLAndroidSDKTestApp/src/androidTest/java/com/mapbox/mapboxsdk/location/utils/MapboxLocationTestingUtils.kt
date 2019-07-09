@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Handler
 import android.os.Looper
-import android.support.test.espresso.UiController
 import com.mapbox.geojson.Feature
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap

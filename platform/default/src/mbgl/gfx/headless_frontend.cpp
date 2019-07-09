@@ -132,19 +132,24 @@ PremultipliedImage HeadlessFrontend::readStillImage() {
 
 PremultipliedImage HeadlessFrontend::render(Map& map) {
     PremultipliedImage result;
+    std::exception_ptr error;
 
-    map.renderStill([&](std::exception_ptr error) {
-        if (error) {
-            std::rethrow_exception(error);
+    map.renderStill([&](std::exception_ptr e) {
+        if (e) {
+            error = e;
         } else {
             result = backend->readStillImage();
         }
     });
 
-    while (!result.valid()) {
+    while (!result.valid() && !error) {
         util::RunLoop::Get()->runOnce();
     }
 
+    if (error) {
+        std::rethrow_exception(error);
+    }
+      
     return result;
 }
 

@@ -93,6 +93,7 @@ public:
 
 struct NodeFileSource : public mbgl::FileSource {
     NodeFileSource(NodeMap* nodeMap_) : nodeMap(nodeMap_) {}
+    ~NodeFileSource() {}
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback) final;
     NodeMap* nodeMap;
 };

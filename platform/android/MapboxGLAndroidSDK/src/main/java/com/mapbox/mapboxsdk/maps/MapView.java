@@ -91,7 +91,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   @UiThread
   public MapView(@NonNull Context context) {
     super(context);
-    initialize(context, MapboxMapOptions.createFromAttributes(context, null));
+    initialize(context, MapboxMapOptions.createFromAttributes(context));
   }
 
   @UiThread
@@ -109,7 +109,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   @UiThread
   public MapView(@NonNull Context context, @Nullable MapboxMapOptions options) {
     super(context);
-    initialize(context, options == null ? MapboxMapOptions.createFromAttributes(context, null) : options);
+    initialize(context, options == null ? MapboxMapOptions.createFromAttributes(context) : options);
   }
 
   @CallSuper

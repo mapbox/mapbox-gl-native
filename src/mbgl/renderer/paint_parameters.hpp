@@ -2,7 +2,9 @@
 
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/renderer/render_light.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
 #include <mbgl/gfx/stencil_mode.hpp>
 #include <mbgl/gfx/color_mode.hpp>
@@ -22,8 +24,6 @@ class ImageManager;
 class LineAtlas;
 class PatternAtlas;
 class UnwrappedTileID;
-class RenderSource;
-class RenderTile;
 
 namespace gfx {
 class Context;
@@ -39,7 +39,7 @@ public:
     mat4 projMatrix;
     mat4 alignedProjMatrix;
     mat4 nearClippedProjMatrix;
-    const TransformState& state;
+    const TransformState state;
 };
 
 class PaintParameters {
@@ -47,8 +47,10 @@ public:
     PaintParameters(gfx::Context&,
                     float pixelRatio,
                     gfx::RendererBackend&,
-                    const UpdateParameters&,
                     const EvaluatedLight&,
+                    MapMode,
+                    MapDebugOptions,
+                    TimePoint,
                     const TransformParameters&,
                     RenderStaticData&,
                     LineAtlas&,
@@ -60,9 +62,9 @@ public:
     std::unique_ptr<gfx::CommandEncoder> encoder;
     std::unique_ptr<gfx::RenderPass> renderPass;
 
+    const TransformParameters& transformParams;
     const TransformState& state;
     const EvaluatedLight& evaluatedLight;
-    const TransformParameters& transformParams;
 
     RenderStaticData& staticData;
     LineAtlas& lineAtlas;
@@ -86,7 +88,7 @@ public:
 
     // Stencil handling
 public:
-    void renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>&);
+    void renderTileClippingMasks(const RenderTiles&);
     gfx::StencilMode stencilModeForClipping(const UnwrappedTileID&) const;
     gfx::StencilMode stencilModeFor3D();
 

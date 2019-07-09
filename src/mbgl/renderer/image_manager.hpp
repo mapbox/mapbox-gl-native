@@ -36,6 +36,7 @@ public:
     void dumpDebugLogs() const;
 
     const style::Image::Impl* getImage(const std::string&) const;
+    const Immutable<style::Image::Impl>* getSharedImage(const std::string&) const;
 
     void addImage(Immutable<style::Image::Impl>);
     bool updateImage(Immutable<style::Image::Impl>);

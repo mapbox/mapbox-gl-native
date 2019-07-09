@@ -44,7 +44,7 @@ public class MapFragmentUtils {
       options = args.getParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS);
     } else {
       // load default options
-      options = MapboxMapOptions.createFromAttributes(context, null);
+      options = MapboxMapOptions.createFromAttributes(context);
     }
     return options;
   }

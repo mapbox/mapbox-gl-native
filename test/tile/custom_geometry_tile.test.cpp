@@ -111,14 +111,14 @@ TEST(CustomGeometryTile, InvokeTileChanged) {
     CustomGeometryTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, CustomGeometrySource::TileOptions(),
     loaderActor);
 
+    Immutable<LayerProperties> layerProperties = makeMutable<CircleLayerProperties>(staticImmutableCast<CircleLayer::Impl>(layer.baseImpl));
     StubTileObserver observer;
     observer.tileChanged = [&] (const Tile&) {
         // Once present, the bucket should never "disappear", which would cause
         // flickering.
-        ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
+        ASSERT_TRUE(tile.layerPropertiesUpdated(layerProperties));
     };
 
-    Immutable<LayerProperties> layerProperties = makeMutable<CircleLayerProperties>(staticImmutableCast<CircleLayer::Impl>(layer.baseImpl));
     std::vector<Immutable<LayerProperties>> layers { layerProperties };
     tile.setLayers(layers);
     tile.setObserver(&observer);

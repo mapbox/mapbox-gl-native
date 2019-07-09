@@ -28,8 +28,10 @@ TransformParameters::TransformParameters(const TransformState& state_)
 PaintParameters::PaintParameters(gfx::Context& context_,
                     float pixelRatio_,
                     gfx::RendererBackend& backend_,
-                    const UpdateParameters& updateParameters,
                     const EvaluatedLight& evaluatedLight_,
+                    MapMode mode_,
+                    MapDebugOptions debugOptions_,
+                    TimePoint timePoint_,
                     const TransformParameters& transformParams_,
                     RenderStaticData& staticData_,
                     LineAtlas& lineAtlas_,
@@ -37,15 +39,15 @@ PaintParameters::PaintParameters(gfx::Context& context_,
     : context(context_),
     backend(backend_),
     encoder(context.createCommandEncoder()),
-    state(updateParameters.transformState),
-    evaluatedLight(evaluatedLight_),
     transformParams(transformParams_),
+    state(transformParams_.state),
+    evaluatedLight(evaluatedLight_),
     staticData(staticData_),
     lineAtlas(lineAtlas_),
     patternAtlas(patternAtlas_),
-    mapMode(updateParameters.mode),
-    debugOptions(updateParameters.debugOptions),
-    timePoint(updateParameters.timePoint),
+    mapMode(mode_),
+    debugOptions(debugOptions_),
+    timePoint(timePoint_),
     pixelRatio(pixelRatio_),
 #ifndef NDEBUG
     programs((debugOptions & MapDebugOptions::Overdraw) ? staticData_.overdrawPrograms : staticData_.programs)
@@ -88,7 +90,7 @@ void PaintParameters::clearStencil() {
 namespace {
 
 // Detects a difference in keys of renderTiles and tileClippingMaskIDs
-bool tileIDsIdentical(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles,
+bool tileIDsIdentical(const RenderTiles& renderTiles,
                       const std::map<UnwrappedTileID, int32_t>& tileClippingMaskIDs) {
     assert(std::is_sorted(renderTiles.begin(), renderTiles.end(),
                           [](const RenderTile& a, const RenderTile& b) { return a.id < b.id; }));
@@ -101,7 +103,7 @@ bool tileIDsIdentical(const std::vector<std::reference_wrapper<RenderTile>>& ren
 
 } // namespace
 
-void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles) {
+void PaintParameters::renderTileClippingMasks(const RenderTiles& renderTiles) {
     if (renderTiles.empty() || tileIDsIdentical(renderTiles, tileClippingMaskIDs)) {
         // The current stencil mask is for this source already; no need to draw another one.
         return;

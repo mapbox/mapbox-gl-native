@@ -516,6 +516,8 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
 
 void NativeMapView::setContentPadding(JNIEnv&, float top, float left, float bottom, float right) {
     insets = {top, left, bottom, right};
+    // invalidate the camera position to consider the new padding
+    map->jumpTo(map->getCameraOptions(insets));
 }
 
 jni::Local<jni::Array<jni::jfloat>> NativeMapView::getContentPadding(JNIEnv& env) {

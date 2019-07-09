@@ -4,13 +4,13 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-
 import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import junit.framework.Assert;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -45,9 +45,11 @@ public final class CameraUpdateFactory {
 
   /**
    * Returns a CameraUpdate that transforms the camera such that the specified
-   * latitude/longitude bounds are centered on screen at the greatest possible zoom level.
+   * latitude/longitude bounds are centered on screen at the greatest possible zoom level while maintaining
+   * current camera position bearing and tilt values.
+   * <p>
    * You can specify padding, in order to inset the bounding box from the map view's edges.
-   * The returned CameraUpdate has a bearing of 0 and a tilt of 0.
+   * </p>
    *
    * @param bounds  Bounds to match Camera position with
    * @param padding Padding added to the bounds
@@ -59,9 +61,29 @@ public final class CameraUpdateFactory {
 
   /**
    * Returns a CameraUpdate that transforms the camera such that the specified
-   * latitude/longitude bounds are centered on screen at the greatest possible zoom level.
+   * latitude/longitude bounds are centered on screen at the greatest possible zoom level while using
+   * provided bearing and tilt values.
+   * <p>
    * You can specify padding, in order to inset the bounding box from the map view's edges.
-   * The returned CameraUpdate has a bearing of 0 and a tilt of 0.
+   * </p>
+   *
+   * @param bounds  Bounds to match Camera position with
+   * @param bearing Bearing to take in account when generating the bounds
+   * @param tilt    Tilt to take in account when generating the bounds
+   * @param padding Padding added to the bounds
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate newLatLngBounds(@NonNull LatLngBounds bounds, double bearing, double tilt, int padding) {
+    return newLatLngBounds(bounds, bearing, tilt, padding, padding, padding, padding);
+  }
+
+  /**
+   * Returns a CameraUpdate that transforms the camera such that the specified
+   * latitude/longitude bounds are centered on screen at the greatest possible zoom level while maintaining
+   * current camera position bearing and tilt values.
+   * <p>
+   * You can specify padding, in order to inset the bounding box from the map view's edges.
+   * </p>
    *
    * @param bounds        Bounds to base the Camera position out of
    * @param paddingLeft   Padding left of the bounds
@@ -72,7 +94,29 @@ public final class CameraUpdateFactory {
    */
   public static CameraUpdate newLatLngBounds(@NonNull LatLngBounds bounds, int paddingLeft, int paddingTop,
                                              int paddingRight, int paddingBottom) {
-    return new CameraBoundsUpdate(bounds, paddingLeft, paddingTop, paddingRight, paddingBottom);
+    return new CameraBoundsUpdate(bounds, null, null, paddingLeft, paddingTop, paddingRight, paddingBottom);
+  }
+
+  /**
+   * Returns a CameraUpdate that transforms the camera such that the specified
+   * latitude/longitude bounds are centered on screen at the greatest possible zoom level while using
+   * provided bearing and tilt values.
+   * <p>
+   * You can specify padding, in order to inset the bounding box from the map view's edges.
+   * </p>
+   *
+   * @param bounds        Bounds to base the Camera position out of
+   * @param bearing       Bearing to take in account when generating the bounds
+   * @param tilt          Tilt to take in account when generating the bounds
+   * @param paddingLeft   Padding left of the bounds
+   * @param paddingTop    Padding top of the bounds
+   * @param paddingRight  Padding right of the bounds
+   * @param paddingBottom Padding bottom of the bounds
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate newLatLngBounds(@NonNull LatLngBounds bounds, double bearing, double tilt,
+                                             int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
+    return new CameraBoundsUpdate(bounds, bearing, tilt, paddingLeft, paddingTop, paddingRight, paddingBottom);
   }
 
   /**
@@ -253,16 +297,21 @@ public final class CameraUpdateFactory {
 
   static final class CameraBoundsUpdate implements CameraUpdate {
 
-    private LatLngBounds bounds;
-    private int[] padding;
+    private final LatLngBounds bounds;
+    private final int[] padding;
+    private final Double bearing;
+    private final Double tilt;
 
-    CameraBoundsUpdate(LatLngBounds bounds, int[] padding) {
+    CameraBoundsUpdate(LatLngBounds bounds, Double bearing, Double tilt, int[] padding) {
       this.bounds = bounds;
       this.padding = padding;
+      this.bearing = bearing;
+      this.tilt = tilt;
     }
 
-    CameraBoundsUpdate(LatLngBounds bounds, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
-      this(bounds, new int[] {paddingLeft, paddingTop, paddingRight, paddingBottom});
+    CameraBoundsUpdate(LatLngBounds bounds, Double bearing, Double tilt, int paddingLeft,
+                       int paddingTop, int paddingRight, int paddingBottom) {
+      this(bounds, bearing, tilt, new int[] {paddingLeft, paddingTop, paddingRight, paddingBottom});
     }
 
     public LatLngBounds getBounds() {
@@ -275,7 +324,15 @@ public final class CameraUpdateFactory {
 
     @Override
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
-      return mapboxMap.getCameraForLatLngBounds(bounds, padding);
+      if (bearing == null && tilt == null) {
+        // use current camera position tilt and bearing
+        return mapboxMap.getCameraForLatLngBounds(bounds, padding);
+      } else {
+        // use provided tilt and bearing
+        Assert.assertNotNull(bearing);
+        Assert.assertNotNull(tilt);
+        return mapboxMap.getCameraForLatLngBounds(bounds, padding, bearing, tilt);
+      }
     }
 
     @Override

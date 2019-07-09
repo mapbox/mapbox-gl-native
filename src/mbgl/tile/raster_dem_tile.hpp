@@ -59,21 +59,21 @@ namespace style {
 class Layer;
 } // namespace style
 
-class RasterDEMTile : public Tile {
+class RasterDEMTile final : public Tile {
 public:
     RasterDEMTile(const OverscaledTileID&,
                    const TileParameters&,
                    const Tileset&);
     ~RasterDEMTile() override;
 
+    std::unique_ptr<TileRenderData> createRenderData() override;
     void setNecessity(TileNecessity) final;
 
     void setError(std::exception_ptr);
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
     void setData(std::shared_ptr<const std::string> data);
 
-    void upload(gfx::UploadPass&) override;
-    Bucket* getBucket(const style::Layer::Impl&) const override;
+    bool layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) override;
 
     HillshadeBucket* getBucket() const;
     void backfillBorder(const RasterDEMTile& borderTile, const DEMTileNeighbors mask);
@@ -98,7 +98,7 @@ private:
 
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
-    std::unique_ptr<HillshadeBucket> bucket;
+    std::shared_ptr<HillshadeBucket> bucket;
 
 };
 

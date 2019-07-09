@@ -356,6 +356,8 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   private void showTrackingListDialog() {
     List<String> trackingTypes = new ArrayList<>();
     trackingTypes.add("None");
+    trackingTypes.add("None Compass");
+    trackingTypes.add("None GPS");
     trackingTypes.add("Tracking");
     trackingTypes.add("Tracking Compass");
     trackingTypes.add("Tracking GPS");
@@ -370,6 +372,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
       locationTrackingBtn.setText(selectedTrackingType);
       if (selectedTrackingType.contentEquals("None")) {
         setCameraTrackingMode(CameraMode.NONE);
+      } else if (selectedTrackingType.contentEquals("None Compass")) {
+        setCameraTrackingMode(CameraMode.NONE_COMPASS);
+      } else if (selectedTrackingType.contentEquals("None GPS")) {
+        setCameraTrackingMode(CameraMode.NONE_GPS);
       } else if (selectedTrackingType.contentEquals("Tracking")) {
         setCameraTrackingMode(CameraMode.TRACKING);
       } else if (selectedTrackingType.contentEquals("Tracking Compass")) {
@@ -409,6 +415,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     this.cameraMode = currentMode;
     if (currentMode == CameraMode.NONE) {
       locationTrackingBtn.setText("None");
+    } else if (currentMode == CameraMode.NONE_COMPASS) {
+      locationTrackingBtn.setText("None Compass");
+    } else if (currentMode == CameraMode.NONE_GPS) {
+      locationTrackingBtn.setText("None GPS");
     } else if (currentMode == CameraMode.TRACKING) {
       locationTrackingBtn.setText("Tracking");
     } else if (currentMode == CameraMode.TRACKING_COMPASS) {

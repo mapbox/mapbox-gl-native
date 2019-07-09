@@ -5,6 +5,7 @@ import android.graphics.PointF
 import android.support.test.InstrumentationRegistry
 import android.support.test.annotation.UiThreadTest
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
@@ -19,7 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class NativeMapViewTest {
+class NativeMapViewTest : AppCenter() {
 
     private lateinit var nativeMapView: NativeMap
 
@@ -94,7 +95,6 @@ class NativeMapViewTest {
         assertEquals("Longitude should match", expected.longitude, actual.longitude, DELTA)
     }
 
-
     @Test
     @UiThreadTest
     fun testBearingDefault() {
@@ -159,7 +159,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testLatLngForPixel() {
         val expected = LATLNG_TEST
-        nativeMapView.setLatLng(LATLNG_TEST,0)
+        nativeMapView.setLatLng(LATLNG_TEST, 0)
         val actual = nativeMapView.latLngForPixel(
                 PointF((WIDTH / 2).toFloat(), (HEIGHT / 2).toFloat())
         )
@@ -366,11 +366,11 @@ class NativeMapViewTest {
     class DummyRenderer(context: Context) : MapRenderer(context, null) {
 
         override fun requestRender() {
-            //no-op
+            // no-op
         }
 
         override fun queueEvent(runnable: Runnable?) {
-            //no-op
+            // no-op
         }
     }
 }

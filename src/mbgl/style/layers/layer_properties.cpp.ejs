@@ -30,6 +30,10 @@ namespace style {
 
 <%- camelize(type) %>LayerProperties::~<%- camelize(type) %>LayerProperties() = default;
 
+unsigned long <%- camelize(type) %>LayerProperties::constantsMask() const {
+    return evaluated.constantsMask();
+}
+
 const <%- camelize(type) %>Layer::Impl& <%- camelize(type) %>LayerProperties::layerImpl() const {
     return static_cast<const <%- camelize(type) %>Layer::Impl&>(*baseImpl);
 }

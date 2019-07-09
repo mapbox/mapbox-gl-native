@@ -49,6 +49,8 @@ public:
         HeatmapPaintProperties::PossiblyEvaluated);
     ~HeatmapLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const HeatmapLayer::Impl& layerImpl() const;
     // Data members.
     HeatmapPaintProperties::PossiblyEvaluated evaluated;

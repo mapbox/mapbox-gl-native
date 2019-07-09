@@ -54,6 +54,7 @@
 #endif
 #include "text/collator_jni.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
+#include "text/format_number_jni.hpp"
 #include "logger.hpp"
 
 namespace mbgl {
@@ -200,6 +201,7 @@ void registerNatives(JavaVM *vm) {
     Locale::registerNative(env);
     Collator::registerNative(env);
     StringUtils::registerNative(env);
+    NumberFormat::registerNative(env);
 
     // Logger
     Logger::registerNative(env);

@@ -43,7 +43,9 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.format;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.formatEntry;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.match;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.switchCase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.toBool;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
@@ -51,6 +53,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
@@ -114,7 +117,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     setContentView(R.layout.activity_symbollayer);
 
     // Create map configuration
-    MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(this, null);
+    MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(this);
     mapboxMapOptions.camera(new CameraPosition.Builder().target(
       new LatLng(52.35273, 4.91638))
       .zoom(13)
@@ -198,6 +201,12 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
           // use DDS
           boolean selected = feature.getBooleanProperty(SELECTED_FEATURE_PROPERTY);
           feature.addBooleanProperty(SELECTED_FEATURE_PROPERTY, !selected);
+
+          // validate symbol flicker regression for #13407
+          markerSymbolLayer.setProperties(iconOpacity(match(
+            get(ID_FEATURE_PROPERTY), literal(1.0f),
+            stop(feature.getStringProperty("id"), selected ? 0.3f :  1.0f)
+          )));
         }
       }
       markerSource.setGeoJson(markerCollection);

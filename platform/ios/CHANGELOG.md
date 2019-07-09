@@ -2,22 +2,53 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## Master
+## master
 
 * Exclude CJK resources from offline download by default. ([#14176](https://github.com/mapbox/mapbox-gl-native/pull/14176))
 
-## 5.1.0
+## 5.2.0
+
+### Offline maps
+
+* Fixed an issue where offline regions could report the wrong number of tiles. ([#14958](https://github.com/mapbox/mapbox-gl-native/pull/14958))
+
+### Packaging
+
+* Removed previously deprecated methods and properties that had been marked `unavailable`. ([#15000](https://github.com/mapbox/mapbox-gl-native/pull/15000))
+* The downloaded zip file of this framework no longer contains a local podspec. ([#15027](https://github.com/mapbox/mapbox-gl-native/pull/15027))
 
 ### Styles and rendering
 
-* Setting `MGLMapView.contentInset` now moves the map’s focal point to the center of the content frame after insetting. ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
+* Hiragana and katakana are now included in the range of CJK glyphs that are rendered locally by default. ([#15009](https://github.com/mapbox/mapbox-gl-native/pull/15009))
+* Added the `-[MGLMapViewDelegate mapView:shouldRemoveStyleImage:]` method for optimizing style image caching. ([#14769](https://github.com/mapbox/mapbox-gl-native/pull/14769))
+* Fixed style change transition regression caused by delayed setting of the updated layer properties. ([#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016))
+
+### Other changes
+
+* Added variants of several animated `MGLMapView` methods that accept completion handlers ([#14381](https://github.com/mapbox/mapbox-gl-native/pull/14381)):
+  * `-[MGLMapView setVisibleCoordinateBounds:edgePadding:animated:completionHandler:]`
+  * `-[MGLMapView setContentInset:animated:completionHandler:]`
+  * `-[MGLMapView setUserTrackingMode:animated:completionHandler:]`
+  * `-[MGLMapView setTargetCoordinate:animated:completionHandler:]`
+  * `-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]`
+  * `-[MGLMapView selectAnnotation:animated:completionHandler:]`
+* Deprecated variants of the above methods without completion handlers. ([#14959](https://github.com/mapbox/mapbox-gl-native/pull/14959))
+* Fixed an issue where the two-finger tilt gesture would continue after lifting one finger. ([#14969](https://github.com/mapbox/mapbox-gl-native/pull/14969))
+
+## 5.1.0 - June 19, 2019
+
+### Styles and rendering
+
+* Fixed a crash when a fill pattern in a style could not be found. ([#14696](https://github.com/mapbox/mapbox-gl-native/pull/14696))
 * Fixed a rendering performance regression when rendering polylines. ([#14851](https://github.com/mapbox/mapbox-gl-native/pull/14851))
 * Fixed a rendering performance regression introduced in 4.11.0. ([#14907](https://github.com/mapbox/mapbox-gl-native/pull/14907))
 * Fixed an issue where symbols underneath opaque fill layers could be incorrectly drawn above such layers. ([#14839](https://github.com/mapbox/mapbox-gl-native/pull/14839))
+* Fixed an issue where `MGLFillExtrusionStyleLayer` vertical gradients might not be rendered. ([#14808](https://github.com/mapbox/mapbox-gl-native/pull/14808))
 
 ### Other changes
 
 * The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInset` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
+* Setting `MGLMapView.contentInset` now moves the map’s focal point to the center of the content frame after insetting. ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
 * Fixed a feature querying bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 
 ## 5.0.0 - May 22, 2019
@@ -29,6 +60,7 @@ There are no breaking API changes in this release.
 ### Styles and rendering
 
 * Changed placement order of `MGLSymbolStyleLayer` to match the viewport-y order when `MGLSymbolStyleLayer.symbolZOrder` is set to `MGLSymbolZOrderViewportY`, allowing icons to overlap but not text. ([#14486](https://github.com/mapbox/mapbox-gl-native/pull/14486))
+* Added `MGLSymbolStyleLayer.symbolSortKey` and `MGLSymbolZOrderAuto` to allow customization of symbol z-ordering. ([#14386](https://github.com/mapbox/mapbox-gl-native/pull/14386))
 
 ### Other changes
 

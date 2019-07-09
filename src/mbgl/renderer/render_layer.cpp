@@ -47,17 +47,17 @@ bool RenderLayer::supportsZoom(float zoom) const {
 
 void RenderLayer::prepare(const LayerPrepareParameters& params) {
     assert(params.source);
-    renderTiles = filterRenderTiles(params.source->getRenderedTiles());
+    renderTiles = filterRenderTiles(params.source->getRenderTiles());
 }
 
 optional<Color> RenderLayer::getSolidBackground() const {
     return nullopt;
 }
 
-RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
+RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
     RenderTiles filtered;
 
-    for (RenderTile& tile : tiles) {
+    for (const RenderTile& tile : tiles) {
         if (tile.holdForFade()) {
             continue;
         }
@@ -78,21 +78,21 @@ void RenderLayer::checkRenderability(const PaintParameters& parameters,
     }
 
     if (activeBindingCount > parameters.context.maximumVertexBindingCount) {
-        Log::Info(Event::OpenGL,
-                "The layer '%s' uses more data-driven properties than the current device "
-                "supports, and will have rendering errors. To ensure compatibility with this "
-                "device, use %d fewer data driven properties in this layer.",
-                getID().c_str(),
-                activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
+        Log::Error(Event::OpenGL,
+                   "The layer '%s' uses more data-driven properties than the current device "
+                   "supports, and will have rendering errors. To ensure compatibility with this "
+                   "device, use %d fewer data driven properties in this layer.",
+                   getID().c_str(),
+                   activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
     } else if (activeBindingCount > parameters.context.minimumRequiredVertexBindingCount) {
-        Log::Info(Event::OpenGL,
-                "The layer '%s' uses more data-driven properties than some devices may support. "
-                "Though it will render correctly on this device, it may have rendering errors "
-                "on other devices. To ensure compatibility with all devices, use %d fewer "
-                "data-driven properties in this layer.",
-                getID().c_str(),
-                activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
+        Log::Warning(Event::OpenGL,
+                   "The layer '%s' uses more data-driven properties than some devices may support. "
+                   "Though it will render correctly on this device, it may have rendering errors "
+                   "on other devices. To ensure compatibility with all devices, use %d fewer "
+                   "data-driven properties in this layer.",
+                   getID().c_str(),
+                   activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
     }
 }

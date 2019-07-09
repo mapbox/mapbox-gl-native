@@ -51,6 +51,7 @@
     <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
     <string name="description_circle_layer">Show bus stops and route in Singapore</string>
     <string name="description_url_transform">Transform urls on the fly</string>
+    <string name="description_cache_management">Control the cache management with FileSource API</string>
     <string name="description_restricted_bounds">Limit viewport to Iceland</string>
     <string name="description_fill_extrusion_layer">Shows how to add 3D extruded shapes</string>
     <string name="description_building_fill_extrusion_layer">Shows how to show 3D extruded buildings</string>

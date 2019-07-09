@@ -318,7 +318,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
     deleteDatabaseFiles();
     util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
 
-    OfflineDatabase db(filename, mapbox::sqlite::ReadOnly);
+    OfflineDatabase db(filename);
 
     Resource resource = Resource::style("mapbox://styles/mapbox/satellite-v9");
     ASSERT_TRUE(db.get(resource));
@@ -515,7 +515,141 @@ TEST(OfflineDatabase, GetRegionDefinition) {
     );
 }
 
-TEST(OfflineDatabase, DeleteRegion) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MaximumAmbientCacheSize)) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+
+    auto databaseSize = [] {
+        return util::read_file(filename).size();
+    };
+
+    {
+        OfflineDatabase db(filename);
+    }
+
+    size_t initialSize = util::read_file(filename).size();
+    size_t maximumSize = 50 * 1024 * 1024;
+
+    Response response;
+    response.data = randomString(100 * 1024);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 50 MB
+
+        OfflineTilePyramidRegionDefinition definition{ "mapbox://style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
+        OfflineRegionMetadata metadata{{ 1, 2, 3 }};
+
+        auto region = db.createRegion(definition, metadata);
+
+        // Add 100 MB of resources (50/50 ambient/region)
+        for (unsigned i = 0; i < 250; ++i) {
+            const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(ambientTile, response);
+
+            const Resource ambientStyle = Resource::style("mapbox://ambient_style_" + std::to_string(i));
+            db.put(ambientStyle, response);
+
+            const Resource regionTile = Resource::tile("mapbox://region_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.putRegionResource(region->getID(), regionTile, response);
+
+            const Resource regionStyle = Resource::style("mapbox://region_style_" + std::to_string(i));
+            db.putRegionResource(region->getID(), regionStyle, response);
+        }
+    }
+
+    // We are adding about 50 MB of "region" data and 50 MB,
+    // of "ambient" data. The effective size of the ambient
+    // cache will be zero here because it will try to make
+    // room for the region data.
+    EXPECT_GE(databaseSize(), maximumSize);
+    EXPECT_LE(databaseSize(), 60 * 1024 * 1024);
+
+    maximumSize = 30 * 1024 * 1024;
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 30 MB
+    }
+
+    // Setting a new size to the ambient cache should have no
+    // effect because it is all taken by offline region anyway.
+    EXPECT_GE(databaseSize(), maximumSize);
+    EXPECT_LE(databaseSize(), 60 * 1024 * 1024);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 30 MB
+        db.deleteRegion(std::move(db.listRegions().value()[0]));
+    }
+
+    // After deleting the offline region, the data will migrate
+    // to the ambient cache, respecting the size defined.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), maximumSize / 2);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize * 2); // 60 MB
+    }
+
+    // Doubling the size should have no effect if
+    // we don't and new tiles and if the ambient cache
+    // is already under the maximum size.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), maximumSize / 2);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 30 MB
+
+        // Add ~50 MB in ambient cache data.
+        for (unsigned i = 0; i < 250; ++i) {
+            const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(ambientTile, response);
+
+            const Resource ambientStyle = Resource::style("mapbox://ambient_style_" + std::to_string(i));
+            db.put(ambientStyle, response);
+        }
+    }
+
+    // Only ambient cache now, so it should respect
+    // the established size.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), maximumSize / 2);
+
+    maximumSize = 20 * 1024 * 1024;
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(maximumSize); // 20 MB
+    }
+
+    // Should shrink again.
+    EXPECT_LE(databaseSize(), maximumSize);
+    EXPECT_GE(databaseSize(), initialSize);
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
+        for (unsigned i = 0; i < 5; ++i) {
+            const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+            db.put(ambientTile, response);
+            ASSERT_FALSE(db.get(ambientTile));
+
+            const Resource ambientStyle = Resource::style("mapbox://ambient_style_" + std::to_string(i));
+            db.put(ambientStyle, response);
+            ASSERT_FALSE(db.get(ambientStyle));
+        }
+    }
+
+    // Setting the size to zero should effectively
+    // clear the cache now.
+    EXPECT_EQ(initialSize, util::read_file(filename).size());
+}
+
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
     FixtureLog log;
     deleteDatabaseFiles();
 
@@ -536,9 +670,12 @@ TEST(OfflineDatabase, DeleteRegion) {
 
         auto region = db.createRegion(definition, metadata);
 
-        for (unsigned i = 0; i < 100; ++i) {
+        for (unsigned i = 0; i < 50; ++i) {
             const Resource tile = Resource::tile("mapbox://tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
             db.putRegionResource(region->getID(), tile, response);
+
+            const Resource style = Resource::style("mapbox://style_" + std::to_string(i));
+            db.putRegionResource(region->getID(), style, response);
         }
 
         db.deleteRegion(std::move(*region));
@@ -553,11 +690,109 @@ TEST(OfflineDatabase, DeleteRegion) {
 
         // After clearing the cache, the size of the database
         // should get back to the original size.
-        db.clearTileCache();
+        db.clearAmbientCache();
     }
 
     EXPECT_EQ(initialSize, util::read_file(filename).size());
     EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+TEST(OfflineDatabase, MapboxTileLimitExceeded) {
+    FixtureLog log;
+
+    uint64_t limit = 60;
+
+    OfflineDatabase db(":memory:");
+    db.setOfflineMapboxTileCountLimit(limit);
+
+    Response response;
+    response.data = randomString(4096);
+
+    auto insertAmbientTile = [&](unsigned i) {
+        const Resource ambientTile = Resource::tile("mapbox://ambient_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.put(ambientTile, response);
+    };
+
+    auto insertRegionTile = [&](int64_t regionID, unsigned i) {
+        const Resource tile = Resource::tile("mapbox://region_tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.putRegionResource(regionID, tile, response);
+    };
+
+    OfflineTilePyramidRegionDefinition definition1{ "mapbox://style1", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
+    OfflineRegionMetadata metadata1{{ 1, 2, 3 }};
+
+    OfflineTilePyramidRegionDefinition definition2{ "mapbox://style2", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
+    OfflineRegionMetadata metadata2{{ 1, 2, 3 }};
+
+    auto region1 = db.createRegion(definition1, metadata1);
+    auto region2 = db.createRegion(definition2, metadata2);
+
+    // Fine because tile limit only affects offline region.
+    for (unsigned i = 0; i < limit * 2; ++i) {
+        insertAmbientTile(i);
+    }
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), 0);
+
+    // Fine because this region is under the tile limit.
+    for (unsigned i = 0; i < limit - 10; ++i) {
+        insertRegionTile(region1->getID(), i);
+    }
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), limit - 10);
+
+    // Fine because this region + the previous is at the limit.
+    for (unsigned i = limit; i < limit + 10; ++i) {
+        insertRegionTile(region2->getID(), i);
+    }
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), limit);
+
+    // Full.
+    ASSERT_THROW(insertRegionTile(region1->getID(), 200), MapboxTileLimitExceededException);
+    ASSERT_THROW(insertRegionTile(region2->getID(), 201), MapboxTileLimitExceededException);
+
+    // These tiles are already on respective
+    // regions.
+    insertRegionTile(region1->getID(), 0);
+    insertRegionTile(region2->getID(), 60);
+
+    // Should be fine, ambient tile.
+    insertAmbientTile(333);
+
+    // Also fine, not Mapbox.
+    const Resource notMapboxTile = Resource::tile("foobar://region_tile", 1, 0, 0, 0, Tileset::Scheme::XYZ);
+    db.putRegionResource(region1->getID(), notMapboxTile, response);
+
+    // These tiles are not on the region they are
+    // being added to, but exist on another region,
+    // so they do not add to the total size.
+    insertRegionTile(region2->getID(), 0);
+    insertRegionTile(region1->getID(), 60);
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), limit);
+
+    // The tile 1 belongs to two regions and will
+    // still count as resource.
+    db.deleteRegion(std::move(*region2));
+
+    ASSERT_EQ(db.getOfflineMapboxTileCount(), 51);
+
+    // Add new tiles to the region 1. We are adding
+    // 10, which would blow up the limit if it wasn't
+    // for the fact that tile 60 is already on the
+    // database and will not count.
+    for (unsigned i = limit; i < limit + 10; ++i) {
+        insertRegionTile(region1->getID(), i);
+    }
+
+    // Full again.
+    ASSERT_THROW(insertRegionTile(region1->getID(), 202), MapboxTileLimitExceededException);
+
+    db.deleteRegion(std::move(*region1));
+
+    ASSERT_EQ(0u, db.listRegions().value().size());
+    ASSERT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, Invalidate) {
@@ -571,49 +806,73 @@ TEST(OfflineDatabase, Invalidate) {
     response.mustRevalidate = false;
     response.expires = util::now() + 1h;
 
-    const Resource ambient = Resource::tile("mapbox://tile_ambient", 1, 0, 0, 0, Tileset::Scheme::XYZ);
-    db.put(ambient, response);
+    const Resource ambientTile = Resource::tile("mapbox://tile_ambient", 1, 0, 0, 0, Tileset::Scheme::XYZ);
+    db.put(ambientTile, response);
+
+    const Resource ambientStyle  = Resource::style("mapbox://style_ambient");
+    db.put(ambientStyle, response);
 
     OfflineTilePyramidRegionDefinition definition { "mapbox://style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
 
     auto region1 = db.createRegion(definition, metadata);
-    const Resource offline1 = Resource::tile("mapbox://tile_offline_region1", 1.0, 0, 0, 0, Tileset::Scheme::XYZ);
-    db.putRegionResource(region1->getID(), offline1, response);
+    const Resource region1Tile = Resource::tile("mapbox://tile_offline_region1", 1.0, 0, 0, 0, Tileset::Scheme::XYZ);
+    db.putRegionResource(region1->getID(), region1Tile, response);
+
+    const Resource region1Style = Resource::style("mapbox://style_offline_region1");
+    db.putRegionResource(region1->getID(), region1Style, response);
 
     auto region2 = db.createRegion(definition, metadata);
-    const Resource offline2 = Resource::tile("mapbox://tile_offline_region2", 1.0, 0, 0, 0, Tileset::Scheme::XYZ);
-    db.putRegionResource(region2->getID(), offline2, response);
+    const Resource region2Tile = Resource::tile("mapbox://tile_offline_region2", 1.0, 0, 0, 0, Tileset::Scheme::XYZ);
+    db.putRegionResource(region2->getID(), region2Tile, response);
+
+    const Resource region2Style = Resource::style("mapbox://style_offline_region2");
+    db.putRegionResource(region2->getID(), region2Style, response);
 
     // Prior to invalidation, all tiles are usable.
-    EXPECT_TRUE(db.get(ambient)->isUsable());
-    EXPECT_TRUE(db.get(offline1)->isUsable());
-    EXPECT_TRUE(db.get(offline2)->isUsable());
+    EXPECT_TRUE(db.get(ambientTile)->isUsable());
+    EXPECT_TRUE(db.get(ambientStyle)->isUsable());
+    EXPECT_TRUE(db.get(region1Tile)->isUsable());
+    EXPECT_TRUE(db.get(region1Style)->isUsable());
+    EXPECT_TRUE(db.get(region2Tile)->isUsable());
+    EXPECT_TRUE(db.get(region2Style)->isUsable());
 
     // Invalidate a region will not invalidate ambient
     // tiles or other regions.
     EXPECT_TRUE(db.invalidateRegion(region1->getID()) == nullptr);
 
-    EXPECT_TRUE(db.get(ambient)->isUsable());
-    EXPECT_FALSE(db.get(offline1)->isUsable());
-    EXPECT_TRUE(db.get(offline2)->isUsable());
+    EXPECT_TRUE(db.get(ambientTile)->isUsable());
+    EXPECT_TRUE(db.get(ambientStyle)->isUsable());
+    EXPECT_FALSE(db.get(region1Tile)->isUsable());
+    EXPECT_FALSE(db.get(region1Style)->isUsable());
+    EXPECT_TRUE(db.get(region2Tile)->isUsable());
+    EXPECT_TRUE(db.get(region2Style)->isUsable());
 
     // Invalidate the ambient cache will not invalidate
     // the regions that are still valid.
-    EXPECT_TRUE(db.invalidateTileCache() == nullptr);
+    EXPECT_TRUE(db.invalidateAmbientCache() == nullptr);
 
-    EXPECT_FALSE(db.get(ambient)->isUsable());
-    EXPECT_FALSE(db.get(offline1)->isUsable());
-    EXPECT_TRUE(db.get(offline2)->isUsable());
+    EXPECT_FALSE(db.get(ambientTile)->isUsable());
+    EXPECT_FALSE(db.get(ambientStyle)->isUsable());
+    EXPECT_FALSE(db.get(region1Tile)->isUsable());
+    EXPECT_FALSE(db.get(region1Style)->isUsable());
+    EXPECT_TRUE(db.get(region2Tile)->isUsable());
+    EXPECT_TRUE(db.get(region2Style)->isUsable());
 
     // Sanity check.
-    EXPECT_TRUE(db.get(ambient)->expires < util::now());
-    EXPECT_TRUE(db.get(offline1)->expires < util::now());
-    EXPECT_TRUE(db.get(offline2)->expires > util::now());
+    EXPECT_TRUE(db.get(ambientTile)->expires < util::now());
+    EXPECT_TRUE(db.get(ambientStyle)->expires < util::now());
+    EXPECT_TRUE(db.get(region1Tile)->expires < util::now());
+    EXPECT_TRUE(db.get(region1Style)->expires < util::now());
+    EXPECT_TRUE(db.get(region2Tile)->expires > util::now());
+    EXPECT_TRUE(db.get(region2Style)->expires > util::now());
 
-    EXPECT_TRUE(db.get(ambient)->mustRevalidate);
-    EXPECT_TRUE(db.get(offline1)->mustRevalidate);
-    EXPECT_FALSE(db.get(offline2)->mustRevalidate);
+    EXPECT_TRUE(db.get(ambientTile)->mustRevalidate);
+    EXPECT_TRUE(db.get(ambientStyle)->mustRevalidate);
+    EXPECT_TRUE(db.get(region1Tile)->mustRevalidate);
+    EXPECT_TRUE(db.get(region1Style)->mustRevalidate);
+    EXPECT_FALSE(db.get(region2Tile)->mustRevalidate);
+    EXPECT_FALSE(db.get(region2Style)->mustRevalidate);
 
     // Should not throw.
     EXPECT_TRUE(db.invalidateRegion(region2->getID()) == nullptr);
@@ -627,7 +886,7 @@ TEST(OfflineDatabase, Invalidate) {
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
-TEST(OfflineDatabase, ClearTileCache) {
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ClearAmbientCache)) {
     FixtureLog log;
     deleteDatabaseFiles();
 
@@ -643,12 +902,15 @@ TEST(OfflineDatabase, ClearTileCache) {
 
         OfflineDatabase db(filename);
 
-        for (unsigned i = 0; i < 100; ++i) {
+        for (unsigned i = 0; i < 50; ++i) {
             const Resource tile = Resource::tile("mapbox://tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
             db.put(tile, response);
+
+            const Resource style = Resource::style("mapbox://style_" + std::to_string(i));
+            db.put(style, response);
         }
 
-        db.clearTileCache();
+        db.clearAmbientCache();
     }
 
     EXPECT_EQ(initialSize, util::read_file(filename).size());
@@ -693,7 +955,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
             EXPECT_TRUE(bool(db2.get(fixture::resource)));
 
             if (i == 50) {
-                db2.clearTileCache();
+                db2.clearAmbientCache();
             }
         }
     });
@@ -725,7 +987,8 @@ TEST(OfflineDatabase, PutReturnsSize) {
 
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
 
     Response response;
     response.data = randomString(1024);
@@ -743,7 +1006,9 @@ TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
 
 TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, true };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -763,7 +1028,8 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
 
 TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
 
     Response big;
     big.data = randomString(1024 * 100);
@@ -819,7 +1085,9 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
 
 TEST(OfflineDatabase, HasRegionResource) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, true };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -843,7 +1111,9 @@ TEST(OfflineDatabase, HasRegionResource) {
 
 TEST(OfflineDatabase, HasRegionResourceTile) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, false };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -938,7 +1208,9 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
 
 TEST(OfflineDatabase, BatchInsertion) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, true };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -963,8 +1235,10 @@ TEST(OfflineDatabase, BatchInsertion) {
 
 TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
     FixtureLog log;
-    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineDatabase db(":memory:");
     db.setOfflineMapboxTileCountLimit(1);
+    db.setMaximumAmbientCacheSize(1024 * 100);
+
     OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0, false };
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
@@ -1001,7 +1275,9 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v2.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions();
         ASSERT_TRUE(regions);
         for (auto& region : regions.value()) {
@@ -1023,7 +1299,9 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v3.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
@@ -1042,7 +1320,9 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v4.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
@@ -1068,7 +1348,9 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
     util::copyFile(filename, "test/fixtures/offline_database/v5.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
         auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
@@ -1096,7 +1378,8 @@ TEST(OfflineDatabase, DowngradeSchema) {
     util::copyFile(filename, "test/fixtures/offline_database/v999.db");
 
     {
-        OfflineDatabase db(filename, 0);
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
     }
 
     EXPECT_EQ(6, databaseUserVersion(filename));
@@ -1474,7 +1757,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithDiskFull)) {
 }
 #endif // __QT__
 
-TEST(OfflineDatabse, ChangePath) {
+TEST(OfflineDatabase, ChangePath) {
     std::string newPath("test/fixtures/offline_database/test.db");
     OfflineDatabase db(":memory:");
     db.changePath(newPath);
@@ -1482,13 +1765,13 @@ TEST(OfflineDatabse, ChangePath) {
     util::deleteFile(newPath);
 }
 
-TEST(OfflineDatabse, resetCache) {
+TEST(OfflineDatabase, ResetDatabase) {
     FixtureLog log;
     deleteDatabaseFiles();
     util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
 
     OfflineDatabase db(filename);
-    auto result = db.resetCache();
+    auto result = db.resetDatabase();
     EXPECT_FALSE(result);
 
     auto regions = db.listRegions().value();

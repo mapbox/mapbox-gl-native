@@ -1393,6 +1393,9 @@ public final class LocationComponent {
     animationsValueChangeListeners.addAll(locationLayerController.getAnimationListeners());
     animationsValueChangeListeners.addAll(locationCameraController.getAnimationListeners());
     locationAnimatorCoordinator.updateAnimatorListenerHolders(animationsValueChangeListeners);
+    locationAnimatorCoordinator.resetAllCameraAnimations(mapboxMap.getCameraPosition(),
+      locationCameraController.getCameraMode() == CameraMode.TRACKING_GPS_NORTH);
+    locationAnimatorCoordinator.resetAllLayerAnimations();
   }
 
   @NonNull
@@ -1517,7 +1520,8 @@ public final class LocationComponent {
   }
 
   @NonNull
-  private OnCameraTrackingChangedListener cameraTrackingChangedListener = new OnCameraTrackingChangedListener() {
+  @VisibleForTesting
+  OnCameraTrackingChangedListener cameraTrackingChangedListener = new OnCameraTrackingChangedListener() {
     @Override
     public void onCameraTrackingDismissed() {
       for (OnCameraTrackingChangedListener listener : onCameraTrackingChangedListeners) {
@@ -1530,8 +1534,6 @@ public final class LocationComponent {
       locationAnimatorCoordinator.cancelZoomAnimation();
       locationAnimatorCoordinator.cancelTiltAnimation();
       updateAnimatorListenerHolders();
-      locationAnimatorCoordinator.resetAllCameraAnimations(mapboxMap.getCameraPosition(),
-        locationCameraController.getCameraMode() == CameraMode.TRACKING_GPS_NORTH);
       for (OnCameraTrackingChangedListener listener : onCameraTrackingChangedListeners) {
         listener.onCameraTrackingChanged(currentMode);
       }
@@ -1539,7 +1541,8 @@ public final class LocationComponent {
   };
 
   @NonNull
-  private OnRenderModeChangedListener renderModeChangedListener = new OnRenderModeChangedListener() {
+  @VisibleForTesting
+  OnRenderModeChangedListener renderModeChangedListener = new OnRenderModeChangedListener() {
     @Override
     public void onRenderModeChanged(int currentMode) {
       updateAnimatorListenerHolders();

@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -64,6 +66,7 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onSnapshotReady(MapSnapshot snapshot) {
+    this.mapSnapshot = snapshot;
     Timber.i("Snapshot ready");
     ImageView imageView = (ImageView) findViewById(R.id.snapshot_image);
     Bitmap image = addMarker(snapshot);
@@ -91,6 +94,12 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
       null
     );
     return snapshot.getBitmap();
+  }
+
+  @VisibleForTesting
+  @Nullable
+  public MapSnapshot getMapSnapshot() {
+    return mapSnapshot;
   }
 
 }

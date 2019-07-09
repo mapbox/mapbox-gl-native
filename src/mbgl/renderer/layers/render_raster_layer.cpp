@@ -3,6 +3,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/renderer/sources/render_image_source.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/tile/tile.hpp>
@@ -74,13 +75,7 @@ static std::array<float, 3> spinWeights(float spin) {
 
 void RenderRasterLayer::prepare(const LayerPrepareParameters& params) {
     RenderLayer::prepare(params);
-    auto* imageSource = params.source->as<RenderImageSource>();
-    if (imageSource && imageSource->isLoaded()) {
-        assert(imageSource->isEnabled());
-        assert(imageSource->sharedData.bucket);
-        assert(imageSource->sharedData.matrices);
-        imageData = imageSource->sharedData;
-    }
+    imageData = params.source->getImageRenderData();
 }
 
 void RenderRasterLayer::render(PaintParameters& parameters) {
@@ -147,7 +142,7 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
         assert(bucket.texture);
 
         size_t i = 0;
-        for (const auto& matrix_ : *imageData->matrices) {
+        for (const auto& matrix_ : imageData->matrices) {
             draw(matrix_,
                 *bucket.vertexBuffer,
                 *bucket.indexBuffer,

@@ -751,14 +751,14 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                                                                                      heading:0];
                         __weak typeof(self) weakSelf = self;
                         [self.mapView setCamera:camera withDuration:0.3 animationTimingFunction:nil completionHandler:^{
-                            [weakSelf.mapView setContentInset:contentInsets animated:YES];
+                            [weakSelf.mapView setContentInset:contentInsets animated:YES completionHandler:nil];
                         }];
                     } else {
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[0]];
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[1]];
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[2]];
                         [self.view sendSubviewToBack:self.contentInsetsOverlays[3]];
-                        [self.mapView setContentInset:_originalContentInsets animated:YES];
+                        [self.mapView setContentInset:_originalContentInsets animated:YES completionHandler:nil];
                     }
                     break;
                 }
@@ -1686,7 +1686,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 - (void)selectAnOffscreenPointAnnotation {
     id<MGLAnnotation> annotation = [self randomOffscreenPointAnnotation];
     if (annotation) {
-        [self.mapView selectAnnotation:annotation animated:YES];
+        [self.mapView selectAnnotation:annotation animated:YES completionHandler:nil];
 
         NSAssert(self.mapView.selectedAnnotations.firstObject, @"The annotation was not selected");
     }
@@ -1946,7 +1946,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         // positioning rect)
 
         [self.mapView addAnnotation:pin];
-        [self.mapView selectAnnotation:pin animated:YES];
+        [self.mapView selectAnnotation:pin animated:YES completionHandler:nil];
     }
 }
 

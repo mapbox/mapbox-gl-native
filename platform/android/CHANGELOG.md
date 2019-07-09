@@ -4,12 +4,45 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 8.2.0-alpha.2 - July 3, 2019
+
+### Bugs
+ - Fixed style change transition regression caused by delayed setting of the updated layer properties [#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016)
+ 
+### Features
+ - Cache management API [#14962](https://github.com/mapbox/mapbox-gl-native/pull/14962)
+ - Include Hiragana and Katakana glyph ranges to LocalGlyphRasterizer [#15009](https://github.com/mapbox/mapbox-gl-native/pull/15009)
+ 
+### Build
+ - Update CI image with NDK r20 [#15005](https://github.com/mapbox/mapbox-gl-native/pull/15005)
+
+## 8.2.0-alpha.1 - June 26, 2019
+
 ### Bugs
  - Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation [#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884) 
-
-### Styles and rendering
-
+ - Switch back to a more compact line attributes layout [#14851](https://github.com/mapbox/mapbox-gl-native/pull/14851)
+ - Correct reset viewport restriction [#14882](https://github.com/mapbox/mapbox-gl-native/pull/14882)
+ - Allow null updates to GeoJsonSource [#14898](https://github.com/mapbox/mapbox-gl-native/pull/14898)
+ - Accept floating point numbers during core and platform color conversion [#14954](https://github.com/mapbox/mapbox-gl-native/pull/14954)
  - Implemented asymmetric center of perspective: fixed an issue that caused the focal point to be always based on the view's horizontal center when setting [MapboxMap setPadding](https://docs.mapbox.com/android/api/map-sdk/8.0.0/com/mapbox/mapboxsdk/maps/MapboxMap.html#setPadding-int-int-int-int-). [#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664)
+
+### Features
+ - Add resource usage to HttpRequest, add offline query flag to HttpRequest [#14837](https://github.com/mapbox/mapbox-gl-native/pull/14837)
+
+## 8.1.0 - June 20, 2019
+
+### Bugs
+ - Accept floating numbers during core->platform color conversion [#14954](https://github.com/mapbox/mapbox-gl-native/pull/14954)
+ - Ensure to re-enable move when quickzoom finishes [#14965](https://github.com/mapbox/mapbox-gl-native/pull/14965)
+
+### Features
+ - Limit concurrent request for Android 4.4 and below to 10 [#14971](https://github.com/mapbox/mapbox-gl-native/pull/14971)
+
+_Note about #14971:_ This pr makes an adjustment as a precautionary measure towards a rare bug that was discovered via instrumented unit tests on Android 4.4 (aka KitKat). This bug isn’t tied to a code change in the Mapbox Maps SDK for Android. Rather, the root cause is on the Android OS (and how it interacts with OkHttp).
+
+The Maps SDK doesn’t directly communicate with this system library that the bug originates from, but goes through an external dependency that handles the http communication for the Maps SDK. Capturing from the upstream repository that the code path to this system library isn’t thread safe in Android 4.4 and can result in the native crash above. The only way to fix this issue is by upgrading the end-user device to Android 5.0 or higher which isn’t possible if the device manufacturer hasn’t released an update for it.
+
+Please see https://github.com/square/okhttp/issues/2679 for more information.
 
 ## 8.1.0-beta.1 - June 13, 2019
 
@@ -18,7 +51,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fix reset behavior for setLatLngBoundsForCameraTarget [#14882](https://github.com/mapbox/mapbox-gl-native/pull/14882)
 
 ### Features
- - Change library loader to soloader [#14890](https://github.com/mapbox/mapbox-gl-native/pull/14890)
  -  Add resource usage to HttpRequest, add offline query param [#14837](https://github.com/mapbox/mapbox-gl-native/pull/14837)
 
 ## 8.0.1 - June 11, 2019

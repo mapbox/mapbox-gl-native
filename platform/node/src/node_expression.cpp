@@ -42,7 +42,8 @@ type::Type parseType(v8::Local<v8::Object> type) {
         {"object", type::Object},
         {"color", type::Color},
         {"value", type::Value},
-        {"formatted", type::Formatted}
+        {"formatted", type::Formatted},
+        {"number-format", type::String}
     };
 
     v8::Local<v8::Value> v8kind = Nan::Get(type, Nan::New("kind").ToLocalChecked()).ToLocalChecked();

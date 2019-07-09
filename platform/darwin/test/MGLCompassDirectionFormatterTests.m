@@ -7,6 +7,11 @@
 
 @implementation MGLCompassDirectionFormatterTests
 
+- (void)setUp {
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/14908
+    XCTAssertEqualObjects(NSLocale.currentLocale.localeIdentifier, @"en_US", @"Device locale must be en_US for these tests to pass.");
+}
+
 - (void)testCompassDirections {
     MGLCompassDirectionFormatter *shortFormatter = [[MGLCompassDirectionFormatter alloc] init];
     shortFormatter.unitStyle = NSFormattingUnitStyleShort;

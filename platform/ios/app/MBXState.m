@@ -21,9 +21,9 @@ NSString *const MBXReuseQueueStatsEnabled = @"MBXReuseQueueStatsEnabled";
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:_camera forKey:MBXCamera];
-    [coder encodeObject:[NSNumber numberWithInt:_userTrackingMode] forKey:MBXUserTrackingMode];
+    [coder encodeObject:[NSNumber numberWithUnsignedInteger:_userTrackingMode] forKey:MBXUserTrackingMode];
     [coder encodeBool:_showsUserLocation forKey:MBXShowsUserLocation];
-    [coder encodeObject:[NSNumber numberWithInt:_debugMask] forKey:MBXDebugMaskValue];
+    [coder encodeObject:[NSNumber numberWithUnsignedInteger:_debugMask] forKey:MBXDebugMaskValue];
     [coder encodeBool:_showsZoomLevelOrnament forKey:MBXShowsZoomLevelOrnament];
     [coder encodeBool:_showsTimeFrameGraph forKey:MBXShowsTimeFrameGraph];
     [coder encodeBool:_debugLoggingEnabled forKey:MBXDebugLoggingEnabled];
@@ -68,7 +68,18 @@ NSString *const MBXReuseQueueStatsEnabled = @"MBXReuseQueueStatsEnabled";
 }
 
 - (NSString*) debugDescription {
-    return [NSString stringWithFormat:@"Camera: %@\nTracking mode: %lu\nShows user location: %@\nDebug mask value: %lu\nShows zoom level ornament: %@\nShows time frame graph: %@\nDebug logging enabled: %@\nShows map scale: %@\nShows user heading indicator: %@\nFramerate measurement enabled: %@", self.camera, (unsigned long)self.userTrackingMode, (self.showsUserLocation) ? @"YES" : @"NO", (unsigned long)self.debugMask, (self.showsZoomLevelOrnament) ? @"YES" : @"NO", (self.showsTimeFrameGraph) ? @"YES" : @"NO", (self.debugLoggingEnabled) ? @"YES" : @"NO", (self.showsMapScale) ? @"YES" : @"NO", (self.showsUserHeadingIndicator) ? @"YES" : @"NO", (self.framerateMeasurementEnabled) ? @"YES" : @"NO", (self.reuseQueueStatsEnabled) ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"Camera: %@\nTracking mode: %lu\nShows user location: %@\nDebug mask value: %lu\nShows zoom level ornament: %@\nShows time frame graph: %@\nDebug logging enabled: %@\nShows map scale: %@\nShows user heading indicator: %@\nFramerate measurement enabled: %@\nReuse queue stats enabled: %@",
+            self.camera,
+            (unsigned long)self.userTrackingMode,
+            self.showsUserLocation ? @"YES" : @"NO",
+            (unsigned long)self.debugMask,
+            self.showsZoomLevelOrnament ? @"YES" : @"NO",
+            self.showsTimeFrameGraph ? @"YES" : @"NO",
+            self.debugLoggingEnabled ? @"YES" : @"NO",
+            self.showsMapScale ? @"YES" : @"NO",
+            self.showsUserHeadingIndicator ? @"YES" : @"NO",
+            self.framerateMeasurementEnabled ? @"YES" : @"NO",
+            self.reuseQueueStatsEnabled ? @"YES" : @"NO"];
 }
 
 @end

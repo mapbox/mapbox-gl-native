@@ -69,6 +69,7 @@ public:
     void onSourceChanged(mbgl::style::Source& source) override;
     void onDidBecomeIdle() override;
     void onStyleImageMissing(const std::string& imageIdentifier) override;
+    bool onCanRemoveUnusedStyleImage(const std::string& imageIdentifier) override;
 
 protected:
     /// Cocoa map view that this adapter bridges to.

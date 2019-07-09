@@ -2,12 +2,13 @@ package com.mapbox.mapboxsdk.testapp.storage
 
 import android.app.Activity
 import android.support.annotation.WorkerThread
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.storage.FileSource
 import junit.framework.Assert
 import java.io.File
 import java.util.concurrent.CountDownLatch
 
-class FileSourceTestUtils(private val activity: Activity) {
+class FileSourceTestUtils(private val activity: Activity) : AppCenter() {
   val originalPath = FileSource.getResourcesCachePath(activity)
   val testPath = "$originalPath/test"
   val testPath2 = "$originalPath/test2"

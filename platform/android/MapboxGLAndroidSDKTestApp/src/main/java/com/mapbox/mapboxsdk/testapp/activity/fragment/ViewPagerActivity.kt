@@ -45,7 +45,7 @@ class ViewPagerActivity : AppCompatActivity() {
     }
 
     override fun getItem(position: Int): Fragment? {
-      val options = MapboxMapOptions.createFromAttributes(context, null)
+      val options = MapboxMapOptions.createFromAttributes(context)
       options.textureMode(true)
       options.camera(
         CameraPosition.Builder()

@@ -45,9 +45,9 @@ class KeepDetector : Detector(), SourceCodeScanner, FileScanner {
         context.report(ISSUE_NOT_KEPT, node,
           context.getNameLocation(node),
           "This method contains native references and will be minified.")
-      } else if (node.isConstructor
-        && node.parameterList.parameters.find { it.type == PsiType.LONG && it.name!!.contains("native") } != null
-        && checkKeepAnnotation(node)) {
+      } else if (node.isConstructor &&
+        node.parameterList.parameters.find { it.type == PsiType.LONG && it.name!!.contains("native") } != null &&
+        checkKeepAnnotation(node)) {
         context.report(ISSUE_NOT_KEPT, node,
           context.getNameLocation(node as UElement),
           "This constructor might contain native references and will be minified. " +

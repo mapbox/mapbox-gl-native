@@ -41,6 +41,7 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const _Nonnull MGLUnderlyingMapUna
 - (void)mapViewDidFinishLoadingStyle;
 - (void)sourceDidChange:(nonnull MGLSource *)source;
 - (void)didFailToLoadImage:(nonnull NSString *)imageName;
+- (BOOL)shouldRemoveStyleImage:(nonnull NSString *)imageName;
 
 /** Triggers another render pass even when it is not necessary. */
 - (void)setNeedsRerender;

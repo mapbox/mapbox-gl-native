@@ -40,11 +40,11 @@ class OfflineDatabase : private util::noncopyable {
 public:
     // Limits affect ambient caching (put) only; resources required by offline
     // regions are exempt.
-    OfflineDatabase(std::string path, uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
+    OfflineDatabase(std::string path);
     ~OfflineDatabase();
 
     void changePath(const std::string&);
-    std::exception_ptr resetCache();
+    std::exception_ptr resetDatabase();
 
     optional<Response> get(const Resource&);
 
@@ -56,12 +56,12 @@ public:
     // are the latest version. This is more efficient than cleaning the
     // cache because if the tile is considered valid after the server
     // lookup, it will not get downloaded again.
-    std::exception_ptr invalidateTileCache();
+    std::exception_ptr invalidateAmbientCache();
 
     // Clear the tile cache, freeing resources. This operation can be
     // potentially slow because it will trigger a VACUUM on SQLite,
     // forcing the database to move pages on the filesystem.
-    std::exception_ptr clearTileCache();
+    std::exception_ptr clearAmbientCache();
 
     expected<OfflineRegions, std::exception_ptr> listRegions();
 
@@ -86,6 +86,7 @@ public:
     expected<OfflineRegionDefinition, std::exception_ptr> getRegionDefinition(int64_t regionID);
     expected<OfflineRegionStatus, std::exception_ptr> getRegionCompletedStatus(int64_t regionID);
 
+    std::exception_ptr setMaximumAmbientCacheSize(uint64_t);
     void setOfflineMapboxTileCountLimit(uint64_t);
     uint64_t getOfflineMapboxTileCountLimit();
     bool offlineMapboxTileCountLimitExceeded();
@@ -104,6 +105,7 @@ private:
     void migrateToVersion3();
     void migrateToVersion6();
     void cleanup();
+    bool disabled();
 
     mapbox::sqlite::Statement& getStatement(const char *);
 
@@ -136,9 +138,9 @@ private:
     template <class T>
     T getPragma(const char *);
 
-    uint64_t maximumCacheSize;
-
+    uint64_t maximumAmbientCacheSize = util::DEFAULT_MAX_CACHE_SIZE;
     uint64_t offlineMapboxTileCountLimit = util::mapbox::DEFAULT_OFFLINE_TILE_COUNT_LIMIT;
+
     optional<uint64_t> offlineMapboxTileCount;
 
     bool evict(uint64_t neededFreeSize);

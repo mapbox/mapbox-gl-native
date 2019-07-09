@@ -54,7 +54,6 @@ class LocationComponentTest : EspressoTest() {
 
   private lateinit var locationComponentActivationOptions: LocationComponentActivationOptions
 
-
   override fun validateTestSetup() {
     super.validateTestSetup()
     assertThat(mapboxMap.style, notNullValue())
@@ -71,8 +70,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponent_initializesLocationEngineCorrectlyWhenOnesNotProvided() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
 
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
@@ -93,9 +97,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponent_initializesLocationEngineCorrectlyWhenOnesNotProvidedButHasOptions() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
                 .locationComponentOptions(
@@ -131,9 +139,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponent_doesntInitializeEngineWhenNullProvided() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
           locationComponentActivationOptions = LocationComponentActivationOptions
                   .builder(context, style)
                   .locationEngine(null)
@@ -170,8 +182,13 @@ class LocationComponentTest : EspressoTest() {
   fun settingMapStyleImmediatelyBeforeLoadingComponent_throwsInvalidStyle() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         mapboxMap.setStyle(Style.Builder().fromUrl(Style.LIGHT))
 
         component.activateLocationComponent(LocationComponentActivationOptions
@@ -188,9 +205,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponent_doesntShowUntilFirstLocationFix() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -222,10 +243,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponentOptions_disablingStaleStateDoesWorkCorrectly() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         locationComponentActivationOptions = LocationComponentActivationOptions
                   .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -258,9 +282,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponentOptions_loadsForegroundBitmapFromNameOption() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
           locationComponentActivationOptions = LocationComponentActivationOptions
                   .builder(context, style)
                   .useDefaultLocationEngine(false)
@@ -306,9 +334,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponentOptions_loadsGpsNameWithGpsRenderMode() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -343,9 +375,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponentOptions_customIconNameRevertsToDefault() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -379,9 +415,13 @@ class LocationComponentTest : EspressoTest() {
   fun locationComponentOptions_customGpsIconNameChangeBackWithMode() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -414,9 +454,13 @@ class LocationComponentTest : EspressoTest() {
   fun stillStaleAfterResuming() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -451,9 +495,13 @@ class LocationComponentTest : EspressoTest() {
   fun stillNotStaleAfterResuming() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -483,9 +531,13 @@ class LocationComponentTest : EspressoTest() {
     val rgbaColor = ColorUtils.colorToRgbaString(color)
 
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -516,9 +568,13 @@ class LocationComponentTest : EspressoTest() {
   fun forceLocationUpdate_doesMoveLocationLayerIconToCorrectPosition() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -541,9 +597,13 @@ class LocationComponentTest : EspressoTest() {
   fun disablingComponentHidesPuck() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -568,9 +628,13 @@ class LocationComponentTest : EspressoTest() {
   fun disablingComponentAndChangingStyleAllowsToEnableAgain() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -592,9 +656,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_isDisabledOnStart() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.onStop()
         component.onStart()
 
@@ -619,9 +687,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_keepsEnabledWhenStoppedAndStarted() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
-
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -641,8 +713,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_keepsDisabledWhenStoppedAndStarted() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(
                 LocationComponentActivationOptions
                         .builder(context, style)
@@ -663,8 +740,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_ableToChangeStyleAfterResuming() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -685,8 +767,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_interruptedDuringStyleChange() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -705,8 +792,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_forceLocationUpdateAfterStopped() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -726,8 +818,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_acceptAndReuseLocationUpdatesBeforeLayerStarted() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -750,8 +847,13 @@ class LocationComponentTest : EspressoTest() {
   fun lifecycle_lifecycleChangeRightAfterStyleReload() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -781,8 +883,13 @@ class LocationComponentTest : EspressoTest() {
   fun mapChange_settingComponentStyle() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -810,8 +917,13 @@ class LocationComponentTest : EspressoTest() {
   fun mapChange_forcingLocation() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -836,8 +948,13 @@ class LocationComponentTest : EspressoTest() {
   fun mapChange_settingMapStyleBeforeComponentCreation() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         styleChangeIdlingResource.waitForStyle(mapboxMap, MAPBOX_HEAVY_STYLE)
         TestingAsyncUtils.waitForLayer(uiController, mapView)
 
@@ -868,8 +985,13 @@ class LocationComponentTest : EspressoTest() {
   fun animators_layerBearingCorrect() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -896,8 +1018,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_cameraLatLngBearingCorrect() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -932,8 +1059,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_cameraBearingCorrect() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -971,8 +1103,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_cameraNoneCorrect() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1011,8 +1148,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_focalPointAdjustment() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1033,8 +1175,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_dontZoomWhileNotTracking() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1056,8 +1203,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_zoomWhileTracking() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1079,8 +1231,13 @@ class LocationComponentTest : EspressoTest() {
   @Ignore
   fun animators_zoomWhileTrackingCanceledOnModeChange() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1103,8 +1260,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_dontZoomWhileStopped() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1130,8 +1292,13 @@ class LocationComponentTest : EspressoTest() {
   @Ignore
   fun animators_cancelZoomWhileTracking() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1154,8 +1321,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_dontTiltWhileNotTracking() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1177,8 +1349,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_tiltWhileTracking() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1200,8 +1377,13 @@ class LocationComponentTest : EspressoTest() {
   @Ignore
   fun animators_tiltWhileTrackingCanceledOnModeChange() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1224,8 +1406,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun animators_dontTiltWhileStopped() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1250,8 +1437,13 @@ class LocationComponentTest : EspressoTest() {
   @Ignore
   fun animators_cancelTiltWhileTracking() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1273,8 +1465,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun cameraPositionAdjustedToTrackingModeWhenComponentEnabled() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1301,8 +1498,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun cameraPositionSnappedToTargetIfExceedsThreshold() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1330,8 +1532,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun compassEngine_onComponentInitializedDefaultIsProvided() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)
@@ -1347,8 +1554,13 @@ class LocationComponentTest : EspressoTest() {
   @Test
   fun compassEngine_changesWhenNewProvided() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             style: Style, uiController: UiController, context: Context) {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
         component.activateLocationComponent(LocationComponentActivationOptions
                 .builder(context, style)
                 .useDefaultLocationEngine(false)

@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.maps
 import android.graphics.Bitmap
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
-class RemoveUnusedImagesTest {
+class RemoveUnusedImagesTest : AppCenter() {
 
   @Rule
   @JvmField
@@ -35,7 +36,7 @@ class RemoveUnusedImagesTest {
     rule.runOnUiThread {
       mapView = rule.activity.findViewById(R.id.mapView)
       mapView.getMapAsync {
-        mapboxMap = it;
+        mapboxMap = it
         mapboxMap.setStyle(Style.Builder().fromJson(styleJson))
       }
     }
@@ -46,7 +47,7 @@ class RemoveUnusedImagesTest {
     var callbackLatch = CountDownLatch(2)
     rule.runOnUiThread {
       mapView.addOnStyleImageMissingListener {
-        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512,  Bitmap.Config.ARGB_8888))
+        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888))
       }
 
       // Remove layer and source, so that rendered tiles are no longer used, therefore, map must
@@ -68,7 +69,7 @@ class RemoveUnusedImagesTest {
       }
     }
 
-    if(!latch.await(5, TimeUnit.SECONDS) && !callbackLatch.await(5, TimeUnit.SECONDS)){
+    if (!latch.await(5, TimeUnit.SECONDS) && !callbackLatch.await(5, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }
@@ -77,7 +78,7 @@ class RemoveUnusedImagesTest {
   fun testRemoveUnusedImagesDefaultListener() {
     rule.runOnUiThread {
       mapView.addOnStyleImageMissingListener {
-        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512,  Bitmap.Config.ARGB_8888))
+        mapboxMap.style!!.addImage(it, Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888))
       }
 
       // Remove layer and source, so that rendered tiles are no longer used, thus
@@ -96,7 +97,7 @@ class RemoveUnusedImagesTest {
       }
     }
 
-    if(!latch.await(5, TimeUnit.SECONDS)){
+    if (!latch.await(5, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }

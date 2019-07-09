@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.Transform
-import io.mockk.mockk
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -88,7 +87,7 @@ class LocationComponentTest {
 
   @Test
   fun activateWithRequestTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
 
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
 
@@ -102,27 +101,27 @@ class LocationComponentTest {
       .getDimension(R.dimen.mapbox_locationComponentTrackingMultiFingerMoveThreshold)
     doReturn(0f).`when`(resources)
       .getDimension(R.dimen.mapbox_locationComponentTrackingMultiFingerMoveThreshold)
-    locationComponent.activateLocationComponent(context, mockk(), true, locationEngineRequest)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), true, locationEngineRequest)
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
   }
 
   @Test
   fun activateWithDefaultLocationEngineRequestAndOptionsTestDefaultLocationEngine() {
-    locationComponent.activateLocationComponent(context, mockk(), true, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), true, locationEngineRequest, locationComponentOptions)
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
     Assert.assertNotNull(locationComponent.locationEngine)
   }
 
   @Test
   fun activateWithDefaultLocationEngineRequestAndOptionsTestCustomLocationEngine() {
-    locationComponent.activateLocationComponent(context, mockk(), false, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), false, locationEngineRequest, locationComponentOptions)
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
     Assert.assertNull(locationComponent.locationEngine)
   }
 
   @Test
   fun locationUpdatesWhenEnabledDisableTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     verify(locationEngine, times(0)).removeLocationUpdates(currentListener)
     verify(locationEngine, times(0)).requestLocationUpdates(eq(locationEngineRequest), eq(currentListener), any(Looper::class.java))
 
@@ -140,7 +139,7 @@ class LocationComponentTest {
 
   @Test
   fun locationUpdatesWhenStartedStoppedTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
 
@@ -153,7 +152,7 @@ class LocationComponentTest {
 
   @Test
   fun locationUpdatesWhenNewRequestTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
 
@@ -165,7 +164,7 @@ class LocationComponentTest {
 
   @Test
   fun lastLocationUpdateOnStartTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
 
@@ -174,7 +173,7 @@ class LocationComponentTest {
 
   @Test
   fun transitionCallbackFinishedTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -192,7 +191,7 @@ class LocationComponentTest {
 
   @Test
   fun transitionCallbackCanceledTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -210,7 +209,7 @@ class LocationComponentTest {
 
   @Test
   fun transitionCustomFinishedTest() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -228,7 +227,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_listenWhenConsumedByNoneCamera() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -240,7 +239,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_listenWhenConsumedByTrackingCamera() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -252,7 +251,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_listenWhenConsumedByLayer() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -264,7 +263,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_notListenWhenNotConsumed() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -283,7 +282,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_removeListenerOnChange() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -297,7 +296,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_removeListenerOnStop() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -310,7 +309,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_reAddListenerOnStart() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -324,7 +323,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_removeListenerOnStyleStartLoad() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -337,7 +336,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_reAddListenerOnStyleLoadFinished() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -351,7 +350,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_reAddListenerOnlyWhenEnabled() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
@@ -367,7 +366,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_notAdListenerWhenDisabled() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
 
@@ -378,7 +377,7 @@ class LocationComponentTest {
 
   @Test
   fun compass_notAdListenerWhenStopped() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.isLocationComponentEnabled = true
     `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
 
@@ -389,11 +388,66 @@ class LocationComponentTest {
 
   @Test
   fun developerAnimationCalled() {
-    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.isLocationComponentEnabled = true
     for (listener in developerAnimationListeners) {
       listener.onDeveloperAnimationStarted()
     }
     verify(locationCameraController).setCameraMode(eq(CameraMode.NONE), isNull<Location>(), eq(TRANSITION_ANIMATION_DURATION_MS), isNull<Double>(), isNull<Double>(), isNull<Double>(), any())
+  }
+
+  @Test
+  fun internal_cameraTrackingChangedListener_onCameraTrackingDismissed() {
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+
+    val cameraChangeListener: OnCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener::class.java)
+    locationComponent.addOnCameraTrackingChangedListener(cameraChangeListener)
+
+    locationComponent.cameraTrackingChangedListener.onCameraTrackingDismissed()
+
+    verify(cameraChangeListener).onCameraTrackingDismissed()
+  }
+
+  @Test
+  fun internal_cameraTrackingChangedListener_onCameraTrackingChanged() {
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+
+    val cameraValueListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    val layerValueListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    `when`(locationCameraController.animationListeners).thenReturn(setOf(cameraValueListener))
+    `when`(locationLayerController.animationListeners).thenReturn(setOf(layerValueListener))
+    val cameraChangeListener: OnCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener::class.java)
+    locationComponent.addOnCameraTrackingChangedListener(cameraChangeListener)
+
+    locationComponent.cameraTrackingChangedListener.onCameraTrackingChanged(CameraMode.TRACKING_GPS)
+
+    verify(locationAnimatorCoordinator).cancelZoomAnimation()
+    verify(locationAnimatorCoordinator).cancelTiltAnimation()
+    verify(locationAnimatorCoordinator).updateAnimatorListenerHolders(eq(setOf(cameraValueListener, layerValueListener)))
+    verify(locationAnimatorCoordinator).resetAllCameraAnimations(any(), anyBoolean())
+    verify(locationAnimatorCoordinator).resetAllLayerAnimations()
+    verify(cameraChangeListener).onCameraTrackingChanged(CameraMode.TRACKING_GPS)
+  }
+
+  @Test
+  fun internal_renderModeChangedListener_onRenderModeChanged() {
+    locationComponent.activateLocationComponent(context, mock(Style::class.java), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+
+    val cameraListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    val layerListener: AnimatorListenerHolder = mock(AnimatorListenerHolder::class.java)
+    `when`(locationCameraController.animationListeners).thenReturn(setOf(cameraListener))
+    `when`(locationLayerController.animationListeners).thenReturn(setOf(layerListener))
+    val renderChangeListener: OnRenderModeChangedListener = mock(OnRenderModeChangedListener::class.java)
+    locationComponent.addOnRenderModeChangedListener(renderChangeListener)
+
+    locationComponent.renderModeChangedListener.onRenderModeChanged(RenderMode.NORMAL)
+
+    verify(locationAnimatorCoordinator).updateAnimatorListenerHolders(eq(setOf(cameraListener, layerListener)))
+    verify(locationAnimatorCoordinator).resetAllCameraAnimations(any(), anyBoolean())
+    verify(locationAnimatorCoordinator).resetAllLayerAnimations()
+    verify(renderChangeListener).onRenderModeChanged(RenderMode.NORMAL)
   }
 }

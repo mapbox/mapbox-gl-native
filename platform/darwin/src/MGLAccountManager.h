@@ -36,8 +36,6 @@ MGL_EXPORT
  */
 @property (class, nullable) NSString *accessToken;
 
-+ (BOOL)mapboxMetricsEnabledSettingShownInApp __attribute__((unavailable("Telemetry settings are now always shown in the ℹ️ menu.")));
-
 @end
 
 NS_ASSUME_NONNULL_END

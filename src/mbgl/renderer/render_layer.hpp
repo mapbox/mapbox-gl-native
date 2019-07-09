@@ -19,6 +19,7 @@ class RenderSource;
 class RenderTile;
 class TransformState;
 class PatternAtlas;
+class LineAtlas;
 
 class LayerRenderData {
 public:
@@ -29,7 +30,8 @@ public:
 class LayerPlacementData {
 public:
     std::reference_wrapper<Bucket> bucket;
-    std::reference_wrapper<RenderTile> tile;
+    std::reference_wrapper<const RenderTile> tile;
+    std::shared_ptr<FeatureIndex> featureIndex;
 };
 
 class LayerPrepareParameters {
@@ -37,8 +39,11 @@ public:
     RenderSource* source;
     ImageManager& imageManager;
     PatternAtlas& patternAtlas;
+    LineAtlas& lineAtlas;
     const TransformState& state;
 };
+
+using RenderTiles = std::vector<std::reference_wrapper<const RenderTile>>;
 
 class RenderLayer {
 protected:
@@ -77,7 +82,7 @@ public:
     // Checks whether the given zoom is inside this layer zoom range.
     bool supportsZoom(float zoom) const;
 
-    virtual void upload(gfx::UploadPass&, UploadParameters&) {}
+    virtual void upload(gfx::UploadPass&) {}
     virtual void render(PaintParameters&) = 0;
 
     // Check wether the given geometry intersects
@@ -112,7 +117,6 @@ protected:
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
 protected:
-    using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     // Stores current set of tiles to be rendered for this layer.
     RenderTiles renderTiles;
 

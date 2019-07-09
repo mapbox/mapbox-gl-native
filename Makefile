@@ -213,24 +213,59 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	-derivedDataPath $(IOS_OUTPUT_PATH) \
 	-configuration $(BUILDTYPE) -sdk iphonesimulator \
-	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8' \
 	-workspace $(IOS_WORK_PATH) \
 	-jobs $(JOBS)
 
 ifneq ($(MORE_SIMULATORS),)
-	IOS_XCODEBUILD_SIM += -parallel-testing-enabled YES \
+	IOS_LATEST = true
+	IOS_11 = true
+	IOS_10 = true
+	IOS_9 = true
+endif
+
+ifdef IOS_LATEST
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8' \
 	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xs Max' \
 	-destination 'platform=iOS Simulator,OS=latest,name=iPhone Xr' \
-	-destination 'platform=iOS Simulator,OS=latest,name=iPad Pro (11-inch)' \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPad Pro (11-inch)'
+endif
+
+ifdef IOS_11
+	IOS_XCODEBUILD_SIM += \
 	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone 7' \
 	-destination 'platform=iOS Simulator,OS=11.4,name=iPhone X' \
-	-destination 'platform=iOS Simulator,OS=11.4,name=iPad Air 2,' \
+	-destination 'platform=iOS Simulator,OS=11.4,name=iPad (5th generation)'
+endif
+
+ifdef IOS_10
+	IOS_XCODEBUILD_SIM += \
 	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone SE' \
 	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPhone 7 Plus' \
-	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPad Air' \
+	-destination 'platform=iOS Simulator,OS=10.3.1,name=iPad Pro (9.7-inch)'
+endif
+
+ifdef IOS_9
+	IOS_XCODEBUILD_SIM += \
 	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s Plus' \
 	-destination 'platform=iOS Simulator,OS=9.3,name=iPhone 6s' \
-	-destination 'platform=iOS Simulator,OS=9.3,name=iPad 2'
+	-destination 'platform=iOS Simulator,OS=9.3,name=iPad Air 2'
+endif
+
+# If IOS_XCODEBUILD_SIM does not contain a simulator destination, add the default.
+ifeq (, $(findstring destination, $(IOS_XCODEBUILD_SIM)))
+	IOS_XCODEBUILD_SIM += \
+	-destination 'platform=iOS Simulator,OS=latest,name=iPhone 8'
+else
+	IOS_XCODEBUILD_SIM += -parallel-testing-enabled YES
+endif
+
+ifneq ($(ONLY_TESTING),)
+	IOS_XCODEBUILD_SIM += -only-testing:$(ONLY_TESTING)
+endif
+
+ifneq ($(SKIP_TESTING),)
+	IOS_XCODEBUILD_SIM += -skip-testing:$(SKIP_TESTING)
 endif
 
 ifneq ($(CI),)
@@ -257,9 +292,13 @@ iproj: $(IOS_PROJ_PATH)
 	xed $(IOS_WORK_PATH)
 
 .PHONY: ios-lint
-ios-lint:
+ios-lint: ios-pod-lint
 	find platform/ios/framework -type f -name '*.plist' | xargs plutil -lint
 	find platform/ios/app -type f -name '*.plist' | xargs plutil -lint
+
+.PHONY: ios-pod-lint
+ios-pod-lint:
+	./platform/ios/scripts/lint-podspecs.js
 
 .PHONY: ios-test
 ios-test: $(IOS_PROJ_PATH)
@@ -517,12 +556,6 @@ qt-docs:
 .PHONY: test-node
 test-node: node
 	npm test
-	npm run test-suite
-
-.PHONY: test-node-recycle-map
-test-node-recycle-map: node
-	npm test
-	npm run test-render -- --recycle-map --shuffle
 	npm run test-query
 	npm run test-expressions
 
@@ -738,6 +771,11 @@ apackage: platform/android/gradle/configuration.gradle
 android-ui-test: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
+#Run instrumentations tests on MicroSoft App Center
+.PHONY: run-android-test-app-center
+run-android-test-app-center:
+	cd platform/android && appcenter test run espresso --app "mapboxcn-outlook.com/MapsSdk" --devices "mapboxcn-outlook.com/china" --app-path MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk  --test-series "master" --locale "en_US" --build-dir MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug
+
 # Uploads the compiled Android SDK to Bintray
 .PHONY: run-android-upload-to-bintray
 run-android-upload-to-bintray: platform/android/gradle/configuration.gradle
@@ -758,21 +796,26 @@ android-gfxinfo:
 test-code-android:
 	node platform/android/scripts/generate-test-code.js
 
-# Runs checkstyle and lint on the Android code
+# Runs checkstyle and lint on the java code
 .PHONY: android-check
-android-check : android-checkstyle run-android-nitpick android-lint-sdk android-lint-test-app
+android-check : android-checkstyle run-android-nitpick android-lint-sdk android-lint-test-app android-ktlint
 
-# Runs checkstyle on the Android code
+# Runs checkstyle on the java code
 .PHONY: android-checkstyle
 android-checkstyle: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:checkstyle :MapboxGLAndroidSDKTestApp:checkstyle
 
-# Runs lint on the Android SDK code
+# Runs checkstyle on the kotlin code
+.PHONY: android-ktlint
+android-ktlint: 
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none ktlint
+
+# Runs lint on the Android SDK java code
 .PHONY: android-lint-sdk
 android-lint-sdk: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:lint
 
-# Runs lint on the Android test app code
+# Runs lint on the Android test app java code
 .PHONY: android-lint-test-app
 android-lint-test-app: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:lint

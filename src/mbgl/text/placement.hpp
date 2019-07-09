@@ -93,6 +93,7 @@ public:
     const RenderTile& tile;
     const mat4& projMatrix;
     std::string sourceId;
+    std::shared_ptr<FeatureIndex> featureIndex;
     bool showCollisionBoxes;
 };
     

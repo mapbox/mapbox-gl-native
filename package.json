@@ -45,7 +45,6 @@
     "install": "node-pre-gyp install --fallback-to-build=false || make node",
     "test": "tape platform/node/test/js/**/*.test.js",
     "test-memory": "node --expose-gc platform/node/test/memory.test.js",
-    "test-suite": "run-s test-render test-query test-expressions",
     "test-expressions": "node -r esm platform/node/test/expression.test.js",
     "test-render": "node -r esm platform/node/test/render.test.js",
     "test-query": "node -r esm platform/node/test/query.test.js"

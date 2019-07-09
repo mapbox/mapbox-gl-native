@@ -1,13 +1,16 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 
-static NSString * const MGLTestLocaleIdentifier = @"en-US";
-
 @interface MGLClockDirectionFormatterTests : XCTestCase
 
 @end
 
 @implementation MGLClockDirectionFormatterTests
+
+- (void)setUp {
+    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/14908
+    XCTAssertEqualObjects(NSLocale.currentLocale.localeIdentifier, @"en_US", @"Device locale must be en_US for these tests to pass.");
+}
 
 - (void)testClockDirections {
     MGLClockDirectionFormatter *shortFormatter = [[MGLClockDirectionFormatter alloc] init];
