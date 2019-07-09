@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 * Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers. ([#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930))
+* Fixed rendering layers after fill-extrusion regression caused by optimization of fill-extrusion rendering. ([#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065))
 
 ## 5.2.0
 
