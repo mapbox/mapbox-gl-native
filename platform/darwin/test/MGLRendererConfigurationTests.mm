@@ -78,14 +78,12 @@ static NSString * const MGLRendererConfigurationTests_collisionBehaviorKey = @"M
 }
 
 - (void)testOverridingMGLCollisionBehaviorPre40 {
-    
     // Dictionary = NO, NSUserDefaults = YES
     {
         [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:MGLRendererConfigurationTests_collisionBehaviorKey];
         MGLRendererConfiguration *config = [[MGLRendererConfiguration alloc] initWithPropertyDictionary:@{MGLRendererConfigurationTests_collisionBehaviorKey:@(NO)}];
         XCTAssert(config.perSourceCollisions);
     }
-    
     // Dictionary = YES, NSUserDefaults = NO
     {
         [[NSUserDefaults standardUserDefaults] setObject:@(NO) forKey:MGLRendererConfigurationTests_collisionBehaviorKey];
