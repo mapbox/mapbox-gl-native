@@ -116,6 +116,7 @@ void Renderer::dumpDebugLogs() {
 }
 
 void Renderer::reduceMemoryUse() {
+    gfx::BackendScope guard { impl->backend };
     impl->reduceMemoryUse();
     impl->orchestrator.reduceMemoryUse();
 }
