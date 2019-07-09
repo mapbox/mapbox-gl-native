@@ -200,7 +200,7 @@
                             </barButtonItem>
                             <barButtonItem style="plain" systemItem="refresh" id="2fx-iS-Veb">
                                 <connections>
-                                    <action selector="refreshPacks:" destination="7q0-lI-zqb" id="npm-06-HXb"/>
+                                    <action selector="invalidatePacks:" destination="7q0-lI-zqb" id="5lx-FY-aTt"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>

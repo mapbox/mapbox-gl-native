@@ -126,11 +126,14 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (IBAction)refreshPacks:(id)sender {
-   
+- (IBAction)invalidatePacks:(id)sender {
     for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+        
+        CFTimeInterval start = CACurrentMediaTime();
         [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable error) {
-            NSLog(@"Revalidated pack");
+            CFTimeInterval end = CACurrentMediaTime();
+            CFTimeInterval difference = end - start;
+            NSLog(@"invalidatePack Started: %f Ended: %f Total Time: %f", start, end, difference);
         }];
     }
 }
