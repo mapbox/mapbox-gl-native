@@ -303,7 +303,10 @@ MGL_EXPORT
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(nullable MGLOfflinePackRemovalCompletionHandler)completion;
 
 /**
- Forces the offline pack to revalidate its tiles with tiles from the server.
+ Checks that the tiles in the specified offline pack match those from the
+ server. Local tiles that do not match the latest version on the server
+ are updated.
+ 
  This is more efficient than deleting the offline pack and downloading it
  again. If the data stored locally matches that on the server, new data will
  not be downloaded.
@@ -366,7 +369,7 @@ MGL_EXPORT
  ambient cache size to 30 MB and offline packs use 20 MB, there may only be 10 MB
  reserved for the ambient cache.
  
- This method should be called before the map and map style have been loade.
+ This method should be called before the map and map style have been loaded.
  
  This method is potentially expensive, as the ambient cache will trim cached data
  to prevent the database from being larger than the specified amount.
@@ -379,8 +382,9 @@ MGL_EXPORT
 - (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError *_Nullable error))completion;
 
 /**
- Forces ambient cache tiles to be revalidated. The local tiles are checked
- against those on the tile server to ensure that they are the latest version.
+ Checks that the tiles in the ambient cache match those from the server. Local
+ tiles that do not match the latest version on the server are updated.
+ 
  This is more efficient than cleaning the cache because valid local tiles will
  not be downloaded again.
  
