@@ -26,7 +26,7 @@ public:
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const override;
 
-    uint8_t getMaxZoom() const { return maxzoom; }
+    uint8_t getMaxZoom() const override { return maxzoom; }
 
 private:
     const style::RasterSource::Impl& impl() const;
@@ -36,10 +36,5 @@ private:
 
     void onTileChanged(Tile&) override;
 };
-
-template <>
-inline bool RenderSource::is<RenderRasterDEMSource>() const {
-    return baseImpl->type == style::SourceType::RasterDEM;
-}
 
 } // namespace mbgl

@@ -10,7 +10,7 @@ import org.junit.Before
 
 const val TIMEOUT_UI_SEARCH_WAIT = 5000L
 
-abstract class BaseIntegrationTest : AppCenter(){
+abstract class BaseIntegrationTest : AppCenter() {
 
   protected lateinit var device: UiDevice
 

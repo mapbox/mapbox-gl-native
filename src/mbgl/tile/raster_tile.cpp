@@ -7,6 +7,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
@@ -23,6 +24,10 @@ RasterTile::RasterTile(const OverscaledTileID& id_,
 }
 
 RasterTile::~RasterTile() = default;
+
+std::unique_ptr<TileRenderData> RasterTile::createRenderData() {
+    return std::make_unique<SharedBucketTileRenderData<RasterBucket>>(bucket);
+}
 
 void RasterTile::setError(std::exception_ptr err) {
     loaded = true;
@@ -58,14 +63,8 @@ void RasterTile::onError(std::exception_ptr err, const uint64_t resultCorrelatio
     observer->onTileError(*this, err);
 }
 
-void RasterTile::upload(gfx::UploadPass& uploadPass) {
-    if (bucket) {
-        bucket->upload(uploadPass);
-    }
-}
-
-Bucket* RasterTile::getBucket(const style::Layer::Impl&) const {
-    return bucket.get();
+bool RasterTile::layerPropertiesUpdated(const Immutable<style::LayerProperties>&) {
+    return bool(bucket);
 }
 
 void RasterTile::setMask(TileMask&& mask) {

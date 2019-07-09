@@ -19,9 +19,4 @@ private:
     const style::CustomGeometrySource::Impl& impl() const;
 };
 
-template <>
-inline bool RenderSource::is<RenderCustomGeometrySource>() const {
-    return baseImpl->type == style::SourceType::CustomVector;
-}
-
 } // namespace mbgl

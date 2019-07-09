@@ -4,10 +4,9 @@
 #include <mbgl/gfx/texture.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/renderer/tile_mask.hpp>
 
 #include <array>
 #include <memory>
@@ -26,6 +25,7 @@ class PaintParameters;
 class DebugBucket;
 class SourcePrepareParameters;
 class FeatureIndex;
+class TileRenderData;
 
 class RenderTile final {
 public:
@@ -58,12 +58,10 @@ public:
     optional<ImagePosition> getPattern(const std::string& pattern) const;
     const gfx::Texture& getGlyphAtlasTexture() const;
     const gfx::Texture& getIconAtlasTexture() const;
-    std::shared_ptr<FeatureIndex> getFeatureIndex() const;
 
-    void setMask(TileMask&&);
-    void upload(gfx::UploadPass&);
+    void upload(gfx::UploadPass&) const;
     void prepare(const SourcePrepareParameters&);
-    void finishRender(PaintParameters&);
+    void finishRender(PaintParameters&) const;
 
     mat4 translateVtxMatrix(const mat4& tileMatrix,
                             const std::array<float, 2>& translation,
@@ -72,6 +70,9 @@ public:
                             const bool inViewportPixelUnits) const;
 private:
     Tile& tile;
+    // The following members are reset at placement stage.
+    std::unique_ptr<TileRenderData> renderData;
+    bool needsRendering = false;
 };
 
 } // namespace mbgl

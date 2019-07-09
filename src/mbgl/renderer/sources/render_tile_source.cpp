@@ -2,15 +2,46 @@
 
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/render_tree.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
+class TileSourceRenderItem : public RenderItem {
+public:
+    TileSourceRenderItem(Immutable<std::vector<RenderTile>> renderTiles_, std::string name_)
+        : renderTiles(std::move(renderTiles_))
+        , name(std::move(name_)) {}
+
+private:
+    void upload(gfx::UploadPass&) const override;
+    void render(PaintParameters&) const override;
+    bool hasRenderPass(RenderPass) const override { return false; }
+    const std::string& getName() const override { return name; }
+
+    Immutable<std::vector<RenderTile>> renderTiles;
+    std::string name;
+};
+
+void TileSourceRenderItem::upload(gfx::UploadPass& parameters) const {
+    for (auto& tile : *renderTiles) {
+        tile.upload(parameters);
+    }
+}
+
+void TileSourceRenderItem::render(PaintParameters& parameters) const {
+    for (auto& tile : *renderTiles) {
+        tile.finishRender(parameters);
+    }
+}
+
 RenderTileSource::RenderTileSource(Immutable<style::Source::Impl> impl_)
-    : RenderSource(std::move(impl_)) {
+    : RenderSource(std::move(impl_))
+    , renderTiles(makeMutable<std::vector<RenderTile>>()) {
     tilePyramid.setObserver(this);
 }
 
@@ -20,25 +51,18 @@ bool RenderTileSource::isLoaded() const {
     return tilePyramid.isLoaded();
 }
 
-void RenderTileSource::upload(gfx::UploadPass& parameters) {
-    for (auto& tile : renderTiles) {
-        tile.upload(parameters);
-    }
+std::unique_ptr<RenderItem> RenderTileSource::createRenderItem() {
+    return std::make_unique<TileSourceRenderItem>(renderTiles, baseImpl->id);
 }
 
 void RenderTileSource::prepare(const SourcePrepareParameters& parameters) {
-    renderTiles.clear();
-    renderTiles.reserve(tilePyramid.getRenderedTiles().size());
+    auto tiles = makeMutable<std::vector<RenderTile>>();
+    tiles->reserve(tilePyramid.getRenderedTiles().size());
     for (auto& entry : tilePyramid.getRenderedTiles()) {
-        renderTiles.emplace_back(entry.first, entry.second);
-        renderTiles.back().prepare(parameters);
+        tiles->emplace_back(entry.first, entry.second);
+        tiles->back().prepare(parameters);
     }
-}
-
-void RenderTileSource::finishRender(PaintParameters& parameters) {
-    for (auto& tile : renderTiles) {
-        tile.finishRender(parameters);
-    }
+    renderTiles = std::move(tiles);
 }
 
 void RenderTileSource::updateFadingTiles() {
@@ -49,8 +73,12 @@ bool RenderTileSource::hasFadingTiles() const {
     return tilePyramid.hasFadingTiles();
 }
 
-std::vector<std::reference_wrapper<RenderTile>> RenderTileSource::getRenderedTiles() {
-    return { renderTiles.begin(), renderTiles.end() };
+RenderTiles RenderTileSource::getRenderTiles() {
+    return { renderTiles->begin(), renderTiles->end() };
+}
+
+const Tile* RenderTileSource::getRenderedTile(const UnwrappedTileID& tileID) const {
+    return tilePyramid.getRenderedTile(tileID);
 }
 
 std::unordered_map<std::string, std::vector<Feature>>

@@ -55,25 +55,11 @@ private:
     uint32_t index;
 };
 
-class SourceRenderItem final : public RenderItem { 
-public:
-    explicit SourceRenderItem(RenderSource& source_) 
-        : source(source_) {}
-
-private:
-    bool hasRenderPass(RenderPass) const override { return false; }
-    void upload(gfx::UploadPass& pass) const override { source.get().upload(pass); }
-    void render(PaintParameters& parameters) const override { source.get().finishRender(parameters); }
-    const std::string& getName() const override { return source.get().baseImpl->id; } 
-
-    std::reference_wrapper<RenderSource> source;
-};
-
 class RenderTreeImpl final : public RenderTree {
 public:
     RenderTreeImpl(std::unique_ptr<RenderTreeParameters> parameters_,
                    std::set<LayerRenderItem> layerRenderItems_,
-                   std::vector<SourceRenderItem> sourceRenderItems_,
+                   std::vector<std::unique_ptr<RenderItem>> sourceRenderItems_,
                    LineAtlas& lineAtlas_,
                    PatternAtlas& patternAtlas_)
         : RenderTree(std::move(parameters_)),
@@ -87,13 +73,16 @@ public:
         return { layerRenderItems.begin(), layerRenderItems.end() };
     }
     RenderItems getSourceRenderItems() const override {
-        return { sourceRenderItems.begin(), sourceRenderItems.end() };
+        RenderItems result;
+        result.reserve(sourceRenderItems.size());
+        for (const auto& item : sourceRenderItems) result.emplace_back(*item);
+        return result;
     }
     LineAtlas& getLineAtlas() const override { return lineAtlas; }
     PatternAtlas& getPatternAtlas() const override { return patternAtlas; }
 
     std::set<LayerRenderItem> layerRenderItems;
-    std::vector<SourceRenderItem> sourceRenderItems;
+    std::vector<std::unique_ptr<RenderItem>> sourceRenderItems;
     std::reference_wrapper<LineAtlas> lineAtlas;
     std::reference_wrapper<PatternAtlas> patternAtlas;
 };
@@ -339,12 +328,10 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         return nullptr;
     }
 
-    std::vector<SourceRenderItem> sourceRenderItems;
-    // Update all matrices and generate data that we should upload to the GPU.
+    // Prepare. Update all matrices and generate data that we should upload to the GPU.
     for (const auto& entry : renderSources) {
         if (entry.second->isEnabled()) {
-            entry.second->prepare({renderTreeParameters->transformParams, updateParameters.debugOptions});
-            sourceRenderItems.emplace_back(*entry.second);
+            entry.second->prepare({renderTreeParameters->transformParams, updateParameters.debugOptions, *imageManager});
         }
     }
 
@@ -355,7 +342,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             layersNeedPlacement.emplace_back(renderLayer);
         }
     }
-
+    // Symbol placement.
     {
         if (!isMapModeContinuous) {
             // TODO: Think about right way for symbol index to handle still rendering
@@ -404,6 +391,13 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         // Notify observer about unused images when map is fully loaded
         // and there are no ongoing transitions.
         imageManager->reduceMemoryUseIfCacheSizeExceedsLimit();
+    }
+
+    std::vector<std::unique_ptr<RenderItem>> sourceRenderItems;
+    for (const auto& entry : renderSources) {
+        if (entry.second->isEnabled()) {
+            sourceRenderItems.emplace_back(entry.second->createRenderItem());
+        }
     }
 
     return std::make_unique<RenderTreeImpl>(

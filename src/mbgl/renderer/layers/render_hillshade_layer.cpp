@@ -67,9 +67,7 @@ bool RenderHillshadeLayer::hasCrossfade() const {
 
 void RenderHillshadeLayer::prepare(const LayerPrepareParameters& params) {
     RenderLayer::prepare(params);
-    if (auto* demsrc = params.source->as<RenderRasterDEMSource>()) {
-        maxzoom = demsrc->getMaxZoom();
-    }
+    maxzoom = params.source->getMaxZoom();
 }
 
 void RenderHillshadeLayer::render(PaintParameters& parameters) {

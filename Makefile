@@ -771,6 +771,11 @@ apackage: platform/android/gradle/configuration.gradle
 android-ui-test: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
+#Run instrumentations tests on MicroSoft App Center
+.PHONY: run-android-test-app-center
+run-android-test-app-center:
+	cd platform/android && appcenter test run espresso --app "mapboxcn-outlook.com/MapsSdk" --devices "mapboxcn-outlook.com/china" --app-path MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk  --test-series "master" --locale "en_US" --build-dir MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug
+
 # Uploads the compiled Android SDK to Bintray
 .PHONY: run-android-upload-to-bintray
 run-android-upload-to-bintray: platform/android/gradle/configuration.gradle
@@ -791,21 +796,26 @@ android-gfxinfo:
 test-code-android:
 	node platform/android/scripts/generate-test-code.js
 
-# Runs checkstyle and lint on the Android code
+# Runs checkstyle and lint on the java code
 .PHONY: android-check
-android-check : android-checkstyle run-android-nitpick android-lint-sdk android-lint-test-app
+android-check : android-checkstyle run-android-nitpick android-lint-sdk android-lint-test-app android-ktlint
 
-# Runs checkstyle on the Android code
+# Runs checkstyle on the java code
 .PHONY: android-checkstyle
 android-checkstyle: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:checkstyle :MapboxGLAndroidSDKTestApp:checkstyle
 
-# Runs lint on the Android SDK code
+# Runs checkstyle on the kotlin code
+.PHONY: android-ktlint
+android-ktlint: 
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none ktlint
+
+# Runs lint on the Android SDK java code
 .PHONY: android-lint-sdk
 android-lint-sdk: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:lint
 
-# Runs lint on the Android test app code
+# Runs lint on the Android test app java code
 .PHONY: android-lint-test-app
 android-lint-test-app: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:lint

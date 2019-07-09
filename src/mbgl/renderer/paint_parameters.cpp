@@ -90,7 +90,7 @@ void PaintParameters::clearStencil() {
 namespace {
 
 // Detects a difference in keys of renderTiles and tileClippingMaskIDs
-bool tileIDsIdentical(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles,
+bool tileIDsIdentical(const RenderTiles& renderTiles,
                       const std::map<UnwrappedTileID, int32_t>& tileClippingMaskIDs) {
     assert(std::is_sorted(renderTiles.begin(), renderTiles.end(),
                           [](const RenderTile& a, const RenderTile& b) { return a.id < b.id; }));
@@ -103,7 +103,7 @@ bool tileIDsIdentical(const std::vector<std::reference_wrapper<RenderTile>>& ren
 
 } // namespace
 
-void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles) {
+void PaintParameters::renderTileClippingMasks(const RenderTiles& renderTiles) {
     if (renderTiles.empty() || tileIDsIdentical(renderTiles, tileClippingMaskIDs)) {
         // The current stencil mask is for this source already; no need to draw another one.
         return;

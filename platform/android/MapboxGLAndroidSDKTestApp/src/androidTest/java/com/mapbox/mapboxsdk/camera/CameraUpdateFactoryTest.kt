@@ -140,5 +140,4 @@ class CameraUpdateFactoryTest : BaseTest() {
       assertEquals("tilt should match:", 40.0, cameraPosition.tilt, 0.1)
     }
   }
-
 }

@@ -17,7 +17,6 @@ import android.widget.TextView
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
 import com.mapbox.mapboxsdk.testapp.R
@@ -106,7 +105,7 @@ class NestedViewPagerActivity : AppCompatActivity() {
         class MapPagerAdapter(private val context: Context, fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
 
             override fun getItem(position: Int): Fragment {
-                val options = MapboxMapOptions.createFromAttributes(context, null)
+                val options = MapboxMapOptions.createFromAttributes(context)
                 options.textureMode(true)
                 options.doubleTapGesturesEnabled(false)
                 options.rotateGesturesEnabled(false)
@@ -127,7 +126,8 @@ class NestedViewPagerActivity : AppCompatActivity() {
                         options.camera(CameraPosition.Builder().target(LatLng(62.326440, 92.764913)).zoom(3.0).build())
                         val fragment = SupportMapFragment.newInstance(options)
                         fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.DARK) }
-                        return fragment                    }
+                        return fragment
+                    }
                     3 -> {
                         return EmptyFragment.newInstance()
                     }
@@ -135,7 +135,8 @@ class NestedViewPagerActivity : AppCompatActivity() {
                         options.camera(CameraPosition.Builder().target(LatLng(-25.007786, 133.623852)).zoom(3.0).build())
                         val fragment = SupportMapFragment.newInstance(options)
                         fragment.getMapAsync { mapboxMap -> mapboxMap.setStyle(Style.SATELLITE) }
-                        return fragment                    }
+                        return fragment
+                    }
                     5 -> {
                         return EmptyFragment.newInstance()
                     }
