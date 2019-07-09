@@ -1,4 +1,4 @@
-#import "MGLCompassButton.h"
+#import "MGLCompassButton_Private.h"
 #import "MGLCompassDirectionFormatter.h"
 
 #import <Mapbox/MGLGeometry.h>
@@ -11,18 +11,20 @@
 
 @interface MGLCompassButton ()
 
+@property (nonatomic, weak) MGLMapView *mapView;
 @property (nonatomic) MGLCompassDirectionFormatter *accessibilityCompassFormatter;
 
 @end
 
 @implementation MGLCompassButton
 
-+ (instancetype)compassButton {
-    return [[MGLCompassButton alloc] init];
++ (instancetype)compassButtonWithMapView:(MGLMapView *)mapView {
+    return [[MGLCompassButton alloc] initWithMapView:mapView];
 }
 
-- (instancetype)init {
+- (instancetype)initWithMapView:(MGLMapView *)mapView {
     if (self = [super init]) {
+        self.mapView = mapView;
         [self commonInit];
     }
     return self;
@@ -36,6 +38,9 @@
     self.alpha = 0;
     self.userInteractionEnabled = YES;
     self.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
+    [self addGestureRecognizer:tapGesture];
 
     self.accessibilityTraits = UIAccessibilityTraitButton;
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
@@ -66,8 +71,11 @@
     return image;
 }
 
-- (void)updateCompassWithDirection:(CLLocationDirection)direction
-{
+- (void)handleTapGesture:(__unused UITapGestureRecognizer *)sender {
+    [self.mapView resetNorth];
+}
+
+- (void)updateCompassWithDirection:(CLLocationDirection)direction {
     CLLocationDirection plateDirection = mbgl::util::wrap(-direction, 0., 360.);
     self.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(plateDirection));
 

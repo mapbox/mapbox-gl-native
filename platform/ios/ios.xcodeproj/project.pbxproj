@@ -372,6 +372,8 @@
 		9620BB3B1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
 		9621F2502091020E005B3800 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96381C0222C6F3950053497D /* MGLMapViewPitchTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96381C0122C6F3950053497D /* MGLMapViewPitchTests.m */; };
+		9641771F22D546DA00332422 /* MGLCompassButton_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9641771E22D546DA00332422 /* MGLCompassButton_Private.h */; };
+		9641772022D546DA00332422 /* MGLCompassButton_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9641771E22D546DA00332422 /* MGLCompassButton_Private.h */; };
 		9654C1261FFC1AB900DB6A19 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
 		9654C1291FFC1CCD00DB6A19 /* MGLPolygon_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */; };
 		9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */; };
@@ -1109,6 +1111,7 @@
 		9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSDKUpdateChecker.h; sourceTree = "<group>"; };
 		9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MGLSDKUpdateChecker.mm; sourceTree = "<group>"; };
 		96381C0122C6F3950053497D /* MGLMapViewPitchTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewPitchTests.m; sourceTree = "<group>"; };
+		9641771E22D546DA00332422 /* MGLCompassButton_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLCompassButton_Private.h; sourceTree = "<group>"; };
 		9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolyline_Private.h; sourceTree = "<group>"; };
 		9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolygon_Private.h; sourceTree = "<group>"; };
 		9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewScaleBarTests.m; sourceTree = "<group>"; };
@@ -1667,6 +1670,7 @@
 			isa = PBXGroup;
 			children = (
 				96E6145722CC169000109F14 /* MGLCompassButton.h */,
+				9641771E22D546DA00332422 /* MGLCompassButton_Private.h */,
 				96E6145822CC169000109F14 /* MGLCompassButton.mm */,
 				355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */,
 				355ADFFC1E9281DA00F3939D /* MGLScaleBar.mm */,
@@ -2422,6 +2426,7 @@
 				DA35A2BB1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h in Headers */,
 				353933FE1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */,
 				DA8848201CBAFA6200AB86E3 /* MGLOfflinePack_Private.h in Headers */,
+				9641771F22D546DA00332422 /* MGLCompassButton_Private.h in Headers */,
 				DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */,
 				DA8847FA1CBAFA5100AB86E3 /* MGLPolyline.h in Headers */,
 				3566C7711D4A9198008152BC /* MGLSource_Private.h in Headers */,
@@ -2614,6 +2619,7 @@
 				96E516DE200054F700A02306 /* MGLGeometry_Private.h in Headers */,
 				353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
 				3566C76D1D4A8DFA008152BC /* MGLRasterTileSource.h in Headers */,
+				9641772022D546DA00332422 /* MGLCompassButton_Private.h in Headers */,
 				DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */,
 				DABFB85E1CBE99E500D62B32 /* MGLAnnotation.h in Headers */,
 				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,

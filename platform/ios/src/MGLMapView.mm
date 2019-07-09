@@ -55,11 +55,11 @@
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAnnotationView_Private.h"
+#import "MGLCompassButton_Private.h"
 #import "MGLScaleBar.h"
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLMapboxEvents.h"
-#import "MMEConstants.h"
 #import "MGLSDKUpdateChecker.h"
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
@@ -68,6 +68,7 @@
 #import "MGLMapAccessibilityElement.h"
 #import "MGLLocationManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MMEConstants.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -534,8 +535,7 @@ public:
 
     // setup compass
     //
-    _compassView = [MGLCompassButton compassButton];
-    [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
+    _compassView = [MGLCompassButton compassButtonWithMapView:self];
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
     _compassViewPosition = MGLOrnamentPositionTopRight;
@@ -1491,19 +1491,6 @@ public:
 }
 
 #pragma mark - Gestures -
-
-- (void)handleCompassTapGesture:(__unused id)sender
-{
-    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonResetNorth;
-
-    [self resetNorthAnimated:YES];
-
-    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
-        self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
-    {
-        self.userTrackingMode = MGLUserTrackingModeFollow;
-    }
-}
 
 - (void)touchesBegan:(__unused NSSet<UITouch *> *)touches withEvent:(__unused UIEvent *)event
 {
@@ -2517,6 +2504,8 @@ public:
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonResetNorth;
+
     [self setDirection:0 animated:animated];
 }
 
@@ -3437,7 +3426,8 @@ public:
     MGLLogDebug(@"Setting direction: %f animated: %@", direction, MGLStringFromBOOL(animated));
     if ( ! animated && ! self.rotationAllowed) return;
 
-    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
+    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
+        self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
     {
         self.userTrackingMode = MGLUserTrackingModeFollow;
     }

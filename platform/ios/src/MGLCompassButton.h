@@ -1,7 +1,6 @@
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
-#import "MGLTypes.h"
+#import <Mapbox/MGLTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,10 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
  You can configure a compass button to be visible all the time or only when the compass heading changes.
  */
 @property (nonatomic, assign) MGLOrnamentVisibility compassVisibility;
-
-// TODO: Make these private
-+ (instancetype)compassButton;
-- (void)updateCompassWithDirection:(CLLocationDirection)direction;
 
 @end
 
