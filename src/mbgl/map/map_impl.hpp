@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
@@ -51,6 +52,9 @@ public:
     // Map
     void jumpTo(const CameraOptions&);
 
+    // Internal
+    void updateInternal(TimePoint timePoint);
+
     MapObserver& observer;
     RendererFrontend& rendererFrontend;
 
@@ -74,6 +78,8 @@ public:
     bool loading = false;
     bool rendererFullyLoaded;
     std::unique_ptr<StillImageRequest> stillImageRequest;
+    std::shared_ptr<Mailbox> mailbox;
+    ActorRef<Map::Impl> actor;
 };
 
 } // namespace mbgl
