@@ -24,7 +24,7 @@ Set `MGLIdeographicFontFamilyName` in your containing application's Info.plist t
 
 - A string value of a single font family name.
 
-An array of font family names. Fonts will be used in the defined order, eventually falling back to default system font if none are available.
+- An array of font family names. Fonts will be used in the defined order, eventually falling back to default system font if none are available.
 
 - A boolean value `NO` to disable client-side rendering of CJK glyphs — remote fonts specified in your style will be used instead.
 
