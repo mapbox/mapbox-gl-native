@@ -9,6 +9,7 @@
 #endif
 
 static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPre4_0";
+static NSString * const MGLIdeographicFontFamilyNameKey = @"MGLIdeographicFontFamilyName";
 
 @interface MGLRendererConfiguration ()
 @property (nonatomic, readwrite) BOOL perSourceCollisions;
@@ -70,6 +71,10 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
 }
 
 - (mbgl::optional<std::string>)localFontFamilyName {
+    return [self _localFontFamilyNameWithPropertyDictionary:[[NSBundle mainBundle]infoDictionary]];
+}
+
+- (mbgl::optional<std::string>)_localFontFamilyNameWithPropertyDictionary:(nonnull NSDictionary *)properties {
     
     std::string systemFontFamilyName;
 #if TARGET_OS_IPHONE
@@ -77,8 +82,8 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
 #else
     systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:NSFontWeightRegular].familyName UTF8String]);
 #endif
-
-    id fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
+    
+    id fontFamilyName = properties[MGLIdeographicFontFamilyNameKey];
     
     if([fontFamilyName isKindOfClass:[NSNumber class]] && ![fontFamilyName boolValue])
     {
@@ -86,7 +91,17 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     }
     else if([fontFamilyName isKindOfClass:[NSString class]])
     {
-        return fontFamilyName ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
+        BOOL isValidFont = NO;
+#if TARGET_OS_IPHONE
+        if([[UIFont familyNames] containsObject:fontFamilyName]){
+            isValidFont = YES;
+        }
+#else
+        if([[[NSFontManager sharedFontManager] availableFontFamilies] containsObject:fontFamilyName]){
+            isValidFont = YES;
+        }
+#endif
+        return (fontFamilyName && isValidFont) ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
     }
     // Ability to specify an array of fonts for fallbacks for `localIdeographicFontFamily`
     else if ([fontFamilyName isKindOfClass:[NSArray class]]){
