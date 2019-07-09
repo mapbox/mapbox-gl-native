@@ -380,7 +380,7 @@ public class FileSource {
   public native void deactivate();
 
   @Keep
-  public native void setAccessToken(@NonNull String accessToken);
+  public native void setAccessToken(@Nullable String accessToken);
 
   @NonNull
   @Keep
