@@ -26,7 +26,7 @@ The name of the font family to use for client-side text rendering of CJK ideogra
 
 Set `MGLIdeographicFontFamilyName` in your containing application's Info.plist to font family name(s) that will be available at run time, such as “PingFang TC” or “Marker Felt”. This plist key accepts:
 
-A string value of a single font family name.
+- A string value of a single font family name.
 
 An array of font family names. Fonts will be used in the defined order, eventually falling back to default system font if none are available.
 
