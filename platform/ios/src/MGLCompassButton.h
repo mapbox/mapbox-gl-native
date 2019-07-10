@@ -1,12 +1,13 @@
 #import <UIKit/UIKit.h>
 
-#import <Mapbox/MGLTypes.h>
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  A specialized view that displays the current compass heading for its associated map.
  */
+MGL_EXPORT
 @interface MGLCompassButton : UIImageView
 
 /**
