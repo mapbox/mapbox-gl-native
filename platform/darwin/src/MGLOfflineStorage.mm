@@ -450,7 +450,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)invalidatePack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion {
-    
     if (!completion) { return; }
     mbgl::OfflineRegion& region = *pack.mbglOfflineRegion;
     NSError *error;
