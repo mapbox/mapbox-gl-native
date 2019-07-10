@@ -454,7 +454,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     mbgl::OfflineRegion& region = *pack.mbglOfflineRegion;
     NSError *error;
     if (!pack.mbglOfflineRegion) {
-        
         completion(nil);
         return; }
 
