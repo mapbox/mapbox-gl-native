@@ -111,6 +111,10 @@ protected:
     // in the console to inform the developer.
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
+    void addRenderPassesFromTiles();
+
+    const LayerRenderData* getRenderDataForPass(const RenderTile&, RenderPass) const;
+
 protected:
     using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     // Stores current set of tiles to be rendered for this layer.
@@ -122,8 +126,9 @@ protected:
 
     std::vector<LayerPlacementData> placementData;
 
-private:
     RenderTiles filterRenderTiles(RenderTiles) const;
+
+private:
     // Some layers may not render correctly on some hardware when the vertex attribute limit of
     // that GPU is exceeded. More attributes are used when adding many data driven paint properties
     // to a layer.
