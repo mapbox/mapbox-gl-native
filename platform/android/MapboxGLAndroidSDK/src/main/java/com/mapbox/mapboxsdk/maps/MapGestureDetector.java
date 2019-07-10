@@ -75,9 +75,6 @@ final class MapGestureDetector {
 
   private AndroidGesturesManager gesturesManager;
 
-  // Manages when to ignore double-tap event because we've started the quick-zoom. See #14013.
-  private boolean executeDoubleTap;
-
   private Animator scaleAnimator;
   private Animator rotateAnimator;
   private final List<Animator> scheduledAnimators = new ArrayList<>();
@@ -110,7 +107,9 @@ final class MapGestureDetector {
 
   private void initializeGestureListeners(@NonNull Context context, boolean attachDefaultListeners) {
     if (attachDefaultListeners) {
-      StandardGestureListener standardGestureListener = new StandardGestureListener();
+      StandardGestureListener standardGestureListener = new StandardGestureListener(
+        context.getResources().getDimension(
+          com.mapbox.android.gestures.R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
       MoveGestureListener moveGestureListener = new MoveGestureListener();
       ScaleGestureListener scaleGestureListener = new ScaleGestureListener(
         context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity));
@@ -304,6 +303,14 @@ final class MapGestureDetector {
   }
 
   private final class StandardGestureListener extends StandardGestureDetector.SimpleStandardOnGestureListener {
+
+    private PointF doubleTapFocalPoint;
+    private final float doubleTapMovementThreshold;
+
+    StandardGestureListener(float doubleTapMovementThreshold) {
+      this.doubleTapMovementThreshold = doubleTapMovementThreshold;
+    }
+
     @Override
     public boolean onDown(MotionEvent motionEvent) {
       return true;
@@ -336,7 +343,7 @@ final class MapGestureDetector {
     public boolean onDoubleTapEvent(MotionEvent motionEvent) {
       int action = motionEvent.getActionMasked();
       if (action == MotionEvent.ACTION_DOWN) {
-        executeDoubleTap = true;
+        doubleTapFocalPoint = new PointF(motionEvent.getX(), motionEvent.getY());
 
         // disable the move detector in preparation for the quickzoom,
         // so that we don't move the map's center slightly before the quickzoom is started (see #14227)
@@ -344,26 +351,27 @@ final class MapGestureDetector {
       }
 
       if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
-        if (executeDoubleTap) {
-          // re-enable the move detector only if we did not start the quickzoom, otherwise, re-enable in the #onScaleEnd
-          gesturesManager.getMoveGestureDetector().setEnabled(true);
-        }
+        // re-enable the move detector
+        gesturesManager.getMoveGestureDetector().setEnabled(true);
 
-        if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled() || !executeDoubleTap) {
+        float diffX = Math.abs(motionEvent.getX() - doubleTapFocalPoint.x);
+        float diffY = Math.abs(motionEvent.getY() - doubleTapFocalPoint.y);
+        if (diffX > doubleTapMovementThreshold || diffY > doubleTapMovementThreshold) {
+          // Ignore double-tap event because we've started the quick-zoom. See #14013.
           return false;
         }
 
-        PointF zoomFocalPoint;
+        if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled()) {
+          return false;
+        }
+
         // Single finger double tap
         if (constantFocalPoint != null) {
           // User provided focal point
-          zoomFocalPoint = constantFocalPoint;
-        } else {
-          // Zoom in on gesture
-          zoomFocalPoint = new PointF(motionEvent.getX(), motionEvent.getY());
+          doubleTapFocalPoint = constantFocalPoint;
         }
 
-        zoomInAnimated(zoomFocalPoint, false);
+        zoomInAnimated(doubleTapFocalPoint, false);
 
         return true;
       }
@@ -464,13 +472,6 @@ final class MapGestureDetector {
     @Override
     public boolean onScaleBegin(@NonNull StandardScaleGestureDetector detector) {
       quickZoom = detector.getPointersCount() == 1;
-      if (quickZoom) {
-        // Unfortunately, the double-tap event is returned by the framework when the second `ACTION_DOWN` event
-        // is registered in the right interval, regardless of the following `ACTION_MOVE` events.
-        // That's why, the quick-zoom gives us a handy reference when we've exceeded the movement threshold
-        // and we should ignore the double-tap.
-        executeDoubleTap = false;
-      }
 
       if (!uiSettings.isZoomGesturesEnabled()) {
         return false;
