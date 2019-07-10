@@ -52,6 +52,13 @@
     [self sizeToFit];
 }
 
+- (void)setCompassVisibility:(MGLOrnamentVisibility)compassVisibility {
+    if (_compassVisibility == compassVisibility) { return; }
+    _compassVisibility = compassVisibility;
+
+    [self updateCompassAnimated:NO];
+}
+
 - (UIImage *)compassImage {
     UIImage *scaleImage = [UIImage mgl_resourceImageNamed:@"Compass"];
     UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, UIScreen.mainScreen.scale);
@@ -75,7 +82,12 @@
     [self.mapView resetNorth];
 }
 
-- (void)updateCompassWithDirection:(CLLocationDirection)direction {
+- (void)updateCompass {
+    [self updateCompassAnimated:YES];
+}
+
+- (void)updateCompassAnimated:(BOOL)animated {
+    CLLocationDirection direction = self.mapView.direction;
     CLLocationDirection plateDirection = mbgl::util::wrap(-direction, 0., 360.);
     self.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(plateDirection));
 
@@ -85,26 +97,26 @@
     switch (self.compassVisibility) {
         case MGLOrnamentVisibilityAdaptive:
             if (direction > 0 && self.alpha < 1) {
-                [self showCompass];
+                [self showCompass:animated];
             } else if (direction == 0 && self.alpha > 0) {
-                [self hideCompass];
+                [self hideCompass:animated];
             }
             break;
         case MGLOrnamentVisibilityVisible:
-            [self showCompass];
+            [self showCompass:animated];
             break;
         case MGLOrnamentVisibilityHidden:
-            [self hideCompass];
+            [self hideCompass:animated];
             break;
     }
 }
 
-- (void)showCompass {
-    [self animateToAlpha:1];
+- (void)showCompass:(BOOL)animated {
+    animated ? [self animateToAlpha:1] : [self setAlpha:1];
 }
 
-- (void)hideCompass {
-    [self animateToAlpha:0];
+- (void)hideCompass:(BOOL)animated {
+    animated ? [self animateToAlpha:0] : [self setAlpha:0];
 }
 
 - (void)animateToAlpha:(CGFloat)alpha {

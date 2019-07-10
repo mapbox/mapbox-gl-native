@@ -6507,7 +6507,7 @@ public:
 
 - (void)updateCompass
 {
-    [self.compassView updateCompassWithDirection:self.direction];
+    [self.compassView updateCompass];
 }
 
 - (void)updateScaleBar

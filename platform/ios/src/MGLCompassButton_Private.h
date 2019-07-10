@@ -1,5 +1,4 @@
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
 #import <Mapbox/MGLCompassButton.h>
 
@@ -13,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) MGLMapView *mapView;
 
-- (void)updateCompassWithDirection:(CLLocationDirection)direction;
+- (void)updateCompass;
 
 @end
 
