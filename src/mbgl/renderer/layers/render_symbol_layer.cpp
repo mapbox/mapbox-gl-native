@@ -263,7 +263,7 @@ void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters)
     passes = ((evaluated.get<style::IconOpacity>().constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
               || (evaluated.get<style::TextOpacity>().constantOr(1) > 0 && hasTextOpacity && textSize > 0))
              ? RenderPass::Translucent | RenderPass::Upload : RenderPass::None;
-
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -349,7 +349,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
     };
 
     for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
         if (!renderData) {
             continue;
         }
@@ -494,6 +494,7 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 
 void RenderSymbolLayer::prepare(const LayerPrepareParameters& params) {
     renderTiles = params.source->getRenderedTiles();
+    addRenderPassesFromTiles();
     const auto comp = [bearing = params.state.getBearing()](const RenderTile& a, const RenderTile& b) {
         Point<float> pa(a.id.canonical.x, a.id.canonical.y);
         Point<float> pb(b.id.canonical.x, b.id.canonical.y);

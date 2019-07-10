@@ -37,8 +37,8 @@ void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &paramet
         parameters.getCrossfadeParameters(),
         unevaluated.evaluate(parameters));
 
-    passes = properties->evaluated.get<style::BackgroundOpacity>() > 0 ? RenderPass::Translucent
-                                                                       : RenderPass::None;
+    passes = properties->evaluated.get<style::BackgroundOpacity>() > 0 ? RenderPass::Translucent : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -133,8 +133,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
 }
 
 optional<Color> RenderBackgroundLayer::getSolidBackground() const {
-    const auto& evaluated = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).evaluated;
-    if (!evaluated.get<BackgroundPattern>().from.empty()) {
+    const auto& evaluated = getEvaluated<BackgroundLayerProperties>(evaluatedProperties);
+    if (!evaluated.get<BackgroundPattern>().from.empty() || evaluated.get<style::BackgroundOpacity>() <= 0.0f) {
         return nullopt;
     }
 

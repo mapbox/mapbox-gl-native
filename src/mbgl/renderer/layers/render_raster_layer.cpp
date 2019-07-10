@@ -33,6 +33,7 @@ void RenderRasterLayer::evaluate(const PropertyEvaluationParameters& parameters)
         staticImmutableCast<RasterLayer::Impl>(baseImpl),
         unevaluated.evaluate(parameters));
     passes = properties->evaluated.get<style::RasterOpacity>() > 0 ? RenderPass::Translucent : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -73,7 +74,8 @@ static std::array<float, 3> spinWeights(float spin) {
 }
 
 void RenderRasterLayer::prepare(const LayerPrepareParameters& params) {
-    RenderLayer::prepare(params);
+    assert(params.source);
+    renderTiles = filterRenderTiles(params.source->getRenderedTiles());
     auto* imageSource = params.source->as<RenderImageSource>();
     if (imageSource && imageSource->isLoaded()) {
         assert(imageSource->isEnabled());

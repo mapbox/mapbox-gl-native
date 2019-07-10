@@ -53,7 +53,7 @@ void RenderHillshadeLayer::evaluate(const PropertyEvaluationParameters& paramete
     passes = (properties->evaluated.get<style::HillshadeExaggeration >() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
-
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -66,7 +66,8 @@ bool RenderHillshadeLayer::hasCrossfade() const {
 }
 
 void RenderHillshadeLayer::prepare(const LayerPrepareParameters& params) {
-    RenderLayer::prepare(params);
+    assert(params.source);
+    renderTiles = filterRenderTiles(params.source->getRenderedTiles());
     if (auto* demsrc = params.source->as<RenderRasterDEMSource>()) {
         maxzoom = demsrc->getMaxZoom();
     }

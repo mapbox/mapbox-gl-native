@@ -48,6 +48,7 @@ bool RenderLayer::supportsZoom(float zoom) const {
 void RenderLayer::prepare(const LayerPrepareParameters& params) {
     assert(params.source);
     renderTiles = filterRenderTiles(params.source->getRenderedTiles());
+    addRenderPassesFromTiles();
 }
 
 optional<Color> RenderLayer::getSolidBackground() const {
@@ -95,6 +96,21 @@ void RenderLayer::checkRenderability(const PaintParameters& parameters,
                    activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
     }
+}
+
+void RenderLayer::addRenderPassesFromTiles() {
+    for (const RenderTile& tile : renderTiles) {
+        if (const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl)) {
+            passes |= RenderPass(renderData->layerProperties->renderPasses);
+        }
+    }
+}
+
+const LayerRenderData* RenderLayer::getRenderDataForPass(const RenderTile& tile, RenderPass pass) const {
+    if (const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl)) {
+        return bool(RenderPass(renderData->layerProperties->renderPasses) & pass) ? renderData : nullptr;
+    }
+    return nullptr;
 }
 
 } //namespace mbgl
