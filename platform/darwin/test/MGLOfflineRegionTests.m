@@ -57,7 +57,7 @@
         XCTAssertFalse(tilePyramidOfflineRegion.includesIdeographicGlyphs, @"tile pyramid offline region should not include ideographic glyphs");
     }
     
-    //Shape offline region
+    // Shape offline region
     {
         NSString *geojson = @"{\"type\": \"Point\", \"coordinates\": [-3.8671874999999996, 52.482780222078226] }";
         NSError *error;
