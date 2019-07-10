@@ -48,6 +48,7 @@ void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
               && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
               && evaluated.get<style::LineWidth>().constantOr(1.0) > 0)
              ? RenderPass::Translucent | RenderPass::Upload : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -99,7 +100,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
     parameters.renderTileClippingMasks(renderTiles);
 
     for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
         if (!renderData) {
             continue;
         }

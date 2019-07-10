@@ -60,7 +60,7 @@ void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     } else {
         passes |= RenderPass::Opaque;
     }
-
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -76,7 +76,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
     if (unevaluated.get<FillPattern>().isUndefined()) {
         parameters.renderTileClippingMasks(renderTiles);
         for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
             if (!renderData) {
                 continue;
             }
@@ -162,7 +162,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.renderTileClippingMasks(renderTiles);
 
         for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+            const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
             if (!renderData) {
                 continue;
             }
