@@ -201,6 +201,39 @@
     pack = nil;
 }
 
+- (void)testInvalidatePack {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect offline pack to be invalidated without an error."];
+    MGLCoordinateBounds bounds = {
+        { .latitude = 48.8660, .longitude = 2.3306 },
+        { .latitude = 48.8603, .longitude = 2.3213 },
+    };
+    MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:[MGLStyle streetsStyleURL] bounds:bounds fromZoomLevel:10 toZoomLevel:11];
+    
+    NSString *nameKey = @"Name";
+    NSString *name = @"Paris square";
+    
+    NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{nameKey: name}];
+    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
+        XCTAssertNotNil(pack);
+        [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable) {
+            XCTAssertNotNil(pack);
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testSetMaximumAmbientCache {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect maximum cache size to be raised without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] setMaximumAmbientCacheSize:500000 withCallback:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:3 handler:nil];
+}
+
 - (void)testInvalidateAmbientCache {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Expect cache to be invalidated without an error."];
     [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
@@ -216,7 +249,7 @@
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10 handler:nil];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 - (void)testResetDatabase {
@@ -225,7 +258,7 @@
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10 handler:nil];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 - (void)testBackupExclusion {
