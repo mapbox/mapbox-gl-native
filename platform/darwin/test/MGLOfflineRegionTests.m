@@ -48,7 +48,7 @@
     XCTAssertEqual(original.includesIdeographicGlyphs, copy.includesIdeographicGlyphs, @"Include ideographs has changed.");
 }
 
-- (void)testIncludesIdeographicGlyphsByDefault{
+- (void)testIncludesIdeographicGlyphsByDefault {
     
     //Tile pyramid offline region
     {
