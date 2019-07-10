@@ -44,6 +44,7 @@ void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& para
     passes = (properties->evaluated.get<style::FillExtrusionOpacity>() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -115,7 +116,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         // Draw solid color extrusions
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_) {
             for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
                 if (!renderData) {
                     continue;
                 }
@@ -160,7 +161,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_) {
             for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+                const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
                 if (!renderData) {
                     continue;
                 }
