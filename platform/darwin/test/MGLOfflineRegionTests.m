@@ -65,7 +65,6 @@
         XCTAssertNil(error);
         MGLShapeOfflineRegion *shapeOfflineRegion = [[MGLShapeOfflineRegion alloc] initWithStyleURL:[MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion] shape:shape fromZoomLevel:5 toZoomLevel:10];
         XCTAssertFalse(shapeOfflineRegion.includesIdeographicGlyphs, @"tile pyramid offline region should not include ideographic glyphs");
-
     }
 }
 
