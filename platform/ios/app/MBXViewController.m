@@ -110,11 +110,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousSetContentInsets,
     MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousOrnamentsPlacement,
-    MBXSettingsMiscellaneousInvalidateAmbientCache,
-    MBXSettingsMiscellaneousClearDatabase,
-    MBXSettingsMiscellaneousResetAmbientCache,
     MBXSettingsMiscellaneousPrintLogFile,
-    MBXSettingsMiscellaneousDeleteLogFile,
+    MBXSettingsMiscellaneousDeleteLogFile
 };
 
 // Utility methods
@@ -442,9 +439,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 [NSString stringWithFormat:@"Turn %@ Content Insets", (_contentInsetsEnabled ? @"Off" : @"On")],
                 @"View Route Simulation",
                 @"Ornaments Placement",
-                @"Invalidate Ambient Cache",
-                @"Reset Database",
-                @"Reset Ambient Cache",
             ]];
 
             if (self.currentState.debugLoggingEnabled)
@@ -772,20 +766,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     MBXOrnamentsViewController *ornamentsViewController = [[MBXOrnamentsViewController alloc] init];
                     [self.navigationController pushViewController:ornamentsViewController animated:YES];
-                    break;
-                }
-                case MBXSettingsMiscellaneousInvalidateAmbientCache:
-                {
-                    [self invalidateAmbientCache];
-                    break;
-                }
-                case MBXSettingsMiscellaneousClearDatabase:
-                {
-                    [self resetDatabase];
-                    break;
-                }
-                case MBXSettingsMiscellaneousResetAmbientCache: {
-                    [self clearAmbientCache];
                     break;
                 }
                 default:
@@ -1783,62 +1763,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", [dateFormatter stringFromDate:[NSDate date]]]];
 
     return filePath;
-}
-
-- (void)invalidateAmbientCache {
-    CFTimeInterval start = CACurrentMediaTime();
-    NSUInteger fileSize = [self getCacheSize];
-    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
-        NSInteger newFileSize = [self getCacheSize];
-        NSLog(@"Ambient cache has been reloaded. Initial size: %lu New size: %lu  Difference: %lu", fileSize, newFileSize, fileSize - newFileSize);
-        
-        CFTimeInterval end = CACurrentMediaTime();
-        CFTimeInterval difference = end - start;
-        NSLog(@"resetDatabase\nStarted: %f\nEnded: %f\nTotal Time: %f", start, end, difference);
-    }];
-}
-
-- (void)resetDatabase {
-    CFTimeInterval start = CACurrentMediaTime();
-    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
-        if (!error) {
-            CFTimeInterval end = CACurrentMediaTime();
-            CFTimeInterval difference = end - start;
-            NSLog(@"resetDatabase\nStarted: %f\nEnded: %f\nTotal Time: %f", start, end, difference);
-        }
-    }];
-}
-
-- (void)clearAmbientCache {
-    // Access the cache.db file
-    NSInteger fileSize = [self getCacheSize];
-    CFTimeInterval start = CACurrentMediaTime();
-    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletion:^(NSError * _Nullable error) {
-        NSInteger newFileSize = [self getCacheSize];
-        NSLog(@"Ambient cache has been cleared. Initial size: %lu New size: %lu  Difference: %lu", fileSize, newFileSize, fileSize - newFileSize);
-    
-        CFTimeInterval end = CACurrentMediaTime();
-        CFTimeInterval difference = end - start;
-        NSLog(@"clearAmbientCache\nStarted: %f\nEnded: %f\nTotal Time: %f", start, end, difference);
-    }];
-}
-
-// This method is used to access the cache database file, then get the cache.db size.
-- (NSInteger)getCacheSize {
-    
-    NSFileManager *manager = [NSFileManager defaultManager];
-    NSURL *cacheDirectoryURL = [manager URLForDirectory:NSApplicationSupportDirectory
-                                                                      inDomain:NSUserDomainMask
-                                                             appropriateForURL:nil
-                                                                        create:YES
-                                                                         error:nil];
-    
-    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-
-    NSString *urlString = [NSString stringWithFormat:@"%@/.mapbox/cache.db", bundleIdentifier];
-    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:urlString];
-    NSString *path = cacheDirectoryURL.path;
-    return [[manager attributesOfItemAtPath:path error:nil] fileSize];
 }
 
 #pragma mark - Random World Tour

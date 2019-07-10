@@ -450,23 +450,28 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)invalidatePack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion {
-    if (!completion) { return; }
+
     mbgl::OfflineRegion& region = *pack.mbglOfflineRegion;
     NSError *error;
     if (!pack.mbglOfflineRegion) {
         completion(nil);
-        return; }
+        return;
+    }
 
     _mbglFileSource->invalidateOfflineRegion(region, [&](std::exception_ptr exception) {
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-                                                                               }];
+            error = [NSError errorWithDomain:MGLErrorDomain
+                                        code:-1
+                                    userInfo:@{
+                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+                                               }];
         }
     });
-    dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
-        completion(error);
-    });
+    if (completion) {
+        dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+            completion(error);
+        });
+    }
 }
 
 - (void)reloadPacks {
@@ -510,7 +515,8 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 #pragma mark - Ambient Cache management
 
-- (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable))completion {
+- (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable))completion {
+
     _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
         if (!completion) { return; }
         
@@ -531,7 +537,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 - (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable))completion {
     _mbglFileSource->invalidateAmbientCache([&, completion](std::exception_ptr exception){
-        if (!completion) { return; }
         
         NSError *error;
         if (exception) {
@@ -540,16 +545,16 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                                                                                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                                                                                }];
         }
-        
-        dispatch_async(dispatch_get_main_queue(), ^ {
-            completion(error);
-        });
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                completion(error);
+            });
+        }
     });
 }
 
 - (void)clearAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion {
     _mbglFileSource->clearAmbientCache([&, completion](std::exception_ptr exception){
-        if (!completion) { return; }
         NSError *error;
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain
@@ -557,9 +562,11 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                                                                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
                                                                                }];
         }
-        dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
-            completion(error);
-        });
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+                completion(error);
+            });
+        }
     });
 }
 

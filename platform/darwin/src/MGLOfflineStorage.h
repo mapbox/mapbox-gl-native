@@ -379,7 +379,7 @@ MGL_EXPORT
  has been set. This handler is executed synchronously on the main queue.
  */
 
-- (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError *_Nullable error))completion;
+- (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCallback:(void (^)(NSError *_Nullable error))completion;
 
 /**
  Checks that the tiles in the ambient cache match those from the server. Local
