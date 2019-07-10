@@ -47,23 +47,12 @@ bool RenderLayer::supportsZoom(float zoom) const {
 
 void RenderLayer::prepare(const LayerPrepareParameters& params) {
     assert(params.source);
-    renderTiles = filterRenderTiles(params.source->getRenderTiles());
+    renderTiles = params.source->getRenderTiles();
+    assert(renderTiles);
 }
 
 optional<Color> RenderLayer::getSolidBackground() const {
     return nullopt;
-}
-
-RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles) const {
-    RenderTiles filtered;
-
-    for (const RenderTile& tile : tiles) {
-        if (tile.holdForFade()) {
-            continue;
-        }
-        filtered.emplace_back(tile);
-    }
-    return filtered;
 }
 
 void RenderLayer::markContextDestroyed() {

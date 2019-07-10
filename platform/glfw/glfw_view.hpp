@@ -68,6 +68,7 @@ private:
     static void onFramebufferResize(GLFWwindow *window, int width, int height);
     static void onMouseClick(GLFWwindow *window, int button, int action, int modifiers);
     static void onMouseMove(GLFWwindow *window, double x, double y);
+    static void onWindowFocus(GLFWwindow *window, int focused);
 
     // Internal
     void report(float duration);

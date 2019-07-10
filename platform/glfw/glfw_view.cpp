@@ -102,6 +102,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     glfwSetFramebufferSizeCallback(window, onFramebufferResize);
     glfwSetScrollCallback(window, onScroll);
     glfwSetKeyCallback(window, onKey);
+    glfwSetWindowFocusCallback(window, onWindowFocus);
 
     glfwGetWindowSize(window, &width, &height);
 
@@ -557,6 +558,13 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     }
     view->lastX = x;
     view->lastY = y;
+}
+
+void GLFWView::onWindowFocus(GLFWwindow *window, int focused) {
+    if (focused == GLFW_FALSE) { // Focus lost.
+        auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+        view->rendererFrontend->getRenderer()->reduceMemoryUse();
+    }
 }
 
 void GLFWView::run() {

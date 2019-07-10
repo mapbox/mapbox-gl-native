@@ -18,7 +18,7 @@ public:
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const std::vector<const RenderLayer*>& layers,
+                          const std::unordered_map<std::string, const RenderLayer*>& layers,
                           const RenderedQueryOptions& options,
                           const mat4& projMatrix) const final;
 

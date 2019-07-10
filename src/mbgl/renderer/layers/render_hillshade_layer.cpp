@@ -71,6 +71,7 @@ void RenderHillshadeLayer::prepare(const LayerPrepareParameters& params) {
 }
 
 void RenderHillshadeLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass != RenderPass::Translucent && parameters.pass != RenderPass::Pass3D)
         return;
     const auto& evaluated = static_cast<const HillshadeLayerProperties&>(*evaluatedProperties).evaluated;  
@@ -126,7 +127,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
     matrix::ortho(mat, 0, util::EXTENT, -util::EXTENT, 0, 0, 1);
     matrix::translate(mat, mat, 0, -util::EXTENT, 0);
 
-    for (const RenderTile& tile : renderTiles) {
+    for (const RenderTile& tile : *renderTiles) {
         auto* bucket_ = tile.getBucket(*baseImpl);
         if (!bucket_) {
             continue;

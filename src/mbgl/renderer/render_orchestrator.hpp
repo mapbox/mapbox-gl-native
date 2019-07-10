@@ -33,6 +33,10 @@ class PatternAtlas;
 class CrossTileSymbolIndex;
 class RenderTree;
 
+namespace style {
+    class LayerProperties;
+} // namespace style
+
 class RenderOrchestrator final : public GlyphManagerObserver,
                                  public ImageManagerObserver,
                                  public RenderSourceObserver {
@@ -74,10 +78,10 @@ private:
               
     void queryRenderedSymbols(std::unordered_map<std::string, std::vector<Feature>>& resultsByLayer,
                               const ScreenLineString& geometry,
-                              const std::vector<const RenderLayer*>& layers,
+                              const std::unordered_map<std::string, const RenderLayer*>& layers,
                               const RenderedQueryOptions& options) const;
     
-    std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&, const std::vector<const RenderLayer*>&) const;
+    std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&, const std::unordered_map<std::string, const RenderLayer*>&) const;
 
     // GlyphManagerObserver implementation.
     void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
@@ -113,6 +117,10 @@ private:
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
+
+    // Vector with reserved capacity of layerImpls->size() to avoid reallocation
+    // on each frame.
+    std::vector<Immutable<style::LayerProperties>> filteredLayersForSource;
 };
 
 } // namespace mbgl

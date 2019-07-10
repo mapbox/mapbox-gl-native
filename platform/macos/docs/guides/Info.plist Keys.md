@@ -16,9 +16,17 @@ Use this key if you need to customize the API base URL used throughout the SDK. 
 
 The default value is `https://api.mapbox.com`.
 
-## MGLIdeographicFontFamilyName                                                                                                                                                          
+## MGLIdeographicFontFamilyName
 
-The name of the font family to use for client-side text rendering of CJK ideographs. Set this to the name of a font family which will be available at run time, e.g. `PingFang TC` (iOS 9+), `Heiti TC` (iOS 8+), another appropriate built-in font, or a font provided by your application. Note that if a non-existent font is specified, iOS will fall back to using Helvetica which is likely not to include support for the glyphs needed to render maps in your application.
+The name of the font family to use for client-side text rendering of CJK ideographs.
+
+Set `MGLIdeographicFontFamilyName` in your containing application's Info.plist to font family name(s) that will be available at run time, such as “PingFang TC” or “Marker Felt”. This plist key accepts:
+
+- A string value of a single font family name.
+
+- An array of font family names. Fonts will be used in the defined order, eventually falling back to default system font if none are available.
+
+- A boolean value `NO` to disable client-side rendering of CJK glyphs — remote fonts specified in your style will be used instead.
 
 ## MGLCollisionBehaviorPre4_0
 
