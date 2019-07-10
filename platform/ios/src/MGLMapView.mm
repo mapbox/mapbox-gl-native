@@ -297,8 +297,8 @@ public:
 
     NSInteger _changeDelimiterSuppressionDepth;
 
-    /// Center coordinate of the pinch gesture on the previous iteration of the gesture.
-    CLLocationCoordinate2D _previousPinchCenterCoordinate;
+    /// Center of the pinch gesture on the previous iteration of the gesture.
+    CGPoint _previousPinchCenterPoint;
     NSUInteger _previousPinchNumberOfTouches;
     
     CLLocationDistance _distanceFromOldUserLocation;
@@ -1643,11 +1643,7 @@ public:
             // meaningless.
             if (self.userTrackingMode == MGLUserTrackingModeNone && pinch.numberOfTouches == _previousPinchNumberOfTouches)
             {
-                CLLocationCoordinate2D centerCoordinate = _previousPinchCenterCoordinate;
-                mbgl::EdgeInsets padding { centerPoint.y, centerPoint.x, self.size.height - centerPoint.y, self.size.width - centerPoint.x };
-                self.mbglMap.jumpTo(mbgl::CameraOptions()
-                                        .withCenter(MGLLatLngFromLocationCoordinate2D(centerCoordinate))
-                                        .withPadding(padding));
+                self.mbglMap.moveBy({centerPoint.x - _previousPinchCenterPoint.x, centerPoint.y - _previousPinchCenterPoint.y});
             }
         }
         [self cameraIsChanging];
@@ -1705,7 +1701,7 @@ public:
         [self unrotateIfNeededForGesture];
     }
 
-    _previousPinchCenterCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
+    _previousPinchCenterPoint = centerPoint;
     _previousPinchNumberOfTouches = pinch.numberOfTouches;
 }
 
