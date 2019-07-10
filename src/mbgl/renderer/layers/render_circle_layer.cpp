@@ -41,6 +41,7 @@ void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters)
               && (evaluated.get<style::CircleOpacity>().constantOr(1) > 0 ||
                   evaluated.get<style::CircleStrokeOpacity>().constantOr(1) > 0))
              ? RenderPass::Translucent : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -59,7 +60,7 @@ void RenderCircleLayer::render(PaintParameters& parameters) {
     }
 
     for (const RenderTile& tile : *renderTiles) {
-        const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
         if (!renderData) {
             continue;
         }

@@ -44,6 +44,7 @@ void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& para
     passes = (properties->evaluated.get<style::FillExtrusionOpacity>() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -67,7 +68,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
 
     const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
     const auto& crossfade = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).crossfade;
-    if (evaluated.get<FillExtrusionOpacity>() == 0) {
+    if (evaluatedProperties->renderPasses == mbgl::underlying_type(RenderPass::None)) {
         return;
     }
 
@@ -121,7 +122,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
         // Draw solid color extrusions
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
             for (const RenderTile& tile : *renderTiles) {
-                const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
+                const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
                 if (!renderData) {
                     continue;
                 }
@@ -168,7 +169,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
         const auto fillPatternValue = evaluated.get<FillExtrusionPattern>().constantOr(mbgl::Faded<std::basic_string<char> >{"", ""});
         auto drawTiles = [&](const gfx::StencilMode& stencilMode_, const gfx::ColorMode& colorMode_, const std::string& name) {
             for (const RenderTile& tile : *renderTiles) {
-                const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
+                const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
                 if (!renderData) {
                     continue;
                 }

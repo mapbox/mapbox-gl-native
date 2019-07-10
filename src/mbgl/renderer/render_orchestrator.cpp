@@ -292,14 +292,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             const Immutable<Layer::Impl>& layerImpl = *it;
             RenderLayer* layer = getRenderLayer(layerImpl->id);
             const auto* layerInfo = layerImpl->getTypeInfo();
-            const bool layerNeedsRendering = layer->needsRendering();
+            const bool layerIsVisible = layer->baseImpl->visibility != style::VisibilityType::None;
             const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
             renderTreeParameters->has3D |= (layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
                     sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || constantsMaskChanged.count(layerImpl->id) || hasLayoutDifference(layerDiff, layerImpl->id));
-                    if (layerNeedsRendering) {
+                    if (layerIsVisible) {
                         filteredLayersForSource.push_back(layer->evaluatedProperties);
                         if (zoomFitsLayer) {
                             sourceNeedsRendering = true;
@@ -311,7 +311,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             } 
 
             // Handle layers without source.
-            if (layerNeedsRendering && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
+            if (layerIsVisible && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
                 if (backgroundLayerAsColor && layerImpl.get() == layerImpls->at(0).get()) {
                     const auto& solidBackground = layer->getSolidBackground();
                     if (solidBackground) {
