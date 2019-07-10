@@ -50,7 +50,7 @@
 
 - (void)testIncludesIdeographicGlyphsByDefault {
     
-    //Tile pyramid offline region
+    // Tile pyramid offline region
     {
         MGLCoordinateBounds bounds = MGLCoordinateBoundsMake(kCLLocationCoordinate2DInvalid, kCLLocationCoordinate2DInvalid);
         MGLTilePyramidOfflineRegion *tilePyramidOfflineRegion = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:[MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion] bounds:bounds fromZoomLevel:5 toZoomLevel:10];
