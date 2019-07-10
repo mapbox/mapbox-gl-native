@@ -512,7 +512,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 #pragma mark - Ambient Cache management
 
 - (void)setMaximumAmbientCacheSize:(NSInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable))completion {
-
     _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
         if (!completion) { return; }
         
