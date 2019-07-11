@@ -175,7 +175,7 @@ License: [The Apache Software License, Version 2.0](http://www.apache.org/licens
 
 Mapbox GL uses portions of the Mapbox Android Gestures Library.  
 URL: [https://github.com/mapbox/mapbox-gestures-android](https://github.com/mapbox/mapbox-gestures-android)  
-License: [BSD 2-Clause "Simplified" License](https://raw.githubusercontent.com/mapbox/mapbox-gestures-android/master/LICENSE.md)
+License: [BSD](https://opensource.org/licenses/BSD-2-Clause)
 
 ===========================================================================
 
