@@ -4,9 +4,27 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
-- Fixed a map update bug caused by the render tiles and the render passes getting unsynchronized [#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092)
-- Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers [#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930)
-- Fixed rendering layers after fill-extrusion regression caused by optimization of fill-extrusion rendering [#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065)
+## 8.2.0-alpha.3 - July 11, 2019
+
+### Bugs
+ - Fixed a map update bug caused by the render tiles and the render passes getting unsynchronized [#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092)
+ - Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers [#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930)
+ - Fixed rendering layers after fill-extrusion regression caused by optimization of fill-extrusion rendering [#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065)
+ - Decrease the minimum pixel distance required to interpolate during camera animation [#15073](https://github.com/mapbox/mapbox-gl-native/pull/15073)
+ - Ensure location shadow's gradient radius is greater than 0 [#15099](https://github.com/mapbox/mapbox-gl-native/pull/15099)
+ - Allow map panning after quick zoom is disabled but a phantom gesture is executed [#15093](https://github.com/mapbox/mapbox-gl-native/pull/15093)
+ - Ensure that move detector is enabled if double-tap is interrupted [#15103](https://github.com/mapbox/mapbox-gl-native/pull/15103)
+ 
+### Feature
+ - Introduce MapboxMapOptions facility creation method [#15069](https://github.com/mapbox/mapbox-gl-native/pull/15069)
+ - Throw configuration exception when accessing Mapbox services with an invalid token [#15081](https://github.com/mapbox/mapbox-gl-native/pull/15081)
+ - Allow setting a null access token in the runtime [#15081](https://github.com/mapbox/mapbox-gl-native/pull/15081)
+ 
+### Build
+ - Update okhttp to latest stable version that support pre lollipop (`3.12.3`) [#15087](https://github.com/mapbox/mapbox-gl-native/pull/15087)
+ 
+### Documentation
+ - Fix up "match" expressions docs with stop arguments [#15102](https://github.com/mapbox/mapbox-gl-native/pull/15102)
 
 ## 8.2.0-alpha.2 - July 3, 2019
 
