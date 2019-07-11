@@ -450,7 +450,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)invalidatePack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable))completion {
-
     mbgl::OfflineRegion& region = *pack.mbglOfflineRegion;
     NSError *error;
     if (!pack.mbglOfflineRegion) {
@@ -460,11 +459,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
     _mbglFileSource->invalidateOfflineRegion(region, [&](std::exception_ptr exception) {
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain
-                                        code:-1
-                                    userInfo:@{
-                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-                                               }];
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+            }];
         }
     });
     if (completion) {
@@ -516,34 +513,29 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 #pragma mark - Ambient Cache management
 
 - (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable))completion {
-
     _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
-        if (!completion) { return; }
-        
         NSError *error;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain
-                                        code:-1
-                                    userInfo:@{
-                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-                                               }
-                     ];
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+            }];
         }
-        dispatch_sync(dispatch_get_main_queue(), ^ {
-            completion(error);
-        });
+        if (!completion) {
+            dispatch_sync(dispatch_get_main_queue(), ^ {
+                completion(error);
+            });
+        }
     });
 }
 
 - (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable))completion {
     _mbglFileSource->invalidateAmbientCache([&, completion](std::exception_ptr exception){
-        
         NSError *error;
         if (exception) {
             // Convert std::exception_ptr to an NSError.
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-                                                                               }];
+                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+            }];
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^ {
@@ -557,10 +549,9 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     _mbglFileSource->clearAmbientCache([&, completion](std::exception_ptr exception){
         NSError *error;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain
-                                          code:-1 userInfo:@{
-                                                                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-                                                                               }];
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+            }];
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
@@ -571,15 +562,12 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)resetDatabaseWithCompletionHandler:(void (^)(NSError *_Nullable error))completion {
-    if (!completion) { return; };
-
     _mbglFileSource->resetDatabase([&, completion](std::exception_ptr exception) {
         NSError *error = nil;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain
-                                        code:-1 userInfo:@{
-                                                           NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-                                                           }];
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+            }];
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
