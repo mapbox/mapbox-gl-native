@@ -1721,10 +1721,13 @@ public:
     [self cancelTransitions];
  // jk - Detect which gesture is happening more/simulataneously
     // jk - this makes the annotations rotation while the map does not.
-    self.currentRotation += self.rotate.rotation;
-    if ( std::abs(self.currentRotation) < 30 ) {
-        [rotate reset];
+    self.currentRotation += abs(rotate.rotation);
+    if ( self.currentRotation < 30 ) {
+        NSLog(@"%f", rotate.rotation);
         rotate.delaysTouchesBegan = YES;
+        rotate.rotation = 0;
+        NSLog(@"currentrotation %f", self.currentRotation);
+        return;
     }
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
     MGLMapCamera *oldCamera = self.camera;
