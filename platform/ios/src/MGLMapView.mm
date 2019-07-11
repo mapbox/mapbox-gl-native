@@ -257,6 +257,7 @@ public:
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
 @property (nonatomic, readonly) BOOL enablePresentsWithTransaction;
 @property (nonatomic) UIImage *lastSnapshotImage;
+@property (nonatomic) NSMutableArray *pendingCompletionBlocks;
 
 /// Experimental rendering performance measurement.
 @property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
@@ -625,6 +626,11 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+
+    // Pending completion blocks are called *after* annotation views have been updated
+    // in updateFromDisplayLink.
+    _pendingCompletionBlocks = [NSMutableArray array];
+    
     
     // As of 3.7.5, we intentionally do not listen for `UIApplicationWillResignActiveNotification` or call `pauseRendering:` in response to it, as doing
     // so causes a loop when asking for location permission. See: https://github.com/mapbox/mapbox-gl-native/issues/11225
@@ -1046,6 +1052,33 @@ public:
     return CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
 }
 
+#pragma mark - Pending completion blocks
+
+- (void)processPendingBlocks
+{
+    NSArray *blocks = self.pendingCompletionBlocks;
+    self.pendingCompletionBlocks = [NSMutableArray array];
+
+    for (dispatch_block_t block in blocks)
+    {
+        block();
+    }
+}
+
+- (BOOL)addPendingBlock:(dispatch_block_t)block
+{
+    // Only add a block if the display link (that calls processPendingBlocks) is
+    // running, otherwise fall back to calling immediately.
+    BOOL addBlock = (_displayLink && !_displayLink.isPaused);
+    
+    if (addBlock)
+    {
+        [self.pendingCompletionBlocks addObject:block];
+    }
+
+    return addBlock;
+}
+
 #pragma mark - Life Cycle -
 
 - (void)updateFromDisplayLink:(CADisplayLink *)displayLink
@@ -1070,7 +1103,7 @@ public:
         return;
     }
     
-    if (_needsDisplayRefresh)
+    if (_needsDisplayRefresh || (self.pendingCompletionBlocks.count > 0))
     {
         _needsDisplayRefresh = NO;
 
@@ -1079,6 +1112,13 @@ public:
         [self updateAnnotationViews];
         [self updateCalloutView];
 
+        // Call any pending completion blocks. This is primarily to ensure
+        // that annotations are in the expected position after core rendering
+        // and map update.
+        //
+        // TODO: Consider using this same mechanism for delegate callbacks.
+        [self processPendingBlocks];
+        
         _mbglView->display();
     }
 
@@ -1145,6 +1185,7 @@ public:
     {
         [_displayLink invalidate];
         _displayLink = nil;
+        [self processPendingBlocks];
     }
 }
 
@@ -1428,6 +1469,7 @@ public:
         [MGLMapboxEvents flush];
 
         _displayLink.paused = YES;
+        [self processPendingBlocks];
 
         if ( ! self.glSnapshotView)
         {
@@ -1480,6 +1522,11 @@ public:
 {
     super.hidden = hidden;
     _displayLink.paused = hidden;
+    
+    if (hidden)
+    {
+        [self processPendingBlocks];
+    }
 }
 
 - (void)tintColorDidChange
@@ -3340,26 +3387,35 @@ public:
         animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf addPendingBlock:completion])
+            {
+                completion();
+            }
+        };
+        
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
             // Must run asynchronously after the transition is completely over.
             // Otherwise, a call to -setCenterCoordinate: within the completion
             // handler would reenter the completion handler’s caller.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
     
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
     if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, insets))
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
@@ -3526,12 +3582,22 @@ public:
         animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf addPendingBlock:completion])
+            {
                 completion();
-            });
+            }
+        };
+
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
 
@@ -3541,11 +3607,9 @@ public:
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
     if ([self.camera isEqualToMapCamera:camera])
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
@@ -3686,22 +3750,30 @@ public:
         animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf addPendingBlock:completion])
+            {
                 completion();
-            });
+            }
+        };
+
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
     
     if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, edgePadding))
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
@@ -3757,22 +3829,30 @@ public:
         animationOptions.minZoom = MGLZoomLevelForAltitude(peakAltitude, peakPitch,
                                                            peakLatitude, self.frame.size);
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf addPendingBlock:completion])
+            {
                 completion();
-            });
+            }
+        };
+
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
     
     if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, insets))
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
