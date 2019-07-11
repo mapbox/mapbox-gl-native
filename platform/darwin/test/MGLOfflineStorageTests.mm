@@ -207,7 +207,9 @@
         { .latitude = 48.8660, .longitude = 2.3306 },
         { .latitude = 48.8603, .longitude = 2.3213 },
     };
-    MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:[MGLStyle streetsStyleURL] bounds:bounds fromZoomLevel:10 toZoomLevel:11];
+    
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:styleURL bounds:bounds fromZoomLevel:10 toZoomLevel:11];
     
     NSString *nameKey = @"Name";
     NSString *name = @"Paris square";
