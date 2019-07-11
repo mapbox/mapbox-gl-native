@@ -4,6 +4,13 @@
 #import "MGLTestLocationManager.h"
 #import "MGLCompactCalloutView.h"
 
+#import "MGLGeometry_Private.h"
+#import "MGLMapView_Private.h"
+
+#include <mbgl/util/geo.hpp>
+#include <mbgl/map/camera.hpp>
+#include <mbgl/map/map.hpp>
+
 @interface MGLTestCalloutView : MGLCompactCalloutView
 @property (nonatomic) BOOL implementsMarginHints;
 @end
@@ -23,6 +30,8 @@
 - (MGLAnnotationTag)annotationTagAtPoint:(CGPoint)point persistingResults:(BOOL)persist;
 - (id <MGLAnnotation>)annotationWithTag:(MGLAnnotationTag)tag;
 - (MGLMapCamera *)cameraByRotatingToDirection:(CLLocationDirection)degrees aroundAnchorPoint:(CGPoint)anchorPoint;
+- (MGLMapCamera *)cameraByZoomingToZoomLevel:(double)zoom aroundAnchorPoint:(CGPoint)anchorPoint;
+- (MGLMapCamera *)cameraForCameraOptions:(const mbgl::CameraOptions &)cameraOptions;
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 @end
 
@@ -504,9 +513,143 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     XCTAssertEqual(originalFrame.origin.y + offset.y, offsetFrame.origin.y);
 }
 
+#pragma mark - Rotating/zooming
+
 - (void)testSelectingAnnotationWhenMapIsRotated {
     
-    __block MGLPointAnnotation *annotation;
+    CLLocationCoordinate2D coordinates[] = {
+        { 40.0, 40.0 },
+        { NAN, NAN }
+    };
+    
+    NSArray *annotations = [self internalAddAnnotationsAtCoordinates:coordinates];
+    MGLPointAnnotation *annotation = annotations.firstObject;
+    
+    CGPoint anchor = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
+
+    // Rotate
+    CLLocationDirection lastAngle = 0.0;
+
+    srand48(0);
+    for (NSInteger iter = 0; iter < 10; iter++ ) {
+                
+        CLLocationDirection angle = (CLLocationDirection)((drand48()*1080.0) - 540.0);
+        
+        NSString *activityTitle = [NSString stringWithFormat:@"Rotate to: %0.1f from: %0.1f", angle, lastAngle];
+        [XCTContext runActivityNamed:activityTitle
+                               block:^(id<XCTActivity>  _Nonnull activity) {
+
+                                   MGLMapCamera *toCamera = [self.mapView cameraByRotatingToDirection:angle aroundAnchorPoint:anchor];
+                                   [self internalTestSelecting:annotation withCamera:toCamera];
+                               }];
+        
+        lastAngle = angle;
+    }
+}
+
+- (void)testSelectingAnnotationWhenMapIsScaled {
+
+    CLLocationCoordinate2D coordinates[] = {
+        { 0.005, 0.005 },
+        { NAN, NAN }
+    };
+    
+    NSArray *annotations = [self internalAddAnnotationsAtCoordinates:coordinates];
+    MGLPointAnnotation *annotation = annotations.firstObject;
+    
+    CGPoint anchor = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
+    
+    srand48(0);
+    for (NSInteger iter = 0; iter < 10; iter++ ) {
+        
+        double zoom = (double)(drand48()*14.0);
+        
+        NSString *activityTitle = [NSString stringWithFormat:@"Zoom to %0.1f", zoom];
+        [XCTContext runActivityNamed:activityTitle
+                               block:^(id<XCTActivity>  _Nonnull activity) {
+                                   MGLMapCamera *toCamera = [self.mapView cameraByZoomingToZoomLevel:zoom aroundAnchorPoint:anchor];
+                                   [self internalTestSelecting:annotation withCamera:toCamera];
+                               }];
+    }
+}
+
+- (void)testSelectingAnnotationWhenMapIsScaledAndRotated {
+    
+    CLLocationCoordinate2D coordinates[] = {
+        { 0.005, 0.005 },
+        { NAN, NAN }
+    };
+    
+    NSArray *annotations = [self internalAddAnnotationsAtCoordinates:coordinates];
+    MGLPointAnnotation *annotation = annotations.firstObject;
+    
+    CGPoint anchor = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
+    
+    srand48(0);
+    for (NSInteger iter = 0; iter < 10; iter++ ) {
+        
+        double zoom = (double)(7.0 + drand48()*7.0);
+        CLLocationDirection angle = (CLLocationDirection)((drand48()*1080.0) - 540.0);
+        
+        NSString *activityTitle = [NSString stringWithFormat:@"Zoom to %0.1f", zoom];
+        [XCTContext runActivityNamed:activityTitle
+                               block:^(id<XCTActivity>  _Nonnull activity)
+         {
+             mbgl::CameraOptions currentCameraOptions;
+             
+             currentCameraOptions.bearing = angle;
+             currentCameraOptions.anchor = mbgl::ScreenCoordinate { anchor.x, anchor.y };
+             currentCameraOptions.zoom = zoom;
+             MGLMapCamera *toCamera = [self.mapView cameraForCameraOptions:currentCameraOptions];
+             
+             [self internalTestSelecting:annotation withCamera:toCamera];
+         }];
+    }
+}
+
+
+- (void)testShowingAnnotationsThenSelecting {
+    CLLocationCoordinate2D coordinates[21];
+    srand48(0);
+    
+    for (int i = 0; i < 10; i++)
+    {
+        coordinates[i].latitude = drand48();
+        coordinates[i].longitude = drand48();
+    }
+    coordinates[20] = CLLocationCoordinate2DMake(NAN, NAN);
+
+    NSArray *annotations = [self internalAddAnnotationsAtCoordinates:coordinates];
+
+    XCTestExpectation *showCompleted = [self expectationWithDescription:@"showCompleted"];
+
+    CGSize size = self.mapView.frame.size;
+    
+    CGFloat maximumPadding = 100;
+    CGFloat yPadding = (size.height / 5 <= maximumPadding) ? (size.height / 5) : maximumPadding;
+    CGFloat xPadding = (size.width / 5 <= maximumPadding) ? (size.width / 5) : maximumPadding;
+    
+    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
+
+    [self.mapView showAnnotations:annotations
+                      edgePadding:edgeInsets
+                         animated:YES
+                completionHandler:^{
+                    [showCompleted fulfill];
+                }];
+    
+    [self waitForExpectations:@[showCompleted] timeout:3.5];
+    
+    [self waitForCollisionDetectionToRun];
+    
+    for (MGLPointAnnotation *point in annotations) {
+        [self internalSelectDeselectAnnotation:point];
+    }
+}
+
+- (NSArray*)internalAddAnnotationsAtCoordinates:(CLLocationCoordinate2D*)coordinates
+{
+    __block NSMutableArray *annotations = [NSMutableArray array];
     
     [XCTContext runActivityNamed:@"Map setup"
                            block:^(id<XCTActivity>  _Nonnull activity)
@@ -531,40 +674,31 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
              return annotationView;
          };
          
-         annotation = [[MGLPointAnnotation alloc] init];
-         annotation.title = NSStringFromSelector(_cmd);
-         annotation.coordinate = CLLocationCoordinate2DMake(40.0, 40.0);
-         [self.mapView addAnnotation:annotation];
+         CLLocationCoordinate2D *coordinatePtr = coordinates;
+         while (!isnan(coordinatePtr->latitude)) {
+             CLLocationCoordinate2D coordinate = *coordinatePtr++;
+         
+             MGLPointAnnotation *annotation = [[MGLPointAnnotation alloc] init];
+             annotation.title = NSStringFromSelector(_cmd);
+             annotation.coordinate = coordinate;
+             [annotations addObject:annotation];
+         }
+         
+         [self.mapView addAnnotations:annotations];
+
      }];
 
-    // Rotate
-    CLLocationDirection lastAngle = 0.0;
+    NSArray *copiedAnnotations = [annotations copy];
+    annotations = nil;
     
-    srand48(0);
-    for (NSInteger iter = 0; iter < 30; iter++ ) {
-                
-        CLLocationDirection angle = (CLLocationDirection)((drand48()*1080.0) - 540.0);
-        
-        NSString *activityTitle = [NSString stringWithFormat:@"Rotate to: %0.1f from: %0.1f", angle, lastAngle];
-        [XCTContext runActivityNamed:activityTitle
-                               block:^(id<XCTActivity>  _Nonnull activity) {
-                                   [self internalTestSelecting:annotation whenMapIsRotatedTo:angle];
-                               }];
-        
-        lastAngle = angle;
-    }
-                               
-    annotation = nil;
+    return copiedAnnotations;
 }
 
-- (void)internalTestSelecting:(MGLPointAnnotation*)point whenMapIsRotatedTo:(CLLocationDirection)angle {
+- (void)internalTestSelecting:(MGLPointAnnotation*)point withCamera:(MGLMapCamera*)camera {
     
-    CGPoint anchor = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
-    MGLMapCamera *toCamera = [self.mapView cameraByRotatingToDirection:angle aroundAnchorPoint:anchor];
-
     // Rotate
     XCTestExpectation *rotationCompleted = [self expectationWithDescription:@"rotationCompleted"];
-    [self.mapView setCamera:toCamera withDuration:0.1 animationTimingFunction:nil completionHandler:^{
+    [self.mapView setCamera:camera withDuration:0.1 animationTimingFunction:nil completionHandler:^{
         [rotationCompleted fulfill];
     }];
     
@@ -574,32 +708,41 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     [self waitForCollisionDetectionToRun];
     
     // Look up annotation at point
-    CGPoint annotationPoint = [self.mapView convertCoordinate:point.coordinate toPointToView:self.mapView];
-    
-    MGLAnnotationTag tagAtPoint = [self.mapView annotationTagAtPoint:annotationPoint persistingResults:YES];
-    if (tagAtPoint != UINT32_MAX)
-    {
-        id <MGLAnnotation> annotation = [self.mapView annotationWithTag:tagAtPoint];
-        XCTAssertNotNil(annotation);
-        
-        // Select
-        XCTestExpectation *selectionCompleted = [self expectationWithDescription:@"Selection completed"];
-        [self.mapView selectAnnotation:annotation moveIntoView:NO animateSelection:NO completionHandler:^{
-            [selectionCompleted fulfill];
-        }];
-        
-        [self waitForExpectations:@[selectionCompleted] timeout:0.05];
+    [self internalSelectDeselectAnnotation:point];
+}
 
-        XCTAssert(self.mapView.selectedAnnotations.count == 1, @"There should only be 1 selected annotation");
-        XCTAssertEqualObjects(self.mapView.selectedAnnotations.firstObject, annotation, @"The annotation should be selected");
-        
-        // Deselect
-        [self.mapView deselectAnnotation:annotation animated:NO];
-    }
-    else
-    {
-        XCTFail(@"Should be an annotation at this point: %@", NSStringFromCGPoint(annotationPoint));
-    }
+- (void)internalSelectDeselectAnnotation:(MGLPointAnnotation*)point {
+    [XCTContext runActivityNamed:[NSString stringWithFormat:@"Select annotation: %@", point]
+                           block:^(id<XCTActivity>  _Nonnull activity)
+     {
+         CGPoint annotationPoint = [self.mapView convertCoordinate:point.coordinate toPointToView:self.mapView];
+         
+         MGLAnnotationTag tagAtPoint = [self.mapView annotationTagAtPoint:annotationPoint persistingResults:YES];
+         if (tagAtPoint != UINT32_MAX)
+         {
+             id <MGLAnnotation> annotation = [self.mapView annotationWithTag:tagAtPoint];
+             XCTAssertNotNil(annotation);
+             
+             // Select
+             XCTestExpectation *selectionCompleted = [self expectationWithDescription:@"Selection completed"];
+             [self.mapView selectAnnotation:annotation moveIntoView:NO animateSelection:NO completionHandler:^{
+                 [selectionCompleted fulfill];
+             }];
+             
+             [self waitForExpectations:@[selectionCompleted] timeout:0.05];
+             
+             XCTAssert(self.mapView.selectedAnnotations.count == 1, @"There should only be 1 selected annotation");
+             XCTAssertEqualObjects(self.mapView.selectedAnnotations.firstObject, annotation, @"The annotation should be selected");
+             
+             // Deselect
+             [self.mapView deselectAnnotation:annotation animated:NO];
+         }
+         else
+         {
+             XCTFail(@"Should be an annotation at this point: %@", NSStringFromCGPoint(annotationPoint));
+         }
+     }];
+    
 }
 
 #pragma mark - Utilities
