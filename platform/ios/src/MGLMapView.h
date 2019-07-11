@@ -1,9 +1,9 @@
-#import "MGLGeometry.h"
-#import "MGLMapCamera.h"
-
 #import <UIKit/UIKit.h>
 
+#import "MGLCompassButton.h"
 #import "MGLFoundation.h"
+#import "MGLGeometry.h"
+#import "MGLMapCamera.h"
 #import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -122,7 +122,6 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapView
 
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLMissingLocationServicesUsageDescriptionException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUserLocationAnnotationTypeException;
-FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
 
 /**
  An interactive, customizable map view with an interface similar to the one
@@ -316,7 +315,7 @@ MGL_EXPORT
  A control indicating the map’s direction and allowing the user to manipulate
  the direction, positioned in the upper-right corner.
  */
-@property (nonatomic, readonly) UIImageView *compassView;
+@property (nonatomic, readonly) MGLCompassButton *compassView;
 
 /**
  The position of the compass view. The default value is `MGLOrnamentPositionTopRight`.

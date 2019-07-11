@@ -1,6 +1,9 @@
 #import "UIImage+MGLAdditions.h"
+#import "NSBundle+MGLAdditions.h"
 
 #include <mbgl/util/image+MGLAdditions.hpp>
+
+const MGLExceptionName MGLResourceNotFoundException = @"MGLResourceNotFoundException";
 
 @implementation UIImage (MGLAdditions)
 
@@ -42,7 +45,20 @@
                                                 float(self.scale), isTemplate);
 }
 
--(mbgl::PremultipliedImage)mgl_premultipliedImage {
+- (mbgl::PremultipliedImage)mgl_premultipliedImage {
     return MGLPremultipliedImageFromCGImage(self.CGImage);
 }
+
++ (UIImage *)mgl_resourceImageNamed:(NSString *)imageName {
+    UIImage *image = [UIImage imageNamed:imageName
+                                inBundle:[NSBundle mgl_frameworkBundle]
+           compatibleWithTraitCollection:nil];
+
+    if (!image) {
+        [NSException raise:MGLResourceNotFoundException format:@"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
+    }
+
+    return image;
+}
+
 @end

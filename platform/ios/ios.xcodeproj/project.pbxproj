@@ -372,6 +372,8 @@
 		9620BB3B1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
 		9621F2502091020E005B3800 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96381C0222C6F3950053497D /* MGLMapViewPitchTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96381C0122C6F3950053497D /* MGLMapViewPitchTests.m */; };
+		9641771F22D546DA00332422 /* MGLCompassButton_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9641771E22D546DA00332422 /* MGLCompassButton_Private.h */; };
+		9641772022D546DA00332422 /* MGLCompassButton_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9641771E22D546DA00332422 /* MGLCompassButton_Private.h */; };
 		9654C1261FFC1AB900DB6A19 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
 		9654C1291FFC1CCD00DB6A19 /* MGLPolygon_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */; };
 		9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */; };
@@ -424,6 +426,11 @@
 		96E516FB20005A4000A02306 /* MGLUserLocationHeadingBeamLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */; };
 		96E516FC20005A4400A02306 /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		96E5170420005A6B00A02306 /* SMCalloutView.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848891CBB037E00AB86E3 /* SMCalloutView.h */; };
+		96E6145622CC135200109F14 /* MGLCompassButtonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E6145522CC135200109F14 /* MGLCompassButtonTests.m */; };
+		96E6145922CC169000109F14 /* MGLCompassButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E6145722CC169000109F14 /* MGLCompassButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96E6145A22CC169000109F14 /* MGLCompassButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E6145722CC169000109F14 /* MGLCompassButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96E6145B22CC169000109F14 /* MGLCompassButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96E6145822CC169000109F14 /* MGLCompassButton.mm */; };
+		96E6145C22CC169000109F14 /* MGLCompassButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96E6145822CC169000109F14 /* MGLCompassButton.mm */; };
 		96ED34DE22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */; };
 		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		9C188C4F2242C95A0022FA55 /* MMEDate.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMEDate.m */; };
@@ -1104,6 +1111,7 @@
 		9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSDKUpdateChecker.h; sourceTree = "<group>"; };
 		9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MGLSDKUpdateChecker.mm; sourceTree = "<group>"; };
 		96381C0122C6F3950053497D /* MGLMapViewPitchTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewPitchTests.m; sourceTree = "<group>"; };
+		9641771E22D546DA00332422 /* MGLCompassButton_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLCompassButton_Private.h; sourceTree = "<group>"; };
 		9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolyline_Private.h; sourceTree = "<group>"; };
 		9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolygon_Private.h; sourceTree = "<group>"; };
 		9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewScaleBarTests.m; sourceTree = "<group>"; };
@@ -1132,6 +1140,9 @@
 		96E0272C1E57C7E5004B8E66 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E0272D1E57C7E6004B8E66 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E0272E1E57C7E7004B8E66 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		96E6145522CC135200109F14 /* MGLCompassButtonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLCompassButtonTests.m; sourceTree = "<group>"; };
+		96E6145722CC169000109F14 /* MGLCompassButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLCompassButton.h; sourceTree = "<group>"; };
+		96E6145822CC169000109F14 /* MGLCompassButton.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCompassButton.mm; sourceTree = "<group>"; };
 		96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapViewDirectionTests.mm; sourceTree = "<group>"; };
 		96F017292118FBAE00892778 /* MGLMapView_Experimental.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapView_Experimental.h; sourceTree = "<group>"; };
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
@@ -1658,6 +1669,9 @@
 		355ADFF91E9281C300F3939D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				96E6145722CC169000109F14 /* MGLCompassButton.h */,
+				9641771E22D546DA00332422 /* MGLCompassButton_Private.h */,
+				96E6145822CC169000109F14 /* MGLCompassButton.mm */,
 				355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */,
 				355ADFFC1E9281DA00F3939D /* MGLScaleBar.mm */,
 			);
@@ -2026,6 +2040,7 @@
 				DA35A2C31CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m */,
 				35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.mm */,
 				DA35A2C41CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m */,
+				96E6145522CC135200109F14 /* MGLCompassButtonTests.m */,
 				DA35A2A91CCA058D00E826B2 /* MGLCoordinateFormatterTests.m */,
 				3598544C1E1D38AA00B29F84 /* MGLDistanceFormatterTests.m */,
 				6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */,
@@ -2411,6 +2426,7 @@
 				DA35A2BB1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h in Headers */,
 				353933FE1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */,
 				DA8848201CBAFA6200AB86E3 /* MGLOfflinePack_Private.h in Headers */,
+				9641771F22D546DA00332422 /* MGLCompassButton_Private.h in Headers */,
 				DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */,
 				DA8847FA1CBAFA5100AB86E3 /* MGLPolyline.h in Headers */,
 				3566C7711D4A9198008152BC /* MGLSource_Private.h in Headers */,
@@ -2454,6 +2470,7 @@
 				74CB5EC3219B282500102936 /* MGLCircleStyleLayer_Private.h in Headers */,
 				DA8847F01CBAFA5100AB86E3 /* MGLAnnotation.h in Headers */,
 				400533011DB0862B0069F638 /* NSArray+MGLAdditions.h in Headers */,
+				96E6145922CC169000109F14 /* MGLCompassButton.h in Headers */,
 				1F06668A1EC64F8E001C16D7 /* MGLLight.h in Headers */,
 				4049C29D1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
 				40CF6DBB1DAC3C6600A4D18B /* MGLShape_Private.h in Headers */,
@@ -2602,6 +2619,7 @@
 				96E516DE200054F700A02306 /* MGLGeometry_Private.h in Headers */,
 				353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
 				3566C76D1D4A8DFA008152BC /* MGLRasterTileSource.h in Headers */,
+				9641772022D546DA00332422 /* MGLCompassButton_Private.h in Headers */,
 				DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */,
 				DABFB85E1CBE99E500D62B32 /* MGLAnnotation.h in Headers */,
 				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
@@ -2645,6 +2663,7 @@
 				9C6E283922A982670056B7BE /* MMEEventLogReportViewController.h in Headers */,
 				1F6A82A92138871900BA5B41 /* MGLLoggingConfiguration_Private.h in Headers */,
 				DABFB8661CBE99E500D62B32 /* MGLPointAnnotation.h in Headers */,
+				96E6145A22CC169000109F14 /* MGLCompassButton.h in Headers */,
 				96E516E42000560B00A02306 /* MGLComputedShapeSource_Private.h in Headers */,
 				96E516E92000560B00A02306 /* MGLAnnotationImage_Private.h in Headers */,
 				96E516E52000560B00A02306 /* MGLOfflinePack_Private.h in Headers */,
@@ -3240,6 +3259,7 @@
 				40CFA6511D7875BB008103BD /* MGLShapeSourceTests.mm in Sources */,
 				DA35A2C51CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m in Sources */,
 				35B8E08C1D6C8B5100E768D2 /* MGLPredicateTests.mm in Sources */,
+				96E6145622CC135200109F14 /* MGLCompassButtonTests.m in Sources */,
 				96036A0620059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m in Sources */,
 				1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */,
 				DA695426215B1E76002041A4 /* MGLMapCameraTests.m in Sources */,
@@ -3336,6 +3356,7 @@
 				3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */,
 				9C6E282B22A981570056B7BE /* MGLMapboxEvents.m in Sources */,
 				1FCCEC36222605C400302E3B /* MGLSDKMetricsManager.m in Sources */,
+				96E6145B22CC169000109F14 /* MGLCompassButton.mm in Sources */,
 				40834BE71FE05E1800C1BD0D /* MMEAPIClient.m in Sources */,
 				DA8848591CBAFB9800AB86E3 /* MGLMapView.mm in Sources */,
 				DA8848501CBAFB9800AB86E3 /* MGLAnnotationImage.m in Sources */,
@@ -3462,6 +3483,7 @@
 				1FCCEC37222605C400302E3B /* MGLSDKMetricsManager.m in Sources */,
 				9C6E282C22A981580056B7BE /* MGLMapboxEvents.m in Sources */,
 				DAA4E41F1CBB730400178DFB /* MGLMultiPoint.mm in Sources */,
+				96E6145C22CC169000109F14 /* MGLCompassButton.mm in Sources */,
 				DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */,
 				40834C041FE05E1800C1BD0D /* MMELocationManager.m in Sources */,
 				9C6E281F22A980AC0056B7BE /* CLLocation+MMEMobileEvents.m in Sources */,
