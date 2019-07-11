@@ -4,7 +4,8 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
-* Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers. ([#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930))
+- Fixed a map update bug caused by the render tiles and the render passes getting unsynchronized [#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092)
+- Performance improvements for queryRenderedFeatures API and optimization that allocates containers based on a number of rendered layers [#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930)
 - Fixed rendering layers after fill-extrusion regression caused by optimization of fill-extrusion rendering [#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065)
 
 ## 8.2.0-alpha.2 - July 3, 2019
