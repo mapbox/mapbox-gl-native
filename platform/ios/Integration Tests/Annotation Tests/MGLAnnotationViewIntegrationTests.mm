@@ -608,7 +608,15 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
 }
 
 
+- (void)testShowingAnnotationsThenSelectingAnimated {
+    [self internalTestShowingAnnotationsThenSelectingAnimated:YES];
+}
+
 - (void)testShowingAnnotationsThenSelecting {
+    [self internalTestShowingAnnotationsThenSelectingAnimated:NO];
+}
+
+- (void)internalTestShowingAnnotationsThenSelectingAnimated:(BOOL)animated {
     CLLocationCoordinate2D coordinates[21];
     srand48(0);
     
@@ -633,13 +641,15 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
 
     [self.mapView showAnnotations:annotations
                       edgePadding:edgeInsets
-                         animated:YES
+                         animated:animated
                 completionHandler:^{
                     [showCompleted fulfill];
                 }];
     
     [self waitForExpectations:@[showCompleted] timeout:3.5];
-    
+  
+    // These tests will fail if this isn't here. But this isn't quite what we're
+    // seeing in https://github.com/mapbox/mapbox-gl-native/issues/15106
     [self waitForCollisionDetectionToRun];
     
     for (MGLPointAnnotation *point in annotations) {
