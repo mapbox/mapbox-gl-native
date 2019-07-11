@@ -21,6 +21,8 @@
 
 @interface MGLMapView (Tests)
 - (MGLAnnotationTag)annotationTagAtPoint:(CGPoint)point persistingResults:(BOOL)persist;
+- (id <MGLAnnotation>)annotationWithTag:(MGLAnnotationTag)tag;
+- (MGLMapCamera *)cameraByRotatingToDirection:(CLLocationDirection)degrees aroundAnchorPoint:(CGPoint)anchorPoint;
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 @end
 
@@ -500,6 +502,104 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     
     XCTAssertEqual(originalFrame.origin.x + offset.x, offsetFrame.origin.x);
     XCTAssertEqual(originalFrame.origin.y + offset.y, offsetFrame.origin.y);
+}
+
+- (void)testSelectingAnnotationWhenMapIsRotated {
+    
+    __block MGLPointAnnotation *annotation;
+    
+    [XCTContext runActivityNamed:@"Map setup"
+                           block:^(id<XCTActivity>  _Nonnull activity)
+     {
+         
+         NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
+         
+         CGSize annotationSize = CGSizeMake(40.0, 40.0);
+         
+         self.viewForAnnotation = ^MGLAnnotationView*(MGLMapView *view, id<MGLAnnotation> annotation2) {
+             
+             if (![annotation2 isKindOfClass:[MGLPointAnnotation class]]) {
+                 return nil;
+             }
+             
+             // No dequeue
+             MGLAnnotationView *annotationView = [[MGLAnnotationView alloc] initWithAnnotation:annotation2 reuseIdentifier:MGLTestAnnotationReuseIdentifer];
+             annotationView.bounds             = (CGRect){ .origin = CGPointZero, .size = annotationSize };
+             annotationView.backgroundColor    = UIColor.redColor;
+             annotationView.enabled            = YES;
+             
+             return annotationView;
+         };
+         
+         annotation = [[MGLPointAnnotation alloc] init];
+         annotation.title = NSStringFromSelector(_cmd);
+         annotation.coordinate = CLLocationCoordinate2DMake(40.0, 40.0);
+         [self.mapView addAnnotation:annotation];
+     }];
+
+    // Rotate
+    CLLocationDirection lastAngle = 0.0;
+    
+    srand48(0);
+    for (NSInteger iter = 0; iter < 30; iter++ ) {
+                
+        CLLocationDirection angle = (CLLocationDirection)((drand48()*1080.0) - 540.0);
+        
+        NSString *activityTitle = [NSString stringWithFormat:@"Rotate to: %0.1f from: %0.1f", angle, lastAngle];
+        [XCTContext runActivityNamed:activityTitle
+                               block:^(id<XCTActivity>  _Nonnull activity) {
+                                   [self internalTestSelecting:annotation whenMapIsRotatedTo:angle];
+                               }];
+        
+        lastAngle = angle;
+    }
+                               
+    annotation = nil;
+}
+
+- (void)internalTestSelecting:(MGLPointAnnotation*)point whenMapIsRotatedTo:(CLLocationDirection)angle {
+    
+    CGPoint anchor = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
+    MGLMapCamera *toCamera = [self.mapView cameraByRotatingToDirection:angle aroundAnchorPoint:anchor];
+
+    // Rotate
+    XCTestExpectation *rotationCompleted = [self expectationWithDescription:@"rotationCompleted"];
+    [self.mapView setCamera:toCamera withDuration:0.1 animationTimingFunction:nil completionHandler:^{
+        [rotationCompleted fulfill];
+    }];
+    
+    [self waitForExpectations:@[rotationCompleted] timeout:1.5];
+    
+    // Collision detection may not have completed, if not we may not get our annotation.
+    [self waitForCollisionDetectionToRun];
+    
+    // Look up annotation at point
+    CGPoint annotationPoint = [self.mapView convertCoordinate:point.coordinate toPointToView:self.mapView];
+    
+    MGLAnnotationTag tagAtPoint = [self.mapView annotationTagAtPoint:annotationPoint persistingResults:YES];
+    if (tagAtPoint != UINT32_MAX)
+    {
+        id <MGLAnnotation> annotation = [self.mapView annotationWithTag:tagAtPoint];
+        XCTAssertNotNil(annotation);
+        
+        // Select
+        XCTestExpectation *selectionCompleted = [self expectationWithDescription:@"Selection completed"];
+        [self.mapView selectAnnotation:annotation moveIntoView:NO animateSelection:NO completionHandler:^{
+            [selectionCompleted fulfill];
+        }];
+        
+        [self waitForExpectations:@[selectionCompleted] timeout:0.05];
+
+        XCTAssert(self.mapView.selectedAnnotations.count == 1, @"There should only be 1 selected annotation");
+        XCTAssertEqualObjects(self.mapView.selectedAnnotations.firstObject, annotation, @"The annotation should be selected");
+        
+        // Deselect
+        [self.mapView deselectAnnotation:annotation animated:NO];
+    }
+    else
+    {
+        XCTFail(@"Should be an annotation at this point: %@", NSStringFromCGPoint(annotationPoint));
+    }
 }
 
 #pragma mark - Utilities
