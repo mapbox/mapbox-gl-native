@@ -45,6 +45,7 @@ workflows:
       - linux-doxygen
       - linux-render-tests
       - ios-debug
+      - ios-debug-xcode11
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -72,6 +73,7 @@ workflows:
       - ios-sanitize-nightly
       - ios-sanitize-address-nightly
       - ios-static-analyzer-nightly
+      - ios-static-analyzer-nightly-xcode11
 
 commands:
   npm-install:
@@ -974,6 +976,32 @@ jobs:
       - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
+  ios-debug-xcode11:
+    macos:
+      xcode: "11.0.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+    steps:
+      - install-macos-dependencies
+      - install-dependencies
+      - build-ios-test
+      - check-public-symbols
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
+      - run:
+          name: Lint podspecs and plist files
+          command: make ios-lint
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
   metrics-nightly:
     docker:
       - image: mbgl/linux-gcc-5:54f59e3ac5
@@ -1036,6 +1064,26 @@ jobs:
   ios-static-analyzer-nightly:
     macos:
       xcode: "10.3.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      SLACK_CHANNEL: C0ACM9Q2C
+    steps:
+      - install-macos-dependencies
+      - install-dependencies
+      - run:
+          name: Build and run SDK unit tests with the static analyzer
+          command: make ios-static-analyzer
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+      - notify-slack-nightly-failure
+
+# ------------------------------------------------------------------------------
+  ios-static-analyzer-nightly-xcode11:
+    macos:
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
