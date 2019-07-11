@@ -1324,13 +1324,12 @@ public class Expression {
    * {@code
    * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
    * symbolLayer.setProperties(
-   *     textColor(
-   *         match(get("keyToValue"),
-   *             literal(1), rgba(255, 0, 0, 1.0f),
-   *             literal(2), rgba(0, 0, 255.0f, 1.0f),
-   *             rgba(0.0f, 255.0f, 0.0f, 1.0f)
-   *         )
+   *   textColor(
+   *     match(get("keyToValue"), rgba(0.0f, 255.0f, 0.0f, 1.0f),
+   *       stop(1f, rgba(255, 0, 0, 1.0f)),
+   *       stop(2f, rgba(0, 0, 255.0f, 1.0f))
    *     )
+   *   )
    * );
    * }
    * </pre>
