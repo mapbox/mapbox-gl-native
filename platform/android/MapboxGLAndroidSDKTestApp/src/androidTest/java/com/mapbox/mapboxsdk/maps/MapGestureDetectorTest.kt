@@ -158,4 +158,29 @@ class MapGestureDetectorTest : BaseTest() {
       Assert.assertEquals(initialZoom!!, mapboxMap.cameraPosition.zoom, 0.01)
     }
   }
+
+  @Test
+  fun doubleTap_interrupted_moveStillEnabled() {
+    validateTestSetup()
+
+    rule.runOnUiThread {
+      mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4.0))
+    }
+
+    onView(withId(R.id.mapView)).perform(quickScale(mapboxMap.gesturesManager.standardScaleGestureDetector.spanSinceStartThreshold / 2, withVelocity = false, duration = 50L, interrupt = true))
+
+    var expectedTarget: LatLng? = null
+    rule.runOnUiThread {
+      val currentPoint = mapboxMap.projection.toScreenLocation(mapboxMap.cameraPosition.target)
+      val resultingPoint = PointF(currentPoint.x + maxWidth / 2f, currentPoint.y + maxHeight / 2f)
+      expectedTarget = mapboxMap.projection.fromScreenLocation(resultingPoint)
+    }
+
+    // move to expected target
+    onView(withId(R.id.mapView)).perform(move(-maxWidth / 2f, -maxHeight / 2f, withVelocity = false))
+    rule.runOnUiThread {
+      Assert.assertEquals(expectedTarget!!.latitude, mapboxMap.cameraPosition.target.latitude, 10.0)
+      Assert.assertEquals(expectedTarget!!.longitude, mapboxMap.cameraPosition.target.longitude, 10.0)
+    }
+  }
 }
