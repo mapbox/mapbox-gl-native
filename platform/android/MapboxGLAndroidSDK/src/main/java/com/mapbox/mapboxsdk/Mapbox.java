@@ -85,7 +85,7 @@ public final class Mapbox {
   /**
    * Set the current active accessToken.
    */
-  public static void setAccessToken(@Nullable String accessToken) {
+  public static void setAccessToken(String accessToken) {
     validateMapbox();
     INSTANCE.accessToken = accessToken;
 
