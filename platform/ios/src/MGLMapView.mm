@@ -215,8 +215,6 @@ public:
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
-// jk
-@property (nonatomic) NSMutableArray<UIGestureRecognizer *> *activeGestureRecognizers;
 
 @property (nonatomic) UIInterfaceOrientation currentOrientation;
 @property (nonatomic) UIInterfaceOrientationMask applicationSupportedInterfaceOrientations;
@@ -608,8 +606,6 @@ public:
     _singleTapGestureRecognizer.delegate = self;
     [_singleTapGestureRecognizer requireGestureRecognizerToFail:_quickZoom];
     [self addGestureRecognizer:_singleTapGestureRecognizer];
-
-    _activeGestureRecognizers = [[NSMutableArray alloc] init];
 
     // observe app activity
     //
@@ -1623,12 +1619,11 @@ public:
     MGLMapCamera *oldCamera = self.camera;
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGesturePinch;
-    
+
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         self.scale = powf(2, [self zoomLevel]);
 
-        [self.activeGestureRecognizers addObject:pinch];
         [self notifyGestureDidBegin];
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
@@ -1657,7 +1652,6 @@ public:
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
-        [self.activeGestureRecognizers removeObject:pinch];
 
         CGFloat velocity = pinch.velocity;
         if (isnan(velocity))
@@ -1719,16 +1713,17 @@ public:
     if ( ! self.isRotateEnabled) return;
 
     [self cancelTransitions];
- // jk - Detect which gesture is happening more/simulataneously
-    // jk - this makes the annotations rotation while the map does not.
-    self.currentRotation += abs(rotate.rotation);
-    if ( self.currentRotation < 30 ) {
-        NSLog(@"%f", rotate.rotation);
+
+    
+    // custom gesture recognizer? we need to delay the gesture recognizer. I could set a threshold for the recognizer, and once it has been met keep going.
+    // Why shouldn't I concatenate the rotation value? What bad thing happens? Help...
+
+    if ( MGLDegreesFromRadians(self.currentRotation) < 30) {
         rotate.delaysTouchesBegan = YES;
+        self.currentRotation += abs(rotate.rotation);
         rotate.rotation = 0;
-        NSLog(@"currentrotation %f", self.currentRotation);
-        return;
     }
+
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
     MGLMapCamera *oldCamera = self.camera;
 
@@ -1736,6 +1731,7 @@ public:
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
+        
         self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
 
         if (self.userTrackingMode != MGLUserTrackingModeNone)
@@ -1744,24 +1740,10 @@ public:
         }
 
         self.shouldTriggerHapticFeedbackForCompass = NO;
-        [self.activeGestureRecognizers addObject:rotate];
         [self notifyGestureDidBegin];
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        if (self.mbglMap.isRotating()) {
-            NSLog(@"MAP IS SCALING JK");
-        }
-        /* jk - once map view does start rotating, it is jumpy. Also, this happens whenever I rotate, not just when zooming.
-         The delay should only happen if a rotate starts while zooming.
-        */
-//        self.currentRotation += self.rotate.rotation;
-//        if ( std::abs(self.currentRotation) < 3 && [self.activeGestureRecognizers containsObject:self.pinch]) {
-//            NSLog(@"ROTATION: %f", rotate.rotation);
-//            rotate.delaysTouchesBegan = YES;
-//            return;
-//        }
-        
         CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
 
         // constrain to +/-30 degrees when merely rotating like Apple does
@@ -1802,11 +1784,10 @@ public:
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
-        [self.activeGestureRecognizers removeObject:rotate];
         CGFloat velocity = rotate.velocity;
         CGFloat decelerationRate = self.decelerationRate;
         self.currentRotation = 0;
-        
+
         if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
         {
             CGFloat radians = self.angle + rotate.rotation;
