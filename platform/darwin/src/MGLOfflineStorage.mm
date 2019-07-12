@@ -69,9 +69,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     return sharedOfflineStorage;
 }
 
-//- (NSInteger)maximumAmbientCacheSize {
-//    return _
-//}
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 - (void)pauseFileSource:(__unused NSNotification *)notification {
     if (self.isPaused) {
