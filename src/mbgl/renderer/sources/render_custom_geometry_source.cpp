@@ -21,7 +21,10 @@ void RenderCustomGeometrySource::update(Immutable<style::Source::Impl> baseImpl_
                                  const bool needsRendering,
                                  const bool needsRelayout,
                                  const TileParameters& parameters) {
-    std::swap(baseImpl, baseImpl_);
+    if (baseImpl != baseImpl_) {
+        std::swap(baseImpl, baseImpl_);
+        tilePyramid.clearAll();
+    }
 
     enabled = needsRendering;
 
