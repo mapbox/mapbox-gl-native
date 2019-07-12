@@ -1,3 +1,5 @@
+#include <mbgl/util/logging.hpp>
+
 #import "MGLLoggingConfiguration_Private.h"
 
 #ifndef MGL_LOGGING_DISABLED
@@ -5,7 +7,18 @@
 #import <os/log.h>
 #endif
 
-@implementation MGLLoggingConfiguration
+namespace mbgl {
+    class MGLoggingObserver : public Log :: Observer {
+        bool onRecord(EventSeverity, Event, int64_t, const std::string&) override {
+            return true;
+        }
+    };
+}
+
+
+@implementation MGLLoggingConfiguration{
+    mbgl:: MGLoggingObserver ob;
+}
 
 + (instancetype)sharedConfiguration
 {
@@ -16,6 +29,13 @@
         ((MGLLoggingConfiguration *)sharedConfiguration).handler = nil;
     });
     return sharedConfiguration;
+}
+
+- (id)init{
+    if(self = [super init]){
+        
+    }
+    return self;
 }
 
 - (void)setHandler:(void (^)(MGLLoggingLevel, NSString *, NSUInteger, NSString *))handler {
