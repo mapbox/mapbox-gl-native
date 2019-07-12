@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+### Bugs
+ - Fixed a custom geometry source bug caused by using the outdated tiles after style update [#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112)
+
 ## 8.2.0-alpha.3 - July 11, 2019
 
 ### Bugs
