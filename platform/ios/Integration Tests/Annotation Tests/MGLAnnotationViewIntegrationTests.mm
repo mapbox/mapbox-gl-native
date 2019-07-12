@@ -620,7 +620,7 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     CLLocationCoordinate2D coordinates[21];
     srand48(0);
     
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < (int)(sizeof(coordinates)/sizeof(coordinates[0])); i++)
     {
         coordinates[i].latitude = drand48();
         coordinates[i].longitude = drand48();
