@@ -8,8 +8,11 @@
 - (void)resetNorthAnimated:(BOOL)animated;
 @end
 
-@interface UIRotationGestureRecognizer (MGLMapViewDirectionTests)
-@property (nonatomic, readwrite) UIGestureRecognizerState state;
+@interface UIRotationGestureRecognizerMock : UIRotationGestureRecognizer
+@end
+
+@implementation UIRotationGestureRecognizerMock
+- (CGPoint)locationInView:(nullable UIView*)view { return view.center; }
 @end
 
 @interface MGLMapViewDirectionTests : XCTestCase
@@ -38,22 +41,28 @@
     XCTAssertEqual(self.mapView.direction, 0, @"Rotation is not allowed at world-scale zoom levels.");
 
     self.mapView.zoomLevel = 15;
+    CLLocationCoordinate2D originalCenterCoordinate = self.mapView.centerCoordinate;
 
     for (NSNumber *degrees in @[@-999, @-359, @-240, @-180, @-90, @-45, @0, @45, @90, @180, @240, @360, @999]) {
         double inputDegrees = [degrees doubleValue];
         double wrappedDegrees = mbgl::util::wrap(inputDegrees, 0., 360.);
         self.mapView.direction = inputDegrees;
         XCTAssertEqualWithAccuracy(self.mapView.direction, wrappedDegrees, 0.001);
+
+        XCTAssertEqual(originalCenterCoordinate.latitude, self.mapView.centerCoordinate.latitude, "@Map center coordinate latitude should remain constant when direction is set to %@°.", degrees);
+        XCTAssertEqual(originalCenterCoordinate.longitude, self.mapView.centerCoordinate.longitude, @"Map center coordinate longitude should remain constant when direction is set to %@°.", degrees);
     }
 
     [self.mapView resetNorthAnimated:NO];
     XCTAssertEqual(self.mapView.direction, 0, @"Reset-to-north should set direction to 0°.");
+    XCTAssertEqual(originalCenterCoordinate.latitude, self.mapView.centerCoordinate.latitude, "@Map center coordinate latitude should remain constant when direction is reset.");
+    XCTAssertEqual(originalCenterCoordinate.longitude, self.mapView.centerCoordinate.longitude, @"Map center coordinate latitude should remain constant when direction is reset.");
 }
 
 - (void)testRotateEnabled {
     self.mapView.zoomLevel = 10;
 
-    UIRotationGestureRecognizer *gesture = [[UIRotationGestureRecognizer alloc] initWithTarget:nil action:nil];
+    UIRotationGestureRecognizerMock *gesture = [[UIRotationGestureRecognizerMock alloc] initWithTarget:nil action:nil];
     gesture.state = UIGestureRecognizerStateBegan;
     gesture.rotation = MGLRadiansFromDegrees(30);
     CGFloat wrappedRotation = mbgl::util::wrap(-MGLDegreesFromRadians(gesture.rotation), 0., 360.);
@@ -85,10 +94,12 @@
 
 - (void)testRotationGesture {
     self.mapView.zoomLevel = 15;
+    CLLocationCoordinate2D originalCenterCoordinate = self.mapView.centerCoordinate;
 
-    UIRotationGestureRecognizer *gesture = [[UIRotationGestureRecognizer alloc] initWithTarget:nil action:nil];
+    UIRotationGestureRecognizerMock *gesture = [[UIRotationGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
     gesture.state = UIGestureRecognizerStateBegan;
     gesture.rotation = 0;
+    [self.mapView addGestureRecognizer:gesture];
     [self.mapView handleRotateGesture:gesture];
     XCTAssertEqual(self.mapView.direction, gesture.rotation);
 
@@ -98,6 +109,11 @@
         [self.mapView handleRotateGesture:gesture];
         CGFloat wrappedRotation = mbgl::util::wrap(-MGLDegreesFromRadians(gesture.rotation), 0., 360.);
         XCTAssertEqualWithAccuracy(self.mapView.direction, wrappedRotation, 0.001, @"Map direction should match gesture rotation for input of %@°.", degrees);
+
+        // Given a hypothetical rotation around the exact center of the map, the center coordinate should remain the same.
+        // See above where we override -[UIRotationGestureRecognizer locationInView:] to always return the center of the target view.
+        XCTAssertEqualWithAccuracy(originalCenterCoordinate.latitude, self.mapView.centerCoordinate.latitude, 0.0000001, "@Map center coordinate latitude should remain constant during rotation of %@°.", degrees);
+        XCTAssertEqualWithAccuracy(originalCenterCoordinate.longitude, self.mapView.centerCoordinate.longitude, 0.0000001, @"Map center coordinate longitude should remain constant during rotation of %@°.", degrees);
     }
 }
 
