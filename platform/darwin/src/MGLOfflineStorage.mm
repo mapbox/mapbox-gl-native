@@ -509,7 +509,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 #pragma mark - Ambient Cache management
 
-- (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCallback:(void (^)(NSError  * _Nullable))completion {
+- (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCompletionHandler:(void (^)(NSError  * _Nullable))completion {
     _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
@@ -525,7 +525,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     });
 }
 
-- (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable))completion {
+- (void)invalidateAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable))completion {
     _mbglFileSource->invalidateAmbientCache([&, completion](std::exception_ptr exception){
         NSError *error;
         if (exception) {
@@ -542,7 +542,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     });
 }
 
-- (void)clearAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion {
+- (void)clearAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable error))completion {
     _mbglFileSource->clearAmbientCache([&, completion](std::exception_ptr exception){
         NSError *error;
         if (exception) {

@@ -379,7 +379,7 @@ MGL_EXPORT
  has been set. This handler is executed synchronously on the main queue.
  */
 
-- (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCallback:(void (^)(NSError *_Nullable error))completion;
+- (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 /**
  Checks that the tiles in the ambient cache match those from the server. Local
@@ -394,7 +394,7 @@ MGL_EXPORT
  been revalidated. This handler is executed asynchronously on the main queue.
  */
 
-- (void)invalidateAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
+- (void)invalidateAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 /**
  Erase resources from the ambient cache.
@@ -406,7 +406,7 @@ MGL_EXPORT
  cleared. This handler is executed asynchronously on the main queue.
  */
 
-- (void)clearAmbientCacheWithCompletion:(void (^)(NSError *_Nullable error))completion;
+- (void)clearAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 /**
  Delete the existing database, which includes both the ambient cache and offline packs,

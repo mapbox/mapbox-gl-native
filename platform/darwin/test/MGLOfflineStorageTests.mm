@@ -228,17 +228,17 @@
 
 - (void)testSetMaximumAmbientCache {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Expect maximum cache size to be raised without an error."];
-    [[MGLOfflineStorage sharedOfflineStorage] setMaximumAmbientCacheSize:500000 withCallback:^(NSError * _Nullable error) {
+    [[MGLOfflineStorage sharedOfflineStorage] setMaximumAmbientCacheSize:0 withCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:20 handler:nil];
+    [self waitForExpectationsWithTimeout:30 handler:nil];
 }
 
 - (void)testInvalidateAmbientCache {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Expect cache to be invalidated without an error."];
-    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
@@ -247,7 +247,7 @@
 
 - (void)testClearCache {
     XCTestExpectation *expectation = [self expectationWithDescription:@"Expect cache to be cleared without an error."];
-    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletion:^(NSError * _Nullable error) {
+    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
