@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
  In addition to the JSON stylesheet, different styles may require different font
  glyphs, sprite sheets, and other resources.
  
- The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s
- map ID (`mapbox://styles/{user}/{style}`).
+ The URL may be a full HTTP or HTTPS URL or a Mapbox
+ style URL (`mapbox://styles/{user}/{style}`).
  */
 @property (nonatomic, readonly) NSURL *styleURL;
 

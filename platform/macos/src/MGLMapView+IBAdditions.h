@@ -21,8 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** URL of the style currently displayed in the receiver.
 
-    The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
-    map ID (`mapbox://styles/<user>/<style>`), or a path to a local file
+    The URL may be a full HTTP or HTTPS URL, a Mapbox
+    style URL (`mapbox://styles/<user>/<style>`), or a path to a local file
     relative to the application’s resource path. Leave this field blank for the
     default style. */
 @property (nonatomic, nullable) IBInspectable NSString *styleURL__;
