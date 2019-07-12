@@ -233,7 +233,7 @@
         [expectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:10 handler:nil];
+    [self waitForExpectationsWithTimeout:20 handler:nil];
 }
 
 - (void)testInvalidateAmbientCache {
@@ -251,7 +251,7 @@
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10 handler:nil];
+    [self waitForExpectationsWithTimeout:20 handler:nil];
 }
 
 - (void)testResetDatabase {
@@ -260,7 +260,7 @@
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:20 handler:nil];
 }
 
 - (void)testBackupExclusion {
