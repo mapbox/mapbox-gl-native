@@ -517,7 +517,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
-        if (!completion) {
+        if (completion) {
             dispatch_sync(dispatch_get_main_queue(), ^ {
                 completion(error);
             });
