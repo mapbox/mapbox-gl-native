@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.ZOOM_RATE;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
@@ -558,7 +560,9 @@ final class MapGestureDetector {
       double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
       double currentZoom = transform.getRawZoom();
       PointF focalPoint = getScaleFocalPoint(detector);
-      long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
+      // (log(x + 1 / e^2) + 2) * 150, x=0 to 2.5 (MapboxConstants#MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE)
+      long animationTime = (long) ((Math.log((Math.abs(zoomAddition)) + 1 / Math.pow(Math.E, 2)) + 2)
+        * SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER);
       scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, focalPoint, animationTime);
       scheduleAnimator(scaleAnimator);
     }
@@ -578,7 +582,8 @@ final class MapGestureDetector {
     }
 
     private double calculateScale(double velocityXY, boolean isScalingOut) {
-      double zoomAddition = (float) Math.log(velocityXY / 1000 + 1);
+      double zoomAddition = velocityXY * MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE * 1e-4;
+      zoomAddition = MathUtils.clamp(zoomAddition, 0, MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE);
       if (isScalingOut) {
         zoomAddition = -zoomAddition;
       }
