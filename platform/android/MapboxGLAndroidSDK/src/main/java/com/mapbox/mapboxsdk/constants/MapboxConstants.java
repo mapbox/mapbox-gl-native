@@ -79,6 +79,16 @@ public class MapboxConstants {
   public static final float ROTATION_THRESHOLD_INCREASE_WHEN_SCALING = 25f;
 
   /**
+   * Maximum absolute zoom change for multi-pointer scale velocity animation
+   */
+  public static final double MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE = 2.5;
+
+  /**
+   * Scale velocity animation duration multiplier.
+   */
+  public static final double SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER = 150;
+
+  /**
    * Time within which user needs to lift fingers for velocity animation to start.
    */
   public static final long SCHEDULED_ANIMATION_TIMEOUT = 150L;
