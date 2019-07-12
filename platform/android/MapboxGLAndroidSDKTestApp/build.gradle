@@ -47,11 +47,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
         }
+        monkey {
+            initWith debug
+        }
     }
 
     dexOptions {
-        maxProcessCount 8
-        javaMaxHeapSize "2g"
+        maxProcessCount 16
+        javaMaxHeapSize "4g"
         preDexLibraries true
     }
 }
@@ -70,6 +73,7 @@ dependencies {
     implementation dependenciesList.gmsLocation
     implementation dependenciesList.timber
     debugImplementation dependenciesList.leakCanaryDebug
+    monkeyImplementation dependenciesList.leakCanaryRelease
     releaseImplementation dependenciesList.leakCanaryRelease
 
     androidTestImplementation dependenciesList.supportAnnotations
@@ -86,8 +90,7 @@ apply from: "${rootDir}/gradle/gradle-make.gradle"
 apply from: "${rootDir}/gradle/gradle-config.gradle"
 apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
 apply from: "${rootDir}/gradle/gradle-lint.gradle"
-
-
+apply from: "${rootDir}/gradle/monkey-runner.gradle"
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'

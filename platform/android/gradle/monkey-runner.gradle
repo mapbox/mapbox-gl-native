@@ -1,0 +1,5 @@
+task runMonkey(type: Exec) {
+    dependsOn 'installMonkey'
+    commandLine "adb shell monkey -p com.mapbox.mapboxsdk.testapp -c android.intent.category.LAUNCHER 1".split(" ")
+    commandLine "adb", "shell", "monkey", "-p", "com.mapbox.mapboxsdk.testapp", "-v", "--pct-nav", "10", "--pct-syskeys", "2", "--pct-anyevent", "2", "--pct-touch", "44", "--pct-motion", "40", "--pct-trackball", "2", "--monitor-native-crashes", "20000"
+}

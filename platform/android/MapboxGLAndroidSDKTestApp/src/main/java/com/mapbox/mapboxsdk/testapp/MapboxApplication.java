@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
-
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -12,7 +11,6 @@ import com.mapbox.mapboxsdk.testapp.utils.TileLoadingMeasurementUtils;
 import com.mapbox.mapboxsdk.testapp.utils.TimberLogger;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
-
 import timber.log.Timber;
 
 import static timber.log.Timber.DebugTree;
@@ -60,17 +58,19 @@ public class MapboxApplication extends Application {
   }
 
   private void initializeStrictMode() {
-    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-      .detectDiskReads()
-      .detectDiskWrites()
-      .detectNetwork()
-      .penaltyLog()
-      .build());
-    StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-      .detectLeakedSqlLiteObjects()
-      .penaltyLog()
-      .penaltyDeath()
-      .build());
+    if (isDebugBuild()) {
+      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+        .detectDiskReads()
+        .detectDiskWrites()
+        .detectNetwork()
+        .penaltyLog()
+        .build());
+      StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectLeakedSqlLiteObjects()
+        .penaltyLog()
+        .penaltyDeath()
+        .build());
+    }
   }
 
   private void initializeMapbox() {
@@ -84,12 +84,22 @@ public class MapboxApplication extends Application {
     telemetry.setDebugLoggingEnabled(true);
     TileLoadingMeasurementUtils.setUpTileLoadingMeasurement();
 
-    MapStrictMode.setStrictModeEnabled(true);
+    if (!isMonkeyBuild()) {
+      MapStrictMode.setStrictModeEnabled(true);
+    }
   }
 
   private static void validateAccessToken(String accessToken) {
     if (TextUtils.isEmpty(accessToken) || accessToken.equals(DEFAULT_MAPBOX_ACCESS_TOKEN)) {
       Timber.e(ACCESS_TOKEN_NOT_SET_MESSAGE);
     }
+  }
+
+  private boolean isMonkeyBuild() {
+    return BuildConfig.BUILD_TYPE.contentEquals("monkey");
+  }
+
+  private boolean isDebugBuild() {
+    return BuildConfig.BUILD_TYPE.contentEquals("debug");
   }
 }
