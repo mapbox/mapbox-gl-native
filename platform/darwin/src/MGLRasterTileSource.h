@@ -70,13 +70,13 @@ MGL_EXPORT
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
 
- The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
- Mapbox URL indicating a map identifier (`mapbox://<mapid>`). The URL should
+ The URL may be a full HTTP or HTTPS URL or, for tilesets hosted by Mapbox, a
+ Mapbox URL indicating a tileset ID (`mapbox://<tilesetid>`). The URL should
  point to a JSON file that conforms to the
  <a href="https://github.com/mapbox/tilejson-spec/">TileJSON specification</a>.
 
  If a Mapbox URL is specified, this source uses a tile size of 256. For all
- other tile sets, the default value is 512. (See the
+ other tilesets, the default value is 512. (See the
  `MGLTileSourceOptionTileSize` documentation for more information about tile
  sizes.) If you need to use a tile size other than the default, use the
  `-initWithIdentifier:configurationURL:tileSize:` method.
@@ -96,8 +96,8 @@ MGL_EXPORT
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
 
- The URL may be a full HTTP or HTTPS URL or, for tile sets hosted by Mapbox, a
- Mapbox URL indicating a map identifier (`mapbox://<mapid>`). The URL should
+ The URL may be a full HTTP or HTTPS URL or, for tilesets hosted by Mapbox, a
+ Mapbox URL indicating a tileset ID (`mapbox://<tilesetid>`). The URL should
  point to a JSON file that conforms to the
  <a href="https://github.com/mapbox/tilejson-spec/">TileJSON specification</a>.
 
