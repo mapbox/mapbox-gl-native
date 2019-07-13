@@ -392,6 +392,7 @@
 		9680274022653B84006BA4A1 /* MBXSKUToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 9680273E22653B84006BA4A1 /* MBXSKUToken.h */; };
 		9680276422655696006BA4A1 /* libmbxaccounts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9680274122653C3E006BA4A1 /* libmbxaccounts.a */; };
 		96802766226556C5006BA4A1 /* libmbxaccounts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9680274122653C3E006BA4A1 /* libmbxaccounts.a */; };
+		9686D1BD22D9357700194EA0 /* MGLMapViewZoomTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9686D1BC22D9357700194EA0 /* MGLMapViewZoomTests.m */; };
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
 		96E516DC2000547000A02306 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
@@ -1131,6 +1132,7 @@
 		967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+MGLAdditions.m"; sourceTree = "<group>"; };
 		9680273E22653B84006BA4A1 /* MBXSKUToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBXSKUToken.h; path = "../vendor/mapbox-accounts-ios/MBXSKUToken.h"; sourceTree = "<group>"; };
 		9680274122653C3E006BA4A1 /* libmbxaccounts.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbxaccounts.a; path = "vendor/mapbox-accounts-ios/libmbxaccounts.a"; sourceTree = SOURCE_ROOT; };
+		9686D1BC22D9357700194EA0 /* MGLMapViewZoomTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewZoomTests.m; sourceTree = "<group>"; };
 		968F36B41E4D0FC6003A5522 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027241E57C76E004B8E66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027271E57C77A004B8E66 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -2057,6 +2059,7 @@
 				96381C0122C6F3950053497D /* MGLMapViewPitchTests.m */,
 				9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */,
 				076171C22139C70900668A35 /* MGLMapViewTests.m */,
+				9686D1BC22D9357700194EA0 /* MGLMapViewZoomTests.m */,
 				1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */,
 				96036A0520059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m */,
 				DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */,
@@ -3274,6 +3277,7 @@
 				3575798B1D502B0C000B822E /* MGLBackgroundStyleLayerTests.mm in Sources */,
 				9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */,
 				409D0A0D1ED614CE00C95D0C /* MGLAnnotationViewIntegrationTests.swift in Sources */,
+				9686D1BD22D9357700194EA0 /* MGLMapViewZoomTests.m in Sources */,
 				DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */,
 				55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */,
 				07D8C6FF1F67562C00381808 /* MGLComputedShapeSourceTests.m in Sources */,
