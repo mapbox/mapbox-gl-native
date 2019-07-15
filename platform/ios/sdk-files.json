@@ -92,7 +92,7 @@
         "platform/darwin/src/MGLTypes.m",
         "platform/darwin/src/MGLFillExtrusionStyleLayer.mm",
         "platform/darwin/src/MGLTileSource.mm",
-        "platform/darwin/src/MGLLoggingConfiguration.m",
+        "platform/darwin/src/MGLLoggingConfiguration.mm",
         "platform/ios/src/MGLScaleBar.mm",
         "platform/darwin/src/MGLMapCamera.mm",
         "platform/darwin/src/MGLRasterDEMSource.mm",
