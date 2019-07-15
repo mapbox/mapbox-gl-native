@@ -7,6 +7,7 @@
 
 @implementation MGLNetworkConfigurationTests
 
+// Regression test for https://github.com/mapbox/mapbox-gl-native/issues/14982
 - (void)testAccessingEventsFromMultipleThreads {
     MGLNetworkConfiguration *configuration = [[MGLNetworkConfiguration alloc] init];
     

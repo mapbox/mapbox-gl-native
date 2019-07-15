@@ -67,8 +67,8 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 }
 
 - (void)startDownloadEvent:(NSString *)urlString type:(NSString *)resourceType {
-    NSDate *startDate = [NSDate date];
     if (urlString && ![self eventDictionaryForKey:urlString]) {
+        NSDate *startDate = [NSDate date];
         [self setEventDictionary:@{ MGLStartTime: startDate, MGLResourceType: resourceType } forKey:urlString];
     }
 }
@@ -87,8 +87,11 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
         NSString *urlString = response.URL.relativePath;
         if (urlString && [self eventDictionaryForKey:urlString]) {
             NSDictionary *eventAttributes = [self eventAttributesForURL:response withAction:action];
-            [self.metricsDelegate networkConfiguration:self didGenerateMetricEvent:eventAttributes];
             [self removeEventDictionaryForKey:urlString];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.metricsDelegate networkConfiguration:self didGenerateMetricEvent:eventAttributes];
+            });            
         }
     }
     
