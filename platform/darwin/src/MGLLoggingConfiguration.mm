@@ -11,7 +11,7 @@ namespace mbgl {
     
 class MGLCoreLoggingObserver : public Log :: Observer {
 public:
-    //Filt logs from core
+    //Filter logs from core
     bool onRecord(EventSeverity severity, Event, int64_t, const std::string&) override{
         if(_platformLoggingLevel == MGLLoggingLevelNone){
             return true;
