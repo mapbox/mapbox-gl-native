@@ -340,7 +340,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         NSMutableArray *packs;
         if (!result) {
             NSString *description = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"ADD_FILE_CONTENTS_FAILED_DESC", @"Foundation", nil, @"Unable to add offline packs from the file at %@.", @"User-friendly error description"), filePath];
-            error = [NSError errorWithDomain:MGLErrorDomain code:9 userInfo:@{
+            error = [NSError errorWithDomain:MGLErrorDomain code:10 userInfo:@{
                                                                                NSLocalizedDescriptionKey: description,
                                                                                NSLocalizedFailureReasonErrorKey: @(mbgl::util::toString(result.error()).c_str())
                                                                                }];
@@ -400,7 +400,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         NSError *error;
         if (!mbglOfflineRegion) {
             NSString *errorDescription = @(mbgl::util::toString(mbglOfflineRegion.error()).c_str());
-            error = [NSError errorWithDomain:MGLErrorDomain code:9 userInfo:errorDescription ? @{
+            error = [NSError errorWithDomain:MGLErrorDomain code:10 userInfo:errorDescription ? @{
                 NSLocalizedDescriptionKey: errorDescription,
             } : nil];
         }
@@ -433,7 +433,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     _mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:9 userInfo:@{
+            error = [NSError errorWithDomain:MGLErrorDomain code:10 userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
@@ -456,7 +456,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
     _mbglFileSource->invalidateOfflineRegion(region, [&](std::exception_ptr exception) {
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:9 userInfo:@{
+            error = [NSError errorWithDomain:MGLErrorDomain code:10 userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
@@ -513,7 +513,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     _mbglFileSource->setMaximumAmbientCacheSize(cacheSize, [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:9 userInfo:@{
+            error = [NSError errorWithDomain:MGLErrorDomain code:10 userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
@@ -530,7 +530,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         NSError *error;
         if (exception) {
             // Convert std::exception_ptr to an NSError.
-            error = [NSError errorWithDomain:MGLErrorDomain code:9 userInfo:@{
+            error = [NSError errorWithDomain:MGLErrorDomain code:10 userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
@@ -546,7 +546,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     _mbglFileSource->clearAmbientCache([&, completion](std::exception_ptr exception){
         NSError *error;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:9 userInfo:@{
+            error = [NSError errorWithDomain:MGLErrorDomain code:10 userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
