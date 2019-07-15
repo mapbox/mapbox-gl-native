@@ -167,7 +167,7 @@ void canonicalizeTileset(Tileset& tileset, const std::string& sourceURL, style::
     }
 }
 
-const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT = 6000;
+const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT = 20000;
 
 } // end namespace mapbox
 } // end namespace util
