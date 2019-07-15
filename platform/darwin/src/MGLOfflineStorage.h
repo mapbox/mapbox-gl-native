@@ -383,8 +383,9 @@ MGL_EXPORT
 - (void)setMaximumAmbientCacheSize:(NSUInteger)cacheSize withCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 /**
- Invalidates the ambient cache. Checks that the tiles in the ambient cache match those from the server. Local
- tiles that do not match the latest version on the server are updated.
+ Invalidates the ambient cache. This method checks that the tiles in the
+ ambient cache match those from the server. Local tiles that do not match
+ the latest version on the server are updated.
  
  This is more efficient than cleaning the cache because valid local tiles will
  not be downloaded again.
