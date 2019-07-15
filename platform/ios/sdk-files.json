@@ -65,6 +65,7 @@
         "platform/darwin/src/MGLDistanceFormatter.m",
         "platform/ios/src/MGLMapboxEvents.m",
         "platform/darwin/src/MGLSDKMetricsManager.m",
+        "platform/ios/src/MGLCompassButton.mm",
         "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEAPIClient.m",
         "platform/ios/src/MGLMapView.mm",
         "platform/ios/src/MGLAnnotationImage.m",
@@ -141,6 +142,7 @@
         "MGLStyle.h": "platform/darwin/src/MGLStyle.h",
         "MGLUserLocationAnnotationView.h": "platform/ios/src/MGLUserLocationAnnotationView.h",
         "MGLAnnotation.h": "platform/darwin/src/MGLAnnotation.h",
+        "MGLCompassButton.h": "platform/ios/src/MGLCompassButton.h",
         "MGLLight.h": "platform/darwin/src/MGLLight.h",
         "MGLPointCollection.h": "platform/darwin/src/MGLPointCollection.h",
         "MGLAnnotationView.h": "platform/ios/src/MGLAnnotationView.h",
@@ -195,6 +197,7 @@
     "private_headers": {
         "MGLFillStyleLayer_Private.h": "platform/darwin/src/MGLFillStyleLayer_Private.h",
         "MGLOfflinePack_Private.h": "platform/darwin/src/MGLOfflinePack_Private.h",
+        "MGLCompassButton_Private.h": "platform/ios/src/MGLCompassButton_Private.h",
         "MGLSource_Private.h": "platform/darwin/src/MGLSource_Private.h",
         "MGLAnnotationView_Private.h": "platform/ios/src/MGLAnnotationView_Private.h",
         "MGLValueEvaluator.h": "platform/darwin/src/MGLValueEvaluator.h",
