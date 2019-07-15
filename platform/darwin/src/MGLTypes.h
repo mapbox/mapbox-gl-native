@@ -53,7 +53,9 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     /** Source is in use and cannot be removed */
     MGLErrorCodeSourceIsInUseCannotRemove = 7,
     /** Source is in use and cannot be removed */
-    MGLErrorCodeSourceIdentifierMismatch = 8
+    MGLErrorCodeSourceIdentifierMismatch = 8,
+    /** An error occurred while accessing or modifying the offline database */
+    MGLErrorCodeOfflineDatabase = 9
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */
