@@ -34,6 +34,7 @@ void RenderRasterLayer::evaluate(const PropertyEvaluationParameters& parameters)
         staticImmutableCast<RasterLayer::Impl>(baseImpl),
         unevaluated.evaluate(parameters));
     passes = properties->evaluated.get<style::RasterOpacity>() > 0 ? RenderPass::Translucent : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -74,8 +75,9 @@ static std::array<float, 3> spinWeights(float spin) {
 }
 
 void RenderRasterLayer::prepare(const LayerPrepareParameters& params) {
-    RenderLayer::prepare(params);
+    renderTiles = params.source->getRenderTiles();
     imageData = params.source->getImageRenderData();
+    assert(renderTiles || imageData);
 }
 
 void RenderRasterLayer::render(PaintParameters& parameters) {
@@ -153,8 +155,8 @@ void RenderRasterLayer::render(PaintParameters& parameters) {
                 },
                 bucket.drawScopeID + std::to_string(i++));
         }
-    } else {
-        for (const RenderTile& tile : renderTiles) {
+    } else if (renderTiles) {
+        for (const RenderTile& tile : *renderTiles) {
             auto* bucket_ = tile.getBucket(*baseImpl);
             if (!bucket_) {
                 continue;

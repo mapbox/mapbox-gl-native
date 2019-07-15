@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.location
 
 import android.Manifest
-import android.R
 import android.content.Context
 import android.location.Location
+import android.support.test.annotation.UiThreadTest
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.UiController
@@ -23,8 +23,10 @@ import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.pushSour
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.Matchers.equalTo
@@ -368,7 +370,7 @@ class LocationLayerControllerTest : EspressoTest() {
     executeComponentTest(componentAction)
 
     // Waiting for style to finish loading while pushing updates
-    onView(withId(R.id.content)).check(matches(isDisplayed()))
+    onView(withId(android.R.id.content)).check(matches(isDisplayed()))
   }
 
   @Test
@@ -399,7 +401,7 @@ class LocationLayerControllerTest : EspressoTest() {
     executeComponentTest(componentAction)
 
     // Waiting for style to finish loading while pushing updates
-    onView(withId(R.id.content)).check(matches(isDisplayed()))
+    onView(withId(android.R.id.content)).check(matches(isDisplayed()))
   }
 
   @Test
@@ -534,6 +536,14 @@ class LocationLayerControllerTest : EspressoTest() {
     executeComponentTest(componentAction)
   }
 
+  @Test
+  @UiThreadTest
+  fun test_15026_missingShadowGradientRadius() {
+    // test for https://github.com/mapbox/mapbox-gl-native/issues/15026
+    val shadowDrawable = BitmapUtils.getDrawableFromRes(context, R.drawable.mapbox_user_icon_shadow_0px_test)
+    Utils.generateShadow(shadowDrawable, 0f)
+  }
+
   @After
   override fun afterTest() {
     super.afterTest()
@@ -541,6 +551,6 @@ class LocationLayerControllerTest : EspressoTest() {
   }
 
   private fun executeComponentTest(listener: LocationComponentAction.OnPerformLocationComponentAction) {
-    onView(withId(R.id.content)).perform(LocationComponentAction(mapboxMap, listener))
+    onView(withId(android.R.id.content)).perform(LocationComponentAction(mapboxMap, listener))
   }
 }

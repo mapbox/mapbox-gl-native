@@ -43,7 +43,7 @@ void RenderHeatmapLayer::evaluate(const PropertyEvaluationParameters& parameters
     passes = (properties->evaluated.get<style::HeatmapOpacity>() > 0)
             ? (RenderPass::Translucent | RenderPass::Pass3D)
             : RenderPass::None;
-
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -63,6 +63,7 @@ void RenderHeatmapLayer::upload(gfx::UploadPass& uploadPass) {
 }
 
 void RenderHeatmapLayer::render(PaintParameters& parameters) {
+    assert(renderTiles);
     if (parameters.pass == RenderPass::Opaque) {
         return;
     }
@@ -93,8 +94,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters) {
         auto renderPass = parameters.encoder->createRenderPass(
             "heatmap texture", { *renderTexture, Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {} });
 
-        for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = tile.getLayerRenderData(*baseImpl);
+        for (const RenderTile& tile : *renderTiles) {
+            const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
             if (!renderData) {
                 continue;
             }

@@ -770,6 +770,7 @@ jobs:
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
       - install-macos-dependencies
       - install-node-macos-dependencies
@@ -950,6 +951,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
       - install-macos-dependencies
       - install-dependencies
@@ -990,6 +992,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - install-macos-dependencies
@@ -1013,6 +1016,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - install-macos-dependencies
@@ -1032,6 +1036,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - install-macos-dependencies
@@ -1051,6 +1056,7 @@ jobs:
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - install-macos-dependencies
@@ -1091,6 +1097,7 @@ jobs:
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - checkout
@@ -1134,6 +1141,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
       - install-macos-dependencies
       - install-dependencies
@@ -1159,6 +1167,7 @@ jobs:
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
       JOBS: 2
     steps:
       - install-macos-dependencies
@@ -1203,6 +1212,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
       - install-macos-dependencies
       - install-qt-macos-dependencies

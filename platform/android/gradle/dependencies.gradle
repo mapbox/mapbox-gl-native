@@ -23,7 +23,7 @@ ext {
             mockk           : '1.9',
             robolectric     : '4.1',
             timber          : '4.7.1',
-            okhttp          : '3.12.0',
+            okhttp          : '3.12.3',
             kotlin          : '1.3.11',
             licenses        : '0.8.42',
             bintray         : '1.8.4',

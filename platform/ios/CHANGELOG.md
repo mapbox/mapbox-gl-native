@@ -6,7 +6,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Styles and rendering
 
-* Fixed style change transition regression caused by delayed setting of the updated layer properties. ([#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016))
+* Fixed a custom geometry source bug caused by using the outdated tiles after style update [#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112)
 
 ## 5.2.0
 
@@ -17,10 +17,17 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Packaging
 
 * Removed previously deprecated methods and properties that had been marked `unavailable`. ([#15000](https://github.com/mapbox/mapbox-gl-native/pull/15000))
+* The downloaded zip file of this framework no longer contains a local podspec. ([#15027](https://github.com/mapbox/mapbox-gl-native/pull/15027))
 
 ### Styles and rendering
 
+* Fixed a map update bug caused by the render tiles and the render passes getting unsynchronized. ([#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092))
+* The `MGLIdeographicFontFamilyName` Info.plist key now also accepts an array of font family names, to customize font fallback behavior. It can also be set to a Boolean value of `NO` to force the SDK to typeset CJK characters in a remote font specified by `MGLSymbolStyleLayer.textFontNames`. ([#14862](https://github.com/mapbox/mapbox-gl-native/pull/14862))
+* Hiragana and katakana are now included in the range of CJK glyphs that are rendered locally by default. ([#15009](https://github.com/mapbox/mapbox-gl-native/pull/15009))
 * Added the `-[MGLMapViewDelegate mapView:shouldRemoveStyleImage:]` method for optimizing style image caching. ([#14769](https://github.com/mapbox/mapbox-gl-native/pull/14769))
+* Fixed style change transition regression caused by delayed setting of the updated layer properties. ([#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016))
+* Fixed an issue where layers with fill extrusions would be incorrectly rendered above other layers. ([#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065))
+* Improved feature querying performance. ([#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930))
 
 ### Other changes
 
@@ -33,6 +40,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
   * `-[MGLMapView selectAnnotation:animated:completionHandler:]`
 * Deprecated variants of the above methods without completion handlers. ([#14959](https://github.com/mapbox/mapbox-gl-native/pull/14959))
 * Fixed an issue where the two-finger tilt gesture would continue after lifting one finger. ([#14969](https://github.com/mapbox/mapbox-gl-native/pull/14969))
+* Added `MGLMapView.compassView.visibility` and `MGLOrnamentVisibility` to allow configuration of compass visibility behavior. ([#15055](https://github.com/mapbox/mapbox-gl-native/pull/15055))
+* Fixed a bug where using the pinch gesture could result in an incorrect map center coordinate. ([#15097](https://github.com/mapbox/mapbox-gl-native/pull/15097))
 
 ## 5.1.0 - June 19, 2019
 

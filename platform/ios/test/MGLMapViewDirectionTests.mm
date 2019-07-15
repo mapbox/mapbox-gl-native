@@ -51,6 +51,39 @@ static MGLMapView *mapView;
     XCTAssertEqual(mapView.direction, 0, @"Reset-to-north should set direction to 0°.");
 }
 
+- (void)testRotateEnabled {
+    mapView.zoomLevel = 10;
+
+    UIRotationGestureRecognizer *gesture = [[UIRotationGestureRecognizer alloc] initWithTarget:nil action:nil];
+    gesture.state = UIGestureRecognizerStateBegan;
+    gesture.rotation = MGLRadiansFromDegrees(30);
+    CGFloat wrappedRotation = mbgl::util::wrap(-MGLDegreesFromRadians(gesture.rotation), 0., 360.);
+
+    // Disabled
+    {
+        mapView.rotateEnabled = NO;
+        XCTAssertEqual(mapView.allowsRotating, NO);
+
+        [mapView handleRotateGesture:gesture];
+        XCTAssertNotEqual(mapView.direction, wrappedRotation, @"Gestural rotation should not work when rotation is disabled.");
+
+        mapView.direction = 45.f;
+        XCTAssertEqualWithAccuracy(mapView.direction, 45, 0.001, @"Programmatic rotation is allowed when rotateEnabled = NO.");
+    }
+
+    // Enabled
+    {
+        [mapView resetNorthAnimated:NO];
+        mapView.rotateEnabled = YES;
+        XCTAssertEqual(mapView.allowsRotating, YES);
+
+        gesture.state = UIGestureRecognizerStateChanged;
+        gesture.rotation = MGLRadiansFromDegrees(30);
+        [mapView handleRotateGesture:gesture];
+        XCTAssertEqualWithAccuracy(mapView.direction, wrappedRotation, 0.001, @"Gestural rotation should work when rotation is enabled.");
+    }
+}
+
 - (void)testRotateGesture {
     mapView.zoomLevel = 15;
 

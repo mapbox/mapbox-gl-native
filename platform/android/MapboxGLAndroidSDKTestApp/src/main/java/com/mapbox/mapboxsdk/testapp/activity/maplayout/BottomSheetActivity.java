@@ -133,7 +133,7 @@ public class BottomSheetActivity extends AppCompatActivity {
       Bundle bundle = new Bundle();
       bundle.putInt("mapcounter", mapCounter);
       mapFragment.setArguments(bundle);
-      MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(context, null);
+      MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(context);
       mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
       return mapFragment;
     }
@@ -211,7 +211,7 @@ public class BottomSheetActivity extends AppCompatActivity {
 
     public static BottomSheetFragment newInstance(Context context) {
       BottomSheetFragment mapFragment = new BottomSheetFragment();
-      MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(context, null);
+      MapboxMapOptions mapboxMapOptions = MapboxMapOptions.createFromAttributes(context);
       mapboxMapOptions.renderSurfaceOnTop(true);
       mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
       return mapFragment;

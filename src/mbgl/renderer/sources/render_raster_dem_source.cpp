@@ -125,7 +125,7 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
 std::unordered_map<std::string, std::vector<Feature>>
 RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
-                                          const std::vector<const RenderLayer*>&,
+                                          const std::unordered_map<std::string, const RenderLayer*>&,
                                           const RenderedQueryOptions&,
                                           const mat4&) const {
     return std::unordered_map<std::string, std::vector<Feature>>{};

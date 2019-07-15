@@ -291,12 +291,12 @@ LayerRenderData* GeometryTile::getLayerRenderData(const style::Layer::Impl& laye
     return layoutResult ? layoutResult->getLayerRenderData(layerImpl) : nullptr;
 }
 
-float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {
+float GeometryTile::getQueryPadding(const std::unordered_map<std::string, const RenderLayer*>& layers) {
     float queryPadding = 0;
-    for (const RenderLayer* layer : layers) {
-        const LayerRenderData* data = getLayerRenderData(*layer->baseImpl);
+    for (const auto& pair : layers) {
+        const LayerRenderData* data = getLayerRenderData(*pair.second->baseImpl);
         if (data && data->bucket && data->bucket->hasData()) {
-            queryPadding = std::max(queryPadding, data->bucket->getQueryRadius(*layer));
+            queryPadding = std::max(queryPadding, data->bucket->getQueryRadius(*pair.second));
         }
     }
     return queryPadding;
@@ -306,7 +306,7 @@ void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
-    const std::vector<const RenderLayer*>& layers,
+    const std::unordered_map<std::string, const RenderLayer*>& layers,
     const RenderedQueryOptions& options,
     const mat4& projMatrix) {
 

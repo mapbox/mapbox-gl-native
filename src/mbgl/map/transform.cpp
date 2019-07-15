@@ -236,7 +236,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double r1 = r(1);
 
     // When u₀ = u₁, the optimal path doesn’t require both ascent and descent.
-    bool isClose = std::abs(u1) < 1.0 || !std::isfinite(r0) || !std::isfinite(r1);
+    bool isClose = std::abs(u1) < 0.000001 || !std::isfinite(r0) || !std::isfinite(r1);
 
     /** w(s): Returns the visible span on the ground, measured in pixels with
         respect to the initial scale.

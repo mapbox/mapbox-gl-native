@@ -57,6 +57,7 @@ custom_categories:
     children:
       - MGLCalloutView
       - MGLCalloutViewDelegate
+      - MGLCompassButton
   - name: Location Updates
     children:
       - MGLLocationManager
