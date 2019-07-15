@@ -8,20 +8,53 @@
 #endif
 
 namespace mbgl {
-    class MGLoggingObserver : public Log :: Observer {
-        bool onRecord(EventSeverity, Event, int64_t, const std::string&) override {
+    
+class MGLCoreLoggingObserver : public Log :: Observer {
+public:
+    //Filt logs from core
+    bool onRecord(EventSeverity severity, Event, int64_t, const std::string&) override{
+        if(_platformLoggingLevel == MGLLoggingLevelNone){
             return true;
         }
-    };
+        else if(_platformLoggingLevel == MGLLoggingLevelFault){
+            if(severity == EventSeverity::Error)
+                return false;
+            return true;
+        }
+        else if (_platformLoggingLevel == MGLLoggingLevelError){
+            if(severity == EventSeverity::Error)
+                return false;
+            return true;
+        }
+        else if (_platformLoggingLevel == MGLLoggingLevelWarning){
+            if(severity == EventSeverity::Error || severity == EventSeverity :: Warning)
+                return false;
+            return true;
+        }
+        else if (_platformLoggingLevel == MGLLoggingLevelInfo){
+            if(severity == EventSeverity::Error || severity == EventSeverity :: Warning ||severity == EventSeverity::Info)
+                return false;
+            return true;
+        }
+        return false;
+    }
+    
+    void setPlatformLoggingLevel(MGLLoggingLevel platformLoggingLevel){
+        _platformLoggingLevel = platformLoggingLevel;
+    }
+    
+private:
+    MGLLoggingLevel _platformLoggingLevel = MGLLoggingLevelNone;
+};
+
 }
 
-
-@implementation MGLLoggingConfiguration{
-    mbgl:: MGLoggingObserver ob;
-}
-
-+ (instancetype)sharedConfiguration
+@implementation MGLLoggingConfiguration
 {
+    std::unique_ptr<mbgl::MGLCoreLoggingObserver> _coreLoggingObserver;
+}
+
++ (instancetype)sharedConfiguration {
     static dispatch_once_t once;
     static id sharedConfiguration;
     dispatch_once(&once, ^{
@@ -29,13 +62,6 @@ namespace mbgl {
         ((MGLLoggingConfiguration *)sharedConfiguration).handler = nil;
     });
     return sharedConfiguration;
-}
-
-- (id)init{
-    if(self = [super init]){
-        
-    }
-    return self;
 }
 
 - (void)setHandler:(void (^)(MGLLoggingLevel, NSString *, NSUInteger, NSString *))handler {
@@ -47,8 +73,22 @@ namespace mbgl {
     }
 }
 
-- (void)logCallingFunction:(const char *)callingFunction functionLine:(NSUInteger)functionLine messageType:(MGLLoggingLevel)type format:(id)messageFormat, ...
-{
+- (void)setLoggingLevel:(MGLLoggingLevel)loggingLevel {
+    if(loggingLevel > MGLLoggingLevelVerbose) {
+        _loggingLevel = MGLLoggingLevelVerbose;
+    }
+    else if (loggingLevel < MGLLoggingLevelNone) {
+        _loggingLevel = MGLLoggingLevelNone;
+    }
+    else {
+        _loggingLevel = loggingLevel;
+    }
+    _coreLoggingObserver = std::make_unique<mbgl::MGLCoreLoggingObserver>();
+    _coreLoggingObserver->setPlatformLoggingLevel(loggingLevel);
+    mbgl::Log::setObserver(std::move(_coreLoggingObserver));
+}
+
+- (void)logCallingFunction:(const char *)callingFunction functionLine:(NSUInteger)functionLine messageType:(MGLLoggingLevel)type format:(id)messageFormat, ... {
     va_list formatList;
     va_start(formatList, messageFormat);
     NSString *formattedMessage = [[NSString alloc] initWithFormat:messageFormat arguments:formatList];
@@ -88,6 +128,7 @@ namespace mbgl {
             os_log_t mapbox_log;
             switch (level) {
                 case MGLLoggingLevelInfo:
+                case MGLLoggingLevelWarning:
                     mapbox_log = info_log;
                     break;
 #if MGL_LOGGING_ENABLE_DEBUG
@@ -112,6 +153,7 @@ namespace mbgl {
             NSString *category;
             switch (level) {
                 case MGLLoggingLevelInfo:
+                case MGLLoggingLevelWarning:
                     category = @"INFO";
                     break;
 #if MGL_LOGGING_ENABLE_DEBUG
