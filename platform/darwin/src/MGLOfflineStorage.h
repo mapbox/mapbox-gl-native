@@ -172,7 +172,8 @@ typedef NS_ENUM(NSUInteger, MGLResourceKind) {
 /**
  MGLOfflineStorage implements a singleton (shared object) that manages offline
  packs and ambient caching. All of this class’s instance methods are asynchronous,
- reflecting the fact that offline resources are stored in a database. The shared object maintains a canonical collection of offline packs in its `packs` property.
+ reflecting the fact that offline resources are stored in a database. The shared
+ object maintains a canonical collection of offline packs in its `packs` property.
  
  #### Related examples
  See the <a href="https://docs.mapbox.com/ios/maps/examples/offline-pack/">
