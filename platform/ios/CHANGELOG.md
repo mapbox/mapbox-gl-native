@@ -8,6 +8,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed a custom geometry source bug caused by using the outdated tiles after style update [#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112)
 
+### Other changes
+
+* Added MGLNetworkConfiguration.sessionDelegate [#15128](https://github.com/mapbox/mapbox-gl-native/pull/15128)
+
 ## 5.2.0
 
 ### Offline maps

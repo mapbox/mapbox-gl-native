@@ -16,6 +16,7 @@
 
 ### Other changes
 
+* Added MGLNetworkConfiguration.sessionDelegate [#15128](https://github.com/mapbox/mapbox-gl-native/pull/15128)
 * The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInsets` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
 
 ### Other changes
