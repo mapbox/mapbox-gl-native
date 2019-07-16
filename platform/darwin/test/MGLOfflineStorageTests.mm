@@ -201,6 +201,68 @@
     pack = nil;
 }
 
+- (void)testInvalidatePack {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect offline pack to be invalidated without an error."];
+    MGLCoordinateBounds bounds = {
+        { .latitude = 48.8660, .longitude = 2.3306 },
+        { .latitude = 48.8603, .longitude = 2.3213 },
+    };
+    
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:styleURL bounds:bounds fromZoomLevel:10 toZoomLevel:11];
+    
+    NSString *nameKey = @"Name";
+    NSString *name = @"Paris square";
+    
+    NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{nameKey: name}];
+    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
+        XCTAssertNotNil(pack);
+        [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable) {
+            XCTAssertNotNil(pack);
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testSetMaximumAmbientCache {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect maximum cache size to be raised without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] setMaximumAmbientCacheSize:0 withCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testInvalidateAmbientCache {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect cache to be invalidated without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testClearCache {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect cache to be cleared without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testResetDatabase {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Expect database to be reset without an error."];
+    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
 - (void)testBackupExclusion {
     NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
                                                                       inDomain:NSUserDomainMask
