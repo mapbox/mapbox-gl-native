@@ -563,7 +563,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     _mbglFileSource->resetDatabase([&, completion](std::exception_ptr exception) {
         NSError *error = nil;
         if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+            error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeUnknown userInfo:@{
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
