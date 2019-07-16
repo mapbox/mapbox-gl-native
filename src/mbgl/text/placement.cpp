@@ -194,20 +194,24 @@ void Placement::placeBucket(
                 const float textBoxScale = symbolInstance.textBoxScale;
 
                 // If this symbol was in the last placement, shift the previously used
-                // anchor to the front of the anchor list.
+                // anchor to the front of the anchor list, only if the previous anchor
+                // is still in the anchor list.
                 if (prevPlacement) {
                     auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                    if (prevOffset != prevPlacement->variableOffsets.end() &&
-                        variableTextAnchors.front() != prevOffset->second.anchor) {
-                        std::vector<style::TextVariableAnchorType> filtered;
-                        filtered.reserve(variableTextAnchors.size());
-                        filtered.push_back(prevOffset->second.anchor);
-                        for (auto anchor : variableTextAnchors) {
-                            if (anchor != prevOffset->second.anchor) {
-                                filtered.push_back(anchor);
+                    if (prevOffset != prevPlacement->variableOffsets.end()) {
+                        const auto prevAnchor = prevOffset->second.anchor;
+                        auto found = std::find(variableTextAnchors.begin(), variableTextAnchors.end(), prevAnchor);
+                        if (found != variableTextAnchors.begin() && found != variableTextAnchors.end()) {
+                            std::vector<style::TextVariableAnchorType> filtered;
+                            filtered.reserve(variableTextAnchors.size());
+                            filtered.push_back(prevAnchor);
+                            for (auto anchor : variableTextAnchors) {
+                                if (anchor != prevAnchor) {
+                                    filtered.push_back(anchor);
+                                }
                             }
+                            variableTextAnchors = std::move(filtered);
                         }
-                        variableTextAnchors = std::move(filtered);
                     }
                 }
 
