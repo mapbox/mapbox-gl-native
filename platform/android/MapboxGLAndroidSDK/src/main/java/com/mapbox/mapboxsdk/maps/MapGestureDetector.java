@@ -29,8 +29,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAXIMUM_ANGULAR_VELOCITY;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.ROTATE_VELOCITY_RATIO_THRESHOLD;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_RATIO_THRESHOLD;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.ZOOM_RATE;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
@@ -114,11 +117,14 @@ final class MapGestureDetector {
           com.mapbox.android.gestures.R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
       MoveGestureListener moveGestureListener = new MoveGestureListener();
       ScaleGestureListener scaleGestureListener = new ScaleGestureListener(
+        context.getResources().getDimension(R.dimen.mapbox_density_constant),
         context.getResources().getDimension(R.dimen.mapbox_minimum_scale_speed),
         context.getResources().getDimension(R.dimen.mapbox_minimum_angled_scale_speed),
         context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity)
       );
       RotateGestureListener rotateGestureListener = new RotateGestureListener(
+        context.getResources().getDimension(R.dimen.mapbox_density_constant),
+        context.getResources().getDimension(R.dimen.mapbox_angular_velocity_multiplier),
         context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity));
       ShoveGestureListener shoveGestureListener = new ShoveGestureListener();
       TapGestureListener tapGestureListener = new TapGestureListener();
@@ -258,7 +264,7 @@ final class MapGestureDetector {
   };
 
   /**
-   * Schedules a velocity animator to be executed when user lift fingers,
+   * Schedules a velocity animator to be executed when user lifts fingers,
    * unless canceled by the {@link #cancelAnimatorsRunnable}.
    *
    * @param animator animator ot be scheduled
@@ -483,12 +489,16 @@ final class MapGestureDetector {
     private final float minimumGestureSpeed;
     private final float minimumAngledGestureSpeed;
     private final float minimumVelocity;
+    private final double scaleVelocityRatioThreshold;
     private boolean quickZoom;
+    private float spanSinceLast;
 
-    ScaleGestureListener(float minimumGestureSpeed, float minimumAngledGestureSpeed, float minimumVelocity) {
+    ScaleGestureListener(double densityMultiplier, float minimumGestureSpeed, float minimumAngledGestureSpeed,
+                         float minimumVelocity) {
       this.minimumGestureSpeed = minimumGestureSpeed;
       this.minimumAngledGestureSpeed = minimumAngledGestureSpeed;
       this.minimumVelocity = minimumVelocity;
+      this.scaleVelocityRatioThreshold = SCALE_VELOCITY_RATIO_THRESHOLD * densityMultiplier;
     }
 
     @Override
@@ -539,6 +549,8 @@ final class MapGestureDetector {
 
       notifyOnScaleBeginListeners(detector);
 
+      spanSinceLast = Math.abs(detector.getCurrentSpan() - detector.getPreviousSpan());
+
       return true;
     }
 
@@ -553,6 +565,8 @@ final class MapGestureDetector {
       transform.zoomBy(zoomBy, focalPoint);
 
       notifyOnScaleListeners(detector);
+
+      spanSinceLast = Math.abs(detector.getCurrentSpan() - detector.getPreviousSpan());
 
       return true;
     }
@@ -571,7 +585,9 @@ final class MapGestureDetector {
 
       float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
 
-      if (!uiSettings.isScaleVelocityAnimationEnabled() || velocityXY < minimumVelocity) {
+      if (!uiSettings.isScaleVelocityAnimationEnabled()
+        || velocityXY < minimumVelocity
+        || spanSinceLast / velocityXY < scaleVelocityRatioThreshold) {
         // notifying listeners that camera is idle only if there is no follow-up animation
         dispatchCameraIdle();
         return;
@@ -625,10 +641,14 @@ final class MapGestureDetector {
   }
 
   private final class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
+    private final float angularVelocityMultiplier;
     private final float minimumAngularVelocity;
+    private final double rotateVelocityRatioThreshold;
 
-    RotateGestureListener(float minimumAngularVelocity) {
+    RotateGestureListener(double densityMultiplier, float angularVelocityMultiplier, float minimumAngularVelocity) {
+      this.angularVelocityMultiplier = angularVelocityMultiplier;
       this.minimumAngularVelocity = minimumAngularVelocity;
+      this.rotateVelocityRatioThreshold = ROTATE_VELOCITY_RATIO_THRESHOLD * densityMultiplier;
     }
 
     @Override
@@ -685,24 +705,23 @@ final class MapGestureDetector {
                             float velocityY, float angularVelocity) {
       notifyOnRotateEndListeners(detector);
 
-      if (!uiSettings.isRotateVelocityAnimationEnabled() || Math.abs(angularVelocity) < minimumAngularVelocity) {
+      angularVelocity = angularVelocity * angularVelocityMultiplier;
+      angularVelocity = MathUtils.clamp(angularVelocity, -MAXIMUM_ANGULAR_VELOCITY, MAXIMUM_ANGULAR_VELOCITY);
+
+      float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
+      float delta = Math.abs(detector.getDeltaSinceLast());
+      double ratio = delta / velocityXY;
+
+      if (!uiSettings.isRotateVelocityAnimationEnabled()
+        || Math.abs(angularVelocity) < minimumAngularVelocity
+        || (gesturesManager.getStandardScaleGestureDetector().isInProgress() && ratio < rotateVelocityRatioThreshold)) {
         // notifying listeners that camera is idle only if there is no follow-up animation
         dispatchCameraIdle();
         return;
       }
 
-      boolean negative = angularVelocity < 0;
-      angularVelocity = (float) Math.pow(angularVelocity, 2);
-      angularVelocity = MathUtils.clamp(
-        angularVelocity, MapboxConstants.MINIMUM_ANGULAR_VELOCITY, MapboxConstants.MAXIMUM_ANGULAR_VELOCITY);
-
-      long animationTime = (long) (Math.log(angularVelocity + 1) * 500);
-
-      if (negative) {
-        angularVelocity = -angularVelocity;
-      }
-
-      // todo clear scale velocity if angular velocity exceeds a threshold
+      long animationTime = (long) ((Math.log((Math.abs(angularVelocity)) + 1 / Math.pow(Math.E, 2)) + 2)
+        * SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER);
 
       PointF focalPoint = getRotateFocalPoint(detector);
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime, focalPoint);
@@ -927,10 +946,6 @@ final class MapGestureDetector {
       && (!uiSettings.isZoomGesturesEnabled() || !gesturesManager.getStandardScaleGestureDetector().isInProgress())
       && (!uiSettings.isRotateGesturesEnabled() || !gesturesManager.getRotateGestureDetector().isInProgress())
       && (!uiSettings.isTiltGesturesEnabled() || !gesturesManager.getShoveGestureDetector().isInProgress());
-  }
-
-  private boolean isZoomValid(double mapZoom) {
-    return mapZoom >= MapboxConstants.MINIMUM_ZOOM && mapZoom <= MapboxConstants.MAXIMUM_ZOOM;
   }
 
   void notifyOnMapClickListeners(@NonNull PointF tapPoint) {
