@@ -2,6 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/vector_tile.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 
 namespace mbgl {
 
@@ -25,16 +26,19 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
     enabled = needsRendering;
 
     optional<Tileset> _tileset = impl().getTileset();
-
-    if (tileset != _tileset) {
+    // In Continuous mode, keep the existing tiles if the new tileset is not
+    // yet available, thus providing smart style transitions without flickering.
+    // In other modes, allow clearing the tile pyramid first, before the early
+    // return in order to avoid render tests being flaky.
+    bool canUpdateTileset = _tileset || parameters.mode != MapMode::Continuous;
+    if (canUpdateTileset && tileset != _tileset) {
         tileset = _tileset;
 
         // TODO: this removes existing buckets, and will cause flickering.
         // Should instead refresh tile data in place.
         tilePyramid.clearAll();
     }
-    // Allow clearing the tile pyramid first, before the early return in case
-    //  the new tileset is not yet available or has an error in loading
+
     if (!_tileset) {
         return;
     }
