@@ -10,6 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 * Updated "map ID" to the more accurate term "tileset ID" in documentation; updated "style's Map ID" to the more accurate term "style URL". ([#15116](https://github.com/mapbox/mapbox-gl-native/pull/15116))
+* Ideographic glyphs from Chinese, Japanese, and Korean are no longer downloaded by default as part of offline packs; they are instead rendered on-device, saving bandwidth and storage while improving performance. ([#14176](https://github.com/mapbox/mapbox-gl-native/pull/14176))
 
 ## 5.2.0
 
@@ -44,6 +45,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Deprecated variants of the above methods without completion handlers. ([#14959](https://github.com/mapbox/mapbox-gl-native/pull/14959))
 * Fixed an issue where the two-finger tilt gesture would continue after lifting one finger. ([#14969](https://github.com/mapbox/mapbox-gl-native/pull/14969))
 * Added `MGLMapView.compassView.visibility` and `MGLOrnamentVisibility` to allow configuration of compass visibility behavior. ([#15055](https://github.com/mapbox/mapbox-gl-native/pull/15055))
+* Fixed a bug where using the pinch gesture could result in an incorrect map center coordinate. ([#15097](https://github.com/mapbox/mapbox-gl-native/pull/15097))
+* Fixed a crash during network access. ([#15113](https://github.com/mapbox/mapbox-gl-native/pull/15113))
 
 ## 5.1.0 - June 19, 2019
 

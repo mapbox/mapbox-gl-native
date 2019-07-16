@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14810.11" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14766.13"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,14 +13,14 @@
             <objects>
                 <viewController id="WaX-pd-UZQ" userLabel="Map View Controller" customClass="MBXViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Z9X-fc-PUC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="203" height="33"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kNe-zV-9ha" customClass="MGLMapView">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="203" height="33"/>
                                 <subviews>
                                     <button hidden="YES" opaque="NO" userInteractionEnabled="NO" alpha="0.69999999999999996" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="58y-pX-YyB">
-                                        <rect key="frame" x="8" y="102" width="40" height="20"/>
+                                        <rect key="frame" x="8" y="82" width="40" height="20"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <accessibility key="accessibilityConfiguration">
                                             <accessibilityTraits key="traits" button="YES" notEnabled="YES"/>
@@ -40,7 +38,7 @@
                                         </userDefinedRuntimeAttributes>
                                     </button>
                                     <view hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BHE-Wn-x69" customClass="MBXFrameTimeGraphView">
-                                        <rect key="frame" x="0.0" y="467" width="375" height="200"/>
+                                        <rect key="frame" x="0.0" y="-167" width="203" height="200"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <accessibility key="accessibilityConfiguration">
                                             <accessibilityTraits key="traits" notEnabled="YES"/>
@@ -143,7 +141,7 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fGu-Ys-Eh1" id="sUf-bc-8xG">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="My Inactive Offline Pack" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JtH-Ce-MI5">
@@ -167,7 +165,7 @@
                                 <rect key="frame" x="0.0" y="72" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mKB-tz-Zfl" id="nS3-aU-nBr">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="My Active Offline Pack" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9ZK-gS-wJ4">
@@ -194,11 +192,18 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Offline Packs" id="UcK-PK-eQA">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="gCV-hl-Mzc">
-                            <connections>
-                                <action selector="addCurrentRegion:" destination="7q0-lI-zqb" id="G2O-3V-aEA"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="gCV-hl-Mzc">
+                                <connections>
+                                    <action selector="addCurrentRegion:" destination="7q0-lI-zqb" id="G2O-3V-aEA"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem style="plain" systemItem="refresh" id="2fx-iS-Veb">
+                                <connections>
+                                    <action selector="invalidatePacks:" destination="7q0-lI-zqb" id="5lx-FY-aTt"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <segue destination="x2D-ga-sM5" kind="unwind" identifier="ReturnToMap" unwindAction="unwindToMapViewController:" id="6MZ-Ed-tu2"/>
@@ -215,7 +220,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="PSe-Ot-7Ff" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ONr-CS-J5X">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -257,7 +262,7 @@
                                 </constraints>
                             </scrollView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="l5l-w7-P80" userLabel="Control Panel View">
-                                <rect key="frame" x="0.0" y="20" width="375" height="64"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="64"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Zoom" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DgB-BD-Ltx">
                                         <rect key="frame" x="29.5" y="6" width="35" height="16"/>
@@ -381,22 +386,22 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="miZ-Fw-EWq" userLabel="Image View TL">
-                                <rect key="frame" x="0.0" y="64" width="125" height="301.5"/>
+                                <rect key="frame" x="0.0" y="44" width="125" height="311.5"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="XuN-T4-Z83" userLabel="Image View TM">
-                                <rect key="frame" x="125" y="64" width="125" height="301.5"/>
+                                <rect key="frame" x="125" y="44" width="125" height="311.5"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ykR-Ku-i9l" userLabel="Image View TR">
-                                <rect key="frame" x="250" y="64" width="125" height="301.5"/>
+                                <rect key="frame" x="250" y="44" width="125" height="311.5"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="TL0-V8-T2F" userLabel="Image View BL">
-                                <rect key="frame" x="0.0" y="365.5" width="125" height="301.5"/>
+                                <rect key="frame" x="0.0" y="355.5" width="125" height="311.5"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="eMy-JU-rq4" userLabel="Image View BM">
-                                <rect key="frame" x="125" y="365.5" width="125" height="301.5"/>
+                                <rect key="frame" x="125" y="355.5" width="125" height="311.5"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zT0-3J-0xw" userLabel="Image View BR">
-                                <rect key="frame" x="250" y="365.5" width="125" height="301.5"/>
+                                <rect key="frame" x="250" y="355.5" width="125" height="311.5"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
