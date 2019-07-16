@@ -396,15 +396,17 @@ static const CGFloat kAnnotationScale = 0.125f;
     for (CGFloat dx = -100.0; dx <= 100.0; dx += 100.0 ) {
         for (CGFloat dy = -100.0; dy <= 100.0; dy += 100.0 ) {
             CGVector offset = CGVectorMake(dx, dy);
-            [self internalTestSelectingAnnotationWithCenterOffsetWithOffset:offset];
+            UIEdgeInsets edgeInsets = UIEdgeInsetsMake(fmax(-dy, 0.0), fmax(-dy, 0.0), fmax(dy, 0.0), fmax(dx, 0.0));
+            [self internalTestSelectingAnnotationWithCenterOffsetWithOffset:offset edgeInsets:edgeInsets];
         }
     }
 }
 
-- (void)internalTestSelectingAnnotationWithCenterOffsetWithOffset:(CGVector)offset {
+- (void)internalTestSelectingAnnotationWithCenterOffsetWithOffset:(CGVector)offset edgeInsets:(UIEdgeInsets)edgeInsets {
 
     NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
 
+    self.mapView.contentInset = edgeInsets;
     CGSize size = self.mapView.bounds.size;
 
     CGSize annotationSize = CGSizeMake(40.0, 40.0);
@@ -444,8 +446,8 @@ static const CGFloat kAnnotationScale = 0.125f;
 
     // Check that the annotation is in the center of the view
     CGPoint annotationPoint = [self.mapView convertCoordinate:point.coordinate toPointToView:self.mapView];
-    XCTAssertEqualWithAccuracy(annotationPoint.x, size.width/2.0, 0.25);
-    XCTAssertEqualWithAccuracy(annotationPoint.y, size.height/2.0, 0.25);
+    XCTAssertEqualWithAccuracy(annotationPoint.x, (size.width - edgeInsets.right + edgeInsets.left)/2.0, 0.25);
+    XCTAssertEqualWithAccuracy(annotationPoint.y, (size.height - edgeInsets.bottom + edgeInsets.top)/2.0, 0.25);
 
     // Now test taps around the annotation
     CGPoint tapPoint = CGPointMake(annotationPoint.x + offset.dx, annotationPoint.y + offset.dy);
