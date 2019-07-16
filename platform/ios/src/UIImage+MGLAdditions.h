@@ -1,8 +1,12 @@
 #import <UIKit/UIKit.h>
 
+#import <Mapbox/MGLTypes.h>
+
 #include <mbgl/style/image.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
+
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
 
 @interface UIImage (MGLAdditions)
 
@@ -13,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (std::unique_ptr<mbgl::style::Image>)mgl_styleImageWithIdentifier:(NSString *)identifier;
 
 - (mbgl::PremultipliedImage)mgl_premultipliedImage;
+
++ (UIImage *)mgl_resourceImageNamed:(NSString *)imageName;
 
 @end
 
