@@ -74,11 +74,6 @@ public class MapboxConstants {
   public static final long VELOCITY_THRESHOLD_IGNORE_FLING = 1000;
 
   /**
-   * Value by which the default rotation threshold will be increased when scaling
-   */
-  public static final float ROTATION_THRESHOLD_INCREASE_WHEN_SCALING = 25f;
-
-  /**
    * Maximum absolute zoom change for multi-pointer scale velocity animation
    */
   public static final double MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE = 2.5;
@@ -89,19 +84,24 @@ public class MapboxConstants {
   public static final double SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER = 150;
 
   /**
+   * Last scale span delta to XY velocity ratio required to execute scale velocity animation.
+   */
+  public static final double SCALE_VELOCITY_RATIO_THRESHOLD = 4 * 1e-3;
+
+  /**
+   * Last rotation delta to XY velocity ratio required to execute rotation velocity animation.
+   */
+  public static final double ROTATE_VELOCITY_RATIO_THRESHOLD = 2.2 * 1e-4;
+
+  /**
    * Time within which user needs to lift fingers for velocity animation to start.
    */
   public static final long SCHEDULED_ANIMATION_TIMEOUT = 150L;
 
   /**
-   * Minimum angular velocity for rotation animation
-   */
-  public static final float MINIMUM_ANGULAR_VELOCITY = 1.5f;
-
-  /**
    * Maximum angular velocity for rotation animation
    */
-  public static final float MAXIMUM_ANGULAR_VELOCITY = 20f;
+  public static final float MAXIMUM_ANGULAR_VELOCITY = 30f;
 
   /**
    * Factor to calculate tilt change based on pixel change during shove gesture.
