@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  See `MGLIdeographicFontFamilyName` setting. Also, for regions outside of
  China, Japan, and Korea, these glyphs will rarely appear for non-CJK users.
  
- By default, this property is set to `YES`, so that the offline pack will
+ By default, this property is set to `NO`, so that the offline pack will
  include ideographic glyphs.
  */
 @property (nonatomic) BOOL includesIdeographicGlyphs;
