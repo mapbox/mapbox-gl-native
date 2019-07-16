@@ -65,10 +65,6 @@ public:
     void setMaxZoom(double);
     double getMaxZoom() const;
 
-    // Viewport center offset, from [size.width / 2, size.height / 2], defined
-    // by |edgeInsets| in screen coordinates, with top left origin.
-    ScreenCoordinate getCenterOffset() const;
-
     // Rotation
     float getBearing() const;
     float getFieldOfView() const;
@@ -99,6 +95,10 @@ public:
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
+
+    // Viewport center offset, from [size.width / 2, size.height / 2], defined
+    // by |edgeInsets| in screen coordinates, with top left origin.
+    ScreenCoordinate getCenterOffset() const;
 
     LatLngBounds bounds;
 
