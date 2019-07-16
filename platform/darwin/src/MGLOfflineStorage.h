@@ -385,11 +385,11 @@ MGL_EXPORT
 
 /**
  Invalidates the ambient cache. This method checks that the tiles in the
- ambient cache match those from the server. Local tiles that do not match
- the latest version on the server are updated.
+ ambient cache match those from the server. If the local tiles do not match
+ those on the server, they are re-downloaded.
  
- This is more efficient than cleaning the cache because valid local tiles will
- not be downloaded again.
+ This is recommended over clearing the cache or resetting the database
+ because valid local tiles will not be downloaded again.
  
  Resources shared with offline packs will not be affected by this method.
  
@@ -400,11 +400,12 @@ MGL_EXPORT
 - (void)invalidateAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 /**
- Clears the ambient cache, freeing storage space. This method does not
+ Clears the ambient cache by deleting resources. This method does not
  affect resources shared with offline regions.
  
- @param completion The completion handler to call once the ambient cache has been
- cleared. This handler is executed asynchronously on the main queue.
+ @param completion The completion handler to call once resources from
+ the ambient cache have been cleared. This handler is executed
+ asynchronously on the main queue.
  */
 
 - (void)clearAmbientCacheWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
