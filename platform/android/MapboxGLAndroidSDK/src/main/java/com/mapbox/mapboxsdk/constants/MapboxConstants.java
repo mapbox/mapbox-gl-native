@@ -200,5 +200,6 @@ public class MapboxConstants {
   public static final String STATE_ROTATE_ANIMATION_ENABLED = "mapbox_rotateAnimationEnabled";
   public static final String STATE_FLING_ANIMATION_ENABLED = "mapbox_flingAnimationEnabled";
   public static final String STATE_INCREASE_ROTATE_THRESHOLD = "mapbox_increaseRotateThreshold";
+  public static final String STATE_DISABLE_ROTATE_WHEN_SCALING = "mapbox_disableRotateWhenScaling";
   public static final String STATE_INCREASE_SCALE_THRESHOLD = "mapbox_increaseScaleThreshold";
 }

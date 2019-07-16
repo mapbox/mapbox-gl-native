@@ -13,7 +13,6 @@ import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
-import com.mapbox.android.gestures.Constants;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.MultiFingerTapGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -115,12 +114,12 @@ final class MapGestureDetector {
           com.mapbox.android.gestures.R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
       MoveGestureListener moveGestureListener = new MoveGestureListener();
       ScaleGestureListener scaleGestureListener = new ScaleGestureListener(
-        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity));
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_speed),
+        context.getResources().getDimension(R.dimen.mapbox_minimum_angled_scale_speed),
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity)
+      );
       RotateGestureListener rotateGestureListener = new RotateGestureListener(
-        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
-        context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity),
-        context.getResources().getDimension(
-          com.mapbox.android.gestures.R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
+        context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity));
       ShoveGestureListener shoveGestureListener = new ShoveGestureListener();
       TapGestureListener tapGestureListener = new TapGestureListener();
 
@@ -152,6 +151,7 @@ final class MapGestureDetector {
     }
 
     gesturesManager = androidGesturesManager;
+    gesturesManager.getRotateGestureDetector().setAngleThreshold(3f);
   }
 
   /**
@@ -480,10 +480,14 @@ final class MapGestureDetector {
 
   private final class ScaleGestureListener extends StandardScaleGestureDetector.SimpleStandardOnScaleGestureListener {
 
+    private final float minimumGestureSpeed;
+    private final float minimumAngledGestureSpeed;
     private final float minimumVelocity;
     private boolean quickZoom;
 
-    ScaleGestureListener(float minimumVelocity) {
+    ScaleGestureListener(float minimumGestureSpeed, float minimumAngledGestureSpeed, float minimumVelocity) {
+      this.minimumGestureSpeed = minimumGestureSpeed;
+      this.minimumAngledGestureSpeed = minimumAngledGestureSpeed;
       this.minimumVelocity = minimumVelocity;
     }
 
@@ -501,17 +505,37 @@ final class MapGestureDetector {
         }
         // re-try disabling the move detector in case double tap has been interrupted before quickzoom started
         gesturesManager.getMoveGestureDetector().setEnabled(false);
+      } else {
+        if (detector.getPreviousSpan() > 0) {
+          float currSpan = detector.getCurrentSpan();
+          float prevSpan = detector.getPreviousSpan();
+          double currTime = detector.getCurrentEvent().getEventTime();
+          double prevTime = detector.getPreviousEvent().getEventTime();
+          if (currTime == prevTime) {
+            return false;
+          }
+          double speed = Math.abs(currSpan - prevSpan) / (currTime - prevTime);
+          if (speed < minimumGestureSpeed) {
+            // do not scale if the minimal gesture speed is not met
+            return false;
+          } else if (!gesturesManager.getRotateGestureDetector().isInProgress()) {
+            float rotationDeltaSinceLast = gesturesManager.getRotateGestureDetector().getDeltaSinceLast();
+            if (Math.abs(rotationDeltaSinceLast) > 0.4 && speed < minimumAngledGestureSpeed) {
+              // do not scale in case we're preferring to start rotation
+              return false;
+            }
+
+            if (uiSettings.isDisableRotateWhenScaling()) {
+              // disable rotate gesture when scale is detected first
+              gesturesManager.getRotateGestureDetector().setEnabled(false);
+            }
+          }
+        } else {
+          return false;
+        }
       }
 
       cancelTransitionsIfRequired();
-
-      if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
-        // increase rotate angle threshold when scale is detected first
-        gesturesManager.getRotateGestureDetector().setAngleThreshold(
-          Constants.DEFAULT_ROTATE_ANGLE_THRESHOLD
-            + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
-        );
-      }
 
       notifyOnScaleBeginListeners(detector);
 
@@ -538,13 +562,9 @@ final class MapGestureDetector {
       if (quickZoom) {
         // re-enabled the move detector if the quickzoom happened
         gesturesManager.getMoveGestureDetector().setEnabled(true);
-      }
-
-      if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
-        // resetting default angle threshold
-        gesturesManager.getRotateGestureDetector().setAngleThreshold(
-          Constants.DEFAULT_ROTATE_ANGLE_THRESHOLD
-        );
+      } else {
+        // re-enable rotation in case it's been disabled
+        gesturesManager.getRotateGestureDetector().setEnabled(true);
       }
 
       notifyOnScaleEndListeners(detector);
@@ -605,15 +625,10 @@ final class MapGestureDetector {
   }
 
   private final class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
-    private final float minimumScaleSpanWhenRotating;
     private final float minimumAngularVelocity;
-    private final float defaultSpanSinceStartThreshold;
 
-    RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity,
-                          float defaultSpanSinceStartThreshold) {
-      this.minimumScaleSpanWhenRotating = minimumScaleSpanWhenRotating;
+    RotateGestureListener(float minimumAngularVelocity) {
       this.minimumAngularVelocity = minimumAngularVelocity;
-      this.defaultSpanSinceStartThreshold = defaultSpanSinceStartThreshold;
     }
 
     @Override
@@ -622,14 +637,25 @@ final class MapGestureDetector {
         return false;
       }
 
-      cancelTransitionsIfRequired();
-
-      if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
-        // when rotation starts, interrupting scale and increasing the threshold
-        // to make rotation without scaling easier
-        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
-        gesturesManager.getStandardScaleGestureDetector().interrupt();
+      float deltaSinceLast = Math.abs(detector.getDeltaSinceLast());
+      double currTime = detector.getCurrentEvent().getEventTime();
+      double prevTime = detector.getPreviousEvent().getEventTime();
+      if (currTime == prevTime) {
+        return false;
       }
+      double speed = deltaSinceLast / (currTime - prevTime);
+      float deltaSinceStart = Math.abs(detector.getDeltaSinceStart());
+
+      // adjust the responsiveness of a rotation gesture - the higher the speed, the bigger the threshold
+      if (speed < 0.04
+        || (speed > 0.07 && deltaSinceStart < 5)
+        || (speed > 0.15 && deltaSinceStart < 7)
+        || (speed > 0.5 && deltaSinceStart < 15)
+      ) {
+        return false;
+      }
+
+      cancelTransitionsIfRequired();
 
       notifyOnRotateBeginListeners(detector);
 
@@ -657,11 +683,6 @@ final class MapGestureDetector {
     @Override
     public void onRotateEnd(@NonNull RotateGestureDetector detector, float velocityX,
                             float velocityY, float angularVelocity) {
-      if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
-        // resetting default scale threshold values
-        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(defaultSpanSinceStartThreshold);
-      }
-
       notifyOnRotateEndListeners(detector);
 
       if (!uiSettings.isRotateVelocityAnimationEnabled() || Math.abs(angularVelocity) < minimumAngularVelocity) {
@@ -680,6 +701,8 @@ final class MapGestureDetector {
       if (negative) {
         angularVelocity = -angularVelocity;
       }
+
+      // todo clear scale velocity if angular velocity exceeds a threshold
 
       PointF focalPoint = getRotateFocalPoint(detector);
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime, focalPoint);
