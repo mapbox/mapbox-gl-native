@@ -25,21 +25,21 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     enabled = needsRendering;
 
-    optional<Tileset> _tileset = impl().getTileset();
+    const optional<Tileset>& implTileset = impl().tileset;
     // In Continuous mode, keep the existing tiles if the new tileset is not
     // yet available, thus providing smart style transitions without flickering.
     // In other modes, allow clearing the tile pyramid first, before the early
     // return in order to avoid render tests being flaky.
-    bool canUpdateTileset = _tileset || parameters.mode != MapMode::Continuous;
-    if (canUpdateTileset && tileset != _tileset) {
-        tileset = _tileset;
+    bool canUpdateTileset = implTileset || parameters.mode != MapMode::Continuous;
+    if (canUpdateTileset && tileset != implTileset) {
+        tileset = implTileset;
 
         // TODO: this removes existing buckets, and will cause flickering.
         // Should instead refresh tile data in place.
         tilePyramid.clearAll();
     }
 
-    if (!_tileset) {
+    if (!implTileset) {
         return;
     }
 

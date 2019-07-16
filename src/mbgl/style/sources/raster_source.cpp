@@ -65,7 +65,7 @@ void RasterSource::loadDescription(FileSource& fileSource) {
             }
 
             util::mapbox::canonicalizeTileset(*tileset, url, getType(), getTileSize());
-            bool changed = impl().getTileset() != *tileset;
+            bool changed = impl().tileset != *tileset;
 
             baseImpl = makeMutable<Impl>(impl(), *tileset);
             loaded = true;
