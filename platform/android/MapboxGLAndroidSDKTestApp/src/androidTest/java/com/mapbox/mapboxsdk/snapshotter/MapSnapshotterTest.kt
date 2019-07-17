@@ -6,6 +6,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity
+import junit.framework.Assert
 import junit.framework.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
@@ -39,11 +40,13 @@ class MapSnapshotterTest {
             .build()
         )
       val mapSnapshotter = MapSnapshotter(rule.activity, options)
-      mapSnapshotter.start {
+      mapSnapshotter.start({
         assertNotNull(it)
         assertNotNull(it.bitmap)
         countDownLatch.countDown()
-      }
+      }, {
+        Assert.fail(it)
+      })
     }
     if (!countDownLatch.await(30, TimeUnit.SECONDS)) {
       throw TimeoutException()
