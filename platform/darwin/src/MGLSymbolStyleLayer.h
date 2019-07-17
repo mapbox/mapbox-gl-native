@@ -1166,8 +1166,8 @@ MGL_EXPORT
  The default value of this property is an expression that evaluates to `center`.
  Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `text` is non-`nil`. Otherwise,
- it is ignored.
+ This property is only applied to the style if `text` is non-`nil`, and
+ `textVariableAnchor` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1380,7 +1380,8 @@ MGL_EXPORT
  ems downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
+ `textRadialOffset` is set to `nil`, and `textVariableAnchor` is set to `nil`.
+ Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1403,7 +1404,8 @@ MGL_EXPORT
  ems upward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
+ `textRadialOffset` is set to `nil`, and `textVariableAnchor` is set to `nil`.
+ Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1503,8 +1505,8 @@ MGL_EXPORT
  The default value of this property is an expression that evaluates to the float
  `0`. Set this property to `nil` to reset it to the default value.
  
- This property is only applied to the style if `textOffset` is set to `nil`.
- Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1611,9 +1613,9 @@ MGL_EXPORT
  an offset, use the `textRadialOffset` instead of the two-dimensional
  `textOffset`.
  
- This property is only applied to the style if `textAnchor` is set to `nil`, and
- `textOffset` is set to `nil`, and `symbolPlacement` is set to an expression
- that evaluates to or `MGLSymbolPlacementPoint`. Otherwise, it is ignored.
+ This property is only applied to the style if `text` is non-`nil`, and
+ `symbolPlacement` is set to an expression that evaluates to or
+ `MGLSymbolPlacementPoint`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
