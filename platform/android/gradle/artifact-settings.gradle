@@ -14,6 +14,7 @@ ext {
 
     mapboxBintrayUserOrg = 'mapbox'
     mapboxBintrayRepoName = 'mapbox'
+    mapboxBintrayPackageName = 'com.mapbox.mapboxsdk:mapbox-android-sdk'
     mapboxBintrayUser = project.hasProperty('BINTRAY_USER') ? project.property('BINTRAY_USER') : System.getenv('BINTRAY_USER')
     mapboxBintrayApiKey = project.hasProperty('BINTRAY_API_KEY') ? project.property('BINTRAY_API_KEY') : System.getenv('BINTRAY_API_KEY')
     mapboxGpgPassphrase = project.hasProperty('GPG_PASSPHRASE') ? project.property('GPG_PASSPHRASE') : System.getenv('GPG_PASSPHRASE')
