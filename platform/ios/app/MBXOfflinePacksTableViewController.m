@@ -103,8 +103,10 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
         }
 
         MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:mapView.styleURL bounds:mapView.visibleCoordinateBounds fromZoomLevel:mapView.zoomLevel toZoomLevel:mapView.maximumZoomLevel];
-        BOOL hasIdeographicFontFamilyName = !![[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
-        region.includesIdeographicGlyphs = hasIdeographicFontFamilyName;
+        id ideographicFontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
+        if([ideographicFontFamilyName isKindOfClass:[NSNumber class]] && ![ideographicFontFamilyName boolValue]){
+            region.includesIdeographicGlyphs = YES;
+        }
         NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{
             MBXOfflinePackContextNameKey: name,
         }];
@@ -125,6 +127,19 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
     [self presentViewController:alertController animated:YES completion:nil];
 }
+
+- (IBAction)invalidatePacks:(id)sender {
+    for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+        
+        CFTimeInterval start = CACurrentMediaTime();
+        [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+            CFTimeInterval end = CACurrentMediaTime();
+            CFTimeInterval difference = end - start;
+            NSLog(@"invalidatePack Started: %f Ended: %f Total Time: %f", start, end, difference);
+        }];
+    }
+}
+
 
 #pragma mark - Table view data source
 
