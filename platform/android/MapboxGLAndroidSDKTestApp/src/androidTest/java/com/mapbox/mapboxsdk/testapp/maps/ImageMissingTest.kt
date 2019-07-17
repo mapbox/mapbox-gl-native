@@ -7,14 +7,14 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
 class ImageMissingTest : AppCenter() {

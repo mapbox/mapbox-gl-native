@@ -9,13 +9,13 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity
 import com.mapbox.mapboxsdk.testapp.utils.FileUtils
+import java.io.IOException
+import java.util.concurrent.CountDownLatch
 import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
-import java.io.IOException
-import java.util.concurrent.CountDownLatch
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)

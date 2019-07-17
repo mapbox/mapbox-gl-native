@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.fragment
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.View
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
@@ -28,7 +27,7 @@ class FragmentBackStackActivity : AppCompatActivity() {
       add(R.id.container, mapFragment)
     }.commit()
 
-    button.setOnClickListener { handleClick(it) }
+    button.setOnClickListener { handleClick() }
   }
 
   private fun initMap(mapboxMap: MapboxMap) {
@@ -37,7 +36,7 @@ class FragmentBackStackActivity : AppCompatActivity() {
     }
   }
 
-  private fun handleClick(button: View) {
+  private fun handleClick() {
     supportFragmentManager.beginTransaction().apply {
       replace(R.id.container, NestedViewPagerActivity.ItemAdapter.EmptyFragment())
       addToBackStack("map_empty_fragment")

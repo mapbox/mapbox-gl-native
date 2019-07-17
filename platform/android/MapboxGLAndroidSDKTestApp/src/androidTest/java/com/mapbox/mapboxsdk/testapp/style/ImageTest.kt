@@ -6,11 +6,11 @@ import android.support.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
+import java.util.*
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 
 /**
  * CRUD tests around Image

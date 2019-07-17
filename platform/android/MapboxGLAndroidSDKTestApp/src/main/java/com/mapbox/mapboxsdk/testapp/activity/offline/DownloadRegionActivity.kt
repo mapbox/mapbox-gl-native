@@ -14,10 +14,10 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.offline.*
 import com.mapbox.mapboxsdk.testapp.R
-import kotlinx.android.synthetic.main.activity_region_download.*
-import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlinx.android.synthetic.main.activity_region_download.*
+import timber.log.Timber
 
 /**
  * Example showcasing how to download an offline region headless, allows to test pausing and resuming the download.

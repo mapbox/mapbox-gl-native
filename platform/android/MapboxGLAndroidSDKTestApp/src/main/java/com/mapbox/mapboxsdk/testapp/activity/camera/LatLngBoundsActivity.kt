@@ -19,8 +19,8 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil.loadStringFromAssets
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import kotlinx.android.synthetic.main.activity_latlngbounds.*
 import java.net.URISyntaxException
+import kotlinx.android.synthetic.main.activity_latlngbounds.*
 
 /**
  * Test activity showcasing using the LatLngBounds camera API.

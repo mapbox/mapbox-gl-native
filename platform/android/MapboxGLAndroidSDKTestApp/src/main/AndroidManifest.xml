@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mapbox.mapboxsdk.testapp">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+          package="com.mapbox.mapboxsdk.testapp">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -13,7 +13,9 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:appComponentFactory"
+        android:appComponentFactory="customComponentFactory">
 
         <activity
             android:name=".activity.FeatureOverviewActivity"
