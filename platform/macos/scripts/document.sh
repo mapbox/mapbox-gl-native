@@ -49,4 +49,4 @@ jazzy \
     --theme platform/darwin/docs/theme \
     --output ${OUTPUT} \
     --title "Maps SDK for macOS" \
-    --module_version ${SHORT_VERSION}
+    --module-version ${SHORT_VERSION}
