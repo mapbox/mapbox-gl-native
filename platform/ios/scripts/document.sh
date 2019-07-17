@@ -45,8 +45,6 @@ jazzy \
     --root-url https://docs.mapbox.com/ios/api/maps/${RELEASE_VERSION}/ \
     --theme ${THEME} \
     --head "${CUSTOM_HEAD}" \
-    --output ${OUTPUT}
-
-# https://github.com/realm/jazzy/issues/411
-find ${OUTPUT} -name *.html -exec \
-    perl -pi -e 's/BRANDLESS_DOCSET_TITLE/iOS SDK $1/, s/Mapbox\s+(Docs|Reference)/Mapbox Maps SDK for iOS $1/' {} \;
+    --output ${OUTPUT} \
+    --title "Maps SDK for iOS" \
+    --module-version ${SHORT_VERSION}
