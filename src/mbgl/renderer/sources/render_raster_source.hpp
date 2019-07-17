@@ -5,15 +5,11 @@
 
 namespace mbgl {
 
-class RenderRasterSource final : public RenderTileSource {
+class RenderRasterSource final : public RenderTileSetSource {
 public:
     explicit RenderRasterSource(Immutable<style::RasterSource::Impl>);
 
-    void update(Immutable<style::Source::Impl>,
-                const std::vector<Immutable<style::LayerProperties>>&,
-                bool needsRendering,
-                bool needsRelayout,
-                const TileParameters&) final;
+private:
     void prepare(const SourcePrepareParameters&) final;
 
     std::unordered_map<std::string, std::vector<Feature>>
@@ -26,9 +22,15 @@ public:
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const override;
 
-private:
+    // RenderTileSetSource overrides
+    void updateInternal(const Tileset&,
+                        const std::vector<Immutable<style::LayerProperties>>&,
+                        bool needsRendering,
+                        bool needsRelayout,
+                        const TileParameters&) override;
+    const optional<Tileset>& getTileset() const override;
+
     const style::RasterSource::Impl& impl() const;
-    optional<Tileset> tileset;
 };
 
 } // namespace mbgl
