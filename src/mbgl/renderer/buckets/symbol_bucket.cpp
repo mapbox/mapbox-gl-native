@@ -196,17 +196,17 @@ void SymbolBucket::sortFeatures(const float angle) {
     // The index array buffer is rewritten to reference the (unchanged) vertices in the
     // sorted order.
     for (const SymbolInstance& symbolInstance : getSortedSymbols(angle)) {
-        featureSortOrder->push_back(symbolInstance.dataFeatureIndex);
+        featureSortOrder->push_back(symbolInstance.commonData->dataFeatureIndex);
 
         if (symbolInstance.placedRightTextIndex) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedRightTextIndex]);
         }
 
-        if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
+        if (symbolInstance.placedCenterTextIndex && !symbolInstance.commonData->singleLine) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedCenterTextIndex]);
         }
 
-        if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
+        if (symbolInstance.placedLeftTextIndex && !symbolInstance.commonData->singleLine) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedLeftTextIndex]);
         }
 
@@ -231,7 +231,7 @@ std::vector<std::reference_wrapper<SymbolInstance>> SymbolBucket::getSortedSymbo
         if (aRotated != bRotated) {
             return aRotated < bRotated;
         }
-        return a.dataFeatureIndex > b.dataFeatureIndex;  // aRotated == bRotated
+        return a.commonData->dataFeatureIndex > b.commonData->dataFeatureIndex;  // aRotated == bRotated
     });
 
     return result;

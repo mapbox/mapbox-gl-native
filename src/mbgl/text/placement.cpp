@@ -191,7 +191,7 @@ void Placement::placeBucket(
                 const CollisionBox& textBox = symbolInstance.textCollisionFeature.boxes[0];
                 const float width = textBox.x2 - textBox.x1;
                 const float height = textBox.y2 - textBox.y1;
-                const float textBoxScale = symbolInstance.textBoxScale;
+                const float textBoxScale = symbolInstance.commonData->textBoxScale;
 
                 // If this symbol was in the last placement, shift the previously used
                 // anchor to the front of the anchor list.
@@ -212,7 +212,7 @@ void Placement::placeBucket(
                 }
 
                 for (auto anchor : variableTextAnchors) {
-                    Point<float> shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.radialTextOffset, textBoxScale);
+                    Point<float> shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.commonData->radialTextOffset, textBoxScale);
                     if (rotateWithMap) {            
                         float angle = pitchWithMap ? state.getBearing() : -state.getBearing();
                         shift = util::rotate(shift, angle);
@@ -242,7 +242,7 @@ void Placement::placeBucket(
                         }
 
                         variableOffsets.insert(std::make_pair(symbolInstance.crossTileID, VariableOffset{
-                            symbolInstance.radialTextOffset,
+                            symbolInstance.commonData->radialTextOffset,
                             width,
                             height,
                             anchor,
@@ -283,8 +283,8 @@ void Placement::placeBucket(
             offscreen &= placed.second;
         }
 
-        const bool iconWithoutText = !symbolInstance.hasText || layout.get<style::TextOptional>();
-        const bool textWithoutIcon = !symbolInstance.hasIcon || layout.get<style::IconOptional>();
+        const bool iconWithoutText = !symbolInstance.commonData->hasText || layout.get<style::TextOptional>();
+        const bool textWithoutIcon = !symbolInstance.commonData->hasIcon || layout.get<style::IconOptional>();
 
         // combine placements for icon and text
         if (!iconWithoutText && !textWithoutIcon) {
@@ -540,31 +540,31 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
 
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
 
-        if (symbolInstance.hasText) {
+        if (symbolInstance.commonData->hasText) {
             auto opacityVertex = SymbolSDFTextProgram::opacityVertex(opacityState.text.placed, opacityState.text.opacity);
             if (symbolInstance.placedRightTextIndex) {
-                for (size_t i = 0; i < symbolInstance.rightJustifiedGlyphQuads.size() * 4; i++) {
+                for (size_t i = 0; i < symbolInstance.commonData->rightJustifiedGlyphQuads.size() * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedRightTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
-            if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
-                for (size_t i = 0; i < symbolInstance.centerJustifiedGlyphQuads.size() * 4; i++) {
+            if (symbolInstance.placedCenterTextIndex && !symbolInstance.commonData->singleLine) {
+                for (size_t i = 0; i < symbolInstance.commonData->centerJustifiedGlyphQuads.size() * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedCenterTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
-            if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
-                for (size_t i = 0; i < symbolInstance.leftJustifiedGlyphQuads.size() * 4; i++) {
+            if (symbolInstance.placedLeftTextIndex && !symbolInstance.commonData->singleLine) {
+                for (size_t i = 0; i < symbolInstance.commonData->leftJustifiedGlyphQuads.size() * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedLeftTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedVerticalTextIndex) {
-                for (size_t i = 0; i < symbolInstance.verticalGlyphQuads.size() * 4; i++) {
+                for (size_t i = 0; i < symbolInstance.commonData->verticalGlyphQuads.size() * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 bucket.text.placedSymbols[*symbolInstance.placedVerticalTextIndex].hidden = opacityState.isHidden();
@@ -575,9 +575,9 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                 markUsedJustification(bucket, prevOffset->second.anchor, symbolInstance);
             }
         }
-        if (symbolInstance.hasIcon) {
+        if (symbolInstance.commonData->hasIcon) {
             auto opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
-            if (symbolInstance.iconQuad) {
+            if (symbolInstance.commonData->iconQuad) {
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);

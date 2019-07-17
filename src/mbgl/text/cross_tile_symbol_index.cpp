@@ -10,7 +10,7 @@ namespace mbgl {
 TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstance>& symbolInstances, uint32_t bucketInstanceId_)
     : coord(coord_), bucketInstanceId(bucketInstanceId_) {
         for (SymbolInstance& symbolInstance : symbolInstances) {
-            indexedSymbolInstances[symbolInstance.key].emplace_back(symbolInstance.crossTileID, getScaledCoordinates(symbolInstance, coord));
+            indexedSymbolInstances[symbolInstance.commonData->key].emplace_back(symbolInstance.crossTileID, getScaledCoordinates(symbolInstance, coord));
         }
     }
 
@@ -33,7 +33,7 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
             continue;
         }
 
-        auto it = indexedSymbolInstances.find(symbolInstance.key);
+        auto it = indexedSymbolInstances.find(symbolInstance.commonData->key);
         if (it == indexedSymbolInstances.end()) {
             // No symbol with this key in this bucket
             continue;

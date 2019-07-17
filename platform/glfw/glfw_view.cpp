@@ -25,6 +25,8 @@
 #include <mapbox/geometry.hpp>
 #include <mapbox/geojson.hpp>
 
+#include <iostream>
+
 #if MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
 #endif // MBGL_USE_GLES2
@@ -281,6 +283,12 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             };
             view->animateRouteCallback(view->map);
         } break;
+        case GLFW_KEY_Y:{
+            view->map->jumpTo(mbgl::CameraOptions().withZoom(18).withPitch(0).withBearing(0));
+        }break;
+        case GLFW_KEY_M:{
+            view->map->jumpTo(mbgl::CameraOptions().withZoom(22).withPitch(0).withBearing(0));
+        }break;
         case GLFW_KEY_E:
             view->toggle3DExtrusions(!view->show3DExtrusions);
             break;

@@ -121,11 +121,12 @@ int main(int argc, char *argv[]) {
         style = std::string("file://") + style;
     }
 
-    map.jumpTo(mbgl::CameraOptions()
+    /*map.jumpTo(mbgl::CameraOptions()
                    .withCenter(mbgl::LatLng {settings.latitude, settings.longitude})
                    .withZoom(settings.zoom)
                    .withBearing(settings.bearing)
-                   .withPitch(settings.pitch));
+                   .withPitch(settings.pitch));*/
+    map.jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng{43.5, -100}).withZoom(12).withPitch(0).withBearing(0));
     map.setDebug(mbgl::MapDebugOptions(settings.debug));
 
     view->setOnlineStatusCallback([&settings, fileSource]() {
@@ -181,7 +182,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    map.getStyle().loadURL(style);
+    map.getStyle().loadURL("http://0.0.0.0:8000/style.json");
+    //map.getStyle().loadURL(style);
 
     view->run();
 
