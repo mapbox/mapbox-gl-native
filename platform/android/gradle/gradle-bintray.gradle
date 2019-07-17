@@ -50,7 +50,7 @@ bintray {
     publications('MapboxMapsSdkPublication')
     pkg {
         repo = project.ext.mapboxBintrayRepoName
-        name = project.ext.mapboxArtifactId
+        name = project.ext.mapboxBintrayPackageName
         userOrg = project.ext.mapboxBintrayUserOrg
         licenses = [project.ext.mapboxArtifactLicenseName]
         vcsUrl = project.ext.mapboxArtifactVcsUrl
