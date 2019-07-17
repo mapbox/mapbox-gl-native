@@ -13,30 +13,7 @@ class MGLCoreLoggingObserver : public Log :: Observer {
 public:
     //Filter logs from core
     bool onRecord(EventSeverity severity, Event, int64_t, const std::string&) override{
-        if(_platformLoggingLevel == MGLLoggingLevelNone){
-            return true;
-        }
-        else if(_platformLoggingLevel == MGLLoggingLevelFault){
-            if(severity == EventSeverity::Error)
-                return false;
-            return true;
-        }
-        else if (_platformLoggingLevel == MGLLoggingLevelError){
-            if(severity == EventSeverity::Error)
-                return false;
-            return true;
-        }
-        else if (_platformLoggingLevel == MGLLoggingLevelWarning){
-            if(severity == EventSeverity::Error || severity == EventSeverity :: Warning)
-                return false;
-            return true;
-        }
-        else if (_platformLoggingLevel == MGLLoggingLevelInfo){
-            if(severity == EventSeverity::Error || severity == EventSeverity :: Warning ||severity == EventSeverity::Info)
-                return false;
-            return true;
-        }
-        return false;
+        return !(coreEventSeverityMask[_platformLoggingLevel] & this->mask(severity));
     }
     
     void setPlatformLoggingLevel(MGLLoggingLevel platformLoggingLevel){
@@ -45,6 +22,27 @@ public:
     
 private:
     MGLLoggingLevel _platformLoggingLevel = MGLLoggingLevelNone;
+    
+    constexpr unsigned int mask(const EventSeverity severity) {
+        return (1 << (unsigned int)severity);
+    }
+    
+    /*
+     None                       0
+     EventSeverity::Debug       1 << 0
+     EventSeverity::Info        1 << 1
+     EventSeverity :: Warning   1 << 2
+     EventSeverity::Error       1 << 3
+     */
+    const int coreEventSeverityMask[7] = {
+        0,
+        1 << 3,
+        1 << 3,
+        1 << 2 | 1 << 3,
+        1 << 1 | 1 << 2 | 1 << 3,
+        1 << 0,
+        1 << 0,
+    };
 };
 
 }
