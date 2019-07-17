@@ -2,19 +2,12 @@
 
 #include <mbgl/renderer/sources/render_tile_source.hpp>
 #include <mbgl/style/sources/raster_source_impl.hpp>
-#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 
-class RenderRasterDEMSource final : public RenderTileSource {
+class RenderRasterDEMSource final : public RenderTileSetSource {
 public:
     explicit RenderRasterDEMSource(Immutable<style::RasterSource::Impl>);
-
-    void update(Immutable<style::Source::Impl>,
-                const std::vector<Immutable<style::LayerProperties>>&,
-                bool needsRendering,
-                bool needsRelayout,
-                const TileParameters&) final;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
@@ -26,13 +19,16 @@ public:
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const override;
 
-    uint8_t getMaxZoom() const override { return maxzoom; }
-
 private:
-    const style::RasterSource::Impl& impl() const;
+    // RenderTileSetSource overrides
+    void updateInternal(const Tileset&,
+                        const std::vector<Immutable<style::LayerProperties>>&,
+                        bool needsRendering,
+                        bool needsRelayout,
+                        const TileParameters&) override;
+    const optional<Tileset>& getTileset() const override;
 
-    optional<Tileset> tileset;
-    uint8_t maxzoom = util::TERRAIN_RGB_MAXZOOM;
+    const style::RasterSource::Impl& impl() const;
 
     void onTileChanged(Tile&) override;
 };

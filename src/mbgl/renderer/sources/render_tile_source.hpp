@@ -11,7 +11,6 @@ namespace mbgl {
  */
 class RenderTileSource : public RenderSource {
 public:
-    RenderTileSource(Immutable<style::Source::Impl>);
     ~RenderTileSource() override;
 
     bool isLoaded() const override;
@@ -39,11 +38,39 @@ public:
     void dumpDebugLogs() const override;
 
 protected:
+    RenderTileSource(Immutable<style::Source::Impl>);
     TilePyramid tilePyramid;
     Immutable<std::vector<RenderTile>> renderTiles;
     mutable RenderTiles filteredRenderTiles;
     mutable RenderTiles renderTilesSortedByY;
     float bearing = 0.0f;      
+};
+
+/**
+ * @brief Base class for render sources that use tile sets.
+ */
+class RenderTileSetSource : public RenderTileSource {
+protected:
+    RenderTileSetSource(Immutable<style::Source::Impl>);
+    ~RenderTileSetSource() override;
+
+    virtual void updateInternal(const Tileset&,
+                                const std::vector<Immutable<style::LayerProperties>>&,
+                                bool needsRendering,
+                                bool needsRelayout,
+                                const TileParameters&) = 0;
+    // Returns tileset from the current impl.
+    virtual const optional<Tileset>& getTileset() const = 0;
+
+private:
+    uint8_t getMaxZoom() const final;
+    void update(Immutable<style::Source::Impl>,
+                const std::vector<Immutable<style::LayerProperties>>&,
+                bool needsRendering,
+                bool needsRelayout,
+                const TileParameters&) final;
+
+    optional<Tileset> cachedTileset;
 };
 
 } // namespace mbgl

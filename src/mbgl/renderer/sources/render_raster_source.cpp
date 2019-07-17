@@ -9,50 +9,32 @@ namespace mbgl {
 using namespace style;
 
 RenderRasterSource::RenderRasterSource(Immutable<style::RasterSource::Impl> impl_)
-    : RenderTileSource(std::move(impl_)) {
+    : RenderTileSetSource(std::move(impl_)) {
 }
 
-const style::RasterSource::Impl& RenderRasterSource::impl() const {
+inline const style::RasterSource::Impl& RenderRasterSource::impl() const {
     return static_cast<const style::RasterSource::Impl&>(*baseImpl);
 }
 
-void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
-                                const std::vector<Immutable<LayerProperties>>& layers,
-                                const bool needsRendering,
-                                const bool needsRelayout,
-                                const TileParameters& parameters) {
-    std::swap(baseImpl, baseImpl_);
+const optional<Tileset>& RenderRasterSource::getTileset() const {
+    return impl().tileset;
+}
 
-    enabled = needsRendering;
-
-    const optional<Tileset>& implTileset = impl().tileset;
-    // In Continuous mode, keep the existing tiles if the new tileset is not
-    // yet available, thus providing smart style transitions without flickering.
-    // In other modes, allow clearing the tile pyramid first, before the early
-    // return in order to avoid render tests being flaky.
-    bool canUpdateTileset = implTileset || parameters.mode != MapMode::Continuous;
-    if (canUpdateTileset && tileset != implTileset) {
-        tileset = implTileset;
-
-        // TODO: this removes existing buckets, and will cause flickering.
-        // Should instead refresh tile data in place.
-        tilePyramid.clearAll();
-    }
-
-    if (!implTileset) {
-        return;
-    }
-
+void RenderRasterSource::updateInternal(const Tileset& tileset,
+                                        const std::vector<Immutable<LayerProperties>>& layers,
+                                        const bool needsRendering,
+                                        const bool needsRelayout,
+                                        const TileParameters& parameters) {
     tilePyramid.update(layers,
                        needsRendering,
                        needsRelayout,
                        parameters,
                        SourceType::Raster,
                        impl().getTileSize(),
-                       tileset->zoomRange,
-                       tileset->bounds,
+                       tileset.zoomRange,
+                       tileset.bounds,
                        [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<RasterTile>(tileID, parameters, *tileset);
+                           return std::make_unique<RasterTile>(tileID, parameters, tileset);
                        });
     algorithm::updateTileMasks(tilePyramid.getRenderedTiles());
 }
