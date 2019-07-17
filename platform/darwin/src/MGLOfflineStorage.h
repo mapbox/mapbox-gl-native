@@ -360,7 +360,7 @@ MGL_EXPORT
 #pragma mark - Managing Ambient Cache
 
 /**
- Sets the maximum ambient cache size in megabytes. The default maximum cache
+ Sets the maximum ambient cache size in bytes. The default maximum cache
  size is 50 MB. To disable ambient caching, set the maximum ambient cache size
  to `0`. Setting the maximum ambient cache size does not impact the maximum size
  of offline packs.
