@@ -1,6 +1,6 @@
 Pod::Spec.new do |m|
 
-  version = '5.0.0'
+  version = '5.0.1'
 
   m.name    = 'Mapbox-iOS-SDK-snapshot-dynamic'
   m.version = "#{version}-snapshot"
