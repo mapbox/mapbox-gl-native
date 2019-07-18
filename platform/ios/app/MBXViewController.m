@@ -17,6 +17,21 @@
 #import "../src/MGLMapView_Experimental.h"
 
 #import <objc/runtime.h>
+#import <os/log.h>
+#import <os/signpost.h>
+
+os_log_t signpostlog;
+os_signpost_id_t signpost;
+BOOL queryForRoads = NO;
+
+@interface MGLStyle (qrf)
+@property (nonatomic, readonly, copy) NSArray<MGLVectorStyleLayer *> *roadStyleLayers;
+@end
+
+@interface MGLMapView ()
+- (void)setNeedsRerender;
+@end
+
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = 38.8999418, .longitude = -77.033996 },
@@ -830,7 +845,22 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             dispatch_async(dispatch_get_main_queue(), ^
             {
                 [self.mapView addAnnotations:annotations];
-                [self.mapView showAnnotations:annotations animated:YES];
+
+                signpostlog = os_log_create("com.mapbox.iosapp", "qrf");
+                signpost = os_signpost_id_generate(signpostlog);
+
+                
+//                [self.mapView showAnnotations:annotations animated:YES];
+                
+                os_signpost_interval_begin(signpostlog, signpost, "show-annotations");
+                [self.mapView showAnnotations:annotations edgePadding:UIEdgeInsetsZero animated:YES completionHandler:^{
+                    os_signpost_interval_end(signpostlog, signpost, "show-annotations");
+
+                    // Idle till after all tile parsing/rendering is done (don't want a busy CPU)
+                    [self.mapView setNeedsRerender];
+                    queryForRoads = YES;
+                }];
+                
             });
         }
     });
@@ -1995,6 +2025,19 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 }
 
 #pragma mark - MGLMapViewDelegate
+
+- (void)mapViewDidBecomeIdle:(MGLMapView *)mapView
+{
+    if (queryForRoads)
+    {
+        os_signpost_interval_begin(signpostlog, signpost, "query-roads");
+        NSArray *roadStyleLayerIdentifiers = [self.mapView.style.roadStyleLayers valueForKey:@"identifier"];
+        NSArray *visibleRoadFeatures = [self.mapView visibleFeaturesInRect:self.mapView.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
+        os_signpost_interval_end(signpostlog, signpost, "query-roads");
+        os_signpost_event_emit(signpostlog, signpost, "query-roads-count", "%ld", visibleRoadFeatures.count);
+        queryForRoads = YES;
+    }
+}
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
