@@ -7,6 +7,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity
 import junit.framework.Assert.assertNotNull
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeoutException
  * Integration test that validates if a snapshotter creation
  */
 @RunWith(AndroidJUnit4::class)
+@Ignore("Ignored until https://github.com/mapbox/mapbox-gl-native/issues/11669 is resolved.")
 class MapSnapshotterTest {
 
   @Rule
