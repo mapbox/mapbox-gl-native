@@ -193,8 +193,7 @@ public:
      * tiles stored for offline regions has been reached.
      *
      * Once the limit has been reached, the SDK will not download further offline
-     * tiles from Mapbox APIs until existing tiles have been removed. Contact your
-     * Mapbox sales representative to raise the limit.
+     * tiles from Mapbox APIs until existing tiles have been removed.
      *
      * This limit does not apply to non-Mapbox tile sources.
      *

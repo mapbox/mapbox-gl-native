@@ -58,7 +58,6 @@ FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotific
  Once this limit is reached, no instance of `MGLOfflinePack` can download
  additional tiles from Mapbox APIs until already downloaded tiles are removed by
  calling the `-[MGLOfflineStorage removePack:withCompletionHandler:]` method.
- Contact your Mapbox sales representative to have the limit raised.
  */
 FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification;
 
@@ -344,7 +343,6 @@ MGL_EXPORT
 
  @note The <a href="https://www.mapbox.com/tos/">Mapbox Terms of Service</a>
     prohibits changing or bypassing this limit without permission from Mapbox.
-    Contact your Mapbox sales representative to have the limit raised.
  */
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount;
 
