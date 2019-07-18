@@ -47,7 +47,6 @@ jazzy \
     --readme ${README} \
     --documentation="platform/{darwin,macos}/docs/guides/*.md" \
     --theme platform/darwin/docs/theme \
-    --output ${OUTPUT}
-# https://github.com/realm/jazzy/issues/411
-find ${OUTPUT} -name *.html -exec \
-    perl -pi -e 's/BRANDLESS_DOCSET_TITLE/Maps SDK for macOS $1/, s/Mapbox\s+(Docs|Reference)/Mapbox Maps SDK for macOS $1/' {} \;
+    --output ${OUTPUT} \
+    --title "Maps SDK for macOS" \
+    --module-version ${SHORT_VERSION}
