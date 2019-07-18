@@ -2,7 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 4.10.1 - July 18, 2019
+
+* Fixed a bug in telemetry collection. ([#15162](https://github.com/mapbox/mapbox-gl-native/pull/15162))
+
 ## 4.10.0 - April 17, 2019
+
+This release contains a bug in telemetry collection and has been superseded by 4.10.1 — please update immediately.
 
 ### Styles and rendering
 
