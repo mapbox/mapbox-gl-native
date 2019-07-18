@@ -11,40 +11,25 @@ namespace mbgl {
     
 class MGLCoreLoggingObserver : public Log :: Observer {
 public:
-    //Filter logs from core
-    bool onRecord(EventSeverity severity, Event, int64_t, const std::string&) override{
-        return !(coreEventSeverityMask[_platformLoggingLevel] & this->mask(severity));
+    //Return true not print messages at core level, and filter at platform level.
+    bool onRecord(EventSeverity severity, Event, int64_t, const std::string& msg) override{
+        switch (severity) {
+            case EventSeverity::Debug:
+                MGLLogDebug([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                break;
+            case EventSeverity::Info:
+                MGLLogInfo([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                break;
+            case EventSeverity::Warning:
+                MGLLogWarning([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                break;
+            case EventSeverity::Error:
+                MGLLogError([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                break;
+        }
+        return true;
     }
-    
-    void setPlatformLoggingLevel(MGLLoggingLevel platformLoggingLevel){
-        _platformLoggingLevel = platformLoggingLevel;
-    }
-    
-private:
-    MGLLoggingLevel _platformLoggingLevel = MGLLoggingLevelNone;
-    
-    constexpr unsigned int mask(const EventSeverity severity) {
-        return (1 << (unsigned int)severity);
-    }
-    
-    /*
-     None                       0
-     EventSeverity::Debug       1 << 0
-     EventSeverity::Info        1 << 1
-     EventSeverity :: Warning   1 << 2
-     EventSeverity::Error       1 << 3
-     */
-    const int coreEventSeverityMask[7] = {
-        0,
-        1 << 3,
-        1 << 3,
-        1 << 2 | 1 << 3,
-        1 << 1 | 1 << 2 | 1 << 3,
-        1 << 0,
-        1 << 0,
-    };
 };
-
 }
 
 @implementation MGLLoggingConfiguration
@@ -60,6 +45,14 @@ private:
         ((MGLLoggingConfiguration *)sharedConfiguration).handler = nil;
     });
     return sharedConfiguration;
+}
+
+- (id)init{
+    if(self = [super init]){
+        _coreLoggingObserver = std::make_unique<mbgl::MGLCoreLoggingObserver>();
+        mbgl::Log::setObserver(std::move(_coreLoggingObserver));
+    }
+    return self;
 }
 
 - (void)setHandler:(void (^)(MGLLoggingLevel, NSString *, NSUInteger, NSString *))handler {
@@ -81,9 +74,6 @@ private:
     else {
         _loggingLevel = loggingLevel;
     }
-    _coreLoggingObserver = std::make_unique<mbgl::MGLCoreLoggingObserver>();
-    _coreLoggingObserver->setPlatformLoggingLevel(loggingLevel);
-    mbgl::Log::setObserver(std::move(_coreLoggingObserver));
 }
 
 - (void)logCallingFunction:(const char *)callingFunction functionLine:(NSUInteger)functionLine messageType:(MGLLoggingLevel)type format:(id)messageFormat, ... {
