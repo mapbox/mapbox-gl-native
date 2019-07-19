@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
+import java.util.concurrent.CountDownLatch
 import junit.framework.Assert
 import org.junit.After
 import org.junit.Before
@@ -13,7 +14,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 
 @RunWith(AndroidJUnit4::class)
 open class FileSourceMapTest : AppCenter() {

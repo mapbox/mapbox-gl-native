@@ -40,7 +40,7 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
   private val onRegionMergedListener = object : OfflineManager.MergeOfflineRegionsCallback {
     override fun onMerge(offlineRegions: Array<OfflineRegion>) {
       mapView.getMapAsync {
-        it.setStyle(Style.Builder().fromUrl(TEST_STYLE))
+        it.setStyle(Style.Builder().fromUri(TEST_STYLE))
       }
       Toast.makeText(
         this@MergeOfflineRegionsActivity,
@@ -91,7 +91,7 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
     }
     mapView.getMapAsync {
       it.isDebugActive = true
-      it.setStyle(Style.Builder().fromUrl(TEST_STYLE))
+      it.setStyle(Style.Builder().fromUri(TEST_STYLE))
     }
   }
 

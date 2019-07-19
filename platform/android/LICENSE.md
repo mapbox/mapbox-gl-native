@@ -12,6 +12,12 @@ License: [The Apache Software License, Version 2.0](http://www.apache.org/licens
 
 ===========================================================================
 
+Mapbox GL uses portions of the Android Lifecycle LiveData.  
+URL: [https://developer.android.com/topic/libraries/architecture/index.html](https://developer.android.com/topic/libraries/architecture/index.html)  
+License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
 Mapbox GL uses portions of the Android Lifecycle LiveData Core.  
 URL: [https://developer.android.com/topic/libraries/architecture/index.html](https://developer.android.com/topic/libraries/architecture/index.html)  
 License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -42,7 +48,25 @@ License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.
 
 ===========================================================================
 
+Mapbox GL uses portions of the Android Support Library Async Layout Inflater.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library collections.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
 Mapbox GL uses portions of the Android Support Library compat.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Coordinator Layout.  
 URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
 License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -60,7 +84,73 @@ License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.
 
 ===========================================================================
 
+Mapbox GL uses portions of the Android Support Library Cursor Adapter.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Custom View.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Custom View.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Document File.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Drawer Layout.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
 Mapbox GL uses portions of the Android Support Library fragment.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Interpolators.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library loader.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Local Broadcast Manager.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Print.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library Sliding Pane Layout.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support Library View Pager.  
 URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
 License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -119,7 +209,13 @@ License: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 Mapbox GL uses portions of the SoLoader.  
 URL: [https://github.com/facebook/soloader](https://github.com/facebook/soloader)  
-License: [BSD License](https://github.com/facebook/soloader/blob/master/LICENSE)
+License: [Apache-2](https://github.com/facebook/soloader/blob/master/LICENSE)
+
+===========================================================================
+
+Mapbox GL uses portions of the VersionedParcelable and friends.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ===========================================================================
 

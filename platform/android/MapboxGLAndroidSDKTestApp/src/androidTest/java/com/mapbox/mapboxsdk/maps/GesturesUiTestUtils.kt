@@ -9,14 +9,18 @@ import android.support.test.espresso.ViewAction
 import android.support.test.espresso.matcher.ViewMatchers
 import android.view.MotionEvent
 import android.view.View
-
 import org.hamcrest.Matcher
 
 object GesturesUiTestUtils {
 
   private const val DEFAULT_GESTURE_DURATION = 500L
 
-  fun pinch(startSpan: Float, endSpan: Float, center: PointF? = null, duration: Long = DEFAULT_GESTURE_DURATION): ViewAction {
+  fun pinch(
+    startSpan: Float,
+    endSpan: Float,
+    center: PointF? = null,
+    duration: Long = DEFAULT_GESTURE_DURATION
+  ): ViewAction {
     return object : ViewAction {
       override fun getConstraints(): Matcher<View> {
         return ViewMatchers.isEnabled()
@@ -40,7 +44,13 @@ object GesturesUiTestUtils {
     }
   }
 
-  fun quickScale(deltaY: Float, startPoint: PointF? = null, withVelocity: Boolean = true, duration: Long = DEFAULT_GESTURE_DURATION, interrupt: Boolean = false): ViewAction {
+  fun quickScale(
+    deltaY: Float,
+    startPoint: PointF? = null,
+    withVelocity: Boolean = true,
+    duration: Long = DEFAULT_GESTURE_DURATION,
+    interrupt: Boolean = false
+  ): ViewAction {
     return object : ViewAction {
       override fun getConstraints(): Matcher<View> = ViewMatchers.isEnabled()
 
@@ -59,7 +69,13 @@ object GesturesUiTestUtils {
     }
   }
 
-  fun move(deltaX: Float, deltaY: Float, startPoint: PointF? = null, withVelocity: Boolean = true, duration: Long = DEFAULT_GESTURE_DURATION): ViewAction {
+  fun move(
+    deltaX: Float,
+    deltaY: Float,
+    startPoint: PointF? = null,
+    withVelocity: Boolean = true,
+    duration: Long = DEFAULT_GESTURE_DURATION
+  ): ViewAction {
     return object : ViewAction {
       override fun getConstraints(): Matcher<View> = ViewMatchers.isEnabled()
 
@@ -85,7 +101,8 @@ object GesturesUiTestUtils {
     val viewWidth = view.width * view.scaleX
     return PointF(
       (locationOnScreen[0] + viewWidth / 2).toInt().toFloat(),
-      (locationOnScreen[1] + viewHeight / 2).toInt().toFloat())
+      (locationOnScreen[1] + viewHeight / 2).toInt().toFloat()
+    )
   }
 
   // https://stackoverflow.com/a/46443628/9126211
@@ -147,15 +164,19 @@ object GesturesUiTestUtils {
 
     try {
       // Step 1
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_DOWN, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
 
       // Step 2
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_POINTER_DOWN + (pp2.id shl MotionEvent.ACTION_POINTER_INDEX_SHIFT), 2,
-        properties, pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        properties, pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
 
       // Step 3, 4
@@ -187,9 +208,11 @@ object GesturesUiTestUtils {
         pointerCoords[0] = pc1
         pointerCoords[1] = pc2
 
-        event = MotionEvent.obtain(startTime, eventTime,
+        event = MotionEvent.obtain(
+          startTime, eventTime,
           MotionEvent.ACTION_MOVE, 2, properties,
-          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+        )
         injectMotionEventToUiController(uiController, event)
       }
 
@@ -202,23 +225,34 @@ object GesturesUiTestUtils {
       pointerCoords[1] = pc2
 
       eventTime += eventMinInterval
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_POINTER_UP + (pp2.id shl MotionEvent.ACTION_POINTER_INDEX_SHIFT), 2, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
 
       // Step 6
       eventTime += eventMinInterval
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_UP, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
     } catch (ex: InjectEventSecurityException) {
       throw RuntimeException("Could not perform pinch", ex)
     }
   }
 
-  private fun performQuickScale(uiController: UiController, startPoint: PointF, endPoint: PointF, withVelocity: Boolean, duration: Long, interrupt: Boolean) {
+  private fun performQuickScale(
+    uiController: UiController,
+    startPoint: PointF,
+    endPoint: PointF,
+    withVelocity: Boolean,
+    duration: Long,
+    interrupt: Boolean
+  ) {
     val eventMinInterval: Long = 10
     val tapDownMinInterval: Long = 40 // ViewConfiguration#DOUBLE_TAP_MIN_TIME = 40
     val startTime = SystemClock.uptimeMillis()
@@ -252,23 +286,29 @@ object GesturesUiTestUtils {
      */
     try {
       // Step 1
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_DOWN, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
 
       // Step 2
       eventTime += eventMinInterval
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_UP, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
 
       // Step 3
       eventTime += tapDownMinInterval
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_DOWN, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
 
       // Step 4
@@ -293,9 +333,11 @@ object GesturesUiTestUtils {
 
         pointerCoords[0] = pc1
 
-        event = MotionEvent.obtain(startTime, eventTime,
+        event = MotionEvent.obtain(
+          startTime, eventTime,
           MotionEvent.ACTION_MOVE, if (interrupted) 2 else 1, properties,
-          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+        )
         injectMotionEventToUiController(uiController, event)
 
         if (interrupt && i == moveEventNumber / 2) {
@@ -320,9 +362,11 @@ object GesturesUiTestUtils {
           pointerCoords[1] = pc2
 
           eventTime += eventMinInterval
-          event = MotionEvent.obtain(startTime, eventTime,
+          event = MotionEvent.obtain(
+            startTime, eventTime,
             MotionEvent.ACTION_POINTER_DOWN + (pp2.id shl MotionEvent.ACTION_POINTER_INDEX_SHIFT), 2,
-            properties, pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+            properties, pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+          )
           injectMotionEventToUiController(uiController, event)
           interrupted = true
         }
@@ -330,24 +374,34 @@ object GesturesUiTestUtils {
 
       if (!withVelocity) {
         eventTime += eventMinInterval
-        event = MotionEvent.obtain(startTime, eventTime,
+        event = MotionEvent.obtain(
+          startTime, eventTime,
           MotionEvent.ACTION_MOVE, 1, properties,
-          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+        )
         injectMotionEventToUiController(uiController, event)
       }
 
       // Step 5
       eventTime += eventMinInterval
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_UP, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
     } catch (ex: InjectEventSecurityException) {
       throw RuntimeException("Could not perform quick scale", ex)
     }
   }
 
-  private fun performMove(uiController: UiController, startPoint: PointF, endPoint: PointF, withVelocity: Boolean, duration: Long) {
+  private fun performMove(
+    uiController: UiController,
+    startPoint: PointF,
+    endPoint: PointF,
+    withVelocity: Boolean,
+    duration: Long
+  ) {
     val eventMinInterval: Long = 10
     val startTime = SystemClock.uptimeMillis()
     var eventTime = startTime
@@ -378,9 +432,11 @@ object GesturesUiTestUtils {
      */
     try {
       // Step 1
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_DOWN, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
 
       // Step 2
@@ -403,25 +459,31 @@ object GesturesUiTestUtils {
 
         pointerCoords[0] = pc1
 
-        event = MotionEvent.obtain(startTime, eventTime,
+        event = MotionEvent.obtain(
+          startTime, eventTime,
           MotionEvent.ACTION_MOVE, 1, properties,
-          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+        )
         injectMotionEventToUiController(uiController, event)
       }
 
       if (!withVelocity) {
         eventTime += eventMinInterval
-        event = MotionEvent.obtain(startTime, eventTime,
+        event = MotionEvent.obtain(
+          startTime, eventTime,
           MotionEvent.ACTION_MOVE, 1, properties,
-          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+          pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+        )
         injectMotionEventToUiController(uiController, event)
       }
 
       // Step 3
       eventTime += eventMinInterval
-      event = MotionEvent.obtain(startTime, eventTime,
+      event = MotionEvent.obtain(
+        startTime, eventTime,
         MotionEvent.ACTION_UP, 1, properties,
-        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0)
+        pointerCoords, 0, 0, 1f, 1f, 0, 0, 0, 0
+      )
       injectMotionEventToUiController(uiController, event)
     } catch (ex: InjectEventSecurityException) {
       throw RuntimeException("Could not perform quick scale", ex)

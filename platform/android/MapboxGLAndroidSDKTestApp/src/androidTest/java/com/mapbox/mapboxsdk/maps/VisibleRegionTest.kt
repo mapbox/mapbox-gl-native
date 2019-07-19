@@ -5,7 +5,6 @@ import android.support.test.espresso.UiController
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
-
 import com.mapbox.mapboxsdk.testapp.activity.BaseTest
 import com.mapbox.mapboxsdk.testapp.activity.espresso.PixelTestActivity
 import org.junit.Assert.*

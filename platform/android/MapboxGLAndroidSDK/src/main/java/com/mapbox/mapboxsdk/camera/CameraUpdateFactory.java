@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
-import junit.framework.Assert;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -329,8 +328,8 @@ public final class CameraUpdateFactory {
         return mapboxMap.getCameraForLatLngBounds(bounds, padding);
       } else {
         // use provided tilt and bearing
-        Assert.assertNotNull(bearing);
-        Assert.assertNotNull(tilt);
+        assert bearing != null;
+        assert tilt != null;
         return mapboxMap.getCameraForLatLngBounds(bounds, padding, bearing, tilt);
       }
     }
