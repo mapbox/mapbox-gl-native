@@ -2,6 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+### Styles and rendering
+
+* Fixed flickering on style change for the same tile set ([#15127](https://github.com/mapbox/mapbox-gl-native/pull/15127))
+
+
 ## 5.2.0
 
 ### Networking
@@ -22,7 +29,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed style change transition regression caused by delayed setting of the updated layer properties. ([#15016](https://github.com/mapbox/mapbox-gl-native/pull/15016))
 * Fixed an issue where layers with fill extrusions would be incorrectly rendered above other layers. ([#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065))
 * Improved feature querying performance. ([#14930](https://github.com/mapbox/mapbox-gl-native/pull/14930))
-* Fixed a custom geometry source bug caused by using the outdated tiles after style update [#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112)
+* Fixed a custom geometry source bug caused by using the outdated tiles after style update ([#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112))
 
 ### User interaction
 
