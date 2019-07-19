@@ -112,8 +112,6 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
         );
     };
 
-//    GeometryCollection geometries = geometryTileFeature.getGeometries();
-
     switch (geometryTileFeature.getType()) {
         case FeatureType::Unknown: {
             assert(false);
