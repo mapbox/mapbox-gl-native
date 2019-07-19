@@ -366,6 +366,7 @@ void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters)
     passes = ((evaluated.get<style::IconOpacity>().constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
               || (evaluated.get<style::TextOpacity>().constantOr(1) > 0 && hasTextOpacity && textSize > 0))
              ? RenderPass::Translucent : RenderPass::None;
+    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -471,7 +472,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     };
 
     for (const RenderTile& tile : renderTiles) {
-        const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
+        const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
         if (!renderData) {
             continue;
         }
@@ -619,6 +620,7 @@ style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProper
 void RenderSymbolLayer::setRenderTiles(RenderTiles tiles, const TransformState& state) {
     auto filterFn = [](auto& tile){ return !tile.tile.isRenderable(); };
     renderTiles = RenderLayer::filterRenderTiles(std::move(tiles), filterFn);
+    addRenderPassesFromTiles();
     // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
     // on top of each other, with lower symbols being drawn on top of higher symbols.
     std::sort(renderTiles.begin(), renderTiles.end(), [&state](const auto& a, const auto& b) {

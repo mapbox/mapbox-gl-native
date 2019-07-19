@@ -41,6 +41,7 @@ bool RenderLayer::supportsZoom(float zoom) const {
 void RenderLayer::setRenderTiles(RenderTiles tiles, const TransformState&) {
     auto filterFn = [](auto& tile){ return !tile.tile.isRenderable() || tile.tile.holdForFade(); };
     renderTiles = filterRenderTiles(std::move(tiles), filterFn);
+    addRenderPassesFromTiles();
 }
 
 const RenderLayerSymbolInterface* RenderLayer::getSymbolInterface() const {
@@ -94,6 +95,23 @@ void RenderLayer::checkRenderability(const PaintParameters& parameters,
                    activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
     }
+}
+
+void RenderLayer::addRenderPassesFromTiles() {
+    for (const RenderTile& tile : renderTiles) {
+        if (tile.tile.kind != Tile::Kind::Geometry) break;
+        if (const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl)) {
+            passes |= RenderPass(renderData->layerProperties->renderPasses);
+        }
+    }
+}
+
+const LayerRenderData* RenderLayer::getRenderDataForPass(const RenderTile& tile, RenderPass pass) const {
+    assert(tile.tile.kind == Tile::Kind::Geometry);
+    if (const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl)) {
+        return bool(RenderPass(renderData->layerProperties->renderPasses) & pass) ? renderData : nullptr;
+    }
+    return nullptr;
 }
 
 } //namespace mbgl
