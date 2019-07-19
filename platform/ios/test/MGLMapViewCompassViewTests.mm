@@ -7,6 +7,10 @@
 - (void)resetNorthAnimated:(BOOL)animated;
 @end
 
+@interface MGLCompassButton (MGLCompassButtonTests)
+- (void)handleTapGesture:(__unused UITapGestureRecognizer *)sender;
+@end
+
 @interface MGLCompassButtonTests : XCTestCase
 @property (nonatomic) MGLMapView *mapView;
 @end
@@ -76,6 +80,16 @@
     [self.mapView resetNorthAnimated:NO];
     XCTAssertEqual(self.mapView.direction, 0);
     XCTAssertEqual(self.mapView.compassView.alpha, 1, @"Compass should continue to be visible when direction is north.");
+}
+
+- (void)testCompassTapResetNorth {
+    self.mapView.zoomLevel = 15.f;
+    [self.mapView setDirection:45.f animated:false];
+    XCTAssertEqualWithAccuracy(self.mapView.direction, 45, 0.001);
+    XCTAssertEqual(self.mapView.compassView.alpha, 1, @"Compass should continue to be visible when direction changes.");
+
+    [self.mapView.compassView handleTapGesture:nil];
+    XCTAssertEqual(self.mapView.direction, 0, @"Tapping the compass should reset direction to north.");
 }
 
 - (void)testCompassRotation {
