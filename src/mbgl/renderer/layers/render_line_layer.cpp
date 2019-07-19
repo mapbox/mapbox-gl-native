@@ -214,11 +214,11 @@ void RenderLineLayer::render(PaintParameters& parameters) {
     }
 }
 
-GeometryCollection* offsetLine(const GeometryCollection& rings, const double offset) {
+std::unique_ptr<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
 
     if (offset == 0) return NULL;
 
-    GeometryCollection *newRings = new GeometryCollection();
+    std::unique_ptr<GeometryCollection> newRings = std::make_unique<GeometryCollection>();
 
     Point<double> zero(0, 0);
     for (const auto& ring : rings) {
@@ -249,7 +249,7 @@ GeometryCollection* offsetLine(const GeometryCollection& rings, const double off
 bool RenderLineLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
-        const GeometryCollection& geometries,//$$JR
+        const GeometryCollection& geometries,
         const float zoom,
         const TransformState& transformState,
         const float pixelsToTileUnits,
@@ -268,7 +268,6 @@ bool RenderLineLayer::queryIntersectsFeature(
                           .evaluate(feature, zoom, style::LineOffset::defaultValue()) * pixelsToTileUnits;
 
     // Apply offset to geometry
-//    auto offsetGeometry = offsetLine(feature.getGeometries(), offset);
     auto offsetGeometry = offsetLine(geometries, offset);
 
     // Test intersection
@@ -278,10 +277,9 @@ bool RenderLineLayer::queryIntersectsFeature(
     if (offsetGeometry) {
         intersects = util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
-            *offsetGeometry,//.value_or(geometries),//feature.getGeometries()),
+            *offsetGeometry,
             halfWidth);
     }
-    delete offsetGeometry;
     return intersects;
 }
 

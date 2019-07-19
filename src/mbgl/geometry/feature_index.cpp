@@ -149,7 +149,7 @@ void FeatureIndex::addFeature(
             assert(geometryTileFeature);
         }
 
-        GeometryCollection geometries = geometryTileFeature->getGeometries();
+        const GeometryCollection& geometries = geometryTileFeature->getGeometries();
                 
         bool needsCrossTileIndex = renderLayer->baseImpl->getTypeInfo()->crossTileIndex == style::LayerTypeInfo::CrossTileIndex::Required;
         if (!needsCrossTileIndex &&
@@ -161,7 +161,7 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        result[layerID].push_back(convertFeature(*geometryTileFeature, geometries, tileID));
+        result[layerID].emplace_back(convertFeature(*geometryTileFeature, geometries, tileID));
     }
 }
 

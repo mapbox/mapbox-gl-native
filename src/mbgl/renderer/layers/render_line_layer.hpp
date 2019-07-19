@@ -27,7 +27,7 @@ private:
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
             const GeometryTileFeature&,
-            const GeometryCollection&,//$$JR
+            const GeometryCollection&,
             const float,
             const TransformState&,
             const float,
