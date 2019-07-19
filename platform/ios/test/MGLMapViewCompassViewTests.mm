@@ -11,8 +11,9 @@
 - (void)handleTapGesture:(__unused UITapGestureRecognizer *)sender;
 @end
 
-@interface MGLCompassButtonTests : XCTestCase
+@interface MGLCompassButtonTests : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) MGLMapView *mapView;
+@property (nonatomic) XCTestExpectation *regionDidChangeExpectation;
 @end
 
 @implementation MGLCompassButtonTests
@@ -23,11 +24,13 @@
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
     self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
+    self.mapView.delegate = self;
 }
 
 - (void)tearDown {
     self.mapView = nil;
     [MGLAccountManager setAccessToken:nil];
+    self.regionDidChangeExpectation = nil;
 
     [super tearDown];
 }
@@ -88,7 +91,10 @@
     XCTAssertEqualWithAccuracy(self.mapView.direction, 45, 0.001);
     XCTAssertEqual(self.mapView.compassView.alpha, 1, @"Compass should continue to be visible when direction changes.");
 
+    // Resetting to north happens with animation, so wait for it to finish.
+    self.regionDidChangeExpectation = [[XCTestExpectation alloc] initWithDescription:@"region-did-change"];
     [self.mapView.compassView handleTapGesture:nil];
+    [self waitForExpectations:@[self.regionDidChangeExpectation] timeout:5.0];
     XCTAssertEqual(self.mapView.direction, 0, @"Tapping the compass should reset direction to north.");
 }
 
@@ -107,6 +113,10 @@
 - (CGFloat)degreesFromAffineTransform:(CGAffineTransform)transform {
     CGFloat angle = atan2f(transform.b, transform.a);
     return MGLDegreesFromRadians(angle);
+}
+
+- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+    [self.regionDidChangeExpectation fulfill];
 }
 
 @end
