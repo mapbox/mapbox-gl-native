@@ -6,7 +6,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
-* `[MGLLoggingConfiguration sharedConfiguration].loggingLevel` now can filter logs from core. [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
+* `MGLLoggingLevel` has been updated for better matching core log levels. Now can use `[MGLLoggingConfiguration sharedConfiguration].loggingLevel` to filter logs from core . [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
 
 ## 5.2.0
 
