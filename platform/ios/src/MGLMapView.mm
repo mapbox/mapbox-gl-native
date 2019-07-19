@@ -5173,14 +5173,19 @@ public:
                      completion:NULL];
 }
 
-- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated
+- (UIEdgeInsets)defaultEdgeInsetsForShowAnnotations
 {
     CGFloat maximumPadding = 100;
     CGFloat yPadding = (self.frame.size.height / 5 <= maximumPadding) ? (self.frame.size.height / 5) : maximumPadding;
     CGFloat xPadding = (self.frame.size.width / 5 <= maximumPadding) ? (self.frame.size.width / 5) : maximumPadding;
-
+    
     UIEdgeInsets edgeInsets = UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
+    return edgeInsets;
+}
 
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated
+{
+    UIEdgeInsets edgeInsets = [self defaultEdgeInsetsForShowAnnotations];
     [self showAnnotations:annotations edgePadding:edgeInsets animated:animated completionHandler:nil];
 }
 
