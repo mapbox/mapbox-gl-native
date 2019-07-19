@@ -1968,6 +1968,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 }
             }
         }
+        free(methods);
         NSAssert(numStyleURLMethods == styleNames.count,
                  @"MGLStyle provides %u default styles but iosapp only knows about %lu of them.",
                  numStyleURLMethods, (unsigned long)styleNames.count);
