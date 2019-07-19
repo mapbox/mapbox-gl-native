@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.maps.renderer.textureview;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.TextureView;
-
+import android.view.View;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -25,16 +25,28 @@ public class TextureViewMapRenderer extends MapRenderer {
    * @param context                  the current Context
    * @param textureView              the TextureView
    * @param localIdeographFontFamily the local font family
-   * @param translucentSurface    the translucency flag
+   * @param translucentSurface       the translucency flag
    */
   public TextureViewMapRenderer(@NonNull Context context,
-                                @NonNull TextureView textureView,
+                                @NonNull final TextureView textureView,
                                 String localIdeographFontFamily,
                                 boolean translucentSurface) {
     super(context, localIdeographFontFamily);
     this.translucentSurface = translucentSurface;
-    renderThread = new TextureViewRenderThread(textureView, this);
-    renderThread.start();
+    textureView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+      @Override
+      public void onViewAttachedToWindow(View v) {
+        if (renderThread == null) {
+          renderThread = new TextureViewRenderThread(textureView, TextureViewMapRenderer.this);
+          renderThread.start();
+        }
+      }
+
+      @Override
+      public void onViewDetachedFromWindow(View v) {
+
+      }
+    });
   }
 
   /**
@@ -98,7 +110,9 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   public void onStart() {
-    renderThread.onResume();
+    if (renderThread != null) {
+      renderThread.onResume();
+    }
   }
 
   /**
