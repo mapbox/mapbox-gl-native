@@ -139,7 +139,7 @@ GeometryCoordinates projectQueryGeometry(const GeometryCoordinates& queryGeometr
 bool RenderCircleLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
-        const GeometryCollection&, //$$JR
+        const GeometryCollection&, 
         const float zoom,
         const TransformState& transformState,
         const float pixelsToTileUnits,
