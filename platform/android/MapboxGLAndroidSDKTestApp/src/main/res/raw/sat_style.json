@@ -2,7 +2,8 @@
   "version": 8,
   "name": "Satellite",
   "metadata": {
-    "mapbox:autocomposite": true
+    "mapbox:autocomposite": true,
+    "mapbox:type": "default"
   },
   "sources": {
     "mapbox": {
@@ -11,7 +12,7 @@
       "tileSize": 256
     }
   },
-  "sprite": "mapbox://sprites/mapbox/satellite-v8",
+  "sprite": "mapbox://sprites/mapbox/satellite-v9",
   "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
   "layers": [
     {
@@ -27,5 +28,11 @@
       "source": "mapbox",
       "source-layer": "mapbox_satellite_full"
     }
-  ]
+  ],
+  "created": "1970-01-01T00:00:00.000Z",
+  "modified": "1970-01-01T00:00:00.000Z",
+  "owner": "mapbox",
+  "id": "satellite-v9",
+  "draft": false,
+  "visibility": "public"
 }

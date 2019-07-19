@@ -85,6 +85,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
     if (mapboxMap == null) {
       return;
     }
+    markerList.clear();
     mapboxMap.removeAnnotations();
   }
 

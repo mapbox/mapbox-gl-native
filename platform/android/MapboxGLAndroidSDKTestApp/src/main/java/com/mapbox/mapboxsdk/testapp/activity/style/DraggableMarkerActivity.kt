@@ -104,7 +104,7 @@ class DraggableMarkerActivity : AppCompatActivity() {
       }
 
       draggableSymbolsManager = DraggableSymbolsManager(
-        mapView, mapboxMap, featureCollection, source, layerId, 0, actionBarHeight)
+        mapView, mapboxMap, featureCollection, source, layerId, actionBarHeight, 0)
 
       // Adding symbol drag listeners
       draggableSymbolsManager?.addOnSymbolDragListener(object : DraggableSymbolsManager.OnSymbolDragListener {
