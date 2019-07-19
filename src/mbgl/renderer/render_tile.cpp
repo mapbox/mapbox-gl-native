@@ -85,7 +85,7 @@ void RenderTile::prepare(PaintParameters& parameters) {
     }
 
     // Calculate two matrices for this tile: matrix is the standard tile matrix; nearClippedMatrix
-    // clips the near plane to 100 to save depth buffer precision
+    // has near plane moved further, to enhance depth buffer precision
     parameters.state.matrixFor(matrix, id);
     parameters.state.matrixFor(nearClippedMatrix, id);
     matrix::multiply(matrix, parameters.projMatrix, matrix);

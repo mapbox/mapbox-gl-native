@@ -93,8 +93,7 @@ public:
     uint32_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
-
-
+    uint32_t opaquePassCutoff = 0;
     float symbolFadeChange;
 };
 

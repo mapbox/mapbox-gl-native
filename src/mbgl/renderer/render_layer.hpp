@@ -52,6 +52,9 @@ public:
     // Returns instance of RenderLayerSymbolInterface if RenderLayer supports it.
     virtual const RenderLayerSymbolInterface* getSymbolInterface() const;
 
+    // Returns true if layer writes to depth buffer by drawing using PaintParameters::depthModeFor3D().
+    virtual bool is3D() const { return false; }
+
     const std::string& getID() const;
 
     // Checks whether this layer needs to be rendered in the given render pass.
