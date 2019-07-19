@@ -1,4 +1,5 @@
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/enum.hpp>
 
 #import "MGLLoggingConfiguration_Private.h"
 
@@ -12,19 +13,21 @@ namespace mbgl {
 class MGLCoreLoggingObserver : public Log :: Observer {
 public:
     //Return true not print messages at core level, and filter at platform level.
-    bool onRecord(EventSeverity severity, Event, int64_t, const std::string& msg) override{
+    bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string& msg) override{
+        
+        NSString *message = [NSString stringWithFormat:@"[event]:%s [code]:%lld [message]:%@",Enum<Event>::toString(event), code, [NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]];
         switch (severity) {
             case EventSeverity::Debug:
-                MGLLogDebug([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                MGLLogDebug(message);
                 break;
             case EventSeverity::Info:
-                MGLLogInfo([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                MGLLogInfo(message);
                 break;
             case EventSeverity::Warning:
-                MGLLogWarning([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                MGLLogWarning(message);
                 break;
             case EventSeverity::Error:
-                MGLLogError([NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]);
+                MGLLogError(message);
                 break;
         }
         return true;
