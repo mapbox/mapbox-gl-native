@@ -618,7 +618,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release:
     docker:
-      - image: mbgl/android-ndk-r19:8e91a7ebab
+      - image: mbgl/android-ndk-r20:7b7c4b42cf
     resource_class: xlarge
     working_directory: /src
     environment:
