@@ -66,6 +66,9 @@ public:
     // Returns true is the layer is subject to placement.
     bool needsPlacement() const;
 
+    // Returns true if layer writes to depth buffer by drawing using PaintParameters::depthModeFor3D().
+    virtual bool is3D() const { return false; }
+
     const std::string& getID() const;
 
     // Checks whether this layer needs to be rendered in the given render pass.

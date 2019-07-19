@@ -121,7 +121,7 @@ void RenderTile::prepare(const SourcePrepareParameters& parameters) {
     }
 
     // Calculate two matrices for this tile: matrix is the standard tile matrix; nearClippedMatrix
-    // clips the near plane to 100 to save depth buffer precision
+    // has near plane moved further, to enhance depth buffer precision
     const auto& transform = parameters.transform;
     transform.state.matrixFor(matrix, id);
     transform.state.matrixFor(nearClippedMatrix, id);

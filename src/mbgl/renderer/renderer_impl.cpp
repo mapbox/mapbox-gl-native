@@ -391,8 +391,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             *lineAtlas,
         };
 
+        auto opaquePassCutoffEstimation = renderItems.size();
         for (auto& renderItem : renderItems) {
             RenderLayer& renderLayer = renderItem.layer;
+            if (parameters.opaquePassCutoff == 0) {
+                --opaquePassCutoffEstimation;
+                if (renderLayer.is3D()) {
+                    parameters.opaquePassCutoff = uint32_t(opaquePassCutoffEstimation);
+                }
+            }
             if (renderLayer.hasRenderPass(RenderPass::Upload)) {
                 renderLayer.upload(*uploadPass, uploadParameters);
             }
