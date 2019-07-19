@@ -23,6 +23,7 @@ if [ -z `which jazzy` ]; then
 
     CIRCLECI=${CIRCLECI:-false}
     if [[ "${CIRCLECI}" == true ]]; then
+        sudo gem install ffi -v '1.9.25' --source 'https://rubygems.org/'
         sudo gem install jazzy -v $JAZZY_VERSION --no-document -- --with-sqlite3-lib=/usr/lib
     else
         gem install jazzy -v $JAZZY_VERSION --no-document
