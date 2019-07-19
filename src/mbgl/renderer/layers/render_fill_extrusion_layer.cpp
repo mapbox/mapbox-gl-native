@@ -56,6 +56,10 @@ bool RenderFillExtrusionLayer::hasCrossfade() const {
     return getCrossfade<FillExtrusionLayerProperties>(evaluatedProperties).t != 1;
 }
 
+bool RenderFillExtrusionLayer::is3D() const {
+    return true;
+}
+
 void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
     if (parameters.pass != RenderPass::Translucent) {
         return;
