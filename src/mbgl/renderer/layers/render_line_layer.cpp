@@ -215,10 +215,10 @@ void RenderLineLayer::render(PaintParameters& parameters) {
 }
 
 GeometryCollection* offsetLine(const GeometryCollection& rings, const double offset) {
-    
-    GeometryCollection *newRings = new GeometryCollection();
-    
+
     if (offset == 0) return NULL;
+
+    GeometryCollection *newRings = new GeometryCollection();
 
     Point<double> zero(0, 0);
     for (const auto& ring : rings) {
