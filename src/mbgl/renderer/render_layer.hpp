@@ -95,6 +95,10 @@ protected:
     using FilterFunctionPtr = bool (*)(RenderTile&);
     RenderTiles filterRenderTiles(RenderTiles, FilterFunctionPtr) const;
 
+    void addRenderPassesFromTiles();
+
+    const LayerRenderData* getRenderDataForPass(const RenderTile&, RenderPass) const;
+
 protected:
     // Stores current set of tiles to be rendered for this layer.
     std::vector<std::reference_wrapper<RenderTile>> renderTiles;
