@@ -15,7 +15,7 @@ public:
     //Return true not print messages at core level, and filter at platform level.
     bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string& msg) override{
         
-        NSString *message = [NSString stringWithFormat:@"[event]:%s [code]:%lld [message]:%@",Enum<Event>::toString(event), code, [NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]];
+        NSString *message = [NSString stringWithFormat:@"[event]:%s [code]:%lld [message]:%@", Enum<Event>::toString(event), code, [NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]];
         switch (severity) {
             case EventSeverity::Debug:
                 MGLLogDebug(message);
