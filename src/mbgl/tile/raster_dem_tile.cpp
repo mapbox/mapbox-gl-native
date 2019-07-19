@@ -7,6 +7,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
@@ -34,6 +35,10 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
 }
 
 RasterDEMTile::~RasterDEMTile() = default;
+
+std::unique_ptr<TileRenderData> RasterDEMTile::createRenderData() {
+    return std::make_unique<SharedBucketTileRenderData<HillshadeBucket>>(bucket);
+}
 
 void RasterDEMTile::setError(std::exception_ptr err) {
     loaded = true;
@@ -69,15 +74,8 @@ void RasterDEMTile::onError(std::exception_ptr err, const uint64_t resultCorrela
     observer->onTileError(*this, err);
 }
 
-void RasterDEMTile::upload(gfx::UploadPass& uploadPass) {
-    if (bucket) {
-        bucket->upload(uploadPass);
-    }
-}
-
-
-Bucket* RasterDEMTile::getBucket(const style::Layer::Impl&) const {
-    return bucket.get();
+bool RasterDEMTile::layerPropertiesUpdated(const Immutable<style::LayerProperties>&) {
+    return bool(bucket);
 }
 
 HillshadeBucket* RasterDEMTile::getBucket() const {

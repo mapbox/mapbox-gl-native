@@ -206,34 +206,6 @@ if [[ ${BUILD_DYNAMIC} == true && ${BUILDTYPE} == Release ]]; then
         lipo -info "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}"
 fi
 
-function create_podspec {
-    step "Creating local podspec (${1})"
-    [[ $SYMBOLS = NO ]] && POD_SUFFIX="-stripped" || POD_SUFFIX=""
-    POD_SOURCE_PATH='    :path => ".",'
-    POD_FRAMEWORKS="  m.vendored_frameworks = '"${NAME}".framework'"
-    INPUT_PODSPEC=platform/ios/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
-    OUTPUT_PODSPEC=${OUTPUT}/${1}/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
-    if [[ ${1} == "dynamic" ]]; then
-        sed "s/.*:http.*/${POD_SOURCE_PATH}/" ${INPUT_PODSPEC} > ${OUTPUT_PODSPEC}
-        sed -i '' "s/.*vendored_frameworks.*/${POD_FRAMEWORKS}/" ${OUTPUT_PODSPEC}
-    fi
-    if [[ ${1} == "static" ]]; then
-        awk '/Pod::Spec.new/,/m.platform/' ${INPUT_PODSPEC} > ${OUTPUT_PODSPEC}
-        cat platform/ios/${NAME}-iOS-SDK-static-part.podspec >> ${OUTPUT_PODSPEC}
-        sed -i '' "s/.*:http.*/${POD_SOURCE_PATH}/" ${OUTPUT_PODSPEC}
-    fi
-    cp -pv LICENSE.md ${OUTPUT}/${1}/
-}
-
-if [[ ${BUILD_STATIC} == true ]]; then
-    stat "${OUTPUT}/static/${NAME}.framework"
-    create_podspec "static"
-fi
-if [[ ${BUILD_DYNAMIC} == true ]]; then
-    stat "${OUTPUT}/dynamic/${NAME}.framework"
-    create_podspec "dynamic"
-fi
-
 if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
     cp -rv "${PRODUCTS}/${BUILDTYPE}-iphoneos/Headers" "${OUTPUT}/static/${NAME}.framework/Headers"

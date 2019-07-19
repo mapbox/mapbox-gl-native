@@ -43,11 +43,11 @@ void Tile::queryRenderedFeatures(
         std::unordered_map<std::string, std::vector<Feature>>&,
         const GeometryCoordinates&,
         const TransformState&,
-        const std::vector<const RenderLayer*>&,
+        const std::unordered_map<std::string, const RenderLayer*>&,
         const RenderedQueryOptions&,
         const mat4&) {}
 
-float Tile::getQueryPadding(const std::vector<const RenderLayer*>&) {
+float Tile::getQueryPadding(const std::unordered_map<std::string, const RenderLayer*>&) {
     return 0;
 }
 

@@ -19,14 +19,14 @@ public:
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const std::vector<const RenderLayer*>& layers,
+                          const std::unordered_map<std::string, const RenderLayer*>& layers,
                           const RenderedQueryOptions& options,
                           const mat4& projMatrix) const override;
 
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const override;
 
-    uint8_t getMaxZoom() const { return maxzoom; }
+    uint8_t getMaxZoom() const override { return maxzoom; }
 
 private:
     const style::RasterSource::Impl& impl() const;
@@ -36,10 +36,5 @@ private:
 
     void onTileChanged(Tile&) override;
 };
-
-template <>
-inline bool RenderSource::is<RenderRasterDEMSource>() const {
-    return baseImpl->type == style::SourceType::RasterDEM;
-}
 
 } // namespace mbgl

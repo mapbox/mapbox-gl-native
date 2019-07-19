@@ -61,8 +61,8 @@ MGL_EXPORT
  This is the designated initializer for `MGLTilePyramidOfflineRegion`.
 
  @param styleURL URL of the map style for which to download resources. The URL
-    may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map
-    ID (`mapbox://styles/{user}/{style}`). Specify `nil` for the default style.
+    may be a full HTTP or HTTPS URL or a Mapbox
+    style URL (`mapbox://styles/{user}/{style}`). Specify `nil` for the default style.
     Relative file URLs cannot be used as offline style URLs. To download the
     online resources required by a local style, specify a URL to an online copy
     of the style.

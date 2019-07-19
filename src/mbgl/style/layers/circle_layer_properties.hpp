@@ -80,6 +80,8 @@ public:
         CirclePaintProperties::PossiblyEvaluated);
     ~CircleLayerProperties() override;
 
+    unsigned long constantsMask() const override;
+
     const CircleLayer::Impl& layerImpl() const;
     // Data members.
     CirclePaintProperties::PossiblyEvaluated evaluated;

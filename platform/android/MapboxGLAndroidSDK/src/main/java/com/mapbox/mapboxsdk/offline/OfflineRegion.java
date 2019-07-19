@@ -7,7 +7,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
@@ -97,8 +96,7 @@ public class OfflineRegion {
      * tiles stored for offline regions has been reached.
      *
      * Once the limit has been reached, the SDK will not download further offline
-     * tiles from Mapbox APIs until existing tiles have been removed. Contact your
-     * Mapbox sales representative to raise the limit.
+     * tiles from Mapbox APIs until existing tiles have been removed.
      *
      * This limit does not apply to non-Mapbox tile sources.
      *
@@ -138,6 +136,25 @@ public class OfflineRegion {
      * Receives the delete notification
      */
     void onDelete();
+
+    /**
+     * Receives the error message
+     *
+     * @param error the error message
+     */
+    void onError(String error);
+  }
+
+  /**
+   * This callback receives an asynchronous response containing a notification when
+   * an offline region has been invalidated, or a {@link String} error message otherwise.
+   */
+  @Keep
+  public interface OfflineRegionInvalidateCallback {
+    /**
+     * Receives the invalidate notification
+     */
+    void onInvalidate();
 
     /**
      * Receives the error message
@@ -337,14 +354,14 @@ public class OfflineRegion {
    * @param callback the callback to invoked.
    */
   public void getStatus(@NonNull final OfflineRegionStatusCallback callback) {
-    FileSource.getInstance(Mapbox.getApplicationContext()).activate();
+    fileSource.activate();
     getOfflineRegionStatus(new OfflineRegionStatusCallback() {
       @Override
       public void onStatus(final OfflineRegionStatus status) {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+            fileSource.deactivate();
             callback.onStatus(status);
           }
         });
@@ -355,7 +372,7 @@ public class OfflineRegion {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+            fileSource.deactivate();
             callback.onError(error);
           }
         });
@@ -383,14 +400,14 @@ public class OfflineRegion {
   public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
     if (!isDeleted) {
       isDeleted = true;
-      FileSource.getInstance(Mapbox.getApplicationContext()).activate();
+      fileSource.activate();
       deleteOfflineRegion(new OfflineRegionDeleteCallback() {
         @Override
         public void onDelete() {
           handler.post(new Runnable() {
             @Override
             public void run() {
-              FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+              fileSource.deactivate();
               callback.onDelete();
               OfflineRegion.this.finalize();
             }
@@ -403,13 +420,53 @@ public class OfflineRegion {
             @Override
             public void run() {
               isDeleted = false;
-              FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+              fileSource.deactivate();
               callback.onError(error);
             }
           });
         }
       });
     }
+  }
+
+  /**
+   * Invalidate all the tiles from an offline region forcing Mapbox GL to revalidate
+   * the tiles with the server before using. This is more efficient than deleting the
+   * offline region and downloading it again because if the data on the cache matches
+   * the server, no new data gets transmitted.
+   *
+   * @param callback the callback to be invoked
+   */
+  public void invalidate(@Nullable final OfflineRegionInvalidateCallback callback) {
+    fileSource.activate();
+    invalidateOfflineRegion(new OfflineRegionInvalidateCallback() {
+
+      @Override
+      public void onInvalidate() {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onInvalidate();
+            }
+          }
+        });
+      }
+
+      @Override
+      public void onError(@NonNull final String message) {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onError(message);
+            }
+          }
+        });
+      }
+    });
   }
 
   /**
@@ -468,5 +525,8 @@ public class OfflineRegion {
 
   @Keep
   private native void updateOfflineRegionMetadata(byte[] metadata, OfflineRegionUpdateMetadataCallback callback);
+
+  @Keep
+  private native void invalidateOfflineRegion(OfflineRegionInvalidateCallback callback);
 
 }

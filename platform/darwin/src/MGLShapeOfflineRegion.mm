@@ -72,7 +72,7 @@
         _shape = shape;
         _minimumZoomLevel = minimumZoomLevel;
         _maximumZoomLevel = maximumZoomLevel;
-        _includesIdeographicGlyphs = YES;
+        _includesIdeographicGlyphs = NO;
     }
     return self;
 }

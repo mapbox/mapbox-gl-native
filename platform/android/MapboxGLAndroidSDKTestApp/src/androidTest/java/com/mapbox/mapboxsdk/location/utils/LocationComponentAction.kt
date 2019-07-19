@@ -10,8 +10,10 @@ import com.mapbox.mapboxsdk.location.LocationComponent
 import com.mapbox.mapboxsdk.maps.Style
 import org.hamcrest.Matcher
 
-class LocationComponentAction(private val mapboxMap: MapboxMap,
-                                private val onPerformLocationComponentAction: OnPerformLocationComponentAction) : ViewAction {
+class LocationComponentAction(
+  private val mapboxMap: MapboxMap,
+  private val onPerformLocationComponentAction: OnPerformLocationComponentAction
+) : ViewAction {
 
   override fun getConstraints(): Matcher<View> {
     return isDisplayed()

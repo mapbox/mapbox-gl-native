@@ -4,6 +4,7 @@
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
+#include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/gfx/cull_face_mode.hpp>
@@ -15,7 +16,8 @@ namespace mbgl {
 
 using namespace style;
 
-RenderTile::RenderTile(UnwrappedTileID id_, Tile& tile_) : id(std::move(id_)), tile(tile_) {
+RenderTile::RenderTile(UnwrappedTileID id_, Tile& tile_) 
+    : id(std::move(id_)), tile(tile_) {
 }
 
 RenderTile::~RenderTile() = default;
@@ -65,41 +67,33 @@ const OverscaledTileID& RenderTile::getOverscaledTileID() const { return tile.id
 bool RenderTile::holdForFade() const { return tile.holdForFade(); }
 
 Bucket* RenderTile::getBucket(const style::Layer::Impl& impl) const {
-    return tile.getBucket(impl);
+    assert(renderData);
+    return renderData->getBucket(impl);
 }
 
 const LayerRenderData* RenderTile::getLayerRenderData(const style::Layer::Impl& impl) const {
-    return tile.getLayerRenderData(impl);
+    assert(renderData);
+    return renderData->getLayerRenderData(impl);
 }
 
 optional<ImagePosition> RenderTile::getPattern(const std::string& pattern) const {
-    assert(tile.kind == Tile::Kind::Geometry);
-    return static_cast<const GeometryTile&>(tile).getPattern(pattern);
+    assert(renderData);
+    return renderData->getPattern(pattern);
 }
 
 const gfx::Texture& RenderTile::getGlyphAtlasTexture() const {
-    assert(tile.kind == Tile::Kind::Geometry);
-    assert(static_cast<const GeometryTile&>(tile).glyphAtlasTexture);
-    return *(static_cast<const GeometryTile&>(tile).glyphAtlasTexture);
+    assert(renderData);
+    return renderData->getGlyphAtlasTexture();
 }
 
 const gfx::Texture& RenderTile::getIconAtlasTexture() const {
-    assert(tile.kind == Tile::Kind::Geometry);
-    assert(static_cast<const GeometryTile&>(tile).iconAtlasTexture);
-    return *(static_cast<const GeometryTile&>(tile).iconAtlasTexture);
+    assert(renderData);
+    return renderData->getIconAtlasTexture();
 }
 
-std::shared_ptr<FeatureIndex> RenderTile::getFeatureIndex() const {
-    assert(tile.kind == Tile::Kind::Geometry);
-    return static_cast<const GeometryTile&>(tile).getFeatureIndex();
-}
-
-void RenderTile::setMask(TileMask&& mask) {
-    tile.setMask(std::move(mask));
-}
-
-void RenderTile::upload(gfx::UploadPass& uploadPass) {
-    tile.upload(uploadPass);
+void RenderTile::upload(gfx::UploadPass& uploadPass) const {
+    assert(renderData);
+    renderData->upload(uploadPass);
 
     if (debugBucket) {
         debugBucket->upload(uploadPass);
@@ -107,6 +101,12 @@ void RenderTile::upload(gfx::UploadPass& uploadPass) {
 }
 
 void RenderTile::prepare(const SourcePrepareParameters& parameters) {
+    renderData = tile.createRenderData();
+    assert(renderData);
+    renderData->prepare(parameters);
+
+    needsRendering = tile.usedByRenderedLayers;
+
     if (parameters.debugOptions != MapDebugOptions::NoDebug &&
         (!debugBucket || debugBucket->renderable != tile.isRenderable() ||
          debugBucket->complete != tile.isComplete() ||
@@ -121,7 +121,7 @@ void RenderTile::prepare(const SourcePrepareParameters& parameters) {
     }
 
     // Calculate two matrices for this tile: matrix is the standard tile matrix; nearClippedMatrix
-    // clips the near plane to 100 to save depth buffer precision
+    // has near plane moved further, to enhance depth buffer precision
     const auto& transform = parameters.transform;
     transform.state.matrixFor(matrix, id);
     transform.state.matrixFor(nearClippedMatrix, id);
@@ -129,8 +129,8 @@ void RenderTile::prepare(const SourcePrepareParameters& parameters) {
     matrix::multiply(nearClippedMatrix, transform.nearClippedProjMatrix, nearClippedMatrix);
 }
 
-void RenderTile::finishRender(PaintParameters& parameters) {
-    if (!tile.usedByRenderedLayers || parameters.debugOptions == MapDebugOptions::NoDebug)
+void RenderTile::finishRender(PaintParameters& parameters) const {
+    if (!needsRendering || parameters.debugOptions == MapDebugOptions::NoDebug)
         return;
 
     static const style::Properties<>::PossiblyEvaluated properties {};

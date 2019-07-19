@@ -19,10 +19,11 @@ TransformParameters::TransformParameters(const TransformState& state_)
     // odd viewport sizes.
     state.getProjMatrix(alignedProjMatrix, 1, true);
 
-    // Calculate a second projection matrix with the near plane clipped to 100 so as
-    // not to waste lots of depth buffer precision on very close empty space, for layer
-    // types (fill-extrusion) that use the depth buffer to emulate real-world space.
-    state.getProjMatrix(nearClippedProjMatrix, 100);
+    // Calculate a second projection matrix with the near plane moved further,
+    // to a tenth of the far value, so as not to waste depth buffer precision on
+    // very close empty space, for layer types (fill-extrusion) that use the
+    // depth buffer to emulate real-world space.
+    state.getProjMatrix(nearClippedProjMatrix, 0.1 * state.getCameraToCenterDistance());
 }
 
 PaintParameters::PaintParameters(gfx::Context& context_,
@@ -72,6 +73,9 @@ mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID, bool aligned)
 }
 
 gfx::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gfx::DepthMaskType mask) const {
+    if (currentLayer < opaquePassCutoff) {
+        return gfx::DepthMode::disabled();
+    }
     float depth = depthRangeSize + ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { depth, depth } };
 }
@@ -90,26 +94,27 @@ void PaintParameters::clearStencil() {
 namespace {
 
 // Detects a difference in keys of renderTiles and tileClippingMaskIDs
-bool tileIDsIdentical(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles,
+bool tileIDsIdentical(const RenderTiles& renderTiles,
                       const std::map<UnwrappedTileID, int32_t>& tileClippingMaskIDs) {
-    assert(std::is_sorted(renderTiles.begin(), renderTiles.end(),
+    assert(renderTiles);
+    assert(std::is_sorted(renderTiles->begin(), renderTiles->end(),
                           [](const RenderTile& a, const RenderTile& b) { return a.id < b.id; }));
-    if (renderTiles.size() != tileClippingMaskIDs.size()) {
+    if (renderTiles->size() != tileClippingMaskIDs.size()) {
         return false;
     }
-    return std::equal(renderTiles.begin(), renderTiles.end(), tileClippingMaskIDs.begin(),
+    return std::equal(renderTiles->begin(), renderTiles->end(), tileClippingMaskIDs.begin(),
                       [](const RenderTile& a, const auto& b) { return a.id == b.first; });
 }
 
 } // namespace
 
-void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>& renderTiles) {
-    if (renderTiles.empty() || tileIDsIdentical(renderTiles, tileClippingMaskIDs)) {
+void PaintParameters::renderTileClippingMasks(const RenderTiles& renderTiles) {
+    if (!renderTiles || renderTiles->empty() || tileIDsIdentical(renderTiles, tileClippingMaskIDs)) {
         // The current stencil mask is for this source already; no need to draw another one.
         return;
     }
 
-    if (nextStencilID + renderTiles.size() > 256) {
+    if (nextStencilID + renderTiles->size() > 256) {
         // we'll run out of fresh IDs so we need to clear and start from scratch
         clearStencil();
     }
@@ -120,7 +125,7 @@ void PaintParameters::renderTileClippingMasks(const std::vector<std::reference_w
     const style::Properties<>::PossiblyEvaluated properties {};
     const ClippingMaskProgram::Binders paintAttributeData(properties, 0);
 
-    for (const RenderTile& renderTile : renderTiles) {
+    for (const RenderTile& renderTile : *renderTiles) {
         const int32_t stencilID = nextStencilID++;
         tileClippingMaskIDs.emplace(renderTile.id, stencilID);
 

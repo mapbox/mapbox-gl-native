@@ -77,6 +77,7 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
     };
 
     parameters.symbolFadeChange = renderTreeParameters.symbolFadeChange;
+    parameters.opaquePassCutoff = renderTreeParameters.opaquePassCutOff;
     const auto& sourceRenderItems = renderTree.getSourceRenderItems();
     const auto& layerRenderItems = renderTree.getLayerRenderItems();
 

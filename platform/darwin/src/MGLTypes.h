@@ -53,7 +53,9 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     /** Source is in use and cannot be removed */
     MGLErrorCodeSourceIsInUseCannotRemove = 7,
     /** Source is in use and cannot be removed */
-    MGLErrorCodeSourceIdentifierMismatch = 8
+    MGLErrorCodeSourceIdentifierMismatch = 8,
+    /** An error occurred while modifying the offline storage database */
+    MGLErrorCodeModifyingOfflineStorageFailed = 9
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */
@@ -118,5 +120,17 @@ NS_INLINE MGLTransition MGLTransitionMake(NSTimeInterval duration, NSTimeInterva
     
     return transition;
 }
+
+/**
+ Constants indicating the visibility of different map ornaments.
+ */
+typedef NS_ENUM(NSInteger, MGLOrnamentVisibility) {
+    /** A constant indicating that the ornament adapts to the current map state. */
+    MGLOrnamentVisibilityAdaptive,
+    /** A constant indicating that the ornament is always hidden. */
+    MGLOrnamentVisibilityHidden,
+    /** A constant indicating that the ornament is always visible. */
+    MGLOrnamentVisibilityVisible
+};
 
 NS_ASSUME_NONNULL_END

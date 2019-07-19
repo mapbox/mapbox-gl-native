@@ -24,6 +24,7 @@ class LayerRenderData;
 class TransformState;
 class TileObserver;
 class RenderLayer;
+class TileRenderData;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class CollisionIndex;
@@ -45,6 +46,8 @@ public:
     Tile(Kind, OverscaledTileID);
     virtual ~Tile();
 
+    virtual std::unique_ptr<TileRenderData> createRenderData() = 0;
+
     void setObserver(TileObserver* observer);
 
     virtual void setNecessity(TileNecessity) {}
@@ -52,16 +55,14 @@ public:
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel();
 
-    virtual void upload(gfx::UploadPass&) = 0;
-    virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
-    virtual const LayerRenderData* getLayerRenderData(const style::Layer::Impl&) const {
-        assert(false);
-        return nullptr;
-    }
-    // Updates the contained layer render data with the given properties.
+    // Notifies this tile of the updated layer properties.
+    //
+    // Tile implementation should update the contained layer
+    // render data with the given properties.
+    // 
     // Returns `true` if the corresponding render layer data is present in this tile (and i.e. it
     // was succesfully updated); returns `false` otherwise.
-    virtual bool updateLayerProperties(const Immutable<style::LayerProperties>&) { return true; }
+    virtual bool layerPropertiesUpdated(const Immutable<style::LayerProperties>& layerProperties) = 0;
     virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::LayerProperties>>&) {}
     virtual void setMask(TileMask&&) {}
@@ -70,7 +71,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
-            const std::vector<const RenderLayer*>&,
+            const std::unordered_map<std::string, const RenderLayer*>&,
             const RenderedQueryOptions& options,
             const mat4& projMatrix);
 
@@ -78,7 +79,7 @@ public:
             std::vector<Feature>& result,
             const SourceQueryOptions&);
 
-    virtual float getQueryPadding(const std::vector<const RenderLayer*>&);
+    virtual float getQueryPadding(const std::unordered_map<std::string, const RenderLayer*>&);
 
     void setTriedCache();
 

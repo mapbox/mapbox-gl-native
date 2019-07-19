@@ -13,8 +13,11 @@ namespace style {
 class LayerProperties {
 public:
     virtual ~LayerProperties() = default;
-
+    // Returns constants mask for the data-driven properties.
+    virtual unsigned long constantsMask() const { return 0u; }
     Immutable<Layer::Impl> baseImpl;
+    // Contains render passes used by the renderer, see `mbgl::RenderPass`.
+    uint8_t renderPasses = 0u;
 
 protected:
     LayerProperties(Immutable<Layer::Impl> impl) : baseImpl(std::move(impl)) {}

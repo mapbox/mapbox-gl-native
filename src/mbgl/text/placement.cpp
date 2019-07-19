@@ -78,6 +78,7 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
                 item.tile,
                 projMatrix,
                 layer.baseImpl->source,
+                item.featureIndex,
                 showCollisionBoxes};
         bucket.place(*this, params, seenCrossTileIDs);
     }
@@ -193,20 +194,24 @@ void Placement::placeBucket(
                 const float textBoxScale = symbolInstance.textBoxScale;
 
                 // If this symbol was in the last placement, shift the previously used
-                // anchor to the front of the anchor list.
+                // anchor to the front of the anchor list, only if the previous anchor
+                // is still in the anchor list.
                 if (prevPlacement) {
                     auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                    if (prevOffset != prevPlacement->variableOffsets.end() &&
-                        variableTextAnchors.front() != prevOffset->second.anchor) {
-                        std::vector<style::TextVariableAnchorType> filtered;
-                        filtered.reserve(variableTextAnchors.size());
-                        filtered.push_back(prevOffset->second.anchor);
-                        for (auto anchor : variableTextAnchors) {
-                            if (anchor != prevOffset->second.anchor) {
-                                filtered.push_back(anchor);
+                    if (prevOffset != prevPlacement->variableOffsets.end()) {
+                        const auto prevAnchor = prevOffset->second.anchor;
+                        auto found = std::find(variableTextAnchors.begin(), variableTextAnchors.end(), prevAnchor);
+                        if (found != variableTextAnchors.begin() && found != variableTextAnchors.end()) {
+                            std::vector<style::TextVariableAnchorType> filtered;
+                            filtered.reserve(variableTextAnchors.size());
+                            filtered.push_back(prevAnchor);
+                            for (auto anchor : variableTextAnchors) {
+                                if (anchor != prevAnchor) {
+                                    filtered.push_back(anchor);
+                                }
                             }
+                            variableTextAnchors = std::move(filtered);
                         }
-                        variableTextAnchors = std::move(filtered);
                     }
                 }
 
@@ -332,7 +337,7 @@ void Placement::placeBucket(
     // matching FeatureIndex/data for querying purposes
     retainedQueryData.emplace(std::piecewise_construct,
                                 std::forward_as_tuple(bucket.bucketInstanceId),
-                                std::forward_as_tuple(bucket.bucketInstanceId, renderTile.getFeatureIndex(), overscaledID));
+                                std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
 }
 
 void Placement::commit(TimePoint now) {

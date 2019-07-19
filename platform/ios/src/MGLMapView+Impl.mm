@@ -100,3 +100,8 @@ void MGLMapViewImpl::onStyleImageMissing(const std::string& imageIdentifier) {
     NSString *imageName = [NSString stringWithUTF8String:imageIdentifier.c_str()];
     [mapView didFailToLoadImage:imageName];
 }
+
+bool MGLMapViewImpl::onCanRemoveUnusedStyleImage(const std::string &imageIdentifier) {
+    NSString *imageName = [NSString stringWithUTF8String:imageIdentifier.c_str()];
+    return [mapView shouldRemoveStyleImage:imageName];
+}

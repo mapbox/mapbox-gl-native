@@ -84,9 +84,16 @@ void ImageManager::removeImage(const std::string& id) {
 }
 
 const style::Image::Impl* ImageManager::getImage(const std::string& id) const {
+    if (auto* image = getSharedImage(id)) {
+        return image->get();
+    }
+    return nullptr;
+}
+
+const Immutable<style::Image::Impl>* ImageManager::getSharedImage(const std::string& id) const {
     const auto it = images.find(id);
     if (it != images.end()) {
-        return it->second.get();
+        return &(it->second);
     }
     return nullptr;
 }

@@ -2,6 +2,7 @@
 
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/renderer/render_light.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/gfx/depth_mode.hpp>
@@ -23,8 +24,6 @@ class ImageManager;
 class LineAtlas;
 class PatternAtlas;
 class UnwrappedTileID;
-class RenderSource;
-class RenderTile;
 
 namespace gfx {
 class Context;
@@ -89,7 +88,7 @@ public:
 
     // Stencil handling
 public:
-    void renderTileClippingMasks(const std::vector<std::reference_wrapper<RenderTile>>&);
+    void renderTileClippingMasks(const RenderTiles&);
     gfx::StencilMode stencilModeForClipping(const UnwrappedTileID&) const;
     gfx::StencilMode stencilModeFor3D();
 
@@ -105,8 +104,7 @@ public:
     uint32_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
-
-
+    uint32_t opaquePassCutoff = 0;
     float symbolFadeChange;
 };
 

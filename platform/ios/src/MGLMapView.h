@@ -1,9 +1,9 @@
-#import "MGLGeometry.h"
-#import "MGLMapCamera.h"
-
 #import <UIKit/UIKit.h>
 
+#import "MGLCompassButton.h"
 #import "MGLFoundation.h"
+#import "MGLGeometry.h"
+#import "MGLMapCamera.h"
 #import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -122,7 +122,6 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapView
 
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLMissingLocationServicesUsageDescriptionException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUserLocationAnnotationTypeException;
-FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
 
 /**
  An interactive, customizable map view with an interface similar to the one
@@ -199,7 +198,7 @@ MGL_EXPORT
 
  @param frame The frame for the view, measured in points.
  @param styleURL URL of the map style to display. The URL may be a full HTTP
-    or HTTPS URL, a Mapbox URL indicating the style’s map ID
+    or HTTPS URL, a Mapbox style URL
     (`mapbox://styles/{user}/{style}`), or a path to a local file relative
     to the application’s resource path. Specify `nil` for the default style.
  @return An initialized map view.
@@ -256,8 +255,8 @@ MGL_EXPORT
 /**
  URL of the style currently displayed in the receiver.
 
- The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
- map ID (`mapbox://styles/{user}/{style}`), or a path to a local file
+ The URL may be a full HTTP or HTTPS URL, a Mapbox
+ style URL (`mapbox://styles/{user}/{style}`), or a path to a local file
  relative to the application’s resource path.
 
  If you set this property to `nil`, the receiver will use the default style
@@ -316,7 +315,7 @@ MGL_EXPORT
  A control indicating the map’s direction and allowing the user to manipulate
  the direction, positioned in the upper-right corner.
  */
-@property (nonatomic, readonly) UIImageView *compassView;
+@property (nonatomic, readonly) MGLCompassButton *compassView;
 
 /**
  The position of the compass view. The default value is `MGLOrnamentPositionTopRight`.

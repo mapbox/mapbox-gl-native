@@ -28,7 +28,7 @@ class LoggerTest {
   fun verbosityLogLevelIgnore() {
     Logger.setVerbosity(Logger.DEBUG)
     Logger.v(TAG, MESSAGE)
-    verify(exactly = 0){ logger.v(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.v(TAG, MESSAGE) }
   }
 
   @Test
@@ -42,7 +42,7 @@ class LoggerTest {
   fun debugLogLevelIgnore() {
     Logger.setVerbosity(Logger.WARN)
     Logger.d(TAG, MESSAGE)
-    verify(exactly = 0){ logger.d(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.d(TAG, MESSAGE) }
   }
 
   @Test
@@ -56,7 +56,7 @@ class LoggerTest {
   fun warnLogLevelIgnore() {
     Logger.setVerbosity(Logger.ERROR)
     Logger.w(TAG, MESSAGE)
-    verify(exactly = 0){ logger.w(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.w(TAG, MESSAGE) }
   }
 
   @Test
@@ -70,7 +70,7 @@ class LoggerTest {
   fun errorLogLevelIgnore() {
     Logger.setVerbosity(Logger.NONE)
     Logger.e(TAG, MESSAGE)
-    verify(exactly = 0){ logger.e(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.e(TAG, MESSAGE) }
   }
 
   @Test
@@ -80,10 +80,10 @@ class LoggerTest {
     Logger.d(TAG, MESSAGE)
     Logger.w(TAG, MESSAGE)
     Logger.e(TAG, MESSAGE)
-    verify(exactly = 0){ logger.v(TAG, MESSAGE) }
-    verify(exactly = 0){ logger.d(TAG, MESSAGE) }
-    verify(exactly = 0){ logger.w(TAG, MESSAGE) }
-    verify(exactly = 0){ logger.e(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.v(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.d(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.w(TAG, MESSAGE) }
+    verify(exactly = 0) { logger.e(TAG, MESSAGE) }
   }
 
   companion object {

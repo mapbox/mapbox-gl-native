@@ -11,7 +11,6 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -381,7 +380,7 @@ public class FileSource {
   public native void deactivate();
 
   @Keep
-  public native void setAccessToken(@NonNull String accessToken);
+  public native void setAccessToken(String accessToken);
 
   @NonNull
   @Keep

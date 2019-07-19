@@ -43,15 +43,16 @@ public:
                 optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
-    const std::map<UnwrappedTileID, std::reference_wrapper<Tile>>& getRenderedTiles() const { return renderTiles; }
+    const std::map<UnwrappedTileID, std::reference_wrapper<Tile>>& getRenderedTiles() const { return renderedTiles; }
     Tile* getTile(const OverscaledTileID&);
+    const Tile* getRenderedTile(const UnwrappedTileID&) const;
 
     void handleWrapJump(float lng);
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const std::vector<const RenderLayer*>&,
+                          const std::unordered_map<std::string, const RenderLayer*>&,
                           const RenderedQueryOptions& options,
                           const mat4& projMatrix) const;
 
@@ -75,7 +76,7 @@ private:
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     TileCache cache;
 
-    std::map<UnwrappedTileID, std::reference_wrapper<Tile>> renderTiles; // Sorted by tile id.
+    std::map<UnwrappedTileID, std::reference_wrapper<Tile>> renderedTiles; // Sorted by tile id.
     TileObserver* observer = nullptr;
 
     float prevLng = 0;

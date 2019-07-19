@@ -83,7 +83,7 @@ class SnapshotActivity : AppCompatActivity(), OnMapReadyCallback {
   }
 
   companion object {
-    const val TAG ="Mbgl-SnapshotActivity"
+    const val TAG = "Mbgl-SnapshotActivity"
     const val LOG_MESSAGE = "OnSnapshot"
   }
 }

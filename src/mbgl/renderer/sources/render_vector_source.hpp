@@ -20,9 +20,4 @@ private:
     optional<Tileset> tileset;
 };
 
-template <>
-inline bool RenderSource::is<RenderVectorSource>() const {
-    return baseImpl->type == style::SourceType::Vector;
-}
-
 } // namespace mbgl

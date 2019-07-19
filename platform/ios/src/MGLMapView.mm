@@ -55,11 +55,11 @@
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAnnotationView_Private.h"
+#import "MGLCompassButton_Private.h"
 #import "MGLScaleBar.h"
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLMapboxEvents.h"
-#import "MMEConstants.h"
 #import "MGLSDKUpdateChecker.h"
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
@@ -68,6 +68,7 @@
 #import "MGLMapAccessibilityElement.h"
 #import "MGLLocationManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MMEConstants.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -86,7 +87,6 @@ const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaxim
 
 const MGLExceptionName MGLMissingLocationServicesUsageDescriptionException = @"MGLMissingLocationServicesUsageDescriptionException";
 const MGLExceptionName MGLUserLocationAnnotationTypeException = @"MGLUserLocationAnnotationTypeException";
-const MGLExceptionName MGLResourceNotFoundException = @"MGLResourceNotFoundException";
 const MGLExceptionName MGLUnderlyingMapUnavailableException = @"MGLUnderlyingMapUnavailableException";
 
 const CGPoint MGLOrnamentDefaultPositionOffset = CGPointMake(8, 8);
@@ -197,7 +197,7 @@ public:
 
 @property (nonatomic) NSMutableArray<NSLayoutConstraint *> *scaleBarConstraints;
 @property (nonatomic, readwrite) MGLScaleBar *scaleBar;
-@property (nonatomic, readwrite) UIImageView *compassView;
+@property (nonatomic, readwrite) MGLCompassButton *compassView;
 @property (nonatomic) NSMutableArray<NSLayoutConstraint *> *compassViewConstraints;
 @property (nonatomic, readwrite) UIImageView *logoView;
 @property (nonatomic) NSMutableArray<NSLayoutConstraint *> *logoViewConstraints;
@@ -297,8 +297,8 @@ public:
 
     NSInteger _changeDelimiterSuppressionDepth;
 
-    /// Center coordinate of the pinch gesture on the previous iteration of the gesture.
-    CLLocationCoordinate2D _previousPinchCenterCoordinate;
+    /// Center of the pinch gesture on the previous iteration of the gesture.
+    CGPoint _previousPinchCenterPoint;
     NSUInteger _previousPinchNumberOfTouches;
     
     CLLocationDistance _distanceFromOldUserLocation;
@@ -308,7 +308,6 @@ public:
     BOOL _delegateHasFillColorsForShapeAnnotations;
     BOOL _delegateHasLineWidthsForShapeAnnotations;
 
-    MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
     NSArray<id <MGLFeature>> *_visiblePlaceFeatures;
     NSArray<id <MGLFeature>> *_visibleRoadFeatures;
     NSMutableSet<MGLFeatureAccessibilityElement *> *_featureAccessibilityElements;
@@ -436,8 +435,6 @@ public:
 //    self.isAccessibilityElement = YES;
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_LABEL", nil, nil, @"Map", @"Accessibility label");
     self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction | UIAccessibilityTraitAdjustable;
-    _accessibilityCompassFormatter = [[MGLCompassDirectionFormatter alloc] init];
-    _accessibilityCompassFormatter.unitStyle = NSFormattingUnitStyleLong;
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
     if (@available(iOS 11.0, *)) { self.accessibilityIgnoresInvertColors = YES; }
@@ -510,7 +507,7 @@ public:
 
     // setup logo
     //
-    UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox"];
+    UIImage *logo = [UIImage mgl_resourceImageNamed:@"mapbox"];
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
@@ -538,14 +535,7 @@ public:
 
     // setup compass
     //
-    _compassView = [[UIImageView alloc] initWithImage:self.compassImage];
-    _compassView.alpha = 0;
-    _compassView.userInteractionEnabled = YES;
-    [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
-    _compassView.accessibilityTraits = UIAccessibilityTraitButton;
-    _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
-    _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
-    _compassView.translatesAutoresizingMaskIntoConstraints = NO;
+    _compassView = [MGLCompassButton compassButtonWithMapView:self];
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
     _compassViewPosition = MGLOrnamentPositionTopRight;
@@ -662,26 +652,6 @@ public:
     CGSize size = CGSizeMake(MAX(self.bounds.size.width, 64), MAX(self.bounds.size.height, 64));
     return { static_cast<uint32_t>(size.width),
              static_cast<uint32_t>(size.height) };
-}
-
-- (UIImage *)compassImage
-{
-    UIImage *scaleImage = [MGLMapView resourceImageNamed:@"Compass"];
-    UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, [UIScreen mainScreen].scale);
-    [scaleImage drawInRect:{ CGPointZero, scaleImage.size }];
-
-    NSAttributedString *north = [[NSAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"COMPASS_NORTH", nil, nil, @"N", @"Compass abbreviation for north") attributes:@{
-        NSFontAttributeName: [UIFont systemFontOfSize:11 weight:UIFontWeightUltraLight],
-        NSForegroundColorAttributeName: [UIColor whiteColor],
-    }];
-    CGRect stringRect = CGRectMake((scaleImage.size.width - north.size.width) / 2,
-                                   scaleImage.size.height * 0.435,
-                                   north.size.width, north.size.height);
-    [north drawInRect:stringRect];
-
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification
@@ -1522,19 +1492,6 @@ public:
 
 #pragma mark - Gestures -
 
-- (void)handleCompassTapGesture:(__unused id)sender
-{
-    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonResetNorth;
-
-    [self resetNorthAnimated:YES];
-
-    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
-        self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
-    {
-        self.userTrackingMode = MGLUserTrackingModeFollow;
-    }
-}
-
 - (void)touchesBegan:(__unused NSSet<UITouch *> *)touches withEvent:(__unused UIEvent *)event
 {
     if (!self.zoomEnabled && !self.pitchEnabled && !self.rotateEnabled && !self.scrollEnabled)
@@ -1686,11 +1643,7 @@ public:
             // meaningless.
             if (self.userTrackingMode == MGLUserTrackingModeNone && pinch.numberOfTouches == _previousPinchNumberOfTouches)
             {
-                CLLocationCoordinate2D centerCoordinate = _previousPinchCenterCoordinate;
-                mbgl::EdgeInsets padding { centerPoint.y, centerPoint.x, self.size.height - centerPoint.y, self.size.width - centerPoint.x };
-                self.mbglMap.jumpTo(mbgl::CameraOptions()
-                                        .withCenter(MGLLatLngFromLocationCoordinate2D(centerCoordinate))
-                                        .withPadding(padding));
+                self.mbglMap.moveBy({centerPoint.x - _previousPinchCenterPoint.x, centerPoint.y - _previousPinchCenterPoint.y});
             }
         }
         [self cameraIsChanging];
@@ -1748,7 +1701,7 @@ public:
         [self unrotateIfNeededForGesture];
     }
 
-    _previousPinchCenterCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
+    _previousPinchCenterPoint = centerPoint;
     _previousPinchNumberOfTouches = pinch.numberOfTouches;
 }
 
@@ -2547,6 +2500,8 @@ public:
 
 - (void)resetNorthAnimated:(BOOL)animated
 {
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonResetNorth;
+
     [self setDirection:0 animated:animated];
 }
 
@@ -3467,7 +3422,8 @@ public:
     MGLLogDebug(@"Setting direction: %f animated: %@", direction, MGLStringFromBOOL(animated));
     if ( ! animated && ! self.rotationAllowed) return;
 
-    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
+    if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
+        self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
     {
         self.userTrackingMode = MGLUserTrackingModeFollow;
     }
@@ -4177,7 +4133,7 @@ public:
 /// rect therefore excludes the bottom half.
 - (MGLAnnotationImage *)defaultAnnotationImage
 {
-    UIImage *image = [MGLMapView resourceImageNamed:MGLDefaultStyleMarkerSymbolName];
+    UIImage *image = [UIImage mgl_resourceImageNamed:MGLDefaultStyleMarkerSymbolName];
     image = [image imageWithAlignmentRectInsets:
              UIEdgeInsetsMake(0, 0, image.size.height / 2, 0)];
     MGLAnnotationImage *annotationImage = [MGLAnnotationImage annotationImageWithImage:image
@@ -6234,6 +6190,14 @@ public:
     }
 }
 
+- (BOOL)shouldRemoveStyleImage:(NSString *)imageName {
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldRemoveStyleImage:)]) {
+        return [self.delegate mapView:self shouldRemoveStyleImage:imageName];
+    }
+    
+    return YES;
+}
+
 - (void)updateUserLocationAnnotationView
 {
     [self updateUserLocationAnnotationViewAnimatedWithDuration:0];
@@ -6539,35 +6503,7 @@ public:
 
 - (void)updateCompass
 {
-    CLLocationDirection direction = self.direction;
-    CLLocationDirection plateDirection = mbgl::util::wrap(-direction, 0., 360.);
-    self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(plateDirection));
-
-    self.compassView.isAccessibilityElement = direction > 0;
-    self.compassView.accessibilityValue = [_accessibilityCompassFormatter stringFromDirection:direction];
-
-    if (direction > 0 && self.compassView.alpha < 1)
-    {
-        [UIView animateWithDuration:MGLAnimationDuration
-                              delay:0
-                            options:UIViewAnimationOptionBeginFromCurrentState
-                         animations:^
-                         {
-                             self.compassView.alpha = 1;
-                         }
-                         completion:nil];
-    }
-    else if (direction == 0 && self.compassView.alpha > 0)
-    {
-        [UIView animateWithDuration:MGLAnimationDuration
-                              delay:0
-                            options:UIViewAnimationOptionBeginFromCurrentState
-                         animations:^
-                         {
-                             self.compassView.alpha = 0;
-                         }
-                         completion:nil];
-    }
+    [self.compassView updateCompass];
 }
 
 - (void)updateScaleBar
@@ -6583,21 +6519,6 @@ public:
             [self installScaleBarConstraints];
         }
     }
-}
-
-+ (UIImage *)resourceImageNamed:(NSString *)imageName
-{
-    UIImage *image = [UIImage imageNamed:imageName
-                                inBundle:[NSBundle mgl_frameworkBundle]
-           compatibleWithTraitCollection:nil];
-
-    if ( ! image)
-    {
-        [NSException raise:MGLResourceNotFoundException format:
-         @"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
-    }
-
-    return image;
 }
 
 - (BOOL)isFullyLoaded

@@ -9,6 +9,7 @@
 #endif
 
 static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPre4_0";
+static NSString * const MGLIdeographicFontFamilyNameKey = @"MGLIdeographicFontFamilyName";
 
 @interface MGLRendererConfiguration ()
 @property (nonatomic, readwrite) BOOL perSourceCollisions;
@@ -69,10 +70,54 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     return mbgl::optional<std::string>();
 }
 
-- (std::string)localFontFamilyName {
-    NSString *fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
+- (mbgl::optional<std::string>)localFontFamilyName {
+    return [self _localFontFamilyNameWithPropertyDictionary:[[NSBundle mainBundle] infoDictionary]];
+}
 
-    return fontFamilyName ? std::string([fontFamilyName UTF8String]) : std::string("PingFang");
+- (mbgl::optional<std::string>)_localFontFamilyNameWithPropertyDictionary:(nonnull NSDictionary *)properties {
+    
+    std::string systemFontFamilyName;
+#if TARGET_OS_IPHONE
+    systemFontFamilyName = std::string([[UIFont systemFontOfSize:0 weight:UIFontWeightRegular].familyName UTF8String]);
+#else
+    systemFontFamilyName = std::string([[NSFont systemFontOfSize:0 weight:NSFontWeightRegular].familyName UTF8String]);
+#endif
+    
+    id fontFamilyName = properties[MGLIdeographicFontFamilyNameKey];
+    
+    if([fontFamilyName isKindOfClass:[NSNumber class]] && ![fontFamilyName boolValue])
+    {
+        return mbgl::optional<std::string>();
+    }
+    else if([fontFamilyName isKindOfClass:[NSString class]])
+    {
+        BOOL isValidFont = NO;
+#if TARGET_OS_IPHONE
+        if([[UIFont familyNames] containsObject:fontFamilyName]){
+            isValidFont = YES;
+        }
+#else
+        if([[[NSFontManager sharedFontManager] availableFontFamilies] containsObject:fontFamilyName]){
+            isValidFont = YES;
+        }
+#endif
+        return (fontFamilyName && isValidFont) ? std::string([fontFamilyName UTF8String]) : systemFontFamilyName;
+    }
+    // Ability to specify an array of fonts for fallbacks for `localIdeographicFontFamily`
+    else if ([fontFamilyName isKindOfClass:[NSArray class]]){
+        for(NSString *name in fontFamilyName){
+#if TARGET_OS_IPHONE
+            if([[UIFont familyNames] containsObject:name]){
+                return std::string([name UTF8String]);
+            }
+#else
+            if([[[NSFontManager sharedFontManager] availableFontFamilies] containsObject:name]){
+                return std::string([name UTF8String]);
+            }
+#endif
+        }
+    }
+    return systemFontFamilyName;
 }
 
 @end

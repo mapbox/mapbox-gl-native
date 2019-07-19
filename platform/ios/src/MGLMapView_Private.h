@@ -12,6 +12,9 @@ namespace mbgl {
 class MGLMapViewImpl;
 @class MGLSource;
 
+/// Standard animation duration for UI elements.
+FOUNDATION_EXTERN const NSTimeInterval MGLAnimationDuration;
+
 /// Minimum size of an annotation’s accessibility element.
 FOUNDATION_EXTERN const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
@@ -41,6 +44,7 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const _Nonnull MGLUnderlyingMapUna
 - (void)mapViewDidFinishLoadingStyle;
 - (void)sourceDidChange:(nonnull MGLSource *)source;
 - (void)didFailToLoadImage:(nonnull NSString *)imageName;
+- (BOOL)shouldRemoveStyleImage:(nonnull NSString *)imageName;
 
 /** Triggers another render pass even when it is not necessary. */
 - (void)setNeedsRerender;

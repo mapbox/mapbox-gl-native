@@ -1,8 +1,0 @@
-task downloadSchema(type: Copy) {
-    def address='https://mapbox.s3.amazonaws.com/mapbox-gl-native/event-schema/mobile-event-schemas.jsonl.gz'
-    def target='MapboxGLAndroidSDK/src/test/resources/'
-
-    new File(target + "${address.tokenize('/')[-1]}").withOutputStream { out ->
-        new URL(address).withInputStream { from ->  out << from }
-    }
-}

@@ -19,6 +19,10 @@ CircleLayerProperties::CircleLayerProperties(
 
 CircleLayerProperties::~CircleLayerProperties() = default;
 
+unsigned long CircleLayerProperties::constantsMask() const {
+    return evaluated.constantsMask();
+}
+
 const CircleLayer::Impl& CircleLayerProperties::layerImpl() const {
     return static_cast<const CircleLayer::Impl&>(*baseImpl);
 }

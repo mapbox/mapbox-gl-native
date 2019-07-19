@@ -32,9 +32,4 @@ private:
     std::weak_ptr<style::GeoJSONData> data;
 };
 
-template <>
-inline bool RenderSource::is<RenderGeoJSONSource>() const {
-    return baseImpl->type == style::SourceType::GeoJSON;
-}
-
 } // namespace mbgl

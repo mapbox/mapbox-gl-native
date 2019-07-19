@@ -1,6 +1,7 @@
 #pragma once
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
+#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/style/layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -15,7 +16,6 @@ class TransitionParameters;
 class PropertyEvaluationParameters;
 class UploadParameters;
 class PaintParameters;
-class RenderSource;
 class RenderTile;
 class TransformState;
 class PatternAtlas;
@@ -30,7 +30,8 @@ public:
 class LayerPlacementData {
 public:
     std::reference_wrapper<Bucket> bucket;
-    std::reference_wrapper<RenderTile> tile;
+    std::reference_wrapper<const RenderTile> tile;
+    std::shared_ptr<FeatureIndex> featureIndex;
 };
 
 class LayerPrepareParameters {
@@ -64,6 +65,9 @@ public:
 
     // Returns true if the layer has a pattern property and is actively crossfading.
     virtual bool hasCrossfade() const = 0;
+
+    // Returns true if layer writes to depth buffer by drawing using PaintParameters::depthModeFor3D().
+    virtual bool is3D() const { return false; }
 
     // Returns true is the layer is subject to placement.
     bool needsPlacement() const;
@@ -113,8 +117,11 @@ protected:
     // in the console to inform the developer.
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
+    void addRenderPassesFromTiles();
+
+    const LayerRenderData* getRenderDataForPass(const RenderTile&, RenderPass) const;
+
 protected:
-    using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     // Stores current set of tiles to be rendered for this layer.
     RenderTiles renderTiles;
 
@@ -125,7 +132,6 @@ protected:
     std::vector<LayerPlacementData> placementData;
 
 private:
-    RenderTiles filterRenderTiles(RenderTiles) const;
     // Some layers may not render correctly on some hardware when the vertex attribute limit of
     // that GPU is exceeded. More attributes are used when adding many data driven paint properties
     // to a layer.

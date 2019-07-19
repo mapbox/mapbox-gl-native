@@ -24,8 +24,6 @@
 	<string>7877</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>MGLIdeographicFontFamilyName</key>
-	<string>PingFang TC</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2014–2019 Mapbox</string>
 	<key>NSLocationAlwaysUsageDescription</key>

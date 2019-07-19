@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-JAZZY_VERSION="0.9.6"
+JAZZY_VERSION="0.10.0"
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }

@@ -43,8 +43,8 @@ open class FileSourceMapTest : AppCenter() {
         }
 
         override fun onError(message: String) {
-          Assert.assertEquals("Cannot set path, file source is activated."
-            + " Make sure that the map or a resources download is not running.", message)
+          Assert.assertEquals("Cannot set path, file source is activated." +
+            " Make sure that the map or a resources download is not running.", message)
           latch.countDown()
         }
       })
