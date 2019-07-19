@@ -44,7 +44,6 @@ void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& para
     passes = (properties->evaluated.get<style::FillExtrusionOpacity>() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
-    properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
 
@@ -120,7 +119,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         if (unevaluated.get<FillExtrusionPattern>().isUndefined()) {
             for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
+                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
                 if (!renderData) {
                     continue;
                 }
@@ -146,7 +145,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             }
         } else {
             for (const RenderTile& tile : renderTiles) {
-                const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
+                const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
                 if (!renderData) {
                     continue;
                 }

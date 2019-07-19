@@ -15,8 +15,6 @@ public:
     virtual ~LayerProperties() = default;
 
     Immutable<Layer::Impl> baseImpl;
-    // Contains render passes used by the renderer, see `mbgl::RenderPass`.
-    uint8_t renderPasses = 0u;
 
 protected:
     LayerProperties(Immutable<Layer::Impl> impl) : baseImpl(std::move(impl)) {}

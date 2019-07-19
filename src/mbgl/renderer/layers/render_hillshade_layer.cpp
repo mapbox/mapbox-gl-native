@@ -53,7 +53,7 @@ void RenderHillshadeLayer::evaluate(const PropertyEvaluationParameters& paramete
     passes = (properties->evaluated.get<style::HillshadeExaggeration >() > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
-    properties->renderPasses = mbgl::underlying_type(passes);
+
     evaluatedProperties = std::move(properties);
 }
 

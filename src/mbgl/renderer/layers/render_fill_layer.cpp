@@ -59,7 +59,7 @@ void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     } else {
         passes |= RenderPass::Opaque;
     }
-    properties->renderPasses = mbgl::underlying_type(passes);
+
     evaluatedProperties = std::move(properties);
 }
 
@@ -74,7 +74,7 @@ bool RenderFillLayer::hasCrossfade() const {
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
     if (unevaluated.get<FillPattern>().isUndefined()) {
         for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
+            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
             if (!renderData) {
                 continue;
             }
@@ -158,7 +158,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         for (const RenderTile& tile : renderTiles) {
-            const LayerRenderData* renderData = getRenderDataForPass(tile, parameters.pass);
+            const LayerRenderData* renderData = tile.tile.getLayerRenderData(*baseImpl);
             if (!renderData) {
                 continue;
             }

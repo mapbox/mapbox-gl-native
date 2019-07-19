@@ -250,14 +250,14 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             const Immutable<Layer::Impl>& layerImpl = *it;
             RenderLayer* layer = getRenderLayer(layerImpl->id);
             const auto* layerInfo = layerImpl->getTypeInfo();
-            const bool layerIsVisible = layer->baseImpl->visibility != style::VisibilityType::None;
+            const bool layerNeedsRendering = layer->needsRendering();
             const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
             staticData->has3D = (staticData->has3D || layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
                     sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || hasLayoutDifference(layerDiff, layerImpl->id));
-                    if (layerIsVisible) {
+                    if (layerNeedsRendering) {
                         filteredLayersForSource.push_back(layer->evaluatedProperties);
                         if (zoomFitsLayer) {
                             sourceNeedsRendering = true;
@@ -269,7 +269,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             } 
 
             // Handle layers without source.
-            if (layerIsVisible && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
+            if (layerNeedsRendering && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
                 if (!backend.contextIsShared() && layerImpl.get() == layerImpls->at(0).get()) {
                     const auto& solidBackground = layer->getSolidBackground();
                     if (solidBackground) {
