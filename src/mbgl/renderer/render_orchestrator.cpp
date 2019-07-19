@@ -349,9 +349,11 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
-        if (renderLayer.is3D() && renderTreeParameters->opaquePassCutOff == 0) {
+        if (renderTreeParameters->opaquePassCutOff == 0) {
             --opaquePassCutOffEstimation;
-            renderTreeParameters->opaquePassCutOff = uint32_t(opaquePassCutOffEstimation);
+            if (renderLayer.is3D()) {
+                renderTreeParameters->opaquePassCutOff = uint32_t(opaquePassCutOffEstimation);
+            }
         }
     }
     // Symbol placement.
