@@ -25,10 +25,16 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            const std::vector<SymbolInstance>&& symbolInstances_,
                            float tilePixelRatio_)
     : layout(std::move(layout_)),
+      bucketLeaderID(std::move(bucketName_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
-      bucketLeaderID(std::move(bucketName_)),
+      staticUploaded(false),
+      placementChangesUploaded(false),
+      dynamicUploaded(false),
+      sortUploaded(false),
+      justReloaded(false),
+      hasVariablePlacement(false),
       symbolInstances(std::move(symbolInstances_)),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
@@ -170,8 +176,9 @@ void SymbolBucket::sortFeatures(const float angle) {
     if (!sortFeaturesByY) {
         return;
     }
+    assert (angle != std::numeric_limits<float>::max());
 
-    if (sortedAngle && *sortedAngle == angle) {
+    if (sortedAngle == angle) {
         return;
     }
 

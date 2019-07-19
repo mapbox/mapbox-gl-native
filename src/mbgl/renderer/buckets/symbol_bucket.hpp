@@ -73,18 +73,19 @@ public:
     std::vector<std::reference_wrapper<SymbolInstance>> getSortedSymbols(const float angle);
 
     const style::SymbolLayoutProperties::PossiblyEvaluated layout;
-    const bool sdfIcons;
-    const bool iconsNeedLinear;
-    const bool sortFeaturesByY;
-
     const std::string bucketLeaderID;
+    float sortedAngle = std::numeric_limits<float>::max();
 
-    optional<float> sortedAngle;
-
-    bool staticUploaded = false;
-    bool placementChangesUploaded = false;
-    bool dynamicUploaded = false;
-    bool sortUploaded = false;
+    // Flags
+    const bool sdfIcons : 1;
+    const bool iconsNeedLinear : 1;
+    const bool sortFeaturesByY : 1;
+    bool staticUploaded : 1;
+    bool placementChangesUploaded : 1;
+    bool dynamicUploaded : 1;
+    bool sortUploaded : 1;
+    bool justReloaded : 1;
+    bool hasVariablePlacement : 1;
 
     std::vector<SymbolInstance> symbolInstances;
 
@@ -137,8 +138,7 @@ public:
 
     const float tilePixelRatio;
     uint32_t bucketInstanceId;
-    bool justReloaded = false;
-    bool hasVariablePlacement = false;
+
     mutable optional<bool> hasFormatSectionOverrides_;
 
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
