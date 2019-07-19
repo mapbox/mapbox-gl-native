@@ -216,7 +216,7 @@ void RenderLineLayer::render(PaintParameters& parameters) {
 
 std::unique_ptr<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
 
-    if (offset == 0) return NULL;
+    if (offset == 0) return nullptr;
 
     std::unique_ptr<GeometryCollection> newRings = std::make_unique<GeometryCollection>();
 
