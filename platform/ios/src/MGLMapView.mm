@@ -963,19 +963,19 @@ public:
 
     [self updateAttributionAlertView];
     
-    if (!CGRectContainsRect(self.bounds, self.attributionButton.frame)) {
+    if (!CGRectContainsRect(self.bounds, self.attributionButton.mgl_frameForTransformIdentity)) {
         [NSException raise:NSInvalidArgumentException
                     format:@"The attribution is not in the visible area of the mapview. Please check your position and offset settings"];
     }
-    if (!CGRectContainsRect(self.bounds, self.scaleBar.frame)) {
+    if (!CGRectContainsRect(self.bounds, self.scaleBar.mgl_frameForTransformIdentity)) {
         [NSException raise:NSInvalidArgumentException
                     format:@"The scaleBar is not in the visible area of the mapview. Please check your position and offset settings"];
     }
-    if (!CGRectContainsRect(self.bounds, self.compassView.frame)) {
+    if (!CGRectContainsRect(self.bounds, self.compassView.mgl_frameForTransformIdentity)) {
         [NSException raise:NSInvalidArgumentException
                     format:@"The compassView is not in the visible area of the mapview. Please check your position and offset settings"];
     }
-    if (!CGRectContainsRect(self.bounds, self.logoView.frame)) {
+    if (!CGRectContainsRect(self.bounds, self.logoView.mgl_frameForTransformIdentity)) {
         [NSException raise:NSInvalidArgumentException
                     format:@"The logoView is not in the visible area of the mapview. Please check your position and offset settings"];
     }

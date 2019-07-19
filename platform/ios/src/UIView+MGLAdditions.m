@@ -66,4 +66,16 @@
     }
 }
 
+- (CGRect)mgl_frameForTransformIdentity {
+    CGPoint center = self.center;
+    CGSize size = self.bounds.size;
+
+    return CGRectMake(
+                      center.x - size.width / 2,
+                      center.y - size.height / 2,
+                      size.width,
+                      size.height
+                      );
+}
+
 @end
