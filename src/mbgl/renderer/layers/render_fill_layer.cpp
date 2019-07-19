@@ -252,6 +252,7 @@ void RenderFillLayer::render(PaintParameters& parameters) {
 bool RenderFillLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
+        const GeometryCollection&,//$$JR
         const float,
         const TransformState& transformState,
         const float pixelsToTileUnits,

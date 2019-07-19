@@ -222,6 +222,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
 bool RenderFillExtrusionLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
+        const GeometryCollection&,//$$JR
         const float,
         const TransformState& transformState,
         const float pixelsToTileUnits,

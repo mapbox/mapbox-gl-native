@@ -217,6 +217,7 @@ void RenderHeatmapLayer::updateColorRamp() {
 bool RenderHeatmapLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
+        const GeometryCollection&,//$$JR
         const float zoom,
         const TransformState&,
         const float pixelsToTileUnits,

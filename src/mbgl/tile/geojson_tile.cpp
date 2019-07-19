@@ -33,7 +33,7 @@ void GeoJSONTile::querySourceFeatures(
                     continue;
                 }
 
-                result.push_back(convertFeature(*feature, id.canonical));
+                result.push_back(convertFeature(*feature, feature->getGeometries(), id.canonical));
             }
         }
     }

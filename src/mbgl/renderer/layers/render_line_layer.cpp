@@ -214,14 +214,16 @@ void RenderLineLayer::render(PaintParameters& parameters) {
     }
 }
 
-optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
-    if (offset == 0) return {};
+GeometryCollection* offsetLine(const GeometryCollection& rings, const double offset) {
+    
+    GeometryCollection *newRings = new GeometryCollection();
+    
+    if (offset == 0) return NULL;
 
-    GeometryCollection newRings;
     Point<double> zero(0, 0);
     for (const auto& ring : rings) {
-        newRings.emplace_back();
-        auto& newRing = newRings.back();
+        newRings->emplace_back();
+        auto& newRing = newRings->back();
 
         for (auto i = ring.begin(); i != ring.end(); i++) {
             auto& p = *i;
@@ -247,6 +249,7 @@ optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const d
 bool RenderLineLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
+        const GeometryCollection& geometries,//$$JR
         const float zoom,
         const TransformState& transformState,
         const float pixelsToTileUnits,
@@ -265,14 +268,21 @@ bool RenderLineLayer::queryIntersectsFeature(
                           .evaluate(feature, zoom, style::LineOffset::defaultValue()) * pixelsToTileUnits;
 
     // Apply offset to geometry
-    auto offsetGeometry = offsetLine(feature.getGeometries(), offset);
+//    auto offsetGeometry = offsetLine(feature.getGeometries(), offset);
+    auto offsetGeometry = offsetLine(geometries, offset);
 
     // Test intersection
     const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
-    return util::polygonIntersectsBufferedMultiLine(
+    bool intersects =  false;
+    
+    if (offsetGeometry) {
+        intersects = util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
-            offsetGeometry.value_or(feature.getGeometries()),
+            *offsetGeometry,//.value_or(geometries),//feature.getGeometries()),
             halfWidth);
+    }
+    delete offsetGeometry;
+    return intersects;
 }
 
 void RenderLineLayer::updateColorRamp() {
