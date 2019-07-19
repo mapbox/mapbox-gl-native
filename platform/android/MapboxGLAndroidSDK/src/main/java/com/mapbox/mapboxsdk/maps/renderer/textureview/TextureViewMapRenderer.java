@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps.renderer.textureview;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.TextureView;
 
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
@@ -16,6 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
  * @see MapRenderer
  */
 public class TextureViewMapRenderer extends MapRenderer {
+  @Nullable
   private TextureViewRenderThread renderThread;
   private boolean translucentSurface;
 
@@ -25,16 +27,23 @@ public class TextureViewMapRenderer extends MapRenderer {
    * @param context                  the current Context
    * @param textureView              the TextureView
    * @param localIdeographFontFamily the local font family
-   * @param translucentSurface    the translucency flag
+   * @param translucentSurface       the translucency flag
    */
   public TextureViewMapRenderer(@NonNull Context context,
-                                @NonNull TextureView textureView,
+                                @NonNull final MapboxTextureView textureView,
                                 String localIdeographFontFamily,
                                 boolean translucentSurface) {
     super(context, localIdeographFontFamily);
     this.translucentSurface = translucentSurface;
-    renderThread = new TextureViewRenderThread(textureView, this);
-    renderThread.start();
+    textureView.setOnViewAttachedListener(new MapboxTextureView.OnViewAttachedListener() {
+      @Override
+      public void onViewAttached() {
+        if (renderThread == null) {
+          renderThread = new TextureViewRenderThread(textureView, TextureViewMapRenderer.this);
+          renderThread.start();
+        }
+      }
+    });
   }
 
   /**
@@ -74,6 +83,7 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   public void requestRender() {
+    assert renderThread != null;
     renderThread.requestRender();
   }
 
@@ -82,6 +92,7 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   public void queueEvent(Runnable runnable) {
+    assert renderThread != null;
     renderThread.queueEvent(runnable);
   }
 
@@ -90,7 +101,9 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   public void onStop() {
-    renderThread.onPause();
+    if (renderThread != null) {
+      renderThread.onPause();
+    }
   }
 
   /**
@@ -98,7 +111,9 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   public void onStart() {
-    renderThread.onResume();
+    if (renderThread != null) {
+      renderThread.onResume();
+    }
   }
 
   /**
@@ -106,10 +121,13 @@ public class TextureViewMapRenderer extends MapRenderer {
    */
   @Override
   public void onDestroy() {
-    renderThread.onDestroy();
+    if (renderThread != null) {
+      renderThread.onDestroy();
+    }
   }
 
   public boolean isTranslucentSurface() {
     return translucentSurface;
   }
+
 }

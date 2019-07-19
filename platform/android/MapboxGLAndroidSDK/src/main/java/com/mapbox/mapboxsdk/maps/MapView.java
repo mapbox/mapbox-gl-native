@@ -14,7 +14,6 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -30,6 +29,7 @@ import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.MapboxGLSurfaceView;
+import com.mapbox.mapboxsdk.maps.renderer.textureview.MapboxTextureView;
 import com.mapbox.mapboxsdk.maps.renderer.textureview.TextureViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
@@ -284,7 +284,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private void initialiseDrawingSurface(MapboxMapOptions options) {
     String localFontFamily = options.getLocalIdeographFontFamily();
     if (options.getTextureMode()) {
-      TextureView textureView = new TextureView(getContext());
+      MapboxTextureView textureView = new MapboxTextureView(getContext());
       boolean translucentSurface = options.getTranslucentTextureSurface();
       mapRenderer = new TextureViewMapRenderer(getContext(),
         textureView, localFontFamily, translucentSurface) {

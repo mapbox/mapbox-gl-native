@@ -52,5 +52,6 @@
   "ChildFragmentMapInDialogActivity",
   "PerformanceMeasurementActivity",
   "DownloadRegionActivity",
-  "CacheManagementActivity"
+  "CacheManagementActivity",
+  "TextureRecyclerViewActivity"
 ]
