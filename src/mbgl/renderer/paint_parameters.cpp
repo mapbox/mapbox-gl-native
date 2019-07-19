@@ -43,10 +43,11 @@ PaintParameters::PaintParameters(gfx::Context& context_,
     // odd viewport sizes.
     state.getProjMatrix(alignedProjMatrix, 1, true);
 
-    // Calculate a second projection matrix with the near plane clipped to 100 so as
-    // not to waste lots of depth buffer precision on very close empty space, for layer
-    // types (fill-extrusion) that use the depth buffer to emulate real-world space.
-    state.getProjMatrix(nearClippedProjMatrix, 100);
+    // Calculate a second projection matrix with the near plane moved further,
+    // to a tenth of the far value, so as not to waste depth buffer precision on
+    // very close empty space, for layer types (fill-extrusion) that use the
+    // depth buffer to emulate real-world space.
+    state.getProjMatrix(nearClippedProjMatrix, 0.1 * state.getCameraToCenterDistance());
 
     pixelsToGLUnits = {{ 2.0f  / state.getSize().width, -2.0f / state.getSize().height }};
 
@@ -65,6 +66,9 @@ mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID, bool aligned)
 }
 
 gfx::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gfx::DepthMaskType mask) const {
+    if (currentLayer < opaquePassCutoff) {
+        return gfx::DepthMode::disabled();
+    }
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;
     return gfx::DepthMode { gfx::DepthFunctionType::LessEqual, mask, { nearDepth, farDepth } };
