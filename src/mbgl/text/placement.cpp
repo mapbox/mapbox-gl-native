@@ -547,28 +547,28 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
         if (symbolInstance.hasText) {
             auto opacityVertex = SymbolSDFTextProgram::opacityVertex(opacityState.text.placed, opacityState.text.opacity);
             if (symbolInstance.placedRightTextIndex) {
-                for (size_t i = 0; i < symbolInstance.rightJustifiedGlyphQuads.size() * 4; i++) {
+                for (size_t i = 0; i < symbolInstance.rightJustifiedGlyphQuadsSize * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedRightTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
-                for (size_t i = 0; i < symbolInstance.centerJustifiedGlyphQuads.size() * 4; i++) {
+                for (size_t i = 0; i < symbolInstance.centerJustifiedGlyphQuadsSize * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedCenterTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
-                for (size_t i = 0; i < symbolInstance.leftJustifiedGlyphQuads.size() * 4; i++) {
+                for (size_t i = 0; i < symbolInstance.leftJustifiedGlyphQuadsSize * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedLeftTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedVerticalTextIndex) {
-                for (size_t i = 0; i < symbolInstance.verticalGlyphQuads.size() * 4; i++) {
+                for (size_t i = 0; i < symbolInstance.verticalGlyphQuadsSize * 4; i++) {
                     bucket.text.opacityVertices.emplace_back(opacityVertex);
                 }
                 bucket.text.placedSymbols[*symbolInstance.placedVerticalTextIndex].hidden = opacityState.isHidden();
@@ -581,12 +581,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
         }
         if (symbolInstance.hasIcon) {
             auto opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
-            if (symbolInstance.iconQuad) {
-                bucket.icon.opacityVertices.emplace_back(opacityVertex);
-                bucket.icon.opacityVertices.emplace_back(opacityVertex);
-                bucket.icon.opacityVertices.emplace_back(opacityVertex);
-                bucket.icon.opacityVertices.emplace_back(opacityVertex);
-            }
+            bucket.icon.opacityVertices.emplace_back(opacityVertex);
+            bucket.icon.opacityVertices.emplace_back(opacityVertex);
+            bucket.icon.opacityVertices.emplace_back(opacityVertex);
+            bucket.icon.opacityVertices.emplace_back(opacityVertex);
             if (symbolInstance.placedIconIndex) {
                 bucket.icon.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
             }
