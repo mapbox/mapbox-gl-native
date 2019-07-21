@@ -21,23 +21,39 @@ struct ShapedTextOrientations {
     bool singleLine = false;
 };
 
+struct SymbolInstanceSharedData {
+    SymbolInstanceSharedData(GeometryCoordinates line,
+                            const ShapedTextOrientations& shapedTextOrientations,
+                            const optional<PositionedIcon>& shapedIcon,
+                            const style::SymbolLayoutProperties::Evaluated& layout,
+                            const float layoutTextSize,
+                            const style::SymbolPlacementType textPlacement,
+                            const std::array<float, 2>& textOffset,
+                            const GlyphPositions& positions);
+    bool empty() const;
+    GeometryCoordinates line;
+    // Note: When singleLine == true, only `rightJustifiedGlyphQuads` is populated.
+    SymbolQuads rightJustifiedGlyphQuads;
+    SymbolQuads centerJustifiedGlyphQuads;
+    SymbolQuads leftJustifiedGlyphQuads;
+    SymbolQuads verticalGlyphQuads;
+    optional<SymbolQuad> iconQuad;
+};
+
 class SymbolInstance {
 public:
-    SymbolInstance(Anchor& anchor,
-                   GeometryCoordinates line,
+    SymbolInstance(Anchor& anchor_,
+                   std::shared_ptr<SymbolInstanceSharedData> sharedData,
                    const ShapedTextOrientations& shapedTextOrientations,
-                   optional<PositionedIcon> shapedIcon,
-                   const style::SymbolLayoutProperties::Evaluated&,
-                   const float layoutTextSize,
+                   const optional<PositionedIcon>& shapedIcon,
                    const float textBoxScale,
                    const float textPadding,
-                   style::SymbolPlacementType textPlacement,
-                   const std::array<float, 2> textOffset,
+                   const style::SymbolPlacementType textPlacement,
+                   const std::array<float, 2>& textOffset,
                    const float iconBoxScale,
                    const float iconPadding,
-                   const std::array<float, 2> iconOffset,
-                   const GlyphPositions&,
-                   const IndexedSubfeature&,
+                   const std::array<float, 2>& iconOffset,
+                   const IndexedSubfeature& indexedFeature,
                    const std::size_t layoutFeatureIndex,
                    const std::size_t dataFeatureIndex,
                    std::u16string key,
@@ -46,18 +62,27 @@ public:
                    float radialTextOffset);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
+    const GeometryCoordinates& line() const;
+    const SymbolQuads& rightJustifiedGlyphQuads() const;
+    const SymbolQuads& leftJustifiedGlyphQuads() const;
+    const SymbolQuads& centerJustifiedGlyphQuads() const;
+    const SymbolQuads& verticalGlyphQuads() const;
+    const optional<SymbolQuad>& iconQuad() const;
+    void releaseSharedData();
+
+private:
+    std::shared_ptr<SymbolInstanceSharedData> sharedData;
+
+public:
     Anchor anchor;
-    GeometryCoordinates line;
     bool hasText;
     bool hasIcon;
-    // Note: When singleLine == true, only `rightJustifiedGlyphQuads` is populated.
-    SymbolQuads rightJustifiedGlyphQuads;
-    SymbolQuads centerJustifiedGlyphQuads;
-    SymbolQuads leftJustifiedGlyphQuads;
 
-    SymbolQuads verticalGlyphQuads;
+    std::size_t rightJustifiedGlyphQuadsSize;
+    std::size_t centerJustifiedGlyphQuadsSize;
+    std::size_t leftJustifiedGlyphQuadsSize;
+    std::size_t verticalGlyphQuadsSize;
 
-    optional<SymbolQuad> iconQuad;
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
     WritingModeType writingModes;
