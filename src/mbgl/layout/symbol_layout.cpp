@@ -73,7 +73,7 @@ inline Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> createLayout(
         layout->get<IconPitchAlignment>() = layout->get<IconRotationAlignment>();
     }
 
-    return layout;
+    return std::move(layout);
 }
 
 } // namespace
@@ -738,8 +738,8 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
     for (const SymbolInstance &symbolInstance : symbolInstances) {
         auto populateCollisionBox = [&](const auto& feature) {
             SymbolBucket::CollisionBuffer& collisionBuffer = feature.alongLine ?
-                static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionCircle) :
-                static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionBox);
+                static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateCollisionCircleBuffer()) :
+                static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateCollisionBox());
             for (const CollisionBox &box : feature.boxes) {
                 auto& anchor = box.anchor;
 
@@ -753,7 +753,7 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
 
                 if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                     collisionBuffer.segments.emplace_back(collisionBuffer.vertices.elements(),
-                      feature.alongLine? bucket.collisionCircle.triangles.elements() : bucket.collisionBox.lines.elements());
+                      feature.alongLine ? bucket.collisionCircle->triangles.elements() : bucket.collisionBox->lines.elements());
                 }
 
                 auto& segment = collisionBuffer.segments.back();
@@ -773,13 +773,13 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
 
                 if (feature.alongLine) {
-                    bucket.collisionCircle.triangles.emplace_back(index, index + 1, index + 2);
-                    bucket.collisionCircle.triangles.emplace_back(index, index + 2, index + 3);
+                    bucket.collisionCircle->triangles.emplace_back(index, index + 1, index + 2);
+                    bucket.collisionCircle->triangles.emplace_back(index, index + 2, index + 3);
                 } else {
-                    bucket.collisionBox.lines.emplace_back(index + 0, index + 1);
-                    bucket.collisionBox.lines.emplace_back(index + 1, index + 2);
-                    bucket.collisionBox.lines.emplace_back(index + 2, index + 3);
-                    bucket.collisionBox.lines.emplace_back(index + 3, index + 0);
+                    bucket.collisionBox->lines.emplace_back(index + 0, index + 1);
+                    bucket.collisionBox->lines.emplace_back(index + 1, index + 2);
+                    bucket.collisionBox->lines.emplace_back(index + 2, index + 3);
+                    bucket.collisionBox->lines.emplace_back(index + 3, index + 0);
                 }
 
                 segment.vertexLength += vertexLength;

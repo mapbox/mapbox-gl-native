@@ -129,12 +129,24 @@ public:
     struct CollisionBoxBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Lines> lines;
         optional<gfx::IndexBuffer> indexBuffer;
-    } collisionBox;
+    };
+    std::unique_ptr<CollisionBoxBuffer> collisionBox;
+
+    CollisionBoxBuffer& getOrCreateCollisionBox() {
+        if (!collisionBox) collisionBox = std::make_unique<CollisionBoxBuffer>();
+        return *collisionBox;
+    }
 
     struct CollisionCircleBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Triangles> triangles;
         optional<gfx::IndexBuffer> indexBuffer;
-    } collisionCircle;
+    };
+    std::unique_ptr<CollisionCircleBuffer> collisionCircle;
+
+    CollisionCircleBuffer& getOrCreateCollisionCircleBuffer() {
+        if (!collisionCircle) collisionCircle = std::make_unique<CollisionCircleBuffer>();
+        return *collisionCircle;
+    }
 
     const float tilePixelRatio;
     uint32_t bucketInstanceId;

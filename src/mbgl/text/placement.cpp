@@ -507,8 +507,8 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
 void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState& state, std::set<uint32_t>& seenCrossTileIDs) {
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
-    if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
-    if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
+    if (bucket.hasCollisionBoxData()) bucket.collisionBox->dynamicVertices.clear();
+    if (bucket.hasCollisionCircleData()) bucket.collisionCircle->dynamicVertices.clear();
 
     JointOpacityState duplicateOpacityState(false, false, true);
 
@@ -598,7 +598,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
             auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false, {});
             for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
-                bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionBox->dynamicVertices.emplace_back(dynamicVertex);
             }
         };
 
@@ -633,7 +633,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
             auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !used, shift);
             for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
-                bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionBox->dynamicVertices.emplace_back(dynamicVertex);
             }
         };
         
@@ -643,10 +643,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
             for (const CollisionBox& box : feature.boxes) {
                 auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.used, {});
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
             }
         };
         
