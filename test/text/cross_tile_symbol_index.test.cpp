@@ -11,7 +11,14 @@ SymbolInstance makeSymbolInstance(float x, float y, std::u16string key) {
     style::SymbolLayoutProperties::Evaluated layout_;
     IndexedSubfeature subfeature(0, "", "", 0);
     Anchor anchor(x, y, 0, 0);
-    return SymbolInstance(anchor, line, shaping, {}, layout_, 0, 0, 0, style::SymbolPlacementType::Point, {{0, 0}}, 0, 0, {{0, 0}}, positions, subfeature, 0, 0, key, 0, 0, 0.0f);
+    std::array<float, 2> textOffset{{0.0f, 0.0f}};
+    std::array<float, 2> iconOffset{{0.0f, 0.0f}};
+    style::SymbolPlacementType placementType = style::SymbolPlacementType::Point;
+
+    auto sharedData = std::make_shared<SymbolInstanceSharedData>(std::move(line),
+                                        shaping, nullopt, layout_, 0.0f, placementType,
+                                        textOffset, positions);
+    return SymbolInstance(anchor, std::move(sharedData), shaping, nullopt, 0, 0, placementType, textOffset, 0, 0, iconOffset, subfeature, 0, 0, key, 0, 0, 0.0f);
 }
 
 
