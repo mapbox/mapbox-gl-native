@@ -113,7 +113,7 @@ void drawIcon(const DrawFn& draw,
               const PaintParameters& parameters) {
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
-    const auto& layout = bucket.layout;
+    const auto& layout = *bucket.layout;
     auto values = iconPropertyValues(evaluated, layout);
     const auto& paintPropertyValues = RenderSymbolLayer::iconPaintProperties(evaluated);
 
@@ -184,7 +184,7 @@ void drawText(const DrawFn& draw,
               const PaintParameters& parameters) {
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
-    const auto& layout = bucket.layout;
+    const auto& layout = *bucket.layout;
 
     const gfx::TextureBinding textureBinding{ tile.getGlyphAtlasTexture().getResource(),
                                               gfx::TextureFilterType::Linear };
