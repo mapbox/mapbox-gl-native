@@ -21,7 +21,8 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     uint32_t maxBucketInstanceId = 0;
     CrossTileSymbolLayerIndex index;
 
-    style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
+        makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
@@ -95,7 +96,8 @@ TEST(CrossTileSymbolLayerIndex, resetIDs) {
     uint32_t maxBucketInstanceId = 0;
     CrossTileSymbolLayerIndex index;
 
-    style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
+        makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
@@ -135,7 +137,8 @@ TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
     uint32_t maxBucketInstanceId = 0;
     CrossTileSymbolLayerIndex index;
 
-    style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
+        makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
@@ -173,7 +176,8 @@ TEST(CrossTileSymbolLayerIndex, bucketReplacement) {
     uint32_t maxBucketInstanceId = 0;
     CrossTileSymbolLayerIndex index;
 
-    style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
+        makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;

@@ -43,7 +43,7 @@ public:
 
 class SymbolBucket final : public Bucket {
 public:
-    SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
+    SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEvaluated>,
                  const std::map<std::string, Immutable<style::LayerProperties>>&,
                  const style::PropertyValue<float>& textSize,
                  const style::PropertyValue<float>& iconSize,
@@ -72,7 +72,7 @@ public:
     // The result contains references to the `symbolInstances` items, sorted by viewport Y.
     std::vector<std::reference_wrapper<SymbolInstance>> getSortedSymbols(const float angle);
 
-    const style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout;
     const std::string bucketLeaderID;
     float sortedAngle = std::numeric_limits<float>::max();
 

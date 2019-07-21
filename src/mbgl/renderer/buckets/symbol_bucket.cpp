@@ -13,7 +13,7 @@ namespace {
 std::atomic<uint32_t> maxBucketInstanceId;
 } // namespace
 
-SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
+SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout_,
                            const std::map<std::string, Immutable<style::LayerProperties>>& paintProperties_,
                            const style::PropertyValue<float>& textSize,
                            const style::PropertyValue<float>& iconSize,
@@ -176,7 +176,7 @@ void SymbolBucket::sortFeatures(const float angle) {
     if (!sortFeaturesByY) {
         return;
     }
-    assert (angle != std::numeric_limits<float>::max());
+    assert(angle != std::numeric_limits<float>::max());
 
     if (sortedAngle == angle) {
         return;
@@ -246,7 +246,7 @@ std::vector<std::reference_wrapper<SymbolInstance>> SymbolBucket::getSortedSymbo
 
 bool SymbolBucket::hasFormatSectionOverrides() const {
     if (!hasFormatSectionOverrides_) {
-        hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
+        hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout->get<TextField>());
     }
     return *hasFormatSectionOverrides_;
 }
