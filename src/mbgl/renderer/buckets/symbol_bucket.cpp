@@ -111,28 +111,28 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
 
     if (hasCollisionBoxData()) {
         if (!staticUploaded) {
-            collisionBox.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionBox.lines));
-            collisionBox.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.vertices));
+            collisionBox->indexBuffer = uploadPass.createIndexBuffer(std::move(collisionBox->lines));
+            collisionBox->vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox->vertices));
         }
         if (!placementChangesUploaded) {
-            if (!collisionBox.dynamicVertexBuffer) {
-                collisionBox.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!collisionBox->dynamicVertexBuffer) {
+                collisionBox->dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox->dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*collisionBox.dynamicVertexBuffer, std::move(collisionBox.dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionBox->dynamicVertexBuffer, std::move(collisionBox->dynamicVertices));
             }
         }
     }
 
     if (hasCollisionCircleData()) {
         if (!staticUploaded) {
-            collisionCircle.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionCircle.triangles));
-            collisionCircle.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.vertices));
+            collisionCircle->indexBuffer = uploadPass.createIndexBuffer(std::move(collisionCircle->triangles));
+            collisionCircle->vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle->vertices));
         }
         if (!placementChangesUploaded) {
-            if (!collisionCircle.dynamicVertexBuffer) {
-                collisionCircle.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!collisionCircle->dynamicVertexBuffer) {
+                collisionCircle->dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle->dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*collisionCircle.dynamicVertexBuffer, std::move(collisionCircle.dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionCircle->dynamicVertexBuffer, std::move(collisionCircle->dynamicVertices));
             }
         }
     }
@@ -157,11 +157,11 @@ bool SymbolBucket::hasIconData() const {
 }
 
 bool SymbolBucket::hasCollisionBoxData() const {
-    return !collisionBox.segments.empty();
+    return collisionBox && !collisionBox->segments.empty();
 }
 
 bool SymbolBucket::hasCollisionCircleData() const {
-    return !collisionCircle.segments.empty();
+    return collisionCircle && !collisionCircle->segments.empty();
 }
 
 void addPlacedSymbol(gfx::IndexVector<gfx::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
