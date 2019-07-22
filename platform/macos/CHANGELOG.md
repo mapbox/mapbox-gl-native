@@ -24,13 +24,11 @@
 
 * The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInsets` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
 * Updated "map ID" to the more accurate term "tileset ID" in documentation; updated "style's Map ID" to the more accurate term "style URL". ([#15116](https://github.com/mapbox/mapbox-gl-native/pull/15116))
-
-### Other changes
-
 * Added variants of multiple animated `MGLMapView` methods that accept completion handlers ([#14381](https://github.com/mapbox/mapbox-gl-native/pull/14381)):
   * `-[MGLMapView setVisibleCoordinateBounds:edgePadding:animated:completionHandler:]`
   * `-[MGLMapView setContentInsets:animated:completionHandler:]`
   * `-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]`
+* Improved feature querying performance (focussed on roads). ([#15183](https://github.com/mapbox/mapbox-gl-native/pull/15183))  
 
 ## 0.14.0 - May 22, 2018
 
