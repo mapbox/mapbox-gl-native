@@ -224,11 +224,17 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 @end
 
-#define OS_SIGNPOST_BEGIN(name) \
+#define OS_SIGNPOST_BEGIN_WITH_SELF(self, name) \
     if (@available(iOS 12.0, *)) { os_signpost_interval_begin(self.log, self.signpost, name); }
 
-#define OS_SIGNPOST_END(name) \
+#define OS_SIGNPOST_END_WITH_SELF(self, name) \
     if (@available(iOS 12.0, *)) { os_signpost_interval_end(self.log, self.signpost, name); }
+
+#define OS_SIGNPOST_BEGIN(name) \
+    OS_SIGNPOST_BEGIN_WITH_SELF(self, name)
+
+#define OS_SIGNPOST_END(name) \
+    OS_SIGNPOST_END_WITH_SELF(self, name)
 
 #define OS_SIGNPOST_EVENT(name, ...) \
     if (@available(iOS 12.0, *)) { os_signpost_event_emit(self.log, self.signpost, name, ##__VA_ARGS__); }
@@ -584,9 +590,16 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 {
                     __weak __typeof__(self) weakSelf = self;
                     [self parseFeaturesAddingCount:100 usingViews:YES completionHandler:^{
-                        [self.mapView setNeedsRerender];
-                        [self.pendingIdleBlocks addObject:^{
-                            [weakSelf queryRoads];
+                        [weakSelf.mapView setNeedsRerender];
+                        [weakSelf.pendingIdleBlocks addObject:^{
+                            __typeof__(self) strongSelf = weakSelf;
+                            NSLog(@"BEGIN: query-roads-batch");
+                            OS_SIGNPOST_BEGIN_WITH_SELF(strongSelf, "query-roads-batch");
+                            for (int i = 0; i < 10; i++) {
+                                [strongSelf queryRoads];
+                            }
+                            OS_SIGNPOST_END_WITH_SELF(strongSelf, "query-roads-batch");
+                            NSLog(@"END: query-roads-batch");
                         }];
                     }];
                 }
