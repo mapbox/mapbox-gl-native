@@ -8,6 +8,9 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed flickering on style change for the same tile set ([#15127](https://github.com/mapbox/mapbox-gl-native/pull/15127))
 
+### Other changes
+
+* Improved feature querying performance (focussed on roads). ([#15183](https://github.com/mapbox/mapbox-gl-native/pull/15183))
 
 ## 5.2.0
 

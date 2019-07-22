@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.mapbox.MapboxGL</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -26,12 +26,23 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2014–2019 Mapbox</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The map will display your location. If you choose Always, the map may also use your location when it isn’t visible in order to improve OpenStreetMap and Mapbox products.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The map will display your location. The map may also use your location when it isn’t visible in order to improve OpenStreetMap and Mapbox products.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>The map will display your location.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>The map will display your location. If you choose Always, the map may also use your location when it isn’t visible in order to improve OpenStreetMap and Mapbox products.</string>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>settings</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Settings</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).settings</string>
+		</dict>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -52,17 +63,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIApplicationShortcutItems</key>
-	<array>
-		<dict>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>Settings</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>$(PRODUCT_BUNDLE_IDENTIFIER).settings</string>
-			<key>UIApplicationShortcutItemIconFile</key>
-			<string>settings</string>
-		</dict>
 	</array>
 </dict>
 </plist>

@@ -17,6 +17,8 @@
 #import "../src/MGLMapView_Experimental.h"
 
 #import <objc/runtime.h>
+#import <os/log.h>
+#import <os/signpost.h>
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = 38.8999418, .longitude = -77.033996 },
@@ -63,6 +65,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotationsTestShapes,
     MBXSettingsAnnotationsCustomCallout,
     MBXSettingsAnnotationsQueryAnnotations,
+    MBXSettingsAnnotationsQueryRoadsAroundDC,
     MBXSettingsAnnotationsCustomUserDot,
     MBXSettingsAnnotationsRemoveAnnotations,
     MBXSettingsAnnotationSelectRandomOffscreenPointAnnotation,
@@ -215,10 +218,36 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
 @property (nonatomic) NSMutableArray<UIView *> *contentInsetsOverlays;
 
+@property (nonatomic) os_log_t log;
+@property (nonatomic) os_signpost_id_t signpost;
+@property (nonatomic) NSMutableArray<dispatch_block_t> *pendingIdleBlocks;
+
 @end
 
+#define OS_SIGNPOST_BEGIN_WITH_SELF(self, name) \
+    if (@available(iOS 12.0, *)) { os_signpost_interval_begin(self.log, self.signpost, name); }
+
+#define OS_SIGNPOST_END_WITH_SELF(self, name) \
+    if (@available(iOS 12.0, *)) { os_signpost_interval_end(self.log, self.signpost, name); }
+
+#define OS_SIGNPOST_BEGIN(name) \
+    OS_SIGNPOST_BEGIN_WITH_SELF(self, name)
+
+#define OS_SIGNPOST_END(name) \
+    OS_SIGNPOST_END_WITH_SELF(self, name)
+
+#define OS_SIGNPOST_EVENT(name, ...) \
+    if (@available(iOS 12.0, *)) { os_signpost_event_emit(self.log, self.signpost, name, ##__VA_ARGS__); }
+
+// Expose properties for testing
 @interface MGLMapView (MBXViewController)
 @property (nonatomic) NSDictionary *annotationViewReuseQueueByIdentifier;
+- (void)setNeedsRerender;
+- (UIEdgeInsets)defaultEdgeInsetsForShowAnnotations;
+@end
+
+@interface MGLStyle (MBXViewController)
+@property (nonatomic, readonly, copy) NSArray<MGLVectorStyleLayer *> *roadStyleLayers;
 @end
 
 @implementation MBXViewController
@@ -234,6 +263,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 {
     [super viewDidLoad];
 
+    self.pendingIdleBlocks = [NSMutableArray array];
+    self.log = os_log_create("com.mapbox.iosapp", "MBXViewController");
+    if (@available(iOS 12.0, *)) {
+        self.signpost = os_signpost_id_generate(self.log);
+    }
+    
     // Keep track of current map state and debug preferences,
     // saving and restoring when the application's state changes.
     self.currentState =  [MBXStateManager sharedManager].currentState;
@@ -390,6 +425,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 @"Add Test Shapes",
                 @"Add Point With Custom Callout",
                 @"Query Annotations",
+                @"Query Roads around DC",
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
                 @"Remove Annotations",
                 @"Select an offscreen point annotation",
@@ -520,22 +556,22 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             switch (indexPath.row)
             {
                 case MBXSettingsAnnotations100Views:
-                    [self parseFeaturesAddingCount:100 usingViews:YES];
+                    [self parseFeaturesAddingCount:100 usingViews:YES completionHandler:NULL];
                     break;
                 case MBXSettingsAnnotations1000Views:
-                    [self parseFeaturesAddingCount:1000 usingViews:YES];
+                    [self parseFeaturesAddingCount:1000 usingViews:YES completionHandler:NULL];
                     break;
                 case MBXSettingsAnnotations10000Views:
-                    [self parseFeaturesAddingCount:10000 usingViews:YES];
+                    [self parseFeaturesAddingCount:10000 usingViews:YES completionHandler:NULL];
                     break;
                 case MBXSettingsAnnotations100Sprites:
-                    [self parseFeaturesAddingCount:100 usingViews:NO];
+                    [self parseFeaturesAddingCount:100 usingViews:NO completionHandler:NULL];
                     break;
                 case MBXSettingsAnnotations1000Sprites:
-                    [self parseFeaturesAddingCount:1000 usingViews:NO];
+                    [self parseFeaturesAddingCount:1000 usingViews:NO completionHandler:NULL];
                     break;
                 case MBXSettingsAnnotations10000Sprites:
-                    [self parseFeaturesAddingCount:10000 usingViews:NO];
+                    [self parseFeaturesAddingCount:10000 usingViews:NO completionHandler:NULL];
                     break;
                 case MBXSettingsAnnotationAnimation:
                     [self animateAnnotationView];
@@ -548,6 +584,25 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     break;
                 case MBXSettingsAnnotationsQueryAnnotations:
                     [self testQueryPointAnnotations];
+                    break;
+                    
+                case MBXSettingsAnnotationsQueryRoadsAroundDC:
+                {
+                    __weak __typeof__(self) weakSelf = self;
+                    [self parseFeaturesAddingCount:100 usingViews:YES completionHandler:^{
+                        [weakSelf.mapView setNeedsRerender];
+                        [weakSelf.pendingIdleBlocks addObject:^{
+                            __typeof__(self) strongSelf = weakSelf;
+                            NSLog(@"BEGIN: query-roads-batch");
+                            OS_SIGNPOST_BEGIN_WITH_SELF(strongSelf, "query-roads-batch");
+                            for (int i = 0; i < 10; i++) {
+                                [strongSelf queryRoads];
+                            }
+                            OS_SIGNPOST_END_WITH_SELF(strongSelf, "query-roads-batch");
+                            NSLog(@"END: query-roads-batch");
+                        }];
+                    }];
+                }
                     break;
                 case MBXSettingsAnnotationsCustomUserDot:
                     [self toggleCustomUserDot];
@@ -815,7 +870,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 #pragma mark - Debugging Actions
 
-- (void)parseFeaturesAddingCount:(NSUInteger)featuresCount usingViews:(BOOL)useViews
+- (void)parseFeaturesAddingCount:(NSUInteger)featuresCount usingViews:(BOOL)useViews completionHandler:(nullable dispatch_block_t)completion
 {
     [self.mapView removeAnnotations:self.mapView.annotations];
 
@@ -850,7 +905,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             dispatch_async(dispatch_get_main_queue(), ^
             {
                 [self.mapView addAnnotations:annotations];
-                [self.mapView showAnnotations:annotations animated:YES];
+                UIEdgeInsets insets = [self.mapView defaultEdgeInsetsForShowAnnotations];
+                [self.mapView showAnnotations:annotations
+                                  edgePadding:insets
+                                     animated:YES
+                            completionHandler:completion];
             });
         }
     });
@@ -1765,6 +1824,21 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     return filePath;
 }
 
+#pragma mark - Query Rendered Features
+
+- (void)queryRoads
+{
+    OS_SIGNPOST_BEGIN("query-roads");
+    
+    NSArray *roadStyleLayerIdentifiers = [self.mapView.style.roadStyleLayers valueForKey:@"identifier"];
+    NSArray *visibleRoadFeatures = [self.mapView visibleFeaturesInRect:self.mapView.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
+
+    OS_SIGNPOST_END("query-roads");
+    OS_SIGNPOST_EVENT("query-roads-count", "%lu", (unsigned long)visibleRoadFeatures.count);
+    
+    NSLog(@"Roads & labels feature count: %lu", (unsigned long)visibleRoadFeatures.count);
+}
+
 #pragma mark - Random World Tour
 
 - (void)addAnnotations:(NSInteger)numAnnotations aroundCoordinate:(CLLocationCoordinate2D)coordinate radius:(CLLocationDistance)radius {
@@ -1989,6 +2063,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 }
             }
         }
+        free(methods);
         NSAssert(numStyleURLMethods == styleNames.count,
                  @"MGLStyle provides %u default styles but iosapp only knows about %lu of them.",
                  numStyleURLMethods, (unsigned long)styleNames.count);
@@ -2046,6 +2121,16 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 }
 
 #pragma mark - MGLMapViewDelegate
+
+- (void)mapViewDidBecomeIdle:(MGLMapView *)mapView
+{
+    NSArray *blocks = [self.pendingIdleBlocks copy];
+    [self.pendingIdleBlocks removeAllObjects];
+    
+    for (dispatch_block_t block in blocks) {
+        block();
+    }
+}
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
