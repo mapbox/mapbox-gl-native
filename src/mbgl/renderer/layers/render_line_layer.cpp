@@ -214,37 +214,41 @@ void RenderLineLayer::render(PaintParameters& parameters) {
     }
 }
 
-std::unique_ptr<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
+namespace {
 
-    if (offset == 0) return nullptr;
+optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
+    if (offset == 0) return nullopt;
 
-    std::unique_ptr<GeometryCollection> newRings = std::make_unique<GeometryCollection>();
+    const Point<double> zero(0, 0);
+    const size_t size = rings.size();
+    GeometryCollection newRings(size); // Populates newRings with |size| default-inserted elements.
 
-    Point<double> zero(0, 0);
-    for (const auto& ring : rings) {
-        newRings->emplace_back();
-        auto& newRing = newRings->back();
+    for (size_t i = 0u; i < size; ++i) {
+        auto& ring = rings[i];
+        auto& newRing = newRings[i];
 
-        for (auto i = ring.begin(); i != ring.end(); i++) {
-            auto& p = *i;
+        for (auto it = ring.begin(); it != ring.end(); ++it) {
+            auto& p = *it;
 
-            Point<double> aToB = i == ring.begin() ?
+            Point<double> aToB = it == ring.begin() ?
                                  zero :
-                                 util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
-            Point<double> bToC = i + 1 == ring.end() ?
+                                 util::perp(util::unit(convertPoint<double>(p - *(it - 1))));
+            Point<double> bToC = it + 1 == ring.end() ?
                                  zero :
-                                 util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
+                                 util::perp(util::unit(convertPoint<double>(*(it + 1) - p)));
             Point<double> extrude = util::unit(aToB + bToC);
 
             const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
             extrude *= (1.0 / cosHalfAngle);
 
-            newRing.push_back(convertPoint<int16_t>(extrude * offset) + p);
+            newRing.emplace_back(convertPoint<int16_t>(extrude * offset) + p);
         }
     }
 
-    return newRings;
+    return optional<GeometryCollection>(std::move(newRings));
 }
+
+} // namespace
 
 bool RenderLineLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
@@ -272,15 +276,10 @@ bool RenderLineLayer::queryIntersectsFeature(
 
     // Test intersection
     const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
-    bool intersects =  false;
-    
-    if (offsetGeometry) {
-        intersects = util::polygonIntersectsBufferedMultiLine(
+    return util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
-            *offsetGeometry,
+            offsetGeometry.value_or(geometries),
             halfWidth);
-    }
-    return intersects;
 }
 
 void RenderLineLayer::updateColorRamp() {
