@@ -239,7 +239,7 @@ std::unique_ptr<GeometryCollection> offsetLine(const GeometryCollection& rings, 
             const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
             extrude *= (1.0 / cosHalfAngle);
 
-            newRing.push_back(convertPoint<int16_t>(extrude * offset) + p);
+            newRing.emplace_back(convertPoint<int16_t>(extrude * offset) + p);
         }
     }
 
