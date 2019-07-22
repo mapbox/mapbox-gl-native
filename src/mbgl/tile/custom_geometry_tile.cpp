@@ -83,7 +83,7 @@ void CustomGeometryTile::querySourceFeatures(
                 continue;
             }
 
-            result.emplace_back(convertFeature(*feature, feature->getGeometries(), id.canonical));
+            result.emplace_back(convertFeature(*feature, id.canonical));
         }
     }
 }

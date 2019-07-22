@@ -214,42 +214,47 @@ void RenderLineLayer::render(PaintParameters& parameters) {
     }
 }
 
-std::unique_ptr<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
+namespace {
 
-    if (offset == 0) return nullptr;
-
-    std::unique_ptr<GeometryCollection> newRings = std::make_unique<GeometryCollection>();
-
+optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
+    optional<GeometryCollection> newRings = nullopt;
     Point<double> zero(0, 0);
     for (const auto& ring : rings) {
+        if (offset == 0) {
+            break;
+        } else if (!newRings) {
+            newRings = {};
+        }
+        
         newRings->emplace_back();
         auto& newRing = newRings->back();
-
+        
         for (auto i = ring.begin(); i != ring.end(); i++) {
             auto& p = *i;
-
+            
             Point<double> aToB = i == ring.begin() ?
-                                 zero :
-                                 util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
+            zero :
+            util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
             Point<double> bToC = i + 1 == ring.end() ?
-                                 zero :
-                                 util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
+            zero :
+            util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
             Point<double> extrude = util::unit(aToB + bToC);
-
+            
             const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
             extrude *= (1.0 / cosHalfAngle);
-
-            newRing.emplace_back(convertPoint<int16_t>(extrude * offset) + p);
+            
+            newRing.push_back(convertPoint<int16_t>(extrude * offset) + p);
         }
     }
-
+    
     return newRings;
 }
+    
+} // namespace
 
 bool RenderLineLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
-        const GeometryCollection& geometries,
         const float zoom,
         const TransformState& transformState,
         const float pixelsToTileUnits,
@@ -268,14 +273,14 @@ bool RenderLineLayer::queryIntersectsFeature(
                           .evaluate(feature, zoom, style::LineOffset::defaultValue()) * pixelsToTileUnits;
 
     // Apply offset to geometry
-    auto offsetGeometry = offsetLine(geometries, offset);
+    const auto& geometries = feature.getGeometries();
+    const auto& offsetGeometry = offsetLine(geometries, offset);
 
     // Test intersection
     const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
-    
     return util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
-            offsetGeometry != nullptr ? *offsetGeometry : geometries,
+            offsetGeometry.value_or(geometries),
             halfWidth);
 }
 

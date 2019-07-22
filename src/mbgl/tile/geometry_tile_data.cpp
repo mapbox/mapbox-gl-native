@@ -99,7 +99,7 @@ void limitHoles(GeometryCollection& polygon, uint32_t maxHoles) {
     }
 }
 
-static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const GeometryCollection& geometries, const CanonicalTileID& tileID) {
+static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
     const double size = util::EXTENT * std::pow(2, tileID.z);
     const double x0 = util::EXTENT * tileID.x;
     const double y0 = util::EXTENT * tileID.y;
@@ -111,6 +111,8 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
             360.0 / M_PI * std::atan(std::exp(y2 * M_PI / 180)) - 90.0
         );
     };
+
+    const GeometryCollection& geometries = geometryTileFeature.getGeometries();
 
     switch (geometryTileFeature.getType()) {
         case FeatureType::Unknown: {
@@ -171,8 +173,8 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
     return Point<double>();
 }
 
-Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const GeometryCollection& geometries, const CanonicalTileID& tileID) {
-    Feature feature { convertGeometry(geometryTileFeature, geometries, tileID) };
+Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
+    Feature feature { convertGeometry(geometryTileFeature, tileID) };
     feature.properties = geometryTileFeature.getProperties();
     feature.id = geometryTileFeature.getID();
     return feature;

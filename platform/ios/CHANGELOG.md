@@ -10,7 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
-* Improved feature querying performance (focussed on roads). ([#15183](https://github.com/mapbox/mapbox-gl-native/pull/15183))
+* Improved feature querying performance (focused on roads). ([#15183](https://github.com/mapbox/mapbox-gl-native/pull/15183))
 
 ## 5.2.0
 
