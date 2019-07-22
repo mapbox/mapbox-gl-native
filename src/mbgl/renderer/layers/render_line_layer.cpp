@@ -272,15 +272,11 @@ bool RenderLineLayer::queryIntersectsFeature(
 
     // Test intersection
     const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
-    bool intersects =  false;
     
-    if (offsetGeometry) {
-        intersects = util::polygonIntersectsBufferedMultiLine(
+    return util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
-            *offsetGeometry,
+            offsetGeometry != nullptr ? *offsetGeometry : geometries,
             halfWidth);
-    }
-    return intersects;
 }
 
 void RenderLineLayer::updateColorRamp() {
