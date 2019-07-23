@@ -34,14 +34,15 @@ FeatureIdentifier VectorTileFeature::getID() const {
     return feature.getID();
 }
 
-GeometryCollection VectorTileFeature::getGeometries() const {
-    const float scale = float(util::EXTENT) / feature.getExtent();
-    auto lines = feature.getGeometries<GeometryCollection>(scale);
-    if (feature.getVersion() >= 2 || feature.getType() != mapbox::vector_tile::GeomType::POLYGON) {
-        return lines;
-    } else {
-        return fixupPolygons(lines);
+const GeometryCollection& VectorTileFeature::getGeometries() const {
+    if (!lines) {
+        const float scale = float(util::EXTENT) / feature.getExtent();
+        lines = feature.getGeometries<GeometryCollection>(scale);
+        if (feature.getVersion() < 2 && feature.getType() == mapbox::vector_tile::GeomType::POLYGON) {
+            lines = fixupPolygons(*lines);
+        }
     }
+    return *lines;
 }
 
 VectorTileLayer::VectorTileLayer(std::shared_ptr<const std::string> data_,
