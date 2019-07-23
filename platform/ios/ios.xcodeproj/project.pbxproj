@@ -276,8 +276,8 @@
 		558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 558DE79E1E5615E400C7916D /* MGLFoundation_Private.h */; };
 		558DE7A21E5615E400C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE79F1E5615E400C7916D /* MGLFoundation.mm */; };
 		558DE7A31E5615E400C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE79F1E5615E400C7916D /* MGLFoundation.mm */; };
-		55CF752F213ED92000ED86C4 /* libicu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55CF752E213ED92000ED86C4 /* libicu.a */; };
-		55CF7531213ED92A00ED86C4 /* libicu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55CF7530213ED92A00ED86C4 /* libicu.a */; };
+		55CF752F213ED92000ED86C4 /* libmbgl-vendor-icu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55CF752E213ED92000ED86C4 /* libmbgl-vendor-icu.a */; };
+		55CF7531213ED92A00ED86C4 /* libmbgl-vendor-icu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55CF7530213ED92A00ED86C4 /* libmbgl-vendor-icu.a */; };
 		55D120A61F791007004B6D81 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */; };
 		55D120A81F79100C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A91F79100C004B6D81 /* libmbgl-filesource.a */; };
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
@@ -1070,8 +1070,8 @@
 		5580B45A229570A10091291B /* MGLMapView+OpenGL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "MGLMapView+OpenGL.mm"; sourceTree = "<group>"; };
 		558DE79E1E5615E400C7916D /* MGLFoundation_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFoundation_Private.h; sourceTree = "<group>"; };
 		558DE79F1E5615E400C7916D /* MGLFoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFoundation.mm; sourceTree = "<group>"; };
-		55CF752E213ED92000ED86C4 /* libicu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libicu.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		55CF7530213ED92A00ED86C4 /* libicu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libicu.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		55CF752E213ED92000ED86C4 /* libmbgl-vendor-icu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmbgl-vendor-icu.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		55CF7530213ED92A00ED86C4 /* libmbgl-vendor-icu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmbgl-vendor-icu.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-loop-darwin.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D120A91F79100C004B6D81 /* libmbgl-filesource.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-filesource.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D8C9941D0F133500F42F10 /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/ios/config.xcconfig; sourceTree = "<group>"; };
@@ -1514,7 +1514,7 @@
 				DAABF73D1CBC59BB005B1825 /* libmbgl-core.a in Frameworks */,
 				55D120A61F791007004B6D81 /* libmbgl-loop-darwin.a in Frameworks */,
 				55D120A81F79100C004B6D81 /* libmbgl-filesource.a in Frameworks */,
-				55CF752F213ED92000ED86C4 /* libicu.a in Frameworks */,
+				55CF752F213ED92000ED86C4 /* libmbgl-vendor-icu.a in Frameworks */,
 				DA27C24E1CBB3811000B0ECD /* GLKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1527,7 +1527,7 @@
 				9680276422655696006BA4A1 /* libmbxaccounts.a in Frameworks */,
 				DAAE5F8920F047240089D85B /* libmbgl-filesource.a in Frameworks */,
 				DAAE5F8A20F0472E0089D85B /* libmbgl-loop-darwin.a in Frameworks */,
-				55CF7531213ED92A00ED86C4 /* libicu.a in Frameworks */,
+				55CF7531213ED92A00ED86C4 /* libmbgl-vendor-icu.a in Frameworks */,
 				550570D22296E96E00228ECF /* GLKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2037,8 +2037,8 @@
 			isa = PBXGroup;
 			children = (
 				9680274122653C3E006BA4A1 /* libmbxaccounts.a */,
-				55CF7530213ED92A00ED86C4 /* libicu.a */,
-				55CF752E213ED92000ED86C4 /* libicu.a */,
+				55CF7530213ED92A00ED86C4 /* libmbgl-vendor-icu.a */,
+				55CF752E213ED92000ED86C4 /* libmbgl-vendor-icu.a */,
 				55D120A91F79100C004B6D81 /* libmbgl-filesource.a */,
 				55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */,
 				36F1153C1D46080700878E1A /* libmbgl-platform-ios.a */,

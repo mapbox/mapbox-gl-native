@@ -98,7 +98,7 @@ macro(mbgl_platform_core)
         PRIVATE ${LIBICUI18N}
         PRIVATE ${LIBICUUC}
         PRIVATE ${LIBICUDATA}
-        PRIVATE nunicode
+        PRIVATE mbgl-vendor-nunicode
         PUBLIC -lz
     )
 endmacro()

@@ -22,7 +22,7 @@ target_include_directories(mbgl-glfw
 target_link_libraries(mbgl-glfw
     PRIVATE mbgl-core
     PRIVATE glfw
-    PRIVATE cheap-ruler-cpp
+    PRIVATE mbgl-vendor-cheap-ruler-cpp
     PRIVATE Mapbox::Base::Extras::args
 )
 

@@ -11,7 +11,7 @@ target_include_directories(mbgl-benchmark
 
 target_link_libraries(mbgl-benchmark
     PRIVATE mbgl-core
-    PRIVATE benchmark
+    PRIVATE mbgl-vendor-benchmark
 )
 
 mbgl_platform_benchmark()

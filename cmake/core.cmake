@@ -8,31 +8,31 @@ target_include_directories(mbgl-core
 )
 
 target_link_libraries(mbgl-core PRIVATE
-    earcut.hpp
-    eternal
-    expected
-    geojson-vt-cpp
-    shelf-pack-cpp
-    unique_resource
-    wagyu
+    mbgl-vendor-earcut.hpp
+    mbgl-vendor-eternal
+    mbgl-vendor-expected
+    mbgl-vendor-geojson-vt-cpp
+    mbgl-vendor-shelf-pack-cpp
+    mbgl-vendor-unique_resource
+    mbgl-vendor-wagyu
 )
 
 # linux uses ICU from mason, other platforms use vendored ICU
 if(NOT MBGL_PLATFORM STREQUAL "linux")
-    set(ICU_LIBRARY "icu")
+    set(ICU_LIBRARY "mbgl-vendor-icu")
 endif()
 
 # FIXME: We should not leak these many
 # libraries in our public interface.
 target_link_libraries(mbgl-core PUBLIC
-    boost
+    mbgl-vendor-boost
     mapbox-base-extras
     mapbox-base
     ${ICU_LIBRARY}
-    polylabel
-    protozero
+    mbgl-vendor-polylabel
+    mbgl-vendor-protozero
     Mapbox::Base::Extras::rapidjson
-    vector-tile
+    mbgl-vendor-vector-tile
 )
 
 mbgl_platform_core()

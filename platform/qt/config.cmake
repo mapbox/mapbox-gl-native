@@ -13,7 +13,7 @@ macro(mbgl_platform_core)
 
     target_link_libraries(mbgl-core PRIVATE
         ${MBGL_QT_CORE_LIBRARIES}
-        nunicode
+        mbgl-vendor-nunicode
     )
 
     if(NOT WITH_QT_DECODERS)
@@ -30,7 +30,7 @@ macro(mbgl_platform_core)
 
     if(NOT WITH_QT_I18N)
         target_sources(mbgl-core PRIVATE platform/default/src/mbgl/text/bidi.cpp)
-        target_link_libraries(mbgl-core PRIVATE icu)
+        target_link_libraries(mbgl-core PRIVATE mbgl-vendor-icu)
     else()
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
     endif()
