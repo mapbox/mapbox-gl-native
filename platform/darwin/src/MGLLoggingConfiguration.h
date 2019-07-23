@@ -45,7 +45,7 @@ typedef NS_ENUM(NSInteger, MGLLoggingLevel) {
     MGLLoggingLevelDebug,
 #endif
     /**
-     Verbose-level will print all meassages.
+     Verbose-level will print all messages.
      */
     MGLLoggingLevelVerbose,
 };

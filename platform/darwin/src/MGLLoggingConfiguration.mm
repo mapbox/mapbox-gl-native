@@ -52,8 +52,7 @@ public:
 
 - (id)init{
     if(self = [super init]){
-        _coreLoggingObserver = std::make_unique<mbgl::MGLCoreLoggingObserver>();
-        mbgl::Log::setObserver(std::move(_coreLoggingObserver));
+        mbgl::Log::setObserver(std::make_unique<mbgl::MGLCoreLoggingObserver>());
     }
     return self;
 }
@@ -64,18 +63,6 @@ public:
         _handler = [self defaultBlockHandler];
     } else {
         _handler = handler;
-    }
-}
-
-- (void)setLoggingLevel:(MGLLoggingLevel)loggingLevel {
-    if(loggingLevel > MGLLoggingLevelVerbose) {
-        _loggingLevel = MGLLoggingLevelVerbose;
-    }
-    else if (loggingLevel < MGLLoggingLevelNone) {
-        _loggingLevel = MGLLoggingLevelNone;
-    }
-    else {
-        _loggingLevel = loggingLevel;
     }
 }
 
