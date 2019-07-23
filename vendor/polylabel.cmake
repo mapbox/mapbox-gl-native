@@ -1,5 +1,9 @@
-add_library(polylabel INTERFACE)
+if(TARGET mbgl-vendor-polylabel)
+    return()
+endif()
 
-target_include_directories(polylabel SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/polylabel/include
+add_library(mbgl-vendor-polylabel INTERFACE)
+
+target_include_directories(mbgl-vendor-polylabel SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/polylabel/include
 )

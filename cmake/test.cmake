@@ -23,11 +23,11 @@ target_include_directories(mbgl-test
 )
 
 target_link_libraries(mbgl-test PRIVATE
-    googletest
+    mbgl-vendor-googletest
     Mapbox::Base::Extras::args
     mbgl-core
-    shelf-pack-cpp
-    unique_resource
+    mbgl-vendor-shelf-pack-cpp
+    mbgl-vendor-unique_resource
     Mapbox::Base::pixelmatch-cpp
 )
 

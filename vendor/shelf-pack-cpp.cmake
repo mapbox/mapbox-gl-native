@@ -1,5 +1,9 @@
-add_library(shelf-pack-cpp INTERFACE)
+if(TARGET mbgl-vendor-shelf-pack-cpp)
+    return()
+endif()
 
-target_include_directories(shelf-pack-cpp SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/shelf-pack-cpp/include
+add_library(mbgl-vendor-shelf-pack-cpp INTERFACE)
+
+target_include_directories(mbgl-vendor-shelf-pack-cpp SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/shelf-pack-cpp/include
 )
