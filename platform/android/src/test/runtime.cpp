@@ -1,5 +1,6 @@
 #include "runtime.hpp"
 #include "../jni.hpp"
+#include "../jni_native.hpp"
 
 #include <cassert>
 #include <dlfcn.h>
