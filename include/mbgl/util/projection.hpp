@@ -98,7 +98,7 @@ private:
         return Point<double> {
             util::LONGITUDE_MAX + latLng.longitude(),
             util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latitude * M_PI / util::DEGREES_MAX))
-        } * worldSize / util::DEGREES_MAX;
+        } * (worldSize / util::DEGREES_MAX);
     }
 };
 
