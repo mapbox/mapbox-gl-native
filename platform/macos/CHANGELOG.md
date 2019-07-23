@@ -24,7 +24,7 @@
   * `-[MGLMapView setVisibleCoordinateBounds:edgePadding:animated:completionHandler:]`
   * `-[MGLMapView setContentInsets:animated:completionHandler:]`
   * `-[MGLMapView showAnnotations:edgePadding:animated:completionHandler:]`
-* Improved feature querying performance (focussed on roads). ([#15183](https://github.com/mapbox/mapbox-gl-native/pull/15183))  
+* Improved feature querying performance (primarily road features). ([#15183](https://github.com/mapbox/mapbox-gl-native/pull/15183))  
 
 ## 0.14.0 - May 22, 2018
 

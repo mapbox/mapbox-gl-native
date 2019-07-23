@@ -519,6 +519,10 @@
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
+		CAC3A3E022E75AC200BC8DEF /* MGLSignpost.h in Headers */ = {isa = PBXBuildFile; fileRef = CAC3A3DE22E75AC100BC8DEF /* MGLSignpost.h */; };
+		CAC3A3E122E75AC200BC8DEF /* MGLSignpost.h in Headers */ = {isa = PBXBuildFile; fileRef = CAC3A3DE22E75AC100BC8DEF /* MGLSignpost.h */; };
+		CAC3A3E222E75AC200BC8DEF /* MGLSignpost.m in Sources */ = {isa = PBXBuildFile; fileRef = CAC3A3DF22E75AC200BC8DEF /* MGLSignpost.m */; };
+		CAC3A3E322E75AC200BC8DEF /* MGLSignpost.m in Sources */ = {isa = PBXBuildFile; fileRef = CAC3A3DF22E75AC200BC8DEF /* MGLSignpost.m */; };
 		CAD9D0AA22A86D6F001B25EE /* MGLResourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CAD9D0A922A86D6F001B25EE /* MGLResourceTests.mm */; };
 		CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */; };
 		CF75A91522D85E860058A5C4 /* MGLLoggingConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */; };
@@ -1201,6 +1205,8 @@
 		CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
 		CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleURLIntegrationTest.m; sourceTree = "<group>"; };
 		CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRendererConfigurationTests.mm; path = ../../darwin/test/MGLRendererConfigurationTests.mm; sourceTree = "<group>"; };
+		CAC3A3DE22E75AC100BC8DEF /* MGLSignpost.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLSignpost.h; sourceTree = "<group>"; };
+		CAC3A3DF22E75AC200BC8DEF /* MGLSignpost.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLSignpost.m; sourceTree = "<group>"; };
 		CAD9D0A922A86D6F001B25EE /* MGLResourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLResourceTests.mm; path = ../../darwin/test/MGLResourceTests.mm; sourceTree = "<group>"; };
 		CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "integration-Bridging-Header.h"; sourceTree = "<group>"; };
 		CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLMapSnapshotterSwiftTests.swift; sourceTree = "<group>"; };
@@ -2141,6 +2147,8 @@
 				1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */,
 				CF75A91422D85E860058A5C4 /* MGLLoggingConfiguration.mm */,
 				1F6A82A62138871900BA5B41 /* MGLLoggingConfiguration_Private.h */,
+				CAC3A3DE22E75AC100BC8DEF /* MGLSignpost.h */,
+				CAC3A3DF22E75AC200BC8DEF /* MGLSignpost.m */,
 			);
 			name = Foundation;
 			path = ../darwin/src;
@@ -2513,6 +2521,7 @@
 				9221BAAD2069843A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h in Headers */,
 				96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */,
 				408AA8571DAEDA1700022900 /* NSDictionary+MGLAdditions.h in Headers */,
+				CAC3A3E022E75AC200BC8DEF /* MGLSignpost.h in Headers */,
 				9C6E281422A97FDC0056B7BE /* UIKit+MMEMobileEvents.h in Headers */,
 				DA88483F1CBAFB8500AB86E3 /* MGLUserLocation.h in Headers */,
 				558DE7A01E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
@@ -2706,6 +2715,7 @@
 				96E516F32000597100A02306 /* NSDictionary+MGLAdditions.h in Headers */,
 				1FCAE2A920B88B3800C577DD /* MGLLocationManager_Private.h in Headers */,
 				9C6E283422A982670056B7BE /* MMECommonEventData.h in Headers */,
+				CAC3A3E122E75AC200BC8DEF /* MGLSignpost.h in Headers */,
 				9C6E281E22A980AC0056B7BE /* CLLocation+MMEMobileEvents.h in Headers */,
 				96E516F02000595800A02306 /* NSBundle+MGLAdditions.h in Headers */,
 				96E516F920005A3500A02306 /* MGLFaux3DUserLocationAnnotationView.h in Headers */,
@@ -3390,6 +3400,7 @@
 				DA88482B1CBAFA6200AB86E3 /* MGLTypes.m in Sources */,
 				FA68F14D1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
 				404C26E41D89B877000AA13D /* MGLTileSource.mm in Sources */,
+				CAC3A3E222E75AC200BC8DEF /* MGLSignpost.m in Sources */,
 				355AE0011E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				DA88481D1CBAFA6200AB86E3 /* MGLMapCamera.mm in Sources */,
 				DACA86282019218600E9693A /* MGLRasterDEMSource.mm in Sources */,
@@ -3517,6 +3528,7 @@
 				404C26E51D89B877000AA13D /* MGLTileSource.mm in Sources */,
 				355AE0021E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
+				CAC3A3E322E75AC200BC8DEF /* MGLSignpost.m in Sources */,
 				07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */,
 				DAA4E4341CBB730400178DFB /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DACA86292019218600E9693A /* MGLRasterDEMSource.mm in Sources */,

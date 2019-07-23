@@ -17,8 +17,8 @@
 #import "../src/MGLMapView_Experimental.h"
 
 #import <objc/runtime.h>
-#import <os/log.h>
-#import <os/signpost.h>
+
+#import "MGLSignpost.h"
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = 38.8999418, .longitude = -77.033996 },
@@ -218,26 +218,9 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
 @property (nonatomic) NSMutableArray<UIView *> *contentInsetsOverlays;
 
-@property (nonatomic) os_log_t log;
-@property (nonatomic) os_signpost_id_t signpost;
 @property (nonatomic) NSMutableArray<dispatch_block_t> *pendingIdleBlocks;
 
 @end
-
-#define OS_SIGNPOST_BEGIN_WITH_SELF(self, name) \
-    if (@available(iOS 12.0, *)) { os_signpost_interval_begin(self.log, self.signpost, name); }
-
-#define OS_SIGNPOST_END_WITH_SELF(self, name) \
-    if (@available(iOS 12.0, *)) { os_signpost_interval_end(self.log, self.signpost, name); }
-
-#define OS_SIGNPOST_BEGIN(name) \
-    OS_SIGNPOST_BEGIN_WITH_SELF(self, name)
-
-#define OS_SIGNPOST_END(name) \
-    OS_SIGNPOST_END_WITH_SELF(self, name)
-
-#define OS_SIGNPOST_EVENT(name, ...) \
-    if (@available(iOS 12.0, *)) { os_signpost_event_emit(self.log, self.signpost, name, ##__VA_ARGS__); }
 
 // Expose properties for testing
 @interface MGLMapView (MBXViewController)
@@ -264,10 +247,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [super viewDidLoad];
 
     self.pendingIdleBlocks = [NSMutableArray array];
-    self.log = os_log_create("com.mapbox.iosapp", "MBXViewController");
-    if (@available(iOS 12.0, *)) {
-        self.signpost = os_signpost_id_generate(self.log);
-    }
     
     // Keep track of current map state and debug preferences,
     // saving and restoring when the application's state changes.
@@ -594,11 +573,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                         [weakSelf.pendingIdleBlocks addObject:^{
                             __typeof__(self) strongSelf = weakSelf;
                             NSLog(@"BEGIN: query-roads-batch");
-                            OS_SIGNPOST_BEGIN_WITH_SELF(strongSelf, "query-roads-batch");
+                            MGL_SIGNPOST_BEGIN("query-roads-batch");
                             for (int i = 0; i < 10; i++) {
                                 [strongSelf queryRoads];
                             }
-                            OS_SIGNPOST_END_WITH_SELF(strongSelf, "query-roads-batch");
+                            MGL_SIGNPOST_END("query-roads-batch");
                             NSLog(@"END: query-roads-batch");
                         }];
                     }];
@@ -1828,13 +1807,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 - (void)queryRoads
 {
-    OS_SIGNPOST_BEGIN("query-roads");
+    MGL_SIGNPOST_BEGIN("query-roads");
     
     NSArray *roadStyleLayerIdentifiers = [self.mapView.style.roadStyleLayers valueForKey:@"identifier"];
     NSArray *visibleRoadFeatures = [self.mapView visibleFeaturesInRect:self.mapView.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
 
-    OS_SIGNPOST_END("query-roads");
-    OS_SIGNPOST_EVENT("query-roads-count", "%lu", (unsigned long)visibleRoadFeatures.count);
+    MGL_SIGNPOST_END("query-roads", "%lu", (unsigned long)visibleRoadFeatures.count);
     
     NSLog(@"Roads & labels feature count: %lu", (unsigned long)visibleRoadFeatures.count);
 }
