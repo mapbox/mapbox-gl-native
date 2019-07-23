@@ -1,7 +1,9 @@
 #pragma once
 
+#include <mbgl/util/util.hpp>
+
 namespace mbgl {
 
-int runBenchmark(int argc, char* argv[]);
+MBGL_PUBLIC int runBenchmark(int argc, char* argv[]);
 
 } // namespace mbgl
