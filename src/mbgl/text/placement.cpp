@@ -545,34 +545,29 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
 
         if (symbolInstance.hasText) {
-            auto opacityVertex = SymbolSDFTextProgram::opacityVertex(opacityState.text.placed, opacityState.text.opacity);
+            size_t textOpacityVerticesSize = 0u;
+            const auto& opacityVertex = SymbolSDFTextProgram::opacityVertex(opacityState.text.placed, opacityState.text.opacity);
             if (symbolInstance.placedRightTextIndex) {
-                for (size_t i = 0; i < symbolInstance.rightJustifiedGlyphQuadsSize * 4; i++) {
-                    bucket.text.opacityVertices.emplace_back(opacityVertex);
-                }
+                textOpacityVerticesSize += symbolInstance.rightJustifiedGlyphQuadsSize * 4;
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedRightTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedCenterTextIndex && !symbolInstance.singleLine) {
-                for (size_t i = 0; i < symbolInstance.centerJustifiedGlyphQuadsSize * 4; i++) {
-                    bucket.text.opacityVertices.emplace_back(opacityVertex);
-                }
+                textOpacityVerticesSize += symbolInstance.centerJustifiedGlyphQuadsSize * 4;
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedCenterTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedLeftTextIndex && !symbolInstance.singleLine) {
-                for (size_t i = 0; i < symbolInstance.leftJustifiedGlyphQuadsSize * 4; i++) {
-                    bucket.text.opacityVertices.emplace_back(opacityVertex);
-                }
+                textOpacityVerticesSize += symbolInstance.leftJustifiedGlyphQuadsSize * 4;
                 PlacedSymbol& placed = bucket.text.placedSymbols[*symbolInstance.placedLeftTextIndex];
                 placed.hidden = opacityState.isHidden();
             }
             if (symbolInstance.placedVerticalTextIndex) {
-                for (size_t i = 0; i < symbolInstance.verticalGlyphQuadsSize * 4; i++) {
-                    bucket.text.opacityVertices.emplace_back(opacityVertex);
-                }
+                textOpacityVerticesSize += symbolInstance.verticalGlyphQuadsSize * 4;
                 bucket.text.placedSymbols[*symbolInstance.placedVerticalTextIndex].hidden = opacityState.isHidden();
             }
+
+            bucket.text.opacityVertices.extend(textOpacityVerticesSize, opacityVertex);
 
             auto prevOffset = variableOffsets.find(symbolInstance.crossTileID);
             if (prevOffset != variableOffsets.end()) {
@@ -580,11 +575,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
         }
         if (symbolInstance.hasIcon) {
-            auto opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
-            bucket.icon.opacityVertices.emplace_back(opacityVertex);
-            bucket.icon.opacityVertices.emplace_back(opacityVertex);
-            bucket.icon.opacityVertices.emplace_back(opacityVertex);
-            bucket.icon.opacityVertices.emplace_back(opacityVertex);
+            const auto& opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
+            bucket.icon.opacityVertices.extend(4, opacityVertex);
             if (symbolInstance.placedIconIndex) {
                 bucket.icon.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
             }
@@ -594,10 +586,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             if (feature.alongLine) {
                 return;
             }
-            auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false, {});
-            for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
-                bucket.collisionBox->dynamicVertices.emplace_back(dynamicVertex);
-            }
+            const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false, {});
+            bucket.collisionBox->dynamicVertices.extend(feature.boxes.size() * 4, dynamicVertex);
         };
 
         auto updateCollisionTextBox = [this, &bucket, &symbolInstance, &state, variablePlacement, rotateWithMap, pitchWithMap](const auto& feature, const bool placed) {
@@ -629,10 +619,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                     used = false;
                 }
             }
-            auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !used, shift);
-            for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
-                bucket.collisionBox->dynamicVertices.emplace_back(dynamicVertex);
-            }
+            const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !used, shift);
+            bucket.collisionBox->dynamicVertices.extend(feature.boxes.size() * 4, dynamicVertex);
         };
         
         auto updateCollisionCircles = [&](const auto& feature, const bool placed) {
@@ -640,11 +628,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                 return;
             }
             for (const CollisionBox& box : feature.boxes) {
-                auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.used, {});
-                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
+                const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.used, {});
+                bucket.collisionCircle->dynamicVertices.extend(4, dynamicVertex);
             }
         };
         
@@ -665,18 +650,29 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
     }
 }
 
-void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableAnchorType placedAnchor, SymbolInstance& symbolInstance) {
-    std::map<style::TextJustifyType, optional<size_t>> justificationToIndex {
-                {style::TextJustifyType::Right, symbolInstance.placedRightTextIndex},
-                {style::TextJustifyType::Center, symbolInstance.placedCenterTextIndex},
-                {style::TextJustifyType::Left, symbolInstance.placedLeftTextIndex},
-            };
-    style::TextJustifyType justify = getAnchorJustification(placedAnchor);
-    assert(justify == style::TextJustifyType::Right || justify == style::TextJustifyType::Center || justify == style::TextJustifyType::Left);
-    const optional<size_t> autoIndex = justificationToIndex[justify];
+namespace {
+optional<size_t> justificationToIndex(style::TextJustifyType justify, const SymbolInstance& symbolInstance) {
+    switch(justify) {
+        case style::TextJustifyType::Right: return symbolInstance.placedRightTextIndex;
+        case style::TextJustifyType::Center: return symbolInstance.placedCenterTextIndex;
+        case style::TextJustifyType::Left: return symbolInstance.placedLeftTextIndex;
+        case style::TextJustifyType::Auto: break;
+    }
+    assert(false);
+    return nullopt;
+}
 
-    for (auto& pair : justificationToIndex) {
-        const optional<size_t> index = pair.second;
+const style::TextJustifyType justifyTypes[] = {style::TextJustifyType::Right, style::TextJustifyType::Center, style::TextJustifyType::Left};
+
+}  // namespace
+
+void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableAnchorType placedAnchor, SymbolInstance& symbolInstance) {
+    style::TextJustifyType anchorJustify = getAnchorJustification(placedAnchor);
+    assert(anchorJustify != style::TextJustifyType::Auto);
+    const optional<size_t>& autoIndex = justificationToIndex(anchorJustify, symbolInstance);
+
+    for (auto& justify : justifyTypes) {
+        const optional<size_t> index = justificationToIndex(justify, symbolInstance);
         if (index) {
             assert(bucket.text.placedSymbols.size() > *index);
             if (autoIndex && *index != *autoIndex) {
