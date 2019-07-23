@@ -107,7 +107,8 @@
         "test/util/url.test.cpp"
     ],
     "public_headers": {
-        "mbgl/test.hpp": "test/include/mbgl/test.hpp"
+        "mbgl/test.hpp": "test/include/mbgl/test.hpp",
+        "mbgl/test/util.hpp": "test/include/mbgl/test/util.hpp"
     },
     "private_headers": {
         "mbgl/test/fake_file_source.hpp": "test/src/mbgl/test/fake_file_source.hpp",
@@ -122,7 +123,6 @@
         "mbgl/test/stub_map_observer.hpp": "test/src/mbgl/test/stub_map_observer.hpp",
         "mbgl/test/stub_render_source_observer.hpp": "test/src/mbgl/test/stub_render_source_observer.hpp",
         "mbgl/test/stub_style_observer.hpp": "test/src/mbgl/test/stub_style_observer.hpp",
-        "mbgl/test/stub_tile_observer.hpp": "test/src/mbgl/test/stub_tile_observer.hpp",
-        "mbgl/test/util.hpp": "test/src/mbgl/test/util.hpp"
+        "mbgl/test/stub_tile_observer.hpp": "test/src/mbgl/test/stub_tile_observer.hpp"
     }
 }
