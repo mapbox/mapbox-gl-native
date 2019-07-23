@@ -217,36 +217,34 @@ void RenderLineLayer::render(PaintParameters& parameters) {
 namespace {
 
 optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
-    optional<GeometryCollection> newRings = nullopt;
-    Point<double> zero(0, 0);
-    for (const auto& ring : rings) {
-        if (offset == 0) {
-            break;
-        } else if (!newRings) {
-            newRings = {};
-        }
-        
-        newRings->emplace_back();
-        auto& newRing = newRings->back();
-        
-        for (auto i = ring.begin(); i != ring.end(); i++) {
-            auto& p = *i;
+    optional<GeometryCollection> newRings = {};//nullopt;
+    
+    if (offset != 0) {
+        Point<double> zero(0, 0);
+        newRings = GeometryCollection();//{};
+        for (const auto& ring : rings) {
             
-            Point<double> aToB = i == ring.begin() ?
-            zero :
-            util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
-            Point<double> bToC = i + 1 == ring.end() ?
-            zero :
-            util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
-            Point<double> extrude = util::unit(aToB + bToC);
+            newRings->emplace_back();
+            auto& newRing = newRings->back();
             
-            const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
-            extrude *= (1.0 / cosHalfAngle);
-            
-            newRing.push_back(convertPoint<int16_t>(extrude * offset) + p);
+            for (auto i = ring.begin(); i != ring.end(); i++) {
+                auto& p = *i;
+                
+                Point<double> aToB = i == ring.begin() ?
+                zero :
+                util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
+                Point<double> bToC = i + 1 == ring.end() ?
+                zero :
+                util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
+                Point<double> extrude = util::unit(aToB + bToC);
+                
+                const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
+                extrude *= (1.0 / cosHalfAngle);
+                
+                newRing.emplace_back(convertPoint<int16_t>(extrude * offset) + p);
+            }
         }
     }
-    
     return newRings;
 }
     
