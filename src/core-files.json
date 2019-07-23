@@ -463,6 +463,7 @@
         "mbgl/util/compression.hpp": "include/mbgl/util/compression.hpp",
         "mbgl/util/constants.hpp": "include/mbgl/util/constants.hpp",
         "mbgl/util/convert.hpp": "include/mbgl/util/convert.hpp",
+        "mbgl/util/default_styles.hpp": "include/mbgl/util/default_styles.hpp",
         "mbgl/util/enum.hpp": "include/mbgl/util/enum.hpp",
         "mbgl/util/event.hpp": "include/mbgl/util/event.hpp",
         "mbgl/util/exception.hpp": "include/mbgl/util/exception.hpp",

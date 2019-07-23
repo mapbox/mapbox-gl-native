@@ -75,7 +75,6 @@ add_library(qmapboxgl SHARED
     platform/qt/src/qmapboxgl_renderer_backend.hpp
     platform/qt/src/qmapboxgl_scheduler.cpp
     platform/qt/src/qmapboxgl_scheduler.hpp
-    platform/default/include/mbgl/util/default_styles.hpp
 )
 
 target_include_directories(qmapboxgl

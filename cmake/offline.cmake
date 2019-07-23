@@ -2,10 +2,6 @@ add_executable(mbgl-offline
     bin/offline.cpp
 )
 
-target_sources(mbgl-offline
-    PRIVATE platform/default/include/mbgl/util/default_styles.hpp
-)
-
 target_include_directories(mbgl-offline
     PRIVATE platform/default/include
 )
