@@ -32,7 +32,3 @@ allprojects {
 subprojects {
     apply from: "${rootDir}/gradle/dependencies.gradle"
 }
-
-// Load build system information. If this file does not exist, run
-// `make platform/android/gradle/configuration.gradle`
-apply from: "${rootDir}/gradle/configuration.gradle"

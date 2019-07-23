@@ -40,18 +40,11 @@ ext.nativeBuild = { nativeTargets ->
                         arguments "-DANDROID_TOOLCHAIN=clang"
                         arguments "-DANDROID_STL=" + stl
                         arguments "-DANDROID_CPP_FEATURES=exceptions"
-                        arguments "-DMBGL_PLATFORM=android"
-                        arguments "-DMASON_PLATFORM=android"
-                        arguments "-DNodeJS_EXECUTABLE=" + node
-                        arguments "-Dnpm_EXECUTABLE=" + npm
 
                         // Enable ccache if the user has installed it.
-                        if (ccache?.trim()) {
-                            arguments "-DANDROID_CCACHE=" + ccache
+                        if (file("/usr/bin/ccache").exists()) {
+                            arguments "-DANDROID_CCACHE=/usr/bin/ccache"
                         }
-
-                        cFlags "-Qunused-arguments"
-                        cppFlags "-Qunused-arguments"
 
                         for (target in nativeTargets) {
                             targets target
