@@ -1,5 +1,9 @@
-add_library(expected INTERFACE)
+if(TARGET mbgl-vendor-expected)
+    return()
+endif()
 
-target_include_directories(expected SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/expected/include
+add_library(mbgl-vendor-expected INTERFACE)
+
+target_include_directories(mbgl-vendor-expected SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/expected/include
 )
