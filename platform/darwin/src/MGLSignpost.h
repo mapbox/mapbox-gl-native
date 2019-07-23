@@ -47,6 +47,14 @@ MGL_EXPORT extern os_log_t MGLSignpostLogCreate(const char* name);
 // Use MGL_SIGNPOST_BEGIN & MGL_SIGNPOST_END around sections of code that you
 // wish to profile.
 // MGL_SIGNPOST_EVENT can be used for single one-off events
+//
+// For example:
+//
+//  MGL_SIGNPOST_BEGIN("example");
+//  [self performAComputationallyExpensiveOperation];
+//  MGL_SIGNPOST_END("example", "%d", numberOfWidgets);
+//
+//  MGL_SIGNPOST_EVENT("error", "%d", errorCode);
 
 #define MGL_SIGNPOST_BEGIN(name)        MGL_NAMED_SIGNPOST_BEGIN(MGLDefaultSignpostLog, MGLDefaultSignpostId, name)
 #define MGL_SIGNPOST_END(name, ...)     MGL_NAMED_SIGNPOST_END(MGLDefaultSignpostLog, MGLDefaultSignpostId, name, ##__VA_ARGS__)
