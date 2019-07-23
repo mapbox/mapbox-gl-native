@@ -115,6 +115,9 @@ private:
                          std::function<void(double)>,
                          const Duration&);
 
+    // We don't want to show horizon: limit max pitch based on edge insets.
+    double getMaxPitchForEdgeInsets(const EdgeInsets &insets) const;
+
     TimePoint transitionStart;
     Duration transitionDuration;
     std::function<bool(const TimePoint)> transitionFrameFn;
