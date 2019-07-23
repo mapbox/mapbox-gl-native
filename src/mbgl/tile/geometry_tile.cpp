@@ -360,7 +360,7 @@ void GeometryTile::querySourceFeatures(
                     continue;
                 }
 
-                result.push_back(convertFeature(*feature, id.canonical));
+                result.emplace_back(convertFeature(*feature, id.canonical));
             }
         }
     }

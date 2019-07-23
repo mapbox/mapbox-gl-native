@@ -167,7 +167,7 @@ bool RenderCircleLayer::queryIntersectsFeature(
         projectQueryGeometry(translatedQueryGeometry, posMatrix, transformState.getSize());
     auto transformedSize = alignWithMap ? size * pixelsToTileUnits : size;
 
-    auto geometry = feature.getGeometries();
+    const auto& geometry = feature.getGeometries();
     for (auto& ring : geometry) {
         for (auto& point : ring) {
             const GeometryCoordinate& transformedPoint = alignWithMap ? point : projectPoint(point, posMatrix, transformState.getSize());

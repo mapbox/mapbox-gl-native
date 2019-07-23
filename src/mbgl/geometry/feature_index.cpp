@@ -159,7 +159,7 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        result[layerID].push_back(convertFeature(*geometryTileFeature, tileID));
+        result[layerID].emplace_back(convertFeature(*geometryTileFeature, tileID));
     }
 }
 

@@ -20,7 +20,7 @@ public:
     optional<Value> getValue(const std::string& key) const override { return feature->getValue(key); };
     std::unordered_map<std::string,Value> getProperties() const override { return feature->getProperties(); };
     FeatureIdentifier getID() const override { return feature->getID(); };
-    GeometryCollection getGeometries() const override { return geometry; };
+    const GeometryCollection& getGeometries() const override { return geometry; };
 
     friend bool operator < (const SymbolFeature& lhs, const SymbolFeature& rhs) {
         return lhs.sortKey <  rhs.sortKey;
