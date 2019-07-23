@@ -6,7 +6,6 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.testapp.R
-import junit.framework.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_cache_management.*
 
 /**
@@ -70,7 +69,7 @@ class CacheManagementActivity : AppCompatActivity() {
 
   fun showSnackbar(message: String) {
     // validate that all callbacks occur on main thread
-    assertTrue(Looper.myLooper() == Looper.getMainLooper())
+    assert(Looper.myLooper() == Looper.getMainLooper())
 
     // show snackbar
     Snackbar.make(container, message, Snackbar.LENGTH_SHORT).show()

@@ -90,8 +90,6 @@ private:
     const MapMode mode;
     const float pixelRatio;
 
-    style::SymbolLayoutProperties::PossiblyEvaluated layout;
-
     const uint32_t tileSize;
     const float tilePixelRatio;
 
@@ -101,7 +99,7 @@ private:
 
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;
-
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout;
     std::vector<SymbolFeature> features;
 
     BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread

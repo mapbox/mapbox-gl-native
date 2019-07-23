@@ -10,16 +10,12 @@ RasterSource::Impl::Impl(SourceType sourceType, std::string id_, uint16_t tileSi
 
 RasterSource::Impl::Impl(const Impl& other, Tileset tileset_)
     : Source::Impl(other),
-      tileSize(other.tileSize),
-      tileset(std::move(tileset_)) {
+      tileset(std::move(tileset_)),
+      tileSize(other.tileSize) {
 }
 
 uint16_t RasterSource::Impl::getTileSize() const {
     return tileSize;
-}
-
-optional<Tileset> RasterSource::Impl::getTileset() const {
-    return tileset;
 }
 
 optional<std::string> RasterSource::Impl::getAttribution() const {

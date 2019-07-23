@@ -13,7 +13,7 @@ namespace {
 std::atomic<uint32_t> maxBucketInstanceId;
 } // namespace
 
-SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
+SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout_,
                            const std::map<std::string, Immutable<style::LayerProperties>>& paintProperties_,
                            const style::PropertyValue<float>& textSize,
                            const style::PropertyValue<float>& iconSize,
@@ -25,10 +25,16 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            const std::vector<SymbolInstance>&& symbolInstances_,
                            float tilePixelRatio_)
     : layout(std::move(layout_)),
+      bucketLeaderID(std::move(bucketName_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
-      bucketLeaderID(std::move(bucketName_)),
+      staticUploaded(false),
+      placementChangesUploaded(false),
+      dynamicUploaded(false),
+      sortUploaded(false),
+      justReloaded(false),
+      hasVariablePlacement(false),
       symbolInstances(std::move(symbolInstances_)),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())),
@@ -105,28 +111,28 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
 
     if (hasCollisionBoxData()) {
         if (!staticUploaded) {
-            collisionBox.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionBox.lines));
-            collisionBox.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.vertices));
+            collisionBox->indexBuffer = uploadPass.createIndexBuffer(std::move(collisionBox->lines));
+            collisionBox->vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox->vertices));
         }
         if (!placementChangesUploaded) {
-            if (!collisionBox.dynamicVertexBuffer) {
-                collisionBox.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!collisionBox->dynamicVertexBuffer) {
+                collisionBox->dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox->dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*collisionBox.dynamicVertexBuffer, std::move(collisionBox.dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionBox->dynamicVertexBuffer, std::move(collisionBox->dynamicVertices));
             }
         }
     }
 
     if (hasCollisionCircleData()) {
         if (!staticUploaded) {
-            collisionCircle.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionCircle.triangles));
-            collisionCircle.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.vertices));
+            collisionCircle->indexBuffer = uploadPass.createIndexBuffer(std::move(collisionCircle->triangles));
+            collisionCircle->vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle->vertices));
         }
         if (!placementChangesUploaded) {
-            if (!collisionCircle.dynamicVertexBuffer) {
-                collisionCircle.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!collisionCircle->dynamicVertexBuffer) {
+                collisionCircle->dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle->dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*collisionCircle.dynamicVertexBuffer, std::move(collisionCircle.dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionCircle->dynamicVertexBuffer, std::move(collisionCircle->dynamicVertices));
             }
         }
     }
@@ -151,11 +157,11 @@ bool SymbolBucket::hasIconData() const {
 }
 
 bool SymbolBucket::hasCollisionBoxData() const {
-    return !collisionBox.segments.empty();
+    return collisionBox && !collisionBox->segments.empty();
 }
 
 bool SymbolBucket::hasCollisionCircleData() const {
-    return !collisionCircle.segments.empty();
+    return collisionCircle && !collisionCircle->segments.empty();
 }
 
 void addPlacedSymbol(gfx::IndexVector<gfx::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
@@ -170,8 +176,9 @@ void SymbolBucket::sortFeatures(const float angle) {
     if (!sortFeaturesByY) {
         return;
     }
+    assert(angle != std::numeric_limits<float>::max());
 
-    if (sortedAngle && *sortedAngle == angle) {
+    if (sortedAngle == angle) {
         return;
     }
 
@@ -239,7 +246,7 @@ std::vector<std::reference_wrapper<SymbolInstance>> SymbolBucket::getSortedSymbo
 
 bool SymbolBucket::hasFormatSectionOverrides() const {
     if (!hasFormatSectionOverrides_) {
-        hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout.get<TextField>());
+        hasFormatSectionOverrides_= SymbolLayerPaintPropertyOverrides::hasOverrides(layout->get<TextField>());
     }
     return *hasFormatSectionOverrides_;
 }

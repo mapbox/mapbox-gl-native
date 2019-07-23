@@ -101,7 +101,7 @@ void Placement::placeBucket(
         SymbolBucket& bucket,
         const BucketPlacementParameters& params,
         std::set<uint32_t>& seenCrossTileIDs) {
-    const auto& layout = bucket.layout;
+    const auto& layout = *bucket.layout;
     const auto& renderTile = params.tile;
     const auto& state = collisionIndex.getTransformState();
     const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
@@ -409,7 +409,7 @@ Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float 
 
 bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const TransformState& state, const RenderTile& tile) {
     using namespace style;
-    const auto& layout = bucket.layout;
+    const auto& layout = *bucket.layout;
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
     bool result = false;
 
@@ -507,24 +507,24 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
 void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState& state, std::set<uint32_t>& seenCrossTileIDs) {
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
-    if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
-    if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
+    if (bucket.hasCollisionBoxData()) bucket.collisionBox->dynamicVertices.clear();
+    if (bucket.hasCollisionCircleData()) bucket.collisionCircle->dynamicVertices.clear();
 
     JointOpacityState duplicateOpacityState(false, false, true);
 
-    const bool textAllowOverlap = bucket.layout.get<style::TextAllowOverlap>();
-    const bool iconAllowOverlap = bucket.layout.get<style::IconAllowOverlap>();
-    const bool variablePlacement = !bucket.layout.get<style::TextVariableAnchor>().empty();
-    const bool rotateWithMap = bucket.layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
-    const bool pitchWithMap = bucket.layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
+    const bool textAllowOverlap = bucket.layout->get<style::TextAllowOverlap>();
+    const bool iconAllowOverlap = bucket.layout->get<style::IconAllowOverlap>();
+    const bool variablePlacement = !bucket.layout->get<style::TextVariableAnchor>().empty();
+    const bool rotateWithMap = bucket.layout->get<style::TextRotationAlignment>() == style::AlignmentType::Map;
+    const bool pitchWithMap = bucket.layout->get<style::TextPitchAlignment>() == style::AlignmentType::Map;
 
     // If allow-overlap is true, we can show symbols before placement runs on them
     // But we have to wait for placement if we potentially depend on a paired icon/text
     // with allow-overlap: false.
     // See https://github.com/mapbox/mapbox-gl-native/issues/12483
     JointOpacityState defaultOpacityState(
-            textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || bucket.layout.get<style::IconOptional>()),
-            iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || bucket.layout.get<style::TextOptional>()),
+            textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || bucket.layout->get<style::IconOptional>()),
+            iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || bucket.layout->get<style::TextOptional>()),
             true);
 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
@@ -598,7 +598,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
             auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false, {});
             for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
-                bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionBox->dynamicVertices.emplace_back(dynamicVertex);
             }
         };
 
@@ -633,7 +633,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
             auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !used, shift);
             for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
-                bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionBox->dynamicVertices.emplace_back(dynamicVertex);
             }
         };
         
@@ -643,10 +643,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
             for (const CollisionBox& box : feature.boxes) {
                 auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.used, {});
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle->dynamicVertices.emplace_back(dynamicVertex);
             }
         };
         

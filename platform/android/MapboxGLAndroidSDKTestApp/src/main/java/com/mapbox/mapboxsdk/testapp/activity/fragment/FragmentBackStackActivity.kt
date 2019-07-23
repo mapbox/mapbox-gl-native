@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.fragment
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.View
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
@@ -15,20 +14,32 @@ import kotlinx.android.synthetic.main.activity_backstack_fragment.*
  */
 class FragmentBackStackActivity : AppCompatActivity() {
 
+  companion object {
+    private const val FRAGMENT_TAG = "map_fragment"
+  }
+
   private lateinit var mapFragment: SupportMapFragment
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_backstack_fragment)
 
-    mapFragment = SupportMapFragment.newInstance()
-    mapFragment.getMapAsync { initMap(it) }
+    if (savedInstanceState == null) {
+      mapFragment = SupportMapFragment.newInstance()
+      mapFragment.getMapAsync { initMap(it) }
 
-    supportFragmentManager.beginTransaction().apply {
-      add(R.id.container, mapFragment)
-    }.commit()
+      supportFragmentManager.beginTransaction().apply {
+        add(R.id.container, mapFragment, FRAGMENT_TAG)
+      }.commit()
+    } else {
+      supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)?.also { fragment ->
+        if (fragment is SupportMapFragment) {
+          fragment.getMapAsync { initMap(it) }
+        }
+      }
+    }
 
-    button.setOnClickListener { handleClick(it) }
+    button.setOnClickListener { handleClick() }
   }
 
   private fun initMap(mapboxMap: MapboxMap) {
@@ -37,7 +48,7 @@ class FragmentBackStackActivity : AppCompatActivity() {
     }
   }
 
-  private fun handleClick(button: View) {
+  private fun handleClick() {
     supportFragmentManager.beginTransaction().apply {
       replace(R.id.container, NestedViewPagerActivity.ItemAdapter.EmptyFragment())
       addToBackStack("map_empty_fragment")

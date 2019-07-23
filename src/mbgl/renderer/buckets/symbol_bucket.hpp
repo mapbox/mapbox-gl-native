@@ -43,7 +43,7 @@ public:
 
 class SymbolBucket final : public Bucket {
 public:
-    SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
+    SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEvaluated>,
                  const std::map<std::string, Immutable<style::LayerProperties>>&,
                  const style::PropertyValue<float>& textSize,
                  const style::PropertyValue<float>& iconSize,
@@ -72,19 +72,20 @@ public:
     // The result contains references to the `symbolInstances` items, sorted by viewport Y.
     std::vector<std::reference_wrapper<SymbolInstance>> getSortedSymbols(const float angle);
 
-    const style::SymbolLayoutProperties::PossiblyEvaluated layout;
-    const bool sdfIcons;
-    const bool iconsNeedLinear;
-    const bool sortFeaturesByY;
-
+    Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout;
     const std::string bucketLeaderID;
+    float sortedAngle = std::numeric_limits<float>::max();
 
-    optional<float> sortedAngle;
-
-    bool staticUploaded = false;
-    bool placementChangesUploaded = false;
-    bool dynamicUploaded = false;
-    bool sortUploaded = false;
+    // Flags
+    const bool sdfIcons : 1;
+    const bool iconsNeedLinear : 1;
+    const bool sortFeaturesByY : 1;
+    bool staticUploaded : 1;
+    bool placementChangesUploaded : 1;
+    bool dynamicUploaded : 1;
+    bool sortUploaded : 1;
+    bool justReloaded : 1;
+    bool hasVariablePlacement : 1;
 
     std::vector<SymbolInstance> symbolInstances;
 
@@ -128,17 +129,28 @@ public:
     struct CollisionBoxBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Lines> lines;
         optional<gfx::IndexBuffer> indexBuffer;
-    } collisionBox;
+    };
+    std::unique_ptr<CollisionBoxBuffer> collisionBox;
+
+    CollisionBoxBuffer& getOrCreateCollisionBox() {
+        if (!collisionBox) collisionBox = std::make_unique<CollisionBoxBuffer>();
+        return *collisionBox;
+    }
 
     struct CollisionCircleBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Triangles> triangles;
         optional<gfx::IndexBuffer> indexBuffer;
-    } collisionCircle;
+    };
+    std::unique_ptr<CollisionCircleBuffer> collisionCircle;
+
+    CollisionCircleBuffer& getOrCreateCollisionCircleBuffer() {
+        if (!collisionCircle) collisionCircle = std::make_unique<CollisionCircleBuffer>();
+        return *collisionCircle;
+    }
 
     const float tilePixelRatio;
     uint32_t bucketInstanceId;
-    bool justReloaded = false;
-    bool hasVariablePlacement = false;
+
     mutable optional<bool> hasFormatSectionOverrides_;
 
     std::shared_ptr<std::vector<size_t>> featureSortOrder;

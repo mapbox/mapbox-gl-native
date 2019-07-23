@@ -6,18 +6,21 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity
-import junit.framework.Assert.assertNotNull
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import junit.framework.Assert.assertNotNull
+import org.junit.Assert
+import org.junit.Ignore
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
 /**
  * Integration test that validates if a snapshotter creation
  */
 @RunWith(AndroidJUnit4::class)
+@Ignore("Ignored until https://github.com/mapbox/mapbox-gl-native/issues/11669 is resolved.")
 class MapSnapshotterTest {
 
   @Rule
@@ -39,11 +42,13 @@ class MapSnapshotterTest {
             .build()
         )
       val mapSnapshotter = MapSnapshotter(rule.activity, options)
-      mapSnapshotter.start {
+      mapSnapshotter.start({
         assertNotNull(it)
         assertNotNull(it.bitmap)
         countDownLatch.countDown()
-      }
+      }, {
+        Assert.fail(it)
+      })
     }
     if (!countDownLatch.await(30, TimeUnit.SECONDS)) {
       throw TimeoutException()

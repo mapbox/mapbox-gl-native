@@ -27,7 +27,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
         files.each { file -> println file }
     }
 
-    sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
-    executionData = files([ecSrc, execSrc])
+    sourceDirectories.from = files([mainSrc])
+    classDirectories.from = files([debugTree])
+    executionData.from = files([ecSrc, execSrc])
 }

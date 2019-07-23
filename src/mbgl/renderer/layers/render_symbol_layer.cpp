@@ -113,7 +113,7 @@ void drawIcon(const DrawFn& draw,
               const PaintParameters& parameters) {
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
-    const auto& layout = bucket.layout;
+    const auto& layout = *bucket.layout;
     auto values = iconPropertyValues(evaluated, layout);
     const auto& paintPropertyValues = RenderSymbolLayer::iconPaintProperties(evaluated);
 
@@ -184,7 +184,7 @@ void drawText(const DrawFn& draw,
               const PaintParameters& parameters) {
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
-    const auto& layout = bucket.layout;
+    const auto& layout = *bucket.layout;
 
     const gfx::TextureBinding textureBinding{ tile.getGlyphAtlasTexture().getResource(),
                                               gfx::TextureFilterType::Linear };
@@ -405,10 +405,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
                     uniforms::extrude_scale::Value( extrudeScale ),
                     uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
                 },
-                *bucket.collisionBox.vertexBuffer,
-                *bucket.collisionBox.dynamicVertexBuffer,
-                *bucket.collisionBox.indexBuffer,
-                bucket.collisionBox.segments,
+                *bucket.collisionBox->vertexBuffer,
+                *bucket.collisionBox->dynamicVertexBuffer,
+                *bucket.collisionBox->indexBuffer,
+                bucket.collisionBox->segments,
                 paintAttributeData,
                 properties,
                 CollisionBoxProgram::TextureBindings{},
@@ -443,10 +443,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
                     uniforms::overscale_factor::Value( float(tile.getOverscaledTileID().overscaleFactor()) ),
                     uniforms::camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
                 },
-                *bucket.collisionCircle.vertexBuffer,
-                *bucket.collisionCircle.dynamicVertexBuffer,
-                *bucket.collisionCircle.indexBuffer,
-                bucket.collisionCircle.segments,
+                *bucket.collisionCircle->vertexBuffer,
+                *bucket.collisionCircle->dynamicVertexBuffer,
+                *bucket.collisionCircle->indexBuffer,
+                bucket.collisionCircle->segments,
                 paintAttributeData,
                 properties,
                 CollisionCircleProgram::TextureBindings{},

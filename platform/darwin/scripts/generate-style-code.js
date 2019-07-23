@@ -14,6 +14,11 @@ const suffix = 'StyleLayer';
 
 let spec = _.merge(require('../../../scripts/style-spec'), require('./style-spec-overrides-v8.json'));
 
+// FIXME: https://github.com/mapbox/mapbox-gl-native/issues/15008
+delete spec.layout_circle["circle-sort-key"]
+delete spec.layout_line["line-sort-key"]
+delete spec.layout_fill["fill-sort-key"]
+
 // Rename properties and keep `original` for use with setters and getters
 _.forOwn(cocoaConventions, function (properties, kind) {
     _.forOwn(properties, function (newName, oldName) {
