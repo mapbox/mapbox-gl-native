@@ -1,10 +1,9 @@
-#include <mbgl/test/util.hpp>
-
-#include <QApplication>
 #include <QMapboxGL>
 
 #include <QGLWidget>
 #include <QGLFramebufferObject>
+
+#include <gtest/gtest.h>
 
 class QMapboxGLTest : public QObject, public ::testing::Test {
     Q_OBJECT
