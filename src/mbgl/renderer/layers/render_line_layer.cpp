@@ -214,16 +214,12 @@ void RenderLineLayer::render(PaintParameters& parameters) {
     }
 }
 
-optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
-    if (offset == 0) return {};
+GeometryCollection offsetLine(GeometryCollection rings, const double offset) {
+    if (offset == 0 || rings.empty()) return rings;
 
-    GeometryCollection newRings;
-    Point<double> zero(0, 0);
-    for (const auto& ring : rings) {
-        newRings.emplace_back();
-        auto& newRing = newRings.back();
-
-        for (auto i = ring.begin(); i != ring.end(); i++) {
+    const Point<double> zero(0, 0);
+    for (auto& ring : rings) {
+        for (auto i = ring.begin(); i != ring.end(); ++i) {
             auto& p = *i;
 
             Point<double> aToB = i == ring.begin() ?
@@ -237,11 +233,11 @@ optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const d
             const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
             extrude *= (1.0 / cosHalfAngle);
 
-            newRing.push_back(convertPoint<int16_t>(extrude * offset) + p);
+            ring = {convertPoint<int16_t>(extrude * offset) + p};
         }
     }
 
-    return newRings;
+    return rings;
 }
 
 bool RenderLineLayer::queryIntersectsFeature(
@@ -264,14 +260,12 @@ bool RenderLineLayer::queryIntersectsFeature(
     auto offset = evaluated.get<style::LineOffset>()
                           .evaluate(feature, zoom, style::LineOffset::defaultValue()) * pixelsToTileUnits;
 
-    // Apply offset to geometry
-    auto offsetGeometry = offsetLine(feature.getGeometries(), offset);
-
     // Test intersection
     const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
     return util::polygonIntersectsBufferedMultiLine(
             translatedQueryGeometry.value_or(queryGeometry),
-            offsetGeometry.value_or(feature.getGeometries()),
+            // Apply offset to geometry if offset is > 0;
+            offsetLine(feature.getGeometries(), offset),
             halfWidth);
 }
 
