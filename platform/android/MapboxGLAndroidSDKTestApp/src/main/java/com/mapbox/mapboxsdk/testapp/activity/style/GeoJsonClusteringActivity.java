@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -12,6 +13,7 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -27,7 +29,6 @@ import timber.log.Timber;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
@@ -58,6 +59,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
  */
 public class GeoJsonClusteringActivity extends AppCompatActivity {
 
+  private static final String TAG = "GeoJsonClusteringActivity";
   private static final double CAMERA_ZOOM_DELTA = 0.01;
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -72,7 +74,6 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
 
     // Initialize map as normal
     mapView = findViewById(R.id.mapView);
-    // noinspection ConstantConditions
     mapView.onCreate(savedInstanceState);
 
     mapView.getMapAsync(map -> {
@@ -85,6 +86,27 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
         new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())}
       };
 
+      final Bitmap initialBitmap = BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp));
+      mapView.addOnStyleImageMissingListener(id -> {
+        if (!id.isEmpty()) {
+          Logger.e(TAG, id);
+          try {
+            double scaleSize = Double.parseDouble(id);
+            Bitmap resized = Bitmap.createScaledBitmap(
+              initialBitmap,
+              (int) (initialBitmap.getWidth() * scaleSize),
+              (int) (initialBitmap.getHeight() * scaleSize),
+              true
+            );
+            mapboxMap.getStyle().addImage(id, resized);
+          } catch (NumberFormatException e) {
+            Logger.e(TAG, "Error occurred", e);
+          }
+        } else {
+          Logger.e(TAG, "Id is empty");
+        }
+      });
+
       try {
         mapboxMap.setStyle(new Style.Builder()
           .fromUri(Style.LIGHT)
@@ -93,11 +115,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
           .withLayer(createClusterLevelLayer(0, clusterLayers))
           .withLayer(createClusterLevelLayer(1, clusterLayers))
           .withLayer(createClusterLevelLayer(2, clusterLayers))
-          .withLayer(createClusterTextLayer())
-          .withImage("icon-id", Objects.requireNonNull(
-            BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp))), true
-          )
-        );
+          .withLayer(createClusterTextLayer()));
       } catch (URISyntaxException exception) {
         Timber.e(exception);
       }
@@ -144,7 +162,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
   private SymbolLayer createSymbolLayer() {
     return new SymbolLayer("unclustered-points", "earthquakes")
       .withProperties(
-        iconImage("icon-id"),
+        iconImage(Expression.toString(get("mag"))),
         iconSize(
           division(
             get("mag"), literal(4.0f)
