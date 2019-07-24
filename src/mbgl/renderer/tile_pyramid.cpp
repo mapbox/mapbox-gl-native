@@ -293,6 +293,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
     }
 
     LineString<double> queryGeometry;
+    queryGeometry.reserve(geometry.size());
 
     for (const auto& p : geometry) {
         queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(
