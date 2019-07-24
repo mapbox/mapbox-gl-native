@@ -44,7 +44,7 @@ public:
     virtual optional<Value> getValue(const std::string& key) const = 0;
     virtual PropertyMap getProperties() const { return PropertyMap(); }
     virtual FeatureIdentifier getID() const { return NullValue {}; }
-    virtual const GeometryCollection& getGeometries() const = 0;
+    virtual const GeometryCollection& getGeometries() const;
 };
 
 class GeometryTileLayer {

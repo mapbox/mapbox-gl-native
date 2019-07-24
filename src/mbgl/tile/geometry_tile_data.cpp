@@ -180,4 +180,9 @@ Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const Can
     return feature;
 }
 
+const GeometryCollection& GeometryTileFeature::getGeometries() const {
+    static const GeometryCollection dummy;
+    return dummy;
+}
+
 } // namespace mbgl
