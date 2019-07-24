@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 8.2.0 - July 24, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.0-beta.1...android-v8.2.0) since [Mapbox Maps SDK for Android v8.2.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.0-beta.1):
+
+### Bug fixes
+ - Fix rendering of layers that are on top of fill-extrusion layers [#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065)
+
 ## 8.2.0-beta.1 - July 18, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.0-alpha.3...android-v8.2.0-beta.1) since [Mapbox Maps SDK for Android v8.2.0-alpha.3](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.0-alpha.3):
 
