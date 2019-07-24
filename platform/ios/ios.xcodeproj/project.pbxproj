@@ -12,8 +12,6 @@
 		071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
-		074A7F0D2277C093001A62D1 /* insert_access_token.sh in Resources */ = {isa = PBXBuildFile; fileRef = 074A7F0C2277C093001A62D1 /* insert_access_token.sh */; };
-		074A7F0E2277C093001A62D1 /* insert_access_token.sh in Resources */ = {isa = PBXBuildFile; fileRef = 074A7F0C2277C093001A62D1 /* insert_access_token.sh */; };
 		075AF842227B6762008D7A4C /* MBXState.m in Sources */ = {isa = PBXBuildFile; fileRef = 075AF841227B6762008D7A4C /* MBXState.m */; };
 		075AF845227B67C6008D7A4C /* MBXStateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 075AF844227B67C6008D7A4C /* MBXStateManager.m */; };
 		076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076171C22139C70900668A35 /* MGLMapViewTests.m */; };
@@ -3079,7 +3077,6 @@
 				353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */,
 				DA1DC9711CB6C6CE006E619F /* polyline.geojson in Resources */,
 				DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */,
-				074A7F0D2277C093001A62D1 /* insert_access_token.sh in Resources */,
 				076171C72141A91700668A35 /* Settings.bundle in Resources */,
 				DA821D071CCC6D59007508D4 /* Main.storyboard in Resources */,
 				DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */,
@@ -3109,7 +3106,6 @@
 				DA8933BC1CCD2CA100E68420 /* Foundation.strings in Resources */,
 				DA8933A31CCC95B000E68420 /* Localizable.strings in Resources */,
 				960D0C361ECF5AAF008E151F /* Images.xcassets in Resources */,
-				074A7F0E2277C093001A62D1 /* insert_access_token.sh in Resources */,
 				DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */,
 				DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
