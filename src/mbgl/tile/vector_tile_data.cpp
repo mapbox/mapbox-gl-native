@@ -26,8 +26,11 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     return value->is<NullValue>() ? nullopt : std::move(value);
 }
 
-std::unordered_map<std::string, Value> VectorTileFeature::getProperties() const {
-    return feature.getProperties();
+const PropertyMap& VectorTileFeature::getProperties() const {
+    if (!properties) {
+        properties = feature.getProperties();
+    }
+    return *properties;
 }
 
 FeatureIdentifier VectorTileFeature::getID() const {

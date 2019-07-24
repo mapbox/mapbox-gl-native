@@ -423,7 +423,8 @@ const auto& propertiesCompoundExpression() {
             };
         }
         std::unordered_map<std::string, Value> result;
-        const PropertyMap properties = params.feature->getProperties();
+        const PropertyMap& properties = params.feature->getProperties();
+        result.reserve(properties.size());
         for (const auto& entry : properties) {
             result[entry.first] = toExpressionValue(entry.second);
         }
