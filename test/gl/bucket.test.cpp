@@ -131,7 +131,7 @@ TEST(Buckets, SymbolBucket) {
 
     // SymbolBucket::addFeature() is a no-op.
     GeometryCollection point { { { 0, 0 } } };
-    bucket.addFeature(StubGeometryTileFeature { {}, FeatureType::Point, point, properties }, point, {}, PatternLayerMap());
+    bucket.addFeature(StubGeometryTileFeature { {}, FeatureType::Point, std::move(point), properties }, point, {}, PatternLayerMap());
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 

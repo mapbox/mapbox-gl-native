@@ -35,6 +35,13 @@ public:
     GeometryCollection(Args&&... args) : std::vector<GeometryCoordinates>(std::forward<Args>(args)...) {}
     GeometryCollection(std::initializer_list<GeometryCoordinates> args)
       : std::vector<GeometryCoordinates>(std::move(args)) {}
+    GeometryCollection(GeometryCollection&&) = default;
+    GeometryCollection& operator=(GeometryCollection&&) = default;
+
+    GeometryCollection clone() const { return GeometryCollection(*this); }
+
+private:
+    GeometryCollection(const GeometryCollection&) = default;
 };
 
 class GeometryTileFeature {
