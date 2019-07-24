@@ -4,10 +4,12 @@
 #include <os/log.h>
 #include <os/signpost.h>
 
+#define CONCAT2(x,y) x##y
+#define CONCAT(x,y) CONCAT2(x,y)
+#define SIGNPOST_NAME(x) CONCAT(signpost,x)
 #define MGL_EXPORT __attribute__((visibility ("default")))
 
 MGL_EXPORT extern os_log_t MGLDefaultSignpostLog;
-MGL_EXPORT extern os_signpost_id_t MGLDefaultSignpostId;
 
 /**
  Create an os_log_t (for use with os_signposts) with the "com.mapbox.mapbox" subsystem.
@@ -23,24 +25,30 @@ MGL_EXPORT extern os_signpost_id_t MGLDefaultSignpostId;
  */
 MGL_EXPORT extern os_log_t MGLSignpostLogCreate(const char* name);
 
-#define MGL_NAMED_SIGNPOST_BEGIN(log, signpost, name) \
-    __extension__({ \
+#define MGL_NAMED_SIGNPOST_BEGIN(log, name, ...) \
+    ({ \
+        os_signpost_id_t SIGNPOST_NAME(__LINE__) = OS_SIGNPOST_ID_INVALID; \
         if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
-            os_signpost_interval_begin(log, signpost, name); \
+            SIGNPOST_NAME(__LINE__) = os_signpost_id_generate(log); \
+            os_signpost_interval_begin(log, SIGNPOST_NAME(__LINE__), name, ##__VA_ARGS__); \
         } \
+        SIGNPOST_NAME(__LINE__); \
     })
 
 #define MGL_NAMED_SIGNPOST_END(log, signpost, name, ...) \
     __extension__({ \
-        if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
-            os_signpost_interval_end(log, signpost, name, ##__VA_ARGS__); \
+        if (signpost != OS_SIGNPOST_ID_INVALID) { \
+            if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
+                os_signpost_interval_end(log, signpost, name, ##__VA_ARGS__); \
+            } \
         } \
     })
 
-#define MGL_NAMED_SIGNPOST_EVENT(log, signpost, name, ...) \
+#define MGL_NAMED_SIGNPOST_EVENT(log, name, ...) \
     __extension__({ \
         if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
-            os_signpost_event_emit(log, signpost, name, ##__VA_ARGS__); \
+            os_signpost_id_t SIGNPOST_NAME(__LINE__) = os_signpost_id_generate(log); \
+            os_signpost_event_emit(log, SIGNPOST_NAME(__LINE__), name, ##__VA_ARGS__); \
         } \
     })
 
@@ -50,14 +58,18 @@ MGL_EXPORT extern os_log_t MGLSignpostLogCreate(const char* name);
 //
 // For example:
 //
-//  MGL_SIGNPOST_BEGIN("example");
+//  os_signpost_id_t signpost = MGL_SIGNPOST_BEGIN("example");
 //  [self performAComputationallyExpensiveOperation];
-//  MGL_SIGNPOST_END("example", "%d", numberOfWidgets);
+//  MGL_SIGNPOST_END(signpost, "example", "%d", numberOfWidgets);
 //
 //  MGL_SIGNPOST_EVENT("error", "%d", errorCode);
 
-#define MGL_SIGNPOST_BEGIN(name)        MGL_NAMED_SIGNPOST_BEGIN(MGLDefaultSignpostLog, MGLDefaultSignpostId, name)
-#define MGL_SIGNPOST_END(name, ...)     MGL_NAMED_SIGNPOST_END(MGLDefaultSignpostLog, MGLDefaultSignpostId, name, ##__VA_ARGS__)
-#define MGL_SIGNPOST_EVENT(name, ...)   MGL_NAMED_SIGNPOST_EVENT(MGLDefaultSignpostLog, MGLDefaultSignpostId, name, ##__VA_ARGS__)
+#define MGL_SIGNPOST_BEGIN(name, ...)             MGL_NAMED_SIGNPOST_BEGIN(MGLDefaultSignpostLog, name, ##__VA_ARGS__)
+#define MGL_SIGNPOST_END(signpost, name, ...)     MGL_NAMED_SIGNPOST_END(MGLDefaultSignpostLog, signpost, name, ##__VA_ARGS__)
+#define MGL_SIGNPOST_EVENT(signpost, name, ...)   MGL_NAMED_SIGNPOST_EVENT(MGLDefaultSignpostLog, signpost, name, ##__VA_ARGS__)
+
+#undef CONCAT
+#undef CONCAT2
+#undef SIGNPOST_NAME
 
 #endif /* MGLSignpost_h */
