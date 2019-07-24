@@ -179,6 +179,11 @@ Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const Can
     return feature;
 }
 
+const PropertyMap& GeometryTileFeature::getProperties() const {
+    static const PropertyMap dummy;
+    return dummy;
+}
+
 const GeometryCollection& GeometryTileFeature::getGeometries() const {
     static const GeometryCollection dummy;
     return dummy;
