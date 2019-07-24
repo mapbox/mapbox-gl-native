@@ -13,7 +13,7 @@ class SymbolFeature : public GeometryTileFeature {
 public:
     SymbolFeature(std::unique_ptr<GeometryTileFeature> feature_) :
         feature(std::move(feature_)),
-        geometry(feature->getGeometries()) // we need a mutable copy of the geometry for mergeLines()
+        geometry(feature->getGeometries().clone()) // we need a mutable copy of the geometry for mergeLines()
     {}
     
     FeatureType getType() const override { return feature->getType(); }

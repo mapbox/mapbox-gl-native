@@ -57,32 +57,31 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
     std::size_t len = rings.size();
 
     if (len <= 1) {
-        polygons.push_back(rings);
+        polygons.emplace_back(rings.clone());
         return polygons;
     }
 
     GeometryCollection polygon;
     int8_t ccw = 0;
 
-    for (std::size_t i = 0; i < len; i++) {
-        double area = signedArea(rings[i]);
+    for (const auto& ring : rings) {
+        double area = signedArea(ring);
+        if (area == 0) continue;
 
-        if (area == 0)
-            continue;
-
-        if (ccw == 0)
+        if (ccw == 0) {
             ccw = (area < 0 ? -1 : 1);
-
-        if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
-            polygons.push_back(polygon);
-            polygon.clear();
         }
 
-        polygon.push_back(rings[i]);
+        if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
+            polygons.emplace_back(std::move(polygon));
+        }
+
+        polygon.emplace_back(ring);
     }
 
-    if (!polygon.empty())
-        polygons.push_back(polygon);
+    if (!polygon.empty()) {
+        polygons.emplace_back(std::move(polygon));
+    }
 
     return polygons;
 }
