@@ -4,9 +4,10 @@
 #include <os/log.h>
 #include <os/signpost.h>
 
-#define CONCAT2(x,y) x##y
-#define CONCAT(x,y) CONCAT2(x,y)
-#define SIGNPOST_NAME(x) CONCAT(signpost,x)
+#define SIGNPOST_CONCAT2(x,y)   x##y
+#define SIGNPOST_CONCAT(x,y)    SIGNPOST_CONCAT2(x,y)
+#define SIGNPOST_NAME(x)        SIGNPOST_CONCAT(signpost,x)
+
 #define MGL_EXPORT __attribute__((visibility ("default")))
 
 MGL_EXPORT extern os_log_t MGLDefaultSignpostLog;
@@ -67,9 +68,5 @@ MGL_EXPORT extern os_log_t MGLSignpostLogCreate(const char* name);
 #define MGL_SIGNPOST_BEGIN(name, ...)             MGL_NAMED_SIGNPOST_BEGIN(MGLDefaultSignpostLog, name, ##__VA_ARGS__)
 #define MGL_SIGNPOST_END(signpost, name, ...)     MGL_NAMED_SIGNPOST_END(MGLDefaultSignpostLog, signpost, name, ##__VA_ARGS__)
 #define MGL_SIGNPOST_EVENT(signpost, name, ...)   MGL_NAMED_SIGNPOST_EVENT(MGLDefaultSignpostLog, signpost, name, ##__VA_ARGS__)
-
-#undef CONCAT
-#undef CONCAT2
-#undef SIGNPOST_NAME
 
 #endif /* MGLSignpost_h */
