@@ -271,19 +271,12 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
     auto renderItemsEmplaceHint = layerRenderItems.begin();
 
-    // Reserve size for filteredLayersForSource if there are sources.
-    if (!sourceImpls->empty()) {
-        filteredLayersForSource.reserve(layerImpls->size());
-        if (filteredLayersForSource.capacity() > layerImpls->size()) {
-            filteredLayersForSource.shrink_to_fit();
-        }
-    }
-
     // Update all sources and initialize renderItems.
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
         bool sourceNeedsRendering = false;
-        bool sourceNeedsRelayout = false;       
+        bool sourceNeedsRelayout = false;
+        std::vector<Immutable<style::LayerProperties>> filteredLayersForSource;
         
         uint32_t index = 0u;
         const auto begin = layerImpls->begin();
@@ -292,15 +285,18 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             const Immutable<Layer::Impl>& layerImpl = *it;
             RenderLayer* layer = getRenderLayer(layerImpl->id);
             const auto* layerInfo = layerImpl->getTypeInfo();
-            const bool layerIsVisible = layer->baseImpl->visibility != style::VisibilityType::None;
-            const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
+            
             renderTreeParameters->has3D |= (layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
                 if (layerImpl->source == sourceImpl->id) {
                     sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || constantsMaskChanged.count(layerImpl->id) || hasLayoutDifference(layerDiff, layerImpl->id));
+                    
+                    const bool layerIsVisible = layer->baseImpl->visibility != style::VisibilityType::None;
                     if (layerIsVisible) {
                         filteredLayersForSource.push_back(layer->evaluatedProperties);
+                        
+                        const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
                         if (zoomFitsLayer) {
                             sourceNeedsRendering = true;
                             renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
@@ -311,7 +307,8 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             } 
 
             // Handle layers without source.
-            if (layerIsVisible && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
+            if (sourceImpl.get() != sourceImpls->at(0).get() || layer->baseImpl->visibility == style::VisibilityType::None) continue;
+            if (layer->supportsZoom(zoomHistory.lastZoom)) {
                 if (backgroundLayerAsColor && layerImpl.get() == layerImpls->at(0).get()) {
                     const auto& solidBackground = layer->getSolidBackground();
                     if (solidBackground) {
@@ -322,12 +319,12 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                 renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, nullptr, index);
             }
         }
+        
         source->update(sourceImpl,
                        filteredLayersForSource,
                        sourceNeedsRendering,
                        sourceNeedsRelayout,
                        tileParameters);
-        filteredLayersForSource.clear();
     }
 
     renderTreeParameters->loaded = updateParameters.styleLoaded && isLoaded();

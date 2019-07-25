@@ -117,10 +117,6 @@ private:
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
-
-    // Vector with reserved capacity of layerImpls->size() to avoid reallocation
-    // on each frame.
-    std::vector<Immutable<style::LayerProperties>> filteredLayersForSource;
 };
 
 } // namespace mbgl
