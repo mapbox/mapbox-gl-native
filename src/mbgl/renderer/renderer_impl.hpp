@@ -20,7 +20,7 @@ public:
     Impl(gfx::RendererBackend&,
          float pixelRatio_,
          optional<std::string> programCacheDir,
-         optional<std::string> localFontFamily_);
+         optional<std::vector<std::string>> localFontFamily_);
     ~Impl();
 
 private:

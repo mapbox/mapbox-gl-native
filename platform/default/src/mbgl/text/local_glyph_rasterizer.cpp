@@ -5,11 +5,11 @@ namespace mbgl {
 class LocalGlyphRasterizer::Impl {
 };
 
-LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string>)
-{}
+LocalGlyphRasterizer::LocalGlyphRasterizer(optional<std::vector<std::string>>) {
+}
 
-LocalGlyphRasterizer::~LocalGlyphRasterizer()
-{}
+LocalGlyphRasterizer::~LocalGlyphRasterizer() {
+}
 
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID) {
     return false;

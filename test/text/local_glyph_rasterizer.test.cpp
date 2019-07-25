@@ -32,8 +32,8 @@ namespace {
 
 class LocalGlyphRasterizerTest {
 public:
-    LocalGlyphRasterizerTest(const optional<std::string> fontFamily)
-        : frontend(1, optional<std::string>(), gfx::ContextMode::Unique, fontFamily)
+    LocalGlyphRasterizerTest(optional<std::vector<std::string>> fontFamily)
+        : frontend(1, optional<std::string>(), gfx::ContextMode::Unique, std::move(fontFamily))
     {
     }
 
@@ -55,7 +55,7 @@ public:
 #if defined(__APPLE__)
 
 TEST(LocalGlyphRasterizer, PingFang) {
-    LocalGlyphRasterizerTest test(std::string("PingFang"));
+    LocalGlyphRasterizerTest test({ std::string("PingFang") });
 
     test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);

@@ -26,13 +26,13 @@ class Style;
 
 class MapSnapshotter {
 public:
-    MapSnapshotter(const std::pair<bool, std::string> style,
+    MapSnapshotter(std::pair<bool, std::string> style,
                    const Size&,
-                   const float pixelRatio,
-                   const optional<CameraOptions> cameraOptions,
-                   const optional<LatLngBounds> region,
-                   const optional<std::string> cacheDir,
-                   const optional<std::string> localFontFamily,
+                   float pixelRatio,
+                   optional<CameraOptions> cameraOptions,
+                   optional<LatLngBounds> region,
+                   optional<std::string> cacheDir,
+                   optional<std::vector<std::string>> localFontFamily,
                    const ResourceOptions&);
 
     ~MapSnapshotter();

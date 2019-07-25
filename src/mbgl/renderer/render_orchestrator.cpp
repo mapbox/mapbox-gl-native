@@ -91,7 +91,7 @@ public:
 
 RenderOrchestrator::RenderOrchestrator(
                      bool backgroundLayerAsColor_,
-                     optional<std::string> localFontFamily_)
+                     optional<std::vector<std::string>> localFontFamily_)
     : observer(&nullObserver())
     , glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_))))
     , imageManager(std::make_unique<ImageManager>())

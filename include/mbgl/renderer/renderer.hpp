@@ -24,8 +24,8 @@ class RendererBackend;
 class Renderer {
 public:
     Renderer(gfx::RendererBackend&, float pixelRatio_,
-             const optional<std::string> programCacheDir = {},
-             const optional<std::string> localFontFamily = {});
+             optional<std::string> programCacheDir = {},
+             optional<std::vector<std::string>> localFontFamily = {});
     ~Renderer();
 
     void markContextLost();

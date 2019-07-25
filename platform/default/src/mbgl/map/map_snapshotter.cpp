@@ -14,13 +14,13 @@ namespace mbgl {
 
 class MapSnapshotter::Impl {
 public:
-    Impl(const std::pair<bool, std::string> style,
+    Impl(std::pair<bool, std::string> style,
          const Size&,
-         const float pixelRatio,
-         const optional<CameraOptions> cameraOptions,
-         const optional<LatLngBounds> region,
-         const optional<std::string> programCacheDir,
-         const optional<std::string> localFontFamily,
+         float pixelRatio,
+         optional<CameraOptions> cameraOptions,
+         optional<LatLngBounds> region,
+         optional<std::string> programCacheDir,
+         optional<std::vector<std::string>> localFontFamily,
          const ResourceOptions& resourceOptions);
 
     void setStyleURL(std::string styleURL);
@@ -45,16 +45,16 @@ private:
     Map map;
 };
 
-MapSnapshotter::Impl::Impl(const std::pair<bool, std::string> style,
+MapSnapshotter::Impl::Impl(std::pair<bool, std::string> style,
                            const Size& size,
-                           const float pixelRatio,
-                           const optional<CameraOptions> cameraOptions,
-                           const optional<LatLngBounds> region,
-                           const optional<std::string> programCacheDir,
-                           const optional<std::string> localFontFamily,
+                           float pixelRatio,
+                           optional<CameraOptions> cameraOptions,
+                           optional<LatLngBounds> region,
+                           optional<std::string> programCacheDir,
+                           optional<std::vector<std::string>> localFontFamily,
                            const ResourceOptions& resourceOptions)
      : frontend(
-          size, pixelRatio, programCacheDir, gfx::ContextMode::Unique, localFontFamily),
+          size, pixelRatio, std::move(programCacheDir), gfx::ContextMode::Unique, std::move(localFontFamily)),
       map(frontend,
           MapObserver::nullObserver(),
           MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
@@ -163,17 +163,17 @@ LatLngBounds MapSnapshotter::Impl::getRegion() const {
     return map.latLngBoundsForCamera(getCameraOptions());
 }
 
-MapSnapshotter::MapSnapshotter(const std::pair<bool, std::string> style,
+MapSnapshotter::MapSnapshotter(std::pair<bool, std::string> style,
                                const Size& size,
-                               const float pixelRatio,
-                               const optional<CameraOptions> cameraOptions,
-                               const optional<LatLngBounds> region,
-                               const optional<std::string> programCacheDir,
-                               const optional<std::string> localFontFamily,
+                               float pixelRatio,
+                               optional<CameraOptions> cameraOptions,
+                               optional<LatLngBounds> region,
+                               optional<std::string> programCacheDir,
+                               optional<std::vector<std::string>> localFontFamily,
                                const ResourceOptions& resourceOptions)
    : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>(
-       "Map Snapshotter", style, size, pixelRatio, cameraOptions,
-       region, programCacheDir, localFontFamily, resourceOptions.clone())) {}
+       "Map Snapshotter", std::move(style), size, pixelRatio, std::move(cameraOptions),
+       std::move(region), std::move(programCacheDir), std::move(localFontFamily), resourceOptions.clone())) {}
 
 MapSnapshotter::~MapSnapshotter() = default;
 

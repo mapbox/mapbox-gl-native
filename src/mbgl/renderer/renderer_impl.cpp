@@ -27,7 +27,7 @@ static RendererObserver& nullObserver() {
 Renderer::Impl::Impl(gfx::RendererBackend& backend_,
                      float pixelRatio_,
                      optional<std::string> programCacheDir_,
-                     optional<std::string> localFontFamily_)
+                     optional<std::vector<std::string>> localFontFamily_)
     : orchestrator(!backend_.contextIsShared(), std::move(localFontFamily_))
     , backend(backend_)
     , observer(&nullObserver())

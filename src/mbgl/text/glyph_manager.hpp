@@ -28,7 +28,7 @@ class GlyphManager {
 public:
     GlyphManager(const GlyphManager&) = delete;
     GlyphManager& operator=(const GlyphManager&) = delete;
-    explicit GlyphManager(std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>(optional<std::string>()));
+    explicit GlyphManager(std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>());
     ~GlyphManager();
 
     // Workers send a `getGlyphs` message to the main thread once they have determined

@@ -43,7 +43,7 @@ class RenderOrchestrator final : public GlyphManagerObserver,
 public:
     RenderOrchestrator(
         bool backgroundLayerAsColor_,
-        optional<std::string> localFontFamily_);
+        optional<std::vector<std::string>> localFontFamily_);
     ~RenderOrchestrator() override;
 
     void markContextLost() {
