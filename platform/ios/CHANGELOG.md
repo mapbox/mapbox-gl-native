@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 5.1.2
+## 5.1.2 - July 25, 2019
 
 ### Other changes
 
@@ -30,7 +30,13 @@ This release contains a bug in telemetry collection and has been superseded by 5
 * The `-[MGLMapView setCamera:withDuration:animationTimingFunction:edgePadding:completionHandler:]` method now adds the current value of the `MGLMapView.contentInset` property to the `edgePadding` parameter. ([#14813](https://github.com/mapbox/mapbox-gl-native/pull/14813))
 * Fixed a feature querying bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 
+## 5.0.1 - July 18, 2019
+
+* Fixed a bug in telemetry collection. ([#15077](https://github.com/mapbox/mapbox-gl-native/pull/15077))
+
 ## 5.0.0 - May 22, 2019
+
+This release contains a bug in telemetry collection and has been superseded by 5.0.1 — please update immediately.
 
 This release improves how monthly active users are counted. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://www.mapbox.com/52219) and [#14421](https://github.com/mapbox/mapbox-gl-native/pull/14421).
 
@@ -45,7 +51,13 @@ There are no breaking API changes in this release.
 
 * Fixed an issue where `-[MGLMapView setVisibleCoordinates:count:edgePadding:direction:duration:animationTimingFunction:completionHandler:]` interpreted a negative `direction` as due north instead of maintaining the current direction. ([#14575](https://github.com/mapbox/mapbox-gl-native/pull/14575))
 
-## 4.11.0 - May 15, 2019
+## 4.11.1 - July 18, 2019
+
+ * Fixed a bug in telemetry collection. ([#15161](https://github.com/mapbox/mapbox-gl-native/pull/15161))
+
+ ## 4.11.0 - May 15, 2019
+
+ This release contains a bug in telemetry collection and has been superseded by 4.11.1 — please update immediately.
 
 ### Styles and rendering
 
