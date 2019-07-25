@@ -77,12 +77,14 @@ static std::array<float, 3> spinWeights(float spin) {
 void RenderRasterLayer::prepare(const LayerPrepareParameters& params) {
     renderTiles = params.source->getRenderTiles();
     imageData = params.source->getImageRenderData();
-    assert(renderTiles || imageData);
+    // It is possible image data is not available until the source loads it.
+    assert(renderTiles || imageData || !params.source->isEnabled());
 }
 
 void RenderRasterLayer::render(PaintParameters& parameters) {
-    if (parameters.pass != RenderPass::Translucent)
+    if (parameters.pass != RenderPass::Translucent || (!renderTiles && !imageData)) {
         return;
+    }
     const auto& evaluated = static_cast<const RasterLayerProperties&>(*evaluatedProperties).evaluated;
     RasterProgram::Binders paintAttributeData{ evaluated, 0 };
 
