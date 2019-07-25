@@ -1,3 +1,6 @@
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/enum.hpp>
+
 #import "MGLLoggingConfiguration_Private.h"
 
 #ifndef MGL_LOGGING_DISABLED
@@ -5,10 +8,39 @@
 #import <os/log.h>
 #endif
 
-@implementation MGLLoggingConfiguration
+namespace mbgl {
+    
+class MGLCoreLoggingObserver : public Log :: Observer {
+public:
+    //Return true not print messages at core level, and filter at platform level.
+    bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string& msg) override{
+        
+        NSString *message = [NSString stringWithFormat:@"[event]:%s [code]:%lld [message]:%@", Enum<Event>::toString(event), code, [NSString stringWithCString:msg.c_str() encoding:NSUTF8StringEncoding]];
+        switch (severity) {
+            case EventSeverity::Debug:
+                MGLLogDebug(message);
+                break;
+            case EventSeverity::Info:
+                MGLLogInfo(message);
+                break;
+            case EventSeverity::Warning:
+                MGLLogWarning(message);
+                break;
+            case EventSeverity::Error:
+                MGLLogError(message);
+                break;
+        }
+        return true;
+    }
+};
+}
 
-+ (instancetype)sharedConfiguration
+@implementation MGLLoggingConfiguration
 {
+    std::unique_ptr<mbgl::MGLCoreLoggingObserver> _coreLoggingObserver;
+}
+
++ (instancetype)sharedConfiguration {
     static dispatch_once_t once;
     static id sharedConfiguration;
     dispatch_once(&once, ^{
@@ -16,6 +48,13 @@
         ((MGLLoggingConfiguration *)sharedConfiguration).handler = nil;
     });
     return sharedConfiguration;
+}
+
+- (id)init{
+    if(self = [super init]){
+        mbgl::Log::setObserver(std::make_unique<mbgl::MGLCoreLoggingObserver>());
+    }
+    return self;
 }
 
 - (void)setHandler:(void (^)(MGLLoggingLevel, NSString *, NSUInteger, NSString *))handler {
@@ -27,8 +66,7 @@
     }
 }
 
-- (void)logCallingFunction:(const char *)callingFunction functionLine:(NSUInteger)functionLine messageType:(MGLLoggingLevel)type format:(id)messageFormat, ...
-{
+- (void)logCallingFunction:(const char *)callingFunction functionLine:(NSUInteger)functionLine messageType:(MGLLoggingLevel)type format:(id)messageFormat, ... {
     va_list formatList;
     va_start(formatList, messageFormat);
     NSString *formattedMessage = [[NSString alloc] initWithFormat:messageFormat arguments:formatList];
@@ -68,6 +106,7 @@
             os_log_t mapbox_log;
             switch (level) {
                 case MGLLoggingLevelInfo:
+                case MGLLoggingLevelWarning:
                     mapbox_log = info_log;
                     break;
 #if MGL_LOGGING_ENABLE_DEBUG
@@ -92,6 +131,7 @@
             NSString *category;
             switch (level) {
                 case MGLLoggingLevelInfo:
+                case MGLLoggingLevelWarning:
                     category = @"INFO";
                     break;
 #if MGL_LOGGING_ENABLE_DEBUG

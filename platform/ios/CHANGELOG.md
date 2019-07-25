@@ -8,6 +8,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed flickering on style change for the same tile set. ([#15127](https://github.com/mapbox/mapbox-gl-native/pull/15127))
 
+### Other changes
+
+* `MGLLoggingLevel` has been updated for better matching core log levels. Now can use `[MGLLoggingConfiguration sharedConfiguration].loggingLevel` to filter logs from core . [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
+
 ## 5.2.0 - July 24, 2019
 
 ### Networking

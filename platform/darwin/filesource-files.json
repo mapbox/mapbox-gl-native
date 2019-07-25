@@ -1,7 +1,7 @@
 {
     "//": "This file can be edited manually and is the canonical source.",
     "sources": [
-        "platform/darwin/src/MGLLoggingConfiguration.m",
+        "platform/darwin/src/MGLLoggingConfiguration.mm",
         "platform/darwin/src/MGLNetworkConfiguration.m",
         "platform/darwin/src/http_file_source.mm",
         "platform/default/src/mbgl/storage/file_source.cpp",
