@@ -2,1367 +2,303 @@ version: 2.1
 
 workflows:
   version: 2
-  default:
+  mbgl-core:
     jobs:
-      #
-      # Naming convention: {platform}-{additional description}-{build type}
-      #   - {platform} is the client platform/framework, which may differ from 
-      #     the build platform. Specify both if applicable, e.g., "qt5-macos".
-      #   - {additional description} optionally describes the compiler or other
-      #     unique aspect of the build environment.
-      #   - {build type} is typically "debug" or "release".
-      #
-      - nitpick
-      - clang-tidy:
-          filters:
-            branches:
-              ignore: master
-      - android-debug-arm-v7-buck
-      - android-arm-template:
-          name: android-debug-arm-v8
-      - android-arm-template:
-          name: android-gnustl-arm-v7
-          stl: gnustl_shared
-          firebase_device_id: "flo"
-          firebase_device_os: "21"
-          image: android-ndk-r17c:1d5db0eb34
-          abi: arm-v7
-      - android-release:
-          filters:
-            tags:
-              only: /android-v.*/
-      - node-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node-gcc8-debug:
-          filters:
-            tags:
-              only: /node-.*/
-      - node-macos-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - linux-clang-38-libcxx-debug:
-          name: linux-clang-3.8-libcxx-debug
-      - linux-clang-7-sanitize-address-undefined
-      - linux-clang-7-sanitize-thread
-      - linux-gcc49-debug:
-          name: linux-gcc4.9-debug
-      - linux-gcc5-debug-coverage
-      - linux-doxygen
-      - linux-render-tests
-      - ios-debug
-      - ios-debug-xcode11
-      - ios-release-template:
-          name: ios-release
-      - ios-release-tag:
-          filters:
-            tags:
-              only: /ios-.*/
-            branches:
-              ignore: /.*/
-      - macos-debug
-      - macos-render-tests
-      - qt5-linux-gcc5-release
-      - qt5-macos-debug
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 5 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - metrics-nightly
-      - ios-release-template:
-          name: ios-release-nightly
-      - ios-sanitize-nightly
-      - ios-sanitize-address-nightly
-      - ios-static-analyzer-nightly
-      - ios-static-analyzer-nightly-xcode11
+      - clang-checks
+      - build-template:
+          name: android-armeabi-v7a-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - clang-checks
+          build_params: '-Pmapbox.buildtype=release -Pmapbox.abis=armeabi-v7a -Pmapbox.stl=c++_static :MapboxGLAndroidSDKTestApp:assembleRelease'
+      - build-template:
+          name: android-arm64-v8a-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - android-armeabi-v7a-release
+          build_params: '-Pmapbox.buildtype=release -Pmapbox.abis=arm64-v8a -Pmapbox.stl=c++_static :MapboxGLAndroidSDK:assembleRelease'
+      - build-template:
+          name: android-x86-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - android-armeabi-v7a-release
+          build_params: '-Pmapbox.buildtype=release -Pmapbox.abis=x86 -Pmapbox.stl=c++_static :MapboxGLAndroidSDK:assembleRelease'
+      - build-template:
+          name: android-x86_64-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - android-armeabi-v7a-release
+          build_params: '-Pmapbox.buildtype=release -Pmapbox.abis=x86_64 -Pmapbox.stl=c++_static :MapboxGLAndroidSDK:assembleRelease'
+      - build-template:
+          name: linux-gcc8-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - clang-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
+      - build-template:
+          name: linux-gcc4.9-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - linux-gcc8-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-4.9 -DCMAKE_CXX_COMPILER=g++-4.9'
+          build_params: '--target mbgl-core'
+          test_params: '-N'
+      - build-template:
+          name: linux-gcc8-debug-coverage
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - linux-gcc8-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=DebugCoverage'
+      - build-template:
+          name: linux-clang8-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - clang-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+      - build-template:
+          name: linux-asan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=address'
+      - build-template:
+          name: linux-tsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=thread'
+      - build-template:
+          name: linux-memsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=memory'
+      - build-template:
+          name: linux-ubsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=undefined'
+      - build-template:
+          name: qt5-linux-gcc5-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - clang-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
+          build_params: '--target mbgl-qt'
+          test_params: '-Q -N'
+      - build-template:
+          name: qt5-macos-gcc5-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - qt5-linux-gcc5-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMBGL_WITH_QT=ON -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/lib/cmake)'
+          build_params: '--target mbgl-qt'
+          test_params: '-Q -N'
+      - build-template:
+          name: macos-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - clang-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+      - build-template:
+          name: macos-xcode11-debug
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - macos-xcode11-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
+      - build-template:
+          name: ios-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - clang-checks
+          config_params: '-G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator'
+          build_params: '--config Release'
+          test_params: '-Q -N'
 
 commands:
-  npm-install:
+  prepare:
     steps:
-    - run:
-        name: npm install
-        command: npm install --ignore-scripts
-  prepare-environment:
+      - restore_cache:
+          keys:
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-master'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-'
+      - run:
+          name: Prepare
+          command: |
+            git submodule sync
+            git submodule update --init --recursive
+            npm install --ignore-scripts
+  prepare-macos:
     steps:
-    - run:
-        name: Prepare environment
-        command: touch "$BASH_ENV" && ./scripts/environment.js | tee -a "$BASH_ENV"
-  prepare-ccache:
-    steps:
-    - run:
-        name: Prepare ccache
-        command: |
-          # CircleCI doesn't have any way to embed arbitrary environment variables or command output
-          # into cache keys, so we're using the workaround of writing the desired content to a file,
-          # and then using `{{ checksum "filename" }}` in the cache key.
-          echo "$CIRCLE_BRANCH"
-          echo "$CIRCLE_BRANCH" > .circle-branch
-          echo "$CIRCLE_SHA1"
-          echo "$CIRCLE_SHA1" > .circle-sha1
-          echo "$CIRCLE_TARGET_BRANCH"
-          echo "${CIRCLE_TARGET_BRANCH:master}" > .circle-target-branch
-          echo "$CIRCLE_MERGE_BASE"
-          echo "${CIRCLE_MERGE_BASE:master}" > .circle-merge-base
-          ccache --clear
-  reset-ccache-stats:
-    steps:
-    - run:
-        name: Clear ccache statistics
-        command: |
-          ccache --zero-stats
-          ccache --max-size=2G
-          ccache --show-stats
-  show-ccache-stats:
-    steps:
-    - run:
-        name: Show ccache statistics
-        command: ccache --show-stats
-
-
-  save-node_modules-cache:
-    steps:
-    - save_cache:
-        name: Save node_modules cache
-        key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
-        paths: [ "node_modules" ]
-  restore-node_modules-cache:
-    steps:
-    - restore_cache:
-        name: Restore node_modules cache
-        keys:
-          - 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
-          - 'node_modules/v1/{{ arch }}'
-  save-mason_packages-cache:
-    steps:
-    - save_cache:
-        name: Save mason_packages cache
-        key: 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
-        paths: [ "mason_packages/.binaries" ]
-  restore-mason_packages-cache:
-    steps:
-    - restore_cache:
-        name: Restore mason_packages cache
-        keys:
-          - 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
-          - 'mason_packages/v3/{{ arch }}'
-  save-ccache:
-    steps:
-    - save_cache:
-        name: Save ccache
-        key: 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
-        paths: [ "~/.ccache" ]
-  restore-ccache:
-    steps:
-    - restore_cache:
-        name: Restore ccache
-        keys:
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}/{{ checksum ".circle-merge-base" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}'
-  save-gradle-cache:
-    steps:
-    - save_cache:
-        name: Save gradle cache
-        key: 'gradle/v1/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
-        paths: [ "/root/.gradle" ]
-  restore-gradle-cache:
-    steps:
-    - restore_cache:
-        name: Restore gradle cache
-        keys:
-          - 'gradle/v1/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
-          - 'gradle/v1'
-
-
-  install-dependencies:
+      - run:
+          name: Prepare macOS
+          command: |
+            brew install cmake ccache glfw ninja pkgconfig qt
+  config:
     parameters:
-      node_modules:
-        type: boolean
-        default: true
-      ccache:
-        type: boolean
-        default: true
-      mason:
-        type: boolean
-        default: true
-      gradle:
-        type: boolean
-        default: false
-    steps:
-      - checkout
-      - when:
-          condition: << parameters.node_modules >>
-          steps: [ restore-node_modules-cache, npm-install ]
-      - prepare-environment
-      - when:
-          condition: << parameters.ccache >>
-          steps: [ prepare-ccache, restore-ccache, reset-ccache-stats ]
-      - when:
-          condition: << parameters.mason >>
-          steps: [ restore-mason_packages-cache ]
-      - when:
-          condition: << parameters.gradle >>
-          steps: [ restore-gradle-cache ]
-  save-dependencies:
-    parameters:
-      node_modules:
-        type: boolean
-        default: true
-      ccache:
-        type: boolean
-        default: true
-      mason:
-        type: boolean
-        default: true
-      gradle:
-        type: boolean
-        default: false
-    steps:
-      - when:
-          condition: << parameters.node_modules >>
-          steps: [ save-node_modules-cache ]
-      - when:
-          condition: << parameters.ccache >>
-          steps: [ save-ccache, show-ccache-stats ]
-      - when:
-          condition: << parameters.mason >>
-          steps: [ save-mason_packages-cache ]
-      - when:
-          condition: << parameters.gradle >>
-          steps: [ save-gradle-cache ]
-
-
-  setup-llvm-symbolizer:
-    steps:
-    - run:
-        name: Environment Setup
-        command: |
-          # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
-          ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
-          # We'll use tee to redirect stderr to a file so we can check for sanitiziation
-          # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
-          sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
-
-
-  configure-cmake:
-    steps:
-    - run:
-        name: CMake configuration step
-        command: |
-          mkdir -p build
-          cd build
-          cmake -DWITH_CXX11ABI=${WITH_CXX11ABI:0} -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
-          cd ..
-  build-node:
-    steps:
-    - run:
-        name: Build node
-        command: make node-all
-  build-mbgl-render-test:
-    steps:
-    - run:
-        name: Build mbgl-render-test
-        command: cmake --build build --config ${BUILDTYPE} --target mbgl-render-test -- -j${JOBS}
-  build-mbgl-expression-test:
-    steps:
-    - run:
-        name: Build mbgl-expression-test
-        command: cmake --build build --config ${BUILDTYPE} --target mbgl-expression-test -- -j${JOBS}
-  build-linux:
-    steps:
-    - run:
-        name: Build linux
-        command: make linux
-  build-benchmark:
-    steps:
-    - run:
-        name: Build benchmark
-        command: make benchmark
-  build-test:
-    steps:
-    - run:
-        name: Build test
-        command: make test
-  build-qt-app:
-    steps:
-    - run:
-        name: Build qt-app
-        command: make qt-app
-  build-qt-test:
-    steps:
-    - run:
-        name: Build qt-test
-        command: make qt-test
-  build-ios-test:
-    steps:
-    - run:
-        name: Build ios-test
-        command: make ios-test
-        no_output_timeout: 2m
-  build-ios-integration-test:
-    steps:
-    - run:
-        name: Build ios-integration-test
-        command: make ios-integration-test
-  build-macos-test:
-    steps:
-    - run:
-        name: Build and run macOS tests
-        command: make run-test
-        no_output_timeout: 2m
-
-
-  check-public-symbols:
-    steps:
-    - run:
-        name: Check public symbols
-        command: make darwin-check-public-symbols
-
-
-  conditionally-skip-firebase:
-    steps:
-    - run:
-        name: Check if Firebase should be skipped
-        command: |
-          SKIPPABLE_TAG=$( git log -1 | grep -ioE -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" || true )
-          if [ -n "${SKIPPABLE_TAG}" ]; then
-            echo "Skipping Firebase tests because commit message contained: '${SKIPPABLE_TAG}'"
-            echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
-          fi
-  login-google-cloud-platform:
-    steps:
-    - run:
-        name: Log in to Google Cloud Platform
-        command: |
-          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
-            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
-            rm secret.json
-          fi
-
-
-  install-ios-packaging-dependencies:
-    steps:
-    - run:
-        name: Install iOS packaging dependencies
-        command: ./platform/ios/scripts/install-packaging-dependencies.sh
-        background: true
-
-  install-macos-dependencies:
-    steps:
-    - run:
-        name: Install macOS dependencies
-        command: brew install cmake ccache
-
-  install-node-macos-dependencies:
-    steps:
-    - run:
-        name: Install Node macOS dependencies
-        command: |
-          brew install node@8
-          brew link node@8 --force --overwrite
-
-  install-qt-macos-dependencies:
-    steps:
-    - run:
-        name: Install Qt macOS dependencies
-        command: |
-          brew install qt
-          brew link qt --force
-          export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
-          export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
-          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
-          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
-
-  run-node-macos-tests:
-    steps:
-    - run:
-        name: Run node tests
-        command: make test-node
-
-  run-node-linux-tests:
-    parameters:
-      node_version:
+      config_params:
         type: string
-        default: v8
     steps:
-    - run:
-        name: Run node tests
-        command: |
-          . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v make test-node
-
-  run-macos-render-tests:
-    steps:
-    - run:
-        name: Run render tests (mbgl-render-test)
-        command: |
-          build/mbgl-render-test --recycle-map --shuffle
-        no_output_timeout: 2m
-
-  run-linux-render-tests:
+      - run:
+          name: Configure
+          command: |
+            cmake . -B build << parameters.config_params >>
+  build-android:
     parameters:
-      node_version:
+      build_params:
         type: string
-        default: v8
     steps:
-    - run:
-        name: Run render tests (mbgl-render-test)
-        command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v build/mbgl-render-test --recycle-map --shuffle
+      - run:
+          name: Build
+          command: |
+            ccache --zero-stats --max-size=2G
+            cd platform/android
+            ./gradlew --parallel --max-workers=8 << parameters.build_params >>
+            ccache --show-stats
+            git gc
+  build:
+    parameters:
+      build_params:
+        type: string
+    steps:
+      - run:
+          name: Build
+          command: |
+            ccache --zero-stats --max-size=2G
+            cmake --build build -j 8 << parameters.build_params >>
+            ccache --show-stats
+            git gc
+  save:
+    steps:
+      - save_cache:
+          key: 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
+          paths:
+            - .git/modules
+            - /Users/distiller/Library/Caches/Homebrew
+            - node_modules
+            - ~/.ccache
+            - ~/.gradle
+  test:
+    parameters:
+      test_wrapper:
+        type: string
+      test_params:
+        type: string
+    steps:
+      - run:
+          name: Test
+          command: |
+            cd build
+            << parameters.test_wrapper >> ctest -j 8 --output-on-failure << parameters.test_params >>
 
-  run-unit-tests:
-    steps:
-    - run:
-        name: Run tests
-        command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            make run-test
-
-  run-unit-tests-sanitized:
-    steps:
-    - run:
-        name: Run tests
-        command: |
-          # Source.RenderTileSetSourceUpdate is filtered out due to #15294
-          xvfb-run --server-args="-screen 0 1024x768x24" make run-test--Source.RenderTileSetSourceUpdate 2> >(tee sanitizer 1>&2)
-          # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-          [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
-
-  run-expression-tests:
-    steps:
-    - run:
-        name: Run expression tests
-        command: |
-          build/mbgl-expression-test -s --seed=$RANDOM
-
-  upload-expression-tests:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/expression-tests/index.html
-        destination: expression-tests
-
-  publish-node-package:
-    steps:
-    - run:
-        name: Publish node package
-        when: on_success
-        command: platform/node/scripts/publish.sh
-
-  upload-render-tests:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/render-tests/index.html
-        destination: render-tests
-
-  collect-xcode-build-logs:
-    steps:
-    - run:
-        name: Collect Xcode build logs
-        when: always
-        command: |
-          export XCODE_LOG_DIR=build/logs
-          mkdir -p $XCODE_LOG_DIR
-          cp build/*.log $XCODE_LOG_DIR
-  upload-xcode-build-logs:
-    steps:
-    - store_artifacts:
-        path: build/logs
-
-
-  notify-slack-nightly-failure:
-    steps:
-    - run:
-        name: Send a Slack notification on nightly failure
-        when: on_fail
-        command: |
-          if [[ $CIRCLE_BRANCH == master ]]; then
-            export SLACK_MESSAGE="Nightly build of \`$CIRCLE_JOB\` <$CIRCLE_BUILD_URL|failed>."
-            export SLACK_COLOR="danger"
-            scripts/notify-slack.sh
-          fi
-
-  #
-  # Add this step to all regular jobs to enable skipping of certain non-code-related changes.
-  #
-  # Do not include this step in nightly or release deployment jobs.
-  #
-  # To make a job potentially skippable on changes unrelated to its platform, it must:
-  #   - Target one of the skippable platforms: Android, iOS, or macOS.
-  #   - Have a job name that begins with a supported platform name.
-  #   - Not be related to core functionality or rendering tests. Job names that
-  #     contain "render-tests" cannot be skipped by platform changes.
-  #
-  # See the script in the following step for how to implement support for other platforms.
-  #
-  check-if-this-job-can-be-skipped:
-    steps:
-    - run:
-        name: Check if this job can be skipped
-        command: |
-          if [[ $CIRCLE_BRANCH != master ]] && [[ $CIRCLE_BRANCH != release-* ]] && [[ -z $CIRCLE_TAG ]]; then
-            scripts/check-ci-job-skippability.js
-          fi
+executors:
+  ubuntu-disco:
+    docker:
+      # FIXME: Move the image to mbgl/
+      - image: tmpsantos/mbgl_ci:1.3
+    resource_class: xlarge
+    working_directory: /src
+    environment:
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      MSAN_OPTIONS: poison_in_dtor=1
+      ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
+  macos-11_0_0:
+    macos:
+      xcode: '11.0.0'
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
 
 jobs:
-  nitpick:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Debug
+  clang-checks:
+    executor: ubuntu-disco
     steps:
-      - install-dependencies: { mason: false, ccache: false }
+      - checkout
+      - prepare
+      - config:
+          config_params: '-DMBGL_WITH_CORE_ONLY=ON'
       - run:
-          name: Initialize submodules
+          name: Clang Format
           command: |
-            git submodule update --init
-            git submodule foreach git submodule update --init
+            git diff -U0 --no-color origin/master... *.cpp *.hpp > patch.diff
+            clang-format-diff-8 -p1 -i < patch.diff
+            git diff --exit-code
       - run:
-          name: Verify submodule pin
-          command: scripts/nitpick/submodule-pin.js
-          when: always
-      - run:
-          name: Source file list generation
-          command: scripts/nitpick/generated-code.js sources
-          when: always
-      - run:
-          name: Shader code generation
-          command: scripts/nitpick/generated-code.js shader
-          when: always
-      - run:
-          name: Style code generation
-          command: scripts/nitpick/generated-code.js style
-          when: always
-      - run:
-          name: Android code generation
-          command: scripts/nitpick/generated-code.js android
-          when: always
-
-# ------------------------------------------------------------------------------
-  clang-tidy:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-    steps:
-      - install-dependencies: { ccache: false }
-      - run:
-          name: Fetch 'origin/master' branch
-          command: git fetch origin master:refs/remotes/origin/master
-      - run:
-          name: Generate compilation database
-          command: make compdb
-      - run:
-          name: Run Clang checks
-          command: make check TARGET_BRANCH=${CIRCLE_TARGET_BRANCH:master}
-          no_output_timeout: 20m
-      - save-dependencies: { ccache: false }
-
-# ------------------------------------------------------------------------------
-  android-arm-template:
+          name: Clang Tidy
+          command: |
+            git diff -U0 --no-color origin/master... src include > patch.diff
+            clang-tidy-diff-8.py -clang-tidy-binary clang-tidy-8 -p1 -path build < patch.diff
+      - save
+  build-template:
     parameters:
-      stl:
+      config_params:
         type: string
-        default: "c++_static"
-      image:
+        default: ''
+      build_params:
         type: string
-        default: android-ndk-r20:7b7c4b42cf
-      firebase_device_id:
+        default: ''
+      test_params:
         type: string
-        default: sailfish
-      firebase_device_os:
+        default: ''
+      executor_name:
         type: string
-        default: "26"
-      abi:
-        type: string
-        default: "arm-v8"
-    docker:
-      - image: mbgl/<< parameters.image >>
-    resource_class: xlarge
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 8
-      JOBS: 8
-      BUILDTYPE: Debug
-      IS_LOCAL_DEVELOPMENT: false
-      MBGL_ANDROID_STL: << parameters.stl >>
-    steps:
-      - install-dependencies: { gradle: true }
-      - check-if-this-job-can-be-skipped
-      - run:
-          name: Initialize vendor submodules
-          command: git submodule update --init platform/android/vendor
-      - run:
-          name: Check code style
-          command: make android-check
-      - run:
-          name: Run Android unit tests
-          command: make run-android-unit-test
-      - run:
-          name: Build libmapbox-gl.so for << parameters.abi >>
-          command: make android-lib-<< parameters.abi >>
-      - run:
-          name: Generate Espresso sanity tests
-          command: make test-code-android
-      - run:
-          name: Build Test APK
-          command: |
-            if [ -n "${MAPBOX_DEVELOPER_CONFIG_XML}" ]; then
-              echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
-              make android-ui-test-<< parameters.abi >>
-            fi
-      - save-dependencies: { gradle: true }
-      - conditionally-skip-firebase
-      - login-google-cloud-platform
-      - run:
-          name: Run instrumentation tests on Firebase
-          no_output_timeout: 20m
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              gcloud firebase test android models list
-              gcloud firebase test android run --type instrumentation \
-                --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
-                --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-                --device-ids  << parameters.firebase_device_id >> --os-version-ids << parameters.firebase_device_os >> --locales en --orientations portrait --timeout 20m \
-                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" --directories-to-pull /sdcard --results-dir mapbox-android-sdk-${CIRCLE_BUILD_NUM}
-              coverageFile=`gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/mapbox-android-sdk-${CIRCLE_BUILD_NUM}/**/*.ec | tail -1`
-              gsutil cp $coverageFile $PWD/platform/android/MapboxGLAndroidSDK/build/jacoco | true
-            fi
-      - run:
-          name: Parse and send Jacoco reports
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              make android-create-jacoco-report && make android-parse-and-send-jacoco-report
-            fi
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
-          destination: .
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.html
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/lint-baseline.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.html
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj
-
-# ------------------------------------------------------------------------------
-  android-release:
-    docker:
-      - image: mbgl/android-ndk-r20:7b7c4b42cf
-    resource_class: xlarge
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 8
-      JOBS: 8
-      BUILDTYPE: Release
-      IS_LOCAL_DEVELOPMENT: false
-    steps:
-      - install-dependencies: { gradle: true }
-      - check-if-this-job-can-be-skipped
-      - run:
-          name: Initialize vendor submodules
-          command: git submodule update --init platform/android/vendor
-      - run:
-          name: Android nitpick
-          command: make run-android-nitpick
-      - run:
-          name: Trigger core benchmark run
-          command: |
-            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-              if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
-              fi
-            fi
-      - run:
-          name: Trigger android benchmark run
-          command: |
-            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-              if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
-              fi
-            fi
-      - run:
-          name: Generate Maven credentials
-          command: |
-            if [ -n "${BINTRAY_USER}" ]; then
-              echo "BINTRAY_USER=$BINTRAY_USER
-              BINTRAY_API_KEY=$BINTRAY_API_KEY
-              GPG_PASSPHRASE=$GPG_PASSPHRASE"
-            fi
-      - run:
-          name: Update version name
-          command: |
-            if [[ $CIRCLE_TAG == android-v* ]]; then
-              sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:9}/" platform/android/MapboxGLAndroidSDK/gradle.properties
-            fi
-      - run:
-          name: Build package
-          command: make apackage
-      - run:
-          name: Build release Test App
-          command: make android
-      - run:
-          name: Generate javadoc
-          command: make android-javadoc
-      - save-dependencies: { gradle: true }
-      - run:
-          name: gzip debugable .so files
-          command: |
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/arm64-v8a/libmapbox-gl.so && \
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/armeabi-v7a/libmapbox-gl.so && \
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so && \
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
-          destination: .
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/arm64-v8a/libmapbox-gl.so.gz
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/armeabi-v7a/libmapbox-gl.so.gz
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so.gz
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so.gz
-      - deploy:
-          name: Publish to Bintray
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
-              version=$(cat platform/android/MapboxGLAndroidSDK/gradle.properties | grep "VERSION_NAME")
-              if [[ $version != *"SNAPSHOT"* ]]; then
-                make run-android-upload-to-bintray
-              else
-                make run-android-upload-to-artifactory
-              fi
-            fi
-      - run:
-          name: Record size
-          command: platform/android/scripts/metrics.sh
-# ------------------------------------------------------------------------------
-  android-debug-arm-v7-buck:
-    docker:
-      - image: mbgl/android-ndk-r17c-buck:07c5ef2e71
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Debug
-      ANDROID_NDK: /android/sdk/ndk-bundle
+      target_is_android:
+        type: boolean
+        default: false
+      target_is_linux:
+        type: boolean
+        default: false
+      target_is_macos:
+        type: boolean
+        default: false
+    executor: << parameters.executor_name >>
     steps:
       - checkout
-      - npm-install
-      - prepare-environment
-      - check-if-this-job-can-be-skipped
-      - run:
-          name: Checkout submodules
-          command: |
-            git submodule update --init
-            git submodule foreach git submodule update --init
-      - run:
-          name: Build Android library
-          command: |
-            cd misc/buck
-            buck build mapbox-gl-native:android-core
-
-# ------------------------------------------------------------------------------
-  node-clang39-release:
-    docker:
-      - image: mbgl/linux-clang-3.9:2077f965ed
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: RelWithDebInfo
-      WITH_EGL: 1
-      WITH_CXX11ABI: 0
-    steps:
-      - install-dependencies
-      - build-node
-      - save-dependencies
-      - run-node-linux-tests
-      - publish-node-package
-
-# ------------------------------------------------------------------------------
-  node-gcc8-debug:
-    docker:
-      - image: mbgl/linux-gcc-8:d2b1553d2f
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-node
-      - save-dependencies
-      - publish-node-package
-
-# ------------------------------------------------------------------------------
-  node-macos-release:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-node-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-node
-      - save-dependencies
-      - run-node-macos-tests
-      - publish-node-package
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  linux-clang-38-libcxx-debug:
-    docker:
-      - image: mbgl/linux-clang-3.8-libcxx:d6800bdbb4
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      WITH_CXX11ABI: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-linux
-      - save-dependencies
-
-# ------------------------------------------------------------------------------
-  linux-clang-7-sanitize-address-undefined:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Sanitize
-      WITH_EGL: 1
-      GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=address -fsanitize=undefined
-      LDFLAGS: -fsanitize=address -fsanitize=undefined
-      ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
-      UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - setup-llvm-symbolizer
-      - build-test
-      - save-dependencies
-      - run-unit-tests-sanitized
-
-# ------------------------------------------------------------------------------
-  linux-clang-7-sanitize-thread:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Sanitize
-      WITH_EGL: 1
-      GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=thread
-      LDFLAGS: -fsanitize=thread
-      TSAN_OPTIONS: color=always:print_summary=1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - setup-llvm-symbolizer
-      - build-test
-      - save-dependencies
-      - run-unit-tests-sanitized
-
-# ------------------------------------------------------------------------------
-  linux-gcc49-debug:
-    docker:
-      - image: mbgl/linux-gcc-4.9:e3818a77c1
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      WITH_CXX11ABI: 0
-      DISPLAY: :0
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-linux
-      - build-benchmark
-      - build-test
-      - save-dependencies
-      - run-unit-tests
-      - run:
-          name: Build offline CLI
-          command: make offline
-
-# ------------------------------------------------------------------------------
-  linux-gcc5-debug-coverage:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      WITH_COVERAGE: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-linux
-      - build-benchmark
-      - build-test
-      - save-dependencies
-      - run-unit-tests
-      - run:
-          name: Upload coverage results to codecov.io
-          command: |
-            bash <(curl -sSfL https://codecov.io/bash) || echo 'Codecov failed to upload'
-      - run:
-          name: Upload coverage metrics to s3
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-                scripts/publish_core_codecoverage.js -p Linux -s Core
-            fi
-
-# ------------------------------------------------------------------------------
-  linux-doxygen:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      WITH_COVERAGE: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - run:
-          name: Install doxygen
-          command: apt update && apt install -y doxygen
-      - build-linux
-      - save-dependencies
-      - run:
-          name: Check documentation coverage
-          command: |
-              platform/linux/ninja -C "build/linux-$(uname -m)/Debug" doxygen_coverage
-              scripts/publish_doxygen_coverage.js "build/linux-$(uname -m)/Debug/doxygen-coverage.json"
-
-# ------------------------------------------------------------------------------
-  linux-render-tests:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: RelWithDebInfo
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - configure-cmake
-      - build-mbgl-expression-test
-      - build-mbgl-render-test
-      - run-expression-tests
-      - run-linux-render-tests
-      - save-dependencies
-      - upload-expression-tests
-      - upload-render-tests
-
-# ------------------------------------------------------------------------------
-  ios-debug:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-public-symbols
-      - run:
-          name: Lint podspecs and plist files
-          command: make ios-lint
-      - check-if-this-job-can-be-skipped
-      - build-ios-test
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  ios-debug-xcode11:
-    macos:
-      xcode: "11.0.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-public-symbols
-      - run:
-          name: Lint podspecs and plist files
-          command: make ios-lint
-      - check-if-this-job-can-be-skipped
-      - build-ios-test
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  ios-sanitize-nightly:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with thread and undefined behavior sanitizers
-          command: make ios-sanitize
-      - run:
-          name: Get iOS code coverage
-          command: |
-              platform/ios/scripts/ios-code-coverage.sh CI
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-sanitize-address-nightly:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with address sanitizer
-          command: make ios-sanitize-address
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-static-analyzer-nightly:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with the static analyzer
-          command: make ios-static-analyzer
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-static-analyzer-nightly-xcode11:
-    macos:
-      xcode: "11.0.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - run:
-          name: Build and run SDK unit tests with the static analyzer
-          command: make ios-static-analyzer
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-release-template:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Release
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - install-ios-packaging-dependencies
-      - run:
-          name: Build dynamic framework for device and simulator
-          command: make iframework
-          no_output_timeout: 5m
-      - deploy:
-          name: Upload snapshot build to s3
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              platform/ios/scripts/deploy-snapshot.sh
-            fi
-      - deploy:
-          name: Deploy to Mapbox CocoaPods spec repo
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              platform/ios/scripts/deploy-to-cocoapods.sh
-            fi
-      - run:
-          name: Record size
-          command: platform/ios/scripts/metrics.sh
-      - run:
-          name: Trigger metrics
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=ios-maps-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
-              else
-                echo "MOBILE_METRICS_TOKEN not provided"
-              fi
-            fi
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - notify-slack-nightly-failure
-
-# ------------------------------------------------------------------------------
-  ios-release-tag:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: Release
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      SLACK_CHANNEL: C0ACM9Q2C
-    steps:
-      - checkout
-      - run:
-          name: Send a Slack notification on start
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` started.>"
-            scripts/notify-slack.sh
-      - install-macos-dependencies
-      - install-dependencies
-      - install-ios-packaging-dependencies
-      - run:
-          name: Trigger external deploy steps
-          command: |
-            export VERSION_TAG=${CIRCLE_TAG}
-            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
-            platform/ios/scripts/trigger-external-deploy-steps.sh
-      - run:
-          name: Build, package, and upload iOS release
-          command: |
-            export VERSION_TAG=${CIRCLE_TAG}
-            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
-            platform/ios/scripts/deploy-packages.sh
-      - deploy:
-          name: Deploy to CocoaPods
-          command: platform/ios/scripts/deploy-to-cocoapods.sh
-      - save-dependencies
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-      - run:
-          name: Send a Slack notification on failure
-          when: on_fail
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` failed.>"
-            export SLACK_COLOR="danger"
-            scripts/notify-slack.sh
-      - run:
-          name: Send a Slack notification on success
-          when: on_success
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` succeeded.>"
-            export SLACK_COLOR="good"
-            scripts/notify-slack.sh
-
-# ------------------------------------------------------------------------------
-  macos-debug:
-    macos:
-      xcode: "10.1.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-macos-test
-      - check-public-symbols
-      - run:
-          name: Lint plist files
-          command: make macos-lint
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
-      - save-dependencies
-      - store_artifacts:
-          path: test/fixtures
-          destination: test/fixtures
-      - collect-xcode-build-logs
-      - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  macos-render-tests:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      JOBS: 2
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - configure-cmake
-      - build-mbgl-expression-test
-      - build-mbgl-render-test
-      - save-dependencies
-      - run-expression-tests
-      - run-macos-render-tests
-      - upload-expression-tests
-      - upload-render-tests
-
-# ------------------------------------------------------------------------------
-  metrics-nightly:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-    steps:
-      - install-dependencies
-      - run:
-          name: Collect GitHub statistics
-          command: |
-              scripts/publish_github_stats.js
-
-# ------------------------------------------------------------------------------
-  qt5-linux-gcc5-release:
-    docker:
-      - image: mbgl/linux-gcc-5-qt-5.9:5cd92d7d1c
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      WITH_QT_I18N: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-qt-app
-      - build-qt-test
-      - run:
-          name: Build qt-docs
-          command: make qt-docs
-      - save-dependencies
-      - run:
-          name: Run valgrind-backed tests
-          environment:
-            JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector --gtest_filter=-BiDi.*
-
-# ------------------------------------------------------------------------------
-  qt5-macos-debug:
-    macos:
-      xcode: "9.3.1"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-qt-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-qt-app
-      - build-qt-test
-      - run:
-          name: Run qt-test
-          command: make run-qt-test
-      - save-dependencies
-      - store_artifacts:
-          path: test/fixtures
-          destination: test/fixtures
+      - prepare
+      - when:
+          condition: << parameters.target_is_android >>
+          steps:
+            - build-android:
+                build_params: << parameters.build_params >>
+      - when:
+          condition: << parameters.target_is_linux >>
+          steps:
+            - config:
+                config_params: << parameters.config_params >>
+            - build:
+                build_params: << parameters.build_params >>
+            - test:
+                test_wrapper: 'xvfb-run -s -noreset'
+                test_params: << parameters.test_params >>
+      - when:
+          condition: << parameters.target_is_macos >>
+          steps:
+            - prepare-macos
+            - config:
+                config_params: << parameters.config_params >>
+            - build:
+                build_params: << parameters.build_params >>
+            - test:
+                test_wrapper: ''
+                test_params: << parameters.test_params >>
+      - save

@@ -16,12 +16,14 @@ target_link_libraries(mbgl-render PRIVATE
     mbgl-core
 )
 
-add_test(NAME mbgl-offline-tool-test
-    COMMAND mbgl-offline -s mapbox://styles/mapbox/satellite-v9 --maxZoom=0
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-
-add_test(NAME mbgl-render-tool-test
-    COMMAND mbgl-render
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
+# FIXME: CI must have a valid token
+#
+#add_test(NAME mbgl-offline-tool-test
+#    COMMAND mbgl-offline -s mapbox://styles/mapbox/satellite-v9 --maxZoom=0
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#)
+#
+#add_test(NAME mbgl-render-tool-test
+#    COMMAND mbgl-render
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#)
