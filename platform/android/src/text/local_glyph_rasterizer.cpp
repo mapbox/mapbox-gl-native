@@ -64,8 +64,8 @@ void LocalGlyphRasterizer::registerNative(jni::JNIEnv& env) {
 
 class LocalGlyphRasterizer::Impl {
 public:
-    Impl(const optional<std::string> fontFamily_)
-        : fontFamily(fontFamily_)
+    Impl(optional<std::vector<std::string>> fontFamily_)
+        : fontFamily(std::move(fontFamily_))
     {}
 
     bool isConfigured() const {
@@ -81,16 +81,16 @@ public:
                 break;
             }
         }
-        return androidLocalGlyphRasterizer.drawGlyphBitmap(*fontFamily, bold, glyphID);
+        return androidLocalGlyphRasterizer.drawGlyphBitmap((*fontFamily)[0], bold, glyphID);
     }
 
 private:
-    optional<std::string> fontFamily;
+    optional<std::vector<std::string>> fontFamily;
     android::LocalGlyphRasterizer androidLocalGlyphRasterizer;
 };
 
-LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
-    : impl(std::make_unique<Impl>(fontFamily))
+LocalGlyphRasterizer::LocalGlyphRasterizer(optional<std::vector<std::string>> fontFamily)
+    : impl(std::make_unique<Impl>(std::move(fontFamily)))
 {}
 
 LocalGlyphRasterizer::~LocalGlyphRasterizer()

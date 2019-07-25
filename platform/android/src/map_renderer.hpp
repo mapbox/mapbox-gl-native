@@ -105,7 +105,7 @@ private:
 
     float pixelRatio;
     std::string programCacheDir;
-    optional<std::string> localIdeographFontFamily;
+    optional<std::vector<std::string>> localIdeographFontFamily;
 
     std::shared_ptr<ThreadPool> threadPool;
     std::shared_ptr<Mailbox> mailbox;

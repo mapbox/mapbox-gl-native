@@ -55,6 +55,13 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     }
 
     showLogo = _showLogo;
+    optional<std::vector<std::string>> fontFamily;
+
+    if (_localIdeographFontFamily) {
+        fontFamily = std::vector<std::string>();
+        fontFamily->emplace_back(jni::Make<std::string>(_env, _localIdeographFontFamily));
+    }
+
     // Create the core snapshotter
     snapshotter = std::make_unique<mbgl::MapSnapshotter>(style,
                                                          size,
@@ -62,9 +69,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                                          cameraOptions,
                                                          bounds,
                                                          jni::Make<std::string>(_env, _programCacheDir),
-                                                         _localIdeographFontFamily ?
-                                                            jni::Make<std::string>(_env, _localIdeographFontFamily) :
-                                                            optional<std::string>{},
+                                                         std::move(fontFamily),
                                                          mbgl::android::FileSource::getSharedResourceOptions(_env, _jFileSource));
 }
 

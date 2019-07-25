@@ -21,8 +21,12 @@ MapRenderer::MapRenderer(jni::JNIEnv& _env,
         : javaPeer(_env, obj)
         , pixelRatio(pixelRatio_)
         , programCacheDir(jni::Make<std::string>(_env, programCacheDir_))
-        , localIdeographFontFamily(localIdeographFontFamily_ ? jni::Make<std::string>(_env, localIdeographFontFamily_) : optional<std::string>{})
         , mailbox(std::make_shared<Mailbox>(*this)) {
+
+    if (localIdeographFontFamily_) {
+        localIdeographFontFamily = std::vector<std::string>();
+        localIdeographFontFamily->emplace_back(jni::Make<std::string>(_env, localIdeographFontFamily_));
+    }
 }
 
 MapRenderer::~MapRenderer() = default;
