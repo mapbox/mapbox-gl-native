@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.ZOOM_RATE;
-import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
 /**
@@ -714,7 +713,7 @@ final class MapGestureDetector {
         @Override
         public void onAnimationStart(Animator animation) {
           transform.cancelTransitions();
-          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
+          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
         }
 
         @Override
@@ -823,7 +822,7 @@ final class MapGestureDetector {
       @Override
       public void onAnimationStart(Animator animation) {
         transform.cancelTransitions();
-        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
+        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
       }
 
       @Override
