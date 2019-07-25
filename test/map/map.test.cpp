@@ -20,8 +20,10 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/util/color.hpp>
 
 using namespace mbgl;
@@ -866,4 +868,13 @@ TEST(Map, Issue12432) {
     };
 
     test.runLoop.run();
+}
+
+// https://github.com/mapbox/mapbox-gl-native/issues/15216
+TEST(Map, Issue15216) {
+    MapTest<> test { 1.0f,  MapMode::Continuous };
+    test.map.getStyle().addSource(std::make_unique<ImageSource>("ImageSource", std::array<LatLng, 4>()));
+    test.map.getStyle().addLayer(std::make_unique<RasterLayer>("RasterLayer", "ImageSource"));
+    // Passes, if there is no assertion hit.
+    test.runLoop.runOnce();
 }
