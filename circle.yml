@@ -2,7 +2,133 @@ version: 2.1
 
 workflows:
   version: 2
-  default:
+  mbgl-next:
+    jobs:
+      - next-sanity-checks
+      - next-build-template:
+          name: next-android-armeabi-v7a-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
+      - next-build-template:
+          name: next-android-arm64-v8a-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-android-armeabi-v7a-release
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
+      - next-build-template:
+          name: next-android-x86-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-android-armeabi-v7a-release
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
+      - next-build-template:
+          name: next-android-x86_64-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-android-armeabi-v7a-release
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
+      - next-build-template:
+          name: next-linux-gcc8-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
+      - next-build-template:
+          name: next-linux-gcc4.9-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-4.9 -DCMAKE_CXX_COMPILER=g++-4.9'
+          build_params: '--target mbgl-glfw'
+          test_params: '-N -Q'
+      - next-build-template:
+          name: next-linux-gcc8-debug-coverage
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=DebugCoverage'
+      - next-build-template:
+          name: next-linux-clang8-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+      - next-build-template:
+          name: next-linux-asan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=address'
+      - next-build-template:
+          name: next-linux-tsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=thread'
+      - next-build-template:
+          name: next-linux-memsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=memory'
+      - next-build-template:
+          name: next-linux-ubsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=undefined'
+      - next-build-template:
+          name: next-qt5-linux-gcc5-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
+      - next-build-template:
+          name: next-qt5-macos-gcc5-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-qt5-linux-gcc5-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMBGL_WITH_QT=ON -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/lib/cmake)'
+          test_params: '-N -Q'
+      - next-build-template:
+          name: next-macos-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+      - next-build-template:
+          name: next-macos-xcode11-debug
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-macos-xcode11-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
+      - next-build-template:
+          name: next-ios-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator'
+          test_params: '-Q -N'
+  mbgl-legacy:
     jobs:
       #
       # Naming convention: {platform}-{additional description}-{build type}
@@ -47,8 +173,6 @@ workflows:
           name: linux-clang-3.8-libcxx-debug
       - linux-clang-7-sanitize-address-undefined
       - linux-clang-7-sanitize-thread
-      - linux-gcc49-debug:
-          name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
       - linux-doxygen
       - linux-render-tests
@@ -83,7 +207,102 @@ workflows:
       - ios-static-analyzer-nightly
       - ios-static-analyzer-nightly-xcode11
 
+executors:
+  ubuntu-disco:
+    docker:
+      # FIXME: Move the image to mbgl/
+      - image: tmpsantos/mbgl_ci:1.5
+    resource_class: xlarge
+    working_directory: /src
+    environment:
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      MSAN_OPTIONS: poison_in_dtor=1
+      ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
+      QT_INSTALL_DOCS: /usr/share/qt5/doc
+      QT_VERSION: 5
+  macos-11_0_0:
+    macos:
+      xcode: '11.0.0'
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+
 commands:
+  next-prepare:
+    steps:
+      - restore_cache:
+          keys:
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-master'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-'
+      - run:
+          name: Prepare
+          command: |
+            git submodule sync
+            git submodule update --init --recursive
+            npm install --ignore-scripts
+            ulimit -c unlimited
+  next-prepare-macos:
+    steps:
+      - run:
+          name: Prepare macOS
+          command: |
+            brew install cmake ccache glfw ninja pkgconfig qt
+  next-config:
+    parameters:
+      config_params:
+        type: string
+    steps:
+      - run:
+          name: Configure
+          command: |
+            cmake next -B build << parameters.config_params >>
+  next-build:
+    parameters:
+      build_params:
+        type: string
+    steps:
+      - run:
+          name: Build
+          command: |
+            ccache --zero-stats --max-size=2G
+            cmake --build build -j 8 << parameters.build_params >>
+            ccache --show-stats
+            git gc
+  next-save:
+    steps:
+      - save_cache:
+          key: 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
+          paths:
+            - .git/modules
+            - /Users/distiller/Library/Caches/Homebrew
+            - node_modules
+            - ~/.ccache
+            - ~/.gradle
+      - run:
+          name: Collecting artifacts
+          when: on_fail
+          command: |
+            mkdir -p /tmp/tests/coredumps
+            if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
+            mkdir -p /tmp/tests/render
+            if [ -f mapbox-gl-js/test/integration/render-tests/index.html ]; then cp mapbox-gl-js/test/integration/render-tests/index.html /tmp/tests/render; fi
+      - store_artifacts:
+          path: /tmp/tests
+          destination: tests
+  next-test:
+    parameters:
+      test_wrapper:
+        type: string
+      test_params:
+        type: string
+    steps:
+      - run:
+          name: Test
+          command: |
+            cd build
+            << parameters.test_wrapper >> ctest -j 8 --output-on-failure << parameters.test_params >>
   npm-install:
     steps:
     - run:
@@ -516,6 +735,92 @@ commands:
           fi
 
 jobs:
+  next-sanity-checks:
+    executor: ubuntu-disco
+    steps:
+      - checkout
+      - next-prepare
+      - next-config:
+          config_params: '-DMBGL_WITH_CORE_ONLY=ON'
+      - run:
+          name: CMake Format
+          command: |
+            cmake-format -i $(find next -type f -name CMakeLists.txt -o -name '*.cmake')
+            git diff --exit-code
+      - run:
+          name: Clang Format
+          command: |
+            git diff -U0 --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
+            git diff --exit-code
+      - run:
+          name: Clang Tidy
+          command: |
+            git diff -U0 --no-color origin/master... src include | clang-tidy-diff-8.py -clang-tidy-binary clang-tidy-8 -p1 -path build
+      - run:
+          name: Code Generators
+          command: |
+            platform/android/scripts/generate-style-code.js
+            scripts/generate-file-lists.js
+            scripts/generate-shaders.js
+            scripts/generate-style-code.js
+            git add -A && git diff --staged --exit-code
+      - next-save
+  next-build-template:
+    parameters:
+      config_params:
+        type: string
+        default: ''
+      build_params:
+        type: string
+        default: ''
+      test_params:
+        type: string
+        default: ''
+      executor_name:
+        type: string
+      target_is_android:
+        type: boolean
+        default: false
+      target_is_linux:
+        type: boolean
+        default: false
+      target_is_macos:
+        type: boolean
+        default: false
+    executor: << parameters.executor_name >>
+    steps:
+      - checkout
+      - next-prepare
+      - when:
+          condition: << parameters.target_is_android >>
+          steps:
+            - next-config:
+                config_params: << parameters.config_params >>
+            - next-build:
+                build_params: << parameters.build_params >>
+      - when:
+          condition: << parameters.target_is_linux >>
+          steps:
+            - next-config:
+                config_params: << parameters.config_params >>
+            - next-build:
+                build_params: << parameters.build_params >>
+            - next-test:
+                test_wrapper: 'xvfb-run -s -noreset'
+                test_params: << parameters.test_params >>
+      - when:
+          condition: << parameters.target_is_macos >>
+          steps:
+            - next-prepare-macos
+            - next-config:
+                config_params: << parameters.config_params >>
+            - next-build:
+                build_params: << parameters.build_params >>
+            - next-test:
+                test_wrapper: ''
+                test_params: << parameters.test_params >>
+      - next-save
+
   nitpick:
     docker:
       - image: mbgl/linux-clang-7:a5a3c52107

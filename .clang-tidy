@@ -1,3 +1,4 @@
-Checks: 'modernize-*,misc-static-assert,llvm-namespace-comment,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-core.uninitialized.UndefReturn,-clang-analyzer-core.StackAddressEscape,-clang-analyzer-core.CallAndMessage,-clang-diagnostic-unused-command-line-argument,-clang-analyzer-core.uninitialized.*,-clang-analyzer-core.NullDereference,-clang-analyzer-core.NonNullParamChecker'
+Checks: 'bugprone-*,clang-analyzer-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,readability-*,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-special-member-functions,-google-readability-todo,-google-runtime-int,-misc-non-private-member-variables-in-classes,-readability-magic-numbers,-readability-named-parameter'
 WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
 FormatStyle: file
