@@ -13,14 +13,14 @@ class SymbolFeature : public GeometryTileFeature {
 public:
     SymbolFeature(std::unique_ptr<GeometryTileFeature> feature_) :
         feature(std::move(feature_)),
-        geometry(feature->getGeometries()) // we need a mutable copy of the geometry for mergeLines()
+        geometry(feature->getGeometries().clone()) // we need a mutable copy of the geometry for mergeLines()
     {}
     
     FeatureType getType() const override { return feature->getType(); }
     optional<Value> getValue(const std::string& key) const override { return feature->getValue(key); };
     std::unordered_map<std::string,Value> getProperties() const override { return feature->getProperties(); };
     FeatureIdentifier getID() const override { return feature->getID(); };
-    GeometryCollection getGeometries() const override { return geometry; };
+    const GeometryCollection& getGeometries() const override { return geometry; };
 
     friend bool operator < (const SymbolFeature& lhs, const SymbolFeature& rhs) {
         return lhs.sortKey <  rhs.sortKey;

@@ -1110,12 +1110,18 @@ jobs:
       - install-dependencies
       - install-ios-packaging-dependencies
       - run:
+          name: Trigger external deploy steps
+          command: |
+            export VERSION_TAG=${CIRCLE_TAG}
+            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
+            platform/ios/scripts/trigger-external-deploy-steps.sh
+          background: true
+      - run:
           name: Build, package, and upload iOS release
           command: |
             export VERSION_TAG=${CIRCLE_TAG}
             export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
             platform/ios/scripts/deploy-packages.sh
-            platform/ios/scripts/trigger-external-deploy-steps.sh
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs

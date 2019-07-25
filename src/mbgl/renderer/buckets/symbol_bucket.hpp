@@ -114,7 +114,6 @@ public:
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
 
     struct IconBuffer : public Buffer {
-        PremultipliedImage atlasImage;
     } icon;
 
     struct CollisionBuffer {

@@ -17,7 +17,6 @@ public:
     }
     PropertyMap getProperties() const override { return feature.properties; }
     FeatureIdentifier getID() const override { return feature.id; }
-    GeometryCollection getGeometries() const override { return {}; }
     optional<mbgl::Value> getValue(const std::string& key) const override {
         auto it = feature.properties.find(key);
         if (it != feature.properties.end()) {

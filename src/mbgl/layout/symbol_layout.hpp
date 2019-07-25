@@ -51,7 +51,7 @@ private:
     void addFeature(const size_t,
                     const SymbolFeature&,
                     const ShapedTextOrientations& shapedTextOrientations,
-                    optional<PositionedIcon> shapedIcon,
+                    const optional<PositionedIcon>& shapedIcon,
                     const GlyphPositions&,
                     Point<float> textOffset);
 
