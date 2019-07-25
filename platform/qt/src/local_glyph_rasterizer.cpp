@@ -11,18 +11,18 @@ namespace mbgl {
 
 class LocalGlyphRasterizer::Impl {
 public:
-    Impl(const optional<std::string> fontFamily_);
+    Impl(optional<std::vector<std::string>> fontFamily_);
 
     bool isConfigured() const;
 
-    optional<std::string> fontFamily;
+    optional<std::vector<std::string>> fontFamily;
     QFont font;
 };
 
-LocalGlyphRasterizer::Impl::Impl(const optional<std::string> fontFamily_)
-    : fontFamily(fontFamily_) {
+LocalGlyphRasterizer::Impl::Impl(optional<std::vector<std::string>> fontFamily_)
+    : fontFamily(std::move(fontFamily_)) {
     if (isConfigured()) {
-        font.setFamily(QString::fromStdString(*fontFamily));
+        font.setFamily(QString::fromStdString((*fontFamily)[0]));
         font.setPixelSize(24);
     }
 }
@@ -31,8 +31,8 @@ bool LocalGlyphRasterizer::Impl::isConfigured() const {
     return fontFamily.operator bool();
 }
 
-LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
-    : impl(std::make_unique<Impl>(fontFamily)) {
+LocalGlyphRasterizer::LocalGlyphRasterizer(optional<std::vector<std::string>> fontFamily)
+    : impl(std::make_unique<Impl>(std::move(fontFamily))) {
 }
 
 LocalGlyphRasterizer::~LocalGlyphRasterizer() {

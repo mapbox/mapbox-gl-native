@@ -29,7 +29,7 @@ static auto *getScheduler() {
 QMapboxGLMapRenderer::QMapboxGLMapRenderer(qreal pixelRatio, QMapboxGLSettings::GLContextMode mode, const QString &localFontFamily)
     : m_backend(static_cast<mbgl::gfx::ContextMode>(mode)),
       m_renderer(std::make_unique<mbgl::Renderer>(m_backend, pixelRatio, mbgl::optional<std::string> {},
-                 localFontFamily.isEmpty() ? mbgl::nullopt : mbgl::optional<std::string> { localFontFamily.toStdString() }))
+                 localFontFamily.isEmpty() ? mbgl::nullopt : mbgl::optional<std::vector<std::string>>{{ localFontFamily.toStdString() }}))
     , m_forceScheduler(needsToForceScheduler())
 {
     // If we don't have a Scheduler on this thread, which
