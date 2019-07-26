@@ -34,6 +34,7 @@ private:
 int32_t coveringZoomLevel(double z, style::SourceType type, uint16_t tileSize);
 
 std::vector<UnwrappedTileID> tileCover(const TransformState&, int32_t z);
+std::vector<UnwrappedTileID> tileCoverWithLOD(const TransformState&, int32_t z, int32_t minZLOD);
 std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, int32_t z);
 std::vector<UnwrappedTileID> tileCover(const Geometry<double>&, int32_t z);
 
