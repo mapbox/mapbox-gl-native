@@ -4,6 +4,16 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 5.1.2 - July 25, 2019
 
+### Styles and rendering
+
+* Fixed a map update bug caused by the render tiles and the render passes becoming unsynchronized. (#15092)
+* Fixed a custom geometry source bug caused by using the outdated tiles after style update #15112
+* Fixed an issue where layers with fill extrusions would be incorrectly rendered above other layers. (#15065)
+
+### User interaction
+
+Fixed a bug where using the pinch gesture could result in an incorrect map center coordinate. (#15097)
+
 ### Other changes
 
 * Fixed a crash during network access. ([#15113](https://github.com/mapbox/mapbox-gl-native/pull/15113))
