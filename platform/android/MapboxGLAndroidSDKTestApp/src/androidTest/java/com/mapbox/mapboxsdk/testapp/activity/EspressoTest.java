@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity;
 
+import android.content.Context;
 import android.support.annotation.UiThread;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -24,5 +25,9 @@ public class EspressoTest extends BaseTest {
   protected void initMap(MapboxMap mapboxMap) {
     mapboxMap.setStyle(new Style.Builder().fromUri("asset://streets.json"));
     super.initMap(mapboxMap);
+  }
+
+  public Context getContext() {
+    return rule.getActivity();
   }
 }
