@@ -477,7 +477,9 @@ jobs:
       - install-dependencies: { mason: false, ccache: false }
       - run:
           name: Initialize submodules
-          command: git submodule update --init
+          command: |
+            git submodule update --init
+            git submodule foreach git submodule update --init
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
@@ -720,7 +722,9 @@ jobs:
       - checkout
       - run:
           name: Checkout submodules
-          command: git submodule update --init
+          command: |
+            git submodule update --init
+            git submodule foreach git submodule update --init
       - run:
           name: Build Android library
           command: |
