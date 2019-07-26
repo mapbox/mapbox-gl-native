@@ -28,14 +28,13 @@ endif()
 # libraries in our public interface.
 target_link_libraries(mbgl-core PUBLIC
     boost
+    mapbox-base
     geojson.hpp
-    geometry.hpp
     ${ICU_LIBRARY}
     optional
     polylabel
     protozero
     rapidjson
-    variant
     vector-tile
 )
 
