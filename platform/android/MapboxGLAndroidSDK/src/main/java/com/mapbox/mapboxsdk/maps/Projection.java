@@ -93,6 +93,20 @@ public class Projection {
   }
 
   /**
+   * Returns the geographic location that corresponds to a screen location.
+   * The screen location is specified in screen pixels (not display pixels) relative to the
+   * top left of the map (not the top left of the whole screen).
+   *
+   * @param point A Point on the screen in screen pixels.
+   * @return The LatLng corresponding to the point on the screen, or null if the ray through
+   * the given screen point does not intersect the ground plane.
+   */
+  @NonNull
+  public LatLng fromScreenLocationUnwrapped(@NonNull PointF point) {
+    return nativeMapView.latLngForPixelUnwrapped(point);
+  }
+
+  /**
    * Gets a projection of the viewing frustum for converting between screen coordinates and
    * geo-latitude/longitude coordinates.
    * <p>

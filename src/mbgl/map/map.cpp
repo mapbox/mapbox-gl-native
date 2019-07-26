@@ -360,8 +360,8 @@ ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
     return impl->transform.latLngToScreenCoordinate(unwrappedLatLng);
 }
 
-LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
-    return impl->transform.screenCoordinateToLatLng(pixel);
+LatLng Map::latLngForPixel(const ScreenCoordinate& pixel, LatLng::WrapMode wrapMode) const {
+    return impl->transform.screenCoordinateToLatLng(pixel, wrapMode);
 }
 
 #pragma mark - Annotations

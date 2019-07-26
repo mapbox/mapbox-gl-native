@@ -72,7 +72,7 @@ interface NativeMap {
 
   double getPitch();
 
-  void setZoom(double zoom, @NonNull PointF focalPoint, long duration);
+  void setZoom(double zoom, @Nullable PointF focalPoint, long duration);
 
   double getZoom();
 
@@ -193,6 +193,8 @@ interface NativeMap {
   PointF pixelForLatLng(@NonNull LatLng latLng);
 
   LatLng latLngForPixel(@NonNull PointF pixel);
+
+  LatLng latLngForPixelUnwrapped(@NonNull PointF pixel);
 
   //
   // Utils API

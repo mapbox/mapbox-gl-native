@@ -5,7 +5,7 @@ import android.animation.TypeEvaluator;
 import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-class LatLngEvaluator implements TypeEvaluator<LatLng> {
+public class LatLngEvaluator implements TypeEvaluator<LatLng> {
 
   private final LatLng latLng = new LatLng();
 

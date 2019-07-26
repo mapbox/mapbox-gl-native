@@ -2,12 +2,14 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.animation.PathInterpolatorCompat;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
@@ -22,6 +24,9 @@ import com.mapbox.android.gestures.StandardGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LatLngEvaluator;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.util.ArrayList;
@@ -76,6 +81,7 @@ final class MapGestureDetector {
 
   private Animator scaleAnimator;
   private Animator rotateAnimator;
+  private Animator moveAnimator;
   private final List<Animator> scheduledAnimators = new ArrayList<>();
 
   /**
@@ -211,10 +217,23 @@ final class MapGestureDetector {
         if (!scheduledAnimators.isEmpty()) {
           // Start all awaiting velocity animations
           animationsTimeoutHandler.removeCallbacksAndMessages(null);
+//          for (Animator animator : scheduledAnimators) {
+//            animator.start();
+//          }
+
+          AnimatorSet set = new AnimatorSet();
+          long maxDuration = 0;
           for (Animator animator : scheduledAnimators) {
-            animator.start();
+            long duration = animator.getDuration();
+            if (duration > maxDuration) {
+              maxDuration = duration;
+            }
           }
-          scheduledAnimators.clear();
+          set.setDuration(maxDuration);
+          set.setInterpolator(PathInterpolatorCompat.create(0f, 1.97f, 0f, -0.69f));
+          set.playTogether(scheduledAnimators);
+          set.start();
+//          scheduledAnimators.clear();
         }
         break;
 
@@ -234,6 +253,7 @@ final class MapGestureDetector {
 
     cancelAnimator(scaleAnimator);
     cancelAnimator(rotateAnimator);
+    cancelAnimator(moveAnimator);
 
     dispatchCameraIdle();
   }
@@ -385,46 +405,6 @@ final class MapGestureDetector {
       PointF longClickPoint = new PointF(motionEvent.getX(), motionEvent.getY());
       notifyOnMapLongClickListeners(longClickPoint);
     }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-      if (!uiSettings.isScrollGesturesEnabled()) {
-        // don't allow a fling if scroll is disabled
-        return false;
-      }
-
-      notifyOnFlingListeners();
-
-      if (!uiSettings.isFlingVelocityAnimationEnabled()) {
-        return false;
-      }
-
-      float screenDensity = uiSettings.getPixelRatio();
-
-      // calculate velocity vector for xy dimensions, independent from screen size
-      double velocityXY = Math.hypot(velocityX / screenDensity, velocityY / screenDensity);
-      if (velocityXY < MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING) {
-        // ignore short flings, these can occur when other gestures just have finished executing
-        return false;
-      }
-
-      transform.cancelTransitions();
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-
-      // tilt results in a bigger translation, limiting input for #5281
-      double tilt = transform.getTilt();
-      double tiltFactor = 1.5 + ((tilt != 0) ? (tilt / 10) : 0);
-      double offsetX = velocityX / tiltFactor / screenDensity;
-      double offsetY = velocityY / tiltFactor / screenDensity;
-
-      // calculate animation time based on displacement
-      long animationTime = (long) (velocityXY / 7 / tiltFactor + MapboxConstants.ANIMATION_DURATION_FLING_BASE);
-
-      // update transformation
-      transform.moveBy(offsetX, offsetY, animationTime);
-
-      return true;
-    }
   }
 
   private void doubleTapStarted() {
@@ -463,6 +443,16 @@ final class MapGestureDetector {
 
         // Scroll the map
         transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
+//        PointF startPoint = projection.toScreenLocation(transform.getCenterCoordinate());
+//        PointF endPoint = new PointF(startPoint.x + distanceX, startPoint.y + distanceY);
+//        Logger.e("move", "start: " + startPoint);
+//        Logger.e("move", "end: " + endPoint);
+//
+//        LatLng latLng1 = projection.fromScreenLocation(startPoint);
+//        LatLng latLng = projection.fromScreenLocation(endPoint);
+//        Logger.e("move", "start latttt: " + latLng1);
+//        Logger.e("move", "end latttt: " + latLng);
+//        transform.setCenterCoordinate(latLng);
 
         notifyOnMoveListeners(detector);
       }
@@ -471,8 +461,79 @@ final class MapGestureDetector {
 
     @Override
     public void onMoveEnd(@NonNull MoveGestureDetector detector, float velocityX, float velocityY) {
-      dispatchCameraIdle();
       notifyOnMoveEndListeners(detector);
+
+      float screenDensity = uiSettings.getPixelRatio();
+      // calculate velocity vector for xy dimensions, independent from screen size
+      double velocityXY = Math.hypot(velocityX / screenDensity, velocityY / screenDensity);
+      if (!uiSettings.isFlingVelocityAnimationEnabled()
+        || velocityXY < MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING) {
+        dispatchCameraIdle();
+        // don't allow a fling if scroll is disabled
+        // ignore short flings, these can occur when other gestures just have finished executing
+        return;
+      }
+
+      notifyOnFlingListeners();
+
+      transform.cancelTransitions();
+
+      // tilt results in a bigger translation, limiting input for #5281
+      double tilt = transform.getTilt();
+      double tiltFactor = 1.5 + ((tilt != 0) ? (tilt / 10) : 0);
+      double offsetX = velocityX / tiltFactor / screenDensity;
+      double offsetY = velocityY / tiltFactor / screenDensity;
+
+      // calculate animation time based on displacement
+      long animationTime = (long) (velocityXY / 7 / tiltFactor + MapboxConstants.ANIMATION_DURATION_FLING_BASE);
+
+      PointF startPoint = projection.toScreenLocation(transform.getCenterCoordinate());
+      PointF endPoint = new PointF(startPoint.x - (float) offsetX, startPoint.y - (float) offsetY);
+      moveAnimator = createMoveAnimator(startPoint, endPoint, animationTime);
+      scheduleAnimator(moveAnimator);
+    }
+
+    private Animator createMoveAnimator(PointF startPoint, PointF endPoint, long animationTime) {
+      LatLng startLatLng = projection.fromScreenLocation(startPoint);
+      LatLng endLatLng = projection.fromScreenLocationUnwrapped(endPoint);
+      Logger.e("move", "start: " + startPoint);
+      Logger.e("move", "end: " + endPoint);
+      Logger.e("move", "start latt: " + startLatLng);
+      Logger.e("move", "end latt: " + endLatLng);
+      ValueAnimator animator = ValueAnimator.ofObject(new LatLngEvaluator(), startLatLng, endLatLng);
+      animator.setDuration(animationTime);
+      animator.setInterpolator(PathInterpolatorCompat.create(0f, 1.97f, 0f, -0.69f));
+      animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+        @Override
+        public void onAnimationUpdate(@NonNull ValueAnimator animation) {
+          transform.setCenterCoordinate(((LatLng) animation.getAnimatedValue()));
+        }
+      });
+
+      animator.addListener(new AnimatorListenerAdapter() {
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+          transform.cancelTransitions();
+          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+          transform.setGestureInProgress(true);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+          transform.setGestureInProgress(false);
+          transform.cancelTransitions();
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+          transform.setGestureInProgress(false);
+          dispatchCameraIdle();
+        }
+      });
+
+      return animator;
     }
   }
 
@@ -523,7 +584,11 @@ final class MapGestureDetector {
 
       float scaleFactor = detector.getScaleFactor();
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
-      PointF focalPoint = getScaleFocalPoint(detector);
+      PointF focalPoint = getScaleFocalPoint();
+      if (focalPoint == null) {
+        // around gesture
+        focalPoint = detector.getFocalPoint();
+      }
       transform.zoomBy(zoomBy, focalPoint);
 
       notifyOnScaleListeners(detector);
@@ -557,14 +622,14 @@ final class MapGestureDetector {
 
       double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
       double currentZoom = transform.getRawZoom();
-      PointF focalPoint = getScaleFocalPoint(detector);
+      PointF focalPoint = getScaleFocalPoint();
       long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
       scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, focalPoint, animationTime);
       scheduleAnimator(scaleAnimator);
     }
 
-    @NonNull
-    private PointF getScaleFocalPoint(@NonNull StandardScaleGestureDetector detector) {
+    @Nullable
+    private PointF getScaleFocalPoint() {
       if (constantFocalPoint != null) {
         // around user provided focal point
         return constantFocalPoint;
@@ -572,8 +637,7 @@ final class MapGestureDetector {
         // around center
         return new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
       } else {
-        // around gesture
-        return detector.getFocalPoint();
+        return null;
       }
     }
 
@@ -805,7 +869,7 @@ final class MapGestureDetector {
   }
 
   private Animator createScaleAnimator(double currentZoom, double zoomAddition,
-                                       @NonNull final PointF animationFocalPoint, long animationTime) {
+                                       @Nullable final PointF animationFocalPoint, long animationTime) {
     ValueAnimator animator = ValueAnimator.ofFloat((float) currentZoom, (float) (currentZoom + zoomAddition));
     animator.setDuration(animationTime);
     animator.setInterpolator(new DecelerateInterpolator());

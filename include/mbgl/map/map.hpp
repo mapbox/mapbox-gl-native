@@ -96,7 +96,7 @@ public:
 
     // Projection
     ScreenCoordinate pixelForLatLng(const LatLng&) const;
-    LatLng latLngForPixel(const ScreenCoordinate&) const;
+    LatLng latLngForPixel(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Wrapped) const;
 
     // Annotations
     void addAnnotationImage(std::unique_ptr<style::Image>);

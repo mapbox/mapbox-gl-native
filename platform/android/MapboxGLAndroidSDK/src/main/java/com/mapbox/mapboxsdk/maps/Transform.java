@@ -219,11 +219,11 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
     return nativeMap.getZoom();
   }
 
-  void zoomBy(double zoomAddition, @NonNull PointF focalPoint) {
+  void zoomBy(double zoomAddition, @Nullable PointF focalPoint) {
     setZoom(nativeMap.getZoom() + zoomAddition, focalPoint);
   }
 
-  void setZoom(double zoom, @NonNull PointF focalPoint) {
+  void setZoom(double zoom, @Nullable PointF focalPoint) {
     nativeMap.setZoom(zoom, focalPoint, 0);
   }
 

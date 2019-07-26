@@ -309,11 +309,15 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setZoom(double zoom, @NonNull PointF focalPoint, long duration) {
+  public void setZoom(double zoom, @Nullable PointF focalPoint, long duration) {
     if (checkState("setZoom")) {
       return;
     }
-    nativeSetZoom(zoom, focalPoint.x / pixelRatio, focalPoint.y / pixelRatio, duration);
+    if (focalPoint != null) {
+      nativeSetZoomWithAnchor(zoom, focalPoint.x / pixelRatio, focalPoint.y / pixelRatio, duration);
+    } else {
+      nativeSetZoom(zoom, duration);
+    }
   }
 
   @Override
@@ -661,6 +665,14 @@ final class NativeMapView implements NativeMap {
       return new LatLng();
     }
     return nativeLatLngForPixel(pixel.x / pixelRatio, pixel.y / pixelRatio);
+  }
+
+  @Override
+  public LatLng latLngForPixelUnwrapped(@NonNull PointF pixel) {
+    if (checkState("latLngForPixelUnwrapped")) {
+      return new LatLng();
+    }
+    return nativeLatLngForPixelUnwrapped(pixel.x / pixelRatio, pixel.y / pixelRatio);
   }
 
   @Override
@@ -1152,7 +1164,10 @@ final class NativeMapView implements NativeMap {
   private native void nativeSetPitch(double pitch, long duration);
 
   @Keep
-  private native void nativeSetZoom(double zoom, double cx, double cy, long duration);
+  private native void nativeSetZoom(double zoom, long duration);
+
+  @Keep
+  private native void nativeSetZoomWithAnchor(double zoom, double cx, double cy, long duration);
 
   @Keep
   private native double nativeGetZoom();
@@ -1265,6 +1280,10 @@ final class NativeMapView implements NativeMap {
   @NonNull
   @Keep
   private native LatLng nativeLatLngForPixel(float x, float y);
+
+  @NonNull
+  @Keep
+  private native LatLng nativeLatLngForPixelUnwrapped(float x, float y);
 
   @Keep
   private native double nativeGetTopOffsetPixelsForAnnotationSymbol(String symbolName);

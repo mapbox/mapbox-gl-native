@@ -14,6 +14,7 @@ dependencies {
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.okhttp3
     implementation dependenciesList.soLoader
+    implementation "com.android.support:support-v4:28.0.0"
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.mockk

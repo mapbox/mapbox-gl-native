@@ -113,7 +113,9 @@ public:
 
     void setPitch(jni::JNIEnv&, jni::jdouble, jni::jlong);
 
-    void setZoom(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong);
+    void setZoom(jni::JNIEnv&, jni::jdouble, jni::jlong);
+
+    void setZoomWithAnchor(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong);
 
     jni::jdouble getZoom(jni::JNIEnv&);
 
@@ -170,6 +172,8 @@ public:
     jni::Local<jni::Object<LatLng>> latLngForProjectedMeters(JNIEnv&, jdouble, jdouble);
 
     jni::Local<jni::Object<LatLng>> latLngForPixel(JNIEnv&, jfloat, jfloat);
+
+    jni::Local<jni::Object<LatLng>> latLngForPixelUnwrapped(JNIEnv&, jfloat, jfloat);
 
     jni::Local<jni::Array<jlong>> addPolylines(JNIEnv&, const jni::Array<jni::Object<Polyline>>&);
 

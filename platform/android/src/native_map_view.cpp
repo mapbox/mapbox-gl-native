@@ -435,7 +435,11 @@ void NativeMapView::setPitch(jni::JNIEnv&, jni::jdouble pitch, jni::jlong durati
                 mbgl::AnimationOptions{ mbgl::Milliseconds(duration) });
 }
 
-void NativeMapView::setZoom(jni::JNIEnv&, jni::jdouble zoom, jni::jdouble x, jni::jdouble y, jni::jlong duration) {
+void NativeMapView::setZoom(jni::JNIEnv&, jni::jdouble zoom, jni::jlong duration) {
+    map->easeTo(mbgl::CameraOptions().withZoom(zoom), mbgl::AnimationOptions{ mbgl::Milliseconds(duration) });
+}
+
+void NativeMapView::setZoomWithAnchor(jni::JNIEnv&, jni::jdouble zoom, jni::jdouble x, jni::jdouble y, jni::jlong duration) {
     map->easeTo(mbgl::CameraOptions().withZoom(zoom).withAnchor(mbgl::ScreenCoordinate{ x, y }),
                 mbgl::AnimationOptions{ mbgl::Milliseconds(duration) });
 }
@@ -625,7 +629,13 @@ jni::Local<jni::Object<PointF>> NativeMapView::pixelForLatLng(JNIEnv& env, jdoub
 }
 
 jni::Local<jni::Object<LatLng>> NativeMapView::latLngForPixel(JNIEnv& env, jfloat x, jfloat y) {
-    return LatLng::New(env, map->latLngForPixel(mbgl::ScreenCoordinate(x, y)));
+    mbgl::LatLng latLng = map->latLngForPixel(mbgl::ScreenCoordinate(x, y));
+    return LatLng::New(env, latLng);
+}
+
+jni::Local<jni::Object<LatLng>> NativeMapView::latLngForPixelUnwrapped(JNIEnv& env, jfloat x, jfloat y) {
+    mbgl::LatLng latLng = map->latLngForPixel(mbgl::ScreenCoordinate(x, y), mbgl::LatLng::Unwrapped);
+    return LatLng::New(env, latLng);
 }
 
 jni::Local<jni::Array<jlong>> NativeMapView::addPolylines(JNIEnv& env, const jni::Array<jni::Object<Polyline>>& polylines) {
@@ -1087,6 +1097,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::setPitch, "nativeSetPitch"),
             METHOD(&NativeMapView::getZoom, "nativeGetZoom"),
             METHOD(&NativeMapView::setZoom, "nativeSetZoom"),
+            METHOD(&NativeMapView::setZoomWithAnchor, "nativeSetZoomWithAnchor"),
             METHOD(&NativeMapView::resetZoom, "nativeResetZoom"),
             METHOD(&NativeMapView::setMinZoom, "nativeSetMinZoom"),
             METHOD(&NativeMapView::getMinZoom, "nativeGetMinZoom"),
@@ -1114,6 +1125,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::pixelForLatLng, "nativePixelForLatLng"),
             METHOD(&NativeMapView::latLngForProjectedMeters, "nativeLatLngForProjectedMeters"),
             METHOD(&NativeMapView::latLngForPixel, "nativeLatLngForPixel"),
+            METHOD(&NativeMapView::latLngForPixelUnwrapped, "nativeLatLngForPixelUnwrapped"),
             METHOD(&NativeMapView::addPolylines, "nativeAddPolylines"),
             METHOD(&NativeMapView::addPolygons, "nativeAddPolygons"),
             METHOD(&NativeMapView::updatePolyline, "nativeUpdatePolyline"),
