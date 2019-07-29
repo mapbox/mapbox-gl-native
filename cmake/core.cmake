@@ -31,7 +31,6 @@ target_link_libraries(mbgl-core PUBLIC
     mapbox-base
     geojson.hpp
     ${ICU_LIBRARY}
-    optional
     polylabel
     protozero
     rapidjson

@@ -136,8 +136,8 @@ target_include_directories(example-custom-layer
     PRIVATE include
 )
 
-target_link_libraries(example-custom-layer
-    PRIVATE optional
-    PRIVATE -llog
-    PRIVATE -lGLESv2
+target_link_libraries(example-custom-layer PRIVATE
+    mapbox-base
+    -llog
+    -lGLESv2
 )

@@ -17,6 +17,7 @@
         "mapbox/geometry/point_arithmetic.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/point_arithmetic.hpp",
         "mapbox/geometry/polygon.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/polygon.hpp",
         "mapbox/geometry_io.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry_io.hpp",
+        "optional.hpp": "vendor/mapbox-base/libs/optional/optional.hpp",
         "mapbox/optional.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/optional.hpp",
         "mapbox/recursive_wrapper.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/recursive_wrapper.hpp",
         "mapbox/variant.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/variant.hpp",
