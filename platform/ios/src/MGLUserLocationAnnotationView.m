@@ -5,9 +5,16 @@
 #import "MGLAnnotationView_Private.h"
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
-#import "MGLMapAccessibilityElement.h"
 #import "MGLCoordinateFormatter.h"
 #import "NSBundle+MGLAdditions.h"
+
+/**
+ Private accessibility methods. This is exposed here, rather than including MGLMapView_Private.h as that
+ currently would force this file to become a .mm
+ */
+@interface MGLMapView (MGLUserLocationAnnotationView)
+- (void)accessibilityPostNotification:(UIAccessibilityNotifications)notification argument:(__nullable id)argument;
+@end
 
 
 @interface MGLUserLocationAnnotationView()
@@ -95,7 +102,7 @@
     [super setHidden:hidden];
     if (oldValue != hidden)
     {
-        MGLAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+        [self.mapView accessibilityPostNotification:UIAccessibilityLayoutChangedNotification argument:nil];
     }
 }
 

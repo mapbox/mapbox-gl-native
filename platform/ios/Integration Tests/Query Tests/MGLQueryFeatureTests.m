@@ -141,11 +141,14 @@ void writeDictionaryToFile(NSDictionary *info, NSString *filename);
     NSArray *bElements = b[@"Elements"];
     
     XCTAssertEqual(aElements.count, bElements.count);
+    if (aElements.count != bElements.count) {
+        return;
+    }
     
     for (NSUInteger i = 0; i < aElements.count; i++) {
         NSDictionary *aElement = aElements[i];
         NSDictionary *bElement = bElements[i];
-        
+
         [self assertAccessibilityDictionary:aElement isEqualToDictionary:bElement];
     }
 }
@@ -153,7 +156,10 @@ void writeDictionaryToFile(NSDictionary *info, NSString *filename);
 - (void)assertFloatArray:(NSArray *)a isEqualToFloatArray:(NSArray *)b accuracy:(CGFloat)accuracy
 {
     XCTAssertEqual(a.count, b.count);
-    
+    if (a.count != b.count) {
+        return;
+    }
+
     for (NSUInteger i = 0; i < a.count; i++)
     {
         XCTAssertEqualWithAccuracy(((NSNumber*)a[i]).floatValue, ((NSNumber*)b[i]).floatValue, accuracy);
@@ -163,6 +169,9 @@ void writeDictionaryToFile(NSDictionary *info, NSString *filename);
 - (void)assertBezierPathArray:(NSArray *)a isEqualToBezierPathArray:(NSArray *)b accuracy:(CGFloat)accuracy
 {
     XCTAssertEqual(a.count, b.count);
+    if (a.count != b.count) {
+        return;
+    }
     
     for (NSUInteger i = 0; i < a.count; i++) {
         NSDictionary *adict = a[i];
