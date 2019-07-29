@@ -8,7 +8,7 @@ target_include_directories(mbgl-loop-darwin
 )
 
 target_link_libraries(mbgl-loop-darwin PUBLIC
-    optional
+    mapbox-base
 )
 
 create_source_groups(mbgl-loop-darwin)

@@ -138,8 +138,7 @@ generateFileList('vendor/geojson.hpp-files.json', [ 'vendor/geojson.hpp' ], vend
 generateFileList('vendor/icu-files.json', [ 'vendor/icu' ], vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
 generateFileList('vendor/jni.hpp-files.json', [ 'vendor/jni.hpp' ], vendorRegex, [ "include/**/*.hpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/kdbush.hpp-files.json', [ 'vendor/kdbush.hpp' ], vendorRegex, [ "include/*.hpp" ]);
-generateFileList('vendor/mapbox-base-files.json', [ 'vendor/mapbox-base/libs/geometry.hpp', 'vendor/mapbox-base/libs/variant' ], vendorRegex, [ "include/*.hpp", "include/**/*.hpp" ]);
-generateFileList('vendor/optional-files.json', [ 'vendor/optional' ], vendorRegex, [ "optional.hpp" ]);
+generateFileList('vendor/mapbox-base-files.json', [ 'vendor/mapbox-base/libs/geometry.hpp', 'vendor/mapbox-base/libs/variant', 'vendor/mapbox-base/libs/optional' ], vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "optional.hpp" ]);
 generateFileList('vendor/pixelmatch-cpp-files.json', [ 'vendor/pixelmatch-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/polylabel-files.json', [ 'vendor/polylabel' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/protozero-files.json', [ 'vendor/protozero' ], vendorRegex, [ "include/**/*.hpp" ]);
