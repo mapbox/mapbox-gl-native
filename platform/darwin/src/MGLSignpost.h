@@ -11,6 +11,7 @@
 #define MGL_EXPORT __attribute__((visibility ("default")))
 
 MGL_EXPORT extern os_log_t MGLDefaultSignpostLog;
+MGL_EXPORT extern os_signpost_id_t MGLDefaultSignpost;
 
 /**
  Create an os_log_t (for use with os_signposts) with the "com.mapbox.mapbox" subsystem.
@@ -26,18 +27,26 @@ MGL_EXPORT extern os_log_t MGLDefaultSignpostLog;
  */
 MGL_EXPORT extern os_log_t MGLSignpostLogCreate(const char* name);
 
-#define MGL_NAMED_SIGNPOST_BEGIN(log, name, ...) \
+#define MGL_NAMED_CREATE_SIGNPOST(log) \
     ({ \
         os_signpost_id_t SIGNPOST_NAME(__LINE__) = OS_SIGNPOST_ID_INVALID; \
         if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
             SIGNPOST_NAME(__LINE__) = os_signpost_id_generate(log); \
-            os_signpost_interval_begin(log, SIGNPOST_NAME(__LINE__), name, ##__VA_ARGS__); \
         } \
         SIGNPOST_NAME(__LINE__); \
     })
 
+#define MGL_NAMED_SIGNPOST_BEGIN(log, signpost, name, ...) \
+    ({ \
+        if (signpost != OS_SIGNPOST_ID_INVALID) { \
+            if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
+                os_signpost_interval_begin(log, signpost, name, ##__VA_ARGS__); \
+            } \
+        } \
+    })
+
 #define MGL_NAMED_SIGNPOST_END(log, signpost, name, ...) \
-    __extension__({ \
+    ({ \
         if (signpost != OS_SIGNPOST_ID_INVALID) { \
             if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
                 os_signpost_interval_end(log, signpost, name, ##__VA_ARGS__); \
@@ -45,11 +54,12 @@ MGL_EXPORT extern os_log_t MGLSignpostLogCreate(const char* name);
         } \
     })
 
-#define MGL_NAMED_SIGNPOST_EVENT(log, name, ...) \
-    __extension__({ \
-        if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
-            os_signpost_id_t SIGNPOST_NAME(__LINE__) = os_signpost_id_generate(log); \
-            os_signpost_event_emit(log, SIGNPOST_NAME(__LINE__), name, ##__VA_ARGS__); \
+#define MGL_NAMED_SIGNPOST_EVENT(log, signpost, name, ...) \
+    ({ \
+        if (signpost != OS_SIGNPOST_ID_INVALID) { \
+            if (__builtin_available(iOS 12.0, macOS 10.14, *)) { \
+                os_signpost_event_emit(log, signpost, name, ##__VA_ARGS__); \
+            } \
         } \
     })
 
@@ -59,13 +69,16 @@ MGL_EXPORT extern os_log_t MGLSignpostLogCreate(const char* name);
 //
 // For example:
 //
-//  os_signpost_id_t signpost = MGL_SIGNPOST_BEGIN("example");
+//  os_signpost_id_t signpost = MGL_CREATE_SIGNPOST();
+//  MGL_SIGNPOST_BEGIN(signpost, "example");
 //  [self performAComputationallyExpensiveOperation];
 //  MGL_SIGNPOST_END(signpost, "example", "%d", numberOfWidgets);
 //
 //  MGL_SIGNPOST_EVENT("error", "%d", errorCode);
 
-#define MGL_SIGNPOST_BEGIN(name, ...)             MGL_NAMED_SIGNPOST_BEGIN(MGLDefaultSignpostLog, name, ##__VA_ARGS__)
+#define MGL_CREATE_SIGNPOST()                     MGL_NAMED_CREATE_SIGNPOST(MGLDefaultSignpostLog)
+
+#define MGL_SIGNPOST_BEGIN(signpost, name, ...)   MGL_NAMED_SIGNPOST_BEGIN(MGLDefaultSignpostLog, signpost, name, ##__VA_ARGS__)
 #define MGL_SIGNPOST_END(signpost, name, ...)     MGL_NAMED_SIGNPOST_END(MGLDefaultSignpostLog, signpost, name, ##__VA_ARGS__)
 #define MGL_SIGNPOST_EVENT(signpost, name, ...)   MGL_NAMED_SIGNPOST_EVENT(MGLDefaultSignpostLog, signpost, name, ##__VA_ARGS__)
 

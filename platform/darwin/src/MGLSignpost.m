@@ -2,16 +2,23 @@
 #include "MGLSignpost.h"
 
 os_log_t MGLDefaultSignpostLog = NULL;
+os_signpost_id_t MGLDefaultSignpost = OS_SIGNPOST_ID_INVALID;
 
-void createDefaultSignpostLog(void) __attribute__((constructor));
-void destroyDefaultSignpostLog(void) __attribute__((destructor));
+void destroyDefaultSignpostVaribles(void) __attribute__((destructor));
 
-void destroyDefaultSignpostLog() {
+void destroyDefaultSignpostVaribles() {
     MGLDefaultSignpostLog = NULL;
+    MGLDefaultSignpost = OS_SIGNPOST_ID_INVALID;
 }
 
-void createDefaultSignpost() {
+void createDefaultSignpostVaribles(void) __attribute__((constructor));
+
+void createDefaultSignpostVaribles() {
     MGLDefaultSignpostLog = MGLSignpostLogCreate("MGLSignposts");
+    
+    if (__builtin_available(iOS 12.0, macOS 10.14, *)) {
+        MGLDefaultSignpost = os_signpost_id_generate(MGLDefaultSignpostLog);
+    }
 }
 
 os_log_t MGLSignpostLogCreate(const char* name) {
