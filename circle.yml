@@ -894,9 +894,7 @@ jobs:
       - run:
           name: Upload coverage results to codecov.io
           command: |
-            curl -sSfL -o codecov https://codecov.io/bash
-            chmod +x codecov
-            ./codecov -c
+            bash <(curl -sSfL https://codecov.io/bash) || echo 'Codecov failed to upload'
       - run:
           name: Upload coverage metrics to s3
           command: |
