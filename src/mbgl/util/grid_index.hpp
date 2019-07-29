@@ -57,7 +57,7 @@ template <class T>
 class GridIndex {
 public:
 
-    GridIndex(const float width_, const float height_, const int16_t cellSize_);
+    GridIndex(const float width_, const float height_, const uint32_t cellSize_);
 
     using BBox = mapbox::geometry::box<float>;
     using BCircle = geometry::circle<float>;
@@ -81,8 +81,8 @@ private:
     void query(const BBox&, std::function<bool (const T&, const BBox&)>) const;
     void query(const BCircle&, std::function<bool (const T&, const BBox&)>) const;
 
-    int16_t convertToXCellCoord(const float x) const;
-    int16_t convertToYCellCoord(const float y) const;
+    std::size_t convertToXCellCoord(const float x) const;
+    std::size_t convertToYCellCoord(const float y) const;
     
     bool boxesCollide(const BBox&, const BBox&) const;
     bool circlesCollide(const BCircle&, const BCircle&) const;
@@ -91,8 +91,8 @@ private:
     const float width;
     const float height;
     
-    const int16_t xCellCount;
-    const int16_t yCellCount;
+    const std::size_t xCellCount;
+    const std::size_t yCellCount;
     const double xScale;
     const double yScale;
 
