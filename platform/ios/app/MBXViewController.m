@@ -573,7 +573,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                         [weakSelf.pendingIdleBlocks addObject:^{
                             __typeof__(self) strongSelf = weakSelf;
                             NSLog(@"BEGIN: query-roads-batch");
-                            os_signpost_id_t signpost = MGL_SIGNPOST_BEGIN("query-roads-batch");
+                            os_signpost_id_t signpost = MGL_CREATE_SIGNPOST();
+                            MGL_SIGNPOST_BEGIN(signpost, "query-roads-batch");
                             for (int i = 0; i < 10; i++) {
                                 [strongSelf queryRoads];
                             }
@@ -1807,7 +1808,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 - (void)queryRoads
 {
-    os_signpost_id_t signpost = MGL_SIGNPOST_BEGIN("query-roads");
+    os_signpost_id_t signpost = MGL_CREATE_SIGNPOST();
+    MGL_SIGNPOST_BEGIN(signpost, "query-roads");
     
     NSArray *roadStyleLayerIdentifiers = [self.mapView.style.roadStyleLayers valueForKey:@"identifier"];
     NSArray *visibleRoadFeatures = [self.mapView visibleFeaturesInRect:self.mapView.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
