@@ -274,9 +274,6 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     // Reserve size for filteredLayersForSource if there are sources.
     if (!sourceImpls->empty()) {
         filteredLayersForSource.reserve(layerImpls->size());
-        if (filteredLayersForSource.capacity() > layerImpls->size()) {
-            filteredLayersForSource.shrink_to_fit();
-        }
     }
 
     // Update all sources and initialize renderItems.
@@ -561,6 +558,7 @@ FeatureExtensionValue RenderOrchestrator::queryFeatureExtensions(const std::stri
 }
 
 void RenderOrchestrator::reduceMemoryUse() {
+    filteredLayersForSource.shrink_to_fit();
     for (const auto& entry : renderSources) {
         entry.second->reduceMemoryUse();
     }
