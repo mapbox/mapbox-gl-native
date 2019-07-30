@@ -44,6 +44,11 @@ public class MapboxConstants {
   public static final boolean DEFAULT_MANAGE_SKU_TOKEN = true;
 
   /**
+   * Default value for font fallback for local ideograph fonts
+   */
+  public static final String DEFAULT_FONT = "sans-serif";
+
+  /**
    * Unmeasured state
    */
   public static final float UNMEASURED = -1f;

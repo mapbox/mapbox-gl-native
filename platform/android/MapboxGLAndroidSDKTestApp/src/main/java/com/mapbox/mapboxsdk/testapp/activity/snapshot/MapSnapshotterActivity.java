@@ -7,6 +7,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -68,7 +69,7 @@ public class MapSnapshotterActivity extends AppCompatActivity {
 
       // Optionally the style
       .withStyle((column + row) % 2 == 0 ? Style.MAPBOX_STREETS : Style.DARK)
-      .withLocalIdeographFontFamily("sans-serif");
+      .withLocalIdeographFontFamily(MapboxConstants.DEFAULT_FONT);
 
     // Optionally the visible region
     if (row % 2 == 0) {
