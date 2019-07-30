@@ -1,6 +1,10 @@
 #include <mbgl/util/platform.hpp>
 
+#if 0
 #include <unicode/numberformatter.h>
+#else
+#include <mbgl/util/string.hpp>
+#endif
 
 namespace mbgl {
 namespace platform {
@@ -8,6 +12,7 @@ namespace platform {
 std::string formatNumber(double number, const std::string& localeId, const std::string& currency,
                          uint8_t minFractionDigits, uint8_t maxFractionDigits) {
 
+#if 0
     UErrorCode status = U_ZERO_ERROR;
     icu::UnicodeString ustr;
     std::string formatted;
@@ -29,6 +34,13 @@ std::string formatNumber(double number, const std::string& localeId, const std::
                 .toString();
     }
     return ustr.toUTF8String(formatted);
+#else
+    (void)localeId;
+    (void)currency;
+    (void)minFractionDigits;
+    (void)maxFractionDigits;
+    return mbgl::util::toString(number);
+#endif
 }
 
 } // namespace platform
