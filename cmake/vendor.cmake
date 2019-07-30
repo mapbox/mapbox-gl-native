@@ -27,7 +27,9 @@ include(${CMAKE_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/wagyu.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/args.cmake)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-base)
+if(NOT TARGET mapbox-base)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-base ${CMAKE_BINARY_DIR}/.build-mapbox-gl-native-mapbox-base)
+endif()
 
 if(MBGL_PLATFORM STREQUAL "linux" OR MBGL_PLATFORM STREQUAL "macos")
     include(${CMAKE_SOURCE_DIR}/vendor/glfw.cmake)
