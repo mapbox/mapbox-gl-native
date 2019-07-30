@@ -2,6 +2,11 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 4.11.2 - July 30, 2019
+
+* Fixed a map update bug caused by the render tiles and the render passes becoming unsynchronized. ([#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092))
+* Fixed a custom geometry source bug caused by using the outdated tiles after style update. ([#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112))
+
 ## 4.11.1 - July 18, 2019
 
 * Fixed a bug in telemetry collection. ([#15161](https://github.com/mapbox/mapbox-gl-native/pull/15161))
