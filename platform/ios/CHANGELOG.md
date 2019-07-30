@@ -12,6 +12,21 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * `MGLLoggingLevel` has been updated for better matching core log levels. Now can use `[MGLLoggingConfiguration sharedConfiguration].loggingLevel` to filter logs from core . [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
 
+## 4.11.2 - July 30, 2019
+
+* Fixed a map update bug caused by the render tiles and the render passes becoming unsynchronized. ([#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092))
+* Fixed a custom geometry source bug caused by using the outdated tiles after style update. ([#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112))
+
+## 5.0.2 - July 29, 2019
+
+* Fixed an issue where fill extrusion layers would be incorrectly rendered above other layers. ([#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065))
+* Fixed a map update bug caused by the render tiles and the render passes becoming unsynchronized. ([#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092))
+* Fixed a custom geometry source bug caused by using the outdated tiles after style update. ([#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112))
+
+## 5.1.2 - July 25, 2019
+
+* Fixed a crash during network access. ([#15113](https://github.com/mapbox/mapbox-gl-native/pull/15113))		
+
 ## 5.2.0 - July 24, 2019
 
 ### Networking
