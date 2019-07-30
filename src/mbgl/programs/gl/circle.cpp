@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<CircleProgram> {
     static constexpr const char* name = "circle";
-    static constexpr const uint8_t hash[8] = { 0x1d, 0x47, 0x35, 0xbb, 0x94, 0x3d, 0x93, 0xca };
-    static constexpr const auto vertexOffset = 2927;
-    static constexpr const auto fragmentOffset = 6135;
-};
-
-constexpr const char* ShaderSource<CircleProgram>::name;
-constexpr const uint8_t ShaderSource<CircleProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<CircleProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<CircleProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of circle.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 uniform mat4 u_matrix;
 uniform bool u_scale_with_map;
 uniform bool u_pitch_with_map;
@@ -202,10 +179,8 @@ void main(void) {
     v_data = vec3(extrude.x, extrude.y, antialiasblur);
 }
 
-*/
-
-// Uncompressed source of circle.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 varying vec3 v_data;
 
 
@@ -316,5 +291,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<CircleProgram>::name;
+constexpr const char* ShaderSource<CircleProgram>::vertexSource;
+constexpr const char* ShaderSource<CircleProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<CircleProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<CircleProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

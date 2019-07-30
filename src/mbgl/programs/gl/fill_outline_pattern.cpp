@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillOutlinePatternProgram> {
     static constexpr const char* name = "fill_outline_pattern";
-    static constexpr const uint8_t hash[8] = { 0x56, 0x9c, 0x2f, 0x58, 0x6b, 0x31, 0xff, 0x84 };
-    static constexpr const auto vertexOffset = 15137;
-    static constexpr const auto fragmentOffset = 16997;
-};
-
-constexpr const char* ShaderSource<FillOutlinePatternProgram>::name;
-constexpr const uint8_t ShaderSource<FillOutlinePatternProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<FillOutlinePatternProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<FillOutlinePatternProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of fill_outline_pattern.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 uniform mat4 u_matrix;
 uniform vec2 u_world;
 uniform vec2 u_pixel_coord_upper;
@@ -123,10 +100,8 @@ void main() {
     v_pos = (gl_Position.xy / gl_Position.w + 1.0) / 2.0 * u_world;
 }
 
-*/
-
-// Uncompressed source of fill_outline_pattern.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 
 uniform vec2 u_texsize;
 uniform sampler2D u_image;
@@ -201,5 +176,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<FillOutlinePatternProgram>::name;
+constexpr const char* ShaderSource<FillOutlinePatternProgram>::vertexSource;
+constexpr const char* ShaderSource<FillOutlinePatternProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<FillOutlinePatternProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<FillOutlinePatternProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

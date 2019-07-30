@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LineGradientProgram> {
     static constexpr const char* name = "line_gradient";
-    static constexpr const uint8_t hash[8] = { 0x3f, 0xba, 0xc6, 0x33, 0xcd, 0x86, 0xa2, 0xe8 };
-    static constexpr const auto vertexOffset = 34224;
-    static constexpr const auto fragmentOffset = 37016;
-};
-
-constexpr const char* ShaderSource<LineGradientProgram>::name;
-constexpr const uint8_t ShaderSource<LineGradientProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<LineGradientProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<LineGradientProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of line_gradient.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 
 // the attribute conveying progress along a line is scaled to [0, 2^15)
 #define MAX_LINE_DISTANCE 32767.0
@@ -194,10 +171,8 @@ void main() {
     v_width2 = vec2(outset, inset);
 }
 
-*/
-
-// Uncompressed source of line_gradient.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform lowp float u_device_pixel_ratio;
 uniform sampler2D u_image;
 
@@ -253,5 +228,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<LineGradientProgram>::name;
+constexpr const char* ShaderSource<LineGradientProgram>::vertexSource;
+constexpr const char* ShaderSource<LineGradientProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<LineGradientProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<LineGradientProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

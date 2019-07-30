@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<RasterProgram> {
     static constexpr const char* name = "raster";
-    static constexpr const uint8_t hash[8] = { 0x40, 0x3d, 0x6c, 0xf4, 0xd0, 0x41, 0x51, 0x0e };
-    static constexpr const auto vertexOffset = 48827;
-    static constexpr const auto fragmentOffset = 49176;
-};
-
-constexpr const char* ShaderSource<RasterProgram>::name;
-constexpr const uint8_t ShaderSource<RasterProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<RasterProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<RasterProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of raster.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 uniform mat4 u_matrix;
 uniform vec2 u_tl_parent;
 uniform float u_scale_parent;
@@ -61,10 +38,8 @@ void main() {
     v_pos1 = (v_pos0 * u_scale_parent) + u_tl_parent;
 }
 
-*/
-
-// Uncompressed source of raster.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform float u_fade_t;
 uniform float u_opacity;
 uniform sampler2D u_image0;
@@ -118,5 +93,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<RasterProgram>::name;
+constexpr const char* ShaderSource<RasterProgram>::vertexSource;
+constexpr const char* ShaderSource<RasterProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<RasterProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<RasterProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

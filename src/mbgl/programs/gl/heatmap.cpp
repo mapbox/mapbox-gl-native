@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<HeatmapProgram> {
     static constexpr const char* name = "heatmap";
-    static constexpr const uint8_t hash[8] = { 0xe5, 0xa4, 0x9c, 0x31, 0x01, 0xe5, 0x4a, 0xe0 };
-    static constexpr const auto vertexOffset = 8026;
-    static constexpr const auto fragmentOffset = 9074;
-};
-
-constexpr const char* ShaderSource<HeatmapProgram>::name;
-constexpr const uint8_t ShaderSource<HeatmapProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<HeatmapProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<HeatmapProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of heatmap.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 
 uniform mat4 u_matrix;
 uniform float u_extrude_scale;
@@ -121,10 +98,8 @@ void main(void) {
     gl_Position = u_matrix * pos;
 }
 
-*/
-
-// Uncompressed source of heatmap.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform highp float u_intensity;
 
 varying vec2 v_extrude;
@@ -158,5 +133,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<HeatmapProgram>::name;
+constexpr const char* ShaderSource<HeatmapProgram>::vertexSource;
+constexpr const char* ShaderSource<HeatmapProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<HeatmapProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<HeatmapProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

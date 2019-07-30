@@ -15,13 +15,29 @@ struct ShaderSource;
 template <>
 struct ShaderSource<DebugProgram> {
     static constexpr const char* name = "debug";
-    static constexpr const uint8_t hash[8] = { 0xa8, 0x7d, 0x87, 0x6e, 0x36, 0xa8, 0x81, 0xe3 };
-    static constexpr const auto vertexOffset = 12494;
-    static constexpr const auto fragmentOffset = 12590;
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
+attribute vec2 a_pos;
+
+uniform mat4 u_matrix;
+
+void main() {
+    gl_Position = u_matrix * vec4(a_pos, 0, 1);
+}
+
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
+uniform highp vec4 u_color;
+
+void main() {
+    gl_FragColor = u_color;
+}
+
+)MBGL_SHADER";
 };
 
 constexpr const char* ShaderSource<DebugProgram>::name;
-constexpr const uint8_t ShaderSource<DebugProgram>::hash[8];
+constexpr const char* ShaderSource<DebugProgram>::vertexSource;
+constexpr const char* ShaderSource<DebugProgram>::fragmentSource;
 
 } // namespace gl
 } // namespace programs
@@ -36,26 +52,3 @@ Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programPara
 
 } // namespace gfx
 } // namespace mbgl
-
-// Uncompressed source of debug.vertex.glsl:
-/*
-attribute vec2 a_pos;
-
-uniform mat4 u_matrix;
-
-void main() {
-    gl_Position = u_matrix * vec4(a_pos, 0, 1);
-}
-
-*/
-
-// Uncompressed source of debug.fragment.glsl:
-/*
-uniform highp vec4 u_color;
-
-void main() {
-    gl_FragColor = u_color;
-}
-
-*/
-

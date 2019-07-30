@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<HillshadePrepareProgram> {
     static constexpr const char* name = "hillshade_prepare";
-    static constexpr const uint8_t hash[8] = { 0xe6, 0x01, 0xf2, 0xbb, 0xa0, 0x77, 0x1d, 0xeb };
-    static constexpr const auto vertexOffset = 27698;
-    static constexpr const auto fragmentOffset = 27991;
-};
-
-constexpr const char* ShaderSource<HillshadePrepareProgram>::name;
-constexpr const uint8_t ShaderSource<HillshadePrepareProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<HillshadePrepareProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<HillshadePrepareProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of hillshade_prepare.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 uniform mat4 u_matrix;
 uniform vec2 u_dimension;
 
@@ -55,10 +32,8 @@ void main() {
     v_pos = (a_texture_pos / 8192.0) * scale + epsilon;
 }
 
-*/
-
-// Uncompressed source of hillshade_prepare.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 #ifdef GL_ES
 precision highp float;
 #endif
@@ -132,5 +107,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<HillshadePrepareProgram>::name;
+constexpr const char* ShaderSource<HillshadePrepareProgram>::vertexSource;
+constexpr const char* ShaderSource<HillshadePrepareProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<HillshadePrepareProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<HillshadePrepareProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

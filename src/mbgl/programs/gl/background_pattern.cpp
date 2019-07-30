@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<BackgroundPatternProgram> {
     static constexpr const char* name = "background_pattern";
-    static constexpr const uint8_t hash[8] = { 0x70, 0x13, 0xc8, 0x7e, 0xba, 0x18, 0xf5, 0x19 };
-    static constexpr const auto vertexOffset = 1675;
-    static constexpr const auto fragmentOffset = 2266;
-};
-
-constexpr const char* ShaderSource<BackgroundPatternProgram>::name;
-constexpr const uint8_t ShaderSource<BackgroundPatternProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<BackgroundPatternProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<BackgroundPatternProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of background_pattern.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 uniform mat4 u_matrix;
 uniform vec2 u_pattern_size_a;
 uniform vec2 u_pattern_size_b;
@@ -60,10 +37,8 @@ void main() {
     v_pos_b = get_pattern_pos(u_pixel_coord_upper, u_pixel_coord_lower, u_scale_b * u_pattern_size_b, u_tile_units_to_pixels, a_pos);
 }
 
-*/
-
-// Uncompressed source of background_pattern.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform vec2 u_pattern_tl_a;
 uniform vec2 u_pattern_br_a;
 uniform vec2 u_pattern_tl_b;
@@ -93,5 +68,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<BackgroundPatternProgram>::name;
+constexpr const char* ShaderSource<BackgroundPatternProgram>::vertexSource;
+constexpr const char* ShaderSource<BackgroundPatternProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<BackgroundPatternProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<BackgroundPatternProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

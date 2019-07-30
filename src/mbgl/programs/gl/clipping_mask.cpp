@@ -15,13 +15,27 @@ struct ShaderSource;
 template <>
 struct ShaderSource<ClippingMaskProgram> {
     static constexpr const char* name = "clipping_mask";
-    static constexpr const uint8_t hash[8] = { 0x3e, 0x17, 0xc2, 0x3a, 0x1f, 0xf0, 0xa8, 0xa3 };
-    static constexpr const auto vertexOffset = 7891;
-    static constexpr const auto fragmentOffset = 7987;
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
+attribute vec2 a_pos;
+
+uniform mat4 u_matrix;
+
+void main() {
+    gl_Position = u_matrix * vec4(a_pos, 0, 1);
+}
+
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
+void main() {
+    gl_FragColor = vec4(1.0);
+}
+
+)MBGL_SHADER";
 };
 
 constexpr const char* ShaderSource<ClippingMaskProgram>::name;
-constexpr const uint8_t ShaderSource<ClippingMaskProgram>::hash[8];
+constexpr const char* ShaderSource<ClippingMaskProgram>::vertexSource;
+constexpr const char* ShaderSource<ClippingMaskProgram>::fragmentSource;
 
 } // namespace gl
 } // namespace programs
@@ -36,24 +50,3 @@ Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programPara
 
 } // namespace gfx
 } // namespace mbgl
-
-// Uncompressed source of clipping_mask.vertex.glsl:
-/*
-attribute vec2 a_pos;
-
-uniform mat4 u_matrix;
-
-void main() {
-    gl_Position = u_matrix * vec4(a_pos, 0, 1);
-}
-
-*/
-
-// Uncompressed source of clipping_mask.fragment.glsl:
-/*
-void main() {
-    gl_FragColor = vec4(1.0);
-}
-
-*/
-

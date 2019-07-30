@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<SymbolSDFIconProgram> {
     static constexpr const char* name = "symbol_sdf_icon";
-    static constexpr const uint8_t hash[8] = { 0x4b, 0x0b, 0x5f, 0x6b, 0xa9, 0xec, 0x84, 0x19 };
-    static constexpr const auto vertexOffset = 53288;
-    static constexpr const auto fragmentOffset = 57322;
-};
-
-constexpr const char* ShaderSource<SymbolSDFIconProgram>::name;
-constexpr const uint8_t ShaderSource<SymbolSDFIconProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<SymbolSDFIconProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<SymbolSDFIconProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of symbol_sdf_icon.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 const float PI = 3.141592653589793;
 
 attribute vec4 a_pos_offset;
@@ -224,10 +201,8 @@ void main() {
     v_data1 = vec3(gamma_scale, size, interpolated_fade_opacity);
 }
 
-*/
-
-// Uncompressed source of symbol_sdf_icon.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 #define SDF_PX 8.0
 
 uniform bool u_is_halo;
@@ -331,5 +306,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<SymbolSDFIconProgram>::name;
+constexpr const char* ShaderSource<SymbolSDFIconProgram>::vertexSource;
+constexpr const char* ShaderSource<SymbolSDFIconProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<SymbolSDFIconProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<SymbolSDFIconProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

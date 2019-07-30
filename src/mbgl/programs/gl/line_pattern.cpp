@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LinePatternProgram> {
     static constexpr const char* name = "line_pattern";
-    static constexpr const uint8_t hash[8] = { 0x38, 0x9c, 0x3d, 0xde, 0xb4, 0xe0, 0xd1, 0x61 };
-    static constexpr const auto vertexOffset = 37846;
-    static constexpr const auto fragmentOffset = 41240;
-};
-
-constexpr const char* ShaderSource<LinePatternProgram>::name;
-constexpr const uint8_t ShaderSource<LinePatternProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<LinePatternProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<LinePatternProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of line_pattern.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 // floor(127 / 2) == 63.0
 // the maximum allowed miter limit is 2.0 at the moment. the extrude normal is
 // stored in a byte (-128..127). we scale regular normals up to length 63, but
@@ -226,10 +203,8 @@ void main() {
     v_width2 = vec2(outset, inset);
 }
 
-*/
-
-// Uncompressed source of line_pattern.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform lowp float u_device_pixel_ratio;
 uniform vec2 u_texsize;
 uniform float u_fade;
@@ -341,5 +316,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<LinePatternProgram>::name;
+constexpr const char* ShaderSource<LinePatternProgram>::vertexSource;
+constexpr const char* ShaderSource<LinePatternProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<LinePatternProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<LinePatternProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

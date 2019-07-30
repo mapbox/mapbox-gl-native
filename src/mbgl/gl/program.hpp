@@ -16,6 +16,7 @@
 
 #include <mbgl/util/logging.hpp>
 #include <mbgl/programs/program_parameters.hpp>
+#include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/programs/gl/shaders.hpp>
 
@@ -37,17 +38,17 @@ public:
 
     const ProgramParameters programParameters;
 
-    static constexpr const auto vertexOffset = programs::gl::ShaderSource<Name>::vertexOffset;
-    static constexpr const auto fragmentOffset = programs::gl::ShaderSource<Name>::fragmentOffset;
+    static constexpr const auto vertexSource = programs::gl::ShaderSource<Name>::vertexSource;
+    static constexpr const auto fragmentSource = programs::gl::ShaderSource<Name>::fragmentSource;
 
     class Instance {
     public:
         Instance(Context& context,
-                 const std::initializer_list<const char*>& vertexSource,
-                 const std::initializer_list<const char*>& fragmentSource)
+                 const std::initializer_list<const char*>& vertexShaderSource,
+                 const std::initializer_list<const char*>& fragmentShaderSource)
             : program(context.createProgram(
-                  context.createShader(ShaderType::Vertex, vertexSource),
-                  context.createShader(ShaderType::Fragment, fragmentSource),
+                  context.createShader(ShaderType::Vertex, vertexShaderSource),
+                  context.createShader(ShaderType::Fragment, fragmentShaderSource),
                   attributeLocations.getFirstAttribName())) {
             attributeLocations.queryLocations(program);
             uniformStates.queryLocations(program);
@@ -60,19 +61,19 @@ public:
                        const ProgramParameters& programParameters,
                        const std::string& additionalDefines) {
             // Compile the shader
-            const std::initializer_list<const char*> vertexSource = {
+            const std::initializer_list<const char*> vertexShaderSource = {
                 programParameters.getDefines().c_str(),
                 additionalDefines.c_str(),
-                (programs::gl::shaderSource() + programs::gl::vertexPreludeOffset),
-                (programs::gl::shaderSource() + vertexOffset)
+                programs::gl::vertexPrelude,
+                vertexSource
             };
-            const std::initializer_list<const char*> fragmentSource = {
+            const std::initializer_list<const char*> fragmentShaderSource = {
                 programParameters.getDefines().c_str(),
                 additionalDefines.c_str(),
-                (programs::gl::shaderSource() + programs::gl::fragmentPreludeOffset),
-                (programs::gl::shaderSource() + fragmentOffset)
+                programs::gl::fragmentPrelude,
+                fragmentSource
             };
-            auto result = std::make_unique<Instance>(context, vertexSource, fragmentSource);
+            auto result = std::make_unique<Instance>(context, vertexShaderSource, fragmentShaderSource);
 
             return std::move(result);
         }

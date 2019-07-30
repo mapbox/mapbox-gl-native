@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<CollisionBoxProgram> {
     static constexpr const char* name = "collision_box";
-    static constexpr const uint8_t hash[8] = { 0xcb, 0x6a, 0x9b, 0xd1, 0x1f, 0x31, 0xf8, 0x5b };
-    static constexpr const auto vertexOffset = 10000;
-    static constexpr const auto fragmentOffset = 10679;
-};
-
-constexpr const char* ShaderSource<CollisionBoxProgram>::name;
-constexpr const uint8_t ShaderSource<CollisionBoxProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<CollisionBoxProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<CollisionBoxProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of collision_box.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 attribute vec2 a_pos;
 attribute vec2 a_anchor_pos;
 attribute vec2 a_extrude;
@@ -67,10 +44,8 @@ void main() {
     v_notUsed = a_placed.y;
 }
 
-*/
-
-// Uncompressed source of collision_box.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 
 varying float v_placed;
 varying float v_notUsed;
@@ -92,5 +67,23 @@ void main() {
         gl_FragColor *= .1;
     }
 }
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<CollisionBoxProgram>::name;
+constexpr const char* ShaderSource<CollisionBoxProgram>::vertexSource;
+constexpr const char* ShaderSource<CollisionBoxProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<CollisionBoxProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<CollisionBoxProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

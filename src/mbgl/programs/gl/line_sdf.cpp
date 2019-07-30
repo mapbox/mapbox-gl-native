@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LineSDFProgram> {
     static constexpr const char* name = "line_sdf";
-    static constexpr const uint8_t hash[8] = { 0x25, 0x94, 0x7f, 0xad, 0x84, 0xfe, 0x96, 0xad };
-    static constexpr const auto vertexOffset = 43595;
-    static constexpr const auto fragmentOffset = 47282;
-};
-
-constexpr const char* ShaderSource<LineSDFProgram>::name;
-constexpr const uint8_t ShaderSource<LineSDFProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<LineSDFProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<LineSDFProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of line_sdf.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 // floor(127 / 2) == 63.0
 // the maximum allowed miter limit is 2.0 at the moment. the extrude normal is
 // stored in a byte (-128..127). we scale regular normals up to length 63, but
@@ -234,10 +211,8 @@ void main() {
     v_width2 = vec2(outset, inset);
 }
 
-*/
-
-// Uncompressed source of line_sdf.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 
 uniform lowp float u_device_pixel_ratio;
 uniform sampler2D u_image;
@@ -334,5 +309,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<LineSDFProgram>::name;
+constexpr const char* ShaderSource<LineSDFProgram>::vertexSource;
+constexpr const char* ShaderSource<LineSDFProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<LineSDFProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<LineSDFProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

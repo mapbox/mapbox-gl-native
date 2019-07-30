@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<SymbolIconProgram> {
     static constexpr const char* name = "symbol_icon";
-    static constexpr const uint8_t hash[8] = { 0xf3, 0x81, 0x62, 0xe8, 0x24, 0x49, 0xc6, 0x8f };
-    static constexpr const auto vertexOffset = 50235;
-    static constexpr const auto fragmentOffset = 52883;
-};
-
-constexpr const char* ShaderSource<SymbolIconProgram>::name;
-constexpr const uint8_t ShaderSource<SymbolIconProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<SymbolIconProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<SymbolIconProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of symbol_icon.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 const float PI = 3.141592653589793;
 
 attribute vec4 a_pos_offset;
@@ -145,10 +122,8 @@ void main() {
     v_fade_opacity = max(0.0, min(1.0, fade_opacity[0] + fade_change));
 }
 
-*/
-
-// Uncompressed source of symbol_icon.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform sampler2D u_texture;
 
 varying vec2 v_tex;
@@ -177,5 +152,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<SymbolIconProgram>::name;
+constexpr const char* ShaderSource<SymbolIconProgram>::vertexSource;
+constexpr const char* ShaderSource<SymbolIconProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<SymbolIconProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<SymbolIconProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

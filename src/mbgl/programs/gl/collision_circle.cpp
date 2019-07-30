@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<CollisionCircleProgram> {
     static constexpr const char* name = "collision_circle";
-    static constexpr const uint8_t hash[8] = { 0x99, 0x2e, 0xad, 0x8c, 0xd3, 0x88, 0xae, 0x82 };
-    static constexpr const auto vertexOffset = 10902;
-    static constexpr const auto fragmentOffset = 11818;
-};
-
-constexpr const char* ShaderSource<CollisionCircleProgram>::name;
-constexpr const uint8_t ShaderSource<CollisionCircleProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<CollisionCircleProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<CollisionCircleProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of collision_circle.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 attribute vec2 a_pos;
 attribute vec2 a_anchor_pos;
 attribute vec2 a_extrude;
@@ -76,10 +53,8 @@ void main() {
     v_extrude_scale = u_extrude_scale * u_camera_to_center_distance * collision_perspective_ratio;
 }
 
-*/
-
-// Uncompressed source of collision_circle.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform float u_overscale_factor;
 
 varying float v_placed;
@@ -115,5 +90,23 @@ void main() {
     gl_FragColor = opacity_t * color;
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<CollisionCircleProgram>::name;
+constexpr const char* ShaderSource<CollisionCircleProgram>::vertexSource;
+constexpr const char* ShaderSource<CollisionCircleProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<CollisionCircleProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<CollisionCircleProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillOutlineProgram> {
     static constexpr const char* name = "fill_outline";
-    static constexpr const uint8_t hash[8] = { 0x51, 0x25, 0x43, 0x9d, 0x41, 0x73, 0xe1, 0xbb };
-    static constexpr const auto vertexOffset = 13722;
-    static constexpr const auto fragmentOffset = 14547;
-};
-
-constexpr const char* ShaderSource<FillOutlineProgram>::name;
-constexpr const uint8_t ShaderSource<FillOutlineProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<FillOutlineProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<FillOutlineProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of fill_outline.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 attribute vec2 a_pos;
 
 uniform mat4 u_matrix;
@@ -85,10 +62,8 @@ void main() {
     v_pos = (gl_Position.xy / gl_Position.w + 1.0) / 2.0 * u_world;
 }
 
-*/
-
-// Uncompressed source of fill_outline.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 varying vec2 v_pos;
 
 
@@ -127,5 +102,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<FillOutlineProgram>::name;
+constexpr const char* ShaderSource<FillOutlineProgram>::vertexSource;
+constexpr const char* ShaderSource<FillOutlineProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<FillOutlineProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<FillOutlineProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

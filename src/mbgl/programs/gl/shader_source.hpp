@@ -6,8 +6,6 @@ namespace mbgl {
 namespace programs {
 namespace gl {
 
-const char* shaderSource();
-
 template <typename>
 struct ShaderSource;
 

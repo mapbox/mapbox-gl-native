@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillExtrusionProgram> {
     static constexpr const char* name = "fill_extrusion";
-    static constexpr const uint8_t hash[8] = { 0x9d, 0x76, 0x7f, 0xaa, 0x86, 0x57, 0x56, 0x96 };
-    static constexpr const auto vertexOffset = 21283;
-    static constexpr const auto fragmentOffset = 23214;
-};
-
-constexpr const char* ShaderSource<FillExtrusionProgram>::name;
-constexpr const uint8_t ShaderSource<FillExtrusionProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<FillExtrusionProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<FillExtrusionProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of fill_extrusion.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 uniform mat4 u_matrix;
 uniform vec3 u_lightcolor;
 uniform lowp vec3 u_lightpos;
@@ -145,10 +122,8 @@ void main() {
     v_color *= u_opacity;
 }
 
-*/
-
-// Uncompressed source of fill_extrusion.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 varying vec4 v_color;
 
 void main() {
@@ -159,5 +134,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<FillExtrusionProgram>::name;
+constexpr const char* ShaderSource<FillExtrusionProgram>::vertexSource;
+constexpr const char* ShaderSource<FillExtrusionProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<FillExtrusionProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<FillExtrusionProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl

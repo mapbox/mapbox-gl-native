@@ -15,30 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillPatternProgram> {
     static constexpr const char* name = "fill_pattern";
-    static constexpr const uint8_t hash[8] = { 0x74, 0xa9, 0x97, 0x01, 0x96, 0xbd, 0x87, 0x36 };
-    static constexpr const auto vertexOffset = 18304;
-    static constexpr const auto fragmentOffset = 20083;
-};
-
-constexpr const char* ShaderSource<FillPatternProgram>::name;
-constexpr const uint8_t ShaderSource<FillPatternProgram>::hash[8];
-
-} // namespace gl
-} // namespace programs
-
-namespace gfx {
-
-template <>
-std::unique_ptr<gfx::Program<FillPatternProgram>>
-Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<FillPatternProgram>>(programParameters);
-}
-
-} // namespace gfx
-} // namespace mbgl
-
-// Uncompressed source of fill_pattern.vertex.glsl:
-/*
+    static constexpr const char* vertexSource = R"MBGL_SHADER(
 uniform mat4 u_matrix;
 uniform vec2 u_pixel_coord_upper;
 uniform vec2 u_pixel_coord_lower;
@@ -118,10 +95,8 @@ void main() {
     v_pos_b = get_pattern_pos(u_pixel_coord_upper, u_pixel_coord_lower, toScale * display_size_b, tileZoomRatio, a_pos);
 }
 
-*/
-
-// Uncompressed source of fill_pattern.fragment.glsl:
-/*
+)MBGL_SHADER";
+    static constexpr const char* fragmentSource = R"MBGL_SHADER(
 uniform vec2 u_texsize;
 uniform float u_fade;
 
@@ -189,5 +164,23 @@ void main() {
 #endif
 }
 
-*/
+)MBGL_SHADER";
+};
 
+constexpr const char* ShaderSource<FillPatternProgram>::name;
+constexpr const char* ShaderSource<FillPatternProgram>::vertexSource;
+constexpr const char* ShaderSource<FillPatternProgram>::fragmentSource;
+
+} // namespace gl
+} // namespace programs
+
+namespace gfx {
+
+template <>
+std::unique_ptr<gfx::Program<FillPatternProgram>>
+Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
+    return std::make_unique<gl::Program<FillPatternProgram>>(programParameters);
+}
+
+} // namespace gfx
+} // namespace mbgl
