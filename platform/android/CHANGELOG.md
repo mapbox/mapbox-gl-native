@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+### Features
+ - Add fallback support to local ideograph font families [#15255](https://github.com/mapbox/mapbox-gl-native/pull/15255)
+
 ### Bug fixes
  - Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues [#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195)
  - Allow loading of a map without a Style URI or Style JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)

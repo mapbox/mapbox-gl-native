@@ -18,17 +18,20 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.AttributionLayout;
 import com.mapbox.mapboxsdk.attribution.AttributionMeasure;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.utils.FontUtils;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
@@ -98,7 +101,7 @@ public class MapSnapshotter {
     private LatLngBounds region;
     private CameraPosition cameraPosition;
     private boolean showLogo = true;
-    private String localIdeographFontFamily = "sans-serif";
+    private String localIdeographFontFamily = MapboxConstants.DEFAULT_FONT;
     private String apiBaseUrl;
 
     /**
@@ -182,14 +185,31 @@ public class MapSnapshotter {
      * <p>
      * The font family argument is passed to {@link android.graphics.Typeface#create(String, int)}.
      * Default system fonts are defined in &#x27;/system/etc/fonts.xml&#x27;
-     * Default font for local ideograph font family is "sans-serif".
-     *
+     * Default font for local ideograph font family is {@link MapboxConstants#DEFAULT_FONT}.
+     * </p>
      * @param fontFamily font family for local ideograph generation.
      * @return the mutated {@link Options}
      */
     @NonNull
     public Options withLocalIdeographFontFamily(String fontFamily) {
-      this.localIdeographFontFamily = fontFamily;
+      this.localIdeographFontFamily = FontUtils.extractValidFont(fontFamily);
+      return this;
+    }
+
+    /**
+     * Set a font family from range of font families for generating glyphs locally for ideographs in the
+     * &#x27;CJK Unified Ideographs&#x27; and &#x27;Hangul Syllables&#x27; ranges.
+     * <p>
+     * The font families are checked against the default system fonts defined in
+     * &#x27;/system/etc/fonts.xml&#x27;. Default font for local ideograph font family is
+     * {@link MapboxConstants#DEFAULT_FONT}.
+     * </p>
+     * @param fontFamilies font families for local ideograph generation.
+     * @return the mutated {@link Options}
+     */
+    @NonNull
+    public Options withLocalIdeographFontFamily(String... fontFamilies) {
+      this.localIdeographFontFamily = FontUtils.extractValidFont(fontFamilies);
       return this;
     }
 
@@ -274,7 +294,7 @@ public class MapSnapshotter {
 
     /**
      * @return the font family used for locally generating ideographs,
-     * Default font for local ideograph font family is "sans-serif".
+     * Default font for local ideograph font family is {@link MapboxConstants#DEFAULT_FONT}.
      */
     public String getLocalIdeographFontFamily() {
       return localIdeographFontFamily;

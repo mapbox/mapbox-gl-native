@@ -19,6 +19,7 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
+import com.mapbox.mapboxsdk.utils.FontUtils;
 
 import java.util.Arrays;
 
@@ -70,7 +71,6 @@ public class MapboxMapOptions implements Parcelable {
   private boolean prefetchesTiles = true;
   private boolean zMediaOverlay = false;
   private String localIdeographFontFamily;
-
   private String apiBaseUri;
 
   private boolean textureMode;
@@ -250,7 +250,7 @@ public class MapboxMapOptions implements Parcelable {
       String localIdeographFontFamily =
         typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily);
       if (localIdeographFontFamily == null) {
-        localIdeographFontFamily = "sans-serif";
+        localIdeographFontFamily = MapboxConstants.DEFAULT_FONT;
       }
       mapboxMapOptions.localIdeographFontFamily(localIdeographFontFamily);
 
@@ -637,14 +637,33 @@ public class MapboxMapOptions implements Parcelable {
    * <p>
    * The font family argument is passed to {@link android.graphics.Typeface#create(String, int)}.
    * Default system fonts are defined in &#x27;/system/etc/fonts.xml&#x27;
-   * Default font for local ideograph font family is "sans-serif".
+   * Default font for local ideograph font family is {@link MapboxConstants#DEFAULT_FONT}.
    *
    * @param fontFamily font family for local ideograph generation.
    * @return This
    */
   @NonNull
   public MapboxMapOptions localIdeographFontFamily(String fontFamily) {
-    this.localIdeographFontFamily = fontFamily;
+    this.localIdeographFontFamily = FontUtils.extractValidFont(fontFamily);
+    return this;
+  }
+
+  /**
+   * Set a font family from range of font families for generating glyphs locally for ideographs in the
+   * &#x27;CJK Unified Ideographs&#x27; and &#x27;Hangul Syllables&#x27; ranges. The first matching font
+   * will be selected. If no valid font found, it defaults to {@link MapboxConstants#DEFAULT_FONT}.
+   * <p>
+   * The font families are checked against the default system fonts defined in
+   * &#x27;/system/etc/fonts.xml&#x27; Default font for local ideograph font family is
+   * {@link MapboxConstants#DEFAULT_FONT}.
+   * </p>
+   *
+   * @param fontFamilies an array of font families for local ideograph generation.
+   * @return This
+   */
+  @NonNull
+  public MapboxMapOptions localIdeographFontFamily(String... fontFamilies) {
+    this.localIdeographFontFamily = FontUtils.extractValidFont(fontFamilies);
     return this;
   }
 
@@ -942,7 +961,7 @@ public class MapboxMapOptions implements Parcelable {
   /**
    * Returns the font-family for locally overriding generation of glyphs in the
    * &#x27;CJK Unified Ideographs&#x27; and &#x27;Hangul Syllables&#x27; ranges.
-   * Default font for local ideograph font family is "sans-serif".
+   * Default font for local ideograph font family is {@link MapboxConstants#DEFAULT_FONT}.
    *
    * @return Local ideograph font family name.
    */

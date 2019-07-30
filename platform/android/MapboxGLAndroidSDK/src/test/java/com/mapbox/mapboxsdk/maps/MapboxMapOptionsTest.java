@@ -180,7 +180,7 @@ public class MapboxMapOptionsTest {
   @Test
   public void testLocalIdeographFontFamily_enabledByDefault() {
     MapboxMapOptions options = MapboxMapOptions.createFromAttributes(RuntimeEnvironment.application, null);
-    assertEquals("sans-serif", options.getLocalIdeographFontFamily());
+    assertEquals(MapboxConstants.DEFAULT_FONT, options.getLocalIdeographFontFamily());
   }
 }
 
