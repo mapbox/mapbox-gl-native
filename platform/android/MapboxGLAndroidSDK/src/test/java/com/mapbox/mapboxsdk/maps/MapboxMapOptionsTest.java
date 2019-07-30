@@ -8,6 +8,9 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 
 import java.util.Arrays;
 
@@ -18,6 +21,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(RobolectricTestRunner.class)
 public class MapboxMapOptionsTest {
 
   private static final double DELTA = 1e-15;
@@ -171,6 +175,12 @@ public class MapboxMapOptionsTest {
     // check mutations
     assertTrue(new MapboxMapOptions().crossSourceCollisions(true).getCrossSourceCollisions());
     assertFalse(new MapboxMapOptions().crossSourceCollisions(false).getCrossSourceCollisions());
+  }
+
+  @Test
+  public void testLocalIdeographFontFamily_enabledByDefault() {
+    MapboxMapOptions options = MapboxMapOptions.createFromAttributes(RuntimeEnvironment.application, null);
+    assertEquals("sans-serif", options.getLocalIdeographFontFamily());
   }
 }
 

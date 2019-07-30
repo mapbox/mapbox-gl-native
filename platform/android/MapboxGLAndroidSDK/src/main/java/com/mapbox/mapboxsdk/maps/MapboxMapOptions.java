@@ -69,7 +69,7 @@ public class MapboxMapOptions implements Parcelable {
 
   private boolean prefetchesTiles = true;
   private boolean zMediaOverlay = false;
-  private String localIdeographFontFamily = "sans-serif";
+  private String localIdeographFontFamily;
 
   private String apiBaseUri;
 
@@ -246,8 +246,14 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
       mapboxMapOptions.renderSurfaceOnTop(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
-      mapboxMapOptions.localIdeographFontFamily(
-        typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily));
+
+      String localIdeographFontFamily =
+        typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily);
+      if (localIdeographFontFamily == null) {
+        localIdeographFontFamily = "sans-serif";
+      }
+      mapboxMapOptions.localIdeographFontFamily(localIdeographFontFamily);
+
       mapboxMapOptions.pixelRatio(
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_pixelRatio, 0));
       mapboxMapOptions.foregroundLoadColor(
