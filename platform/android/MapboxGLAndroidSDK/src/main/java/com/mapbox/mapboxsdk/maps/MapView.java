@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.util.LongSparseArray;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -283,6 +284,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private void initialiseDrawingSurface(MapboxMapOptions options) {
     String localFontFamily = options.getLocalIdeographFontFamily();
+    if (TextUtils.isEmpty(localFontFamily)) {
+      localFontFamily = "sans-serif";
+    }
     if (options.getTextureMode()) {
       TextureView textureView = new TextureView(getContext());
       boolean translucentSurface = options.getTranslucentTextureSurface();
