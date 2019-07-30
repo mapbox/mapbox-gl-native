@@ -86,21 +86,23 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC libjpeg-turbo)
     target_add_mason_package(mbgl-core PRIVATE icu)
 
-    # Ignore warning caused by ICU header unistr.h in some CI environments
-    set_source_files_properties(platform/default/src/mbgl/util/format_number.cpp PROPERTIES COMPILE_FLAGS -Wno-error=shadow)
+    if(WITH_ICU_I18N)
+        # Ignore warning caused by ICU header unistr.h in some CI environments
+        set_source_files_properties(platform/default/src/mbgl/util/format_number.cpp PROPERTIES COMPILE_FLAGS -Wno-error=shadow)
 
-    # Link all ICU libraries (by default only libicuuc is linked)
-    find_library(LIBICUI18N NAMES icui18n HINTS ${MASON_PACKAGE_icu_INCLUDE_DIRS}/../lib)
-    find_library(LIBICUUC NAMES icuuc HINTS ${MASON_PACKAGE_icu_INCLUDE_DIRS}/../lib)
-    find_library(LIBICUDATA NAMES icudata HINTS ${MASON_PACKAGE_icu_INCLUDE_DIRS}/../lib)
+        # Link all ICU libraries (by default only libicuuc is linked)
+        find_library(LIBICUI18N NAMES icui18n HINTS ${MASON_PACKAGE_icu_INCLUDE_DIRS}/../lib)
+        find_library(LIBICUUC NAMES icuuc HINTS ${MASON_PACKAGE_icu_INCLUDE_DIRS}/../lib)
+        find_library(LIBICUDATA NAMES icudata HINTS ${MASON_PACKAGE_icu_INCLUDE_DIRS}/../lib)
 
-    target_link_libraries(mbgl-core
-        PRIVATE ${LIBICUI18N}
-        PRIVATE ${LIBICUUC}
-        PRIVATE ${LIBICUDATA}
-        PRIVATE nunicode
-        PUBLIC -lz
-    )
+        target_link_libraries(mbgl-core
+            PRIVATE ${LIBICUI18N}
+            PRIVATE ${LIBICUUC}
+            PRIVATE ${LIBICUDATA}
+            PRIVATE nunicode
+            PUBLIC -lz
+        )
+    endif()
 
     if(WITH_CXX11ABI)
         # Statically link libstdc++ when we're using the new STL ABI

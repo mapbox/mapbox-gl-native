@@ -28,6 +28,7 @@ option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(WITH_EGL      "Use EGL backend" OFF)
 option(WITH_NODEJS   "Download test dependencies like NPM and Node.js" ON)
 option(WITH_ERROR    "Add -Werror flag to build (turns warnings into errors)" ON)
+option(WITH_ICU_I18N "Assume ICU with i18n support" ON)
 
 if (WITH_ERROR)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
@@ -74,6 +75,10 @@ endif()
 set_source_files_properties(src/mbgl/util/version.cpp PROPERTIES COMPILE_DEFINITIONS MBGL_VERSION_REV="${MBGL_VERSION_REV}")
 
 include(cmake/mason-dependencies.cmake)
+
+if(WITH_ICU_18N)
+    add_definitions(-DMBGL_ICU_I18N=1)
+endif()
 
 if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
