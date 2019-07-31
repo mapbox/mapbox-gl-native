@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -23,6 +25,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import timber.log.Timber;
+
+import static com.mapbox.mapboxsdk.constants.GeometryConstants.MAX_LATITUDE;
+import static com.mapbox.mapboxsdk.constants.GeometryConstants.MIN_LATITUDE;
 
 /**
  * Test activity showcasing how to listen to camera change events.
@@ -241,6 +246,13 @@ public class CameraPositionActivity extends FragmentActivity implements OnMapRea
         ((TextView) dialogContent.findViewById(R.id.value_bearing)).getText().toString());
       double tilt = Double.parseDouble(
         ((TextView) dialogContent.findViewById(R.id.value_tilt)).getText().toString());
+
+      if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE) {
+        Toast.makeText(dialogContent.getContext(), "latitude value must be set "
+                + " between " + MIN_LATITUDE + " and " + MAX_LATITUDE,
+          Toast.LENGTH_SHORT).show();
+        return;
+      }
 
       CameraPosition cameraPosition = new CameraPosition.Builder()
         .target(new LatLng(latitude, longitude))
