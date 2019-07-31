@@ -142,6 +142,32 @@ public class LocationCameraControllerTest {
   }
 
   @Test
+  public void setCameraMode_doNotNotifyAboutDuplicates_NONE() {
+    OnCameraTrackingChangedListener internalTrackingChangedListener = mock(OnCameraTrackingChangedListener.class);
+    LocationCameraController camera = buildCamera(internalTrackingChangedListener);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+    int cameraMode = NONE;
+
+    camera.setCameraMode(cameraMode);
+    camera.setCameraMode(cameraMode);
+
+    verify(internalTrackingChangedListener, times(1)).onCameraTrackingChanged(cameraMode);
+  }
+
+  @Test
+  public void setCameraMode_doNotNotifyAboutDuplicates_TRACKING_GPS() {
+    OnCameraTrackingChangedListener internalTrackingChangedListener = mock(OnCameraTrackingChangedListener.class);
+    LocationCameraController camera = buildCamera(internalTrackingChangedListener);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+    int cameraMode = TRACKING_GPS;
+
+    camera.setCameraMode(cameraMode);
+    camera.setCameraMode(cameraMode);
+
+    verify(internalTrackingChangedListener, times(1)).onCameraTrackingChanged(cameraMode);
+  }
+
+  @Test
   public void setCameraMode_cancelTransitionsWhenSet() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));

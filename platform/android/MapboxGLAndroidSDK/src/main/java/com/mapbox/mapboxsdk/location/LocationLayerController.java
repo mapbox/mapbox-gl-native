@@ -111,11 +111,8 @@ final class LocationLayerController {
       removeLayers();
       addLayers();
       if (isHidden) {
-        for (String layerId : layerSet) {
-          setLayerVisibility(layerId, false);
-        }
+        hide();
       }
-      setRenderMode(renderMode);
     }
 
     this.options = options;
@@ -131,49 +128,24 @@ final class LocationLayerController {
     styleAccuracy(options.accuracyAlpha(), options.accuracyColor());
     styleScaling(options);
     determineIconsSource(options);
+
+    if (!isHidden) {
+      show();
+    }
   }
 
   void setRenderMode(@RenderMode.Mode int renderMode) {
-    int previousMode = this.renderMode;
+    if (this.renderMode == renderMode) {
+      return;
+    }
     this.renderMode = renderMode;
 
     if (!isHidden) {
-      boolean isStale = locationFeature.getBooleanProperty(PROPERTY_LOCATION_STALE);
-      switch (renderMode) {
-        case RenderMode.NORMAL:
-          styleForeground(options);
-          setLayerVisibility(SHADOW_LAYER, true);
-          setLayerVisibility(FOREGROUND_LAYER, true);
-          setLayerVisibility(BACKGROUND_LAYER, true);
-          setLayerVisibility(ACCURACY_LAYER, !isStale);
-          setLayerVisibility(BEARING_LAYER, false);
-          break;
-        case RenderMode.COMPASS:
-          styleForeground(options);
-          setLayerVisibility(SHADOW_LAYER, true);
-          setLayerVisibility(FOREGROUND_LAYER, true);
-          setLayerVisibility(BACKGROUND_LAYER, true);
-          setLayerVisibility(ACCURACY_LAYER, !isStale);
-          setLayerVisibility(BEARING_LAYER, true);
-          break;
-        case RenderMode.GPS:
-          styleForeground(options);
-          setLayerVisibility(SHADOW_LAYER, false);
-          setLayerVisibility(FOREGROUND_LAYER, true);
-          setLayerVisibility(BACKGROUND_LAYER, true);
-          setLayerVisibility(ACCURACY_LAYER, false);
-          setLayerVisibility(BEARING_LAYER, false);
-          break;
-        default:
-          break;
-      }
-
-      determineIconsSource(options);
+      styleForeground(options);
+      show();
     }
-
-    if (previousMode != renderMode) {
-      internalRenderModeChangedListener.onRenderModeChanged(renderMode);
-    }
+    determineIconsSource(options);
+    internalRenderModeChangedListener.onRenderModeChanged(renderMode);
   }
 
   int getRenderMode() {
@@ -186,7 +158,32 @@ final class LocationLayerController {
 
   void show() {
     isHidden = false;
-    setRenderMode(renderMode);
+    boolean isStale = locationFeature.getBooleanProperty(PROPERTY_LOCATION_STALE);
+    switch (renderMode) {
+      case RenderMode.NORMAL:
+        setLayerVisibility(SHADOW_LAYER, true);
+        setLayerVisibility(FOREGROUND_LAYER, true);
+        setLayerVisibility(BACKGROUND_LAYER, true);
+        setLayerVisibility(ACCURACY_LAYER, !isStale);
+        setLayerVisibility(BEARING_LAYER, false);
+        break;
+      case RenderMode.COMPASS:
+        setLayerVisibility(SHADOW_LAYER, true);
+        setLayerVisibility(FOREGROUND_LAYER, true);
+        setLayerVisibility(BACKGROUND_LAYER, true);
+        setLayerVisibility(ACCURACY_LAYER, !isStale);
+        setLayerVisibility(BEARING_LAYER, true);
+        break;
+      case RenderMode.GPS:
+        setLayerVisibility(SHADOW_LAYER, false);
+        setLayerVisibility(FOREGROUND_LAYER, true);
+        setLayerVisibility(BACKGROUND_LAYER, true);
+        setLayerVisibility(ACCURACY_LAYER, false);
+        setLayerVisibility(BEARING_LAYER, false);
+        break;
+      default:
+        break;
+    }
   }
 
   void hide() {

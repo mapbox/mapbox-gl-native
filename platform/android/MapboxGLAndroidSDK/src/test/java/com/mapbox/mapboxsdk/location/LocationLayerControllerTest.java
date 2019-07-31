@@ -594,6 +594,44 @@ public class LocationLayerControllerTest {
       .addNumberProperty(PROPERTY_ACCURACY_RADIUS, accuracyRadiusValue);
   }
 
+  @Test
+  public void renderModeChanged_doNotNotifyAboutDuplicates_NORMAL() {
+    OnRenderModeChangedListener internalRenderModeChangedListener = mock(OnRenderModeChangedListener.class);
+    LayerSourceProvider sourceProvider = buildLayerProvider();
+    GeoJsonSource locationSource = mock(GeoJsonSource.class);
+    when(sourceProvider.generateSource(any(Feature.class))).thenReturn(locationSource);
+    LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+
+    LocationLayerController controller =
+      new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options, internalRenderModeChangedListener);
+
+    controller.setRenderMode(RenderMode.NORMAL);
+    controller.setRenderMode(RenderMode.NORMAL);
+
+    verify(internalRenderModeChangedListener, times(1)).onRenderModeChanged(RenderMode.NORMAL);
+  }
+
+  @Test
+  public void renderModeChanged_doNotNotifyAboutDuplicates_GPS() {
+    OnRenderModeChangedListener internalRenderModeChangedListener = mock(OnRenderModeChangedListener.class);
+    LayerSourceProvider sourceProvider = buildLayerProvider();
+    GeoJsonSource locationSource = mock(GeoJsonSource.class);
+    when(sourceProvider.generateSource(any(Feature.class))).thenReturn(locationSource);
+    LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+
+    LocationLayerController controller =
+      new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options, internalRenderModeChangedListener);
+
+    controller.setRenderMode(RenderMode.GPS);
+    controller.setRenderMode(RenderMode.GPS);
+
+    verify(internalRenderModeChangedListener, times(1)).onRenderModeChanged(RenderMode.GPS);
+  }
+
   private LayerFeatureProvider buildFeatureProvider(@NonNull LocationComponentOptions options) {
     LayerFeatureProvider provider = mock(LayerFeatureProvider.class);
     when(provider.generateLocationFeature(null, options)).thenReturn(mock(Feature.class));
