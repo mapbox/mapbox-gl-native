@@ -25,11 +25,15 @@ public:
         return optional<mbgl::Value>();
     }
 };
-
-
+      
 EvaluationResult Expression::evaluate(optional<float> zoom, const Feature& feature, optional<double> colorRampParameter) const {
     GeoJSONFeature f(feature);
     return this->evaluate(EvaluationContext(zoom, &f, colorRampParameter));
+}
+
+EvaluationResult Expression::evaluate(optional<mbgl::Value> accumulated, const Feature& feature) const {
+    GeoJSONFeature f(feature);
+    return this->evaluate(EvaluationContext(accumulated, &f));
 }
 
 } // namespace expression

@@ -9,7 +9,7 @@
 namespace mbgl {
 namespace style {
 
-GeoJSONSource::GeoJSONSource(const std::string& id, const GeoJSONOptions& options)
+GeoJSONSource::GeoJSONSource(const std::string& id, optional<GeoJSONOptions> options)
     : Source(makeMutable<Impl>(std::move(id), options)) {
 }
 

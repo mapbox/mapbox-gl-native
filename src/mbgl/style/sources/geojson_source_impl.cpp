@@ -1,6 +1,6 @@
 #include <mbgl/style/sources/geojson_source_impl.hpp>
-#include <mbgl/util/constants.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <mapbox/geojsonvt.hpp>
@@ -26,8 +26,8 @@ public:
     }
 
     mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
-                                                           const std::uint32_t,
-                                                           const std::uint32_t) final {
+                                                          const std::uint32_t,
+                                                          const std::uint32_t) final {
         return {};
     }
 
@@ -54,8 +54,8 @@ public:
     }
 
     mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t cluster_id,
-                                                           const std::uint32_t limit,
-                                                           const std::uint32_t offset) final {
+                                                          const std::uint32_t limit,
+                                                          const std::uint32_t offset) final {
         return impl.getLeaves(cluster_id, limit, offset);
     }
 
@@ -67,23 +67,55 @@ private:
     mapbox::supercluster::Supercluster impl;
 };
 
-GeoJSONSource::Impl::Impl(std::string id_, GeoJSONOptions options_)
-    : Source::Impl(SourceType::GeoJSON, std::move(id_)),
-      options(std::move(options_)) {
+template <class T>
+T EvaluateFeature(optional<T> accumulated,
+                  mapbox::feature::feature<double>& f,
+                  const std::shared_ptr<expression::Expression> expression,
+                  T finalDefaultValue = T()) {
+    const expression::EvaluationResult result = expression->evaluate(accumulated, f);
+    if (result) {
+        const optional<T> typed = expression::fromExpressionValue<T>(*result);
+        return typed ? *typed : finalDefaultValue;
+    }
+    return finalDefaultValue;
 }
 
-GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
-    : Source::Impl(other),
-      options(other.options) {
-    constexpr double scale = util::EXTENT / util::tileSize;
+GeoJSONSource::Impl::Impl(std::string id_, optional<GeoJSONOptions> options_)
+    : Source::Impl(SourceType::GeoJSON, std::move(id_)) {
+        options = options_ ? std::move(*options_) : GeoJSONOptions{};
+}
 
-    if (options.cluster
-        && geoJSON.is<mapbox::feature::feature_collection<double>>()
-        && !geoJSON.get<mapbox::feature::feature_collection<double>>().empty()) {
+GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON) : Source::Impl(other) {
+    options = std::move(other.options);
+    constexpr double scale = util::EXTENT / util::tileSize;
+    if (options.cluster && geoJSON.is<mapbox::feature::feature_collection<double>>() &&
+        !geoJSON.get<mapbox::feature::feature_collection<double>>().empty()) {
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
         clusterOptions.radius = ::round(scale * options.clusterRadius);
+        clusterOptions.map =
+            [&](const mapbox::feature::property_map& properties) -> mapbox::feature::property_map {
+            mapbox::feature::property_map ret{};
+            for (const auto& p : options.clusterProperties) {
+                auto feature = mapbox::feature::feature<double>();
+                feature.properties = properties;
+                ret[p.first] = EvaluateFeature<mapbox::feature::value>(nullopt, feature, p.second.first);
+            }
+            return ret;
+        };
+        clusterOptions.reduce = [&](mapbox::feature::property_map& toReturn,
+                                    const mapbox::feature::property_map& toFill) {
+            for (const auto& p : options.clusterProperties) {
+                if(toFill.count(p.first) == 0){
+                    continue;
+                }
+                auto feature = mapbox::feature::feature<double>();
+                feature.properties = toFill;
+                optional<mapbox::feature::value> accumulated(toReturn[p.first]);
+                toReturn[p.first] = EvaluateFeature<mapbox::feature::value>(accumulated, feature, p.second.second);    
+            }
+        };
         data = std::make_shared<SuperclusterData>(
             geoJSON.get<mapbox::feature::feature_collection<double>>(), clusterOptions);
     } else {
