@@ -166,7 +166,7 @@ public class OfflineManager {
    * @param callback the callback to be invoked
    */
   public void listOfflineRegions(@NonNull final ListOfflineRegionsCallback callback) {
-    fileSource.activate();
+   // fileSource.activate();
     listOfflineRegions(fileSource, new ListOfflineRegionsCallback() {
 
       @Override
@@ -174,7 +174,7 @@ public class OfflineManager {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+            //fileSource.deactivate();
             callback.onList(offlineRegions);
           }
         });
@@ -185,7 +185,7 @@ public class OfflineManager {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+            //fileSource.deactivate();
             callback.onError(error);
           }
         });
@@ -276,14 +276,14 @@ public class OfflineManager {
    * @param callback the callback to be invoked when the database was reset or when the operation erred.
    */
   public void resetDatabase(@Nullable final FileSourceCallback callback) {
-    fileSource.activate();
+    //fileSource.activate();
     nativeResetDatabase(new FileSourceCallback() {
       @Override
       public void onSuccess() {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+            //fileSource.deactivate();
             if (callback != null) {
               callback.onSuccess();
             }
@@ -296,7 +296,7 @@ public class OfflineManager {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+            //fileSource.deactivate();
             if (callback != null) {
               callback.onError(message);
             }
@@ -322,14 +322,14 @@ public class OfflineManager {
    * @param callback the callback to be invoked when the ambient cache was invalidated or when the operation erred.
    */
   public void invalidateAmbientCache(@Nullable final FileSourceCallback callback) {
-    fileSource.activate();
+    // fileSource.activate();
     nativeInvalidateAmbientCache(new FileSourceCallback() {
       @Override
       public void onSuccess() {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+          //   fileSource.deactivate();
             if (callback != null) {
               callback.onSuccess();
             }
@@ -342,7 +342,7 @@ public class OfflineManager {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+           //  fileSource.deactivate();
             if (callback != null) {
               callback.onError(message);
             }
@@ -367,14 +367,14 @@ public class OfflineManager {
    * @param callback the callback to be invoked when the ambient cache was cleared or when the operation erred.
    */
   public void clearAmbientCache(@Nullable final FileSourceCallback callback) {
-    fileSource.activate();
+    ///fileSource.activate();
     nativeClearAmbientCache(new FileSourceCallback() {
       @Override
       public void onSuccess() {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+            //fileSource.deactivate();
             if (callback != null) {
               callback.onSuccess();
             }
@@ -387,7 +387,7 @@ public class OfflineManager {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+           // fileSource.deactivate();
             if (callback != null) {
               callback.onError(message);
             }
@@ -427,14 +427,14 @@ public class OfflineManager {
    * @param callback the callback to be invoked when the the maximum size has been set or when the operation erred.
    */
   public void setMaximumAmbientCacheSize(long size, @Nullable final FileSourceCallback callback) {
-    fileSource.activate();
+    //fileSource.activate();
     nativeSetMaximumAmbientCacheSize(size, new FileSourceCallback() {
       @Override
       public void onSuccess() {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+          //  fileSource.deactivate();
             if (callback != null) {
               callback.onSuccess();
             }
@@ -444,11 +444,11 @@ public class OfflineManager {
 
       @Override
       public void onError(@NonNull final String message) {
-        fileSource.activate();
+     //   fileSource.activate();
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+           // fileSource.deactivate();
             if (callback != null) {
               callback.onError(message);
             }
@@ -504,7 +504,7 @@ public class OfflineManager {
 
   private void mergeOfflineDatabaseFiles(@NonNull final File file, @NonNull final MergeOfflineRegionsCallback callback,
                                          final boolean isTemporaryFile) {
-    fileSource.activate();
+    //fileSource.activate();
     mergeOfflineRegions(fileSource, file.getAbsolutePath(), new MergeOfflineRegionsCallback() {
       @Override
       public void onMerge(final OfflineRegion[] offlineRegions) {
@@ -514,7 +514,7 @@ public class OfflineManager {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+           // fileSource.deactivate();
             callback.onMerge(offlineRegions);
           }
         });
@@ -528,7 +528,7 @@ public class OfflineManager {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+           // fileSource.deactivate();
             callback.onError(error);
           }
         });
@@ -563,7 +563,7 @@ public class OfflineManager {
     }
 
     ConnectivityReceiver.instance(context).activate();
-    FileSource.getInstance(context).activate();
+    //FileSource.getInstance(context).activate();
     createOfflineRegion(fileSource, definition, metadata, new CreateOfflineRegionCallback() {
 
       @Override
@@ -572,7 +572,7 @@ public class OfflineManager {
           @Override
           public void run() {
             ConnectivityReceiver.instance(context).deactivate();
-            FileSource.getInstance(context).deactivate();
+           // FileSource.getInstance(context).deactivate();
             callback.onCreate(offlineRegion);
           }
         });
@@ -584,7 +584,7 @@ public class OfflineManager {
           @Override
           public void run() {
             ConnectivityReceiver.instance(context).deactivate();
-            FileSource.getInstance(context).deactivate();
+            //FileSource.getInstance(context).deactivate();
             callback.onError(error);
           }
         });

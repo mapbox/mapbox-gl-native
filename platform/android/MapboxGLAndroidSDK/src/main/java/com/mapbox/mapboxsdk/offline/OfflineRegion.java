@@ -207,7 +207,7 @@ public class OfflineRegion {
   // Keep track of the region state
   private int state = STATE_INACTIVE;
 
-  private boolean deliverInactiveMessages = false;
+  private boolean deliverInactiveMessages = true;
 
   /**
    * Gets whether or not the `OfflineRegionObserver` will continue to deliver messages even if
@@ -336,9 +336,9 @@ public class OfflineRegion {
 
     if (state == STATE_ACTIVE) {
       ConnectivityReceiver.instance(context).activate();
-      fileSource.activate();
+      //fileSource.activate();
     } else {
-      fileSource.deactivate();
+      //fileSource.deactivate();
       ConnectivityReceiver.instance(context).deactivate();
     }
 
@@ -354,14 +354,12 @@ public class OfflineRegion {
    * @param callback the callback to invoked.
    */
   public void getStatus(@NonNull final OfflineRegionStatusCallback callback) {
-    fileSource.activate();
     getOfflineRegionStatus(new OfflineRegionStatusCallback() {
       @Override
       public void onStatus(final OfflineRegionStatus status) {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
             callback.onStatus(status);
           }
         });
@@ -372,7 +370,6 @@ public class OfflineRegion {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
             callback.onError(error);
           }
         });
@@ -400,14 +397,14 @@ public class OfflineRegion {
   public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
     if (!isDeleted) {
       isDeleted = true;
-      fileSource.activate();
+      //fileSource.activate();
       deleteOfflineRegion(new OfflineRegionDeleteCallback() {
         @Override
         public void onDelete() {
           handler.post(new Runnable() {
             @Override
             public void run() {
-              fileSource.deactivate();
+             // fileSource.deactivate();
               callback.onDelete();
               OfflineRegion.this.finalize();
             }
@@ -420,7 +417,7 @@ public class OfflineRegion {
             @Override
             public void run() {
               isDeleted = false;
-              fileSource.deactivate();
+              //fileSource.deactivate();
               callback.onError(error);
             }
           });
@@ -438,7 +435,7 @@ public class OfflineRegion {
    * @param callback the callback to be invoked
    */
   public void invalidate(@Nullable final OfflineRegionInvalidateCallback callback) {
-    fileSource.activate();
+  //  fileSource.activate();
     invalidateOfflineRegion(new OfflineRegionInvalidateCallback() {
 
       @Override
@@ -446,7 +443,7 @@ public class OfflineRegion {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+           // fileSource.deactivate();
             if (callback != null) {
               callback.onInvalidate();
             }
@@ -459,7 +456,7 @@ public class OfflineRegion {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            fileSource.deactivate();
+          //  fileSource.deactivate();
             if (callback != null) {
               callback.onError(message);
             }

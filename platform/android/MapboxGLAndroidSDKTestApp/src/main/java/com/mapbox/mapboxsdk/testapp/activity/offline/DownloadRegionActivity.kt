@@ -11,13 +11,17 @@ import android.widget.Toast
 import com.mapbox.mapboxsdk.constants.MapboxConstants
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.log.Logger
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.offline.*
+import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.R
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.activity_region_download.*
 import timber.log.Timber
+
+private const val PAUSE_THRESHOLD = 66_000L
 
 /**
  * Example showcasing how to download an offline region headless, allows to test pausing and resuming the download.
@@ -34,10 +38,13 @@ class DownloadRegionActivity : AppCompatActivity(), OfflineRegion.OfflineRegionO
   private var downloading = false
   private var previousCompletedResourceCount: Long = 0
   private var previousUpdateTimestamp: Long = 0
+  private var once = true
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_region_download)
+
+    FileSource.getInstance(this).activate()
 
     offlineManager = OfflineManager.getInstance(this)
     offlineManager.setOfflineMapboxTileCountLimit(Long.MAX_VALUE)
@@ -97,6 +104,7 @@ class DownloadRegionActivity : AppCompatActivity(), OfflineRegion.OfflineRegionO
   }
 
   private fun startDownload(region: OfflineRegion) {
+    logMessage("startDownload")
     downloading = true
     fab.setImageResource(R.drawable.ic_pause_black_24dp)
     logMessage("Downloading...")
@@ -117,10 +125,12 @@ class DownloadRegionActivity : AppCompatActivity(), OfflineRegion.OfflineRegionO
   }
 
   private fun pauseDownload(region: OfflineRegion) {
+    logMessage("pauseDownload")
     downloading = false
     fab.setImageResource(R.drawable.ic_play_arrow_black_24dp)
     handler.removeCallbacksAndMessages(null)
     region.setDownloadState(OfflineRegion.STATE_INACTIVE)
+    handler.postDelayed({ startDownload(region) }, 3000)
     "Paused".let {
       logMessage(it)
       download_status.text = it
@@ -148,6 +158,13 @@ class DownloadRegionActivity : AppCompatActivity(), OfflineRegion.OfflineRegionO
         previousCompletedResourceCount <= status.requiredResourceCount
       ) {
         logMessage("FAILURE! Completed > required")
+      }
+
+      if (previousCompletedResourceCount < PAUSE_THRESHOLD && status.completedResourceCount >= PAUSE_THRESHOLD) {
+        if (once) {
+          once = false
+          offlineRegion?.let { pauseDownload(it) }
+        }
       }
     }
 
