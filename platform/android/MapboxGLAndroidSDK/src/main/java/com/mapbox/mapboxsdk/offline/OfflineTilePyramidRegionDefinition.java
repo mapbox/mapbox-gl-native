@@ -88,6 +88,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     this.minZoom = parcel.readDouble();
     this.maxZoom = parcel.readDouble();
     this.pixelRatio = parcel.readFloat();
+    this.includeIdeographs = parcel.readByte() != 0;
   }
 
 
@@ -146,6 +147,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     dest.writeDouble(minZoom);
     dest.writeDouble(maxZoom);
     dest.writeFloat(pixelRatio);
+    dest.writeByte((byte) (includeIdeographs ? 1 : 0));
   }
 
   public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
