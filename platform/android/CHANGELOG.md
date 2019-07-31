@@ -2,6 +2,15 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 8.0.2 - July 31, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.0.1...android-v8.0.2) since [Mapbox Maps SDK for Android v8.0.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.0.1):
+
+### Bug fixes
+ - Fixed rendering layers after fill-extrusion regression caused by optimization of fill-extrusion rendering [#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065)
+ - Fixed a map update bug caused by the render tiles and the render passes getting unsynchronized [#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092)
+ - Fixed a custom geometry source bug caused by using the outdated tiles after style update [#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112)
+ - Ensure location shadow's gradient radius is greater than 0 [#15099](https://github.com/mapbox/mapbox-gl-native/pull/15099)
+
 ## 8.3.0-alpha.1 - July 31, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.0...android-v8.3.0-alpha.1) since [Mapbox Maps SDK for Android v8.2.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.0):
 
