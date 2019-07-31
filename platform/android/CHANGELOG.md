@@ -18,6 +18,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ### Bug fixes
  - Fixed a map update bug caused by the render tiles and the render passes getting unsynchronized [#15092](https://github.com/mapbox/mapbox-gl-native/pull/15092)
+ - Ensure location shadow's gradient radius is greater than 0 [#15099](https://github.com/mapbox/mapbox-gl-native/pull/15099)
  - Fixed a custom geometry source bug caused by using the outdated tiles after style update [#15112](https://github.com/mapbox/mapbox-gl-native/pull/15112)
 
 ## 8.3.0-alpha.1 - July 31, 2019
