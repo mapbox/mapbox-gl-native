@@ -25,6 +25,12 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Decrease size of SymbolBucket [#15178](https://github.com/mapbox/mapbox-gl-native/pull/15178)
  - Avoid geometry collections copying [#15201](https://github.com/mapbox/mapbox-gl-native/pull/15201)
 
+## 8.2.1 - July 31, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.0...android-v8.2.1) since [Mapbox Maps SDK for Android v8.2.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.0):
+
+### Bug fixes
+ - Save location animation timestamp only when fed [#15265](https://github.com/mapbox/mapbox-gl-native/pull/15265)
+
 ## 8.1.1 - July 26, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.1.0...android-v8.1.1) since [Mapbox Maps SDK for Android v8.1.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.1.0):
 
