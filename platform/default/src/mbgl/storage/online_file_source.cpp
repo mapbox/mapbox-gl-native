@@ -42,7 +42,6 @@ public:
     void setTransformedURL(const std::string&& url);
     ActorRef<OnlineFileRequest> actor();
 
-    OnlineFileSource::Impl& impl;
     Resource resource;
     std::unique_ptr<AsyncRequest> request;
     util::Timer timer;
@@ -60,6 +59,8 @@ public:
     uint32_t failedRequests = 0;
     Response::Error::Reason failedRequestReason = Response::Error::Reason::Success;
     optional<Timestamp> retryAfter;
+
+    OnlineFileSource::Impl& impl;
 };
 
 class OnlineFileSource::Impl {
@@ -317,9 +318,9 @@ void OnlineFileSource::setResourceTransform(optional<ActorRef<ResourceTransform>
 }
 
 OnlineFileRequest::OnlineFileRequest(Resource resource_, Callback callback_, OnlineFileSource::Impl& impl_)
-    : impl(impl_),
-      resource(std::move(resource_)),
-      callback(std::move(callback_)) {
+    : resource(std::move(resource_)),
+      callback(std::move(callback_)),
+      impl(impl_) {
     impl.add(this);
 }
 
