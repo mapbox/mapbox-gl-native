@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
+## 5.3.0
 
 ### Styles and rendering
 
@@ -10,7 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
-* `MGLLoggingLevel` has been updated for better matching core log levels. Now can use `[MGLLoggingConfiguration sharedConfiguration].loggingLevel` to filter logs from core . [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
+* `MGLLoggingLevel` has been updated to better match core log levels. You can now use `[MGLLoggingConfiguration sharedConfiguration.loggingLevel` to filter logs from core . [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
 
 ## 4.11.2 - July 30, 2019
 
