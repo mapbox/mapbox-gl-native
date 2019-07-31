@@ -106,7 +106,6 @@ void FileSource::resume(jni::JNIEnv&) {
 
     activationCounter.value()++;
     if (activationCounter == 1) {
-        fileSource->resume();
     }
 }
 
@@ -114,7 +113,6 @@ void FileSource::pause(jni::JNIEnv&) {
     if (activationCounter) {
         activationCounter.value()--;
         if (activationCounter == 0) {
-            fileSource->pause();
         }
     }
 }
