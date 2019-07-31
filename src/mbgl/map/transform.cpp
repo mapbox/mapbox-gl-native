@@ -112,7 +112,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-    const double scale = state.zoomScale(zoom);
     pitch = util::clamp(pitch, util::PITCH_MIN, util::PITCH_MAX);
 
     // Minimize rotation by taking the shorter path around the circle.
@@ -121,19 +120,19 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     Duration duration = animation.duration ? *animation.duration : Duration::zero();
 
-    const double startScale = state.scale;
+    const double startZoom = state.getZoom();
     const double startBearing = state.bearing;
     const double startPitch = state.pitch;
     state.panning = unwrappedLatLng != startLatLng;
-    state.scaling = scale != startScale;
+    state.scaling = zoom != startZoom;
     state.rotating = bearing != startBearing;
     const EdgeInsets startEdgeInsets = state.edgeInsets;
 
     startTransition(camera, animation, [=](double t) {
         Point<double> framePoint = util::interpolate(startPoint, endPoint, t);
-        LatLng frameLatLng = Projection::unproject(framePoint, startScale);
-        double frameScale = util::interpolate(startScale, scale, t);
-        state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
+        LatLng frameLatLng = Projection::unproject(framePoint, state.zoomScale(startZoom));
+        double frameZoom = util::interpolate(startZoom, zoom, t);
+        state.setLatLngZoom(frameLatLng, frameZoom);
 
         if (bearing != startBearing) {
             state.bearing = util::wrap(util::interpolate(startBearing, bearing, t), -M_PI, M_PI);
