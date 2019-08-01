@@ -42,6 +42,7 @@
 #include <mbgl/text/glyph_manager.hpp>
 
 #include <cstdint>
+#include <gmock/gmock.h>
 
 using namespace mbgl;
 using SourceType = mbgl::style::SourceType;
@@ -793,3 +794,41 @@ TEST(Source, CustomGeometrySourceSetTileData) {
     test.run();
 }
 
+TEST(Source, RenderTileSetSourceUpdate) {
+    SourceTest test;
+
+    class FakeRenderTileSetSource : public RenderTileSetSource {
+    public:
+        explicit FakeRenderTileSetSource(Immutable<style::Source::Impl> impl_)
+            : RenderTileSetSource(std::move(impl_)) {}
+
+        MOCK_METHOD0(mockedUpdateInternal, void());
+
+        void updateInternal(const Tileset&,
+                            const std::vector<Immutable<style::LayerProperties>>&,
+                            const bool, const bool, const TileParameters&) override {
+            mockedUpdateInternal();
+        }
+
+        const optional<Tileset>& getTileset() const override {
+            return static_cast<const style::VectorSource::Impl&>(*baseImpl).tileset;
+        }
+    };
+
+    VectorSource initialized("source", Tileset{ {"tiles"} });
+    initialized.loadDescription(*test.fileSource);
+
+    FakeRenderTileSetSource renderTilesetSource { initialized.baseImpl };
+
+    LineLayer layer("id", "source");
+    Immutable<LayerProperties> layerProperties = makeMutable<LineLayerProperties>(staticImmutableCast<LineLayer::Impl>(layer.baseImpl));
+    std::vector<Immutable<LayerProperties>> layers { layerProperties };
+
+    // Check that `updateInternal()` is called even if the updated source has not yet loaded description.
+    EXPECT_CALL(renderTilesetSource, mockedUpdateInternal()).Times(2);
+    RenderSource* renderSource = &renderTilesetSource;
+    renderSource->update(initialized.baseImpl, layers, true, true, test.tileParameters);    
+
+    VectorSource uninitialized("source", "http://url");
+    renderSource->update(uninitialized.baseImpl, layers, true, true, test.tileParameters);
+}
