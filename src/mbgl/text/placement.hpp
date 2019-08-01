@@ -123,8 +123,8 @@ private:
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
     bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&);
-    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&, style::TextWritingModeType orientation);
-    void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, SymbolInstance&);
+    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, const SymbolInstance&, style::TextWritingModeType orientation);
+    void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&);
 
     CollisionIndex collisionIndex;
 

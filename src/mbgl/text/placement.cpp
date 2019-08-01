@@ -584,15 +584,13 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
                 if (pitchWithMap) {
                     shiftedAnchor = project(Point<float>(tileAnchor.x + shift.x, tileAnchor.y + shift.y),
                                             labelPlaneMatrix).first;
+                } else if (rotateWithMap) {
+                    auto rotated = util::rotate(shift, -state.getPitch());
+                    shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
+                                                projectedAnchor.first.y + rotated.y);
                 } else {
-                    if (rotateWithMap) {
-                        auto rotated = util::rotate(shift, -state.getPitch());
-                        shiftedAnchor = Point<float>(projectedAnchor.first.x + rotated.x,
-                                                    projectedAnchor.first.y + rotated.y);
-                    } else {
-                        shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
-                                                    projectedAnchor.first.y + shift.y);
-                    }
+                    shiftedAnchor = Point<float>(projectedAnchor.first.x + shift.x,
+                                                 projectedAnchor.first.y + shift.y);
                 }
 
                 for (std::size_t i = 0; i < symbol.glyphOffsets.size(); ++i) {
@@ -806,7 +804,7 @@ const style::TextJustifyType justifyTypes[] = {style::TextJustifyType::Right, st
 
 }  // namespace
 
-void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableAnchorType placedAnchor, SymbolInstance& symbolInstance, style::TextWritingModeType orientation) {
+void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableAnchorType placedAnchor, const SymbolInstance& symbolInstance, style::TextWritingModeType orientation) {
     style::TextJustifyType anchorJustify = getAnchorJustification(placedAnchor);
     assert(anchorJustify != style::TextJustifyType::Auto);
     const optional<size_t>& autoIndex = justificationToIndex(anchorJustify, symbolInstance, orientation);
@@ -826,7 +824,7 @@ void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableA
     }
 }
 
-void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingModeType orientation, SymbolInstance& symbolInstance) {
+void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingModeType orientation, const SymbolInstance& symbolInstance) {
     auto horizontal = orientation == style::TextWritingModeType::Horizontal ?
                                      optional<style::TextWritingModeType>(orientation) : nullopt;
     auto vertical = orientation == style::TextWritingModeType::Vertical ?
