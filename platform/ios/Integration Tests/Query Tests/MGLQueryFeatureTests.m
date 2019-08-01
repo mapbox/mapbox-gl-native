@@ -129,18 +129,18 @@ void writeDictionaryToFile(NSDictionary *info, NSString *filename);
 - (void)assertAccessibilityDictionary:(NSDictionary*)a isEqualToDictionary:(NSDictionary*)b
 {
     NSArray *keys = @[@"isElement", @"ElementsHidden", @"Label", @"Hint", @"Value", @"Traits"];
-    
+    NSString *label = a[@"Label"];
     for (NSString *key in keys) {
-        XCTAssertEqualObjects(a[key], b[key]);
+        XCTAssertEqualObjects(a[key], b[key], @"Key: %@ a.label = %@", key, label);
     }
     
-    [self assertFloatArray:a[@"Frame"] isEqualToFloatArray:b[@"Frame"] accuracy:0.001];
-    [self assertBezierPathArray:a[@"Path"] isEqualToBezierPathArray:b[@"Path"] accuracy:0.001];
+    [self assertFloatArray:a[@"Frame"] isEqualToFloatArray:b[@"Frame"] accuracy:0.001 label:label];
+    [self assertBezierPathArray:a[@"Path"] isEqualToBezierPathArray:b[@"Path"] accuracy:0.001 label:label];
     
     NSArray *aElements = a[@"Elements"];
     NSArray *bElements = b[@"Elements"];
     
-    XCTAssertEqual(aElements.count, bElements.count);
+    XCTAssertEqual(aElements.count, bElements.count, @"a.label = %@", label);
     if (aElements.count != bElements.count) {
         return;
     }
@@ -153,22 +153,22 @@ void writeDictionaryToFile(NSDictionary *info, NSString *filename);
     }
 }
 
-- (void)assertFloatArray:(NSArray *)a isEqualToFloatArray:(NSArray *)b accuracy:(CGFloat)accuracy
+- (void)assertFloatArray:(NSArray *)a isEqualToFloatArray:(NSArray *)b accuracy:(CGFloat)accuracy label:(NSString*)label
 {
-    XCTAssertEqual(a.count, b.count);
+    XCTAssertEqual(a.count, b.count, @"a.label = %@", label);
     if (a.count != b.count) {
         return;
     }
 
     for (NSUInteger i = 0; i < a.count; i++)
     {
-        XCTAssertEqualWithAccuracy(((NSNumber*)a[i]).floatValue, ((NSNumber*)b[i]).floatValue, accuracy);
+        XCTAssertEqualWithAccuracy(((NSNumber*)a[i]).floatValue, ((NSNumber*)b[i]).floatValue, accuracy, @"a.label = %@", label);
     }
 }
 
-- (void)assertBezierPathArray:(NSArray *)a isEqualToBezierPathArray:(NSArray *)b accuracy:(CGFloat)accuracy
+- (void)assertBezierPathArray:(NSArray *)a isEqualToBezierPathArray:(NSArray *)b accuracy:(CGFloat)accuracy label:(NSString*)label
 {
-    XCTAssertEqual(a.count, b.count);
+    XCTAssertEqual(a.count, b.count, @"a.label = %@", label);
     if (a.count != b.count) {
         return;
     }
@@ -187,14 +187,14 @@ void writeDictionaryToFile(NSDictionary *info, NSString *filename);
         NSArray *aValues = adict[aKey];
         NSArray *bValues = bdict[bKey];
         
-        [self assertFloatArray:aValues isEqualToFloatArray:bValues accuracy:accuracy];
+        [self assertFloatArray:aValues isEqualToFloatArray:bValues accuracy:accuracy label:label];
     }
 }
 @end
 
 void writeDictionaryToFile(NSDictionary *info, NSString *filename)
 {
-    NSData *jsondata = [NSJSONSerialization dataWithJSONObject:info options:NSJSONWritingPrettyPrinted error:NULL];
+    NSData *jsondata = [NSJSONSerialization dataWithJSONObject:info options:0/*NSJSONWritingPrettyPrinted*/ error:NULL];
     NSString *path = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                               inDomains:NSUserDomainMask] lastObject].path
                       stringByAppendingPathComponent:filename];
@@ -255,8 +255,7 @@ NSDictionary* MGLTestAccessibilityDictionaryForElement(NSObject* element)
     // Recurse
     elementCount = 0;
     
-    // Looks like element count is 0x7fff... if not a container.
-    if (element.accessibilityElementCount != LONG_MAX) {
+    if (!element.isAccessibilityElement) {
         elementCount = element.accessibilityElementCount;
         NSMutableArray *mutableElements = [NSMutableArray arrayWithCapacity:elementCount];
         for (NSInteger i = 0; i<elementCount; i++) {
