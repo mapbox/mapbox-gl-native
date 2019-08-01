@@ -704,6 +704,13 @@ jobs:
               fi
             fi
       - run:
+          name: Trigger external deploy steps
+          command: |
+            export VERSION_TAG=${CIRCLE_TAG}
+            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
+            platform/android/scripts/trigger-external-deploy-steps.sh
+          background: true
+      - run:
           name: Record size
           command: platform/android/scripts/metrics.sh
 # ------------------------------------------------------------------------------
