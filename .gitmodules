@@ -97,3 +97,6 @@
 [submodule "vendor/mapbox-base"]
 	path = vendor/mapbox-base
 	url = https://github.com/mapbox/mapbox-base.git
+[submodule "vendor/googletest"]
+	path = vendor/googletest
+	url = https://github.com/google/googletest.git
