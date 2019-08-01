@@ -85,7 +85,6 @@
   "render-tests/text-rotate/with-offset": "https://github.com/mapbox/mapbox-gl-native/issues/11872",
   "render-tests/video/default": "skip - https://github.com/mapbox/mapbox-gl-native/issues/601",
   "render-tests/background-color/colorSpace-hcl": "needs issue",
-  "render-tests/combinations/heatmap-translucent--background-opaque": "needs investigation",
   "render-tests/feature-state/composite-expression": "https://github.com/mapbox/mapbox-gl-native/issues/12613",
   "render-tests/feature-state/data-expression": "https://github.com/mapbox/mapbox-gl-native/issues/12613",
   "render-tests/feature-state/vector-source": "https://github.com/mapbox/mapbox-gl-native/issues/12613",

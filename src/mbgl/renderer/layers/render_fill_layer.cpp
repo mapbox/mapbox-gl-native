@@ -47,17 +47,12 @@ void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
         evaluated.get<style::FillOutlineColor>() = evaluated.get<style::FillColor>();
     }
 
-    passes = RenderPass::None;
+    passes = RenderPass::Translucent;
 
-    if (evaluated.get<style::FillAntialias>()) {
-        passes |= RenderPass::Translucent;
-    }
-
-    if (!unevaluated.get<style::FillPattern>().isUndefined()
+    if (!(!unevaluated.get<style::FillPattern>().isUndefined()
         || evaluated.get<style::FillColor>().constantOr(Color()).a < 1.0f
-        || evaluated.get<style::FillOpacity>().constantOr(0) < 1.0f) {
-        passes |= RenderPass::Translucent;
-    } else {
+        || evaluated.get<style::FillOpacity>().constantOr(0) < 1.0f)) {
+        // Supply both - evaluated based on opaquePassCutoff in render().
         passes |= RenderPass::Opaque;
     }
     properties->renderPasses = mbgl::underlying_type(passes);
