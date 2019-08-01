@@ -163,7 +163,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         lastTileDistance = approximateTileDistance(*(firstAndLastGlyph->second.tileDistance), firstAndLastGlyph->second.angle, pixelsToTileUnits, projectedAnchor.second, pitchWithMap);
     }
 
-    bool atLeastOneCirclePlaced = false;
+    bool previousCirclePlaced = false;
     for (size_t i = 0; i < feature.boxes.size(); i++) {
         CollisionBox& circle = feature.boxes[i];
         const float boxSignedDistanceFromAnchor = circle.signedDistanceFromAnchor;
@@ -174,6 +174,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
             // don't need to use this circle because the label
             // doesn't extend this far. Either way, mark the circle unused.
             circle.used = false;
+            previousCirclePlaced = false;
             continue;
         }
 
@@ -181,8 +182,9 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         const float tileUnitRadius = (circle.x2 - circle.x1) / 2;
         const float radius = tileUnitRadius * tileToViewport;
 
-        if (atLeastOneCirclePlaced) {
+        if (previousCirclePlaced) {
             const CollisionBox& previousCircle = feature.boxes[i - 1];
+            assert(previousCircle.used);
             const float dx = projectedPoint.x - previousCircle.px;
             const float dy = projectedPoint.y - previousCircle.py;
             // The circle edges touch when the distance between their centers is 2x the radius
@@ -203,13 +205,14 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
                         // use, in which case we want to keep it in place even if it's tightly packed
                         // with the one before it.
                         circle.used = false;
+                        previousCirclePlaced = false;
                         continue;
                     }
                 }
             }
         }
 
-        atLeastOneCirclePlaced = true;
+        previousCirclePlaced = true;
         circle.px1 = projectedPoint.x - radius;
         circle.px2 = projectedPoint.x + radius;
         circle.py1 = projectedPoint.y - radius;
