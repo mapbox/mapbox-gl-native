@@ -3,6 +3,8 @@ export IS_LOCAL_DEVELOPMENT ?= true
 export WITH_CXX11ABI ?= $(shell scripts/check-cxx11abi.sh)
 export TARGET_BRANCH ?= master
 
+CMAKE ?= cmake
+
 
 ifeq ($(BUILDTYPE), Release)
 else ifeq ($(BUILDTYPE), RelWithDebInfo)
@@ -84,7 +86,7 @@ endif
 
 $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings
 	mkdir -p $(MACOS_OUTPUT_PATH)
-	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+	(cd $(MACOS_OUTPUT_PATH) && $(CMAKE) -G Xcode ../.. \
 		-DWITH_EGL=${WITH_EGL})
 
 $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
@@ -183,7 +185,7 @@ genstrings:
 
 $(MACOS_COMPDB_PATH)/Makefile:
 	mkdir -p $(MACOS_COMPDB_PATH)
-	(cd $(MACOS_COMPDB_PATH) && cmake ../../../.. \
+	(cd $(MACOS_COMPDB_PATH) && $(CMAKE) ../../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DWITH_EGL=${WITH_EGL})
 
@@ -274,7 +276,7 @@ endif
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
 	mkdir -p $(IOS_OUTPUT_PATH)
-	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+	(cd $(IOS_OUTPUT_PATH) && $(CMAKE) -G Xcode ../.. \
 		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
 		-DMBGL_PLATFORM=ios \
 		-DMASON_PLATFORM=ios)
@@ -374,7 +376,7 @@ LINUX_BUILD = $(LINUX_OUTPUT_PATH)/build.ninja
 
 $(LINUX_BUILD): $(BUILD_DEPS)
 	mkdir -p $(LINUX_OUTPUT_PATH)
-	(cd $(LINUX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+	(cd $(LINUX_OUTPUT_PATH) && $(CMAKE) -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
@@ -467,7 +469,7 @@ QT_BUILD = $(QT_OUTPUT_PATH)/build.ninja
 $(QT_BUILD): $(BUILD_DEPS)
 	@scripts/check-qt.sh
 	mkdir -p $(QT_OUTPUT_PATH)
-	(cd $(QT_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+	(cd $(QT_OUTPUT_PATH) && $(CMAKE) -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DMBGL_PLATFORM=qt \
 		-DMASON_PLATFORM=$(MASON_PLATFORM) \
@@ -483,7 +485,7 @@ MACOS_QT_PROJ_PATH = $(QT_ROOT_PATH)/xcode/mbgl.xcodeproj
 $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 	@scripts/check-qt.sh
 	mkdir -p $(QT_ROOT_PATH)/xcode
-	(cd $(QT_ROOT_PATH)/xcode && cmake -G Xcode ../../.. \
+	(cd $(QT_ROOT_PATH)/xcode && $(CMAKE) -G Xcode ../../.. \
 		-DMBGL_PLATFORM=qt \
 		-DMASON_PLATFORM=$(MASON_PLATFORM) \
 		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
@@ -508,7 +510,7 @@ QNX_QT_BUILD = $(QNX_OUTPUT_PATH)/build.ninja
 $(QNX_QT_BUILD): $(BUILD_DEPS)
 	@scripts/check-qt.sh
 	mkdir -p $(QNX_OUTPUT_PATH)
-	(cd $(QNX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+	(cd $(QNX_OUTPUT_PATH) && $(CMAKE) -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DQCC_COMPILER_TARGET=${QCC_COMPILER_TARGET} \
 		-DQCC_NTOARCH=${QCC_NTOARCH} \
