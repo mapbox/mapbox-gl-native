@@ -420,7 +420,8 @@ commands:
     - run:
         name: Run tests
         command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
+          # Source.RenderTileSetSourceUpdate is filtered out due to #15294
+          xvfb-run --server-args="-screen 0 1024x768x24" make run-test--Source.RenderTileSetSourceUpdate 2> >(tee sanitizer 1>&2)
           # Unfortunately, Google Test eats the status code, so we'll have to check the output.
           [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
 
