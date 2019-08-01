@@ -1075,18 +1075,15 @@ jobs:
             if [[ $CIRCLE_BRANCH == master ]]; then
               platform/ios/scripts/deploy-snapshot.sh
             fi
-          background: true
       - deploy:
           name: Deploy to Mapbox CocoaPods spec repo
           command: |
             if [[ $CIRCLE_BRANCH == master ]]; then
               platform/ios/scripts/deploy-to-cocoapods.sh
             fi
-          background: true
       - run:
           name: Record size
           command: platform/ios/scripts/metrics.sh
-          background: true
       - run:
           name: Trigger metrics
           command: |
@@ -1097,7 +1094,6 @@ jobs:
                 echo "MOBILE_METRICS_TOKEN not provided"
               fi
             fi
-          background: true
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1128,7 +1124,6 @@ jobs:
             export VERSION_TAG=${CIRCLE_TAG}
             export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
             platform/ios/scripts/trigger-external-deploy-steps.sh
-          background: true
       - run:
           name: Build, package, and upload iOS release
           command: |
@@ -1138,7 +1133,6 @@ jobs:
       - deploy:
           name: Deploy to CocoaPods
           command: platform/ios/scripts/deploy-to-cocoapods.sh
-          background: true
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
