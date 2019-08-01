@@ -138,9 +138,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         if (bearing != startBearing) {
             state.bearing = util::wrap(util::interpolate(startBearing, bearing, t), -M_PI, M_PI);
         }
-        if (pitch != startPitch) {
-            state.pitch = util::interpolate(startPitch, pitch, t);
-        }
         if (padding != startEdgeInsets) {
             // Interpolate edge insets
             state.edgeInsets = {
@@ -149,6 +146,10 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
                 util::interpolate(startEdgeInsets.bottom(), padding.bottom(), t),
                 util::interpolate(startEdgeInsets.right(), padding.right(), t)
             };
+        }
+        auto maxPitch = getMaxPitchForEdgeInsets(state.edgeInsets);
+        if (pitch != startPitch || maxPitch < startPitch) {
+            state.pitch = std::min(maxPitch, util::interpolate(startPitch, pitch, t));
         }
     }, duration);
 }
@@ -302,9 +303,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         if (bearing != startBearing) {
             state.bearing = util::wrap(util::interpolate(startBearing, bearing, k), -M_PI, M_PI);
         }
-        if (pitch != startPitch) {
-            state.pitch = util::interpolate(startPitch, pitch, k);
-        }
         if (padding != startEdgeInsets) {
             // Interpolate edge insets
             state.edgeInsets = {
@@ -313,6 +311,10 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
                 util::interpolate(startEdgeInsets.bottom(), padding.bottom(), us),
                 util::interpolate(startEdgeInsets.right(), padding.right(), us)
             };
+        }
+        auto maxPitch = getMaxPitchForEdgeInsets(state.edgeInsets);
+        if (pitch != startPitch || maxPitch < startPitch) {
+            state.pitch = std::min(maxPitch, util::interpolate(startPitch, pitch, k));
         }
     }, duration);
 }
@@ -574,6 +576,23 @@ LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng
     ScreenCoordinate flippedPoint = point;
     flippedPoint.y = state.size.height - flippedPoint.y;
     return state.screenCoordinateToLatLng(flippedPoint, wrapMode);
+}
+
+double Transform::getMaxPitchForEdgeInsets(const EdgeInsets &insets) const
+{
+    double centerOffsetY = 0.5 * (insets.top() - insets.bottom()); // See TransformState::getCenterOffset.
+
+    const auto height = state.size.height;
+    assert(height);
+    // For details, see description at https://github.com/mapbox/mapbox-gl-native/pull/15195
+    // The definition of half of TransformState::fov with no inset, is: fov = arctan((height / 2) / (height * 1.5)).
+    // We use half of fov, as it is field of view above perspective center.
+    // With inset, this angle changes and tangentOfFovAboveCenterAngle = (h/2 + centerOffsetY) / (height * 1.5).
+    // 1.03 is a bit extra added to prevent parallel ground to viewport clipping plane.
+    const double tangentOfFovAboveCenterAngle = 1.03 * (height / 2.0 + centerOffsetY) / (1.5 * height);
+    const double fovAboveCenter = std::atan(tangentOfFovAboveCenterAngle);
+    return M_PI * 0.5 - fovAboveCenter;
+    // e.g. Maximum pitch of 60 degrees is when perspective center's offset from the top is 84% of screen height.
 }
 
 } // namespace mbgl

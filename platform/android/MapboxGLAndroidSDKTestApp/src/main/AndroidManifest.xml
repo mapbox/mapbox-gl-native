@@ -13,9 +13,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:replace="android:appComponentFactory"
-        android:appComponentFactory="customComponentFactory">
+        android:theme="@style/AppTheme">
 
         <activity
             android:name=".activity.FeatureOverviewActivity"
@@ -589,6 +587,17 @@
             android:name=".activity.style.GridSourceActivity"
             android:description="@string/description_grid_source"
             android:label="@string/activity_grid_source">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
+            android:name=".activity.style.NoStyleActivity"
+            android:description="@string/description_no_style"
+            android:label="@string/activity_no_style">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_style" />

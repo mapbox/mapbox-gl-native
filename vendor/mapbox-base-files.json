@@ -1,0 +1,29 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "mapbox/feature.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/feature.hpp",
+        "mapbox/geometry.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry.hpp",
+        "mapbox/geometry/box.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/box.hpp",
+        "mapbox/geometry/empty.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/empty.hpp",
+        "mapbox/geometry/envelope.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/envelope.hpp",
+        "mapbox/geometry/for_each_point.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/for_each_point.hpp",
+        "mapbox/geometry/geometry.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/geometry.hpp",
+        "mapbox/geometry/line_string.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/line_string.hpp",
+        "mapbox/geometry/multi_line_string.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/multi_line_string.hpp",
+        "mapbox/geometry/multi_point.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/multi_point.hpp",
+        "mapbox/geometry/multi_polygon.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/multi_polygon.hpp",
+        "mapbox/geometry/point.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/point.hpp",
+        "mapbox/geometry/point_arithmetic.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/point_arithmetic.hpp",
+        "mapbox/geometry/polygon.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry/polygon.hpp",
+        "mapbox/geometry_io.hpp": "vendor/mapbox-base/libs/geometry.hpp/include/mapbox/geometry_io.hpp",
+        "optional.hpp": "vendor/mapbox-base/libs/optional/optional.hpp",
+        "mapbox/optional.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/optional.hpp",
+        "mapbox/recursive_wrapper.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/recursive_wrapper.hpp",
+        "mapbox/variant.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/variant.hpp",
+        "mapbox/variant_cast.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/variant_cast.hpp",
+        "mapbox/variant_io.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/variant_io.hpp",
+        "mapbox/variant_visitor.hpp": "vendor/mapbox-base/libs/variant/include/mapbox/variant_visitor.hpp"
+    },
+    "private_headers": {}
+}

@@ -176,7 +176,7 @@ std::vector<std::string> split(const std::string& s, char delim) {
     return elems;
 }
 
-optional<Color> parse(const std::string& css_str) {
+mbgl::optional<Color> parse(const std::string& css_str) {
     std::string str = css_str;
 
     // Remove all whitespace, not compliant, but should just be more accepting.

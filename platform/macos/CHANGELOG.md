@@ -2,6 +2,7 @@
 
 ## master
 
+* Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues. ([#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195))
 * Added an `MGLMapView.prefetchesTiles` property to configure lower-resolution tile prefetching behavior. ([#14816](https://github.com/mapbox/mapbox-gl-native/pull/14816))
 * Fixed queryRenderedFeatues bug caused by incorrect sort feature index calculation. ([#14884](https://github.com/mapbox/mapbox-gl-native/pull/14884))
 * Ideographic glyphs from Chinese, Japanese, and Korean are no longer downloaded by default as part of offline packs; they are instead rendered on-device, saving bandwidth and storage while improving performance. ([#14176](https://github.com/mapbox/mapbox-gl-native/pull/14176))

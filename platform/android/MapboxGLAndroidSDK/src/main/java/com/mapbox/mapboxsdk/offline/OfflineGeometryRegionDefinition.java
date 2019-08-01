@@ -51,7 +51,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition 
   @Keep
   public OfflineGeometryRegionDefinition(
       String styleURL, Geometry geometry, double minZoom, double maxZoom, float pixelRatio) {
-    this(styleURL, geometry, minZoom, maxZoom, pixelRatio, true);
+    this(styleURL, geometry, minZoom, maxZoom, pixelRatio, false);
   }
 
   /**
@@ -88,6 +88,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition 
     this.minZoom = parcel.readDouble();
     this.maxZoom = parcel.readDouble();
     this.pixelRatio = parcel.readFloat();
+    this.includeIdeographs = parcel.readByte() != 0;
   }
 
   @Override
@@ -159,6 +160,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition 
     dest.writeDouble(minZoom);
     dest.writeDouble(maxZoom);
     dest.writeFloat(pixelRatio);
+    dest.writeByte((byte) (includeIdeographs ? 1 : 0));
   }
 
   public static final Creator CREATOR = new Creator() {

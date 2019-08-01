@@ -37,6 +37,8 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public class Style {
 
+  static final String EMPTY_JSON = "{\"version\": 8,\"sources\": {},\"layers\": []}";
+
   private final NativeMap nativeMap;
   private final HashMap<String, Source> sources = new HashMap<>();
   private final HashMap<String, Layer> layers = new HashMap<>();

@@ -48,7 +48,7 @@ class StyleTest {
     fun testEmptyBuilder() {
         val builder = Style.Builder()
         mapboxMap.setStyle(builder)
-        verify(exactly = 1) { nativeMapView.styleJson = "{}" }
+        verify(exactly = 1) { nativeMapView.styleJson = Style.EMPTY_JSON }
     }
 
     @Test

@@ -176,7 +176,7 @@ void RenderTileSetSource::update(Immutable<style::Source::Impl> baseImpl_,
         tilePyramid.clearAll();
     }
 
-    if (!implTileset) return;
+    if (!cachedTileset) return;
 
     updateInternal(*cachedTileset, layers, needsRendering, needsRelayout, parameters);
 }

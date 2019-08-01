@@ -62,6 +62,7 @@ install:
   - git config --system core.longpaths true
   - git submodule sync
   - git submodule update --init
+  - git submodule foreach git submodule update --init
   - ps: |
       if (!(Test-Path cmake-3.10.1-win64-x64.zip)) {
           appveyor DownloadFile https://cmake.org/files/v3.10/cmake-3.10.1-win64-x64.zip

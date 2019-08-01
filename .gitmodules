@@ -19,9 +19,6 @@
 [submodule "vendor/geojson.hpp"]
 	path = vendor/geojson.hpp
 	url = https://github.com/mapbox/geojson.hpp.git
-[submodule "vendor/geometry.hpp"]
-	path = vendor/geometry.hpp
-	url = https://github.com/mapbox/geometry.hpp.git
 [submodule "vendor/polylabel"]
 	path = vendor/polylabel
 	url = https://github.com/mapbox/polylabel.git
@@ -34,9 +31,6 @@
 [submodule "vendor/supercluster.hpp"]
 	path = vendor/supercluster.hpp
 	url = https://github.com/mapbox/supercluster.hpp.git
-[submodule "vendor/variant"]
-	path = vendor/variant
-	url = https://github.com/mapbox/variant.git
 [submodule "vendor/vector-tile"]
 	path = vendor/vector-tile
 	url = https://github.com/mapbox/vector-tile.git
@@ -55,9 +49,6 @@
 [submodule "vendor/icu"]
 	path = vendor/icu
 	url = https://github.com/unicode-org/icu.git
-[submodule "vendor/optional"]
-	path = vendor/optional
-	url = https://github.com/mapbox/Optional.git
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/mapbox/mapbox-gl-native-boost.git
@@ -103,3 +94,9 @@
 [submodule "vendor/filesystem"]
 	path = vendor/filesystem
 	url = https://github.com/gulrak/filesystem.git
+[submodule "vendor/mapbox-base"]
+	path = vendor/mapbox-base
+	url = https://github.com/mapbox/mapbox-base.git
+[submodule "vendor/googletest"]
+	path = vendor/googletest
+	url = https://github.com/google/googletest.git
