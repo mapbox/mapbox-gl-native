@@ -628,7 +628,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                 return;
             }
             for (const CollisionBox& box : feature.boxes) {
-                const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.used, {});
+                const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.projected.isCircle(), {});
                 bucket.collisionCircle->dynamicVertices.extend(4, dynamicVertex);
             }
         };

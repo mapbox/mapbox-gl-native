@@ -45,9 +45,9 @@ public:
     const TransformState& getTransformState() const { return transformState; }
 
 private:
-    bool isOffscreen(const CollisionBox&) const;
-    bool isInsideGrid(const CollisionBox&) const;
-    bool isInsideTile(const CollisionBox&, const CollisionTileBoundaries& tileBoundaries) const;
+    bool isOffscreen(float x1, float y1, float x2, float y2) const;
+    bool isInsideGrid(float x1, float y1, float x2, float y2) const;
+    bool isInsideTile(float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const;
 
     std::pair<bool,bool> placeLineFeature(CollisionFeature& feature,
                                   const mat4& posMatrix,
