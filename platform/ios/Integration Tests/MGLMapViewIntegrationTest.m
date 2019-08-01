@@ -33,11 +33,19 @@
     return accessToken;
 }
 
+- (void)setupAccessToken {
+    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
+}
+- (NSURL*)styleURL {
+    return [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+}
+
 - (void)setUp {
     [super setUp];
+    
+    [self setupAccessToken];
 
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    NSURL *styleURL = [self styleURL];
 
     self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
     self.mapView.delegate = self;
@@ -79,12 +87,19 @@
     XCTAssertEqual(mapView.style, style);
 
     [self.styleLoadingExpectation fulfill];
+    self.styleLoadingExpectation = nil;
 }
 
 - (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(__unused BOOL)fullyRendered {
     [self.renderFinishedExpectation fulfill];
     self.renderFinishedExpectation = nil;
 }
+
+- (void)mapViewDidBecomeIdle:(MGLMapView *)mapView {
+    [self.idleExpectation fulfill];
+    self.idleExpectation = nil;
+}
+
 
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
     if (self.regionWillChange) {
@@ -139,6 +154,13 @@
     self.renderFinishedExpectation = [self expectationWithDescription:@"Map view should be rendered"];
     [self waitForExpectations:@[self.renderFinishedExpectation] timeout:timeout];
     self.renderFinishedExpectation = nil;
+}
+
+- (void)waitForMapViewToIdleWithTimeout:(NSTimeInterval)timeout {
+    XCTAssertNil(self.renderFinishedExpectation);
+    [self.mapView setNeedsRerender];
+    self.idleExpectation = [self expectationWithDescription:@"Map view should idle"];
+    [self waitForExpectations:@[self.idleExpectation] timeout:timeout];
 }
 
 - (void)waitForExpectations:(NSArray<XCTestExpectation *> *)expectations timeout:(NSTimeInterval)seconds {
