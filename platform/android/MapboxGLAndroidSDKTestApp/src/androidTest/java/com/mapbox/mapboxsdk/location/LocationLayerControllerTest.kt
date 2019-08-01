@@ -465,7 +465,7 @@ class LocationLayerControllerTest : EspressoTest() {
   @UiThreadTest
   fun test_15026_missingShadowGradientRadius() {
     // test for https://github.com/mapbox/mapbox-gl-native/issues/15026
-    val shadowDrawable = BitmapUtils.getDrawableFromRes(context, R.drawable.mapbox_user_icon_shadow_0px_test)
+    val shadowDrawable = BitmapUtils.getDrawableFromRes(rule.activity, R.drawable.mapbox_user_icon_shadow_0px_test)
     Utils.generateShadow(shadowDrawable, 0f)
   }
 
