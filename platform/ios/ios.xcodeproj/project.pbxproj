@@ -518,6 +518,9 @@
 		CA8FBC0921A47BB100D1203C /* MGLRendererConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CAB92CF122F204720037BE12 /* MGLQueryFeatureTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB92CF022F204720037BE12 /* MGLQueryFeatureTests.m */; };
+		CAB92CF222F2155A0037BE12 /* points.geojson in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC96C1CB6C6CE006E619F /* points.geojson */; };
+		CAB92CF422F231190037BE12 /* testQueryRoadsAroundDCAccessibilityResults.json in Resources */ = {isa = PBXBuildFile; fileRef = CAB92CF322F231190037BE12 /* testQueryRoadsAroundDCAccessibilityResults.json */; };
 		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		CAC3A3E022E75AC200BC8DEF /* MGLSignpost.h in Headers */ = {isa = PBXBuildFile; fileRef = CAC3A3DE22E75AC100BC8DEF /* MGLSignpost.h */; };
 		CAC3A3E122E75AC200BC8DEF /* MGLSignpost.h in Headers */ = {isa = PBXBuildFile; fileRef = CAC3A3DE22E75AC100BC8DEF /* MGLSignpost.h */; };
@@ -1205,6 +1208,8 @@
 		CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
 		CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleURLIntegrationTest.m; sourceTree = "<group>"; };
 		CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRendererConfigurationTests.mm; path = ../../darwin/test/MGLRendererConfigurationTests.mm; sourceTree = "<group>"; };
+		CAB92CF022F204720037BE12 /* MGLQueryFeatureTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLQueryFeatureTests.m; sourceTree = "<group>"; };
+		CAB92CF322F231190037BE12 /* testQueryRoadsAroundDCAccessibilityResults.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = testQueryRoadsAroundDCAccessibilityResults.json; sourceTree = "<group>"; };
 		CAC3A3DE22E75AC100BC8DEF /* MGLSignpost.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLSignpost.h; sourceTree = "<group>"; };
 		CAC3A3DF22E75AC200BC8DEF /* MGLSignpost.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLSignpost.m; sourceTree = "<group>"; };
 		CAD9D0A922A86D6F001B25EE /* MGLResourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLResourceTests.mm; path = ../../darwin/test/MGLResourceTests.mm; sourceTree = "<group>"; };
@@ -1543,6 +1548,7 @@
 		16376B081FFD9DAF0000563E /* Integration Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CAB92CEF22F2043F0037BE12 /* Query Tests */,
 				CA6914B320E67F07002DB0EE /* Annotations */,
 				CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */,
 				CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */,
@@ -1929,6 +1935,15 @@
 				CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */,
 			);
 			name = Annotations;
+			sourceTree = "<group>";
+		};
+		CAB92CEF22F2043F0037BE12 /* Query Tests */ = {
+			isa = PBXGroup;
+			children = (
+				CAB92CF322F231190037BE12 /* testQueryRoadsAroundDCAccessibilityResults.json */,
+				CAB92CF022F204720037BE12 /* MGLQueryFeatureTests.m */,
+			);
+			path = "Query Tests";
 			sourceTree = "<group>";
 		};
 		DA1DC9411CB6C1C2006E619F = {
@@ -3072,6 +3087,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAB92CF422F231190037BE12 /* testQueryRoadsAroundDCAccessibilityResults.json in Resources */,
+				CAB92CF222F2155A0037BE12 /* points.geojson in Resources */,
 				16376B3E1FFDB4B40000563E /* LaunchScreen.storyboard in Resources */,
 				16376B3B1FFDB4B40000563E /* Assets.xcassets in Resources */,
 			);
@@ -3207,6 +3224,7 @@
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
 				077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */,
 				CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */,
+				CAB92CF122F204720037BE12 /* MGLQueryFeatureTests.m in Sources */,
 				CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
