@@ -2689,12 +2689,13 @@ public:
     
     // Places
     NSArray *sortedPlaceFeatures = nil;
+    NSArray *visiblePlaceFeatures = nil;
     
-    if (_sortedVisiblePlaceElements) {
+    if (!_sortedVisiblePlaceElements) {
         
         MGL_SIGNPOST_BEGIN(signpost, "gae/query-places");
         NSArray *placeStyleLayerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
-        NSArray *visiblePlaceFeatures = [self visibleFeaturesInRect:bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
+        visiblePlaceFeatures = [self visibleFeaturesInRect:bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
         MGL_SIGNPOST_END(signpost, "gae/query-places");
 
         
@@ -2785,8 +2786,8 @@ public:
     {
         MGL_SIGNPOST_BEGIN(signpost, "gae/build-elements");
 
-        BOOL compassViewVisible       = self.compassView.alpha > 0.0;
-        BOOL userLocationViewVisible  = self.userLocationAnnotationView && !self.userLocationAnnotationView.isHidden;
+        BOOL compassViewVisible       = YES;//self.compassView.alpha > 0.0;
+        BOOL userLocationViewVisible  = NO;//self.userLocationAnnotationView && !self.userLocationAnnotationView.isHidden;
         BOOL attributionButtonVisible = self.attributionButton && !self.attributionButton.isHidden;
         
         NSInteger numberOfElements =    (compassViewVisible ? 1 : 0) +
@@ -2840,7 +2841,7 @@ public:
             NSMutableArray *placesArray = [NSMutableArray arrayWithCapacity:4];
             NSMutableSet *placesSet = [NSMutableSet setWithCapacity:numberOfPlaces];
             
-            for (id <MGLFeature> placeFeature in sortedPlaceFeatures.reverseObjectEnumerator) {
+            for (id <MGLFeature> placeFeature in visiblePlaceFeatures.reverseObjectEnumerator) {
                 NSString *name = [placeFeature attributeForKey:@"name"];
                 if (![placesSet containsObject:name]) {
                     [placesArray addObject:name];
