@@ -467,6 +467,15 @@ commands:
             scripts/notify-slack.sh
           fi
 
+  check-if-this-job-can-be-skipped:
+    steps:
+    - run:
+        name: Check if this job can be skipped
+        command: |
+          if [[ $CIRCLE_BRANCH != master ]] && [[ $CIRCLE_BRANCH != release-* ]]; then
+            scripts/check-ci-job-skippability.js
+          fi
+
 jobs:
   nitpick:
     docker:
@@ -557,6 +566,7 @@ jobs:
       MBGL_ANDROID_STL: << parameters.stl >>
     steps:
       - install-dependencies: { gradle: true }
+      - check-if-this-job-can-be-skipped
       - run:
           name: Initialize vendor submodules
           command: git submodule update --init platform/android/vendor
@@ -633,6 +643,7 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - install-dependencies: { gradle: true }
+      - check-if-this-job-can-be-skipped
       - run:
           name: Initialize vendor submodules
           command: git submodule update --init platform/android/vendor
@@ -723,6 +734,9 @@ jobs:
       ANDROID_NDK: /android/sdk/ndk-bundle
     steps:
       - checkout
+      - npm-install
+      - prepare-environment
+      - check-if-this-job-can-be-skipped
       - run:
           name: Checkout submodules
           command: |
@@ -766,6 +780,7 @@ jobs:
       WITH_EGL: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-node
       - save-dependencies
       - publish-node-package
@@ -782,6 +797,7 @@ jobs:
       - install-macos-dependencies
       - install-node-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-node
       - save-dependencies
       - run-node-macos-tests
@@ -803,6 +819,7 @@ jobs:
       WITH_CXX11ABI: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - save-dependencies
 
@@ -824,6 +841,7 @@ jobs:
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
@@ -846,6 +864,7 @@ jobs:
       TSAN_OPTIONS: color=always:print_summary=1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
@@ -866,6 +885,7 @@ jobs:
       DISPLAY: :0
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - build-benchmark
       - build-test
@@ -889,6 +909,7 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - build-benchmark
       - build-test
@@ -919,6 +940,7 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - run:
           name: Install doxygen
           command: apt update && apt install -y doxygen
@@ -943,6 +965,7 @@ jobs:
       WITH_EGL: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - configure-cmake
       - build-mbgl-render-test
       - run-linux-render-tests
@@ -960,14 +983,15 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
-      - build-ios-test
       - check-public-symbols
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
       - run:
           name: Lint podspecs and plist files
           command: make ios-lint
+      - check-if-this-job-can-be-skipped
+      - build-ios-test
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
@@ -1000,21 +1024,6 @@ jobs:
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  metrics-nightly:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-    steps:
-      - install-dependencies
-      - run:
-          name: Collect GitHub statistics
-          command: |
-              scripts/publish_github_stats.js
 
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
@@ -1112,6 +1121,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - install-ios-packaging-dependencies
       - run:
           name: Build dynamic framework for device and simulator
@@ -1210,6 +1220,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-macos-test
       - check-public-symbols
       - run:
@@ -1237,11 +1248,27 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - configure-cmake
       - build-mbgl-render-test
       - save-dependencies
       - run-macos-render-tests
       - upload-render-tests
+
+# ------------------------------------------------------------------------------
+  metrics-nightly:
+    docker:
+      - image: mbgl/linux-gcc-5:54f59e3ac5
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
+    steps:
+      - install-dependencies
+      - run:
+          name: Collect GitHub statistics
+          command: |
+              scripts/publish_github_stats.js
 
 # ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
@@ -1256,6 +1283,7 @@ jobs:
       WITH_QT_I18N: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-qt-app
       - build-qt-test
       - run:
@@ -1282,6 +1310,7 @@ jobs:
       - install-macos-dependencies
       - install-qt-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-qt-app
       - build-qt-test
       - run:
