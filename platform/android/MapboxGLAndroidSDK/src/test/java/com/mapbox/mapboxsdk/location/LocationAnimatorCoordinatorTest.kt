@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.location
 
 import android.animation.Animator
+import android.content.Context
 import android.location.Location
 import android.util.SparseArray
 import android.view.animation.LinearInterpolator
@@ -21,7 +22,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class LocationAnimatorCoordinatorTest {
@@ -37,8 +37,9 @@ class LocationAnimatorCoordinatorTest {
 
   @Before
   fun setUp() {
-    locationComponentOptions = LocationComponentOptions.builder(
-      RuntimeEnvironment.systemContext)
+    val context: Context = mockk(relaxed = true)
+
+    locationComponentOptions = LocationComponentOptions.builder(context)
       .pulsingCircleEnabled(true)
       .build()
 
