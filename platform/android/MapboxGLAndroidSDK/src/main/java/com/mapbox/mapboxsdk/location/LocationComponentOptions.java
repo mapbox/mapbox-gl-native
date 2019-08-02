@@ -1298,7 +1298,7 @@ public class LocationComponentOptions implements Parcelable {
 
       if (locationComponentOptions.layerAbove() != null && locationComponentOptions.layerBelow() != null) {
         throw new IllegalArgumentException("You cannot set both layerAbove and layerBelow options."
-          + "Choose one or the other.");
+          + " Choose one or the other.");
       }
 
       if (locationComponentOptions.pulseEnabled() == null) {

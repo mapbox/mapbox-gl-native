@@ -3,9 +3,11 @@ package com.mapbox.mapboxsdk.location;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.location.modes.PulseMode;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import org.junit.Before;
@@ -63,6 +65,44 @@ public class LocationComponentActivationOptionsTest {
         .locationComponentOptions(locationComponentOptions)
         .useDefaultLocationEngine(true)
         .build();
+    assertNotNull(locationComponentActivationOptions);
+  }
+
+  @Test
+  public void sanityWithDefaultPulsingCircle() throws Exception {
+    when(style.isFullyLoaded()).thenReturn(true);
+
+    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
+        .accuracyAlpha(0.5f)
+        .pulsingCircleEnabled(true)
+        .build();
+    assertNotNull(locationComponentOptions);
+
+    LocationComponentActivationOptions locationComponentActivationOptions =
+        LocationComponentActivationOptions.builder(context, style)
+            .locationComponentOptions(locationComponentOptions)
+            .useDefaultLocationEngine(true)
+            .build();
+    assertNotNull(locationComponentActivationOptions);
+  }
+
+  @Test
+  public void sanityWithCustomizedPulsingCircle() throws Exception {
+    when(style.isFullyLoaded()).thenReturn(true);
+
+    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
+        .accuracyAlpha(0.5f)
+        .pulsingCircleEnabled(true)
+        .pulsingCircleColor(Color.RED)
+        .pulsingCircleInterpolator(PulseMode.LINEAR)
+        .build();
+    assertNotNull(locationComponentOptions);
+
+    LocationComponentActivationOptions locationComponentActivationOptions =
+        LocationComponentActivationOptions.builder(context, style)
+            .locationComponentOptions(locationComponentOptions)
+            .useDefaultLocationEngine(true)
+            .build();
     assertNotNull(locationComponentActivationOptions);
   }
 

@@ -40,7 +40,6 @@ class LocationAnimatorCoordinatorTest {
     val context: Context = mockk(relaxed = true)
 
     locationComponentOptions = LocationComponentOptions.builder(context)
-      .pulsingCircleEnabled(true)
       .build()
 
     locationAnimatorCoordinator = LocationAnimatorCoordinator(projection,
@@ -58,8 +57,7 @@ class LocationAnimatorCoordinatorTest {
       ANIMATOR_CAMERA_COMPASS_BEARING,
       ANIMATOR_LAYER_ACCURACY,
       ANIMATOR_ZOOM,
-      ANIMATOR_TILT,
-      ANIMATOR_PULSING_CIRCLE
+      ANIMATOR_TILT
     ))
   }
 
@@ -355,12 +353,6 @@ class LocationAnimatorCoordinatorTest {
     )
 
     assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_TILT] != null)
-  }
-
-  @Test
-  fun startPulsingCircle_animatorCreated() {
-    locationAnimatorCoordinator.startLocationComponentCirclePulsing(locationComponentOptions)
-    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_PULSING_CIRCLE] != null)
   }
 
   @Test
