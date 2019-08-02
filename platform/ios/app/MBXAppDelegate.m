@@ -11,7 +11,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #ifndef MGL_DISABLE_LOGGING
-    [MGLLoggingConfiguration sharedConfiguration].loggingLevel = MGLLoggingLevelNone;
+    [MGLLoggingConfiguration sharedConfiguration].loggingLevel = MGLLoggingLevelFault;
 #endif
 
     [MGLMetricsManager sharedManager].delegate = self;

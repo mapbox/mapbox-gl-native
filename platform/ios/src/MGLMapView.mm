@@ -568,7 +568,7 @@ public:
 
     _rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
     _rotate.delegate = self;
-    _rotate.delaysTouchesBegan = YES;
+//    _rotateThreshold = 3;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
 
@@ -1714,11 +1714,9 @@ public:
 
     [self cancelTransitions];
 
-    
     // custom gesture recognizer? we need to delay the gesture recognizer. I could set a threshold for the recognizer, and once it has been met keep going.
-    // Why shouldn't I concatenate the rotation value? What bad thing happens? Help...
 
-    if ( MGLDegreesFromRadians(self.currentRotation) < 30) {
+    if ( MGLDegreesFromRadians(self.currentRotation) < self.rotateThreshold) {
         rotate.delaysTouchesBegan = YES;
         self.currentRotation += abs(rotate.rotation);
         rotate.rotation = 0;

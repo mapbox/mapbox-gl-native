@@ -723,6 +723,8 @@ MGL_EXPORT
  */
 @property(nonatomic) CGFloat decelerationRate;
 
+@property(nonatomic) NSUInteger rotateThreshold;
+
 #pragma mark Manipulating the Viewpoint
 
 /**
