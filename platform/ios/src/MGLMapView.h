@@ -295,7 +295,7 @@ MGL_EXPORT
  view’s center coordinate, as well as the device screen width. At latitudes
  farther from the equator, the scale bar becomes visible at lower zoom levels.
 
- The  scale bar's unit of measurement is determined by the end user's.
+ The unit of measurement is determined by the user's device locale.
 
  The view controlled by this property is available at `scaleBar`. The default value
  of this property is `NO`.
