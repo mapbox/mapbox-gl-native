@@ -116,11 +116,11 @@ public:
 private:
     friend SymbolBucket;
     void placeBucket(
-            SymbolBucket&,
+            const SymbolBucket&,
             const BucketPlacementParameters&,
             std::set<uint32_t>& seenCrossTileIDs);
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
-    bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile);
+    bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&);
     void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&);
 
@@ -141,6 +141,9 @@ private:
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
     CollisionGroups collisionGroups;
     std::unique_ptr<Placement> prevPlacement;
+
+    // Used for debug purposes.
+    std::unordered_map<const CollisionFeature*, std::vector<ProjectedCollisionBox>> collisionCircles;
 };
 
 } // namespace mbgl

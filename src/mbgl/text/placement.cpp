@@ -98,7 +98,7 @@ Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor, float
 } // namespace
 
 void Placement::placeBucket(
-        SymbolBucket& bucket,
+        const SymbolBucket& bucket,
         const BucketPlacementParameters& params,
         std::set<uint32_t>& seenCrossTileIDs) {
     const auto& layout = *bucket.layout;
@@ -157,10 +157,13 @@ void Placement::placeBucket(
     std::vector<style::TextVariableAnchorType> variableTextAnchors = layout.get<style::TextVariableAnchor>();
     const bool rotateWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
     const bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
+    const bool hasCollisionCircleData = bucket.hasCollisionCircleData();
 
     const bool zOrderByViewportY = layout.get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY;
+    std::vector<ProjectedCollisionBox> textBoxes;
+    std::vector<ProjectedCollisionBox> iconBoxes;
 
-    auto placeSymbol = [&] (SymbolInstance& symbolInstance) {
+    auto placeSymbol = [&] (const SymbolInstance& symbolInstance) {
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) != 0u) return;
 
         if (renderTile.holdForFade()) {
@@ -169,14 +172,16 @@ void Placement::placeBucket(
             placements.emplace(symbolInstance.crossTileID, JointPlacement(false, false, false));
             return;
         }
+        textBoxes.clear();
+        iconBoxes.clear();
 
         bool placeText = false;
         bool placeIcon = false;
         bool offscreen = true;
         optional<size_t> horizontalTextIndex = symbolInstance.getDefaultHorizontalPlacedTextIndex();
         if (horizontalTextIndex) {
-            CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
-            PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*horizontalTextIndex);
+            const CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
+            const PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*horizontalTextIndex);
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
             if (variableTextAnchors.empty()) {
                 auto placed = collisionIndex.placeFeature(textCollisionFeature, {},
@@ -184,7 +189,7 @@ void Placement::placeBucket(
                         placedSymbol, scale, fontSize,
                         layout.get<style::TextAllowOverlap>(),
                         pitchWithMap,
-                        params.showCollisionBoxes, avoidEdges, collisionGroup.second);
+                        params.showCollisionBoxes, avoidEdges, collisionGroup.second, textBoxes);
                 placeText = placed.first;
                 offscreen &= placed.second;
             } else if (!textCollisionFeature.alongLine && !textCollisionFeature.boxes.empty()) {
@@ -227,7 +232,7 @@ void Placement::placeBucket(
                                                                 placedSymbol, scale, fontSize,
                                                                 layout.get<style::TextAllowOverlap>(),
                                                                 pitchWithMap,
-                                                                params.showCollisionBoxes, avoidEdges, collisionGroup.second);
+                                                                params.showCollisionBoxes, avoidEdges, collisionGroup.second, textBoxes);
 
                     if (placed.first) {
                         assert(symbolInstance.crossTileID != 0u);
@@ -253,12 +258,12 @@ void Placement::placeBucket(
                             textBoxScale,
                             prevAnchor
                         }));
-                        markUsedJustification(bucket, anchor, symbolInstance);
 
                         placeText = placed.first;
                         offscreen &= placed.second;
                         break;
                     }
+                    textBoxes.clear();
                 }
 
                 // If we didn't get placed, we still need to copy our position from the last placement for
@@ -267,14 +272,13 @@ void Placement::placeBucket(
                     auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
                     if (prevOffset != prevPlacement->variableOffsets.end()) {
                         variableOffsets[symbolInstance.crossTileID] = prevOffset->second;
-                        markUsedJustification(bucket, prevOffset->second.anchor, symbolInstance);
                     }
                 }
             }
         }
 
         if (symbolInstance.placedIconIndex) {
-            PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
+            const PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
 
             auto placed = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature, {},
@@ -282,7 +286,7 @@ void Placement::placeBucket(
                     placedSymbol, scale, fontSize,
                     layout.get<style::IconAllowOverlap>(),
                     pitchWithMap,
-                    params.showCollisionBoxes, avoidEdges, collisionGroup.second);
+                    params.showCollisionBoxes, avoidEdges, collisionGroup.second, iconBoxes);
             placeIcon = placed.first;
             offscreen &= placed.second;
         }
@@ -300,11 +304,20 @@ void Placement::placeBucket(
         }
 
         if (placeText) {
-            collisionIndex.insertFeature(symbolInstance.textCollisionFeature, layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
+            collisionIndex.insertFeature(symbolInstance.textCollisionFeature, textBoxes, layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
         }
 
         if (placeIcon) {
-            collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
+            collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, iconBoxes, layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
+        }
+
+        if (hasCollisionCircleData) { 
+            if (symbolInstance.iconCollisionFeature.alongLine && !iconBoxes.empty()) {
+                collisionCircles[&symbolInstance.iconCollisionFeature] = iconBoxes;
+            }
+            if (symbolInstance.textCollisionFeature.alongLine && !textBoxes.empty()) {
+                collisionCircles[&symbolInstance.textCollisionFeature] = textBoxes;
+            }
         }
 
         assert(symbolInstance.crossTileID != 0);
@@ -326,7 +339,7 @@ void Placement::placeBucket(
             placeSymbol(*it);
         }
     } else {
-        for (SymbolInstance& symbol : bucket.symbolInstances) {
+        for (const SymbolInstance& symbol : bucket.symbolInstances) {
             placeSymbol(symbol);
         }
     }
@@ -407,7 +420,7 @@ Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float 
 }
 } // namespace
 
-bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const TransformState& state, const RenderTile& tile) {
+bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const TransformState& state, const RenderTile& tile) const {
     using namespace style;
     const auto& layout = *bucket.layout;
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
@@ -569,9 +582,9 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
 
             bucket.text.opacityVertices.extend(textOpacityVerticesSize, opacityVertex);
 
-            auto prevOffset = variableOffsets.find(symbolInstance.crossTileID);
-            if (prevOffset != variableOffsets.end()) {
-                markUsedJustification(bucket, prevOffset->second.anchor, symbolInstance);
+            auto offset = variableOffsets.find(symbolInstance.crossTileID);
+            if (offset != variableOffsets.end()) {
+                markUsedJustification(bucket, offset->second.anchor, symbolInstance);
             }
         }
         if (symbolInstance.hasIcon) {
@@ -627,9 +640,16 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             if (!feature.alongLine) {
                 return;
             }
-            for (const CollisionBox& box : feature.boxes) {
-                const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !box.projected.isCircle(), {});
-                bucket.collisionCircle->dynamicVertices.extend(4, dynamicVertex);
+            auto circles = collisionCircles.find(&feature);
+            if (circles != collisionCircles.end()) {
+                for (const auto& circle : circles->second) {
+                    const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !circle.isCircle(), {});
+                    bucket.collisionCircle->dynamicVertices.extend(4, dynamicVertex);
+                }
+            } else {
+                // This feature was not placed, because it was not loaded or from a fading tile. Apply default values.
+                static const auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false /*not used*/, {});
+                bucket.collisionCircle->dynamicVertices.extend(4 * feature.boxes.size(), dynamicVertex);
             }
         };
         

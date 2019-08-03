@@ -227,8 +227,8 @@ void SymbolBucket::sortFeatures(const float angle) {
     }
 }
 
-std::vector<std::reference_wrapper<SymbolInstance>> SymbolBucket::getSortedSymbols(const float angle) {
-    std::vector<std::reference_wrapper<SymbolInstance>> result(symbolInstances.begin(), symbolInstances.end());
+std::vector<std::reference_wrapper<const SymbolInstance>> SymbolBucket::getSortedSymbols(const float angle) const {
+    std::vector<std::reference_wrapper<const SymbolInstance>> result(symbolInstances.begin(), symbolInstances.end());
     const float sin = std::sin(angle);
     const float cos = std::cos(angle);
 

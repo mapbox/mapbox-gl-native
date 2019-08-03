@@ -64,9 +64,6 @@ public:
     float y2;
 
     float signedDistanceFromAnchor;
-
-    // generated/updated at placement time
-    ProjectedCollisionBox projected;
 };
 
 class CollisionFeature {
