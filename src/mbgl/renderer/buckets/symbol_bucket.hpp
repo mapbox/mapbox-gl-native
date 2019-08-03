@@ -70,7 +70,7 @@ public:
 
     void sortFeatures(const float angle);
     // The result contains references to the `symbolInstances` items, sorted by viewport Y.
-    std::vector<std::reference_wrapper<SymbolInstance>> getSortedSymbols(const float angle);
+    std::vector<std::reference_wrapper<const SymbolInstance>> getSortedSymbols(const float angle) const;
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout;
     const std::string bucketLeaderID;
@@ -84,7 +84,8 @@ public:
     bool placementChangesUploaded : 1;
     bool dynamicUploaded : 1;
     bool sortUploaded : 1;
-    bool justReloaded : 1;
+    // Set and used by placement.
+    mutable bool justReloaded : 1;
     bool hasVariablePlacement : 1;
 
     std::vector<SymbolInstance> symbolInstances;
@@ -113,8 +114,7 @@ public:
 
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
 
-    struct IconBuffer : public Buffer {
-    } icon;
+    Buffer icon;
 
     struct CollisionBuffer {
         gfx::VertexVector<gfx::Vertex<CollisionBoxLayoutAttributes>> vertices;
