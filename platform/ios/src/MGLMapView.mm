@@ -568,7 +568,7 @@ public:
 
     _rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
     _rotate.delegate = self;
-//    _rotateThreshold = 3;
+    _rotateThreshold = 3;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
 
@@ -1652,7 +1652,6 @@ public:
     }
     else if (pinch.state == UIGestureRecognizerStateEnded || pinch.state == UIGestureRecognizerStateCancelled)
     {
-
         CGFloat velocity = pinch.velocity;
         if (isnan(velocity))
         {
@@ -1729,7 +1728,6 @@ public:
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
-        
         self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
 
         if (self.userTrackingMode != MGLUserTrackingModeNone)
