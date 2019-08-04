@@ -36,7 +36,8 @@ TEST(Shaping, ZWSP) {
                           {0.0f, 0.0f}, // translate
                           WritingModeType::Horizontal,
                           bidi,
-                          glyphs);
+                          glyphs,
+                          /*allowVerticalPlacement*/ false);
     };
 
     // 3 lines
