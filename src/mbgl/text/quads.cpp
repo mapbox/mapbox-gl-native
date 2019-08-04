@@ -160,7 +160,11 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
 
             const Point<float> center{ -halfAdvance, halfAdvance - Shaping::yOffset };
             const float verticalRotation = -M_PI_2;
-            const Point<float> xOffsetCorrection{ 5.0f - Shaping::yOffset, 0.0f };
+
+            // xHalfWidhtOffsetcorrection is a difference between full-width and half-width
+            // advance, should be 0 for full-width glyphs and will pull up half-width glyphs.
+            const float xHalfWidhtOffsetcorrection = util::ONE_EM / 2 - halfAdvance;
+            const Point<float> xOffsetCorrection{ 5.0f - Shaping::yOffset - xHalfWidhtOffsetcorrection, 0.0f };
             
             tl = util::rotate(tl - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
             tr = util::rotate(tr - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;

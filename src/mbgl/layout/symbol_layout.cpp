@@ -314,7 +314,8 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                     /* translate */ textOffset,
                     /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi,
-                    /* glyphs */ glyphMap);
+                    /* glyphs */ glyphMap,
+                    allowVerticalPlacement);
 
                 return result;
             };
