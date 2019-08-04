@@ -290,7 +290,8 @@ void shapeLines(Shaping& shaping,
                 const style::SymbolAnchorType textAnchor,
                 const style::TextJustifyType textJustify,
                 const WritingModeType writingMode,
-                const GlyphMap& glyphMap) {
+                const GlyphMap& glyphMap,
+                bool allowVerticalPlacement) {
     float x = 0;
     float y = Shaping::yOffset;
     
@@ -332,8 +333,13 @@ void shapeLines(Shaping& shaping,
             const double baselineOffset = (lineMaxScale - section.scale) * util::ONE_EM;
             
             const Glyph& glyph = **it->second;
-            
-            if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(codePoint)) {
+
+            if (writingMode == WritingModeType::Horizontal ||
+                // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
+                (!allowVerticalPlacement && !util::i18n::hasUprightVerticalOrientation(codePoint)) ||
+                // If vertical placement is ebabled, don't verticalize glyphs that
+                // are from complex text layout script, or whitespaces.
+                (allowVerticalPlacement && (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint)))) {
                 shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
@@ -377,7 +383,8 @@ const Shaping getShaping(const TaggedString& formattedString,
                          const Point<float>& translate,
                          const WritingModeType writingMode,
                          BiDi& bidi,
-                         const GlyphMap& glyphs) {   
+                         const GlyphMap& glyphs,
+                         bool allowVerticalPlacement) {
     std::vector<TaggedString> reorderedLines;
     if (formattedString.sectionCount() == 1) {
         auto untaggedLines = bidi.processText(formattedString.rawText(),
@@ -394,7 +401,7 @@ const Shaping getShaping(const TaggedString& formattedString,
     }
     Shaping shaping(translate.x, translate.y, writingMode, reorderedLines.size());
     shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
-               textJustify, writingMode, glyphs);
+               textJustify, writingMode, glyphs, allowVerticalPlacement);
     
     return shaping;
 }

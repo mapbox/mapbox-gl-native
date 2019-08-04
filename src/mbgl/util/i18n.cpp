@@ -643,6 +643,14 @@ bool isStringInSupportedScript(const std::string& input) {
     return true;
 }
 
+bool isCharInComplexShapingScript(char16_t chr) {
+    return isInArabic(chr) ||
+           isInArabicSupplement(chr) ||
+           isInArabicExtendedA(chr) ||
+           isInArabicPresentationFormsA(chr) ||
+           isInArabicPresentationFormsB(chr);
+}
+
 bool isWhitespace(char16_t chr) {
     return chr == u' ' || chr == u'\t' || chr == u'\n' || chr == u'\v' || chr == u'\f' || chr == u'\r';
 }
