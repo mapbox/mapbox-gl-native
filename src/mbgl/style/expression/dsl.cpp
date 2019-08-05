@@ -31,8 +31,7 @@ std::unique_ptr<Expression> createExpression(const char* expr) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
     document.Parse<0>(expr);
     if (document.HasParseError()) return nullptr;
-    
-    //optional<expression::TypeAnnotationOption> typeAnnotationOption;
+
     const JSValue* expression = &document;
     expression::ParsingContext ctx;
     expression::ParseResult parsed =

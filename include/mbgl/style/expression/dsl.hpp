@@ -14,8 +14,8 @@ namespace style {
 namespace expression {
 namespace dsl {
 
-// This convenience API does little to no expression validation or type-checking, and is intended
-// for use only by test and other non-production code.
+// This convenience API does little to no expression validation or type-checking, and is intended for
+// use only by test and other non-production code.
 
 template <class... Args>
 std::vector<std::unique_ptr<Expression>> vec(Args... args) {
@@ -23,6 +23,7 @@ std::vector<std::unique_ptr<Expression>> vec(Args... args) {
     util::ignore({ (result.push_back(std::move(args)), 0)... });
     return result;
 }
+
 std::unique_ptr<Expression> createExpression(const char* expr);
 std::unique_ptr<Expression> createExpression(const mbgl::style::conversion::Convertible& expr);
 std::unique_ptr<Expression> error(std::string);
@@ -84,6 +85,7 @@ std::unique_ptr<Expression> interpolate(Interpolator interpolator,
                                         double input3, std::unique_ptr<Expression> output3);
 
 std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inputs);
+
 std::unique_ptr<Expression> format(const char* value);
 std::unique_ptr<Expression> format(std::unique_ptr<Expression>);
 

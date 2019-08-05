@@ -1,13 +1,15 @@
 #include <mbgl/style/conversion/geojson_options.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/dsl.hpp>
+
 #include <sstream>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
 
-optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible& value, Error& error) const {
+optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible& value,
+                                                               Error& error) const {
     GeoJSONOptions options;
 
     const auto minzoomValue = objectMember(value, "minzoom");
@@ -121,6 +123,9 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
                 auto reduce = expression::dsl::createExpression(ss.str().c_str());
                 if (map && reduce) {
                     result.emplace(k, std::make_pair(std::move(map), std::move(reduce)));
+                } else {
+                    error.message = "Failed to convert GeoJSON source clusterProperties";
+                    return {};
                 }
                 return {};
             });

@@ -6,7 +6,6 @@
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
-#include <mbgl/util/feature.hpp>
 
 #include <array>
 #include <vector>
