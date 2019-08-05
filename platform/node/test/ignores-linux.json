@@ -1,0 +1,6 @@
+{
+  "render-tests/fill-pattern/literal": "FLAKY: do not re-enable without extensive testing - https://github.com/mapbox/mapbox-gl-native/issues/14423",
+  "render-tests/fill-pattern/opacity": "FLAKY: do not re-enable without extensive testing - https://github.com/mapbox/mapbox-gl-native/issues/14870",
+  "render-tests/fill-pattern/zoomed": "FLAKY: do not re-enable without extensive testing - https://github.com/mapbox/mapbox-gl-native/issues/14768",
+  "render-tests/line-translate/literal": "FLAKY: do not re-enable without extensive testing - https://github.com/mapbox/mapbox-gl-native/issues/14859"
+}
