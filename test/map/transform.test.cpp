@@ -9,6 +9,7 @@ using namespace mbgl;
 
 TEST(Transform, InvalidZoom) {
     Transform transform;
+    transform.resize({1, 1});
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
@@ -56,6 +57,7 @@ TEST(Transform, InvalidZoom) {
 
 TEST(Transform, InvalidBearing) {
     Transform transform;
+    transform.resize({1, 1});
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
@@ -78,6 +80,7 @@ TEST(Transform, InvalidBearing) {
 
 TEST(Transform, IntegerZoom) {
     Transform transform;
+    transform.resize({1, 1});
 
     auto checkIntegerZoom = [&transform](uint8_t zoomInt, double zoom) {
         transform.jumpTo(CameraOptions().withZoom(zoom));

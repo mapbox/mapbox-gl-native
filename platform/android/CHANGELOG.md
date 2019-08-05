@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## master
+
+### Bug fixes
+ - Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues [#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195)
+ - Allow loading of a map without a Style URI or Style JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)
+
 ## 8.0.2 - July 31, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.0.1...android-v8.0.2) since [Mapbox Maps SDK for Android v8.0.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.0.1):
 

@@ -68,6 +68,7 @@
     <string name="activity_textureview_transparent">TextureView transparent background</string>
     <string name="activity_overlay">Map overlay</string>
     <string name="activity_grid_source">Grid Source</string>
+    <string name="activity_no_style">No Style URI/JSON</string>
     <string name="activity_local_glyph">Local CJK glyph generation</string>
     <string name="activity_hillshade">Hillshade</string>
     <string name="activity_heatmaplayer">Heatmap layer</string>

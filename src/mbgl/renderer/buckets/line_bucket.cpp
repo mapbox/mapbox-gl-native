@@ -63,6 +63,9 @@ void LineBucket::addFeature(const GeometryTileFeature& feature,
 const float COS_HALF_SHARP_CORNER = std::cos(75.0 / 2.0 * (M_PI / 180.0));
 const float SHARP_CORNER_OFFSET = 15.0f;
 
+// Angle per triangle for approximating round line joins.
+const float DEG_PER_TRIANGLE = 20.0f;
+
 // The number of bits that is used to store the line distance in the buffer.
 const int LINE_DISTANCE_BUFFER_BITS = 14;
 
@@ -226,12 +229,17 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
          *
          */
 
-        // Calculate the length of the miter (the ratio of the miter to the width).
-        // Find the cosine of the angle between the next and join normals
-        // using dot product. The inverse of that is the miter length.
+        // Calculate cosines of the angle (and its half) using dot product.
+        const double cosAngle = prevNormal->x * nextNormal->x + prevNormal->y * nextNormal->y;
         const double cosHalfAngle = joinNormal.x * nextNormal->x + joinNormal.y * nextNormal->y;
+
+        // Calculate the length of the miter (the ratio of the miter to the width)
+        // as the inverse of cosine of the angle between next and join normals.
         const double miterLength =
             cosHalfAngle != 0 ? 1 / cosHalfAngle : std::numeric_limits<double>::infinity();
+
+        // Approximate angle from cosine.
+        const double approxAngle = 2 * std::sqrt(2 - 2 * cosHalfAngle);
 
         const bool isSharpCorner = cosHalfAngle < COS_HALF_SHARP_CORNER && prevCoordinate && nextCoordinate;
 
@@ -331,20 +339,20 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
                 // Create a round join by adding multiple pie slices. The join isn't actually round, but
                 // it looks like it is at the sizes we render lines at.
 
-                // Add more triangles for sharper angles.
-                // This math is just a good enough approximation. It isn't "correct".
-                const int n = std::floor((0.5 - (cosHalfAngle - 0.5)) * 8);
+                // Pick the number of triangles for approximating round join by based on the angle between normals.
+                const unsigned n = ::round((approxAngle * 180 / M_PI) / DEG_PER_TRIANGLE);
 
-                for (int m = 0; m < n; m++) {
-                    auto approxFractionalJoinNormal = util::unit(*nextNormal * ((m + 1.0) / (n + 1.0)) + *prevNormal);
-                    addPieSliceVertex(*currentCoordinate, distance, approxFractionalJoinNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
-                }
-
-                addPieSliceVertex(*currentCoordinate, distance, joinNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
-
-                for (int k = n - 1; k >= 0; k--) {
-                    auto approxFractionalJoinNormal = util::unit(*prevNormal * ((k + 1.0) / (n + 1.0)) + *nextNormal);
-                    addPieSliceVertex(*currentCoordinate, distance, approxFractionalJoinNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
+                for (unsigned m = 1; m < n; ++m) {
+                    double t = double(m) / n;
+                    if (t != 0.5) {
+                        // approximate spherical interpolation https://observablehq.com/@mourner/approximating-geometric-slerp
+                        const double t2 = t - 0.5;
+                        const double A = 1.0904 + cosAngle * (-3.2452 + cosAngle * (3.55645 - cosAngle * 1.43519));
+                        const double B = 0.848013 + cosAngle * (-1.06021 + cosAngle * 0.215638);
+                        t = t + t * t2 * (t - 1) * (A * t2 * t2 + B);
+                    }
+                    auto approxFractionalNormal = util::unit(*prevNormal * (1.0 - t) + *nextNormal * t);
+                    addPieSliceVertex(*currentCoordinate, distance, approxFractionalNormal, lineTurnsLeft, startVertex, triangleStore, lineDistances);
                 }
             }
 
