@@ -245,8 +245,10 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         }
 
         [req addValue:impl->userAgent forHTTPHeaderField:@"User-Agent"];
-        
-        if (resource.kind == mbgl::Resource::Kind::Tile) {
+
+        const bool isTile = resource.kind == mbgl::Resource::Kind::Tile;
+
+        if (isTile) {
             [[MGLNetworkConfiguration sharedManager] startDownloadEvent:url.relativePath type:@"tile"];
         }
         
@@ -322,7 +324,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 
                     if (responseCode == 200) {
                         response.data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
-                    } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
+                    } else if (responseCode == 204 || (responseCode == 404 && isTile)) {
                         response.noContent = true;
                     } else if (responseCode == 304) {
                         response.notModified = true;
