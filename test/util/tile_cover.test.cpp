@@ -78,6 +78,35 @@ TEST(TileCover, PitchWithLargerResultSet) {
     }), (std::vector<UnwrappedTileID> { cover.begin(), cover.begin() + 16}) );
 }
 
+TEST(TileCover, TileCoverLODCoversSingleLevelTileCover) {
+    Transform transform;
+    transform.resize({ 512, 768 });
+
+    std::vector<EdgeInsets> padding = { EdgeInsets { 0, 100, 0, 0 }, EdgeInsets { 800, 0, 0, 0 } };
+    std::vector<int32_t> zoom = { 14, 22 };
+    std::vector<double> bearing = { 2, 45, -22.5 };
+    std::vector<double> pitch = { 0, 30, 90 };
+
+    for (auto pad : padding) {
+        for (auto z : zoom) {
+            for (auto bear : bearing) {
+                for (auto p : pitch) {
+                    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.1, -0.1 })
+                        .withPadding(pad).withZoom(z).withBearing(bear).withPitch(p));
+                    auto singleLevelCover = util::tileCover(transform.getState(), z);
+                    auto lodTileCover = util::tileCoverWithLOD(transform.getState(), z, z / 10 * 10);
+                    for (auto tile: singleLevelCover) {
+                        EXPECT_NE(lodTileCover.cend(), std::find_if(lodTileCover.cbegin(), lodTileCover.cend(),
+                            [&tile] (auto parent) { return tile == parent || tile.isChildOf(parent); })) << "for padding: ["
+                            << pad.top() << ", " << pad.left() << ", 0, 0] zoom:" << z << " bearing:"
+                            << bear << " and pitch:" << p;
+                    }
+                }
+            }
+        }
+    }
+}
+
 TEST(TileCover, WorldZ1) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{
         { 1, 0, 0 }, { 1, 0, 1 }, { 1, 1, 0 }, { 1, 1, 1 },

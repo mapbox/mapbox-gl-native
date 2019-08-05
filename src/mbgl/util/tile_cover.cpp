@@ -181,6 +181,9 @@ std::vector<UnwrappedTileID> tileCoverWithLOD(const TransformState& state, int32
 
     const auto offset = state.getCenterOffset();
     constexpr double zoomDiff = 1.0;
+    // Explanation on 0.55: mathematically, it is 0.5 used in calculation of
+    // the next LOD. 0.55 is chosen to avoid using LOD for less than 60 degrees
+    // pitch.
     constexpr double coefLOD[] = {
        0.55 * zoomDiff / (zoomDiff + 1),
        0.55 * (zoomDiff + 1) / (zoomDiff + 2),
