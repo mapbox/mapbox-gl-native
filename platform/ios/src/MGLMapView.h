@@ -289,9 +289,16 @@ MGL_EXPORT
 /**
  A Boolean value indicating whether the map may display scale information.
 
- The scale bar may not be shown at all zoom levels. The view controlled by this
- property is available at `scaleBar`. The default value of this property is
- `NO`.
+ The scale bar may not be shown at all zoom levels. The scale bar becomes visible
+ when the maximum distance visible on the map view is less than 400 miles (800
+ kilometers). The zoom level where this occurs depends on the latitude at the map
+ view’s center coordinate, as well as the device screen width. At latitudes
+ farther from the equator, the scale bar becomes visible at lower zoom levels.
+
+ The unit of measurement is determined by the user's device locale.
+
+ The view controlled by this property is available at `scaleBar`. The default value
+ of this property is `NO`.
  */
 @property (nonatomic, assign) BOOL showsScale;
 
