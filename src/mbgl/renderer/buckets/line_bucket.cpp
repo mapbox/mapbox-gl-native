@@ -64,7 +64,7 @@ const float COS_HALF_SHARP_CORNER = std::cos(75.0 / 2.0 * (M_PI / 180.0));
 const float SHARP_CORNER_OFFSET = 15.0f;
 
 // Angle per triangle for approximating round line joins.
-const float DEG_PER_TRIANGLE = 30.0f;
+const float DEG_PER_TRIANGLE = 20.0f;
 
 // The number of bits that is used to store the line distance in the buffer.
 const int LINE_DISTANCE_BUFFER_BITS = 14;
