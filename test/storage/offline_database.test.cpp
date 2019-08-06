@@ -515,7 +515,8 @@ TEST(OfflineDatabase, GetRegionDefinition) {
     );
 }
 
-TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MaximumAmbientCacheSize)) {
+// Disabled due to flakiness: https://github.com/mapbox/mapbox-gl-native/issues/14966
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DISABLED_MaximumAmbientCacheSize)) {
     FixtureLog log;
     deleteDatabaseFiles();
 
