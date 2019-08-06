@@ -559,6 +559,13 @@ test-node: node
 	npm run test-query
 	npm run test-expressions
 
+.PHONY: test-node-all
+test-node-all: node
+	npm test
+	npm run test-query
+	npm run test-expressions
+	npm run test-render
+
 #### Android targets ###########################################################
 
 MBGL_ANDROID_ABIS  = arm-v7;armeabi-v7a

@@ -36,6 +36,27 @@ static GeometryCollection toGeometryCollection(MultiPolygon<int16_t>&& multipoly
     return result;
 }
 
+// Attempts to restore original point order in rings:
+// see https://github.com/mapbox/mapbox-gl-native/issues/15268.
+static GeometryCollection restorePointOrder(GeometryCollection&& rings, const GeometryCollection& originalRings) {
+    if (rings.size() != originalRings.size()) {
+        // No sense restoring starting point if polygons are changed.
+        return std::move(rings);
+    }
+
+    int i = 0;
+    for (auto& ring : rings) {
+        const auto originalRing = originalRings[i++];
+        auto item = find(ring.begin(), ring.end() - 1, originalRing[0]);
+        if (item != ring.end()) {
+            rotate(ring.begin(), item, ring.end() - 1);
+            // Close the ring.
+            ring.back() = ring.front();
+        }
+    }
+    return std::move(rings);
+}
+
 GeometryCollection fixupPolygons(const GeometryCollection& rings) {
     using namespace mapbox::geometry::wagyu;
 
@@ -48,7 +69,7 @@ GeometryCollection fixupPolygons(const GeometryCollection& rings) {
     MultiPolygon<int16_t> multipolygon;
     clipper.execute(clip_type_union, multipolygon, fill_type_even_odd, fill_type_even_odd);
 
-    return toGeometryCollection(std::move(multipolygon));
+    return restorePointOrder(toGeometryCollection(std::move(multipolygon)), rings);
 }
 
 std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
