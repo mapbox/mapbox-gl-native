@@ -54,7 +54,6 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug
-      - macos-render-tests
       - qt5-linux-gcc5-release
       - qt5-macos-debug
   nightly:
@@ -372,7 +371,7 @@ commands:
     steps:
     - run:
         name: Run node tests
-        command: make test-node
+        command: make test-node-all
 
   run-node-linux-tests:
     parameters:
@@ -386,14 +385,6 @@ commands:
           . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node
-
-  run-macos-render-tests:
-    steps:
-    - run:
-        name: Run render tests (mbgl-render-test)
-        command: |
-          build/mbgl-render-test --recycle-map --shuffle
-        no_output_timeout: 2m
 
   run-linux-render-tests:
     parameters:
@@ -784,6 +775,7 @@ jobs:
       - save-dependencies
       - run-node-macos-tests
       - publish-node-package
+      - upload-render-tests
       - collect-xcode-build-logs
       - upload-xcode-build-logs
 
@@ -1176,24 +1168,6 @@ jobs:
           destination: test/fixtures
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  macos-render-tests:
-    macos:
-      xcode: "10.3.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      JOBS: 2
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - configure-cmake
-      - build-mbgl-render-test
-      - save-dependencies
-      - run-macos-render-tests
-      - upload-render-tests
 
 # ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
