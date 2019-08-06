@@ -45,14 +45,16 @@ const ANDROID_FILES = [
   'platform/android/**'
 ]
 
-const IOS_FILES = [
-  'platform/ios/**',
+const DARWIN_FILES = [
   'platform/darwin/**'
 ]
 
+const IOS_FILES = [
+  'platform/ios/**'
+]
+
 const MACOS_FILES = [
-  'platform/macos/**',
-  'platform/darwin/**'
+  'platform/macos/**'
 ]
 
 const OTHER_PLATFORMS = [
@@ -65,10 +67,13 @@ const OTHER_PLATFORMS = [
 ]
 
 function skippableFilePatternsForCIJob(job) {
-  if (job.startsWith('ios')) {
+  if (job.includes('render-tests')) {
+      // Render tests run on specific platforms are effectively unskippable core jobs, not platform jobs.
+      return ALWAYS_SKIPPABLE_FILES;
+  } else if (job.startsWith('ios')) {
       return _.concat(ALWAYS_SKIPPABLE_FILES, ANDROID_FILES, MACOS_FILES, OTHER_PLATFORMS);
   } else if (job.startsWith('android')) {
-      return _.concat(ALWAYS_SKIPPABLE_FILES, IOS_FILES, MACOS_FILES, OTHER_PLATFORMS);
+      return _.concat(ALWAYS_SKIPPABLE_FILES, DARWIN_FILES, IOS_FILES, MACOS_FILES, OTHER_PLATFORMS);
   } else if (job.startsWith('macos')) {
       return _.concat(ALWAYS_SKIPPABLE_FILES, ANDROID_FILES, IOS_FILES, OTHER_PLATFORMS);
   } else {
@@ -78,13 +83,12 @@ function skippableFilePatternsForCIJob(job) {
 
 console.step(`Getting list of files changed between ${COMMIT_RANGE}`);
 
-let changedFiles = execSync(`git diff --name-only ${COMMIT_RANGE}`)
-  .toString()
-  .trim()
-  .split('\n');
+let changedFiles = execSync(`git diff --name-only ${COMMIT_RANGE}`).toString().split('\n');
 changedFiles = _.compact(changedFiles);
 
-console.log(`${changedFiles.length} total files changed.`);
+console.log(`${changedFiles.length} total files changed.`, changedFiles);
+
+console.step(`Checking changed files for paths relevant to ${CI_JOB_NAME}`);
 
 // Filter the changed files array to remove files that are irrelevant to the specified CI job.
 _.remove(changedFiles, function(changedFile) {
