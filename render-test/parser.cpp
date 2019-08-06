@@ -260,10 +260,22 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
 std::vector<std::pair<std::string, std::string>> parseIgnores() {
     std::vector<std::pair<std::string, std::string>> ignores;
 
-    auto path = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("platform/node/test/ignores.json");
+    auto mainIgnoresPath = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("platform/node/test/ignores.json");
 
-    auto maybeIgnores = readJson(path.string());
-    if (maybeIgnores.is<mbgl::JSDocument>()) {
+    mbgl::filesystem::path platformSpecificIgnores;
+
+#ifdef __APPLE__
+    platformSpecificIgnores = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("render-test/mac-ignores.json");
+#elif __linux__
+    platformSpecificIgnores = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("render-test/linux-ignores.json");
+#endif
+    
+    std::vector<mbgl::filesystem::path> ignoresPaths = { mainIgnoresPath, platformSpecificIgnores };
+    for (auto path: ignoresPaths) {
+        auto maybeIgnores = readJson(path);
+        if (!maybeIgnores.is<mbgl::JSDocument>()) {
+            continue;
+        }
         for (const auto& property : maybeIgnores.get<mbgl::JSDocument>().GetObject()) {
             const std::string ignore = { property.name.GetString(),
                                          property.name.GetStringLength() };

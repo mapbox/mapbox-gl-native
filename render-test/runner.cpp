@@ -62,7 +62,7 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
 
         pixels = // implicitly converting from uint64_t
             mapbox::pixelmatch(actual.data.get(), expected.data.get(), expected.size.width,
-                               expected.size.height, diff.data.get(), 0.16); // GL JS uses 0.1285
+                               expected.size.height, diff.data.get(), 0.1285); // Defined in GL JS
 
         metadata.diff = mbgl::encodePNG(diff);
 
