@@ -1,3 +1,6 @@
+# master
+* Introduce `text-writing-mode` layout property for symbol layer ([#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932)). The `text-writing-mode` layout property allows control over symbol's preferred writing mode. The new property value is an array, whose values are enumeration values from a ( `horizontal` | `vertical` ) set.
+
 # 4.2.0
 - Add an option to set whether or not an image should be treated as a SDF ([#15054](https://github.com/mapbox/mapbox-gl-native/issues/15054))
 - Fix problems associated with node 10 and NAN [#14847](https://github.com/mapbox/mapbox-gl-native/pull/14847)

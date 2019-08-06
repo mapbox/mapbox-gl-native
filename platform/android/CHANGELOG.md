@@ -3,6 +3,7 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+- Introduce `text-writing-mode` layout property for symbol layer [#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932). The `text-writing-mode` layout property allows control over symbol's preferred writing mode. The new property value is an array, whose values are enumeration values from a ( `horizontal` | `vertical` ) set.
 
 ### Features
  - Add fallback support to local ideograph font families [#15255](https://github.com/mapbox/mapbox-gl-native/pull/15255)

@@ -16,6 +16,7 @@
 
 * Setting `MGLMapView.contentInset` now moves the map’s focal point to the center of the content frame after insetting. ([#14664](https://github.com/mapbox/mapbox-gl-native/pull/14664))
 * Added the `-[MGLMapViewDelegate mapView:shouldRemoveStyleImage:]` method for optimizing style image caching. ([#14769](https://github.com/mapbox/mapbox-gl-native/pull/14769))
+* Introduce `text-writing-mode` layout property for symbol layer ([#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932)). The `text-writing-mode` layout property allows control over symbol's preferred writing mode. The new property value is an array, whose values are enumeration values from a ( `horizontal` | `vertical` ) set.
 
 ### Other changes
 
