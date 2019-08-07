@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.location
 
 import android.animation.Animator
-import android.content.Context
 import android.location.Location
 import android.util.SparseArray
 import android.view.animation.LinearInterpolator
@@ -27,7 +26,6 @@ import org.robolectric.RobolectricTestRunner
 class LocationAnimatorCoordinatorTest {
 
   private lateinit var locationAnimatorCoordinator: LocationAnimatorCoordinator
-  private lateinit var locationComponentOptions: LocationComponentOptions
   private val cameraPosition: CameraPosition = CameraPosition.DEFAULT
 
   private val animatorProvider: MapboxAnimatorProvider = mockk()
@@ -37,14 +35,9 @@ class LocationAnimatorCoordinatorTest {
 
   @Before
   fun setUp() {
-    val context: Context = mockk(relaxed = true)
-
-    locationComponentOptions = LocationComponentOptions.builder(context)
-      .build()
-
     locationAnimatorCoordinator = LocationAnimatorCoordinator(projection,
       animatorSetProvider,
-      animatorProvider, locationComponentOptions)
+      animatorProvider)
     configureAnimatorProvider()
     every { projection.getMetersPerPixelAtLatitude(any()) } answers { 1.0 }
     every { animatorSetProvider.startAnimation(any(), any(), any()) } answers {}

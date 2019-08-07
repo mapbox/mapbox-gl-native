@@ -52,7 +52,6 @@ final class LocationAnimatorCoordinator {
   private final MapboxAnimatorSetProvider animatorSetProvider;
   private boolean compassAnimationEnabled;
   private boolean accuracyAnimationEnabled;
-  private LocationComponentOptions locationComponentOptions;
 
   @VisibleForTesting
   int maxAnimationFps = Integer.MAX_VALUE;
@@ -61,12 +60,10 @@ final class LocationAnimatorCoordinator {
   final SparseArray<MapboxAnimator.AnimationsValueChangeListener> listeners = new SparseArray<>();
 
   LocationAnimatorCoordinator(@NonNull Projection projection, @NonNull MapboxAnimatorSetProvider animatorSetProvider,
-                              @NonNull MapboxAnimatorProvider animatorProvider,
-                              @NonNull LocationComponentOptions locationComponentOptions) {
+                              @NonNull MapboxAnimatorProvider animatorProvider) {
     this.projection = projection;
     this.animatorProvider = animatorProvider;
     this.animatorSetProvider = animatorSetProvider;
-    this.locationComponentOptions = locationComponentOptions;
   }
 
   void updateAnimatorListenerHolders(@NonNull Set<AnimatorListenerHolder> listenerHolders) {
@@ -164,13 +161,12 @@ final class LocationAnimatorCoordinator {
   void startLocationComponentCirclePulsing(LocationComponentOptions options) {
     cancelAnimator(ANIMATOR_PULSING_CIRCLE);
     MapboxAnimator.AnimationsValueChangeListener listener = listeners.get(ANIMATOR_PULSING_CIRCLE);
-    locationComponentOptions = options;
     PulsingLocationCircleAnimator pulsingLocationCircleAnimator = animatorProvider.pulsingCircleAnimator(
         listener,
         maxAnimationFps,
-        locationComponentOptions.pulseSingleDuration(),
-        locationComponentOptions.pulseMaxRadius(),
-        locationComponentOptions.pulseInterpolator());
+      options.pulseSingleDuration(),
+      options.pulseMaxRadius(),
+      options.pulseInterpolator());
     if (listener != null) {
       animatorArray.put(ANIMATOR_PULSING_CIRCLE, pulsingLocationCircleAnimator);
     }
