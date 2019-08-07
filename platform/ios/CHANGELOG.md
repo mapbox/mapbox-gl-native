@@ -11,6 +11,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
+* Fixed a rare crash when tile download requests returned “404 Not Found” errors. [#15313](https://github.com/mapbox/mapbox-gl-native/pull/15313)
 * `MGLLoggingLevel` has been updated to better match core log levels. You can now use `MGLLoggingConfiguration.loggingLevel` to filter logs from core. [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
 
 ## 4.11.2 - July 30, 2019
