@@ -646,9 +646,6 @@ class LocationLayerControllerTest : EspressoTest() {
         component.forceLocationUpdate(location)
         TestingAsyncUtils.waitForLayer(uiController, mapView)
 
-        component.applyStyle(LocationComponentOptions.builder(context)
-          .pulsingCircleEnabled(true).build())
-
         assertThat(mapboxMap.isLayerVisible(PULSING_CIRCLE_LAYER), `is`(false))
       }
     }
