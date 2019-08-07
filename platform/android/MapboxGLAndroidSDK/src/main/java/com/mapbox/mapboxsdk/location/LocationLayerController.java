@@ -277,7 +277,7 @@ final class LocationLayerController {
   }
 
   /**
-   * Add the pulsing LocationComponent circle to the map for future use, if need be.updatePulsingLocationCircleRadius
+   * Add the pulsing LocationComponent circle to the map for future use, if need be.
    */
   private void addPulsingCircleLayerToMap() {
     Layer pulsingCircleLayer = layerSourceProvider.generatePulsingCircleLayer();

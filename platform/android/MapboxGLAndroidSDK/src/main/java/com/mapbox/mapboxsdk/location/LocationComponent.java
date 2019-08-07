@@ -710,6 +710,7 @@ public final class LocationComponent {
     LocationComponent.this.options = options;
     if (mapboxMap.getStyle() != null) {
       locationLayerController.applyStyle(options);
+      locationCameraController.initializeOptions(options);
       staleStateManager.setEnabled(options.enableStaleState());
       staleStateManager.setDelayTime(options.staleStateTimeout());
       locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
