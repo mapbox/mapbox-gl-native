@@ -2,20 +2,16 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-### Styles and rendering
-
-* Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues. ([#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195))
-
 ## 5.3.0
 
 ### Styles and rendering
 
 * Fixed flickering on style change for the same tile set. ([#15127](https://github.com/mapbox/mapbox-gl-native/pull/15127))
+* Fixed performance issues when tilting a map with custom content insets. ([#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195))
 
 ### Other changes
 
+* Fixed a rare crash when tile download requests returned “404 Not Found” errors. [#15313](https://github.com/mapbox/mapbox-gl-native/pull/15313)
 * `MGLLoggingLevel` has been updated to better match core log levels. You can now use `MGLLoggingConfiguration.loggingLevel` to filter logs from core. [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
 
 ## 4.11.2 - July 30, 2019
