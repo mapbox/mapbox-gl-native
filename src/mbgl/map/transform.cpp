@@ -82,7 +82,7 @@ void Transform::jumpTo(const CameraOptions& camera) {
  * values for any options not included in `options`.
  */
 void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
-    Duration duration = animation.duration ? *animation.duration : Duration::zero();
+    Duration duration = animation.duration.value_or(Duration::zero());
     if (state.bounds == LatLngBounds::unbounded() && !isGestureInProgress() && duration != Duration::zero()) {
         // reuse flyTo, without exaggerated animation, to achieve constant ground speed.
         return flyTo(camera, animation, true);
