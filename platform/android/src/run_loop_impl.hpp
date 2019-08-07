@@ -41,6 +41,7 @@ public:
     ALooper* loop = nullptr;
     RunLoop* runLoop = nullptr;
     std::atomic<bool> running;
+    std::atomic_flag coalesce = ATOMIC_FLAG_INIT;
 
 private:
     friend RunLoop;
