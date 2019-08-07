@@ -17,6 +17,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ### Bug fixes
 - Load a style without an URI or JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)
+- Do not try to wake up the RunLoop if a wake is already pending. Fixes offline downloads that could freeze after resuming. [#15330](https://github.com/mapbox/mapbox-gl-native/pull/15330)
 
 ## 8.0.2 - July 31, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.0.1...android-v8.0.2) since [Mapbox Maps SDK for Android v8.0.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.0.1):
