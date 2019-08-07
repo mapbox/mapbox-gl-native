@@ -31,8 +31,10 @@ int looperCallbackNew(int fd, int, void* data) {
     int buffer[1];
     while (read(fd, buffer, sizeof(buffer)) > 0) {}
 
-    auto loop = reinterpret_cast<ALooper*>(data);
-    ALooper_wake(loop);
+    auto runLoopImpl = reinterpret_cast<RunLoop::Impl*>(data);
+
+    runLoopImpl->coalesce.clear();
+    ALooper_wake(runLoopImpl->loop);
 
     return 1;
 }
@@ -42,9 +44,9 @@ int looperCallbackDefault(int fd, int, void* data) {
     while (read(fd, buffer, sizeof(buffer)) > 0) {}
 
     auto runLoopImpl = reinterpret_cast<RunLoop::Impl*>(data);
-    auto runLoop = runLoopImpl->runLoop;
 
-    runLoop->runOnce();
+    runLoopImpl->coalesce.clear();
+    runLoopImpl->runLoop->runOnce();
 
     if (!runLoopImpl->running) {
         ALooper_wake(runLoopImpl->loop);
@@ -99,7 +101,7 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     switch (type) {
     case Type::New:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
-            ALOOPER_EVENT_INPUT, looperCallbackNew, loop);
+            ALOOPER_EVENT_INPUT, looperCallbackNew, this);
         break;
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
@@ -129,6 +131,10 @@ RunLoop::Impl::~Impl() {
 }
 
 void RunLoop::Impl::wake() {
+    if (coalesce.test_and_set(std::memory_order_acquire)) {
+        return;
+    }
+
     if (write(fds[PIPE_IN], "\n", 1) == -1) {
         throw std::runtime_error("Failed to write to file descriptor.");
     }
