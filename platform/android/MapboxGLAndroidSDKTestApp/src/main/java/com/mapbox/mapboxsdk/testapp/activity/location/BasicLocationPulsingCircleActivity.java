@@ -24,6 +24,10 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
 
+/**
+ * This activity shows a basic usage of the LocationComponent's pulsing circle. There's no
+ * customization of the pulsing circle's color, radius, speed, etc.
+ */
 public class BasicLocationPulsingCircleActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private static final String SAVED_STATE_LOCATION = "saved_state_location";

@@ -31,8 +31,10 @@ import com.mapbox.mapboxsdk.testapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This activity shows how to customize the LocationComponent's pulsing circle.
+ */
 public class CustomizedLocationPulsingCircleActivity extends AppCompatActivity implements OnMapReadyCallback {
-
 
   //region
 
