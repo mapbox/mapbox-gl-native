@@ -33,4 +33,4 @@ curl -s -X POST \
   -H "Travis-API-Version: 3" \
   -H "Authorization: token ${TRAVISCI_API_TOKEN}" \
   -d "${request_body}" \
-  https://api.travis-ci.com/repo/mapbox%2Fdocs-sandbox/requests
+  https://api.travis-ci.com/repo/mapbox%2F${DOCS_REPO}/requests
