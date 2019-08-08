@@ -480,7 +480,7 @@ commands:
   #
   # Do not include this step in nightly or release deployment jobs.
   #
-  # To make a job potentially skippable for changes to its platform code, it must:
+  # To make a job potentially skippable on changes unrelated to its platform, it must:
   #   - Target one of the skippable platforms: Android, iOS, or macOS.
   #   - Have a job name that begins with a supported platform name.
   #   - Not be related to core functionality or rendering tests. Job names that
