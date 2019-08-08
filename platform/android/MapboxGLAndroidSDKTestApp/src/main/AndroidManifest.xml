@@ -976,17 +976,27 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
-        <activity
-                android:name=".activity.offline.DownloadRegionActivity"
-                android:description="@string/description_region"
-                android:label="@string/activity_region">
+        <activity android:name=".activity.offline.DownloadNotCompletingActivity"
+            android:description="@string/description_region"
+            android:label="@string/activity_region">
             <meta-data
-                    android:name="@string/category"
-                    android:value="@string/category_offline" />
+                android:name="@string/category"
+                android:value="@string/category_offline" />
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activity.FeatureOverviewActivity" />
-        </activity>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity" />
+        </activity> <!-- For Instrumentation tests -->
+        <!--<activity
+            android:name=".activity.offline.DownloadRegionActivity"
+            android:description="@string/description_region"
+            android:label="@string/activity_region">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_offline" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity" />
+        </activity> -->
         <!-- For Instrumentation tests -->
         <activity
             android:name=".activity.style.RuntimeStyleTimingTestActivity"
