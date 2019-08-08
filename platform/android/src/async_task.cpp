@@ -16,6 +16,7 @@ public:
     }
 
     ~Impl() {
+        queued = true;
         loop->removeRunnable(this);
     }
 
@@ -31,9 +32,11 @@ public:
     }
 
     void runTask() override {
-        loop->removeRunnable(this);
-        queued = true;
-        task();
+        if (!queued) {
+            queued = true;
+            loop->removeRunnable(this);
+            task();
+        }
     }
 
 private:

@@ -3,6 +3,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 
+#include <atomic>
 #include <functional>
 
 namespace mbgl {
@@ -10,7 +11,7 @@ namespace util {
 
 class Timer::Impl : public RunLoop::Impl::Runnable {
 public:
-    Impl() = default;
+    Impl() : active(false) {}
 
     ~Impl() {
         stop();
@@ -25,9 +26,11 @@ public:
         due = (timeout == Duration::max()) ? std::chrono::time_point<Clock>::max() : Clock::now() +
                                                                                      timeout;
         loop->addRunnable(this);
+        active = true;
     }
 
     void stop() {
+        active = false;
         loop->removeRunnable(this);
     }
 
@@ -45,8 +48,10 @@ public:
     }
 
     void runTask() override {
-        reschedule();
-        task();
+        if (active) {
+            reschedule();
+            task();
+        }
     }
 
 private:
@@ -56,6 +61,7 @@ private:
     RunLoop::Impl* loop = reinterpret_cast<RunLoop::Impl*>(RunLoop::getLoopHandle());
 
     std::function<void()> task;
+    std::atomic<bool> active;
 };
 
 Timer::Timer() : impl(std::make_unique<Impl>()) {
