@@ -476,7 +476,9 @@ commands:
           fi
 
   #
-  # Add this step to all jobs to enable skipping of certain non-code-related changes.
+  # Add this step to all regular jobs to enable skipping of certain non-code-related changes.
+  #
+  # Do not include this step in nightly or release deployment jobs.
   #
   # To make a job potentially skippable for changes to its platform code, it must:
   #   - Target one of the skippable platforms: Android, iOS, or macOS.
