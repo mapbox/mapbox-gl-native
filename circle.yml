@@ -4,6 +4,14 @@ workflows:
   version: 2
   default:
     jobs:
+      #
+      # Naming convention: {platform}-{additional description}-{build type}
+      #   - {platform} is the client platform/framework, which may differ from 
+      #     the build platform. Specify both if applicable, e.g., "qt5-macos".
+      #   - {additional description} optionally describes the compiler or other
+      #     unique aspect of the build environment.
+      #   - {build type} is typically "debug" or "release".
+      #
       - nitpick
       - clang-tidy:
           filters:
@@ -467,6 +475,17 @@ commands:
             scripts/notify-slack.sh
           fi
 
+  #
+  # Add this step to all jobs to enable skipping of certain non-code-related changes.
+  #
+  # To make a job potentially skippable for changes to its platform code, it must:
+  #   - Target one of the skippable platforms: Android, iOS, or macOS.
+  #   - Have a job name that begins with a supported platform name.
+  #   - Not be related to core functionality or rendering tests. Job names that
+  #     contain "render-tests" cannot be skipped by platform changes.
+  #
+  # See the script in the following step for how to implement support for other platforms.
+  #
   check-if-this-job-can-be-skipped:
     steps:
     - run:

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 /*
-
 This script takes two parameters or three environment variables:
 
   {CI job name|$CIRCLE_JOB} {SHA1...SHA1|$CIRCLE_MERGE_BASE...$CIRCLE_SHA1}
@@ -16,6 +15,17 @@ The flow of this script:
   - If array still contains items, do not authorize skipping CI job.
   - Else if array is empty, skip CI job.
 
+To add support for a new platform:
+
+  - Add a new PLATFORM_FILES array with a list of unique paths for the
+    files belonging to the platform.
+  - Add a case to `skippableFilePatternsForCIJob()` with:
+    - The prefix for the platform's CI job names.
+    - A concatenated array of other platform paths that are safe to ignore
+      for the new platform. These should be files that can change without
+      having any effect on the output of the new platform.
+  - Update other cases in `skippableFilePatternsForCIJob()` to include the
+    paths for the new platform.
 */
 
 const execSync = require('child_process').execSync;
