@@ -14,9 +14,7 @@ namespace mbgl {
 using namespace style;
 
 SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
-                       const SymbolLayoutProperties::Evaluated& layout,
-                       const float layoutTextSize,
-                       const Shaping& shapedText) {
+                       WritingModeType writingMode) {
     const ImagePosition& image = shapedIcon.image();
 
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
@@ -28,43 +26,11 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
     float left = shapedIcon.left() - border / image.pixelRatio;
     float bottom = shapedIcon.bottom() + border / image.pixelRatio;
     float right = shapedIcon.right() + border / image.pixelRatio;
-    Point<float> tl;
-    Point<float> tr;
-    Point<float> br;
-    Point<float> bl;
 
-    if (layout.get<IconTextFit>() != IconTextFitType::None && shapedText) {
-        auto iconWidth = right - left;
-        auto iconHeight = bottom - top;
-        auto size = layoutTextSize / 24.0f;
-        auto textLeft = shapedText.left * size;
-        auto textRight = shapedText.right * size;
-        auto textTop = shapedText.top * size;
-        auto textBottom = shapedText.bottom * size;
-        auto textWidth = textRight - textLeft;
-        auto textHeight = textBottom - textTop;
-        auto padT = layout.get<IconTextFitPadding>()[0];
-        auto padR = layout.get<IconTextFitPadding>()[1];
-        auto padB = layout.get<IconTextFitPadding>()[2];
-        auto padL = layout.get<IconTextFitPadding>()[3];
-        auto offsetY = layout.get<IconTextFit>() == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
-        auto offsetX = layout.get<IconTextFit>() == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
-        auto width = layout.get<IconTextFit>() == IconTextFitType::Width || layout.get<IconTextFit>() == IconTextFitType::Both ? textWidth : iconWidth;
-        auto height = layout.get<IconTextFit>() == IconTextFitType::Height || layout.get<IconTextFit>() == IconTextFitType::Both ? textHeight : iconHeight;
-        left = textLeft + offsetX - padL;
-        top = textTop + offsetY - padT;
-        right = textLeft + offsetX + padR + width;
-        bottom = textTop + offsetY + padB + height;
-        tl = {left, top};
-        tr = {right, top};
-        br = {right, bottom};
-        bl = {left, bottom};
-    } else {
-        tl = {left, top};
-        tr = {right, top};
-        br = {right, bottom};
-        bl = {left, bottom};
-    }
+    Point<float> tl{left, top};
+    Point<float> tr{right, top};
+    Point<float> br{right, bottom};
+    Point<float> bl{left, bottom};
 
     const float angle = shapedIcon.angle();
 
@@ -88,7 +54,7 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
         static_cast<uint16_t>(image.textureRect.h + border * 2)
     };
 
-    return SymbolQuad { tl, tr, bl, br, textureRect, shapedText.writingMode, { 0.0f, 0.0f } };
+    return SymbolQuad { tl, tr, bl, br, textureRect, writingMode, { 0.0f, 0.0f } };
 }
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,

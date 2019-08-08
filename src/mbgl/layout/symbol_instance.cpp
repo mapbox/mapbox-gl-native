@@ -21,15 +21,18 @@ const Shaping& getAnyShaping(const ShapedTextOrientations& shapedTextOrientation
 SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
                                                    const ShapedTextOrientations& shapedTextOrientations,
                                                    const optional<PositionedIcon>& shapedIcon,
+                                                   const optional<PositionedIcon>& verticallyShapedIcon,
                                                    const style::SymbolLayoutProperties::Evaluated& layout,
-                                                   const float layoutTextSize,
                                                    const style::SymbolPlacementType textPlacement,
                                                    const std::array<float, 2>& textOffset,
                                                    const GlyphPositions& positions,
 						   bool allowVerticalPlacement) : line(std::move(line_)) {
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
-        iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.horizontal);
+        iconQuad = getIconQuad(*shapedIcon, getAnyShaping(shapedTextOrientations).writingMode);
+        if (verticallyShapedIcon) {
+            verticalIconQuad = getIconQuad(*verticallyShapedIcon, shapedTextOrientations.vertical.writingMode);
+        }
     }
 
     bool singleLineInitialized = false;
@@ -69,6 +72,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                std::shared_ptr<SymbolInstanceSharedData> sharedData_,
                                const ShapedTextOrientations& shapedTextOrientations,
                                const optional<PositionedIcon>& shapedIcon,
+                               const optional<PositionedIcon>& verticallyShapedIcon,
                                const float textBoxScale_,
                                const float textPadding,
                                const SymbolPlacementType textPlacement,
@@ -107,6 +111,14 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     if (allowVerticalPlacement && shapedTextOrientations.vertical) {
         const float verticalPointLabelAngle = 90.0f;
         verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation + verticalPointLabelAngle);
+        if (verticallyShapedIcon) {
+            verticalIconCollisionFeature = CollisionFeature(sharedData->line,
+                                                            anchor,
+                                                            verticallyShapedIcon,
+                                                            iconBoxScale, iconPadding,
+                                                            indexedFeature,
+                                                            iconRotation + verticalPointLabelAngle);
+        }
     }
 
     rightJustifiedGlyphQuadsSize = sharedData->rightJustifiedGlyphQuads.size();
@@ -151,6 +163,11 @@ const SymbolQuads& SymbolInstance::verticalGlyphQuads() const {
 const optional<SymbolQuad>& SymbolInstance::iconQuad() const {
     assert(sharedData);
     return sharedData->iconQuad;
+}
+
+const optional<SymbolQuad>& SymbolInstance::verticalIconQuad() const {
+    assert(sharedData);
+    return sharedData->verticalIconQuad;
 }
 
 void SymbolInstance::releaseSharedData() {
