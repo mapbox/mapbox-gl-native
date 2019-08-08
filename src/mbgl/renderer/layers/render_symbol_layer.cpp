@@ -131,11 +131,12 @@ void drawIcon(const DrawFn& draw,
                                                 : gfx::TextureFilterType::Nearest };
 
     const Size& iconSize = tile.getIconAtlasTexture().size;
+    const bool variablePlacedIcon = bucket.hasVariablePlacement && layout.get<IconTextFit>() != IconTextFitType::None;
 
     if (bucket.sdfIcons) {
         if (values.hasHalo) {
             draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                SymbolSDFIconProgram::layoutUniformValues(false, false, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
+                SymbolSDFIconProgram::layoutUniformValues(false, variablePlacedIcon, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                 bucket.icon,
                 iconSegments,
                 bucket.iconSizeBinder,
@@ -149,7 +150,7 @@ void drawIcon(const DrawFn& draw,
 
         if (values.hasFill) {
             draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
-                SymbolSDFIconProgram::layoutUniformValues(false, false, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
+                SymbolSDFIconProgram::layoutUniformValues(false, variablePlacedIcon, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                 bucket.icon,
                 iconSegments,
                 bucket.iconSizeBinder,
@@ -162,7 +163,7 @@ void drawIcon(const DrawFn& draw,
         }
     } else {
         draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
-            SymbolIconProgram::layoutUniformValues(false, false, values, iconSize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
+            SymbolIconProgram::layoutUniformValues(false, variablePlacedIcon, values, iconSize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
             bucket.icon,
             iconSegments,
             bucket.iconSizeBinder,

@@ -228,6 +228,10 @@ void SymbolBucket::sortFeatures(const float angle) {
         if (symbolInstance.placedIconIndex) {
             addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
         }
+
+        if (symbolInstance.placedVerticalIconIndex) {
+            addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
+        }
     }
 }
 
