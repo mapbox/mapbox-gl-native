@@ -1010,14 +1010,15 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
-      - build-ios-test
       - check-public-symbols
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
       - run:
           name: Lint podspecs and plist files
           command: make ios-lint
+      - check-if-this-job-can-be-skipped
+      - build-ios-test
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
