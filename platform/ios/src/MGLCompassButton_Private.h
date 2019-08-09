@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-#import <Mapbox/MGLCompassButton.h>
+#import "MGLCompassButton.h"
 
 @class MGLMapView;
 
