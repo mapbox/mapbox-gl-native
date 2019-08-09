@@ -241,6 +241,8 @@ public:
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
 @property (nonatomic) CGFloat currentRotation;
+@property(nonatomic) NSUInteger rotationThreshold;
+@property (nonatomic) BOOL isZooming;
 @property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
@@ -568,9 +570,9 @@ public:
 
     _rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotateGesture:)];
     _rotate.delegate = self;
-    _rotateThreshold = 3;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
+    _rotationThreshold = 3;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1624,6 +1626,10 @@ public:
     {
         self.scale = powf(2, [self zoomLevel]);
 
+        // TODO: Find a comfortable pinch.scale value. Right now,
+        if (pinch.scale > 0.2) {
+            self.isZooming = YES;
+        }
         [self notifyGestureDidBegin];
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
@@ -1699,6 +1705,7 @@ public:
             }
         }
 
+        self.isZooming = NO;
         [self notifyGestureDidEndWithDrift:drift];
         [self unrotateIfNeededForGesture];
     }
@@ -1713,9 +1720,7 @@ public:
 
     [self cancelTransitions];
 
-    // custom gesture recognizer? we need to delay the gesture recognizer. I could set a threshold for the recognizer, and once it has been met keep going.
-
-    if ( MGLDegreesFromRadians(self.currentRotation) < self.rotateThreshold) {
+    if (MGLDegreesFromRadians(self.currentRotation) < self.rotationThreshold && self.isZooming) {
         rotate.delaysTouchesBegan = YES;
         self.currentRotation += abs(rotate.rotation);
         rotate.rotation = 0;
@@ -2586,6 +2591,13 @@ public:
 - (BOOL)prefetchesTiles
 {
     return _mbglMap->getPrefetchZoomDelta() > 0 ? YES : NO;
+}
+
+- (void)setIncreasesRotationThresholdWhenZooming:(BOOL)increasesRotationThresholdWhenZooming {
+    if (increasesRotationThresholdWhenZooming) {
+        self.rotationThreshold = 45;
+    }
+    _increasesRotationThresholdWhenZooming = increasesRotationThresholdWhenZooming;
 }
 
 #pragma mark - Accessibility -

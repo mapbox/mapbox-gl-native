@@ -723,7 +723,10 @@ MGL_EXPORT
  */
 @property(nonatomic) CGFloat decelerationRate;
 
-@property(nonatomic) NSUInteger rotateThreshold;
+/**
+ The minimum number of degrees
+ */
+@property(nonatomic) BOOL increasesRotationThresholdWhenZooming;
 
 #pragma mark Manipulating the Viewpoint
 
