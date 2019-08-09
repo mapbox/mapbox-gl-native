@@ -1,6 +1,6 @@
 #import "MBXOrnamentsViewController.h"
 
-@import Mapbox;
+#import <Mapbox/Mapbox.h>
 
 @interface MBXOrnamentsViewController ()<MGLMapViewDelegate>
 
