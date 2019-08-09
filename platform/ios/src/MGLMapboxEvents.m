@@ -147,7 +147,7 @@ static NSString * const MGLAPIClientUserAgentBase = @"mapbox-maps-ios";
             [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
         }
 
-        [[self sharedInstance] eventsManager].skuId = MBXAccountsSKUIDMapsUser;
+        //[[self sharedInstance] eventsManager].skuId = MBXAccountsSKUIDMapsUser;
         
         [self flush];
     });

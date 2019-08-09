@@ -104,7 +104,8 @@ NSString * const MGLMapboxAccountTypeKey = @"MGLMapboxAccountType";
         return (NSString *)[mbx valueForKeyPath:MGLAccountManagerExternalMethodName];
     }
     
-    return MBXSKUToken.skuToken;
+    //return MBXSKUToken.skuToken;
+    return @"";
 }
 
 #endif
