@@ -15,6 +15,10 @@
 #endif
 
     [MGLMetricsManager sharedManager].delegate = self;
+
+    // Temporary key created just for this hack
+    [MGLAccountManager setAccessToken:@"pk.eyJ1IjoidG1wc2FudG9zIiwiYSI6ImNqeXY0MTJ5ejBrNHMzYm40eTBtaTc5YncifQ.jb6YkzCG4QpJon7mdc4giA"];
+
     return YES;
 }
 
