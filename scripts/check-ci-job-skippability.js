@@ -96,7 +96,7 @@ console.step(`Getting list of files changed between ${COMMIT_RANGE}`);
 let changedFiles = execSync(`git diff --name-only ${COMMIT_RANGE}`).toString().split('\n');
 changedFiles = _.compact(changedFiles);
 
-console.log(`${changedFiles.length} total files changed.`);
+console.log(`${changedFiles.length} file${changedFiles.length == 1 ? '':'s'} changed.`);
 
 console.step(`Checking changed files for paths relevant to ${CI_JOB_NAME} job`);
 
@@ -111,7 +111,7 @@ _.remove(changedFiles, function(changedFile) {
 });
 
 if (changedFiles.length) {
-  console.log(`Found ${changedFiles.length} unskippable changed file${changedFiles.length > 1 ? 's':''}:\n`, changedFiles);
+  console.log(`Found ${changedFiles.length} unskippable changed file${changedFiles.length == 1 ? '':'s'}:\n`, changedFiles);
 } else {
   console.log(`Found no relevant changed files, so it's safe to skip the remainder of this CI job.`)
   if (process.env.CIRCLECI) {
