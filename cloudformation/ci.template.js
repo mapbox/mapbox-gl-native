@@ -99,6 +99,18 @@ const template = {
                 }
               ]
             }
+          },
+          {
+            PolicyName: 'devicefarm',
+            PolicyDocument: {
+              Statement: [
+                {
+                  Action: ['devicefarm:*'],
+                  Effect: 'Allow',
+                  Resource: '*'
+                }
+              ]
+            }
           }
         ]
       }
