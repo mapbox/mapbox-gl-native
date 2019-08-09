@@ -45,7 +45,7 @@ public:
     const std::string bucketLeaderID;
     std::vector<SymbolInstance> symbolInstances;
 
-    static Point<float> evaluateRadialOffset(style::SymbolAnchorType anchor, float radialOffset);
+    static Point<float> evaluateRadialOffset(style::SymbolAnchorType anchor, Point<float> radialOffset);
 
 private:
     void addFeature(const size_t,

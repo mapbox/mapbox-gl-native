@@ -184,9 +184,9 @@ struct TextPitchAlignment : LayoutProperty<AlignmentType> {
     static AlignmentType defaultValue() { return AlignmentType::Auto; }
 };
 
-struct TextRadialOffset : DataDrivenLayoutProperty<float> {
+struct TextRadialOffset : DataDrivenLayoutProperty<RadialOffsetType> {
     static constexpr const char *name() { return "text-radial-offset"; }
-    static float defaultValue() { return 0; }
+    static RadialOffsetType defaultValue() { return { 0, 0 }; }
 };
 
 struct TextRotate : DataDrivenLayoutProperty<float> {

@@ -18,7 +18,7 @@ SymbolInstance makeSymbolInstance(float x, float y, std::u16string key) {
     auto sharedData = std::make_shared<SymbolInstanceSharedData>(std::move(line),
                                         shaping, nullopt, layout_, 0.0f, placementType,
                                         textOffset, positions);
-    return SymbolInstance(anchor, std::move(sharedData), shaping, nullopt, 0, 0, placementType, textOffset, 0, 0, iconOffset, subfeature, 0, 0, key, 0, 0, 0.0f);
+    return SymbolInstance(anchor, std::move(sharedData), shaping, nullopt, 0, 0, placementType, textOffset, 0, 0, iconOffset, subfeature, 0, 0, key, 0, 0, Point<float>());
 }
 
 

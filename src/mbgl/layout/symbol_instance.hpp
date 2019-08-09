@@ -59,7 +59,7 @@ public:
                    std::u16string key,
                    const float overscaling,
                    const float rotate,
-                   float radialTextOffset);
+                   Point<float> radialTextOffset);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -98,7 +98,7 @@ public:
     optional<size_t> placedVerticalTextIndex;
     optional<size_t> placedIconIndex;
     float textBoxScale;
-    float radialTextOffset;
+    Point<float> radialTextOffset;
     bool singleLine;
     uint32_t crossTileID = 0;
 };

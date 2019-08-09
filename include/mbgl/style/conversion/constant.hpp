@@ -59,6 +59,11 @@ struct Converter<std::vector<std::string>> {
     optional<std::vector<std::string>> operator()(const Convertible& value, Error& error) const;
 };
 
+template <>
+struct Converter<RadialOffsetType> {
+    optional<RadialOffsetType> operator()(const Convertible& value, Error& error) const;
+};
+
 } // namespace conversion
 } // namespace style
 } // namespace mbgl

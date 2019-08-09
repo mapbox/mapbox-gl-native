@@ -276,6 +276,22 @@ optional<Position> ValueConverter<Position>::fromExpressionValue(const Value& v)
     return pos ? optional<Position>(Position(*pos)) : optional<Position>();
 }
 
+Value ValueConverter<RadialOffsetType>::toExpressionValue(const mbgl::style::RadialOffsetType& value) {
+    return ValueConverter<std::vector<float>>::toExpressionValue(value);
+}
+
+optional<RadialOffsetType> ValueConverter<RadialOffsetType>::fromExpressionValue(const Value& v) {
+    if (auto val = ValueConverter<std::vector<float>>::fromExpressionValue(v)) {
+        RadialOffsetType result(std::move(*val));
+        return result;
+    }
+    if (auto val = ValueConverter<float>::fromExpressionValue(v)) {
+        RadialOffsetType result(2, *val);
+        return result;
+    }
+    return nullopt;
+}
+
 template <typename T>
 Value ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >>::toExpressionValue(const T& value) {
     return std::string(Enum<T>::toString(value));
@@ -373,6 +389,10 @@ template struct ValueConverter<HillshadeIlluminationAnchorType>;
 
 template type::Type valueTypeToExpressionType<LightAnchorType>();
 template struct ValueConverter<LightAnchorType>;
+
+template<> type::Type valueTypeToExpressionType<RadialOffsetType>() {
+    return valueTypeToExpressionType<std::vector<float>>();
+}
 
 } // namespace expression
 } // namespace style

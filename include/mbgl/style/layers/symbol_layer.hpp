@@ -162,9 +162,9 @@ public:
     const PropertyValue<AlignmentType>& getTextPitchAlignment() const;
     void setTextPitchAlignment(const PropertyValue<AlignmentType>&);
 
-    static PropertyValue<float> getDefaultTextRadialOffset();
-    const PropertyValue<float>& getTextRadialOffset() const;
-    void setTextRadialOffset(const PropertyValue<float>&);
+    static PropertyValue<RadialOffsetType> getDefaultTextRadialOffset();
+    const PropertyValue<RadialOffsetType>& getTextRadialOffset() const;
+    void setTextRadialOffset(const PropertyValue<RadialOffsetType>&);
 
     static PropertyValue<float> getDefaultTextRotate();
     const PropertyValue<float>& getTextRotate() const;

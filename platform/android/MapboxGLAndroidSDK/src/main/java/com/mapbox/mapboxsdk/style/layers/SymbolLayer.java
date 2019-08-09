@@ -484,13 +484,13 @@ public class SymbolLayer extends Layer {
   /**
    * Get the TextRadialOffset property
    *
-   * @return property wrapper value around Float
+   * @return property wrapper value around Float[]
    */
   @NonNull
   @SuppressWarnings("unchecked")
-  public PropertyValue<Float> getTextRadialOffset() {
+  public PropertyValue<Float[]> getTextRadialOffset() {
     checkThread();
-    return (PropertyValue<Float>) new PropertyValue("text-radial-offset", nativeGetTextRadialOffset());
+    return (PropertyValue<Float[]>) new PropertyValue("text-radial-offset", nativeGetTextRadialOffset());
   }
 
   /**

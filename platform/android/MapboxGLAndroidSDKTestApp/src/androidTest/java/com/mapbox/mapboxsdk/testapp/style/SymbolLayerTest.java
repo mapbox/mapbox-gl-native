@@ -611,7 +611,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getTextRadialOffset().getValue());
 
     // Set and Get
-    Float propertyValue = 0.3f;
+    Float[] propertyValue = new Float[] {};
     layer.setProperties(textRadialOffset(propertyValue));
     assertEquals(layer.getTextRadialOffset().getValue(), propertyValue);
   }

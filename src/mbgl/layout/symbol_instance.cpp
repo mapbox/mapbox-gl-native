@@ -81,7 +81,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                std::u16string key_,
                                const float overscaling,
                                const float rotate,
-                               float radialTextOffset_) :
+                               Point<float> radialTextOffset_) :
     sharedData(std::move(sharedData_)),
     anchor(anchor_),
     // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap

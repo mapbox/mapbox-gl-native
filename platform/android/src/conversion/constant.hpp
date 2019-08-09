@@ -81,6 +81,10 @@ struct Converter<jni::Local<jni::Object<>>, std::vector<float>> {
     Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::vector<float>& value) const;
 };
 
+template <>
+struct Converter<jni::Local<jni::Object<>>, style::RadialOffsetType> : public Converter<jni::Local<jni::Object<>>, std::vector<float>> {
+};
+
 template <class T>
 struct Converter<jni::Local<jni::Object<>>, T, typename std::enable_if_t<std::is_enum<T>::value>> {
     Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const T& value) const {

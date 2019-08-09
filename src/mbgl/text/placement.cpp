@@ -85,7 +85,7 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
 }
 
 namespace {
-Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor, float width, float height, float radialOffset, float textBoxScale) {
+Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor, float width, float height, Point<float> radialOffset, float textBoxScale) {
     AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
     float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
     float shiftY = -(alignment.verticalAlign - 0.5f) * height;
@@ -410,7 +410,7 @@ void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformStat
 }
 
 namespace {
-Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float width, float height, float radialOffset, float textBoxScale, float renderTextSize) {
+Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float width, float height, Point<float> radialOffset, float textBoxScale, float renderTextSize) {
     AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
     float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
     float shiftY = -(alignment.verticalAlign - 0.5f) * height;

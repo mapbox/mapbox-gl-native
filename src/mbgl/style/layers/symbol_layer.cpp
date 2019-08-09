@@ -605,15 +605,15 @@ void SymbolLayer::setTextPitchAlignment(const PropertyValue<AlignmentType>& valu
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<float> SymbolLayer::getDefaultTextRadialOffset() {
+PropertyValue<RadialOffsetType> SymbolLayer::getDefaultTextRadialOffset() {
     return TextRadialOffset::defaultValue();
 }
 
-const PropertyValue<float>& SymbolLayer::getTextRadialOffset() const {
+const PropertyValue<RadialOffsetType>& SymbolLayer::getTextRadialOffset() const {
     return impl().layout.get<TextRadialOffset>();
 }
 
-void SymbolLayer::setTextRadialOffset(const PropertyValue<float>& value) {
+void SymbolLayer::setTextRadialOffset(const PropertyValue<RadialOffsetType>& value) {
     if (value == getTextRadialOffset())
         return;
     auto impl_ = mutableImpl();
@@ -1606,7 +1606,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
     }
     
-    if (property == Property::IconRotate || property == Property::IconSize || property == Property::SymbolSortKey || property == Property::TextLetterSpacing || property == Property::TextMaxWidth || property == Property::TextRadialOffset || property == Property::TextRotate || property == Property::TextSize) {
+    if (property == Property::IconRotate || property == Property::IconSize || property == Property::SymbolSortKey || property == Property::TextLetterSpacing || property == Property::TextMaxWidth || property == Property::TextRotate || property == Property::TextSize) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
@@ -1635,11 +1635,6 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
         if (property == Property::TextMaxWidth) {
             setTextMaxWidth(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::TextRadialOffset) {
-            setTextRadialOffset(*typedValue);
             return nullopt;
         }
         
@@ -1735,6 +1730,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         }
         
         setTextJustify(*typedValue);
+        return nullopt;
+        
+    }
+    
+    if (property == Property::TextRadialOffset) {
+        Error error;
+        optional<PropertyValue<RadialOffsetType>> typedValue = convert<PropertyValue<RadialOffsetType>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setTextRadialOffset(*typedValue);
         return nullopt;
         
     }

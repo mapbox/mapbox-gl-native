@@ -114,6 +114,13 @@ struct ValueConverter<std::vector<T>> {
 };
 
 template <>
+struct ValueConverter<RadialOffsetType> {
+    static type::Type expressionType() { return type::Array(type::Number); }
+    static Value toExpressionValue(const mbgl::style::RadialOffsetType& value);
+    static optional<RadialOffsetType> fromExpressionValue(const Value& v);
+};
+
+template <>
 struct ValueConverter<Position> {
     static type::Type expressionType() { return type::Array(type::Number, 3); }
     static Value toExpressionValue(const mbgl::style::Position& value);

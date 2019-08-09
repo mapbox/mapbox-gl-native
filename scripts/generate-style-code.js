@@ -60,6 +60,9 @@ global.evaluatedType = function (property) {
   if (/position/.test(property.name)) {
     return 'Position';
   }
+  if (/-radial-offset/.test(property.name)) {
+    return 'RadialOffsetType';
+  }
   switch (property.type) {
   case 'boolean':
     return 'bool';

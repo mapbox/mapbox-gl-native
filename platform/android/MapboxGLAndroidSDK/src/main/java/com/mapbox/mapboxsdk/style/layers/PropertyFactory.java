@@ -2298,18 +2298,18 @@ public class PropertyFactory {
   /**
    * Radial offset of text, in the direction of the symbol's anchor. Useful in combination with {@link PropertyFactory#textVariableAnchor}, which doesn't support the two-dimensional {@link PropertyFactory#textOffset}.
    *
-   * @param value a Float value
-   * @return property wrapper around Float
+   * @param value a Float[] value
+   * @return property wrapper around Float[]
    */
-  public static PropertyValue<Float> textRadialOffset(Float value) {
+  public static PropertyValue<Float[]> textRadialOffset(Float[] value) {
     return new LayoutPropertyValue<>("text-radial-offset", value);
   }
 
   /**
    * Radial offset of text, in the direction of the symbol's anchor. Useful in combination with {@link PropertyFactory#textVariableAnchor}, which doesn't support the two-dimensional {@link PropertyFactory#textOffset}.
    *
-   * @param value a Float value
-   * @return property wrapper around Float
+   * @param value a Float[] value
+   * @return property wrapper around Float[]
    */
   public static PropertyValue<Expression> textRadialOffset(Expression value) {
     return new LayoutPropertyValue<>("text-radial-offset", value);

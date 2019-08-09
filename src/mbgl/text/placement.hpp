@@ -33,7 +33,7 @@ public:
 
 class VariableOffset {
 public:
-    float radialOffset;
+    Point<float> radialOffset;
     float width;
     float height;
     style::TextVariableAnchorType anchor;

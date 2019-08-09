@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 namespace mbgl {
 
@@ -118,6 +119,12 @@ enum class IconTextFitType : uint8_t {
 enum class LightAnchorType: bool {
     Map,
     Viewport
+};
+
+class RadialOffsetType: public std::vector<float> {
+public:
+    template <typename... Args>
+    RadialOffsetType(Args&&... args) : std::vector<float>(std::forward<Args>(args)...) {}
 };
 
 } // namespace style

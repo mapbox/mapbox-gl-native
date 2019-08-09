@@ -168,6 +168,24 @@ optional<std::vector<std::string>> Converter<std::vector<std::string>>::operator
     return result;
 }
 
+optional<RadialOffsetType> Converter<RadialOffsetType>::operator()(const Convertible& value, Error& error) const {
+    Converter<std::vector<float>> arrayConverter;
+    if (auto val = arrayConverter(value, error)) {
+        RadialOffsetType result = std::move(*val);
+        return result;
+    }
+
+    Converter<float> numberConverter;
+    if (auto val = numberConverter(value, error)) {
+        RadialOffsetType result(2, *val);
+        return result;
+    }
+
+    error.message = "value must be an array of numbers or a number";
+
+    return nullopt;
+}
+
 } // namespace conversion
 } // namespace style
 } // namespace mbgl
