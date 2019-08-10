@@ -89,10 +89,11 @@ print "------------------------------------------------------------------------"
 
 head, tail = os.path.split(appPath)
 appName = tail
+prettyAppName = os.path.splitext(appName)[0]
 
 print("appPath="+appPath)
 print("appName="+appName)
-print("appName="+projectArn)
+print("projectArn="+projectArn)
 
 
 try:
@@ -250,7 +251,7 @@ try:
     '--project-arn', projectArn,
     '--app-arn', uploadAppRequest['upload']['arn'],
     '--device-pool-arn', deviceArn,
-    '--name', 'ios test',
+    '--name', prettyAppName,
     '--test', 'type=XCTEST,testPackageArn='+uploadTestRequest['upload']['arn']+extraCommands,
     '--region', 'us-west-2'], stderr=subprocess.STDOUT)
 except subprocess.CalledProcessError as e:
