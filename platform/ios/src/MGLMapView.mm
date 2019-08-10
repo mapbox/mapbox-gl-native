@@ -267,6 +267,9 @@ public:
 @property (nonatomic) MGLMapDebugMaskOptions residualDebugMask;
 @property (nonatomic, copy) NSURL *residualStyleURL;
 
+/// Tilt gesture recognizer helper
+@property (nonatomic, assign) CGPoint dragGestureMidPoint;
+
 - (mbgl::Map &)mbglMap;
 
 @end
@@ -2139,6 +2142,11 @@ public:
     
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
+        CGPoint westPoint = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
+        CGPoint eastPoint = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
+        CGFloat x = (eastPoint.x + westPoint.x)/2;
+        CGFloat y = (eastPoint.y + westPoint.y)/2;
+        self.dragGestureMidPoint = CGPointMake(x, y-1);
         initialPitch = *self.mbglMap.getCameraOptions().pitch;
         [self notifyGestureDidBegin];
     }
@@ -2150,30 +2158,46 @@ public:
             twoFingerDrag.state = UIGestureRecognizerStateEnded;
             return;
         }
-
-        CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
-        CGFloat slowdown = 2.0;
-
-        CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
-
-        CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
-
-        MGLMapCamera *oldCamera = self.camera;
-        MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
-
-        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
-        {
-            self.mbglMap.jumpTo(mbgl::CameraOptions()
+        
+        CGPoint west = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
+        CGPoint east = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
+        CGFloat x = (east.x + west.x)/2;
+        CGFloat y = (east.y + west.y)/2;
+        CGPoint middlePoint = CGPointMake(x, y);
+        
+        CLLocationDegrees slopeAngle = [self angleBetweenPoints:self.dragGestureMidPoint endPoint:middlePoint];
+        self.dragGestureMidPoint = middlePoint;
+        if ((slopeAngle > 60 && slopeAngle < 120) ||
+            (slopeAngle > 240 && slopeAngle < 300)) {
+            
+            CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
+            CGFloat slowdown = 2.0;
+            
+            CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
+            
+            CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
+            
+            MGLMapCamera *oldCamera = self.camera;
+            MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
+            
+            if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
+            {
+                self.mbglMap.jumpTo(mbgl::CameraOptions()
                                     .withPitch(pitchNew)
                                     .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+            }
+            
+            [self cameraIsChanging];
+        
         }
 
-        [self cameraIsChanging];
+        
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededForGesture];
+        self.dragGestureMidPoint = CGPointZero;
     }
 
 }
@@ -2296,28 +2320,7 @@ public:
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
-    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]])
-    {
-        UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
-        
-        if (panGesture.minimumNumberOfTouches == 2)
-        {
-            CGPoint west = [panGesture locationOfTouch:0 inView:panGesture.view];
-            CGPoint east = [panGesture locationOfTouch:1 inView:panGesture.view];
-            
-            if (west.x > east.x) {
-                CGPoint swap = west;
-                west = east;
-                east = swap;
-            }
-            
-            CLLocationDegrees horizontalToleranceDegrees = 60.0;
-            if ([self angleBetweenPoints:west east:east] > horizontalToleranceDegrees) {
-                return NO;
-            }
-        }
-    }
-    else if (gestureRecognizer == _singleTapGestureRecognizer)
+    if (gestureRecognizer == _singleTapGestureRecognizer)
     {
         // Gesture will be recognized if it could deselect an annotation
         if(!self.selectedAnnotation)
@@ -2334,18 +2337,18 @@ public:
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
-
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (CLLocationDegrees)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
+- (CLLocationDegrees)angleBetweenPoints:(CGPoint)originPoint endPoint:(CGPoint)endPoint
 {
-    CGFloat slope = (west.y - east.y) / (west.x - east.x);
+    CGFloat x = (endPoint.x - originPoint.x);
+    CGFloat y = (endPoint.y - originPoint.y);
     
-    CGFloat angle = atan(fabs(slope));
-    CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
+    CGFloat radians = atan2(y, x);
+    CLLocationDegrees degrees = MGLDegreesFromRadians(radians);
     
-    return degrees;
+    return degrees > 0.0 ? degrees : (360.0 + degrees);
 }
 
 #pragma mark - Attribution -
