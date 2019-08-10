@@ -50,6 +50,8 @@ outputdir = args.outputdir
 
 # Wait for an upload/run to complete by polling for a status
 def wait_for_request_status(request, status = 'SUCCEEDED', api='upload', polling_interval = 15.0):
+    if not request:
+        return
     while True:
         # log start time
         start = time.clock()
