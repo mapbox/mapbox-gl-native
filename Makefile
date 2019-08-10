@@ -336,6 +336,7 @@ ios-check-events-symbols:
 ios-device-farm: $(IOS_PROJ_PATH)
 	set -o pipefail && xcodebuild \
 		ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+		CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
 		-derivedDataPath $(IOS_OUTPUT_PATH) \
 		-configuration $(BUILDTYPE) -sdk iphoneos \
 		-workspace $(IOS_WORK_PATH) \
