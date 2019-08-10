@@ -332,6 +332,16 @@ ios-install-simulators:
 ios-check-events-symbols:
 	./platform/ios/scripts/check-events-symbols.sh
 
+.PHONY: ios-device-farm
+ios-device-farm: $(IOS_PROJ_PATH)
+	set -o pipefail && xcodebuild \
+		ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+		-derivedDataPath $(IOS_OUTPUT_PATH) \
+		-configuration $(BUILDTYPE) -sdk iphoneos \
+		-workspace $(IOS_WORK_PATH) \
+		-jobs $(JOBS) \
+		-scheme 'Integration Test Harness' build-for-testing $(XCPRETTY)
+
 .PHONY: ipackage
 ipackage: ipackage*
 ipackage%:

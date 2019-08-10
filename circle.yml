@@ -53,6 +53,7 @@ workflows:
       - linux-doxygen
       - linux-render-tests
       - ios-debug
+      - ios-debug-device-farm
       - ios-debug-xcode11
       - ios-release-template:
           name: ios-release
@@ -1016,6 +1017,43 @@ jobs:
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
+  ios-debug-device-farm:
+    macos:
+      xcode: "10.3.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+    steps:
+      - install-macos-dependencies
+      - install-dependencies
+      - check-if-this-job-can-be-skipped
+      - run:
+          name: Build for testing
+          command: make ios-device-farm
+      - run:
+          name: Prepare Integration Test Harness for device farm
+          command: |
+            cd build/ios
+            export AWS_DEVICE_FARM_PAYLOAD="$PWD/Integration Test Harness.ipa"
+            export AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD="$PWD/Integration Test Harness XCTest.zip"
+            mkdir Payload && cp -r "Debug-iphoneos/Integration Test Harness.app" Payload
+            zip -rm "$AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD" "Payload/Integration Test Harness.app/PlugIns/integration.xctest/"
+            zip -r "$AWS_DEVICE_FARM_PAYLOAD" Payload
+      - run:
+          name: Upload and run tests on device farm
+          command: |
+            pip install requests awscli
+            python platform/ios/scripts/run-device-farm-ios.py \
+              --project arn:aws:devicefarm:us-west-2:234858372212:project:075d6a84-70b3-43e4-a164-0d119fbd967f \
+              --devicepool arn:aws:devicefarm:us-west-2:234858372212:devicepool:075d6a84-70b3-43e4-a164-0d119fbd967f/29c06cb4-f885-4132-a7b2-e7f139fbfc74 \
+              --ipa "$AWS_DEVICE_FARM_PAYLOAD" \
+              --test "$AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD"
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
