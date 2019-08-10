@@ -12,61 +12,61 @@ workflows:
       #     unique aspect of the build environment.
       #   - {build type} is typically "debug" or "release".
       #
-      - nitpick
-      - clang-tidy:
-          filters:
-            branches:
-              ignore: master
-      - android-debug-arm-v7-buck
-      - android-arm-template:
-          name: android-debug-arm-v8
-      - android-arm-template:
-          name: android-gnustl-arm-v7
-          stl: gnustl_shared
-          firebase_device_id: "flo"
-          firebase_device_os: "21"
-          image: android-ndk-r17c:1d5db0eb34
-          abi: arm-v7
-      - android-release:
-          filters:
-            tags:
-              only: /android-v.*/
-      - node-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node-gcc8-debug:
-          filters:
-            tags:
-              only: /node-.*/
-      - node-macos-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - linux-clang-38-libcxx-debug:
-          name: linux-clang-3.8-libcxx-debug
-      - linux-clang-7-sanitize-address-undefined
-      - linux-clang-7-sanitize-thread
-      - linux-gcc49-debug:
-          name: linux-gcc4.9-debug
-      - linux-gcc5-debug-coverage
-      - linux-doxygen
-      - linux-render-tests
-      - ios-debug
+      # - nitpick
+      # - clang-tidy:
+      #     filters:
+      #       branches:
+      #         ignore: master
+      # - android-debug-arm-v7-buck
+      # - android-arm-template:
+      #     name: android-debug-arm-v8
+      # - android-arm-template:
+      #     name: android-gnustl-arm-v7
+      #     stl: gnustl_shared
+      #     firebase_device_id: "flo"
+      #     firebase_device_os: "21"
+      #     image: android-ndk-r17c:1d5db0eb34
+      #     abi: arm-v7
+      # - android-release:
+      #     filters:
+      #       tags:
+      #         only: /android-v.*/
+      # - node-clang39-release:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - node-gcc8-debug:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - node-macos-release:
+      #     filters:
+      #       tags:
+      #         only: /node-.*/
+      # - linux-clang-38-libcxx-debug:
+      #     name: linux-clang-3.8-libcxx-debug
+      # - linux-clang-7-sanitize-address-undefined
+      # - linux-clang-7-sanitize-thread
+      # - linux-gcc49-debug:
+      #     name: linux-gcc4.9-debug
+      # - linux-gcc5-debug-coverage
+      # - linux-doxygen
+      # - linux-render-tests
+      # - ios-debug
       - ios-debug-device-farm
-      - ios-debug-xcode11
-      - ios-release-template:
-          name: ios-release
-      - ios-release-tag:
-          filters:
-            tags:
-              only: /ios-.*/
-            branches:
-              ignore: /.*/
-      - macos-debug
-      - macos-render-tests
-      - qt5-linux-gcc5-release
-      - qt5-macos-debug
+      # - ios-debug-xcode11
+      # - ios-release-template:
+      #     name: ios-release
+      # - ios-release-tag:
+      #     filters:
+      #       tags:
+      #         only: /ios-.*/
+      #       branches:
+      #         ignore: /.*/
+      # - macos-debug
+      # - macos-render-tests
+      # - qt5-linux-gcc5-release
+      # - qt5-macos-debug
   nightly:
     triggers:
       - schedule:
