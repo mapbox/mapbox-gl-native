@@ -1045,6 +1045,8 @@ jobs:
             mkdir Payload && cp -r "Debug-iphoneos/Integration Test Harness.app" Payload
             zip -rm "$AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD" "Payload/Integration Test Harness.app/PlugIns/integration.xctest/"
             zip -r "$AWS_DEVICE_FARM_PAYLOAD" Payload
+            echo "export AWS_DEVICE_FARM_PAYLOAD=\"$AWS_DEVICE_FARM_PAYLOAD\"" >> $BASH_ENV
+            echo "export AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD=\"$AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD\"" >> $BASH_ENV
       - run:
           name: Upload and run tests on device farm
           command: |
