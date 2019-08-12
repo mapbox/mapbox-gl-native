@@ -274,7 +274,11 @@ void Placement::placeBucket(
                     const float height = textBox.y2 - textBox.y1;
                     const float textBoxScale = symbolInstance.textBoxScale;
                     std::pair<bool, bool> placedFeature = {false, false};
-                    for (auto anchor : variableTextAnchors) {
+                    const size_t anchorsSize = variableTextAnchors.size();
+                    const size_t placementAttempts = textAllowOverlap ? anchorsSize * 2 : anchorsSize;
+                    for (size_t i = 0u; i < placementAttempts; ++i) {
+                        auto anchor = variableTextAnchors[i % anchorsSize];
+                        const bool allowOverlap = (i >= anchorsSize);
                         Point<float> shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.radialTextOffset, textBoxScale);
                         if (rotateWithMap) {
                             float angle = pitchWithMap ? state.getBearing() : -state.getBearing();
@@ -285,7 +289,7 @@ void Placement::placeBucket(
                         placedFeature = collisionIndex.placeFeature(collisionFeature, shift,
                                                                     posMatrix, mat4(), pixelRatio,
                                                                     placedSymbol, scale, fontSize,
-                                                                    layout.get<style::TextAllowOverlap>(),
+                                                                    allowOverlap,
                                                                     pitchWithMap,
                                                                     params.showCollisionBoxes, avoidEdges, collisionGroup.second, textBoxes);
                         if (placedFeature.first) {
