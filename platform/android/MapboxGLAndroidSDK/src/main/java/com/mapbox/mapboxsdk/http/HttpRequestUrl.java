@@ -10,7 +10,10 @@ public class HttpRequestUrl {
   }
 
   /**
-   * Adapts a resource request url based on the host and query size.
+   * Adapts a resource request url based on the host, query size, and offline requirement.
+   * The Maps SDK SKU token is not included with offline tile requests because offline requests
+   * are counted as billable Vector Tile API requests. The offline tile requests are considered
+   * raster Tile API requests if satellite imagery is being fetched.
    *
    * @param host        the host used as endpoint
    * @param resourceUrl the resource to download
@@ -25,10 +28,10 @@ public class HttpRequestUrl {
       } else {
         resourceUrl = resourceUrl + "&";
       }
-      resourceUrl = resourceUrl + "sku=" + Mapbox.getSkuToken();
-
       if (offline) {
-        resourceUrl = resourceUrl + "&offline=true";
+        resourceUrl = resourceUrl + "offline=true";
+      } else {
+        resourceUrl = resourceUrl + "sku=" + Mapbox.getSkuToken();
       }
     }
     return resourceUrl;
