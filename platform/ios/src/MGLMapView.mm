@@ -1720,7 +1720,6 @@ public:
     [self cancelTransitions];
 
     if (MGLDegreesFromRadians(self.currentRotation) < self.rotationThreshold && self.isZooming) {
-        NSLog(@"delays rotate");
         rotate.delaysTouchesBegan = YES;
         self.currentRotation += abs(rotate.rotation);
         rotate.rotation = 0;
@@ -2595,7 +2594,7 @@ public:
 
 - (void)setIncreasesRotationThresholdWhenZooming:(BOOL)increasesRotationThresholdWhenZooming {
     if (increasesRotationThresholdWhenZooming) {
-        self.rotationThreshold = 45;
+        self.rotationThreshold = 25;
     }
     _increasesRotationThresholdWhenZooming = increasesRotationThresholdWhenZooming;
 }

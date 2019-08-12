@@ -2,14 +2,20 @@
 #import <XCTest/XCTest.h>
 
 @interface MGLMapView (MGLMapViewZoomTests)
+@property (nonatomic) BOOL isZooming;
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch;
 @end
 
-@interface UIPinchGestureRecognizerMock : UIPinchGestureRecognizer
+@interface UIPinchGestureRecognizerMock : UIPinchGestureRecognizer {
+@protected CGFloat _velocity;
+}
+@property (nonatomic, readwrite) CGFloat velocity;
 @property (nonatomic) CGPoint locationInViewOverride;
 @end
 
 @implementation UIPinchGestureRecognizerMock
+@synthesize velocity;
+- (void)setVelocity:(CGFloat)velocity { self.velocity = velocity; }
 - (CGPoint)locationInView:(nullable UIView *)view { return self.locationInViewOverride; }
 @end
 
@@ -127,6 +133,15 @@
     self.mapView.direction = 0;
     XCTAssertEqualWithAccuracy(centerCoordinateBeforeReset.latitude, self.mapView.centerCoordinate.latitude, 0.0000001, "@Map center coordinate latitude should remain constant after resetting to north.");
     XCTAssertEqualWithAccuracy(centerCoordinateBeforeReset.longitude, self.mapView.centerCoordinate.longitude, 0.0000001, @"Map center coordinate longitude should remain constant after resetting to north.");
+}
+
+- (void)testPinchAndZoom {
+    UIPinchGestureRecognizerMock *gesture = [[UIPinchGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
+    gesture.state = UIGestureRecognizerStateBegan;
+    gesture.velocity = 5.0;
+    gesture.locationInViewOverride = CGPointMake(0, 0);
+    [self.mapView handlePinchGesture:gesture];
+    XCTAssertTrue(self.mapView.isZooming);
 }
 
 NS_INLINE CGFloat MGLScaleFromZoomLevel(double zoom) {
