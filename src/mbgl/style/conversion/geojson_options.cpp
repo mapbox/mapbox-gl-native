@@ -104,23 +104,30 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
             [&](const std::string& k,
                 const mbgl::style::conversion::Convertible& v) -> optional<conversion::Error> {
                 // Each property shall be formed as ["key" : [operator, [mapExpression]]]
+                // or ["key" : [[operator, ['accumulated'], ['get', key]], [mapExpression]]]
                 if (!isArray(v) || arrayLength(v) != 2) {
                     error.message =
-                        "GeoJSON source clusterProperties member must be an array with length of 2";
-                    return {};
-                }
-                auto reduceOp = toString(arrayMember(v, 0));
-                if (!reduceOp) {
-                    error.message =
-                        "GeoJSON source clusterProperties member must contain a valid operator";
+                            "GeoJSON source clusterProperties member must be an array with length of 2";
                     return {};
                 }
                 auto map = expression::dsl::createExpression(arrayMember(v, 1));
-                std::stringstream ss;
-                // Reformulate reduce expression to [operator, ['accumulated'], ['get', key]]
-                ss << std::string(R"([")") << *reduceOp
-                   << std::string(R"(", ["accumulated"], ["get", ")") << k << std::string(R"("]])");
-                auto reduce = expression::dsl::createExpression(ss.str().c_str());
+                std::unique_ptr<expression::Expression> reduce;
+                if(isArray(arrayMember(v, 0))){
+                    reduce = expression::dsl::createExpression(arrayMember(v, 0));
+                }
+                else{
+                    auto reduceOp = toString(arrayMember(v, 0));
+                    if (!reduceOp) {
+                        error.message =
+                                "GeoJSON source clusterProperties member must contain a valid operator";
+                        return {};
+                    }
+                    std::stringstream ss;
+                    // Reformulate reduce expression to [operator, ['accumulated'], ['get', key]]
+                    ss << std::string(R"([")") << *reduceOp
+                       << std::string(R"(", ["accumulated"], ["get", ")") << k << std::string(R"("]])");
+                    reduce = expression::dsl::createExpression(ss.str().c_str());
+                }
                 if (map && reduce) {
                     result.emplace(k, std::make_pair(std::move(map), std::move(reduce)));
                 } else {

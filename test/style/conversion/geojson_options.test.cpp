@@ -53,7 +53,7 @@ TEST(GeoJSONOptions, FullConversion) {
         "lineMetrics": true,
         "clusterProperties": {
             "max": ["max", ["get", "scalerank"]],
-            "sum": ["+", ["get", "scalerank"]],
+            "sum": [["+", ["accumulated"], ["get", "sum"]], ["get", "scalerank"]],
             "has_island": ["any", ["==", ["get", "featureclass"], "island"]]
         }
     })JSON", error);
