@@ -1626,8 +1626,7 @@ public:
     {
         self.scale = powf(2, [self zoomLevel]);
 
-        // TODO: Find a comfortable pinch.scale value. Right now,
-        if (pinch.scale > 0.2) {
+        if (abs(pinch.velocity) > abs(self.rotate.velocity)) {
             self.isZooming = YES;
         }
         [self notifyGestureDidBegin];
@@ -1721,6 +1720,7 @@ public:
     [self cancelTransitions];
 
     if (MGLDegreesFromRadians(self.currentRotation) < self.rotationThreshold && self.isZooming) {
+        NSLog(@"delays rotate");
         rotate.delaysTouchesBegan = YES;
         self.currentRotation += abs(rotate.rotation);
         rotate.rotation = 0;
