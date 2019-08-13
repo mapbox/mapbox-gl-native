@@ -46,9 +46,6 @@
 [submodule "vendor/unique_resource"]
 	path = vendor/unique_resource
 	url = https://github.com/okdshin/unique_resource.git
-[submodule "vendor/icu"]
-	path = vendor/icu
-	url = https://github.com/unicode-org/icu.git
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/mapbox/mapbox-gl-native-boost.git
