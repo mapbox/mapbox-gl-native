@@ -572,7 +572,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThreshold = 3;
+    _rotationThreshold = 30;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1717,13 +1717,15 @@ public:
 {
     if ( ! self.isRotateEnabled) return;
 
-    [self cancelTransitions];
-
     if (MGLDegreesFromRadians(self.currentRotation) < self.rotationThreshold && self.isZooming) {
+        [self notifyGestureDidBegin];
         rotate.delaysTouchesBegan = YES;
         self.currentRotation += abs(rotate.rotation);
         rotate.rotation = 0;
+        return;
     }
+
+    [self cancelTransitions];
 
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
     MGLMapCamera *oldCamera = self.camera;
