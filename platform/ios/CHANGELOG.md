@@ -6,6 +6,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Styles and rendering
 
+* Enable variable label placement when `text-allow-overlap` property is set to true. ([#15354](https://github.com/mapbox/mapbox-gl-native/pull/15354))
 * Introduce `text-writing-mode` layout property for symbol layer ([#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932)). The `text-writing-mode` layout property allows control over symbol's preferred writing mode. The new property value is an array, whose values are enumeration values from a ( `horizontal` | `vertical` ) set.
 
 ## 5.3.0
