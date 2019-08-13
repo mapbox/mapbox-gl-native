@@ -10,6 +10,8 @@ limitPerRun: 1
 # SEMVER-MAJOR - @tobrun
 exemptLabels:
   - SEMVER-MAJOR
+  - ios
+  - macos
 
 pulls:
   daysUntilStale: 60
