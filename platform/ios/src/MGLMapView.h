@@ -723,13 +723,6 @@ MGL_EXPORT
  */
 @property(nonatomic) CGFloat decelerationRate;
 
-/**
- A Boolean value indicating whether the rotation threshold should be increased
- when zooming. By default, the threshold is 7.5 degrees. Setting this property
- to `YES` increases the threshold to 25 degrees.
- */
-@property(nonatomic) BOOL increasesRotationThresholdWhenZooming;
-
 #pragma mark Manipulating the Viewpoint
 
 /**

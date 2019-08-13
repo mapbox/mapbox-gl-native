@@ -2592,13 +2592,6 @@ public:
     return _mbglMap->getPrefetchZoomDelta() > 0 ? YES : NO;
 }
 
-- (void)setIncreasesRotationThresholdWhenZooming:(BOOL)increasesRotationThresholdWhenZooming {
-    if (increasesRotationThresholdWhenZooming) {
-        self.rotationThreshold = 25;
-    }
-    _increasesRotationThresholdWhenZooming = increasesRotationThresholdWhenZooming;
-}
-
 #pragma mark - Accessibility -
 
 - (NSString *)accessibilityValue
