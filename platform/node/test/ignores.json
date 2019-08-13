@@ -104,8 +104,5 @@
   "query-tests/fill-extrusion/sort-rotated": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/fill-extrusion/sort": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/fill-extrusion/top-in": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
-  "query-tests/regressions/mapbox-gl-js#7883": "https://github.com/mapbox/mapbox-gl-native/issues/14585",
-  "expression-tests/number-format/currency": "https://github.com/mapbox/mapbox-gl-native/issues/13632",
-  "expression-tests/number-format/default": "https://github.com/mapbox/mapbox-gl-native/issues/13632",
-  "expression-tests/number-format/precision": "https://github.com/mapbox/mapbox-gl-native/issues/13632"
+  "query-tests/regressions/mapbox-gl-js#7883": "https://github.com/mapbox/mapbox-gl-native/issues/14585"
 }
