@@ -240,8 +240,8 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
-@property (nonatomic) CGFloat currentRotation;
-@property(nonatomic) NSUInteger rotationThreshold;
+@property (nonatomic) CGFloat rotationBeforeThresholdMet;
+@property(nonatomic) NSUInteger rotationThresholdWhileZooming;
 @property (nonatomic) BOOL isZooming;
 @property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
@@ -572,7 +572,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThreshold = 30;
+    _rotationThresholdWhileZooming = 3;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1717,10 +1717,10 @@ public:
 {
     if ( ! self.isRotateEnabled) return;
 
-    if (MGLDegreesFromRadians(self.currentRotation) < self.rotationThreshold && self.isZooming) {
-        [self notifyGestureDidBegin];
+    if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming) {
+        _changeDelimiterSuppressionDepth++;
         rotate.delaysTouchesBegan = YES;
-        self.currentRotation += abs(rotate.rotation);
+        self.rotationBeforeThresholdMet += abs(rotate.rotation);
         rotate.rotation = 0;
         return;
     }
@@ -1788,7 +1788,7 @@ public:
     {
         CGFloat velocity = rotate.velocity;
         CGFloat decelerationRate = self.decelerationRate;
-        self.currentRotation = 0;
+        self.rotationBeforeThresholdMet = 0;
 
         if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
         {
