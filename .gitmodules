@@ -97,3 +97,6 @@
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest.git
+[submodule "vendor/mapbox-icu"]
+	path = vendor/mapbox-icu
+	url = https://github.com/mapbox/mapbox-icu.git

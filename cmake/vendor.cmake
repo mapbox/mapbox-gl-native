@@ -13,7 +13,6 @@ include(${CMAKE_SOURCE_DIR}/vendor/filesystem.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/geojson-vt-cpp.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/geojson.hpp.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/googletest.cmake)
-include(${CMAKE_SOURCE_DIR}/vendor/icu.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/jni.hpp.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/kdbush.hpp.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/nunicode.cmake)
@@ -30,6 +29,10 @@ include(${CMAKE_SOURCE_DIR}/vendor/args.cmake)
 
 if(NOT TARGET mapbox-base)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-base ${CMAKE_BINARY_DIR}/.build-mapbox-gl-native-mapbox-base)
+endif()
+
+if(NOT TARGET mapbox-icu)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-icu ${CMAKE_BINARY_DIR}/.build-mapbox-gl-native-mapbox-icu)
 endif()
 
 if(MBGL_PLATFORM STREQUAL "linux" OR MBGL_PLATFORM STREQUAL "macos")

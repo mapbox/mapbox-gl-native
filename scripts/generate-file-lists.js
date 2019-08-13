@@ -7,7 +7,8 @@ const xcode = require('xcode');
 
 require('./style-code');
 
-const classifier = /^(?:(?:(?:platform|vendor)\/(?:(?!include|src).)*\/|(?:test|benchmark)\/)?(?:(include|src)\/)?)?(.+\.h(?:pp|xx)?)$/;
+const defaultClassifier = /^(?:(?:(?:platform|vendor)\/(?:(?!include|src).)*\/|(?:test|benchmark)\/)?(?:(include|src)\/)?)?(.+\.h(?:pp|xx)?)$/;
+const icuClassifier = /^(?:(?:(?:vendor)\/(?:(?!common|i18n).)*\/)?(?:(common|i18n)\/)?)?(.+\.h(?:pp|xx)?)$/;
 
 function generateFileList(filename, roots, regex, patterns) {
     writeFileList(
@@ -19,10 +20,12 @@ function generateFileList(filename, roots, regex, patterns) {
             .trim()
             .split('\n')
             .map(file => path.join(root, file))
-        })))
+        })),
+        filename === "vendor/mapbox-icu-files.json" ? icuClassifier : defaultClassifier
+    )
 }
 
-function writeFileList(filename, files) {
+function writeFileList(filename, files, classifier) {
     const json = {
         "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
         sources: [],
@@ -135,7 +138,7 @@ generateFileList('vendor/expected-files.json', [ 'vendor/expected' ], vendorRege
 generateFileList('vendor/filesystem-files.json', [ 'vendor/filesystem' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/geojson-vt-cpp-files.json', [ 'vendor/geojson-vt-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/geojson.hpp-files.json', [ 'vendor/geojson.hpp' ], vendorRegex, [ "include/**/*.hpp" ]);
-generateFileList('vendor/icu-files.json', [ 'vendor/icu' ], vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
+generateFileList('vendor/mapbox-icu-files.json', [ 'vendor/mapbox-icu/icu4c/source/common', 'vendor/mapbox-icu/icu4c/source/i18n', 'vendor/mapbox-icu/icu4c/source/stubdata' ], vendorRegex, [ "*.h", "**/*.h", "*.cpp", "**/*.cpp" ]);
 generateFileList('vendor/jni.hpp-files.json', [ 'vendor/jni.hpp' ], vendorRegex, [ "include/**/*.hpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/kdbush.hpp-files.json', [ 'vendor/kdbush.hpp' ], vendorRegex, [ "include/*.hpp" ]);
 generateFileList('vendor/mapbox-base-files.json', [ 'vendor/mapbox-base/libs/geometry.hpp', 'vendor/mapbox-base/libs/variant', 'vendor/mapbox-base/libs/optional' ], vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "optional.hpp" ]);
