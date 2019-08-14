@@ -127,6 +127,7 @@
 - (void)testPinchAndZoom {
     self.mapView.zoomLevel = 15;
     UIPinchGestureRecognizerMock *pinch = [[UIPinchGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
+    [self.mapView addGestureRecognizer:pinch];
     pinch.state = UIGestureRecognizerStateBegan;
     pinch.velocity = 5.0;
     pinch.locationInViewOverride = CGPointMake(0, 0);
@@ -137,21 +138,38 @@
     UIRotationGestureRecognizerMock *rotate = [[UIRotationGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
     rotate.state = UIGestureRecognizerStateBegan;
     rotate.rotation = MGLRadiansFromDegrees(1);
+    [self.mapView addGestureRecognizer:rotate];
     [self.mapView handleRotateGesture:rotate];
 
-    XCTAssertEqual(rotate.rotation, 0);
+    XCTAssertEqual(rotate.rotation, self.mapView.direction);
 
     rotate.state = UIGestureRecognizerStateChanged;
     rotate.rotation = MGLRadiansFromDegrees(1);
     [self.mapView handleRotateGesture:rotate];
-    XCTAssertEqual(rotate.rotation, 0);
 
+    XCTAssertEqual(self.mapView.direction, 0);
     rotate.state = UIGestureRecognizerStateChanged;
-    rotate.rotation = MGLRadiansFromDegrees(60);
+    rotate.rotation = MGLRadiansFromDegrees(2);
     [self.mapView handleRotateGesture:rotate];
 
-    // Currently failing
-//    XCTAssertNotEqual(self.mapView.direction, 0);
+    XCTAssertEqual(self.mapView.direction, 0);
+
+    for (NSNumber *degrees in @[@10, @10, @30, @90, @180]) {
+        rotate.state = UIGestureRecognizerStateChanged;
+        rotate.rotation = MGLRadiansFromDegrees([degrees doubleValue]);
+        [self.mapView handleRotateGesture:rotate];
+
+        XCTAssertEqual(self.mapView.direction, 360 - MGLDegreesFromRadians(rotate.rotation));
+    }
+
+    rotate.state = UIGestureRecognizerStateEnded;
+    pinch.state = UIGestureRecognizerStateEnded;
+
+    [self.mapView handleRotateGesture:rotate];
+    [self.mapView handlePinchGesture:pinch];
+
+    XCTAssertFalse(self.mapView.isZooming);
+
 }
 
 NS_INLINE CGFloat MGLScaleFromZoomLevel(double zoom) {
