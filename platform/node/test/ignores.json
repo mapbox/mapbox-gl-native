@@ -82,8 +82,6 @@
   "render-tests/feature-state/composite-expression": "https://github.com/mapbox/mapbox-gl-native/issues/12613",
   "render-tests/feature-state/data-expression": "https://github.com/mapbox/mapbox-gl-native/issues/12613",
   "render-tests/feature-state/vector-source": "https://github.com/mapbox/mapbox-gl-native/issues/12613",
-  "render-tests/text-variable-anchor/pitched-rotated-debug": "https://github.com/mapbox/mapbox-gl-native/issues/14211",
-  "render-tests/text-variable-anchor/rotated-offset": "https://github.com/mapbox/mapbox-gl-native/issues/14211",
   "render-tests/text-variable-anchor/remember-last-placement": "skip - fails on gl-native, as symbol index is not functional at static map mode - needs issue",
   "render-tests/geojson/clustered-properties": "https://github.com/mapbox/mapbox-gl-native/issues/14043",
   "render-tests/remove-feature-state/composite-expression": "https://github.com/mapbox/mapbox-gl-native/issues/12413",
