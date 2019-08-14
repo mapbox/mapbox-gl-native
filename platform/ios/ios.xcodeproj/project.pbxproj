@@ -481,6 +481,9 @@
 		9C6E284522A982670056B7BE /* MMEUINavigation.h in Headers */ = {isa = PBXBuildFile; fileRef = 406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */; };
 		9C6E284622A982670056B7BE /* MMEUniqueIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */; };
 		9C6E284722A982670056B7BE /* MMEDispatchManager.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F552140696B00537748 /* MMEDispatchManager.h */; };
+		A4DE3DC923038A07005B3473 /* MGLMockGestureRecognizers.m in Sources */ = {isa = PBXBuildFile; fileRef = A4DE3DC823038A07005B3473 /* MGLMockGestureRecognizers.m */; };
+		A4DE3DCB23038C98005B3473 /* MGLMockGestureRecognizers.h in Sources */ = {isa = PBXBuildFile; fileRef = A4DE3DCA23038A7F005B3473 /* MGLMockGestureRecognizers.h */; };
+		A4DE3DCC23038CCA005B3473 /* MGLMockGestureRecognizers.m in Sources */ = {isa = PBXBuildFile; fileRef = A4DE3DC823038A07005B3473 /* MGLMockGestureRecognizers.m */; };
 		A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */ = {isa = PBXBuildFile; fileRef = A4F3FB1C2254865900A30170 /* missing_icon.json */; };
 		AC46EB59225E600A0039C013 /* MMECertPin.h in Headers */ = {isa = PBXBuildFile; fileRef = AC46EB57225E60090039C013 /* MMECertPin.h */; };
 		AC46EB5A225E600A0039C013 /* MMECertPin.h in Headers */ = {isa = PBXBuildFile; fileRef = AC46EB57225E60090039C013 /* MMECertPin.h */; };
@@ -1173,6 +1176,8 @@
 		9C6E286522A9849E0056B7BE /* release-notes-jazzy.md.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = "release-notes-jazzy.md.ejs"; sourceTree = "<group>"; };
 		9C6E286622A9849E0056B7BE /* deploy-snapshot.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "deploy-snapshot.sh"; sourceTree = "<group>"; };
 		9C6E286722A9849E0056B7BE /* release-notes.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "release-notes.js"; sourceTree = "<group>"; };
+		A4DE3DC823038A07005B3473 /* MGLMockGestureRecognizers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLMockGestureRecognizers.m; sourceTree = "<group>"; };
+		A4DE3DCA23038A7F005B3473 /* MGLMockGestureRecognizers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMockGestureRecognizers.h; sourceTree = "<group>"; };
 		A4F3FB1C2254865900A30170 /* missing_icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = missing_icon.json; sourceTree = "<group>"; };
 		AC46EB57225E60090039C013 /* MMECertPin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMECertPin.h; sourceTree = "<group>"; };
 		AC46EB58225E60090039C013 /* MMECertPin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMECertPin.m; sourceTree = "<group>"; };
@@ -1744,6 +1749,8 @@
 			children = (
 				CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */,
 				4031ACFE1E9FD29F00A3EA26 /* MGLSDKTestHelpers.swift */,
+				A4DE3DCA23038A7F005B3473 /* MGLMockGestureRecognizers.h */,
+				A4DE3DC823038A07005B3473 /* MGLMockGestureRecognizers.m */,
 			);
 			name = "Test Helpers";
 			sourceTree = "<group>";
@@ -3224,6 +3231,7 @@
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
 				075AF842227B6762008D7A4C /* MBXState.m in Sources */,
 				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
+				A4DE3DC923038A07005B3473 /* MGLMockGestureRecognizers.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
 				1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */,
@@ -3236,6 +3244,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4DE3DCC23038CCA005B3473 /* MGLMockGestureRecognizers.m in Sources */,
+				A4DE3DCB23038C98005B3473 /* MGLMockGestureRecognizers.h in Sources */,
 				6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */,
 				DA2E88631CC0382C00F24E7B /* MGLOfflineRegionTests.m in Sources */,
 				409F43FD1E9E781C0048729D /* MGLMapViewDelegateIntegrationTests.swift in Sources */,

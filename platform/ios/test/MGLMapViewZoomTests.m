@@ -1,23 +1,21 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
+#import "MGLMockGestureRecognizers.h"
 
 @interface MGLMapView (MGLMapViewZoomTests)
 @property (nonatomic) BOOL isZooming;
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch;
+- (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate;
 @end
 
-@interface UIPinchGestureRecognizerMock : UIPinchGestureRecognizer {
-@protected CGFloat _velocity;
-}
-@property (nonatomic, readwrite) CGFloat velocity;
-@property (nonatomic) CGPoint locationInViewOverride;
-@end
 
-@implementation UIPinchGestureRecognizerMock
-@synthesize velocity;
-- (void)setVelocity:(CGFloat)velocity { self.velocity = velocity; }
-- (CGPoint)locationInView:(nullable UIView *)view { return self.locationInViewOverride; }
-@end
+
+//@interface UIRotationGestureRecognizerMock : UIRotationGestureRecognizer
+//@end
+//
+//@implementation UIRotationGestureRecognizerMock
+//- (CGPoint)locationInView:(nullable UIView*)view { return view.center; }
+//@end
 
 @interface MGLMapViewZoomTests : XCTestCase
 @property (nonatomic) MGLMapView *mapView;
@@ -136,12 +134,31 @@
 }
 
 - (void)testPinchAndZoom {
-    UIPinchGestureRecognizerMock *gesture = [[UIPinchGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
-    gesture.state = UIGestureRecognizerStateBegan;
-    gesture.velocity = 5.0;
-    gesture.locationInViewOverride = CGPointMake(0, 0);
-    [self.mapView handlePinchGesture:gesture];
+    UIPinchGestureRecognizerMock *pinch = [[UIPinchGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
+    pinch.state = UIGestureRecognizerStateBegan;
+    pinch.velocity = 5.0;
+    pinch.locationInViewOverride = CGPointMake(0, 0);
+    [self.mapView handlePinchGesture:pinch];
+
     XCTAssertTrue(self.mapView.isZooming);
+
+    UIRotationGestureRecognizerMock *rotate = [[UIRotationGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
+    rotate.state = UIGestureRecognizerStateBegan;
+    rotate.rotation = MGLRadiansFromDegrees(1);
+    [self.mapView handleRotateGesture:rotate];
+
+    XCTAssertEqual(rotate.rotation, 0);
+
+//    rotate.state = UIGestureRecognizerStateChanged;
+//    rotate.rotation = MGLRadiansFromDegrees(1);
+//    [self.mapView handleRotateGesture:rotate];
+//    XCTAssertEqual(rotate.rotation, 0);
+
+    rotate.state = UIGestureRecognizerStateChanged;
+    rotate.rotation = MGLRadiansFromDegrees(60);
+    [self.mapView handleRotateGesture:rotate];
+    
+    XCTAssertNotEqual(self.mapView.direction, 0);
 }
 
 NS_INLINE CGFloat MGLScaleFromZoomLevel(double zoom) {
