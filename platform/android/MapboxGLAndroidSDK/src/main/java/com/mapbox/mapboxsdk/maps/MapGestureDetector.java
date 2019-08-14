@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -31,11 +32,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAXIMUM_ANGULAR_VELOCITY;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.QUICK_ZOOM_MAX_ZOOM_CHANGE;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.ROTATE_VELOCITY_RATIO_THRESHOLD;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_RATIO_THRESHOLD;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.ZOOM_RATE;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
+import static com.mapbox.mapboxsdk.utils.MathUtils.normalize;
 
 /**
  * Manages gestures events on a MapView.
@@ -75,6 +78,8 @@ final class MapGestureDetector {
    */
   @Nullable
   private PointF constantFocalPoint;
+
+  private PointF doubleTapFocalPoint;
 
   private AndroidGesturesManager gesturesManager;
 
@@ -321,8 +326,6 @@ final class MapGestureDetector {
   }
 
   private final class StandardGestureListener extends StandardGestureDetector.SimpleStandardOnGestureListener {
-
-    private PointF doubleTapFocalPoint;
     private final float doubleTapMovementThreshold;
 
     StandardGestureListener(float doubleTapMovementThreshold) {
@@ -495,6 +498,8 @@ final class MapGestureDetector {
     private final double scaleVelocityRatioThreshold;
     private boolean quickZoom;
     private float spanSinceLast;
+    private double screenHeight;
+    private double startZoom;
 
     ScaleGestureListener(double densityMultiplier, float minimumGestureSpeed, float minimumAngledGestureSpeed,
                          float minimumVelocity) {
@@ -548,6 +553,9 @@ final class MapGestureDetector {
         }
       }
 
+      screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+      startZoom = transform.getRawZoom();
+
       cancelTransitionsIfRequired();
 
       notifyOnScaleBeginListeners(detector);
@@ -562,10 +570,24 @@ final class MapGestureDetector {
       // dispatching camera start event only when the movement actually occurred
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
-      float scaleFactor = detector.getScaleFactor();
-      double zoomBy = getNewZoom(scaleFactor, quickZoom);
       PointF focalPoint = getScaleFocalPoint(detector);
-      transform.zoomBy(zoomBy, focalPoint);
+      if (quickZoom) {
+        double pixelDeltaChange = Math.abs(detector.getCurrentEvent().getY() - doubleTapFocalPoint.y);
+        boolean zoomedOut = detector.getCurrentEvent().getY() < doubleTapFocalPoint.y;
+
+        // normalize the pixel delta change, ranging from 0 to screen height in Y axis, to a constant zoom change range
+        double normalizedDeltaChange = normalize(pixelDeltaChange, 0, screenHeight, 0, QUICK_ZOOM_MAX_ZOOM_CHANGE);
+
+        // calculate target zoom and adjust for a multiplier
+        double targetZoom = (zoomedOut ? startZoom - normalizedDeltaChange : startZoom + normalizedDeltaChange);
+        targetZoom *= uiSettings.getZoomRate();
+
+        transform.setZoom(targetZoom, focalPoint);
+      } else {
+        double zoomBy =
+          (Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2)) * ZOOM_RATE * uiSettings.getZoomRate();
+        transform.zoomBy(zoomBy, focalPoint);
+      }
 
       notifyOnScaleListeners(detector);
 
@@ -627,19 +649,6 @@ final class MapGestureDetector {
         zoomAddition = -zoomAddition;
       }
       return zoomAddition;
-    }
-
-    private double getNewZoom(float scaleFactor, boolean quickZoom) {
-      double zoomBy = (Math.log(scaleFactor) / Math.log(Math.PI / 2)) * ZOOM_RATE * uiSettings.getZoomRate();
-      if (quickZoom) {
-        // clamp scale factors we feed to core #7514
-        boolean negative = zoomBy < 0;
-        zoomBy = MathUtils.clamp(Math.abs(zoomBy),
-          MapboxConstants.MINIMUM_SCALE_FACTOR_CLAMP,
-          MapboxConstants.MAXIMUM_SCALE_FACTOR_CLAMP);
-        return negative ? -zoomBy : zoomBy;
-      }
-      return zoomBy;
     }
   }
 

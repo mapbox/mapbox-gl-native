@@ -176,4 +176,18 @@ class MapGestureDetectorTest : BaseTest() {
       Assert.assertNotEquals(initialCameraPosition!!.target.longitude, mapboxMap.cameraPosition.target.longitude, 1.0)
     }
   }
+
+  @Test
+  fun quickZoom_roundTripping() {
+    validateTestSetup()
+    rule.runOnUiThread {
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(51.0, 16.0), 8.0))
+    }
+    onView(withId(R.id.mapView)).perform(quickScale(-400f, withVelocity = false))
+    onView(withId(R.id.mapView)).perform(quickScale(400f, withVelocity = false))
+
+    rule.runOnUiThread {
+      Assert.assertEquals(8.0, mapboxMap.cameraPosition.zoom, 0.0001)
+    }
+  }
 }
