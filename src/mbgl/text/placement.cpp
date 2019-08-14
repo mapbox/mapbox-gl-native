@@ -172,6 +172,7 @@ void Placement::placeBucket(
             placements.emplace(symbolInstance.crossTileID, JointPlacement(false, false, false));
             return;
         }
+        textBoxes.clear();
         iconBoxes.clear();
 
         bool placeText = false;
