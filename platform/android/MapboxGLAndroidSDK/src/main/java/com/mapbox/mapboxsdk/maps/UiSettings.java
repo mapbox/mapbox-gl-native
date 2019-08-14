@@ -962,9 +962,7 @@ public final class UiSettings {
    * Returns whether scale threshold should be increase whenever rotation is detected.
    *
    * @return If true, scale threshold will be increased.
-   * @deprecated unused
    */
-  @Deprecated
   public boolean isIncreaseScaleThresholdWhenRotating() {
     return increaseScaleThresholdWhenRotating;
   }
@@ -973,9 +971,7 @@ public final class UiSettings {
    * set whether scale threshold should be increase whenever rotation is detected.
    *
    * @param increaseScaleThresholdWhenRotating If true, scale threshold will be increased.
-   * @deprecated unused
    */
-  @Deprecated
   public void setIncreaseScaleThresholdWhenRotating(boolean increaseScaleThresholdWhenRotating) {
     this.increaseScaleThresholdWhenRotating = increaseScaleThresholdWhenRotating;
   }

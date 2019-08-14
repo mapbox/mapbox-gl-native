@@ -74,6 +74,14 @@ public class MapboxConstants {
   public static final long VELOCITY_THRESHOLD_IGNORE_FLING = 1000;
 
   /**
+   * Value by which the default rotation threshold will be increased when scaling
+   *
+   * @deprecated unused, see {@link com.mapbox.mapboxsdk.maps.UiSettings#setDisableRotateWhenScaling(boolean)}
+   */
+  @Deprecated
+  public static final float ROTATION_THRESHOLD_INCREASE_WHEN_SCALING = 25f;
+
+  /**
    * Maximum absolute zoom change for multi-pointer scale velocity animation
    */
   public static final double MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE = 2.5;
@@ -82,6 +90,14 @@ public class MapboxConstants {
    * Scale velocity animation duration multiplier.
    */
   public static final double SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER = 150;
+
+  /**
+   * Minimum angular velocity for rotation animation
+   *
+   * @deprecated unused, see {@link #ROTATE_VELOCITY_RATIO_THRESHOLD}
+   */
+  @Deprecated
+  public static final float MINIMUM_ANGULAR_VELOCITY = 1.5f;
 
   /**
    * Last scale span delta to XY velocity ratio required to execute scale velocity animation.

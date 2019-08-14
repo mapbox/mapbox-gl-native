@@ -123,9 +123,12 @@ final class MapGestureDetector {
         context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity)
       );
       RotateGestureListener rotateGestureListener = new RotateGestureListener(
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
         context.getResources().getDimension(R.dimen.mapbox_density_constant),
         context.getResources().getDimension(R.dimen.mapbox_angular_velocity_multiplier),
-        context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity));
+        context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity),
+        context.getResources().getDimension(
+          com.mapbox.android.gestures.R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
       ShoveGestureListener shoveGestureListener = new ShoveGestureListener();
       TapGestureListener tapGestureListener = new TapGestureListener();
 
@@ -641,14 +644,19 @@ final class MapGestureDetector {
   }
 
   private final class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
+    private final float minimumScaleSpanWhenRotating;
     private final float angularVelocityMultiplier;
     private final float minimumAngularVelocity;
     private final double rotateVelocityRatioThreshold;
+    private final float defaultSpanSinceStartThreshold;
 
-    RotateGestureListener(double densityMultiplier, float angularVelocityMultiplier, float minimumAngularVelocity) {
+    RotateGestureListener(float minimumScaleSpanWhenRotating, double densityMultiplier, float angularVelocityMultiplier,
+                          float minimumAngularVelocity, float defaultSpanSinceStartThreshold) {
+      this.minimumScaleSpanWhenRotating = minimumScaleSpanWhenRotating;
       this.angularVelocityMultiplier = angularVelocityMultiplier;
       this.minimumAngularVelocity = minimumAngularVelocity;
       this.rotateVelocityRatioThreshold = ROTATE_VELOCITY_RATIO_THRESHOLD * densityMultiplier;
+      this.defaultSpanSinceStartThreshold = defaultSpanSinceStartThreshold;
     }
 
     @Override
@@ -673,6 +681,13 @@ final class MapGestureDetector {
         || (speed > 0.5 && deltaSinceStart < 15)
       ) {
         return false;
+      }
+
+      if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
+        // when rotation starts, interrupting scale and increasing the threshold
+        // to make rotation without scaling easier
+        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
+        gesturesManager.getStandardScaleGestureDetector().interrupt();
       }
 
       cancelTransitionsIfRequired();
@@ -703,6 +718,11 @@ final class MapGestureDetector {
     @Override
     public void onRotateEnd(@NonNull RotateGestureDetector detector, float velocityX,
                             float velocityY, float angularVelocity) {
+      if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
+        // resetting default scale threshold values
+        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(defaultSpanSinceStartThreshold);
+      }
+
       notifyOnRotateEndListeners(detector);
 
       angularVelocity = angularVelocity * angularVelocityMultiplier;
