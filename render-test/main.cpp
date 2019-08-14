@@ -7,6 +7,7 @@
 #include "runner.hpp"
 
 #include <random>
+#include <regex>
 
 #define ANSI_COLOR_RED        "\x1b[31m"
 #define ANSI_COLOR_GREEN      "\x1b[32m"
@@ -17,6 +18,25 @@
 #define ANSI_COLOR_GRAY       "\x1b[37m"
 #define ANSI_COLOR_LIGHT_GRAY "\x1b[90m"
 #define ANSI_COLOR_RESET      "\x1b[0m"
+
+namespace {
+
+TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
+    auto defaultExpectations = stylePath;
+    defaultExpectations.remove_filename();
+    const static std::regex regex{ TestRunner::getBasePath() };
+    auto platformExpectations = std::regex_replace(defaultExpectations.string(), regex, TestRunner::getPlatformExpectationsPath());
+    assert(!defaultExpectations.empty());
+    assert(!platformExpectations.empty());
+
+    return {
+        std::move(stylePath),
+        std::move(defaultExpectations),
+        std::move(platformExpectations)
+    };
+}
+
+} // namespace
 
 int main(int argc, char** argv) {
     bool recycleMap;
@@ -31,11 +51,12 @@ int main(int argc, char** argv) {
     const auto ignores = parseIgnores();
 
     // Recursively traverse through the test paths and collect test directories containing "style.json".
-    std::vector<mbgl::filesystem::path> testPaths;
+    std::vector<TestPaths> testPaths;
+    testPaths.reserve(ids.size());
     for (const auto& id : ids) {
         for (auto& testPath : mbgl::filesystem::recursive_directory_iterator(mbgl::filesystem::path(id))) {
             if (testPath.path().filename() == "style.json") {
-                testPaths.push_back(testPath);
+                testPaths.emplace_back(makeTestPaths(testPath));
             }
         }
     }
@@ -67,7 +88,7 @@ int main(int argc, char** argv) {
         std::string& status = metadata.status;
         std::string& color = metadata.color;
 
-        id = testPath.remove_filename().string();
+        id = testPath.defaultExpectations.string();
         id = id.substr(rootLength + 1, id.length() - rootLength - 2);
 
         bool shouldIgnore = false;
