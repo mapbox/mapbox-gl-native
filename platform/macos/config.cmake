@@ -70,6 +70,10 @@ endmacro()
 
 
 macro(mbgl_platform_offline)
+    target_sources(mbgl-offline
+        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
+    )
+
     target_link_libraries(mbgl-offline
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
