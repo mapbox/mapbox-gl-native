@@ -56,6 +56,9 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
         mbgl::filesystem::create_directories(metadata.paths.platformExpectations);
         mbgl::util::write_file(metadata.paths.platformExpectations.string() + "/expected.png", mbgl::encodePNG(actual));
         return true;
+    } else if (getenv("UPDATE_GENERIC")) {
+        mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actual));
+        return true;
     }
 
     mbgl::util::write_file(base + "/actual.png", metadata.actual);
