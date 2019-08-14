@@ -2,10 +2,6 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-### Styles and rendering
-
 ## 5.3.0
 
 ### Styles and rendering
