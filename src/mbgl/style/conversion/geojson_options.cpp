@@ -99,6 +99,7 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
             return nullopt;
         }
         GeoJSONOptions::ClusterProperties result;
+        assert(error.message.empty());
         eachMember(
             *clusterProperties,
             [&](const std::string& k,
@@ -107,34 +108,42 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
                 // or ["key" : [[operator, ['accumulated'], ['get', key]], [mapExpression]]]
                 if (!isArray(v) || arrayLength(v) != 2) {
                     error.message =
-                            "GeoJSON source clusterProperties member must be an array with length of 2";
-                    return {};
+                        "GeoJSON source clusterProperties member must be an array with length of 2";
+                    return nullopt;
                 }
                 auto map = expression::dsl::createExpression(arrayMember(v, 1));
-                std::unique_ptr<expression::Expression> reduce;
-                if(isArray(arrayMember(v, 0))){
-                    reduce = expression::dsl::createExpression(arrayMember(v, 0));
+                if (!map) {
+                    error.message =
+                        "Failed to convert GeoJSON source clusterProperties map expression";
+                    return nullopt;
                 }
-                else{
+                std::unique_ptr<expression::Expression> reduce;
+                if (isArray(arrayMember(v, 0))) {
+                    reduce = expression::dsl::createExpression(arrayMember(v, 0));
+                } else {
                     auto reduceOp = toString(arrayMember(v, 0));
                     if (!reduceOp) {
                         error.message =
-                                "GeoJSON source clusterProperties member must contain a valid operator";
-                        return {};
+                            "GeoJSON source clusterProperties member must contain a valid operator";
+                        return nullopt;
                     }
                     std::stringstream ss;
                     // Reformulate reduce expression to [operator, ['accumulated'], ['get', key]]
+                    // The reason to create expression via parsing string instead of invoking function
+                    // createCompoundExpression is due to expression type disunity can’t be resolved
+                    // with current logic of createCompoundExpression
                     ss << std::string(R"([")") << *reduceOp
-                       << std::string(R"(", ["accumulated"], ["get", ")") << k << std::string(R"("]])");
+                       << std::string(R"(", ["accumulated"], ["get", ")") << k
+                       << std::string(R"("]])");
                     reduce = expression::dsl::createExpression(ss.str().c_str());
                 }
-                if (map && reduce) {
-                    result.emplace(k, std::make_pair(std::move(map), std::move(reduce)));
-                } else {
-                    error.message = "Failed to convert GeoJSON source clusterProperties";
-                    return {};
+                if (!reduce) {
+                    error.message =
+                        "Failed to convert GeoJSON source clusterProperties reduce expression";
+                    return nullopt;
                 }
-                return {};
+                result.emplace(k, std::make_pair(std::move(map), std::move(reduce)));
+                return nullopt;
             });
         if (!error.message.empty()) {
             return nullopt;

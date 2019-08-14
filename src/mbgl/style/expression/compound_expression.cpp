@@ -369,7 +369,7 @@ const auto& lineProgressCompoundExpression() {
 }
 
 const auto& accumulatedCompoundExpression() {
-    static auto signature = detail::makeSignature("accumulated", [](const EvaluationContext& params) -> Result<Value> {
+    const static auto signature = detail::makeSignature("accumulated", [](const EvaluationContext& params) -> Result<Value> {
         if (!params.accumulated) {
             return EvaluationError {
                 "The 'accumulated' expression is unavailable in the current evaluation context."
