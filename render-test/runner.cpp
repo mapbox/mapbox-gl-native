@@ -26,8 +26,24 @@
 #include <cassert>
 #include <regex>
 
+
+// static 
+const std::string& TestRunner::getBasePath() {
+    const static std::string result =
+        std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration/render-tests");
+    return result;
+}
+
+// static
+const std::string& TestRunner::getPlatformExpectationsPath() {
+    const static std::string result =
+        std::string(TEST_RUNNER_ROOT_PATH).append("/render-test/expected");
+    return result;
+}
+
 bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& metadata) {
-    const std::string base = metadata.path.remove_filename().string();
+    const std::string& base = metadata.paths.defaultExpectations.string();
+
     metadata.actual = mbgl::encodePNG(actual);
 
     if (actual.size.isEmpty()) {
@@ -37,7 +53,8 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
 
 #if !TEST_READ_ONLY
     if (getenv("UPDATE")) {
-        mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actual));
+        mbgl::filesystem::create_directories(metadata.paths.platformExpectations);
+        mbgl::util::write_file(metadata.paths.platformExpectations.string() + "/expected.png", mbgl::encodePNG(actual));
         return true;
     }
 
@@ -48,8 +65,10 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
     mbgl::PremultipliedImage diff { actual.size };
 
     double pixels = 0.0;
+    const auto& expectedPath = mbgl::filesystem::exists(metadata.paths.platformExpectations) ?
+        metadata.paths.platformExpectations : metadata.paths.defaultExpectations;
 
-    for (const auto& entry: readExpectedEntries(base)) {
+    for (const auto& entry: readExpectedEntries(expectedPath)) {
         mbgl::optional<std::string> maybeExpectedImage = mbgl::util::readFile(entry);
         if (!maybeExpectedImage) {
             metadata.errorMessage = "Failed to load expected image " + entry;

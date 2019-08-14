@@ -14,6 +14,11 @@ public:
     bool run(TestMetadata&);
     void reset();
 
+    /// Returns path of the render tests root directory.
+    static const std::string& getBasePath();
+    /// Returns path of mapbox-gl-native expectations directory.
+    static const std::string& getPlatformExpectationsPath();
+
 private:
     bool runOperations(const std::string& key, TestMetadata&);
     bool checkImage(mbgl::PremultipliedImage&& image, TestMetadata&);

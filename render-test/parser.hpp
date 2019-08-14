@@ -11,6 +11,7 @@
 
 struct TestMetadata;
 struct TestStatistics;
+struct TestPaths;
 
 using ErrorMessage = std::string;
 using JSONReply = mbgl::variant<mbgl::JSDocument, ErrorMessage>;
@@ -24,7 +25,8 @@ std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base)
 
 ArgumentsTuple parseArguments(int argc, char** argv);
 std::vector<std::pair<std::string, std::string>> parseIgnores();
-TestMetadata parseTestMetadata(const mbgl::filesystem::path& path);
+
+TestMetadata parseTestMetadata(const TestPaths& paths);
 
 std::string createResultPage(const TestStatistics&, const std::vector<TestMetadata>&, bool shuffle, uint32_t seed);
 

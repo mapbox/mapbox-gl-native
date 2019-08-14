@@ -15,6 +15,7 @@
 
 #include "parser.hpp"
 #include "metadata.hpp"
+#include "runner.hpp"
 
 #include <sstream>
 #include <regex>
@@ -243,17 +244,18 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
 
     std::vector<std::string> ids;
     for (const auto& id : args::get(testNameValues)) {
-        ids.emplace_back(testDefaultPath + "/" + id);
+        ids.emplace_back(TestRunner::getBasePath() + "/" + id);
     }
 
     if (ids.empty()) {
-        ids.emplace_back(testDefaultPath);
+        ids.emplace_back(TestRunner::getBasePath());
     }
 
     return ArgumentsTuple {
         recycleMapFlag ? args::get(recycleMapFlag) : false,
         shuffleFlag ? args::get(shuffleFlag) : false, seedValue ? args::get(seedValue) : 1u,
-        testPathValue ? args::get(testPathValue) : testDefaultPath, ids
+        testPathValue ? args::get(testPathValue) : testDefaultPath,
+        std::move(ids)
     };
 }
 
@@ -288,13 +290,13 @@ std::vector<std::pair<std::string, std::string>> parseIgnores() {
     return ignores;
 }
 
-TestMetadata parseTestMetadata(const mbgl::filesystem::path& path) {
+TestMetadata parseTestMetadata(const TestPaths& paths) {
     TestMetadata metadata;
-    metadata.path = path;
+    metadata.paths = paths;
 
-    auto maybeJson = readJson(path.string());
+    auto maybeJson = readJson(paths.stylePath.string());
     if (!maybeJson.is<mbgl::JSDocument>()) { // NOLINT
-        metadata.errorMessage = std::string("Unable to parse: ") + path.string();
+        metadata.errorMessage = std::string("Unable to parse: ") + metadata.paths.stylePath.string();
         return metadata;
     }
 
@@ -303,14 +305,14 @@ TestMetadata parseTestMetadata(const mbgl::filesystem::path& path) {
 
     if (!metadata.document.HasMember("metadata")) {
         mbgl::Log::Warning(mbgl::Event::ParseStyle, "Style has no 'metadata': %s",
-                           path.c_str());
+                           paths.stylePath.c_str());
         return metadata;
     }
 
     const mbgl::JSValue& metadataValue = metadata.document["metadata"];
     if (!metadataValue.HasMember("test")) {
         mbgl::Log::Warning(mbgl::Event::ParseStyle, "Style has no 'metadata.test': %s",
-                           path.c_str());
+                           paths.stylePath.c_str());
         return metadata;
     }
 
