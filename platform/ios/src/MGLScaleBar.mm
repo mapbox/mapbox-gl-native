@@ -181,12 +181,15 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     // Zero is a special case (no formatting)
     [self addZeroLabel];
 
-    [NSNotificationCenter defaultCenter] addObserver:<#(nonnull id)#> selector:<#(nonnull SEL)#> name:<#(nullable NSNotificationName)#> object:NSCurrentLocaleDidChangeNotification
-//    NSNotificationCenter addObserver:self forKeyPath:@selector(resetLabelImageCache) options:<#(NSKeyValueObservingOptions)#> context:<#(nullable void *)#>
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resetLabelImageCache) name:NSCurrentLocaleDidChangeNotification object:nil];
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 - (void)resetLabelImageCache {
-
+    self.labelImageCache = [[NSMutableDictionary alloc] init];
+    
 }
 #pragma mark - Dimensions
 
