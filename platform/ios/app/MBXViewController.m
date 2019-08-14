@@ -215,6 +215,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
 @property (nonatomic) NSMutableArray<UIView *> *contentInsetsOverlays;
 
+@property (nonatomic) NSTimer *hideScaleBarTimer;
 @end
 
 @interface MGLMapView (MBXViewController)
@@ -301,6 +302,41 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 [self.helperWindows removeObject:window];
             }
         }
+    }];
+
+    [self handleZoomOnScale];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [self hideScaleWithAnimation:NO];
+}
+- (void)handleZoomOnScale {
+    if (!self.mapView.showsScale) { return; }
+
+    self.mapView.scaleBar.alpha = 1;
+
+    if (self.hideScaleBarTimer) {
+        [self.hideScaleBarTimer invalidate];
+    }
+
+     __weak typeof(self) weakSelf = self;
+    self.hideScaleBarTimer = [NSTimer scheduledTimerWithTimeInterval:2.0 repeats:NO block:^(NSTimer * _Nonnull timer) {
+        if (![timer isValid]) {
+            [weakSelf hideScaleWithAnimation:YES];
+        }
+    }];
+}
+
+- (void)hideScaleWithAnimation:(BOOL)animated {
+    [self.hideScaleBarTimer invalidate];
+    self.hideScaleBarTimer = nil;
+
+    if (!animated) { return; }
+     __weak typeof(self) weakSelf = self;
+    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        self.mapView.scaleBar.alpha = 0;
+    } completion:^(BOOL finished) {
+        weakSelf.mapView.showsScale = NO;
     }];
 }
 

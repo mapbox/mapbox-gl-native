@@ -84,7 +84,7 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic) UIColor *secondaryColor;
 @property (nonatomic) CALayer *borderLayer;
 @property (nonatomic, assign) CGFloat borderWidth;
-@property (nonatomic) NSCache* labelImageCache;
+@property (nonatomic) NSMutableDictionary* labelImageCache;
 @property (nonatomic) MGLScaleBarLabel* prototypeLabel;
 @property (nonatomic) CGFloat lastLabelWidth;
 
@@ -159,7 +159,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     _formatter = [[MGLDistanceFormatter alloc] init];
 
     // Image labels are now images
-    _labelImageCache              = [[NSCache alloc] init];
+    _labelImageCache              = [[NSMutableDictionary alloc] init];
     _prototypeLabel               = [[MGLScaleBarLabel alloc] init];
     _prototypeLabel.font          = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
     _prototypeLabel.clipsToBounds = NO;
@@ -180,8 +180,14 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
     // Zero is a special case (no formatting)
     [self addZeroLabel];
+
+    [NSNotificationCenter defaultCenter] addObserver:<#(nonnull id)#> selector:<#(nonnull SEL)#> name:<#(nullable NSNotificationName)#> object:NSCurrentLocaleDidChangeNotification
+//    NSNotificationCenter addObserver:self forKeyPath:@selector(resetLabelImageCache) options:<#(NSKeyValueObservingOptions)#> context:<#(nullable void *)#>
 }
 
+- (void)resetLabelImageCache {
+
+}
 #pragma mark - Dimensions
 
 - (CGSize)intrinsicContentSize {
