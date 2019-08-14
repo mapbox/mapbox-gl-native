@@ -241,7 +241,7 @@ public:
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
 @property (nonatomic) CGFloat rotationBeforeThresholdMet;
-@property(nonatomic) NSUInteger rotationThresholdWhileZooming;
+@property (nonatomic) NSUInteger rotationThresholdWhileZooming;
 @property (nonatomic) BOOL isZooming;
 @property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
