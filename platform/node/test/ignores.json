@@ -39,6 +39,7 @@
   "render-tests/custom-layer-js/null-island": "skip - js specific",
   "render-tests/custom-layer-js/tent-3d": "skip - js specific",
   "render-tests/regressions/mapbox-gl-js#7708": "skip - js specific",
+  "render-tests/debug/overdraw": "https://github.com/mapbox/mapbox-gl-native/issues/15638",
   "render-tests/debug/collision": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/tile": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/tile-overscaled": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
