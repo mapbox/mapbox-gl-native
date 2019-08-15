@@ -87,6 +87,11 @@ public class MapboxConstants {
   public static final double MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE = 2.5;
 
   /**
+   * Maximum possible zoom change during the quick zoom gesture executed across the whole screen
+   */
+  public static final double QUICK_ZOOM_MAX_ZOOM_CHANGE = 4.0;
+
+  /**
    * Scale velocity animation duration multiplier.
    */
   public static final double SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER = 150;
@@ -156,12 +161,18 @@ public class MapboxConstants {
 
   /**
    * The currently used minimum scale factor to clamp to when a quick zoom gesture occurs
+   *
+   * @deprecated unused
    */
+  @Deprecated
   public static final float MINIMUM_SCALE_FACTOR_CLAMP = 0.00f;
 
   /**
    * The currently used maximum scale factor to clamp to when a quick zoom gesture occurs
+   *
+   * @deprecated unused
    */
+  @Deprecated
   public static final float MAXIMUM_SCALE_FACTOR_CLAMP = 0.15f;
 
   /**
