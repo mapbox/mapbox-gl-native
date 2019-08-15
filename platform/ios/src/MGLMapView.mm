@@ -1718,11 +1718,9 @@ public:
     if ( ! self.isRotateEnabled) return;
 
     if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming) {
-        _changeDelimiterSuppressionDepth++;
         rotate.delaysTouchesBegan = YES;
         self.rotationBeforeThresholdMet += abs(rotate.rotation);
         rotate.rotation = 0;
-        return;
     }
 
     [self cancelTransitions];
