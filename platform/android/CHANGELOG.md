@@ -3,23 +3,31 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
-- Enable variable label placement when `text-allow-overlap` property is set to true [#15354](https://github.com/mapbox/mapbox-gl-native/pull/15354).
-- Introduce `text-writing-mode` layout property for symbol layer [#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932). The `text-writing-mode` layout property allows control over symbol's preferred writing mode. The new property value is an array, whose values are enumeration values from a ( `horizontal` | `vertical` ) set.
+
+## 8.3.0-alpha.3 - August 15, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-alpha.2...android-v8.3.0-alpha.3) since [Mapbox Maps SDK for Android v8.3.0-alpha.2](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-alpha.2):
+
+### Gestures handling
+ - Bumped gestures library version to v0.5.0 which replaces the compat gesture detector with a custom scale gesture detector implementation. This is a softly breaking change because the underlying scale gesture detector reference has been removed. This brings a set of improvements to gestures without removing any functionality from the previous implementation. [#15136](https://github.com/mapbox/mapbox-gl-native/pull/15136)
+ - Improved scale and rotate gestures by refining sensitivity thresholds and animation velocity. [#15136](https://github.com/mapbox/mapbox-gl-native/pull/15136)
+ - Improved quick-zoom gestures by making zoom changes linear. Quick-zoom scale changes are now executed based on y-axis delta changes. [#15386](https://github.com/mapbox/mapbox-gl-native/pull/15386)
 
 ### Features
- - Add fallback support to local ideograph font families [#15255](https://github.com/mapbox/mapbox-gl-native/pull/15255)
+ - Introduced the text-writing-mode layout property for symbol layers. This property allows labels to be placed horizontally or vertically. The property accepts an array of enumeration values from a ( horizontal | vertical ) set. [#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932)
+ - Added support for fallback fonts in `localIdeographFontFamily`. [#15255](https://github.com/mapbox/mapbox-gl-native/pull/15255)
 
 ### Bug fixes
  - Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues [#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195)
- - Allow loading of a map without a Style URI or Style JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)
+ - Allow loading of a map without a style URI or style JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)
  - Fixed an issue where animated camera transitions zoomed in or out too dramatically [#15281](https://github.com/mapbox/mapbox-gl-native/pull/15281)
+ - Enable variable label placement when `text-allow-overlap` property is set to true [#15354](https://github.com/mapbox/mapbox-gl-native/pull/15354)
 
 ## 8.3.0-alpha.2 - August 7, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-alpha.1...android-v8.3.0-alpha.2) since [Mapbox Maps SDK for Android v8.3.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-alpha.1):
 
 ### Bug fixes
-- Load a style without an URI or JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)
-- Do not try to wake up the RunLoop if a wake is already pending. Fixes offline downloads that could freeze after resuming. [#15330](https://github.com/mapbox/mapbox-gl-native/pull/15330)
+ - Load a style without an URI or JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)
+ - Do not try to wake up the RunLoop if a wake is already pending. Fixes offline downloads that could freeze after resuming. [#15330](https://github.com/mapbox/mapbox-gl-native/pull/15330)
 
 ## 8.0.2 - July 31, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.0.1...android-v8.0.2) since [Mapbox Maps SDK for Android v8.0.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.0.1):
