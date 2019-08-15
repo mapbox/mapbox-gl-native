@@ -44,4 +44,11 @@ std::array<double, 4> Color::toArray() const {
     }
 }
 
+mbgl::Value Color::toObject() const {
+    return std::unordered_map<std::string, mbgl::Value>{{"r", double(r)},
+                                                        {"g", double(g)},
+                                                        {"b", double(b)},
+                                                        {"a", double(a)}};
+}
+
 } // namespace mbgl
