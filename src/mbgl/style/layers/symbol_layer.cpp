@@ -9,7 +9,6 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/style/expression/dsl.hpp>
 
 #include <mapbox/eternal.hpp>
 

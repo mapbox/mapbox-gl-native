@@ -159,8 +159,6 @@ void Placement::placeBucket(
     const bool rotateWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
     const bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
     const bool hasIconTextFit = layout.get<style::IconTextFit>() != style::IconTextFitType::None;
-    const bool hasIconCollisionCircleData = bucket.hasIconCollisionCircleData();
-    const bool hasTextCollisionCircleData = bucket.hasTextCollisionCircleData();
 
     const bool zOrderByViewportY = layout.get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY;
     std::vector<ProjectedCollisionBox> textBoxes;
@@ -419,7 +417,9 @@ void Placement::placeBucket(
             }
         }
 
-
+        const bool hasIconCollisionCircleData = bucket.hasIconCollisionCircleData();
+        const bool hasTextCollisionCircleData = bucket.hasTextCollisionCircleData();
+        
         if (hasIconCollisionCircleData && symbolInstance.iconCollisionFeature.alongLine && !iconBoxes.empty()) {
             collisionCircles[&symbolInstance.iconCollisionFeature] = iconBoxes;
         }
@@ -846,8 +846,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             } else {
                 // This feature was not placed, because it was not loaded or from a fading tile. Apply default values.
                 static const auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false /*not used*/, {});
-                isText ? bucket.textCollisionCircle->dynamicVertices.extend(4, dynamicVertex):
-                         bucket.iconCollisionCircle->dynamicVertices.extend(4, dynamicVertex);
+                isText ? bucket.textCollisionCircle->dynamicVertices.extend(4 * feature.boxes.size(), dynamicVertex):
+                         bucket.iconCollisionCircle->dynamicVertices.extend(4 * feature.boxes.size(), dynamicVertex);
             }
         };
         Point<float> textShift{0.0f, 0.0f};
