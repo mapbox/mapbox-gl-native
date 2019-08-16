@@ -572,7 +572,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 3;
+    _rotationThresholdWhileZooming = 3.5;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1718,9 +1718,12 @@ public:
     if ( ! self.isRotateEnabled) return;
 
     if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming) {
+        _changeDelimiterSuppressionDepth++;
         rotate.delaysTouchesBegan = YES;
         self.rotationBeforeThresholdMet += abs(rotate.rotation);
         rotate.rotation = 0;
+        NSLog(@"threshold not met");
+        return;
     }
 
     [self cancelTransitions];
@@ -1741,14 +1744,14 @@ public:
 
         self.shouldTriggerHapticFeedbackForCompass = NO;
         [self notifyGestureDidBegin];
+        NSLog(@"rotate began");
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
+        CGFloat newDegrees = [self newDegreesForRotationGesture:rotate];
 
         // constrain to +/-30 degrees when merely rotating like Apple does
         //
-        
         if ( ! self.isRotationAllowed && std::abs(self.pinch.scale) < 10)
         {
             newDegrees = fminf(newDegrees,  30);
@@ -2241,6 +2244,28 @@ public:
     return degrees;
 }
 
+- (CGFloat)newDegreesForRotationGesture:(UIRotationGestureRecognizer *)rotate {
+    CGFloat newDegrees;
+
+    if (self.isZooming) {
+        CGFloat rotation = rotate.rotation;
+        CGFloat newRotation = 0;
+
+        CGFloat b = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming * 2);
+        CGFloat a = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming);
+        if ((rotation >= b) || (rotation <= -b)) {
+            newRotation = rotation;
+        }
+        else if (rotation >= a) {
+            newRotation = -b*0.5*(cos(M_PI*(rotation-a)/(b-a)) - 1.0);
+        }
+        else if (rotation <= -a) {
+            newRotation = b*0.5*(cos(M_PI*(rotation+a)/(a-b)) - 1.0);
+        }
+    }
+    newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
+    return newDegrees;
+}
 #pragma mark - Attribution -
 
 - (void)showAttribution:(id)sender
