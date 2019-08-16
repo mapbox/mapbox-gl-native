@@ -3,6 +3,10 @@
 #import "MGLMapView_Private.h"
 #import "NSBundle+MGLAdditions.h"
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEEventsManager.h"
+#endif
+
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/source.hpp>
@@ -77,6 +81,10 @@
             *outError = [NSError errorWithDomain:MGLErrorDomain
                                             code:MGLErrorCodeSourceIsInUseCannotRemove
                                         userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:*outError];
+#endif
+            
         }
     } else if (outError) {
         // TODO: Consider raising an exception here
@@ -87,6 +95,9 @@
         *outError = [NSError errorWithDomain:MGLErrorDomain
                                         code:MGLErrorCodeSourceIdentifierMismatch
                                     userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+        [[MMEEventsManager sharedManager] reportError:*outError];
+#endif
     }
     
     return removed;

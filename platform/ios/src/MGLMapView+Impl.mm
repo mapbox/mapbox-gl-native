@@ -3,6 +3,10 @@
 #import "MGLStyle_Private.h"
 #import "NSBundle+MGLAdditions.h"
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEEventsManager.h"
+#endif
+
 std::unique_ptr<MGLMapViewImpl> MGLMapViewImpl::Create(MGLMapView* nativeView) {
     return std::make_unique<MGLMapViewOpenGLImpl>(nativeView);
 }
@@ -61,6 +65,9 @@ void MGLMapViewImpl::onDidFailLoadingMap(mbgl::MapLoadError mapError, const std:
         NSLocalizedFailureReasonErrorKey: @(what.c_str()),
     };
     NSError *error = [NSError errorWithDomain:MGLErrorDomain code:code userInfo:userInfo];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+    [[MMEEventsManager sharedManager] reportError:error];
+#endif
     [mapView mapViewDidFailLoadingMapWithError:error];
 }
 

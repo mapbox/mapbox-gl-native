@@ -224,6 +224,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
             NSString *description = @(mbgl::util::toString(mbglError).c_str());
             NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description};
             NSError *error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeSnapshotFailed userInfo:userInfo];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:error];
+#endif
             
             // Dispatch to result queue
             dispatch_async(queue, ^{
@@ -565,6 +568,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
             NSError *error = [NSError errorWithDomain:MGLErrorDomain
                                                  code:errorCode
                                              userInfo:userInfo];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            [[MMEEventsManager sharedManager] reportError:error];
+#endif
             completion(NULL, error);
         });
     }
