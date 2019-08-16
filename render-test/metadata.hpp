@@ -19,8 +19,12 @@ struct TestStatistics {
 
 struct TestPaths {
     mbgl::filesystem::path stylePath;
-    mbgl::filesystem::path defaultExpectations;
-    mbgl::filesystem::path platformExpectations;
+    std::vector<mbgl::filesystem::path> expectations;
+
+    std::string defaultExpectations() const {
+        assert(!expectations.empty());
+        return expectations.front().string();
+    }
 };
 
 struct TestMetadata {
