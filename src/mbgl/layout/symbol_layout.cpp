@@ -807,30 +807,44 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
 }
 
 void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
-
+    
     if (!hasSymbolInstances()) {
         return;
     }
 
-    for (const SymbolInstance &symbolInstance : symbolInstances) {
-        auto populateCollisionBox = [&](const auto& feature) {
-            SymbolBucket::CollisionBuffer& collisionBuffer = feature.alongLine ?
-                static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateCollisionCircleBuffer()) :
-                static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateCollisionBox());
-            for (const CollisionBox &box : feature.boxes) {
+    for (const SymbolInstance& symbolInstance : symbolInstances) {
+        auto populateCollisionBox = [&](const auto& feature, bool isText) {
+            SymbolBucket::CollisionBuffer& collisionBuffer =
+                feature.alongLine ? (isText ? static_cast<SymbolBucket::CollisionBuffer&>(
+                                                  bucket.getOrCreateTextCollisionCircleBuffer())
+                                            : static_cast<SymbolBucket::CollisionBuffer&>(
+                                                  bucket.getOrCreateIconCollisionCircleBuffer()))
+                                  : (isText ? static_cast<SymbolBucket::CollisionBuffer&>(
+                                                  bucket.getOrCreateTextCollisionBox())
+                                            : static_cast<SymbolBucket::CollisionBuffer&>(
+                                                  bucket.getOrCreateIconCollisionBox()));
+
+            for (const CollisionBox& box : feature.boxes) {
                 auto& anchor = box.anchor;
 
-                Point<float> tl{box.x1, box.y1};
-                Point<float> tr{box.x2, box.y1};
-                Point<float> bl{box.x1, box.y2};
-                Point<float> br{box.x2, box.y2};
+                Point<float> tl{ box.x1, box.y1 };
+                Point<float> tr{ box.x2, box.y1 };
+                Point<float> bl{ box.x1, box.y2 };
+                Point<float> br{ box.x2, box.y2 };
 
                 static constexpr std::size_t vertexLength = 4;
                 const std::size_t indexLength = feature.alongLine ? 6 : 8;
 
-                if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-                    collisionBuffer.segments.emplace_back(collisionBuffer.vertices.elements(),
-                      feature.alongLine ? bucket.collisionCircle->triangles.elements() : bucket.collisionBox->lines.elements());
+                if (collisionBuffer.segments.empty() ||
+                    collisionBuffer.segments.back().vertexLength + vertexLength >
+                        std::numeric_limits<uint16_t>::max()) {
+                    collisionBuffer.segments.emplace_back(
+                        collisionBuffer.vertices.elements(),
+                        feature.alongLine
+                            ? (isText ? bucket.textCollisionCircle->triangles.elements()
+                                      : bucket.iconCollisionCircle->triangles.elements())
+                            : (isText ? bucket.textCollisionBox->lines.elements()
+                                      : bucket.iconCollisionBox->lines.elements()));
                 }
 
                 auto& segment = collisionBuffer.segments.back();
@@ -850,27 +864,29 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
 
                 if (feature.alongLine) {
-                    bucket.collisionCircle->triangles.emplace_back(index, index + 1, index + 2);
-                    bucket.collisionCircle->triangles.emplace_back(index, index + 2, index + 3);
+                    auto& collisionCircle = (isText ? bucket.textCollisionCircle : bucket.iconCollisionCircle);
+                    collisionCircle->triangles.emplace_back(index, index + 1, index + 2);
+                    collisionCircle->triangles.emplace_back(index, index + 2, index + 3);
                 } else {
-                    bucket.collisionBox->lines.emplace_back(index + 0, index + 1);
-                    bucket.collisionBox->lines.emplace_back(index + 1, index + 2);
-                    bucket.collisionBox->lines.emplace_back(index + 2, index + 3);
-                    bucket.collisionBox->lines.emplace_back(index + 3, index + 0);
+                    auto& collisionBox = (isText ? bucket.textCollisionBox : bucket.iconCollisionBox);
+                    collisionBox->lines.emplace_back(index + 0, index + 1);
+                    collisionBox->lines.emplace_back(index + 1, index + 2);
+                    collisionBox->lines.emplace_back(index + 2, index + 3);
+                    collisionBox->lines.emplace_back(index + 3, index + 0);
                 }
 
                 segment.vertexLength += vertexLength;
                 segment.indexLength += indexLength;
             }
         };
-        populateCollisionBox(symbolInstance.textCollisionFeature);
+        populateCollisionBox(symbolInstance.textCollisionFeature, true);
         if (symbolInstance.verticalTextCollisionFeature) {
-            populateCollisionBox(*symbolInstance.verticalTextCollisionFeature);
+            populateCollisionBox(*symbolInstance.verticalTextCollisionFeature, true);
         }
         if (symbolInstance.verticalIconCollisionFeature) {
-            populateCollisionBox(*symbolInstance.verticalIconCollisionFeature);
+            populateCollisionBox(*symbolInstance.verticalIconCollisionFeature, false);
         }
-        populateCollisionBox(symbolInstance.iconCollisionFeature);
+        populateCollisionBox(symbolInstance.iconCollisionFeature, false);
     }
 }
 

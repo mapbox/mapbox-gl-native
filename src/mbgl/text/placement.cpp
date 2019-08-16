@@ -159,7 +159,8 @@ void Placement::placeBucket(
     const bool rotateWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
     const bool pitchWithMap = layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map;
     const bool hasIconTextFit = layout.get<style::IconTextFit>() != style::IconTextFitType::None;
-    const bool hasCollisionCircleData = bucket.hasCollisionCircleData();
+    const bool hasIconCollisionCircleData = bucket.hasIconCollisionCircleData();
+    const bool hasTextCollisionCircleData = bucket.hasTextCollisionCircleData();
 
     const bool zOrderByViewportY = layout.get<style::SymbolZOrder>() == style::SymbolZOrderType::ViewportY;
     std::vector<ProjectedCollisionBox> textBoxes;
@@ -418,13 +419,12 @@ void Placement::placeBucket(
             }
         }
 
-        if (hasCollisionCircleData) { 
-            if (symbolInstance.iconCollisionFeature.alongLine && !iconBoxes.empty()) {
-                collisionCircles[&symbolInstance.iconCollisionFeature] = iconBoxes;
-            }
-            if (symbolInstance.textCollisionFeature.alongLine && !textBoxes.empty()) {
-                collisionCircles[&symbolInstance.textCollisionFeature] = textBoxes;
-            }
+
+        if (hasIconCollisionCircleData && symbolInstance.iconCollisionFeature.alongLine && !iconBoxes.empty()) {
+            collisionCircles[&symbolInstance.iconCollisionFeature] = iconBoxes;
+        }
+        if (hasTextCollisionCircleData && symbolInstance.textCollisionFeature.alongLine && !textBoxes.empty()) {
+            collisionCircles[&symbolInstance.textCollisionFeature] = textBoxes;
         }
 
         assert(symbolInstance.crossTileID != 0);
@@ -696,8 +696,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
     if (bucket.hasSdfIconData()) bucket.sdfIcon.opacityVertices.clear();
-    if (bucket.hasCollisionBoxData()) bucket.collisionBox->dynamicVertices.clear();
-    if (bucket.hasCollisionCircleData()) bucket.collisionCircle->dynamicVertices.clear();
+    if (bucket.hasIconCollisionBoxData()) bucket.iconCollisionBox->dynamicVertices.clear();
+    if (bucket.hasIconCollisionCircleData()) bucket.iconCollisionCircle->dynamicVertices.clear();
+    if (bucket.hasTextCollisionBoxData()) bucket.textCollisionBox->dynamicVertices.clear();
+    if (bucket.hasTextCollisionCircleData()) bucket.textCollisionCircle->dynamicVertices.clear();
 
     JointOpacityState duplicateOpacityState(false, false, true);
 
@@ -788,15 +790,15 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             }
         }
         
-        auto updateCollisionBox = [&](const auto& feature, const bool placed, const Point<float>& shift) {
+        auto updateIconCollisionBox = [&](const auto& feature, const bool placed, const Point<float>& shift) {
             if (feature.alongLine) {
                 return;
             }
             const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false, shift);
-            bucket.collisionBox->dynamicVertices.extend(feature.boxes.size() * 4, dynamicVertex);
+            bucket.iconCollisionBox->dynamicVertices.extend(feature.boxes.size() * 4, dynamicVertex);
         };
 
-        auto updateCollisionTextBox = [this, &bucket, &symbolInstance, &state, variablePlacement, rotateWithMap, pitchWithMap](const auto& feature, const bool placed) {
+        auto updateTextCollisionBox = [this, &bucket, &symbolInstance, &state, variablePlacement, rotateWithMap, pitchWithMap](const auto& feature, const bool placed) {
             Point<float> shift{0.0f, 0.0f};
             if (feature.alongLine) {
                 return shift;
@@ -826,11 +828,11 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                 }
             }
             const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !used, shift);
-            bucket.collisionBox->dynamicVertices.extend(feature.boxes.size() * 4, dynamicVertex);
+            bucket.textCollisionBox->dynamicVertices.extend(feature.boxes.size() * 4, dynamicVertex);
             return shift;
         };
         
-        auto updateCollisionCircles = [&](const auto& feature, const bool placed) {
+        auto updateCollisionCircles = [&](const auto& feature, const bool placed, bool isText) {
             if (!feature.alongLine) {
                 return;
             }
@@ -838,31 +840,36 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
             if (circles != collisionCircles.end()) {
                 for (const auto& circle : circles->second) {
                     const auto& dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, !circle.isCircle(), {});
-                    bucket.collisionCircle->dynamicVertices.extend(4, dynamicVertex);
+                    isText ? bucket.textCollisionCircle->dynamicVertices.extend(4, dynamicVertex):
+                             bucket.iconCollisionCircle->dynamicVertices.extend(4, dynamicVertex);
                 }
             } else {
                 // This feature was not placed, because it was not loaded or from a fading tile. Apply default values.
                 static const auto dynamicVertex = CollisionBoxProgram::dynamicVertex(placed, false /*not used*/, {});
-                bucket.collisionCircle->dynamicVertices.extend(4 * feature.boxes.size(), dynamicVertex);
+                isText ? bucket.textCollisionCircle->dynamicVertices.extend(4, dynamicVertex):
+                         bucket.iconCollisionCircle->dynamicVertices.extend(4, dynamicVertex);
             }
         };
-        
-        if (bucket.hasCollisionBoxData()) {
-            const auto& textShift = updateCollisionTextBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
-            if (bucket.allowVerticalPlacement) {
-                Point<float> verticalTextShift{0.0f, 0.0f};
-                if (symbolInstance.verticalTextCollisionFeature) {
-                    verticalTextShift = updateCollisionTextBox(*symbolInstance.verticalTextCollisionFeature, opacityState.text.placed);
-                }
-                if (symbolInstance.verticalIconCollisionFeature) {
-                    updateCollisionBox(*symbolInstance.verticalIconCollisionFeature, opacityState.text.placed, hasIconTextFit ? verticalTextShift : Point<float>{0.0f, 0.0f});
-                }
+        Point<float> textShift{0.0f, 0.0f};
+        Point<float> verticalTextShift{0.0f, 0.0f};
+        if (bucket.hasTextCollisionBoxData()) {
+            textShift = updateTextCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            if (bucket.allowVerticalPlacement && symbolInstance.verticalTextCollisionFeature) {
+                verticalTextShift = updateTextCollisionBox(*symbolInstance.verticalTextCollisionFeature, opacityState.text.placed);
             }
-            updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed, hasIconTextFit ? textShift : Point<float>{0.0f, 0.0f});
         }
-        if (bucket.hasCollisionCircleData()) {
-            updateCollisionCircles(symbolInstance.textCollisionFeature, opacityState.text.placed);
-            updateCollisionCircles(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        if (bucket.hasIconCollisionBoxData()) {
+            updateIconCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed, hasIconTextFit ? textShift : Point<float>{0.0f, 0.0f});
+            if (bucket.allowVerticalPlacement && symbolInstance.verticalIconCollisionFeature) {
+                updateIconCollisionBox(*symbolInstance.verticalIconCollisionFeature, opacityState.text.placed, hasIconTextFit ? verticalTextShift : Point<float>{0.0f, 0.0f});
+            }
+        }
+        
+        if (bucket.hasIconCollisionCircleData()) {
+            updateCollisionCircles(symbolInstance.iconCollisionFeature, opacityState.icon.placed, false);
+        }
+        if (bucket.hasTextCollisionCircleData()) {
+            updateCollisionCircles(symbolInstance.textCollisionFeature, opacityState.text.placed, true);
         }
     }
 
