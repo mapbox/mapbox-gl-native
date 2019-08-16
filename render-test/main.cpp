@@ -22,17 +22,18 @@
 namespace {
 
 TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
-    auto defaultExpectations = stylePath;
-    defaultExpectations.remove_filename();
-    const static std::regex regex{ TestRunner::getBasePath() };
-    auto platformExpectations = std::regex_replace(defaultExpectations.string(), regex, TestRunner::getPlatformExpectationsPath());
-    assert(!defaultExpectations.empty());
-    assert(!platformExpectations.empty());
+    std::vector<mbgl::filesystem::path> expectations{ stylePath };
+    expectations.front().remove_filename();
+
+    const static std::regex regex{ TestRunner::getBasePath() };    
+    for (const std::string& path : TestRunner::getPlatformExpectationsPaths()) {
+        expectations.emplace_back(std::regex_replace(expectations.front().string(), regex, path));
+        assert(!expectations.back().empty());
+    }
 
     return {
         std::move(stylePath),
-        std::move(defaultExpectations),
-        std::move(platformExpectations)
+        std::move(expectations)
     };
 }
 
@@ -88,7 +89,7 @@ int main(int argc, char** argv) {
         std::string& status = metadata.status;
         std::string& color = metadata.color;
 
-        id = testPath.defaultExpectations.string();
+        id = testPath.defaultExpectations();
         id = id.substr(rootLength + 1, id.length() - rootLength - 2);
 
         bool shouldIgnore = false;

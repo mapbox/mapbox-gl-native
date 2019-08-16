@@ -35,14 +35,17 @@ const std::string& TestRunner::getBasePath() {
 }
 
 // static
-const std::string& TestRunner::getPlatformExpectationsPath() {
-    const static std::string result =
-        std::string(TEST_RUNNER_ROOT_PATH).append("/render-test/expected");
+const std::vector<std::string>& TestRunner::getPlatformExpectationsPaths() {
+    // TODO: Populate from command line.
+    const static std::vector<std::string> result {
+        std::string(TEST_RUNNER_ROOT_PATH).append("/render-test/expected")
+    };
     return result;
 }
 
 bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& metadata) {
-    const std::string& base = metadata.paths.defaultExpectations.string();
+    const std::string& base = metadata.paths.defaultExpectations();
+    const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
 
     metadata.actual = mbgl::encodePNG(actual);
 
@@ -52,11 +55,11 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
     }
 
 #if !TEST_READ_ONLY
-    if (getenv("UPDATE")) {
-        mbgl::filesystem::create_directories(metadata.paths.platformExpectations);
-        mbgl::util::write_file(metadata.paths.platformExpectations.string() + "/expected.png", mbgl::encodePNG(actual));
+    if (getenv("UPDATE_PLATFORM")) {
+        mbgl::filesystem::create_directories(expectations.back());
+        mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actual));
         return true;
-    } else if (getenv("UPDATE_GENERIC")) {
+    } else if (getenv("UPDATE_DEFAULT")) {
         mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actual));
         return true;
     }
@@ -68,9 +71,19 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
     mbgl::PremultipliedImage diff { actual.size };
 
     double pixels = 0.0;
-    const auto& expectedPath = mbgl::filesystem::exists(metadata.paths.platformExpectations) ?
-        metadata.paths.platformExpectations : metadata.paths.defaultExpectations;
+    mbgl::filesystem::path expectedPath;
+    for (auto rit = expectations.rbegin(); rit!= expectations.rend(); ++rit) {
+        if (mbgl::filesystem::exists(*rit)) {
+            expectedPath = *rit;
+            break;
+        }
+    }
 
+    if (expectedPath.empty()) {
+        metadata.errorMessage = "Failed to find expectations for: " + metadata.paths.stylePath.string();
+        return false;
+    }
+    
     for (const auto& entry: readExpectedEntries(expectedPath)) {
         mbgl::optional<std::string> maybeExpectedImage = mbgl::util::readFile(entry);
         if (!maybeExpectedImage) {
