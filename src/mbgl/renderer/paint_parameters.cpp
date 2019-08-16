@@ -129,39 +129,30 @@ void PaintParameters::renderTileClippingMasks(const RenderTiles& renderTiles) {
         const int32_t stencilID = nextStencilID++;
         tileClippingMaskIDs.emplace(renderTile.id, stencilID);
 
-        program.draw(
-            context,
-            *renderPass,
-            gfx::Triangles(),
-            gfx::DepthMode::disabled(),
-            gfx::StencilMode {
-                gfx::StencilMode::Always{},
-                stencilID,
-                0b11111111,
-                gfx::StencilOpType::Keep,
-                gfx::StencilOpType::Keep,
-                gfx::StencilOpType::Replace
-            },
-            gfx::ColorMode::disabled(),
-            gfx::CullFaceMode::disabled(),
-            *staticData.quadTriangleIndexBuffer,
-            staticData.tileTriangleSegments,
-            program.computeAllUniformValues(
-                ClippingMaskProgram::LayoutUniformValues {
-                    uniforms::matrix::Value( matrixForTile(renderTile.id) ),
-                },
-                paintAttributeData,
-                properties,
-                state.getZoom()
-            ),
-            program.computeAllAttributeBindings(
-                *staticData.tileVertexBuffer,
-                paintAttributeData,
-                properties
-            ),
-            ClippingMaskProgram::TextureBindings{},
-            "clipping/" + util::toString(stencilID)
-        );
+        program.draw(context,
+                     *renderPass,
+                     gfx::Triangles(),
+                     gfx::DepthMode::disabled(),
+                     gfx::StencilMode{gfx::StencilMode::Always{},
+                                      stencilID,
+                                      0b11111111,
+                                      gfx::StencilOpType::Keep,
+                                      gfx::StencilOpType::Keep,
+                                      gfx::StencilOpType::Replace},
+                     gfx::ColorMode::disabled(),
+                     gfx::CullFaceMode::disabled(),
+                     *staticData.quadTriangleIndexBuffer,
+                     staticData.clippingMaskSegments,
+                     program.computeAllUniformValues(
+                         ClippingMaskProgram::LayoutUniformValues{
+                             uniforms::matrix::Value(matrixForTile(renderTile.id)),
+                         },
+                         paintAttributeData,
+                         properties,
+                         state.getZoom()),
+                     program.computeAllAttributeBindings(*staticData.tileVertexBuffer, paintAttributeData, properties),
+                     ClippingMaskProgram::TextureBindings{},
+                     "clipping/" + util::toString(stencilID));
     }
 }
 

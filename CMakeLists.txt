@@ -772,8 +772,6 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/http_timeout.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/i18n.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/i18n.hpp
-    ${PROJECT_SOURCE_DIR}/src/mbgl/util/id.cpp
-    ${PROJECT_SOURCE_DIR}/src/mbgl/util/id.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/interpolate.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/intersection_tests.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/util/intersection_tests.hpp

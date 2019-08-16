@@ -30,10 +30,10 @@ public:
     optional<gfx::IndexBuffer> quadTriangleIndexBuffer;
     optional<gfx::IndexBuffer> tileBorderIndexBuffer;
 
-    SegmentVector<BackgroundAttributes> tileTriangleSegments;
-    SegmentVector<DebugAttributes> tileBorderSegments;
-    SegmentVector<RasterAttributes> rasterSegments;
-    SegmentVector<HeatmapTextureAttributes> heatmapTextureSegments;
+    static SegmentVector<BackgroundAttributes> tileTriangleSegments();
+    static SegmentVector<DebugAttributes> tileBorderSegments();
+    static SegmentVector<RasterAttributes> rasterSegments();
+    static SegmentVector<HeatmapTextureAttributes> heatmapTextureSegments();
 
     optional<gfx::Renderbuffer<gfx::RenderbufferPixelType::Depth>> depthRenderbuffer;
     bool has3D = false;
@@ -41,6 +41,8 @@ public:
     Size backendSize;
 
     Programs programs;
+
+    const SegmentVector<BackgroundAttributes> clippingMaskSegments;
 
 #ifndef NDEBUG
     Programs overdrawPrograms;

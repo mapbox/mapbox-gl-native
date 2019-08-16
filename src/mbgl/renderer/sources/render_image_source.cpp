@@ -36,33 +36,25 @@ void ImageSourceRenderData::render(PaintParameters& parameters) const {
     auto& programInstance = parameters.programs.debug;
 
     for (auto matrix : matrices) {
-        programInstance.draw(
-            parameters.context,
-            *parameters.renderPass,
-            gfx::LineStrip { 4.0f * parameters.pixelRatio },
-            gfx::DepthMode::disabled(),
-            gfx::StencilMode::disabled(),
-            gfx::ColorMode::unblended(),
-            gfx::CullFaceMode::disabled(),
-            *parameters.staticData.tileBorderIndexBuffer,
-            parameters.staticData.tileBorderSegments,
-            programInstance.computeAllUniformValues(
-                DebugProgram::LayoutUniformValues {
-                    uniforms::matrix::Value( matrix ),
-                    uniforms::color::Value( Color::red() )
-                },
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom()
-            ),
-            programInstance.computeAllAttributeBindings(
-                *parameters.staticData.tileVertexBuffer,
-                paintAttributeData,
-                properties
-            ),
-            DebugProgram::TextureBindings{},
-            "image"
-        );
+        programInstance.draw(parameters.context,
+                             *parameters.renderPass,
+                             gfx::LineStrip{4.0f * parameters.pixelRatio},
+                             gfx::DepthMode::disabled(),
+                             gfx::StencilMode::disabled(),
+                             gfx::ColorMode::unblended(),
+                             gfx::CullFaceMode::disabled(),
+                             *parameters.staticData.tileBorderIndexBuffer,
+                             parameters.staticData.tileBorderSegments(),
+                             programInstance.computeAllUniformValues(
+                                 DebugProgram::LayoutUniformValues{uniforms::matrix::Value(matrix),
+                                                                   uniforms::color::Value(Color::red())},
+                                 paintAttributeData,
+                                 properties,
+                                 parameters.state.getZoom()),
+                             programInstance.computeAllAttributeBindings(
+                                 *parameters.staticData.tileVertexBuffer, paintAttributeData, properties),
+                             DebugProgram::TextureBindings{},
+                             "image");
     }
 }
 
