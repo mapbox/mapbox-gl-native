@@ -20,9 +20,14 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+
 inline const LineLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == LineLayer::Impl::staticTypeInfo());
     return static_cast<const LineLayer::Impl&>(*impl);
 }
+
+} // namespace
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
     : RenderLayer(makeMutable<LineLayerProperties>(std::move(_impl))),

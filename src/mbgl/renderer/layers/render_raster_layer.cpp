@@ -14,9 +14,14 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+
 inline const RasterLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == RasterLayer::Impl::staticTypeInfo());
     return static_cast<const RasterLayer::Impl&>(*impl);
 }
+
+} // namespace
 
 RenderRasterLayer::RenderRasterLayer(Immutable<style::RasterLayer::Impl> _impl)
     : RenderLayer(makeMutable<RasterLayerProperties>(std::move(_impl))),
