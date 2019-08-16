@@ -493,7 +493,7 @@ commands:
     - run:
         name: Check if this job can be skipped
         command: |
-          if [[ $CIRCLE_BRANCH != master ]] && [[ $CIRCLE_BRANCH != release-* ]]; then
+          if [[ $CIRCLE_BRANCH != master ]] && [[ $CIRCLE_BRANCH != release-* ]] && [[ -z $CIRCLE_TAG ]]; then
             scripts/check-ci-job-skippability.js
           fi
 
