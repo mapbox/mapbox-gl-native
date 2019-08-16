@@ -1722,7 +1722,6 @@ public:
         rotate.delaysTouchesBegan = YES;
         self.rotationBeforeThresholdMet += abs(rotate.rotation);
         rotate.rotation = 0;
-        NSLog(@"threshold not met");
         return;
     }
 
@@ -1744,7 +1743,6 @@ public:
 
         self.shouldTriggerHapticFeedbackForCompass = NO;
         [self notifyGestureDidBegin];
-        NSLog(@"rotate began");
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
     {
