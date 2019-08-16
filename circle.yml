@@ -335,14 +335,29 @@ commands:
             echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
           fi
   login-google-cloud-platform:
+    parameters:
+      project:
+        type: string
     steps:
     - run:
         name: Log in to Google Cloud Platform
         command: |
-          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
-            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
-            rm secret.json
+          if [[ -z "${SKIP_FIREBASE:-}" ]]; then
+            PROJECT=<< parameters.project >>
+            ACCOUNT_JSON=''
+            if [[ ${PROJECT} =~ "android" && -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" ]]; then
+              ACCOUNT_JSON="${GCLOUD_SERVICE_ACCOUNT_JSON}"
+            elif [[ ${PROJECT} =~ "ios" && -n "${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}" ]]; then
+              ACCOUNT_JSON="${GCLOUD_SERVICE_ACCOUNT_JSON_IOS}"
+            else
+              echo "No Google Cloud Platform credentials found for ${PROJECT}"
+            fi
+
+            if [[ -n "${ACCOUNT_JSON}" ]]; then
+              echo "${ACCOUNT_JSON}" > secret.json
+              gcloud auth activate-service-account --key-file secret.json --project ${PROJECT}
+              rm secret.json
+            fi
           fi
 
 
@@ -613,7 +628,7 @@ jobs:
             fi
       - save-dependencies: { gradle: true }
       - conditionally-skip-firebase
-      - login-google-cloud-platform
+      - login-google-cloud-platform: { project: 'android-gl-native' }
       - run:
           name: Run instrumentation tests on Firebase
           no_output_timeout: 20m
@@ -1034,29 +1049,39 @@ jobs:
       - install-dependencies
       - check-if-this-job-can-be-skipped
       - run:
+          name: Install Google/Firebase dependencies
+          command: |
+            brew cask install google-cloud-sdk
+      - login-google-cloud-platform: { project: 'ios-maps-sdk-249922' }
+      - run:
           name: Build for testing
           command: make ios-device-farm
       - run:
           name: Prepare Integration Test Harness for device farm
           command: |
             cd build/ios
-            export AWS_DEVICE_FARM_PAYLOAD="$PWD/Integration Tests.ipa"
-            export AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD="$PWD/Integration Test Harness XCTest.zip"
-            mkdir Payload && cp -r "Debug-iphoneos/Integration Test Harness.app" Payload
-            cp -r "Payload/Integration Test Harness.app/PlugIns/integration.xctest" .
-            zip -r "$AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD" *.xctest
-            zip -r "$AWS_DEVICE_FARM_PAYLOAD" Payload
-            echo "export AWS_DEVICE_FARM_PAYLOAD=\"$AWS_DEVICE_FARM_PAYLOAD\"" >> $BASH_ENV
-            echo "export AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD=\"$AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD\"" >> $BASH_ENV
+            export DEVICE_FARM_PAYLOAD="$PWD/IntegrationTests.zip"
+            echo "export DEVICE_FARM_PAYLOAD=\"$DEVICE_FARM_PAYLOAD\"" >> $BASH_ENV
+            rm Debug-iphoneos/*.a
+            zip -r $DEVICE_FARM_PAYLOAD Debug-iphoneos *.xctestrun
       - run:
           name: Upload and run tests on device farm
+          no_output_timeout: 20m
           command: |
-            pip install requests awscli
-            python platform/ios/scripts/run-device-farm-ios.py \
-              --project arn:aws:devicefarm:us-west-2:234858372212:project:075d6a84-70b3-43e4-a164-0d119fbd967f \
-              --devicepool arn:aws:devicefarm:us-west-2:234858372212:devicepool:075d6a84-70b3-43e4-a164-0d119fbd967f/29c06cb4-f885-4132-a7b2-e7f139fbfc74 \
-              --ipa "$AWS_DEVICE_FARM_PAYLOAD" \
-              --test "$AWS_DEVICE_FARM_TESTRUNNER_PAYLOAD"
+            if [[ -z "${SKIP_FIREBASE:-}" ]]; then
+              gcloud firebase test ios models list
+              gcloud firebase test ios versions list
+              if gcloud firebase test ios run \
+                --test $DEVICE_FARM_PAYLOAD \
+                --device model=iphone8,version=12.0,locale=en,orientation=portrait --timeout 20m
+              then
+                echo "Device farm tests seem to have completed successfully"
+              else
+                DEVICE_FARM_EXIT_CODE=$?
+                echo "Device farm tests exited abnormally with non-zero exit code: $DEVICE_FARM_EXIT_CODE"
+                exit $DEVICE_FARM_EXIT_CODE
+              fi
+            fi
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
