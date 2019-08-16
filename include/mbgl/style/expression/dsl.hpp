@@ -1,13 +1,13 @@
 #pragma once
 
-#include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/interpolator.hpp>
+#include <mbgl/style/expression/value.hpp>
 #include <mbgl/util/ignore.hpp>
 
+#include <initializer_list>
 #include <memory>
 #include <string>
-#include <initializer_list>
 
 namespace mbgl {
 namespace style {
@@ -24,15 +24,18 @@ std::vector<std::unique_ptr<Expression>> vec(Args... args) {
     return result;
 }
 
+std::unique_ptr<Expression> createExpression(const char* expr);
+std::unique_ptr<Expression> createExpression(const mbgl::style::conversion::Convertible& expr);
 std::unique_ptr<Expression> error(std::string);
 
 std::unique_ptr<Expression> literal(const char* value);
 std::unique_ptr<Expression> literal(Value value);
 std::unique_ptr<Expression> literal(std::initializer_list<double> value);
-std::unique_ptr<Expression> literal(std::initializer_list<const char *> value);
+std::unique_ptr<Expression> literal(std::initializer_list<const char*> value);
 
-std::unique_ptr<Expression> assertion(type::Type, std::unique_ptr<Expression>,
-                                      std::unique_ptr<Expression> def = nullptr);
+std::unique_ptr<Expression>
+assertion(type::Type, std::unique_ptr<Expression>, 
+          std::unique_ptr<Expression> def = nullptr);
 std::unique_ptr<Expression> number(std::unique_ptr<Expression>,
                                    std::unique_ptr<Expression> def = nullptr);
 std::unique_ptr<Expression> string(std::unique_ptr<Expression>,
@@ -46,21 +49,17 @@ std::unique_ptr<Expression> toString(std::unique_ptr<Expression>,
                                      std::unique_ptr<Expression> def = nullptr);
 std::unique_ptr<Expression> toFormatted(std::unique_ptr<Expression>,
                                         std::unique_ptr<Expression> def = nullptr);
-    
+
 std::unique_ptr<Expression> get(const char* value);
 std::unique_ptr<Expression> get(std::unique_ptr<Expression>);
 
 std::unique_ptr<Expression> id();
 std::unique_ptr<Expression> zoom();
 
-std::unique_ptr<Expression> eq(std::unique_ptr<Expression>,
-                               std::unique_ptr<Expression>);
-std::unique_ptr<Expression> ne(std::unique_ptr<Expression>,
-                               std::unique_ptr<Expression>);
-std::unique_ptr<Expression> gt(std::unique_ptr<Expression>,
-                               std::unique_ptr<Expression>);
-std::unique_ptr<Expression> lt(std::unique_ptr<Expression>,
-                               std::unique_ptr<Expression>);
+std::unique_ptr<Expression> eq(std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+std::unique_ptr<Expression> ne(std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+std::unique_ptr<Expression> gt(std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+std::unique_ptr<Expression> lt(std::unique_ptr<Expression>, std::unique_ptr<Expression>);
 
 std::unique_ptr<Expression> step(std::unique_ptr<Expression> input,
                                  std::unique_ptr<Expression> output0,
@@ -86,7 +85,7 @@ std::unique_ptr<Expression> interpolate(Interpolator interpolator,
                                         double input3, std::unique_ptr<Expression> output3);
 
 std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inputs);
-    
+
 std::unique_ptr<Expression> format(const char* value);
 std::unique_ptr<Expression> format(std::unique_ptr<Expression>);
 
