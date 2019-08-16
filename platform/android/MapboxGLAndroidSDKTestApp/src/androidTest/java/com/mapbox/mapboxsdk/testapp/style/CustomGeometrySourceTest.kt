@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.style
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.matcher.ViewMatchers.isRoot
-import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource.THREAD_POOL_LIMIT
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource.THREAD_PREFIX
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
@@ -15,7 +14,6 @@ import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_LA
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_SOURCE
 import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils
 import org.junit.Assert
-import org.junit.Ignore
 import org.junit.Test
 
 class CustomGeometrySourceTest : BaseTest() {
@@ -23,7 +21,6 @@ class CustomGeometrySourceTest : BaseTest() {
   override fun getActivityClass(): Class<*> = GridSourceActivity::class.java
 
   @Test
-  @Ignore
   fun sourceNotLeakingThreadsTest() {
     validateTestSetup()
     WaitAction.invoke(4000)
@@ -38,7 +35,6 @@ class CustomGeometrySourceTest : BaseTest() {
   }
 
   @Test
-  @Ignore
   fun threadsShutdownWhenSourceRemovedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->
@@ -48,13 +44,12 @@ class CustomGeometrySourceTest : BaseTest() {
       TestingAsyncUtils.waitForLayer(uiController, mapView)
       Assert.assertTrue("There should be no threads running when the source is removed.",
         Thread.getAllStackTraces().keys.filter {
-          it.name.startsWith(CustomGeometrySource.THREAD_PREFIX)
+          it.name.startsWith(THREAD_PREFIX)
         }.count() == 0)
     }
   }
 
   @Test
-  @Ignore
   fun threadsRestartedWhenSourceReAddedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->
@@ -67,8 +62,8 @@ class CustomGeometrySourceTest : BaseTest() {
       TestingAsyncUtils.waitForLayer(uiController, mapView)
       Assert.assertTrue("Threads should be restarted when the source is re-added to the map.",
         Thread.getAllStackTraces().keys.filter {
-          it.name.startsWith(CustomGeometrySource.THREAD_PREFIX)
-        }.count() == CustomGeometrySource.THREAD_POOL_LIMIT)
+          it.name.startsWith(THREAD_PREFIX)
+        }.count() == THREAD_POOL_LIMIT)
     }
   }
 }
