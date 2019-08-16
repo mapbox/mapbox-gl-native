@@ -23,7 +23,7 @@ using namespace style;
 
 namespace {
 
-inline const LineLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+inline const LineLayer::Impl& impl_cast(const Immutable<style::Layer::Impl>& impl) {
     assert(impl->getTypeInfo() == LineLayer::Impl::staticTypeInfo());
     return static_cast<const LineLayer::Impl&>(*impl);
 }
@@ -32,14 +32,13 @@ inline const LineLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
     : RenderLayer(makeMutable<LineLayerProperties>(std::move(_impl))),
-      unevaluated(impl(baseImpl).paint.untransitioned()),
-      colorRamp({256, 1}) {
-}
+      unevaluated(impl_cast(baseImpl).paint.untransitioned()),
+      colorRamp({256, 1}) {}
 
 RenderLineLayer::~RenderLineLayer() = default;
 
 void RenderLineLayer::transition(const TransitionParameters& parameters) {
-    unevaluated = impl(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
+    unevaluated = impl_cast(baseImpl).paint.transitioned(parameters, std::move(unevaluated));
     updateColorRamp();
 }
 

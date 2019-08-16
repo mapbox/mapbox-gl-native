@@ -37,7 +37,6 @@ public:
 
     optional<gfx::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
     optional<gfx::IndexBuffer> indexBuffer;
-    const std::string drawScopeID;
 };
 
 } // namespace mbgl
