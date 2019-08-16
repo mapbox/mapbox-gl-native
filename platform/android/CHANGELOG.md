@@ -17,6 +17,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Added support for fallback fonts in `localIdeographFontFamily`. [#15255](https://github.com/mapbox/mapbox-gl-native/pull/15255)
 
 ### Bug fixes
+ - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398).
  - Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues [#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195)
  - Allow loading of a map without a style URI or style JSON [#15293](https://github.com/mapbox/mapbox-gl-native/pull/15293)
  - Fixed an issue where animated camera transitions zoomed in or out too dramatically [#15281](https://github.com/mapbox/mapbox-gl-native/pull/15281)
