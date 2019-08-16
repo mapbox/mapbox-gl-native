@@ -227,6 +227,7 @@ void drawText(const DrawFn& draw,
 }
 
 inline const SymbolLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == SymbolLayer::Impl::staticTypeInfo());
     return static_cast<const SymbolLayer::Impl&>(*impl);
 }
 

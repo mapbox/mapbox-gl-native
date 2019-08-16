@@ -18,9 +18,14 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+
 inline const HillshadeLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == HillshadeLayer::Impl::staticTypeInfo());
     return static_cast<const HillshadeLayer::Impl&>(*impl);
 }
+
+} // namespace
 
 RenderHillshadeLayer::RenderHillshadeLayer(Immutable<style::HillshadeLayer::Impl> _impl)
     : RenderLayer(makeMutable<HillshadeLayerProperties>(std::move(_impl))),
