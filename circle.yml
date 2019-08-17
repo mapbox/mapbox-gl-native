@@ -1055,7 +1055,7 @@ jobs:
       - login-google-cloud-platform: { project: 'ios-maps-sdk-249922' }
       - run:
           name: Build for testing
-          command: make ios-device-farm
+          command: make ios-build-for-testing
       - run:
           name: Prepare Integration Test Harness for device farm
           command: |

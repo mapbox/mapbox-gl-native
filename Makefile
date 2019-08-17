@@ -332,16 +332,25 @@ ios-install-simulators:
 ios-check-events-symbols:
 	./platform/ios/scripts/check-events-symbols.sh
 
-.PHONY: ios-device-farm
-ios-device-farm: $(IOS_PROJ_PATH)
+.PHONY: ios-build-for-testing
+ios-build-for-testing: $(IOS_PROJ_PATH)
 	set -o pipefail && xcodebuild \
 		ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
-		CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
 		-derivedDataPath $(IOS_OUTPUT_PATH) \
 		-configuration $(BUILDTYPE) -sdk iphoneos \
 		-workspace $(IOS_WORK_PATH) \
 		-jobs $(JOBS) \
 		-scheme 'Integration Test Harness' build-for-testing $(XCPRETTY)
+
+
+.PHONY: ios-device-farm
+ios-device-farm: ios-build-for-testing
+	cd build/ios && rm Debug-iphoneos/*.a && zip -r IntegrationTests.zip Debug-iphoneos *.xctestrun
+	gcloud config set project ios-maps-sdk-249922
+	gcloud firebase test ios run \
+		--test build/ios/IntegrationTests.zip \
+		--device model=iphone8,version=12.0,locale=en,orientation=portrait \
+		--timeout 20m
 
 .PHONY: ipackage
 ipackage: ipackage*
