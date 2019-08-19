@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -57,6 +58,8 @@ public class OfflineActivity extends AppCompatActivity
 
   private boolean isEndNotified;
 
+  private static boolean initialLoad = true;
+
   /*
    * Offline objects
    */
@@ -85,11 +88,13 @@ public class OfflineActivity extends AppCompatActivity
       mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
         new CameraPosition.Builder()
           .target(new LatLng(40.749851, -73.967966))
-          .zoom(14)
+          .zoom(initialLoad ? 16 : 12)
           .bearing(0)
           .tilt(0)
           .build()));
     });
+
+    mapView.addOnDidFinishLoadingMapListener(() -> Logger.e("TAG", "OnDidFinishLoadingMap listener invoke"));
 
     // The progress bar
     progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -209,8 +214,9 @@ public class OfflineActivity extends AppCompatActivity
     startProgress();
 
     // Definition
-    LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
-    double minZoom = mapboxMap.getCameraPosition().zoom;
+
+    LatLngBounds bounds = new LatLngBounds.Builder().include(new LatLng(40.750900, -73.970584)).include(new LatLng(40.747649, -73.965531)).build();
+    double minZoom = 16;
     double maxZoom = mapboxMap.getMaxZoomLevel();
     float pixelRatio = this.getResources().getDisplayMetrics().density;
     OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
@@ -247,6 +253,7 @@ public class OfflineActivity extends AppCompatActivity
 
         if (status.isComplete()) {
           // Download complete
+          initialLoad = false;
           endProgress("Region downloaded successfully.");
           offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
           offlineRegion.setObserver(null);
