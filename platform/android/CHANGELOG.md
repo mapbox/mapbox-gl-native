@@ -4,6 +4,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 ### Bug fixes
+ - Fixed use of objects after moving, potentially causing crashes. [#15408](https://github.com/mapbox/mapbox-gl-native/pull/1540)
  - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398).
 
 ## 8.3.0-alpha.3 - August 15, 2019
