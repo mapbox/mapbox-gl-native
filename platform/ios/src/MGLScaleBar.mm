@@ -187,10 +187,12 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
 - (void)resetLabelImageCache {
     self.labelImageCache = [[NSMutableDictionary alloc] init];
-    
+    [self addZeroLabel];
 }
+
 #pragma mark - Dimensions
 
 - (CGSize)intrinsicContentSize {
