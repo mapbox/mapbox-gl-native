@@ -19,6 +19,7 @@ namespace mbgl {
 using namespace style;
 
 inline const HillshadeLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    if (impl->getTypeInfo() != HillshadeLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const HillshadeLayer::Impl&>(*impl);
 }
 

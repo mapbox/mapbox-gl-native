@@ -21,6 +21,7 @@ namespace mbgl {
 using namespace style;
 
 inline const LineLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    if (impl->getTypeInfo() != LineLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const LineLayer::Impl&>(*impl);
 }
 

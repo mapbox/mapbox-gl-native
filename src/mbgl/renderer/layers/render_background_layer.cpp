@@ -16,7 +16,9 @@ namespace mbgl {
 
 using namespace style;
 
+
 inline const BackgroundLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    if(impl->getTypeInfo() != BackgroundLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const style::BackgroundLayer::Impl&>(*impl);
 }
 

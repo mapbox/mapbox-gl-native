@@ -22,6 +22,7 @@ namespace mbgl {
 using namespace style;
 
 inline const FillLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    if (impl->getTypeInfo() != FillLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const FillLayer::Impl&>(*impl);
 }
 

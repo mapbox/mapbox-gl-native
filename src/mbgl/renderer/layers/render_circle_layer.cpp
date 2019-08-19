@@ -16,6 +16,7 @@ namespace mbgl {
 using namespace style;
 
 inline const style::CircleLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    if (impl->getTypeInfo() != CircleLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const style::CircleLayer::Impl&>(*impl);
 }
 

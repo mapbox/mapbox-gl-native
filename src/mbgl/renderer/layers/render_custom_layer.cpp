@@ -15,6 +15,7 @@ namespace mbgl {
 using namespace style;
 
 inline const CustomLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    if (impl->getTypeInfo() != CustomLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const CustomLayer::Impl&>(*impl);
 }
 

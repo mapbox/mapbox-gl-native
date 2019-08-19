@@ -20,6 +20,7 @@ namespace mbgl {
 using namespace style;
 
 inline const HeatmapLayer::Impl& impl(const Immutable<Layer::Impl>& impl) {
+    if (impl->getTypeInfo() != HeatmapLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const HeatmapLayer::Impl&>(*impl);
 }
 

@@ -15,6 +15,7 @@ namespace mbgl {
 using namespace style;
 
 inline const RasterLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    if (impl->getTypeInfo() != RasterLayer::Impl::staticTypeInfo()) abort();
     return static_cast<const RasterLayer::Impl&>(*impl);
 }
 
