@@ -41,8 +41,9 @@ TEST(HttpRetry, RateLimit) {
 }
 
 TEST(HttpRetry, ExpiredInitial) {
-    // 1 sec timeout
-    ASSERT_EQ(Seconds(1), expirationTimeout({ util::now() + Seconds(1) }, 0));
+    // 1 sec timeout, will not be exactly 1 because of precision/rounding
+    ASSERT_TRUE(Milliseconds(1000) >= expirationTimeout({ util::now() + Seconds(1) }, 0));
+    ASSERT_TRUE(Milliseconds(990) < expirationTimeout({ util::now() + Seconds(1) }, 0));
 }
 
 TEST(HttpRetry, ExpiredSubsequent) {

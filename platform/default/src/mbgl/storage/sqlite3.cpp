@@ -301,7 +301,7 @@ void Query::bindBlob(int offset, const std::vector<uint8_t>& value, bool retain)
 
 template <>
 void Query::bind(
-        int offset, std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> value) {
+        int offset, std::chrono::time_point<std::chrono::system_clock> value) {
     assert(stmt.impl);
     stmt.impl->check(sqlite3_bind_int64(stmt.impl->stmt, offset, std::chrono::system_clock::to_time_t(value)));
 }
@@ -317,7 +317,7 @@ template <> void Query::bind(int offset, mbgl::optional<std::string> value) {
 template <>
 void Query::bind(
     int offset,
-    mbgl::optional<std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>> value) {
+    mbgl::optional<std::chrono::time_point<std::chrono::system_clock>> value) {
     if (!value) {
         bind(offset, nullptr);
     } else {
@@ -377,7 +377,7 @@ template <> std::vector<uint8_t> Query::get(int offset) {
 }
 
 template <>
-std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>
+std::chrono::time_point<std::chrono::system_clock>
 Query::get(int offset) {
     assert(stmt.impl);
     return std::chrono::time_point_cast<std::chrono::seconds>(
@@ -412,13 +412,13 @@ template <> mbgl::optional<std::string> Query::get(int offset) {
 }
 
 template <>
-mbgl::optional<std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>>
+mbgl::optional<std::chrono::time_point<std::chrono::system_clock>>
 Query::get(int offset) {
     assert(stmt.impl);
     if (sqlite3_column_type(stmt.impl->stmt, offset) == SQLITE_NULL) {
         return mbgl::nullopt;
     } else {
-        return get<std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>>(
+        return get<std::chrono::time_point<std::chrono::system_clock>>(
             offset);
     }
 }

@@ -31,7 +31,7 @@ optional<Timestamp> parseRetryHeaders(const optional<std::string>& retryAfter,
     if (retryAfter) {
         try {
             auto secs = std::chrono::seconds(std::stoi(*retryAfter));
-            return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::now() + secs);
+            return std::chrono::system_clock::now() + secs;
         } catch (...) {
             return util::parseTimestamp((*retryAfter).c_str());
         }

@@ -33,7 +33,7 @@ Duration expirationTimeout(optional<Timestamp> expires, uint32_t expiredRequests
     if (expiredRequests) {
         return Seconds(1u << std::min(expiredRequests - 1, 31u));
     } else if (expires) {
-        return std::max(Seconds::zero(), *expires - util::now());
+        return std::max(std::chrono::system_clock::duration::zero(), *expires - util::now());
     } else {
         return Duration::max();
     }

@@ -356,7 +356,7 @@ Timestamp interpolateExpiration(const Timestamp& current,
         return current;
     }
 
-    auto delta = current - *prior;
+    auto delta = std::chrono::duration_cast<Seconds>(current - *prior);
 
     // Server is serving the same expired resource
     // over and over, fallback to exponential backoff.

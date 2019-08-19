@@ -12,14 +12,12 @@ using Milliseconds = std::chrono::milliseconds;
 
 using TimePoint = Clock::time_point;
 using Duration  = Clock::duration;
-
-// Used to measure second-precision times, such as times gathered from HTTP responses.
-using Timestamp = std::chrono::time_point<std::chrono::system_clock, Seconds>;
+using Timestamp = std::chrono::time_point<std::chrono::system_clock>;
 
 namespace util {
 
 inline Timestamp now() {
-    return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::now());
+    return std::chrono::system_clock::now();
 }
 
 // Returns the RFC1123 formatted date. E.g. "Tue, 04 Nov 2014 02:13:24 GMT"

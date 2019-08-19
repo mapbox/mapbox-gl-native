@@ -5,6 +5,7 @@
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
+using namespace std::chrono;
 
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     util::RunLoop loop;
@@ -34,7 +35,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
             EXPECT_EQ(response.error, res2.error);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ(*response.data, *res2.data);
-            EXPECT_EQ(response.expires, res2.expires);
+            EXPECT_EQ(system_clock::to_time_t(*response.expires), system_clock::to_time_t(*res2.expires));
             EXPECT_EQ(response.mustRevalidate, res2.mustRevalidate);
             EXPECT_EQ(response.modified, res2.modified);
             EXPECT_EQ(response.etag, res2.etag);
@@ -267,7 +268,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Cached value", *res.data);
         ASSERT_TRUE(bool(res.expires));
-        EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_EQ(system_clock::to_time_t(*response.expires), system_clock::to_time_t(*res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
@@ -297,7 +298,7 @@ TEST(DefaultFileSource, OptionalExpired) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Cached value", *res.data);
         ASSERT_TRUE(bool(res.expires));
-        EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_EQ(system_clock::to_time_t(*response.expires), system_clock::to_time_t(*res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
