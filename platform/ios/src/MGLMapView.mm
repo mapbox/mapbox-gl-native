@@ -2245,6 +2245,7 @@ public:
 - (CGFloat)newDegreesForRotationGesture:(UIRotationGestureRecognizer *)rotate {
     CGFloat newDegrees;
 
+    self.rotationBeforeThresholdMet += abs(rotate.rotation);
     if (self.isZooming) {
         CGFloat rotation = rotate.rotation;
         CGFloat newRotation = 0;
@@ -2259,6 +2260,9 @@ public:
         }
         else if (rotation <= -a) {
             newRotation = b*0.5*(cos(M_PI*(rotation+a)/(a-b)) - 1.0);
+        }
+        if (rotation >= -a && rotation <= a) {
+            newRotation = 0;
         }
     }
     newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
