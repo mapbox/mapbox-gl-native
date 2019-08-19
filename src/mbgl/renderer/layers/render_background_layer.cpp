@@ -16,14 +16,9 @@ namespace mbgl {
 
 using namespace style;
 
-namespace {
-
 inline const BackgroundLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
-    assert(impl->getTypeInfo() == BackgroundLayer::Impl::staticTypeInfo());
     return static_cast<const style::BackgroundLayer::Impl&>(*impl);
 }
-
-} // namespace
 
 RenderBackgroundLayer::RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl> _impl)
     : RenderLayer(makeMutable<BackgroundLayerProperties>(std::move(_impl))),

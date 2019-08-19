@@ -14,14 +14,9 @@ namespace mbgl {
 
 using namespace style;
 
-namespace {
-
 inline const CustomLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
-    assert(impl->getTypeInfo() == CustomLayer::Impl::staticTypeInfo());
     return static_cast<const CustomLayer::Impl&>(*impl);
 }
-
-} // namespace
 
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
     : RenderLayer(makeMutable<CustomLayerProperties>(std::move(_impl))),
