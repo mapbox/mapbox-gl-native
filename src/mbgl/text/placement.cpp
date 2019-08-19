@@ -62,6 +62,7 @@ Placement::Placement(const TransformState& state_, MapMode mapMode_, style::Tran
     : collisionIndex(state_)
     , mapMode(mapMode_)
     , transitionOptions(std::move(transitionOptions_))
+    , placementZoom(state_.getZoom())
     , collisionGroups(crossSourceCollisions)
     , prevPlacement(std::move(prevPlacement_))
 {
@@ -438,17 +439,15 @@ void Placement::placeBucket(
                                 std::forward_as_tuple(bucket.bucketInstanceId, params.featureIndex, overscaledID));
 }
 
-void Placement::commit(TimePoint now) {
+void Placement::commit(TimePoint now, const double zoom) {
     assert(prevPlacement);
     commitTime = now;
 
     bool placementChanged = false;
 
-    float increment = mapMode == MapMode::Continuous &&
-                      transitionOptions.enablePlacementTransitions &&
-                      transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) > Milliseconds(0) ?
-        std::chrono::duration<float>(commitTime - prevPlacement->commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) :
-        1.0;
+    prevZoomAdjustment = prevPlacement->zoomAdjustment(zoom);
+
+    float increment = prevPlacement->symbolFadeChange(commitTime);
 
     // add the opacities from the current placement, and copy their current values from the previous placement
     for (auto& jointPlacement : placements) {
@@ -855,10 +854,18 @@ void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingMode
 float Placement::symbolFadeChange(TimePoint now) const {
     if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions &&
         transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) > Milliseconds(0)) {
-        return std::chrono::duration<float>(now - commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
+        return std::chrono::duration<float>(now - commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) + prevZoomAdjustment;
     } else {
         return 1.0;
     }
+}
+
+float Placement::zoomAdjustment(const float zoom) const {
+    // When zooming out labels can overlap each other quickly. This
+    // adjustment is used to reduce the fade duration for symbols while zooming out quickly.
+    // It is also used to reduce the interval between placement calculations. Reducing the
+    // interval between placements means collisions are discovered and eliminated sooner.
+    return std::max(0.0, 1.0 - std::pow(2.0, zoom - placementZoom));
 }
 
 bool Placement::hasTransitions(TimePoint now) const {
@@ -869,12 +876,13 @@ bool Placement::hasTransitions(TimePoint now) const {
     }
 }
 
-bool Placement::stillRecent(TimePoint now) const {
+bool Placement::stillRecent(TimePoint now, const float zoom) const {
     // Even if transitionOptions.duration is set to a value < 300ms, we still wait for this default transition duration
     // before attempting another placement operation.
+    const auto fadeDuration = std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION));
     return mapMode == MapMode::Continuous &&
         transitionOptions.enablePlacementTransitions &&
-        commitTime + std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION)) > now;
+        commitTime + fadeDuration * (1.0 - zoomAdjustment(zoom)) > now;
 }
 
 void Placement::setStale() {

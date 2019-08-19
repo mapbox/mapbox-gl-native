@@ -361,7 +361,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
 
         bool symbolBucketsChanged = false;
-        const bool placementChanged = !placement->stillRecent(updateParameters.timePoint);
+        const bool placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom());
         std::set<std::string> usedSymbolLayers;
         if (placementChanged) {
             placement = std::make_unique<Placement>(
@@ -381,7 +381,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
 
         if (placementChanged) {
-            placement->commit(updateParameters.timePoint);
+            placement->commit(updateParameters.timePoint, updateParameters.transformState.getZoom());
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
             for (const auto& entry : renderSources) {
                 entry.second->updateFadingTiles();
