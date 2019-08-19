@@ -1,0 +1,53 @@
+{
+    "version": 8,
+    "sources": {
+        "composite": {
+            "url": "mapbox://mapbox.mapbox-streets-v8",
+            "type": "vector"
+        }
+    },
+    "layers": [
+        {
+            "id": "country-label",
+            "type": "symbol",
+            "source": "composite",
+            "source-layer": "place_label",
+            "minzoom": 3,
+            "maxzoom": 8,
+            "filter": ["==", ["get", "type"], "country"],
+            "layout": {
+                "text-field": ["coalesce", ["get", "name_en"], ["get", "name"]],
+                "text-max-width": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    0,
+                    5,
+                    3,
+                    6
+                ],
+                "text-font": [
+                    "step",
+                    ["zoom"],
+                    ["literal", ["Roboto Medium", "Arial Unicode MS Regular"]],
+                    4,
+                    ["literal", ["Roboto Bold", "Arial Unicode MS Bold"]]
+                ],
+                "text-size": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    1,
+                    ["step", ["get", "symbolrank"], 12, 3, 10, 5, 9],
+                    9,
+                    ["step", ["get", "symbolrank"], 35, 3, 27, 5, 22]
+                ]
+            },
+            "paint": {
+                "text-halo-width": 1.5,
+                "text-halo-color": "hsla(0, 0%, 100%, 0.95)",
+                "text-color": "hsl(0, 0%, 0%)"
+            }
+        }
+    ]
+}

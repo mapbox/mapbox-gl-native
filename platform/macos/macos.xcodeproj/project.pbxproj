@@ -35,6 +35,7 @@
 		1FCCEC55222EF9FE00302E3B /* MGLSDKMetricsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FCCEC52222EF9FE00302E3B /* MGLSDKMetricsManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1FF4858D2237235300F19727 /* MGLAttributedExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FF4858B2237235200F19727 /* MGLAttributedExpression.m */; };
 		1FF4858E2237235300F19727 /* MGLAttributedExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF4858C2237235200F19727 /* MGLAttributedExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1FFAEDBB22650A7E009A1B2A /* basic-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 1FFAEDBA22650A7D009A1B2A /* basic-style.json */; };
 		3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */; };
 		3526EABD1DF9B19800006B43 /* MGLCodingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3526EABC1DF9B19800006B43 /* MGLCodingTests.mm */; };
@@ -355,6 +356,7 @@
 		1FDB00CD21F8F1FF00D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1FF4858B2237235200F19727 /* MGLAttributedExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAttributedExpression.m; sourceTree = "<group>"; };
 		1FF4858C2237235200F19727 /* MGLAttributedExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributedExpression.h; sourceTree = "<group>"; };
+		1FFAEDBA22650A7D009A1B2A /* basic-style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "basic-style.json"; path = "../../darwin/test/basic-style.json"; sourceTree = "<group>"; };
 		3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSExpression+MGLAdditions.mm"; sourceTree = "<group>"; };
 		3526EABC1DF9B19800006B43 /* MGLCodingTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLCodingTests.mm; path = ../../darwin/test/MGLCodingTests.mm; sourceTree = "<group>"; };
@@ -1196,6 +1198,7 @@
 				DAE6C33A1CC30DB200DB3429 /* Info.plist */,
 				DA2784FD1DF03060001D5B8D /* Media.xcassets */,
 				DA35D0891E1A631B007DED41 /* one-liner.json */,
+				1FFAEDBA22650A7D009A1B2A /* basic-style.json */,
 				1F8A59F921653483004DFE75 /* sideload_sat.db */,
 			);
 			name = "SDK Tests";
@@ -1603,6 +1606,7 @@
 				DA2784FE1DF03060001D5B8D /* Media.xcassets in Resources */,
 				DA35D08A1E1A631B007DED41 /* one-liner.json in Resources */,
 				1F8A59FA21653483004DFE75 /* sideload_sat.db in Resources */,
+				1FFAEDBB22650A7E009A1B2A /* basic-style.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
