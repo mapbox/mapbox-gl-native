@@ -74,6 +74,7 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
 
         if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
             polygons.emplace_back(std::move(polygon));
+            polygon = GeometryCollection();
         }
 
         polygon.emplace_back(ring);

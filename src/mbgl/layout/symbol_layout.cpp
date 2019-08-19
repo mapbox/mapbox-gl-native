@@ -366,7 +366,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                     Shaping shaping = applyShaping(*feature.formattedText, WritingModeType::Horizontal, SymbolAnchorType::Center, justification);
                     if (shaping) {
                         shapingForJustification = std::move(shaping);
-                        if (shaping.lineCount == 1u) {
+                        if (shapingForJustification.lineCount == 1u) {
                             shapedTextOrientations.singleLine = true;
                             break;
                         }
