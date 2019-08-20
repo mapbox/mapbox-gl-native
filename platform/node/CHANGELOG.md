@@ -1,5 +1,9 @@
 # master
+* Fixed rendering and collision detection issues with using `text-variable-anchor` and `icon-text-fit` properties on the same layer ([#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367)).
+
+# 4.3.0
 * Introduce `text-writing-mode` layout property for symbol layer ([#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932)). The `text-writing-mode` layout property allows control over symbol's preferred writing mode. The new property value is an array, whose values are enumeration values from a ( `horizontal` | `vertical` ) set.
+* Add typechecking while constructing legacy filter to prevent converting an unexpected filter type [#15389](https://github.com/mapbox/mapbox-gl-native/pull/15389).
 
 # 4.2.0
 - Add an option to set whether or not an image should be treated as a SDF ([#15054](https://github.com/mapbox/mapbox-gl-native/issues/15054))
