@@ -109,4 +109,33 @@ public class GeoJsonOptions extends HashMap<String, Object> {
     this.put("clusterRadius", clusterRadius);
     return this;
   }
+
+  /**
+   * An object defining custom properties on the generated clusters if clustering is enabled,
+   * aggregating values from clustered points. Has the form {"property_name": [operator, [map_expression]]} or
+   * {"property_name": [[operator, accumulated, expression], [map_expression]]}
+   *
+   * @param propertyName name of the property
+   * @param operator operator is any expression function that accepts at least 2 operands (e.g. "+" or "max") - it
+   *                 accumulates the property value from clusters/points the cluster contains. It can either be a
+   *                 string with single operator, or be an object array converted from valid expression
+   * @param mapExpr map expression produces the value of a single point, it shall be an object array, which is
+   *                converted from a valid expression
+   * @return the current instance for chaining
+   */
+  @NonNull
+  public GeoJsonOptions withClusterProperty(String propertyName, Object operator, Object mapExpr) {
+    if (this.containsKey("clusterProperties")) {
+      HashMap<String, Object[]> properties = (HashMap<String, Object[]>)(this.get("clusterProperties"));
+      properties.put(propertyName, new Object[]{operator, mapExpr});
+      properties.put(propertyName, new Object[]{operator, mapExpr});
+      this.put("clusterProperties", properties);
+    } else {
+      HashMap<String, Object[]> properties = new HashMap<String, Object[]>();
+      properties.put(propertyName, new Object[]{operator, mapExpr});
+      properties.put(propertyName, new Object[]{operator, mapExpr});
+      this.put("clusterProperties", properties);
+    }
+    return this;
+  }
 }

@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.accumulated;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
@@ -39,6 +41,8 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.max;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.neq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
@@ -138,6 +142,9 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       .withCluster(true)
       .withClusterMaxZoom(14)
       .withClusterRadius(50)
+      .withClusterProperty("max", max(accumulated(), get("max")).toArray(), get("mag").toArray())
+      .withClusterProperty("sum", "+", get("mag").toArray())
+      .withClusterProperty("felt", "any", neq(get("felt"), literal("null")).toArray())
     );
   }
 
@@ -182,9 +189,9 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
   }
 
   private SymbolLayer createClusterTextLayer() {
-    return new SymbolLayer("count", "earthquakes")
+    return new SymbolLayer("property", "earthquakes")
       .withProperties(
-        textField(Expression.toString(get("point_count"))),
+        textField(concat(get("point_count"), literal(", "), get("max"))),
         textSize(12f),
         textColor(Color.WHITE),
         textIgnorePlacement(true),
