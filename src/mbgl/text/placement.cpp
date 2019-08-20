@@ -942,7 +942,7 @@ float Placement::zoomAdjustment(const float zoom) const {
     // adjustment is used to reduce the fade duration for symbols while zooming out quickly.
     // It is also used to reduce the interval between placement calculations. Reducing the
     // interval between placements means collisions are discovered and eliminated sooner.
-    return std::max(0.0, 1.0 - std::pow(2.0, zoom - placementZoom));
+    return std::max(0.0, (placementZoom - zoom) / 1.5);
 }
 
 bool Placement::hasTransitions(TimePoint now) const {
