@@ -88,15 +88,14 @@ class HTTPFileSource::Impl {
 public:
     Impl() {
         @autoreleasepool {
-
-            NSURLSessionConfiguration *sessionConfig =
-            [MGLNetworkConfiguration sharedManager].sessionConfiguration;
-            
+            NSURLSessionConfiguration *sessionConfig = [MGLNetworkConfiguration sharedManager].sessionConfiguration;
             session = [NSURLSession sessionWithConfiguration:sessionConfig];
 
             userAgent = getUserAgent();
 
-            accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountTypeKey];
+#endif
         }
     }
 

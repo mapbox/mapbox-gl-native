@@ -3,14 +3,16 @@
 #import "NSBundle+MGLAdditions.h"
 #import "MGLAccountManager_Private.h"
 
+// NSUserDefaults and Info.plist keys
+NSString * const MGLMapboxMetricsEnabledKey = @"MGLMapboxMetricsEnabled";
+static NSString * const MGLMapboxMetricsDebugLoggingEnabledKey = @"MGLMapboxMetricsDebugLoggingEnabled";
+static NSString * const MGLMapboxMetricsEnabledSettingShownInAppKey = @"MGLMapboxMetricsEnabledSettingShownInApp";
+static NSString * const MGLTelemetryAccessTokenKey = @"MGLTelemetryAccessToken";
+static NSString * const MGLTelemetryBaseURLKey = @"MGLTelemetryBaseURL";
+static NSString * const MGLEventsProfileKey = @"MMEEventsProfile";
+static NSString * const MGLVariableGeofenceKey = @"VariableGeofence";
+
 static NSString * const MGLAPIClientUserAgentBase = @"mapbox-maps-ios";
-static NSString * const MGLMapboxAccountType = @"MGLMapboxAccountType";
-static NSString * const MGLMapboxMetricsEnabled = @"MGLMapboxMetricsEnabled";
-static NSString * const MGLMapboxMetricsDebugLoggingEnabled = @"MGLMapboxMetricsDebugLoggingEnabled";
-static NSString * const MGLTelemetryAccessToken = @"MGLTelemetryAccessToken";
-static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
-static NSString * const MGLEventsProfile = @"MMEEventsProfile";
-static NSString * const MGLVariableGeofence = @"VariableGeofence";
 
 @interface MGLMapboxEvents ()
 
@@ -19,16 +21,16 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
 @property (nonatomic, copy) NSString *accessToken;
 
 @end
-@implementation MGLMapboxEvents
 
+@implementation MGLMapboxEvents
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
         NSBundle *bundle = [NSBundle mainBundle];
-        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:MGLMapboxAccountType];
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{MGLMapboxAccountType: accountTypeNumber ?: @0,
-                                                                  MGLMapboxMetricsEnabled: @YES,
-                                                                  MGLMapboxMetricsDebugLoggingEnabled: @NO}];
+        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:MGLMapboxAccountTypeKey];
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{MGLMapboxAccountTypeKey: accountTypeNumber ?: @0,
+                                                                  MGLMapboxMetricsEnabledKey: @YES,
+                                                                  MGLMapboxMetricsDebugLoggingEnabledKey: @NO}];
     }
 }
 
@@ -46,9 +48,9 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
     self = [super init];
     if (self) {
         _eventsManager = MMEEventsManager.sharedManager;
-        _eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsDebugLoggingEnabled];
-        _eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountType];
-        _eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsEnabled];
+        _eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsDebugLoggingEnabledKey];
+        _eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountTypeKey];
+        _eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsEnabledKey];
         
         // It is possible for the shared instance of this class to be created because of a call to
         // +[MGLAccountManager load] early on in the app lifecycle of the host application.
@@ -57,11 +59,11 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
         // (once -[MMEEventsManager initializeWithAccessToken:userAgentBase:hostSDKVersion:] is called.
         // Normally, the telem access token and base URL are not set this way. However, overriding these values
         // with user defaults can be useful for testing with an alternative (test) backend system.
-        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessToken]) {
-            self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessToken];
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessTokenKey]) {
+            self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessTokenKey];
         }
-        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryBaseURL]) {
-            self.baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryBaseURL]];
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryBaseURLKey]) {
+            self.baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryBaseURLKey]];
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDefaultsDidChange:) name:NSUserDefaultsDidChangeNotification object:nil];
@@ -81,22 +83,22 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
 }
 
 - (void)updateNonDisablingConfigurationValues {
-    self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
+    self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsDebugLoggingEnabledKey];
     
-    // It is possible for `MGLTelemetryAccessToken` to have been set yet `userDefaultsDidChange:`
+    // It is possible for the telemetry access token key to have been set yet `userDefaultsDidChange:`
     // is called before `setupWithAccessToken:` is called.
     // In that case, setting the access token here will have no effect. In practice, that's fine
     // because the access token value will be resolved when `setupWithAccessToken:` is called eventually
-    if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessToken]) {
-        self.eventsManager.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessToken];
+    if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessTokenKey]) {
+        self.eventsManager.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessTokenKey];
     }
     
-    // It is possible for `MGLTelemetryBaseURL` to have been set yet `userDefaultsDidChange:`
+    // It is possible for the telemetry base URL key to have been set yet `userDefaultsDidChange:`
     // is called before setupWithAccessToken: is called.
     // In that case, setting the base URL here will have no effect. In practice, that's fine
     // because the base URL value will be resolved when `setupWithAccessToken:` is called eventually
-    if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryBaseURL]) {
-        NSURL *baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryBaseURL]];
+    if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryBaseURLKey]) {
+        NSURL *baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryBaseURLKey]];
         self.eventsManager.baseURL = baseURL;
     }
 }
@@ -109,8 +111,8 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
     if ([[notification object] respondsToSelector:@selector(objectForKey:)]) {
         NSUserDefaults *userDefaults = [notification object];
         
-        NSInteger accountType = [userDefaults integerForKey:MGLMapboxAccountType];
-        BOOL metricsEnabled = [userDefaults boolForKey:MGLMapboxMetricsEnabled];
+        NSInteger accountType = [userDefaults integerForKey:MGLMapboxAccountTypeKey];
+        BOOL metricsEnabled = [userDefaults boolForKey:MGLMapboxMetricsEnabledKey];
         
         if (accountType != self.eventsManager.accountType || metricsEnabled != self.eventsManager.metricsEnabled) {
             self.eventsManager.accountType = accountType;
@@ -124,7 +126,7 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
 + (void)setupWithAccessToken:(NSString *)accessToken {
     int64_t delayTime = 0;
     
-    if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:MGLEventsProfile] isEqualToString:MGLVariableGeofence]) {
+    if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:MGLEventsProfileKey] isEqualToString:MGLVariableGeofenceKey]) {
         delayTime = 10;
     }
     
@@ -164,11 +166,11 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
 }
 
 + (void)ensureMetricsOptoutExists {
-    NSNumber *shownInAppNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
+    NSNumber *shownInAppNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:MGLMapboxMetricsEnabledSettingShownInAppKey];
     BOOL metricsEnabledSettingShownInAppFlag = [shownInAppNumber boolValue];
     
     if (!metricsEnabledSettingShownInAppFlag &&
-        [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountType] == 0) {
+        [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountTypeKey] == 0) {
         // Opt-out is not configured in UI, so check for Settings.bundle
         id defaultEnabledValue;
         NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -178,7 +180,7 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
             NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
             NSArray *preferences = settings[@"PreferenceSpecifiers"];
             for (NSDictionary *prefSpecification in preferences) {
-                if ([prefSpecification[@"Key"] isEqualToString:MGLMapboxMetricsEnabled]) {
+                if ([prefSpecification[@"Key"] isEqualToString:MGLMapboxMetricsEnabledKey]) {
                     defaultEnabledValue = prefSpecification[@"DefaultValue"];
                 }
             }
