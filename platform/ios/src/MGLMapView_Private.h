@@ -52,6 +52,7 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const _Nonnull MGLUnderlyingMapUna
 /// Synchronously render a frame of the map.
 - (void)renderSync;
 
+- (nonnull mbgl::Map *)mbglMap;
 - (nonnull mbgl::Renderer *)renderer;
 
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
