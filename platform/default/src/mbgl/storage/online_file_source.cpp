@@ -328,7 +328,7 @@ void OnlineFileRequest::schedule() {
     if (resource.priorExpires) {
         schedule(resource.priorExpires);
     } else {
-        schedule(util::now());
+        schedule(std::chrono::system_clock::now());
     }
 }
 
@@ -339,7 +339,7 @@ OnlineFileRequest::~OnlineFileRequest() {
 Timestamp interpolateExpiration(const Timestamp& current,
                                 optional<Timestamp> prior,
                                 bool& expired) {
-    auto now = util::now();
+    auto now = std::chrono::system_clock::now();
     if (current > now) {
         return current;
     }
@@ -461,7 +461,7 @@ void OnlineFileRequest::networkIsReachableAgain() {
     // We need all requests to fail at least once before we are going to start retrying
     // them, and we only immediately restart request that failed due to connection issues.
     if (failedRequestReason == Response::Error::Reason::Connection) {
-        schedule(util::now());
+        schedule(std::chrono::system_clock::now());
     }
 }
 

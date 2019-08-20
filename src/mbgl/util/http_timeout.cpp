@@ -18,7 +18,7 @@ Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t
         return Seconds(1u << std::min(failedRequests - 1, 31u));
     } else if (failedRequestReason == Response::Error::Reason::RateLimit) {
         if (retryAfter) {
-            return *retryAfter - util::now();
+            return *retryAfter - std::chrono::system_clock::now();
         } else {
             // Default
             return Seconds(util::DEFAULT_RATE_LIMIT_TIMEOUT);
@@ -33,7 +33,7 @@ Duration expirationTimeout(optional<Timestamp> expires, uint32_t expiredRequests
     if (expiredRequests) {
         return Seconds(1u << std::min(expiredRequests - 1, 31u));
     } else if (expires) {
-        return std::max(std::chrono::system_clock::duration::zero(), *expires - util::now());
+        return std::max(std::chrono::system_clock::duration::zero(), *expires - std::chrono::system_clock::now());
     } else {
         return Duration::max();
     }

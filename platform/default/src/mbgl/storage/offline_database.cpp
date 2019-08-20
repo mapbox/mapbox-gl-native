@@ -279,7 +279,7 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     // Update accessed timestamp used for LRU eviction.
     try {
         mapbox::sqlite::Query accessedQuery{ getStatement("UPDATE resources SET accessed = ?1 WHERE url = ?2") };
-        accessedQuery.bind(1, util::now());
+        accessedQuery.bind(1, std::chrono::system_clock::now());
         accessedQuery.bind(2, resource.url);
         accessedQuery.run();
     } catch (const mapbox::sqlite::Exception& ex) {
@@ -352,7 +352,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
             "WHERE url    = ?4 ") };
         // clang-format on
 
-        notModifiedQuery.bind(1, util::now());
+        notModifiedQuery.bind(1, std::chrono::system_clock::now());
         notModifiedQuery.bind(2, response.expires);
         notModifiedQuery.bind(3, response.mustRevalidate);
         notModifiedQuery.bind(4, resource.url);
@@ -380,7 +380,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
     updateQuery.bind(3, response.expires);
     updateQuery.bind(4, response.mustRevalidate);
     updateQuery.bind(5, response.modified);
-    updateQuery.bind(6, util::now());
+    updateQuery.bind(6, std::chrono::system_clock::now());
     updateQuery.bind(9, resource.url);
 
     if (response.noContent) {
@@ -408,7 +408,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
     insertQuery.bind(4, response.expires);
     insertQuery.bind(5, response.mustRevalidate);
     insertQuery.bind(6, response.modified);
-    insertQuery.bind(7, util::now());
+    insertQuery.bind(7, std::chrono::system_clock::now());
 
     if (response.noContent) {
         insertQuery.bind(8, nullptr);
@@ -437,7 +437,7 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
             "  AND z            = ?6 ") };
         // clang-format on
 
-        accessedQuery.bind(1, util::now());
+        accessedQuery.bind(1, std::chrono::system_clock::now());
         accessedQuery.bind(2, tile.urlTemplate);
         accessedQuery.bind(3, tile.pixelRatio);
         accessedQuery.bind(4, tile.x);
@@ -540,7 +540,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
             "  AND z             = ?8 ") };
         // clang-format on
 
-        notModifiedQuery.bind(1, util::now());
+        notModifiedQuery.bind(1, std::chrono::system_clock::now());
         notModifiedQuery.bind(2, response.expires);
         notModifiedQuery.bind(3, response.mustRevalidate);
         notModifiedQuery.bind(4, tile.urlTemplate);
@@ -575,7 +575,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     updateQuery.bind(2, response.etag);
     updateQuery.bind(3, response.expires);
     updateQuery.bind(4, response.mustRevalidate);
-    updateQuery.bind(5, util::now());
+    updateQuery.bind(5, std::chrono::system_clock::now());
     updateQuery.bind(8, tile.urlTemplate);
     updateQuery.bind(9, tile.pixelRatio);
     updateQuery.bind(10, tile.x);
@@ -610,7 +610,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     insertQuery.bind(7, response.mustRevalidate);
     insertQuery.bind(8, response.etag);
     insertQuery.bind(9, response.expires);
-    insertQuery.bind(10, util::now());
+    insertQuery.bind(10, std::chrono::system_clock::now());
 
     if (response.noContent) {
         insertQuery.bind(11, nullptr);

@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
               fileSource(fileSource_),
               loop(loop_),
               mergePath(std::move(mergePath_)),
-              start(util::now()) {
+              start(std::chrono::system_clock::now()) {
         }
 
         void statusChanged(OfflineRegionStatus status) override {
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
 
             std::string bytesPerSecond = "-";
 
-            auto elapsedSeconds = (util::now() - start) / 1s;
+            auto elapsedSeconds = (std::chrono::system_clock::now() - start) / 1s;
             if (elapsedSeconds != 0) {
                 bytesPerSecond = util::toString(status.completedResourceSize / elapsedSeconds);
             }

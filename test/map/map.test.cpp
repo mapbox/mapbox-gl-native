@@ -433,7 +433,7 @@ TEST(Map, StyleExpired) {
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
-    response.expires = util::now() - 1h;
+    response.expires = std::chrono::system_clock::now() - 1h;
 
     test.fileSource->respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource->requests.size());
@@ -451,7 +451,7 @@ TEST(Map, StyleExpired) {
 
     // Send a fresh response, and confirm that we didn't overwrite the style, but continue to wait
     // for a fresh response.
-    response.expires = util::now() + 1h;
+    response.expires = std::chrono::system_clock::now() + 1h;
     test.fileSource->respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource->requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
@@ -469,7 +469,7 @@ TEST(Map, StyleExpiredWithAnnotations) {
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
-    response.expires = util::now() - 1h;
+    response.expires = std::chrono::system_clock::now() - 1h;
 
     test.fileSource->respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource->requests.size());
@@ -493,7 +493,7 @@ TEST(Map, StyleExpiredWithRender) {
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
-    response.expires = util::now() - 1h;
+    response.expires = std::chrono::system_clock::now() - 1h;
 
     test.fileSource->respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource->requests.size());
@@ -787,7 +787,7 @@ TEST(Map, NoContentTiles) {
     // Insert a 204 No Content response for the 0/0/0 tile
     Response response;
     response.noContent = true;
-    response.expires = util::now() + 1h;
+    response.expires = std::chrono::system_clock::now() + 1h;
     test.fileSource->put(Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0,
                                        Tileset::Scheme::XYZ),
                         response);

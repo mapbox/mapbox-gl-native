@@ -34,7 +34,7 @@ TEST(HttpRetry, ConnectionError) {
 
 TEST(HttpRetry, RateLimit) {
     // Pre-set value from header
-    ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1, { util::now() + Seconds(1) }));
+    ASSERT_EQ(Seconds(1), errorRetryTimeout(Response::Error::Reason::Server, 1, { std::chrono::system_clock::now() + Seconds(1) }));
 
     // Default
     ASSERT_EQ(Seconds(5), errorRetryTimeout(Response::Error::Reason::RateLimit, 1, {}));
@@ -42,8 +42,8 @@ TEST(HttpRetry, RateLimit) {
 
 TEST(HttpRetry, ExpiredInitial) {
     // 1 sec timeout, will not be exactly 1 because of precision/rounding
-    ASSERT_TRUE(Milliseconds(1000) >= expirationTimeout({ util::now() + Seconds(1) }, 0));
-    ASSERT_TRUE(Milliseconds(990) < expirationTimeout({ util::now() + Seconds(1) }, 0));
+    ASSERT_TRUE(Milliseconds(1000) >= expirationTimeout({ std::chrono::system_clock::now() + Seconds(1) }, 0));
+    ASSERT_TRUE(Milliseconds(990) < expirationTimeout({ std::chrono::system_clock::now() + Seconds(1) }, 0));
 }
 
 TEST(HttpRetry, ExpiredSubsequent) {

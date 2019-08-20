@@ -155,7 +155,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_GT(util::now(), *res.expires);
+        EXPECT_GT(std::chrono::system_clock::now(), *res.expires);
         EXPECT_FALSE(res.mustRevalidate);
     });
 
@@ -181,12 +181,12 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
         switch (counter++) {
         case 0: {
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_GT(util::now(), *res.expires);
+            EXPECT_GT(std::chrono::system_clock::now(), *res.expires);
         } break;
         case 1: {
             EXPECT_EQ(nullptr, res.error);
 
-            auto now = util::now();
+            auto now = std::chrono::system_clock::now();
             EXPECT_LT(now + Seconds(40), *res.expires) << "Expiration not interpolated to 60s";
             EXPECT_GT(now + Seconds(80), *res.expires) << "Expiration not interpolated to 60s";
 
@@ -204,7 +204,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
 
     // Very long expiration time, should never arrive.
     Resource resource1{ Resource::Unknown, "http://127.0.0.1:3000/test" };
-    resource1.priorExpires = util::now() + Seconds(100000);
+    resource1.priorExpires = std::chrono::system_clock::now() + Seconds(100000);
 
     std::unique_ptr<AsyncRequest> req1 = fs.request(resource1, [&](Response) {
         FAIL() << "Should never be called";
@@ -219,7 +219,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
 
     // Very long expiration time, should never arrive.
     Resource resource3{ Resource::Unknown, "http://127.0.0.1:3000/test" };
-    resource3.priorExpires = util::now() + Seconds(100000);
+    resource3.priorExpires = std::chrono::system_clock::now() + Seconds(100000);
 
     std::unique_ptr<AsyncRequest> req3 = fs.request(resource3, [&](Response) {
         FAIL() << "Should never be called";
@@ -380,7 +380,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitStandard)) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
         ASSERT_EQ(true, bool(res.error->retryAfter));
-        ASSERT_LT(util::now(), res.error->retryAfter);
+        ASSERT_LT(std::chrono::system_clock::now(), res.error->retryAfter);
         loop.stop();
     });
 
@@ -395,7 +395,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RateLimitMBX)) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::RateLimit, res.error->reason);
         ASSERT_EQ(true, bool(res.error->retryAfter));
-        ASSERT_LT(util::now(), res.error->retryAfter);
+        ASSERT_LT(std::chrono::system_clock::now(), res.error->retryAfter);
         loop.stop();
     });
 

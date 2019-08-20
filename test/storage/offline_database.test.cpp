@@ -805,7 +805,7 @@ TEST(OfflineDatabase, Invalidate) {
     Response response;
     response.noContent = true;
     response.mustRevalidate = false;
-    response.expires = util::now() + 1h;
+    response.expires = std::chrono::system_clock::now() + 1h;
 
     const Resource ambientTile = Resource::tile("mapbox://tile_ambient", 1, 0, 0, 0, Tileset::Scheme::XYZ);
     db.put(ambientTile, response);
@@ -861,12 +861,12 @@ TEST(OfflineDatabase, Invalidate) {
     EXPECT_TRUE(db.get(region2Style)->isUsable());
 
     // Sanity check.
-    EXPECT_TRUE(db.get(ambientTile)->expires < util::now());
-    EXPECT_TRUE(db.get(ambientStyle)->expires < util::now());
-    EXPECT_TRUE(db.get(region1Tile)->expires < util::now());
-    EXPECT_TRUE(db.get(region1Style)->expires < util::now());
-    EXPECT_TRUE(db.get(region2Tile)->expires > util::now());
-    EXPECT_TRUE(db.get(region2Style)->expires > util::now());
+    EXPECT_TRUE(db.get(ambientTile)->expires < std::chrono::system_clock::now());
+    EXPECT_TRUE(db.get(ambientStyle)->expires < std::chrono::system_clock::now());
+    EXPECT_TRUE(db.get(region1Tile)->expires < std::chrono::system_clock::now());
+    EXPECT_TRUE(db.get(region1Style)->expires < std::chrono::system_clock::now());
+    EXPECT_TRUE(db.get(region2Tile)->expires > std::chrono::system_clock::now());
+    EXPECT_TRUE(db.get(region2Style)->expires > std::chrono::system_clock::now());
 
     EXPECT_TRUE(db.get(ambientTile)->mustRevalidate);
     EXPECT_TRUE(db.get(ambientStyle)->mustRevalidate);

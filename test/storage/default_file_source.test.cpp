@@ -258,7 +258,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
 
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
-    response.expires = util::now() + 1h;
+    response.expires = system_clock::now() + 1h;
     fs.put(optionalResource, response);
 
     std::unique_ptr<AsyncRequest> req;
@@ -288,7 +288,7 @@ TEST(DefaultFileSource, OptionalExpired) {
 
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
-    response.expires = util::now() - 1h;
+    response.expires = system_clock::now() - 1h;
     fs.put(optionalResource, response);
 
     std::unique_ptr<AsyncRequest> req;
@@ -363,7 +363,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
-    response.expires = util::now() + 1h;
+    response.expires = system_clock::now() + 1h;
     fs.put(resource, response);
 
     std::unique_ptr<AsyncRequest> req;
@@ -373,7 +373,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
         EXPECT_TRUE(res.notModified);
         EXPECT_FALSE(res.data.get());
         ASSERT_TRUE(bool(res.expires));
-        EXPECT_LT(util::now(), *res.expires);
+        EXPECT_LT(system_clock::now(), *res.expires);
         EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         ASSERT_TRUE(bool(res.etag));
@@ -398,7 +398,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
-    response.expires = util::now() + 1h;
+    response.expires = system_clock::now() + 1h;
     fs.put(resource, response);
 
     std::unique_ptr<AsyncRequest> req;
@@ -432,7 +432,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
-    response.expires = util::now() + 1h;
+    response.expires = system_clock::now() + 1h;
     fs.put(resource, response);
 
     std::unique_ptr<AsyncRequest> req;
@@ -468,7 +468,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
-    response.expires = util::now() + 1h;
+    response.expires = system_clock::now() + 1h;
     fs.put(resource, response);
 
     std::unique_ptr<AsyncRequest> req;
@@ -478,7 +478,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
         EXPECT_TRUE(res.notModified);
         EXPECT_FALSE(res.data.get());
         ASSERT_TRUE(bool(res.expires));
-        EXPECT_LT(util::now(), *res.expires);
+        EXPECT_LT(system_clock::now(), *res.expires);
         EXPECT_TRUE(res.mustRevalidate);
         ASSERT_TRUE(bool(res.modified));
         EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
@@ -504,7 +504,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
     response.data = std::make_shared<std::string>("Cached value");
-    response.expires = util::now() + 1h;
+    response.expires = system_clock::now() + 1h;
     fs.put(resource, response);
 
     std::unique_ptr<AsyncRequest> req;
@@ -651,7 +651,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
         // return new data, only a 304 Not Modified response.
         EXPECT_EQ("Prior value", *res.data);
         ASSERT_TRUE(res.expires);
-        EXPECT_LE(util::now(), *res.expires);
+        EXPECT_LE(system_clock::now(), *res.expires);
         EXPECT_TRUE(res.mustRevalidate);
         ASSERT_TRUE(res.modified);
         EXPECT_EQ(Timestamp{ Seconds(1417392000) }, *res.modified);

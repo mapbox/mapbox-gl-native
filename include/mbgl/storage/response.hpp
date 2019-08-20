@@ -38,13 +38,13 @@ public:
     optional<std::string> etag;
 
     bool isFresh() const {
-        return expires ? *expires > util::now() : !error;
+        return expires ? *expires > std::chrono::system_clock::now() : !error;
     }
 
     // Indicates whether we are allowed to use this response according to HTTP caching rules.
     // It may or may not be stale.
     bool isUsable() const {
-        return !mustRevalidate || (expires && *expires > util::now());
+        return !mustRevalidate || (expires && *expires > std::chrono::system_clock::now());
     }
 };
 

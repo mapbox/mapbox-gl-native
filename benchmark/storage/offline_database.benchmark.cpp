@@ -18,7 +18,7 @@ public:
 
         response.data = std::make_shared<std::string>(50 * 1024, 0);
         response.mustRevalidate = false;
-        response.expires = mbgl::util::now() + 1h;
+        response.expires = mbgl::std::chrono::system_clock::now() + 1h;
 
         resetAmbientTiles();
         resetRegion();
