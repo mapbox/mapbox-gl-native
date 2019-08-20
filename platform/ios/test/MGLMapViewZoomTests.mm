@@ -129,6 +129,7 @@
 
 - (void)testPinchAndZoom {
 
+    [[NSUserDefaults standardUserDefaults] setObject:@3 forKey:@"MGLRotationThresholdWhileZooming"];
     self.mapView.rotationThresholdWhileZooming = 3;
     self.mapView.zoomLevel = 15;
     UIPinchGestureRecognizerMock *pinch = [[UIPinchGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
