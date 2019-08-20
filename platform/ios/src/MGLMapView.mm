@@ -241,6 +241,7 @@ public:
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
 @property (nonatomic) CGFloat rotationThresholdWhileZooming;
+@property (nonatomic) CGFloat rotationBeforeThresholdMet;
 @property (nonatomic) BOOL isZooming;
 @property (nonatomic) BOOL isRotating;
 @property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
@@ -572,7 +573,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 35;
+    _rotationThresholdWhileZooming = 3.5;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1726,7 +1727,9 @@ public:
 
 
     // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
-    if (MGLDegreesFromRadians(fabs(rotate.rotation)) < self.rotationThresholdWhileZooming && self.isZooming) {
+    if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming && !self.isRotating) {
+        self.rotationBeforeThresholdMet += fabs(rotate.rotation);
+        rotate.rotation = 0;
         return;
     }
 
@@ -1745,7 +1748,7 @@ public:
     }
     if (rotate.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat newDegrees = [self newDegreesForRotationGesture:rotate];
+        CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
 
         // constrain to +/-30 degrees when merely rotating like Apple does
         //
@@ -1785,6 +1788,7 @@ public:
     else if ((rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled))
     {
 
+        self.rotationBeforeThresholdMet = 0;
         if (! self.isRotating) { return; }
         self.isRotating = NO;
 
@@ -2245,37 +2249,6 @@ public:
     return degrees;
 }
 
-- (CGFloat)newDegreesForRotationGesture:(UIRotationGestureRecognizer *)rotate {
-    CGFloat newDegrees;
-
-    CGFloat rotation = rotate.rotation;
-
-    if (self.isZooming) {
-
-        // Provide a value where the rotation value no longer needs to be adjusted. Adding 5 gives a few degrees to ease into to a new rotation.
-        CGFloat stopInterpolatingRotation = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming * 3);
-        CGFloat rotationThreshold = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming);
-
-        if ((rotation >= stopInterpolatingRotation) || (rotation <= -stopInterpolatingRotation)) {
-            rotation = rotation;
-        }
-
-        // Use linear interpolation to smooth out the rotation as it goes from being delayed. This prevents a jump after the rotation begins.
-        else if (rotation >= rotationThreshold) {
-            rotation = stopInterpolatingRotation * (rotation - rotationThreshold) / (stopInterpolatingRotation - rotationThreshold);
-        }
-
-        // Take into account counterclockwise rotations.
-        else if (rotation <= -rotationThreshold) {
-            rotation = -stopInterpolatingRotation *
-            (rotation + rotationThreshold) / (-stopInterpolatingRotation + rotationThreshold);
-        }
-    }
-
-    newDegrees = MGLDegreesFromRadians(self.angle + rotation) * -1;
-
-    return newDegrees;
-}
 #pragma mark - Attribution -
 
 - (void)showAttribution:(id)sender
