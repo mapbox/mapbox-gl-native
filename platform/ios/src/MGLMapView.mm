@@ -1785,7 +1785,6 @@ public:
     else if ((rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled))
     {
 
-        self.rotationBeforeThresholdMet = 0;
         if (! self.isRotating) { return; }
         self.isRotating = NO;
 
