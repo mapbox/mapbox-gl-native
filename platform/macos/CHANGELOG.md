@@ -11,6 +11,7 @@
 * Fixed rendering layers after fill-extrusion regression caused by optimization of fill-extrusion rendering. ([#15065](https://github.com/mapbox/mapbox-gl-native/pull/15065))
 * `MGLLoggingLevel` has been updated for better matching core log levels. Now can use `[MGLLoggingConfiguration sharedConfiguration].loggingLevel` to filter logs from core . [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
 * Fixed an issue where animated camera transitions zoomed in or out too dramatically. [#15281](https://github.com/mapbox/mapbox-gl-native/pull/15281)
+* Fixed rendering and collision detection issues with using `text-variable-anchor` and `icon-text-fit` properties on the same layer. ([#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367))
 
 ### Styles and rendering
 
