@@ -26,42 +26,39 @@ class OfflineDownloadTest : OfflineRegion.OfflineRegionObserver {
   private val countDownLatch = CountDownLatch(1)
   private lateinit var offlineRegion: OfflineRegion
 
-  @Test(timeout = 30000)
+  @Test(timeout = 60000)
   fun offlineDownload() {
     rule.runOnUiThreadActivity {
       OfflineManager.getInstance(rule.activity).createOfflineRegion(
         createTestRegionDefinition(),
         ByteArray(0),
         object : OfflineManager.CreateOfflineRegionCallback {
-          override fun onCreate(region: OfflineRegion?) {
-            region?.let {
-              offlineRegion = it
-              offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
-              offlineRegion.setObserver(this@OfflineDownloadTest)
-            }
+          override fun onCreate(region: OfflineRegion) {
+            offlineRegion = region
+            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+            offlineRegion.setObserver(this@OfflineDownloadTest)
           }
 
-          override fun onError(error: String?) {
+          override fun onError(error: String) {
             Logger.e(TAG, "Error while creating offline region: $error")
           }
         })
     }
 
-    if (!countDownLatch.await(30, TimeUnit.SECONDS)) {
+    if (!countDownLatch.await(60, TimeUnit.SECONDS)) {
       throw TimeoutException()
     }
   }
 
-  override fun onStatusChanged(status: OfflineRegionStatus?) {
-    status?.let {
-      if (it.isComplete) {
-        offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE)
-        countDownLatch.countDown()
-      }
+  override fun onStatusChanged(status: OfflineRegionStatus) {
+    Logger.i(TAG, "Download percentage ${100.0 * status.completedResourceCount / status.requiredResourceCount}")
+    if (status.isComplete) {
+      offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE)
+      countDownLatch.countDown()
     }
   }
 
-  override fun onError(error: OfflineRegionError?) {
+  override fun onError(error: OfflineRegionError) {
     Logger.e(TAG, "Error while downloading offline region: $error")
   }
 
@@ -69,7 +66,7 @@ class OfflineDownloadTest : OfflineRegion.OfflineRegionObserver {
     Logger.e(TAG, "Tile count limited exceeded: $limit")
   }
 
-  fun createTestRegionDefinition(): OfflineRegionDefinition {
+  private fun createTestRegionDefinition(): OfflineRegionDefinition {
     return OfflineGeometryRegionDefinition(
       Style.MAPBOX_STREETS,
       Point.fromLngLat(50.847857, 4.360137),
