@@ -128,6 +128,9 @@ const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
 /// Distance threshold to stop the camera while animating.
 const CLLocationDistance MGLDistanceThresholdForCameraPause = 500;
 
+///
+static NSString * const MGLRotationThresholdWhileZooming = @"MGLRotationThresholdWhileZooming";
+
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
@@ -573,7 +576,13 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 3;
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults objectForKey:MGLRotationThresholdWhileZooming]) {
+        _rotationThresholdWhileZooming = [[defaults objectForKey:MGLRotationThresholdWhileZooming] floatValue];
+    } else {
+        _rotationThresholdWhileZooming = 0;
+    }
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1724,7 +1733,6 @@ public:
     MGLMapCamera *oldCamera = self.camera;
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
-
 
     // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
     if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming && !self.isRotating) {
