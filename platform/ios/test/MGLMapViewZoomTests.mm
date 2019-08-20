@@ -162,8 +162,10 @@
         [self.mapView handleRotateGesture:rotate];
 
         CGFloat wrappedRotation = mbgl::util::wrap(-MGLDegreesFromRadians(rotate.rotation), 0., 360.);
-    XCTAssertEqualWithAccuracy(self.mapView.direction, wrappedRotation, 0.001, @"Map direction should match gesture rotation for input of %@°.", degrees);
-//        XCTAssertEqual(self.mapView.direction, 360 - MGLDegreesFromRadians(rotate.rotation));
+
+
+       // Check that the direction property now matches the gesture's rotation.
+        XCTAssertEqualWithAccuracy(self.mapView.direction, wrappedRotation, 0.001, @"Map direction should match gesture rotation for input of %@°.", degrees);
     }
 
     rotate.state = UIGestureRecognizerStateEnded;
