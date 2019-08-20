@@ -8,6 +8,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398).
  - Font lookup on pre lollipop devices failed, provide default font list instead [#15410](https://github.com/mapbox/mapbox-gl-native/pull/15410).
 
+### Docs
+ - Add javadoc to OnStyleImageMissingListener indicating the required synchronous addition images, document workaround [#15418](https://github.com/mapbox/mapbox-gl-native/pull/15418) 
+
 ## 8.3.0-alpha.3 - August 15, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-alpha.2...android-v8.3.0-alpha.3) since [Mapbox Maps SDK for Android v8.3.0-alpha.2](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-alpha.2):
 

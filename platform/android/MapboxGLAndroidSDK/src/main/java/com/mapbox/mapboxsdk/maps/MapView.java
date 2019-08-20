@@ -1013,14 +1013,18 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-   * Interface definition for a callback to be invoked with the id of a missing icon.
+   * Interface definition for a callback to be invoked with the id of a missing icon. The icon should be added
+   * synchronously with {@link Style#addImage(String, Bitmap)} to be rendered on the current zoom level. When loading
+   * icons asynchronously, you can load a placeholder image and replace it when you icon has loaded.
    * <p>
    * {@link MapView#addOnStyleImageMissingListener(OnStyleImageMissingListener)}
    * </p>
    */
   public interface OnStyleImageMissingListener {
     /**
-     * Called when the map is missing an icon.
+     * Called when the map is missing an icon.The icon should be added synchronously with
+     * {@link Style#addImage(String, Bitmap)} to be rendered on the current zoom level. When loading icons
+     * asynchronously, you can load a placeholder image and replace it when you icon has loaded.
      *
      * @param id the id of the icon that is missing
      */
