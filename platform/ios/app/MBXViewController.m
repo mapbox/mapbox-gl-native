@@ -1111,8 +1111,26 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 - (void)styleSymbolLayer
 {
-    MGLSymbolStyleLayer *stateLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"state-label-lg"];
-    stateLayer.textColor = [NSExpression expressionForConstantValue:[UIColor redColor]];
+    UIImage *background = [UIImage imageNamed:@"background"];
+    UIImage *backgroundSDF = [background imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [self.mapView.style setImage:backgroundSDF forName:@"background"];
+    
+    MGLSymbolStyleLayer *symbolStyleLayer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:@"road-intersections"];
+    symbolStyleLayer.iconImageName = [NSExpression expressionForConstantValue:@"background"];
+    symbolStyleLayer.iconTextFit = [NSExpression expressionForConstantValue:[NSValue valueWithMGLIconTextFit:MGLIconTextFitBoth]];
+    symbolStyleLayer.iconScale = [NSExpression expressionForConstantValue:@1.0];
+    UIEdgeInsets padding = UIEdgeInsetsMake(5.0, 5.0, 5.0, 5.0); // padding is evenly distributed
+    symbolStyleLayer.iconTextFitPadding = [NSExpression expressionForConstantValue:[NSValue valueWithUIEdgeInsets:padding]];
+    
+    symbolStyleLayer.iconColor = [NSExpression expressionForConstantValue:UIColor.whiteColor];
+    UIColor *haloColor = [UIColor colorWithRed:(51.0/255) green:(117.0/255) blue:(197.0/255) alpha:1.0];
+    symbolStyleLayer.iconHaloColor = [NSExpression expressionForConstantValue:haloColor];
+    symbolStyleLayer.iconHaloWidth = [NSExpression expressionForConstantValue:@4.0];
+    
+    symbolStyleLayer.textHaloColor = [NSExpression expressionForConstantValue:UIColor.whiteColor];
+    symbolStyleLayer.textHaloWidth = [NSExpression expressionForConstantValue:@0.5];
+    symbolStyleLayer.textHaloBlur = [NSExpression expressionForConstantValue:@0.5];
+    symbolStyleLayer.textColor = [NSExpression expressionForConstantValue:haloColor];
 }
 
 - (void)styleBuildingLayer
@@ -1996,7 +2014,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     self.styleIndex = (self.styleIndex + 1) % styleNames.count;
 
-    self.mapView.styleURL = styleURLs[self.styleIndex];
+    self.mapView.styleURL = [NSURL URLWithString:@"insert here your url"];
 
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
     [titleButton setTitle:styleNames[self.styleIndex] forState:UIControlStateNormal];
