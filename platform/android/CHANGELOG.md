@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398).
  - Font lookup on pre lollipop devices failed, provide default font list instead [#15410](https://github.com/mapbox/mapbox-gl-native/pull/15410).
  - Fixed rendering and collision detection issues with using `text-variable-anchor` and `icon-text-fit` properties on the same layer [#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367).
+ - Fixed a bug where quick-scale was registered during a move gesture that followed a double-tap. Bumped gestures library to `v0.5.1`. [#15427](https://github.com/mapbox/mapbox-gl-native/pull/15427)
 
 ### Docs
  - Add javadoc to OnStyleImageMissingListener indicating the required synchronous addition images, document workaround [#15418](https://github.com/mapbox/mapbox-gl-native/pull/15418) 
