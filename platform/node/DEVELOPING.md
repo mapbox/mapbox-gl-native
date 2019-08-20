@@ -12,6 +12,8 @@ To compile the Node.js bindings and install module dependencies, from the reposi
 
     npm install --build-from-source
 
+You will need to have [xcpretty](https://github.com/xcpretty/xcpretty) and [node-gyp](https://github.com/nodejs/node-gyp) installed and configured.
+
 To recompile just the C++ code while developing, run `make node`.
 
 To create an Xcode project and use a GUI debugger in the case of a crash, run `make xnode`.
