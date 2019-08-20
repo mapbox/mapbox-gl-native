@@ -525,8 +525,6 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     NSArray *annotations = [self internalAddAnnotationsAtCoordinates:coordinates];
     MGLPointAnnotation *annotation = annotations.firstObject;
     
-    CGPoint anchor = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
-
     // Rotate
     CLLocationDirection lastAngle = 0.0;
 
@@ -534,6 +532,8 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     for (NSInteger iter = 0; iter < 10; iter++ ) {
                 
         CLLocationDirection angle = (CLLocationDirection)((drand48()*1080.0) - 540.0);
+        
+        CGPoint anchor = CGPointMake(drand48()*CGRectGetWidth(self.mapView.bounds), drand48()*CGRectGetHeight(self.mapView.bounds));
         
         NSString *activityTitle = [NSString stringWithFormat:@"Rotate to: %0.1f from: %0.1f", angle, lastAngle];
         [XCTContext runActivityNamed:activityTitle
@@ -583,14 +583,14 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     NSArray *annotations = [self internalAddAnnotationsAtCoordinates:coordinates];
     MGLPointAnnotation *annotation = annotations.firstObject;
     
-    CGPoint anchor = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
-    
     srand48(0);
     for (NSInteger iter = 0; iter < 10; iter++ ) {
         
         double zoom = (double)(7.0 + drand48()*7.0);
         CLLocationDirection angle = (CLLocationDirection)((drand48()*1080.0) - 540.0);
         
+        CGPoint anchor = CGPointMake(drand48()*CGRectGetWidth(self.mapView.bounds), drand48()*CGRectGetHeight(self.mapView.bounds));
+
         NSString *activityTitle = [NSString stringWithFormat:@"Zoom to %0.1f", zoom];
         [XCTContext runActivityNamed:activityTitle
                                block:^(id<XCTActivity>  _Nonnull activity)
@@ -617,8 +617,30 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
 }
 
 - (void)internalTestShowingAnnotationsThenSelectingAnimated:(BOOL)animated {
-    CLLocationCoordinate2D coordinates[21];
     srand48(0);
+
+    CGFloat maxXPadding = std::max(CGRectGetWidth(self.mapView.bounds)/5.0, 100.0);
+    CGFloat maxYPadding = std::max(CGRectGetHeight(self.mapView.bounds)/5.0, 100.0);
+
+    for (int i = 0; i < 10; i++) {
+        UIEdgeInsets edgePadding;
+        edgePadding.top    = floor(drand48()*maxYPadding);
+        edgePadding.bottom = floor(drand48()*maxYPadding);
+        edgePadding.left   = floor(drand48()*maxXPadding);
+        edgePadding.right  = floor(drand48()*maxXPadding);
+
+        UIEdgeInsets contentInsets;
+        contentInsets.top    = floor(drand48()*maxYPadding);
+        contentInsets.bottom = floor(drand48()*maxYPadding);
+        contentInsets.left   = floor(drand48()*maxXPadding);
+        contentInsets.right  = floor(drand48()*maxXPadding);
+
+        [self internalTestShowingAnnotationsThenSelectingAnimated:animated edgePadding:edgePadding contentInsets:contentInsets];
+    }
+}
+
+- (void)internalTestShowingAnnotationsThenSelectingAnimated:(BOOL)animated edgePadding:(UIEdgeInsets)edgeInsets contentInsets:(UIEdgeInsets)contentInsets {
+    CLLocationCoordinate2D coordinates[21];
     
     for (int i = 0; i < (int)(sizeof(coordinates)/sizeof(coordinates[0])); i++)
     {
@@ -631,14 +653,7 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
 
     XCTestExpectation *showCompleted = [self expectationWithDescription:@"showCompleted"];
 
-    CGSize size = self.mapView.frame.size;
-    
-    CGFloat maximumPadding = 100;
-    CGFloat yPadding = (size.height / 5 <= maximumPadding) ? (size.height / 5) : maximumPadding;
-    CGFloat xPadding = (size.width / 5 <= maximumPadding) ? (size.width / 5) : maximumPadding;
-    
-    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
-
+    self.mapView.contentInset = contentInsets;
     [self.mapView showAnnotations:annotations
                       edgePadding:edgeInsets
                          animated:animated
@@ -655,6 +670,10 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
     for (MGLPointAnnotation *point in annotations) {
         [self internalSelectDeselectAnnotation:point];
     }
+    
+    [self.mapView removeAnnotations:annotations];
+    self.mapView.contentInset = UIEdgeInsetsZero;
+    [self waitForCollisionDetectionToRun];
 }
 
 - (NSArray*)internalAddAnnotationsAtCoordinates:(CLLocationCoordinate2D*)coordinates
