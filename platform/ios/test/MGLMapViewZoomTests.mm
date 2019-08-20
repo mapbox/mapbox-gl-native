@@ -6,6 +6,7 @@
 
 @interface MGLMapView (MGLMapViewZoomTests)
 @property (nonatomic) BOOL isZooming;
+@property (nonatomic) CGFloat rotationThresholdWhileZooming;
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch;
 - (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate;
 @end
@@ -127,6 +128,8 @@
 }
 
 - (void)testPinchAndZoom {
+
+    self.mapView.rotationThresholdWhileZooming = 3;
     self.mapView.zoomLevel = 15;
     UIPinchGestureRecognizerMock *pinch = [[UIPinchGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
     [self.mapView addGestureRecognizer:pinch];

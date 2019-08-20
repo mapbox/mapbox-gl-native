@@ -8,9 +8,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue where it was possible to set the map’s content insets then tilt the map enough to see the horizon, causing performance issues. ([#15195](https://github.com/mapbox/mapbox-gl-native/pull/15195))
 
-### User interaction
-
-* Fixed an issue where the map would rotate too easily during pinch gestures. ([#14929](https://github.com/mapbox/mapbox-gl-native/pull/14929))
 ## 5.3.0
 
 ### Styles and rendering
