@@ -3,6 +3,10 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+
+### Features
+ - Add number-format expression [#15424](https://github.com/mapbox/mapbox-gl-native/pull/15424)
+
 ### Bug fixes
  - Fixed use of objects after moving, potentially causing crashes. [#15408](https://github.com/mapbox/mapbox-gl-native/pull/1540)
  - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398).
