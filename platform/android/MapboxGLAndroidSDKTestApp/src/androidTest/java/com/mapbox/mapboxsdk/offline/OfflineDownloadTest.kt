@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Integration test that validates downloading an offline region from a point geometry at zoomlevel 17
+ * Integration test that validates downloading an offline region from a point geometry at zoom level 17
  */
 @RunWith(AndroidJUnit4::class)
 class OfflineDownloadTest : OfflineRegion.OfflineRegionObserver {
