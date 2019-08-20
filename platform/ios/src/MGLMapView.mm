@@ -1720,16 +1720,16 @@ public:
 {
     if ( ! self.isRotateEnabled) return;
 
-    [self cancelTransitions];
-
-    CGPoint centerPoint = [self anchorPointForGesture:rotate];
-    MGLMapCamera *oldCamera = self.camera;
-
-    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
-
     if ([[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey]) {
         [self handleRotateGestureRecognizerWithThreshold:rotate];
     } else {
+        [self cancelTransitions];
+
+        CGPoint centerPoint = [self anchorPointForGesture:rotate];
+        MGLMapCamera *oldCamera = self.camera;
+
+        self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
+
         if (rotate.state == UIGestureRecognizerStateBegan)
         {
             self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
@@ -1820,6 +1820,13 @@ public:
 }
 
 - (void)handleRotateGestureRecognizerWithThreshold:(UIRotationGestureRecognizer *)rotate {
+    [self cancelTransitions];
+
+    CGPoint centerPoint = [self anchorPointForGesture:rotate];
+    MGLMapCamera *oldCamera = self.camera;
+
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
+
     // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
     if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming && !self.isRotating) {
         self.rotationBeforeThresholdMet += fabs(rotate.rotation);
