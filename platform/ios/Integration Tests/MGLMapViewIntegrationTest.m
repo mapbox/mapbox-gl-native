@@ -2,6 +2,7 @@
 
 @interface MGLMapView (MGLMapViewIntegrationTest)
 - (void)updateFromDisplayLink:(CADisplayLink *)displayLink;
+- (void)setNeedsRerender;
 @end
 
 @implementation MGLMapViewIntegrationTest
@@ -133,7 +134,7 @@
 
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout {
     XCTAssertNil(self.renderFinishedExpectation);
-    [self.mapView setNeedsDisplay];
+    [self.mapView setNeedsRerender];
     self.renderFinishedExpectation = [self expectationWithDescription:@"Map view should be rendered"];
     [self waitForExpectations:@[self.renderFinishedExpectation] timeout:timeout];
 }
