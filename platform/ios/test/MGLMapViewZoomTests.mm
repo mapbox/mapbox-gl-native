@@ -2,6 +2,8 @@
 #import <XCTest/XCTest.h>
 #import "MGLMockGestureRecognizers.h"
 
+#import <mbgl/math/wrap.hpp>
+
 @interface MGLMapView (MGLMapViewZoomTests)
 @property (nonatomic) BOOL isZooming;
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch;
@@ -141,25 +143,27 @@
     [self.mapView addGestureRecognizer:rotate];
     [self.mapView handleRotateGesture:rotate];
 
-    XCTAssertEqual(rotate.rotation, self.mapView.direction);
+    // Both the rotation and direction should be zero since the rotation threshold hasn't been met.
+    XCTAssertEqual(rotate.rotation, 0);
+    XCTAssertEqual(self.mapView.direction, 0);
 
-    rotate.state = UIGestureRecognizerStateChanged;
-    rotate.rotation = MGLRadiansFromDegrees(1);
-    [self.mapView handleRotateGesture:rotate];
-
+    // The direction should be `0`. The default rotation threshold is `3`.
     XCTAssertEqual(self.mapView.direction, 0);
     rotate.state = UIGestureRecognizerStateChanged;
     rotate.rotation = MGLRadiansFromDegrees(2);
     [self.mapView handleRotateGesture:rotate];
 
+    // The direction should be `0`. The default rotation threshold is `3`.
     XCTAssertEqual(self.mapView.direction, 0);
 
-    for (NSNumber *degrees in @[@10, @10, @30, @90, @180]) {
+    for (NSNumber *degrees in @[@-90, @-10, @10, @10, @30, @90, @180, @240, @460, @500, @590, @800]) {
         rotate.state = UIGestureRecognizerStateChanged;
         rotate.rotation = MGLRadiansFromDegrees([degrees doubleValue]);
         [self.mapView handleRotateGesture:rotate];
 
-        XCTAssertEqual(self.mapView.direction, 360 - MGLDegreesFromRadians(rotate.rotation));
+        CGFloat wrappedRotation = mbgl::util::wrap(-MGLDegreesFromRadians(rotate.rotation), 0., 360.);
+    XCTAssertEqualWithAccuracy(self.mapView.direction, wrappedRotation, 0.001, @"Map direction should match gesture rotation for input of %@°.", degrees);
+//        XCTAssertEqual(self.mapView.direction, 360 - MGLDegreesFromRadians(rotate.rotation));
     }
 
     rotate.state = UIGestureRecognizerStateEnded;

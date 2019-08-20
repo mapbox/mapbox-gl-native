@@ -572,7 +572,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 3.5;
+    _rotationThresholdWhileZooming = 50;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -2254,7 +2254,7 @@ public:
         CGFloat rotation = rotate.rotation;
         CGFloat newRotation = 0;
 
-        // Provide a value where the rotation value no longer needs to be adjusted.
+        // Provide a value where the rotation value no longer needs to be adjusted. Adding 5 gives a few degrees to ease into to a new rotation.
         CGFloat stopInterpolatingRotation = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming + 5);
         CGFloat rotationThreshold = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming);
 
@@ -2262,14 +2262,14 @@ public:
             newRotation = rotation;
         }
 
-        // Use linear interpolation to smooth out the rotation as it goes from being delayed. This prevents a jump after the rotation begins.
+        // Use linear interpolation to smooth out the rotation as it goes from being delayed. This prevents a jump after the rotation begins. From https://stackoverflow.com/questions/1820862/obj-c-linear-interpolation-between-two-numbers
         else if (rotation >= rotationThreshold) {
-            newRotation = -stopInterpolatingRotation*0.5*(cos(M_PI*(rotation-rotationThreshold)/(stopInterpolatingRotation-rotationThreshold)) - 1.0);
+            newRotation = -stopInterpolatingRotation + (-stopInterpolatingRotation - rotationThreshold) * 0.5;
         }
 
         // Take into account counterclockwise rotations.
         else if (rotation <= -rotationThreshold) {
-            newRotation = stopInterpolatingRotation*0.5*(cos(M_PI*(rotation+rotationThreshold)/(rotationThreshold-stopInterpolatingRotation)) - 1.0);
+            newRotation = newRotation = stopInterpolatingRotation + (stopInterpolatingRotation - rotationThreshold) * 0.5;
         }
     }
 
