@@ -2425,7 +2425,7 @@ public:
     NSString *message;
     NSString *participateTitle;
     NSString *declineTitle;
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"])
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsEnabledKey])
     {
         message = NSLocalizedStringWithDefaultValue(@"TELEMETRY_ENABLED_MSG", nil, nil, @"You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.", @"Telemetry prompt message");
         participateTitle = NSLocalizedStringWithDefaultValue(@"TELEMETRY_ENABLED_ON", nil, nil, @"Keep Participating", @"Telemetry prompt button");
@@ -2453,14 +2453,14 @@ public:
     UIAlertAction *declineAction = [UIAlertAction actionWithTitle:declineTitle
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * _Nonnull action) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"MGLMapboxMetricsEnabled"];
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:MGLMapboxMetricsEnabledKey];
     }];
     [alertController addAction:declineAction];
     
     UIAlertAction *participateAction = [UIAlertAction actionWithTitle:participateTitle
                                                                 style:UIAlertActionStyleCancel
                                                               handler:^(UIAlertAction * _Nonnull action) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"MGLMapboxMetricsEnabled"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:MGLMapboxMetricsEnabledKey];
     }];
     [alertController addAction:participateAction];
     
