@@ -572,7 +572,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 50;
+    _rotationThresholdWhileZooming = 3.5;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
