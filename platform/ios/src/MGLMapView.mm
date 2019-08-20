@@ -240,9 +240,9 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
-@property (nonatomic) CGFloat rotationBeforeThresholdMet;
 @property (nonatomic) CGFloat rotationThresholdWhileZooming;
 @property (nonatomic) BOOL isZooming;
+@property (nonatomic) BOOL isRotating;
 @property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
@@ -572,7 +572,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 3.5;
+    _rotationThresholdWhileZooming = 35;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1724,23 +1724,17 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
 
+
     // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
-    if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming) {
-
-        self.rotationBeforeThresholdMet += abs(rotate.rotation);
-        rotate.delaysTouchesBegan = YES;
-        rotate.rotation = 0;
-
-        // If the gesture's state is `UIGestureRecognizerStateBegan`, continue. This prevents an exception where _changeDelimiterSuppressionDepth is less than 0.
-        if (rotate.state != UIGestureRecognizerStateBegan) {
-            return;
-        }
+    if (MGLDegreesFromRadians(fabs(rotate.rotation)) < self.rotationThresholdWhileZooming && self.isZooming) {
+        return;
     }
 
-    if (rotate.state == UIGestureRecognizerStateBegan)
+    if (rotate.state == UIGestureRecognizerStateBegan || ! self.isRotating)
     {
         self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
 
+        self.isRotating = YES;
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
             self.userTrackingMode = MGLUserTrackingModeFollow;
@@ -1749,7 +1743,7 @@ public:
         self.shouldTriggerHapticFeedbackForCompass = NO;
         [self notifyGestureDidBegin];
     }
-    else if (rotate.state == UIGestureRecognizerStateChanged)
+    if (rotate.state == UIGestureRecognizerStateChanged)
     {
         CGFloat newDegrees = [self newDegreesForRotationGesture:rotate];
 
@@ -1788,11 +1782,15 @@ public:
             }
         }
     }
-    else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
+    else if ((rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled))
     {
+
+        self.rotationBeforeThresholdMet = 0;
+        if (! self.isRotating) { return; }
+        self.isRotating = NO;
+
         CGFloat velocity = rotate.velocity;
         CGFloat decelerationRate = self.decelerationRate;
-        self.rotationBeforeThresholdMet = 0;
 
         if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
         {
@@ -1809,8 +1807,9 @@ public:
                                        .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
                                     MGLDurationFromTimeInterval(decelerationRate));
 
+
                 [self notifyGestureDidEndWithDrift:YES];
-                
+
                 __weak MGLMapView *weakSelf = self;
                 
                 [self animateWithDelay:decelerationRate animations:^
@@ -2250,30 +2249,32 @@ public:
 - (CGFloat)newDegreesForRotationGesture:(UIRotationGestureRecognizer *)rotate {
     CGFloat newDegrees;
 
+    CGFloat rotation = rotate.rotation;
+
     if (self.isZooming) {
-        CGFloat rotation = rotate.rotation;
-        CGFloat newRotation = 0;
 
         // Provide a value where the rotation value no longer needs to be adjusted. Adding 5 gives a few degrees to ease into to a new rotation.
-        CGFloat stopInterpolatingRotation = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming + 5);
+        CGFloat stopInterpolatingRotation = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming * 3);
         CGFloat rotationThreshold = MGLRadiansFromDegrees(self.rotationThresholdWhileZooming);
 
         if ((rotation >= stopInterpolatingRotation) || (rotation <= -stopInterpolatingRotation)) {
-            newRotation = rotation;
+            rotation = rotation;
         }
 
-        // Use linear interpolation to smooth out the rotation as it goes from being delayed. This prevents a jump after the rotation begins. From https://stackoverflow.com/questions/1820862/obj-c-linear-interpolation-between-two-numbers
+        // Use linear interpolation to smooth out the rotation as it goes from being delayed. This prevents a jump after the rotation begins.
         else if (rotation >= rotationThreshold) {
-            newRotation = -stopInterpolatingRotation + (-stopInterpolatingRotation - rotationThreshold) * 0.5;
+            rotation = stopInterpolatingRotation * (rotation - rotationThreshold) / (stopInterpolatingRotation - rotationThreshold);
         }
 
         // Take into account counterclockwise rotations.
         else if (rotation <= -rotationThreshold) {
-            newRotation = newRotation = stopInterpolatingRotation + (stopInterpolatingRotation - rotationThreshold) * 0.5;
+            rotation = -stopInterpolatingRotation *
+            (rotation + rotationThreshold) / (-stopInterpolatingRotation + rotationThreshold);
         }
     }
 
-    newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
+    newDegrees = MGLDegreesFromRadians(self.angle + rotation) * -1;
+
     return newDegrees;
 }
 #pragma mark - Attribution -
