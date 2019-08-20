@@ -10,7 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### User interaction
 
-* Fixed an issue causing the map too rotate too easily during a pinch gesture.([#14929](https://github.com/mapbox/mapbox-gl-native/pull/14929))
+* Fixed an issue where the map would rotate too easily during pinch gestures. ([#14929](https://github.com/mapbox/mapbox-gl-native/pull/14929))
 ## 5.3.0
 
 ### Styles and rendering
