@@ -43,7 +43,7 @@ To publish a new version of the package:
     - [ ] an updated version number in [`package.json`](../../package.json#L3)
     - [ ] an entry in [`platform/node/CHANGELOG.md`](CHANGELOG.md) describing the changes in the release
 - [ ] run `git tag node-v{VERSION}` where `{VERSION}` matches the version in `package.json`, e.g. `git tag node-v3.3.2`
-- [ ] run `git push && git push --gs`
+- [ ] run `git push && git push --tags`
 
 The CI builds for tag pushes will check if the tag matches the version listed in `package.json`, and if so, will run with `BUILDTYPE=Release` and publish a binary with `node-pre-gyp`.
 
