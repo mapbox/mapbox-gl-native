@@ -6,7 +6,6 @@ NSString *const MBXShowsUserLocation = @"MBXShowsUserLocation";
 NSString *const MBXDebugMaskValue = @"MBXDebugMaskValue";
 NSString *const MBXShowsZoomLevelOrnament =  @"MBXShowsZoomLevelOrnament";
 NSString *const MBXShowsTimeFrameGraph = @"MBXShowsFrameTimeGraph";
-NSString *const MBXDebugLoggingEnabled = @"MGLMapboxMetricsDebugLoggingEnabled";
 NSString *const MBXShowsMapScale = @"MBXMapShowsScale";
 NSString *const MBXMapShowsHeadingIndicator = @"MBXMapShowsHeadingIndicator";
 NSString *const MBXMapFramerateMeasurementEnabled = @"MBXMapFramerateMeasurementEnabled";
@@ -26,7 +25,6 @@ NSString *const MBXReuseQueueStatsEnabled = @"MBXReuseQueueStatsEnabled";
     [coder encodeObject:[NSNumber numberWithUnsignedInteger:_debugMask] forKey:MBXDebugMaskValue];
     [coder encodeBool:_showsZoomLevelOrnament forKey:MBXShowsZoomLevelOrnament];
     [coder encodeBool:_showsTimeFrameGraph forKey:MBXShowsTimeFrameGraph];
-    [coder encodeBool:_debugLoggingEnabled forKey:MBXDebugLoggingEnabled];
     [coder encodeBool:_showsMapScale forKey:MBXShowsMapScale];
     [coder encodeBool:_showsUserHeadingIndicator forKey:MBXMapShowsHeadingIndicator];
     [coder encodeBool:_framerateMeasurementEnabled forKey:MBXMapFramerateMeasurementEnabled];
@@ -41,7 +39,6 @@ NSString *const MBXReuseQueueStatsEnabled = @"MBXReuseQueueStatsEnabled";
         NSNumber *decodedDebugMaskOptions = [decoder decodeObjectForKey:MBXDebugMaskValue];
         BOOL decodedZoomLevelOrnament = [decoder decodeBoolForKey:MBXShowsZoomLevelOrnament];
         BOOL decodedShowsTimeFrameGraph = [decoder decodeBoolForKey:MBXShowsTimeFrameGraph];
-        BOOL decodedDebugLoggingEnabled = [decoder decodeBoolForKey:MBXDebugLoggingEnabled];
         BOOL decodedShowsMapScale = [decoder decodeBoolForKey:MBXShowsMapScale];
         BOOL decodedShowsUserHeadingIndicator = [decoder decodeBoolForKey:MBXMapShowsHeadingIndicator];
         BOOL decodedFramerateMeasurementEnabled = [decoder decodeBoolForKey:MBXMapFramerateMeasurementEnabled];
@@ -53,7 +50,6 @@ NSString *const MBXReuseQueueStatsEnabled = @"MBXReuseQueueStatsEnabled";
         _debugMask = decodedDebugMaskOptions.intValue;
         _showsZoomLevelOrnament = decodedZoomLevelOrnament;
         _showsTimeFrameGraph = decodedShowsTimeFrameGraph;
-        _debugLoggingEnabled = decodedDebugLoggingEnabled;
         _showsMapScale = decodedShowsMapScale;
         _showsUserHeadingIndicator = decodedShowsUserHeadingIndicator;
         _framerateMeasurementEnabled = decodedFramerateMeasurementEnabled;
@@ -75,7 +71,6 @@ NSString *const MBXReuseQueueStatsEnabled = @"MBXReuseQueueStatsEnabled";
             (unsigned long)self.debugMask,
             self.showsZoomLevelOrnament ? @"YES" : @"NO",
             self.showsTimeFrameGraph ? @"YES" : @"NO",
-            self.debugLoggingEnabled ? @"YES" : @"NO",
             self.showsMapScale ? @"YES" : @"NO",
             self.showsUserHeadingIndicator ? @"YES" : @"NO",
             self.framerateMeasurementEnabled ? @"YES" : @"NO",
