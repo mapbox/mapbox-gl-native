@@ -2,6 +2,11 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+### Styles and rendering
+* Fixed rendering and collision detection issues with using `text-variable-anchor` and `icon-text-fit` properties on the same layer. ([#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367))
+
 ## 5.3.0
 
 ### Styles and rendering
