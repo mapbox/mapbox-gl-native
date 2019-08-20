@@ -573,7 +573,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 3.5;
+    _rotationThresholdWhileZooming = 3;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1787,14 +1787,12 @@ public:
     }
     else if ((rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled))
     {
-
         self.rotationBeforeThresholdMet = 0;
         if (! self.isRotating) { return; }
         self.isRotating = NO;
 
         CGFloat velocity = rotate.velocity;
         CGFloat decelerationRate = self.decelerationRate;
-
         if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
         {
             CGFloat radians = self.angle + rotate.rotation;
@@ -1810,9 +1808,7 @@ public:
                                        .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
                                     MGLDurationFromTimeInterval(decelerationRate));
 
-
                 [self notifyGestureDidEndWithDrift:YES];
-
                 __weak MGLMapView *weakSelf = self;
                 
                 [self animateWithDelay:decelerationRate animations:^
