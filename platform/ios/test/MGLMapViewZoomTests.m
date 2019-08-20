@@ -169,7 +169,6 @@
     [self.mapView handlePinchGesture:pinch];
 
     XCTAssertFalse(self.mapView.isZooming);
-
 }
 
 NS_INLINE CGFloat MGLScaleFromZoomLevel(double zoom) {
