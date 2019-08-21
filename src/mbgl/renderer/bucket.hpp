@@ -47,10 +47,8 @@ public:
         return 0;
     };
 
-    bool needsUpload() const {
-        return hasData() && !uploaded;
-    }
-   
+    bool needsUpload() const { return (hasData() && !uploaded) || stateChanged; }
+
     // The following methods are implemented by buckets that require cross-tile indexing and placement.
 
     // Returns a pair, the first element of which is a bucket cross-tile id
@@ -67,6 +65,7 @@ public:
 protected:
     Bucket() = default;
     std::atomic<bool> uploaded { false };
+    std::atomic<bool> stateChanged{false};
 };
 
 } // namespace mbgl

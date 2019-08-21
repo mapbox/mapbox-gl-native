@@ -75,7 +75,7 @@ optional<ImagePosition> GeometryTileRenderData::getPattern(const std::string& pa
 void GeometryTileRenderData::upload(gfx::UploadPass& uploadPass) {
     if (!layoutResult) return;
 
-    auto uploadFn = [&] (Bucket& bucket) {
+    auto uploadFn = [&](Bucket& bucket) {
         if (bucket.needsUpload()) {
             bucket.upload(uploadPass);
         }

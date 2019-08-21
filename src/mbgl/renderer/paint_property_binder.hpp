@@ -109,7 +109,9 @@ public:
                                       const ImagePositions&, const optional<PatternDependency>&,
                                       const style::expression::Value&) = 0;
 
-    virtual void updateVertexVectors(const FeatureStates&, const GeometryTileLayer&, const ImagePositions&) {}
+    virtual bool updateVertexVectors(const FeatureStates&, const GeometryTileLayer&, const ImagePositions&) {
+        return false;
+    }
 
     virtual void updateVertexVector(std::size_t, std::size_t, const GeometryTileFeature&, const FeatureState&) = 0;
 
@@ -221,8 +223,10 @@ public:
         }
     }
 
-    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer,
+    bool updateVertexVectors(const FeatureStates& states,
+                             const GeometryTileLayer& layer,
                              const ImagePositions&) override {
+        bool updated = false;
         for (const auto& it : states) {
             const auto positions = featureMap.find(it.first);
             if (positions == featureMap.end()) {
@@ -233,9 +237,11 @@ public:
                 std::unique_ptr<GeometryTileFeature> feature = layer.getFeature(pos.featureIndex);
                 if (feature) {
                     updateVertexVector(pos.start, pos.end, *feature, it.second);
+                    updated = true;
                 }
             }
         }
+        return updated;
     }
 
     void updateVertexVector(std::size_t start, std::size_t end, const GeometryTileFeature& feature,
@@ -322,8 +328,10 @@ public:
         }
     }
 
-    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer,
+    bool updateVertexVectors(const FeatureStates& states,
+                             const GeometryTileLayer& layer,
                              const ImagePositions&) override {
+        bool updated = false;
         for (const auto& it : states) {
             const auto positions = featureMap.find(it.first);
             if (positions == featureMap.end()) {
@@ -334,9 +342,11 @@ public:
                 std::unique_ptr<GeometryTileFeature> feature = layer.getFeature(pos.featureIndex);
                 if (feature) {
                     updateVertexVector(pos.start, pos.end, *feature, it.second);
+                    updated = true;
                 }
             }
         }
+        return updated;
     }
 
     void updateVertexVector(std::size_t start, std::size_t end, const GeometryTileFeature& feature,
@@ -359,13 +369,12 @@ public:
         vertexBuffer = uploadPass.createVertexBuffer(std::move(vertexVector));
     }
 
-    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    std::tuple<optional<gfx::AttributeBinding>> attributeBinding(
+        const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return std::tuple<optional<gfx::AttributeBinding>>{
-                gfx::attributeBinding(*vertexBuffer)
-            };
+            return std::tuple<optional<gfx::AttributeBinding>>{gfx::attributeBinding(*vertexBuffer)};
         }
     }
 
@@ -584,35 +593,44 @@ public:
     PaintPropertyBinders(const EvaluatedProperties& properties, float z)
         : binders(Binder<Ps>::create(properties.template get<Ps>(), z, Ps::defaultValue())...) {
         (void)z; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
+        needsUpload = false;
     }
 
     PaintPropertyBinders(PaintPropertyBinders&&) = default;
     PaintPropertyBinders(const PaintPropertyBinders&) = delete;
 
-    void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
+    void populateVertexVectors(const GeometryTileFeature& feature,
+                               std::size_t length,
+                               std::size_t index,
                                const ImagePositions& patternPositions,
                                const optional<PatternDependency>& patternDependencies,
                                const style::expression::Value& formattedSection = {}) {
-        util::ignore({(binders.template get<Ps>()->populateVertexVector(feature, length, index, patternPositions,
-                                                                        patternDependencies, formattedSection),
+        util::ignore({(binders.template get<Ps>()->populateVertexVector(
+                           feature, length, index, patternPositions, patternDependencies, formattedSection),
                        0)...});
+        needsUpload = true;
     }
 
-    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer,
+    bool updateVertexVectors(const FeatureStates& states,
+                             const GeometryTileLayer& layer,
                              const ImagePositions& imagePositions) {
-        util::ignore({(binders.template get<Ps>()->updateVertexVectors(states, layer, imagePositions), 0)...});
+        util::ignore(
+            {(needsUpload |= binders.template get<Ps>()->updateVertexVectors(states, layer, imagePositions), 0)...});
+        return needsUpload;
     }
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, const CrossfadeParameters& crossfade) const {
-        util::ignore({
-            (binders.template get<Ps>()->setPatternParameters(posA, posB, crossfade), 0)...
-        });
+        util::ignore({(binders.template get<Ps>()->setPatternParameters(posA, posB, crossfade), 0)...});
     }
 
     void upload(gfx::UploadPass& uploadPass) {
+        if (!needsUpload) {
+            return;
+        }
         util::ignore({
             (binders.template get<Ps>()->upload(uploadPass), 0)...
         });
+        needsUpload = false;
     }
 
     template <class P>
@@ -652,6 +670,7 @@ public:
 
 private:
     Binders binders;
+    bool needsUpload = false;
 };
 
 } // namespace mbgl

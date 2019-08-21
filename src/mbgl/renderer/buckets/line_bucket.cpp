@@ -522,6 +522,7 @@ void LineBucket::upload(gfx::UploadPass& uploadPass) {
     }
 
     uploaded = true;
+    stateChanged = false;
 }
 
 bool LineBucket::hasData() const {
@@ -554,10 +555,11 @@ float LineBucket::getQueryRadius(const RenderLayer& layer) const {
 void LineBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
                         const ImagePositions& imagePositions) {
     auto it = paintPropertyBinders.find(layerID);
+    bool updated = false;
     if (it != paintPropertyBinders.end()) {
-        it->second.updateVertexVectors(states, layer, imagePositions);
-        uploaded = false;
+        updated |= it->second.updateVertexVectors(states, layer, imagePositions);
     }
+    stateChanged = updated;
 }
 
 } // namespace mbgl
