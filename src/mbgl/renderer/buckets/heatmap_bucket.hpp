@@ -21,7 +21,8 @@ public:
     void addFeature(const GeometryTileFeature&,
                             const GeometryCollection&,
                             const ImagePositions&,
-                            const PatternLayerMap&) override;
+                            const PatternLayerMap&,
+                            std::size_t) override;
     bool hasData() const override;
 
     void upload(gfx::UploadPass&) override;

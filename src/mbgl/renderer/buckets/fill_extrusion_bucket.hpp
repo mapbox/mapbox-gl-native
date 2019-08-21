@@ -27,13 +27,16 @@ public:
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,
                     const mbgl::ImagePositions&,
-                    const PatternLayerMap&) override;
+                    const PatternLayerMap&,
+                    std::size_t) override;
 
     bool hasData() const override;
 
     void upload(gfx::UploadPass&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
+
+    void update(const FeatureStates&, const GeometryTileLayer&, const std::string&, const ImagePositions&) override;
 
     gfx::VertexVector<FillExtrusionLayoutVertex> vertices;
     gfx::IndexVector<gfx::Triangles> triangles;

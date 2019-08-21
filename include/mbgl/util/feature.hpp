@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mapbox/feature.hpp>
 
@@ -29,6 +30,29 @@ optional<T> numericValue(const Value& value) {
         },
         [] (auto) {
             return optional<T>();
+        });
+}
+
+inline optional<std::string> featureIDtoString(const FeatureIdentifier& id) {
+    if (id.is<NullValue>()) {
+        return nullopt;
+    }
+
+    return id.match(
+        [] (const std::string& value_) {
+            return value_;
+        },
+        [] (uint64_t value_) {
+            return util::toString(value_);
+        },
+        [] (int64_t value_) {
+            return util::toString(value_);
+        },
+        [] (double value_) {
+            return util::toString(value_);
+        },
+        [] (const auto&) -> optional<std::string> {
+            return nullopt;
         });
 }
 

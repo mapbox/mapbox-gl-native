@@ -47,7 +47,8 @@ FillBucket::~FillBucket() = default;
 void FillBucket::addFeature(const GeometryTileFeature& feature,
                             const GeometryCollection& geometry,
                             const ImagePositions& patternPositions,
-                            const PatternLayerMap& patternDependencies) {
+                            const PatternLayerMap& patternDependencies,
+                            std::size_t index) {
     for (auto& polygon : classifyRings(geometry)) {
         // Optimize polygons with many interior rings for earcut tesselation.
         limitHoles(polygon, 500);
@@ -114,17 +115,19 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
     for (auto& pair : paintPropertyBinders) {
         const auto it = patternDependencies.find(pair.first);
         if (it != patternDependencies.end()){
-            pair.second.populateVertexVectors(feature, vertices.elements(), patternPositions, it->second);
+            pair.second.populateVertexVectors(feature, vertices.elements(), index, patternPositions, it->second);
         } else {
-            pair.second.populateVertexVectors(feature, vertices.elements(), patternPositions, {});
+            pair.second.populateVertexVectors(feature, vertices.elements(), index, patternPositions, {});
         }
     }
 }
 
 void FillBucket::upload(gfx::UploadPass& uploadPass) {
-    vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
-    lineIndexBuffer = uploadPass.createIndexBuffer(std::move(lines));
-    triangleIndexBuffer = triangles.empty() ? optional<gfx::IndexBuffer> {} : uploadPass.createIndexBuffer(std::move(triangles));
+    if (!uploaded) {
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        lineIndexBuffer = uploadPass.createIndexBuffer(std::move(lines));
+        triangleIndexBuffer = triangles.empty() ? optional<gfx::IndexBuffer> {} : uploadPass.createIndexBuffer(std::move(triangles));
+    }
 
     for (auto& pair : paintPropertyBinders) {
         pair.second.upload(uploadPass);
@@ -141,6 +144,14 @@ float FillBucket::getQueryRadius(const RenderLayer& layer) const {
     const auto& evaluated = getEvaluated<FillLayerProperties>(layer.evaluatedProperties);
     const std::array<float, 2>& translate = evaluated.get<FillTranslate>();
     return util::length(translate[0], translate[1]);
+}
+
+void FillBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID, const ImagePositions& imagePositions) {
+    auto it = paintPropertyBinders.find(layerID);
+    if (it != paintPropertyBinders.end()) {
+        it->second.updateVertexVectors(states, layer, imagePositions);
+        uploaded = false;
+    }
 }
 
 } // namespace mbgl
