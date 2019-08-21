@@ -2142,11 +2142,7 @@ public:
     
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
-        CGPoint westPoint = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
-        CGPoint eastPoint = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
-        CGFloat x = (eastPoint.x + westPoint.x)/2;
-        CGFloat y = (eastPoint.y + westPoint.y)/2;
-        self.dragGestureMidPoint = CGPointMake(x, y-1);
+        self.dragGestureMidPoint = [twoFingerDrag translationInView:twoFingerDrag.view];
         initialPitch = *self.mbglMap.getCameraOptions().pitch;
         [self notifyGestureDidBegin];
     }
@@ -2161,14 +2157,13 @@ public:
         
         CGPoint west = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
         CGPoint east = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
-        CGFloat x = (east.x + west.x)/2;
-        CGFloat y = (east.y + west.y)/2;
-        CGPoint middlePoint = CGPointMake(x, y);
+        CLLocationDegrees fingerSlopeAngle = [self angleBetweenPoints:west endPoint:east];
         
-        CLLocationDegrees slopeAngle = [self angleBetweenPoints:self.dragGestureMidPoint endPoint:middlePoint];
+        CGPoint middlePoint = [twoFingerDrag translationInView:twoFingerDrag.view];
+        
+        CLLocationDegrees gestureSlopeAngle = [self angleBetweenPoints:self.dragGestureMidPoint endPoint:middlePoint];
         self.dragGestureMidPoint = middlePoint;
-        if ((slopeAngle > 60 && slopeAngle < 120) ||
-            (slopeAngle > 240 && slopeAngle < 300)) {
+        if (fabs(fingerSlopeAngle) < 45 && fabs(gestureSlopeAngle) > 60 ) {
             
             CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
             CGFloat slowdown = 2.0;
@@ -2320,7 +2315,23 @@ public:
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
-    if (gestureRecognizer == _singleTapGestureRecognizer)
+    if (gestureRecognizer == _twoFingerDrag)
+    {
+        UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
+        
+        if (panGesture.minimumNumberOfTouches == 2)
+        {
+            CGPoint west = [panGesture locationOfTouch:0 inView:panGesture.view];
+            CGPoint east = [panGesture locationOfTouch:1 inView:panGesture.view];
+            
+            CLLocationDegrees horizontalToleranceDegrees = 45.0;
+            CLLocationDegrees degrees = [self angleBetweenPoints:west endPoint:east];
+            if (fabs(degrees) > horizontalToleranceDegrees) {
+                return NO;
+            }
+        }
+    }
+    else if (gestureRecognizer == _singleTapGestureRecognizer)
     {
         // Gesture will be recognized if it could deselect an annotation
         if(!self.selectedAnnotation)
@@ -2342,13 +2353,19 @@ public:
 
 - (CLLocationDegrees)angleBetweenPoints:(CGPoint)originPoint endPoint:(CGPoint)endPoint
 {
+    if (originPoint.x > endPoint.x) {
+        CGPoint swap = originPoint;
+        originPoint = endPoint;
+        endPoint = swap;
+    }
+    
     CGFloat x = (endPoint.x - originPoint.x);
     CGFloat y = (endPoint.y - originPoint.y);
     
     CGFloat radians = atan2(y, x);
     CLLocationDegrees degrees = MGLDegreesFromRadians(radians);
     
-    return degrees > 0.0 ? degrees : (360.0 + degrees);
+    return degrees;
 }
 
 #pragma mark - Attribution -
