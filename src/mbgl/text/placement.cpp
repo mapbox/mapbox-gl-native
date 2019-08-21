@@ -554,8 +554,8 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
             }
             if (bucket.hasIconData()) {
                 reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols,
-                    tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
-                    tile, *bucket.iconSizeBinder, state);
+                                    tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
+                                    tile, *bucket.iconSizeBinder, state);
                 result = true;
             }
         }

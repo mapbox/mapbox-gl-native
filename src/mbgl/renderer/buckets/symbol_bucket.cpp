@@ -247,9 +247,11 @@ void SymbolBucket::sortFeatures(const float angle) {
 
         if (symbolInstance.placedVerticalIconIndex) {
             if (symbolInstance.hasSdfIcon()) {
-                addPlacedSymbol(sdfIcon.triangles,               sdfIcon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
+                addPlacedSymbol(sdfIcon.triangles,
+                                sdfIcon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
             } else {
-                addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
+                addPlacedSymbol(icon.triangles,
+                                icon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
             }
         }
     }
