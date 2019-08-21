@@ -387,4 +387,27 @@ void GeometryTile::performedFadePlacement() {
     }
 }
 
+void GeometryTile::setFeatureState(const LayerFeatureStates& states) {
+    auto layers = getData();
+    if (!layers || states.empty() || !layoutResult) return;
+
+    auto& layerIdToLayerRenderData = layoutResult->layerRenderData;
+    for (auto& layer : layerIdToLayerRenderData) {
+        const auto& layerID = layer.first;
+        const auto sourceLayer = layers->getLayer(layerID);
+        if (sourceLayer) {
+            const auto& sourceLayerID = sourceLayer->getName();
+            auto entry = states.find(sourceLayerID);
+            if (entry == states.end()) continue;
+            const auto& featureStates = entry->second;
+            if (featureStates.empty()) continue;
+
+            auto bucket = layer.second.bucket;
+            if (bucket && bucket->hasData()) {
+                bucket->update(featureStates, *sourceLayer, layerID, layoutResult->iconAtlas.patternPositions);
+            }
+        }
+    }
+}
+
 } // namespace mbgl

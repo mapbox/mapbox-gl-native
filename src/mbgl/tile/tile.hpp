@@ -125,7 +125,9 @@ public:
     // We hold onto a tile for two placements: fading starts with the first placement
     // and will have time to finish by the second placement.
     virtual void performedFadePlacement() {}
-    
+
+    virtual void setFeatureState(const LayerFeatureStates&) {}
+
     void dumpDebugLogs() const;
 
     const Kind kind;
