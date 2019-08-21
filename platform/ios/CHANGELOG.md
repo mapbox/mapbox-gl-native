@@ -23,7 +23,7 @@ This release changes how offline tile requests are billed — they are now bill
 * Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function. ([#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398))
 * Fixed a rare crash when tile download requests returned “404 Not Found” errors. ([#15313](https://github.com/mapbox/mapbox-gl-native/pull/15313))
 * `MGLLoggingLevel` has been updated to better match core log levels. You can now use `MGLLoggingConfiguration.loggingLevel` to filter logs from core. ([#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120))
-* Fixed an issue where the scale bar could show `0mm` instead of `0`. ([#15381](https://github.com/mapbox/mapbox-gl-native/pull/15381))
+* Fixed an issue where the scale bar could show `0 mm` instead of `0`. ([#15381](https://github.com/mapbox/mapbox-gl-native/pull/15381))
 
 ## 4.11.2 - July 30, 2019
 
