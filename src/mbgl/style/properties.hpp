@@ -180,9 +180,26 @@ public:
                 });
         }
 
+        template <class T>
+        static T evaluate(float z, const GeometryTileFeature& feature, const FeatureState& state,
+                          const PossiblyEvaluatedPropertyValue<T>& v, const T& defaultValue) {
+            return v.match(
+                [&] (const T& t) {
+                    return t;
+                },
+                [&] (const PropertyExpression<T>& t) {
+                    return t.evaluate(z, feature, state, defaultValue);
+                });
+        }
+
         template <class P>
         auto evaluate(float z, const GeometryTileFeature& feature) const {
             return evaluate(z, feature, this->template get<P>(), P::defaultValue());
+        }
+
+        template <class P>
+        auto evaluate(float z, const GeometryTileFeature& feature, const FeatureState& state) const {
+            return evaluate(z, feature, state, this->template get<P>(), P::defaultValue());
         }
 
         Evaluated evaluate(float z, const GeometryTileFeature& feature) const {
