@@ -1827,6 +1827,8 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
 
+    _rotationThresholdWhileZooming = [[[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey] floatValue];
+
     // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
     if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming && !self.isRotating) {
         self.rotationBeforeThresholdMet += fabs(rotate.rotation);
@@ -1864,8 +1866,8 @@ public:
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             self.mbglMap.jumpTo(mbgl::CameraOptions()
-                                .withBearing(newDegrees)
-                                .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
+                                    .withBearing(newDegrees)
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
         }
 
         [self cameraIsChanging];
