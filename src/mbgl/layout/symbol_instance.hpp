@@ -65,7 +65,7 @@ public:
                    const float textRotation,
                    float radialTextOffset,
                    bool allowVerticalPlacement,
-                   const uint8_t iconFlags);
+                   const uint8_t iconFlags = 0x00);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -85,7 +85,8 @@ private:
 public:
     Anchor anchor;
     bool hasText;
-    uint8_t iconStatus{0x00}; //(0x00 => not an icon; 0x01 => normal icon; 0x03 => sdfIcon)
+    // Bitwise icon status flag, 0x00 => not an icon; 0x01 => normal icon; 0x03 => sdfIcon. default value 0x00
+    uint8_t iconStatus;
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;

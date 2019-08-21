@@ -774,16 +774,16 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
         }
         if (symbolInstance.hasIcon()) {
             const auto& opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
-            auto& icon = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
+            auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
             
             if (symbolInstance.placedIconIndex) {
-                icon.opacityVertices.extend(4, opacityVertex);
-                icon.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
+                iconBuffer.opacityVertices.extend(4, opacityVertex);
+                iconBuffer.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
             }
 
             if (symbolInstance.placedVerticalIconIndex) {
-                icon.opacityVertices.extend(4, opacityVertex);
-                icon.placedSymbols[*symbolInstance.placedVerticalIconIndex].hidden = opacityState.isHidden();
+                iconBuffer.opacityVertices.extend(4, opacityVertex);
+                iconBuffer.placedSymbols[*symbolInstance.placedVerticalIconIndex].hidden = opacityState.isHidden();
             }
         }
         

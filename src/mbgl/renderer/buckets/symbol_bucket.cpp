@@ -197,7 +197,7 @@ void SymbolBucket::sortFeatures(const float angle) {
 
     sortedAngle = angle;
 
-    // The current approach to sorting doesn't sort across segments so don't try.
+    // The current approach to sorting doesn't sort across text and icon segments so don't try.
     // Sorting within segments separately seemed not to be worth the complexity.
     if (text.segments.size() > 1 || (icon.segments.size() > 1 || sdfIcon.segments.size() > 1)) {
         return;
