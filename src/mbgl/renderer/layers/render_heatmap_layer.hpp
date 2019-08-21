@@ -28,7 +28,8 @@ private:
             const float,
             const TransformState&,
             const float,
-            const mat4&) const override;
+            const mat4&,
+            const FeatureState&) const override;
 
     // Paint properties
     style::HeatmapPaintProperties::Unevaluated unevaluated;

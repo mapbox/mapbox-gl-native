@@ -94,7 +94,8 @@ public:
             const float,
             const TransformState&,
             const float,
-            const mat4&) const { return false; };
+            const mat4&,
+            const FeatureState&) const { return false; };
 
     virtual void prepare(const LayerPrepareParameters&);
 

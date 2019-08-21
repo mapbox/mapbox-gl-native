@@ -30,12 +30,13 @@ private:
             const float,
             const TransformState&,
             const float,
-            const mat4&) const override;
+            const mat4&,
+            const FeatureState&) const override;
 
     // Paint properties
     style::LinePaintProperties::Unevaluated unevaluated;
 
-    float getLineWidth(const GeometryTileFeature&, const float) const;
+    float getLineWidth(const GeometryTileFeature&, const float, const FeatureState&) const;
     void updateColorRamp();
 
     PremultipliedImage colorRamp;
