@@ -562,6 +562,24 @@ FeatureExtensionValue RenderOrchestrator::queryFeatureExtensions(const std::stri
     return {};
 }
 
+void RenderOrchestrator::setFeatureState(const std::string& sourceID,
+                                         const optional<std::string>& sourceLayerID,
+                                         const std::string& featureID,
+                                         const FeatureState& state) {
+    if (RenderSource* renderSource = getRenderSource(sourceID)) {
+        renderSource->setFeatureState(sourceLayerID, featureID, state);
+    }
+}
+
+void RenderOrchestrator::getFeatureState(FeatureState& state,
+                                         const std::string& sourceID,
+                                         const optional<std::string>& sourceLayerID,
+                                         const std::string& featureID) const {
+    if (RenderSource* renderSource = getRenderSource(sourceID)) {
+        renderSource->getFeatureState(state, sourceLayerID, featureID);
+    }
+}
+
 void RenderOrchestrator::reduceMemoryUse() {
     filteredLayersForSource.shrink_to_fit();
     for (const auto& entry : renderSources) {
