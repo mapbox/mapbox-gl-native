@@ -642,22 +642,26 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
         }
 
         if (updateTextFitIcon && bucket.hasVariablePlacement) {
-            bucket.icon.dynamicVertices.clear();
-            for (std::size_t i = 0; i < bucket.icon.placedSymbols.size(); ++i) {
-                const PlacedSymbol& placedIcon = bucket.icon.placedSymbols[i];
-                if (placedIcon.hidden || (!placedIcon.placedOrientation && bucket.allowVerticalPlacement)) {
-                    hideGlyphs(placedIcon.glyphOffsets.size(), bucket.icon.dynamicVertices);
-                } else {
-                    const auto& pair = placedTextShifts.find(i);
-                    if (pair == placedTextShifts.end()) {
-                        hideGlyphs(placedIcon.glyphOffsets.size(), bucket.icon.dynamicVertices);
+            auto updateIcon = [&](SymbolBucket::Buffer& iconBuffer) {
+                iconBuffer.dynamicVertices.clear();
+                for (std::size_t i = 0; i < iconBuffer.placedSymbols.size(); ++i) {
+                    const PlacedSymbol& placedIcon = iconBuffer.placedSymbols[i];
+                    if (placedIcon.hidden || (!placedIcon.placedOrientation && bucket.allowVerticalPlacement)) {
+                        hideGlyphs(placedIcon.glyphOffsets.size(), iconBuffer.dynamicVertices);
                     } else {
-                        for (std::size_t j = 0; j < placedIcon.glyphOffsets.size(); ++j) {
-                            addDynamicAttributes(pair->second.second, placedIcon.angle, bucket.icon.dynamicVertices);
+                        const auto& pair = placedTextShifts.find(i);
+                        if (pair == placedTextShifts.end()) {
+                            hideGlyphs(placedIcon.glyphOffsets.size(), iconBuffer.dynamicVertices);
+                        } else {
+                            for (std::size_t j = 0; j < placedIcon.glyphOffsets.size(); ++j) {
+                                addDynamicAttributes(pair->second.second, placedIcon.angle, iconBuffer.dynamicVertices);
+                            }
                         }
                     }
                 }
-            }
+            };
+            updateIcon(bucket.icon);
+            updateIcon(bucket.sdfIcon);
         }
 
         result = true;
@@ -931,20 +935,13 @@ void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingMode
         bucket.text.placedSymbols.at(*symbolInstance.placedVerticalTextIndex).placedOrientation = vertical;
     }
 
+    auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
     if (symbolInstance.placedIconIndex) {
-        if (symbolInstance.hasSdfIcon()) {
-            bucket.sdfIcon.placedSymbols.at(*symbolInstance.placedIconIndex).placedOrientation = horizontal;
-        } else {
-            bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex).placedOrientation = horizontal;
-        }
+        iconBuffer.placedSymbols.at(*symbolInstance.placedIconIndex).placedOrientation = horizontal;
     }
 
     if (symbolInstance.placedVerticalIconIndex) {
-        if (symbolInstance.hasSdfIcon()) {
-            bucket.sdfIcon.placedSymbols.at(*symbolInstance.placedVerticalIconIndex).placedOrientation = vertical;
-        } else {
-            bucket.icon.placedSymbols.at(*symbolInstance.placedVerticalIconIndex).placedOrientation = vertical;
-        }
+        iconBuffer.placedSymbols.at(*symbolInstance.placedVerticalIconIndex).placedOrientation = vertical;
     }
 }
 

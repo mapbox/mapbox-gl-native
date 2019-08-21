@@ -94,6 +94,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     anchor(anchor_),
     // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
     hasText(!sharedData->empty()),
+    iconStatus(iconFlag),
     // Create the collision features that will be used to check whether this symbol instance can be placed
     // As a collision approximation, we can use either the vertical or any of the horizontal versions of the feature
     textCollisionFeature(sharedData->line, anchor, getAnyShaping(shapedTextOrientations), textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation),
@@ -108,7 +109,6 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     radialTextOffset(radialTextOffset_),
     singleLine(shapedTextOrientations.singleLine) {
 
-    iconStatus |= iconFlag;
     if (allowVerticalPlacement && shapedTextOrientations.vertical) {
         const float verticalPointLabelAngle = 90.0f;
         verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation + verticalPointLabelAngle);

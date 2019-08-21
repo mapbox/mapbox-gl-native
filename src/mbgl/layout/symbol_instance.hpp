@@ -65,7 +65,7 @@ public:
                    const float textRotation,
                    float radialTextOffset,
                    bool allowVerticalPlacement,
-                   const uint8_t iconFlags = 0x00);
+                   const uint8_t iconFlags);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
