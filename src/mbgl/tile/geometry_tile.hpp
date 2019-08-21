@@ -94,6 +94,8 @@ public:
     
     const std::string sourceID;
     
+    void setFeatureState(const LayerFeatureStates&) override;
+
 protected:
     const GeometryTileData* getData() const;
     LayerRenderData* getLayerRenderData(const style::Layer::Impl&);
