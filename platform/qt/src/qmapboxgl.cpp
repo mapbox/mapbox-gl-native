@@ -136,7 +136,7 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
         .rgbSwapped()
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-#if QT_VERSION >= 0x051000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     auto img = std::make_unique<uint8_t[]>(swapped.sizeInBytes());
     memcpy(img.get(), swapped.constBits(), swapped.sizeInBytes());
 #else
