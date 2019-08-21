@@ -801,6 +801,7 @@ static const CGPoint kAnnotationRelativeScale = { 0.05f, 0.125f };
 - (void)waitForCollisionDetectionToRun {
     XCTAssertNil(self.renderFinishedExpectation, @"Incorrect test setup");
 
+    [self.mapView setNeedsRerender];
     self.renderFinishedExpectation = [self expectationWithDescription:@"Map view should be rendered"];
     XCTestExpectation *timerExpired = [self expectationWithDescription:@"Timer expires"];
 

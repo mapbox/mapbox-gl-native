@@ -26,6 +26,7 @@
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) MGLMapView *mapView;
+@property (nonatomic) UIWindow *window;
 @property (nonatomic) MGLStyle *style;
 @property (nonatomic) XCTestExpectation *styleLoadingExpectation;
 @property (nonatomic) XCTestExpectation *renderFinishedExpectation;
