@@ -62,7 +62,7 @@ public:
     void onDidFinishLoadingMap() override;
     void onDidFailLoadingMap(MapLoadError, const std::string&) override;
     void onWillStartRenderingFrame() override;
-    void onDidFinishRenderingFrame(MapObserver::RenderMode) override;
+    void onDidFinishRenderingFrame(MapObserver::RenderMode, bool) override;
     void onWillStartRenderingMap() override;
     void onDidFinishRenderingMap(MapObserver::RenderMode) override;
     void onDidBecomeIdle() override;

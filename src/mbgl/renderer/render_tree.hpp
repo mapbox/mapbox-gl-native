@@ -52,6 +52,7 @@ public:
     float symbolFadeChange = 0.0f;
     bool needsRepaint = false;
     bool loaded = false;
+    bool placementChanged = false;
 };
 
 class RenderTree {
