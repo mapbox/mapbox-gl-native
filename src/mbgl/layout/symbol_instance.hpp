@@ -64,7 +64,8 @@ public:
                    const float iconRotation,
                    const float textRotation,
                    float radialTextOffset,
-                   bool allowVerticalPlacement);
+                   bool allowVerticalPlacement,
+                   const uint8_t iconFlags = 0x00);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -74,6 +75,8 @@ public:
     const SymbolQuads& verticalGlyphQuads() const;
     const optional<SymbolQuad>& iconQuad() const;
     const optional<SymbolQuad>& verticalIconQuad() const;
+    bool hasIcon() const;
+    bool hasSdfIcon() const;
     void releaseSharedData();
 
 private:
@@ -82,7 +85,7 @@ private:
 public:
     Anchor anchor;
     bool hasText;
-    bool hasIcon;
+    uint8_t iconStatus{0x00}; //(0x00 => not an icon; 0x01 => normal icon; 0x03 => sdfIcon)
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;

@@ -153,7 +153,7 @@ void Placement::placeBucket(
     //  This is the reverse of our normal policy of "fade in on pan", but should look like any other
     //  collision and hopefully not be too noticeable.
     // See https://github.com/mapbox/mapbox-gl-native/issues/12683
-    const bool alwaysShowText = textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || layout.get<style::IconOptional>());
+    const bool alwaysShowText = textAllowOverlap && (iconAllowOverlap || !(bucket.hasIconData() || bucket.hasSdfIconData()) || layout.get<style::IconOptional>());
     const bool alwaysShowIcon = iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || layout.get<style::TextOptional>());
     std::vector<style::TextVariableAnchorType> variableTextAnchors = layout.get<style::TextVariableAnchor>();
     const bool rotateWithMap = layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map;
@@ -367,7 +367,8 @@ void Placement::placeBucket(
                 shift = {0.0f, 0.0f};
             }
 
-            const PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
+            const auto& icon = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
+            const PlacedSymbol& placedSymbol = icon.placedSymbols.at(*symbolInstance.placedIconIndex);
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
             const auto& placeIconFeature = [&] (const CollisionFeature& collisionFeature) {
                 return collisionIndex.placeFeature(collisionFeature, shift,
@@ -390,7 +391,7 @@ void Placement::placeBucket(
         }
 
         const bool iconWithoutText = !symbolInstance.hasText || layout.get<style::TextOptional>();
-        const bool textWithoutIcon = !symbolInstance.hasIcon || layout.get<style::IconOptional>();
+        const bool textWithoutIcon = !(symbolInstance.hasIcon() || symbolInstance.hasSdfIcon()) || layout.get<style::IconOptional>();
 
         // combine placements for icon and text
         if (!iconWithoutText && !textWithoutIcon) {
@@ -538,17 +539,25 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
     const auto& layout = *bucket.layout;
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
     const bool hasVariableAnchors = !layout.get<TextVariableAnchor>().empty() && bucket.hasTextData();
-    const bool updateTextFitIcon = layout.get<IconTextFit>() != IconTextFitType::None && (bucket.allowVerticalPlacement || hasVariableAnchors) && bucket.hasIconData();
+    const bool updateTextFitIcon = layout.get<IconTextFit>() != IconTextFitType::None && (bucket.allowVerticalPlacement || hasVariableAnchors) && (bucket.hasIconData() || bucket.hasSdfIconData());
     bool result = false;
 
     if (alongLine) {
-        if (bucket.hasIconData() && layout.get<IconRotationAlignment>() == AlignmentType::Map) {
+        if (layout.get<IconRotationAlignment>() == AlignmentType::Map) {
             const bool pitchWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
             const bool keepUpright = layout.get<style::IconKeepUpright>();
-            reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols,
-                tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
-                tile, *bucket.iconSizeBinder, state);
-            result = true;
+            if (bucket.hasIconData()) {
+                reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols,
+                    tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
+                    tile, *bucket.iconSizeBinder, state);
+                result = true;
+            }
+            if(bucket.hasSdfIconData()) {
+                reprojectLineLabels(bucket.sdfIcon.dynamicVertices, bucket.sdfIcon.placedSymbols,
+                                    tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
+                                    tile, *bucket.iconSizeBinder, state);
+                result = true;
+            }
         }
 
         if (bucket.hasTextData() && layout.get<TextRotationAlignment>() == AlignmentType::Map) {
@@ -681,6 +690,7 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
 void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState& state, std::set<uint32_t>& seenCrossTileIDs) {
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
+    if (bucket.hasSdfIconData()) bucket.sdfIcon.opacityVertices.clear();
     if (bucket.hasCollisionBoxData()) bucket.collisionBox->dynamicVertices.clear();
     if (bucket.hasCollisionCircleData()) bucket.collisionCircle->dynamicVertices.clear();
 
@@ -698,7 +708,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
     // with allow-overlap: false.
     // See https://github.com/mapbox/mapbox-gl-native/issues/12483
     JointOpacityState defaultOpacityState(
-            textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || bucket.layout->get<style::IconOptional>()),
+            textAllowOverlap && (iconAllowOverlap || !(bucket.hasIconData() || bucket.hasSdfIconData()) || bucket.layout->get<style::IconOptional>()),
             iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || bucket.layout->get<style::TextOptional>()),
             true);
 
@@ -758,16 +768,18 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                 markUsedJustification(bucket, prevOffset->second.anchor, symbolInstance, previousOrientation);
             }
         }
-        if (symbolInstance.hasIcon) {
+        if (symbolInstance.hasIcon()) {
             const auto& opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
+            auto& icon = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
+            
             if (symbolInstance.placedIconIndex) {
-                bucket.icon.opacityVertices.extend(4, opacityVertex);
-                bucket.icon.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
+                icon.opacityVertices.extend(4, opacityVertex);
+                icon.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
             }
 
             if (symbolInstance.placedVerticalIconIndex) {
-                bucket.icon.opacityVertices.extend(4, opacityVertex);
-                bucket.icon.placedSymbols[*symbolInstance.placedVerticalIconIndex].hidden = opacityState.isHidden();
+                icon.opacityVertices.extend(4, opacityVertex);
+                icon.placedSymbols[*symbolInstance.placedVerticalIconIndex].hidden = opacityState.isHidden();
             }
         }
         

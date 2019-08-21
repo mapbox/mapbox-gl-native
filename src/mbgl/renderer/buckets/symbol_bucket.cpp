@@ -18,7 +18,6 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            const style::PropertyValue<float>& textSize,
                            const style::PropertyValue<float>& iconSize,
                            float zoom,
-                           bool sdfIcons_,
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
@@ -28,7 +27,6 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            std::vector<style::TextWritingModeType> placementModes_)
     : layout(std::move(layout_)),
       bucketLeaderID(std::move(bucketName_)),
-      sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
       staticUploaded(false),
@@ -113,6 +111,38 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
         }
     }
 
+    if (hasSdfIconData()) {
+        if (!staticUploaded) {
+            sdfIcon.indexBuffer = uploadPass.createIndexBuffer(
+                std::move(sdfIcon.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw
+                                                              : gfx::BufferUsageType::StaticDraw);
+            sdfIcon.vertexBuffer = uploadPass.createVertexBuffer(std::move(sdfIcon.vertices));
+            for (auto& pair : paintProperties) {
+                pair.second.iconBinders.upload(uploadPass);
+            }
+        } else if (!sortUploaded) {
+            uploadPass.updateIndexBuffer(*icon.indexBuffer, std::move(sdfIcon.triangles));
+        }
+        if (!dynamicUploaded) {
+            if (!sdfIcon.dynamicVertexBuffer) {
+                sdfIcon.dynamicVertexBuffer = uploadPass.createVertexBuffer(
+                    std::move(sdfIcon.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            } else {
+                uploadPass.updateVertexBuffer(*sdfIcon.dynamicVertexBuffer,
+                                              std::move(sdfIcon.dynamicVertices));
+            }
+        }
+        if (!placementChangesUploaded) {
+            if (!sdfIcon.opacityVertexBuffer) {
+                sdfIcon.opacityVertexBuffer = uploadPass.createVertexBuffer(
+                    std::move(sdfIcon.opacityVertices), gfx::BufferUsageType::StreamDraw);
+            } else {
+                uploadPass.updateVertexBuffer(*sdfIcon.opacityVertexBuffer,
+                                              std::move(sdfIcon.opacityVertices));
+            }
+        }
+    }
+
     if (hasCollisionBoxData()) {
         if (!staticUploaded) {
             collisionBox->indexBuffer = uploadPass.createIndexBuffer(std::move(collisionBox->lines));
@@ -149,7 +179,7 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
 }
 
 bool SymbolBucket::hasData() const {
-    return hasTextData() || hasIconData() || hasCollisionBoxData();
+    return hasTextData() || hasIconData() || hasSdfIconData() || hasCollisionBoxData();
 }
 
 bool SymbolBucket::hasTextData() const {
@@ -158,6 +188,10 @@ bool SymbolBucket::hasTextData() const {
 
 bool SymbolBucket::hasIconData() const {
     return !icon.segments.empty();
+}
+
+bool SymbolBucket::hasSdfIconData() const {
+    return !sdfIcon.segments.empty();
 }
 
 bool SymbolBucket::hasCollisionBoxData() const {
@@ -199,6 +233,7 @@ void SymbolBucket::sortFeatures(const float angle) {
 
     text.triangles.clear();
     icon.triangles.clear();
+    sdfIcon.triangles.clear();
 
     featureSortOrder = std::make_unique<std::vector<size_t>>();
     featureSortOrder->reserve(symbolInstances.size());
@@ -226,7 +261,13 @@ void SymbolBucket::sortFeatures(const float angle) {
         }
 
         if (symbolInstance.placedIconIndex) {
-            addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
+            if (symbolInstance.hasSdfIcon()) {
+                addPlacedSymbol(sdfIcon.triangles,
+                                sdfIcon.placedSymbols[*symbolInstance.placedIconIndex]);
+            } else {
+                addPlacedSymbol(icon.triangles,
+                                icon.placedSymbols[*symbolInstance.placedIconIndex]);
+            }
         }
 
         if (symbolInstance.placedVerticalIconIndex) {
