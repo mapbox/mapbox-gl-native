@@ -230,7 +230,8 @@ bool RenderFillExtrusionLayer::queryIntersectsFeature(
         const float,
         const TransformState& transformState,
         const float pixelsToTileUnits,
-        const mat4&) const {
+        const mat4&,
+        const FeatureState&) const {
     const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,

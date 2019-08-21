@@ -263,7 +263,8 @@ bool RenderLineLayer::queryIntersectsFeature(
         const float zoom,
         const TransformState& transformState,
         const float pixelsToTileUnits,
-        const mat4&) const {
+        const mat4&,
+        const FeatureState& featureState) const {
     const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
     // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
@@ -275,9 +276,9 @@ bool RenderLineLayer::queryIntersectsFeature(
 
     // Evaluate function
     auto offset = evaluated.get<style::LineOffset>()
-                          .evaluate(feature, zoom, style::LineOffset::defaultValue()) * pixelsToTileUnits;
+                          .evaluate(feature, zoom, featureState, style::LineOffset::defaultValue()) * pixelsToTileUnits;
     // Test intersection
-    const float halfWidth = getLineWidth(feature, zoom) / 2.0 * pixelsToTileUnits;
+    const float halfWidth = getLineWidth(feature, zoom, featureState) / 2.0 * pixelsToTileUnits;
 
     // Apply offset to geometry
     if (offset != 0.0f && !feature.getGeometries().empty()) {
@@ -314,12 +315,12 @@ void RenderLineLayer::updateColorRamp() {
     }
 }
 
-float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {
+float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom, const FeatureState& featureState) const {
     const auto& evaluated = static_cast<const LineLayerProperties&>(*evaluatedProperties).evaluated;
     float lineWidth = evaluated.get<style::LineWidth>()
-            .evaluate(feature, zoom, style::LineWidth::defaultValue());
+            .evaluate(feature, zoom, featureState, style::LineWidth::defaultValue());
     float gapWidth = evaluated.get<style::LineGapWidth>()
-            .evaluate(feature, zoom, style::LineGapWidth::defaultValue());
+            .evaluate(feature, zoom, featureState, style::LineGapWidth::defaultValue());
     if (gapWidth) {
         return gapWidth + 2 * lineWidth;
     } else {
