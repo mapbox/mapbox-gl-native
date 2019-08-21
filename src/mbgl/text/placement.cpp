@@ -367,8 +367,8 @@ void Placement::placeBucket(
                 shift = {0.0f, 0.0f};
             }
 
-            const auto& icon = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
-            const PlacedSymbol& placedSymbol = icon.placedSymbols.at(*symbolInstance.placedIconIndex);
+            const auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
+            const PlacedSymbol& placedSymbol = iconBuffer.placedSymbols.at(*symbolInstance.placedIconIndex);
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
             const auto& placeIconFeature = [&] (const CollisionFeature& collisionFeature) {
                 return collisionIndex.placeFeature(collisionFeature, shift,
@@ -546,16 +546,16 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
         if (layout.get<IconRotationAlignment>() == AlignmentType::Map) {
             const bool pitchWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
             const bool keepUpright = layout.get<style::IconKeepUpright>();
-            if (bucket.hasIconData()) {
-                reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols,
-                    tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
-                    tile, *bucket.iconSizeBinder, state);
-                result = true;
-            }
             if(bucket.hasSdfIconData()) {
                 reprojectLineLabels(bucket.sdfIcon.dynamicVertices, bucket.sdfIcon.placedSymbols,
                                     tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
                                     tile, *bucket.iconSizeBinder, state);
+                result = true;
+            }
+            if (bucket.hasIconData()) {
+                reprojectLineLabels(bucket.icon.dynamicVertices, bucket.icon.placedSymbols,
+                    tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
+                    tile, *bucket.iconSizeBinder, state);
                 result = true;
             }
         }
@@ -932,11 +932,19 @@ void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingMode
     }
 
     if (symbolInstance.placedIconIndex) {
-        bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex).placedOrientation = horizontal;
+        if (symbolInstance.hasSdfIcon()) {
+            bucket.sdfIcon.placedSymbols.at(*symbolInstance.placedIconIndex).placedOrientation = horizontal;
+        } else {
+            bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex).placedOrientation = horizontal;
+        }
     }
 
     if (symbolInstance.placedVerticalIconIndex) {
-        bucket.icon.placedSymbols.at(*symbolInstance.placedVerticalIconIndex).placedOrientation = vertical;
+        if (symbolInstance.hasSdfIcon()) {
+            bucket.sdfIcon.placedSymbols.at(*symbolInstance.placedVerticalIconIndex).placedOrientation = vertical;
+        } else {
+            bucket.icon.placedSymbols.at(*symbolInstance.placedVerticalIconIndex).placedOrientation = vertical;
+        }
     }
 }
 

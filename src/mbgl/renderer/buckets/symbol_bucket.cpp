@@ -85,62 +85,37 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
         }
     }
 
-    if (hasIconData()) {
+    auto updateIconBuffer = [&](Buffer& iconBuffer) {
         if (!staticUploaded) {
-            icon.indexBuffer = uploadPass.createIndexBuffer(std::move(icon.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw : gfx::BufferUsageType::StaticDraw);
-            icon.vertexBuffer = uploadPass.createVertexBuffer(std::move(icon.vertices));
+            iconBuffer.indexBuffer = uploadPass.createIndexBuffer(std::move(iconBuffer.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw : gfx::BufferUsageType::StaticDraw);
+            iconBuffer.vertexBuffer = uploadPass.createVertexBuffer(std::move(iconBuffer.vertices));
             for (auto& pair : paintProperties) {
                 pair.second.iconBinders.upload(uploadPass);
             }
         } else if (!sortUploaded) {
-            uploadPass.updateIndexBuffer(*icon.indexBuffer, std::move(icon.triangles));
+            uploadPass.updateIndexBuffer(*iconBuffer.indexBuffer, std::move(iconBuffer.triangles));
         }
         if (!dynamicUploaded) {
-            if (!icon.dynamicVertexBuffer) {
-                icon.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(icon.dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!iconBuffer.dynamicVertexBuffer) {
+                iconBuffer.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(iconBuffer.dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*icon.dynamicVertexBuffer, std::move(icon.dynamicVertices));
+                uploadPass.updateVertexBuffer(*iconBuffer.dynamicVertexBuffer, std::move(iconBuffer.dynamicVertices));
             }
         }
         if (!placementChangesUploaded) {
-            if (!icon.opacityVertexBuffer) {
-                icon.opacityVertexBuffer = uploadPass.createVertexBuffer(std::move(icon.opacityVertices), gfx::BufferUsageType::StreamDraw);
+            if (!iconBuffer.opacityVertexBuffer) {
+                iconBuffer.opacityVertexBuffer = uploadPass.createVertexBuffer(std::move(iconBuffer.opacityVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*icon.opacityVertexBuffer, std::move(icon.opacityVertices));
+                uploadPass.updateVertexBuffer(*iconBuffer.opacityVertexBuffer, std::move(iconBuffer.opacityVertices));
             }
         }
+    };
+    if (hasIconData()) {
+        updateIconBuffer(icon);
     }
 
     if (hasSdfIconData()) {
-        if (!staticUploaded) {
-            sdfIcon.indexBuffer = uploadPass.createIndexBuffer(
-                std::move(sdfIcon.triangles), sortFeaturesByY ? gfx::BufferUsageType::StreamDraw
-                                                              : gfx::BufferUsageType::StaticDraw);
-            sdfIcon.vertexBuffer = uploadPass.createVertexBuffer(std::move(sdfIcon.vertices));
-            for (auto& pair : paintProperties) {
-                pair.second.iconBinders.upload(uploadPass);
-            }
-        } else if (!sortUploaded) {
-            uploadPass.updateIndexBuffer(*icon.indexBuffer, std::move(sdfIcon.triangles));
-        }
-        if (!dynamicUploaded) {
-            if (!sdfIcon.dynamicVertexBuffer) {
-                sdfIcon.dynamicVertexBuffer = uploadPass.createVertexBuffer(
-                    std::move(sdfIcon.dynamicVertices), gfx::BufferUsageType::StreamDraw);
-            } else {
-                uploadPass.updateVertexBuffer(*sdfIcon.dynamicVertexBuffer,
-                                              std::move(sdfIcon.dynamicVertices));
-            }
-        }
-        if (!placementChangesUploaded) {
-            if (!sdfIcon.opacityVertexBuffer) {
-                sdfIcon.opacityVertexBuffer = uploadPass.createVertexBuffer(
-                    std::move(sdfIcon.opacityVertices), gfx::BufferUsageType::StreamDraw);
-            } else {
-                uploadPass.updateVertexBuffer(*sdfIcon.opacityVertexBuffer,
-                                              std::move(sdfIcon.opacityVertices));
-            }
-        }
+        updateIconBuffer(sdfIcon);
     }
 
     if (hasCollisionBoxData()) {
@@ -224,7 +199,7 @@ void SymbolBucket::sortFeatures(const float angle) {
 
     // The current approach to sorting doesn't sort across segments so don't try.
     // Sorting within segments separately seemed not to be worth the complexity.
-    if (text.segments.size() > 1 || icon.segments.size() > 1) {
+    if (text.segments.size() > 1 || (icon.segments.size() > 1 || sdfIcon.segments.size() > 1)) {
         return;
     }
 
@@ -271,7 +246,11 @@ void SymbolBucket::sortFeatures(const float angle) {
         }
 
         if (symbolInstance.placedVerticalIconIndex) {
-            addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
+            if (symbolInstance.hasSdfIcon()) {
+                addPlacedSymbol(sdfIcon.triangles,               sdfIcon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
+            } else {
+                addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
+            }
         }
     }
 }

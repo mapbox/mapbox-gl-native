@@ -409,7 +409,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                     layout->evaluate<IconAnchor>(zoom, feature),
                     layout->evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
                 if (image->second->sdf) {
-                   iconFlag |= 0x02;
+                    iconFlag |= 0x02;
                 }
                 if (image->second->pixelRatio != pixelRatio) {
                     iconsNeedLinear = true;

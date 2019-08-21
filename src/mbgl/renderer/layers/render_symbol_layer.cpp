@@ -364,13 +364,13 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
         const auto& bucketPaintProperties = bucket.paintProperties.at(getID());
 
         auto addRenderables =
-            [&tile, renderData, &bucketPaintProperties,
-             it = renderableSegments.begin()](std::multiset<RenderableSegment>& renderableSegments,
+            [&tile, renderData, &bucketPaintProperties](std::multiset<RenderableSegment>& renderableSegs,
                                               auto& segments, bool isText) mutable {
+                auto it = renderableSegs.begin();
                 for (auto& segment : segments) {
-                    it = renderableSegments.emplace_hint(it, SegmentWrapper{ std::ref(segment) },
-                                                         tile, *renderData, bucketPaintProperties,
-                                                         segment.sortKey, isText);
+                    it = renderableSegs.emplace_hint(it, SegmentWrapper{ std::ref(segment) },
+                                                     tile, *renderData, bucketPaintProperties,
+                                                     segment.sortKey, isText);
                 }
             };
 
