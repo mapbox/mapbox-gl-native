@@ -1,0 +1,39 @@
+android:
+- platform/android/**/*
+
+core:
+- platform/default/**/*
+- src/**/*
+- test/**/*
+- vendor/**/*
+
+documentation:
+- ./**/*.md
+- ./**/*.md.ejs
+- platform/**/docs/**/*
+
+ios:
+- platform/ios/**/*
+- platform/darwin/**/*
+
+linux:
+- platform/linux/**/*
+
+macos:
+- platform/macos/**/*
+- platform/darwin/**/*
+
+node.js:
+- platform/node/**/*
+
+offline:
+- platform/android/src/offline/**/*
+- platform/default/mbgl/storage/offline*
+- include/mbgl/storage/offline*
+
+qt:
+- platform/qt/**/*
+
+telemetry:
+- platform/android/MapboxGLAndroidSDK/**/telemetry/**/*
+- platform/ios/vendor/mapbox-events-ios/**/*
