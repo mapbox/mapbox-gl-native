@@ -146,10 +146,10 @@ ViewportMode TransformState::getViewportMode() const {
 
 #pragma mark - Camera options
 
-CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const {
+CameraOptions TransformState::getCameraOptions(optional<EdgeInsets> padding) const {
     return CameraOptions()
         .withCenter(getLatLng())
-        .withPadding(padding)
+        .withPadding(padding ? padding : edgeInsets)
         .withZoom(getZoom())
         .withBearing(-bearing * util::RAD2DEG)
         .withPitch(pitch * util::RAD2DEG);

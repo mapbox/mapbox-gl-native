@@ -43,7 +43,7 @@ public:
     // Viewport mode
     ViewportMode getViewportMode() const;
 
-    CameraOptions getCameraOptions(const EdgeInsets&) const;
+    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
 
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
