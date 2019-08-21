@@ -21,7 +21,8 @@ This release changes how offline tile requests are billed — they are now bill
 
 ### Other changes
 
-* Fixed use of objects after moving, potentially causing crashes. [#15408](https://github.com/mapbox/mapbox-gl-native/pull/1540)
+* Fixed a bug where glyphs generated through the LocalGlyphRasterizer interface were changing fonts during some zoom changes. ([#15407](https://github.com/mapbox/mapbox-gl-native/pull/15407))
+* Fixed use of objects after moving, potentially causing crashes. ([#15408](https://github.com/mapbox/mapbox-gl-native/pull/15408))
 * Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function. ([#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398))
 * Fixed a rare crash when tile download requests returned “404 Not Found” errors. ([#15313](https://github.com/mapbox/mapbox-gl-native/pull/15313))
 * `MGLLoggingLevel` has been updated to better match core log levels. You can now use `MGLLoggingConfiguration.loggingLevel` to filter logs from core. ([#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120))
