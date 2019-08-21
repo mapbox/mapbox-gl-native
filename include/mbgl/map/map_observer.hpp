@@ -41,7 +41,7 @@ public:
     virtual void onDidFinishLoadingMap() {}
     virtual void onDidFailLoadingMap(MapLoadError, const std::string&) {}
     virtual void onWillStartRenderingFrame() {}
-    virtual void onDidFinishRenderingFrame(RenderMode) {}
+    virtual void onDidFinishRenderingFrame(RenderMode, bool /*placementChanged*/) {}
     virtual void onWillStartRenderingMap() {}
     virtual void onDidFinishRenderingMap(RenderMode) {}
     virtual void onDidFinishLoadingStyle() {}

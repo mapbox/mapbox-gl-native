@@ -32,7 +32,7 @@ public:
         }
     }
 
-    void onDidFinishRenderingFrame(RenderMode mode) final {
+    void onDidFinishRenderingFrame(RenderMode mode, bool) final {
         if (didFinishRenderingFrameCallback) {
             didFinishRenderingFrameCallback(mode);
         }

@@ -185,7 +185,7 @@ void NativeMapView::onWillStartRenderingFrame() {
     }
 }
 
-void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderMode mode) {
+void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderMode mode, bool) {
     assert(vm != nullptr);
 
     android::UniqueEnv _env = android::AttachEnv();
