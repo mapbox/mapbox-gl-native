@@ -12,6 +12,7 @@
 * `MGLLoggingLevel` has been updated for better matching core log levels. Now can use `[MGLLoggingConfiguration sharedConfiguration].loggingLevel` to filter logs from core . [#15120](https://github.com/mapbox/mapbox-gl-native/pull/15120)
 * Fixed an issue where animated camera transitions zoomed in or out too dramatically. [#15281](https://github.com/mapbox/mapbox-gl-native/pull/15281)
 * Fixed rendering and collision detection issues with using `text-variable-anchor` and `icon-text-fit` properties on the same layer. ([#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367))
+- Fixed symbol overlap when zooming out quickly. ([15416](https://github.com/mapbox/mapbox-gl-native/pull/15416))
 
 ### Styles and rendering
 
