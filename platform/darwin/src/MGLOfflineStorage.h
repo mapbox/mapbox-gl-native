@@ -173,6 +173,11 @@ typedef NS_ENUM(NSUInteger, MGLResourceKind) {
  packs and ambient caching. All of this class’s instance methods are asynchronous,
  reflecting the fact that offline resources are stored in a database. The shared
  object maintains a canonical collection of offline packs in its `packs` property.
+
+ Mapbox resources downloaded via this API are subject to separate Vector Tile and
+ Raster Tile API pricing and are not included in the Maps SDK’s “unlimited” requests.
+ See <a href="https://www.mapbox.com/pricing/">our pricing page</a> for more
+ information.
  
  #### Related examples
  See the <a href="https://docs.mapbox.com/ios/maps/examples/offline-pack/">
@@ -341,8 +346,7 @@ MGL_EXPORT
  attempt to download additional tiles until already downloaded tiles are removed
  by calling the `-removePack:withCompletionHandler:` method.
 
- @note The <a href="https://www.mapbox.com/tos/">Mapbox Terms of Service</a>
-    prohibits changing or bypassing this limit without permission from Mapbox.
+ @param maximumCount The maximum number of tiles allowed to be downloaded.
  */
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount;
 
@@ -420,7 +424,7 @@ MGL_EXPORT
 
 - (void)resetDatabaseWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
-/*
+/**
  Inserts the provided resource into the ambient cache.
  
  This method mimics the caching that would take place if the equivalent resource
