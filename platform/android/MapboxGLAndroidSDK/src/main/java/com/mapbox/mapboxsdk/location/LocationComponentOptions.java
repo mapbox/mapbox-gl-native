@@ -1530,8 +1530,11 @@ public class LocationComponentOptions implements Parcelable {
      * </p>
      *
      * @param padding The margins for the map in pixels (left, top, right, bottom).
+     * @deprecated Use {@link CameraPosition.Builder#padding(double, double, double, double)}
+     * or {@link CameraUpdateFactory#paddingTo(double, double, double, double)} instead.
      */
     @NonNull
+    @Deprecated
     public LocationComponentOptions.Builder padding(@Nullable int[] padding) {
       if (padding == null) {
         throw new NullPointerException("Null padding");
