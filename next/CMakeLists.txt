@@ -539,6 +539,8 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/renderer/sources/render_tile_source.hpp
     ${MBGL_ROOT}/src/mbgl/renderer/sources/render_vector_source.cpp
     ${MBGL_ROOT}/src/mbgl/renderer/sources/render_vector_source.hpp
+    ${MBGL_ROOT}/src/mbgl/renderer/source_state.cpp
+    ${MBGL_ROOT}/src/mbgl/renderer/source_state.hpp
     ${MBGL_ROOT}/src/mbgl/renderer/style_diff.cpp
     ${MBGL_ROOT}/src/mbgl/renderer/style_diff.hpp
     ${MBGL_ROOT}/src/mbgl/renderer/tile_mask.hpp
