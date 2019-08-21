@@ -108,7 +108,7 @@ public:
             const PatternLayerMap& patterns = patternFeature.patterns;
             const GeometryCollection& geometries = feature->getGeometries();
 
-            bucket->addFeature(*feature, geometries, patternPositions, patterns);
+            bucket->addFeature(*feature, geometries, patternPositions, patterns, i);
             featureIndex->insert(geometries, i, sourceLayerID, bucketLeaderID);
         }
         if (bucket->hasData()) {
