@@ -16,6 +16,7 @@ namespace mbgl {
 class RenderedQueryOptions;
 class RenderLayer;
 class TransformState;
+class SourceFeatureState;
 
 class CollisionIndex;
 
@@ -68,7 +69,8 @@ public:
             const RenderedQueryOptions& options,
             const UnwrappedTileID&,
             const std::unordered_map<std::string, const RenderLayer*>&,
-            const float additionalQueryPadding) const;
+            const float additionalQueryPadding,
+            const SourceFeatureState& sourceFeatureState) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
             const GeometryCoordinates& queryGeometry,
@@ -96,7 +98,8 @@ private:
             const GeometryCoordinates& queryGeometry,
             const TransformState& transformState,
             const float pixelsToTileUnits,
-            const mat4& posMatrix) const;
+            const mat4& posMatrix,
+            const SourceFeatureState* sourceFeatureState) const;
 
     GridIndex<IndexedSubfeature> grid;
     unsigned int sortIndex = 0;

@@ -54,7 +54,8 @@ public:
                           const TransformState& transformState,
                           const std::unordered_map<std::string, const RenderLayer*>&,
                           const RenderedQueryOptions& options,
-                          const mat4& projMatrix) const;
+                          const mat4& projMatrix,
+                          const mbgl::SourceFeatureState& featureState) const;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;
 

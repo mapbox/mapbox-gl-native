@@ -45,7 +45,8 @@ void Tile::queryRenderedFeatures(
         const TransformState&,
         const std::unordered_map<std::string, const RenderLayer*>&,
         const RenderedQueryOptions&,
-        const mat4&) {}
+        const mat4&,
+        const SourceFeatureState&) {}
 
 float Tile::getQueryPadding(const std::unordered_map<std::string, const RenderLayer*>&) {
     return 0;

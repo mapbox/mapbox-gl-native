@@ -127,7 +127,7 @@ RenderTileSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                           const std::unordered_map<std::string, const RenderLayer*>& layers,
                                           const RenderedQueryOptions& options,
                                           const mat4& projMatrix) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix, featureState);
 }
 
 std::vector<Feature> RenderTileSource::querySourceFeatures(const SourceQueryOptions& options) const {

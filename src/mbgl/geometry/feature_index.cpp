@@ -8,6 +8,7 @@
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/renderer/source_state.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
@@ -48,7 +49,8 @@ void FeatureIndex::query(
         const RenderedQueryOptions& queryOptions,
         const UnwrappedTileID& tileID,
         const std::unordered_map<std::string, const RenderLayer*>& layers,
-        const float additionalQueryPadding) const {
+        const float additionalQueryPadding,
+        const SourceFeatureState& sourceFeatureState) const {
     
     if (!tileData) {
         return;
@@ -74,7 +76,7 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryOptions, tileID.canonical, layers, queryGeometry, transformState, pixelsToTileUnits, posMatrix);
+        addFeature(result, indexedFeature, queryOptions, tileID.canonical, layers, queryGeometry, transformState, pixelsToTileUnits, posMatrix, &sourceFeatureState);
     }
 }
     
@@ -113,7 +115,7 @@ FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolF
 
     for (const auto& symbolFeature : sortedFeatures) {
         mat4 unusedMatrix;
-        addFeature(result, symbolFeature, queryOptions, tileID.canonical, layers, GeometryCoordinates(), {}, 0, unusedMatrix);
+        addFeature(result, symbolFeature, queryOptions, tileID.canonical, layers, GeometryCoordinates(), {}, 0, unusedMatrix, nullptr);
     }
     return result;
 }
@@ -127,7 +129,8 @@ void FeatureIndex::addFeature(
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
     const float pixelsToTileUnits,
-    const mat4& posMatrix) const {
+    const mat4& posMatrix,
+    const SourceFeatureState* sourceFeatureState) const {
 
     // Lazily calculated.
     std::unique_ptr<GeometryTileLayer> sourceLayer;
@@ -148,6 +151,13 @@ void FeatureIndex::addFeature(
             geometryTileFeature = sourceLayer->getFeature(indexedFeature.index);
             assert(geometryTileFeature);
         }
+        FeatureState state;
+        if (sourceFeatureState) {
+            optional<std::string> idStr = featureIDtoString(geometryTileFeature->getID());
+            if (idStr) {
+                sourceFeatureState->getState(state, sourceLayer->getName(), *idStr);
+            }
+        }
 
         bool needsCrossTileIndex = renderLayer->baseImpl->getTypeInfo()->crossTileIndex == style::LayerTypeInfo::CrossTileIndex::Required;
         if (!needsCrossTileIndex &&
@@ -159,7 +169,11 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        result[layerID].emplace_back(convertFeature(*geometryTileFeature, tileID));
+        Feature feature = convertFeature(*geometryTileFeature, tileID);
+        feature.source = renderLayer->baseImpl->source;
+        feature.sourceLayer = sourceLayer->getName();
+        feature.state = state;
+        result[layerID].emplace_back(feature);
     }
 }
 

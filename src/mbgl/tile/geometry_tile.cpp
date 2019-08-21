@@ -308,7 +308,8 @@ void GeometryTile::queryRenderedFeatures(
     const TransformState& transformState,
     const std::unordered_map<std::string, const RenderLayer*>& layers,
     const RenderedQueryOptions& options,
-    const mat4& projMatrix) {
+    const mat4& projMatrix,
+    const SourceFeatureState& featureState) {
 
     if (!getData()) return;
 
@@ -327,7 +328,8 @@ void GeometryTile::queryRenderedFeatures(
                               options,
                               id.toUnwrapped(),
                               layers,
-                              queryPadding * transformState.maxPitchScaleFactor());
+                              queryPadding * transformState.maxPitchScaleFactor(),
+                              featureState);
 }
 
 void GeometryTile::querySourceFeatures(
