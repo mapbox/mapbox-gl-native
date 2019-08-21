@@ -20,7 +20,8 @@ bool isFeatureConstant(const Expression& expression) {
         } else if (
             name == "properties" ||
             name == "geometry-type" ||
-            name == "id"
+            name == "id" ||
+            name == "feature-state"
         ) {
             return false;
         } else if (0u == name.rfind(filter, 0u)) {
