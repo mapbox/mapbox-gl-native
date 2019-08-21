@@ -675,6 +675,20 @@ const auto& errorCompoundExpression() {
     return signature;
 }
 
+const auto& featureStateCompoundExpression() {
+    static auto signature = detail::makeSignature("feature-state", [](const EvaluationContext& params, const std::string& key) -> Result<Value> {
+        mbgl::Value state;
+        if (params.featureState) {
+            auto it = params.featureState->find(key);
+            if (it != params.featureState->end()) {
+                state = mbgl::Value(it->second);
+            }
+        }
+        return toExpressionValue(state);
+    });
+    return signature;
+}
+
 // Legacy Filters
 const auto& filterEqualsCompoundExpression() {
     static auto signature = detail::makeSignature("filter-==", [](const EvaluationContext& params, const std::string& key, const Value &lhs) -> Result<bool> {
@@ -921,6 +935,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto compoundExpressionRegistry = mapbox::eternal
     { "concat", concatCompoundExpression },
     { "resolved-locale", resolvedLocaleCompoundExpression },
     { "error", errorCompoundExpression },
+    { "feature-state", featureStateCompoundExpression },
     // Legacy Filters
     { "filter-==", filterEqualsCompoundExpression },
     { "filter-id-==", filterIdEqualsCompoundExpression },
