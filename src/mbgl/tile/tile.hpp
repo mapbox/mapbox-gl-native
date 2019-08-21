@@ -28,6 +28,7 @@ class TileRenderData;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class CollisionIndex;
+class SourceFeatureState;
 
 namespace gfx {
 class UploadPass;
@@ -73,7 +74,8 @@ public:
             const TransformState&,
             const std::unordered_map<std::string, const RenderLayer*>&,
             const RenderedQueryOptions& options,
-            const mat4& projMatrix);
+            const mat4& projMatrix,
+            const SourceFeatureState& featureState);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,

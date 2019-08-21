@@ -54,7 +54,8 @@ public:
             const TransformState&,
             const std::unordered_map<std::string, const RenderLayer*>& layers,
             const RenderedQueryOptions& options,
-            const mat4& projMatrix) override;
+            const mat4& projMatrix,
+            const SourceFeatureState& featureState) override;
 
     void querySourceFeatures(
         std::vector<Feature>& result,

@@ -49,7 +49,7 @@ RenderAnnotationSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                               const std::unordered_map<std::string, const RenderLayer*>& layers,
                                               const RenderedQueryOptions& options,
                                               const mat4& projMatrix) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix, {});
 }
 
 std::vector<Feature> RenderAnnotationSource::querySourceFeatures(const SourceQueryOptions&) const {
