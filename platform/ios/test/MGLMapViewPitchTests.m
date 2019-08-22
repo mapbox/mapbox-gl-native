@@ -4,6 +4,9 @@
 @interface MockUIPanGestureRecognizer : UIPanGestureRecognizer
 @property CGFloat mbx_tiltGestureYTranslation;
 @property NSUInteger mbx_numberOfFingersForGesture;
+@property CGPoint mbx_middlePoint;
+@property CGPoint mbx_westPoint;
+@property CGPoint mbx_eastPoint;
 @end
 
 @implementation MockUIPanGestureRecognizer
@@ -11,11 +14,19 @@
     if (self = [super initWithTarget:target action:action]) {
         self.mbx_tiltGestureYTranslation = 0;
         self.mbx_numberOfFingersForGesture = 2;
+        self.mbx_westPoint = CGPointMake(100, self.mbx_tiltGestureYTranslation);
+        self.mbx_eastPoint = CGPointMake(200, self.mbx_tiltGestureYTranslation);
     }
     return self;
 }
 - (NSUInteger)numberOfTouches { return self.mbx_numberOfFingersForGesture; }
-- (CGPoint)translationInView:(UIView *)view { return CGPointMake(0, self.mbx_tiltGestureYTranslation); }
+- (CGPoint)translationInView:(UIView *)view { return CGPointMake(self.mbx_middlePoint.x, self.mbx_tiltGestureYTranslation); }
+- (CGPoint)locationOfTouch:(NSUInteger)touchIndex inView:(UIView *)view {
+    if (touchIndex == 0) {
+        return CGPointMake(self.mbx_westPoint.x, self.mbx_tiltGestureYTranslation);
+    }
+    return CGPointMake(self.mbx_eastPoint.x, self.mbx_tiltGestureYTranslation);
+}
 - (void)setTiltGestureYTranslationForPitchDegrees:(CGFloat)degrees {
     // The tilt gesture takes the number of screen points the fingers have moved and then divides them by a "slowdown" factor, which happens to be set to 2.0 in -[MGLMapView handleTwoFingerDragGesture:].
     self.mbx_tiltGestureYTranslation = -(degrees * 2.0);
