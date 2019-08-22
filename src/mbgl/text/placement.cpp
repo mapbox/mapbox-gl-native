@@ -367,7 +367,7 @@ void Placement::placeBucket(
                 shift = {0.0f, 0.0f};
             }
 
-            const auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
+            const auto& iconBuffer = symbolInstance.hasSdfIcon ? bucket.sdfIcon : bucket.icon;
             const PlacedSymbol& placedSymbol = iconBuffer.placedSymbols.at(*symbolInstance.placedIconIndex);
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
             const auto& placeIconFeature = [&] (const CollisionFeature& collisionFeature) {
@@ -391,7 +391,7 @@ void Placement::placeBucket(
         }
 
         const bool iconWithoutText = !symbolInstance.hasText || layout.get<style::TextOptional>();
-        const bool textWithoutIcon = !(symbolInstance.hasIcon() || symbolInstance.hasSdfIcon()) || layout.get<style::IconOptional>();
+        const bool textWithoutIcon = !symbolInstance.hasIcon || layout.get<style::IconOptional>();
 
         // combine placements for icon and text
         if (!iconWithoutText && !textWithoutIcon) {
@@ -772,9 +772,9 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                 markUsedJustification(bucket, prevOffset->second.anchor, symbolInstance, previousOrientation);
             }
         }
-        if (symbolInstance.hasIcon()) {
+        if (symbolInstance.hasIcon) {
             const auto& opacityVertex = SymbolIconProgram::opacityVertex(opacityState.icon.placed, opacityState.icon.opacity);
-            auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
+            auto& iconBuffer = symbolInstance.hasSdfIcon ? bucket.sdfIcon : bucket.icon;
             
             if (symbolInstance.placedIconIndex) {
                 iconBuffer.opacityVertices.extend(4, opacityVertex);
@@ -935,7 +935,7 @@ void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingMode
         bucket.text.placedSymbols.at(*symbolInstance.placedVerticalTextIndex).placedOrientation = vertical;
     }
 
-    auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket.sdfIcon : bucket.icon;
+    auto& iconBuffer = symbolInstance.hasSdfIcon ? bucket.sdfIcon : bucket.icon;
     if (symbolInstance.placedIconIndex) {
         iconBuffer.placedSymbols.at(*symbolInstance.placedIconIndex).placedOrientation = horizontal;
     }

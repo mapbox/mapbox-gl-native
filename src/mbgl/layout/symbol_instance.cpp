@@ -108,8 +108,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     radialTextOffset(radialTextOffset_),
     singleLine(shapedTextOrientations.singleLine) {
     assert(iconFlag < 3);
-    sdfIcon = iconFlag & 0x02;
-    normalIcon = iconFlag & 0x01;
+    hasIcon = iconFlag & 0x03;
+    hasSdfIcon = iconFlag & 0x02;
     if (allowVerticalPlacement && shapedTextOrientations.vertical) {
         const float verticalPointLabelAngle = 90.0f;
         verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation + verticalPointLabelAngle);
@@ -170,14 +170,6 @@ const optional<SymbolQuad>& SymbolInstance::iconQuad() const {
 const optional<SymbolQuad>& SymbolInstance::verticalIconQuad() const {
     assert(sharedData);
     return sharedData->verticalIconQuad;
-}
-
-bool SymbolInstance::hasIcon() const {
-    return normalIcon || sdfIcon;
-}
-
-bool SymbolInstance::hasSdfIcon() const {
-    return sdfIcon;
 }
 
 void SymbolInstance::releaseSharedData() {

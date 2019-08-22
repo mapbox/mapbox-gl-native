@@ -632,7 +632,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
         const bool hasText = symbolInstance.hasText;
-        const bool hasIcon = symbolInstance.hasIcon();
+        const bool hasIcon = symbolInstance.hasIcon;
         const bool singleLine = symbolInstance.singleLine;
 
         const auto& feature = features.at(symbolInstance.layoutFeatureIndex);
@@ -643,7 +643,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
         // is used when dynamic vertices for icon-text-fit image have to be updated.
         if (hasIcon) {
             const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
-            auto& iconBuffer = symbolInstance.hasSdfIcon() ? bucket->sdfIcon : bucket->icon;
+            auto& iconBuffer = symbolInstance.hasSdfIcon ? bucket->sdfIcon : bucket->icon;
             const auto placeIcon = [&] (const SymbolQuad& iconQuad, auto& index, const WritingModeType writingMode) {
                 iconBuffer.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.iconOffset, writingMode, symbolInstance.line(), std::vector<float>());
