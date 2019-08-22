@@ -142,9 +142,9 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       .withCluster(true)
       .withClusterMaxZoom(14)
       .withClusterRadius(50)
-      .withClusterProperty("max", max(accumulated(), get("max")).toArray(), get("mag").toArray())
-      .withClusterProperty("sum", "+", get("mag").toArray())
-      .withClusterProperty("felt", "any", neq(get("felt"), literal("null")).toArray())
+      .withClusterProperty("max", max(accumulated(), get("max")), get("mag"))
+      .withClusterProperty("sum", literal("+"), get("mag"))
+      .withClusterProperty("felt", literal("any"), neq(get("felt"), literal("null")))
     );
   }
 
