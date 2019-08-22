@@ -63,8 +63,8 @@ NSString *const MBXReuseQueueStatsEnabled = @"MBXReuseQueueStatsEnabled";
     return YES;
 }
 
-- (NSString*) debugDescription {
-    return [NSString stringWithFormat:@"Camera: %@\nTracking mode: %lu\nShows user location: %@\nDebug mask value: %lu\nShows zoom level ornament: %@\nShows time frame graph: %@\nDebug logging enabled: %@\nShows map scale: %@\nShows user heading indicator: %@\nFramerate measurement enabled: %@\nReuse queue stats enabled: %@",
+- (NSString *)debugDescription {
+    return [NSString stringWithFormat:@"Camera: %@\nTracking mode: %lu\nShows user location: %@\nDebug mask value: %lu\nShows zoom level ornament: %@\nShows time frame graph: %@\nShows map scale: %@\nShows user heading indicator: %@\nFramerate measurement enabled: %@\nReuse queue stats enabled: %@",
             self.camera,
             (unsigned long)self.userTrackingMode,
             self.showsUserLocation ? @"YES" : @"NO",
