@@ -1436,6 +1436,27 @@ public class Expression {
   }
 
   /**
+   * Gets the value of a cluster property accumulated so far. Can only be used in the clusterProperties
+   * option of a clustered GeoJSON source.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   *  GeoJsonOptions options = new GeoJsonOptions()
+   *                              .withCluster(true)
+   *                              .withClusterProperty("max", max(accumulated(), get("max")).toArray(), get("mag").toArray());
+   * }
+   * </pre>
+   *
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-accumulated">Style specification</a>
+   */
+  public static Expression accumulated() {
+    return new Expression("accumulated");
+  }
+
+  /**
    * Gets the kernel density estimation of a pixel in a heatmap layer,
    * which is a relative measure of how many data points are crowded around a particular pixel.
    * Can only be used in the `heatmap-color` property.
