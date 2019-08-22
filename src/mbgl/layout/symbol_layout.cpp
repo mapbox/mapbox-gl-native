@@ -398,18 +398,20 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
         }
 
         // if feature has icon, get sprite atlas position
+        
+        // Bitwise flag for icon status. 0x00 => not an icon, 0x01 => normal icon, 0x02 => sdf icon
         uint8_t iconFlag{0x00};
         if (feature.icon) {
             auto image = imageMap.find(*feature.icon);
             if (image != imageMap.end()) {
-                iconFlag |= 0x01;
+                iconFlag = 0x01;
                 shapedIcon = PositionedIcon::shapeIcon(
                     imagePositions.at(*feature.icon),
                     layout->evaluate<IconOffset>(zoom, feature),
                     layout->evaluate<IconAnchor>(zoom, feature),
                     layout->evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
                 if (image->second->sdf) {
-                    iconFlag |= 0x02;
+                    iconFlag = 0x02;
                 }
                 if (image->second->pixelRatio != pixelRatio) {
                     iconsNeedLinear = true;

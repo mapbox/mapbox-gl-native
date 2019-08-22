@@ -84,9 +84,9 @@ private:
 
 public:
     Anchor anchor;
-    bool hasText;
-    // Bitwise icon status flag, 0x00 => not an icon; 0x01 => normal icon; 0x03 => sdfIcon. default value 0x00
-    uint8_t iconStatus;
+    bool hasText : 1;
+    bool sdfIcon : 1;
+    bool normalIcon : 1;
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;
