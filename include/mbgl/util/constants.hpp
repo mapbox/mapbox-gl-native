@@ -34,7 +34,13 @@ constexpr double LATITUDE_MAX = 85.051128779806604;
 constexpr double LONGITUDE_MAX = 180;
 constexpr double DEGREES_MAX = 360;
 constexpr double PITCH_MIN = 0.0;
-constexpr double PITCH_MAX = M_PI / 3;
+/*
+ * Max pitch is limited to 90 deg - TransformState::fov / 2, which evaluates to 71.5 deg, when
+ * perspective center's offset is 0.  When padding is used, and the perspective center moved from
+ * center of the screen, max pitch is further capped by Transform::getMaxPitchForEdgeInsets.
+ * We set the max to 70 to keep the limit constant with small padding.
+ */
+constexpr double PITCH_MAX = 70 * DEG2RAD;
 constexpr double MIN_ZOOM = 0.0;
 constexpr double MAX_ZOOM = 25.5;
 constexpr float  MIN_ZOOM_F = MIN_ZOOM;

@@ -49,6 +49,10 @@ public:
     double pixel_x() const;
     double pixel_y() const;
 
+    // Viewport center offset, from [size.width / 2, size.height / 2], defined
+    // by |edgeInsets| in screen coordinates, with top left origin.
+    ScreenCoordinate getCenterOffset() const;
+
     // Zoom
     double getZoom() const;
     uint8_t getIntegerZoom() const;
@@ -95,10 +99,6 @@ public:
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
-
-    // Viewport center offset, from [size.width / 2, size.height / 2], defined
-    // by |edgeInsets| in screen coordinates, with top left origin.
-    ScreenCoordinate getCenterOffset() const;
 
     LatLngBounds bounds;
 

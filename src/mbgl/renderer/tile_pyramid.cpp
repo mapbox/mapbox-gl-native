@@ -106,11 +106,11 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
             }
 
             if (panZoom < idealZoom) {
-                panTiles = util::tileCover(parameters.transformState, panZoom);
+                panTiles = util::tileCoverWithLOD(parameters.transformState, panZoom, zoomRange.min);
             }
         }
 
-        idealTiles = util::tileCover(parameters.transformState, idealZoom);
+        idealTiles = util::tileCoverWithLOD(parameters.transformState, idealZoom, zoomRange.min);
     }
 
     // Stores a list of all the tiles that we're definitely going to retain. There are two

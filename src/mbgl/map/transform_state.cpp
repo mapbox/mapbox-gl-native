@@ -174,6 +174,10 @@ double TransformState::pixel_y() const {
     return center + y;
 }
 
+ScreenCoordinate TransformState::getCenterOffset() const {
+    return { 0.5 * (edgeInsets.left() - edgeInsets.right()), 0.5 * (edgeInsets.top() - edgeInsets.bottom()) };
+}
+
 #pragma mark - Zoom
 
 double TransformState::getZoom() const {
@@ -371,10 +375,6 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
         double max_x = (scale_ * util::tileSize - (rotatedNorth() ? size.height : size.width)) / 2;
         x_ = std::max(-max_x, std::min(x_, max_x));
     }
-}
-
-ScreenCoordinate TransformState::getCenterOffset() const {
-    return { 0.5 * (edgeInsets.left() - edgeInsets.right()), 0.5 * (edgeInsets.top() - edgeInsets.bottom()) };
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {

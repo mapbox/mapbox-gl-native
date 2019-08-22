@@ -173,6 +173,62 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
         z);
 }
 
+std::vector<UnwrappedTileID> tileCoverWithLOD(const TransformState& state, int32_t z, int32_t minZ) {
+    assert(state.valid());
+
+    const double w = state.getSize().width;
+    const double h = state.getSize().height;
+
+    const auto offset = state.getCenterOffset();
+    constexpr double zoomDiff = 1.0;
+    // Explanation on 0.55: mathematically, it is 0.5 used in calculation of
+    // the next LOD. 0.55 is chosen to avoid using LOD for less than 60 degrees
+    // pitch.
+    constexpr double coefLOD[] = {
+       0.55 * zoomDiff / (zoomDiff + 1),
+       0.55 * (zoomDiff + 1) / (zoomDiff + 2),
+       0.55 * (zoomDiff + 2) / (zoomDiff + 3)
+    };
+    // Tangens of field of view above center.
+    const double tanFov = (h * 0.5 + offset.y) / (1.5 * h);
+
+    std::vector<UnwrappedTileID> result;
+    double top = 0.0;
+    double bottom = 0.0;
+
+    for (size_t i = 0; top < h && i <= std::extent<decltype(coefLOD)>::value; i++, z--) {
+        if (z == minZ || i == std::extent<decltype(coefLOD)>::value) {
+            top = h; // final pass, get all to the top.
+        } else {
+            const double treshold = state.getPitch() ?  : (h * 0.5 + offset.y);
+            top = std::min(h, treshold );
+            top = state.getPitch()
+                ? std::min(h, h * 0.5 - offset.y + h * coefLOD[i] / (tanFov * std::tan(state.getPitch())))
+                : h;
+        }
+        std::vector<UnwrappedTileID> cover = tileCover(
+            TileCoordinate::fromScreenCoordinate(state, z, { 0,   top }).p,
+            TileCoordinate::fromScreenCoordinate(state, z, { w,   top }).p,
+            TileCoordinate::fromScreenCoordinate(state, z, { w,   bottom }).p,
+            TileCoordinate::fromScreenCoordinate(state, z, { 0,   bottom }).p,
+            TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
+            z);
+        bottom = top;
+        if (i == 0) {
+            if (top == h) {
+                return cover;
+            }
+            std::swap(result, cover);
+            continue;
+        }
+        result.insert(
+            result.end(),
+            std::make_move_iterator(cover.begin()),
+            std::make_move_iterator(cover.end()));
+    }
+    return result;
+}
+
 std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t z) {
     std::vector<UnwrappedTileID> result;
     TileCover tc(geometry, z, true);
