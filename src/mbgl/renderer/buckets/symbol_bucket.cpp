@@ -235,7 +235,7 @@ void SymbolBucket::sortFeatures(const float angle) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedVerticalTextIndex]);
         }
 
-        auto& iconBuffer = symbolInstance.hasSdfIcon() ? sdfIcon : icon;
+        auto& iconBuffer = symbolInstance.hasSdfIcon ? sdfIcon : icon;
         if (symbolInstance.placedIconIndex) {
             addPlacedSymbol(iconBuffer.triangles,
                             iconBuffer.placedSymbols[*symbolInstance.placedIconIndex]);

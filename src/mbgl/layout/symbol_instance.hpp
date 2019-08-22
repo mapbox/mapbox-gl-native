@@ -75,8 +75,6 @@ public:
     const SymbolQuads& verticalGlyphQuads() const;
     const optional<SymbolQuad>& iconQuad() const;
     const optional<SymbolQuad>& verticalIconQuad() const;
-    bool hasIcon() const;
-    bool hasSdfIcon() const;
     void releaseSharedData();
 
 private:
@@ -85,8 +83,8 @@ private:
 public:
     Anchor anchor;
     bool hasText : 1;
-    bool sdfIcon : 1;
-    bool normalIcon : 1;
+    bool hasIcon : 1;
+    bool hasSdfIcon : 1;
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;
