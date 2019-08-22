@@ -88,12 +88,12 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const float iconRotation,
                                const float textRotation,
                                float radialTextOffset_,
-                               bool allowVerticalPlacement) :
+                               bool allowVerticalPlacement,
+                               const uint8_t iconFlag) :
     sharedData(std::move(sharedData_)),
     anchor(anchor_),
     // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
     hasText(!sharedData->empty()),
-    hasIcon(shapedIcon),
     // Create the collision features that will be used to check whether this symbol instance can be placed
     // As a collision approximation, we can use either the vertical or any of the horizontal versions of the feature
     textCollisionFeature(sharedData->line, anchor, getAnyShaping(shapedTextOrientations), textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation),
@@ -107,7 +107,9 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     textBoxScale(textBoxScale_),
     radialTextOffset(radialTextOffset_),
     singleLine(shapedTextOrientations.singleLine) {
-
+    assert(iconFlag < 3);
+    sdfIcon = iconFlag & 0x02;
+    normalIcon = iconFlag & 0x01;
     if (allowVerticalPlacement && shapedTextOrientations.vertical) {
         const float verticalPointLabelAngle = 90.0f;
         verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation + verticalPointLabelAngle);
@@ -168,6 +170,14 @@ const optional<SymbolQuad>& SymbolInstance::iconQuad() const {
 const optional<SymbolQuad>& SymbolInstance::verticalIconQuad() const {
     assert(sharedData);
     return sharedData->verticalIconQuad;
+}
+
+bool SymbolInstance::hasIcon() const {
+    return normalIcon || sdfIcon;
+}
+
+bool SymbolInstance::hasSdfIcon() const {
+    return sdfIcon;
 }
 
 void SymbolInstance::releaseSharedData() {

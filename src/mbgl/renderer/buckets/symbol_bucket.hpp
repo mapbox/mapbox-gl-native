@@ -55,7 +55,6 @@ public:
                  const style::PropertyValue<float>& textSize,
                  const style::PropertyValue<float>& iconSize,
                  float zoom,
-                 bool sdfIcons,
                  bool iconsNeedLinear,
                  bool sortFeaturesByY,
                  const std::string bucketLeaderID,
@@ -72,6 +71,7 @@ public:
     void updateVertices(Placement&, bool updateOpacities, const TransformState&, const RenderTile&, std::set<uint32_t>&) override;
     bool hasTextData() const;
     bool hasIconData() const;
+    bool hasSdfIconData() const;
     bool hasCollisionBoxData() const;
     bool hasCollisionCircleData() const;
     bool hasFormatSectionOverrides() const;
@@ -86,7 +86,6 @@ public:
     float sortedAngle = std::numeric_limits<float>::max();
 
     // Flags
-    const bool sdfIcons : 1;
     const bool iconsNeedLinear : 1;
     const bool sortFeaturesByY : 1;
     bool staticUploaded : 1;
@@ -124,7 +123,8 @@ public:
     std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
 
     Buffer icon;
-
+    Buffer sdfIcon;
+    
     struct CollisionBuffer {
         gfx::VertexVector<gfx::Vertex<CollisionBoxLayoutAttributes>> vertices;
         gfx::VertexVector<gfx::Vertex<CollisionBoxDynamicAttributes>> dynamicVertices;
