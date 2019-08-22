@@ -34,7 +34,7 @@ public:
     ~GeometryTile() override;
 
     void setError(std::exception_ptr);
-    void setData(std::unique_ptr<const GeometryTileData>);
+    void setData(std::unique_ptr<const GeometryTileData>, bool resetLayers = false);
 
     std::unique_ptr<TileRenderData> createRenderData() override;
     void setLayers(const std::vector<Immutable<style::LayerProperties>>&) override;

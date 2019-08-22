@@ -14,7 +14,7 @@ public:
                 const TileParameters&,
                 mapbox::feature::feature_collection<int16_t>);
 
-    void updateData(mapbox::feature::feature_collection<int16_t>);
+    void updateData(mapbox::feature::feature_collection<int16_t>, bool resetLayers = false);
 
     void querySourceFeatures(
         std::vector<Feature>& result,

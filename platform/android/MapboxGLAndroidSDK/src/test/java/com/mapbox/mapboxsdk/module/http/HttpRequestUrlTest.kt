@@ -20,14 +20,14 @@ class HttpRequestUrlTest {
 
   @Test
   fun testOfflineFlagMapboxCom() {
-    val expected = "http://mapbox.com/path/of/no/return.pbf?sku=foobar&offline=true"
+    val expected = "http://mapbox.com/path/of/no/return.pbf?offline=true"
     val actual = HttpRequestUrl.buildResourceUrl("mapbox.com", "http://mapbox.com/path/of/no/return.pbf", 0, true)
     assertEquals(expected, actual)
   }
 
   @Test
   fun testOfflineFlagMapboxCn() {
-    val expected = "http://mapbox.cn/path/of/no/return.pbf?sku=foobar&offline=true"
+    val expected = "http://mapbox.cn/path/of/no/return.pbf?offline=true"
     val actual = HttpRequestUrl.buildResourceUrl("mapbox.cn", "http://mapbox.cn/path/of/no/return.pbf", 0, true)
     assertEquals(expected, actual)
   }
