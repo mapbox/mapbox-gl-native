@@ -268,7 +268,7 @@ public:
 @property (nonatomic, copy) NSURL *residualStyleURL;
 
 /// Tilt gesture recognizer helper
-@property (nonatomic, assign) CGPoint dragGestureMidPoint;
+@property (nonatomic, assign) CGPoint dragGestureMiddlePoint;
 
 - (mbgl::Map &)mbglMap;
 
@@ -2142,7 +2142,9 @@ public:
     
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
-        self.dragGestureMidPoint = [twoFingerDrag translationInView:twoFingerDrag.view];
+        CGPoint midPoint = [twoFingerDrag translationInView:twoFingerDrag.view];
+        // Creates an angle at the beginning of the gesture
+        self.dragGestureMiddlePoint = CGPointMake(midPoint.x, midPoint.y-1);
         initialPitch = *self.mbglMap.getCameraOptions().pitch;
         [self notifyGestureDidBegin];
     }
@@ -2161,8 +2163,8 @@ public:
         
         CGPoint middlePoint = [twoFingerDrag translationInView:twoFingerDrag.view];
         
-        CLLocationDegrees gestureSlopeAngle = [self angleBetweenPoints:self.dragGestureMidPoint endPoint:middlePoint];
-        self.dragGestureMidPoint = middlePoint;
+        CLLocationDegrees gestureSlopeAngle = [self angleBetweenPoints:self.dragGestureMiddlePoint endPoint:middlePoint];
+        self.dragGestureMiddlePoint = middlePoint;
         if (fabs(fingerSlopeAngle) < 45 && fabs(gestureSlopeAngle) > 60 ) {
             
             CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
@@ -2192,7 +2194,7 @@ public:
     {
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededForGesture];
-        self.dragGestureMidPoint = CGPointZero;
+        self.dragGestureMiddlePoint = CGPointZero;
     }
 
 }
