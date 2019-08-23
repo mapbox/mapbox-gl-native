@@ -168,7 +168,8 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
 }
 
 bool SymbolBucket::hasData() const {
-    return hasTextData() || hasIconData() || hasSdfIconData() || hasIconCollisionBoxData() || hasTextCollisionBoxData();
+    return hasTextData() || hasIconData() || hasSdfIconData() || hasIconCollisionBoxData() ||
+           hasTextCollisionBoxData() || hasIconCollisionCircleData() || hasTextCollisionCircleData();
 }
 
 bool SymbolBucket::hasTextData() const {

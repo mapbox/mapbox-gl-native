@@ -807,7 +807,6 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
 }
 
 void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
-    
     if (!hasSymbolInstances()) {
         return;
     }
