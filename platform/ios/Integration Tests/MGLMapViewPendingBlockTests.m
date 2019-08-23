@@ -149,7 +149,8 @@
                                           addToPendingCallback:nil];
 }
 
-- (void)testFlyToCamera {
+// Marked as pending due to https://github.com/mapbox/mapbox-gl-native/issues/15471
+- (void)testFlyToCameraPENDING {
     __typeof__(self) weakSelf = self;
     
     void (^transition)(dispatch_block_t) = ^(dispatch_block_t completion) {
@@ -324,6 +325,8 @@
     XCTAssert(self.mapView.pendingCompletionBlocks.count == 0);
     
     __block BOOL blockAddedToPendingBlocks = NO;
+    
+    // Observes changes to pendingCompletionBlocks (including additions)
     self.observation = ^(NSDictionary *change){
 
         NSLog(@"change = %@ count = %lu", change, myself.mapView.pendingCompletionBlocks.count);
@@ -333,8 +336,8 @@
         MGLTestAssert(myself, [value isKindOfClass:[NSArray class]]);
         
         if (value.count > 0) {
-            MGLTestAssert(myself, [value containsObject:block]);
-            
+            MGLTestAssert(myself, [value containsObject:block]);            
+            MGLTestAssert(myself, !blockAddedToPendingBlocks);
             if ([myself.mapView.pendingCompletionBlocks containsObject:block]) {
                 blockAddedToPendingBlocks = YES;
                 
