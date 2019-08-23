@@ -1,4 +1,5 @@
 add_executable(mbgl-render-test
+    render-test/allocation_index.cpp
     render-test/main.cpp
     render-test/parser.cpp
     render-test/runner.cpp
