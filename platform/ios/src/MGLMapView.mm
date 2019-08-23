@@ -1065,18 +1065,19 @@ public:
     }
 }
 
-- (BOOL)addPendingBlock:(dispatch_block_t)block
+- (BOOL)scheduleTransitionCompletion:(dispatch_block_t)block
 {
     // Only add a block if the display link (that calls processPendingBlocks) is
     // running, otherwise fall back to calling immediately.
-    BOOL addBlock = (_displayLink && !_displayLink.isPaused);
-    
-    if (addBlock)
+    if (_displayLink && !_displayLink.isPaused)
     {
+        [self willChangeValueForKey:@"pendingCompletionBlocks"];
         [self.pendingCompletionBlocks addObject:block];
+        [self didChangeValueForKey:@"pendingCompletionBlocks"];
+        return YES;
     }
-
-    return addBlock;
+    
+    return NO;
 }
 
 #pragma mark - Life Cycle -
@@ -3395,7 +3396,7 @@ public:
         __weak __typeof__(self) weakSelf = self;
         
         pendingCompletion = ^{
-            if (![weakSelf addPendingBlock:completion])
+            if (![weakSelf scheduleTransitionCompletion:completion])
             {
                 completion();
             }
@@ -3590,7 +3591,7 @@ public:
         __weak __typeof__(self) weakSelf = self;
         
         pendingCompletion = ^{
-            if (![weakSelf addPendingBlock:completion])
+            if (![weakSelf scheduleTransitionCompletion:completion])
             {
                 completion();
             }
@@ -3758,7 +3759,7 @@ public:
         __weak __typeof__(self) weakSelf = self;
         
         pendingCompletion = ^{
-            if (![weakSelf addPendingBlock:completion])
+            if (![weakSelf scheduleTransitionCompletion:completion])
             {
                 completion();
             }
@@ -3837,7 +3838,7 @@ public:
         __weak __typeof__(self) weakSelf = self;
         
         pendingCompletion = ^{
-            if (![weakSelf addPendingBlock:completion])
+            if (![weakSelf scheduleTransitionCompletion:completion])
             {
                 completion();
             }
