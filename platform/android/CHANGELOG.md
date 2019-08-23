@@ -9,7 +9,20 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ## 8.3.0
 This release changes how offline tile requests are billed — they are now billed on a pay-as-you-go basis and all developers are able raise the offline tile limit for their users. Offline requests were previously exempt from monthly active user (MAU) billing and increasing the offline per-user tile limit to more than 6,000 tiles required the purchase of an enterprise license. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://blog.mapbox.com/offline-maps-for-all-bb0fc51827be) and [#15380](https://github.com/mapbox/mapbox-gl-native/pull/15380).
 
+## 8.2.2 - August 23, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.1...android-v8.2.2) since [Mapbox Maps SDK for Android v8.2.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.1):
+
+### Bug fixes
+ - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function. [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398)
+ - Fixed use of objects after moving, potentially causing crashes. [#15408](https://github.com/mapbox/mapbox-gl-native/pull/1540)
+ - Fixed a wrong calculation of visibility in high pitch scenarios which might've led to tiles in the viewport not being rendered. [#15461](https://github.com/mapbox/mapbox-gl-native/pull/15461)
+
+### Other Changes
+ - Do not invalidate the camera immediately when map padding is set. Reverts a change introduced in the `v8.2.0`. [#15437](https://github.com/mapbox/mapbox-gl-native/pull/15437)
+
 ## 8.3.0-beta.1 - August 22, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-alpha.3...android-v8.3.0-beta.1) since [Mapbox Maps SDK for Android v8.3.0-alpha.3](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-alpha.3):
+
 ### Bug fixes
  - Fixed a bug where glyphs generated through the LocalGlyphRasterizer interface were changing fonts during some zoom changes. [#15407](https://github.com/mapbox/mapbox-gl-native/pull/15407)
  - Fixed use of objects after moving, potentially causing crashes. [#15408](https://github.com/mapbox/mapbox-gl-native/pull/15408)
