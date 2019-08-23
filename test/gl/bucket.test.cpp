@@ -127,6 +127,8 @@ TEST(Buckets, SymbolBucket) {
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasIconCollisionBoxData());
     ASSERT_FALSE(bucket.hasTextCollisionBoxData());
+    ASSERT_FALSE(bucket.hasIconCollisionCircleData());
+    ASSERT_FALSE(bucket.hasTextCollisionCircleData());
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
