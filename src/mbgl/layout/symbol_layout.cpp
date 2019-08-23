@@ -811,18 +811,14 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
     if (!hasSymbolInstances()) {
         return;
     }
-
+    
     for (const SymbolInstance& symbolInstance : symbolInstances) {
         auto populateCollisionBox = [&](const auto& feature, bool isText) {
             SymbolBucket::CollisionBuffer& collisionBuffer =
-                feature.alongLine ? (isText ? static_cast<SymbolBucket::CollisionBuffer&>(
-                                                  bucket.getOrCreateTextCollisionCircleBuffer())
-                                            : static_cast<SymbolBucket::CollisionBuffer&>(
-                                                  bucket.getOrCreateIconCollisionCircleBuffer()))
-                                  : (isText ? static_cast<SymbolBucket::CollisionBuffer&>(
-                                                  bucket.getOrCreateTextCollisionBox())
-                                            : static_cast<SymbolBucket::CollisionBuffer&>(
-                                                  bucket.getOrCreateIconCollisionBox()));
+                feature.alongLine ? (isText ? static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateTextCollisionCircleBuffer())
+                                            : static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateIconCollisionCircleBuffer()))
+                                  : (isText ? static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateTextCollisionBox())
+                                            : static_cast<SymbolBucket::CollisionBuffer&>(bucket.getOrCreateIconCollisionBox()));
 
             for (const CollisionBox& box : feature.boxes) {
                 auto& anchor = box.anchor;
@@ -835,16 +831,12 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 static constexpr std::size_t vertexLength = 4;
                 const std::size_t indexLength = feature.alongLine ? 6 : 8;
 
-                if (collisionBuffer.segments.empty() ||
-                    collisionBuffer.segments.back().vertexLength + vertexLength >
-                        std::numeric_limits<uint16_t>::max()) {
+                if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                     collisionBuffer.segments.emplace_back(
                         collisionBuffer.vertices.elements(),
                         feature.alongLine
-                            ? (isText ? bucket.textCollisionCircle->triangles.elements()
-                                      : bucket.iconCollisionCircle->triangles.elements())
-                            : (isText ? bucket.textCollisionBox->lines.elements()
-                                      : bucket.iconCollisionBox->lines.elements()));
+                            ? (isText ? bucket.textCollisionCircle->triangles.elements() : bucket.iconCollisionCircle->triangles.elements())
+                            : (isText ? bucket.textCollisionBox->lines.elements() : bucket.iconCollisionBox->lines.elements()));
                 }
 
                 auto& segment = collisionBuffer.segments.back();

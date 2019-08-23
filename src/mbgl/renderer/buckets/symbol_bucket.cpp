@@ -118,78 +118,46 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
         updateIconBuffer(sdfIcon);
     }
 
-    if (hasIconCollisionBoxData()) {
+    const auto updateCollisionBox = [&](CollisionBoxBuffer& collisionBox) {
         if (!staticUploaded) {
-            iconCollisionBox->indexBuffer =
-                uploadPass.createIndexBuffer(std::move(iconCollisionBox->lines));
-            iconCollisionBox->vertexBuffer =
-                uploadPass.createVertexBuffer(std::move(iconCollisionBox->vertices));
+            collisionBox.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionBox.lines));
+            collisionBox.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.vertices));
         }
         if (!placementChangesUploaded) {
-            if (!iconCollisionBox->dynamicVertexBuffer) {
-                iconCollisionBox->dynamicVertexBuffer = uploadPass.createVertexBuffer(
-                    std::move(iconCollisionBox->dynamicVertices), gfx::BufferUsageType::StreamDraw);
+            if (!collisionBox.dynamicVertexBuffer) {
+                collisionBox.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionBox.dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*iconCollisionBox->dynamicVertexBuffer,
-                                              std::move(iconCollisionBox->dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionBox.dynamicVertexBuffer, std::move(collisionBox.dynamicVertices));
             }
         }
+    };
+    if (hasIconCollisionBoxData()) {
+        updateCollisionBox(*iconCollisionBox);
     }
 
     if (hasTextCollisionBoxData()) {
-        if (!staticUploaded) {
-            textCollisionBox->indexBuffer =
-                uploadPass.createIndexBuffer(std::move(textCollisionBox->lines));
-            textCollisionBox->vertexBuffer =
-                uploadPass.createVertexBuffer(std::move(textCollisionBox->vertices));
-        }
-        if (!placementChangesUploaded) {
-            if (!textCollisionBox->dynamicVertexBuffer) {
-                textCollisionBox->dynamicVertexBuffer = uploadPass.createVertexBuffer(
-                    std::move(textCollisionBox->dynamicVertices), gfx::BufferUsageType::StreamDraw);
-            } else {
-                uploadPass.updateVertexBuffer(*textCollisionBox->dynamicVertexBuffer,
-                                              std::move(textCollisionBox->dynamicVertices));
-            }
-        }
+        updateCollisionBox(*textCollisionBox);
     }
 
-    if (hasIconCollisionCircleData()) {
+    const auto updateCollisionCircle = [&](CollisionCircleBuffer& collisionCircle) {
         if (!staticUploaded) {
-            iconCollisionCircle->indexBuffer =
-                uploadPass.createIndexBuffer(std::move(iconCollisionCircle->triangles));
-            iconCollisionCircle->vertexBuffer =
-                uploadPass.createVertexBuffer(std::move(iconCollisionCircle->vertices));
+            collisionCircle.indexBuffer = uploadPass.createIndexBuffer(std::move(collisionCircle.triangles));
+            collisionCircle.vertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.vertices));
         }
         if (!placementChangesUploaded) {
-            if (!iconCollisionCircle->dynamicVertexBuffer) {
-                iconCollisionCircle->dynamicVertexBuffer =
-                    uploadPass.createVertexBuffer(std::move(iconCollisionCircle->dynamicVertices),
-                                                  gfx::BufferUsageType::StreamDraw);
+            if (!collisionCircle.dynamicVertexBuffer) {
+                collisionCircle.dynamicVertexBuffer = uploadPass.createVertexBuffer(std::move(collisionCircle.dynamicVertices), gfx::BufferUsageType::StreamDraw);
             } else {
-                uploadPass.updateVertexBuffer(*iconCollisionCircle->dynamicVertexBuffer,
-                                              std::move(iconCollisionCircle->dynamicVertices));
+                uploadPass.updateVertexBuffer(*collisionCircle.dynamicVertexBuffer, std::move(collisionCircle.dynamicVertices));
             }
         }
+    };
+    if (hasIconCollisionCircleData()) {
+        updateCollisionCircle(*iconCollisionCircle);
     }
 
     if (hasTextCollisionCircleData()) {
-        if (!staticUploaded) {
-            textCollisionCircle->indexBuffer =
-                uploadPass.createIndexBuffer(std::move(textCollisionCircle->triangles));
-            textCollisionCircle->vertexBuffer =
-                uploadPass.createVertexBuffer(std::move(textCollisionCircle->vertices));
-        }
-        if (!placementChangesUploaded) {
-            if (!textCollisionCircle->dynamicVertexBuffer) {
-                textCollisionCircle->dynamicVertexBuffer =
-                    uploadPass.createVertexBuffer(std::move(textCollisionCircle->dynamicVertices),
-                                                  gfx::BufferUsageType::StreamDraw);
-            } else {
-                uploadPass.updateVertexBuffer(*textCollisionCircle->dynamicVertexBuffer,
-                                              std::move(textCollisionCircle->dynamicVertices));
-            }
-        }
+        updateCollisionCircle(*textCollisionCircle);
     }
 
     uploaded = true;

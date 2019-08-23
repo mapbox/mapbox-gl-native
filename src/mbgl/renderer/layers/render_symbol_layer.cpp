@@ -392,98 +392,62 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
             }
         }
 
-        static const style::Properties<>::PossiblyEvaluated properties {};
-        static const CollisionBoxProgram::Binders paintAttributeData(properties, 0);
-
-        auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
-        const float scale = std::pow(2, parameters.state.getZoom() - tile.getOverscaledTileID().overscaledZ);
-        std::array<float,2> extrudeScale =
+        const auto drawCollisonData = [&](const bool isText, const bool hasCollisionBox, const bool hasCollisionCircle) {
+            if (!hasCollisionBox && !hasCollisionCircle) return;
+            
+            static const style::Properties<>::PossiblyEvaluated properties {};
+            static const CollisionBoxProgram::Binders paintAttributeData(properties, 0);
+            auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
+            const float scale = std::pow(2, parameters.state.getZoom() - tile.getOverscaledTileID().overscaledZ);
+            std::array<float,2> extrudeScale =
             {{
                 parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
                 parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
             }};
-        const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData->layerProperties);
-        const auto& layout = *bucket.layout;
+            const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData->layerProperties);
+            const auto& layout = *bucket.layout;
+            const auto values = isText ? textPropertyValues(evaluated, layout) : iconPropertyValues(evaluated, layout);
+            const bool needTranslate = values.translate[0] != 0 || values.translate[1] != 0;
+            
+            if (hasCollisionBox) {
+                const auto& collisionBox = isText ? bucket.textCollisionBox : bucket.iconCollisionBox;
+                parameters.programs.getSymbolLayerPrograms().collisionBox.draw(
+                   parameters.context, *parameters.renderPass, gfx::Lines{ 1.0f },
+                   gfx::DepthMode::disabled(), gfx::StencilMode::disabled(),
+                   parameters.colorModeForRenderPass(), gfx::CullFaceMode::disabled(),
+                   CollisionBoxProgram::LayoutUniformValues{
+                       uniforms::matrix::Value((needTranslate
+                                                ? tile.translatedMatrix(values.translate, values.translateAnchor, parameters.state)
+                                                : tile.matrix)),
+                       uniforms::extrude_scale::Value(extrudeScale),
+                       uniforms::camera_to_center_distance::Value(parameters.state.getCameraToCenterDistance()) },
+                   *collisionBox->vertexBuffer, *collisionBox->dynamicVertexBuffer,
+                   *collisionBox->indexBuffer, collisionBox->segments, paintAttributeData, properties,
+                   CollisionBoxProgram::TextureBindings{}, parameters.state.getZoom(), getID());
+            }
+            if (hasCollisionCircle) {
+                const auto& collisionCircle = isText ? bucket.textCollisionCircle : bucket.iconCollisionCircle;
+                parameters.programs.getSymbolLayerPrograms().collisionCircle.draw(
+                    parameters.context, *parameters.renderPass, gfx::Triangles(),
+                    gfx::DepthMode::disabled(), gfx::StencilMode::disabled(),
+                    parameters.colorModeForRenderPass(), gfx::CullFaceMode::disabled(),
+                    CollisionCircleProgram::LayoutUniformValues{
+                      uniforms::matrix::Value((needTranslate
+                                               ? tile.translatedMatrix(values.translate, values.translateAnchor, parameters.state)
+                                               : tile.matrix)),
+                      uniforms::extrude_scale::Value(extrudeScale),
+                      uniforms::overscale_factor::Value(float(tile.getOverscaledTileID().overscaleFactor())),
+                      uniforms::camera_to_center_distance::Value(parameters.state.getCameraToCenterDistance()) },
+                    *collisionCircle->vertexBuffer, *collisionCircle->dynamicVertexBuffer,
+                    *collisionCircle->indexBuffer, collisionCircle->segments, paintAttributeData,
+                    properties, CollisionCircleProgram::TextureBindings{}, parameters.state.getZoom(),
+                    getID());
+            }
+        };
+        drawCollisonData( false /*isText*/, bucket.hasIconCollisionBoxData(), bucket.hasIconCollisionCircleData());
+   
+        drawCollisonData( true /*isText*/, bucket.hasTextCollisionBoxData(), bucket.hasTextCollisionCircleData());
 
-        if (bucket.hasIconCollisionBoxData()) {
-            const auto values = iconPropertyValues(evaluated, layout);
-            parameters.programs.getSymbolLayerPrograms().collisionBox.draw(
-                parameters.context, *parameters.renderPass, gfx::Lines{ 1.0f },
-                gfx::DepthMode::disabled(), gfx::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(), gfx::CullFaceMode::disabled(),
-                CollisionBoxProgram::LayoutUniformValues{
-                    uniforms::matrix::Value(tile.translatedMatrix(
-                        values.translate, values.translateAnchor, parameters.state)),
-                    uniforms::extrude_scale::Value(extrudeScale),
-                    uniforms::camera_to_center_distance::Value(
-                        parameters.state.getCameraToCenterDistance()) },
-                *bucket.iconCollisionBox->vertexBuffer,
-                *bucket.iconCollisionBox->dynamicVertexBuffer,
-                *bucket.iconCollisionBox->indexBuffer, bucket.iconCollisionBox->segments,
-                paintAttributeData, properties, CollisionBoxProgram::TextureBindings{},
-                parameters.state.getZoom(), getID());
-        }
-
-        if (bucket.hasTextCollisionBoxData()) {
-            auto values = textPropertyValues(evaluated, layout);
-            parameters.programs.getSymbolLayerPrograms().collisionBox.draw(
-                parameters.context, *parameters.renderPass, gfx::Lines{ 1.0f },
-                gfx::DepthMode::disabled(), gfx::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(), gfx::CullFaceMode::disabled(),
-                CollisionBoxProgram::LayoutUniformValues{
-                    uniforms::matrix::Value(tile.translatedMatrix(
-                        values.translate, values.translateAnchor, parameters.state)),
-                    uniforms::extrude_scale::Value(extrudeScale),
-                    uniforms::camera_to_center_distance::Value(
-                        parameters.state.getCameraToCenterDistance()) },
-                *bucket.textCollisionBox->vertexBuffer,
-                *bucket.textCollisionBox->dynamicVertexBuffer,
-                *bucket.textCollisionBox->indexBuffer, bucket.textCollisionBox->segments,
-                paintAttributeData, properties, CollisionBoxProgram::TextureBindings{},
-                parameters.state.getZoom(), getID());
-        }
-
-        if (bucket.hasIconCollisionCircleData()) {
-            auto values = iconPropertyValues(evaluated, layout);
-            parameters.programs.getSymbolLayerPrograms().collisionCircle.draw(
-                parameters.context, *parameters.renderPass, gfx::Triangles(),
-                gfx::DepthMode::disabled(), gfx::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(), gfx::CullFaceMode::disabled(),
-                CollisionCircleProgram::LayoutUniformValues{
-                    uniforms::matrix::Value(tile.translatedMatrix(
-                        values.translate, values.translateAnchor, parameters.state)),
-                    uniforms::extrude_scale::Value(extrudeScale),
-                    uniforms::overscale_factor::Value(
-                        float(tile.getOverscaledTileID().overscaleFactor())),
-                    uniforms::camera_to_center_distance::Value(
-                        parameters.state.getCameraToCenterDistance()) },
-                *bucket.iconCollisionCircle->vertexBuffer,
-                *bucket.iconCollisionCircle->dynamicVertexBuffer,
-                *bucket.iconCollisionCircle->indexBuffer, bucket.iconCollisionCircle->segments,
-                paintAttributeData, properties, CollisionCircleProgram::TextureBindings{},
-                parameters.state.getZoom(), getID());
-        }
-
-        if (bucket.hasTextCollisionCircleData()) {
-            auto values = textPropertyValues(evaluated, layout);
-            parameters.programs.getSymbolLayerPrograms().collisionCircle.draw(
-                parameters.context, *parameters.renderPass, gfx::Triangles(),
-                gfx::DepthMode::disabled(), gfx::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(), gfx::CullFaceMode::disabled(),
-                CollisionCircleProgram::LayoutUniformValues{
-                    uniforms::matrix::Value(tile.translatedMatrix(
-                        values.translate, values.translateAnchor, parameters.state)),
-                    uniforms::extrude_scale::Value(extrudeScale),
-                    uniforms::overscale_factor::Value(
-                        float(tile.getOverscaledTileID().overscaleFactor())),
-                    uniforms::camera_to_center_distance::Value(
-                        parameters.state.getCameraToCenterDistance()) },
-                *bucket.textCollisionCircle->vertexBuffer,
-                *bucket.textCollisionCircle->dynamicVertexBuffer,
-                *bucket.textCollisionCircle->indexBuffer, bucket.textCollisionCircle->segments,
-                paintAttributeData, properties, CollisionCircleProgram::TextureBindings{},
-                parameters.state.getZoom(), getID());
-        }
     }
 
     if (sortFeaturesByKey) {
