@@ -32,7 +32,7 @@ public:
     CameraOptions getCameraOptions(optional<EdgeInsets>) const;
 
     /** Instantaneously, synchronously applies the given camera options. */
-    void jumpTo(const CameraOptions&);
+    void jumpTo(const CameraOptions&, const AnimationOptions& = {});
     /** Asynchronously transitions all specified camera options linearly along
         an optional time curve. However, center coordinate is not transitioned
         linearly as, instead, ground speed is kept linear.*/

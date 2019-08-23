@@ -72,8 +72,8 @@ CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
  * a transition. The map will retain the current values for any options
  * not included in `options`.
  */
-void Transform::jumpTo(const CameraOptions& camera) {
-    easeTo(camera);
+    void Transform::jumpTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    easeTo(camera, animation);
 }
 
 /**
@@ -96,6 +96,9 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom) || std::isnan(bearing) || std::isnan(pitch)) {
+        if (animation.transitionFinishFn) {
+            animation.transitionFinishFn();
+        }
         return;
     }
 
@@ -172,6 +175,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom) || std::isnan(bearing) || std::isnan(pitch) || state.size.isEmpty()) {
+        if (animation.transitionFinishFn) {
+            animation.transitionFinishFn();
+        }
         return;
     }
 
@@ -273,7 +279,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
     if (duration == Duration::zero()) {
         // Perform an instantaneous transition.
-        jumpTo(camera);
+        jumpTo(camera, animation.transitionFinishFn);
         return;
     }
 
