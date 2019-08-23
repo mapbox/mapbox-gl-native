@@ -43,6 +43,20 @@ TEST(TileCover, Pitch) {
               util::tileCover(transform.getState(), 2));
 }
 
+TEST(TileCover, PitchIssue15442) {
+    Transform transform;
+    transform.resize({ 412, 691 });
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 59.116898740996106, 91.565660781803615, })
+                             .withZoom(2.0551126748417214).withBearing(0.74963938256567264 * util::RAD2DEG)
+                             .withPitch(1.0471975511965976 * util::RAD2DEG));
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+            { 2, 3, 1 }, { 2, 2, 1 }, { 2, 3, 0 }, { 2, 2, 0 }, { 1, { 2, 0, 0 } }, { 1, { 2, 1, 0 } }
+    }),
+              util::tileCover(transform.getState(), 2));
+}
+
 TEST(TileCover, WorldZ1) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{
         { 1, 0, 0 }, { 1, 0, 1 }, { 1, 1, 0 }, { 1, 1, 1 },
