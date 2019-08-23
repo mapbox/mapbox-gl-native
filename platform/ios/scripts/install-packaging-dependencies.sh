@@ -22,15 +22,6 @@ else
 fi
 
 ##
-## wget
-##
-if [ -z `which wget` ]; then
-    brew install wget
-else
-    echo "Found brew"
-fi
-
-##
 ## cocoapods
 ##
 if [[ -z `which pod` || $(pod --version) != "${COCOAPODS_VERSION}" ]]; then
