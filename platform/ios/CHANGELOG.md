@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## master
 
-* Fixed an issue that caused tilt gesture to trigger easily. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
+* Fixed an issue that caused the tilt gesture to trigger too easily and conflict with pinch or pan gestures. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
 
 ## 5.3.0
 

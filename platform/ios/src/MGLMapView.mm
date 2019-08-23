@@ -157,6 +157,9 @@ static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 0;
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
+/// The threshold used to consider when a tilt gesture should start.
+const CLLocationDegrees MGLHorizontalTiltToleranceDegrees = 45.0;
+
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
 typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
@@ -2157,17 +2160,17 @@ public:
             return;
         }
         
-        CGPoint west = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
-        CGPoint east = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
-        CLLocationDegrees fingerSlopeAngle = [self angleBetweenPoints:west endPoint:east];
+        CGPoint leftTouchPoint = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
+        CGPoint rightTouchPoint = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
+        CLLocationDegrees fingerSlopeAngle = [self angleBetweenPoints:leftTouchPoint endPoint:rightTouchPoint];
         
         CGPoint middlePoint = [twoFingerDrag translationInView:twoFingerDrag.view];
         
         CLLocationDegrees gestureSlopeAngle = [self angleBetweenPoints:self.dragGestureMiddlePoint endPoint:middlePoint];
         self.dragGestureMiddlePoint = middlePoint;
-        if (fabs(fingerSlopeAngle) < 45 && fabs(gestureSlopeAngle) > 60 ) {
+        if (fabs(fingerSlopeAngle) < MGLHorizontalTiltToleranceDegrees && fabs(gestureSlopeAngle) > 60.0 ) {
             
-            CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
+            CGFloat gestureDistance = middlePoint.y;
             CGFloat slowdown = 2.0;
             
             CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
@@ -2323,12 +2326,11 @@ public:
         
         if (panGesture.minimumNumberOfTouches == 2)
         {
-            CGPoint west = [panGesture locationOfTouch:0 inView:panGesture.view];
-            CGPoint east = [panGesture locationOfTouch:1 inView:panGesture.view];
+            CGPoint leftTouchPoint = [panGesture locationOfTouch:0 inView:panGesture.view];
+            CGPoint rightTouchPoint = [panGesture locationOfTouch:1 inView:panGesture.view];
             
-            CLLocationDegrees horizontalToleranceDegrees = 45.0;
-            CLLocationDegrees degrees = [self angleBetweenPoints:west endPoint:east];
-            if (fabs(degrees) > horizontalToleranceDegrees) {
+            CLLocationDegrees degrees = [self angleBetweenPoints:leftTouchPoint endPoint:rightTouchPoint];
+            if (fabs(degrees) > MGLHorizontalTiltToleranceDegrees) {
                 return NO;
             }
         }
@@ -2364,10 +2366,10 @@ public:
     CGFloat x = (endPoint.x - originPoint.x);
     CGFloat y = (endPoint.y - originPoint.y);
     
-    CGFloat radians = atan2(y, x);
-    CLLocationDegrees degrees = MGLDegreesFromRadians(radians);
+    CGFloat angleInRadians = atan2(y, x);
+    CLLocationDegrees angleInDegrees = MGLDegreesFromRadians(angleInRadians);
     
-    return degrees;
+    return angleInDegrees;
 }
 
 #pragma mark - Attribution -
