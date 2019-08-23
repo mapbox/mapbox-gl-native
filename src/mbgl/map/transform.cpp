@@ -72,8 +72,8 @@ CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
  * a transition. The map will retain the current values for any options
  * not included in `options`.
  */
-void Transform::jumpTo(const CameraOptions& camera, std::function<void()> finish) {
-    easeTo(camera, finish);
+void Transform::jumpTo(const CameraOptions& camera) {
+    easeTo(camera);
 }
 
 /**
@@ -279,7 +279,10 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
     if (duration == Duration::zero()) {
         // Perform an instantaneous transition.
-        jumpTo(camera, animation.transitionFinishFn);
+        jumpTo(camera);
+        if (animation.transitionFinishFn) {
+            animation.transitionFinishFn();
+        }
         return;
     }
 
