@@ -1,3 +1,5 @@
+#include "allocation_index.hpp"
+
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -18,6 +20,21 @@
 #define ANSI_COLOR_GRAY       "\x1b[37m"
 #define ANSI_COLOR_LIGHT_GRAY "\x1b[90m"
 #define ANSI_COLOR_RESET      "\x1b[0m"
+
+void* operator new(std::size_t sz) {
+    void* ptr = AllocationIndex::allocate(sz);
+    if (!ptr) throw std::bad_alloc{};
+
+    return ptr;
+}
+
+void operator delete(void* ptr) noexcept {
+    AllocationIndex::deallocate(ptr);
+}
+
+void operator delete(void* ptr, size_t) noexcept {
+    AllocationIndex::deallocate(ptr);
+}
 
 namespace {
 
