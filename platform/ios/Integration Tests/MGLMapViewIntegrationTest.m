@@ -33,13 +33,17 @@
     return accessToken;
 }
 
+- (MGLMapView *)mapViewForTestWithFrame:(CGRect)rect styleURL:(NSURL *)styleURL {
+    return [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
+}
+
 - (void)setUp {
     [super setUp];
 
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
 
-    self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
+    self.mapView = [self mapViewForTestWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
     self.mapView.delegate = self;
 
     UIView *superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];

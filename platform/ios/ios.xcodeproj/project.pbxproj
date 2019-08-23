@@ -506,9 +506,10 @@
 		CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */; };
 		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
 		CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */; };
-		CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */; };
 		CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */; };
 		CA4F3BDE230F74C3008BAFEA /* MGLMapViewPendingBlockTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA4F3BDD230F74C3008BAFEA /* MGLMapViewPendingBlockTests.m */; };
+		CA4F3BE223107793008BAFEA /* MGLCameraTransitionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA4F3BE123107793008BAFEA /* MGLCameraTransitionTests.mm */; };
+		CA4F3BE4231077B9008BAFEA /* MGLCameraTransitionFinishTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA4F3BE3231077B9008BAFEA /* MGLCameraTransitionFinishTests.mm */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA65C4F821E9BB080068B0D4 /* MGLCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = CA65C4F721E9BB080068B0D4 /* MGLCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1197,9 +1198,10 @@
 		CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewIntegrationTest.m; sourceTree = "<group>"; wrapsLines = 0; };
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
 		CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapSnapshotterTest.m; sourceTree = "<group>"; };
-		CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCameraTransitionTests.mm; sourceTree = "<group>"; };
 		CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerIntegrationTests.m; sourceTree = "<group>"; };
 		CA4F3BDD230F74C3008BAFEA /* MGLMapViewPendingBlockTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewPendingBlockTests.m; sourceTree = "<group>"; };
+		CA4F3BE123107793008BAFEA /* MGLCameraTransitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCameraTransitionTests.mm; sourceTree = "<group>"; };
+		CA4F3BE3231077B9008BAFEA /* MGLCameraTransitionFinishTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCameraTransitionFinishTests.mm; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
 		CA65C4F721E9BB080068B0D4 /* MGLCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCluster.h; sourceTree = "<group>"; };
@@ -1543,12 +1545,12 @@
 		16376B081FFD9DAF0000563E /* Integration Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CA4F3BE023107793008BAFEA /* Camera Tests */,
 				CA6914B320E67F07002DB0EE /* Annotations */,
 				CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */,
 				CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */,
 				16376B091FFD9DAF0000563E /* MBGLIntegrationTests.mm */,
 				16376B0B1FFD9DAF0000563E /* Info.plist */,
-				CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */,
 				CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */,
 				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
 				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
@@ -1924,6 +1926,15 @@
 				CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */,
 			);
 			path = "Snapshotter Tests";
+			sourceTree = "<group>";
+		};
+		CA4F3BE023107793008BAFEA /* Camera Tests */ = {
+			isa = PBXGroup;
+			children = (
+				CA4F3BE123107793008BAFEA /* MGLCameraTransitionTests.mm */,
+				CA4F3BE3231077B9008BAFEA /* MGLCameraTransitionFinishTests.mm */,
+			);
+			path = "Camera Tests";
 			sourceTree = "<group>";
 		};
 		CA6914B320E67F07002DB0EE /* Annotations */ = {
@@ -3197,7 +3208,6 @@
 			files = (
 				CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */,
 				CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */,
-				CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */,
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.mm in Sources */,
 				CA4F3BDE230F74C3008BAFEA /* MGLMapViewPendingBlockTests.m in Sources */,
 				CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */,
@@ -3207,7 +3217,9 @@
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
 				077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */,
 				CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.mm in Sources */,
+				CA4F3BE223107793008BAFEA /* MGLCameraTransitionTests.mm in Sources */,
 				CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */,
+				CA4F3BE4231077B9008BAFEA /* MGLCameraTransitionFinishTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
