@@ -72,8 +72,8 @@ CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
  * a transition. The map will retain the current values for any options
  * not included in `options`.
  */
-    void Transform::jumpTo(const CameraOptions& camera, const AnimationOptions& animation) {
-    easeTo(camera, animation);
+void Transform::jumpTo(const CameraOptions& camera, std::function<void()> finish) {
+    easeTo(camera, finish);
 }
 
 /**
