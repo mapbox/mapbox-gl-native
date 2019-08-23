@@ -42,6 +42,13 @@ struct SymbolInstanceSharedData {
     optional<SymbolQuad> verticalIconQuad;
 };
 
+enum class SymbolContent : uint8_t {
+    None = 0,
+    Text = 1 << 0,
+    IconRGBA= 1 << 1,
+    IconSDF = 1 << 2
+};
+
 class SymbolInstance {
 public:
     SymbolInstance(Anchor& anchor_,
@@ -65,7 +72,7 @@ public:
                    const float textRotation,
                    float radialTextOffset,
                    bool allowVerticalPlacement,
-                   const uint8_t iconFlags = 0x00);
+                   const SymbolContent& iconType = SymbolContent::None);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -73,6 +80,9 @@ public:
     const SymbolQuads& leftJustifiedGlyphQuads() const;
     const SymbolQuads& centerJustifiedGlyphQuads() const;
     const SymbolQuads& verticalGlyphQuads() const;
+    bool hasText() const;
+    bool hasIcon() const;
+    bool hasSdfIcon() const;
     const optional<SymbolQuad>& iconQuad() const;
     const optional<SymbolQuad>& verticalIconQuad() const;
     void releaseSharedData();
@@ -82,9 +92,7 @@ private:
 
 public:
     Anchor anchor;
-    bool hasText : 1;
-    bool hasIcon : 1;
-    bool hasSdfIcon : 1;
+    uint8_t symbolContent;
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;
