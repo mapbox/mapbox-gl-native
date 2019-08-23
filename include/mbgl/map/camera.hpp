@@ -94,10 +94,6 @@ struct AnimationOptions {
     /** Creates an animation with the specified duration. */
     AnimationOptions(Duration d)
         : duration(d) {}
-    
-    AnimationOptions(std::function<void()> finish)
-        : transitionFinishFn(finish) {}
-    
 };
 
 } // namespace mbgl
