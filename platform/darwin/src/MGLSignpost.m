@@ -1,5 +1,5 @@
-@import Foundation;
-#include "MGLSignpost.h"
+#import "MGLFoundation.h"
+#import "MGLSignpost.h"
 
 os_log_t MGLDefaultSignpostLog = NULL;
 os_signpost_id_t MGLDefaultSignpost = OS_SIGNPOST_ID_INVALID;
