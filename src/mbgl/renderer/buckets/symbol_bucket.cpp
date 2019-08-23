@@ -113,7 +113,6 @@ void SymbolBucket::upload(gfx::UploadPass& uploadPass) {
     if (hasIconData()) {
         updateIconBuffer(icon);
     }
-
     if (hasSdfIconData()) {
         updateIconBuffer(sdfIcon);
     }
