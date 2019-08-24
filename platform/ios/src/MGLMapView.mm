@@ -2146,7 +2146,12 @@ public:
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
         CGPoint midPoint = [twoFingerDrag translationInView:twoFingerDrag.view];
-        // Creates an angle at the beginning of the gesture
+        // In the following if and for the first execution middlePoint
+        // will be equal to dragGestureMiddlePoint and the resulting
+        // gestureSlopeAngle will be 0º causing a small delay,
+        // initializing dragGestureMiddlePoint with the current midPoint
+        // but substracting one point from 'y' forces an initial 90º angle
+        // making the gesture avoid the delay
         self.dragGestureMiddlePoint = CGPointMake(midPoint.x, midPoint.y-1);
         initialPitch = *self.mbglMap.getCameraOptions().pitch;
         [self notifyGestureDidBegin];
