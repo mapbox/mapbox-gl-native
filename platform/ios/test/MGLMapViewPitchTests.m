@@ -2,23 +2,35 @@
 #import <XCTest/XCTest.h>
 
 @interface MockUIPanGestureRecognizer : UIPanGestureRecognizer
-@property CGFloat mbx_tiltGestureYTranslation;
 @property NSUInteger mbx_numberOfFingersForGesture;
+@property CGPoint mbx_middlePoint;
+@property CGPoint mbx_westPoint;
+@property CGPoint mbx_eastPoint;
 @end
 
 @implementation MockUIPanGestureRecognizer
 - (instancetype)initWithTarget:(id)target action:(SEL)action {
     if (self = [super initWithTarget:target action:action]) {
-        self.mbx_tiltGestureYTranslation = 0;
         self.mbx_numberOfFingersForGesture = 2;
+        self.mbx_westPoint = CGPointMake(100, 0);
+        self.mbx_eastPoint = CGPointMake(200, 0);
     }
     return self;
 }
 - (NSUInteger)numberOfTouches { return self.mbx_numberOfFingersForGesture; }
-- (CGPoint)translationInView:(UIView *)view { return CGPointMake(0, self.mbx_tiltGestureYTranslation); }
+- (CGPoint)translationInView:(UIView *)view { return self.mbx_middlePoint; }
+- (CGPoint)locationOfTouch:(NSUInteger)touchIndex inView:(UIView *)view {
+    if (touchIndex == 0) {
+        return self.mbx_westPoint;
+    }
+    return self.mbx_eastPoint;
+}
 - (void)setTiltGestureYTranslationForPitchDegrees:(CGFloat)degrees {
     // The tilt gesture takes the number of screen points the fingers have moved and then divides them by a "slowdown" factor, which happens to be set to 2.0 in -[MGLMapView handleTwoFingerDragGesture:].
-    self.mbx_tiltGestureYTranslation = -(degrees * 2.0);
+    CGFloat mbx_tiltGestureYTranslation = -(degrees * 2.0);
+    self.mbx_westPoint = CGPointMake(self.mbx_westPoint.x, mbx_tiltGestureYTranslation);
+    self.mbx_eastPoint = CGPointMake(self.mbx_eastPoint.x, mbx_tiltGestureYTranslation);
+    self.mbx_middlePoint = CGPointMake(self.mbx_middlePoint.x, mbx_tiltGestureYTranslation);
 }
 @end
 
@@ -109,6 +121,25 @@
         [gesture setTiltGestureYTranslationForPitchDegrees:inputDegrees];
         [self.mapView handleTwoFingerDragGesture:gesture];
         XCTAssertEqualWithAccuracy(self.mapView.camera.pitch, inputDegrees, 0.001, @"Pitch should be set to %.f°.", inputDegrees);
+    }
+}
+
+- (void)testHorizontalTiltGesture {
+    MockUIPanGestureRecognizer *gesture = [[MockUIPanGestureRecognizer alloc] initWithTarget:self.mapView action:nil];
+    gesture.state = UIGestureRecognizerStateBegan;
+    [self.mapView handleTwoFingerDragGesture:gesture];
+    XCTAssertEqual(self.mapView.camera.pitch, 0, @"Pitch should initially be set to 0°.");
+    
+    // Tilt gestures should not be triggered on horizontal dragging.
+    for (NSInteger deltaX = 0; deltaX < 5; deltaX++) {
+        gesture.mbx_westPoint = CGPointMake(100 - deltaX, 100);
+        gesture.mbx_eastPoint = CGPointMake(100 - deltaX, 50);
+        gesture.mbx_middlePoint = CGPointMake((gesture.mbx_westPoint.x + gesture.mbx_westPoint.x)/2, (gesture.mbx_westPoint.y + gesture.mbx_westPoint.y)/2);
+
+        gesture.state = UIGestureRecognizerStateChanged;
+        
+        [self.mapView handleTwoFingerDragGesture:gesture];
+        XCTAssertEqual(self.mapView.camera.pitch, 0, @"Horizontal dragging should not tilt the map.");
     }
 }
 

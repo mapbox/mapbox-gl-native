@@ -157,6 +157,9 @@ static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 0;
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
+/// The threshold used to consider when a tilt gesture should start.
+const CLLocationDegrees MGLHorizontalTiltToleranceDegrees = 45.0;
+
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
 typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationTagContextMap;
@@ -266,6 +269,9 @@ public:
 @property (nonatomic, copy) MGLMapCamera *residualCamera;
 @property (nonatomic) MGLMapDebugMaskOptions residualDebugMask;
 @property (nonatomic, copy) NSURL *residualStyleURL;
+
+/// Tilt gesture recognizer helper
+@property (nonatomic, assign) CGPoint dragGestureMiddlePoint;
 
 - (mbgl::Map &)mbglMap;
 
@@ -2139,6 +2145,14 @@ public:
     
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
+        CGPoint midPoint = [twoFingerDrag translationInView:twoFingerDrag.view];
+        // In the following if and for the first execution middlePoint
+        // will be equal to dragGestureMiddlePoint and the resulting
+        // gestureSlopeAngle will be 0º causing a small delay,
+        // initializing dragGestureMiddlePoint with the current midPoint
+        // but substracting one point from 'y' forces an initial 90º angle
+        // making the gesture avoid the delay
+        self.dragGestureMiddlePoint = CGPointMake(midPoint.x, midPoint.y-1);
         initialPitch = *self.mbglMap.getCameraOptions().pitch;
         [self notifyGestureDidBegin];
     }
@@ -2150,30 +2164,45 @@ public:
             twoFingerDrag.state = UIGestureRecognizerStateEnded;
             return;
         }
-
-        CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
-        CGFloat slowdown = 2.0;
-
-        CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
-
-        CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
-
-        MGLMapCamera *oldCamera = self.camera;
-        MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
-
-        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
-        {
-            self.mbglMap.jumpTo(mbgl::CameraOptions()
+        
+        CGPoint leftTouchPoint = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
+        CGPoint rightTouchPoint = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
+        CLLocationDegrees fingerSlopeAngle = [self angleBetweenPoints:leftTouchPoint endPoint:rightTouchPoint];
+        
+        CGPoint middlePoint = [twoFingerDrag translationInView:twoFingerDrag.view];
+        
+        CLLocationDegrees gestureSlopeAngle = [self angleBetweenPoints:self.dragGestureMiddlePoint endPoint:middlePoint];
+        self.dragGestureMiddlePoint = middlePoint;
+        if (fabs(fingerSlopeAngle) < MGLHorizontalTiltToleranceDegrees && fabs(gestureSlopeAngle) > 60.0 ) {
+            
+            CGFloat gestureDistance = middlePoint.y;
+            CGFloat slowdown = 2.0;
+            
+            CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
+            
+            CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
+            
+            MGLMapCamera *oldCamera = self.camera;
+            MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
+            
+            if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
+            {
+                self.mbglMap.jumpTo(mbgl::CameraOptions()
                                     .withPitch(pitchNew)
                                     .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+            }
+            
+            [self cameraIsChanging];
+        
         }
 
-        [self cameraIsChanging];
+        
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededForGesture];
+        self.dragGestureMiddlePoint = CGPointZero;
     }
 
 }
@@ -2296,23 +2325,17 @@ public:
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
-    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]])
+    if (gestureRecognizer == _twoFingerDrag)
     {
         UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
         
         if (panGesture.minimumNumberOfTouches == 2)
         {
-            CGPoint west = [panGesture locationOfTouch:0 inView:panGesture.view];
-            CGPoint east = [panGesture locationOfTouch:1 inView:panGesture.view];
+            CGPoint leftTouchPoint = [panGesture locationOfTouch:0 inView:panGesture.view];
+            CGPoint rightTouchPoint = [panGesture locationOfTouch:1 inView:panGesture.view];
             
-            if (west.x > east.x) {
-                CGPoint swap = west;
-                west = east;
-                east = swap;
-            }
-            
-            CLLocationDegrees horizontalToleranceDegrees = 60.0;
-            if ([self angleBetweenPoints:west east:east] > horizontalToleranceDegrees) {
+            CLLocationDegrees degrees = [self angleBetweenPoints:leftTouchPoint endPoint:rightTouchPoint];
+            if (fabs(degrees) > MGLHorizontalTiltToleranceDegrees) {
                 return NO;
             }
         }
@@ -2334,18 +2357,24 @@ public:
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
-
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (CLLocationDegrees)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
+- (CLLocationDegrees)angleBetweenPoints:(CGPoint)originPoint endPoint:(CGPoint)endPoint
 {
-    CGFloat slope = (west.y - east.y) / (west.x - east.x);
+    if (originPoint.x > endPoint.x) {
+        CGPoint swap = originPoint;
+        originPoint = endPoint;
+        endPoint = swap;
+    }
     
-    CGFloat angle = atan(fabs(slope));
-    CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
+    CGFloat x = (endPoint.x - originPoint.x);
+    CGFloat y = (endPoint.y - originPoint.y);
     
-    return degrees;
+    CGFloat angleInRadians = atan2(y, x);
+    CLLocationDegrees angleInDegrees = MGLDegreesFromRadians(angleInRadians);
+    
+    return angleInDegrees;
 }
 
 #pragma mark - Attribution -
