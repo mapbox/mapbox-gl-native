@@ -18,6 +18,7 @@
 
 #include <mapbox/pixelmatch.hpp>
 
+#include "allocation_index.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
@@ -25,7 +26,7 @@
 #include <algorithm>
 #include <cassert>
 #include <regex>
-
+#include <utility>
 
 // static 
 const std::string& TestRunner::getBasePath() {
@@ -155,6 +156,9 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
     static const std::string removeSourceOp("removeSource");
     static const std::string setPaintPropertyOp("setPaintProperty");
     static const std::string setLayoutPropertyOp("setLayoutProperty");
+    static const std::string memoryProbeOp("probeMemory");
+    static const std::string memoryProbeStartOp("probeMemoryStart");
+    static const std::string memoryProbeEndOp("probeMemoryEnd");
 
     // wait
     if (operationArray[0].GetString() == waitOp) {
@@ -392,7 +396,25 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             const mbgl::JSValue* propertyValue = &operationArray[3];
             layer->setLayoutProperty(propertyName, propertyValue);
         }
+    // probeMemoryStart
+    } else if (operationArray[0].GetString() == memoryProbeStartOp) {
+        assert(!AllocationIndex::isActive());
+        AllocationIndex::setActive(true);
+    // probeMemory
+    } else if (operationArray[0].GetString() == memoryProbeOp) {
+        assert(AllocationIndex::isActive());
+        assert(operationArray.Size() >= 2u);
+        assert(operationArray[1].IsString());
+        std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
 
+        metadata.memoryProbes.emplace(std::piecewise_construct,
+                                      std::forward_as_tuple(std::move(mark)), 
+                                      std::forward_as_tuple(AllocationIndex::getAllocatedSize(), AllocationIndex::getAllocationsCount()));
+    // probeMemoryEnd
+    } else if (operationArray[0].GetString() == memoryProbeEndOp) {
+        assert(AllocationIndex::isActive());
+        AllocationIndex::setActive(false);
+        AllocationIndex::reset();
     } else {
         metadata.errorMessage = std::string("Unsupported operation: ")  + operationArray[0].GetString();
         return false;
@@ -414,6 +436,8 @@ TestRunner::Impl::Impl(const TestMetadata& metadata)
           mbgl::ResourceOptions().withCacheOnlyRequestsSupport(false)) {}
 
 bool TestRunner::run(TestMetadata& metadata) {
+    AllocationIndex::setActive(false);
+    AllocationIndex::reset();
     std::string key = mbgl::util::toString(uint32_t(metadata.mapMode))
         + "/" + mbgl::util::toString(metadata.pixelRatio)
         + "/" + mbgl::util::toString(uint32_t(metadata.crossSourceCollisions));
