@@ -6,36 +6,32 @@
 @implementation MGLStyleURLIntegrationTest
 
 - (void)internalTestWithStyleSelector:(SEL)selector {
-    if (![self validAccessToken]) {
-        return;
-    }
-
     self.mapView.styleURL = [MGLStyle performSelector:selector];
     [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
 }
 
 
-- (void)testLoadingStreetsStyleURL {
+- (void)testLoadingStreetsStyleURL🔒 {
     [self internalTestWithStyleSelector:@selector(streetsStyleURL)];
 }
 
-- (void)testLoadingOutdoorsStyleURL {
+- (void)testLoadingOutdoorsStyleURL🔒 {
     [self internalTestWithStyleSelector:@selector(outdoorsStyleURL)];
 }
 
-- (void)testLoadingLightStyleURL {
+- (void)testLoadingLightStyleURL🔒 {
     [self internalTestWithStyleSelector:@selector(lightStyleURL)];
 }
 
-- (void)testLoadingDarkStyleURL {
+- (void)testLoadingDarkStyleURL🔒 {
     [self internalTestWithStyleSelector:@selector(darkStyleURL)];
 }
 
-- (void)testLoadingSatelliteStyleURL {
+- (void)testLoadingSatelliteStyleURL🔒 {
     [self internalTestWithStyleSelector:@selector(satelliteStyleURL)];
 }
 
-- (void)testLoadingSatelliteStreetsStyleURL {
+- (void)testLoadingSatelliteStreetsStyleURL🔒 {
     [self internalTestWithStyleSelector:@selector(satelliteStreetsStyleURL)];
 }
 
