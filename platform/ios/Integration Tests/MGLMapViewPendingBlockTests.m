@@ -257,7 +257,7 @@
         
         MGLTestAssert(strongSelf, !strongSelf.completionHandlerCalled);
         
-        // Now hide the mapview
+        // Pause rendering, stopping display link
         [strongSelf.mapView pauseRendering:nil];
         
         MGLTestAssert(strongSelf, strongSelf.completionHandlerCalled);
@@ -292,7 +292,7 @@
         
         MGLTestAssert(strongSelf, !strongSelf.completionHandlerCalled);
         
-        // Now hide the mapview
+        // Remove from window, triggering validateDisplayLink
         [strongSelf.mapView removeFromSuperview];
         
         MGLTestAssert(strongSelf, strongSelf.completionHandlerCalled);
