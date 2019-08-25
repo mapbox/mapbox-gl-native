@@ -43,7 +43,7 @@ public:
     MapAdapter map { frontend, MapObserver::nullObserver(), fileSource,
                   MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
-    void checkRendering(const char * name, double imageMatchPixelsThreshold = 0.05, double pixelMatchThreshold = 0.1) {
+    void checkRendering(const char * name, double imageMatchPixelsThreshold = 0.015, double pixelMatchThreshold = 0.1) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
                          frontend.render(map), imageMatchPixelsThreshold, pixelMatchThreshold);
     }
@@ -64,7 +64,7 @@ TEST(LocalGlyphRasterizer, PingFang) {
         return response;
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
-#if defined(__APPLE__)
+#if defined(__APPLE__) && !defined(__QT__)
     test.checkRendering("ping_fang");
 #elif defined(__QT__)
     test.checkRendering("ping_fang_qt");
@@ -72,6 +72,22 @@ TEST(LocalGlyphRasterizer, PingFang) {
 }
 
 #endif // defined(__APPLE__)
+
+#if defined(__linux__) && defined(__QT__)
+TEST(LocalGlyphRasterizer, NotoSansCJK) {
+    LocalGlyphRasterizerTest test(std::string("Noto Sans CJK KR Regular"));
+
+    test.fileSource->glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.checkRendering("noto_sans_cjk_kr_regular_qt");
+}
+#endif // defined(__linux__) && defined(__QT__)
 
 TEST(LocalGlyphRasterizer, NoLocal) {
     // Expectation: without any local fonts set, and without any CJK glyphs provided,
