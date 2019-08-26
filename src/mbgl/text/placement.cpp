@@ -546,7 +546,7 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
         if (layout.get<IconRotationAlignment>() == AlignmentType::Map) {
             const bool pitchWithMap = layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map;
             const bool keepUpright = layout.get<style::IconKeepUpright>();
-            if(bucket.hasSdfIconData()) {
+            if (bucket.hasSdfIconData()) {
                 reprojectLineLabels(bucket.sdfIcon.dynamicVertices, bucket.sdfIcon.placedSymbols,
                                     tile.matrix, pitchWithMap, true /*rotateWithMap*/, keepUpright,
                                     tile, *bucket.iconSizeBinder, state);

@@ -50,6 +50,12 @@ public:
     bool hasFill;
 };
 
+enum class SymbolType : uint8_t {
+    Text,
+    IconRGBA,
+    IconSDF
+};
+
 } // namespace style
 
 class RenderSymbolLayer final: public RenderLayer {
