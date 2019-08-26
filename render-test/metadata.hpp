@@ -39,6 +39,12 @@ struct MemoryProbe {
     size_t allocations;
 };
 
+class TestMetrics {
+public:
+    bool isEmpty() const { return memory.empty(); }
+    std::map<std::string, MemoryProbe> memory;
+};
+
 struct TestMetadata {
     TestMetadata() = default;
 
@@ -72,5 +78,6 @@ struct TestMetadata {
     std::string errorMessage;
     double difference = 0.0;
 
-    std::map<std::string, MemoryProbe> memoryProbes; 
+    TestMetrics metrics;
+    TestMetrics expectedMetrics;
 };

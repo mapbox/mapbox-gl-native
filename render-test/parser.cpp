@@ -187,6 +187,29 @@ std::string serializeJsonValue(const mbgl::JSValue& value) {
     return buffer.GetString();
 }
 
+std::string serializeMetrics(const TestMetrics& metrics) {
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    // Start memory section.
+    writer.Key("memory");
+    writer.StartArray();
+    for (const auto& memoryProbe : metrics.memory) {
+        assert(!memoryProbe.first.empty());       
+        writer.StartArray();
+        writer.String(memoryProbe.first.c_str());
+        writer.Uint64(memoryProbe.second.size);
+        writer.Uint64(memoryProbe.second.allocations);
+        writer.EndArray();
+    }
+    // End memory section.
+    writer.EndArray();
+    writer.EndObject();
+
+    return s.GetString();
+}
+
 std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base) {
     static const std::regex regex(".*expected.*.png");
 
@@ -288,6 +311,36 @@ std::vector<std::pair<std::string, std::string>> parseIgnores() {
     }
 
     return ignores;
+}
+
+TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
+    TestMetrics result;
+
+    auto maybeJson = readJson(path.string());
+    if (!maybeJson.is<mbgl::JSDocument>()) { // NOLINT
+        return result;
+    }
+
+    const auto& document = maybeJson.get<mbgl::JSDocument>();
+    if (document.HasMember("memory")) {
+        const mbgl::JSValue& memoryValue = document["memory"];
+        assert(memoryValue.IsArray());
+        for (auto& probeValue : memoryValue.GetArray()) {
+            assert(probeValue.IsArray());
+            assert(probeValue.Size() >= 3u);
+            assert(probeValue[0].IsString());
+            assert(probeValue[1].IsNumber());
+            assert(probeValue[2].IsNumber());
+
+            const std::string mark { probeValue[0].GetString(), probeValue[0].GetStringLength() };
+            assert(!mark.empty());
+            result.memory.emplace(std::piecewise_construct,
+                                  std::forward_as_tuple(std::move(mark)), 
+                                  std::forward_as_tuple(probeValue[1].GetUint64(), probeValue[2].GetUint64()));
+        }
+    }
+
+    return result;
 }
 
 TestMetadata parseTestMetadata(const TestPaths& paths) {
