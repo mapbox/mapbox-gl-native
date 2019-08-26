@@ -63,12 +63,12 @@ public class CameraPositionActivity extends FragmentActivity implements OnMapRea
       fab = findViewById(R.id.fab);
       fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
       fab.setOnClickListener(this);
+
+      toggleLogCameraChanges();
+
+      // listen to long click events to toggle logging camera changes
+      mapboxMap.addOnMapLongClickListener(this);
     });
-
-    toggleLogCameraChanges();
-
-    // listen to long click events to toggle logging camera changes
-    mapboxMap.addOnMapLongClickListener(this);
   }
 
   @Override
