@@ -7,4 +7,9 @@
         <item>1000</item>
         <item>10000</item>
     </string-array>
+    <string-array name="array_local_ideograph_family_test">
+        <item>foo</item>
+        <item>monospace</item>
+        <item>bar</item>
+    </string-array>
 </resources>
