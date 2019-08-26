@@ -67,20 +67,20 @@ struct RenderableSegment {
                       const LayerRenderData& renderData_,
                       const SymbolBucket::PaintProperties& bucketPaintProperties_,
                       float sortKey_,
-                      bool isText_) :
+                      const SymbolType type_) :
     segment(std::move(segment_)),
     tile(tile_),
     renderData(renderData_),
     bucketPaintProperties(bucketPaintProperties_),
     sortKey(sortKey_),
-    isText(isText_) {}
+    type(type_) {}
 
     SegmentWrapper segment;
     const RenderTile& tile;
     const LayerRenderData& renderData;
     const SymbolBucket::PaintProperties& bucketPaintProperties;
     float sortKey;
-    bool isText;
+    SymbolType type;
 
     friend bool operator < (const RenderableSegment& lhs, const RenderableSegment& rhs) {
         // Sort renderable segments by a sort key.
@@ -91,11 +91,11 @@ struct RenderableSegment {
         // In cases when sort key is the same, sort by the type of a segment (text over icons),
         // and for segments of the same type with the same sort key, sort by a tile id.
         if (lhs.sortKey == rhs.sortKey) {
-            if (!lhs.isText && rhs.isText) {
+            if (lhs.type != SymbolType::Text && rhs.type == SymbolType::Text) {
                 return true;
             }
 
-            if (lhs.isText == rhs.isText)  {
+            if (lhs.type == rhs.type)  {
                 return lhs.tile.id < rhs.tile.id;
             }
         }
@@ -110,7 +110,8 @@ void drawIcon(const DrawFn& draw,
               const LayerRenderData& renderData,
               SegmentsWrapper iconSegments,
               const SymbolBucket::PaintProperties& bucketPaintProperties,
-              const PaintParameters& parameters) {
+              const PaintParameters& parameters,
+              const bool sdfIcons) {
     auto& bucket = static_cast<SymbolBucket&>(*renderData.bucket);
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
     const auto& layout = *bucket.layout;
@@ -124,7 +125,7 @@ void drawIcon(const DrawFn& draw,
     const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
     const gfx::TextureBinding textureBinding{ tile.getIconAtlasTexture().getResource(),
-                                            bucket.sdfIcons ||
+                                            sdfIcons ||
                                                     parameters.state.isChanging() ||
                                                     iconScaled || iconTransformed
                                                 ? gfx::TextureFilterType::Linear
@@ -133,11 +134,11 @@ void drawIcon(const DrawFn& draw,
     const Size& iconSize = tile.getIconAtlasTexture().size;
     const bool variablePlacedIcon = bucket.hasVariablePlacement && layout.get<IconTextFit>() != IconTextFitType::None;
 
-    if (bucket.sdfIcons) {
+    if (sdfIcons) {
         if (values.hasHalo) {
             draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
                 SymbolSDFIconProgram::layoutUniformValues(false, variablePlacedIcon, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
-                bucket.icon,
+                bucket.sdfIcon,
                 iconSegments,
                 bucket.iconSizeBinder,
                 bucketPaintProperties.iconBinders,
@@ -151,7 +152,7 @@ void drawIcon(const DrawFn& draw,
         if (values.hasFill) {
             draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
                 SymbolSDFIconProgram::layoutUniformValues(false, variablePlacedIcon, values, iconSize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
-                bucket.icon,
+                bucket.sdfIcon,
                 iconSegments,
                 bucket.iconSizeBinder,
                 bucketPaintProperties.iconBinders,
@@ -361,23 +362,31 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
         assert(bucket.paintProperties.find(getID()) != bucket.paintProperties.end());
         const auto& bucketPaintProperties = bucket.paintProperties.at(getID());
 
-        auto addRenderables = [&renderableSegments, &tile, renderData, &bucketPaintProperties, it = renderableSegments.begin()] (auto& segments, bool isText) mutable {
+        auto addRenderables = [&renderableSegments, &tile, renderData, &bucketPaintProperties, it = renderableSegments.begin()] (auto& segments, const SymbolType type) mutable {
             for (auto& segment : segments) {
-                it = renderableSegments.emplace_hint(it, SegmentWrapper{std::ref(segment)}, tile, *renderData, bucketPaintProperties, segment.sortKey, isText);
+                it = renderableSegments.emplace_hint(it, SegmentWrapper{std::ref(segment)}, tile, *renderData, bucketPaintProperties, segment.sortKey, type);
             }
         };
 
         if (bucket.hasIconData()) {
             if (sortFeaturesByKey) {
-                addRenderables(bucket.icon.segments, false /*isText*/);
+                addRenderables(bucket.icon.segments, SymbolType::IconRGBA);
             } else {
-                drawIcon(draw, tile, *renderData, std::ref(bucket.icon.segments), bucketPaintProperties, parameters);
+                drawIcon(draw, tile, *renderData, std::ref(bucket.icon.segments), bucketPaintProperties, parameters, false /*sdfIcon*/);
+            }
+        }
+        
+        if (bucket.hasSdfIconData()) {
+            if (sortFeaturesByKey) {
+                addRenderables(bucket.sdfIcon.segments, SymbolType::IconSDF);
+            } else {
+                drawIcon(draw, tile, *renderData, std::ref(bucket.sdfIcon.segments), bucketPaintProperties, parameters, true /*sdfIcon*/);
             }
         }
 
         if (bucket.hasTextData()) {
             if (sortFeaturesByKey) {
-                addRenderables(bucket.text.segments, true /*isText*/);
+                addRenderables(bucket.text.segments, SymbolType::Text);
             } else {
                 drawText(draw, tile, *renderData, std::ref(bucket.text.segments), bucketPaintProperties, parameters);
             }
@@ -460,10 +469,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
 
     if (sortFeaturesByKey) {
         for (auto& renderable : renderableSegments) {
-            if (renderable.isText) {
+            if (renderable.type == SymbolType::Text) {
                 drawText(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
             } else {
-                drawIcon(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters);
+                drawIcon(draw, renderable.tile, renderable.renderData, renderable.segment, renderable.bucketPaintProperties, parameters, renderable.type == SymbolType::IconSDF);
             }
         }
     }

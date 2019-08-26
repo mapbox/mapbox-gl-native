@@ -4,7 +4,8 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
-
+#include <mbgl/util/traits.hpp>
+#include <mbgl/util/util.hpp>
 
 namespace mbgl {
 
@@ -42,6 +43,25 @@ struct SymbolInstanceSharedData {
     optional<SymbolQuad> verticalIconQuad;
 };
 
+enum class SymbolContent : uint8_t {
+    None = 0,
+    Text = 1 << 0,
+    IconRGBA = 1 << 1,
+    IconSDF = 1 << 2
+};
+
+MBGL_CONSTEXPR SymbolContent operator|(SymbolContent a, SymbolContent b) {
+    return SymbolContent(mbgl::underlying_type(a) | mbgl::underlying_type(b));
+}
+
+MBGL_CONSTEXPR SymbolContent& operator|=(SymbolContent& a, SymbolContent b) {
+    return (a = a | b);
+}
+
+MBGL_CONSTEXPR SymbolContent operator&(SymbolContent a, SymbolContent b) {
+    return SymbolContent(mbgl::underlying_type(a) & mbgl::underlying_type(b));
+}
+
 class SymbolInstance {
 public:
     SymbolInstance(Anchor& anchor_,
@@ -64,7 +84,8 @@ public:
                    const float iconRotation,
                    const float textRotation,
                    float radialTextOffset,
-                   bool allowVerticalPlacement);
+                   bool allowVerticalPlacement,
+                   const SymbolContent iconType = SymbolContent::None);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -72,6 +93,9 @@ public:
     const SymbolQuads& leftJustifiedGlyphQuads() const;
     const SymbolQuads& centerJustifiedGlyphQuads() const;
     const SymbolQuads& verticalGlyphQuads() const;
+    bool hasText() const;
+    bool hasIcon() const;
+    bool hasSdfIcon() const;
     const optional<SymbolQuad>& iconQuad() const;
     const optional<SymbolQuad>& verticalIconQuad() const;
     void releaseSharedData();
@@ -81,8 +105,7 @@ private:
 
 public:
     Anchor anchor;
-    bool hasText;
-    bool hasIcon;
+    SymbolContent symbolContent;
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;
