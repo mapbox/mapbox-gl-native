@@ -220,9 +220,29 @@
         [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable) {
             XCTAssertNotNil(pack);
             XCTAssertNil(error);
-            [expectation fulfill];
         }];
     }];
+
+//    MGLCoordinateBounds columbus = MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(39.916, -83.044), CLLocationCoordinate2DMake(40.004, -82.946));
+//
+//    NSString *nameKey2 = @"Name";
+//    NSString *name2 = @"Paris square";
+//
+//    NSData *context2 = [NSKeyedArchiver archivedDataWithRootObject:@{nameKey2: name2}];
+//    MGLTilePyramidOfflineRegion *region2 = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:styleURL bounds:columbus fromZoomLevel:10 toZoomLevel:11];
+//
+//    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region2 withContext:context2 completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
+//        [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+//            [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+//                XCTAssertNotNil(error);
+//                [expectation fulfill];
+//            }];
+//        }];
+//    }];
+
+//
+
+
     [self waitForExpectationsWithTimeout:10 handler:nil];
 }
 
@@ -251,6 +271,8 @@
         XCTAssertNil(error);
         [expectation fulfill];
     }];
+
+
     [self waitForExpectationsWithTimeout:10 handler:nil];
 }
 
@@ -258,6 +280,26 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Expect database to be reset without an error."];
     [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+
+    MGLCoordinateBounds bounds = {
+        { .latitude = 48.8660, .longitude = 2.3306 },
+        { .latitude = 48.8603, .longitude = 2.3213 },
+    };
+
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+
+    // Attempting to reset the database while an offline pack is downloading should lead to an error.
+    MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:styleURL bounds:bounds fromZoomLevel:10 toZoomLevel:11];
+
+    NSString *nameKey = @"Name";
+    NSString *name = @"Paris square";
+
+    NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{nameKey: name}];
+    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:nil];
+    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:10 handler:nil];
