@@ -7,12 +7,10 @@ set -u
 # dynamic environment variables:
 #     VERSION_TAG={determined automatically}: Version tag in format ios-vX.X.X-pre.X
 #     GITHUB_RELEASE=true: Upload to github
-#     BINARY_DIRECTORY=build/ios/deploy: Directory in which to save test packages
 
 # environment variables and dependencies:
 #     - You must run "mbx auth ..." before running
 #     - Set GITHUB_TOKEN to a GitHub API access token in your environment to use GITHUB_RELEASE
-#     - "wget" is required for downloading the zip files from s3
 #     - The "github-release" command is required to use GITHUB_RELEASE
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
@@ -36,8 +34,6 @@ buildPackageStyle() {
         ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" ${style}
         file_name=mapbox-ios-sdk-${PUBLISH_VERSION}-${style}.zip
     fi
-    step "Downloading ${file_name} from s3 to ${BINARY_DIRECTORY}"
-    wget -O ${BINARY_DIRECTORY}/${file_name} http://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/${file_name}
     if [[ "${GITHUB_RELEASE}" == true ]]; then
         step "Uploading ${file_name} to GitHub"
         github-release upload \
@@ -54,7 +50,7 @@ export BUILDTYPE=Release
 
 VERSION_TAG=${VERSION_TAG:-''}
 PUBLISH_VERSION=
-BINARY_DIRECTORY=${BINARY_DIRECTORY:-build/ios/deploy}
+BINARY_DIRECTORY='build/ios'
 GITHUB_RELEASE=${GITHUB_RELEASE:-true}
 PUBLISH_PRE_FLAG=''
 
