@@ -10,6 +10,7 @@ import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -70,7 +71,11 @@ public class MapboxMapOptions implements Parcelable {
 
   private boolean prefetchesTiles = true;
   private boolean zMediaOverlay = false;
+
+  private boolean localIdeographFontFamilyEnabled = true;
   private String localIdeographFontFamily;
+  private String[] localIdeographFontFamilies;
+
   private String apiBaseUri;
 
   private boolean textureMode;
@@ -130,7 +135,9 @@ public class MapboxMapOptions implements Parcelable {
     translucentTextureSurface = in.readByte() != 0;
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
+    localIdeographFontFamilyEnabled = in.readByte() != 0;
     localIdeographFontFamily = in.readString();
+    localIdeographFontFamilies = in.createStringArray();
     pixelRatio = in.readFloat();
     foregroundLoadColor = in.readInt();
     crossSourceCollisions = in.readByte() != 0;
@@ -156,9 +163,15 @@ public class MapboxMapOptions implements Parcelable {
    */
   @NonNull
   public static MapboxMapOptions createFromAttributes(@NonNull Context context, @Nullable AttributeSet attrs) {
-    MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
-    float pxlRatio = context.getResources().getDisplayMetrics().density;
     TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.mapbox_MapView, 0, 0);
+    return createFromAttributes(new MapboxMapOptions(), context, typedArray);
+  }
+
+  @VisibleForTesting
+  static MapboxMapOptions createFromAttributes(@NonNull MapboxMapOptions mapboxMapOptions,
+                                               @NonNull Context context,
+                                               @Nullable TypedArray typedArray) {
+    float pxlRatio = context.getResources().getDisplayMetrics().density;
     try {
       mapboxMapOptions.camera(new CameraPosition.Builder(typedArray).build());
 
@@ -247,12 +260,24 @@ public class MapboxMapOptions implements Parcelable {
       mapboxMapOptions.renderSurfaceOnTop(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
 
-      String localIdeographFontFamily =
-        typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily);
-      if (localIdeographFontFamily == null) {
-        localIdeographFontFamily = MapboxConstants.DEFAULT_FONT;
+      mapboxMapOptions.localIdeographFontFamilyEnabled =
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_localIdeographEnabled, true);
+
+      int localIdeographFontFamiliesResId =
+        typedArray.getResourceId(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamilies, 0);
+      if (localIdeographFontFamiliesResId != 0) {
+        String[] localIdeographFontFamilies =
+          context.getResources().getStringArray(localIdeographFontFamiliesResId);
+        mapboxMapOptions.localIdeographFontFamily(localIdeographFontFamilies);
+      } else {
+        // did user provide xml font string?
+        String localIdeographFontFamily =
+          typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily);
+        if (localIdeographFontFamily == null) {
+          localIdeographFontFamily = MapboxConstants.DEFAULT_FONT;
+        }
+        mapboxMapOptions.localIdeographFontFamily(localIdeographFontFamily);
       }
-      mapboxMapOptions.localIdeographFontFamily(localIdeographFontFamily);
 
       mapboxMapOptions.pixelRatio(
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_pixelRatio, 0));
@@ -632,6 +657,18 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Enable local ideograph font family, defaults to true.
+   *
+   * @param enabled true to enable, false to disable
+   * @return This
+   */
+  @NonNull
+  public MapboxMapOptions localIdeographFontFamilyEnabled(boolean enabled) {
+    this.localIdeographFontFamilyEnabled = enabled;
+    return this;
+  }
+
+  /**
    * Set the font family for generating glyphs locally for ideographs in the &#x27;CJK Unified Ideographs&#x27;
    * and &#x27;Hangul Syllables&#x27; ranges.
    * <p>
@@ -944,6 +981,11 @@ public class MapboxMapOptions implements Parcelable {
     return textureMode;
   }
 
+  /**
+   * Returns true if TextureView supports a translucent surface
+   *
+   * @return True if translucent surface is active
+   */
   public boolean getTranslucentTextureSurface() {
     return translucentTextureSurface;
   }
@@ -962,11 +1004,22 @@ public class MapboxMapOptions implements Parcelable {
    * Returns the font-family for locally overriding generation of glyphs in the
    * &#x27;CJK Unified Ideographs&#x27; and &#x27;Hangul Syllables&#x27; ranges.
    * Default font for local ideograph font family is {@link MapboxConstants#DEFAULT_FONT}.
+   * Returns null if local ideograph font families are disabled.
    *
    * @return Local ideograph font family name.
    */
+  @Nullable
   public String getLocalIdeographFontFamily() {
-    return localIdeographFontFamily;
+    return localIdeographFontFamilyEnabled ? localIdeographFontFamily : null;
+  }
+
+  /**
+   * Returns true if local ideograph font family is enabled, defaults to true.
+   *
+   * @return True if local ideograph font family is enabled
+   */
+  public boolean isLocalIdeographFontFamilyEnabled() {
+    return localIdeographFontFamilyEnabled;
   }
 
   /**
@@ -1029,7 +1082,9 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (translucentTextureSurface ? 1 : 0));
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
+    dest.writeByte((byte) (localIdeographFontFamilyEnabled ? 1 : 0));
     dest.writeString(localIdeographFontFamily);
+    dest.writeStringArray(localIdeographFontFamilies);
     dest.writeFloat(pixelRatio);
     dest.writeInt(foregroundLoadColor);
     dest.writeByte((byte) (crossSourceCollisions ? 1 : 0));
@@ -1114,7 +1169,6 @@ public class MapboxMapOptions implements Parcelable {
     if (!Arrays.equals(attributionMargins, options.attributionMargins)) {
       return false;
     }
-
     if (apiBaseUri != null ? !apiBaseUri.equals(options.apiBaseUri) : options.apiBaseUri != null) {
       return false;
     }
@@ -1124,9 +1178,16 @@ public class MapboxMapOptions implements Parcelable {
     if (zMediaOverlay != options.zMediaOverlay) {
       return false;
     }
+    if (localIdeographFontFamilyEnabled != options.localIdeographFontFamilyEnabled) {
+      return false;
+    }
     if (!localIdeographFontFamily.equals(options.localIdeographFontFamily)) {
       return false;
     }
+    if (!Arrays.equals(localIdeographFontFamilies, options.localIdeographFontFamilies)) {
+      return false;
+    }
+
     if (pixelRatio != options.pixelRatio) {
       return false;
     }
@@ -1171,7 +1232,9 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (translucentTextureSurface ? 1 : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);
+    result = 31 * result + (localIdeographFontFamilyEnabled ? 1 : 0);
     result = 31 * result + (localIdeographFontFamily != null ? localIdeographFontFamily.hashCode() : 0);
+    result = 31 * result + Arrays.hashCode(localIdeographFontFamilies);
     result = 31 * result + (int) pixelRatio;
     result = 31 * result + (crossSourceCollisions ? 1 : 0);
     return result;
