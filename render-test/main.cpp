@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 
         bool errored = !metadata.errorMessage.empty();
         if (!errored) {
-            errored = runner.run(metadata) && !metadata.errorMessage.empty();
+            errored = !runner.run(metadata) || !metadata.errorMessage.empty();
         }
 
         bool passed = !errored && !metadata.diff.empty() && metadata.difference <= metadata.allowed;

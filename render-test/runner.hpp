@@ -21,7 +21,7 @@ public:
 
 private:
     bool runOperations(const std::string& key, TestMetadata&);
-    bool checkImage(mbgl::PremultipliedImage&& image, TestMetadata&);
+    bool checkResults(mbgl::PremultipliedImage&& image, TestMetadata&);
 
     struct Impl {
         Impl(const TestMetadata&);

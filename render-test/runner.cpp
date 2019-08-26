@@ -27,6 +27,7 @@
 #include <cassert>
 #include <regex>
 #include <utility>
+#include <sstream>
 
 // static 
 const std::string& TestRunner::getBasePath() {
@@ -44,13 +45,13 @@ const std::vector<std::string>& TestRunner::getPlatformExpectationsPaths() {
     return result;
 }
 
-bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& metadata) {
+bool TestRunner::checkResults(mbgl::PremultipliedImage&& actualImage, TestMetadata& metadata) {
     const std::string& base = metadata.paths.defaultExpectations();
     const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
 
-    metadata.actual = mbgl::encodePNG(actual);
+    metadata.actual = mbgl::encodePNG(actualImage);
 
-    if (actual.size.isEmpty()) {
+    if (actualImage.size.isEmpty()) {
         metadata.errorMessage = "Invalid size for actual image";
         return false;
     }
@@ -58,34 +59,46 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
 #if !TEST_READ_ONLY
     if (getenv("UPDATE_PLATFORM")) {
         mbgl::filesystem::create_directories(expectations.back());
-        mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actual));
+        mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actualImage));
         return true;
     } else if (getenv("UPDATE_DEFAULT")) {
-        mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actual));
+        mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actualImage));
         return true;
+    } else if (getenv("UPDATE_METRICS")) {
+        if (!metadata.metrics.isEmpty()) {
+            mbgl::filesystem::create_directories(expectations.back());
+            mbgl::util::write_file(expectations.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
+            return true;
+        }
     }
 
     mbgl::util::write_file(base + "/actual.png", metadata.actual);
 #endif
 
-    mbgl::PremultipliedImage expected { actual.size };
-    mbgl::PremultipliedImage diff { actual.size };
+    mbgl::PremultipliedImage expectedImage { actualImage.size };
+    mbgl::PremultipliedImage imageDiff { actualImage.size };
 
     double pixels = 0.0;
-    mbgl::filesystem::path expectedPath;
+    std::vector<std::string> expectedImagesPaths;
+    mbgl::filesystem::path expectedMetricsPath;
     for (auto rit = expectations.rbegin(); rit!= expectations.rend(); ++rit) {
         if (mbgl::filesystem::exists(*rit)) {
-            expectedPath = *rit;
-            break;
+            if (metadata.expectedMetrics.isEmpty()) {
+                mbgl::filesystem::path maybeExpectedMetricsPath{ *rit };
+                maybeExpectedMetricsPath.replace_filename("metrics.json");
+                metadata.expectedMetrics = readExpectedMetrics(maybeExpectedMetricsPath);
+            }
+            expectedImagesPaths = readExpectedEntries(*rit);
+            if (!expectedImagesPaths.empty()) break;
         }
     }
 
-    if (expectedPath.empty()) {
+    if (expectedImagesPaths.empty()) {
         metadata.errorMessage = "Failed to find expectations for: " + metadata.paths.stylePath.string();
         return false;
     }
     
-    for (const auto& entry: readExpectedEntries(expectedPath)) {
+    for (const auto& entry: expectedImagesPaths) {
         mbgl::optional<std::string> maybeExpectedImage = mbgl::util::readFile(entry);
         if (!maybeExpectedImage) {
             metadata.errorMessage = "Failed to load expected image " + entry;
@@ -94,21 +107,46 @@ bool TestRunner::checkImage(mbgl::PremultipliedImage&& actual, TestMetadata& met
 
         metadata.expected = *maybeExpectedImage;
 
-        expected = mbgl::decodeImage(*maybeExpectedImage);
+        expectedImage = mbgl::decodeImage(*maybeExpectedImage);
 
         pixels = // implicitly converting from uint64_t
-            mapbox::pixelmatch(actual.data.get(), expected.data.get(), expected.size.width,
-                               expected.size.height, diff.data.get(), 0.1285); // Defined in GL JS
+            mapbox::pixelmatch(actualImage.data.get(), expectedImage.data.get(), expectedImage.size.width,
+                               expectedImage.size.height, imageDiff.data.get(), 0.1285); // Defined in GL JS
 
-        metadata.diff = mbgl::encodePNG(diff);
+        metadata.diff = mbgl::encodePNG(imageDiff);
 
 #if !TEST_READ_ONLY
         mbgl::util::write_file(base + "/diff.png", metadata.diff);
 #endif
 
-        metadata.difference = pixels / expected.size.area();
+        metadata.difference = pixels / expectedImage.size.area();
         if (metadata.difference <= metadata.allowed) {
             break;
+        }
+    }
+    // Check memory metrics.
+    for (const auto& expected : metadata.expectedMetrics.memory) {
+        auto actual = metadata.metrics.memory.find(expected.first);
+        if (actual == metadata.metrics.memory.end()) {
+            metadata.errorMessage = "Failed to find memory probe: " + expected.first;
+            return false;
+        }
+        if (actual->second.size > expected.second.size) {
+            std::stringstream ss;
+            ss << "Allocated size at memory probe \" " << expected.first << "\" is "
+               << actual->second.size << " bytes, expected is " << expected.second.size << " bytes.";
+
+            metadata.errorMessage = ss.str();
+            return false;
+        }
+
+        if (actual->second.allocations > expected.second.allocations) {
+            std::stringstream ss;
+            ss << "Number of allocations at memory probe \" " << expected.first << "\" is "
+               << actual->second.allocations << ", expected is " << expected.second.allocations << ".";
+
+            metadata.errorMessage = ss.str();
+            return false;
         }
     }
 
@@ -407,9 +445,9 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(operationArray[1].IsString());
         std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
 
-        metadata.memoryProbes.emplace(std::piecewise_construct,
-                                      std::forward_as_tuple(std::move(mark)), 
-                                      std::forward_as_tuple(AllocationIndex::getAllocatedSize(), AllocationIndex::getAllocationsCount()));
+        metadata.metrics.memory.emplace(std::piecewise_construct,
+                                        std::forward_as_tuple(std::move(mark)), 
+                                        std::forward_as_tuple(AllocationIndex::getAllocatedSize(), AllocationIndex::getAllocationsCount()));
     // probeMemoryEnd
     } else if (operationArray[0].GetString() == memoryProbeEndOp) {
         assert(AllocationIndex::isActive());
@@ -469,7 +507,7 @@ bool TestRunner::run(TestMetadata& metadata) {
         return false;
     }
 
-    return checkImage(std::move(image), metadata);
+    return checkResults(std::move(image), metadata);
 }
 
 void TestRunner::reset() {
