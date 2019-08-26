@@ -237,14 +237,11 @@ void SymbolBucket::sortFeatures(const float angle) {
 
         auto& iconBuffer = symbolInstance.hasSdfIcon() ? sdfIcon : icon;
         if (symbolInstance.placedIconIndex) {
-            addPlacedSymbol(iconBuffer.triangles,
-                            iconBuffer.placedSymbols[*symbolInstance.placedIconIndex]);
+            addPlacedSymbol(iconBuffer.triangles, iconBuffer.placedSymbols[*symbolInstance.placedIconIndex]);
         }
 
         if (symbolInstance.placedVerticalIconIndex) {
-            addPlacedSymbol(iconBuffer.triangles,
-                            iconBuffer.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
-           
+            addPlacedSymbol(iconBuffer.triangles, iconBuffer.placedSymbols[*symbolInstance.placedVerticalIconIndex]);
         }
     }
 }

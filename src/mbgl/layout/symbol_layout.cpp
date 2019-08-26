@@ -436,7 +436,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                               optional<PositionedIcon> shapedIcon,
                               const GlyphPositions& glyphPositions,
                               Point<float> offset,
-                              const SymbolContent& iconType) {
+                              const SymbolContent iconType) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 

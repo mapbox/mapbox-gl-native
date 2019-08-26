@@ -54,7 +54,7 @@ private:
                     optional<PositionedIcon> shapedIcon,
                     const GlyphPositions&,
                     Point<float> textOffset,
-                    const SymbolContent& iconType);
+                    const SymbolContent iconType);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;

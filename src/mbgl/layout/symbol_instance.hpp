@@ -4,7 +4,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
-
+#include <mbgl/util/traits.hpp>
 
 namespace mbgl {
 
@@ -45,9 +45,21 @@ struct SymbolInstanceSharedData {
 enum class SymbolContent : uint8_t {
     None = 0,
     Text = 1 << 0,
-    IconRGBA= 1 << 1,
+    IconRGBA = 1 << 1,
     IconSDF = 1 << 2
 };
+
+constexpr SymbolContent operator|(SymbolContent a, SymbolContent b) {
+    return SymbolContent(mbgl::underlying_type(a) | mbgl::underlying_type(b));
+}
+
+constexpr SymbolContent& operator|=(SymbolContent& a, SymbolContent b) {
+    return (a = a | b);
+}
+
+constexpr SymbolContent operator&(SymbolContent a, SymbolContent b) {
+    return SymbolContent(mbgl::underlying_type(a) & mbgl::underlying_type(b));
+}
 
 class SymbolInstance {
 public:
@@ -72,7 +84,7 @@ public:
                    const float textRotation,
                    float radialTextOffset,
                    bool allowVerticalPlacement,
-                   const SymbolContent& iconType = SymbolContent::None);
+                   const SymbolContent iconType = SymbolContent::None);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -92,7 +104,7 @@ private:
 
 public:
     Anchor anchor;
-    uint8_t symbolContent;
+    SymbolContent symbolContent;
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;
