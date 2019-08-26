@@ -683,6 +683,7 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
         // When text box is rotated, icon-text-fit icon must be rotated as well.
         if (updateTextFitIcon) {
             updateDynamicVertices(bucket.icon);
+            updateDynamicVertices(bucket.sdfIcon);
         }
 
         result = true;
