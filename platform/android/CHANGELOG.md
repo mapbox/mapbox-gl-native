@@ -6,11 +6,16 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ### Features
  - Introduce `clusterProperties` option for aggregated cluster properties. [#15425](https://github.com/mapbox/mapbox-gl-native/pull/15425)
 
-### Bug fixes
-- Fixed a rendering issue that non-SDF icon would be treated as SDF icon if they are in the same layer. [#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456)
+## 8.3.0 - August 28, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-beta.1...android-v8.3.0) since [Mapbox Maps SDK for Android v8.3.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-beta.1):
 
-## 8.3.0
 This release changes how offline tile requests are billed — they are now billed on a pay-as-you-go basis and all developers are able raise the offline tile limit for their users. Offline requests were previously exempt from monthly active user (MAU) billing and increasing the offline per-user tile limit to more than 6,000 tiles required the purchase of an enterprise license. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://blog.mapbox.com/offline-maps-for-all-bb0fc51827be) and [#15380](https://github.com/mapbox/mapbox-gl-native/pull/15380).
+
+### Features
+ - Allow ability to pass a string array resource into `localIdeographFontFamily` for enabling/disabling the feature and specifying fallback fonts. [#15488](https://github.com/mapbox/mapbox-gl-native/pull/15488)
+
+### Bug fixes
+ - Fixed a rendering issue caused by all icons being treated as SDFs if an SDF and non-SDF icon were in the same layer. [#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456)
 
 ## 8.2.2 - August 23, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.1...android-v8.2.2) since [Mapbox Maps SDK for Android v8.2.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.1):
