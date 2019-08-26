@@ -19,6 +19,7 @@
 const MGLShapeSourceOption MGLShapeSourceOptionBuffer = @"MGLShapeSourceOptionBuffer";
 const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius = @"MGLShapeSourceOptionClusterRadius";
 const MGLShapeSourceOption MGLShapeSourceOptionClustered = @"MGLShapeSourceOptionClustered";
+const MGLShapeSourceOption MGLShapeSourceOptionClusterProperties = @"MGLShapeSourceOptionClusterProperties";
 const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel = @"MGLShapeSourceOptionMaximumZoomLevel";
 const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering = @"MGLShapeSourceOptionMaximumZoomLevelForClustering";
 const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLevel = @"MGLShapeSourceOptionMinimumZoomLevel";
@@ -82,6 +83,14 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
                         format:@"MGLShapeSourceOptionClustered must be an NSNumber."];
         }
         geoJSONOptions.cluster = value.boolValue;
+    }
+
+    if (NSString *value = options[MGLShapeSourceOptionClusterProperties]) {
+        if (![value isKindOfClass:[NSString class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionClusterProperties must be an NSString."];
+        }
+        geoJSONOptions.clusterProperties = value;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionLineDistanceMetrics]) {

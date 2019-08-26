@@ -41,6 +41,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterProperties;
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
  which to cluster points if clustering is enabled. Defaults to one zoom level
