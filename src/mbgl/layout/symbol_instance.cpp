@@ -88,12 +88,11 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const float iconRotation,
                                const float textRotation,
                                float radialTextOffset_,
-                               bool allowVerticalPlacement) :
+                               bool allowVerticalPlacement,
+                               const SymbolContent iconType) :
     sharedData(std::move(sharedData_)),
     anchor(anchor_),
-    // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
-    hasText(!sharedData->empty()),
-    hasIcon(shapedIcon),
+    symbolContent(iconType),
     // Create the collision features that will be used to check whether this symbol instance can be placed
     // As a collision approximation, we can use either the vertical or any of the horizontal versions of the feature
     textCollisionFeature(sharedData->line, anchor, getAnyShaping(shapedTextOrientations), textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation),
@@ -107,7 +106,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     textBoxScale(textBoxScale_),
     radialTextOffset(radialTextOffset_),
     singleLine(shapedTextOrientations.singleLine) {
-
+    // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
+    if(!sharedData->empty()) symbolContent |= SymbolContent::Text;
     if (allowVerticalPlacement && shapedTextOrientations.vertical) {
         const float verticalPointLabelAngle = 90.0f;
         verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation + verticalPointLabelAngle);
@@ -163,6 +163,18 @@ const SymbolQuads& SymbolInstance::verticalGlyphQuads() const {
 const optional<SymbolQuad>& SymbolInstance::iconQuad() const {
     assert(sharedData);
     return sharedData->iconQuad;
+}
+    
+bool SymbolInstance::hasText() const {
+    return static_cast<bool>(symbolContent & SymbolContent::Text);
+}
+    
+bool SymbolInstance::hasIcon() const {
+    return static_cast<bool>(symbolContent & SymbolContent::IconRGBA) || hasSdfIcon();
+}
+    
+bool SymbolInstance::hasSdfIcon() const {
+    return static_cast<bool>(symbolContent & SymbolContent::IconSDF);
 }
 
 const optional<SymbolQuad>& SymbolInstance::verticalIconQuad() const {
