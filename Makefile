@@ -801,7 +801,7 @@ test-code-android:
 
 # Runs checkstyle and lint on the java code
 .PHONY: android-check
-android-check : android-checkstyle run-android-nitpick android-lint-sdk android-lint-test-app android-ktlint
+android-check : android-ktlint android-checkstyle android-lint-sdk android-lint-test-app run-android-nitpick
 
 # Runs checkstyle on the java code
 .PHONY: android-checkstyle
@@ -810,7 +810,7 @@ android-checkstyle: platform/android/gradle/configuration.gradle
 
 # Runs checkstyle on the kotlin code
 .PHONY: android-ktlint
-android-ktlint: 
+android-ktlint: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none ktlint
 
 # Runs lint on the Android SDK java code
