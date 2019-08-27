@@ -1,16 +1,16 @@
 # master
 * Introduce `text-writing-mode` layout property for symbol layer ([#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932)). The `text-writing-mode` layout property allows control over symbol's preferred writing mode. The new property value is an array, whose values are enumeration values from a ( `horizontal` | `vertical` ) set.
 * Fixed rendering and collision detection issues with using `text-variable-anchor` and `icon-text-fit` properties on the same layer ([#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367)).
-* Fixed a rendering issue that non-SDF icon would be treated as SDF icon if they are in the same layer. [#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456)
+* Fixed a rendering issue that non-SDF icon would be treated as SDF icon if they are in the same layer. ([#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456))
 
 # 4.2.0
 - Add an option to set whether or not an image should be treated as a SDF ([#15054](https://github.com/mapbox/mapbox-gl-native/issues/15054))
-- Fix problems associated with node 10 and NAN [#14847](https://github.com/mapbox/mapbox-gl-native/pull/14847)
+- Fix problems associated with node 10 and NAN ([#14847](https://github.com/mapbox/mapbox-gl-native/pull/14847))
 
 # 4.1.0
-- Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
-- Add `crossSourceCollisions` map option, with default of `true`. When set to `false`, cross-source collision detection is disabled. ([#12820] (https://github.com/mapbox/mapbox-gl-native/issues/12820))
-- Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
+- Add `symbol-z-order` symbol layout property to style spec ([#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783))
+- Add `crossSourceCollisions` map option, with default of `true`. When set to `false`, cross-source collision detection is disabled. ([#12820](https://github.com/mapbox/mapbox-gl-native/issues/12820))
+- Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) ([#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864))
 - Fixed an issue where fill and line layers would occasionally flicker on zoom ([#12982](https://github.com/mapbox/mapbox-gl-native/pull/12982))
 
 # 4.0.0
