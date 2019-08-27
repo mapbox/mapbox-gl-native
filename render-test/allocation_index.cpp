@@ -9,6 +9,7 @@
 namespace {
 
 std::atomic_size_t indexedMemorySize{0};
+std::atomic_size_t indexedMemoryPeak{0};
 std::atomic_size_t allocationsCount{0};
 std::unordered_map<void*, size_t> memoryIndex;
 std::atomic_bool suppresIndexing{false};
@@ -30,6 +31,7 @@ void addToIndex(std::size_t sz, void* ptr) {
     FlagGuard flk(suppresIndexing);
     allocationsCount++;
     indexedMemorySize += sz;
+    if (indexedMemoryPeak < indexedMemorySize) indexedMemoryPeak = size_t(indexedMemorySize);
     memoryIndex[ptr] = sz;
 }
 
@@ -67,6 +69,7 @@ void AllocationIndex::reset() {
     memoryIndex.clear();
     indexedMemorySize = 0;
     allocationsCount = 0;
+    indexedMemoryPeak = 0;
 }
 
 // static
@@ -90,4 +93,9 @@ size_t AllocationIndex::getAllocatedSize() {
 // static
 size_t AllocationIndex::getAllocationsCount() {
     return allocationsCount;
+}
+
+// static
+size_t AllocationIndex::getAllocatedSizePeak() {
+    return indexedMemoryPeak;
 }

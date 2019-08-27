@@ -31,11 +31,11 @@ struct TestPaths {
 
 struct MemoryProbe {
     MemoryProbe() = default;
-    MemoryProbe(size_t size_, size_t allocations_)
-        : size(size_)
+    MemoryProbe(size_t peak_, size_t allocations_)
+        : peak(peak_)
         , allocations(allocations_) {}
 
-    size_t size;
+    size_t peak;
     size_t allocations;
 };
 

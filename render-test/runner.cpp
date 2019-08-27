@@ -131,10 +131,10 @@ bool TestRunner::checkResults(mbgl::PremultipliedImage&& actualImage, TestMetada
             metadata.errorMessage = "Failed to find memory probe: " + expected.first;
             return false;
         }
-        if (actual->second.size > expected.second.size) {
+        if (actual->second.peak > expected.second.peak) {
             std::stringstream ss;
-            ss << "Allocated size at memory probe \" " << expected.first << "\" is "
-               << actual->second.size << " bytes, expected is " << expected.second.size << " bytes.";
+            ss << "Allocated memory peak size at probe \"" << expected.first << "\" is "
+               << actual->second.peak << " bytes, expected is " << expected.second.peak << " bytes.";
 
             metadata.errorMessage = ss.str();
             return false;
@@ -142,7 +142,7 @@ bool TestRunner::checkResults(mbgl::PremultipliedImage&& actualImage, TestMetada
 
         if (actual->second.allocations > expected.second.allocations) {
             std::stringstream ss;
-            ss << "Number of allocations at memory probe \" " << expected.first << "\" is "
+            ss << "Number of allocations at probe \"" << expected.first << "\" is "
                << actual->second.allocations << ", expected is " << expected.second.allocations << ".";
 
             metadata.errorMessage = ss.str();
@@ -447,7 +447,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
 
         metadata.metrics.memory.emplace(std::piecewise_construct,
                                         std::forward_as_tuple(std::move(mark)), 
-                                        std::forward_as_tuple(AllocationIndex::getAllocatedSize(), AllocationIndex::getAllocationsCount()));
+                                        std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(), AllocationIndex::getAllocationsCount()));
     // probeMemoryEnd
     } else if (operationArray[0].GetString() == memoryProbeEndOp) {
         assert(AllocationIndex::isActive());
