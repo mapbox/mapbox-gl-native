@@ -339,11 +339,9 @@ public class MapSnapshotter {
       fileSource.setApiBaseUrl(apiBaseUrl);
     }
 
-    String programCacheDir = FileSource.getInternalCachePath(context);
-
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
       options.height, options.styleUri, options.styleJson, options.region, options.cameraPosition,
-      options.showLogo, programCacheDir, options.localIdeographFontFamily);
+      options.showLogo, options.localIdeographFontFamily);
   }
 
   /**
@@ -625,8 +623,7 @@ public class MapSnapshotter {
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl, String styleJson,
                                          LatLngBounds region, CameraPosition position,
-                                         boolean showLogo, String programCacheDir,
-                                         String localIdeographFontFamily);
+                                         boolean showLogo, String localIdeographFontFamily);
 
   @Keep
   protected native void nativeStart();
