@@ -19,7 +19,6 @@ class Renderer::Impl {
 public:
     Impl(gfx::RendererBackend&,
          float pixelRatio_,
-         optional<std::string> programCacheDir,
          optional<std::string> localFontFamily_);
     ~Impl();
 
@@ -40,7 +39,6 @@ private:
     RendererObserver* observer;
 
     const float pixelRatio;
-    const optional<std::string> programCacheDir;
     std::unique_ptr<RenderStaticData> staticData;
 
     enum class RenderState {

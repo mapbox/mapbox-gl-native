@@ -24,7 +24,6 @@ class RendererBackend;
 class Renderer {
 public:
     Renderer(gfx::RendererBackend&, float pixelRatio_,
-             const optional<std::string> programCacheDir = {},
              const optional<std::string> localFontFamily = {});
     ~Renderer();
 

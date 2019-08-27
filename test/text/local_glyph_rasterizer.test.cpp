@@ -33,7 +33,7 @@ namespace {
 class LocalGlyphRasterizerTest {
 public:
     LocalGlyphRasterizerTest(const optional<std::string> fontFamily)
-        : frontend(1, optional<std::string>(), gfx::ContextMode::Unique, fontFamily)
+        : frontend(1, gfx::ContextMode::Unique, fontFamily)
     {
     }
 
