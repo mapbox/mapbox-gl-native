@@ -199,7 +199,7 @@ std::string serializeMetrics(const TestMetrics& metrics) {
         assert(!memoryProbe.first.empty());       
         writer.StartArray();
         writer.String(memoryProbe.first.c_str());
-        writer.Uint64(memoryProbe.second.size);
+        writer.Uint64(memoryProbe.second.peak);
         writer.Uint64(memoryProbe.second.allocations);
         writer.EndArray();
     }
