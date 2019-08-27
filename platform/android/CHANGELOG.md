@@ -6,6 +6,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ### Features
  - Introduce `clusterProperties` option for aggregated cluster properties. [#15425](https://github.com/mapbox/mapbox-gl-native/pull/15425)
 
+### Bug fixes
+- Fixed a rendering issue that non-SDF icon would be treated as SDF icon if they are in the same layer. [#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456)
+
 ## 8.3.0
 This release changes how offline tile requests are billed — they are now billed on a pay-as-you-go basis and all developers are able raise the offline tile limit for their users. Offline requests were previously exempt from monthly active user (MAU) billing and increasing the offline per-user tile limit to more than 6,000 tiles required the purchase of an enterprise license. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://blog.mapbox.com/offline-maps-for-all-bb0fc51827be) and [#15380](https://github.com/mapbox/mapbox-gl-native/pull/15380).
 
