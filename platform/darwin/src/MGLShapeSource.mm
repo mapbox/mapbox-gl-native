@@ -3,6 +3,7 @@
 
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLStyle_Private.h"
+#import "MGLStyleValue_Private.h"
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
@@ -85,12 +86,45 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
         geoJSONOptions.cluster = value.boolValue;
     }
 
-    if (NSString *value = options[MGLShapeSourceOptionClusterProperties]) {
-        if (![value isKindOfClass:[NSString class]]) {
+    if (NSDictionary *value = options[MGLShapeSourceOptionClusterProperties]) {
+        if (![value isKindOfClass:[NSDictionary<NSString *, NSArray *> class]]) {
             [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionClusterProperties must be an NSString."];
+                        format:@"MGLShapeSourceOptionClusterProperties must be an NSDictionary with an NSString as a key and an array containing two NSExpression objects as a value."];
         }
-        geoJSONOptions.clusterProperties = value;
+
+        NSEnumerator *stringEnumerator = [value keyEnumerator];
+        NSString *key;
+        std::unordered_map<std::string, std::pair<std::shared_ptr<mbgl::style::expression::Expression>, std::shared_ptr<mbgl::style::expression::Expression>>> clusterMap;
+
+//        new std::pair<mbgl::style::expression a, mbgl::style::expression b>;
+        while (key == [stringEnumerator nextObject]) {
+            // check that array has only 2 values
+            NSArray *expArray = value[key];
+            if ([expArray count] != 2) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"MGLShapeSourceOptionClusterProperties requires two NSExpression objects."];
+            }
+
+            NSExpression *exp1 = expArray[0];
+            NSExpression *exp2 = expArray[1];
+           // convert values into style expressions
+            auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp1, true);
+            auto mbglValue2 = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp2, true);
+            auto mbglPair = std::make_pair(mbglValue, mbglValue2);
+
+            std::string keyString = std::string([key UTF8String]);
+
+//            clusterMap[keyString] = ;
+
+        }
+        geoJSONOptions.clusterProperties = clusterMap;
+//        for (NSExpression *exp in )
+//        NSExpression *exp = [NSExpression expressionForFunction:@"max" arguments:@[[NSExpression valueForKeyPath:@"key"], []];
+
+//        geoJSONOptions.clusterProperties = MGLStyleValueTransformer<std::string, NSString *>().toExpression(value);
+//            auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
+//            properties->insert(<[ket cStringUsingEncoding:NSUTF8StringEncoding], expression.to>)
+//            mbgl::style::GeoJSONOptions::ClusterProperties clusterProperties = value;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionLineDistanceMetrics]) {
