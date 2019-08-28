@@ -399,10 +399,11 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
             static const CollisionBoxProgram::Binders paintAttributeData(properties, 0);
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
             const float scale = std::pow(2, parameters.state.getZoom() - tile.getOverscaledTileID().overscaledZ);
-            std::array<float, 2> extrudeScale = {
-                { parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
-                  parameters.pixelsToGLUnits[1] / (pixelRatio * scale) }
-            };
+            std::array<float,2> extrudeScale =
+                {{
+                    parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
+                    parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
+                }};
             const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData->layerProperties);
             const auto& layout = *bucket.layout;
             const auto values = isText ? textPropertyValues(evaluated, layout): iconPropertyValues(evaluated, layout);
@@ -446,8 +447,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
                     parameters.colorModeForRenderPass(),
                     gfx::CullFaceMode::disabled(),
                     CollisionCircleProgram::LayoutUniformValues {
-                        uniforms::matrix::Value(
-                            (needTranslate
+                        uniforms::matrix::Value((needTranslate
                                  ? tile.translatedMatrix(values.translate, values.translateAnchor, parameters.state)
                                  : tile.matrix)),
                         uniforms::extrude_scale::Value(extrudeScale),
@@ -456,7 +456,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters) {
                     },
                     *collisionCircle->vertexBuffer,
                     *collisionCircle->dynamicVertexBuffer,
-                    *collisionCircle->indexBuffer, 
+                    *collisionCircle->indexBuffer,
                     collisionCircle->segments,
                     paintAttributeData,
                     properties,

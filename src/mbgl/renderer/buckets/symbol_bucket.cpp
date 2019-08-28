@@ -182,7 +182,7 @@ bool SymbolBucket::hasIconData() const {
 bool SymbolBucket::hasSdfIconData() const {
     return !sdfIcon.segments.empty();
 }
-    
+
 bool SymbolBucket::hasIconCollisionBoxData() const {
     return iconCollisionBox && !iconCollisionBox->segments.empty();
 }
@@ -190,7 +190,7 @@ bool SymbolBucket::hasIconCollisionBoxData() const {
 bool SymbolBucket::hasIconCollisionCircleData() const {
     return iconCollisionCircle && !iconCollisionCircle->segments.empty();
 }
-    
+
 bool SymbolBucket::hasTextCollisionBoxData() const {
     return textCollisionBox && !textCollisionBox->segments.empty();
 }
@@ -198,7 +198,7 @@ bool SymbolBucket::hasTextCollisionBoxData() const {
 bool SymbolBucket::hasTextCollisionCircleData() const {
     return textCollisionCircle && !textCollisionCircle->segments.empty();
 }
-    
+
 void addPlacedSymbol(gfx::IndexVector<gfx::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
     auto endIndex = placedSymbol.vertexStartIndex + placedSymbol.glyphOffsets.size() * 4;
     for (auto vertexIndex = placedSymbol.vertexStartIndex; vertexIndex < endIndex; vertexIndex += 4) {

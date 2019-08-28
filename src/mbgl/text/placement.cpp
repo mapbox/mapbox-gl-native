@@ -419,7 +419,7 @@ void Placement::placeBucket(
 
         const bool hasIconCollisionCircleData = bucket.hasIconCollisionCircleData();
         const bool hasTextCollisionCircleData = bucket.hasTextCollisionCircleData();
-        
+
         if (hasIconCollisionCircleData && symbolInstance.iconCollisionFeature.alongLine && !iconBoxes.empty()) {
             collisionCircles[&symbolInstance.iconCollisionFeature] = iconBoxes;
         }
@@ -864,7 +864,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                 updateIconCollisionBox(*symbolInstance.verticalIconCollisionFeature, opacityState.text.placed, hasIconTextFit ? verticalTextShift : Point<float>{0.0f, 0.0f});
             }
         }
-        
+
         if (bucket.hasIconCollisionCircleData()) {
             updateCollisionCircles(symbolInstance.iconCollisionFeature, opacityState.icon.placed, false);
         }

@@ -807,10 +807,11 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
 }
 
 void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
+
     if (!hasSymbolInstances()) {
         return;
     }
-    
+
     for (const SymbolInstance& symbolInstance : symbolInstances) {
         auto populateCollisionBox = [&](const auto& feature, bool isText) {
             SymbolBucket::CollisionBuffer& collisionBuffer =
@@ -822,10 +823,10 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
             for (const CollisionBox& box : feature.boxes) {
                 auto& anchor = box.anchor;
 
-                Point<float> tl{ box.x1, box.y1 };
-                Point<float> tr{ box.x2, box.y1 };
-                Point<float> bl{ box.x1, box.y2 };
-                Point<float> br{ box.x2, box.y2 };
+                Point<float> tl{box.x1, box.y1};
+                Point<float> tr{box.x2, box.y1};
+                Point<float> bl{box.x1, box.y2};
+                Point<float> br{box.x2, box.y2};
 
                 static constexpr std::size_t vertexLength = 4;
                 const std::size_t indexLength = feature.alongLine ? 6 : 8;
