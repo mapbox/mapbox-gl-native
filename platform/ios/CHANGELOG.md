@@ -6,9 +6,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue that caused the tilt gesture to trigger too easily and conflict with pinch or pan gestures. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
 * Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
-* Fixed a rendering issue that non-SDF icon would be treated as SDF icon if they are in the same layer. ([#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456))
 
-## 5.3.0
+## 5.3.0 - August 28. 2019
 
 This release changes how offline tile requests are billed — they are now billed on a pay-as-you-go basis and all developers are able raise the offline tile limit for their users. Offline requests were previously exempt from monthly active user (MAU) billing and increasing the offline per-user tile limit to more than 6,000 tiles required the purchase of an enterprise license. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://blog.mapbox.com/offline-maps-for-all-bb0fc51827be) and [#15380](https://github.com/mapbox/mapbox-gl-native/pull/15380).
 
@@ -21,6 +20,7 @@ This release changes how offline tile requests are billed — they are now bill
 * Added the `MGLSymbolStyleLayer.textWritingModes` layout property. This property can be set to `MGLTextWritingModeHorizontal` or `MGLTextWritingModeVertical`. ([#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932))
 * Fixed rendering and collision detection issues with using `MGLSymbolStyleLayer.textVariableAnchor` and `MGLSymbolStyleLayer.iconTextFit` properties on the same layer. ([#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367))
 * Fixed symbol overlap when zooming out quickly. ([15416](https://github.com/mapbox/mapbox-gl-native/pull/15416))
+* Fixed a rendering issue that non-SDF icon would be treated as SDF icon if they are in the same layer. ([#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456))
 
 ### Other changes
 
