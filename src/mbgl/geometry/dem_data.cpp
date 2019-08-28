@@ -3,36 +3,23 @@
 
 namespace mbgl {
 
-DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding):
+DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding _encoding):
     dim(_image.size.height),
     // extra two pixels per row for border backfilling on either edge
     stride(dim + 2),
+    encoding(_encoding),
     image({ static_cast<uint32_t>(stride), static_cast<uint32_t>(stride) }) {
 
     if (_image.size.height != _image.size.width){
         throw std::runtime_error("raster-dem tiles must be square.");
     }
 
-    auto decodeMapbox = [] (const uint8_t r, const uint8_t g, const uint8_t b){
-        // https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb
-        return (r * 256 * 256 + g * 256 + b)/10 - 10000;
-    };
-
-    auto decodeTerrarium = [] (const uint8_t r, const uint8_t g, const uint8_t b){
-        // https://aws.amazon.com/public-datasets/terrain/
-        return ((r * 256 + g + b / 256) - 32768);
-    };
-
-    auto decodeRGB = encoding == Tileset::DEMEncoding::Terrarium ? decodeTerrarium : decodeMapbox;
-
-    std::memset(image.data.get(), 0, image.bytes());
-
+    auto* dest = reinterpret_cast<uint32_t*>(image.data.get()) + stride + 1;
+    auto* source = reinterpret_cast<uint32_t*>(_image.data.get());
     for (int32_t y = 0; y < dim; y++) {
-        for (int32_t x = 0; x < dim; x++) {
-            const int32_t i = y * dim + x;
-            const int32_t j = i * 4;
-            set(x, y, decodeRGB(_image.data[j], _image.data[j+1], _image.data[j+2]));
-        }
+        memcpy(dest, source, dim * 4);
+        dest += stride;
+        source += dim;
     }
     
     // in order to avoid flashing seams between tiles, here we are initially populating a 1px border of
@@ -40,25 +27,20 @@ DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding
     // replaced when the tile's neighboring tiles are loaded and the accurate data can be backfilled using
     // DEMData#backfillBorder
 
+    auto* data = reinterpret_cast<uint32_t*>(image.data.get());
     for (int32_t x = 0; x < dim; x++) {
+        auto rowOffset = stride * (x + 1);
         // left vertical border
-        set(-1, x, get(0, x));
+        data[rowOffset] = data[rowOffset + 1];
 
         // right vertical border
-        set(dim, x, get(dim - 1, x));
-
-        //left horizontal border
-        set(x, -1, get(x, 0));
-
-        // right horizontal border
-        set(x, dim, get(x, dim - 1));
+        data[rowOffset + dim + 1] = data[rowOffset + dim];
     }
-
-    // corners
-    set(-1, -1, get(0, 0));
-    set(dim, -1, get(dim - 1, 0));
-    set( -1, dim, get(0, dim - 1));
-    set(dim, dim, get(dim - 1, dim - 1));
+    
+    // top horizontal border with corners
+    memcpy(data, data + stride, stride * 4);
+    // bottom horizontal border with corners
+    memcpy(data + (dim + 1) * stride, data + dim * stride, stride * 4);
 }
 
 // This function takes the DEMData from a neighboring tile and backfills the edge/corner
@@ -90,11 +72,29 @@ void DEMData::backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy
     int32_t ox = -dx * dim;
     int32_t oy = -dy * dim;
     
+    auto* dest = reinterpret_cast<uint32_t*>(image.data.get());
+    auto* source = reinterpret_cast<uint32_t*>(o.image.data.get());
+
     for (int32_t y = yMin; y < yMax; y++) {
         for (int32_t x = xMin; x < xMax; x++) {
-            set(x, y, o.get(x + ox, y + oy));
+            dest[idx(x, y)] = source[idx(x + ox, y + oy)];
         }
     }
+}
+
+int32_t DEMData::get(const int32_t x, const int32_t y) const {
+    const auto& unpack = getUnpackVector();
+    const uint8_t* value = image.data.get() + idx(x, y) * 4;
+    return value[0] * unpack[0] + value[1] * unpack[1] + value[2] * unpack[2] - unpack[3];
+}
+
+const std::array<float, 4>& DEMData::getUnpackVector() const {
+    // https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb
+    static const std::array<float, 4> unpackMapbox = {{ 6553.6, 25.6, 0.1, 10000.0 }};
+    // https://aws.amazon.com/public-datasets/terrain/
+    static const std::array<float, 4> unpackTerrarium = {{ 256.0, 1.0, 1.0 / 256.0, 32768.0 }};
+
+    return encoding == Tileset::DEMEncoding::Terrarium ? unpackTerrarium : unpackMapbox;
 }
 
 } // namespace mbgl

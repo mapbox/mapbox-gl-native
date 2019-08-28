@@ -163,6 +163,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters) {
                     uniforms::dimension::Value( {{stride, stride}} ),
                     uniforms::zoom::Value( float(tile.id.canonical.z) ),
                     uniforms::maxzoom::Value( float(maxzoom) ),
+                    uniforms::unpack::Value( bucket.getDEMData().getUnpackVector() ),
                 },
                 paintAttributeData,
                 properties,
