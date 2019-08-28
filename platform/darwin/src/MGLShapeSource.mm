@@ -113,10 +113,10 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
             std::string keyString = std::string([key UTF8String]);
 
-            // No viable overloaded operator[] for type ...
-            // clusterMap[keyString] = mbglPair;
+            clusterMap->emplace(keyString, mbglPair);
 
         }
+        // No viable overloaded '='
 //        geoJSONOptions.clusterProperties = clusterMap;
     }
 
