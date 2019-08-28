@@ -260,6 +260,12 @@ MGL_EXPORT
 /**
  Creates and registers an offline pack that downloads the resources needed to
  use the given region offline.
+ 
+ As of version 5.3 of the Maps SDK for iOS, offline tile requests are no longer
+ exempt from billing on mobile. Developers are subject to separate Vector Tile
+ and Raster Tile API pricing for offline use. See
+ <a href="https://www.mapbox.com/pricing/">our pricing page</a> for more 
+ information.
 
  The resulting pack is added to the shared offline storage object’s `packs`
  property, then the `completion` block is executed with that pack passed in.
@@ -339,7 +345,7 @@ MGL_EXPORT
 
 /**
  Sets the maximum number of Mapbox-hosted tiles that may be downloaded and
- stored on the current device.
+ stored on the current device. By default, the limit is set to 6,000.
 
  Once this limit is reached, an
  `MGLOfflinePackMaximumMapboxTilesReachedNotification` is posted for every
