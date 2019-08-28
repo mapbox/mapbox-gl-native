@@ -12,7 +12,7 @@
 using ErrorMessage = std::string;
 using JSONReply = mbgl::variant<mbgl::JSDocument, ErrorMessage>;
 
-using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::vector<std::string>>;
+using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::vector<TestPaths>>;
 
 JSONReply readJson(const mbgl::filesystem::path&);
 std::string serializeJsonValue(const mbgl::JSValue&);
