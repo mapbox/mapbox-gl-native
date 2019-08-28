@@ -94,9 +94,8 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
         NSEnumerator *stringEnumerator = [value keyEnumerator];
         NSString *key;
-        std::unordered_map<std::string, std::pair<std::shared_ptr<mbgl::style::expression::Expression>, std::shared_ptr<mbgl::style::expression::Expression>>> clusterMap;
+        mbgl::style::GeoJSONOptions::ClusterProperties * clusterMap = new mbgl::style::GeoJSONOptions::ClusterProperties;
 
-//        new std::pair<mbgl::style::expression a, mbgl::style::expression b>;
         while (key == [stringEnumerator nextObject]) {
             // check that array has only 2 values
             NSArray *expArray = value[key];
@@ -114,17 +113,11 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
             std::string keyString = std::string([key UTF8String]);
 
-//            clusterMap[keyString] = ;
+            // No viable overloaded operator[] for type ...
+            // clusterMap[keyString] = mbglPair;
 
         }
-        geoJSONOptions.clusterProperties = clusterMap;
-//        for (NSExpression *exp in )
-//        NSExpression *exp = [NSExpression expressionForFunction:@"max" arguments:@[[NSExpression valueForKeyPath:@"key"], []];
-
-//        geoJSONOptions.clusterProperties = MGLStyleValueTransformer<std::string, NSString *>().toExpression(value);
-//            auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
-//            properties->insert(<[ket cStringUsingEncoding:NSUTF8StringEncoding], expression.to>)
-//            mbgl::style::GeoJSONOptions::ClusterProperties clusterProperties = value;
+//        geoJSONOptions.clusterProperties = clusterMap;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionLineDistanceMetrics]) {
