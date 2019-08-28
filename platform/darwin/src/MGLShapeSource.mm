@@ -106,14 +106,19 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
             NSExpression *exp1 = expArray[0];
             NSExpression *exp2 = expArray[1];
-           // convert values into style expressions
+           // convert values into style expressions. IDK how to do this, but ¯\_(ツ)_/¯
+//            auto mbglValue1 = m
+
             auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp1, true);
             auto mbglValue2 = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp2, true);
-            auto mbglPair = std::make_pair(mbglValue, mbglValue2);
+
+            // No viable conversion from 'pair<typename __unwrap_ref_decay<PropertyValue<basic_string<char> > &>::type, typename __unwrap_ref_decay<PropertyValue<basic_string<char> > &>::type>' to 'pair<std::shared_ptr<mbgl::style::expression::Expression>, std::shared_ptr<mbgl::style::expression::Expression>>'
+            //
+//            mbgl::style::GeoJSONOptions::ClusterExpression mbglPair = std::make_pair(mbglValue, mbglValue2);
 
             std::string keyString = std::string([key UTF8String]);
 
-            clusterMap->emplace(keyString, mbglPair);
+//            clusterMap->emplace(keyString, mbglPair);
 
         }
         // No viable overloaded '='
