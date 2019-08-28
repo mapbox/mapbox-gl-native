@@ -42,6 +42,7 @@
   "render-tests/debug/collision": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/tile": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/tile-overscaled": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
+  "render-tests/debug/raster": "https://github.com/mapbox/mapbox-gl-native/issues/15510",
   "render-tests/extent/1024-circle": "needs investigation",
   "render-tests/fill-extrusion-pattern/@2x": "https://github.com/mapbox/mapbox-gl-js/issues/3327",
   "render-tests/fill-extrusion-pattern/function": "https://github.com/mapbox/mapbox-gl-js/issues/3327",
