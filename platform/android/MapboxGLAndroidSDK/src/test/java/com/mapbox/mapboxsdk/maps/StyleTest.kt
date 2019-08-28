@@ -405,22 +405,4 @@ class StyleTest {
             Assert.assertEquals("Layer that failed to be added shouldn't be cached", layer1, mapboxMap.style!!.getLayer("layer1"))
         }
     }
-
-  @Test
-  fun testClearRemovesSourcesFirst() {
-    val source1 = mockk<GeoJsonSource>(relaxed = true)
-    every { source1.id } returns "source1"
-    val layer1 = mockk<SymbolLayer>(relaxed = true)
-    every { layer1.id } returns "layer1"
-
-    val builder = Style.Builder().withLayer(layer1).withSource(source1)
-    mapboxMap.setStyle(builder)
-    mapboxMap.notifyStyleLoaded()
-    mapboxMap.setStyle(Style.MAPBOX_STREETS)
-
-    verifyOrder {
-      nativeMapView.removeLayer(layer1)
-      nativeMapView.removeSource(source1)
-    }
-  }
 }
