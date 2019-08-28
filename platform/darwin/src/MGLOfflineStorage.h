@@ -262,9 +262,10 @@ MGL_EXPORT
  use the given region offline.
  
  As of version 5.3 of the Maps SDK for iOS, offline tile requests are no longer
- exempt from billing on mobile. Developers are billed per vector or raster tile 
- API request above the free tier for offline use. For more information, see the 
- <a href="https://www.mapbox.com/pricing/">Pricing</a> page.
+ exempt from billing on mobile. Developers are subject to separate Vector Tile
+ and Raster Tile API pricing for offline use. See
+ <a href="https://www.mapbox.com/pricing/">our pricing page</a> for more 
+ information.
 
  The resulting pack is added to the shared offline storage object’s `packs`
  property, then the `completion` block is executed with that pack passed in.
