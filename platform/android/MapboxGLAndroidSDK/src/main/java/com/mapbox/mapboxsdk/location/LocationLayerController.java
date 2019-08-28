@@ -140,11 +140,11 @@ final class LocationLayerController {
     }
     this.renderMode = renderMode;
 
+    styleForeground(options);
+    determineIconsSource(options);
     if (!isHidden) {
-      styleForeground(options);
       show();
     }
-    determineIconsSource(options);
     internalRenderModeChangedListener.onRenderModeChanged(renderMode);
   }
 
