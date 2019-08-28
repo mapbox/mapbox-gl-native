@@ -64,6 +64,10 @@ public:
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
 
+    static void SetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void GetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void RemoveFeatureState(const Nan::FunctionCallbackInfo<v8::Value>&);
+
     static v8::Local<v8::Value> ParseError(const char* msg);
 
     void startRender(RenderOptions options);
