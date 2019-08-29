@@ -1295,7 +1295,7 @@ jobs:
 # ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
     docker:
-      - image: mbgl/linux-gcc-5-qt-5.9:5132cfd29f
+      - image: mbgl/linux-gcc-5-qt-5.9:5cd92d7d1c
     resource_class: large
     working_directory: /src
     environment:

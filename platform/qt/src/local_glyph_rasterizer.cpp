@@ -1,5 +1,6 @@
 #include <mbgl/text/local_glyph_rasterizer.hpp>
 #include <mbgl/util/i18n.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <QtCore/QFile>
 #include <QtGui/QFont>
@@ -17,13 +18,15 @@ public:
 
     optional<std::string> fontFamily;
     QFont font;
+    optional<QFontMetrics> metrics;
 };
 
 LocalGlyphRasterizer::Impl::Impl(const optional<std::string> fontFamily_)
     : fontFamily(fontFamily_) {
     if (isConfigured()) {
         font.setFamily(QString::fromStdString(*fontFamily));
-        font.setPixelSize(24);
+        font.setPixelSize(util::ONE_EM);
+        metrics = QFontMetrics(font);
     }
 }
 
@@ -39,29 +42,33 @@ LocalGlyphRasterizer::~LocalGlyphRasterizer() {
 }
 
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
-    return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->isConfigured();
+    return impl->isConfigured() && impl->metrics->inFont(glyphID) && util::i18n::allowsFixedWidthGlyphGeneration(glyphID);
 }
 
 Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     Glyph glyph;
     glyph.id = glyphID;
 
-    QFontMetrics metrics(impl->font);
-    Size size(metrics.width(glyphID), metrics.height());
+    if (!impl->isConfigured()) {
+        assert(false);
+        return glyph;
+    }
 
-    glyph.metrics.width = size.width;
-    glyph.metrics.height = size.height;
+    glyph.metrics.width = impl->metrics->width(glyphID);
+    glyph.metrics.height = impl->metrics->height();
     glyph.metrics.left = 3;
     glyph.metrics.top = -8;
-    glyph.metrics.advance = metrics.width(glyphID);
+    glyph.metrics.advance = glyph.metrics.width;
 
+    // Set width of a glyph's backing image to be util::ONE_EM.
+    Size size(util::ONE_EM, glyph.metrics.height);
     QImage image(QSize(size.width, size.height), QImage::Format_Alpha8);
     image.fill(qRgba(0, 0, 0, 0));
-
     QPainter painter(&image);
     painter.setFont(impl->font);
     painter.setRenderHints(QPainter::TextAntialiasing);
-    painter.drawText(QPointF(0, metrics.ascent()), QString(QChar(glyphID)));
+    // Render at constant baseline, to align with glyphs that are rendered by node-fontnik.
+    painter.drawText(QPointF(0, 20), QString(QChar(glyphID)));
 
     auto img = std::make_unique<uint8_t[]>(image.byteCount());
     memcpy(img.get(), image.constBits(), image.byteCount());

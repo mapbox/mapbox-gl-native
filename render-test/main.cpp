@@ -3,13 +3,11 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/io.hpp>
 
-#include "filesystem.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
 
 #include <random>
-#include <regex>
 
 #define ANSI_COLOR_RED        "\x1b[31m"
 #define ANSI_COLOR_GREEN      "\x1b[32m"
@@ -36,48 +34,17 @@ void operator delete(void* ptr, size_t) noexcept {
     AllocationIndex::deallocate(ptr);
 }
 
-namespace {
-
-TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
-    std::vector<mbgl::filesystem::path> expectations{ stylePath };
-    expectations.front().remove_filename();
-
-    const static std::regex regex{ TestRunner::getBasePath() };    
-    for (const std::string& path : TestRunner::getPlatformExpectationsPaths()) {
-        expectations.emplace_back(std::regex_replace(expectations.front().string(), regex, path));
-        assert(!expectations.back().empty());
-    }
-
-    return {
-        std::move(stylePath),
-        std::move(expectations)
-    };
-}
-
-} // namespace
-
 int main(int argc, char** argv) {
     bool recycleMap;
     bool shuffle;
     uint32_t seed;
     std::string testRootPath;
-    std::vector<std::string> ids;
+    std::vector<TestPaths> testPaths;
 
-    std::tie(recycleMap, shuffle, seed, testRootPath, ids) = parseArguments(argc, argv);
+    std::tie(recycleMap, shuffle, seed, testRootPath, testPaths) = parseArguments(argc, argv);
     const std::string::size_type rootLength = testRootPath.length();
 
     const auto ignores = parseIgnores();
-
-    // Recursively traverse through the test paths and collect test directories containing "style.json".
-    std::vector<TestPaths> testPaths;
-    testPaths.reserve(ids.size());
-    for (const auto& id : ids) {
-        for (auto& testPath : mbgl::filesystem::recursive_directory_iterator(mbgl::filesystem::path(id))) {
-            if (testPath.path().filename() == "style.json") {
-                testPaths.emplace_back(makeTestPaths(testPath));
-            }
-        }
-    }
 
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);

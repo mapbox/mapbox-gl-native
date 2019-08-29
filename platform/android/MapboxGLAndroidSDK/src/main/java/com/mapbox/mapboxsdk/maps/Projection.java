@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps;
 import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -24,7 +25,6 @@ public class Projection {
   private final NativeMap nativeMapView;
   @NonNull
   private final MapView mapView;
-  private int[] contentPadding = new int[] {0, 0, 0, 0};
 
   Projection(@NonNull NativeMap nativeMapView, @NonNull MapView mapView) {
     this.nativeMapView = nativeMapView;
@@ -32,8 +32,7 @@ public class Projection {
   }
 
   void setContentPadding(int[] contentPadding) {
-    this.contentPadding = contentPadding;
-    float[] output = new float[contentPadding.length];
+    double[] output = new double[contentPadding.length];
     for (int i = 0; i < contentPadding.length; i++) {
       output[i] = contentPadding[i];
     }
@@ -41,11 +40,15 @@ public class Projection {
   }
 
   int[] getContentPadding() {
-    return contentPadding;
+    double[] padding = nativeMapView.getCameraPosition().padding;
+    return new int[] {(int) padding[0], (int) padding[1], (int) padding[2], (int) padding[3]};
   }
 
+  /**
+   * @deprecated unused
+   */
+  @Deprecated
   public void invalidateContentPadding() {
-    setContentPadding(contentPadding);
   }
 
   /**
@@ -126,10 +129,11 @@ public class Projection {
       top = 0;
       bottom = mapView.getHeight();
     } else {
-      left = (float) contentPadding[0];
-      right = (float) (mapView.getWidth() - contentPadding[2]);
-      top = (float) contentPadding[1];
-      bottom = (float) (mapView.getHeight() - contentPadding[3]);
+      int[] contentPadding = getContentPadding();
+      left = contentPadding[0];
+      right = mapView.getWidth() - contentPadding[2];
+      top = contentPadding[1];
+      bottom = mapView.getHeight() - contentPadding[3];
     }
 
     LatLng center = fromScreenLocation(new PointF(left + (right - left) / 2, top + (bottom - top) / 2));

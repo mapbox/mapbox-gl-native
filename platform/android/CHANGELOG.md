@@ -5,6 +5,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ## master
 ### Features
  - Introduce `clusterProperties` option for aggregated cluster properties. [#15425](https://github.com/mapbox/mapbox-gl-native/pull/15425)
+ - Expose the `CameraPosition#padding` field and associated utility camera position builders. This gives a choice to set a persisting map padding immediately during a transition instead of setting it lazily `MapboxMap#setPadding`, which required scheduling additional transition to be applied. This also deprecates `MapboxMap#setPadding` as there should be no need for a lazy padding setter. [#15444](https://github.com/mapbox/mapbox-gl-native/pull/15444)
+
+ ### Performance improvements
+ - Mark used offline region resources in batches. [#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521)
 
 ### Bug fixes
  - Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. [#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467)
@@ -19,6 +23,7 @@ This release changes how offline tile requests are billed — they are now bille
 
 ### Bug fixes
  - Fixed a rendering issue caused by all icons being treated as SDFs if an SDF and non-SDF icon were in the same layer. [#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456)
+ - Fixed an issue where changing location's render mode when the`LocationComponent` is disable wouldn't invalidate the foreground icon when it's back enabled. [#15507](https://github.com/mapbox/mapbox-gl-native/pull/15507)
 
 ## 8.2.2 - August 23, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.1...android-v8.2.2) since [Mapbox Maps SDK for Android v8.2.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.1):

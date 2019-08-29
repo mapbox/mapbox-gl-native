@@ -68,7 +68,7 @@
           {
             "type": "Feature",
             "properties": {
-              "name": "身什戰アあ"
+              "name": "안녕 세상 KR"
             },
             "geometry": {
               "type": "LineString",
@@ -144,7 +144,7 @@
           {
             "type": "Feature",
             "properties": {
-              "name": "8身什戰アあ"
+              "name": "안녕 세상8"
             },
             "geometry": {
               "type": "LineString",
