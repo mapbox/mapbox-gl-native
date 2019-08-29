@@ -877,27 +877,15 @@ std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
     return std::current_exception();
 }
 
-optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) try {
-    auto response = getInternal(resource);
-
-    if (response) {
-        markUsed(regionID, resource);
-    }
-
-    return response;
+optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(const Resource& resource) try {
+    return getInternal(resource);
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "read region resource");
     return nullopt;
 }
 
-optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Resource& resource) try {
-    auto response = hasInternal(resource);
-
-    if (response) {
-        markUsed(regionID, resource);
-    }
-
-    return response;
+optional<int64_t> OfflineDatabase::hasRegionResource(const Resource& resource) try {
+    return hasInternal(resource);
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "query region resource");
     return nullopt;

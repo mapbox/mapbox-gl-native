@@ -60,10 +60,12 @@ private:
     std::list<std::unique_ptr<AsyncRequest>> requests;
     std::unordered_set<std::string> requiredSourceURLs;
     std::deque<Resource> resourcesRemaining;
+    std::list<Resource> resourcesToBeMarkedAsUsed;
     std::list<std::tuple<Resource, Response>> buffer;
 
     void queueResource(Resource&&);
     void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);
+    void markPendingUsedResources();
 };
 
 } // namespace mbgl

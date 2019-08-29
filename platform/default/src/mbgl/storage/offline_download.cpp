@@ -353,9 +353,12 @@ void OfflineDownload::activateDownload() {
 */
 void OfflineDownload::continueDownload() {
     if (resourcesRemaining.empty() && status.complete()) {
+        markPendingUsedResources();
         setState(OfflineRegionDownloadState::Inactive);
         return;
     }
+
+    if (resourcesToBeMarkedAsUsed.size() >= 200) markPendingUsedResources();
 
     while (!resourcesRemaining.empty() && requests.size() < onlineFileSource.getMaximumConcurrentRequests()) {
         ensureResource(std::move(resourcesRemaining.front()));
@@ -391,6 +394,11 @@ void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tiles
     });
 }
 
+void OfflineDownload::markPendingUsedResources() {
+    offlineDatabase.markUsedResources(id, resourcesToBeMarkedAsUsed);
+    resourcesToBeMarkedAsUsed.clear();
+}
+
 void OfflineDownload::ensureResource(Resource&& resource,
                                      std::function<void(Response)> callback) {
     assert(resource.priority == Resource::Priority::Low);
@@ -399,24 +407,29 @@ void OfflineDownload::ensureResource(Resource&& resource,
     auto workRequestsIt = requests.insert(requests.begin(), nullptr);
     *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
-
+        const auto resourceKind = resource.kind;
         auto getResourceSizeInDatabase = [&] () -> optional<int64_t> {
+            optional<int64_t> result;
             if (!callback) {
-                return offlineDatabase.hasRegionResource(id, resource);
+                result = offlineDatabase.hasRegionResource(resource);
+            } else {
+                optional<std::pair<Response, uint64_t>> response = offlineDatabase.getRegionResource(resource);
+                if (response) {
+                    callback(response->first);
+                    result = response->second;
+                }
             }
-            optional<std::pair<Response, uint64_t>> response = offlineDatabase.getRegionResource(id, resource);
-            if (!response) {
-                return {};
-            }
-            callback(response->first);
-            return response->second;
+
+            if (result) resourcesToBeMarkedAsUsed.emplace_back(std::move(resource));
+            return result;
         };
 
         optional<int64_t> offlineResponse = getResourceSizeInDatabase();
         if (offlineResponse) {
+            assert(!resourcesToBeMarkedAsUsed.empty());
             status.completedResourceCount++;
             status.completedResourceSize += *offlineResponse;
-            if (resource.kind == Resource::Kind::Tile) {
+            if (resourceKind == Resource::Kind::Tile) {
                 status.completedTileCount += 1;
                 status.completedTileSize += *offlineResponse;
             }
