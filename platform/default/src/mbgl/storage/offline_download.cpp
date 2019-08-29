@@ -151,8 +151,9 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
         auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
             if (urlOrTileset.is<Tileset>()) {
-                result->requiredResourceCount +=
-                        tileCount(definition, type, tileSize, urlOrTileset.get<Tileset>().zoomRange);
+                uint64_t tileSourceCount = tileCount(definition, type, tileSize, urlOrTileset.get<Tileset>().zoomRange);
+                result->requiredTileCount += tileSourceCount;
+                result->requiredResourceCount += tileSourceCount;
             } else {
                 result->requiredResourceCount += 1;
                 const auto& url = urlOrTileset.get<std::string>();
@@ -161,8 +162,9 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                     style::conversion::Error error;
                     optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
                     if (tileset) {
-                        result->requiredResourceCount +=
-                                tileCount(definition, type, tileSize, (*tileset).zoomRange);
+                        uint64_t tileSourceCount = tileCount(definition, type, tileSize, (*tileset).zoomRange);
+                        result->requiredTileCount += tileSourceCount;
+                        result->requiredResourceCount += tileSourceCount;
                     }
                 } else {
                     result->requiredResourceCountIsPrecise = false;
@@ -383,12 +385,16 @@ void OfflineDownload::queueResource(Resource&& resource) {
     resource.setPriority(Resource::Priority::Low);
     resource.setUsage(Resource::Usage::Offline);
     status.requiredResourceCount++;
+    if (resource.kind == mbgl::Resource::Kind::Tile) {
+        status.requiredTileCount++;
+    }
     resourcesRemaining.push_front(std::move(resource));
 }
 
 void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tileset& tileset) {
     tileCover(definition, type, tileSize, tileset.zoomRange, [&](const auto& tile) {
         status.requiredResourceCount++;
+        status.requiredTileCount++;
 
         auto tileResource = Resource::tile(
                 tileset.tiles[0], definition.match([](auto& def) { return def.pixelRatio; }),
