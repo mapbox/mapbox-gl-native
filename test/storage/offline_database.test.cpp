@@ -1093,8 +1093,8 @@ TEST(OfflineDatabase, HasRegionResource) {
     auto region = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(region);
 
-    EXPECT_FALSE(bool(db.hasRegionResource(region->getID(), Resource::style("http://example.com/1"))));
-    EXPECT_FALSE(bool(db.hasRegionResource(region->getID(), Resource::style("http://example.com/20"))));
+    EXPECT_FALSE(bool(db.hasRegionResource(Resource::style("http://example.com/1"))));
+    EXPECT_FALSE(bool(db.hasRegionResource(Resource::style("http://example.com/20"))));
 
     Response response;
     response.data = randomString(1024);
@@ -1103,9 +1103,9 @@ TEST(OfflineDatabase, HasRegionResource) {
         db.putRegionResource(region->getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
     }
 
-    EXPECT_TRUE(bool(db.hasRegionResource(region->getID(), Resource::style("http://example.com/1"))));
-    EXPECT_TRUE(bool(db.hasRegionResource(region->getID(), Resource::style("http://example.com/20"))));
-    EXPECT_EQ(1024, *(db.hasRegionResource(region->getID(), Resource::style("http://example.com/20"))));
+    EXPECT_TRUE(bool(db.hasRegionResource(Resource::style("http://example.com/1"))));
+    EXPECT_TRUE(bool(db.hasRegionResource(Resource::style("http://example.com/20"))));
+    EXPECT_EQ(1024, *(db.hasRegionResource(Resource::style("http://example.com/20"))));
 
     EXPECT_EQ(0u, log.uncheckedCount());
 }
@@ -1131,16 +1131,16 @@ TEST(OfflineDatabase, HasRegionResourceTile) {
 
     response.data = std::make_shared<std::string>("first");
 
-    EXPECT_FALSE(bool(db.hasRegionResource(region->getID(), resource)));
+    EXPECT_FALSE(bool(db.hasRegionResource(resource)));
     db.putRegionResource(region->getID(), resource, response);
-    EXPECT_TRUE(bool(db.hasRegionResource(region->getID(), resource)));
-    EXPECT_EQ(5, *(db.hasRegionResource(region->getID(), resource)));
+    EXPECT_TRUE(bool(db.hasRegionResource(resource)));
+    EXPECT_EQ(5, *(db.hasRegionResource(resource)));
 
     auto anotherRegion = db.createRegion(definition, OfflineRegionMetadata());
     ASSERT_TRUE(anotherRegion);
     EXPECT_LT(region->getID(), anotherRegion->getID());
-    EXPECT_TRUE(bool(db.hasRegionResource(anotherRegion->getID(), resource)));
-    EXPECT_EQ(5, *(db.hasRegionResource(anotherRegion->getID(), resource)));
+    EXPECT_TRUE(bool(db.hasRegionResource(resource)));
+    EXPECT_EQ(5, *(db.hasRegionResource(resource)));
 
     EXPECT_EQ(0u, log.uncheckedCount());
 
@@ -1488,12 +1488,12 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DisallowedIO)) {
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't update region metadata: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(nullopt, db.getRegionResource(region->getID(), fixture::resource));
+    EXPECT_EQ(nullopt, db.getRegionResource(fixture::resource));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't update timestamp: authorization denied")));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't read region resource: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(nullopt, db.hasRegionResource(region->getID(), fixture::resource));
+    EXPECT_EQ(nullopt, db.hasRegionResource(fixture::resource));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't query region resource: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
@@ -1566,7 +1566,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithSingleRegion_Update))
         EXPECT_EQ(1u, status->completedTileCount);
 
         //Verify the modified timestamp matches the tile in the sideloaded db.
-        auto updatedTile = db.getRegionResource(regionId,
+        auto updatedTile = db.getRegionResource(
             Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp",
                 1, 0, 0, 1, Tileset::Scheme::XYZ));
         EXPECT_EQ(Timestamp{ Seconds(1520409600) }, *(updatedTile->first.modified));
@@ -1586,8 +1586,7 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_NoUpdate) {
     EXPECT_EQ(1u, result->size());
     EXPECT_EQ(1u, db.listRegions()->size());
 
-    auto regionId = result->front().getID();
-    auto updatedTile = db.getRegionResource(regionId,
+    auto updatedTile = db.getRegionResource(
         Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp",
             1, 0, 0, 1, Tileset::Scheme::XYZ));
 
@@ -1601,14 +1600,13 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_AmbientTiles) {
 
     OfflineDatabase db(":memory:");
     auto result = db.mergeDatabase(filename_sideload);
-    auto regionId = result->front().getID();
 
-    EXPECT_TRUE(bool(db.hasRegionResource(regionId, Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 0, 0, 1, Tileset::Scheme::XYZ))));
+    EXPECT_TRUE(bool(db.hasRegionResource(Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 0, 0, 1, Tileset::Scheme::XYZ))));
 
     //Ambient resources should not be copied
-    EXPECT_FALSE(bool(db.hasRegionResource(regionId, Resource::style("mapbox://styles/mapbox/streets-v9"))));
-    EXPECT_FALSE(bool(db.hasRegionResource(regionId, Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 0, 1, 2, Tileset::Scheme::XYZ))));
-    EXPECT_FALSE(bool(db.hasRegionResource(regionId, Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 1, 1, 2, Tileset::Scheme::XYZ))));
+    EXPECT_FALSE(bool(db.hasRegionResource(Resource::style("mapbox://styles/mapbox/streets-v9"))));
+    EXPECT_FALSE(bool(db.hasRegionResource(Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 0, 1, 2, Tileset::Scheme::XYZ))));
+    EXPECT_FALSE(bool(db.hasRegionResource(Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 1, 1, 2, Tileset::Scheme::XYZ))));
 }
 
 TEST(OfflineDatabase, MergeDatabaseWithMultipleRegions_New) {
