@@ -33,6 +33,7 @@
 		170C437D2029D97900863DF0 /* MGLHeatmapStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170C43792028D49800863DF0 /* MGLHeatmapStyleLayerTests.mm */; };
 		1753ED421E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
 		1753ED431E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
+		1F0196AA23174B0700F5C819 /* MGLMapViewContentInsetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F0196A923174B0700F5C819 /* MGLMapViewContentInsetTests.m */; };
 		1F06668A1EC64F8E001C16D7 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F0666881EC64F8E001C16D7 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F06668D1EC64F8E001C16D7 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.mm */; };
 		1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */; };
@@ -899,6 +900,7 @@
 		170C43782028D49800863DF0 /* MGLHeatmapColorTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLHeatmapColorTests.mm; path = ../../darwin/test/MGLHeatmapColorTests.mm; sourceTree = "<group>"; };
 		170C43792028D49800863DF0 /* MGLHeatmapStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLHeatmapStyleLayerTests.mm; path = ../../darwin/test/MGLHeatmapStyleLayerTests.mm; sourceTree = "<group>"; };
 		1753ED411E53CE6F00A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
+		1F0196A923174B0700F5C819 /* MGLMapViewContentInsetTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewContentInsetTests.m; sourceTree = "<group>"; };
 		1F0666881EC64F8E001C16D7 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
 		1F0666891EC64F8E001C16D7 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
 		1F26B6BF20E189C9007BCC21 /* MBXCustomLocationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXCustomLocationViewController.h; sourceTree = "<group>"; };
@@ -2084,6 +2086,7 @@
 				DA5DB1291FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m */,
 				DA695425215B1E75002041A4 /* MGLMapCameraTests.m */,
 				96E6145522CC135200109F14 /* MGLMapViewCompassViewTests.mm */,
+				1F0196A923174B0700F5C819 /* MGLMapViewContentInsetTests.m */,
 				96ED34DD22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm */,
 				16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */,
 				96381C0122C6F3950053497D /* MGLMapViewPitchTests.m */,
@@ -3322,6 +3325,7 @@
 				920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */,
 				DA5DB12A1FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m in Sources */,
 				96ED34DE22374C0900E9FCA9 /* MGLMapViewDirectionTests.mm in Sources */,
+				1F0196AA23174B0700F5C819 /* MGLMapViewContentInsetTests.m in Sources */,
 				FAE1CDCB1E9D79CB00C40B5B /* MGLFillExtrusionStyleLayerTests.mm in Sources */,
 				DA35A2AA1CCA058D00E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
 				357579831D502AE6000B822E /* MGLRasterStyleLayerTests.mm in Sources */,
