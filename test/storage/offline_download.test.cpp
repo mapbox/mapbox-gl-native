@@ -150,6 +150,7 @@ TEST(OfflineDownload, InlineSource) {
 
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
+            EXPECT_EQ(1u, status.completedTileCount);
             EXPECT_EQ(2u, status.completedResourceCount);
             EXPECT_EQ(test.size, status.completedResourceSize);
             EXPECT_TRUE(status.requiredResourceCountIsPrecise);
@@ -253,6 +254,7 @@ TEST(OfflineDownload, Activate) {
 
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
+            EXPECT_EQ(status.completedTileCount, status.requiredTileCount);
             EXPECT_EQ(264u, status.completedResourceCount); // 256 glyphs, 2 sprite images, 2 sprite jsons, 1 tile, 1 style, source, image
             EXPECT_EQ(test.size, status.completedResourceSize);
 
@@ -260,6 +262,7 @@ TEST(OfflineDownload, Activate) {
             OfflineRegionStatus computedStatus = download.getStatus();
             EXPECT_EQ(OfflineRegionDownloadState::Inactive, computedStatus.downloadState);
             EXPECT_EQ(status.requiredResourceCount, computedStatus.requiredResourceCount);
+            EXPECT_EQ(status.requiredTileCount, computedStatus.requiredTileCount);
             EXPECT_EQ(status.completedResourceCount, computedStatus.completedResourceCount);
             EXPECT_EQ(status.completedResourceSize, computedStatus.completedResourceSize);
             EXPECT_EQ(status.completedTileCount, computedStatus.completedTileCount);
@@ -330,6 +333,7 @@ TEST(OfflineDownload, ExcludeIdeographs) {
     
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
+            EXPECT_EQ(status.completedTileCount, status.requiredTileCount);
             EXPECT_EQ(138u, status.completedResourceCount); // 130 glyphs, 2 sprite images, 2 sprite jsons, 1 tile, 1 style, source, image
             EXPECT_EQ(test.size, status.completedResourceSize);
             
@@ -337,6 +341,7 @@ TEST(OfflineDownload, ExcludeIdeographs) {
             OfflineRegionStatus computedStatus = download.getStatus();
             EXPECT_EQ(OfflineRegionDownloadState::Inactive, computedStatus.downloadState);
             EXPECT_EQ(status.requiredResourceCount, computedStatus.requiredResourceCount);
+            EXPECT_EQ(status.requiredTileCount, computedStatus.requiredTileCount);
             EXPECT_EQ(status.completedResourceCount, computedStatus.completedResourceCount);
             EXPECT_EQ(status.completedResourceSize, computedStatus.completedResourceSize);
             EXPECT_EQ(status.completedTileCount, computedStatus.completedTileCount);
@@ -391,6 +396,8 @@ TEST(OfflineDownload, GetStatusNoResources) {
     EXPECT_EQ(0u, status.completedResourceCount);
     EXPECT_EQ(0u, status.completedResourceSize);
     EXPECT_EQ(1u, status.requiredResourceCount);
+    EXPECT_EQ(0u, status.completedTileCount);
+    EXPECT_EQ(0u, status.requiredTileCount);
     EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
@@ -414,6 +421,8 @@ TEST(OfflineDownload, GetStatusStyleComplete) {
     EXPECT_EQ(1u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
     EXPECT_EQ(263u, status.requiredResourceCount);
+    EXPECT_EQ(0u, status.completedTileCount);
+    EXPECT_EQ(0u, status.requiredTileCount);
     EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
@@ -441,6 +450,8 @@ TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
     EXPECT_EQ(2u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
     EXPECT_EQ(264u, status.requiredResourceCount);
+    EXPECT_EQ(0u, status.completedTileCount);
+    EXPECT_EQ(1u, status.requiredTileCount);
     EXPECT_TRUE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
