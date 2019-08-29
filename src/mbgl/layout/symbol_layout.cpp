@@ -871,14 +871,14 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 segment.indexLength += indexLength;
             }
         };
-        populateCollisionBox(symbolInstance.textCollisionFeature, true);
+        populateCollisionBox(symbolInstance.textCollisionFeature, true /*isText*/);
         if (symbolInstance.verticalTextCollisionFeature) {
-            populateCollisionBox(*symbolInstance.verticalTextCollisionFeature, true);
+            populateCollisionBox(*symbolInstance.verticalTextCollisionFeature, true /*isText*/);
         }
         if (symbolInstance.verticalIconCollisionFeature) {
-            populateCollisionBox(*symbolInstance.verticalIconCollisionFeature, false);
+            populateCollisionBox(*symbolInstance.verticalIconCollisionFeature, false /*isText*/);
         }
-        populateCollisionBox(symbolInstance.iconCollisionFeature, false);
+        populateCollisionBox(symbolInstance.iconCollisionFeature, false /*isText*/);
     }
 }
 
