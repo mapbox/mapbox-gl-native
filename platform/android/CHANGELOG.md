@@ -7,6 +7,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Introduce `clusterProperties` option for aggregated cluster properties. [#15425](https://github.com/mapbox/mapbox-gl-native/pull/15425)
  - Expose the `CameraPosition#padding` field and associated utility camera position builders. This gives a choice to set a persisting map padding immediately during a transition instead of setting it lazily `MapboxMap#setPadding`, which required scheduling additional transition to be applied. This also deprecates `MapboxMap#setPadding` as there should be no need for a lazy padding setter. [#15444](https://github.com/mapbox/mapbox-gl-native/pull/15444)
 
+ ### Performance improvements
+ - Mark used offline region resources in batches. [#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521)
+
 ## 8.3.0 - August 28, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-beta.1...android-v8.3.0) since [Mapbox Maps SDK for Android v8.3.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-beta.1):
 
