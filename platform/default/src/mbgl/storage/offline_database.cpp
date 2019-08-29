@@ -1278,6 +1278,19 @@ bool OfflineDatabase::exceedsOfflineMapboxTileCountLimit(const Resource& resourc
         && offlineMapboxTileCountLimitExceeded();
 }
 
+void OfflineDatabase::markUsedResources(int64_t regionID, const std::list<Resource>& resources) try {
+    if (!db) {
+        initialize();
+    }
+    mapbox::sqlite::Transaction transaction(*db);
+    for (const auto& resource : resources) {
+        markUsed(regionID, resource);
+    }
+    transaction.commit();
+} catch (const mapbox::sqlite::Exception& ex) {
+    handleError(ex, "mark resources as used");
+}
+
 std::exception_ptr OfflineDatabase::resetDatabase() try {
     removeExisting();
     initialize();
