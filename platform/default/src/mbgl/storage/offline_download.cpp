@@ -228,7 +228,7 @@ void OfflineDownload::activateDownload() {
     styleResource.setPriority(Resource::Priority::Low);
     styleResource.setUsage(Resource::Usage::Offline);
 
-    ensureResource(styleResource, [&](Response styleResponse) {
+    ensureResource(std::move(styleResource), [&](Response styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
         style::Parser parser;
@@ -250,7 +250,7 @@ void OfflineDownload::activateDownload() {
                     sourceResource.setPriority(Resource::Priority::Low);
                     sourceResource.setUsage(Resource::Usage::Offline);
 
-                    ensureResource(sourceResource, [=](Response sourceResponse) {
+                    ensureResource(std::move(sourceResource), [=](Response sourceResponse) {
                         style::conversion::Error error;
                         optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
                         if (tileset) {
@@ -358,7 +358,7 @@ void OfflineDownload::continueDownload() {
     }
 
     while (!resourcesRemaining.empty() && requests.size() < onlineFileSource.getMaximumConcurrentRequests()) {
-        ensureResource(resourcesRemaining.front());
+        ensureResource(std::move(resourcesRemaining.front()));
         resourcesRemaining.pop_front();
     }
 }
@@ -391,7 +391,7 @@ void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tiles
     });
 }
 
-void OfflineDownload::ensureResource(const Resource& resource,
+void OfflineDownload::ensureResource(Resource&& resource,
                                      std::function<void(Response)> callback) {
     assert(resource.priority == Resource::Priority::Low);
     assert(resource.usage == Resource::Usage::Offline);

@@ -46,7 +46,7 @@ private:
      * While the request is in progress, it is recorded in `requests`. If the download
      * is deactivated, all in progress requests are cancelled.
      */
-    void ensureResource(const Resource&, std::function<void (Response)> = {});
+    void ensureResource(Resource&&, std::function<void (Response)> = {});
 
     void onMapboxTileCountLimitExceeded();
 
