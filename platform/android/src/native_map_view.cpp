@@ -185,7 +185,7 @@ void NativeMapView::onWillStartRenderingFrame() {
     }
 }
 
-void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderMode mode) {
+void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderMode mode, bool) {
     assert(vm != nullptr);
 
     android::UniqueEnv _env = android::AttachEnv();
@@ -336,13 +336,17 @@ void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy, jni::
     map->moveBy({dx, dy}, animationOptions);
 }
 
-void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom) {
+void NativeMapView::jumpTo(jni::JNIEnv& env, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom, const jni::Array<jni::jdouble>& padding) {
     mbgl::CameraOptions options;
     if (bearing != -1) {
         options.bearing = bearing;
     }
     options.center = mbgl::LatLng(latitude, longitude);
-    options.padding = insets;
+    if (padding) {
+        assert(padding.Length(env) == 4);
+        options.padding = mbgl::EdgeInsets{padding.Get(env, 0), padding.Get(env, 1),
+                                           padding.Get(env, 2), padding.Get(env, 3)};
+    }
     if (pitch != -1) {
         options.pitch = pitch;
     }
@@ -353,13 +357,17 @@ void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble lati
     map->jumpTo(options);
 }
 
-void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom, jni::jboolean easing) {
+void NativeMapView::easeTo(jni::JNIEnv& env, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom, const jni::Array<jni::jdouble>& padding, jni::jboolean easing) {
     mbgl::CameraOptions cameraOptions;
     if (bearing != -1) {
         cameraOptions.bearing = bearing;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
-    cameraOptions.padding = insets;
+    if (padding) {
+        assert(padding.Length(env) == 4);
+        cameraOptions.padding = mbgl::EdgeInsets{padding.Get(env, 0), padding.Get(env, 1),
+                                           padding.Get(env, 2), padding.Get(env, 3)};
+    }
     if (pitch != -1) {
         cameraOptions.pitch = pitch;
     }
@@ -377,13 +385,17 @@ void NativeMapView::easeTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble lati
     map->easeTo(cameraOptions, animationOptions);
 }
 
-void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom) {
+void NativeMapView::flyTo(jni::JNIEnv& env, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration, jni::jdouble pitch, jni::jdouble zoom, const jni::Array<jni::jdouble>& padding) {
     mbgl::CameraOptions cameraOptions;
     if (bearing != -1) {
         cameraOptions.bearing = bearing;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
-    cameraOptions.padding = insets;
+    if (padding) {
+        assert(padding.Length(env) == 4);
+        cameraOptions.padding = mbgl::EdgeInsets{padding.Get(env, 0), padding.Get(env, 1),
+                                                 padding.Get(env, 2), padding.Get(env, 3)};
+    }
     if (pitch != -1) {
         cameraOptions.pitch = pitch;
     }
@@ -397,23 +409,29 @@ void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble bearing, jni::jdouble latit
 }
 
 jni::Local<jni::Object<LatLng>> NativeMapView::getLatLng(JNIEnv& env) {
-    return LatLng::New(env, *map->getCameraOptions(insets).center);
+    return LatLng::New(env, *map->getCameraOptions(mbgl::nullopt).center);
 }
 
-void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration) {
-    map->easeTo(mbgl::CameraOptions().withCenter(mbgl::LatLng(latitude, longitude)).withPadding(insets),
-                mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+void NativeMapView::setLatLng(jni::JNIEnv& env, jni::jdouble latitude, jni::jdouble longitude, const jni::Array<jni::jdouble>& padding, jni::jlong duration) {
+    mbgl::CameraOptions cameraOptions;
+    cameraOptions.center = mbgl::LatLng(latitude, longitude);
+    if (padding) {
+        assert(padding.Length(env) == 4);
+        cameraOptions.padding = mbgl::EdgeInsets{padding.Get(env, 0), padding.Get(env, 1),
+                                                 padding.Get(env, 2), padding.Get(env, 3)};
+    }
+    map->easeTo(cameraOptions, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
 jni::Local<jni::Object<CameraPosition>> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& jBounds, double top, double left, double bottom, double right, double bearing, double tilt) {
     mbgl::EdgeInsets padding = {top, left, bottom, right};
-    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), padding, bearing, tilt));
+    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), padding, bearing, tilt), pixelRatio);
 }
 
 jni::Local<jni::Object<CameraPosition>> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, const jni::Object<geojson::Geometry>& jGeometry, double top, double left, double bottom, double right, double bearing, double tilt) {
     auto geometry = geojson::Geometry::convert(env, jGeometry);
     mbgl::EdgeInsets padding = {top, left, bottom, right};
-    return CameraPosition::New(env, map->cameraForGeometry(geometry, padding, bearing, tilt));
+    return CameraPosition::New(env, map->cameraForGeometry(geometry, padding, bearing, tilt), pixelRatio);
 }
 
 void NativeMapView::setReachability(jni::JNIEnv&, jni::jboolean reachable) {
@@ -514,23 +532,6 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
     map->easeTo(cameraOptions, animationOptions);
 }
 
-void NativeMapView::setContentPadding(JNIEnv&, float top, float left, float bottom, float right) {
-    insets = {top, left, bottom, right};
-    // invalidate the camera position to consider the new padding
-    map->jumpTo(map->getCameraOptions(insets));
-}
-
-jni::Local<jni::Array<jni::jfloat>> NativeMapView::getContentPadding(JNIEnv& env) {
-    auto result = jni::Array<jni::jfloat>::New(env, 4);
-    std::vector<jfloat> vect;
-    vect.push_back(insets.top());
-    vect.push_back(insets.left());
-    vect.push_back(insets.bottom());
-    vect.push_back(insets.right());
-    result.SetRegion<std::vector<jni::jfloat>>(env, 0, vect);
-    return result;
-}
-
 void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
     mapRenderer.requestSnapshot([&](PremultipliedImage image) {
         auto _env = android::AttachEnv();
@@ -548,7 +549,7 @@ void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
 }
 
 jni::Local<jni::Object<CameraPosition>> NativeMapView::getCameraPosition(jni::JNIEnv& env) {
-    return CameraPosition::New(env, map->getCameraOptions(insets));
+    return CameraPosition::New(env, map->getCameraOptions(mbgl::nullopt), pixelRatio);
 }
 
 void NativeMapView::updateMarker(jni::JNIEnv& env, jni::jlong markerId, jni::jdouble lat, jni::jdouble lon, const jni::String& jid) {
@@ -1098,8 +1099,6 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getBearing, "nativeGetBearing"),
             METHOD(&NativeMapView::resetNorth, "nativeResetNorth"),
             METHOD(&NativeMapView::setVisibleCoordinateBounds, "nativeSetVisibleCoordinateBounds"),
-            METHOD(&NativeMapView::setContentPadding, "nativeSetContentPadding"),
-            METHOD(&NativeMapView::getContentPadding, "nativeGetContentPadding"),
             METHOD(&NativeMapView::scheduleSnapshot, "nativeTakeSnapshot"),
             METHOD(&NativeMapView::getCameraPosition, "nativeGetCameraPosition"),
             METHOD(&NativeMapView::updateMarker, "nativeUpdateMarker"),

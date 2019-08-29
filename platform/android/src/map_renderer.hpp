@@ -44,7 +44,6 @@ public:
     MapRenderer(jni::JNIEnv& _env,
                 const jni::Object<MapRenderer>&,
                 jni::jfloat pixelRatio,
-                const jni::String& programCacheDir,
                 const jni::String& localIdeographFontFamily);
 
     ~MapRenderer() override;
@@ -104,7 +103,6 @@ private:
     jni::WeakReference<jni::Object<MapRenderer>, jni::EnvAttachingDeleter> javaPeer;
 
     float pixelRatio;
-    std::string programCacheDir;
     optional<std::string> localIdeographFontFamily;
 
     std::shared_ptr<ThreadPool> threadPool;

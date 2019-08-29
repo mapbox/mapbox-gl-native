@@ -13,8 +13,9 @@
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
 
-#include "parser.hpp"
+#include "filesystem.hpp"
 #include "metadata.hpp"
+#include "parser.hpp"
 #include "runner.hpp"
 
 #include <sstream>
@@ -162,6 +163,22 @@ mbgl::optional<std::string> localizeMapboxTilesetURL(const std::string& url) {
     return getIntegrationPath(url, "tilesets/", regex);
 }
 
+TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
+    std::vector<mbgl::filesystem::path> expectations{ stylePath };
+    expectations.front().remove_filename();
+
+    const static std::regex regex{ TestRunner::getBasePath() };
+    for (const std::string& path : TestRunner::getPlatformExpectationsPaths()) {
+        expectations.emplace_back(std::regex_replace(expectations.front().string(), regex, path));
+        assert(!expectations.back().empty());
+    }
+
+    return {
+        std::move(stylePath),
+        std::move(expectations)
+    };
+}
+
 } // namespace
 
 JSONReply readJson(const mbgl::filesystem::path& jsonPath) {
@@ -185,6 +202,29 @@ std::string serializeJsonValue(const mbgl::JSValue& value) {
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     value.Accept(writer);
     return buffer.GetString();
+}
+
+std::string serializeMetrics(const TestMetrics& metrics) {
+    rapidjson::StringBuffer s;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+    writer.StartObject();
+    // Start memory section.
+    writer.Key("memory");
+    writer.StartArray();
+    for (const auto& memoryProbe : metrics.memory) {
+        assert(!memoryProbe.first.empty());       
+        writer.StartArray();
+        writer.String(memoryProbe.first.c_str());
+        writer.Uint64(memoryProbe.second.peak);
+        writer.Uint64(memoryProbe.second.allocations);
+        writer.EndArray();
+    }
+    // End memory section.
+    writer.EndArray();
+    writer.EndObject();
+
+    return s.GetString();
 }
 
 std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base) {
@@ -216,6 +256,8 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                                         { "seed" });
     args::ValueFlag<std::string> testPathValue(argumentParser, "rootPath", "Test root rootPath",
                                                { 'p', "rootPath" });
+    args::ValueFlag<std::regex> testFilterValue(argumentParser, "filter", "Test filter regex",
+                                               { 'f', "filter" });
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
 
     try {
@@ -237,25 +279,50 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         mbgl::Log::Info(mbgl::Event::General, stream.str());
         mbgl::Log::Error(mbgl::Event::General, e.what());
         exit(2);
+    } catch (const std::regex_error& e) {
+        mbgl::Log::Error(mbgl::Event::General, "Invalid filter regular expression: %s", e.what());
+        exit(3);
     }
 
-    const std::string testDefaultPath =
-        std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration/render-tests");
+    mbgl::filesystem::path rootPath {testPathValue ? args::get(testPathValue) : TestRunner::getBasePath()};
+    if (!mbgl::filesystem::exists(rootPath)) {
+        mbgl::Log::Error(mbgl::Event::General, "Provided rootPath '%s' does not exist.", rootPath.string().c_str());
+        exit(4);
+    }
 
-    std::vector<std::string> ids;
+    std::vector<mbgl::filesystem::path> paths;
     for (const auto& id : args::get(testNameValues)) {
-        ids.emplace_back(TestRunner::getBasePath() + "/" + id);
+        paths.emplace_back(TestRunner::getBasePath() + "/" + id);
     }
 
-    if (ids.empty()) {
-        ids.emplace_back(TestRunner::getBasePath());
+    if (paths.empty()) {
+        paths.emplace_back(TestRunner::getBasePath());
+    }
+
+    // Recursively traverse through the test paths and collect test directories containing "style.json".
+    std::vector<TestPaths> testPaths;
+    testPaths.reserve(paths.size());
+    for (const auto& path : paths) {
+        if (!mbgl::filesystem::exists(path)) {
+            mbgl::Log::Warning(mbgl::Event::General, "Provided test folder '%s' does not exist.", path.string().c_str());
+            continue;
+        }
+        for (auto& testPath : mbgl::filesystem::recursive_directory_iterator(path)) {
+            // Skip paths that fail regexp match.
+            if (testFilterValue && !std::regex_match(testPath.path().string(), args::get(testFilterValue))) {
+                continue;
+            }
+            if (testPath.path().filename() == "style.json") {
+                testPaths.emplace_back(makeTestPaths(testPath));
+            }
+        }
     }
 
     return ArgumentsTuple {
         recycleMapFlag ? args::get(recycleMapFlag) : false,
         shuffleFlag ? args::get(shuffleFlag) : false, seedValue ? args::get(seedValue) : 1u,
-        testPathValue ? args::get(testPathValue) : testDefaultPath,
-        std::move(ids)
+        testPathValue ? args::get(testPathValue) : TestRunner::getBasePath(),
+        std::move(testPaths)
     };
 }
 
@@ -288,6 +355,36 @@ std::vector<std::pair<std::string, std::string>> parseIgnores() {
     }
 
     return ignores;
+}
+
+TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
+    TestMetrics result;
+
+    auto maybeJson = readJson(path.string());
+    if (!maybeJson.is<mbgl::JSDocument>()) { // NOLINT
+        return result;
+    }
+
+    const auto& document = maybeJson.get<mbgl::JSDocument>();
+    if (document.HasMember("memory")) {
+        const mbgl::JSValue& memoryValue = document["memory"];
+        assert(memoryValue.IsArray());
+        for (auto& probeValue : memoryValue.GetArray()) {
+            assert(probeValue.IsArray());
+            assert(probeValue.Size() >= 3u);
+            assert(probeValue[0].IsString());
+            assert(probeValue[1].IsNumber());
+            assert(probeValue[2].IsNumber());
+
+            const std::string mark { probeValue[0].GetString(), probeValue[0].GetStringLength() };
+            assert(!mark.empty());
+            result.memory.emplace(std::piecewise_construct,
+                                  std::forward_as_tuple(std::move(mark)), 
+                                  std::forward_as_tuple(probeValue[1].GetUint64(), probeValue[2].GetUint64()));
+        }
+    }
+
+    return result;
 }
 
 TestMetadata parseTestMetadata(const TestPaths& paths) {

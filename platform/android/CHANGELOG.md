@@ -3,18 +3,54 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
-
 ### Features
+ - Introduce `clusterProperties` option for aggregated cluster properties. [#15425](https://github.com/mapbox/mapbox-gl-native/pull/15425)
+ - Expose the `CameraPosition#padding` field and associated utility camera position builders. This gives a choice to set a persisting map padding immediately during a transition instead of setting it lazily `MapboxMap#setPadding`, which required scheduling additional transition to be applied. This also deprecates `MapboxMap#setPadding` as there should be no need for a lazy padding setter. [#15444](https://github.com/mapbox/mapbox-gl-native/pull/15444)
  - Add number-format expression [#15424](https://github.com/mapbox/mapbox-gl-native/pull/15424)
 
+ ### Performance improvements
+ - Mark used offline region resources in batches. [#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521)
+
+## 8.3.0 - August 28, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-beta.1...android-v8.3.0) since [Mapbox Maps SDK for Android v8.3.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-beta.1):
+
+This release changes how offline tile requests are billed — they are now billed on a pay-as-you-go basis and all developers are able raise the offline tile limit for their users. Offline requests were previously exempt from monthly active user (MAU) billing and increasing the offline per-user tile limit to more than 6,000 tiles required the purchase of an enterprise license. By upgrading to this release, you are opting into the changes outlined in [this blog post](https://blog.mapbox.com/offline-maps-for-all-bb0fc51827be) and [#15380](https://github.com/mapbox/mapbox-gl-native/pull/15380).
+
+### Features
+ - Allow ability to pass a string array resource into `localIdeographFontFamily` for enabling/disabling the feature and specifying fallback fonts. [#15488](https://github.com/mapbox/mapbox-gl-native/pull/15488)
+
 ### Bug fixes
+ - Fixed a rendering issue caused by all icons being treated as SDFs if an SDF and non-SDF icon were in the same layer. [#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456)
+ - Fixed an issue where changing location's render mode when the`LocationComponent` is disable wouldn't invalidate the foreground icon when it's back enabled. [#15507](https://github.com/mapbox/mapbox-gl-native/pull/15507)
+
+## 8.2.2 - August 23, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.1...android-v8.2.2) since [Mapbox Maps SDK for Android v8.2.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.1):
+
+### Bug fixes
+ - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function. [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398)
  - Fixed use of objects after moving, potentially causing crashes. [#15408](https://github.com/mapbox/mapbox-gl-native/pull/1540)
+ - Fixed a wrong calculation of visibility in high pitch scenarios which might've led to tiles in the viewport not being rendered. [#15461](https://github.com/mapbox/mapbox-gl-native/pull/15461)
+
+### Other Changes
+ - Do not invalidate the camera immediately when map padding is set. Reverts a change introduced in the `v8.2.0`. [#15437](https://github.com/mapbox/mapbox-gl-native/pull/15437)
+
+## 8.3.0-beta.1 - August 22, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-alpha.3...android-v8.3.0-beta.1) since [Mapbox Maps SDK for Android v8.3.0-alpha.3](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-alpha.3):
+
+### Bug fixes
+ - Fixed a bug where glyphs generated through the LocalGlyphRasterizer interface were changing fonts during some zoom changes. [#15407](https://github.com/mapbox/mapbox-gl-native/pull/15407)
+ - Fixed use of objects after moving, potentially causing crashes. [#15408](https://github.com/mapbox/mapbox-gl-native/pull/15408)
  - Fixed a possible crash that could be caused by invoking the wrong layer implementation casting function [#15398](https://github.com/mapbox/mapbox-gl-native/pull/15398).
  - Font lookup on pre lollipop devices failed, provide default font list instead [#15410](https://github.com/mapbox/mapbox-gl-native/pull/15410).
  - Fixed rendering and collision detection issues with using `text-variable-anchor` and `icon-text-fit` properties on the same layer [#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367).
+ - Fixed a bug where quick-scale was registered during a move gesture that followed a double-tap. Bumped gestures library to `v0.5.1`. [#15427](https://github.com/mapbox/mapbox-gl-native/pull/15427)
+ - Fixed symbol overlap when zooming out quickly. [#15416](https://github.com/mapbox/mapbox-gl-native/pull/15416)
+
+### Other Changes
+ - Do not invalidate the camera immediately when map padding is set. Reverts a change introduced in the `v8.2.0`. [#15437](https://github.com/mapbox/mapbox-gl-native/pull/15437)
 
 ### Docs
- - Add javadoc to OnStyleImageMissingListener indicating the required synchronous addition images, document workaround [#15418](https://github.com/mapbox/mapbox-gl-native/pull/15418) 
+ - Add javadoc to OnStyleImageMissingListener indicating the required synchronous addition images, document workaround [#15418](https://github.com/mapbox/mapbox-gl-native/pull/15418)
 
 ## 8.3.0-alpha.3 - August 15, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-alpha.2...android-v8.3.0-alpha.3) since [Mapbox Maps SDK for Android v8.3.0-alpha.2](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-alpha.2):
@@ -62,7 +98,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.2.0...android-v8.3.0-alpha.1) since [Mapbox Maps SDK for Android v8.2.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.2.0):
 
 ### Features
- - Do not include CJK ideographs in the offline packs by default. This decreases overall offline download size but changes appereance by a default set local glyph generation [#14269](https://github.com/mapbox/mapbox-gl-native/pull/14269)
+ - Do not include CJK ideographs in the offline packs by default. This decreases overall offline download size but changes appearance by a default set local glyph generation [#14269](https://github.com/mapbox/mapbox-gl-native/pull/14269)
  - Update target SDK to 28, update support library and fix gradle warnings [#15135](https://github.com/mapbox/mapbox-gl-native/pull/15135)
  - Introduce VertexVector::extend() and use it in placement code [#15194](https://github.com/mapbox/mapbox-gl-native/pull/15194)
 

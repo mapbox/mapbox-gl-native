@@ -632,6 +632,41 @@ public class LocationLayerControllerTest {
     verify(internalRenderModeChangedListener, times(1)).onRenderModeChanged(RenderMode.GPS);
   }
 
+  @Test
+  public void layerHidden_renderModeChanged_layerShown_foregroundIconUpdated() {
+    OnRenderModeChangedListener internalRenderModeChangedListener = mock(OnRenderModeChangedListener.class);
+    LayerSourceProvider sourceProvider = buildLayerProvider();
+    when(sourceProvider.generateSource(any(Feature.class))).thenReturn(mock(GeoJsonSource.class));
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    int drawableResId = 123;
+    int tintColor = 456;
+    when(options.foregroundDrawable()).thenReturn(drawableResId);
+    when(options.foregroundTintColor()).thenReturn(tintColor);
+    LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
+    Bitmap bitmap = mock(Bitmap.class);
+    when(bitmapProvider.generateBitmap(drawableResId, tintColor)).thenReturn(bitmap);
+
+    LocationLayerController controller =
+      new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options, internalRenderModeChangedListener);
+
+    verify(style).addImage(FOREGROUND_ICON, bitmap);
+
+    int drawableGpsResId = 789;
+    when(options.gpsDrawable()).thenReturn(drawableGpsResId);
+
+    Bitmap bitmapGps = mock(Bitmap.class);
+    when(bitmapProvider.generateBitmap(drawableGpsResId, tintColor)).thenReturn(bitmapGps);
+
+    controller.hide();
+
+    controller.setRenderMode(RenderMode.GPS);
+
+    controller.show();
+
+    verify(style).addImage(FOREGROUND_ICON, bitmapGps);
+  }
+
   private LayerFeatureProvider buildFeatureProvider(@NonNull LocationComponentOptions options) {
     LayerFeatureProvider provider = mock(LayerFeatureProvider.class);
     when(provider.generateLocationFeature(null, options)).thenReturn(mock(Feature.class));

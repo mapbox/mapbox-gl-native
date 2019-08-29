@@ -68,7 +68,7 @@ void MGLMapViewImpl::onWillStartRenderingFrame() {
     [mapView mapViewWillStartRenderingFrame];
 }
 
-void MGLMapViewImpl::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode) {
+void MGLMapViewImpl::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode, bool) {
     bool fullyRendered = mode == mbgl::MapObserver::RenderMode::Full;
     [mapView mapViewDidFinishRenderingFrameFullyRendered:fullyRendered];
 }

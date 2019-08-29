@@ -1,16 +1,14 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
+#import "MGLMockGestureRecognizers.h"
+
+#import <mbgl/math/wrap.hpp>
 
 @interface MGLMapView (MGLMapViewZoomTests)
+@property (nonatomic) BOOL isZooming;
+@property (nonatomic) CGFloat rotationThresholdWhileZooming;
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)pinch;
-@end
-
-@interface UIPinchGestureRecognizerMock : UIPinchGestureRecognizer
-@property (nonatomic) CGPoint locationInViewOverride;
-@end
-
-@implementation UIPinchGestureRecognizerMock
-- (CGPoint)locationInView:(nullable UIView *)view { return self.locationInViewOverride; }
+- (void)handleRotateGesture:(UIRotationGestureRecognizer *)rotate;
 @end
 
 @interface MGLMapViewZoomTests : XCTestCase
@@ -127,6 +125,60 @@
     self.mapView.direction = 0;
     XCTAssertEqualWithAccuracy(centerCoordinateBeforeReset.latitude, self.mapView.centerCoordinate.latitude, 0.0000001, "@Map center coordinate latitude should remain constant after resetting to north.");
     XCTAssertEqualWithAccuracy(centerCoordinateBeforeReset.longitude, self.mapView.centerCoordinate.longitude, 0.0000001, @"Map center coordinate longitude should remain constant after resetting to north.");
+}
+
+- (void)testPinchAndZoom {
+
+    [[NSUserDefaults standardUserDefaults] setObject:@3 forKey:@"MGLRotationThresholdWhileZooming"];
+    self.mapView.rotationThresholdWhileZooming = 3;
+    self.mapView.zoomLevel = 15;
+    UIPinchGestureRecognizerMock *pinch = [[UIPinchGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
+    [self.mapView addGestureRecognizer:pinch];
+    pinch.state = UIGestureRecognizerStateBegan;
+    pinch.velocity = 5.0;
+    pinch.locationInViewOverride = CGPointMake(0, 0);
+    [self.mapView handlePinchGesture:pinch];
+
+    XCTAssertTrue(self.mapView.isZooming);
+
+    UIRotationGestureRecognizerMock *rotate = [[UIRotationGestureRecognizerMock alloc] initWithTarget:self.mapView action:nil];
+    rotate.state = UIGestureRecognizerStateBegan;
+    rotate.rotation = MGLRadiansFromDegrees(1);
+    [self.mapView addGestureRecognizer:rotate];
+    [self.mapView handleRotateGesture:rotate];
+
+    // Both the rotation and direction should be zero since the rotation threshold hasn't been met.
+    XCTAssertEqual(rotate.rotation, 0);
+    XCTAssertEqual(self.mapView.direction, 0);
+
+    // The direction should be `0`. The default rotation threshold is `3`.
+    XCTAssertEqual(self.mapView.direction, 0);
+    rotate.state = UIGestureRecognizerStateChanged;
+    rotate.rotation = MGLRadiansFromDegrees(2);
+    [self.mapView handleRotateGesture:rotate];
+
+    // The direction should be `0`. The default rotation threshold is `3`.
+    XCTAssertEqual(self.mapView.direction, 0);
+
+    for (NSNumber *degrees in @[@-90, @-10, @10, @10, @30, @90, @180, @240, @460, @500, @590, @800]) {
+        rotate.state = UIGestureRecognizerStateChanged;
+        rotate.rotation = MGLRadiansFromDegrees([degrees doubleValue]);
+        [self.mapView handleRotateGesture:rotate];
+
+        CGFloat wrappedRotation = mbgl::util::wrap(-MGLDegreesFromRadians(rotate.rotation), 0., 360.);
+
+
+       // Check that the direction property now matches the gesture's rotation.
+        XCTAssertEqualWithAccuracy(self.mapView.direction, wrappedRotation, 0.001, @"Map direction should match gesture rotation for input of %@°.", degrees);
+    }
+
+    rotate.state = UIGestureRecognizerStateEnded;
+    pinch.state = UIGestureRecognizerStateEnded;
+
+    [self.mapView handleRotateGesture:rotate];
+    [self.mapView handlePinchGesture:pinch];
+
+    XCTAssertFalse(self.mapView.isZooming);
 }
 
 NS_INLINE CGFloat MGLScaleFromZoomLevel(double zoom) {

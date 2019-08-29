@@ -2,6 +2,7 @@
 
 @interface MGLMapView (MGLMapViewIntegrationTest)
 - (void)updateFromDisplayLink:(CADisplayLink *)displayLink;
+- (void)setNeedsRerender;
 @end
 
 @implementation MGLMapViewIntegrationTest
@@ -43,9 +44,9 @@
 
     UIView *superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];
     [superView addSubview:self.mapView];
-    UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    [window addSubview:superView];
-    [window makeKeyAndVisible];
+    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    [self.window addSubview:superView];
+    [self.window makeKeyAndVisible];
 
     if (!self.mapView.style) {
         [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
@@ -57,6 +58,7 @@
     self.renderFinishedExpectation = nil;
     self.mapView = nil;
     self.style = nil;
+    self.window = nil;
     [MGLAccountManager setAccessToken:nil];
 
     [super tearDown];
@@ -133,9 +135,10 @@
 
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout {
     XCTAssertNil(self.renderFinishedExpectation);
-    [self.mapView setNeedsDisplay];
+    [self.mapView setNeedsRerender];
     self.renderFinishedExpectation = [self expectationWithDescription:@"Map view should be rendered"];
     [self waitForExpectations:@[self.renderFinishedExpectation] timeout:timeout];
+    self.renderFinishedExpectation = nil;
 }
 
 - (void)waitForExpectations:(NSArray<XCTestExpectation *> *)expectations timeout:(NSTimeInterval)seconds {

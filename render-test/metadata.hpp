@@ -7,6 +7,8 @@
 
 #include "filesystem.hpp"
 
+#include <map>
+
 struct TestStatistics {
     TestStatistics() = default;
 
@@ -25,6 +27,22 @@ struct TestPaths {
         assert(!expectations.empty());
         return expectations.front().string();
     }
+};
+
+struct MemoryProbe {
+    MemoryProbe() = default;
+    MemoryProbe(size_t peak_, size_t allocations_)
+        : peak(peak_)
+        , allocations(allocations_) {}
+
+    size_t peak;
+    size_t allocations;
+};
+
+class TestMetrics {
+public:
+    bool isEmpty() const { return memory.empty(); }
+    std::map<std::string, MemoryProbe> memory;
 };
 
 struct TestMetadata {
@@ -59,4 +77,7 @@ struct TestMetadata {
 
     std::string errorMessage;
     double difference = 0.0;
+
+    TestMetrics metrics;
+    TestMetrics expectedMetrics;
 };

@@ -10,6 +10,7 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -67,6 +68,10 @@ final class NativeMapView implements NativeMap {
 
   // Flag to indicate destroy was called
   private boolean destroyed = false;
+
+  // Cached to enable lazily set padding.
+  // Whenever an animation is schedule, this value is cleared and the source of truth becomes the core transform state.
+  private double[] edgeInsets;
 
   // Holds the pointer to JNI NativeMapView
   @Keep
@@ -241,7 +246,8 @@ final class NativeMapView implements NativeMap {
     if (checkState("setLatLng")) {
       return;
     }
-    nativeSetLatLng(latLng.getLatitude(), latLng.getLongitude(), duration);
+    nativeSetLatLng(latLng.getLatitude(), latLng.getLongitude(),
+      getAnimationPaddingAndClearCachedInsets(null), duration);
   }
 
   @Override
@@ -374,30 +380,20 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setContentPadding(float[] padding) {
+  public void setContentPadding(double[] padding) {
     if (checkState("setContentPadding")) {
       return;
     }
-    // TopLeftBottomRight
-    nativeSetContentPadding(
-      padding[1] / pixelRatio,
-      padding[0] / pixelRatio,
-      padding[3] / pixelRatio,
-      padding[2] / pixelRatio);
+    this.edgeInsets = padding;
   }
 
   @Override
-  public float[] getContentPadding() {
+  public double[] getContentPadding() {
     if (checkState("getContentPadding")) {
-      return new float[] {0, 0, 0, 0};
+      return new double[] {0, 0, 0, 0};
     }
-    float[] topLeftBottomRight = nativeGetContentPadding();
-    return new float[] {
-      topLeftBottomRight[1] * pixelRatio,
-      topLeftBottomRight[0] * pixelRatio,
-      topLeftBottomRight[3] * pixelRatio,
-      topLeftBottomRight[2] * pixelRatio
-    };
+    // if cached insets are not applied yet, return them, otherwise, get the padding from the camera
+    return edgeInsets != null ? edgeInsets : getCameraPosition().padding;
   }
 
   @Override
@@ -672,29 +668,31 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void jumpTo(@NonNull LatLng center, double zoom, double pitch, double angle) {
+  public void jumpTo(@NonNull LatLng center, double zoom, double pitch, double angle, double[] padding) {
     if (checkState("jumpTo")) {
       return;
     }
-    nativeJumpTo(angle, center.getLatitude(), center.getLongitude(), pitch, zoom);
+    nativeJumpTo(angle, center.getLatitude(), center.getLongitude(), pitch, zoom,
+      getAnimationPaddingAndClearCachedInsets(padding));
   }
 
   @Override
-  public void easeTo(@NonNull LatLng center, double zoom, double angle, double pitch, long duration,
+  public void easeTo(@NonNull LatLng center, double zoom, double angle, double pitch, double[] padding, long duration,
                      boolean easingInterpolator) {
     if (checkState("easeTo")) {
       return;
     }
     nativeEaseTo(angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom,
-      easingInterpolator);
+      getAnimationPaddingAndClearCachedInsets(padding), easingInterpolator);
   }
 
   @Override
-  public void flyTo(@NonNull LatLng center, double zoom, double angle, double pitch, long duration) {
+  public void flyTo(@NonNull LatLng center, double zoom, double angle, double pitch, double[] padding, long duration) {
     if (checkState("flyTo")) {
       return;
     }
-    nativeFlyTo(angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom);
+    nativeFlyTo(angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom,
+      getAnimationPaddingAndClearCachedInsets(padding));
   }
 
   @Override
@@ -703,7 +701,11 @@ final class NativeMapView implements NativeMap {
     if (checkState("getCameraValues")) {
       return new CameraPosition.Builder().build();
     }
-    return nativeGetCameraPosition();
+    if (edgeInsets != null) {
+      return new CameraPosition.Builder(nativeGetCameraPosition()).padding(edgeInsets).build();
+    } else {
+      return nativeGetCameraPosition();
+    }
   }
 
   @Override
@@ -1126,7 +1128,7 @@ final class NativeMapView implements NativeMap {
   private native void nativeMoveBy(double dx, double dy, long duration);
 
   @Keep
-  private native void nativeSetLatLng(double latitude, double longitude, long duration);
+  private native void nativeSetLatLng(double latitude, double longitude, double[] padding, long duration);
 
   @NonNull
   @Keep
@@ -1174,12 +1176,6 @@ final class NativeMapView implements NativeMap {
 
   @Keep
   private native void nativeRotateBy(double sx, double sy, double ex, double ey, long duration);
-
-  @Keep
-  private native void nativeSetContentPadding(float top, float left, float bottom, float right);
-
-  @Keep
-  private native float[] nativeGetContentPadding();
 
   @Keep
   private native void nativeSetBearing(double degrees, long duration);
@@ -1270,16 +1266,17 @@ final class NativeMapView implements NativeMap {
   private native double nativeGetTopOffsetPixelsForAnnotationSymbol(String symbolName);
 
   @Keep
-  private native void nativeJumpTo(double angle, double latitude, double longitude, double pitch, double zoom);
+  private native void nativeJumpTo(double angle, double latitude, double longitude, double pitch, double zoom,
+                                   double[] padding);
 
   @Keep
   private native void nativeEaseTo(double angle, double latitude, double longitude,
-                                   long duration, double pitch, double zoom,
+                                   long duration, double pitch, double zoom, double[] padding,
                                    boolean easingInterpolator);
 
   @Keep
   private native void nativeFlyTo(double angle, double latitude, double longitude,
-                                  long duration, double pitch, double zoom);
+                                  long duration, double pitch, double zoom, double[] padding);
 
   @NonNull
   @Keep
@@ -1435,6 +1432,20 @@ final class NativeMapView implements NativeMap {
   @Override
   public boolean isDestroyed() {
     return destroyed;
+  }
+
+  private double[] getAnimationPaddingAndClearCachedInsets(double[] providedPadding) {
+    if (providedPadding == null) {
+      providedPadding = this.edgeInsets;
+    }
+    this.edgeInsets = null;
+    return providedPadding == null ? null :
+      new double[] {
+        providedPadding[1] / pixelRatio,
+        providedPadding[0] / pixelRatio,
+        providedPadding[3] / pixelRatio,
+        providedPadding[2] / pixelRatio
+      };
   }
 
   public interface ViewCallback {

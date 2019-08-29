@@ -3,6 +3,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/projection.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/clamp.hpp>
 
@@ -145,10 +146,10 @@ ViewportMode TransformState::getViewportMode() const {
 
 #pragma mark - Camera options
 
-CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const {
+CameraOptions TransformState::getCameraOptions(optional<EdgeInsets> padding) const {
     return CameraOptions()
         .withCenter(getLatLng())
-        .withPadding(padding)
+        .withPadding(padding ? padding : edgeInsets)
         .withZoom(getZoom())
         .withBearing(-bearing * util::RAD2DEG)
         .withPitch(pitch * util::RAD2DEG);
@@ -289,9 +290,9 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
     return { p[0] / p[3], size.height - p[1] / p[3] };
 }
 
-LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
+TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoordinate& point, uint8_t atZoom) const {
     if (size.isEmpty()) {
-        return {};
+        return { {}, 0 };
     }
 
     float targetZ = 0;
@@ -325,7 +326,13 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
     double z1 = coord1[2] / w1;
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
 
-    return Projection::unproject(util::interpolate(p0, p1, t), scale / util::tileSize, wrapMode);
+    Point<double> p = util::interpolate(p0, p1, t) / scale * static_cast<double>(1 << atZoom);
+    return { { p.x, p.y }, static_cast<double>(atZoom) };
+}
+
+LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
+    auto coord = screenCoordinateToTileCoordinate(point, 0);
+    return Projection::unproject(coord.p, 1 / util::tileSize, wrapMode);
 }
 
 mat4 TransformState::coordinatePointMatrix() const {

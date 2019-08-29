@@ -7,7 +7,9 @@
 
         <!--Configuration-->
         <attr name="mapbox_apiBaseUri" format="string"/>
+        <attr name="mapbox_localIdeographEnabled" format="boolean"/>
         <attr name="mapbox_localIdeographFontFamily" format="string"/>
+        <attr name="mapbox_localIdeographFontFamilies" format="reference"/>
         <attr name="mapbox_cross_source_collisions" format="boolean"/>
 
         <!--Camera-->

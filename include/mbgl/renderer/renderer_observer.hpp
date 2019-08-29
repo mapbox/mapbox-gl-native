@@ -26,8 +26,8 @@ public:
     // Start of frame, initial is the first frame for this map
     virtual void onWillStartRenderingFrame() {}
 
-    // End of frame, boolean flags that a repaint is required
-    virtual void onDidFinishRenderingFrame(RenderMode, bool) {}
+    // End of frame, booleans flags that a repaint is required and that placement changed.
+    virtual void onDidFinishRenderingFrame(RenderMode, bool /*repaint*/, bool /*placementChanged*/) {}
 
     // Final frame
     virtual void onDidFinishRenderingMap() {}

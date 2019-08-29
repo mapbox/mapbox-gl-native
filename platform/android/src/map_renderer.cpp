@@ -16,11 +16,9 @@ namespace android {
 MapRenderer::MapRenderer(jni::JNIEnv& _env,
                          const jni::Object<MapRenderer>& obj,
                          jni::jfloat pixelRatio_,
-                         const jni::String& programCacheDir_,
                          const jni::String& localIdeographFontFamily_)
         : javaPeer(_env, obj)
         , pixelRatio(pixelRatio_)
-        , programCacheDir(jni::Make<std::string>(_env, programCacheDir_))
         , localIdeographFontFamily(localIdeographFontFamily_ ? jni::Make<std::string>(_env, localIdeographFontFamily_) : optional<std::string>{})
         , mailbox(std::make_shared<Mailbox>(*this)) {
 }
@@ -173,7 +171,7 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
 
     // Create the new backend and renderer
     backend = std::make_unique<AndroidRendererBackend>();
-    renderer = std::make_unique<Renderer>(*backend, pixelRatio, programCacheDir, localIdeographFontFamily);
+    renderer = std::make_unique<Renderer>(*backend, pixelRatio, localIdeographFontFamily);
     rendererRef = std::make_unique<ActorRef<Renderer>>(*renderer, mailbox);
 
     // Set the observer on the new Renderer implementation
@@ -214,7 +212,7 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<MapRenderer>(env, javaClass, "nativePtr",
-                                         jni::MakePeer<MapRenderer, const jni::Object<MapRenderer>&, jni::jfloat, const jni::String&, const jni::String&>,
+                                         jni::MakePeer<MapRenderer, const jni::Object<MapRenderer>&, jni::jfloat, const jni::String&>,
                                          "nativeInitialize", "finalize",
                                          METHOD(&MapRenderer::render, "nativeRender"),
                                          METHOD(&MapRenderer::onRendererReset, "nativeReset"),

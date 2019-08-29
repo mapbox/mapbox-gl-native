@@ -22,18 +22,28 @@ namespace mbgl {
         NSURL *url = [NSURL URLWithString:@(testURL.c_str())];
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
         NSArray<NSURLQueryItem *> *items = components.queryItems;
-        XCTAssert(items.count == 2 );
+        XCTAssert(items.count == 2);
     }
 
     Resource resource(Resource::Kind::Unknown, testURL);
 
-    // By default, resource are NOT offline
+    // By default, resources are NOT offline
     {
+        bool skuTokenQueryItemFound;
         NSURL *url = resourceURLWithAccountType(resource, 0);
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
         for (NSURLQueryItem *item in components.queryItems) {
             XCTAssertFalse([item.name isEqualToString:@"offline"]);
+            if ([item.name isEqualToString:@"sku"]) {
+                skuTokenQueryItemFound = YES;
+            }
         }
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+        XCTAssertTrue(skuTokenQueryItemFound, "Default resource URL should have SKU token query item");
+#else
+        XCTAssertFalse(skuTokenQueryItemFound, "Non-iOS platforms should not have a SKU token query item");
+#endif
     }
     
     // Now check offline
@@ -43,20 +53,20 @@ namespace mbgl {
         NSURL *url = resourceURLWithAccountType(resource, 0);
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
         
-        // For offline, we expect a single offline param and a sku param
+        // For offline, we expect a single offline query item
         NSInteger foundCount = 0;
         
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
         for (NSURLQueryItem *item in components.queryItems) {
             if (([item.name isEqualToString:@"offline"] && [item.value isEqualToString:@"true"]) ||
                 ([item.name isEqualToString:@"a"] && [item.value isEqualToString:@"one"]) ||
-                ([item.name isEqualToString:@"b"] && [item.value isEqualToString:@"two"]) ||
-                ([item.name isEqualToString:@"sku"])) {
+                ([item.name isEqualToString:@"b"] && [item.value isEqualToString:@"two"])) {
                 foundCount++;
             }
+            XCTAssertFalse([item.name isEqualToString:@"sku"]);
         }
 
-        XCTAssert(foundCount == 4);
+        XCTAssert(foundCount == 3);
 #else
         // NOTE: Currently the macOS SDK does not supply the sku or offline query parameters
         for (NSURLQueryItem *item in components.queryItems) {
@@ -64,6 +74,7 @@ namespace mbgl {
                 ([item.name isEqualToString:@"b"] && [item.value isEqualToString:@"two"])) {
                 foundCount++;
             }
+            XCTAssertFalse([item.name isEqualToString:@"sku"]);
         }
         
         XCTAssert(foundCount == 2);

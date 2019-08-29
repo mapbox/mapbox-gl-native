@@ -88,15 +88,14 @@ class HTTPFileSource::Impl {
 public:
     Impl() {
         @autoreleasepool {
-
-            NSURLSessionConfiguration *sessionConfig =
-            [MGLNetworkConfiguration sharedManager].sessionConfiguration;
-            
+            NSURLSessionConfiguration *sessionConfig = [MGLNetworkConfiguration sharedManager].sessionConfiguration;
             session = [NSURLSession sessionWithConfiguration:sessionConfig];
 
             userAgent = getUserAgent();
 
-            accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountTypeKey];
+#endif
         }
     }
 
@@ -205,13 +204,13 @@ NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountTyp
     if (accountType == 0 &&
         ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
-        NSURLQueryItem *accountsQueryItem = [NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken];
-        
-        NSMutableArray *queryItems = [NSMutableArray arrayWithObject:accountsQueryItem];
-        
-        // offline here
+        NSMutableArray *queryItems = [NSMutableArray array];
+
         if (resource.usage == Resource::Usage::Offline) {
             [queryItems addObject:[NSURLQueryItem queryItemWithName:@"offline" value:@"true"]];
+        } else {
+            // Only add SKU token to requests not tagged as "offline" usage.
+            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"sku" value:MGLAccountManager.skuToken]];
         }
         
         if (components.queryItems) {
