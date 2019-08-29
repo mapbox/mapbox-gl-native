@@ -21,6 +21,13 @@
 
 #include <set>
 
+namespace {
+
+const size_t kResourcesBatchSize = 64;
+const size_t kMarkBatchSize = 200;
+
+} // namespace
+
 namespace mbgl {
 
 using namespace style;
@@ -358,7 +365,7 @@ void OfflineDownload::continueDownload() {
         return;
     }
 
-    if (resourcesToBeMarkedAsUsed.size() >= 200) markPendingUsedResources();
+    if (resourcesToBeMarkedAsUsed.size() >= kMarkBatchSize) markPendingUsedResources();
 
     while (!resourcesRemaining.empty() && requests.size() < onlineFileSource.getMaximumConcurrentRequests()) {
         ensureResource(std::move(resourcesRemaining.front()));
@@ -461,7 +468,7 @@ void OfflineDownload::ensureResource(Resource&& resource,
             buffer.emplace_back(resource, onlineResponse);
 
             // Flush buffer periodically
-            if (buffer.size() == 64 || resourcesRemaining.size() == 0) {
+            if (buffer.size() == kResourcesBatchSize || resourcesRemaining.empty()) {
                 try {
                     offlineDatabase.putRegionResources(id, buffer, status);
                 } catch (const MapboxTileLimitExceededException&) {
