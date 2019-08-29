@@ -92,6 +92,7 @@ public:
     bool offlineMapboxTileCountLimitExceeded();
     uint64_t getOfflineMapboxTileCount();
     bool exceedsOfflineMapboxTileCountLimit(const Resource&);
+    void markUsedResources(int64_t regionID, const std::list<Resource>&);
 
 private:
     void initialize();
