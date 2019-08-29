@@ -101,7 +101,6 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
 - (void)drawTextInRect:(CGRect)rect {
     CGSize shadowOffset = self.shadowOffset;
-    UIColor *textColor = self.textColor;
     
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetLineWidth(context, 2);
@@ -112,7 +111,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     [super drawTextInRect:rect];
     
     CGContextSetTextDrawingMode(context, kCGTextFill);
-    self.textColor = textColor;
+    self.textColor = [UIColor blackColor];
     self.shadowOffset = CGSizeMake(0, 0);
     [super drawTextInRect:rect];
     
