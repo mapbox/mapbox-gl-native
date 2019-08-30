@@ -16,9 +16,6 @@
 [submodule "vendor/geojson-vt-cpp"]
 	path = vendor/geojson-vt-cpp
 	url = https://github.com/mapbox/geojson-vt-cpp.git
-[submodule "vendor/geojson.hpp"]
-	path = vendor/geojson.hpp
-	url = https://github.com/mapbox/geojson.hpp.git
 [submodule "vendor/polylabel"]
 	path = vendor/polylabel
 	url = https://github.com/mapbox/polylabel.git

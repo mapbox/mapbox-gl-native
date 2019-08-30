@@ -3,6 +3,9 @@
     "sources": [],
     "public_headers": {
         "kdbush.hpp": "vendor/mapbox-base/extras/kdbush.hpp/include/kdbush.hpp",
+        "mapbox/geojson.hpp": "vendor/mapbox-base/mapbox/geojson.hpp/include/mapbox/geojson.hpp",
+        "mapbox/geojson/rapidjson.hpp": "vendor/mapbox-base/mapbox/geojson.hpp/include/mapbox/geojson/rapidjson.hpp",
+        "mapbox/geojson_impl.hpp": "vendor/mapbox-base/mapbox/geojson.hpp/include/mapbox/geojson_impl.hpp",
         "mapbox/feature.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/feature.hpp",
         "mapbox/geometry.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/geometry.hpp",
         "mapbox/geometry/box.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/geometry/box.hpp",

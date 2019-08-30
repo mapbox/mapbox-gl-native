@@ -28,7 +28,6 @@ target_link_libraries(mbgl-core PUBLIC
     boost
     mapbox-base-extras
     mapbox-base
-    geojson.hpp
     ${ICU_LIBRARY}
     polylabel
     protozero
