@@ -1,8 +1,0 @@
-{
-    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
-    "sources": [],
-    "public_headers": {
-        "kdbush.hpp": "vendor/kdbush.hpp/include/kdbush.hpp"
-    },
-    "private_headers": {}
-}

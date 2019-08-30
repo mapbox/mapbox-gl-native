@@ -137,9 +137,9 @@ generateFileList('vendor/geojson-vt-cpp-files.json', [ 'vendor/geojson-vt-cpp' ]
 generateFileList('vendor/geojson.hpp-files.json', [ 'vendor/geojson.hpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/icu-files.json', [ 'vendor/icu' ], vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
 generateFileList('vendor/jni.hpp-files.json', [ 'vendor/jni.hpp' ], vendorRegex, [ "include/**/*.hpp", ":!:include/jni/string_conversion.hpp" ]);
-generateFileList('vendor/kdbush.hpp-files.json', [ 'vendor/kdbush.hpp' ], vendorRegex, [ "include/*.hpp" ]);
 generateFileList('vendor/mapbox-base-files.json',
-    [ 'vendor/mapbox-base/mapbox/geometry.hpp',
+    [ 'vendor/mapbox-base/extras/kdbush.hpp',
+      'vendor/mapbox-base/mapbox/geometry.hpp',
       'vendor/mapbox-base/mapbox/variant',
       'vendor/mapbox-base/mapbox/optional',
       'vendor/mapbox-base/mapbox/supercluster.hpp' ], 

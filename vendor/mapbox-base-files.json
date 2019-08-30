@@ -2,6 +2,7 @@
     "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
     "sources": [],
     "public_headers": {
+        "kdbush.hpp": "vendor/mapbox-base/extras/kdbush.hpp/include/kdbush.hpp",
         "mapbox/feature.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/feature.hpp",
         "mapbox/geometry.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/geometry.hpp",
         "mapbox/geometry/box.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/geometry/box.hpp",

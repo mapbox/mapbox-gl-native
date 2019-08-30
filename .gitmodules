@@ -37,9 +37,6 @@
 [submodule "vendor/expected-lite"]
 	path = vendor/expected
 	url = https://github.com/martinmoene/expected-lite.git
-[submodule "vendor/kdbush.hpp"]
-	path = vendor/kdbush.hpp
-	url = https://github.com/mourner/kdbush.hpp.git
 [submodule "vendor/unique_resource"]
 	path = vendor/unique_resource
 	url = https://github.com/okdshin/unique_resource.git
