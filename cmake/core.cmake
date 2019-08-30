@@ -14,7 +14,6 @@ target_link_libraries(mbgl-core PRIVATE
     geojson-vt-cpp
     kdbush.hpp
     shelf-pack-cpp
-    supercluster.hpp
     unique_resource
     wagyu
 )

@@ -18,6 +18,7 @@
         "mapbox/geometry/polygon.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/geometry/polygon.hpp",
         "mapbox/geometry_io.hpp": "vendor/mapbox-base/mapbox/geometry.hpp/include/mapbox/geometry_io.hpp",
         "optional.hpp": "vendor/mapbox-base/mapbox/optional/optional.hpp",
+        "supercluster.hpp": "vendor/mapbox-base/mapbox/supercluster.hpp/include/supercluster.hpp",
         "mapbox/optional.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/optional.hpp",
         "mapbox/recursive_wrapper.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/recursive_wrapper.hpp",
         "mapbox/variant.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant.hpp",
