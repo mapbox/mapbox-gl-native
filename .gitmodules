@@ -49,9 +49,6 @@
 [submodule "vendor/cheap-ruler-cpp"]
 	path = vendor/cheap-ruler-cpp
 	url = https://github.com/mapbox/cheap-ruler-cpp.git
-[submodule "vendor/pixelmatch-cpp"]
-	path = vendor/pixelmatch-cpp
-	url = https://github.com/mapbox/pixelmatch-cpp.git
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = https://github.com/glfw/glfw.git

@@ -136,6 +136,7 @@ generateFileList('vendor/icu-files.json', [ 'vendor/icu' ], vendorRegex, [ "incl
 generateFileList('vendor/mapbox-base-files.json',
     [ 'vendor/mapbox-base/extras/kdbush.hpp',
       'vendor/mapbox-base/extras/filesystem',
+      'vendor/mapbox-base/mapbox/pixelmatch-cpp',
       'vendor/mapbox-base/mapbox/geometry.hpp',
       'vendor/mapbox-base/mapbox/variant',
       'vendor/mapbox-base/mapbox/optional',
@@ -143,7 +144,6 @@ generateFileList('vendor/mapbox-base-files.json',
       'vendor/mapbox-base/mapbox/geojson.hpp',
       'vendor/mapbox-base/mapbox/jni.hpp' ], 
     vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "optional.hpp", ":!:include/jni/string_conversion.hpp" ]);
-generateFileList('vendor/pixelmatch-cpp-files.json', [ 'vendor/pixelmatch-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/polylabel-files.json', [ 'vendor/polylabel' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/protozero-files.json', [ 'vendor/protozero' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/rapidjson-files.json', [ 'vendor/rapidjson' ], vendorRegex, [ "include/**/*.h" ]);
