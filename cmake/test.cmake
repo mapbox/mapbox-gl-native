@@ -28,7 +28,7 @@ target_link_libraries(mbgl-test PRIVATE
     mbgl-core
     shelf-pack-cpp
     unique_resource
-    pixelmatch-cpp
+    Mapbox::Base::pixelmatch-cpp
 )
 
 mbgl_platform_test()
