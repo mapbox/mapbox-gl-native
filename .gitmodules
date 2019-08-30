@@ -7,9 +7,6 @@
 [submodule "vendor/nunicode"]
 	path = vendor/nunicode
 	url = https://bitbucket.org/alekseyt/nunicode.git
-[submodule "vendor/rapidjson"]
-	path = vendor/rapidjson
-	url = https://github.com/Tencent/rapidjson.git
 [submodule "vendor/earcut.hpp"]
 	path = vendor/earcut.hpp
 	url = https://github.com/mapbox/earcut.hpp.git

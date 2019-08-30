@@ -24,7 +24,7 @@ target_link_libraries(mbgl-render-test PRIVATE
     expected
     Mapbox::Base::Extras::filesystem
     Mapbox::Base::pixelmatch-cpp
-    rapidjson
+    Mapbox::Base::Extras::rapidjson
 )
 
 add_definitions(-DTEST_RUNNER_ROOT_PATH="${CMAKE_SOURCE_DIR}")
