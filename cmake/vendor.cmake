@@ -21,7 +21,7 @@ include(${CMAKE_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/wagyu.cmake)
 
 if(NOT TARGET mapbox-base)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-base ${CMAKE_BINARY_DIR}/.build-mapbox-gl-native-mapbox-base)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-base ${CMAKE_BINARY_DIR}/.build-mapbox-gl-native-mapbox-base EXCLUDE_FROM_ALL)
 endif()
 
 target_compile_definitions(mapbox-base-extras-rapidjson INTERFACE
