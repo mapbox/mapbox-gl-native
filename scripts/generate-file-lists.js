@@ -138,14 +138,18 @@ generateFileList('vendor/geojson.hpp-files.json', [ 'vendor/geojson.hpp' ], vend
 generateFileList('vendor/icu-files.json', [ 'vendor/icu' ], vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
 generateFileList('vendor/jni.hpp-files.json', [ 'vendor/jni.hpp' ], vendorRegex, [ "include/**/*.hpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/kdbush.hpp-files.json', [ 'vendor/kdbush.hpp' ], vendorRegex, [ "include/*.hpp" ]);
-generateFileList('vendor/mapbox-base-files.json', [ 'vendor/mapbox-base/mapbox/geometry.hpp', 'vendor/mapbox-base/mapbox/variant', 'vendor/mapbox-base/mapbox/optional' ], vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "optional.hpp" ]);
+generateFileList('vendor/mapbox-base-files.json',
+    [ 'vendor/mapbox-base/mapbox/geometry.hpp',
+      'vendor/mapbox-base/mapbox/variant',
+      'vendor/mapbox-base/mapbox/optional',
+      'vendor/mapbox-base/mapbox/supercluster.hpp' ], 
+    vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "optional.hpp" ]);
 generateFileList('vendor/pixelmatch-cpp-files.json', [ 'vendor/pixelmatch-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/polylabel-files.json', [ 'vendor/polylabel' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/protozero-files.json', [ 'vendor/protozero' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/rapidjson-files.json', [ 'vendor/rapidjson' ], vendorRegex, [ "include/**/*.h" ]);
 generateFileList('vendor/shelf-pack-cpp-files.json', [ 'vendor/shelf-pack-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/sqlite-files.json', [ 'vendor/sqlite' ], vendorRegex, [ "include/*.h", "src/*.c" ]);
-generateFileList('vendor/supercluster.hpp-files.json', [ 'vendor/supercluster.hpp' ], vendorRegex, [ "include/*.hpp" ]);
 generateFileList('vendor/unique_resource-files.json', [ 'vendor/unique_resource' ], vendorRegex, [ "unique_resource.hpp" ]);
 generateFileList('vendor/vector-tile-files.json', [ 'vendor/vector-tile' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/wagyu-files.json', [ 'vendor/wagyu' ], vendorRegex, [ "include/**/*.hpp" ]);
