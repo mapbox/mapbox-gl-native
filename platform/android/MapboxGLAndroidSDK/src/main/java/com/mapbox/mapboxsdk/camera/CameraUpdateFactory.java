@@ -5,6 +5,7 @@ import android.graphics.PointF;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -28,7 +29,7 @@ public final class CameraUpdateFactory {
    */
   public static CameraUpdate newCameraPosition(@NonNull CameraPosition cameraPosition) {
     return new CameraPositionUpdate(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt,
-      cameraPosition.zoom);
+      cameraPosition.zoom, cameraPosition.padding);
   }
 
   /**
@@ -39,7 +40,7 @@ public final class CameraUpdateFactory {
    * @return CameraUpdate Final Camera Position
    */
   public static CameraUpdate newLatLng(@NonNull LatLng latLng) {
-    return new CameraPositionUpdate(-1, latLng, -1, -1);
+    return new CameraPositionUpdate(-1, latLng, -1, -1, null);
   }
 
   /**
@@ -48,6 +49,7 @@ public final class CameraUpdateFactory {
    * current camera position bearing and tilt values.
    * <p>
    * You can specify padding, in order to inset the bounding box from the map view's edges.
+   * The padding will not persist and impact following camera transformations.
    * </p>
    *
    * @param bounds  Bounds to match Camera position with
@@ -64,6 +66,7 @@ public final class CameraUpdateFactory {
    * provided bearing and tilt values.
    * <p>
    * You can specify padding, in order to inset the bounding box from the map view's edges.
+   * The padding will not persist and impact following camera transformations.
    * </p>
    *
    * @param bounds  Bounds to match Camera position with
@@ -82,6 +85,7 @@ public final class CameraUpdateFactory {
    * current camera position bearing and tilt values.
    * <p>
    * You can specify padding, in order to inset the bounding box from the map view's edges.
+   * The padding will not persist and impact following camera transformations.
    * </p>
    *
    * @param bounds        Bounds to base the Camera position out of
@@ -102,6 +106,7 @@ public final class CameraUpdateFactory {
    * provided bearing and tilt values.
    * <p>
    * You can specify padding, in order to inset the bounding box from the map view's edges.
+   * The padding will not persist and impact following camera transformations.
    * </p>
    *
    * @param bounds        Bounds to base the Camera position out of
@@ -120,14 +125,31 @@ public final class CameraUpdateFactory {
 
   /**
    * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude
-   * specified by a LatLng object, and moves to the given zoom level.
+   * specified by a LatLng object taking the specified padding into account.
    *
    * @param latLng Target location to change to
    * @param zoom   Zoom level to change to
    * @return CameraUpdate Final Camera Position
    */
   public static CameraUpdate newLatLngZoom(@NonNull LatLng latLng, double zoom) {
-    return new CameraPositionUpdate(-1, latLng, -1, zoom);
+    return new CameraPositionUpdate(-1, latLng, -1, zoom, null);
+  }
+
+  /**
+   * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude
+   * specified by a LatLng object, and moves to the given zoom level.
+   * Applied padding is going to persist and impact following camera transformations.
+   *
+   * @param latLng Target location to change to
+   * @param left   Left padding
+   * @param top    Top padding
+   * @param right  Right padding
+   * @param bottom Bottom padding
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate newLatLngPadding(@NonNull LatLng latLng,
+                                              double left, double top, double right, double bottom) {
+    return new CameraPositionUpdate(-1, latLng, -1, -1, new double[] {left, top, right, bottom});
   }
 
   /**
@@ -188,7 +210,7 @@ public final class CameraUpdateFactory {
    * @return CameraUpdate Final Camera Position
    */
   public static CameraUpdate bearingTo(double bearing) {
-    return new CameraPositionUpdate(bearing, null, -1, -1);
+    return new CameraPositionUpdate(bearing, null, -1, -1, null);
   }
 
   /**
@@ -198,7 +220,34 @@ public final class CameraUpdateFactory {
    * @return CameraUpdate Final Camera Position
    */
   public static CameraUpdate tiltTo(double tilt) {
-    return new CameraPositionUpdate(-1, null, tilt, -1);
+    return new CameraPositionUpdate(-1, null, tilt, -1, null);
+  }
+
+  /**
+   * Returns a CameraUpdate that when animated changes the camera padding.
+   * Applied padding is going to persist and impact following camera transformations.
+   * <p>
+   * Specified in left, top, right, bottom order.
+   * </p>
+   *
+   * @param padding Padding to change to
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate paddingTo(double[] padding) {
+    return new CameraPositionUpdate(-1, null, -1, -1, padding);
+  }
+
+  /**
+   * Returns a CameraUpdate that when animated changes the camera padding.
+   * Applied padding is going to persist and impact following camera transformations.
+   * <p>
+   * Specified in left, top, right, bottom order.
+   * </p>
+   *
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate paddingTo(double left, double top, double right, double bottom) {
+    return paddingTo(new double[] {left, top, right, bottom});
   }
 
   //
@@ -211,12 +260,14 @@ public final class CameraUpdateFactory {
     private final LatLng target;
     private final double tilt;
     private final double zoom;
+    private final double[] padding;
 
-    CameraPositionUpdate(double bearing, LatLng target, double tilt, double zoom) {
+    CameraPositionUpdate(double bearing, LatLng target, double tilt, double zoom, double[] padding) {
       this.bearing = bearing;
       this.target = target;
       this.tilt = tilt;
       this.zoom = zoom;
+      this.padding = padding;
     }
 
     public LatLng getTarget() {
@@ -235,10 +286,14 @@ public final class CameraUpdateFactory {
       return zoom;
     }
 
+    public double[] getPadding() {
+      return padding;
+    }
+
     @Override
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
-      CameraPosition previousPosition = mapboxMap.getCameraPosition();
       if (target == null) {
+        CameraPosition previousPosition = mapboxMap.getCameraPosition();
         return new CameraPosition.Builder(this)
           .target(previousPosition.target)
           .build();
@@ -247,7 +302,7 @@ public final class CameraUpdateFactory {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(Object o) {
       if (this == o) {
         return true;
       }
@@ -266,7 +321,10 @@ public final class CameraUpdateFactory {
       if (Double.compare(that.zoom, zoom) != 0) {
         return false;
       }
-      return target != null ? target.equals(that.target) : that.target == null;
+      if (target != null ? !target.equals(that.target) : that.target != null) {
+        return false;
+      }
+      return Arrays.equals(padding, that.padding);
     }
 
     @Override
@@ -280,6 +338,7 @@ public final class CameraUpdateFactory {
       result = 31 * result + (int) (temp ^ (temp >>> 32));
       temp = Double.doubleToLongBits(zoom);
       result = 31 * result + (int) (temp ^ (temp >>> 32));
+      result = 31 * result + Arrays.hashCode(padding);
       return result;
     }
 
@@ -290,6 +349,7 @@ public final class CameraUpdateFactory {
         + ", target=" + target
         + ", tilt=" + tilt
         + ", zoom=" + zoom
+        + ", padding=" + Arrays.toString(padding)
         + '}';
     }
   }

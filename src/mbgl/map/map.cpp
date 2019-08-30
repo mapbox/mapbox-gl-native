@@ -124,7 +124,7 @@ bool Map::isPanning() const {
 
 #pragma mark -
 
-CameraOptions Map::getCameraOptions(const EdgeInsets& padding) const {
+CameraOptions Map::getCameraOptions(optional<EdgeInsets> padding) const {
     return impl->transform.getCameraOptions(padding);
 }
 

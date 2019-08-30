@@ -523,14 +523,12 @@ public class Style {
     for (Layer layer : layers.values()) {
       if (layer != null) {
         layer.setDetached();
-        nativeMap.removeLayer(layer);
       }
     }
 
     for (Source source : sources.values()) {
       if (source != null) {
         source.setDetached();
-        nativeMap.removeSource(source);
       }
     }
 

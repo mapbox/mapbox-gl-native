@@ -6,6 +6,11 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue that caused the tilt gesture to trigger too easily and conflict with pinch or pan gestures. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
 * Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
+* Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
+
+ ### Performance improvements
+ 
+ * Mark used offline region resources in batches. ([#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521))
 
 ## 5.3.0 - August 28, 2019
 

@@ -38,7 +38,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
 
     optional<mbgl::CameraOptions> cameraOptions;
     if (position) {
-        cameraOptions = CameraPosition::getCameraOptions(_env, position);
+        cameraOptions = CameraPosition::getCameraOptions(_env, position, pixelRatio);
     }
 
     optional<mbgl::LatLngBounds> bounds;
@@ -124,7 +124,7 @@ void MapSnapshotter::setSize(JNIEnv&, jni::jint width, jni::jint height) {
 }
 
 void MapSnapshotter::setCameraPosition(JNIEnv& env, const jni::Object<CameraPosition>& position) {
-    auto options = CameraPosition::getCameraOptions(env, position);
+    auto options = CameraPosition::getCameraOptions(env, position, pixelRatio);
     snapshotter->setCameraOptions(options);
 }
 

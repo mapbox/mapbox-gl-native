@@ -78,8 +78,8 @@ public:
     std::exception_ptr invalidateRegion(int64_t regionID);
 
     // Return value is (response, stored size)
-    optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
-    optional<int64_t> hasRegionResource(int64_t regionID, const Resource&);
+    optional<std::pair<Response, uint64_t>> getRegionResource(const Resource&);
+    optional<int64_t> hasRegionResource(const Resource&);
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
     void putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>&, OfflineRegionStatus&);
 
@@ -92,6 +92,7 @@ public:
     bool offlineMapboxTileCountLimitExceeded();
     uint64_t getOfflineMapboxTileCount();
     bool exceedsOfflineMapboxTileCountLimit(const Resource&);
+    void markUsedResources(int64_t regionID, const std::list<Resource>&);
 
 private:
     void initialize();

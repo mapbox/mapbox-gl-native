@@ -63,7 +63,7 @@ void Transform::resize(const Size size) {
 
 #pragma mark - Camera
 
-CameraOptions Transform::getCameraOptions(const EdgeInsets& padding) const {
+CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
     return state.getCameraOptions(padding);
 }
 

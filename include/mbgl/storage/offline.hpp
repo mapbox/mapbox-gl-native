@@ -129,6 +129,11 @@ public:
     uint64_t completedTileCount = 0;
 
     /**
+     * The number of tiles that are known to be required for this region.
+     */
+    uint64_t requiredTileCount = 0;
+
+    /**
      * The cumulative size, in bytes, of all tiles that have been fully downloaded.
      * This is a subset of `completedResourceSize`.
      */
