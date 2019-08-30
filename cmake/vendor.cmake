@@ -22,7 +22,6 @@ include(${CMAKE_SOURCE_DIR}/vendor/shelf-pack-cpp.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/unique_resource.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/wagyu.cmake)
-include(${CMAKE_SOURCE_DIR}/vendor/args.cmake)
 
 if(NOT TARGET mapbox-base)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-base ${CMAKE_BINARY_DIR}/.build-mapbox-gl-native-mapbox-base)
