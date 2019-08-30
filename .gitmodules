@@ -52,9 +52,6 @@
 [submodule "vendor/pixelmatch-cpp"]
 	path = vendor/pixelmatch-cpp
 	url = https://github.com/mapbox/pixelmatch-cpp.git
-[submodule "vendor/jni.hpp"]
-	path = vendor/jni.hpp
-	url = https://github.com/mapbox/jni.hpp.git
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = https://github.com/glfw/glfw.git

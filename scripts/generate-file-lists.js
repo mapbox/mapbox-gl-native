@@ -135,15 +135,15 @@ generateFileList('vendor/expected-files.json', [ 'vendor/expected' ], vendorRege
 generateFileList('vendor/filesystem-files.json', [ 'vendor/filesystem' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/geojson-vt-cpp-files.json', [ 'vendor/geojson-vt-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/icu-files.json', [ 'vendor/icu' ], vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
-generateFileList('vendor/jni.hpp-files.json', [ 'vendor/jni.hpp' ], vendorRegex, [ "include/**/*.hpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/mapbox-base-files.json',
     [ 'vendor/mapbox-base/extras/kdbush.hpp',
       'vendor/mapbox-base/mapbox/geometry.hpp',
       'vendor/mapbox-base/mapbox/variant',
       'vendor/mapbox-base/mapbox/optional',
       'vendor/mapbox-base/mapbox/supercluster.hpp',
-      'vendor/mapbox-base/mapbox/geojson.hpp' ], 
-    vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "optional.hpp" ]);
+      'vendor/mapbox-base/mapbox/geojson.hpp',
+      'vendor/mapbox-base/mapbox/jni.hpp' ], 
+    vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "optional.hpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/pixelmatch-cpp-files.json', [ 'vendor/pixelmatch-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/polylabel-files.json', [ 'vendor/polylabel' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/protozero-files.json', [ 'vendor/protozero' ], vendorRegex, [ "include/**/*.hpp" ]);
