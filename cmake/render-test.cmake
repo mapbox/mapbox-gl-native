@@ -22,7 +22,7 @@ target_link_libraries(mbgl-render-test PRIVATE
     mbgl-filesource
     Mapbox::Base::Extras::args
     expected
-    filesystem
+    Mapbox::Base::Extras::filesystem
     pixelmatch-cpp
     rapidjson
 )
