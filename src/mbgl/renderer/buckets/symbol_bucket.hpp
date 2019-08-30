@@ -72,8 +72,10 @@ public:
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasSdfIconData() const;
-    bool hasCollisionBoxData() const;
-    bool hasCollisionCircleData() const;
+    bool hasIconCollisionBoxData() const;
+    bool hasIconCollisionCircleData() const;
+    bool hasTextCollisionBoxData() const;
+    bool hasTextCollisionCircleData() const;
     bool hasFormatSectionOverrides() const;
 
 
@@ -138,22 +140,34 @@ public:
         gfx::IndexVector<gfx::Lines> lines;
         optional<gfx::IndexBuffer> indexBuffer;
     };
-    std::unique_ptr<CollisionBoxBuffer> collisionBox;
+    std::unique_ptr<CollisionBoxBuffer> iconCollisionBox;
+    std::unique_ptr<CollisionBoxBuffer> textCollisionBox;
 
-    CollisionBoxBuffer& getOrCreateCollisionBox() {
-        if (!collisionBox) collisionBox = std::make_unique<CollisionBoxBuffer>();
-        return *collisionBox;
+    CollisionBoxBuffer& getOrCreateIconCollisionBox() {
+        if (!iconCollisionBox) iconCollisionBox = std::make_unique<CollisionBoxBuffer>();
+        return *iconCollisionBox;
+    }
+
+    CollisionBoxBuffer& getOrCreateTextCollisionBox() {
+        if (!textCollisionBox) textCollisionBox = std::make_unique<CollisionBoxBuffer>();
+        return *textCollisionBox;
     }
 
     struct CollisionCircleBuffer : public CollisionBuffer {
         gfx::IndexVector<gfx::Triangles> triangles;
         optional<gfx::IndexBuffer> indexBuffer;
     };
-    std::unique_ptr<CollisionCircleBuffer> collisionCircle;
+    std::unique_ptr<CollisionCircleBuffer> iconCollisionCircle;
+    std::unique_ptr<CollisionCircleBuffer> textCollisionCircle;
 
-    CollisionCircleBuffer& getOrCreateCollisionCircleBuffer() {
-        if (!collisionCircle) collisionCircle = std::make_unique<CollisionCircleBuffer>();
-        return *collisionCircle;
+    CollisionCircleBuffer& getOrCreateIconCollisionCircleBuffer() {
+        if (!iconCollisionCircle) iconCollisionCircle = std::make_unique<CollisionCircleBuffer>();
+        return *iconCollisionCircle;
+    }
+
+    CollisionCircleBuffer& getOrCreateTextCollisionCircleBuffer() {
+        if (!textCollisionCircle) textCollisionCircle = std::make_unique<CollisionCircleBuffer>();
+        return *textCollisionCircle;
     }
 
     const float tilePixelRatio;

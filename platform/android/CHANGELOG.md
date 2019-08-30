@@ -10,6 +10,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  ### Performance improvements
  - Mark used offline region resources in batches. [#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521)
 
+### Bug fixes
+ - Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. [#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467)
+
 ## 8.3.0 - August 28, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0-beta.1...android-v8.3.0) since [Mapbox Maps SDK for Android v8.3.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0-beta.1):
 
