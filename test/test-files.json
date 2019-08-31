@@ -35,6 +35,7 @@
         "test/src/mbgl/test/stub_file_source.cpp",
         "test/src/mbgl/test/test.cpp",
         "test/src/mbgl/test/util.cpp",
+        "test/storage/sync_file_source.test.cpp",
         "test/storage/asset_file_source.test.cpp",
         "test/storage/default_file_source.test.cpp",
         "test/storage/headers.test.cpp",
