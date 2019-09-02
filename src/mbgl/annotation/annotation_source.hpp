@@ -5,17 +5,22 @@
 
 namespace mbgl {
 
-class AnnotationSource : public style::Source {
+class AnnotationSource final : public style::Source {
 public:
     AnnotationSource();
 
     class Impl;
     const Impl& impl() const;
 
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
+
 private:
     void loadDescription(FileSource&) final;
 
     Mutable<Impl> mutableImpl() const;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 class AnnotationSource::Impl : public style::Source::Impl {

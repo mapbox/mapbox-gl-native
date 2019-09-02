@@ -10,7 +10,7 @@ class AsyncRequest;
 
 namespace style {
 
-class VectorSource : public Source {
+class VectorSource final : public Source {
 public:
     VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset);
     ~VectorSource() final;
@@ -23,9 +23,14 @@ public:
 
     void loadDescription(FileSource&) final;
 
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
+
 private:
     const variant<std::string, Tileset> urlOrTileset;
     std::unique_ptr<AsyncRequest> req;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>

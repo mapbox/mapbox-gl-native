@@ -25,9 +25,14 @@ public:
 
     void loadDescription(FileSource&) final;
 
+    mapbox::base::WeakPtr<Source> makeWeakPtr() final {
+        return weakFactory.makeWeakPtr();
+    }
+
 private:
     const variant<std::string, Tileset> urlOrTileset;
     std::unique_ptr<AsyncRequest> req;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>
