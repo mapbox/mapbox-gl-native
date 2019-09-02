@@ -43,6 +43,10 @@ std::string formatNumber(double number, const std::string& localeId, const std::
         numberFormatter.maximumFractionDigits = maxFractionDigits;
         numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
     } else {
+        // Reset fraction digits to NSNumberFormatter's default values, so that the
+        // system will choose formatting based on number formatter locale.
+        numberFormatter.minimumFractionDigits = 0;
+        numberFormatter.maximumFractionDigits = 0;
         numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
     }
     NSString *formatted = [numberFormatter stringFromNumber:@(number)];
