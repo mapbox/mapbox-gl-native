@@ -120,7 +120,7 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
           }
         }
       });
-    } else if(callback != null) {
+    } else if (callback != null) {
       callback.onFinish();
     }
   }
@@ -139,7 +139,7 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
       mapView.addOnCameraDidChangeListener(this);
       nativeMap.easeTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing, cameraPosition.tilt,
         cameraPosition.padding, durationMs, easingInterpolator);
-    } else if(callback != null) {
+    } else if (callback != null) {
       callback.onFinish();
     }
   }
@@ -161,7 +161,7 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
       mapView.addOnCameraDidChangeListener(this);
       nativeMap.flyTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing,
         cameraPosition.tilt, cameraPosition.padding, durationMs);
-    } else if(callback != null) {
+    } else if (callback != null) {
       callback.onFinish();
     }
   }

@@ -49,6 +49,24 @@ class TransformTest {
   }
 
   @Test
+  fun testMoveCameraToSamePosition() {
+    val mapboxMap = mockk<MapboxMap>()
+    every { mapboxMap.cameraPosition } answers { CameraPosition.DEFAULT }
+
+    val callback = mockk<MapboxMap.CancelableCallback>()
+    every { callback.onFinish() } answers {}
+
+    val expected = CameraPosition.DEFAULT
+    val update = CameraUpdateFactory.newCameraPosition(expected)
+
+    transform.moveCamera(mapboxMap, update, null) // Initialize camera position
+    transform.moveCamera(mapboxMap, update, callback)
+
+    verify (exactly = 1, verifyBlock = { nativeMapView.jumpTo(any(), any(), any(), any(), any()) })
+    verify { callback.onFinish() }
+  }
+
+  @Test
   fun testMinZoom() {
     transform.minZoom = 10.0
     verify { nativeMapView.minZoom = 10.0 }
