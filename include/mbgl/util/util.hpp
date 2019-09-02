@@ -23,6 +23,7 @@
 // Compiler defines for making symbols visible, otherwise they
 // will be defined as hidden by default.
 
+// clang-format off
 #if defined WIN32
     #ifdef MBGL_BUILDING_LIB
         #ifdef __GNUC__
@@ -38,5 +39,6 @@
         #endif
     #endif
 #else
-    #define MBGL_PUBLIC __attribute__((visibility ("default")))
+    #define MBGL_PUBLIC __attribute__((visibility ("default"))) // NOLINT
 #endif
+// clang-format on
