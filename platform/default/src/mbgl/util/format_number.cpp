@@ -23,7 +23,9 @@ std::string formatNumber(double number, const std::string& localeId, const std::
                 .toString();
     } else {
         ustr = icu::number::NumberFormatter::with()
+#if U_ICU_VERSION_MAJOR_NUM >= 62
                 .precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits))
+#endif
                 .locale(locale)
                 .formatDouble(number, status)
                 .toString();
