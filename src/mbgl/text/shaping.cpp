@@ -413,7 +413,7 @@ const Shaping getShaping(const TaggedString& formattedString,
                          const style::SymbolAnchorType textAnchor,
                          const style::TextJustifyType textJustify,
                          const float spacing,
-                         const Point<float>& translate,
+                         const std::array<float, 2>& translate,
                          const WritingModeType writingMode,
                          BiDi& bidi,
                          const GlyphMap& glyphs,
@@ -432,7 +432,7 @@ const Shaping getShaping(const TaggedString& formattedString,
             reorderedLines.emplace_back(line, formattedString.getSections());
         }
     }
-    Shaping shaping(translate.x, translate.y, writingMode, reorderedLines.size());
+    Shaping shaping(translate[0], translate[1], writingMode, reorderedLines.size());
     shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
                textJustify, writingMode, glyphs, allowVerticalPlacement);
     

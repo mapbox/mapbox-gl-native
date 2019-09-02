@@ -34,7 +34,7 @@ public:
 
 class VariableOffset {
 public:
-    float radialOffset;
+    std::array<float, 2> offset;
     float width;
     float height;
     style::TextVariableAnchorType anchor;

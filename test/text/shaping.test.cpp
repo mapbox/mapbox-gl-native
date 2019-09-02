@@ -33,7 +33,7 @@ TEST(Shaping, ZWSP) {
                           style::SymbolAnchorType::Center,
                           style::TextJustifyType::Center,
                           0,            // spacing
-                          {0.0f, 0.0f}, // translate
+                          {{0.0f, 0.0f}}, // translate
                           WritingModeType::Horizontal,
                           bidi,
                           glyphs,

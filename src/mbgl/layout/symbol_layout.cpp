@@ -91,10 +91,12 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<TextSize>()),
-      iconSize(toSymbolLayerProperties(layers.at(0)).layerImpl().layout.get<IconSize>()),
       layout(createLayout(toSymbolLayerProperties(layers.at(0)).layerImpl().layout, zoom)) {
     const SymbolLayer::Impl& leader = toSymbolLayerProperties(layers.at(0)).layerImpl();
+
+    textSize = leader.layout.get<TextSize>();
+    iconSize = leader.layout.get<IconSize>();
+    textRadialOffset = leader.layout.get<TextRadialOffset>();
 
     const bool hasText = has<TextField>(*layout) && has<TextFont>(*layout);
     const bool hasIcon = has<IconImage>(*layout);
@@ -235,11 +237,9 @@ Shaping& shapingForTextJustifyType(ShapedTextOrientations& shapedTextOrientation
     }
 }
 
-}  // namespace
-
-// static
-Point<float> SymbolLayout::evaluateRadialOffset(SymbolAnchorType anchor, float radialOffset) {
-    Point<float> result{};
+std::array<float, 2> evaluateRadialOffset(style::SymbolAnchorType anchor, float radialOffset) { 
+    std::array<float, 2> result{{0.0f, 0.0f}};
+    if (radialOffset < 0.0f) radialOffset = 0.0f; // Ignore negative offset.
     // solve for r where r^2 + r^2 = radialOffset^2
     const float sqrt2 = 1.41421356237f;
     const float hypotenuse = radialOffset / sqrt2;
@@ -247,17 +247,17 @@ Point<float> SymbolLayout::evaluateRadialOffset(SymbolAnchorType anchor, float r
     switch (anchor) {
     case SymbolAnchorType::TopRight:
     case SymbolAnchorType::TopLeft:
-        result.y = hypotenuse - baselineOffset;
+        result[1] = hypotenuse - baselineOffset;
         break;
     case SymbolAnchorType::BottomRight:
     case SymbolAnchorType::BottomLeft:
-        result.y = -hypotenuse + baselineOffset;
+        result[1] = -hypotenuse + baselineOffset;
         break;
     case SymbolAnchorType::Bottom:
-        result.y = -radialOffset + baselineOffset;
+        result[1] = -radialOffset + baselineOffset;
         break;
     case SymbolAnchorType::Top:
-        result.y = radialOffset - baselineOffset;
+        result[1] = radialOffset - baselineOffset;
         break;
     default:
         break;
@@ -266,19 +266,67 @@ Point<float> SymbolLayout::evaluateRadialOffset(SymbolAnchorType anchor, float r
     switch (anchor) {
     case SymbolAnchorType::TopRight:
     case SymbolAnchorType::BottomRight:
-        result.x = -hypotenuse;
+        result[0] = -hypotenuse;
         break;
     case SymbolAnchorType::TopLeft:
     case SymbolAnchorType::BottomLeft:
-        result.x = hypotenuse;
+        result[0] = hypotenuse;
         break;
     case SymbolAnchorType::Left:
-        result.x = radialOffset;
+        result[0] = radialOffset;
         break;
     case SymbolAnchorType::Right:
-        result.x = -radialOffset;
+        result[0] = -radialOffset;
         break;
     default:
+        break;
+    }
+
+    return result;
+}
+
+} // namespace
+
+// static
+std::array<float, 2> SymbolLayout::evaluateVariableOffset(style::SymbolAnchorType anchor, std::array<float, 2> offset) {
+    if (offset[1] == INVALID_OFFSET_VALUE) {
+        return evaluateRadialOffset(anchor, offset[0]);
+    }
+    std::array<float, 2> result{{0.0f, 0.0f}};
+    offset[0] = std::abs(offset[0]);
+    offset[1] = std::abs(offset[1]);
+
+    switch (anchor) {
+    case SymbolAnchorType::TopRight:
+    case SymbolAnchorType::TopLeft:
+    case SymbolAnchorType::Top:
+        result[1] = offset[1] - baselineOffset;
+        break;
+    case SymbolAnchorType::BottomRight:
+    case SymbolAnchorType::BottomLeft:
+    case SymbolAnchorType::Bottom:
+        result[1] = -offset[1] + baselineOffset;
+        break;
+    case SymbolAnchorType::Center:
+    case SymbolAnchorType::Left:
+    case SymbolAnchorType::Right:
+        break;
+    }
+
+    switch (anchor) {
+    case SymbolAnchorType::TopRight:
+    case SymbolAnchorType::BottomRight:
+    case SymbolAnchorType::Right:
+        result[0] = -offset[0];
+        break;
+    case SymbolAnchorType::TopLeft:
+    case SymbolAnchorType::BottomLeft:
+    case SymbolAnchorType::Left:
+        result[0] = offset[0];
+        break;
+    case SymbolAnchorType::Center:
+    case SymbolAnchorType::Top:
+    case SymbolAnchorType::Bottom:
         break;
     }
 
@@ -296,7 +344,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
 
         ShapedTextOrientations shapedTextOrientations;
         optional<PositionedIcon> shapedIcon;
-        Point<float> textOffset;
+        std::array<float, 2> textOffset{{0.0f, 0.0f}};
 
         // if feature has text, shape the text
         if (feature.formattedText) {
@@ -320,18 +368,18 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                 return result;
             };
             const std::vector<style::TextVariableAnchorType> variableTextAnchor = layout->evaluate<TextVariableAnchor>(zoom, feature);
-            const float radialOffset = layout->evaluate<TextRadialOffset>(zoom, feature);
             const SymbolAnchorType textAnchor = layout->evaluate<TextAnchor>(zoom, feature); 
             if (variableTextAnchor.empty()) {
                 // Layers with variable anchors use the `text-radial-offset` property and the [x, y] offset vector
                 // is calculated at placement time instead of layout time
+                const float radialOffset = layout->evaluate<TextRadialOffset>(zoom, feature);
                 if (radialOffset > 0.0f) {
                     // The style spec says don't use `text-offset` and `text-radial-offset` together
                     // but doesn't actually specify what happens if you use both. We go with the radial offset.
                     textOffset = evaluateRadialOffset(textAnchor, radialOffset * util::ONE_EM);
                 } else {
-                    textOffset = { layout->evaluate<TextOffset>(zoom, feature)[0] * util::ONE_EM,
-                                   layout->evaluate<TextOffset>(zoom, feature)[1] * util::ONE_EM};
+                    textOffset = {{layout->evaluate<TextOffset>(zoom, feature)[0] * util::ONE_EM,
+                                   layout->evaluate<TextOffset>(zoom, feature)[1] * util::ONE_EM}};
                 }
             }
             TextJustifyType textJustify = textAlongLine ? TextJustifyType::Center : layout->evaluate<TextJustify>(zoom, feature);
@@ -435,14 +483,13 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                               const ShapedTextOrientations& shapedTextOrientations,
                               optional<PositionedIcon> shapedIcon,
                               const GlyphPositions& glyphPositions,
-                              Point<float> offset,
+                              std::array<float, 2> textOffset,
                               const SymbolContent iconType) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
     const float layoutTextSize = layout->evaluate<TextSize>(zoom + 1, feature);
     const float layoutIconSize = layout->evaluate<IconSize>(zoom + 1, feature);
-    const std::array<float, 2> textOffset = {{ offset.x, offset.y }};
 
     const std::array<float, 2> iconOffset = layout->evaluate<IconOffset>(zoom, feature);
 
@@ -462,7 +509,15 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float textMaxAngle = layout->get<TextMaxAngle>() * util::DEG2RAD;
     const float iconRotation = layout->evaluate<IconRotate>(zoom, feature);
     const float textRotation = layout->evaluate<TextRotate>(zoom, feature);
-    const float radialTextOffset = layout->evaluate<TextRadialOffset>(zoom, feature) * util::ONE_EM;
+    std::array<float, 2> variableTextOffset;
+    if (!textRadialOffset.isUndefined()) {
+        variableTextOffset = {{layout->evaluate<TextRadialOffset>(zoom, feature) * util::ONE_EM,
+                               INVALID_OFFSET_VALUE}};
+    } else {
+        variableTextOffset = {{layout->evaluate<TextOffset>(zoom, feature)[0] * util::ONE_EM,
+                               layout->evaluate<TextOffset>(zoom, feature)[1] * util::ONE_EM}};
+    }
+
     const SymbolPlacementType textPlacement = layout->get<TextRotationAlignment>() != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
                                                   : layout->get<SymbolPlacement>();
@@ -503,7 +558,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                     iconBoxScale, iconPadding, iconOffset, indexedFeature,
                     layoutFeatureIndex, feature.index,
                     feature.formattedText ? feature.formattedText->rawText() : std::u16string(),
-                    overscaling, iconRotation, textRotation, radialTextOffset, allowVerticalPlacement, iconType);
+                    overscaling, iconRotation, textRotation, variableTextOffset, allowVerticalPlacement, iconType);
         }
     };
 
