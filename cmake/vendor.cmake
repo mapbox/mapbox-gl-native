@@ -24,17 +24,6 @@ if(NOT TARGET mapbox-base)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/mapbox-base ${CMAKE_BINARY_DIR}/.build-mapbox-gl-native-mapbox-base EXCLUDE_FROM_ALL)
 endif()
 
-target_compile_definitions(mapbox-base-extras-rapidjson INTERFACE
-    RAPIDJSON_HAS_STDSTRING=1
-)
-
-if(WIN32)
-    target_compile_definitions(mapbox-base-extras-rapidjson INTERFACE
-        RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    )
-endif()
-
-
 if(MBGL_PLATFORM STREQUAL "linux" OR MBGL_PLATFORM STREQUAL "macos")
     include(${CMAKE_SOURCE_DIR}/vendor/glfw.cmake)
 endif()
