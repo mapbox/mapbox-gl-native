@@ -86,15 +86,13 @@ void Placement::placeLayer(const RenderLayer& layer, const mat4& projMatrix, boo
 }
 
 namespace {
-Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor, float width, float height, float radialOffset, float textBoxScale) {
+Point<float> calculateVariableLayoutOffset(style::SymbolAnchorType anchor, float width, float height, std::array<float, 2> offset, float textBoxScale) {
     AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
     float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
     float shiftY = -(alignment.verticalAlign - 0.5f) * height;
-    Point<float> offset = SymbolLayout::evaluateRadialOffset(anchor, radialOffset);
-    return Point<float>(
-        shiftX + offset.x * textBoxScale,
-        shiftY + offset.y * textBoxScale
-    );
+    auto variableOffset = SymbolLayout::evaluateVariableOffset(anchor, offset);
+    return { shiftX + variableOffset[0] * textBoxScale,
+             shiftY + variableOffset[1] * textBoxScale };
 }
 } // namespace
 
@@ -283,7 +281,7 @@ void Placement::placeBucket(
                     for (size_t i = 0u; i < placementAttempts; ++i) {
                         auto anchor = variableTextAnchors[i % anchorsSize];
                         const bool allowOverlap = (i >= anchorsSize);
-                        shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.radialTextOffset, textBoxScale);
+                        shift = calculateVariableLayoutOffset(anchor, width, height, symbolInstance.variableTextOffset, textBoxScale);
                         if (rotateWithMap) {
                             float angle = pitchWithMap ? state.getBearing() : -state.getBearing();
                             shift = util::rotate(shift, angle);
@@ -314,7 +312,7 @@ void Placement::placeBucket(
                             }
 
                             variableOffsets.insert(std::make_pair(symbolInstance.crossTileID, VariableOffset{
-                                symbolInstance.radialTextOffset,
+                                symbolInstance.variableTextOffset,
                                 width,
                                 height,
                                 anchor,
@@ -524,13 +522,13 @@ void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformStat
 }
 
 namespace {
-Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float width, float height, float radialOffset, float textBoxScale, float renderTextSize) {
+Point<float> calculateVariableRenderShift(style::SymbolAnchorType anchor, float width, float height, std::array<float, 2> textOffset, float textBoxScale, float renderTextSize) {
     AnchorAlignment alignment = AnchorAlignment::getAnchorAlignment(anchor);
     float shiftX = -(alignment.horizontalAlign - 0.5f) * width;
     float shiftY = -(alignment.verticalAlign - 0.5f) * height;
-    Point<float> offset = SymbolLayout::evaluateRadialOffset(anchor, radialOffset);
-    return { (shiftX / textBoxScale + offset.x) * renderTextSize,
-             (shiftY / textBoxScale + offset.y) * renderTextSize };
+    auto variablOffset = SymbolLayout::evaluateVariableOffset(anchor, textOffset);
+    return { (shiftX / textBoxScale + variablOffset[0]) * renderTextSize,
+             (shiftY / textBoxScale + variablOffset[1]) * renderTextSize };
 }
 } // namespace
 
@@ -610,7 +608,7 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
                         (*variableOffset).anchor,
                         (*variableOffset).width,
                         (*variableOffset).height,
-                        (*variableOffset).radialOffset,
+                        (*variableOffset).offset,
                         (*variableOffset).textBoxScale,
                         renderTextSize);
 
@@ -815,7 +813,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState
                     shift = calculateVariableLayoutOffset(variableOffset.anchor,
                                                           variableOffset.width,
                                                           variableOffset.height,
-                                                          variableOffset.radialOffset,
+                                                          variableOffset.offset,
                                                           variableOffset.textBoxScale);
                     if (rotateWithMap) {
                         shift = util::rotate(shift, pitchWithMap ? state.getBearing() : -state.getBearing());
