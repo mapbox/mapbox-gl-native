@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.HashMap;
 
 import timber.log.Timber;
 
@@ -62,11 +62,11 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOutlineColor
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class ExpressionTest extends EspressoTest {
@@ -676,20 +676,23 @@ public class ExpressionTest extends EspressoTest {
       LatLng latLng = new LatLng(51, 17);
       Feature feature = Feature.fromGeometry(Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()));
       feature.addNumberProperty("number_value", 12.345678);
+      feature.addStringProperty("locale_value", "nl-BE");
+      feature.addNumberProperty("max_value", 5);
+      feature.addNumberProperty("min_value", 1);
+
 
       mapboxMap.getStyle().addSource(new GeoJsonSource("source", feature));
       SymbolLayer layer = new SymbolLayer("layer", "source");
       mapboxMap.getStyle().addLayer(layer);
 
       Expression numberFormatExpression = numberFormat(
-        number(get("number_value")),
-        locale("nl-BE"),
-        maxFractionDigits(5),
-        minFractionDigits(1)
+        number(number(get("number_value"))),
+        locale(string(get("locale_value"))),
+        maxFractionDigits(number(get("max_value"))),
+        minFractionDigits(number(get("min_value")))
       );
 
       layer.setProperties(textField(numberFormatExpression));
-
       TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
 
       assertFalse(mapboxMap.queryRenderedFeatures(
@@ -701,8 +704,32 @@ public class ExpressionTest extends EspressoTest {
       // Expressions evaluated to string are wrapped by a format expression, take array index 1 to get original
       Object[] returnExpression = (Object[]) layer.getTextField().getExpression().toArray()[1];
       Object[] setExpression = numberFormatExpression.toArray();
-      assertTrue("Object[] expression representation should match", Arrays.deepEquals(returnExpression, setExpression));
+      assertEquals("Number format should match",returnExpression[0], setExpression[0]);
+      assertArrayEquals("Get value expression should match",
+        (Object[]) returnExpression[1],
+        (Object[]) setExpression[1]
+      );
+
+      // number format objects
+      HashMap<String, Object> returnMap = (HashMap<String, Object>) returnExpression[2];
+      HashMap<String, Object> setMap = (HashMap<String, Object>) returnExpression[2];
+
+      assertArrayEquals("Number format min fraction digits should match ",
+        (Object[]) returnMap.get("min-fraction-digits"),
+        (Object[]) setMap.get("min-fraction-digits")
+      );
+
+      assertArrayEquals("Number format max fraction digits should match ",
+        (Object[]) returnMap.get("max-fraction-digits"),
+        (Object[]) setMap.get("max-fraction-digits")
+      );
+
+      assertArrayEquals("Number format min fraction digits should match ",
+        (Object[]) returnMap.get("locale"),
+        (Object[]) setMap.get("locale")
+      );
     });
+
   }
 
   private void setupStyle() {
