@@ -5,7 +5,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -3145,6 +3144,40 @@ public class Expression {
   }
 
   /**
+   * Converts the input number into a string representation using the providing formatting rules.
+   * If set, the locale argument specifies the locale to use, as a BCP 47 language tag.
+   * If set, the currency argument specifies an ISO 4217 code to use for currency-style formatting.
+   * If set, the min-fraction-digits and max-fraction-digits arguments specify the minimum and maximum number
+   * of fractional digits to include.
+   *
+   * @param number number expression
+   * @param options number formatting options
+   * @return expression
+   */
+  public static Expression numberFormat(@NonNull Expression number, @NonNull NumberFormatOption... options) {
+    final Map<String, Expression> map = new HashMap<>();
+    for (NumberFormatOption option : options) {
+      map.put(option.type, option.value);
+    }
+    return new Expression("number-format", number, new ExpressionMap(map));
+  }
+
+  /**
+   * Converts the input number into a string representation using the providing formatting rules.
+   * If set, the locale argument specifies the locale to use, as a BCP 47 language tag.
+   * If set, the currency argument specifies an ISO 4217 code to use for currency-style formatting.
+   * If set, the min-fraction-digits and max-fraction-digits arguments specify the minimum and maximum number
+   * of fractional digits to include.
+   *
+   * @param number number expression
+   * @param options number formatting options
+   * @return expression
+   */
+  public static Expression numberFormat(@NonNull Number number, @NonNull NumberFormatOption... options) {
+    return numberFormat(literal(number), options);
+  }
+
+  /**
    * Asserts that the input value is a boolean.
    * If multiple values are provided, each one is evaluated in order until a boolean value is obtained.
    * If none of the inputs are booleans, the expression is an error.
@@ -4386,20 +4419,137 @@ public class Expression {
   }
 
   /**
+   * Base class for an option entry that is encapsulated as a json object member for an expression.
+   */
+  private static class Option {
+    @NonNull
+    String type;
+    @NonNull
+    Expression value;
+
+    /**
+     * Create an option option entry that is encapsulated as a json object member for an expression.
+     *
+     * @param type json object member name
+     * @param value json object member value
+     */
+    Option(@NonNull String type, @NonNull Expression value) {
+      this.type = type;
+      this.value = value;
+    }
+  }
+
+  /**
+   * Holds format options used in a {@link #numberFormat(Number, NumberFormatOption...)} expression.
+   */
+  public static class NumberFormatOption extends Option {
+
+    /**
+     * {@inheritDoc}
+     */
+    NumberFormatOption(@NonNull String type, @NonNull Expression value) {
+      super(type, value);
+    }
+
+    /**
+     * Number formatting option for specifying the locale to use, as a BCP 47 language tag.
+     *
+     * @param string the locale to use while performing number formatting
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption locale(@NonNull Expression string) {
+      return new NumberFormatOption("locale", string);
+    }
+
+    /**
+     * Number formatting option for specifying the locale to use, as a BCP 47 language tag.
+     *
+     * @param string the locale to use while performing number formatting
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption locale(@NonNull String string) {
+      return new NumberFormatOption("locale", literal(string));
+    }
+
+    /**
+     * Number formatting option for specifying the currency to use, an ISO 4217 code.
+     *
+     * @param string the currency to use while performing number formatting
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption currency(@NonNull Expression string) {
+      return new NumberFormatOption("currency", string);
+    }
+
+    /**
+     * Number formatting options for specifying the currency to use, an ISO 4217 code.
+     *
+     * @param string the currency to use while performing number formatting
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption currency(@NonNull String string) {
+      return new NumberFormatOption("currency", literal(string));
+    }
+
+    /**
+     * Number formatting options for specifying the minimum fraction digits to include.
+     *
+     * @param number the amount of minimum fraction digits to include
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption minFractionDigits(@NonNull Expression number) {
+      return new NumberFormatOption("min-fraction-digits", number);
+    }
+
+    /**
+     * Number formatting options for specifying the minimum fraction digits to include.
+     *
+     * @param number the amount of minimum fraction digits to include
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption minFractionDigits(int number) {
+      return new NumberFormatOption("min-fraction-digits", literal(number));
+    }
+
+    /**
+     * Number formatting options for specifying the maximum fraction digits to include.
+     *
+     * @param number the amount of minimum fraction digits to include
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption maxFractionDigits(@NonNull Expression number) {
+      return new NumberFormatOption("max-fraction-digits", number);
+    }
+
+    /**
+     * Number formatting options for specifying the maximum fraction digits to include.
+     *
+     * @param number the amount of minimum fraction digits to include
+     * @return number format option
+     */
+    @NonNull
+    public static NumberFormatOption maxFractionDigits(@NonNull int number) {
+      return new NumberFormatOption("max-fraction-digits", literal(number));
+    }
+  }
+
+  /**
    * Holds format options used in a {@link #formatEntry(Expression, FormatOption...)} that builds
    * a {@link #format(FormatEntry...)} expression.
    * <p>
    * If an option is not set, it defaults to the base value defined for the symbol.
    */
-  public static class FormatOption {
-    @NonNull
-    private String type;
-    @NonNull
-    private Expression value;
+  public static class FormatOption extends Option {
 
     FormatOption(@NonNull String type, @NonNull Expression value) {
-      this.type = type;
-      this.value = value;
+      super(type, value);
     }
 
     /**
