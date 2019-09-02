@@ -24,11 +24,11 @@ std::string formatNumber(double number, const std::string& localeId, const std::
     } else {
         ustr = icu::number::NumberFormatter::with()
 #if U_ICU_VERSION_MAJOR_NUM >= 62
-                .precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits))
+                   .precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits))
 #endif
-                .locale(locale)
-                .formatDouble(number, status)
-                .toString();
+                   .locale(locale)
+                   .formatDouble(number, status)
+                   .toString();
     }
     return ustr.toUTF8String(formatted);
 }

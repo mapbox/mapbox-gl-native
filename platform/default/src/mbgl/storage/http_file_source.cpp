@@ -321,7 +321,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = Timestamp{ Seconds(curl_getdate(value.c_str(), nullptr)) };
+        baton->response->modified = Timestamp{Seconds(curl_getdate(value.c_str(), nullptr))};
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
         baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
@@ -331,7 +331,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         baton->response->mustRevalidate = cc.mustRevalidate;
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = Timestamp{ Seconds(curl_getdate(value.c_str(), nullptr)) };
+        baton->response->expires = Timestamp{Seconds(curl_getdate(value.c_str(), nullptr))};
     } else if ((begin = headerMatches("retry-after: ", buffer, length)) != std::string::npos) {
         baton->retryAfter = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("x-rate-limit-reset: ", buffer, length)) != std::string::npos) {
@@ -357,13 +357,13 @@ void HTTPRequest::handleResult(CURLcode code) {
         case CURLE_COULDNT_CONNECT:
         case CURLE_OPERATION_TIMEDOUT:
 
-            response->error = std::make_unique<Error>(
-                Error::Reason::Connection, std::string{ curl_easy_strerror(code) } + ": " + error);
+            response->error = std::make_unique<Error>(Error::Reason::Connection,
+                                                      std::string{curl_easy_strerror(code)} + ": " + error);
             break;
 
         default:
-            response->error = std::make_unique<Error>(
-                Error::Reason::Other, std::string{ curl_easy_strerror(code) } + ": " + error);
+            response->error =
+                std::make_unique<Error>(Error::Reason::Other, std::string{curl_easy_strerror(code)} + ": " + error);
             break;
         }
     } else {
