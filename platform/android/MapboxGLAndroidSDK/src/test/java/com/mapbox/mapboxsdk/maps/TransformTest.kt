@@ -74,7 +74,7 @@ class TransformTest {
 
     every { mapView.addOnCameraDidChangeListener(any()) } answers { transform.onCameraDidChange(true) }
     every { mapView.removeOnCameraDidChangeListener(any()) } answers {}
-    
+
     val callback = mockk<MapboxMap.CancelableCallback>()
     every { callback.onFinish() } answers {}
 
@@ -102,7 +102,7 @@ class TransformTest {
 
     transform.easeCamera(mapboxMap, update, 100, false, callback)
 
-    verify (exactly=0, verifyBlock = { nativeMapView.easeTo(any(), any(), any(), any(), any(), any(), any()) })
+    verify (exactly = 0, verifyBlock = { nativeMapView.easeTo(any(), any(), any(), any(), any(), any(), any()) })
     verify { callback.onFinish() }
   }
 
@@ -141,7 +141,7 @@ class TransformTest {
 
     transform.animateCamera(mapboxMap, update, 100, callback)
 
-    verify (exactly=0, verifyBlock = { nativeMapView.flyTo(any(), any(), any(), any(), any(), any()) })
+    verify (exactly = 0, verifyBlock = { nativeMapView.flyTo(any(), any(), any(), any(), any(), any()) })
     verify { callback.onFinish() }
   }
 
