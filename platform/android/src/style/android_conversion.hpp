@@ -103,8 +103,7 @@ public:
         } else if (value.isString()) {
             return { value.toString() };
         } else if (value.isNumber()) {
-            auto doubleVal = value.toDouble();
-            return { doubleVal - (int) doubleVal > 0.0 ? doubleVal : value.toLong() };
+            return { value.toDouble() };
         } else {
             return {};
         }
