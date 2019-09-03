@@ -11,6 +11,9 @@ using NullValue = mapbox::feature::null_value_t;
 using PropertyMap = mapbox::feature::property_map;
 using FeatureIdentifier = mapbox::feature::identifier;
 using Feature = mapbox::feature::feature<double>;
+using FeatureState = PropertyMap;
+using FeatureStates = std::unordered_map<std::string, FeatureState>; // <featureID, FeatureState>
+using LayerFeatureStates = std::unordered_map<std::string, FeatureStates>; // <sourceLayer, FeatureStates>
 
 template <class T>
 optional<T> numericValue(const Value& value) {
