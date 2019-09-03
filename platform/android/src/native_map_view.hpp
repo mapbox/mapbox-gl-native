@@ -91,7 +91,7 @@ public:
 
     void moveBy(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
 
-    void jumpTo(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jdouble, jni::jdouble, const jni::Array<jni::jdouble>&);
+    void jumpTo(jni::JNIEnv&, jni::jdouble, const jni::Array<jni::jdouble>&, jni::jdouble, jni::jdouble, const jni::Array<jni::jdouble>&);
 
     void easeTo(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong, jni::jdouble, jni::jdouble, const jni::Array<jni::jdouble>&, jni::jboolean);
 

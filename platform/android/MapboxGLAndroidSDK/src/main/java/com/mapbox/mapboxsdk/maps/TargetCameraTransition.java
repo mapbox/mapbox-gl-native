@@ -8,7 +8,7 @@ public class TargetCameraTransition extends CameraTransition<LatLng> {
 
   private final LatLng latLng = new LatLng();
 
-  public TargetCameraTransition(int type, long delay, long duration, LatLng endValue, Interpolator interpolator) {
+  public TargetCameraTransition(int type, long duration, long delay, LatLng endValue, Interpolator interpolator) {
     super(type, duration, delay, endValue, interpolator);
   }
 

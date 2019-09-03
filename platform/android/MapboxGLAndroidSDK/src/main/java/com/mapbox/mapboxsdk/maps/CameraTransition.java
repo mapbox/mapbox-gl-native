@@ -29,7 +29,8 @@ public abstract class CameraTransition<T> {
   private final double duration;
   private final double delay;
 
-  private boolean canceled;
+  private boolean isCanceled;
+  private boolean isStarted;
   private boolean isFinishing;
 
   private final Interpolator interpolator;
@@ -42,13 +43,11 @@ public abstract class CameraTransition<T> {
     this.interpolator = interpolator;
   }
 
-  void initTime(double currentTime) {
+  void initTime(T startValue, double currentTime) {
     this.startTime = currentTime + delay;
     this.endTime = this.startTime + duration;
-  }
-
-  void setStartValue(T startValue) {
     this.startValue = startValue;
+    this.isStarted = true;
   }
 
   public int getType() {
@@ -56,11 +55,11 @@ public abstract class CameraTransition<T> {
   }
 
   public boolean isCanceled() {
-    return canceled;
+    return isCanceled;
   }
 
   public void cancel() {
-    canceled = true;
+    isCanceled = true;
   }
 
   public T getStartValue() {
@@ -106,6 +105,10 @@ public abstract class CameraTransition<T> {
     return getAnimatedValue(fraction);
   }
 
+  public boolean isStarted() {
+    return isStarted;
+  }
+
   boolean isFinishing() {
     return isFinishing;
   }
@@ -124,5 +127,6 @@ public abstract class CameraTransition<T> {
 
   abstract int getCameraProperty();
 
+  // todo camera - make protected?
   abstract T getAnimatedValue(double fraction);
 }

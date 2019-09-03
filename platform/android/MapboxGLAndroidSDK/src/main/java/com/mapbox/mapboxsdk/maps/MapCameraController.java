@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class MapCameraController {
         }
 
         final CameraPosition update = cameraPosition;
-        if (!runningTransitions.isEmpty()) {
+        if (!runningTransitions.isEmpty() && update != null) {
           handler.post(new Runnable() {
             @Override
             public void run() {
@@ -54,8 +55,14 @@ public class MapCameraController {
                   transition.onCancel();
                   iterator.remove();
                   CameraPosition.Builder builder = new CameraPosition.Builder(finalUpdate);
-                  if (transition.getCameraProperty() == CameraTransition.PROPERTY_CENTER) {
-                    builder.target(null);
+                  switch (transition.getCameraProperty()) {
+                    case CameraTransition.PROPERTY_CENTER:
+                      builder.target(null);
+                      break;
+
+                    case CameraTransition.PROPERTY_ZOOM:
+                      builder.zoom(-1);
+                      break;
                   }
                   finalUpdate = builder.build();
                 }
@@ -63,10 +70,7 @@ public class MapCameraController {
 
               // todo camera - check if update is noop, abort then
 
-              if (finalUpdate != null && finalUpdate.target != null) {
-                // todo camera - remove if-check
-                transform.moveCamera(finalUpdate);
-              }
+              transform.moveCamera(finalUpdate);
 
               iterator = runningTransitions.values().iterator();
               while (iterator.hasNext()) {
@@ -83,34 +87,37 @@ public class MapCameraController {
         // todo camera - what's the correct delay not to flood and block the main thread?
         double nextFrameTime = System.currentTimeMillis() + 5;
 
-        if (!runningTransitions.isEmpty()) {
-          boolean willRun = false;
+        boolean willRun = false;
+        for (CameraTransition transition : runningTransitions.values()) {
+          if (transition.getStartTime() <= nextFrameTime) {
+            willRun = true;
+            break;
+          }
+        }
+
+        if (willRun) {
+          CameraPosition.Builder builder = new CameraPosition.Builder();
+
           for (CameraTransition transition : runningTransitions.values()) {
             if (transition.getStartTime() <= nextFrameTime) {
-              willRun = true;
-              break;
-            }
-          }
-
-          if (willRun) {
-            CameraPosition.Builder builder = new CameraPosition.Builder();
-
-            TargetCameraTransition targetCameraTransition =
-              (TargetCameraTransition) runningTransitions.get(CameraTransition.PROPERTY_CENTER);
-            if (targetCameraTransition != null && targetCameraTransition.getStartTime() <= nextFrameTime) {
-              if (nextFrameTime >= targetCameraTransition.getEndTime()) {
-                builder.target(targetCameraTransition.getEndValue());
-                targetCameraTransition.setFinishing();
-              } else {
-                builder.target(targetCameraTransition.onFrame(nextFrameTime));
+              if (nextFrameTime >= transition.getEndTime()) {
+                transition.setFinishing();
               }
 
-              cameraPosition = builder.build();
+              Object value = transition.isFinishing() ? transition.getEndValue() : transition.onFrame(nextFrameTime);
+              switch (transition.getCameraProperty()) {
+                case CameraTransition.PROPERTY_CENTER:
+                  builder.target((LatLng) value);
+                  break;
+
+                case CameraTransition.PROPERTY_ZOOM:
+                  builder.zoom((double) value);
+                  break;
+              }
             }
-          } else {
-            cameraPosition = null;
           }
 
+          cameraPosition = builder.build();
         } else {
           cameraPosition = null;
         }
@@ -133,11 +140,13 @@ public class MapCameraController {
   }
 
   public void startTransition(final CameraTransition transition) {
-    transition.initTime(System.currentTimeMillis());
+    long time = System.currentTimeMillis();
     switch (transition.getCameraProperty()) {
       case CameraTransition.PROPERTY_CENTER:
-        transition.setStartValue(transform.getCameraPosition().target);
+        transition.initTime(transform.getCameraPosition().target, time);
         break;
+      case CameraTransition.PROPERTY_ZOOM:
+        transition.initTime(transform.getCameraPosition().zoom, time);
     }
 
     behavior.animationScheduled(this, transition);
@@ -152,10 +161,10 @@ public class MapCameraController {
         transition.cancel();
       } else {
         runningTransition.cancel();
-        schedule(transition);
+        runningTransitions.put(transition.getCameraProperty(), transition);
       }
     } else {
-      schedule(transition);
+      runningTransitions.put(transition.getCameraProperty(), transition);
     }
   }
 
@@ -193,10 +202,6 @@ public class MapCameraController {
 
     @NonNull
     CameraTransition resolve(CameraTransition currentTransition, CameraTransition interruptingTransition);
-  }
-
-  private void schedule(CameraTransition transition) {
-    runningTransitions.put(transition.getCameraProperty(), transition);
   }
 
   public static class DefaultCameraBehavior implements CameraBehavior {

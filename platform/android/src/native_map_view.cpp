@@ -336,12 +336,14 @@ void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy, jni::
     map->moveBy({dx, dy}, animationOptions);
 }
 
-void NativeMapView::jumpTo(jni::JNIEnv& env, jni::jdouble bearing, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom, const jni::Array<jni::jdouble>& padding) {
+void NativeMapView::jumpTo(jni::JNIEnv& env, jni::jdouble bearing, const jni::Array<jni::jdouble>& center, jni::jdouble pitch, jni::jdouble zoom, const jni::Array<jni::jdouble>& padding) {
     mbgl::CameraOptions options;
     if (bearing != -1) {
         options.bearing = bearing;
     }
-    options.center = mbgl::LatLng(latitude, longitude);
+    if (center) {
+        options.center = mbgl::LatLng(center.Get(env, 0), center.Get(env, 1));
+    }
     if (padding) {
         assert(padding.Length(env) == 4);
         options.padding = mbgl::EdgeInsets{padding.Get(env, 0), padding.Get(env, 1),
