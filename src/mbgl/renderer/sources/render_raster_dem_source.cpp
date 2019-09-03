@@ -4,53 +4,39 @@
 #include <mbgl/algorithm/update_tile_masks.hpp>
 #include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
 RenderRasterDEMSource::RenderRasterDEMSource(Immutable<style::RasterSource::Impl> impl_)
-    : RenderTileSource(std::move(impl_)) {
+    : RenderTileSetSource(std::move(impl_)) {
 }
 
 const style::RasterSource::Impl& RenderRasterDEMSource::impl() const {
     return static_cast<const style::RasterSource::Impl&>(*baseImpl);
 }
 
-void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
-                                const std::vector<Immutable<LayerProperties>>& layers,
-                                const bool needsRendering,
-                                const bool needsRelayout,
-                                const TileParameters& parameters) {
-    std::swap(baseImpl, baseImpl_);
+const optional<Tileset>& RenderRasterDEMSource::getTileset() const {
+    return impl().tileset;
+}
 
-    enabled = needsRendering;
-
-    optional<Tileset> _tileset = impl().getTileset();
-
-    if (tileset != _tileset) {
-        tileset = _tileset;
-        maxzoom = tileset->zoomRange.max;
-        // TODO: this removes existing buckets, and will cause flickering.
-        // Should instead refresh tile data in place.
-        tilePyramid.clearAll();
-    }
-    // Allow clearing the tile pyramid first, before the early return in case
-    //  the new tileset is not yet available or has an error in loading
-    if (!_tileset) {
-        return;
-    }
-
+void RenderRasterDEMSource::updateInternal(const Tileset& tileset,
+                                           const std::vector<Immutable<LayerProperties>>& layers,
+                                           const bool needsRendering,
+                                           const bool needsRelayout,
+                                           const TileParameters& parameters) {
     tilePyramid.update(layers,
                        needsRendering,
                        needsRelayout,
                        parameters,
                        SourceType::RasterDEM,
                        impl().getTileSize(),
-                       tileset->zoomRange,
-                       tileset->bounds,
+                       tileset.zoomRange,
+                       tileset.bounds,
                        [&] (const OverscaledTileID& tileID) {
-                           return std::make_unique<RasterDEMTile>(tileID, parameters, *tileset);
+                           return std::make_unique<RasterDEMTile>(tileID, parameters, tileset);
                        });
     algorithm::updateTileMasks(tilePyramid.getRenderedTiles());
 }

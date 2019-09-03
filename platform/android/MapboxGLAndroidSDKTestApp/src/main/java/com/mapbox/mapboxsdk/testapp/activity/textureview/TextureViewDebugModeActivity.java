@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.activity.textureview;
 
-import android.view.MenuItem;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.activity.maplayout.DebugModeActivity;
@@ -17,19 +16,6 @@ public class TextureViewDebugModeActivity extends DebugModeActivity implements O
     mapboxMapOptions.textureMode(true);
     return mapboxMapOptions;
   }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        // activity uses singleInstance for testing purposes
-        // code below provides a default navigation when using the app
-        onBackPressed();
-        return true;
-    }
-    return super.onOptionsItemSelected(item);
-  }
-
 
   @Override
   public void onBackPressed() {

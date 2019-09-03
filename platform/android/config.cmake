@@ -43,7 +43,7 @@ macro(mbgl_platform_core)
     )
 
     target_link_libraries(mbgl-core
-        PUBLIC jni.hpp
+        PUBLIC Mapbox::Base::jni.hpp
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -ljnigraphics
@@ -61,7 +61,7 @@ macro(mbgl_filesource)
 
     target_link_libraries(mbgl-filesource
         PUBLIC sqlite
-        PUBLIC jni.hpp
+        PUBLIC Mapbox::Base::jni.hpp
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -latomic
@@ -136,8 +136,8 @@ target_include_directories(example-custom-layer
     PRIVATE include
 )
 
-target_link_libraries(example-custom-layer
-    PRIVATE optional
-    PRIVATE -llog
-    PRIVATE -lGLESv2
+target_link_libraries(example-custom-layer PRIVATE
+    mapbox-base
+    -llog
+    -lGLESv2
 )

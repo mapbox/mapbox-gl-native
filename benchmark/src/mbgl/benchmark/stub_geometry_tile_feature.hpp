@@ -35,7 +35,7 @@ public:
         return properties.count(key) ? properties.at(key) : optional<Value>();
     }
 
-    GeometryCollection getGeometries() const override {
+    const GeometryCollection& getGeometries() const override {
         return geometry;
     }
 };

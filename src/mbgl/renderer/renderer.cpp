@@ -10,11 +10,9 @@ namespace mbgl {
 
 Renderer::Renderer(gfx::RendererBackend& backend,
                    float pixelRatio_,
-                   const optional<std::string> programCacheDir_,
                    const optional<std::string> localFontFamily_)
     : impl(std::make_unique<Impl>(backend,
                                   pixelRatio_,
-                                  std::move(programCacheDir_),
                                   std::move(localFontFamily_))) {
 }
 

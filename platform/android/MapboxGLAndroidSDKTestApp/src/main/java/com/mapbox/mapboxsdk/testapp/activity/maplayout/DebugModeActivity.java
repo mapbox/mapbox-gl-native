@@ -25,7 +25,6 @@ import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.utils.IdleZoomListener;
 
 import java.util.List;
 import java.util.Locale;
@@ -41,9 +40,9 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
 
   private MapView mapView;
   private MapboxMap mapboxMap;
+  private MapboxMap.OnCameraMoveListener cameraMoveListener;
   private ActionBarDrawerToggle actionBarDrawerToggle;
   private int currentStyleIndex;
-  private IdleZoomListener idleZoomListener;
   private boolean isReportFps = true;
 
   private static final String[] STYLES = new String[] {
@@ -152,7 +151,13 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
 
   private void setupZoomView() {
     final TextView textView = findViewById(R.id.textZoom);
-    mapboxMap.addOnCameraIdleListener(idleZoomListener = new IdleZoomListener(mapboxMap, textView));
+    mapboxMap.addOnCameraMoveListener(cameraMoveListener = new MapboxMap.OnCameraMoveListener() {
+      @Override
+      public void onCameraMove() {
+        textView.setText(String.format(DebugModeActivity.this.getString(
+          R.string.debug_zoom), mapboxMap.getCameraPosition().zoom));
+      }
+    });
   }
 
   private void setupDebugChangeView() {
@@ -233,8 +238,8 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    if (mapboxMap != null && idleZoomListener != null) {
-      mapboxMap.removeOnCameraIdleListener(idleZoomListener);
+    if (mapboxMap != null) {
+      mapboxMap.removeOnCameraMoveListener(cameraMoveListener);
     }
     mapView.onDestroy();
   }

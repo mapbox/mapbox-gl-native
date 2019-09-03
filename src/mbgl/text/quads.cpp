@@ -14,9 +14,7 @@ namespace mbgl {
 using namespace style;
 
 SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
-                       const SymbolLayoutProperties::Evaluated& layout,
-                       const float layoutTextSize,
-                       const Shaping& shapedText) {
+                       WritingModeType writingMode) {
     const ImagePosition& image = shapedIcon.image();
 
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
@@ -28,43 +26,11 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
     float left = shapedIcon.left() - border / image.pixelRatio;
     float bottom = shapedIcon.bottom() + border / image.pixelRatio;
     float right = shapedIcon.right() + border / image.pixelRatio;
-    Point<float> tl;
-    Point<float> tr;
-    Point<float> br;
-    Point<float> bl;
 
-    if (layout.get<IconTextFit>() != IconTextFitType::None && shapedText) {
-        auto iconWidth = right - left;
-        auto iconHeight = bottom - top;
-        auto size = layoutTextSize / 24.0f;
-        auto textLeft = shapedText.left * size;
-        auto textRight = shapedText.right * size;
-        auto textTop = shapedText.top * size;
-        auto textBottom = shapedText.bottom * size;
-        auto textWidth = textRight - textLeft;
-        auto textHeight = textBottom - textTop;
-        auto padT = layout.get<IconTextFitPadding>()[0];
-        auto padR = layout.get<IconTextFitPadding>()[1];
-        auto padB = layout.get<IconTextFitPadding>()[2];
-        auto padL = layout.get<IconTextFitPadding>()[3];
-        auto offsetY = layout.get<IconTextFit>() == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
-        auto offsetX = layout.get<IconTextFit>() == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
-        auto width = layout.get<IconTextFit>() == IconTextFitType::Width || layout.get<IconTextFit>() == IconTextFitType::Both ? textWidth : iconWidth;
-        auto height = layout.get<IconTextFit>() == IconTextFitType::Height || layout.get<IconTextFit>() == IconTextFitType::Both ? textHeight : iconHeight;
-        left = textLeft + offsetX - padL;
-        top = textTop + offsetY - padT;
-        right = textLeft + offsetX + padR + width;
-        bottom = textTop + offsetY + padB + height;
-        tl = {left, top};
-        tr = {right, top};
-        br = {right, bottom};
-        bl = {left, bottom};
-    } else {
-        tl = {left, top};
-        tr = {right, top};
-        br = {right, bottom};
-        bl = {left, bottom};
-    }
+    Point<float> tl{left, top};
+    Point<float> tr{right, top};
+    Point<float> br{right, bottom};
+    Point<float> bl{left, bottom};
 
     const float angle = shapedIcon.angle();
 
@@ -88,15 +54,17 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
         static_cast<uint16_t>(image.textureRect.h + border * 2)
     };
 
-    return SymbolQuad { tl, tr, bl, br, textureRect, shapedText.writingMode, { 0.0f, 0.0f } };
+    return SymbolQuad { tl, tr, bl, br, textureRect, writingMode, { 0.0f, 0.0f } };
 }
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const std::array<float, 2> textOffset,
                           const SymbolLayoutProperties::Evaluated& layout,
                           const style::SymbolPlacementType placement,
-                          const GlyphPositions& positions) {
+                          const GlyphPositions& positions,
+                          bool allowVerticalPlacement) {
     const float textRotate = layout.get<TextRotate>() * util::DEG2RAD;
+    const bool alongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && placement != SymbolPlacementType::Point;
 
     SymbolQuads quads;
 
@@ -117,16 +85,23 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         const float rectBuffer = 3.0f + glyphPadding;
 
         const float halfAdvance = glyph.metrics.advance * positionedGlyph.scale / 2.0;
-        const bool alongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && placement != SymbolPlacementType::Point;
 
         const Point<float> glyphOffset = alongLine ?
             Point<float>{ positionedGlyph.x + halfAdvance, positionedGlyph.y } :
             Point<float>{ 0.0f, 0.0f };
 
-        const Point<float> builtInOffset = alongLine ?
+        Point<float> builtInOffset = alongLine ?
             Point<float>{ 0.0f, 0.0f } :
             Point<float>{ positionedGlyph.x + halfAdvance + textOffset[0], positionedGlyph.y + textOffset[1] };
 
+        Point<float> verticalizedLabelOffset = { 0.0f, 0.0f };
+        const bool rotateVerticalGlyph = (alongLine || allowVerticalPlacement) && positionedGlyph.vertical;
+        if (rotateVerticalGlyph) {
+            // Vertical POI labels, that are rotated 90deg CW and whose glyphs must preserve upright orientation
+            // need to be rotated 90deg CCW. After quad is rotated, it is translated to the original built-in offset.
+            verticalizedLabelOffset = builtInOffset;
+            builtInOffset = { 0.0f, 0.0f };
+        }
 
         const float x1 = (glyph.metrics.left - rectBuffer) * positionedGlyph.scale - halfAdvance + builtInOffset.x;
         const float y1 = (-glyph.metrics.top - rectBuffer) * positionedGlyph.scale + builtInOffset.y;
@@ -138,22 +113,29 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         Point<float> bl{x1, y2};
         Point<float> br{x2, y2};
 
-        if (alongLine && positionedGlyph.vertical) {
+        if (rotateVerticalGlyph) {
             // Vertical-supporting glyphs are laid out in 24x24 point boxes (1 square em)
             // In horizontal orientation, the y values for glyphs are below the midline
             // and we use a "yOffset" of -17 to pull them up to the middle.
             // By rotating counter-clockwise around the point at the center of the left
             // edge of a 24x24 layout box centered below the midline, we align the center
             // of the glyphs with the horizontal midline, so the yOffset is no longer
-            // necessary, but we also pull the glyph to the left along the x axis
-            const Point<float> center{-halfAdvance, halfAdvance};
+            // necessary, but we also pull the glyph to the left along the x axis.
+            // The y coordinate includes baseline yOffset, therefore, needs to be accounted
+            // for when glyph is rotated and translated.
+
+            const Point<float> center{ -halfAdvance, halfAdvance - Shaping::yOffset };
             const float verticalRotation = -M_PI_2;
-            const Point<float> xOffsetCorrection{5, 0};
+
+            // xHalfWidhtOffsetcorrection is a difference between full-width and half-width
+            // advance, should be 0 for full-width glyphs and will pull up half-width glyphs.
+            const float xHalfWidhtOffsetcorrection = util::ONE_EM / 2 - halfAdvance;
+            const Point<float> xOffsetCorrection{ 5.0f - Shaping::yOffset - xHalfWidhtOffsetcorrection, 0.0f };
             
-            tl = util::rotate(tl - center, verticalRotation) + center + xOffsetCorrection;
-            tr = util::rotate(tr - center, verticalRotation) + center + xOffsetCorrection;
-            bl = util::rotate(bl - center, verticalRotation) + center + xOffsetCorrection;
-            br = util::rotate(br - center, verticalRotation) + center + xOffsetCorrection;
+            tl = util::rotate(tl - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
+            tr = util::rotate(tr - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
+            bl = util::rotate(bl - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
+            br = util::rotate(br - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
         }
 
         if (textRotate) {

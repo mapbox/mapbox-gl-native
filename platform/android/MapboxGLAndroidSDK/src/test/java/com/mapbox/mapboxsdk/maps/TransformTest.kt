@@ -25,8 +25,8 @@ class TransformTest {
     every { nativeMapView.isDestroyed } returns false
     every { nativeMapView.cameraPosition } returns CameraPosition.DEFAULT
     every { nativeMapView.cancelTransitions() } answers {}
-    every { nativeMapView.jumpTo(any(), any(), any(), any()) } answers {}
-    every { nativeMapView.flyTo(any(), any(), any(), any(), any()) } answers {}
+    every { nativeMapView.jumpTo(any(), any(), any(), any(), any()) } answers {}
+    every { nativeMapView.flyTo(any(), any(), any(), any(), any(), any()) } answers {}
     every { nativeMapView.minZoom = any() } answers {}
     every { nativeMapView.maxZoom = any() } answers {}
   }
@@ -44,7 +44,7 @@ class TransformTest {
     val update = CameraUpdateFactory.newCameraPosition(expected)
     transform.moveCamera(mapboxMap, update, callback)
 
-    verify { nativeMapView.jumpTo(target, -1.0, -1.0, -1.0) }
+    verify { nativeMapView.jumpTo(target, -1.0, -1.0, -1.0, null) }
     verify { callback.onFinish() }
   }
 

@@ -1,0 +1,11 @@
+{
+  "render-tests/regressions/mapbox-gl-js#7066": "Failing with mbgl-render-test",
+  "render-tests/regressions/mapbox-gl-js#5642": "Failing with mbgl-render-test",
+  "render-tests/line-pattern/opacity": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/15320",
+  "render-tests/fill-opacity/zoom-and-property-function-pattern": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/15322",
+  "render-tests/fill-pattern/literal": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/14423",
+  "render-tests/fill-pattern/opacity": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/14870",
+  "render-tests/fill-pattern/zoomed": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/14768",
+  "render-tests/line-translate/literal": "Flaky on Linux: https://github.com/mapbox/mapbox-gl-native/issues/14859"
+}
+

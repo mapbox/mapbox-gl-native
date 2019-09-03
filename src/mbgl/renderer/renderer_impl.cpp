@@ -26,13 +26,11 @@ static RendererObserver& nullObserver() {
 
 Renderer::Impl::Impl(gfx::RendererBackend& backend_,
                      float pixelRatio_,
-                     optional<std::string> programCacheDir_,
                      optional<std::string> localFontFamily_)
     : orchestrator(!backend_.contextIsShared(), std::move(localFontFamily_))
     , backend(backend_)
     , observer(&nullObserver())
-    , pixelRatio(pixelRatio_)
-    , programCacheDir(std::move(programCacheDir_)) {
+    , pixelRatio(pixelRatio_) {
 
 }
 
@@ -53,7 +51,7 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
     const auto& renderTreeParameters = renderTree.getParameters();
 
     if (!staticData) {
-        staticData = std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio, programCacheDir);
+        staticData = std::make_unique<RenderStaticData>(backend.getContext(), pixelRatio);
     }
     staticData->has3D = renderTreeParameters.has3D;
 
@@ -212,7 +210,8 @@ void Renderer::Impl::render(const RenderTree& renderTree) {
 
     observer->onDidFinishRenderingFrame(
         renderTreeParameters.loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-        renderTreeParameters.needsRepaint
+        renderTreeParameters.needsRepaint,
+        renderTreeParameters.placementChanged
     );
 
     if (!renderTreeParameters.loaded) {

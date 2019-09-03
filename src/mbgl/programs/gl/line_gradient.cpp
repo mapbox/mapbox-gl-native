@@ -16,8 +16,8 @@ template <>
 struct ShaderSource<LineGradientProgram> {
     static constexpr const char* name = "line_gradient";
     static constexpr const uint8_t hash[8] = { 0x3f, 0xba, 0xc6, 0x33, 0xcd, 0x86, 0xa2, 0xe8 };
-    static constexpr const auto vertexOffset = 34224;
-    static constexpr const auto fragmentOffset = 37016;
+    static constexpr const auto vertexOffset = 34236;
+    static constexpr const auto fragmentOffset = 37028;
 };
 
 constexpr const char* ShaderSource<LineGradientProgram>::name;

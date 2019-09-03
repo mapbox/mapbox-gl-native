@@ -11,11 +11,13 @@ template <class V>
 class VertexVector {
 public:
     using Vertex = V;
+    template<typename Arg>
+    void emplace_back(Arg&& vertex) {
+        v.emplace_back(std::forward<Arg>(vertex));
+    }
 
-    template <class... Args>
-    void emplace_back(Args&&... args) {
-        static_assert(sizeof...(args) == 1, "wrong buffer element count");
-        util::ignore({ (v.emplace_back(std::forward<Args>(args)), 0)... });
+    void extend(std::size_t n, const Vertex& val) {
+        v.resize(v.size() + n, val);
     }
 
     std::size_t elements() const {

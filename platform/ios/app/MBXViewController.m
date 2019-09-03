@@ -211,7 +211,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) BOOL shouldLimitCameraChanges;
 @property (nonatomic) BOOL randomWalk;
 @property (nonatomic) BOOL zoomLevelOrnamentEnabled;
-@property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) NSMutableArray<UIWindow *> *helperWindows;
 @property (nonatomic) NSMutableArray<UIView *> *contentInsetsOverlays;
 
@@ -246,7 +245,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         self.mapView.showsScale = YES;
         self.zoomLevelOrnamentEnabled = NO;
         self.frameTimeGraphEnabled = NO;
-        self.debugLoggingEnabled = YES;
     } else {
         // Revert to the previously saved state
         [self restoreMapState:nil];
@@ -441,14 +439,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 @"Ornaments Placement",
             ]];
 
-            if (self.currentState.debugLoggingEnabled)
-            {
-                [settingsTitles addObjectsFromArray:@[
-                    @"Print Telemetry Logfile",
-                    @"Delete Telemetry Logfile",
-                ]];
-            };
-
             break;
         default:
             NSAssert(NO, @"All settings sections should be implemented");
@@ -558,15 +548,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 case MBXSettingsAnnotationSelectRandomOffscreenPointAnnotation:
                     [self selectAnOffscreenPointAnnotation];
                     break;
-
                 case MBXSettingsAnnotationCenterSelectedAnnotation:
                     [self centerSelectedAnnotation];
                     break;
-
                 case MBXSettingsAnnotationAddVisibleAreaPolyline:
                     [self addVisibleAreaPolyline];
                     break;
-
                 default:
                     NSAssert(NO, @"All annotations setting rows should be implemented");
                     break;
@@ -666,13 +653,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     break;
                 case MBXSettingsMiscellaneousRandomTour:
                     [self randomWorldTour];
-                    break;
-
-                case MBXSettingsMiscellaneousPrintLogFile:
-                    [self printTelemetryLogFile];
-                    break;
-                case MBXSettingsMiscellaneousDeleteLogFile:
-                    [self deleteTelemetryLogFile];
                     break;
                 case MBXSettingsMiscellaneousScrollView:
                 {
@@ -1734,37 +1714,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     return backupImage;
 }
 
-- (void)printTelemetryLogFile
-{
-    NSString *fileContents = [NSString stringWithContentsOfFile:[self telemetryDebugLogFilePath] encoding:NSUTF8StringEncoding error:nil];
-    NSLog(@"%@", fileContents);
-}
-
-- (void)deleteTelemetryLogFile
-{
-    NSString *filePath = [self telemetryDebugLogFilePath];
-    if ([[NSFileManager defaultManager] isDeletableFileAtPath:filePath])
-    {
-        NSError *error;
-        BOOL success = [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
-        if (success) {
-            NSLog(@"Deleted telemetry log.");
-        } else {
-            NSLog(@"Error deleting telemetry log: %@", error.localizedDescription);
-        }
-    }
-}
-
-- (NSString *)telemetryDebugLogFilePath
-{
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd"];
-    [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
-    NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", [dateFormatter stringFromDate:[NSDate date]]]];
-
-    return filePath;
-}
-
 #pragma mark - Random World Tour
 
 - (void)addAnnotations:(NSInteger)numAnnotations aroundCoordinate:(CLLocationCoordinate2D)coordinate radius:(CLLocationDistance)radius {
@@ -2396,7 +2345,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     self.currentState.showsZoomLevelOrnament = self.zoomLevelOrnamentEnabled;
     self.currentState.showsTimeFrameGraph = self.frameTimeGraphEnabled;
     self.currentState.debugMask = self.mapView.debugMask;
-    self.currentState.debugLoggingEnabled = self.debugLoggingEnabled;
     self.currentState.reuseQueueStatsEnabled = self.reuseQueueStatsEnabled;
 
     [[MBXStateManager sharedManager] saveState:self.currentState];
@@ -2413,7 +2361,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     self.zoomLevelOrnamentEnabled = currentState.showsZoomLevelOrnament;
     self.frameTimeGraphEnabled = currentState.showsTimeFrameGraph;
     self.mapView.debugMask = currentState.debugMask;
-    self.debugLoggingEnabled = currentState.debugLoggingEnabled;
     self.reuseQueueStatsEnabled = currentState.reuseQueueStatsEnabled;
 
     self.currentState = currentState;

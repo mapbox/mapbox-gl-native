@@ -11,9 +11,6 @@ build/
 *.so
 *.apk
 
-# Lib assets
-MapboxGLAndroidSDK/src/main/assets/
-
 # Local settings
 local.properties
 gradle/configuration.gradle
@@ -33,3 +30,5 @@ MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/acti
 # Input files for running render tests
 MapboxGLAndroidSDKTestApp/src/main/assets/integration/
 
+# Local AS configuration file
+gradle.properties

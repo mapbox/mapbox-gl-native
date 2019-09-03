@@ -62,7 +62,7 @@ void VectorSource::loadDescription(FileSource& fileSource) {
             }
 
             util::mapbox::canonicalizeTileset(*tileset, url, getType(), util::tileSize);
-            bool changed = impl().getTileset() != *tileset;
+            bool changed = impl().tileset != *tileset;
 
             baseImpl = makeMutable<Impl>(impl(), *tileset);
             loaded = true;

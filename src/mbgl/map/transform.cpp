@@ -63,7 +63,7 @@ void Transform::resize(const Size size) {
 
 #pragma mark - Camera
 
-CameraOptions Transform::getCameraOptions(const EdgeInsets& padding) const {
+CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
     return state.getCameraOptions(padding);
 }
 
@@ -82,6 +82,11 @@ void Transform::jumpTo(const CameraOptions& camera) {
  * values for any options not included in `options`.
  */
 void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    Duration duration = animation.duration.value_or(Duration::zero());
+    if (state.bounds == LatLngBounds::unbounded() && !isGestureInProgress() && duration != Duration::zero()) {
+        // reuse flyTo, without exaggerated animation, to achieve constant ground speed.
+        return flyTo(camera, animation, true);
+    }
     const EdgeInsets& padding = camera.padding.value_or(state.edgeInsets);
     LatLng startLatLng = getLatLng(LatLng::Unwrapped);
     const LatLng& unwrappedLatLng = camera.center.value_or(startLatLng);
@@ -112,34 +117,28 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-    const double scale = state.zoomScale(zoom);
     pitch = util::clamp(pitch, util::PITCH_MIN, util::PITCH_MAX);
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.bearing);
     state.bearing = _normalizeAngle(state.bearing, bearing);
 
-    Duration duration = animation.duration ? *animation.duration : Duration::zero();
-
-    const double startScale = state.scale;
+    const double startZoom = state.getZoom();
     const double startBearing = state.bearing;
     const double startPitch = state.pitch;
     state.panning = unwrappedLatLng != startLatLng;
-    state.scaling = scale != startScale;
+    state.scaling = zoom != startZoom;
     state.rotating = bearing != startBearing;
     const EdgeInsets startEdgeInsets = state.edgeInsets;
 
     startTransition(camera, animation, [=](double t) {
         Point<double> framePoint = util::interpolate(startPoint, endPoint, t);
-        LatLng frameLatLng = Projection::unproject(framePoint, startScale);
-        double frameScale = util::interpolate(startScale, scale, t);
-        state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
+        LatLng frameLatLng = Projection::unproject(framePoint, state.zoomScale(startZoom));
+        double frameZoom = util::interpolate(startZoom, zoom, t);
+        state.setLatLngZoom(frameLatLng, frameZoom);
 
         if (bearing != startBearing) {
             state.bearing = util::wrap(util::interpolate(startBearing, bearing, t), -M_PI, M_PI);
-        }
-        if (pitch != startPitch) {
-            state.pitch = util::interpolate(startPitch, pitch, t);
         }
         if (padding != startEdgeInsets) {
             // Interpolate edge insets
@@ -149,6 +148,10 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
                 util::interpolate(startEdgeInsets.bottom(), padding.bottom(), t),
                 util::interpolate(startEdgeInsets.right(), padding.right(), t)
             };
+        }
+        auto maxPitch = getMaxPitchForEdgeInsets(state.edgeInsets);
+        if (pitch != startPitch || maxPitch < startPitch) {
+            state.pitch = std::min(maxPitch, util::interpolate(startPitch, pitch, t));
         }
     }, duration);
 }
@@ -161,7 +164,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     Where applicable, local variable documentation begins with the associated
     variable or function in van Wijk (2003). */
-void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &animation) {
+void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &animation, bool linearZoomInterpolation) {
     const EdgeInsets& padding = camera.padding.value_or(state.edgeInsets);
     const LatLng& latLng = camera.center.value_or(getLatLng(LatLng::Unwrapped)).wrapped();
     double zoom = camera.zoom.value_or(getZoom());
@@ -208,16 +211,16 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
         1.42 is the average value selected by participants in the user study in
         van Wijk (2003). A value of 6<sup>¼</sup> would be equivalent to the
-        root mean squared average velocity, V<sub>RMS</sub>. A value of 1 would
-        produce a circular motion. */
+        root mean squared average velocity, V<sub>RMS</sub>. A value of 1
+        produces a circular motion. */
     double rho = 1.42;
-    if (animation.minZoom) {
-        double minZoom = util::min(*animation.minZoom, startZoom, zoom);
+    if (animation.minZoom || linearZoomInterpolation) {
+        double minZoom = util::min(animation.minZoom.value_or(startZoom), startZoom, zoom);
         minZoom = util::clamp(minZoom, state.getMinZoom(), state.getMaxZoom());
         /// w<sub>m</sub>: Maximum visible span, measured in pixels with respect
         /// to the initial scale.
         double wMax = w0 / state.zoomScale(minZoom - startZoom);
-        rho = std::sqrt(wMax / u1 * 2);
+        rho = u1 != 0 ? std::sqrt(wMax / u1 * 2) : 1.0;
     }
     /// ρ²
     double rho2 = rho * rho;
@@ -232,8 +235,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     };
 
     /// r₀: Zoom-out factor during ascent.
-    double r0 = r(0);
-    double r1 = r(1);
+    double r0 = u1 != 0 ? r(0) : INFINITY; // Silence division by 0 on sanitize bot.
+    double r1 = u1 != 0 ? r(1) : INFINITY;
 
     // When u₀ = u₁, the optimal path doesn’t require both ascent and descent.
     bool isClose = std::abs(u1) < 0.000001 || !std::isfinite(r0) || !std::isfinite(r1);
@@ -288,7 +291,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
         // Calculate the current point and zoom level along the flight path.
         Point<double> framePoint = util::interpolate(startPoint, endPoint, us);
-        double frameZoom = startZoom + state.scaleZoom(1 / w(s));
+        double frameZoom = linearZoomInterpolation ? util::interpolate(startZoom, zoom, k)
+                                                   : startZoom + state.scaleZoom(1 / w(s));
 
         // Zoom can be NaN if size is empty.
         if (std::isnan(frameZoom)) {
@@ -302,17 +306,18 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         if (bearing != startBearing) {
             state.bearing = util::wrap(util::interpolate(startBearing, bearing, k), -M_PI, M_PI);
         }
-        if (pitch != startPitch) {
-            state.pitch = util::interpolate(startPitch, pitch, k);
-        }
         if (padding != startEdgeInsets) {
             // Interpolate edge insets
             state.edgeInsets = {
-                util::interpolate(startEdgeInsets.top(), padding.top(), us),
-                util::interpolate(startEdgeInsets.left(), padding.left(), us),
-                util::interpolate(startEdgeInsets.bottom(), padding.bottom(), us),
-                util::interpolate(startEdgeInsets.right(), padding.right(), us)
+                util::interpolate(startEdgeInsets.top(), padding.top(), k),
+                util::interpolate(startEdgeInsets.left(), padding.left(), k),
+                util::interpolate(startEdgeInsets.bottom(), padding.bottom(), k),
+                util::interpolate(startEdgeInsets.right(), padding.right(), k)
             };
+        }
+        auto maxPitch = getMaxPitchForEdgeInsets(state.edgeInsets);
+        if (pitch != startPitch || maxPitch < startPitch) {
+            state.pitch = std::min(maxPitch, util::interpolate(startPitch, pitch, k));
         }
     }, duration);
 }
@@ -574,6 +579,23 @@ LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng
     ScreenCoordinate flippedPoint = point;
     flippedPoint.y = state.size.height - flippedPoint.y;
     return state.screenCoordinateToLatLng(flippedPoint, wrapMode);
+}
+
+double Transform::getMaxPitchForEdgeInsets(const EdgeInsets &insets) const
+{
+    double centerOffsetY = 0.5 * (insets.top() - insets.bottom()); // See TransformState::getCenterOffset.
+
+    const auto height = state.size.height;
+    assert(height);
+    // For details, see description at https://github.com/mapbox/mapbox-gl-native/pull/15195
+    // The definition of half of TransformState::fov with no inset, is: fov = arctan((height / 2) / (height * 1.5)).
+    // We use half of fov, as it is field of view above perspective center.
+    // With inset, this angle changes and tangentOfFovAboveCenterAngle = (h/2 + centerOffsetY) / (height * 1.5).
+    // 1.03 is a bit extra added to prevent parallel ground to viewport clipping plane.
+    const double tangentOfFovAboveCenterAngle = 1.03 * (height / 2.0 + centerOffsetY) / (1.5 * height);
+    const double fovAboveCenter = std::atan(tangentOfFovAboveCenterAngle);
+    return M_PI * 0.5 - fovAboveCenter;
+    // e.g. Maximum pitch of 60 degrees is when perspective center's offset from the top is 84% of screen height.
 }
 
 } // namespace mbgl

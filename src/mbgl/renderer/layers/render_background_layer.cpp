@@ -16,9 +16,14 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+
 inline const BackgroundLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == BackgroundLayer::Impl::staticTypeInfo());
     return static_cast<const style::BackgroundLayer::Impl&>(*impl);
 }
+
+} // namespace
 
 RenderBackgroundLayer::RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl> _impl)
     : RenderLayer(makeMutable<BackgroundLayerProperties>(std::move(_impl))),
@@ -37,8 +42,14 @@ void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &paramet
         parameters.getCrossfadeParameters(),
         unevaluated.evaluate(parameters));
 
-    passes = properties->evaluated.get<style::BackgroundOpacity>() > 0 ? RenderPass::Translucent
-                                                                       : RenderPass::None;
+    passes = properties->evaluated.get<style::BackgroundOpacity>() == 0.0f
+        ? RenderPass::None
+        : (!unevaluated.get<style::BackgroundPattern>().isUndefined()
+           || properties->evaluated.get<style::BackgroundOpacity>() < 1.0f
+           || properties->evaluated.get<style::BackgroundColor>().a < 1.0f)
+        ? RenderPass::Translucent
+        // Supply both - evaluated based on opaquePassCutoff in render().
+        : RenderPass::Opaque | RenderPass::Translucent;
     properties->renderPasses = mbgl::underlying_type(passes);
     evaluatedProperties = std::move(properties);
 }
@@ -77,7 +88,9 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
             parameters.context,
             *parameters.renderPass,
             gfx::Triangles(),
-            parameters.depthModeForSublayer(0, gfx::DepthMaskType::ReadOnly),
+            parameters.depthModeForSublayer(0, parameters.pass == RenderPass::Opaque
+                ? gfx::DepthMaskType::ReadWrite
+                : gfx::DepthMaskType::ReadOnly),
             gfx::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
             gfx::CullFaceMode::disabled(),
@@ -118,6 +131,12 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
             );
         }
     } else {
+        auto backgroundRenderPass = (evaluated.get<BackgroundColor>().a >= 1.0f
+            && evaluated.get<BackgroundOpacity>() >= 1.0f
+            && parameters.currentLayer >= parameters.opaquePassCutoff) ? RenderPass::Opaque : RenderPass::Translucent;
+        if (parameters.pass != backgroundRenderPass) {
+            return;
+        }
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
                 parameters.programs.getBackgroundLayerPrograms().background,

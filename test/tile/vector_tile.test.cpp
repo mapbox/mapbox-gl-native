@@ -98,7 +98,7 @@ TEST(VectorTileData, ParseResults) {
     ASSERT_TRUE(feature->getID().is<uint64_t>());
     ASSERT_EQ(feature->getID().get<uint64_t>(), 1u);
 
-    std::unordered_map<std::string, Value> properties = feature->getProperties();
+    const std::unordered_map<std::string, Value>& properties = feature->getProperties();
     ASSERT_EQ(properties.size(), 3u);
     ASSERT_EQ(properties.at("disputed"), *feature->getValue("disputed"));
 

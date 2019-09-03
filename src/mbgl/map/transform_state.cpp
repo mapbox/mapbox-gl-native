@@ -3,6 +3,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/projection.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/clamp.hpp>
 
@@ -36,18 +37,18 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
     const double cameraToCenterDistance = getCameraToCenterDistance();
     auto offset = getCenterOffset();
 
-    // Find the distance from the viewport center point
-    // [width/2 + offset.x, height/2 + offset.y] to the top edge, to point
-    // [width/2 + offset.x, 0] in Z units, using the law of sines.
+    // Find the Z distance from the viewport center point
+    // [width/2 + offset.x, height/2 + offset.y] to the top edge; to point
+    // [width/2 + offset.x, 0] in Z units.
     // 1 Z unit is equivalent to 1 horizontal px at the center of the map
     // (the distance between[width/2, height/2] and [width/2 + 1, height/2])
-    const double fovAboveCenter = getFieldOfView() * (0.5 + offset.y / size.height);
-    const double groundAngle = M_PI / 2.0 + getPitch();
-    const double aboveCenterSurfaceDistance = std::sin(fovAboveCenter) * cameraToCenterDistance / std::sin(M_PI - groundAngle - fovAboveCenter);
-
-
+    // See https://github.com/mapbox/mapbox-gl-native/pull/15195 for details.
+    // See TransformState::fov description: fov = 2 * arctan((height / 2) / (height * 1.5)).
+    const double tanFovAboveCenter = (size.height * 0.5 + offset.y) / (size.height * 1.5);
+    const double tanMultiple = tanFovAboveCenter * std::tan(getPitch());
+    assert(tanMultiple < 1);
     // Calculate z distance of the farthest fragment that should be rendered.
-    const double furthestDistance = std::cos(M_PI / 2 - getPitch()) * aboveCenterSurfaceDistance + cameraToCenterDistance;
+    const double furthestDistance = cameraToCenterDistance / (1 - tanMultiple);
     // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
     const double farZ = furthestDistance * 1.01;
 
@@ -64,7 +65,7 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
     matrix::scale(projMatrix, projMatrix, 1.0, flippedY ? 1 : -1, 1);
 
-    matrix::translate(projMatrix, projMatrix, 0, 0, -getCameraToCenterDistance());
+    matrix::translate(projMatrix, projMatrix, 0, 0, -cameraToCenterDistance);
 
     using NO = NorthOrientation;
     switch (getNorthOrientation()) {
@@ -145,10 +146,10 @@ ViewportMode TransformState::getViewportMode() const {
 
 #pragma mark - Camera options
 
-CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const {
+CameraOptions TransformState::getCameraOptions(optional<EdgeInsets> padding) const {
     return CameraOptions()
         .withCenter(getLatLng())
-        .withPadding(padding)
+        .withPadding(padding ? padding : edgeInsets)
         .withZoom(getZoom())
         .withBearing(-bearing * util::RAD2DEG)
         .withPitch(pitch * util::RAD2DEG);
@@ -289,9 +290,9 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
     return { p[0] / p[3], size.height - p[1] / p[3] };
 }
 
-LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
+TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoordinate& point, uint8_t atZoom) const {
     if (size.isEmpty()) {
-        return {};
+        return { {}, 0 };
     }
 
     float targetZ = 0;
@@ -325,7 +326,13 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
     double z1 = coord1[2] / w1;
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
 
-    return Projection::unproject(util::interpolate(p0, p1, t), scale / util::tileSize, wrapMode);
+    Point<double> p = util::interpolate(p0, p1, t) / scale * static_cast<double>(1 << atZoom);
+    return { { p.x, p.y }, static_cast<double>(atZoom) };
+}
+
+LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
+    auto coord = screenCoordinateToTileCoordinate(point, 0);
+    return Projection::unproject(coord.p, 1 / util::tileSize, wrapMode);
 }
 
 mat4 TransformState::coordinatePointMatrix() const {

@@ -368,6 +368,18 @@ const auto& lineProgressCompoundExpression() {
     return signature;
 }
 
+const auto& accumulatedCompoundExpression() {
+    const static auto signature = detail::makeSignature("accumulated", [](const EvaluationContext& params) -> Result<Value> {
+        if (!params.accumulated) {
+            return EvaluationError {
+                "The 'accumulated' expression is unavailable in the current evaluation context."
+            };
+        }
+        return Value(toExpressionValue(*params.accumulated));
+    });
+    return signature;
+}
+    
 const auto& hasContextCompoundExpression() {
     static auto signature = detail::makeSignature("has", [](const EvaluationContext& params, const std::string& key) -> Result<bool> {
         if (!params.feature) {
@@ -423,7 +435,8 @@ const auto& propertiesCompoundExpression() {
             };
         }
         std::unordered_map<std::string, Value> result;
-        const PropertyMap properties = params.feature->getProperties();
+        const PropertyMap& properties = params.feature->getProperties();
+        result.reserve(properties.size());
         for (const auto& entry : properties) {
             result[entry.first] = toExpressionValue(entry.second);
         }
@@ -870,6 +883,7 @@ MAPBOX_ETERNAL_CONSTEXPR const auto compoundExpressionRegistry = mapbox::eternal
     { "zoom", zoomCompoundExpression },
     { "heatmap-density", heatmapDensityCompoundExpression },
     { "line-progress", lineProgressCompoundExpression },
+    { "accumulated", accumulatedCompoundExpression },
     { "has", hasContextCompoundExpression },
     { "has", hasObjectCompoundExpression },
     { "get", getContextCompoundExpression },

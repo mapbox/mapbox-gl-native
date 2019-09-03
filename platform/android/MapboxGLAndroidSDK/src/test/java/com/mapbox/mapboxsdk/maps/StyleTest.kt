@@ -8,10 +8,7 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
+import io.mockk.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -51,7 +48,7 @@ class StyleTest {
     fun testEmptyBuilder() {
         val builder = Style.Builder()
         mapboxMap.setStyle(builder)
-        verify(exactly = 1) { nativeMapView.styleJson = "{}" }
+        verify(exactly = 1) { nativeMapView.styleJson = Style.EMPTY_JSON }
     }
 
     @Test

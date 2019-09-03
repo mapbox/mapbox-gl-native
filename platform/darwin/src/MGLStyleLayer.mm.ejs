@@ -25,10 +25,10 @@ namespace mbgl {
 
 <% if (layoutProperties.length) { -%>
 <% for (const property of layoutProperties) { -%>
-<% if (property.type == "enum") { -%>
-    MBGL_DEFINE_ENUM(MGL<%- camelize(property.name) %>, {
+<% if (definesEnum(property, layoutProperties)) { -%>
+    MBGL_DEFINE_ENUM(MGL<%- camelize(enumName(property)) %>, {
 <% for (const value in property.values) { -%>
-        { MGL<%- camelize(property.name) %><%- camelize(value) %>, "<%-value%>" },
+        { MGL<%- camelize(enumName(property)) %><%- camelize(value) %>, "<%-value%>" },
 <% } -%>
     });
 
@@ -37,10 +37,10 @@ namespace mbgl {
 <% } -%>
 <% if (paintProperties.length) { -%>
 <% for (const property of paintProperties) { -%>
-<% if (property.type == "enum") { -%>
-    MBGL_DEFINE_ENUM(MGL<%- camelize(property.name) %>, {
+<% if (definesEnum(property, paintProperties)) { -%>
+    MBGL_DEFINE_ENUM(MGL<%- camelize(enumName(property)) %>, {
 <% for (const value in property.values) { -%>
-        { MGL<%- camelize(property.name) %><%- camelize(value) %>, "<%-value%>" },
+        { MGL<%- camelize(enumName(property)) %><%- camelize(value) %>, "<%-value%>" },
 <% } -%>
     });
 
@@ -239,12 +239,12 @@ namespace mbgl {
 @implementation NSValue (MGL<%- camelize(type) %>StyleLayerAdditions)
 
 <% for (let property of enumProperties) { -%>
-+ (NSValue *)valueWithMGL<%- camelize(property.name) %>:(MGL<%- camelize(property.name) %>)<%- objCName(property) %> {
-    return [NSValue value:&<%- objCName(property) %> withObjCType:@encode(MGL<%- camelize(property.name) %>)];
++ (NSValue *)valueWithMGL<%- camelize(enumName(property)) %>:(MGL<%- camelize(enumName(property)) %>)<%- objCName(property) %> {
+    return [NSValue value:&<%- objCName(property) %> withObjCType:@encode(MGL<%- camelize(enumName(property)) %>)];
 }
 
-- (MGL<%- camelize(property.name) %>)MGL<%- camelize(property.name) %>Value {
-    MGL<%- camelize(property.name) %> <%- objCName(property) %>;
+- (MGL<%- camelize(enumName(property)) %>)MGL<%- camelize(enumName(property)) %>Value {
+    MGL<%- camelize(enumName(property)) %> <%- objCName(property) %>;
     [self getValue:&<%- objCName(property) %>];
     return <%- objCName(property) %>;
 }

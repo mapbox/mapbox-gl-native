@@ -14,6 +14,7 @@ NS_INLINE NSString *MGLStringFromNSEdgeInsets(NSEdgeInsets insets) {
 
 #define MGLLogInfo(...)
 #define MGLLogDebug(...)
+#define MGLLogWarning(...)
 #define MGLLogError(...)
 #define MGLLogFault(...)
 
@@ -25,9 +26,10 @@ NS_INLINE NSString *MGLStringFromNSEdgeInsets(NSEdgeInsets insets) {
     #define MGLLogDebug(...)
 #endif
 
-#define MGLLogInfo(message, ...)  MGLLogWithType(MGLLoggingLevelInfo, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
-#define MGLLogError(message, ...) MGLLogWithType(MGLLoggingLevelError, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
-#define MGLLogFault(message, ...) MGLLogWithType(MGLLoggingLevelFault, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#define MGLLogInfo(message, ...)     MGLLogWithType(MGLLoggingLevelInfo, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#define MGLLogWarning(message, ...)  MGLLogWithType(MGLLoggingLevelWarning, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#define MGLLogError(message, ...)    MGLLogWithType(MGLLoggingLevelError, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#define MGLLogFault(message, ...)    MGLLogWithType(MGLLoggingLevelFault, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
 
 #endif
 

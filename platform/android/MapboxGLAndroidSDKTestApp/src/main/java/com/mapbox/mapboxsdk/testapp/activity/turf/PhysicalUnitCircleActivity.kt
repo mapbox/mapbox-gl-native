@@ -52,7 +52,7 @@ class PhysicalUnitCircleActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeL
       radiusBar.setOnSeekBarChangeListener(this)
 
       mapboxMap.setStyle(Style.Builder()
-        .fromUrl(Style.SATELLITE_STREETS)
+        .fromUri(Style.SATELLITE_STREETS)
         .withLayer(FillLayer(LAYER_ID, SOURCE_ID).withProperties(fillColor(interpolate(
           exponential(0.5f), zoom(),
           stop(8, color(Color.RED)),

@@ -4,6 +4,14 @@ workflows:
   version: 2
   default:
     jobs:
+      #
+      # Naming convention: {platform}-{additional description}-{build type}
+      #   - {platform} is the client platform/framework, which may differ from 
+      #     the build platform. Specify both if applicable, e.g., "qt5-macos".
+      #   - {additional description} optionally describes the compiler or other
+      #     unique aspect of the build environment.
+      #   - {build type} is typically "debug" or "release".
+      #
       - nitpick
       - clang-tidy:
           filters:
@@ -45,6 +53,7 @@ workflows:
       - linux-doxygen
       - linux-render-tests
       - ios-debug
+      - ios-debug-xcode11
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -72,6 +81,7 @@ workflows:
       - ios-sanitize-nightly
       - ios-sanitize-address-nightly
       - ios-static-analyzer-nightly
+      - ios-static-analyzer-nightly-xcode11
 
 commands:
   npm-install:
@@ -420,7 +430,8 @@ commands:
     - run:
         name: Run tests
         command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
+          # Source.RenderTileSetSourceUpdate is filtered out due to #15294
+          xvfb-run --server-args="-screen 0 1024x768x24" make run-test--Source.RenderTileSetSourceUpdate 2> >(tee sanitizer 1>&2)
           # Unfortunately, Google Test eats the status code, so we'll have to check the output.
           [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
 
@@ -464,6 +475,28 @@ commands:
             scripts/notify-slack.sh
           fi
 
+  #
+  # Add this step to all regular jobs to enable skipping of certain non-code-related changes.
+  #
+  # Do not include this step in nightly or release deployment jobs.
+  #
+  # To make a job potentially skippable on changes unrelated to its platform, it must:
+  #   - Target one of the skippable platforms: Android, iOS, or macOS.
+  #   - Have a job name that begins with a supported platform name.
+  #   - Not be related to core functionality or rendering tests. Job names that
+  #     contain "render-tests" cannot be skipped by platform changes.
+  #
+  # See the script in the following step for how to implement support for other platforms.
+  #
+  check-if-this-job-can-be-skipped:
+    steps:
+    - run:
+        name: Check if this job can be skipped
+        command: |
+          if [[ $CIRCLE_BRANCH != master ]] && [[ $CIRCLE_BRANCH != release-* ]] && [[ -z $CIRCLE_TAG ]]; then
+            scripts/check-ci-job-skippability.js
+          fi
+
 jobs:
   nitpick:
     docker:
@@ -477,7 +510,9 @@ jobs:
       - install-dependencies: { mason: false, ccache: false }
       - run:
           name: Initialize submodules
-          command: git submodule update --init
+          command: |
+            git submodule update --init
+            git submodule foreach git submodule update --init
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
@@ -552,6 +587,7 @@ jobs:
       MBGL_ANDROID_STL: << parameters.stl >>
     steps:
       - install-dependencies: { gradle: true }
+      - check-if-this-job-can-be-skipped
       - run:
           name: Initialize vendor submodules
           command: git submodule update --init platform/android/vendor
@@ -618,7 +654,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release:
     docker:
-      - image: mbgl/android-ndk-r19:8e91a7ebab
+      - image: mbgl/android-ndk-r20:7b7c4b42cf
     resource_class: xlarge
     working_directory: /src
     environment:
@@ -628,6 +664,7 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - install-dependencies: { gradle: true }
+      - check-if-this-job-can-be-skipped
       - run:
           name: Initialize vendor submodules
           command: git submodule update --init platform/android/vendor
@@ -718,9 +755,14 @@ jobs:
       ANDROID_NDK: /android/sdk/ndk-bundle
     steps:
       - checkout
+      - npm-install
+      - prepare-environment
+      - check-if-this-job-can-be-skipped
       - run:
           name: Checkout submodules
-          command: git submodule update --init
+          command: |
+            git submodule update --init
+            git submodule foreach git submodule update --init
       - run:
           name: Build Android library
           command: |
@@ -759,6 +801,7 @@ jobs:
       WITH_EGL: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-node
       - save-dependencies
       - publish-node-package
@@ -766,7 +809,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -775,6 +818,7 @@ jobs:
       - install-macos-dependencies
       - install-node-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-node
       - save-dependencies
       - run-node-macos-tests
@@ -796,6 +840,7 @@ jobs:
       WITH_CXX11ABI: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - save-dependencies
 
@@ -817,6 +862,7 @@ jobs:
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
@@ -839,6 +885,7 @@ jobs:
       TSAN_OPTIONS: color=always:print_summary=1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
@@ -859,6 +906,7 @@ jobs:
       DISPLAY: :0
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - build-benchmark
       - build-test
@@ -882,6 +930,7 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - build-benchmark
       - build-test
@@ -890,9 +939,7 @@ jobs:
       - run:
           name: Upload coverage results to codecov.io
           command: |
-            curl -sSfL -o codecov https://codecov.io/bash
-            chmod +x codecov
-            ./codecov -c
+            bash <(curl -sSfL https://codecov.io/bash) || echo 'Codecov failed to upload'
       - run:
           name: Upload coverage metrics to s3
           command: |
@@ -914,6 +961,7 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - run:
           name: Install doxygen
           command: apt update && apt install -y doxygen
@@ -938,6 +986,7 @@ jobs:
       WITH_EGL: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - configure-cmake
       - build-mbgl-render-test
       - run-linux-render-tests
@@ -947,7 +996,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -955,14 +1004,15 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
-      - build-ios-test
       - check-public-symbols
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
       - run:
           name: Lint podspecs and plist files
           command: make ios-lint
+      - check-if-this-job-can-be-skipped
+      - build-ios-test
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
@@ -971,24 +1021,36 @@ jobs:
       - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  metrics-nightly:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    working_directory: /src
+  ios-debug-xcode11:
+    macos:
+      xcode: "11.0.0"
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
+      - install-macos-dependencies
       - install-dependencies
+      - check-public-symbols
       - run:
-          name: Collect GitHub statistics
-          command: |
-              scripts/publish_github_stats.js
+          name: Lint podspecs and plist files
+          command: make ios-lint
+      - check-if-this-job-can-be-skipped
+      - build-ios-test
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1012,7 +1074,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1032,7 +1094,27 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      SLACK_CHANNEL: C0ACM9Q2C
+    steps:
+      - install-macos-dependencies
+      - install-dependencies
+      - run:
+          name: Build and run SDK unit tests with the static analyzer
+          command: make ios-static-analyzer
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+      - notify-slack-nightly-failure
+
+# ------------------------------------------------------------------------------
+  ios-static-analyzer-nightly-xcode11:
+    macos:
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1052,7 +1134,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-template:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1061,6 +1143,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - install-ios-packaging-dependencies
       - run:
           name: Build dynamic framework for device and simulator
@@ -1071,6 +1154,12 @@ jobs:
           command: |
             if [[ $CIRCLE_BRANCH == master ]]; then
               platform/ios/scripts/deploy-snapshot.sh
+            fi
+      - deploy:
+          name: Deploy to Mapbox CocoaPods spec repo
+          command: |
+            if [[ $CIRCLE_BRANCH == master ]]; then
+              platform/ios/scripts/deploy-to-cocoapods.sh
             fi
       - run:
           name: Record size
@@ -1093,7 +1182,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-tag:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1110,12 +1199,20 @@ jobs:
       - install-dependencies
       - install-ios-packaging-dependencies
       - run:
+          name: Trigger external deploy steps
+          command: |
+            export VERSION_TAG=${CIRCLE_TAG}
+            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
+            platform/ios/scripts/trigger-external-deploy-steps.sh
+      - run:
           name: Build, package, and upload iOS release
           command: |
             export VERSION_TAG=${CIRCLE_TAG}
             export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
             platform/ios/scripts/deploy-packages.sh
-            platform/ios/scripts/trigger-external-deploy-steps.sh
+      - deploy:
+          name: Deploy to CocoaPods
+          command: platform/ios/scripts/deploy-to-cocoapods.sh
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1145,6 +1242,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-macos-test
       - check-public-symbols
       - run:
@@ -1163,7 +1261,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-render-tests:
     macos:
-      xcode: "10.2.1"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1172,6 +1270,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - configure-cmake
       - build-mbgl-render-test
       - save-dependencies
@@ -1179,9 +1278,24 @@ jobs:
       - upload-render-tests
 
 # ------------------------------------------------------------------------------
+  metrics-nightly:
+    docker:
+      - image: mbgl/linux-gcc-5:54f59e3ac5
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
+    steps:
+      - install-dependencies
+      - run:
+          name: Collect GitHub statistics
+          command: |
+              scripts/publish_github_stats.js
+
+# ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
     docker:
-      - image: mbgl/linux-gcc-5-qt-5.9:5132cfd29f
+      - image: mbgl/linux-gcc-5-qt-5.9:5cd92d7d1c
     resource_class: large
     working_directory: /src
     environment:
@@ -1191,6 +1305,7 @@ jobs:
       WITH_QT_I18N: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-qt-app
       - build-qt-test
       - run:
@@ -1217,6 +1332,7 @@ jobs:
       - install-macos-dependencies
       - install-qt-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-qt-app
       - build-qt-test
       - run:

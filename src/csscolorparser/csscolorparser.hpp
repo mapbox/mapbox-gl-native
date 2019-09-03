@@ -25,14 +25,12 @@
 #ifndef CSS_COLOR_PARSER_CPP
 #define CSS_COLOR_PARSER_CPP
 
+#include <mbgl/util/optional.hpp>
+
 #include <string>
 #include <cmath>
-#include <optional.hpp>
 
 namespace CSSColorParser {
-
-template <class T>
-using optional = std::experimental::optional<T>;
 
 struct Color {
     inline Color() {
@@ -52,7 +50,7 @@ inline bool operator!=(const Color& lhs, const Color& rhs) {
     return !(lhs == rhs);
 }
 
-optional<Color> parse(const std::string& css_str);
+mbgl::optional<Color> parse(const std::string& css_str);
 
 } // namespace CSSColorParser
 

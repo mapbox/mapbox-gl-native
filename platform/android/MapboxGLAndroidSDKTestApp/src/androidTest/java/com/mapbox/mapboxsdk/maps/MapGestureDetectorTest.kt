@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps
 
-import android.graphics.PointF
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -12,7 +11,7 @@ import com.mapbox.mapboxsdk.maps.GesturesUiTestUtils.quickScale
 import com.mapbox.mapboxsdk.testapp.R
 import com.mapbox.mapboxsdk.testapp.activity.BaseTest
 import com.mapbox.mapboxsdk.testapp.activity.maplayout.SimpleMapActivity
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -38,7 +37,6 @@ class MapGestureDetectorTest : BaseTest() {
     onView(withId(R.id.mapView)).perform(quickScale(maxHeight / 2f, withVelocity = false))
     rule.runOnUiThread {
       Assert.assertTrue(mapboxMap.cameraPosition.zoom > initialZoom!!)
-      Assert.assertTrue(Math.abs(mapboxMap.cameraPosition.zoom - initialZoom!!) > 0.5)
     }
   }
 
@@ -60,18 +58,11 @@ class MapGestureDetectorTest : BaseTest() {
       Assert.assertEquals(initialCameraPosition!!, mapboxMap.cameraPosition)
     }
 
-    var expectedTarget: LatLng? = null
-    rule.runOnUiThread {
-      val currentPoint = mapboxMap.projection.toScreenLocation(initialCameraPosition!!.target)
-      val resultingPoint = PointF(currentPoint.x + maxWidth / 2f, currentPoint.y + maxHeight / 2f)
-      expectedTarget = mapboxMap.projection.fromScreenLocation(resultingPoint)
-    }
-
     // move to expected target
     onView(withId(R.id.mapView)).perform(move(-maxWidth / 2f, -maxHeight / 2f, withVelocity = false))
     rule.runOnUiThread {
-      Assert.assertEquals(expectedTarget!!.latitude, mapboxMap.cameraPosition.target.latitude, 5.0)
-      Assert.assertEquals(expectedTarget!!.longitude, mapboxMap.cameraPosition.target.longitude, 5.0)
+      Assert.assertNotEquals(initialCameraPosition!!.target.latitude, mapboxMap.cameraPosition.target.latitude, 1.0)
+      Assert.assertNotEquals(initialCameraPosition!!.target.longitude, mapboxMap.cameraPosition.target.longitude, 1.0)
     }
   }
 
@@ -87,8 +78,8 @@ class MapGestureDetectorTest : BaseTest() {
     onView(withId(R.id.mapView)).perform(quickScale(maxHeight / 2f))
     rule.runOnUiThread {
       // camera did not move
-      Assert.assertEquals(initialTarget!!.latitude, mapboxMap.cameraPosition.target.latitude, 0.5)
-      Assert.assertEquals(initialTarget!!.longitude, mapboxMap.cameraPosition.target.longitude, 0.5)
+      Assert.assertEquals(initialTarget!!.latitude, mapboxMap.cameraPosition.target.latitude, 1.0)
+      Assert.assertEquals(initialTarget!!.longitude, mapboxMap.cameraPosition.target.longitude, 1.0)
     }
   }
 
@@ -98,18 +89,19 @@ class MapGestureDetectorTest : BaseTest() {
     validateTestSetup()
     onView(withId(R.id.mapView)).perform(quickScale(maxHeight / 2f, interrupt = true))
 
-    var expectedTarget: LatLng? = null
+    var initialCameraPosition: CameraPosition? = null
     rule.runOnUiThread {
-      val currentPoint = mapboxMap.projection.toScreenLocation(mapboxMap.cameraPosition.target)
-      val resultingPoint = PointF(currentPoint.x + maxWidth / 2f, currentPoint.y + maxHeight / 2f)
-      expectedTarget = mapboxMap.projection.fromScreenLocation(resultingPoint)
+      // zoom in so we can move vertically
+      mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4.0))
+      initialCameraPosition = mapboxMap.cameraPosition
+      mapboxMap.uiSettings.isQuickZoomGesturesEnabled = false
     }
 
     // move to expected target
     onView(withId(R.id.mapView)).perform(move(-maxWidth / 2f, -maxHeight / 2f, withVelocity = false))
     rule.runOnUiThread {
-      Assert.assertEquals(expectedTarget!!.latitude, mapboxMap.cameraPosition.target.latitude, 10.0)
-      Assert.assertEquals(expectedTarget!!.longitude, mapboxMap.cameraPosition.target.longitude, 10.0)
+      Assert.assertNotEquals(initialCameraPosition!!.target.latitude, mapboxMap.cameraPosition.target.latitude, 1.0)
+      Assert.assertNotEquals(initialCameraPosition!!.target.longitude, mapboxMap.cameraPosition.target.longitude, 1.0)
     }
   }
 
@@ -169,18 +161,33 @@ class MapGestureDetectorTest : BaseTest() {
 
     onView(withId(R.id.mapView)).perform(quickScale(mapboxMap.gesturesManager.standardScaleGestureDetector.spanSinceStartThreshold / 2, withVelocity = false, duration = 50L, interrupt = true))
 
-    var expectedTarget: LatLng? = null
+    var initialCameraPosition: CameraPosition? = null
     rule.runOnUiThread {
-      val currentPoint = mapboxMap.projection.toScreenLocation(mapboxMap.cameraPosition.target)
-      val resultingPoint = PointF(currentPoint.x + maxWidth / 2f, currentPoint.y + maxHeight / 2f)
-      expectedTarget = mapboxMap.projection.fromScreenLocation(resultingPoint)
+      // zoom in so we can move vertically
+      mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4.0))
+      initialCameraPosition = mapboxMap.cameraPosition
+      mapboxMap.uiSettings.isQuickZoomGesturesEnabled = false
     }
 
     // move to expected target
     onView(withId(R.id.mapView)).perform(move(-maxWidth / 2f, -maxHeight / 2f, withVelocity = false))
     rule.runOnUiThread {
-      Assert.assertEquals(expectedTarget!!.latitude, mapboxMap.cameraPosition.target.latitude, 10.0)
-      Assert.assertEquals(expectedTarget!!.longitude, mapboxMap.cameraPosition.target.longitude, 10.0)
+      Assert.assertNotEquals(initialCameraPosition!!.target.latitude, mapboxMap.cameraPosition.target.latitude, 1.0)
+      Assert.assertNotEquals(initialCameraPosition!!.target.longitude, mapboxMap.cameraPosition.target.longitude, 1.0)
+    }
+  }
+
+  @Test
+  fun quickZoom_roundTripping() {
+    validateTestSetup()
+    rule.runOnUiThread {
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(51.0, 16.0), 3.0))
+    }
+    onView(withId(R.id.mapView)).perform(quickScale(300f, withVelocity = false, duration = 750L))
+    onView(withId(R.id.mapView)).perform(quickScale(-300f, withVelocity = false, duration = 750L))
+
+    rule.runOnUiThread {
+      Assert.assertEquals(3.0, mapboxMap.cameraPosition.zoom, 0.0001)
     }
   }
 }

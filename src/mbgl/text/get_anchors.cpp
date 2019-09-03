@@ -166,6 +166,8 @@ optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
             if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
                 return anchor;
             }
+
+            return nullopt;
         }
         
         prevDistance += segmentDistance;

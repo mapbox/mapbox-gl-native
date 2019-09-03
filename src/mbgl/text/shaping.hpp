@@ -4,6 +4,7 @@
 #include <mbgl/text/tagged_string.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 namespace mbgl {
 
@@ -52,6 +53,12 @@ public:
                                     style::SymbolAnchorType iconAnchor,
                                     const float iconRotation);
 
+    // Updates shaped icon's bounds based on shaped text's bounds and provided
+    // layout properties.
+    void fitIconToText(const style::SymbolLayoutProperties::Evaluated& layout,
+                       const Shaping& shapedText,
+                       float layoutTextSize);
+
     const ImagePosition& image() const { return _image; }
     float top() const { return _top; }
     float bottom() const { return _bottom; }
@@ -66,9 +73,10 @@ const Shaping getShaping(const TaggedString& string,
                          style::SymbolAnchorType textAnchor,
                          style::TextJustifyType textJustify,
                          float spacing,
-                         const Point<float>& translate,
+                         const std::array<float, 2>& translate,
                          const WritingModeType,
                          BiDi& bidi,
-                         const GlyphMap& glyphs);
+                         const GlyphMap& glyphs,
+                         bool allowVerticalPlacement);
 
 } // namespace mbgl

@@ -2296,7 +2296,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Radial offset of text, in the direction of the symbol's anchor. Useful in combination with {@link PropertyFactory#textVariableAnchor}, which doesn't support the two-dimensional {@link PropertyFactory#textOffset}.
+   * Radial offset of text, in the direction of the symbol's anchor. Useful in combination with {@link PropertyFactory#textVariableAnchor}, which defaults to using the two-dimensional {@link PropertyFactory#textOffset} if present.
    *
    * @param value a Float value
    * @return property wrapper around Float
@@ -2306,7 +2306,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Radial offset of text, in the direction of the symbol's anchor. Useful in combination with {@link PropertyFactory#textVariableAnchor}, which doesn't support the two-dimensional {@link PropertyFactory#textOffset}.
+   * Radial offset of text, in the direction of the symbol's anchor. Useful in combination with {@link PropertyFactory#textVariableAnchor}, which defaults to using the two-dimensional {@link PropertyFactory#textOffset} if present.
    *
    * @param value a Float value
    * @return property wrapper around Float
@@ -2316,7 +2316,7 @@ public class PropertyFactory {
   }
 
   /**
-   * To increase the chance of placing high-priority labels on the map, you can provide an array of {@link Property.TEXT_ANCHOR} locations: the render will attempt to place the label at each location, in order, before moving onto the next label. Use `text-justify: auto` to choose justification based on anchor position. To apply an offset, use the {@link PropertyFactory#textRadialOffset} instead of the two-dimensional {@link PropertyFactory#textOffset}.
+   * To increase the chance of placing high-priority labels on the map, you can provide an array of {@link Property.TEXT_ANCHOR} locations: the render will attempt to place the label at each location, in order, before moving onto the next label. Use `text-justify: auto` to choose justification based on anchor position. To apply an offset, use the {@link PropertyFactory#textRadialOffset} or the two-dimensional {@link PropertyFactory#textOffset}.
    *
    * @param value a String[] value
    * @return property wrapper around String[]
@@ -2326,7 +2326,7 @@ public class PropertyFactory {
   }
 
   /**
-   * To increase the chance of placing high-priority labels on the map, you can provide an array of {@link Property.TEXT_ANCHOR} locations: the render will attempt to place the label at each location, in order, before moving onto the next label. Use `text-justify: auto` to choose justification based on anchor position. To apply an offset, use the {@link PropertyFactory#textRadialOffset} instead of the two-dimensional {@link PropertyFactory#textOffset}.
+   * To increase the chance of placing high-priority labels on the map, you can provide an array of {@link Property.TEXT_ANCHOR} locations: the render will attempt to place the label at each location, in order, before moving onto the next label. Use `text-justify: auto` to choose justification based on anchor position. To apply an offset, use the {@link PropertyFactory#textRadialOffset} or the two-dimensional {@link PropertyFactory#textOffset}.
    *
    * @param value a String[] value
    * @return property wrapper around String[]
@@ -2373,6 +2373,26 @@ public class PropertyFactory {
    */
   public static PropertyValue<Expression> textMaxAngle(Expression value) {
     return new LayoutPropertyValue<>("text-max-angle", value);
+  }
+
+  /**
+   * The property allows control over a symbol's orientation. Note that the property values act as a hint, so that a symbol whose language doesn’t support the provided orientation will be laid out in its natural orientation. Example: English point symbol will be rendered horizontally even if array value contains single 'vertical' enum value. The order of elements in an array define priority order for the placement of an orientation variant.
+   *
+   * @param value a String[] value
+   * @return property wrapper around String[]
+   */
+  public static PropertyValue<String[]> textWritingMode(String[] value) {
+    return new LayoutPropertyValue<>("text-writing-mode", value);
+  }
+
+  /**
+   * The property allows control over a symbol's orientation. Note that the property values act as a hint, so that a symbol whose language doesn’t support the provided orientation will be laid out in its natural orientation. Example: English point symbol will be rendered horizontally even if array value contains single 'vertical' enum value. The order of elements in an array define priority order for the placement of an orientation variant.
+   *
+   * @param value a String[] value
+   * @return property wrapper around String[]
+   */
+  public static PropertyValue<Expression> textWritingMode(Expression value) {
+    return new LayoutPropertyValue<>("text-writing-mode", value);
   }
 
   /**
@@ -2456,7 +2476,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
+   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up. If used with text-variable-anchor, input values will be taken as absolute values. Offsets along the x- and y-axis will be applied automatically based on the anchor position.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
@@ -2466,7 +2486,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up.
+   * Offset distance of text from its anchor. Positive values indicate right and down, while negative values indicate left and up. If used with text-variable-anchor, input values will be taken as absolute values. Offsets along the x- and y-axis will be applied automatically based on the anchor position.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]

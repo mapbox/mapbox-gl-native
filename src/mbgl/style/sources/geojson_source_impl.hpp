@@ -26,7 +26,7 @@ public:
 
 class GeoJSONSource::Impl : public Source::Impl {
 public:
-    Impl(std::string id, GeoJSONOptions);
+    Impl(std::string id, optional<GeoJSONOptions>);
     Impl(const GeoJSONSource::Impl&, const GeoJSON&);
     ~Impl() final;
 

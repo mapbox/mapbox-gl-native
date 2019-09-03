@@ -102,6 +102,10 @@ final class LocationCameraController {
                      long transitionDuration,
                      @Nullable Double zoom, @Nullable Double bearing, @Nullable Double tilt,
                      @Nullable OnLocationCameraTransitionListener internalTransitionListener) {
+    if (this.cameraMode == cameraMode) {
+      return;
+    }
+
     final boolean wasTracking = isLocationTracking();
     this.cameraMode = cameraMode;
 

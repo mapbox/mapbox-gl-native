@@ -54,9 +54,9 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
             const float yMin = std::min({tl.y, tr.y, bl.y, br.y});
             const float yMax = std::max({tl.y, tr.y, bl.y, br.y});
             
-            boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, xMin, yMin, xMax, yMax);
+            boxes.emplace_back(anchor.point, xMin, yMin, xMax, yMax);
         } else {
-            boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2);
+            boxes.emplace_back(anchor.point, x1, y1, x2, y2);
         }
     }
 }
@@ -155,7 +155,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             0 :
             (boxDistanceToAnchor - firstBoxOffset) * 0.8;
 
-        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance, boxSize / 2);
+        boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance);
     }
 }
 

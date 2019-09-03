@@ -15,9 +15,14 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+
 inline const style::CircleLayer::Impl& impl(const Immutable<style::Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == CircleLayer::Impl::staticTypeInfo());
     return static_cast<const style::CircleLayer::Impl&>(*impl);
 }
+
+} // namespace
 
 RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
     : RenderLayer(makeMutable<CircleLayerProperties>(std::move(_impl))),
@@ -167,7 +172,7 @@ bool RenderCircleLayer::queryIntersectsFeature(
         projectQueryGeometry(translatedQueryGeometry, posMatrix, transformState.getSize());
     auto transformedSize = alignWithMap ? size * pixelsToTileUnits : size;
 
-    auto geometry = feature.getGeometries();
+    const auto& geometry = feature.getGeometries();
     for (auto& ring : geometry) {
         for (auto& point : ring) {
             const GeometryCoordinate& transformedPoint = alignWithMap ? point : projectPoint(point, posMatrix, transformState.getSize());

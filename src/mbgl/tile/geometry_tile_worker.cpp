@@ -117,10 +117,11 @@ GeometryTileWorker::~GeometryTileWorker() = default;
    completed parse.
 */
 
-void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, uint64_t correlationID_) {
+void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, bool resetLayers_, uint64_t correlationID_) {
     try {
         data = std::move(data_);
         correlationID = correlationID_;
+        if (resetLayers_) layers = nullopt;
 
         switch (state) {
         case Idle:
@@ -382,7 +383,7 @@ void GeometryTileWorker::parse() {
                 if (!filter(expression::EvaluationContext { static_cast<float>(this->id.overscaledZ), feature.get() }))
                     continue;
 
-                GeometryCollection geometries = feature->getGeometries();
+                const GeometryCollection& geometries = feature->getGeometries();
                 bucket->addFeature(*feature, geometries, {}, PatternLayerMap ());
                 featureIndex->insert(geometries, i, sourceLayerID, leaderImpl.id);
             }

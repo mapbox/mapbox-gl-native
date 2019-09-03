@@ -67,6 +67,7 @@ public final class UiSettings {
   private boolean flingVelocityAnimationEnabled = true;
 
   private boolean increaseRotateThresholdWhenScaling = true;
+  private boolean disableRotateWhenScaling = true;
   private boolean increaseScaleThresholdWhenRotating = true;
 
   private float zoomRate = 1.0f;
@@ -132,6 +133,7 @@ public final class UiSettings {
     outState.putBoolean(MapboxConstants.STATE_ROTATE_ANIMATION_ENABLED, isRotateVelocityAnimationEnabled());
     outState.putBoolean(MapboxConstants.STATE_FLING_ANIMATION_ENABLED, isFlingVelocityAnimationEnabled());
     outState.putBoolean(MapboxConstants.STATE_INCREASE_ROTATE_THRESHOLD, isIncreaseRotateThresholdWhenScaling());
+    outState.putBoolean(MapboxConstants.STATE_DISABLE_ROTATE_WHEN_SCALING, isDisableRotateWhenScaling());
     outState.putBoolean(MapboxConstants.STATE_INCREASE_SCALE_THRESHOLD, isIncreaseScaleThresholdWhenRotating());
     outState.putBoolean(MapboxConstants.STATE_QUICK_ZOOM_ENABLED, isQuickZoomGesturesEnabled());
     outState.putFloat(MapboxConstants.STATE_ZOOM_RATE, getZoomRate());
@@ -148,6 +150,7 @@ public final class UiSettings {
     setFlingVelocityAnimationEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_FLING_ANIMATION_ENABLED));
     setIncreaseRotateThresholdWhenScaling(
       savedInstanceState.getBoolean(MapboxConstants.STATE_INCREASE_ROTATE_THRESHOLD));
+    setDisableRotateWhenScaling(savedInstanceState.getBoolean(MapboxConstants.STATE_DISABLE_ROTATE_WHEN_SCALING));
     setIncreaseScaleThresholdWhenRotating(
       savedInstanceState.getBoolean(MapboxConstants.STATE_INCREASE_SCALE_THRESHOLD));
     setQuickZoomGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_QUICK_ZOOM_ENABLED));
@@ -919,7 +922,9 @@ public final class UiSettings {
    * Returns whether rotation threshold should be increase whenever scale is detected.
    *
    * @return If true, rotation threshold will be increased.
+   * @deprecated unused, see {@link #isDisableRotateWhenScaling()} instead
    */
+  @Deprecated
   public boolean isIncreaseRotateThresholdWhenScaling() {
     return increaseRotateThresholdWhenScaling;
   }
@@ -928,9 +933,29 @@ public final class UiSettings {
    * Set whether rotation threshold should be increase whenever scale is detected.
    *
    * @param increaseRotateThresholdWhenScaling If true, rotation threshold will be increased.
+   * @deprecated unused, see {@link #setDisableRotateWhenScaling(boolean)} instead
    */
+  @Deprecated
   public void setIncreaseRotateThresholdWhenScaling(boolean increaseRotateThresholdWhenScaling) {
     this.increaseRotateThresholdWhenScaling = increaseRotateThresholdWhenScaling;
+  }
+
+  /**
+   * Returns whether rotation gesture detector is disabled when scale is detected first.
+   *
+   * @return If true, rotation gesture detector will be disabled when scale is detected first.
+   */
+  public boolean isDisableRotateWhenScaling() {
+    return disableRotateWhenScaling;
+  }
+
+  /**
+   * Set whether rotation gesture detector should be disabled when scale is detected first.
+   *
+   * @param disableRotateWhenScaling If true, rotation gesture detector will be disabled when scale is detected first.
+   */
+  public void setDisableRotateWhenScaling(boolean disableRotateWhenScaling) {
+    this.disableRotateWhenScaling = disableRotateWhenScaling;
   }
 
   /**

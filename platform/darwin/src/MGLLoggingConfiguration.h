@@ -16,33 +16,38 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef NS_ENUM(NSInteger, MGLLoggingLevel) {
     /**
-     None-level messages are ignored.
+     None-level won't print any messages.
      */
     MGLLoggingLevelNone = 0,
-    /**
-     Info-level messages contain information that may be helpful for flow tracing
-     but is not essential.
-     */
-    MGLLoggingLevelInfo,
-#if MGL_LOGGING_ENABLE_DEBUG
-    /**
-     Debug-level messages contain information that may be helpful for troubleshooting
-     specific problems.
-     */
-    MGLLoggingLevelDebug,
-#endif
-    /**
-     Error-level messages contain information that is intended to aid in process-level
-     errors.
-     */
-    MGLLoggingLevelError,
     /**
      Fault-level messages contain system-level error information.
      */
     MGLLoggingLevelFault,
     /**
-     :nodoc: Any new logging level should be included in the default logging implementation.
+     Error-level messages contain information that is intended to aid in process-level
+     errors.
+    */
+    MGLLoggingLevelError,
+    /**
+     Warning-level messages contain warning information for potential risks.
      */
+    MGLLoggingLevelWarning,
+    /**
+     Info-level messages contain information that may be helpful for flow tracing
+     but is not essential.
+     */
+    MGLLoggingLevelInfo,
+    /**
+     Debug-level messages contain information that may be helpful for troubleshooting
+     specific problems.
+     */
+#if MGL_LOGGING_ENABLE_DEBUG
+    MGLLoggingLevelDebug,
+#endif
+    /**
+     Verbose-level will print all messages.
+     */
+    MGLLoggingLevelVerbose,
 };
 
 /**

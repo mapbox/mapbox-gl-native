@@ -19,38 +19,38 @@
 NS_ASSUME_NONNULL_BEGIN
 
 <% for (const property of layoutProperties) { -%>
-<% if (property.type == "enum") { -%>
+<% if (definesEnum(property, layoutProperties)) { -%>
 /**
-<%- propertyDoc(property.name, property, type, 'enum').wrap(80, 1) %>
+<%- propertyDoc(enumName(property), property, type, 'enum').wrap(80, 1) %>
 
  Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(enumName(property)) %>) {
 <% for (const value in property.values) { -%>
     /**
-<%- propertyDoc(property.name, property.values[value], type, 'enum').wrap(80, 4+1) %>
+<%- propertyDoc(enumName(property), property.values[value], type, 'enum').wrap(80, 4+1) %>
      */
-    MGL<%- camelize(property.name) %><%- camelize(value) %>,
+    MGL<%- camelize(enumName(property)) %><%- camelize(value) %>,
 <% } -%>
 };
 
 <% } -%>
 <% } -%>
 <% for (const property of paintProperties) { -%>
-<% if (property.type == "enum") { -%>
+<% if (definesEnum(property, paintProperties)) { -%>
 /**
-<%- propertyDoc(property.name, property, type, 'enum').wrap(80, 1) %>
+<%- propertyDoc(enumName(property), property, type, 'enum').wrap(80, 1) %>
 
- Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(property.name) %>`
+ Values of this type are used in the `MGL<%- camelize(type) %>StyleLayer.<%- camelizeWithLeadingLowercase(enumName(property)) %>`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
+typedef NS_ENUM(NSUInteger, MGL<%- camelize(enumName(property)) %>) {
 <% for (const value in property.values) { -%>
     /**
-<%- propertyDoc(property.name, property.values[value], type, 'enum').wrap(80, 4+1) %>
+<%- propertyDoc(enumName(property), property.values[value], type, 'enum').wrap(80, 4+1) %>
      */
-    MGL<%- camelize(property.name) %><%- camelize(value) %>,
+    MGL<%- camelize(enumName(property)) %><%- camelize(value) %>,
 <% } -%>
 };
 
@@ -180,17 +180,17 @@ which it is added.
 
 <% for (let property of enumProperties) { -%>
 /**
- Creates a new value object containing the given `MGL<%- camelize(property.name) %>` enumeration.
+ Creates a new value object containing the given `MGL<%- camelize(enumName(property)) %>` enumeration.
 
  @param <%- objCName(property) %> The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGL<%- camelize(property.name) %>:(MGL<%- camelize(property.name) %>)<%- objCName(property) %>;
++ (instancetype)valueWithMGL<%- camelize(enumName(property)) %>:(MGL<%- camelize(enumName(property)) %>)<%- objCName(property) %>;
 
 /**
- The `MGL<%- camelize(property.name) %>` enumeration representation of the value.
+ The `MGL<%- camelize(enumName(property)) %>` enumeration representation of the value.
  */
-@property (readonly) MGL<%- camelize(property.name) %> MGL<%- camelize(property.name) %>Value;
+@property (readonly) MGL<%- camelize(enumName(property)) %> MGL<%- camelize(enumName(property)) %>Value;
 
 <% } -%>
 @end

@@ -4,8 +4,10 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/render_tree.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/tile/vector_tile.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 
 namespace mbgl {
@@ -137,6 +139,46 @@ void RenderTileSource::reduceMemoryUse() {
 
 void RenderTileSource::dumpDebugLogs() const {
     tilePyramid.dumpDebugLogs();
+}
+
+// RenderTileSetSource implementation
+
+RenderTileSetSource::RenderTileSetSource(Immutable<style::Source::Impl> impl_)
+    : RenderTileSource(std::move(impl_)) {
+}
+
+RenderTileSetSource::~RenderTileSetSource() = default;
+
+uint8_t RenderTileSetSource::getMaxZoom() const {
+    return cachedTileset ? cachedTileset->zoomRange.max : util::TERRAIN_RGB_MAXZOOM;
+}
+
+void RenderTileSetSource::update(Immutable<style::Source::Impl> baseImpl_,
+                                const std::vector<Immutable<style::LayerProperties>>& layers,
+                                const bool needsRendering,
+                                const bool needsRelayout,
+                                const TileParameters& parameters) {
+    std::swap(baseImpl, baseImpl_);
+
+    enabled = needsRendering;
+
+    const optional<Tileset>& implTileset = getTileset();
+    // In Continuous mode, keep the existing tiles if the new cachedTileset is not
+    // yet available, thus providing smart style transitions without flickering.
+    // In other modes, allow clearing the tile pyramid first, before the early
+    // return in order to avoid render tests being flaky.
+    bool canUpdateTileset = implTileset || parameters.mode != MapMode::Continuous;
+    if (canUpdateTileset && cachedTileset != implTileset) {
+        cachedTileset = implTileset;
+
+        // TODO: this removes existing buckets, and will cause flickering.
+        // Should instead refresh tile data in place.
+        tilePyramid.clearAll();
+    }
+
+    if (!cachedTileset) return;
+
+    updateInternal(*cachedTileset, layers, needsRendering, needsRelayout, parameters);
 }
 
 } // namespace mbgl

@@ -70,7 +70,7 @@ class DraggableMarkerActivity : AppCompatActivity() {
 
       mapboxMap.setStyle(
         Style.Builder()
-          .fromUrl(Style.MAPBOX_STREETS)
+          .fromUri(Style.MAPBOX_STREETS)
           .withImage(markerImageId, IconFactory.getInstance(this).defaultMarker().bitmap)
           .withSource(source)
           .withLayer(layer)
@@ -104,7 +104,7 @@ class DraggableMarkerActivity : AppCompatActivity() {
       }
 
       draggableSymbolsManager = DraggableSymbolsManager(
-        mapView, mapboxMap, featureCollection, source, layerId, 0, actionBarHeight)
+        mapView, mapboxMap, featureCollection, source, layerId, actionBarHeight, 0)
 
       // Adding symbol drag listeners
       draggableSymbolsManager?.addOnSymbolDragListener(object : DraggableSymbolsManager.OnSymbolDragListener {

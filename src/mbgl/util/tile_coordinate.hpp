@@ -13,6 +13,7 @@ using TileCoordinatePoint = Point<double>;
 
 // Has floating point x/y coordinates.
 // Used for computing the tiles that need to be visible in the viewport.
+// In mapbox-gl-js, this is named MercatorCoordinate.
 class TileCoordinate {
 public:
     TileCoordinatePoint p;
@@ -23,8 +24,8 @@ public:
         return { Projection::project(latLng, scale) / util::tileSize, zoom };
     }
 
-    static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& screenCoordinate) {
-        return fromLatLng(zoom, state.screenCoordinateToLatLng(screenCoordinate));
+    static TileCoordinate fromScreenCoordinate(const TransformState& state, uint8_t zoom, const ScreenCoordinate& screenCoordinate) {
+        return state.screenCoordinateToTileCoordinate(screenCoordinate, zoom);
     }
 
     TileCoordinate zoomTo(double zoom) const {

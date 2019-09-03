@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.activity.location
 
 import android.annotation.SuppressLint
-import android.app.Fragment
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
@@ -30,9 +30,9 @@ class LocationFragmentActivity : AppCompatActivity() {
     setContentView(R.layout.activity_location_layer_fragment)
 
     fab.setOnClickListener {
-      val fragment = fragmentManager.findFragmentByTag(EmptyFragment.TAG)
+      val fragment = supportFragmentManager.findFragmentByTag(EmptyFragment.TAG)
       if (fragment == null) {
-        fragmentManager
+        supportFragmentManager
           .beginTransaction()
           .replace(R.id.container, EmptyFragment.newInstance(), EmptyFragment.TAG)
           .addToBackStack("transaction2")
@@ -45,7 +45,7 @@ class LocationFragmentActivity : AppCompatActivity() {
 
     if (PermissionsManager.areLocationPermissionsGranted(this)) {
       if (savedInstanceState == null) {
-        fragmentManager
+        supportFragmentManager
           .beginTransaction()
           .replace(R.id.container, LocationFragment.newInstance(), LocationFragment.TAG)
           .commit()
@@ -60,7 +60,7 @@ class LocationFragmentActivity : AppCompatActivity() {
         override fun onPermissionResult(granted: Boolean) {
           if (granted) {
             if (savedInstanceState == null) {
-              fragmentManager
+              supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.container, LocationFragment.newInstance(), LocationFragment.TAG)
                 .commit()
@@ -96,7 +96,8 @@ class LocationFragmentActivity : AppCompatActivity() {
     }
 
     @SuppressLint("MissingPermission")
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+      super.onViewCreated(view, savedInstanceState)
       mapView.onCreate(savedInstanceState)
       mapView.getMapAsync {
         mapboxMap = it
@@ -104,9 +105,9 @@ class LocationFragmentActivity : AppCompatActivity() {
           val component = mapboxMap.locationComponent
 
           component.activateLocationComponent(LocationComponentActivationOptions
-                  .builder(activity, style)
-                  .useDefaultLocationEngine(true)
-                  .build())
+            .builder(activity!!, style)
+            .useDefaultLocationEngine(true)
+            .build())
 
           component.isLocationComponentEnabled = true
           component.locationEngine?.getLastLocation(this)
@@ -166,8 +167,8 @@ class LocationFragmentActivity : AppCompatActivity() {
       }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
-      val textView = TextView(inflater?.context)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+      val textView = TextView(inflater.context)
       textView.text = "This is an empty Fragment"
       return textView
     }

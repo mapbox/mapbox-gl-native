@@ -58,7 +58,7 @@ FeatureIdentifier AnnotationTileFeature::getID() const {
     return data->id;
 }
 
-GeometryCollection AnnotationTileFeature::getGeometries() const {
+const GeometryCollection& AnnotationTileFeature::getGeometries() const {
     return data->geometries;
 }
 

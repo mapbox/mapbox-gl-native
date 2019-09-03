@@ -274,9 +274,6 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     // Reserve size for filteredLayersForSource if there are sources.
     if (!sourceImpls->empty()) {
         filteredLayersForSource.reserve(layerImpls->size());
-        if (filteredLayersForSource.capacity() > layerImpls->size()) {
-            filteredLayersForSource.shrink_to_fit();
-        }
     }
 
     // Update all sources and initialize renderItems.
@@ -349,9 +346,11 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         if (renderLayer.needsPlacement()) {
             layersNeedPlacement.emplace_back(renderLayer);
         }
-        if (renderLayer.is3D() && renderTreeParameters->opaquePassCutOff == 0) {
+        if (renderTreeParameters->opaquePassCutOff == 0) {
             --opaquePassCutOffEstimation;
-            renderTreeParameters->opaquePassCutOff = uint32_t(opaquePassCutOffEstimation);
+            if (renderLayer.is3D()) {
+                renderTreeParameters->opaquePassCutOff = uint32_t(opaquePassCutOffEstimation);
+            }
         }
     }
     // Symbol placement.
@@ -362,9 +361,9 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
 
         bool symbolBucketsChanged = false;
-        const bool placementChanged = !placement->stillRecent(updateParameters.timePoint);
+        renderTreeParameters->placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom());
         std::set<std::string> usedSymbolLayers;
-        if (placementChanged) {
+        if (renderTreeParameters->placementChanged) {
             placement = std::make_unique<Placement>(
                 updateParameters.transformState, updateParameters.mode,
                 updateParameters.transitionOptions, updateParameters.crossSourceCollisions,
@@ -375,14 +374,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             const RenderLayer& layer = *it;
             if (crossTileSymbolIndex.addLayer(layer, updateParameters.transformState.getLatLng().longitude())) symbolBucketsChanged = true;
 
-            if (placementChanged) {
+            if (renderTreeParameters->placementChanged) {
                 usedSymbolLayers.insert(layer.getID());
                 placement->placeLayer(layer, renderTreeParameters->transformParams.projMatrix, updateParameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
-        if (placementChanged) {
-            placement->commit(updateParameters.timePoint);
+        if (renderTreeParameters->placementChanged) {
+            placement->commit(updateParameters.timePoint, updateParameters.transformState.getZoom());
             crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
             for (const auto& entry : renderSources) {
                 entry.second->updateFadingTiles();
@@ -392,7 +391,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
 
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            placement->updateLayerBuckets(*it, updateParameters.transformState, placementChanged || symbolBucketsChanged);
+            placement->updateLayerBuckets(*it, updateParameters.transformState, renderTreeParameters->placementChanged || symbolBucketsChanged);
         }
 
         renderTreeParameters->symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
@@ -485,7 +484,12 @@ void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, st
 
 std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options, const std::unordered_map<std::string, const RenderLayer*>& layers) const {
     std::unordered_set<std::string> sourceIDs;
+    std::unordered_map<std::string, const RenderLayer*> filteredLayers;
     for (const auto& pair : layers) {
+        if (!pair.second->needsRendering() || !pair.second->supportsZoom(zoomHistory.lastZoom)) {
+            continue;
+        }
+        filteredLayers.emplace(pair);
         sourceIDs.emplace(pair.second->baseImpl->source);
     }
 
@@ -495,12 +499,12 @@ std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineS
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
     for (const auto& sourceID : sourceIDs) {
         if (RenderSource* renderSource = getRenderSource(sourceID)) {
-            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
+            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, filteredLayers, options, projMatrix);
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
     
-    queryRenderedSymbols(resultsByLayer, geometry, layers, options);
+    queryRenderedSymbols(resultsByLayer, geometry, filteredLayers, options);
 
     std::vector<Feature> result;
 
@@ -509,11 +513,7 @@ std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineS
     }
 
     // Combine all results based on the style layer renderItems.
-    for (const auto& pair : layers) {
-        if (!pair.second->needsRendering() || !pair.second->supportsZoom(zoomHistory.lastZoom)) {
-            continue;
-        }
-
+    for (const auto& pair : filteredLayers) {
         auto it = resultsByLayer.find(pair.second->baseImpl->id);
         if (it != resultsByLayer.end()) {
             std::move(it->second.begin(), it->second.end(), std::back_inserter(result));
@@ -558,6 +558,7 @@ FeatureExtensionValue RenderOrchestrator::queryFeatureExtensions(const std::stri
 }
 
 void RenderOrchestrator::reduceMemoryUse() {
+    filteredLayersForSource.shrink_to_fit();
     for (const auto& entry : renderSources) {
         entry.second->reduceMemoryUse();
     }

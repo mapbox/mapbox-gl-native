@@ -94,7 +94,7 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
             const uint8_t maxZ = impl().getZoomRange().max;
             for (const auto& pair : tilePyramid.getTiles()) {
                 if (pair.first.canonical.z <= maxZ) {
-                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data_->getTile(pair.first.canonical));
+                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data_->getTile(pair.first.canonical), needsRelayout);
                 }
             }
         }

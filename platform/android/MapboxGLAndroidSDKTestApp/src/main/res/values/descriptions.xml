@@ -69,6 +69,7 @@
     <string name="description_textureview_transparent">Enable a transparent surface on TextureView</string>
     <string name="description_overlay">Blend an overlay on a map</string>
     <string name="description_grid_source">Example Custom Geometry Source</string>
+    <string name="description_no_style">Load a map without providing a style URI or JSON</string>
     <string name="description_local_glyph">Suzhou using Droid Sans for Chinese glyphs</string>
     <string name="description_hillshade">Example raster-dem source and hillshade layer</string>
     <string name="description_heatmaplayer">Use HeatmapLayer to visualise earthquakes</string>

@@ -29,17 +29,21 @@ public:
 
     // Camera
     /** Returns the current camera options. */
-    CameraOptions getCameraOptions(const EdgeInsets&) const;
+    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
 
     /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);
     /** Asynchronously transitions all specified camera options linearly along
-        an optional time curve. */
+        an optional time curve. However, center coordinate is not transitioned
+        linearly as, instead, ground speed is kept linear.*/
     void easeTo(const CameraOptions&, const AnimationOptions& = {});
     /** Asynchronously zooms out, pans, and zooms back into the given camera
         along a great circle, as though the viewer is riding a supersonic
-        jetcopter. */
-    void flyTo(const CameraOptions&, const AnimationOptions& = {});
+        jetcopter.
+        Parameter linearZoomInterpolation: when true, there is no additional
+        zooming out as zoom is linearly interpolated from current to given
+        camera zoom. This is used for easeTo.*/
+    void flyTo(const CameraOptions&, const AnimationOptions& = {}, bool linearZoomInterpolation = false);
 
     // Position
 
@@ -114,6 +118,9 @@ private:
                          const AnimationOptions&,
                          std::function<void(double)>,
                          const Duration&);
+
+    // We don't want to show horizon: limit max pitch based on edge insets.
+    double getMaxPitchForEdgeInsets(const EdgeInsets &insets) const;
 
     TimePoint transitionStart;
     Duration transitionDuration;

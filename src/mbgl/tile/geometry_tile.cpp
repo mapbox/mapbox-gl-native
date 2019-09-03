@@ -176,13 +176,13 @@ void GeometryTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
+void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_, bool resetLayers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     pending = true;
 
     ++correlationID;
-    worker.self().invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
+    worker.self().invoke(&GeometryTileWorker::setData, std::move(data_), resetLayers, correlationID);
 }
 
 std::unique_ptr<TileRenderData> GeometryTile::createRenderData() {
@@ -360,7 +360,7 @@ void GeometryTile::querySourceFeatures(
                     continue;
                 }
 
-                result.push_back(convertFeature(*feature, id.canonical));
+                result.emplace_back(convertFeature(*feature, id.canonical));
             }
         }
     }

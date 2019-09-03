@@ -20,10 +20,9 @@ TEST(getIconQuads, normal) {
     auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -6.5f, -4.5f }}, SymbolAnchorType::Center, 0);
 
     GeometryCoordinates line;
-    Shaping shapedText;
 
     SymbolQuad quad =
-        getIconQuad(shapedIcon, layout, 16.0f, shapedText);
+        getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
     EXPECT_EQ(quad.tl.x, -14);
     EXPECT_EQ(quad.tl.y, -10);
@@ -42,8 +41,6 @@ TEST(getIconQuads, style) {
         style::Image::Impl("test", PremultipliedImage({1,1}), 1.0)
     };
 
-    auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
-
     GeometryCoordinates line;
     Shaping shapedText;
     shapedText.top = -10.0f;
@@ -54,9 +51,10 @@ TEST(getIconQuads, style) {
 
     // none
     {
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
         SymbolLayoutProperties::Evaluated layout;
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
         EXPECT_EQ(quad.tl.x, -19.5);
         EXPECT_EQ(quad.tl.y, -19.5);
@@ -73,16 +71,18 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties::Evaluated layout;
         layout.get<TextSize>() = 24.0f;
         layout.get<IconTextFit>() = IconTextFitType::Width;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 24.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 24.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
-        EXPECT_EQ(quad.tl.x, -60);
+        EXPECT_EQ(quad.tl.x, -61);
         EXPECT_EQ(quad.tl.y, 0);
-        EXPECT_EQ(quad.tr.x, 20);
+        EXPECT_EQ(quad.tr.x, 21);
         EXPECT_EQ(quad.tr.y, 0);
-        EXPECT_EQ(quad.bl.x, -60);
+        EXPECT_EQ(quad.bl.x, -61);
         EXPECT_EQ(quad.bl.y, 20);
-        EXPECT_EQ(quad.br.x, 20);
+        EXPECT_EQ(quad.br.x, 21);
         EXPECT_EQ(quad.br.y, 20);
     }
 
@@ -91,16 +91,18 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties::Evaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Width;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 12.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
-        EXPECT_EQ(quad.tl.x, -30);
+        EXPECT_EQ(quad.tl.x, -31);
         EXPECT_EQ(quad.tl.y, -5);
-        EXPECT_EQ(quad.tr.x, 10);
+        EXPECT_EQ(quad.tr.x, 11);
         EXPECT_EQ(quad.tr.y, -5);
-        EXPECT_EQ(quad.bl.x, -30);
+        EXPECT_EQ(quad.bl.x, -31);
         EXPECT_EQ(quad.bl.y, 15);
-        EXPECT_EQ(quad.br.x, 10);
+        EXPECT_EQ(quad.br.x, 11);
         EXPECT_EQ(quad.br.y, 15);
     }
 
@@ -113,16 +115,18 @@ TEST(getIconQuads, style) {
         layout.get<IconTextFitPadding>()[1] = 10.0f;
         layout.get<IconTextFitPadding>()[2] = 5.0f;
         layout.get<IconTextFitPadding>()[3] = 10.0f;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 12.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
-        EXPECT_EQ(quad.tl.x, -40);
+        EXPECT_EQ(quad.tl.x, -41);
         EXPECT_EQ(quad.tl.y, -10);
-        EXPECT_EQ(quad.tr.x, 20);
+        EXPECT_EQ(quad.tr.x, 21);
         EXPECT_EQ(quad.tr.y, -10);
-        EXPECT_EQ(quad.bl.x, -40);
+        EXPECT_EQ(quad.bl.x, -41);
         EXPECT_EQ(quad.bl.y, 20);
-        EXPECT_EQ(quad.br.x, 20);
+        EXPECT_EQ(quad.br.x, 21);
         EXPECT_EQ(quad.br.y, 20);
     }
 
@@ -131,17 +135,19 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties::Evaluated layout;
         layout.get<TextSize>() = 24.0f;
         layout.get<IconTextFit>() = IconTextFitType::Height;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 24.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 24.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
         EXPECT_EQ(quad.tl.x, -30);
-        EXPECT_EQ(quad.tl.y, -10);
+        EXPECT_EQ(quad.tl.y, -11);
         EXPECT_EQ(quad.tr.x, -10);
-        EXPECT_EQ(quad.tr.y, -10);
+        EXPECT_EQ(quad.tr.y, -11);
         EXPECT_EQ(quad.bl.x, -30);
-        EXPECT_EQ(quad.bl.y, 30);
+        EXPECT_EQ(quad.bl.y, 31);
         EXPECT_EQ(quad.br.x, -10);
-        EXPECT_EQ(quad.br.y, 30);
+        EXPECT_EQ(quad.br.y, 31);
     }
 
     // height x textSize
@@ -149,17 +155,19 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties::Evaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Height;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 12.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
         EXPECT_EQ(quad.tl.x, -20);
-        EXPECT_EQ(quad.tl.y, -5);
+        EXPECT_EQ(quad.tl.y, -6);
         EXPECT_EQ(quad.tr.x, 0);
-        EXPECT_EQ(quad.tr.y, -5);
+        EXPECT_EQ(quad.tr.y, -6);
         EXPECT_EQ(quad.bl.x, -20);
-        EXPECT_EQ(quad.bl.y, 15);
+        EXPECT_EQ(quad.bl.y, 16);
         EXPECT_EQ(quad.br.x, 0);
-        EXPECT_EQ(quad.br.y, 15);
+        EXPECT_EQ(quad.br.y, 16);
     }
 
     // height x textSize + padding
@@ -171,17 +179,19 @@ TEST(getIconQuads, style) {
         layout.get<IconTextFitPadding>()[1] = 10.0f;
         layout.get<IconTextFitPadding>()[2] = 5.0f;
         layout.get<IconTextFitPadding>()[3] = 10.0f;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 12.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
         EXPECT_EQ(quad.tl.x, -30);
-        EXPECT_EQ(quad.tl.y, -10);
+        EXPECT_EQ(quad.tl.y, -11);
         EXPECT_EQ(quad.tr.x, 10);
-        EXPECT_EQ(quad.tr.y, -10);
+        EXPECT_EQ(quad.tr.y, -11);
         EXPECT_EQ(quad.bl.x, -30);
-        EXPECT_EQ(quad.bl.y, 20);
+        EXPECT_EQ(quad.bl.y, 21);
         EXPECT_EQ(quad.br.x, 10);
-        EXPECT_EQ(quad.br.y, 20);
+        EXPECT_EQ(quad.br.y, 21);
     }
 
     // both
@@ -189,17 +199,19 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties::Evaluated layout;
         layout.get<TextSize>() = 24.0f;
         layout.get<IconTextFit>() = IconTextFitType::Both;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 24.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 24.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
-        EXPECT_EQ(quad.tl.x, -60);
-        EXPECT_EQ(quad.tl.y, -10);
-        EXPECT_EQ(quad.tr.x, 20);
-        EXPECT_EQ(quad.tr.y, -10);
-        EXPECT_EQ(quad.bl.x, -60);
-        EXPECT_EQ(quad.bl.y, 30);
-        EXPECT_EQ(quad.br.x, 20);
-        EXPECT_EQ(quad.br.y, 30);
+        EXPECT_EQ(quad.tl.x, -61);
+        EXPECT_EQ(quad.tl.y, -11);
+        EXPECT_EQ(quad.tr.x, 21);
+        EXPECT_EQ(quad.tr.y, -11);
+        EXPECT_EQ(quad.bl.x, -61);
+        EXPECT_EQ(quad.bl.y, 31);
+        EXPECT_EQ(quad.br.x, 21);
+        EXPECT_EQ(quad.br.y, 31);
     }
 
     // both x textSize
@@ -207,17 +219,19 @@ TEST(getIconQuads, style) {
         SymbolLayoutProperties::Evaluated layout;
         layout.get<TextSize>() = 12.0f;
         layout.get<IconTextFit>() = IconTextFitType::Both;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 12.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
-        EXPECT_EQ(quad.tl.x, -30);
-        EXPECT_EQ(quad.tl.y, -5);
-        EXPECT_EQ(quad.tr.x, 10);
-        EXPECT_EQ(quad.tr.y, -5);
-        EXPECT_EQ(quad.bl.x, -30);
-        EXPECT_EQ(quad.bl.y, 15);
-        EXPECT_EQ(quad.br.x, 10);
-        EXPECT_EQ(quad.br.y, 15);
+        EXPECT_EQ(quad.tl.x, -31);
+        EXPECT_EQ(quad.tl.y, -6);
+        EXPECT_EQ(quad.tr.x, 11);
+        EXPECT_EQ(quad.tr.y, -6);
+        EXPECT_EQ(quad.bl.x, -31);
+        EXPECT_EQ(quad.bl.y, 16);
+        EXPECT_EQ(quad.br.x, 11);
+        EXPECT_EQ(quad.br.y, 16);
     }
 
     // both x textSize + padding
@@ -229,17 +243,19 @@ TEST(getIconQuads, style) {
         layout.get<IconTextFitPadding>()[1] = 10.0f;
         layout.get<IconTextFitPadding>()[2] = 5.0f;
         layout.get<IconTextFitPadding>()[3] = 10.0f;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 12.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
-        EXPECT_EQ(quad.tl.x, -40);
-        EXPECT_EQ(quad.tl.y, -10);
-        EXPECT_EQ(quad.tr.x, 20);
-        EXPECT_EQ(quad.tr.y, -10);
-        EXPECT_EQ(quad.bl.x, -40);
-        EXPECT_EQ(quad.bl.y, 20);
-        EXPECT_EQ(quad.br.x, 20);
-        EXPECT_EQ(quad.br.y, 20);
+        EXPECT_EQ(quad.tl.x, -41);
+        EXPECT_EQ(quad.tl.y, -11);
+        EXPECT_EQ(quad.tr.x, 21);
+        EXPECT_EQ(quad.tr.y, -11);
+        EXPECT_EQ(quad.bl.x, -41);
+        EXPECT_EQ(quad.bl.y, 21);
+        EXPECT_EQ(quad.br.x, 21);
+        EXPECT_EQ(quad.br.y, 21);
     }
 
     // both x textSize + padding t/r/b/l
@@ -251,17 +267,19 @@ TEST(getIconQuads, style) {
         layout.get<IconTextFitPadding>()[1] = 5.0f;
         layout.get<IconTextFitPadding>()[2] = 10.0f;
         layout.get<IconTextFitPadding>()[3] = 15.0f;
+        auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
+        shapedIcon.fitIconToText(layout, shapedText, 12.0f);
         SymbolQuad quad =
-            getIconQuad(shapedIcon, layout, 12.0f, shapedText);
+            getIconQuad(shapedIcon, WritingModeType::Horizontal);
 
-        EXPECT_EQ(quad.tl.x, -45);
-        EXPECT_EQ(quad.tl.y, -5);
-        EXPECT_EQ(quad.tr.x, 15);
-        EXPECT_EQ(quad.tr.y, -5);
-        EXPECT_EQ(quad.bl.x, -45);
-        EXPECT_EQ(quad.bl.y, 25);
-        EXPECT_EQ(quad.br.x, 15);
-        EXPECT_EQ(quad.br.y, 25);
+        EXPECT_EQ(quad.tl.x, -46);
+        EXPECT_EQ(quad.tl.y, -6);
+        EXPECT_EQ(quad.tr.x, 16);
+        EXPECT_EQ(quad.tr.y, -6);
+        EXPECT_EQ(quad.bl.x, -46);
+        EXPECT_EQ(quad.bl.y, 26);
+        EXPECT_EQ(quad.br.x, 16);
+        EXPECT_EQ(quad.br.y, 26);
     }
 }
 

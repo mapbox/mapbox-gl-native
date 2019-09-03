@@ -18,6 +18,10 @@ namespace java {
 
     jni::jclass* Map::jclass;
     jni::jmethodID* Map::getMethodId;
+    jni::jmethodID* Map::keySetMethodId;
+
+    jni::jclass* Set::jclass;
+    jni::jmethodID* Set::toArrayMethodId;
 
     void registerNatives(JNIEnv& env) {
         ObjectArray::jclass = jni::NewGlobalRef(env, &jni::FindClass(env, "[Ljava/lang/Object;")).release();
@@ -34,6 +38,10 @@ namespace java {
 
         Map::jclass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/util/Map")).release();
         Map::getMethodId = &jni::GetMethodID(env, *Map::jclass, "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+        Map::keySetMethodId = &jni::GetMethodID(env, *Map::jclass, "keySet", "()Ljava/util/Set;");
+
+        Set::jclass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/util/Set")).release();
+        Set::toArrayMethodId = &jni::GetMethodID(env, *Set::jclass, "toArray", "()[Ljava/lang/Object;");
     }
 
 }
