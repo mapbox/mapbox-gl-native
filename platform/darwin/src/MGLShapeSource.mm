@@ -107,17 +107,16 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             NSExpression *exp1 = expArray[0];
             NSExpression *exp2 = expArray[1];
            // convert values into style expressions. IDK how to do this, but ¯\_(ツ)_/¯
-//            auto mbglValue1 = m
-            id jsonObject1 = exp1.mgl_jsonExpressionObject;
-//            auto mbglValue = MGLSt
 
             auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp1, true);
             const auto& mbglExpression1 = &mbglValue.PropertyValue::asExpression().getExpression();
+            auto& sharedExpressionPtr1 = std::make_shared<mbgl::style::expression::Expression>(mbglExpression1);
             auto mbglValue2 = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp2, true);
             const auto& mbglExpression2 = &mbglValue2.PropertyValue::asExpression().getExpression();
-//             No viable conversion from 'pair<typename __unwrap_ref_decay<const Expression *&>::type, typename __unwrap_ref_decay<const Expression *&>::type>' to 'pair<std::shared_ptr<mbgl::style::expression::Expression>, std::shared_ptr<mbgl::style::expression::Expression>>'
+            auto& sharedExpressionPtr2 = std::make_shared<mbgl::style::expression::Expression>(mbglExpression2);
+// 
 //
-            mbgl::style::GeoJSONOptions::ClusterExpression mbglPair = std::make_pair(mbglExpression1, mbglExpression2);
+            mbgl::style::GeoJSONOptions::ClusterExpression mbglPair = std::make_pair(sharedExpressionPtr1, sharedExpressionPtr2);
 
             std::string keyString = std::string([key UTF8String]);
 
