@@ -124,6 +124,15 @@ public final class Transform implements MapView.OnCameraDidChangeListener {
   }
 
   @UiThread
+  public final void moveCamera(@Nullable CameraPosition cameraPosition) {
+    if (isValidCameraPosition(cameraPosition)) {
+      nativeMap.jumpTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.tilt, cameraPosition.bearing,
+        cameraPosition.padding);
+      invalidateCameraPosition();
+    }
+  }
+
+  @UiThread
   final void easeCamera(@NonNull MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
                         @Nullable final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);

@@ -80,6 +80,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private ImageView attrView;
   private ImageView logoView;
 
+  private MapCameraController cameraController;
+
   @Nullable
   private MapGestureDetector mapGestureDetector;
   @Nullable
@@ -169,11 +171,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     AnnotationManager annotationManager = new AnnotationManager(this, annotationsArray, iconManager,
       annotations, markers, polygons, polylines, shapeAnnotations);
     Transform transform = new Transform(this, nativeMapView, cameraDispatcher);
+    cameraController = new MapCameraController(transform);
 
     // MapboxMap
     List<MapboxMap.OnDeveloperAnimationListener> developerAnimationListeners = new ArrayList<>();
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener, cameraDispatcher,
-      developerAnimationListeners);
+      developerAnimationListeners, cameraController);
     mapboxMap.injectAnnotationManager(annotationManager);
 
     // user input
@@ -417,6 +420,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapChangeReceiver.clear();
     mapCallback.onDestroy();
     initialRenderCallback.onDestroy();
+
+    if (cameraController != null) {
+      cameraController.onDestroy();
+    }
 
     if (compassView != null) {
       // avoid leaking context through animator #13742

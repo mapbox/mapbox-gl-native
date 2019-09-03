@@ -61,6 +61,7 @@ public final class MapboxMap {
   private final UiSettings uiSettings;
   private final Projection projection;
   private final Transform transform;
+  private final MapCameraController cameraController;
   private final CameraChangeDispatcher cameraChangeDispatcher;
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
   private final List<Style.OnStyleLoaded> awaitingStyleGetters = new ArrayList<>();
@@ -82,11 +83,13 @@ public final class MapboxMap {
 
   MapboxMap(NativeMap map, Transform transform, UiSettings ui, Projection projection,
             OnGesturesManagerInteractionListener listener, CameraChangeDispatcher cameraChangeDispatcher,
-            List<OnDeveloperAnimationListener> developerAnimationStartedListeners) {
+            List<OnDeveloperAnimationListener> developerAnimationStartedListeners,
+            MapCameraController cameraController) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.projection = projection;
     this.transform = transform;
+    this.cameraController = cameraController;
     this.onGesturesManagerInteractionListener = listener;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
     this.developerAnimationStartedListeners = developerAnimationStartedListeners;
@@ -2387,5 +2390,9 @@ public final class MapboxMap {
     for (OnDeveloperAnimationListener listener : developerAnimationStartedListeners) {
       listener.onDeveloperAnimationStarted();
     }
+  }
+
+  public MapCameraController getCameraController() {
+    return cameraController;
   }
 }
