@@ -86,7 +86,7 @@ public class MapCameraController {
         if (!runningTransitions.isEmpty()) {
           boolean willRun = false;
           for (CameraTransition transition : runningTransitions.values()) {
-            if (transition.startTime <= nextFrameTime) {
+            if (transition.getStartTime() <= nextFrameTime) {
               willRun = true;
               break;
             }
@@ -97,9 +97,9 @@ public class MapCameraController {
 
             TargetCameraTransition targetCameraTransition =
               (TargetCameraTransition) runningTransitions.get(CameraTransition.PROPERTY_CENTER);
-            if (targetCameraTransition != null && targetCameraTransition.startTime <= nextFrameTime) {
-              if (nextFrameTime >= targetCameraTransition.endTime) {
-                builder.target(targetCameraTransition.endValue);
+            if (targetCameraTransition != null && targetCameraTransition.getStartTime() <= nextFrameTime) {
+              if (nextFrameTime >= targetCameraTransition.getEndTime()) {
+                builder.target(targetCameraTransition.getEndValue());
                 targetCameraTransition.setFinishing();
               } else {
                 builder.target(targetCameraTransition.onFrame(nextFrameTime));
@@ -133,7 +133,7 @@ public class MapCameraController {
   }
 
   public void startTransition(final CameraTransition transition) {
-    transition.setStartTime(System.currentTimeMillis() + transition.getDelay());
+    transition.initTime(System.currentTimeMillis());
     switch (transition.getCameraProperty()) {
       case CameraTransition.PROPERTY_CENTER:
         transition.setStartValue(transform.getCameraPosition().target);

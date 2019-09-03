@@ -1,13 +1,15 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.view.animation.Interpolator;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class TargetCameraTransition extends CameraTransition<LatLng> {
 
   private final LatLng latLng = new LatLng();
 
-  public TargetCameraTransition(int type, long delay, long duration, LatLng endValue) {
-    super(type, duration, delay, endValue);
+  public TargetCameraTransition(int type, long delay, long duration, LatLng endValue, Interpolator interpolator) {
+    super(type, duration, delay, endValue, interpolator);
   }
 
   @Override
@@ -16,14 +18,11 @@ public class TargetCameraTransition extends CameraTransition<LatLng> {
   }
 
   @Override
-  LatLng onFrame(double currentTime) {
-    double fraction = (currentTime - startTime) / duration;
-
-    latLng.setLatitude(startValue.getLatitude()
-      + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
-    latLng.setLongitude(startValue.getLongitude()
-      + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
-
+  LatLng getAnimatedValue(double fraction) {
+    latLng.setLatitude(getStartValue().getLatitude()
+      + ((getEndValue().getLatitude() - getStartValue().getLatitude()) * fraction));
+    latLng.setLongitude(getStartValue().getLongitude()
+      + ((getEndValue().getLongitude() - getStartValue().getLongitude()) * fraction));
     return latLng;
   }
 }

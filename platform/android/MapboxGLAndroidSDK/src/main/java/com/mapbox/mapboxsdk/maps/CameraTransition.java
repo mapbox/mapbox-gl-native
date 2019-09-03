@@ -1,6 +1,16 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.support.v4.view.animation.PathInterpolatorCompat;
+import android.view.animation.Interpolator;
+
 public abstract class CameraTransition<T> {
+
+  public static final int TYPE_ANY = 0;
+  public static final int TYPE_GESTURE = 1;
+  public static final int TYPE_LOCATION = 2;
+
+  public static final Interpolator INTERPOLATOR_LINEAR = PathInterpolatorCompat.create(0f, 0f, 1f, 1f);
+  public static final Interpolator INTERPOLATOR_EASING = PathInterpolatorCompat.create(0f, 0f, 0.25f, 1f);
 
   static final int PROPERTY_CENTER = 0;
   static final int PROPERTY_ZOOM = 1;
@@ -9,31 +19,44 @@ public abstract class CameraTransition<T> {
   static final int PROPERTY_ANCHOR = 4;
   static final int PROPERTY_PADDING = 5;
 
-  public static final int TYPE_ANY = 0;
-  public static final int TYPE_GESTURE = 1;
-  public static final int TYPE_LOCATION = 2;
-
   private final int type;
-  T startValue;
-  protected final T endValue;
-  double startTime;
-  protected final double duration;
+
+  private T startValue;
+  private final T endValue;
+
+  private double startTime;
+  private double endTime;
+  private final double duration;
   private final double delay;
-  protected final double endTime;
-  protected boolean canceled;
+
+  private boolean canceled;
   private boolean isFinishing;
 
-  CameraTransition(int type, double duration, double delay, T endValue) {
+  private final Interpolator interpolator;
+
+  CameraTransition(int type, double duration, double delay, T endValue, Interpolator interpolator) {
     this.type = type;
-    this.startTime = System.currentTimeMillis() + delay;
     this.duration = duration;
     this.delay = delay;
-    this.endTime = startTime + duration;
     this.endValue = endValue;
+    this.interpolator = interpolator;
+  }
+
+  void initTime(double currentTime) {
+    this.startTime = currentTime + delay;
+    this.endTime = this.startTime + duration;
+  }
+
+  void setStartValue(T startValue) {
+    this.startValue = startValue;
   }
 
   public int getType() {
     return type;
+  }
+
+  public boolean isCanceled() {
+    return canceled;
   }
 
   public void cancel() {
@@ -41,27 +64,28 @@ public abstract class CameraTransition<T> {
   }
 
   public T getStartValue() {
+    if (startValue == null) {
+      throw new RuntimeException("start or queue the transition first");
+    }
     return startValue;
-  }
-
-  void setStartValue(T startValue) {
-    this.startValue = startValue;
   }
 
   public T getEndValue() {
     return endValue;
   }
 
-  public boolean isCanceled() {
-    return canceled;
-  }
-
   public double getStartTime() {
+    if (startTime <= 0) {
+      throw new RuntimeException("start or queue the transition first");
+    }
     return startTime;
   }
 
-  void setStartTime(double startTime) {
-    this.startTime = startTime;
+  public double getEndTime() {
+    if (endTime <= 0) {
+      throw new RuntimeException("start or queue the transition first");
+    }
+    return endTime;
   }
 
   public double getDuration() {
@@ -72,13 +96,15 @@ public abstract class CameraTransition<T> {
     return delay;
   }
 
-  public double getEndTime() {
-    return endTime;
+  public Interpolator getInterpolator() {
+    return interpolator;
   }
 
-  abstract int getCameraProperty();
-
-  abstract T onFrame(double currentTime);
+  T onFrame(double currentTime) {
+    double animationPosition = (currentTime - startTime) / duration;
+    double fraction = interpolator.getInterpolation((float) animationPosition);
+    return getAnimatedValue(fraction);
+  }
 
   boolean isFinishing() {
     return isFinishing;
@@ -95,4 +121,8 @@ public abstract class CameraTransition<T> {
   void onFinish() {
     // todo camera - notify listeners
   }
+
+  abstract int getCameraProperty();
+
+  abstract T getAnimatedValue(double fraction);
 }
