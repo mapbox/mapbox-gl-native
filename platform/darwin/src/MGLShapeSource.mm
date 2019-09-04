@@ -108,12 +108,16 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             NSExpression *exp2 = expArray[1];
            // convert values into style expressions. IDK how to do this, but ¯\_(ツ)_/¯
 
+            // Static_assert failed due to requirement 'is_constructible<mbgl::style::PropertyExpression<std::__1::basic_string<char> >, const mbgl::style::expression::Expression **>::value' "Can't construct object in make_shared"
             auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp1, true);
-            const auto& mbglExpression1 = &mbglValue.PropertyValue::asExpression().getExpression();
-            auto& sharedExpressionPtr1 = std::make_shared<mbgl::style::expression::Expression>(mbglExpression1);
+            auto mbglExpression1 = &mbglValue.PropertyValue::asExpression().getExpression();
+            const auto sharedExpressionPtr1 = std::make_shared<mbgl::style::PropertyExpression<std::string>>(&mbglExpression1);
+
             auto mbglValue2 = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp2, true);
-            const auto& mbglExpression2 = &mbglValue2.PropertyValue::asExpression().getExpression();
-            auto& sharedExpressionPtr2 = std::make_shared<mbgl::style::expression::Expression>(mbglExpression2);
+            auto& mbglExpression2 = mbglValue2.PropertyValue::asExpression().getExpression();
+
+            const auto sharedExpressionPtr2 = std::make_shared<mbgl::style::PropertyExpression<std::string>>(mbglExpression2);
+
 // 
 //
             mbgl::style::GeoJSONOptions::ClusterExpression mbglPair = std::make_pair(sharedExpressionPtr1, sharedExpressionPtr2);
