@@ -65,10 +65,9 @@
     [scaleImage drawInRect:{CGPointZero, scaleImage.size}];
     
     UIFont *northFont;
-    if(@available(iOS 13, *)){
+    if (@available(iOS 13.0, *)) {
         northFont = [UIFont systemFontOfSize:11 weight:UIFontWeightLight];
-    }
-    else{
+    } else {
         northFont = [UIFont systemFontOfSize:11 weight:UIFontWeightUltraLight];
     }
 
