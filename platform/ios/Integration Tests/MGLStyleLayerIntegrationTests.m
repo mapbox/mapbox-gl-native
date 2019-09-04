@@ -58,4 +58,18 @@
     [self waitForMapViewToBeRenderedWithTimeout:10];
 }
 
+- (void)testForRaisingExceptionsOnStaleStyleObjects {
+    self.mapView.centerCoordinate = CLLocationCoordinate2DMake(38.897,-77.039);
+    self.mapView.zoomLevel = 10.5;
+    
+    MGLVectorTileSource *source = [[MGLVectorTileSource alloc] initWithIdentifier:@"trees" configurationURL:[NSURL URLWithString:@"mapbox://examples.2uf7qges"]];
+    [self.mapView.style addSource:source];
+
+    self.styleLoadingExpectation = nil;
+    [self.mapView setStyleURL:[[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"]];
+    [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
+
+    XCTAssertThrowsSpecificNamed(source.configurationURL, NSException, MGLInvalidStyleSourceException, @"MGLSource should raise an exception if its core peer got invalidated");
+}
+
 @end
