@@ -65,11 +65,13 @@ static const CGFloat MGLRasterTileSourceRetinaTileSize = 512;
 }
 
 - (NSURL *)configurationURL {
+    MGLAssertStyleSourceIsValid();
     auto url = self.rawSource->getURL();
     return url ? [NSURL URLWithString:@(url->c_str())] : nil;
 }
 
 - (NSString *)attributionHTMLString {
+    MGLAssertStyleSourceIsValid();
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;
 }

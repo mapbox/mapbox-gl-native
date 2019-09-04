@@ -7,6 +7,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/source.hpp>
 
+const MGLExceptionName MGLInvalidStyleSourceException = @"MGLInvalidStyleSourceException";
+
 @interface MGLSource ()
 
 // Even though this class is abstract, MGLStyle uses it to represent some
@@ -65,6 +67,7 @@
 }
 
 - (BOOL)removeFromMapView:(MGLMapView *)mapView error:(NSError * __nullable * __nullable)outError {
+    MGLAssertStyleSourceIsValid();
     BOOL removed = NO;
     
     if (self.rawSource == mapView.style.rawStyle->getSource(self.identifier.UTF8String)) {

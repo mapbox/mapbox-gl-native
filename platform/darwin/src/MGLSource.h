@@ -1,8 +1,11 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLFoundation.h"
+#import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidStyleSourceException;
 
 /**
  `MGLSource` is an abstract base class for map content sources. A map content
