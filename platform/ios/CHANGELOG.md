@@ -9,6 +9,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Fixed an issue where the scale bar text would become illegible if iOS 13 dark mode was enabled. ([#15524](https://github.com/mapbox/mapbox-gl-native/pull/15524))
  * Enable using of `text-offset` option together with `text-variable-anchor` (if `text-radial-offset` option is not provided). If used with `text-variable-anchor`, input values will be taken as absolute values. Offsets along the x- and y-axis will be applied automatically based on the anchor position. ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))
+ * Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
 
  ### Performance improvements
  
