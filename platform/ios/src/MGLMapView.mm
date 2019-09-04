@@ -128,6 +128,9 @@ const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
 /// Distance threshold to stop the camera while animating.
 const CLLocationDistance MGLDistanceThresholdForCameraPause = 500;
 
+/// Rotation threshold while a pinch gesture is occurring.
+static NSString * const MGLRotationThresholdWhileZoomingKey = @"MGLRotationThresholdWhileZooming";
+
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
@@ -1779,6 +1782,9 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
 
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey]) {
+        self.rotationThresholdWhileZooming = [[[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey] floatValue];
+    }
     // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
     if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming && !self.isRotating) {
         self.rotationBeforeThresholdMet += fabs(rotate.rotation);
