@@ -63,6 +63,18 @@ public class MapCameraController {
                     case CameraTransition.PROPERTY_ZOOM:
                       builder.zoom(-1);
                       break;
+
+                    case CameraTransition.PROPERTY_PITCH:
+                      builder.tilt(-1);
+                      break;
+
+                    case CameraTransition.PROPERTY_BEARING:
+                      builder.bearing(-1);
+                      break;
+
+                    case CameraTransition.PROPERTY_PADDING:
+                      builder.padding(null);
+                      break;
                   }
                   finalUpdate = builder.build();
                 }
@@ -113,6 +125,22 @@ public class MapCameraController {
                 case CameraTransition.PROPERTY_ZOOM:
                   builder.zoom((double) value);
                   break;
+
+                case CameraTransition.PROPERTY_PITCH:
+                  builder.tilt((double) value);
+                  break;
+
+                case CameraTransition.PROPERTY_BEARING:
+                  builder.bearing((double) value);
+                  break;
+
+                case CameraTransition.PROPERTY_PADDING:
+                  double[] padding = new double[4];
+                  for (int i = 0; i < 4; i++) {
+                    padding[i] = ((Double[]) value)[i];
+                  }
+                  builder.padding(padding);
+                  break;
               }
             }
           }
@@ -145,8 +173,27 @@ public class MapCameraController {
       case CameraTransition.PROPERTY_CENTER:
         transition.initTime(transform.getCameraPosition().target, time);
         break;
+
       case CameraTransition.PROPERTY_ZOOM:
         transition.initTime(transform.getCameraPosition().zoom, time);
+        break;
+
+      case CameraTransition.PROPERTY_PITCH:
+        transition.initTime(transform.getCameraPosition().tilt, time);
+        break;
+
+      case CameraTransition.PROPERTY_BEARING:
+        transition.initTime(transform.getCameraPosition().bearing, time);
+        break;
+
+      case CameraTransition.PROPERTY_PADDING:
+        double[] padding = transform.getCameraPosition().padding;
+        final Double[] result = new Double[padding.length];
+        for (int i = 0; i < padding.length; i++) {
+          result[i] = Double.valueOf(padding[i]);
+        }
+        transition.initTime(result, time);
+        break;
     }
 
     behavior.animationScheduled(this, transition);
