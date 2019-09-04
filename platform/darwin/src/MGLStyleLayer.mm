@@ -14,13 +14,14 @@ const MGLExceptionName MGLInvalidStyleLayerException = @"MGLInvalidStyleLayerExc
 
 @implementation MGLStyleLayer {
     std::unique_ptr<mbgl::style::Layer> _pendingLayer;
+    mapbox::base::WeakPtr<mbgl::style::Layer> _weakLayer;
 }
 
 - (instancetype)initWithRawLayer:(mbgl::style::Layer *)rawLayer {
     if (self = [super init]) {
         _identifier = @(rawLayer->getID().c_str());
-        _rawLayer = rawLayer;
-        _rawLayer->peer = LayerWrapper { self };
+        _weakLayer = rawLayer->makeWeakPtr();
+        rawLayer->peer = LayerWrapper { self };
     }
     return self;
 }
@@ -30,6 +31,11 @@ const MGLExceptionName MGLInvalidStyleLayerException = @"MGLInvalidStyleLayerExc
         _pendingLayer = std::move(pendingLayer);
     }
     return self;
+}
+
+- (mbgl::style::Layer *)rawLayer
+{
+    return _weakLayer.get();
 }
 
 - (void)addToStyle:(MGLStyle *)style belowLayer:(MGLStyleLayer *)otherLayer
