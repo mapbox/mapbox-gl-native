@@ -63,7 +63,7 @@ class TransformTest {
     transform.moveCamera(mapboxMap, update, null) // Initialize camera position
     transform.moveCamera(mapboxMap, update, callback)
 
-    verify (exactly = 1, verifyBlock = { nativeMapView.jumpTo(any(), any(), any(), any(), any()) })
+    verify(exactly = 1, verifyBlock = { nativeMapView.jumpTo(any(), any(), any(), any(), any()) })
     verify { callback.onFinish() }
   }
 
@@ -102,7 +102,7 @@ class TransformTest {
 
     transform.easeCamera(mapboxMap, update, 100, false, callback)
 
-    verify (exactly = 0, verifyBlock = { nativeMapView.easeTo(any(), any(), any(), any(), any(), any(), any()) })
+    verify(exactly = 0, verifyBlock = { nativeMapView.easeTo(any(), any(), any(), any(), any(), any(), any()) })
     verify { callback.onFinish() }
   }
 
@@ -141,7 +141,7 @@ class TransformTest {
 
     transform.animateCamera(mapboxMap, update, 100, callback)
 
-    verify (exactly = 0, verifyBlock = { nativeMapView.flyTo(any(), any(), any(), any(), any(), any()) })
+    verify(exactly = 0, verifyBlock = { nativeMapView.flyTo(any(), any(), any(), any(), any(), any()) })
     verify { callback.onFinish() }
   }
 
