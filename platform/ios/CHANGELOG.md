@@ -6,13 +6,17 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue that caused the tilt gesture to trigger too easily and conflict with pinch or pan gestures. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
 * Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
-* Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
+* Fixed a rendering issue of `collisionBox` when `MGLSymbolStyleLayer.textTranslate` or `MGLSymbolStyleLayer.iconTranslate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Fixed an issue where the scale bar text would become illegible if iOS 13 dark mode was enabled. ([#15524](https://github.com/mapbox/mapbox-gl-native/pull/15524))
- * Enable using of `text-offset` option together with `text-variable-anchor` (if `text-radial-offset` option is not provided). If used with `text-variable-anchor`, input values will be taken as absolute values. Offsets along the x- and y-axis will be applied automatically based on the anchor position. ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))
+ * Enable use of `MGLSymbolStyleLayer.textOffset` option together with `MGLSymbolStyleLayer.textVariableAnchor` (if `MGLSymbolStyleLayer.textRadialOffset` option is not provided). If used with `MGLSymbolStyleLayer.textVariableAnchor`, input values will be taken as absolute values. Offsets along the x- and y-axis will be applied automatically based on the anchor position. ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))
 
  ### Performance improvements
  
  * Mark used offline region resources in batches. ([#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521))
+
+### User interaction
+
+* Fixed an issue that caused the map to rotate too easily during a pinch gesture. [(#15562)](https://github.com/mapbox/mapbox-gl-native/pull/15562)
 
 ## 5.3.0 - August 28, 2019
 
@@ -26,7 +30,7 @@ This release changes how offline tile requests are billed — they are now bill
 * Enabled variable label placement when `MGLSymbolStyleLayer.textAllowsOverlap` is set to true. ([#15354](https://github.com/mapbox/mapbox-gl-native/pull/15354))
 * Added the `MGLSymbolStyleLayer.textWritingModes` layout property. This property can be set to `MGLTextWritingModeHorizontal` or `MGLTextWritingModeVertical`. ([#14932](https://github.com/mapbox/mapbox-gl-native/pull/14932))
 * Fixed rendering and collision detection issues with using `MGLSymbolStyleLayer.textVariableAnchor` and `MGLSymbolStyleLayer.iconTextFit` properties on the same layer. ([#15367](https://github.com/mapbox/mapbox-gl-native/pull/15367))
-* Fixed symbol overlap when zooming out quickly. ([15416](https://github.com/mapbox/mapbox-gl-native/pull/15416))
+* Fixed symbol overlap when zooming out quickly. ([#15416](https://github.com/mapbox/mapbox-gl-native/pull/15416))
 * Fixed a rendering issue where non-SDF icons would be treated as SDF icons if they are in the same layer. ([#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456))
 
 ### Other changes
