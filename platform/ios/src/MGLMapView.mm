@@ -583,6 +583,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
+    _rotationThresholdWhileZooming = 3;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -1774,106 +1775,6 @@ public:
 {
     if ( ! self.isRotateEnabled) return;
 
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey]) {
-        [self handleRotateGestureRecognizerWithThreshold:rotate];
-    } else {
-        [self cancelTransitions];
-
-        CGPoint centerPoint = [self anchorPointForGesture:rotate];
-        MGLMapCamera *oldCamera = self.camera;
-
-        self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
-
-        if (rotate.state == UIGestureRecognizerStateBegan)
-        {
-            self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
-
-            self.isRotating = YES;
-            if (self.userTrackingMode != MGLUserTrackingModeNone)
-            {
-                self.userTrackingMode = MGLUserTrackingModeFollow;
-            }
-
-            self.shouldTriggerHapticFeedbackForCompass = NO;
-            [self notifyGestureDidBegin];
-        }
-        if (rotate.state == UIGestureRecognizerStateChanged)
-        {
-            CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
-
-            // constrain to +/-30 degrees when merely rotating like Apple does
-            //
-            if ( ! self.isRotationAllowed && std::abs(self.pinch.scale) < 10)
-            {
-                newDegrees = fminf(newDegrees,  30);
-                newDegrees = fmaxf(newDegrees, -30);
-            }
-
-            MGLMapCamera *toCamera = [self cameraByRotatingToDirection:newDegrees aroundAnchorPoint:centerPoint];
-
-            if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
-            {
-               self.mbglMap.jumpTo(mbgl::CameraOptions()
-                                       .withBearing(newDegrees)
-                                       .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
-            }
-
-            [self cameraIsChanging];
-
-            // Trigger a light haptic feedback event when the user rotates to due north.
-            if (@available(iOS 10.0, *))
-            {
-                if (self.isHapticFeedbackEnabled && fabs(newDegrees) <= 1 && self.shouldTriggerHapticFeedbackForCompass)
-                {
-                    UIImpactFeedbackGenerator *hapticFeedback = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
-                    [hapticFeedback impactOccurred];
-
-                    self.shouldTriggerHapticFeedbackForCompass = NO;
-                }
-                else if (fabs(newDegrees) > 1)
-                {
-                    self.shouldTriggerHapticFeedbackForCompass = YES;
-                }
-            }
-        }
-        else if ((rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled))
-        {
-            CGFloat velocity = rotate.velocity;
-            CGFloat decelerationRate = self.decelerationRate;
-            if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
-            {
-                CGFloat radians = self.angle + rotate.rotation;
-                CGFloat newRadians = radians + velocity * decelerationRate * 0.1;
-                CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
-
-                MGLMapCamera *toCamera = [self cameraByRotatingToDirection:newDegrees aroundAnchorPoint:centerPoint];
-
-                if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
-                {
-                    self.mbglMap.easeTo(mbgl::CameraOptions()
-                                           .withBearing(newDegrees)
-                                           .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
-                                        MGLDurationFromTimeInterval(decelerationRate));
-
-                    [self notifyGestureDidEndWithDrift:YES];
-                    __weak MGLMapView *weakSelf = self;
-
-                    [self animateWithDelay:decelerationRate animations:^
-                     {
-                         [weakSelf unrotateIfNeededForGesture];
-                     }];
-                }
-            }
-            else
-            {
-                [self notifyGestureDidEndWithDrift:NO];
-                [self unrotateIfNeededForGesture];
-            }
-        }
-    }
-}
-
-- (void)handleRotateGestureRecognizerWithThreshold:(UIRotationGestureRecognizer *)rotate {
     [self cancelTransitions];
 
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
@@ -1881,8 +1782,9 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
 
-    _rotationThresholdWhileZooming = [[[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey] floatValue];
-
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey]) {
+        self.rotationThresholdWhileZooming = [[[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey] floatValue];
+    }
     // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
     if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming && !self.isRotating) {
         self.rotationBeforeThresholdMet += fabs(rotate.rotation);
