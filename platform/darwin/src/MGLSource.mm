@@ -19,6 +19,7 @@
 
 @implementation MGLSource {
     std::unique_ptr<mbgl::style::Source> _pendingSource;
+    mapbox::base::WeakPtr<mbgl::style::Source> _weakSource;
 }
 
 
@@ -33,11 +34,16 @@
 - (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource mapView:(MGLMapView *)mapView {
     NSString *identifier = @(rawSource->getID().c_str());
     if (self = [self initWithIdentifier:identifier]) {
-        _rawSource = rawSource;
-        _rawSource->peer = SourceWrapper { self };
+        _weakSource = rawSource->makeWeakPtr();
+        rawSource->peer = SourceWrapper { self };
         _mapView = mapView;
     }
     return self;
+}
+
+- (mbgl::style::Source *)rawSource
+{
+    return _weakSource.get();
 }
 
 - (instancetype)initWithPendingSource:(std::unique_ptr<mbgl::style::Source>)pendingSource {
