@@ -128,9 +128,6 @@ const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
 /// Distance threshold to stop the camera while animating.
 const CLLocationDistance MGLDistanceThresholdForCameraPause = 500;
 
-/// Rotation threshold while a pinch gesture is occurring.
-static NSString * const MGLRotationThresholdWhileZoomingKey = @"MGLRotationThresholdWhileZooming";
-
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
@@ -583,7 +580,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
-    _rotationThresholdWhileZooming = 3.5;
+    _rotationThresholdWhileZooming = 3;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
