@@ -41,6 +41,7 @@ void RasterSource::loadDescription(FileSource& fileSource) {
     if (urlOrTileset.is<Tileset>()) {
         baseImpl = makeMutable<Impl>(impl(), urlOrTileset.get<Tileset>());
         loaded = true;
+        observer->onSourceLoaded(*this);
         return;
     }
 

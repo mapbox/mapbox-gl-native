@@ -45,7 +45,16 @@ public:
     const std::string bucketLeaderID;
     std::vector<SymbolInstance> symbolInstances;
 
-    static Point<float> evaluateRadialOffset(style::SymbolAnchorType anchor, float radialOffset);
+    static constexpr float INVALID_OFFSET_VALUE = std::numeric_limits<float>::max();
+    /**
+     * @brief Calculates variable text offset.
+     * 
+     * @param anchor text anchor
+     * @param textOffset Either `text-offset` or [ `text-radial-offset`, INVALID_OFFSET_VALUE ]
+     * @return std::array<float, 2> offset along x- and y- axis correspondingly.
+     */
+    static std::array<float, 2> evaluateVariableOffset(style::SymbolAnchorType anchor, std::array<float, 2> textOffset);
+    
 
 private:
     void addFeature(const size_t,
@@ -53,7 +62,7 @@ private:
                     const ShapedTextOrientations& shapedTextOrientations,
                     optional<PositionedIcon> shapedIcon,
                     const GlyphPositions&,
-                    Point<float> textOffset,
+                    std::array<float, 2> textOffset,
                     const SymbolContent iconType);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
@@ -101,6 +110,7 @@ private:
 
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;
+    style::TextRadialOffset::UnevaluatedType textRadialOffset;
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout;
     std::vector<SymbolFeature> features;
 

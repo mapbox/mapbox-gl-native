@@ -1404,8 +1404,7 @@ MGL_EXPORT
  ems downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textRadialOffset` is set to `nil`, and `textVariableAnchor` is set to `nil`.
- Otherwise, it is ignored.
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1428,8 +1427,7 @@ MGL_EXPORT
  ems upward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textRadialOffset` is set to `nil`, and `textVariableAnchor` is set to `nil`.
- Otherwise, it is ignored.
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1521,8 +1519,8 @@ MGL_EXPORT
 
 /**
  Radial offset of text, in the direction of the symbol's anchor. Useful in
- combination with `textVariableAnchor`, which doesn't support the
- two-dimensional `textOffset`.
+ combination with `textVariableAnchor`, which defaults to using the
+ two-dimensional `textOffset` if present.
  
  This property is measured in ems.
  
@@ -1634,8 +1632,7 @@ MGL_EXPORT
  provide an array of `textAnchor` locations: the render will attempt to place
  the label at each location, in order, before moving onto the next label. Use
  `textJustify: auto` to choose justification based on anchor position. To apply
- an offset, use the `textRadialOffset` instead of the two-dimensional
- `textOffset`.
+ an offset, use the `textRadialOffset` or the two-dimensional `textOffset`.
  
  This property is only applied to the style if `text` is non-`nil`, and
  `symbolPlacement` is set to an expression that evaluates to or

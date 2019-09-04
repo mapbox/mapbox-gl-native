@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Introduce `clusterProperties` option for aggregated cluster properties. [#15425](https://github.com/mapbox/mapbox-gl-native/pull/15425)
  - Expose the `CameraPosition#padding` field and associated utility camera position builders. This gives a choice to set a persisting map padding immediately during a transition instead of setting it lazily `MapboxMap#setPadding`, which required scheduling additional transition to be applied. This also deprecates `MapboxMap#setPadding` as there should be no need for a lazy padding setter. [#15444](https://github.com/mapbox/mapbox-gl-native/pull/15444)
  - Add number-format expression that allows to format a number to a string, with configurations as minimal/maximal fraction and locale/currency. [#15424](https://github.com/mapbox/mapbox-gl-native/pull/15424)
+ - Enable using of `text-offset` option together with `text-variable-anchor` (if `text-radial-offset` option is not provided). If used with `text-variable-anchor`, input values will be taken as absolute values. Offsets along the x- and y-axis will be applied automatically based on the anchor position. [#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542)
 
  ### Performance improvements
  - Mark used offline region resources in batches. [#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521)
