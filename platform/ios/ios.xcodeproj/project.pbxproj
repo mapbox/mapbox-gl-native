@@ -523,6 +523,7 @@
 		CA8FBC0921A47BB100D1203C /* MGLRendererConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CAAA65D92321BBA900F08A39 /* MGLTestAssertionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CAAA65D82321BBA900F08A39 /* MGLTestAssertionHandler.m */; };
 		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		CAD9D0AA22A86D6F001B25EE /* MGLResourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CAD9D0A922A86D6F001B25EE /* MGLResourceTests.mm */; };
 		CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */; };
@@ -1211,6 +1212,8 @@
 		CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
 		CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleURLIntegrationTest.m; sourceTree = "<group>"; };
 		CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRendererConfigurationTests.mm; path = ../../darwin/test/MGLRendererConfigurationTests.mm; sourceTree = "<group>"; };
+		CAAA65D72321BBA900F08A39 /* MGLTestAssertionHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTestAssertionHandler.h; sourceTree = "<group>"; };
+		CAAA65D82321BBA900F08A39 /* MGLTestAssertionHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTestAssertionHandler.m; sourceTree = "<group>"; };
 		CAD9D0A922A86D6F001B25EE /* MGLResourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLResourceTests.mm; path = ../../darwin/test/MGLResourceTests.mm; sourceTree = "<group>"; };
 		CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "integration-Bridging-Header.h"; sourceTree = "<group>"; };
 		CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLMapSnapshotterSwiftTests.swift; sourceTree = "<group>"; };
@@ -1758,6 +1761,8 @@
 				4031ACFE1E9FD29F00A3EA26 /* MGLSDKTestHelpers.swift */,
 				A4DE3DCA23038A7F005B3473 /* MGLMockGestureRecognizers.h */,
 				A4DE3DC823038A07005B3473 /* MGLMockGestureRecognizers.m */,
+				CAAA65D72321BBA900F08A39 /* MGLTestAssertionHandler.h */,
+				CAAA65D82321BBA900F08A39 /* MGLTestAssertionHandler.m */,
 			);
 			name = "Test Helpers";
 			sourceTree = "<group>";
@@ -3264,6 +3269,7 @@
 			files = (
 				A4DE3DCC23038CCA005B3473 /* MGLMockGestureRecognizers.m in Sources */,
 				A4DE3DCB23038C98005B3473 /* MGLMockGestureRecognizers.h in Sources */,
+				CAAA65D92321BBA900F08A39 /* MGLTestAssertionHandler.m in Sources */,
 				6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */,
 				DA2E88631CC0382C00F24E7B /* MGLOfflineRegionTests.m in Sources */,
 				409F43FD1E9E781C0048729D /* MGLMapViewDelegateIntegrationTests.swift in Sources */,

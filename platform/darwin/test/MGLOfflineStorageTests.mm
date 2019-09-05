@@ -1,14 +1,15 @@
 #import <Mapbox/Mapbox.h>
+#import <XCTest/XCTest.h>
 
 #import "MGLOfflineStorage_Private.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
-
-#import <XCTest/XCTest.h>
+#import "MGLTestAssertionHandler.h"
 
 #include <mbgl/util/run_loop.hpp>
 
 #pragma clang diagnostic ignored "-Wshadow"
+
 
 @interface MGLOfflineStorageTests : XCTestCase <MGLOfflineStorageDelegate>
 @end
@@ -310,7 +311,52 @@
     XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks - 1, @"Removed pack should have been removed from the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks or -testAddPack.");
 }
 
-- (void)internalAddPacksForBounds:(dispatch_block_t)block {
+- (void)testRemovePackTwiceInSuccession {
+
+    [self addPackIfNeeded];
+    
+    NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+
+    MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs.lastObject;
+    XCTAssertNotNil(pack, @"Added pack should still exist.");
+
+    [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+        const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
+        NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
+        return changeKind == NSKeyValueChangeRemoval && indices.count == 1;
+    }];
+    
+    XCTestExpectation *completionHandlerExpectation = [self expectationWithDescription:@"remove pack completion handler"];
+
+    [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:nil];
+
+    NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
+    [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+    
+    [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should be invalid in the completion handler.");
+        [completionHandlerExpectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+
+    [[[NSThread currentThread] threadDictionary] setValue:oldHandler forKey:NSAssertionHandlerKey];
+
+    XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should have been invalidated synchronously.");
+
+    XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks - 1, @"Removed pack should have been removed from the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks or -testAddPack.");
+}
+
+- (void)addPackIfNeeded {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"added packs"];
+    
+    [self addPacks:1 completion:^{
+        [expectation fulfill];
+    }];
+    [self waitForExpectations:@[expectation] timeout:1.0];
+}
+
+- (void)addPacks:(NSInteger)count completion:(dispatch_block_t)block {
     NSURL *styleURL = [MGLStyle lightStyleURLWithVersion:8];
         
     MGLCoordinateBounds bounds[] = {
@@ -320,10 +366,15 @@
         {{37.7, -122.5}, {37.9, -122.4}}    // SF
     };
         
-    int count = sizeof(bounds)/sizeof(bounds[0]);
+    int arraySize = sizeof(bounds)/sizeof(bounds[0]);
     
+    count = MIN(count, arraySize);
+    
+    dispatch_group_t group = dispatch_group_create();
     
     for (int i = 0; i < count; i++) {
+        
+        dispatch_group_enter(group);
         MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:styleURL bounds:bounds[i] fromZoomLevel:20 toZoomLevel:20];
         NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{
             @"index": @(i)
@@ -335,91 +386,28 @@
             XCTAssertNotNil(pack);
             XCTAssertNil(error);
             
-            if(block)
-                block();
+            dispatch_group_leave(group);
         }];
+    }
+    
+    if (block) {
+        dispatch_group_notify(group, dispatch_get_main_queue(), block);
     }
 }
 
-
-- (void)testRemovePacks1 {
+// Test to explore https://github.com/mapbox/mapbox-gl-native/issues/15536
+- (void)testRemovePacksOnBackgroundQueueWhileReloading {
     NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
 
     if (countOfPacks < 4) {
         XCTestExpectation *expectation = [self expectationWithDescription:@"added packs"];
-        expectation.expectedFulfillmentCount = 4;
 
-        [self internalAddPacksForBounds:^{
+        [self addPacks:4 completion:^{
             [expectation fulfill];
         }];
         [self waitForExpectations:@[expectation] timeout:10.0];
     }
-    countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
-    XCTAssert(countOfPacks > 0);
-
-    // Now delete
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"all packs removed"];
-    expectation.expectedFulfillmentCount = countOfPacks;
-
-    NSArray *packs = [MGLOfflineStorage sharedOfflineStorage].packs;
-    XCTAssertNotNil(packs);
-        
-    NSArray *validPacks = [packs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        MGLOfflinePack *pack = (MGLOfflinePack*)evaluatedObject;
-        return pack.state != MGLOfflinePackStateInvalid;
-    }]];
-    
-    for (MGLOfflinePack *pack in validPacks) {
-        [[MGLOfflineStorage sharedOfflineStorage] removePack:pack
-                                       withCompletionHandler:^(NSError * _Nullable error) {
-            [expectation fulfill];
-        }];
-    }
-        
-    [self waitForExpectations:@[expectation] timeout:60.0];
-    
-    countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
-    XCTAssertEqual(countOfPacks, 0);
-
-    
-    
-    //    so on `keyPath`  `packs` change (`NSKeyValueChange.settings`)
-//    we dispatch to a `SerialQueue` and remove the pack one by one and wait for the first one to be completed before proceeding to reduce the load on the Database access.
-//    serialQueue.async { [weak self] in
-//    guard let packs = storage.packs else {
-//    return []
-//    }
-//    let validPacks = packs.filter { $0.state != .invalid }
-//
-//    for pack in validPacks {
-//        let packGroup = DispatchGroup()
-//        packGroup.enter()
-//        storage.removePack(pack) { [weak self] (error) in
-//            packGroup.leave()
-//        }
-//        // Wait until the pack completion handler is executed
-//        // Marking the pack as removed for us
-//        packGroup.wait()
-//    }
-//    }
-}
-
- 
-- (void)testRemovePacks {
-    NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
-
-    if (countOfPacks < 4) {
-        XCTestExpectation *expectation = [self expectationWithDescription:@"added packs"];
-        expectation.expectedFulfillmentCount = 4;
-
-        [self internalAddPacksForBounds:^{
-            [expectation fulfill];
-        }];
-        [self waitForExpectations:@[expectation] timeout:10.0];
-
-         
-    }
     countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
     XCTAssert(countOfPacks > 0);
 
@@ -431,9 +419,14 @@
     
     MGLOfflineStorage *storage = [MGLOfflineStorage sharedOfflineStorage];
     
-    [self internalAddPacksForBounds:nil];
+    [storage reloadPacks];
     
     dispatch_async(queue, ^{
+        
+        NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
+        [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+
+        
         NSArray *packs = storage.packs;
         
         if (!packs) {
@@ -448,14 +441,17 @@
         for (MGLOfflinePack *pack in validPacks) {
             dispatch_group_t group = dispatch_group_create();
             dispatch_group_enter(group);
+//          [storage removePack:pack withCompletionHandler:nil];
             [storage removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
                 dispatch_group_leave(group);
             }];
             dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-            
-            
+                        
             [expectation fulfill];
         }
+        
+        [[[NSThread currentThread] threadDictionary] setValue:oldHandler forKey:NSAssertionHandlerKey];
+
     });
     
     [self waitForExpectations:@[expectation] timeout:60.0];
