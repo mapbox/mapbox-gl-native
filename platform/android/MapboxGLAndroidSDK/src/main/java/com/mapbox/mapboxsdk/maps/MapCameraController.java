@@ -83,6 +83,8 @@ public class MapCameraController {
                 Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
                 while (iterator.hasNext()) {
                   CameraTransition transition = iterator.next();
+                  transition.onProgress();
+
                   if (transition.isFinishing()) {
                     transition.onFinish();
                     iterator.remove();
@@ -150,9 +152,6 @@ public class MapCameraController {
   }
 
   public void startTransition(CameraTransition transition) {
-    long time = System.currentTimeMillis();
-    transition.initTime(getCameraPropertyValue(transition.getCameraProperty()), time);
-
     synchronized (runningTransitionsLock) {
       behavior.animationScheduled(this, transition);
 
@@ -162,13 +161,15 @@ public class MapCameraController {
         if (resultingTransition != transition && resultingTransition != runningTransition) {
           throw new UnsupportedOperationException();
         } else if (resultingTransition != transition) {
-          // todo camera - invoke cancel callback right away
           transition.cancel();
+          transition.onCancel();
         } else {
           runningTransition.cancel();
-          runningTransitions.put(transition.getCameraProperty(), transition);
+          queuedTransitions.get(transition.getCameraProperty()).push(transition);
         }
       } else {
+        long time = System.currentTimeMillis();
+        transition.initTime(getCameraPropertyValue(transition.getCameraProperty()), time);
         runningTransitions.put(transition.getCameraProperty(), transition);
       }
     }
@@ -187,12 +188,12 @@ public class MapCameraController {
 
   @NonNull
   public HashMap<Integer, LinkedList<CameraTransition>> getQueuedTransitions() {
-    return queuedTransitions;
+    return new HashMap<>(queuedTransitions);
   }
 
   @NonNull
   public HashMap<Integer, CameraTransition> getRunningTransitions() {
-    return runningTransitions;
+    return new HashMap<>(runningTransitions);
   }
 
   @NonNull
