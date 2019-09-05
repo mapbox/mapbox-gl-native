@@ -111,7 +111,6 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             auto& mbglExpression1 = mbglValue.PropertyValue::asExpression().getExpression();
 
             auto sharedExpressionPtr1 = std::make_shared<mbgl::style::expression::Expression>(mbglExpression1);
-            sharedExpressionPtr1.reset();
 
             auto mbglValue2 = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp2, true);
             auto& mbglExpression2 = mbglValue2.PropertyValue::asExpression().getExpression();
