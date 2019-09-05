@@ -94,7 +94,23 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
     }
 }
 
+static void API_renderStill_recreate_map_disable_prefetch(::benchmark::State& state) {
+    RenderBenchmark bench;
+
+    while (state.KeepRunning()) {
+        HeadlessFrontend frontend { size, pixelRatio };
+        Map map { frontend, MapObserver::nullObserver(),
+                  MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
+                  ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
+        map.setPrefetchZoomDelta(0);
+        map.setPrefetchParentTiles(false);
+        prepare(map);
+        frontend.render(map);
+    }
+}
+
 BENCHMARK(API_renderStill_reuse_map);
 BENCHMARK(API_renderStill_reuse_map_formatted_labels);
 BENCHMARK(API_renderStill_reuse_map_switch_styles);
 BENCHMARK(API_renderStill_recreate_map);
+BENCHMARK(API_renderStill_recreate_map_disable_prefetch);
