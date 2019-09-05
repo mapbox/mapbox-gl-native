@@ -3,7 +3,9 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
-
+### Bug fixes
+ - Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`. [#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560)
+ 
 ## 8.4.0-alpha.1 - September 4, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0...android-v8.4.0-alpha.1) since [Mapbox Maps SDK for Android v8.3.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0):
 
@@ -14,7 +16,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Enable using of `text-offset` option together with `text-variable-anchor` (if `text-radial-offset` option is not provided). If used with `text-variable-anchor`, input values will be taken as absolute values. Offsets along the x- and y-axis will be applied automatically based on the anchor position. [#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542)
 
 ### Bug fixes
- - Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. [#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467)
+- Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. [#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467)
 - Fixed unnecessary layers blink when the same components are re-added after the style reload [#15513](https://github.com/mapbox/mapbox-gl-native/pull/15513)
 - Fixed an issue in JNI marshaling code that converted a float to long that produced invalid expressions [#15557](https://github.com/mapbox/mapbox-gl-native/pull/15557)
 - Call callback onFinish() immediately when trying to move camera to current position [#15558](https://github.com/mapbox/mapbox-gl-native/pull/15558)
