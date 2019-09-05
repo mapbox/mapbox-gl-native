@@ -7,16 +7,16 @@ import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MapCameraController {
 
   @NonNull
-  private final List<CameraTransition> queuedTransitions = new ArrayList<>();
+  private final HashMap<Integer, LinkedList<CameraTransition>> queuedTransitions = new HashMap<>(5);
 
   @NonNull
   private final ReentrantLock runningTransitionsLock = new ReentrantLock();
@@ -69,6 +69,8 @@ public class MapCameraController {
                     CameraPosition.Builder builder = new CameraPosition.Builder(finalUpdate);
                     setCameraProperty(builder, transition.getCameraProperty(), null);
                     finalUpdate = builder.build();
+
+                    startNextTransition(transition.getCameraProperty());
                   }
                 }
               }
@@ -84,6 +86,8 @@ public class MapCameraController {
                   if (transition.isFinishing()) {
                     transition.onFinish();
                     iterator.remove();
+
+                    startNextTransition(transition.getCameraProperty());
                   }
                 }
               }
@@ -136,10 +140,16 @@ public class MapCameraController {
 
   MapCameraController(@NonNull final Transform transform) {
     this.transform = transform;
+    queuedTransitions.put(CameraTransition.PROPERTY_CENTER, new LinkedList<CameraTransition>());
+    queuedTransitions.put(CameraTransition.PROPERTY_ZOOM, new LinkedList<CameraTransition>());
+    queuedTransitions.put(CameraTransition.PROPERTY_PITCH, new LinkedList<CameraTransition>());
+    queuedTransitions.put(CameraTransition.PROPERTY_BEARING, new LinkedList<CameraTransition>());
+    queuedTransitions.put(CameraTransition.PROPERTY_ANCHOR, new LinkedList<CameraTransition>());
+    queuedTransitions.put(CameraTransition.PROPERTY_PADDING, new LinkedList<CameraTransition>());
     thread.start();
   }
 
-  public void startTransition(final CameraTransition transition) {
+  public void startTransition(CameraTransition transition) {
     long time = System.currentTimeMillis();
     transition.initTime(getCameraPropertyValue(transition.getCameraProperty()), time);
 
@@ -164,8 +174,19 @@ public class MapCameraController {
     }
   }
 
+  public void queueTransition(CameraTransition transition) {
+    CameraTransition running = runningTransitions.get(transition.getCameraProperty());
+    LinkedList<CameraTransition> queued = queuedTransitions.get(transition.getCameraProperty());
+    assert queued != null;
+    if (running == null && queued.isEmpty()) {
+      startTransition(transition);
+    } else {
+      queued.addLast(transition);
+    }
+  }
+
   @NonNull
-  public List<CameraTransition> getQueuedTransitions() {
+  public HashMap<Integer, LinkedList<CameraTransition>> getQueuedTransitions() {
     return queuedTransitions;
   }
 
@@ -186,8 +207,10 @@ public class MapCameraController {
   void onDestroy() {
     destroyed = true;
 
-    for (CameraTransition transition : queuedTransitions) {
-      transition.onCancel();
+    for (List<CameraTransition> transitions : queuedTransitions.values()) {
+      for (CameraTransition transition : transitions) {
+        transition.onCancel();
+      }
     }
     queuedTransitions.clear();
 
@@ -236,29 +259,39 @@ public class MapCameraController {
   }
 
   private Object getCameraPropertyValue(int property) {
+    CameraPosition cameraPosition = transform.getCameraPosition();
+    assert cameraPosition != null;
     switch (property) {
       case CameraTransition.PROPERTY_CENTER:
-        return transform.getCameraPosition().target;
+        return cameraPosition.target;
 
       case CameraTransition.PROPERTY_ZOOM:
-        return transform.getCameraPosition().zoom;
+        return cameraPosition.zoom;
 
       case CameraTransition.PROPERTY_PITCH:
-        return transform.getCameraPosition().tilt;
+        return cameraPosition.tilt;
 
       case CameraTransition.PROPERTY_BEARING:
-        return transform.getCameraPosition().bearing;
+        return cameraPosition.bearing;
 
       case CameraTransition.PROPERTY_PADDING:
-        double[] padding = transform.getCameraPosition().padding;
+        double[] padding = cameraPosition.padding;
         final Double[] result = new Double[padding.length];
         for (int i = 0; i < padding.length; i++) {
-          result[i] = Double.valueOf(padding[i]);
+          result[i] = padding[i];
         }
         return result;
 
       default:
         throw new IllegalArgumentException("no such property");
+    }
+  }
+
+  private void startNextTransition(int cameraProperty) {
+    LinkedList<CameraTransition> queue = queuedTransitions.get(cameraProperty);
+    assert queue != null;
+    if (!queue.isEmpty()) {
+      startTransition(queue.pop());
     }
   }
 
@@ -281,9 +314,11 @@ public class MapCameraController {
           }
         }
 
-        for (CameraTransition currentTransition : controller.getQueuedTransitions()) {
-          if (currentTransition.getType() != CameraTransition.TYPE_GESTURE) {
-            currentTransition.cancel();
+        for (List<CameraTransition> currentTransitions : controller.getQueuedTransitions().values()) {
+          for (CameraTransition currentTransition : currentTransitions) {
+            if (currentTransition.getType() != CameraTransition.TYPE_GESTURE) {
+              currentTransition.cancel();
+            }
           }
         }
       }
