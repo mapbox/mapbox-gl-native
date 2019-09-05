@@ -214,6 +214,7 @@ public final class CameraPosition implements Parcelable {
    */
   public static final class Builder {
 
+    // todo camera - this should take boxed Double object because -1 can be a valid angle
     private double bearing = -1;
     @Nullable
     private LatLng target = null;

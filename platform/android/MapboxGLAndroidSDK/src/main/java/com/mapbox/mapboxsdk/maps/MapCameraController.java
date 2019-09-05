@@ -11,11 +11,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MapCameraController {
 
   @NonNull
   private final List<CameraTransition> queuedTransitions = new ArrayList<>();
+
+  @NonNull
+  private final ReentrantLock runningTransitionsLock = new ReentrantLock();
 
   @NonNull
   private final HashMap<Integer, CameraTransition> runningTransitions = new HashMap<>(5);
@@ -33,6 +37,9 @@ public class MapCameraController {
 
   @NonNull
   private final Thread thread = new Thread(new Runnable() {
+
+    private static final short MIN_FRAME_INTERVAL = 10;
+
     @Override
     public void run() {
       CameraPosition cameraPosition = null;
@@ -42,41 +49,27 @@ public class MapCameraController {
         }
 
         final CameraPosition update = cameraPosition;
-        if (!runningTransitions.isEmpty() && update != null) {
+        if (update != null) {
           handler.post(new Runnable() {
             @Override
             public void run() {
+              if (destroyed) {
+                return;
+              }
+
               CameraPosition finalUpdate = update;
 
-              Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
-              while (iterator.hasNext()) {
-                CameraTransition transition = iterator.next();
-                if (transition.isCanceled()) {
-                  transition.onCancel();
-                  iterator.remove();
-                  CameraPosition.Builder builder = new CameraPosition.Builder(finalUpdate);
-                  switch (transition.getCameraProperty()) {
-                    case CameraTransition.PROPERTY_CENTER:
-                      builder.target(null);
-                      break;
-
-                    case CameraTransition.PROPERTY_ZOOM:
-                      builder.zoom(-1);
-                      break;
-
-                    case CameraTransition.PROPERTY_PITCH:
-                      builder.tilt(-1);
-                      break;
-
-                    case CameraTransition.PROPERTY_BEARING:
-                      builder.bearing(-1);
-                      break;
-
-                    case CameraTransition.PROPERTY_PADDING:
-                      builder.padding(null);
-                      break;
+              synchronized (runningTransitionsLock) {
+                Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
+                while (iterator.hasNext()) {
+                  CameraTransition transition = iterator.next();
+                  if (transition.isCanceled()) {
+                    transition.onCancel();
+                    iterator.remove();
+                    CameraPosition.Builder builder = new CameraPosition.Builder(finalUpdate);
+                    setCameraProperty(builder, transition.getCameraProperty(), null);
+                    finalUpdate = builder.build();
                   }
-                  finalUpdate = builder.build();
                 }
               }
 
@@ -84,12 +77,14 @@ public class MapCameraController {
 
               transform.moveCamera(finalUpdate);
 
-              iterator = runningTransitions.values().iterator();
-              while (iterator.hasNext()) {
-                CameraTransition transition = iterator.next();
-                if (transition.isFinishing()) {
-                  transition.onFinish();
-                  iterator.remove();
+              synchronized (runningTransitionsLock) {
+                Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
+                while (iterator.hasNext()) {
+                  CameraTransition transition = iterator.next();
+                  if (transition.isFinishing()) {
+                    transition.onFinish();
+                    iterator.remove();
+                  }
                 }
               }
             }
@@ -97,66 +92,43 @@ public class MapCameraController {
         }
 
         // todo camera - what's the correct delay not to flood and block the main thread?
-        double nextFrameTime = System.currentTimeMillis() + 5;
+        long nextFrameTime = System.currentTimeMillis() + MIN_FRAME_INTERVAL;
 
-        boolean willRun = false;
-        for (CameraTransition transition : runningTransitions.values()) {
-          if (transition.getStartTime() <= nextFrameTime) {
-            willRun = true;
-            break;
-          }
-        }
-
-        if (willRun) {
+        synchronized (runningTransitionsLock) {
+          boolean willRun = false;
           CameraPosition.Builder builder = new CameraPosition.Builder();
-
-          for (CameraTransition transition : runningTransitions.values()) {
+          for (final CameraTransition transition : runningTransitions.values()) {
             if (transition.getStartTime() <= nextFrameTime) {
+              willRun = true;
               if (nextFrameTime >= transition.getEndTime()) {
-                transition.setFinishing();
+                handler.post(new Runnable() {
+                  @Override
+                  public void run() {
+                    transition.setFinishing();
+                  }
+                });
               }
 
               Object value = transition.isFinishing() ? transition.getEndValue() : transition.onFrame(nextFrameTime);
-              switch (transition.getCameraProperty()) {
-                case CameraTransition.PROPERTY_CENTER:
-                  builder.target((LatLng) value);
-                  break;
-
-                case CameraTransition.PROPERTY_ZOOM:
-                  builder.zoom((double) value);
-                  break;
-
-                case CameraTransition.PROPERTY_PITCH:
-                  builder.tilt((double) value);
-                  break;
-
-                case CameraTransition.PROPERTY_BEARING:
-                  builder.bearing((double) value);
-                  break;
-
-                case CameraTransition.PROPERTY_PADDING:
-                  double[] padding = new double[4];
-                  for (int i = 0; i < 4; i++) {
-                    padding[i] = ((Double[]) value)[i];
-                  }
-                  builder.padding(padding);
-                  break;
-              }
+              setCameraProperty(builder, transition.getCameraProperty(), value);
             }
           }
 
-          cameraPosition = builder.build();
-        } else {
-          cameraPosition = null;
+          if (willRun) {
+            cameraPosition = builder.build();
+          } else {
+            cameraPosition = null;
+          }
         }
 
-        double sleepTime = nextFrameTime - System.currentTimeMillis();
-        int nanos = (int) (sleepTime % 999_999);
+        long sleepTime = nextFrameTime - System.currentTimeMillis();
 
-        try {
-          Thread.sleep((long) sleepTime, nanos);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+        if (sleepTime >= 0) {
+          try {
+            Thread.sleep(sleepTime);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
         }
       }
     }
@@ -169,49 +141,26 @@ public class MapCameraController {
 
   public void startTransition(final CameraTransition transition) {
     long time = System.currentTimeMillis();
-    switch (transition.getCameraProperty()) {
-      case CameraTransition.PROPERTY_CENTER:
-        transition.initTime(transform.getCameraPosition().target, time);
-        break;
+    transition.initTime(getCameraPropertyValue(transition.getCameraProperty()), time);
 
-      case CameraTransition.PROPERTY_ZOOM:
-        transition.initTime(transform.getCameraPosition().zoom, time);
-        break;
+    synchronized (runningTransitionsLock) {
+      behavior.animationScheduled(this, transition);
 
-      case CameraTransition.PROPERTY_PITCH:
-        transition.initTime(transform.getCameraPosition().tilt, time);
-        break;
-
-      case CameraTransition.PROPERTY_BEARING:
-        transition.initTime(transform.getCameraPosition().bearing, time);
-        break;
-
-      case CameraTransition.PROPERTY_PADDING:
-        double[] padding = transform.getCameraPosition().padding;
-        final Double[] result = new Double[padding.length];
-        for (int i = 0; i < padding.length; i++) {
-          result[i] = Double.valueOf(padding[i]);
+      final CameraTransition runningTransition = runningTransitions.get(transition.getCameraProperty());
+      if (runningTransition != null) {
+        CameraTransition resultingTransition = behavior.resolve(runningTransition, transition);
+        if (resultingTransition != transition && resultingTransition != runningTransition) {
+          throw new UnsupportedOperationException();
+        } else if (resultingTransition != transition) {
+          // todo camera - invoke cancel callback right away
+          transition.cancel();
+        } else {
+          runningTransition.cancel();
+          runningTransitions.put(transition.getCameraProperty(), transition);
         }
-        transition.initTime(result, time);
-        break;
-    }
-
-    behavior.animationScheduled(this, transition);
-
-    final CameraTransition runningTransition = runningTransitions.get(transition.getCameraProperty());
-    if (runningTransition != null) {
-      CameraTransition resultingTransition = behavior.resolve(runningTransition, transition);
-      if (resultingTransition != transition && resultingTransition != runningTransition) {
-        throw new UnsupportedOperationException();
-      } else if (resultingTransition != transition) {
-        // todo camera - invoke cancel callback right away
-        transition.cancel();
       } else {
-        runningTransition.cancel();
         runningTransitions.put(transition.getCameraProperty(), transition);
       }
-    } else {
-      runningTransitions.put(transition.getCameraProperty(), transition);
     }
   }
 
@@ -235,11 +184,81 @@ public class MapCameraController {
   }
 
   void onDestroy() {
+    destroyed = true;
+
+    for (CameraTransition transition : queuedTransitions) {
+      transition.onCancel();
+    }
+    queuedTransitions.clear();
+
+    for (CameraTransition transition : runningTransitions.values()) {
+      transition.onCancel();
+    }
+    runningTransitions.clear();
+
     try {
-      destroyed = true;
       thread.join();
     } catch (InterruptedException ex) {
       ex.printStackTrace();
+    }
+  }
+
+  private static void setCameraProperty(CameraPosition.Builder builder, int property, Object value) {
+    switch (property) {
+      case CameraTransition.PROPERTY_CENTER:
+        builder.target(value == null ? null : (LatLng) value);
+        break;
+
+      case CameraTransition.PROPERTY_ZOOM:
+        builder.zoom(value == null ? -1 : (Double) value);
+        break;
+
+      case CameraTransition.PROPERTY_PITCH:
+        builder.tilt(value == null ? -1 : (Double) value);
+        break;
+
+      case CameraTransition.PROPERTY_BEARING:
+        builder.bearing(value == null ? -1 : (Double) value);
+        break;
+
+      case CameraTransition.PROPERTY_PADDING:
+        if (value instanceof Double[]) {
+          double[] padding = new double[4];
+          for (int i = 0; i < 4; i++) {
+            padding[i] = ((Double[]) value)[i];
+          }
+          builder.padding(padding);
+        } else {
+          builder.padding(value == null ? null : (double[]) value);
+        }
+        break;
+    }
+  }
+
+  private Object getCameraPropertyValue(int property) {
+    switch (property) {
+      case CameraTransition.PROPERTY_CENTER:
+        return transform.getCameraPosition().target;
+
+      case CameraTransition.PROPERTY_ZOOM:
+        return transform.getCameraPosition().zoom;
+
+      case CameraTransition.PROPERTY_PITCH:
+        return transform.getCameraPosition().tilt;
+
+      case CameraTransition.PROPERTY_BEARING:
+        return transform.getCameraPosition().bearing;
+
+      case CameraTransition.PROPERTY_PADDING:
+        double[] padding = transform.getCameraPosition().padding;
+        final Double[] result = new Double[padding.length];
+        for (int i = 0; i < padding.length; i++) {
+          result[i] = Double.valueOf(padding[i]);
+        }
+        return result;
+
+      default:
+        throw new IllegalArgumentException("no such property");
     }
   }
 
