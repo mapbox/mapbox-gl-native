@@ -170,11 +170,11 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
 
     if (!panTiles.empty()) {
         algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn,
-                [](const UnwrappedTileID&, Tile&) {}, panTiles, zoomRange, panZoom);
+                [](const UnwrappedTileID&, Tile&) {}, panTiles, zoomRange, panZoom, parameters.prefetchParentTiles);
     }
 
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
-                                 idealTiles, zoomRange, tileZoom);
+                                 idealTiles, zoomRange, tileZoom, parameters.prefetchParentTiles);
     
     for (auto previouslyRenderedTile : previouslyRenderedTiles) {
         Tile& tile = previouslyRenderedTile.second;

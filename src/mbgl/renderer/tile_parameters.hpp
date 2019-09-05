@@ -23,6 +23,7 @@ public:
     ImageManager& imageManager;
     GlyphManager& glyphManager;
     const uint8_t prefetchZoomDelta;
+    const bool prefetchParentTiles;
 };
 
 } // namespace mbgl

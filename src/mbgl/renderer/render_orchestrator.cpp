@@ -159,7 +159,8 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         updateParameters.annotationManager,
         *imageManager,
         *glyphManager,
-        updateParameters.prefetchZoomDelta
+        updateParameters.prefetchZoomDelta,
+        updateParameters.prefetchParentTiles
     };
 
     glyphManager->setURL(updateParameters.glyphURL);

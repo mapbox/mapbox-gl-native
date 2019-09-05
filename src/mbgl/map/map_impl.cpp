@@ -65,6 +65,7 @@ void Map::Impl::onUpdate() {
         annotationManager,
         fileSource,
         prefetchZoomDelta,
+        prefetchParentTiles,
         bool(stillImageRequest),
         crossSourceCollisions
     };

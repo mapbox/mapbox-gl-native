@@ -115,6 +115,8 @@ public:
     // default `delta` is 4.
     void setPrefetchZoomDelta(uint8_t delta);
     uint8_t getPrefetchZoomDelta() const;
+    void setPrefetchParentTiles(bool enable);
+    bool getPrefetchParentTiles() const;
 
     // Debug
     void setDebug(MapDebugOptions);

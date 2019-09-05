@@ -452,6 +452,14 @@ uint8_t Map::getPrefetchZoomDelta() const {
     return impl->prefetchZoomDelta;
 }
 
+void Map::setPrefetchParentTiles(bool enable) {
+    impl->prefetchParentTiles = enable;
+}
+
+bool Map::getPrefetchParentTiles() const {
+    return impl->prefetchParentTiles;
+}
+
 bool Map::isFullyLoaded() const {
     return impl->style->impl->isLoaded() && impl->rendererFullyLoaded;
 }

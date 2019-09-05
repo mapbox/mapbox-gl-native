@@ -20,7 +20,8 @@ void updateRenderables(GetTileFn getTile,
                        RenderTileFn renderTile,
                        const IdealTileIDs& idealTileIDs,
                        const Range<uint8_t>& zoomRange,
-                       const uint8_t dataTileZoom) {
+                       const uint8_t dataTileZoom,
+                       const bool prefetchParentTiles) {
     std::unordered_set<OverscaledTileID> checked;
     bool covered;
     int32_t overscaledZ;
@@ -81,7 +82,7 @@ void updateRenderables(GetTileFn getTile,
                 }
             }
 
-            if (!covered) {
+            if (!covered && prefetchParentTiles) {
                 // We couldn't find child tiles that entirely cover the ideal tile.
                 for (overscaledZ = dataTileZoom - 1; overscaledZ >= zoomRange.min; --overscaledZ) {
                     const auto parentDataTileID = idealDataTileID.scaledTo(overscaledZ);
