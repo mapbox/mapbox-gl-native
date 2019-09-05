@@ -107,19 +107,19 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             NSExpression *exp1 = expArray[0];
             NSExpression *exp2 = expArray[1];
            // convert values into style expressions. IDK how to do this, but ¯\_(ツ)_/¯
-
-            // Static_assert failed due to requirement 'is_constructible<mbgl::style::PropertyExpression<std::__1::basic_string<char> >, const mbgl::style::expression::Expression **>::value' "Can't construct object in make_shared"
             auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp1, true);
-            auto mbglExpression1 = &mbglValue.PropertyValue::asExpression().getExpression();
-            const auto sharedExpressionPtr1 = std::make_shared<mbgl::style::PropertyExpression<std::string>>(&mbglExpression1);
+            auto& mbglExpression1 = mbglValue.PropertyValue::asExpression().getExpression();
+
+            auto sharedExpressionPtr1 = std::make_shared<mbgl::style::expression::Expression>(mbglExpression1);
+            sharedExpressionPtr1.reset();
 
             auto mbglValue2 = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(exp2, true);
             auto& mbglExpression2 = mbglValue2.PropertyValue::asExpression().getExpression();
+            auto sharedExpressionPtr2 = std::make_shared<mbgl::style::expression::Expression>(mbglExpression2);
 
-            const auto sharedExpressionPtr2 = std::make_shared<mbgl::style::PropertyExpression<std::string>>(mbglExpression2);
-
-// 
-//
+                        // Static_assert failed due to requirement 'is_constructible<mbgl::style::expression::Expression, const mbgl::style::expression::Expression &>::value' "Can't construct object in make_shared"
+            // Assigning to 'std::__1::__shared_weak_count *' from incompatible type 'std::__1::unique_ptr<std::__1::__shared_ptr_emplace<mbgl::style::expression::Expression, std::__1::allocator<mbgl::style::expression::Expression> >, std::__1::__allocator_destructor<std::__1::allocator<std::__1::__shared_ptr_emplace<mbgl::style::expression::Expression, std::__1::allocator<mbgl::style::expression::Expression> > > > >::pointer' (aka 'std::__1::__shared_ptr_emplace<mbgl::style::expression::Expression, std::__1::allocator<mbgl::style::expression::Expression> > *')
+//             Field type 'mbgl::style::expression::Expression' is an abstract class
             mbgl::style::GeoJSONOptions::ClusterExpression mbglPair = std::make_pair(sharedExpressionPtr1, sharedExpressionPtr2);
 
             std::string keyString = std::string([key UTF8String]);
