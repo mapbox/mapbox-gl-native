@@ -40,7 +40,8 @@ public:
         annotationManager,
         imageManager,
         glyphManager,
-        0
+        0,
+        true
     };
 };
 
