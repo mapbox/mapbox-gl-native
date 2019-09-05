@@ -172,6 +172,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 }
 
 - (NSString *)description {
+    MGLAssertStyleSourceIsValid();
     return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; shape = %@>",
             NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.shape];
 }

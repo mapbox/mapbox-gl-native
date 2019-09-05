@@ -81,6 +81,7 @@
 }
 
 - (NSString *)description {
+    MGLAssertStyleSourceIsValid();
     return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = %@; URL = %@; image = %@>",
             NSStringFromClass([self class]), (void *)self, self.identifier, MGLStringFromCoordinateQuad(self.coordinates), self.URL, self.image];
 }

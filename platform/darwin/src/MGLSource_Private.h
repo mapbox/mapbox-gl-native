@@ -30,7 +30,7 @@ do { \
 if (!self.rawSource) { \
 [NSException raise:MGLInvalidStyleSourceException \
 format: \
-@"-This source got invalidated after the style change "]; \
+@"This source got invalidated after the style change "]; \
 } \
 } while (NO);
 
