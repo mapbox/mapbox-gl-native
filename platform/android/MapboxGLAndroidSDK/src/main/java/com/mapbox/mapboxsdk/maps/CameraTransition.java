@@ -27,6 +27,7 @@ public abstract class CameraTransition<T> {
   private final int reason;
 
   private T startValue;
+  private T currentValue;
   private final T endValue;
 
   private double startTimeMillis;
@@ -93,6 +94,10 @@ public abstract class CameraTransition<T> {
     return startValue;
   }
 
+  public T getCurrentValue() {
+    return currentValue;
+  }
+
   public T getEndValue() {
     return endValue;
   }
@@ -148,7 +153,7 @@ public abstract class CameraTransition<T> {
   T onFrame(double currentTimeNanos) {
     double animationPosition = (currentTimeNanos - startTimeNanos) / durationNanos;
     double fraction = interpolator.getInterpolation((float) animationPosition);
-    return getAnimatedValue(fraction);
+    return currentValue = getAnimatedValue(fraction);
   }
 
   boolean isFinishing() {
@@ -159,16 +164,16 @@ public abstract class CameraTransition<T> {
     isFinishing = true;
   }
 
-  public void onProgress() {
+  void onProgress() {
     for (Listener listener : listeners) {
-      listener.onProgress();
+      listener.onProgress(this);
     }
   }
 
   void onCancel() {
     this.isCanceled = true;
     for (Listener listener : listeners) {
-      listener.onCancel();
+      listener.onCancel(this);
     }
     onFinish();
   }
@@ -182,7 +187,7 @@ public abstract class CameraTransition<T> {
     this.isStarted = false;
     this.isFinished = true;
     for (Listener listener : listeners) {
-      listener.onFinish();
+      listener.onFinish(this);
     }
   }
 
@@ -193,10 +198,10 @@ public abstract class CameraTransition<T> {
 
   public interface Listener {
 
-    void onProgress();
+    void onProgress(CameraTransition transition);
 
-    void onCancel();
+    void onCancel(CameraTransition transition);
 
-    void onFinish();
+    void onFinish(CameraTransition transition);
   }
 }

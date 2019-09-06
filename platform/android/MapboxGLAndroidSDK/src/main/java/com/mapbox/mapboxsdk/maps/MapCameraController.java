@@ -11,8 +11,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MapCameraController {
+
+  @NonNull
+  private final List<OnCameraChangedListener> cameraChangedListeners = new CopyOnWriteArrayList<>();
 
   @NonNull
   private final HashMap<Integer, LinkedList<CameraTransition>> queuedTransitions = new HashMap<>(5);
@@ -57,11 +61,11 @@ public class MapCameraController {
         checkNextTransition(transition.getCameraProperty());
       }
 
-      boolean shouldRun = false;
+      boolean hasUpdates = false;
       CameraPosition.Builder builder = new CameraPosition.Builder();
       for (final CameraTransition transition : runningTransitions.values()) {
         if (transition.getStartTimeNanos() <= frameTimeNanos) {
-          shouldRun = true;
+          hasUpdates = true;
           if (frameTimeNanos >= transition.getEndTimeNanos()) {
             transition.setFinishing();
           }
@@ -71,8 +75,11 @@ public class MapCameraController {
         }
       }
 
-      if (shouldRun) {
+      if (hasUpdates) {
         transform.moveCamera(builder.build());
+        for (OnCameraChangedListener listener : cameraChangedListeners) {
+          listener.onCameraChanged();
+        }
       }
 
       List<CameraTransition> finished = new ArrayList<>();
@@ -162,6 +169,14 @@ public class MapCameraController {
   public void cancelAllTransitions() {
     cancelQueuedTransitions();
     cancelRunningTransitions();
+  }
+
+  public void addOnCameraChangedListener(OnCameraChangedListener listener) {
+    cameraChangedListeners.add(listener);
+  }
+
+  public void removeOnCameraChangedListener(OnCameraChangedListener listener) {
+    cameraChangedListeners.remove(listener);
   }
 
   @NonNull
@@ -265,6 +280,10 @@ public class MapCameraController {
 
     @NonNull
     CameraTransition resolve(CameraTransition currentTransition, CameraTransition interruptingTransition);
+  }
+
+  public interface OnCameraChangedListener {
+    void onCameraChanged();
   }
 
   public static class DefaultCameraBehavior implements CameraBehavior {
