@@ -7,9 +7,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class CameraTransition<T> {
 
-  public static final int TYPE_ANY = 0;
-  public static final int TYPE_GESTURE = 1;
-  public static final int TYPE_LOCATION = 2;
+  //todo camera - reason should be an intdef/enum/object so that devs can extend without clashing with default values
+  public static final int REASON_ANY = 0;
+  public static final int REASON_GESTURE = 1;
+  public static final int REASON_LOCATION = 2;
 
   public static final Interpolator INTERPOLATOR_LINEAR = PathInterpolatorCompat.create(0f, 0f, 1f, 1f);
   public static final Interpolator INTERPOLATOR_EASING = PathInterpolatorCompat.create(0f, 0f, 0.25f, 1f);
@@ -23,7 +24,7 @@ public abstract class CameraTransition<T> {
 
   private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
 
-  private final int type;
+  private final int reason;
 
   private T startValue;
   private final T endValue;
@@ -39,12 +40,13 @@ public abstract class CameraTransition<T> {
 
   private boolean isCanceled;
   private boolean isStarted;
+  private boolean isFinished;
   private boolean isFinishing;
 
   private final Interpolator interpolator;
 
-  CameraTransition(int type, double durationMillis, double delayMillis, T endValue, Interpolator interpolator) {
-    this.type = type;
+  CameraTransition(int reason, double durationMillis, double delayMillis, T endValue, Interpolator interpolator) {
+    this.reason = reason;
     this.durationMillis = durationMillis;
     this.durationNanos = durationMillis * 1E6;
     this.delayMillis = delayMillis;
@@ -53,17 +55,19 @@ public abstract class CameraTransition<T> {
     this.interpolator = interpolator;
   }
 
-  void initTime(T startValue, double currentTimeNanos) {
+  void onStart(T startValue, double currentTimeNanos) {
     this.startTimeMillis = currentTimeNanos / 1E6 + delayMillis;
     this.startTimeNanos = currentTimeNanos + delayNanos;
     this.endTimeMillis = startTimeMillis + durationMillis;
     this.endTimeNanos = startTimeNanos + durationNanos;
     this.startValue = startValue;
     this.isStarted = true;
+    this.isCanceled = false;
+    this.isFinished = false;
   }
 
-  public int getType() {
-    return type;
+  public int getReason() {
+    return reason;
   }
 
   public boolean isCanceled() {
@@ -78,8 +82,12 @@ public abstract class CameraTransition<T> {
     return isStarted;
   }
 
+  public boolean isFinished() {
+    return isFinished;
+  }
+
   public T getStartValue() {
-    if (startValue == null) {
+    if (!isStarted) {
       throw new RuntimeException("start or queue the transition first");
     }
     return startValue;
@@ -90,28 +98,28 @@ public abstract class CameraTransition<T> {
   }
 
   public double getStartTime() {
-    if (startTimeMillis <= 0) {
+    if (!isStarted) {
       throw new RuntimeException("start or queue the transition first");
     }
     return startTimeMillis;
   }
 
   double getStartTimeNanos() {
-    if (startTimeNanos <= 0) {
+    if (!isStarted) {
       throw new RuntimeException("start or queue the transition first");
     }
     return startTimeNanos;
   }
 
   public double getEndTime() {
-    if (endTimeMillis <= 0) {
+    if (!isStarted) {
       throw new RuntimeException("start or queue the transition first");
     }
     return endTimeMillis;
   }
 
   double getEndTimeNanos() {
-    if (endTimeNanos <= 0) {
+    if (!isStarted) {
       throw new RuntimeException("start or queue the transition first");
     }
     return endTimeNanos;
@@ -121,16 +129,8 @@ public abstract class CameraTransition<T> {
     return durationMillis;
   }
 
-  double getDurationNanos() {
-    return durationNanos;
-  }
-
   public double getDelay() {
     return delayMillis;
-  }
-
-  double getDelayNanos() {
-    return delayNanos;
   }
 
   public Interpolator getInterpolator() {
@@ -166,12 +166,21 @@ public abstract class CameraTransition<T> {
   }
 
   void onCancel() {
+    this.isCanceled = true;
     for (Listener listener : listeners) {
       listener.onCancel();
     }
+    onFinish();
   }
 
   void onFinish() {
+    this.startTimeMillis = 0;
+    this.startTimeNanos = 0;
+    this.endTimeMillis = 0;
+    this.endTimeNanos = 0;
+    this.startValue = null;
+    this.isStarted = false;
+    this.isFinished = true;
     for (Listener listener : listeners) {
       listener.onFinish();
     }

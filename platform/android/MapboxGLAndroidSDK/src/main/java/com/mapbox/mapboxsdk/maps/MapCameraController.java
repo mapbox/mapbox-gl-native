@@ -26,8 +26,6 @@ public class MapCameraController {
   @NonNull
   private final Transform transform;
 
-  private volatile boolean destroyed;
-
   private final Choreographer choreographer = Choreographer.getInstance();
 
   MapCameraController(@NonNull final Transform transform) {
@@ -44,22 +42,19 @@ public class MapCameraController {
   private final Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
     @Override
     public void doFrame(long frameTimeNanos) {
-      if (destroyed) {
-        return;
-      }
       List<CameraTransition> canceled = new ArrayList<>();
       Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
       while (iterator.hasNext()) {
         CameraTransition transition = iterator.next();
         if (transition.isCanceled()) {
-          transition.onCancel();
           iterator.remove();
           canceled.add(transition);
         }
       }
 
       for (CameraTransition transition : canceled) {
-        startNextTransition(transition.getCameraProperty());
+        transition.onCancel();
+        checkNextTransition(transition.getCameraProperty());
       }
 
       boolean shouldRun = false;
@@ -80,7 +75,6 @@ public class MapCameraController {
         transform.moveCamera(builder.build());
       }
 
-
       List<CameraTransition> finished = new ArrayList<>();
       iterator = runningTransitions.values().iterator();
       while (iterator.hasNext()) {
@@ -88,14 +82,14 @@ public class MapCameraController {
         transition.onProgress();
 
         if (transition.isFinishing()) {
-          transition.onFinish();
           iterator.remove();
           finished.add(transition);
         }
       }
 
       for (CameraTransition transition : finished) {
-        startNextTransition(transition.getCameraProperty());
+        transition.onFinish();
+        checkNextTransition(transition.getCameraProperty());
       }
 
       choreographer.postFrameCallback(this);
@@ -111,7 +105,6 @@ public class MapCameraController {
       if (resultingTransition != transition && resultingTransition != runningTransition) {
         throw new UnsupportedOperationException();
       } else if (resultingTransition != transition) {
-        transition.cancel();
         transition.onCancel();
       } else {
         runningTransition.cancel();
@@ -119,7 +112,7 @@ public class MapCameraController {
       }
     } else {
       long time = System.nanoTime();
-      transition.initTime(getCameraPropertyValue(transition.getCameraProperty()), time);
+      transition.onStart(getCameraPropertyValue(transition.getCameraProperty()), time);
       runningTransitions.put(transition.getCameraProperty(), transition);
     }
   }
@@ -133,6 +126,42 @@ public class MapCameraController {
     } else {
       queued.addLast(transition);
     }
+  }
+
+  public void cancelQueuedTransitions() {
+    List<CameraTransition> canceled = new ArrayList<>();
+    for (List<CameraTransition> transitions : queuedTransitions.values()) {
+      Iterator<CameraTransition> iterator = transitions.iterator();
+      while (iterator.hasNext()) {
+        CameraTransition transition = iterator.next();
+        iterator.remove();
+        canceled.add(transition);
+      }
+    }
+
+    for (CameraTransition transition : canceled) {
+      transition.onCancel();
+    }
+  }
+
+  public void cancelRunningTransitions() {
+    List<CameraTransition> canceled = new ArrayList<>();
+    Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
+    while (iterator.hasNext()) {
+      CameraTransition transition = iterator.next();
+      iterator.remove();
+      canceled.add(transition);
+    }
+
+    for (CameraTransition transition : canceled) {
+      transition.onCancel();
+      checkNextTransition(transition.getCameraProperty());
+    }
+  }
+
+  public void cancelAllTransitions() {
+    cancelQueuedTransitions();
+    cancelRunningTransitions();
   }
 
   @NonNull
@@ -155,19 +184,8 @@ public class MapCameraController {
   }
 
   void onDestroy() {
-    destroyed = true;
-
-    for (List<CameraTransition> transitions : queuedTransitions.values()) {
-      for (CameraTransition transition : transitions) {
-        transition.onCancel();
-      }
-    }
-    queuedTransitions.clear();
-
-    for (CameraTransition transition : runningTransitions.values()) {
-      transition.onCancel();
-    }
-    runningTransitions.clear();
+    cancelAllTransitions();
+    choreographer.removeFrameCallback(frameCallback);
   }
 
   private static void setCameraProperty(CameraPosition.Builder builder, int property, Object value) {
@@ -231,11 +249,13 @@ public class MapCameraController {
     }
   }
 
-  private void startNextTransition(int cameraProperty) {
-    LinkedList<CameraTransition> queue = queuedTransitions.get(cameraProperty);
-    assert queue != null;
-    if (!queue.isEmpty()) {
-      startTransition(queue.pop());
+  private void checkNextTransition(int cameraProperty) {
+    if (runningTransitions.get(cameraProperty) == null) {
+      LinkedList<CameraTransition> queue = queuedTransitions.get(cameraProperty);
+      assert queue != null;
+      if (!queue.isEmpty()) {
+        startTransition(queue.pop());
+      }
     }
   }
 
@@ -251,16 +271,16 @@ public class MapCameraController {
 
     @Override
     public void animationScheduled(MapCameraController controller, CameraTransition transition) {
-      if (transition.getType() == CameraTransition.TYPE_GESTURE) {
+      if (transition.getReason() == CameraTransition.REASON_GESTURE) {
         for (CameraTransition currentTransition : controller.getRunningTransitions().values()) {
-          if (currentTransition.getType() != CameraTransition.TYPE_GESTURE) {
+          if (currentTransition.getReason() != CameraTransition.REASON_GESTURE) {
             currentTransition.cancel();
           }
         }
 
         for (List<CameraTransition> currentTransitions : controller.getQueuedTransitions().values()) {
           for (CameraTransition currentTransition : currentTransitions) {
-            if (currentTransition.getType() != CameraTransition.TYPE_GESTURE) {
+            if (currentTransition.getReason() != CameraTransition.REASON_GESTURE) {
               currentTransition.cancel();
             }
           }
