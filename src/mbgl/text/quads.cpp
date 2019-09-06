@@ -58,7 +58,7 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
 }
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
-                          const std::array<float, 2> textOffset,
+                          const std::array<float, 2> textOffset_,
                           const SymbolLayoutProperties::Evaluated& layout,
                           const style::SymbolPlacementType placement,
                           const GlyphPositions& positions,
@@ -67,6 +67,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
     const bool alongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && placement != SymbolPlacementType::Point;
 
     SymbolQuads quads;
+    std::array<float, 2> textOffset = textOffset_;
 
     for (const PositionedGlyph &positionedGlyph: shapedText.positionedGlyphs) {
         auto fontPositions = positions.find(positionedGlyph.font);
@@ -85,6 +86,12 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         const float rectBuffer = 3.0f + glyphPadding;
 
         const float halfAdvance = glyph.metrics.advance * positionedGlyph.scale / 2.0;
+        const bool rotateVerticalGlyph = (alongLine || allowVerticalPlacement) && positionedGlyph.vertical;
+
+        // Swap offsets for vertical POI labels
+        if (rotateVerticalGlyph) {
+            textOffset = {{textOffset_[1], -textOffset_[0]}};
+        }
 
         const Point<float> glyphOffset = alongLine ?
             Point<float>{ positionedGlyph.x + halfAdvance, positionedGlyph.y } :
@@ -95,7 +102,6 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
             Point<float>{ positionedGlyph.x + halfAdvance + textOffset[0], positionedGlyph.y + textOffset[1] };
 
         Point<float> verticalizedLabelOffset = { 0.0f, 0.0f };
-        const bool rotateVerticalGlyph = (alongLine || allowVerticalPlacement) && positionedGlyph.vertical;
         if (rotateVerticalGlyph) {
             // Vertical POI labels, that are rotated 90deg CW and whose glyphs must preserve upright orientation
             // need to be rotated 90deg CCW. After quad is rotated, it is translated to the original built-in offset.

@@ -432,10 +432,18 @@ const Shaping getShaping(const TaggedString& formattedString,
             reorderedLines.emplace_back(line, formattedString.getSections());
         }
     }
-    Shaping shaping(translate[0], translate[1], writingMode, reorderedLines.size());
+
+    Shaping shaping;
+    // Swap text-offset for vertical POI labels.
+    if (allowVerticalPlacement && writingMode == WritingModeType::Vertical) {
+        shaping = Shaping(translate[1], -translate[0], writingMode, reorderedLines.size());
+    } else {
+        shaping = Shaping(translate[0], translate[1], writingMode, reorderedLines.size());
+    }
+
     shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
                textJustify, writingMode, glyphs, allowVerticalPlacement);
-    
+
     return shaping;
 }
 
