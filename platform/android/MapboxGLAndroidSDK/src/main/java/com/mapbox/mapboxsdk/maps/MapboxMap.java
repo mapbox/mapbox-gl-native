@@ -2392,6 +2392,9 @@ public final class MapboxMap {
     }
   }
 
+  /**
+   * Returns the camera controller that manages camera transitions.
+   */
   public MapCameraController getCameraController() {
     return cameraController;
   }

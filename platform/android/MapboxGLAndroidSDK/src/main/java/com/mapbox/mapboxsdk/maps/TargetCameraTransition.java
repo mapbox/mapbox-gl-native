@@ -14,7 +14,7 @@ public class TargetCameraTransition extends CameraTransition<LatLng> {
 
   @Override
   int getCameraProperty() {
-    return PROPERTY_CENTER;
+    return PROPERTY_TARGET;
   }
 
   @Override

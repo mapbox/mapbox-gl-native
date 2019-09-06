@@ -34,7 +34,7 @@ public class MapCameraController {
 
   MapCameraController(@NonNull final Transform transform) {
     this.transform = transform;
-    queuedTransitions.put(CameraTransition.PROPERTY_CENTER, new LinkedList<CameraTransition>());
+    queuedTransitions.put(CameraTransition.PROPERTY_TARGET, new LinkedList<CameraTransition>());
     queuedTransitions.put(CameraTransition.PROPERTY_ZOOM, new LinkedList<CameraTransition>());
     queuedTransitions.put(CameraTransition.PROPERTY_PITCH, new LinkedList<CameraTransition>());
     queuedTransitions.put(CameraTransition.PROPERTY_BEARING, new LinkedList<CameraTransition>());
@@ -103,8 +103,12 @@ public class MapCameraController {
     }
   };
 
+  /**
+   * Starts transition immediately. Transition's delay doesn't queue the transition,
+   * but blocks the slot until the delay time is fulfilled.
+   */
   public void startTransition(CameraTransition transition) {
-    behavior.animationScheduled(this, transition);
+    behavior.animationStarted(this, transition);
 
     final CameraTransition runningTransition = runningTransitions.get(transition.getCameraProperty());
     if (runningTransition != null) {
@@ -124,6 +128,11 @@ public class MapCameraController {
     }
   }
 
+  /**
+   * Queues the transition. The transition is going to be executed immediately if there are other transitions
+   * changing the same property as the scheduled one. If there is a running animation,
+   * the queued one is going to get started when the running one finished or gets canceled.
+   */
   public void queueTransition(CameraTransition transition) {
     CameraTransition running = runningTransitions.get(transition.getCameraProperty());
     LinkedList<CameraTransition> queued = queuedTransitions.get(transition.getCameraProperty());
@@ -135,6 +144,9 @@ public class MapCameraController {
     }
   }
 
+  /**
+   * Cancels queued transitions.
+   */
   public void cancelQueuedTransitions() {
     List<CameraTransition> canceled = new ArrayList<>();
     for (List<CameraTransition> transitions : queuedTransitions.values()) {
@@ -151,6 +163,9 @@ public class MapCameraController {
     }
   }
 
+  /**
+   * Cancels running transitions.
+   */
   public void cancelRunningTransitions() {
     List<CameraTransition> canceled = new ArrayList<>();
     Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
@@ -166,36 +181,68 @@ public class MapCameraController {
     }
   }
 
+  /**
+   * Cancels all transitions.
+   */
   public void cancelAllTransitions() {
     cancelQueuedTransitions();
     cancelRunningTransitions();
   }
 
+  /**
+   * Adds a camera listener.
+   */
   public void addOnCameraChangedListener(OnCameraChangedListener listener) {
     cameraChangedListeners.add(listener);
   }
 
+  /**
+   * Removes a camera listener.
+   */
   public void removeOnCameraChangedListener(OnCameraChangedListener listener) {
     cameraChangedListeners.remove(listener);
   }
 
+  /**
+   * Returns all queued transitions. The returned objects maps the camera property,
+   * for example {@link CameraTransition#PROPERTY_TARGET} or {@link CameraTransition#PROPERTY_ZOOM},
+   * to the list of queued transitions that will animate this property.
+   */
   @NonNull
   public HashMap<Integer, LinkedList<CameraTransition>> getQueuedTransitions() {
     return new HashMap<>(queuedTransitions);
   }
 
+  /**
+   * Returns all running transitions. The returned objects maps the camera property,
+   * for example {@link CameraTransition#PROPERTY_TARGET} or {@link CameraTransition#PROPERTY_ZOOM},
+   * to the currently running transition.
+   */
   @NonNull
   public HashMap<Integer, CameraTransition> getRunningTransitions() {
     return new HashMap<>(runningTransitions);
   }
 
+  /**
+   * Returns the currently set behavior.
+   */
   @NonNull
   public CameraBehavior getBehavior() {
     return behavior;
   }
 
+  /**
+   * Sets the behavior.
+   */
   public void setBehavior(@NonNull CameraBehavior behavior) {
     this.behavior = behavior;
+  }
+
+  /**
+   * Returns the current camera position.
+   */
+  public CameraPosition getCameraPosition() {
+    return transform.getCameraPosition();
   }
 
   void onDestroy() {
@@ -205,7 +252,7 @@ public class MapCameraController {
 
   private static void setCameraProperty(CameraPosition.Builder builder, int property, Object value) {
     switch (property) {
-      case CameraTransition.PROPERTY_CENTER:
+      case CameraTransition.PROPERTY_TARGET:
         builder.target(value == null ? null : (LatLng) value);
         break;
 
@@ -239,7 +286,7 @@ public class MapCameraController {
     CameraPosition cameraPosition = transform.getCameraPosition();
     assert cameraPosition != null;
     switch (property) {
-      case CameraTransition.PROPERTY_CENTER:
+      case CameraTransition.PROPERTY_TARGET:
         return cameraPosition.target;
 
       case CameraTransition.PROPERTY_ZOOM:
@@ -274,10 +321,26 @@ public class MapCameraController {
     }
   }
 
+  /**
+   * Camera behavior's methods are called in various state of the camera transition.
+   * It can be used to achieve a desired outcome when transitions collide (try to change the same camera property)
+   * or perform business logic that would otherwise have to be handled in many other places that schedule animations.
+   */
   public interface CameraBehavior {
 
-    void animationScheduled(MapCameraController controller, CameraTransition transition);
+    /**
+     * Called whenever a transition is started. If a transition is queued,
+     * it's only going to be started when at the top of the queue.
+     */
+    void animationStarted(MapCameraController controller, CameraTransition transition);
 
+    /**
+     * Called whenever there's a transition scheduled to be started,
+     * but another one is already changing the requested camera property.
+     * <p>
+     * The transition that is going be returned by this method is going to be executed (or allowed to finish),
+     * the other one is going to get canceled immediately.
+     */
     @NonNull
     CameraTransition resolve(CameraTransition currentTransition, CameraTransition interruptingTransition);
   }
@@ -286,10 +349,13 @@ public class MapCameraController {
     void onCameraChanged();
   }
 
+  /**
+   * Default implementation of the camera behavior.
+   */
   public static class DefaultCameraBehavior implements CameraBehavior {
 
     @Override
-    public void animationScheduled(MapCameraController controller, CameraTransition transition) {
+    public void animationStarted(MapCameraController controller, CameraTransition transition) {
       if (transition.getReason() == CameraTransition.REASON_GESTURE) {
         for (CameraTransition currentTransition : controller.getRunningTransitions().values()) {
           if (currentTransition.getReason() != CameraTransition.REASON_GESTURE) {
