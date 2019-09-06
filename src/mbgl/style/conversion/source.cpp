@@ -86,8 +86,25 @@ static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& 
     if (!urlOrTileset) {
         return nullopt;
     }
-
-    return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset)) };
+    auto maxzoomValue = objectMember(value, "maxzoom");
+    optional<float> maxzoom;
+    if (maxzoomValue) {
+        maxzoom = toNumber(*maxzoomValue);
+        if (!maxzoom || *maxzoom < 0 || *maxzoom > std::numeric_limits<uint8_t>::max()) {
+            error.message = "invalid maxzoom";
+            return nullopt;
+        }
+    }
+    auto minzoomValue = objectMember(value, "minzoom");
+    optional<float> minzoom;
+    if (minzoomValue) {
+        minzoom = toNumber(*minzoomValue);
+        if (!minzoom || *minzoom < 0 || *minzoom > std::numeric_limits<uint8_t>::max()) {
+            error.message = "invalid minzoom";
+            return nullopt;
+        }
+    }
+    return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset), maxzoom, minzoom) };
 }
 
 static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
