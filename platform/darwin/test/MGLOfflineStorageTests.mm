@@ -436,6 +436,63 @@
     
     [self waitForExpectations:@[expectation] timeout:10.0];
     
+    // TODO: What should we expect here? All packs removed?
+    
+    NSLog(@"Test `%@` complete", NSStringFromSelector(_cmd));
+}
+
+// Test to explore https://github.com/mapbox/mapbox-gl-native/issues/15536
+- (void)test15536RemovePacksOnBackgroundQueueWhileReloading {
+
+    [self addPacks:4];
+    
+    NSInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+    XCTAssert(countOfPacks > 0);
+
+    // Now delete packs one by one
+    dispatch_queue_t queue = dispatch_queue_create("com.mapbox.testRemovePacks", DISPATCH_QUEUE_SERIAL);
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"all packs removed"];
+    expectation.expectedFulfillmentCount = countOfPacks;
+    
+    MGLOfflineStorage *storage = [MGLOfflineStorage sharedOfflineStorage];
+    
+    // Simulate what happens the first time sharedOfflineStorage is accessed
+    [storage reloadPacks];
+
+//  NSArray *packs = [storage.packs copy];
+    
+    dispatch_async(queue, ^{
+        NSArray *packs = storage.packs;
+        NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
+        [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+                
+        NSArray *validPacks = [packs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+            MGLOfflinePack *pack = (MGLOfflinePack*)evaluatedObject;
+            return pack.state != MGLOfflinePackStateInvalid;
+        }]];
+        
+        for (MGLOfflinePack *pack in validPacks) {
+            // NOTE: pack can be invalid, as we have two threads potentially
+            // modifying the same MGLOfflinePack.
+            
+            dispatch_group_t group = dispatch_group_create();
+            dispatch_group_enter(group);
+            [storage removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+                dispatch_group_leave(group);
+            }];
+            dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+            
+            [expectation fulfill];
+        }
+        
+        [[[NSThread currentThread] threadDictionary] setValue:oldHandler forKey:NSAssertionHandlerKey];
+    });
+    
+    [self waitForExpectations:@[expectation] timeout:60.0];
+    
+    // TODO: What should we expect here? All packs removed?
+    
     NSLog(@"Test `%@` complete", NSStringFromSelector(_cmd));
 }
 
