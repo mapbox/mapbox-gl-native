@@ -4,7 +4,7 @@ import android.view.animation.Interpolator;
 
 public class PaddingCameraTransition extends CameraTransition<Double[]> {
 
-  public PaddingCameraTransition(int type, double duration, double delay, Double[] endValue, Interpolator interpolator) {
+  public PaddingCameraTransition(int type, long duration, long delay, Double[] endValue, Interpolator interpolator) {
     super(type, duration, delay, endValue, interpolator);
   }
 
@@ -14,7 +14,7 @@ public class PaddingCameraTransition extends CameraTransition<Double[]> {
   }
 
   @Override
-  Double[] getAnimatedValue(double fraction) {
+  protected Double[] getAnimatedValue(double fraction) {
     Double[] startValue = getStartValue();
     Double[] endValue = getEndValue();
 
@@ -24,5 +24,17 @@ public class PaddingCameraTransition extends CameraTransition<Double[]> {
     }
 
     return value;
+  }
+
+  public static class Builder extends CameraTransition.Builder<PaddingCameraTransition, Double[]> {
+
+    public Builder(Double[] endValue) {
+      super(endValue);
+    }
+
+    @Override
+    public PaddingCameraTransition build() {
+      return new PaddingCameraTransition(reason, durationMillis, delayMillis, endValue, interpolator);
+    }
   }
 }

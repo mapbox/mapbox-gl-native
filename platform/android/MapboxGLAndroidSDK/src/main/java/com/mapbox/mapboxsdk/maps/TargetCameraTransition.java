@@ -18,11 +18,23 @@ public class TargetCameraTransition extends CameraTransition<LatLng> {
   }
 
   @Override
-  LatLng getAnimatedValue(double fraction) {
+  protected LatLng getAnimatedValue(double fraction) {
     latLng.setLatitude(getStartValue().getLatitude()
       + ((getEndValue().getLatitude() - getStartValue().getLatitude()) * fraction));
     latLng.setLongitude(getStartValue().getLongitude()
       + ((getEndValue().getLongitude() - getStartValue().getLongitude()) * fraction));
     return latLng;
+  }
+
+  public static class Builder extends CameraTransition.Builder<TargetCameraTransition, LatLng> {
+
+    public Builder(LatLng endValue) {
+      super(endValue);
+    }
+
+    @Override
+    public TargetCameraTransition build() {
+      return new TargetCameraTransition(reason, durationMillis, delayMillis, endValue, interpolator);
+    }
   }
 }

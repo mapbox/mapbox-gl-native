@@ -4,7 +4,7 @@ import android.view.animation.Interpolator;
 
 public class PitchCameraTransition extends CameraTransition<Double> {
 
-  public PitchCameraTransition(int type, double duration, double delay, Double endValue, Interpolator interpolator) {
+  public PitchCameraTransition(int type, long duration, long delay, Double endValue, Interpolator interpolator) {
     super(type, duration, delay, endValue, interpolator);
   }
 
@@ -14,7 +14,19 @@ public class PitchCameraTransition extends CameraTransition<Double> {
   }
 
   @Override
-  Double getAnimatedValue(double fraction) {
+  protected Double getAnimatedValue(double fraction) {
     return getStartValue() + ((getEndValue() - getStartValue()) * fraction);
+  }
+
+  public static class Builder extends CameraTransition.Builder<PitchCameraTransition, Double> {
+
+    public Builder(Double endValue) {
+      super(endValue);
+    }
+
+    @Override
+    public PitchCameraTransition build() {
+      return new PitchCameraTransition(reason, durationMillis, delayMillis, endValue, interpolator);
+    }
   }
 }

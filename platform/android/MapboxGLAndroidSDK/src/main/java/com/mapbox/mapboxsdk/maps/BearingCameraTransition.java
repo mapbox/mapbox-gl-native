@@ -4,7 +4,7 @@ import android.view.animation.Interpolator;
 
 public class BearingCameraTransition extends CameraTransition<Double> {
 
-  public BearingCameraTransition(int type, double duration, double delay, Double endValue, Interpolator interpolator) {
+  public BearingCameraTransition(int type, long duration, long delay, Double endValue, Interpolator interpolator) {
     super(type, duration, delay, endValue, interpolator);
   }
 
@@ -14,7 +14,19 @@ public class BearingCameraTransition extends CameraTransition<Double> {
   }
 
   @Override
-  Double getAnimatedValue(double fraction) {
+  protected Double getAnimatedValue(double fraction) {
     return getStartValue() + ((getEndValue() - getStartValue()) * fraction);
+  }
+
+  public static class Builder extends CameraTransition.Builder<BearingCameraTransition, Double> {
+
+    public Builder(Double endValue) {
+      super(endValue);
+    }
+
+    @Override
+    public BearingCameraTransition build() {
+      return new BearingCameraTransition(reason, durationMillis, delayMillis, endValue, interpolator);
+    }
   }
 }

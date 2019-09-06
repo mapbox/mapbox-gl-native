@@ -3,6 +3,8 @@ package com.mapbox.mapboxsdk.maps;
 import android.support.v4.view.animation.PathInterpolatorCompat;
 import android.view.animation.Interpolator;
 
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class CameraTransition<T> {
@@ -46,7 +48,15 @@ public abstract class CameraTransition<T> {
 
   private final Interpolator interpolator;
 
-  CameraTransition(int reason, double durationMillis, double delayMillis, T endValue, Interpolator interpolator) {
+  CameraTransition(int reason, long durationMillis, long delayMillis, T endValue, Interpolator interpolator) {
+    if (endValue == null) {
+      throw new IllegalArgumentException("end value cannot be null");
+    }
+
+    if (interpolator == null) {
+      throw new IllegalArgumentException("interpolator cannot be null");
+    }
+
     this.reason = reason;
     this.durationMillis = durationMillis;
     this.durationNanos = durationMillis * 1E6;
@@ -193,8 +203,7 @@ public abstract class CameraTransition<T> {
 
   abstract int getCameraProperty();
 
-  // todo camera - make protected?
-  abstract T getAnimatedValue(double fraction);
+  protected abstract T getAnimatedValue(double fraction);
 
   public interface Listener {
 
@@ -203,5 +212,39 @@ public abstract class CameraTransition<T> {
     void onCancel(CameraTransition transition);
 
     void onFinish(CameraTransition transition);
+  }
+
+  public abstract static class Builder<T, K> {
+    protected int reason = REASON_ANY;
+    protected long durationMillis = MapboxConstants.ANIMATION_DURATION;
+    protected long delayMillis = 0;
+    protected final K endValue;
+    protected Interpolator interpolator = INTERPOLATOR_EASING;
+
+    public Builder(K endValue) {
+      this.endValue = endValue;
+    }
+
+    public Builder<T, K> reason(int reason) {
+      this.reason = reason;
+      return this;
+    }
+
+    public Builder<T, K> duration(long durationMillis) {
+      this.durationMillis = durationMillis;
+      return this;
+    }
+
+    public Builder<T, K> delay(long delayMillis) {
+      this.delayMillis = delayMillis;
+      return this;
+    }
+
+    public Builder<T, K> interpolator(Interpolator interpolator) {
+      this.interpolator = interpolator;
+      return this;
+    }
+
+    public abstract T build();
   }
 }
