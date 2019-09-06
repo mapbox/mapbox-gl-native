@@ -552,7 +552,7 @@
 		DA2DBBCE1D51E80400D38FF9 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2DBBCD1D51E80400D38FF9 /* MGLStyleLayerTests.m */; };
 		DA2E88561CC036F400F24E7B /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		DA2E88611CC0382C00F24E7B /* MGLGeometryTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */; };
-		DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */; };
+		DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.mm */; };
 		DA2E88631CC0382C00F24E7B /* MGLOfflineRegionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */; };
 		DA2E88651CC0382C00F24E7B /* MGLStyleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */; };
 		DA35A29E1CC9E94C00E826B2 /* MGLCoordinateFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A29D1CC9E94C00E826B2 /* MGLCoordinateFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1247,7 +1247,7 @@
 		DA2E88511CC036F400F24E7B /* test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA2E88551CC036F400F24E7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeometryTests.mm; path = ../../darwin/test/MGLGeometryTests.mm; sourceTree = "<group>"; };
-		DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflinePackTests.m; path = ../../darwin/test/MGLOfflinePackTests.m; sourceTree = "<group>"; };
+		DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflinePackTests.mm; path = ../../darwin/test/MGLOfflinePackTests.mm; sourceTree = "<group>"; };
 		DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflineRegionTests.m; path = ../../darwin/test/MGLOfflineRegionTests.m; sourceTree = "<group>"; };
 		DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLStyleTests.mm; path = ../../darwin/test/MGLStyleTests.mm; sourceTree = "<group>"; };
 		DA33895F1FA3EAB7001EA329 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Foundation.strings"; sourceTree = "<group>"; };
@@ -2089,7 +2089,7 @@
 				1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */,
 				96036A0520059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m */,
 				DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */,
-				DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */,
+				DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.mm */,
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
 				55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */,
 				35B8E08B1D6C8B5100E768D2 /* MGLPredicateTests.mm */,
@@ -3308,7 +3308,7 @@
 				9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */,
 				409D0A0D1ED614CE00C95D0C /* MGLAnnotationViewIntegrationTests.swift in Sources */,
 				9686D1BD22D9357700194EA0 /* MGLMapViewZoomTests.mm in Sources */,
-				DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */,
+				DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.mm in Sources */,
 				55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */,
 				07D8C6FF1F67562C00381808 /* MGLComputedShapeSourceTests.m in Sources */,
 				920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */,

@@ -1,5 +1,7 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
+#import "MGLOfflinePack_Private.h"
+#import "MGLTestAssertionHandler.h"
 
 @interface MGLOfflinePackTests : XCTestCase
 
@@ -16,6 +18,21 @@
     XCTAssertThrowsSpecificNamed(invalidPack.context, NSException, MGLInvalidOfflinePackException, @"Invalid offline pack should raise an exception when accessing its context.");
     XCTAssertThrowsSpecificNamed([invalidPack resume], NSException, MGLInvalidOfflinePackException, @"Invalid offline pack should raise an exception when being resumed.");
     XCTAssertThrowsSpecificNamed([invalidPack suspend], NSException, MGLInvalidOfflinePackException, @"Invalid offline pack should raise an exception when being suspended.");
+}
+
+- (void)testInvalidatingAnInvalidPack {
+    MGLOfflinePack *invalidPack = [[MGLOfflinePack alloc] init];
+
+    XCTAssertThrowsSpecificNamed([invalidPack invalidate], NSException, NSInternalInconsistencyException, @"Invalid offline pack should raise an exception when being invalidated.");
+
+    // Now try again, without asserts
+    NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
+    [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+
+    // Make sure this doesn't crash without asserts
+    [invalidPack invalidate];
+    
+    [[[NSThread currentThread] threadDictionary] setValue:oldHandler forKey:NSAssertionHandlerKey];
 }
 
 - (void)testProgressBoxing {
