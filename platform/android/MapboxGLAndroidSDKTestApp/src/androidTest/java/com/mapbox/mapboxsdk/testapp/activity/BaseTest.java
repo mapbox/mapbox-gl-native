@@ -37,7 +37,8 @@ public abstract class BaseTest extends AppCenter {
   public TestName testName = new TestName();
 
   @Rule
-  public GrantPermissionRule grantLocationPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+  public GrantPermissionRule grantLocationPermissionRule = GrantPermissionRule
+          .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
 
   protected MapboxMap mapboxMap;
   protected MapView mapView;
@@ -79,7 +80,12 @@ public abstract class BaseTest extends AppCenter {
     try {
       rule.runOnUiThread(() -> {
         mapView = rule.getActivity().findViewById(R.id.mapView);
-        mapView.getMapAsync(this::initMap);
+        if (mapView != null) {
+          mapView.getMapAsync(this::initMap);
+        } else {
+          Timber.w("Skipping map load test since mapView is not found.");
+          latch.countDown();
+        }
       });
     } catch (Throwable throwable) {
       throwable.printStackTrace();
