@@ -1,25 +1,21 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.view.Choreographer;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class MapCameraController {
 
   @NonNull
   private final HashMap<Integer, LinkedList<CameraTransition>> queuedTransitions = new HashMap<>(5);
-
-  @NonNull
-  private final ReentrantLock runningTransitionsLock = new ReentrantLock();
 
   @NonNull
   private final HashMap<Integer, CameraTransition> runningTransitions = new HashMap<>(5);
@@ -28,117 +24,11 @@ public class MapCameraController {
   private CameraBehavior behavior = new DefaultCameraBehavior();
 
   @NonNull
-  private final Handler handler = new Handler(Looper.getMainLooper());
-
-  @NonNull
   private final Transform transform;
 
   private volatile boolean destroyed;
 
-  @NonNull
-  private final Thread thread = new Thread(new Runnable() {
-
-    private static final short MIN_FRAME_INTERVAL = 10;
-
-    @Override
-    public void run() {
-      CameraPosition cameraPosition = null;
-      while (true) {
-        if (destroyed) {
-          return;
-        }
-
-        final CameraPosition update = cameraPosition;
-        if (update != null) {
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              if (destroyed) {
-                return;
-              }
-
-              CameraPosition finalUpdate = update;
-
-              synchronized (runningTransitionsLock) {
-                Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
-                while (iterator.hasNext()) {
-                  CameraTransition transition = iterator.next();
-                  if (transition.isCanceled()) {
-                    transition.onCancel();
-                    iterator.remove();
-                    CameraPosition.Builder builder = new CameraPosition.Builder(finalUpdate);
-                    setCameraProperty(builder, transition.getCameraProperty(), null);
-                    finalUpdate = builder.build();
-
-                    startNextTransition(transition.getCameraProperty());
-                  }
-                }
-              }
-
-              // todo camera - check if update is noop, abort then
-
-              transform.moveCamera(finalUpdate);
-
-              synchronized (runningTransitionsLock) {
-                Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
-                while (iterator.hasNext()) {
-                  CameraTransition transition = iterator.next();
-                  transition.onProgress();
-
-                  if (transition.isFinishing()) {
-                    transition.onFinish();
-                    iterator.remove();
-
-                    startNextTransition(transition.getCameraProperty());
-                  }
-                }
-              }
-            }
-          });
-        }
-
-        // todo camera - what's the correct delay not to flood and block the main thread?
-        long nextFrameTime = System.currentTimeMillis() + MIN_FRAME_INTERVAL;
-
-        synchronized (runningTransitionsLock) {
-          boolean willRun = false;
-          CameraPosition.Builder builder = new CameraPosition.Builder();
-          for (final CameraTransition transition : runningTransitions.values()) {
-            if (transition.getStartTime() <= nextFrameTime) {
-              willRun = true;
-              if (nextFrameTime >= transition.getEndTime()) {
-                handler.post(new Runnable() {
-                  @Override
-                  public void run() {
-                    transition.setFinishing();
-                  }
-                });
-              }
-
-              Object value = transition.isFinishing() ? transition.getEndValue() : transition.onFrame(nextFrameTime);
-              setCameraProperty(builder, transition.getCameraProperty(), value);
-            }
-          }
-
-          if (willRun) {
-            cameraPosition = builder.build();
-          } else {
-            cameraPosition = null;
-          }
-        }
-
-        long sleepTime = nextFrameTime - System.currentTimeMillis();
-
-        if (sleepTime >= 0) {
-          try {
-            Thread.sleep(sleepTime);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-        }
-      }
-    }
-  }, "MapCameraController");
+  private final Choreographer choreographer = Choreographer.getInstance();
 
   MapCameraController(@NonNull final Transform transform) {
     this.transform = transform;
@@ -148,30 +38,89 @@ public class MapCameraController {
     queuedTransitions.put(CameraTransition.PROPERTY_BEARING, new LinkedList<CameraTransition>());
     queuedTransitions.put(CameraTransition.PROPERTY_ANCHOR, new LinkedList<CameraTransition>());
     queuedTransitions.put(CameraTransition.PROPERTY_PADDING, new LinkedList<CameraTransition>());
-    thread.start();
+    choreographer.postFrameCallback(frameCallback);
   }
 
-  public void startTransition(CameraTransition transition) {
-    synchronized (runningTransitionsLock) {
-      behavior.animationScheduled(this, transition);
-
-      final CameraTransition runningTransition = runningTransitions.get(transition.getCameraProperty());
-      if (runningTransition != null) {
-        CameraTransition resultingTransition = behavior.resolve(runningTransition, transition);
-        if (resultingTransition != transition && resultingTransition != runningTransition) {
-          throw new UnsupportedOperationException();
-        } else if (resultingTransition != transition) {
-          transition.cancel();
-          transition.onCancel();
-        } else {
-          runningTransition.cancel();
-          queuedTransitions.get(transition.getCameraProperty()).push(transition);
-        }
-      } else {
-        long time = System.currentTimeMillis();
-        transition.initTime(getCameraPropertyValue(transition.getCameraProperty()), time);
-        runningTransitions.put(transition.getCameraProperty(), transition);
+  private final Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
+    @Override
+    public void doFrame(long frameTimeNanos) {
+      if (destroyed) {
+        return;
       }
+      List<CameraTransition> canceled = new ArrayList<>();
+      Iterator<CameraTransition> iterator = runningTransitions.values().iterator();
+      while (iterator.hasNext()) {
+        CameraTransition transition = iterator.next();
+        if (transition.isCanceled()) {
+          transition.onCancel();
+          iterator.remove();
+          canceled.add(transition);
+        }
+      }
+
+      for (CameraTransition transition : canceled) {
+        startNextTransition(transition.getCameraProperty());
+      }
+
+      boolean shouldRun = false;
+      CameraPosition.Builder builder = new CameraPosition.Builder();
+      for (final CameraTransition transition : runningTransitions.values()) {
+        if (transition.getStartTimeNanos() <= frameTimeNanos) {
+          shouldRun = true;
+          if (frameTimeNanos >= transition.getEndTimeNanos()) {
+            transition.setFinishing();
+          }
+
+          Object value = transition.isFinishing() ? transition.getEndValue() : transition.onFrame(frameTimeNanos);
+          setCameraProperty(builder, transition.getCameraProperty(), value);
+        }
+      }
+
+      if (shouldRun) {
+        transform.moveCamera(builder.build());
+      }
+
+
+      List<CameraTransition> finished = new ArrayList<>();
+      iterator = runningTransitions.values().iterator();
+      while (iterator.hasNext()) {
+        CameraTransition transition = iterator.next();
+        transition.onProgress();
+
+        if (transition.isFinishing()) {
+          transition.onFinish();
+          iterator.remove();
+          finished.add(transition);
+        }
+      }
+
+      for (CameraTransition transition : finished) {
+        startNextTransition(transition.getCameraProperty());
+      }
+
+      choreographer.postFrameCallback(this);
+    }
+  };
+
+  public void startTransition(CameraTransition transition) {
+    behavior.animationScheduled(this, transition);
+
+    final CameraTransition runningTransition = runningTransitions.get(transition.getCameraProperty());
+    if (runningTransition != null) {
+      CameraTransition resultingTransition = behavior.resolve(runningTransition, transition);
+      if (resultingTransition != transition && resultingTransition != runningTransition) {
+        throw new UnsupportedOperationException();
+      } else if (resultingTransition != transition) {
+        transition.cancel();
+        transition.onCancel();
+      } else {
+        runningTransition.cancel();
+        queuedTransitions.get(transition.getCameraProperty()).push(transition);
+      }
+    } else {
+      long time = System.nanoTime();
+      transition.initTime(getCameraPropertyValue(transition.getCameraProperty()), time);
+      runningTransitions.put(transition.getCameraProperty(), transition);
     }
   }
 
@@ -219,12 +168,6 @@ public class MapCameraController {
       transition.onCancel();
     }
     runningTransitions.clear();
-
-    try {
-      thread.join();
-    } catch (InterruptedException ex) {
-      ex.printStackTrace();
-    }
   }
 
   private static void setCameraProperty(CameraPosition.Builder builder, int property, Object value) {
