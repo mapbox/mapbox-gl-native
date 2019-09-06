@@ -50,8 +50,8 @@ mbgl::CameraOptions CameraPosition::getCameraOptions(jni::JNIEnv& env, const jni
 
     return mbgl::CameraOptions {
             center,
-            EdgeInsets {padding.Get(env, 1) * pixelRatio, padding.Get(env, 0) * pixelRatio,
-                        padding.Get(env, 3) * pixelRatio, padding.Get(env, 2) * pixelRatio},
+            padding ? EdgeInsets {padding.Get(env, 1) * pixelRatio, padding.Get(env, 0) * pixelRatio,
+                        padding.Get(env, 3) * pixelRatio, padding.Get(env, 2) * pixelRatio} : (EdgeInsets) {},
             {},
             position.Get(env, zoom),
             position.Get(env, bearing),
