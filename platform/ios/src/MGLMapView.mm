@@ -274,6 +274,10 @@ public:
 /// Tilt gesture recognizer helper
 @property (nonatomic, assign) CGPoint dragGestureMiddlePoint;
 
+/// This property is used to keep track of the view's safe edge insets
+/// and calculate the ornament's position
+@property (nonatomic, assign) UIEdgeInsets safeMapViewContentInsets;
+
 - (mbgl::Map &)mbglMap;
 
 @end
@@ -518,6 +522,8 @@ public:
     _annotationViewReuseQueueByIdentifier = [NSMutableDictionary dictionary];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
+    
+    _automaticallyAdjustContentInset = YES;
 
     // setup logo
     //
@@ -832,23 +838,31 @@ public:
                                 size:(CGSize)size
                              margins:(CGPoint)margins {
     NSMutableArray *updatedConstraints = [NSMutableArray array];
+    UIEdgeInsets inset = UIEdgeInsetsZero;
+    
+    if (! self.automaticallyAdjustContentInset) {
+        inset = UIEdgeInsetsMake(self.contentInset.top - self.safeMapViewContentInsets.top,
+                                 self.contentInset.left - self.safeMapViewContentInsets.left,
+                                 self.contentInset.bottom - self.safeMapViewContentInsets.bottom,
+                                 self.contentInset.right - self.safeMapViewContentInsets.right);
+    }
     
     switch (position) {
         case MGLOrnamentPositionTopLeft:
-            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y]];
-            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y + inset.top]];
+            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x + inset.left]];
             break;
         case MGLOrnamentPositionTopRight:
-            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y]];
-            [updatedConstraints addObject:[self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y + inset.top]];
+            [updatedConstraints addObject:[self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x + inset.right]];
             break;
         case MGLOrnamentPositionBottomLeft:
-            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y]];
-            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y + inset.bottom]];
+            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x + inset.left]];
             break;
         case MGLOrnamentPositionBottomRight:
-            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y]];
-            [updatedConstraints addObject: [self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y + inset.bottom]];
+            [updatedConstraints addObject: [self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x + inset.right]];
             break;
     }
 
@@ -968,40 +982,44 @@ public:
 /// Updates `contentInset` to reflect the current window geometry.
 - (void)adjustContentInset
 {
-    // We could crawl all the way up the responder chain using
-    // -viewControllerForLayoutGuides, but an intervening view means that any
-    // manual contentInset should not be overridden; something other than the
-    // top and bottom bars may be influencing the manual inset.
-    UIViewController *viewController;
-    if ([self.nextResponder isKindOfClass:[UIViewController class]])
+    UIEdgeInsets adjustedContentInsets = UIEdgeInsetsZero;
+    
+    if (@available(iOS 11.0, *))
     {
-        // This map view is the content view of a view controller.
-        viewController = (UIViewController *)self.nextResponder;
-    }
-    else if ([self.superview.nextResponder isKindOfClass:[UIViewController class]])
-    {
-        // This map view is an immediate child of a view controller’s content view.
-        viewController = (UIViewController *)self.superview.nextResponder;
-    }
+        adjustedContentInsets = self.safeAreaInsets;
+        
+    } else {
+        // We could crawl all the way up the responder chain using
+        // -viewControllerForLayoutGuides, but an intervening view means that any
+        // manual contentInset should not be overridden; something other than the
+        // top and bottom bars may be influencing the manual inset.
+        UIViewController *viewController;
+        if ([self.nextResponder isKindOfClass:[UIViewController class]])
+        {
+            // This map view is the content view of a view controller.
+            viewController = (UIViewController *)self.nextResponder;
+        }
+        else if ([self.superview.nextResponder isKindOfClass:[UIViewController class]])
+        {
+            // This map view is an immediate child of a view controller’s content view.
+            viewController = (UIViewController *)self.superview.nextResponder;
+        }
+        
+        adjustedContentInsets.top = viewController.topLayoutGuide.length;
+        CGFloat bottomPoint = CGRectGetMaxY(viewController.view.bounds) -
+                                (CGRectGetMaxY(viewController.view.bounds)
+                                - viewController.bottomLayoutGuide.length);
+        adjustedContentInsets.bottom = bottomPoint;
 
-    if ( ! viewController.automaticallyAdjustsScrollViewInsets)
+    }
+    
+    self.safeMapViewContentInsets = adjustedContentInsets;
+    if ( ! self.automaticallyAdjustContentInset)
     {
         return;
     }
-
-    UIEdgeInsets contentInset = UIEdgeInsetsZero;
-    CGPoint topPoint = CGPointMake(0, viewController.topLayoutGuide.length);
-    contentInset.top = [self convertPoint:topPoint fromView:viewController.view].y;
-    CGPoint bottomPoint = CGPointMake(0, CGRectGetMaxY(viewController.view.bounds)
-                                      - viewController.bottomLayoutGuide.length);
-    contentInset.bottom = (CGRectGetMaxY(self.bounds)
-                           - [self convertPoint:bottomPoint fromView:viewController.view].y);
-
-    // Negative insets are invalid, replace with 0.
-    contentInset.top = fmaxf(contentInset.top, 0);
-    contentInset.bottom = fmaxf(contentInset.bottom, 0);
-
-    self.contentInset = contentInset;
+    
+    self.contentInset = adjustedContentInsets;
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
@@ -1016,6 +1034,12 @@ public:
 
 - (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
 {
+    // makes sure the insets don't have negative values that could hide the ornaments
+    // thus violating our ToS
+    contentInset = UIEdgeInsetsMake(fmaxf(contentInset.top, 0),
+                                    fmaxf(contentInset.left, 0),
+                                    fmaxf(contentInset.bottom, 0),
+                                    fmaxf(contentInset.right, 0));
     MGLLogDebug(@"Setting contentInset: %@ animated:", NSStringFromUIEdgeInsets(contentInset), MGLStringFromBOOL(animated));
     if (UIEdgeInsetsEqualToEdgeInsets(contentInset, self.contentInset))
     {

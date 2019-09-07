@@ -5,6 +5,7 @@
 
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) UIWindow *window;
+@property (nonatomic) UIViewController *viewController;
 @property (nonatomic) XCTestExpectation *styleLoadingExpectation;
 @property (assign) CGRect screenBounds;
 
@@ -22,11 +23,11 @@
     self.mapView.zoomLevel = 16;
     self.mapView.delegate = self;
     
-    
-    UIView *view = [[UIView alloc] initWithFrame:self.screenBounds];
-    [view addSubview:self.mapView];
+    self.viewController = [[UIViewController alloc] init];
+    self.viewController.view = [[UIView alloc] initWithFrame:self.screenBounds];
+    [self.viewController.view addSubview:self.mapView];
     self.window = [[UIWindow alloc] initWithFrame:self.screenBounds];
-    [self.window addSubview:view];
+    [self.window addSubview:self.viewController.view];
     [self.window makeKeyAndVisible];
     
     if (!self.mapView.style) {
@@ -99,7 +100,7 @@
     XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
     
     UIEdgeInsets insets = UIEdgeInsetsMake(15, 10, 20, 5);
-    self.mapView.automaticallyAdjustContentInset = YES;
+    self.mapView.automaticallyAdjustContentInset = NO;
     self.mapView.contentInset = insets;
     
     [self.mapView setNeedsLayout];
@@ -121,6 +122,28 @@
     expectedAttributionOrigin = CGPointMake(x, y);
     XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
     
+    // tests that passing negative values result in a 0 inset value
+    insets = UIEdgeInsetsMake(-100, -100, -100, -100);
+    self.mapView.contentInset = insets;
+    
+    [self.mapView setNeedsLayout];
+    [self.mapView layoutIfNeeded];
+    
+    expectedScaleBarOrigin = CGPointMake(margin, margin);
+    XCTAssertTrue(CGPointEqualToPoint(scaleBar.frame.origin, expectedScaleBarOrigin));
+    
+    x = self.screenBounds.size.width - compassView.bounds.size.width - margin;
+    expectedCompassOrigin = CGPointMake(x, margin);
+    XCTAssertTrue(CGPointEqualToPoint(compassView.frame.origin, expectedCompassOrigin));
+    
+    y = self.screenBounds.size.height - logoView.bounds.size.height - margin;
+    expectedLogoOrigin = CGPointMake(margin, y);
+    XCTAssertTrue(CGPointEqualToPoint(logoView.frame.origin, expectedLogoOrigin));
+    
+    x = self.screenBounds.size.width - attributionView.bounds.size.width - margin;
+    y = self.screenBounds.size.height - attributionView.bounds.size.height - margin;
+    expectedAttributionOrigin = CGPointMake(x, y);
+    XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
 }
 
 @end
