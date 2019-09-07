@@ -24,7 +24,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
-* Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
+* Fixed a potential integer overflow at high zoom levels. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
 * Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
 * Fixed a bug where the completion block passed to `-[MGLMapView flyToCamera:completionHandler:` (and related methods) wouldn't be called. ([#15473](https://github.com/mapbox/mapbox-gl-native/pull/15473))
 
