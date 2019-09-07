@@ -20,7 +20,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Performance improvements
  
-* Mark used offline region resources in batches. ([#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521))
+* Improved offline region download performance by batching certain database activities. ([#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521))
 
 ### Other changes
 
