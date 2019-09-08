@@ -137,6 +137,7 @@ generateFileList('vendor/mapbox-base-files.json',
     [ 'vendor/mapbox-base/extras/kdbush.hpp',
       'vendor/mapbox-base/extras/filesystem',
       'vendor/mapbox-base/extras/rapidjson',
+      'vendor/mapbox-base/extras/expected-lite',
       'vendor/mapbox-base/mapbox/pixelmatch-cpp',
       'vendor/mapbox-base/mapbox/geometry.hpp',
       'vendor/mapbox-base/mapbox/variant',
@@ -145,8 +146,10 @@ generateFileList('vendor/mapbox-base-files.json',
       'vendor/mapbox-base/mapbox/geojson.hpp',
       'vendor/mapbox-base/mapbox/jni.hpp',
       'vendor/mapbox-base/mapbox/weak',
-      'vendor/mapbox-base/mapbox/typewrapper' ], 
-    vendorRegex, [ "include/*.hpp", "include/**/*.hpp", "include/**/*.h", "optional.hpp", ":!:include/jni/string_conversion.hpp" ]);
+      'vendor/mapbox-base/mapbox/typewrapper',
+      'vendor/mapbox-base/mapbox/io' ],
+    vendorRegex, [ "src/*.cpp", "include/*.hpp", "include/**/*.hpp", "include/**/*.h", "optional.hpp",
+                   ":!:src/mapbox/geojson.cpp", ":!:include/jni/string_conversion.hpp" ]);
 generateFileList('vendor/polylabel-files.json', [ 'vendor/polylabel' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/protozero-files.json', [ 'vendor/protozero' ], vendorRegex, [ "include/**/*.hpp" ]);
 generateFileList('vendor/shelf-pack-cpp-files.json', [ 'vendor/shelf-pack-cpp' ], vendorRegex, [ "include/**/*.hpp" ]);
