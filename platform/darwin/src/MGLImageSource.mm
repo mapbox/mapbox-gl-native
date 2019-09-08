@@ -81,9 +81,16 @@
 }
 
 - (NSString *)description {
-    MGLAssertStyleSourceIsValid();
+    NSString *coordinates = @"<unknown>";
+    NSString *URLString = @"<unknown>";
+    
+    if (self.rawSource) {
+        coordinates = MGLStringFromCoordinateQuad(self.coordinates);
+        URLString = self.URL.description;
+    }
+    
     return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = %@; URL = %@; image = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, MGLStringFromCoordinateQuad(self.coordinates), self.URL, self.image];
+            NSStringFromClass([self class]), (void *)self, self.identifier, coordinates, URLString, self.image];
 }
 
 - (mbgl::style::ImageSource *)rawSource {

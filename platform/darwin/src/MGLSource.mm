@@ -28,7 +28,7 @@ const MGLExceptionName MGLInvalidStyleSourceException = @"MGLInvalidStyleSourceE
 - (instancetype)initWithIdentifier:(NSString *)identifier
 {
     if (self = [super init]) {
-        _identifier = identifier;
+        _identifier = [identifier copy];
     }
     return self;
 }

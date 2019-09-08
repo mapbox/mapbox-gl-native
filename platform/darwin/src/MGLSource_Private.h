@@ -27,11 +27,10 @@ struct SourceWrapper {
  */
 #define MGLAssertStyleSourceIsValid() \
 do { \
-if (!self.rawSource) { \
-[NSException raise:MGLInvalidStyleSourceException \
-format: \
-@"This source got invalidated after the style change "]; \
-} \
+    if (!self.rawSource) { \
+        [NSException raise:MGLInvalidStyleSourceException \
+                    format:@"This source got invalidated after the style change"]; \
+    } \
 } while (NO);
 
 @class MGLMapView;
