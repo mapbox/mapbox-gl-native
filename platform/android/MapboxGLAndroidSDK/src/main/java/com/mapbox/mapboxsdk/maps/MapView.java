@@ -425,6 +425,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     if (mapboxMap != null) {
       mapboxMap.onDestroy();
+      mapboxMap = null;
     }
 
     if (nativeMapView != null) {
