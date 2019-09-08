@@ -1,7 +1,7 @@
 #include "allocation_index.hpp"
 
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 
 #include "metadata.hpp"
 #include "parser.hpp"
@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
     }
 
     std::string resultsHTML = createResultPage(stats, metadatas, shuffle, seed);
-    mbgl::util::write_file(testRootPath + "/index.html", resultsHTML);
+    mapbox::base::io::writeFile(testRootPath + "/index.html", resultsHTML);
 
     const uint32_t count = stats.erroredTests + stats.failedTests +
                            stats.ignoreFailedTests + stats.ignorePassedTests +

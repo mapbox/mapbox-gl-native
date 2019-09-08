@@ -1,5 +1,5 @@
 #include <mbgl/util/logging.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -182,9 +182,9 @@ TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
 } // namespace
 
 JSONReply readJson(const mbgl::filesystem::path& jsonPath) {
-    auto maybeJSON = mbgl::util::readFile(jsonPath);
+    auto maybeJSON = mapbox::base::io::readFile(jsonPath);
     if (!maybeJSON) {
-        return { std::string("Unable to open file ") + jsonPath.string() };
+        return { maybeJSON.error() };
     }
 
     mbgl::JSDocument document;

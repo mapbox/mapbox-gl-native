@@ -10,7 +10,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -59,20 +59,20 @@ bool TestRunner::checkResults(mbgl::PremultipliedImage&& actualImage, TestMetada
 #if !TEST_READ_ONLY
     if (getenv("UPDATE_PLATFORM")) {
         mbgl::filesystem::create_directories(expectations.back());
-        mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actualImage));
+        mapbox::base::io::writeFile(expectations.back().string() + "/expected.png", mbgl::encodePNG(actualImage));
         return true;
     } else if (getenv("UPDATE_DEFAULT")) {
-        mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actualImage));
+        mapbox::base::io::writeFile(base + "/expected.png", mbgl::encodePNG(actualImage));
         return true;
     } else if (getenv("UPDATE_METRICS")) {
         if (!metadata.metrics.isEmpty()) {
             mbgl::filesystem::create_directories(expectations.back());
-            mbgl::util::write_file(expectations.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
+            mapbox::base::io::writeFile(expectations.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
             return true;
         }
     }
 
-    mbgl::util::write_file(base + "/actual.png", metadata.actual);
+    mapbox::base::io::writeFile(base + "/actual.png", metadata.actual);
 #endif
 
     mbgl::PremultipliedImage expectedImage { actualImage.size };
@@ -99,7 +99,7 @@ bool TestRunner::checkResults(mbgl::PremultipliedImage&& actualImage, TestMetada
     }
     
     for (const auto& entry: expectedImagesPaths) {
-        mbgl::optional<std::string> maybeExpectedImage = mbgl::util::readFile(entry);
+        auto maybeExpectedImage = mapbox::base::io::readFile(entry);
         if (!maybeExpectedImage) {
             metadata.errorMessage = "Failed to load expected image " + entry;
             return false;
@@ -116,7 +116,7 @@ bool TestRunner::checkResults(mbgl::PremultipliedImage&& actualImage, TestMetada
         metadata.diff = mbgl::encodePNG(imageDiff);
 
 #if !TEST_READ_ONLY
-        mbgl::util::write_file(base + "/diff.png", metadata.diff);
+        mapbox::base::io::writeFile(base + "/diff.png", metadata.diff);
 #endif
 
         metadata.difference = pixels / expectedImage.size.area();
@@ -249,7 +249,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
 
         const mbgl::filesystem::path filePath(std::string(TEST_RUNNER_ROOT_PATH) + "/mapbox-gl-js/test/integration/" + imagePath);
 
-        mbgl::optional<std::string> maybeImage = mbgl::util::readFile(filePath.string());
+        auto maybeImage = mapbox::base::io::readFile(filePath);
         if (!maybeImage) {
             metadata.errorMessage = std::string("Failed to load expected image ") + filePath.string();
             return false;

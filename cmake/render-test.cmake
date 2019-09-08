@@ -20,6 +20,7 @@ target_include_directories(mbgl-render-test
 target_link_libraries(mbgl-render-test PRIVATE
     mbgl-core
     mbgl-filesource
+    Mapbox::Base::io
     Mapbox::Base::Extras::args
     expected
     Mapbox::Base::Extras::filesystem
