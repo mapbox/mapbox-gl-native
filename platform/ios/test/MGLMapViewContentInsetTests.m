@@ -100,7 +100,7 @@
     XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
     
     UIEdgeInsets insets = UIEdgeInsetsMake(15, 10, 20, 5);
-    self.mapView.automaticallyAdjustContentInset = NO;
+    self.viewController.automaticallyAdjustsScrollViewInsets = NO;
     self.mapView.contentInset = insets;
     
     [self.mapView setNeedsLayout];
@@ -144,6 +144,34 @@
     y = self.screenBounds.size.height - attributionView.bounds.size.height - margin;
     expectedAttributionOrigin = CGPointMake(x, y);
     XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
+    
+    self.mapView.automaticallyAdjustContentInset = YES;
+    insets = UIEdgeInsetsMake(100, 100, 100, 100);
+    self.mapView.contentInset = insets;
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(self.mapView.contentInset, insets));
+    
+    [self.mapView setNeedsLayout];
+    [self.mapView layoutIfNeeded];
+    
+    // when automaticallyAdjustContentInset = YES the content insets should be overwrited
+    XCTAssertFalse(UIEdgeInsetsEqualToEdgeInsets(self.mapView.contentInset, insets));
+    
+    expectedScaleBarOrigin = CGPointMake(margin, margin);
+    XCTAssertTrue(CGPointEqualToPoint(scaleBar.frame.origin, expectedScaleBarOrigin));
+    
+    x = self.screenBounds.size.width - compassView.bounds.size.width - margin;
+    expectedCompassOrigin = CGPointMake(x, margin);
+    XCTAssertTrue(CGPointEqualToPoint(compassView.frame.origin, expectedCompassOrigin));
+    
+    y = self.screenBounds.size.height - logoView.bounds.size.height - margin;
+    expectedLogoOrigin = CGPointMake(margin, y);
+    XCTAssertTrue(CGPointEqualToPoint(logoView.frame.origin, expectedLogoOrigin));
+    
+    x = self.screenBounds.size.width - attributionView.bounds.size.width - margin;
+    y = self.screenBounds.size.height - attributionView.bounds.size.height - margin;
+    expectedAttributionOrigin = CGPointMake(x, y);
+    XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
+    
 }
 
 @end

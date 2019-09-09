@@ -277,6 +277,7 @@ public:
 /// This property is used to keep track of the view's safe edge insets
 /// and calculate the ornament's position
 @property (nonatomic, assign) UIEdgeInsets safeMapViewContentInsets;
+@property (nonatomic, strong) NSNumber *automaticallyAdjustContentInsetHolder;
 
 - (mbgl::Map &)mbglMap;
 
@@ -523,7 +524,10 @@ public:
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
     
-    _automaticallyAdjustContentInset = YES;
+    // TODO: This warning should be removed when automaticallyAdjustsScrollViewInsets is removed from
+    // the UIViewController api.
+    NSLog(@"%@ WARNING UIViewController.automaticallyAdjustsScrollViewInsets is deprecated use MGLMapView.automaticallyAdjustContentInset instead.",
+          NSStringFromClass(self.class));
 
     // setup logo
     //
@@ -840,11 +844,26 @@ public:
     NSMutableArray *updatedConstraints = [NSMutableArray array];
     UIEdgeInsets inset = UIEdgeInsetsZero;
     
-    if (! self.automaticallyAdjustContentInset) {
+    BOOL automaticallyAdjustContentInset;
+    if (_automaticallyAdjustContentInsetHolder) {
+        automaticallyAdjustContentInset = _automaticallyAdjustContentInsetHolder.boolValue;
+    } else {
+        UIViewController *viewController = [self rootViewController];
+        automaticallyAdjustContentInset = viewController.automaticallyAdjustsScrollViewInsets;
+    }
+    
+    if (! automaticallyAdjustContentInset) {
         inset = UIEdgeInsetsMake(self.contentInset.top - self.safeMapViewContentInsets.top,
                                  self.contentInset.left - self.safeMapViewContentInsets.left,
                                  self.contentInset.bottom - self.safeMapViewContentInsets.bottom,
                                  self.contentInset.right - self.safeMapViewContentInsets.right);
+        
+        // makes sure the insets don't have negative values that could hide the ornaments
+        // thus violating our ToS
+        inset = UIEdgeInsetsMake(fmaxf(inset.top, 0),
+                                 fmaxf(inset.left, 0),
+                                 fmaxf(inset.bottom, 0),
+                                 fmaxf(inset.right, 0));
     }
     
     switch (position) {
@@ -983,28 +1002,13 @@ public:
 - (void)adjustContentInset
 {
     UIEdgeInsets adjustedContentInsets = UIEdgeInsetsZero;
-    
+    UIViewController *viewController = [self rootViewController];
+    BOOL automaticallyAdjustContentInset;
     if (@available(iOS 11.0, *))
     {
         adjustedContentInsets = self.safeAreaInsets;
         
     } else {
-        // We could crawl all the way up the responder chain using
-        // -viewControllerForLayoutGuides, but an intervening view means that any
-        // manual contentInset should not be overridden; something other than the
-        // top and bottom bars may be influencing the manual inset.
-        UIViewController *viewController;
-        if ([self.nextResponder isKindOfClass:[UIViewController class]])
-        {
-            // This map view is the content view of a view controller.
-            viewController = (UIViewController *)self.nextResponder;
-        }
-        else if ([self.superview.nextResponder isKindOfClass:[UIViewController class]])
-        {
-            // This map view is an immediate child of a view controller’s content view.
-            viewController = (UIViewController *)self.superview.nextResponder;
-        }
-        
         adjustedContentInsets.top = viewController.topLayoutGuide.length;
         CGFloat bottomPoint = CGRectGetMaxY(viewController.view.bounds) -
                                 (CGRectGetMaxY(viewController.view.bounds)
@@ -1013,13 +1017,47 @@ public:
 
     }
     
+    if (_automaticallyAdjustContentInsetHolder) {
+        automaticallyAdjustContentInset = _automaticallyAdjustContentInsetHolder.boolValue;
+    } else {
+        automaticallyAdjustContentInset = viewController.automaticallyAdjustsScrollViewInsets;
+    }
+    
     self.safeMapViewContentInsets = adjustedContentInsets;
-    if ( ! self.automaticallyAdjustContentInset)
+    if ( ! automaticallyAdjustContentInset)
     {
         return;
     }
     
     self.contentInset = adjustedContentInsets;
+}
+
+- (UIViewController *)rootViewController {
+    // We could crawl all the way up the responder chain using
+    // -viewControllerForLayoutGuides, but an intervening view means that any
+    // manual contentInset should not be overridden; something other than the
+    // top and bottom bars may be influencing the manual inset.
+    UIViewController *viewController;
+    if ([self.nextResponder isKindOfClass:[UIViewController class]])
+    {
+        // This map view is the content view of a view controller.
+        viewController = (UIViewController *)self.nextResponder;
+    }
+    else if ([self.superview.nextResponder isKindOfClass:[UIViewController class]])
+    {
+        // This map view is an immediate child of a view controller’s content view.
+        viewController = (UIViewController *)self.superview.nextResponder;
+    }
+    return viewController;
+}
+
+- (void)setAutomaticallyAdjustContentInset:(BOOL)automaticallyAdjustContentInset {
+    MGLLogDebug(@"Setting automaticallyAdjustContentInset: %@", MGLStringFromBOOL(automaticallyAdjustContentInset));
+    _automaticallyAdjustContentInsetHolder = [NSNumber numberWithBool:automaticallyAdjustContentInset];
+}
+
+- (BOOL)automaticallyAdjustContentInset {
+    return _automaticallyAdjustContentInsetHolder.boolValue;
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
@@ -1034,12 +1072,6 @@ public:
 
 - (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
 {
-    // makes sure the insets don't have negative values that could hide the ornaments
-    // thus violating our ToS
-    contentInset = UIEdgeInsetsMake(fmaxf(contentInset.top, 0),
-                                    fmaxf(contentInset.left, 0),
-                                    fmaxf(contentInset.bottom, 0),
-                                    fmaxf(contentInset.right, 0));
     MGLLogDebug(@"Setting contentInset: %@ animated:", NSStringFromUIEdgeInsets(contentInset), MGLStringFromBOOL(animated));
     if (UIEdgeInsetsEqualToEdgeInsets(contentInset, self.contentInset))
     {
