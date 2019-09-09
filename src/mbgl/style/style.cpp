@@ -12,6 +12,10 @@ Style::Style(FileSource& fileSource, float pixelRatio)
     : impl(std::make_unique<Impl>(fileSource, pixelRatio)) {
 }
 
+Style::Style(FileSource& fileSource, float pixelRatio, CameraOptions camera)
+    : impl(std::make_unique<Impl>(fileSource, pixelRatio, std::move(camera))) {
+}
+
 Style::~Style() = default;
 
 void Style::loadJSON(const std::string& json) {

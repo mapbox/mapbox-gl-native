@@ -3,6 +3,7 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/size.hpp>
+#include <mbgl/map/camera.hpp>
 
 #include <memory>
 
@@ -133,6 +134,21 @@ public:
      * @return pixel ratio value.
      */
     float pixelRatio() const;
+
+    /**
+     * @brief Sets the camera options.
+     *
+     * @param camera_ Camera options.
+     * @return reference to MapOptions for chaining options together.
+     */
+    MapOptions& withCamera(CameraOptions camera_);
+
+    /**
+     * @brief Gets the previously set camera options.
+     *
+     * @return Camera options.
+     */
+    const CameraOptions& camera() const;
 
 private:
     class Impl;

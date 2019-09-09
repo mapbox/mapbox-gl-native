@@ -36,6 +36,11 @@ Style::Impl::Impl(FileSource& fileSource_, float pixelRatio)
     light->setObserver(this);
 }
 
+Style::Impl::Impl(FileSource& fileSource_, float pixelRatio, CameraOptions camera)
+    : Impl(fileSource_, pixelRatio) {
+    defaultCamera = std::move(camera);
+}
+
 Style::Impl::~Impl() = default;
 
 void Style::Impl::loadJSON(const std::string& json_) {

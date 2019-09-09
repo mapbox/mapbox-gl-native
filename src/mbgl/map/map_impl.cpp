@@ -18,7 +18,7 @@ Map::Impl::Impl(RendererFrontend& frontend_,
           pixelRatio(mapOptions.pixelRatio()),
           crossSourceCollisions(mapOptions.crossSourceCollisions()),
           fileSource(std::move(fileSource_)),
-          style(std::make_unique<style::Style>(*fileSource, pixelRatio)),
+          style(std::make_unique<style::Style>(*fileSource, pixelRatio, mapOptions.camera())),
           annotationManager(*style) {
     transform.setNorthOrientation(mapOptions.northOrientation());
     style->impl->setObserver(this);

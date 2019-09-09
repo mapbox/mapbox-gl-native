@@ -22,6 +22,7 @@ class Layer;
 class Style {
 public:
     Style(FileSource&, float pixelRatio);
+    Style(FileSource&, float pixelRatio, CameraOptions camera);
     ~Style();
 
     void loadJSON(const std::string&);

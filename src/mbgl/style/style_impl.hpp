@@ -38,6 +38,7 @@ class Style::Impl : public SpriteLoaderObserver,
                     public util::noncopyable {
 public:
     Impl(FileSource&, float pixelRatio);
+    Impl(FileSource&, float pixelRatio, CameraOptions camera);
     ~Impl() override;
 
     void loadJSON(const std::string&);

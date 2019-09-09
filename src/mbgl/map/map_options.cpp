@@ -11,6 +11,7 @@ public:
     bool crossSourceCollisions = true;
     Size size = { 64, 64 };
     float pixelRatio = 1.0;
+    CameraOptions camera;
 };
 
 // These requires the complete type of Impl.
@@ -79,6 +80,15 @@ MapOptions& MapOptions::withPixelRatio(float ratio) {
 
 float MapOptions::pixelRatio() const {
     return impl_->pixelRatio;
+}
+
+MapOptions& MapOptions::withCamera(CameraOptions camera_) {
+    impl_->camera = std::move(camera_);
+    return *this;
+}
+
+const CameraOptions& MapOptions::camera() const {
+    return impl_->camera;
 }
 
 }  // namespace mbgl
