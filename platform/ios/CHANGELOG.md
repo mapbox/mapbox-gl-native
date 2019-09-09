@@ -4,8 +4,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 5.4.0
 
-* Fixed an issue that caused the tilt gesture to trigger too easily and conflict with pinch or pan gestures. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
-* Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
+### Styles and rendering
+
 * Fixed a rendering issue of `collisionBox` when `MGLSymbolStyleLayer.textTranslate` or `MGLSymbolStyleLayer.iconTranslate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Fixed an issue where the scale bar text would become illegible if iOS 13 dark mode was enabled. ([#15524](https://github.com/mapbox/mapbox-gl-native/pull/15524))
 * Enabled use of `MGLSymbolStyleLayer.textOffset` option together with `MGLSymbolStyleLayer.textVariableAnchor` (if `MGLSymbolStyleLayer.textRadialOffset` option is not provided). ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))
@@ -13,13 +13,20 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a bug where the completion block passed to `-[MGLMapView flyToCamera:completionHandler:` (and related methods) wouldn't be called. ([#15473](https://github.com/mapbox/mapbox-gl-native/pull/15473))
 * Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
 
- ### Performance improvements
- 
- * Mark used offline region resources in batches. ([#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521))
-
 ### User interaction
 
+* Fixed an issue that caused the tilt gesture to trigger too easily and conflict with pinch or pan gestures. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
 * Fixed an issue that caused the map to rotate too easily during a pinch gesture. [(#15562)](https://github.com/mapbox/mapbox-gl-native/pull/15562)
+
+### Performance improvements
+ 
+* Improved offline region download performance by batching certain database activities. ([#15521](https://github.com/mapbox/mapbox-gl-native/pull/15521))
+
+### Other changes
+
+* Fixed a potential integer overflow at high zoom levels. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
+* Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
+* Fixed a bug where the completion block passed to `-[MGLMapView flyToCamera:completionHandler:]` (and related methods) wouldn't be called. ([#15473](https://github.com/mapbox/mapbox-gl-native/pull/15473))
 
 ## 5.3.0 - August 28, 2019
 
