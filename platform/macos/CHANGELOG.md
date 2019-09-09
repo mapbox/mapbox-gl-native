@@ -15,7 +15,7 @@
 * Fixed symbol overlap when zooming out quickly. ([15416](https://github.com/mapbox/mapbox-gl-native/pull/15416))
 * Fixed a rendering issue that non-SDF icon would be treated as SDF icon if they are in the same layer. ([#15456](https://github.com/mapbox/mapbox-gl-native/pull/15456))
 * Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
-* Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues  such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
+* Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
 
 ### Styles and rendering
 
