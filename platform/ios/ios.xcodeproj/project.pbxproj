@@ -12,6 +12,7 @@
 		071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
+		0723AB85232717AB0095FD55 /* MBXContextSnapshotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0723AB84232717AB0095FD55 /* MBXContextSnapshotViewController.m */; };
 		075AF842227B6762008D7A4C /* MBXState.m in Sources */ = {isa = PBXBuildFile; fileRef = 075AF841227B6762008D7A4C /* MBXState.m */; };
 		075AF845227B67C6008D7A4C /* MBXStateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 075AF844227B67C6008D7A4C /* MBXStateManager.m */; };
 		076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076171C22139C70900668A35 /* MGLMapViewTests.m */; };
@@ -868,6 +869,8 @@
 		071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLImageSource.h; sourceTree = "<group>"; };
 		071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLImageSourceTests.m; path = ../../darwin/test/MGLImageSourceTests.m; sourceTree = "<group>"; };
+		0723AB83232717AB0095FD55 /* MBXContextSnapshotViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXContextSnapshotViewController.h; sourceTree = "<group>"; };
+		0723AB84232717AB0095FD55 /* MBXContextSnapshotViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXContextSnapshotViewController.m; sourceTree = "<group>"; };
 		074A7F0C2277C093001A62D1 /* insert_access_token.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = insert_access_token.sh; sourceTree = "<group>"; };
 		075AF840227B6762008D7A4C /* MBXState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXState.h; sourceTree = "<group>"; };
 		075AF841227B6762008D7A4C /* MBXState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXState.m; sourceTree = "<group>"; };
@@ -1983,6 +1986,8 @@
 		DA1DC94C1CB6C1C2006E619F /* Demo App */ = {
 			isa = PBXGroup;
 			children = (
+				0723AB83232717AB0095FD55 /* MBXContextSnapshotViewController.h */,
+				0723AB84232717AB0095FD55 /* MBXContextSnapshotViewController.m */,
 				3E6465D52065767A00685536 /* LimeGreenStyleLayer.h */,
 				3E6465D42065767A00685536 /* LimeGreenStyleLayer.m */,
 				DA1DC9501CB6C1C2006E619F /* MBXAppDelegate.h */,
@@ -3248,6 +3253,7 @@
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				075AF845227B67C6008D7A4C /* MBXStateManager.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
+				0723AB85232717AB0095FD55 /* MBXContextSnapshotViewController.m in Sources */,
 				075AF842227B6762008D7A4C /* MBXState.m in Sources */,
 				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
