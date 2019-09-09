@@ -93,6 +93,7 @@
         "optional.hpp": "vendor/mapbox-base/mapbox/optional/optional.hpp",
         "mapbox/pixelmatch.hpp": "vendor/mapbox-base/mapbox/pixelmatch-cpp/include/mapbox/pixelmatch.hpp",
         "supercluster.hpp": "vendor/mapbox-base/mapbox/supercluster.hpp/include/supercluster.hpp",
+        "mapbox/type_wrapper.hpp": "vendor/mapbox-base/mapbox/typewrapper/include/mapbox/type_wrapper.hpp",
         "mapbox/optional.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/optional.hpp",
         "mapbox/recursive_wrapper.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/recursive_wrapper.hpp",
         "mapbox/variant.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant.hpp",

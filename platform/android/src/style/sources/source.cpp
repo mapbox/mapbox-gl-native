@@ -133,7 +133,7 @@ namespace android {
         // Release the peer relationships. These will be re-established when the source is added to a map
         assert(ownedSource->peer.has_value());
         ownedSource->peer.get<std::unique_ptr<Source>>().release();
-        ownedSource->peer = util::peer();
+        ownedSource->peer = mapbox::base::TypeWrapper();
 
         // Release the strong reference to the java peer
         assert(javaPeer);
