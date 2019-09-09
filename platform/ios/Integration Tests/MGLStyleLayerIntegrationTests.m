@@ -69,7 +69,44 @@
     [self.mapView setStyleURL:[[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"]];
     [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
 
+    XCTAssertNotNil(source.description);
     XCTAssertThrowsSpecificNamed(source.configurationURL, NSException, MGLInvalidStyleSourceException, @"MGLSource should raise an exception if its core peer got invalidated");
 }
 
+- (void)testForRaisingExceptionsOnStaleLayerObject {
+    self.mapView.centerCoordinate = CLLocationCoordinate2DMake(38.897,-77.039);
+    self.mapView.zoomLevel = 10.5;
+    
+    MGLPointFeature *feature = [[MGLPointFeature alloc] init];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
+    
+    // Testing generated layers
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"lineLayerID" source:source];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"rasterLayerID" source:source];
+    
+    [self.mapView.style addSource:source];
+    [self.mapView.style addLayer:lineLayer];
+    [self.mapView.style addLayer:rasterLayer];
+
+    XCTAssertNoThrow(lineLayer.isVisible);
+    XCTAssertNoThrow(rasterLayer.isVisible);
+    
+    XCTAssert(![source.description containsString:@"<unknown>"]);
+    XCTAssert(![lineLayer.description containsString:@"<unknown>"]);
+    XCTAssert(![rasterLayer.description containsString:@"<unknown>"]);
+
+    self.styleLoadingExpectation = nil;
+    [self.mapView setStyleURL:[[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"]];
+    [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
+    
+    XCTAssert([source.description containsString:@"<unknown>"]);
+    XCTAssert([lineLayer.description containsString:@"<unknown>"]);
+    XCTAssert([rasterLayer.description containsString:@"<unknown>"]);
+
+    XCTAssertThrowsSpecificNamed(lineLayer.isVisible, NSException, MGLInvalidStyleLayerException, @"Layer should raise an exception if its core peer got invalidated");
+    XCTAssertThrowsSpecificNamed(rasterLayer.isVisible, NSException, MGLInvalidStyleLayerException, @"Layer should raise an exception if its core peer got invalidated");
+    
+    XCTAssertThrowsSpecificNamed([self.mapView.style removeLayer:lineLayer], NSException, NSInvalidArgumentException, @"Style should raise an exception when attempting to remove an invalid layer (e.g. if its core peer got invalidated)");
+    XCTAssertThrowsSpecificNamed([self.mapView.style removeLayer:rasterLayer], NSException, NSInvalidArgumentException, @"Style should raise an exception when attempting to remove an invalid layer (e.g. if its core peer got invalidated)");
+}
 @end

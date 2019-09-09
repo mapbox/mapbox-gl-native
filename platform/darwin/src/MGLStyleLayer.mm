@@ -109,9 +109,15 @@ const MGLExceptionName MGLInvalidStyleLayerException = @"MGLInvalidStyleLayerExc
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; visible = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier,
-            self.visible ? @"YES" : @"NO"];
+    if (self.rawLayer) {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; visible = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier,
+                self.visible ? @"YES" : @"NO"];
+    }
+    else {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; visible = NO>",
+                NSStringFromClass([self class]), (void *)self, self.identifier];
+    }
 }
 
 @end

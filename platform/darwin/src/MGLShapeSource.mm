@@ -172,10 +172,14 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 }
 
 - (NSString *)description {
-    NSString *URLString = (self.rawSource != nil) ? self.URL.description : @"<unknown>";
-    
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; shape = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, URLString, self.shape];
+    if (self.rawSource) {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; shape = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.shape];
+    }
+    else {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = <unknown>; shape = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier, self.shape];
+    }
 }
 
 - (NSArray<id <MGLFeature>> *)featuresMatchingPredicate:(nullable NSPredicate *)predicate {

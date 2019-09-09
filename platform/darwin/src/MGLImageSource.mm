@@ -81,16 +81,17 @@
 }
 
 - (NSString *)description {
-    NSString *coordinates = @"<unknown>";
-    NSString *URLString = @"<unknown>";
-    
     if (self.rawSource) {
-        coordinates = MGLStringFromCoordinateQuad(self.coordinates);
-        URLString = self.URL.description;
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = %@; URL = %@; image = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier,
+                MGLStringFromCoordinateQuad(self.coordinates),
+                self.URL,
+                self.image];
     }
-    
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = %@; URL = %@; image = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, coordinates, URLString, self.image];
+    else {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = <unknown>; URL = <unknown>; image = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier, self.image];
+    }
 }
 
 - (mbgl::style::ImageSource *)rawSource {
