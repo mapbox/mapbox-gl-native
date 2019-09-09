@@ -1,12 +1,12 @@
 #pragma once
 
-#include <mbgl/util/peer.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/conversion.hpp>
 
 #include <mapbox/weak.hpp>
+#include <mapbox/type_wrapper.hpp>
 
 #include <cassert>
 #include <memory>
@@ -121,7 +121,7 @@ public:
     // For use in SDK bindings, which store a reference to a platform-native peer
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
-    util::peer peer;
+    mapbox::base::TypeWrapper peer;
     Layer(Immutable<Impl>);
 
     const LayerTypeInfo* getTypeInfo() const noexcept;
