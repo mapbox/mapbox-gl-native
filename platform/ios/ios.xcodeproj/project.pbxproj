@@ -516,6 +516,7 @@
 		CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848451CBAFB9800AB86E3 /* MGLCompactCalloutView.m */; };
 		CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */; };
 		CA86FF0E22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */; };
+		CA87D9202327ED3B0060A6FF /* bugcontroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA87D91F2327ED3B0060A6FF /* bugcontroller.swift */; };
 		CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */; };
 		CA8FBC0921A47BB100D1203C /* MGLRendererConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
@@ -1201,8 +1202,9 @@
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
 		CA65C4F721E9BB080068B0D4 /* MGLCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCluster.h; sourceTree = "<group>"; };
-		CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
 		CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLAnnotationViewIntegrationTests.mm; path = "Annotation Tests/MGLAnnotationViewIntegrationTests.mm"; sourceTree = "<group>"; };
+		CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
+		CA87D91F2327ED3B0060A6FF /* bugcontroller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = bugcontroller.swift; sourceTree = "<group>"; };
 		CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleURLIntegrationTest.m; sourceTree = "<group>"; };
 		CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRendererConfigurationTests.mm; path = ../../darwin/test/MGLRendererConfigurationTests.mm; sourceTree = "<group>"; };
 		CAD9D0A922A86D6F001B25EE /* MGLResourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLResourceTests.mm; path = ../../darwin/test/MGLResourceTests.mm; sourceTree = "<group>"; };
@@ -1966,6 +1968,7 @@
 		DA1DC94C1CB6C1C2006E619F /* Demo App */ = {
 			isa = PBXGroup;
 			children = (
+				CA87D91F2327ED3B0060A6FF /* bugcontroller.swift */,
 				3E6465D52065767A00685536 /* LimeGreenStyleLayer.h */,
 				3E6465D42065767A00685536 /* LimeGreenStyleLayer.m */,
 				DA1DC9501CB6C1C2006E619F /* MBXAppDelegate.h */,
@@ -2982,7 +2985,7 @@
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = GJZR2MEM28;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1100;
 					};
 					DA2E88501CC036F400F24E7B = {
 						CreatedOnToolsVersion = 7.3;
@@ -3220,6 +3223,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA87D9202327ED3B0060A6FF /* bugcontroller.swift in Sources */,
 				DA1DC9971CB6E046006E619F /* main.m in Sources */,
 				354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */,
 				965DF51120F9430500438AAC /* MBXFrameTimeGraphView.m in Sources */,
@@ -3949,11 +3953,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = NO;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = GJZR2MEM28;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = "Mapbox GL";
+				SWIFT_OBJC_BRIDGING_HEADER = "app/iosapp-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = RelWithDebInfo;
 		};
@@ -4301,11 +4309,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = NO;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = GJZR2MEM28;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = "Mapbox GL";
+				SWIFT_OBJC_BRIDGING_HEADER = "app/iosapp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -4315,11 +4328,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = NO;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = GJZR2MEM28;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = "Mapbox GL";
+				SWIFT_OBJC_BRIDGING_HEADER = "app/iosapp-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
