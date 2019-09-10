@@ -360,11 +360,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             crossTileSymbolIndex.reset();
         }
 
+        bool symbolBucketsAdded = false;
         bool symbolBucketsChanged = false;
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            if (crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude())) symbolBucketsChanged = true;
+            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude()); 
+            symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
+            symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
-        renderTreeParameters->placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom()) || symbolBucketsChanged;
+        renderTreeParameters->placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom()) || symbolBucketsAdded;
 
         std::set<std::string> usedSymbolLayers;
         if (renderTreeParameters->placementChanged) {
@@ -389,7 +392,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
 
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            placement->updateLayerBuckets(*it, updateParameters.transformState, renderTreeParameters->placementChanged);
+            placement->updateLayerBuckets(*it, updateParameters.transformState, renderTreeParameters->placementChanged || symbolBucketsChanged);
         }
 
         renderTreeParameters->symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
