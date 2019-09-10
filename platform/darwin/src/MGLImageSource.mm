@@ -45,11 +45,13 @@
 }
 
 - (NSURL *)URL {
+    MGLAssertStyleSourceIsValid();
     auto url = self.rawSource->getURL();
     return url ? [NSURL URLWithString:@(url->c_str())] : nil;
 }
 
 - (void)setURL:(NSURL *)url {
+    MGLAssertStyleSourceIsValid();
     if (url) {
         self.rawSource->setURL(url.mgl_URLByStandardizingScheme.absoluteString.UTF8String);
         _image = nil;
@@ -59,6 +61,7 @@
 }
 
 - (void)setImage:(MGLImage *)image {
+    MGLAssertStyleSourceIsValid();
     if (image != nullptr) {
         self.rawSource->setImage(image.mgl_premultipliedImage);
     } else {
@@ -68,16 +71,27 @@
 }
 
 - (MGLCoordinateQuad)coordinates {
+    MGLAssertStyleSourceIsValid();
     return MGLCoordinateQuadFromLatLngArray(self.rawSource->getCoordinates());
 }
 
 - (void)setCoordinates: (MGLCoordinateQuad)coordinateQuad {
+    MGLAssertStyleSourceIsValid();
     self.rawSource->setCoordinates(MGLLatLngArrayFromCoordinateQuad(coordinateQuad));
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = %@; URL = %@; image = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, MGLStringFromCoordinateQuad(self.coordinates), self.URL, self.image];
+    if (self.rawSource) {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = %@; URL = %@; image = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier,
+                MGLStringFromCoordinateQuad(self.coordinates),
+                self.URL,
+                self.image];
+    }
+    else {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; coordinates = <unknown>; URL = <unknown>; image = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier, self.image];
+    }
 }
 
 - (mbgl::style::ImageSource *)rawSource {
@@ -85,6 +99,7 @@
 }
 
 - (NSString *)attributionHTMLString {
+    MGLAssertStyleSourceIsValid();
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;
 }

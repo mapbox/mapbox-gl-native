@@ -27,6 +27,7 @@ struct LayerWrapper {
         if (!self.rawLayer) { \
             [NSException raise:MGLInvalidStyleLayerException \
                         format: \
+            @"Either this layer got invalidated after the style change or " \
             @"-[MGLStyle removeLayer:] has been called " \
             @"with this instance but another style layer instance was added with the same identifer. It is an " \
             @"error to send any message to this layer since it cannot be recovered after removal due to the " \

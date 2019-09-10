@@ -6,6 +6,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Styles and rendering
 
+* Fixed crashes triggered when `MGLSource` and `MGLStyleLayer` objects are accessed after having been invalidated after a style change. ([#15539](https://github.com/mapbox/mapbox-gl-native/pull/15539))
 * Fixed a rendering issue of `collisionBox` when `MGLSymbolStyleLayer.textTranslate` or `MGLSymbolStyleLayer.iconTranslate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Fixed an issue where the scale bar text would become illegible if iOS 13 dark mode was enabled. ([#15524](https://github.com/mapbox/mapbox-gl-native/pull/15524))
 * Enabled use of `MGLSymbolStyleLayer.textOffset` option together with `MGLSymbolStyleLayer.textVariableAnchor` (if `MGLSymbolStyleLayer.textRadialOffset` option is not provided). ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))

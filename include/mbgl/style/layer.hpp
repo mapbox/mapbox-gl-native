@@ -6,6 +6,8 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/conversion.hpp>
 
+#include <mapbox/weak.hpp>
+
 #include <cassert>
 #include <memory>
 #include <string>
@@ -124,10 +126,15 @@ public:
 
     const LayerTypeInfo* getTypeInfo() const noexcept;
 
+    mapbox::base::WeakPtr<Layer> makeWeakPtr() {
+        return weakFactory.makeWeakPtr();
+    }
+
 protected:
     virtual Mutable<Impl> mutableBaseImpl() const = 0;
 
     LayerObserver* observer;
+    mapbox::base::WeakPtrFactory<Layer> weakFactory {this};
 };
 
 } // namespace style

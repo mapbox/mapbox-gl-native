@@ -98,7 +98,8 @@
         "mapbox/variant.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant.hpp",
         "mapbox/variant_cast.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant_cast.hpp",
         "mapbox/variant_io.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant_io.hpp",
-        "mapbox/variant_visitor.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant_visitor.hpp"
+        "mapbox/variant_visitor.hpp": "vendor/mapbox-base/mapbox/variant/include/mapbox/variant_visitor.hpp",
+        "mapbox/weak.hpp": "vendor/mapbox-base/mapbox/weak/include/mapbox/weak.hpp"
     },
     "private_headers": {}
 }

@@ -6,6 +6,8 @@
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/style/types.hpp>
 
+#include <mapbox/weak.hpp>
+
 #include <memory>
 #include <string>
 
@@ -78,6 +80,8 @@ public:
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
     util::peer peer;
+
+    virtual mapbox::base::WeakPtr<Source> makeWeakPtr() = 0;
 };
 
 } // namespace style

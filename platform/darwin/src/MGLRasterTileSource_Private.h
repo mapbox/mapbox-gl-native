@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLRasterTileSource (Private)
 
-@property (nonatomic, readonly) mbgl::style::RasterSource *rawSource;
+@property (nonatomic, readonly, nullable) mbgl::style::RasterSource *rawSource;
 
 - (std::unique_ptr<mbgl::style::RasterSource>)pendingSourceWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize;
 
