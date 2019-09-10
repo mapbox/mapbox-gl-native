@@ -112,6 +112,5 @@ class FileSourceStandaloneTest : AppCenter() {
   @After
   fun cleanup() {
     fileSourceTestUtils.cleanup()
-    Assert.assertFalse("FileSource should not be active", fileSource.isActivated)
   }
 }
