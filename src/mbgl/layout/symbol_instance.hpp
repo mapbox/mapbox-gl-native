@@ -4,8 +4,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
-#include <mbgl/util/traits.hpp>
-#include <mbgl/util/util.hpp>
+#include <mbgl/util/bitmask_operations.hpp>
 
 namespace mbgl {
 
@@ -49,18 +48,6 @@ enum class SymbolContent : uint8_t {
     IconRGBA = 1 << 1,
     IconSDF = 1 << 2
 };
-
-MBGL_CONSTEXPR SymbolContent operator|(SymbolContent a, SymbolContent b) {
-    return SymbolContent(mbgl::underlying_type(a) | mbgl::underlying_type(b));
-}
-
-MBGL_CONSTEXPR SymbolContent& operator|=(SymbolContent& a, SymbolContent b) {
-    return (a = a | b);
-}
-
-MBGL_CONSTEXPR SymbolContent operator&(SymbolContent a, SymbolContent b) {
-    return SymbolContent(mbgl::underlying_type(a) & mbgl::underlying_type(b));
-}
 
 class SymbolInstance {
 public:
