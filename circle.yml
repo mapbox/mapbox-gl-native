@@ -260,7 +260,7 @@ commands:
         command: |
           mkdir -p build
           cd build
-          cmake -DWITH_CXX11ABI=${WITH_CXX11ABI:0} -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
+          cmake -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
           cd ..
   build-node:
     steps:
@@ -798,7 +798,6 @@ jobs:
       JOBS: 4
       BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
-      WITH_CXX11ABI: 0
     steps:
       - install-dependencies
       - build-node
@@ -855,7 +854,6 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      WITH_CXX11ABI: 1
     steps:
       - install-dependencies
       - check-if-this-job-can-be-skipped
@@ -920,7 +918,6 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      WITH_CXX11ABI: 0
       DISPLAY: :0
     steps:
       - install-dependencies
