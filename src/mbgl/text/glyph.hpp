@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/text/glyph_range.hpp>
+#include <mbgl/util/bitmask_operations.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/rect.hpp>
 #include <mbgl/util/traits.hpp>
@@ -98,26 +99,6 @@ enum class WritingModeType : uint8_t {
     Horizontal = 1 << 0,
     Vertical = 1 << 1,
 };
-
-MBGL_CONSTEXPR WritingModeType operator|(WritingModeType a, WritingModeType b) {
-    return WritingModeType(mbgl::underlying_type(a) | mbgl::underlying_type(b));
-}
-
-MBGL_CONSTEXPR WritingModeType& operator|=(WritingModeType& a, WritingModeType b) {
-    return (a = a | b);
-}
-
-MBGL_CONSTEXPR bool operator&(WritingModeType lhs, WritingModeType rhs) {
-    return mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs);
-}
-
-MBGL_CONSTEXPR WritingModeType& operator&=(WritingModeType& lhs, WritingModeType rhs) {
-    return (lhs = WritingModeType(mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs)));
-}
-
-MBGL_CONSTEXPR WritingModeType operator~(WritingModeType value) {
-    return WritingModeType(~mbgl::underlying_type(value));
-}
 
 using GlyphDependencies = std::map<FontStack, GlyphIDs>;
 using GlyphRangeDependencies = std::map<FontStack, std::unordered_set<GlyphRange>>;

@@ -456,6 +456,7 @@
         "mbgl/tile/tile_necessity.hpp": "include/mbgl/tile/tile_necessity.hpp",
         "mbgl/util/async_request.hpp": "include/mbgl/util/async_request.hpp",
         "mbgl/util/async_task.hpp": "include/mbgl/util/async_task.hpp",
+        "mbgl/util/bitmask_operations.hpp": "include/mbgl/util/bitmask_operations.hpp",
         "mbgl/util/char_array_buffer.hpp": "include/mbgl/util/char_array_buffer.hpp",
         "mbgl/util/chrono.hpp": "include/mbgl/util/chrono.hpp",
         "mbgl/util/color.hpp": "include/mbgl/util/color.hpp",
