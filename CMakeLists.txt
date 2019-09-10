@@ -22,7 +22,6 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
 
-option(WITH_CXX11ABI "Use the C++11 ABI" ON)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(WITH_EGL      "Use EGL backend" OFF)
@@ -39,13 +38,6 @@ include(cmake/vendor.cmake)
 include(cmake/mason.cmake)
 include(cmake/xcode.cmake)
 include(cmake/doxygen.cmake)
-
-if(WITH_CXX11ABI)
-    set(MASON_CXXABI_SUFFIX -cxx11abi)
-    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
-else()
-    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
-endif()
 
 if(WITH_OSMESA AND WITH_EGL)
     message(FATAL_ERROR "WITH_OSMESA and WITH_EGL are mutually exclusive.")
