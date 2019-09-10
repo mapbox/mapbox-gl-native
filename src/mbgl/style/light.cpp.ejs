@@ -6,6 +6,13 @@
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/light_impl.hpp>
 #include <mbgl/style/light_observer.hpp>
+#include <mbgl/style/conversion/light.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion_impl.hpp>
+
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
@@ -25,6 +32,76 @@ void Light::setObserver(LightObserver* observer_) {
 
 Mutable<Light::Impl> Light::mutableImpl() const {
     return makeMutable<Impl>(*impl);
+}
+
+using namespace conversion;
+
+optional<Error> Light::setProperty(const std::string& name, const Convertible& value) {
+    enum class Property : uint8_t {
+<% for (const property of properties) { -%>
+        <%- camelize(property.name) %>,
+<% } -%>
+<% for (const property of properties) { -%>
+        <%- camelize(property.name) %>Transition,
+<% } -%>
+    };
+
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        <%- properties.map(p => `{ "${p.name}", static_cast<uint8_t>(Property::${camelize(p.name)}) }`).join(',\n        ') %>,
+        <%- properties.map(p => `{ "${p.name}-transition", static_cast<uint8_t>(Property::${camelize(p.name)}Transition) }`).join(',\n        ') %>
+    });
+
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
+        return Error { "light doesn't support this property" };
+    }
+
+    auto property = static_cast<Property>(it->second);
+
+    <%
+        const conversions = {};
+        for (const property of properties) {
+            const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
+            const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
+            const conversion = `optional<${propertyValueType(property)}> typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
+            conversions[conversion] = conversions[conversion] || [];
+            conversions[conversion].push(property);
+        }
+    -%>
+    <% for (const key in conversions) {
+        const properties = conversions[key];
+    %>
+    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
+        Error error;
+        <%- key %>;
+        if (!typedValue) {
+            return error;
+        }
+        <% if (properties.length == 1) { %>
+        set<%- camelize(properties[0].name) %>(*typedValue);
+        return nullopt;
+        <% } else for (const property of properties) { %>
+        if (property == Property::<%- camelize(property.name) %>) {
+            set<%- camelize(property.name) %>(*typedValue);
+            return nullopt;
+        }
+        <% } %>
+    }
+    <% } %>
+
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+    <% for (const property of properties) { %>
+    if (property == Property::<%- camelize(property.name) %>Transition) {
+        set<%- camelize(property.name) %>Transition(*transition);
+        return nullopt;
+    }
+    <% } %>
+
+    return Error { "light doesn't support this property" };
 }
 
 <% for (const property of properties) { -%>
