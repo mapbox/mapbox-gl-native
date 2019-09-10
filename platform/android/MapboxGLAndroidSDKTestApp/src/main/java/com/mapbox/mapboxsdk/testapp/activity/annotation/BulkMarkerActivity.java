@@ -151,6 +151,9 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (progressDialog != null) {
+      progressDialog.dismiss();
+    }
     mapView.onDestroy();
   }
 
