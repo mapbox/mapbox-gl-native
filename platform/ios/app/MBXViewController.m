@@ -1296,6 +1296,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
     MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:NULL];
+    
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-id" shape:shape options:nil];
     [self.mapView.style addSource:source];
 
@@ -1314,22 +1315,32 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 {
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(48.668731, -122.857151) zoomLevel:11 animated:NO];
 
-    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"polyline" ofType:@"geojson"];
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"earthquakes" ofType:@"geojson"];
     NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-url-id" URL:geoJSONURL options:nil];
+//    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-url-id" URL:geoJSONURL options:nil];
+    
+    NSExpression *reduceExpression = [NSExpression expressionForFunction:@"sum:" arguments:@[[NSExpression expressionForVariable:@"featureAccumulated"],  [NSExpression expressionForKeyPath:@"sumVal"]]];
+
+    NSExpression *mapExpression = [NSExpression expressionForKeyPath:@"mag"];
+
+    NSArray<NSExpression *> *expressArray = @[reduceExpression, mapExpression];
+    NSDictionary *clusterProperty = @{@"sumVal" : expressArray};
+
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-id" URL:geoJSONURL options:@{
+                                                                                                                        MGLShapeSourceOptionClustered: @(YES),
+                                                                                                                        MGLShapeSourceOptionClusterRadius: @(15),
+                                                                                                                        MGLShapeSourceOptionClusterProperties: clusterProperty
+                                                                                                                        }];
+    
     [self.mapView.style addSource:source];
-
-    MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"mutable-data-layer-url-id" source:source];
-    [self.mapView.style addLayer:layer];
-
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(41.563986787078704, -75.04843935793578) zoomLevel:8 animated:NO];
-
-        NSString *threeStatesFilePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
-        NSURL *updatedGeoJSONURL = [NSURL fileURLWithPath:threeStatesFilePath];
-
-        source.URL = updatedGeoJSONURL;
-    });
+    
+    // Create image cluster style layer
+    MGLSymbolStyleLayer *clusterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"clusteredPortsNumbers" source:source];
+    clusterLayer.textColor = [NSExpression expressionForConstantValue:[UIColor redColor]];
+    clusterLayer.textFontSize = [NSExpression expressionForConstantValue:@(30)];
+    clusterLayer.text = [NSExpression expressionWithFormat:@"CAST(point_count, 'NSString')"];
+    
+    [self.mapView.style addLayer:clusterLayer];
 }
 
 - (void)updateShapeSourceFeatures

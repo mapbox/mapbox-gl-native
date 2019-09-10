@@ -99,6 +99,7 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
         Feature feature;
         clusterOptions.map = [&](const PropertyMap& properties) -> PropertyMap {
             PropertyMap ret{};
+            if (properties.empty()) return ret;
             for (const auto& p : options.clusterProperties) {
                 feature.properties = properties;
                 ret[p.first] = evaluateFeature<Value>(feature, p.second.first);

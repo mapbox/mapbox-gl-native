@@ -12,11 +12,14 @@
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/position.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #import <mbgl/style/transition_options.hpp>
 #import <mbgl/style/types.hpp>
 
 #import <mbgl/util/enum.hpp>
 #include <mbgl/util/interpolate.hpp>
+
+#include <memory>
 
 #if TARGET_OS_IPHONE
     #import "UIColor+MGLAdditions.h"
@@ -43,6 +46,18 @@ NS_INLINE MGLTransition MGLTransitionFromOptions(const mbgl::style::TransitionOp
 NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition transition) {
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     return options;
+}
+
+NS_INLINE std::unique_ptr<mbgl::style::expression::Expression> MGLClusterPropertyFromNSExpression(NSExpression *expression) {
+    if (!expression) {
+        return nullptr;
+    }
+    
+    NSArray *jsonExpression = expression.mgl_jsonExpressionObject;
+    
+    auto expr = mbgl::style::expression::dsl::createExpression(mbgl::style::conversion::makeConvertible(jsonExpression));
+    
+    return expr;
 }
 
 id MGLJSONObjectFromMBGLExpression(const mbgl::style::expression::Expression &mbglExpression);

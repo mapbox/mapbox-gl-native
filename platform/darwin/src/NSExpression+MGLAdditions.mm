@@ -553,6 +553,10 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     return [NSExpression expressionForVariable:@"lineProgress"];
 }
 
++ (NSExpression *)featureAccumulatedVariableExpression {
+    return [NSExpression expressionForVariable:@"featureAccumulated"];
+}
+
 + (NSExpression *)geometryTypeVariableExpression {
     return [NSExpression expressionForVariable:@"geometryType"];
 }
@@ -839,6 +843,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return NSExpression.heatmapDensityVariableExpression;
         } else if ([op isEqualToString:@"line-progress"]) {
             return NSExpression.lineProgressVariableExpression;
+        } else if ([op isEqualToString:@"accumulated"]) {
+            return NSExpression.featureAccumulatedVariableExpression;
         } else if ([op isEqualToString:@"geometry-type"]) {
             return NSExpression.geometryTypeVariableExpression;
         } else if ([op isEqualToString:@"id"]) {
@@ -961,6 +967,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([self.variable isEqualToString:@"zoomLevel"]) {
                 return @[@"zoom"];
             }
+            if ([self.variable isEqualToString:@"featureAccumulated"]) {
+                return @[@"accumulated"];
+            }
             if ([self.variable isEqualToString:@"geometryType"]) {
                 return @[@"geometry-type"];
             }
@@ -1057,8 +1066,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 NSExpression *count = [NSExpression expressionForFunction:@"count:" arguments:self.arguments];
                 return [NSExpression expressionForFunction:@"divide:by:" arguments:@[sum, count]].mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"sum:"]) {
-                NSArray *arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
-                return [@[@"+"] arrayByAddingObjectsFromArray:arguments];
+                id context = self.arguments.firstObject;
+                if ([context isKindOfClass:[NSExpression class]]) {
+                    NSArray *arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
+                    return [@[@"+"] arrayByAddingObjectsFromArray:arguments];
+                } else {
+                    NSArray *arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
+                    return [@[@"+"] arrayByAddingObjectsFromArray:arguments];
+                }
             } else if ([function isEqualToString:@"count:"]) {
                 NSArray *arguments = self.arguments.firstObject.mgl_jsonExpressionObject;
                 return @[@"length", arguments];
