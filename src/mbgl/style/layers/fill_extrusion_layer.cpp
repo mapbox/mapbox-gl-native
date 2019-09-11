@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -282,7 +283,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionVerticalGradientTransition
 using namespace conversion;
 
 optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         FillExtrusionBase,
         FillExtrusionColor,
         FillExtrusionHeight,
@@ -302,22 +303,22 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "fill-extrusion-base", static_cast<uint8_t>(Property::FillExtrusionBase) },
-        { "fill-extrusion-color", static_cast<uint8_t>(Property::FillExtrusionColor) },
-        { "fill-extrusion-height", static_cast<uint8_t>(Property::FillExtrusionHeight) },
-        { "fill-extrusion-opacity", static_cast<uint8_t>(Property::FillExtrusionOpacity) },
-        { "fill-extrusion-pattern", static_cast<uint8_t>(Property::FillExtrusionPattern) },
-        { "fill-extrusion-translate", static_cast<uint8_t>(Property::FillExtrusionTranslate) },
-        { "fill-extrusion-translate-anchor", static_cast<uint8_t>(Property::FillExtrusionTranslateAnchor) },
-        { "fill-extrusion-vertical-gradient", static_cast<uint8_t>(Property::FillExtrusionVerticalGradient) },
-        { "fill-extrusion-base-transition", static_cast<uint8_t>(Property::FillExtrusionBaseTransition) },
-        { "fill-extrusion-color-transition", static_cast<uint8_t>(Property::FillExtrusionColorTransition) },
-        { "fill-extrusion-height-transition", static_cast<uint8_t>(Property::FillExtrusionHeightTransition) },
-        { "fill-extrusion-opacity-transition", static_cast<uint8_t>(Property::FillExtrusionOpacityTransition) },
-        { "fill-extrusion-pattern-transition", static_cast<uint8_t>(Property::FillExtrusionPatternTransition) },
-        { "fill-extrusion-translate-transition", static_cast<uint8_t>(Property::FillExtrusionTranslateTransition) },
-        { "fill-extrusion-translate-anchor-transition", static_cast<uint8_t>(Property::FillExtrusionTranslateAnchorTransition) },
-        { "fill-extrusion-vertical-gradient-transition", static_cast<uint8_t>(Property::FillExtrusionVerticalGradientTransition) }
+        { "fill-extrusion-base", mbgl::underlying_type(Property::FillExtrusionBase) },
+        { "fill-extrusion-color", mbgl::underlying_type(Property::FillExtrusionColor) },
+        { "fill-extrusion-height", mbgl::underlying_type(Property::FillExtrusionHeight) },
+        { "fill-extrusion-opacity", mbgl::underlying_type(Property::FillExtrusionOpacity) },
+        { "fill-extrusion-pattern", mbgl::underlying_type(Property::FillExtrusionPattern) },
+        { "fill-extrusion-translate", mbgl::underlying_type(Property::FillExtrusionTranslate) },
+        { "fill-extrusion-translate-anchor", mbgl::underlying_type(Property::FillExtrusionTranslateAnchor) },
+        { "fill-extrusion-vertical-gradient", mbgl::underlying_type(Property::FillExtrusionVerticalGradient) },
+        { "fill-extrusion-base-transition", mbgl::underlying_type(Property::FillExtrusionBaseTransition) },
+        { "fill-extrusion-color-transition", mbgl::underlying_type(Property::FillExtrusionColorTransition) },
+        { "fill-extrusion-height-transition", mbgl::underlying_type(Property::FillExtrusionHeightTransition) },
+        { "fill-extrusion-opacity-transition", mbgl::underlying_type(Property::FillExtrusionOpacityTransition) },
+        { "fill-extrusion-pattern-transition", mbgl::underlying_type(Property::FillExtrusionPatternTransition) },
+        { "fill-extrusion-translate-transition", mbgl::underlying_type(Property::FillExtrusionTranslateTransition) },
+        { "fill-extrusion-translate-anchor-transition", mbgl::underlying_type(Property::FillExtrusionTranslateAnchorTransition) },
+        { "fill-extrusion-vertical-gradient-transition", mbgl::underlying_type(Property::FillExtrusionVerticalGradientTransition) }
     });
 
     const auto it = properties.find(name.c_str());

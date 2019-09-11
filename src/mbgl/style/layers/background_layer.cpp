@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -147,7 +148,7 @@ TransitionOptions BackgroundLayer::getBackgroundPatternTransition() const {
 using namespace conversion;
 
 optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         BackgroundColor,
         BackgroundOpacity,
         BackgroundPattern,
@@ -157,12 +158,12 @@ optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "background-color", static_cast<uint8_t>(Property::BackgroundColor) },
-        { "background-opacity", static_cast<uint8_t>(Property::BackgroundOpacity) },
-        { "background-pattern", static_cast<uint8_t>(Property::BackgroundPattern) },
-        { "background-color-transition", static_cast<uint8_t>(Property::BackgroundColorTransition) },
-        { "background-opacity-transition", static_cast<uint8_t>(Property::BackgroundOpacityTransition) },
-        { "background-pattern-transition", static_cast<uint8_t>(Property::BackgroundPatternTransition) }
+        { "background-color", mbgl::underlying_type(Property::BackgroundColor) },
+        { "background-opacity", mbgl::underlying_type(Property::BackgroundOpacity) },
+        { "background-pattern", mbgl::underlying_type(Property::BackgroundPattern) },
+        { "background-color-transition", mbgl::underlying_type(Property::BackgroundColorTransition) },
+        { "background-opacity-transition", mbgl::underlying_type(Property::BackgroundOpacityTransition) },
+        { "background-pattern-transition", mbgl::underlying_type(Property::BackgroundPatternTransition) }
     });
 
     const auto it = properties.find(name.c_str());

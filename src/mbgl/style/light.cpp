@@ -8,6 +8,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -34,7 +35,7 @@ Mutable<Light::Impl> Light::mutableImpl() const {
 using namespace conversion;
 
 optional<Error> Light::setProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         Anchor,
         Color,
         Intensity,
@@ -46,14 +47,14 @@ optional<Error> Light::setProperty(const std::string& name, const Convertible& v
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "anchor", static_cast<uint8_t>(Property::Anchor) },
-        { "color", static_cast<uint8_t>(Property::Color) },
-        { "intensity", static_cast<uint8_t>(Property::Intensity) },
-        { "position", static_cast<uint8_t>(Property::Position) },
-        { "anchor-transition", static_cast<uint8_t>(Property::AnchorTransition) },
-        { "color-transition", static_cast<uint8_t>(Property::ColorTransition) },
-        { "intensity-transition", static_cast<uint8_t>(Property::IntensityTransition) },
-        { "position-transition", static_cast<uint8_t>(Property::PositionTransition) }
+        { "anchor", mbgl::underlying_type(Property::Anchor) },
+        { "color", mbgl::underlying_type(Property::Color) },
+        { "intensity", mbgl::underlying_type(Property::Intensity) },
+        { "position", mbgl::underlying_type(Property::Position) },
+        { "anchor-transition", mbgl::underlying_type(Property::AnchorTransition) },
+        { "color-transition", mbgl::underlying_type(Property::ColorTransition) },
+        { "intensity-transition", mbgl::underlying_type(Property::IntensityTransition) },
+        { "position-transition", mbgl::underlying_type(Property::PositionTransition) }
     });
 
     const auto it = properties.find(name.c_str());
