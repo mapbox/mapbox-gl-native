@@ -2,8 +2,9 @@
 #include "expression_test_runner.hpp"
 #include "filesystem.hpp"
 
-#include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
+
+#include <mapbox/io.hpp>
 
 #include <sstream>
 
@@ -168,10 +169,8 @@ void printStats(const TestStats& stats) {
 
 void writeHTMLResults(const TestStats& stats, const std::string& rootPath, bool shuffle, uint32_t seed) {
     filesystem::path path = filesystem::path(rootPath) / "index.html"s;
-    try {
-        util::write_file(path.string(), createResultPage(stats, shuffle, seed));
-        printf("Results at: %s\n", path.string().c_str());
-    } catch (std::exception&) {
-        printf(ANSI_COLOR_RED "* ERROR can't write result page %s" ANSI_COLOR_RESET "\n", path.string().c_str());
+    auto expected = mapbox::base::io::writeFile(path, createResultPage(stats, shuffle, seed));
+    if (!expected) {
+        printf(ANSI_COLOR_RED "* ERROR: %s" ANSI_COLOR_RESET "\n", expected.error().c_str());
     }
 }

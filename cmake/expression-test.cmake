@@ -19,6 +19,7 @@ target_include_directories(mbgl-expression-test
 
 target_link_libraries(mbgl-expression-test PRIVATE
     mbgl-core
+    Mapbox::Base::io
     Mapbox::Base::Extras::args
     Mapbox::Base::Extras::filesystem
     Mapbox::Base::Extras::rapidjson

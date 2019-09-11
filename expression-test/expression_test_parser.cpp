@@ -1,6 +1,6 @@
 #include "expression_test_parser.hpp"
 
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/conversion/function.hpp>
@@ -50,9 +50,9 @@ void writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer>& writer, const V
 using ErrorMessage = std::string;
 using JSONReply = variant<JSDocument, ErrorMessage>;
 JSONReply readJson(const filesystem::path& jsonPath) {
-    auto maybeJSON = util::readFile(jsonPath);
+    auto maybeJSON = mapbox::base::io::readFile(jsonPath);
     if (!maybeJSON) {
-        return { "Unable to open file "s + jsonPath.string() };
+        return { maybeJSON.error() };
     }
 
     JSDocument document;

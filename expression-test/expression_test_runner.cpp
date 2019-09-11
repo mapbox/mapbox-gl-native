@@ -3,7 +3,7 @@
 #include "expression_test_logger.hpp"
 #include "filesystem.hpp"
 
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 
 #include <rapidjson/writer.h>
 #include <rapidjson/prettywriter.h>
@@ -193,10 +193,9 @@ void writeTestData(const JSDocument& document, const std::string& rootPath, cons
     document.Accept(writer);
     buffer.Put('\n');
     filesystem::path path = filesystem::path(rootPath) / id / "test.json"s;
-    try {
-        util::write_file(path.string(), {buffer.GetString(), buffer.GetSize()});
-    } catch (std::exception&) {
-        printf(ANSI_COLOR_RED "* ERROR can't update '%s' test" ANSI_COLOR_RESET "\n", id.c_str());
+    auto expected = mapbox::base::io::writeFile(path, {buffer.GetString(), buffer.GetSize()});
+    if (!expected) {
+        printf(ANSI_COLOR_RED "* ERROR: %s" ANSI_COLOR_RESET "\n", expected.error().c_str());
     }
 }
 
