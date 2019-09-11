@@ -134,7 +134,7 @@ void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepai
     rendererFullyLoaded = renderMode == RenderMode::Full;
 
     if (mode == MapMode::Continuous) {
-        observer.onDidFinishRenderingFrame(MapObserver::RenderMode(renderMode), placemenChanged);
+        observer.onDidFinishRenderingFrame({MapObserver::RenderMode(renderMode), needsRepaint, placemenChanged});
 
         if (needsRepaint || transform.inTransition()) {
             onUpdate();
