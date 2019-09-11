@@ -2,16 +2,17 @@
 load_sources_list(MBGL_BENCHMARK_FILES benchmark/benchmark-files.json)
 add_executable(mbgl-benchmark ${MBGL_BENCHMARK_FILES})
 
-target_include_directories(mbgl-benchmark
-    PRIVATE src
-    PRIVATE benchmark/include
-    PRIVATE benchmark/src
-    PRIVATE platform/default/include
+target_include_directories(mbgl-benchmark PRIVATE
+    src
+    benchmark/include
+    benchmark/src
+    platform/default/include
 )
 
-target_link_libraries(mbgl-benchmark
-    PRIVATE mbgl-core
-    PRIVATE benchmark
+target_link_libraries(mbgl-benchmark PRIVATE
+    mbgl-core
+    benchmark
+    Mapbox::Base::io
 )
 
 mbgl_platform_benchmark()

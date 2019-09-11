@@ -1,12 +1,12 @@
 #include <benchmark/benchmark.h>
 
 #include <mbgl/tile/vector_tile_data.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 
 using namespace mbgl;
 
 static void Parse_VectorTile(benchmark::State& state) {
-    auto data = std::make_shared<std::string>(util::read_file("test/fixtures/api/assets/streets/10-163-395.vector.pbf"));
+    auto data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/api/assets/streets/10-163-395.vector.pbf"));
 
     while (state.KeepRunning()) {
         std::size_t length = 0;

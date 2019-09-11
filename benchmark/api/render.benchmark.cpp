@@ -10,7 +10,7 @@
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
@@ -31,10 +31,10 @@ public:
 };
 
 static void prepare(Map& map, optional<std::string> json = {}) {
-    map.getStyle().loadJSON(json ? *json : util::read_file("benchmark/fixtures/api/style.json"));
+    map.getStyle().loadJSON(json ? *json : *mapbox::base::io::readFile("benchmark/fixtures/api/style.json"));
     map.jumpTo(CameraOptions().withCenter(LatLng { 40.726989, -73.992857 }).withZoom(15.0)); // Manhattan
 
-    auto image = decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png"));
+    auto image = decodeImage(*mapbox::base::io::readFile("benchmark/fixtures/api/default_marker.png"));
     map.getStyle().addImage(std::make_unique<style::Image>("test-icon", std::move(image), 1.0));
 }
 
@@ -59,7 +59,7 @@ static void API_renderStill_reuse_map_formatted_labels(::benchmark::State& state
     Map map { frontend, MapObserver::nullObserver(),
               MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
               ResourceOptions().withCachePath(cachePath).withAccessToken("foobar") };
-    prepare(map, util::read_file("benchmark/fixtures/api/style_formatted_labels.json"));
+    prepare(map, *mapbox::base::io::readFile("benchmark/fixtures/api/style_formatted_labels.json"));
 
     while (state.KeepRunning()) {
         frontend.render(map);

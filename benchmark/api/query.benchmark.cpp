@@ -8,7 +8,7 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
@@ -20,10 +20,10 @@ public:
     QueryBenchmark() {
         NetworkStatus::Set(NetworkStatus::Status::Offline);
 
-        map.getStyle().loadJSON(util::read_file("benchmark/fixtures/api/style.json"));
+        map.getStyle().loadJSON(*mapbox::base::io::readFile("benchmark/fixtures/api/style.json"));
         map.jumpTo(CameraOptions().withCenter(LatLng { 40.726989, -73.992857 }).withZoom(15.0)); // Manhattan
         map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
-            decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png")), 1.0));
+            decodeImage(*mapbox::base::io::readFile("benchmark/fixtures/api/default_marker.png")), 1.0));
 
         frontend.render(map);
     }
