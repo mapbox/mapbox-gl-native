@@ -762,7 +762,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     HeadlessFrontend frontend(1);
 
     StubMapObserver observer;
-    observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderMode) {
+    observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderFrameStatus) {
         // Start a timer that ends the test one second from now. If we are continuing to render
         // indefinitely, the timer will be constantly restarted and never trigger. Instead, the
         // emergency shutoff above will trigger, failing the test.
