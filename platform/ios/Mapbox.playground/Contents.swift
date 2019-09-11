@@ -121,7 +121,6 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
         let isRecognized = press.state == .recognized
 
         if (isRecognized) {
-//            let coordinate: CLLocationCoordinate2D = mapView.convert(press.location(in: mapView), toCoordinateFrom: mapView)
             let annotation = MGLPointAnnotation()
             annotation.title = "Dropped Marker"
             annotation.coordinate = mapView.convert(press.location(in: mapView), toCoordinateFrom: mapView)
