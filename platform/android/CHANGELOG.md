@@ -3,8 +3,15 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+
+## 8.4.0-alpha.2 - September 11, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-alpha.1...android-v8.4.0-alpha.2) since [Mapbox Maps SDK for Android v8.4.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-alpha.1): 
+
 ### Bug fixes
  - Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. [#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560)
+
+### Other Changes
+ - Bumped Java SDK dependency to 4.9.0-alpha.1 [#15570](https://github.com/mapbox/mapbox-gl-native/pull/15570)
  
 ## 8.4.0-alpha.1 - September 4, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0...android-v8.4.0-alpha.1) since [Mapbox Maps SDK for Android v8.3.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0):
