@@ -1,13 +1,13 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 
 using namespace mbgl;
 
 TEST(GlyphPBF, Parsing) {
     // The fake glyphs contain a number of invalid glyphs, which should be skipped by the parser.
-    auto sdfs = parseGlyphPBF(GlyphRange { 0, 255 }, util::read_file("test/fixtures/resources/fake_glyphs-0-255.pbf"));
+    auto sdfs = parseGlyphPBF(GlyphRange { 0, 255 }, *mapbox::base::io::readFile("test/fixtures/resources/fake_glyphs-0-255.pbf"));
     EXPECT_TRUE(sdfs.size() == 1);
 
     auto& sdf = sdfs[0];

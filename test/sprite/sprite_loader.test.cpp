@@ -5,7 +5,7 @@
 #include <mbgl/sprite/sprite_loader.hpp>
 #include <mbgl/sprite/sprite_loader_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -56,14 +56,14 @@ public:
 Response successfulSpriteImageResponse(const Resource& resource) {
     EXPECT_EQ("test/fixtures/resources/sprite.png", resource.url);
     Response response;
-    response.data = std::make_unique<std::string>(util::read_file(resource.url));
+    response.data = std::make_unique<std::string>(*mapbox::base::io::readFile(resource.url));
     return response;
 }
 
 Response successfulSpriteJSONResponse(const Resource& resource) {
     EXPECT_EQ("test/fixtures/resources/sprite.json", resource.url);
     Response response;
-    response.data = std::make_unique<std::string>(util::read_file(resource.url));
+    response.data = std::make_unique<std::string>(*mapbox::base::io::readFile(resource.url));
     return response;
 }
 

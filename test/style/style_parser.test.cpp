@@ -2,7 +2,7 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/style/parser.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tileset.hpp>
@@ -26,7 +26,7 @@ TEST_P(StyleParserTest, ParseStyle) {
     const std::string base = std::string("test/fixtures/style_parser/") + GetParam();
 
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> infoDoc;
-    infoDoc.Parse<0>(util::read_file(base + ".info.json").c_str());
+    infoDoc.Parse<0>(mapbox::base::io::readFile(base + ".info.json")->c_str());
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
@@ -34,7 +34,7 @@ TEST_P(StyleParserTest, ParseStyle) {
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
     style::Parser parser;
-    auto error = parser.parse(util::read_file(base + ".style.json"));
+    auto error = parser.parse(*mapbox::base::io::readFile(base + ".style.json"));
 
     if (error) {
         Log::Error(Event::ParseStyle, "Failed to parse style: %s", util::toString(error).c_str());
@@ -96,7 +96,7 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
 
 TEST(StyleParser, FontStacks) {
     style::Parser parser;
-    parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));
+    parser.parse(*mapbox::base::io::readFile("test/fixtures/style_parser/font_stacks.json"));
     std::set<mbgl::FontStack> expected;
     expected.insert(FontStack({"a"}));
     expected.insert(FontStack({"a", "b"}));

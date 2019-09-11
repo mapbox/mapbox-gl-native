@@ -1,5 +1,4 @@
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/io.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
@@ -7,6 +6,8 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/test/map_adapter.hpp>
 #include <unordered_map>
+
+#include <mapbox/io.hpp>
 
 #include <gtest/gtest.h>
 
@@ -39,12 +40,13 @@ TEST(SyncFileSource, LoadSyncRender) {
     util::RunLoop loop;
     auto fs = std::make_shared<SyncFileSource>();
     fs->add("mapbox://mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7",
-            util::read_file("test/fixtures/resources/source_vector.json"));
+            *mapbox::base::io::readFile("test/fixtures/resources/source_vector.json"));
     fs->add("mapbox://sprites/mapbox/streets-v9.png",
-            util::read_file("test/fixtures/resources/sprite.png"));
+            *mapbox::base::io::readFile("test/fixtures/resources/sprite.png"));
     fs->add("mapbox://sprites/mapbox/streets-v9.json",
-            util::read_file("test/fixtures/resources/sprite.json"));
+            *mapbox::base::io::readFile("test/fixtures/resources/sprite.json"));
     HeadlessFrontend frontend{ { 512, 512 }, 1.0 };
     MapAdapter map{ frontend, MapObserver::nullObserver(), fs, MapOptions() };
-    map.getStyle().loadJSON(util::read_file("test/fixtures/resources/style_vector.json"));
+    map.getStyle().loadJSON(
+            *mapbox::base::io::readFile("test/fixtures/resources/style_vector.json"));
 }

@@ -12,7 +12,7 @@
 #include <mbgl/storage/offline_download.hpp>
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -29,9 +29,9 @@ static constexpr const char* filename_test_fs = "file:test/fixtures/offline_down
 
 static void deleteDatabaseFiles() {
     // Delete leftover journaling files as well.
-    util::deleteFile(filename);
-    util::deleteFile(filename + "-wal"s);
-    util::deleteFile(filename + "-journal"s);
+    mapbox::base::io::deleteFile(filename);
+    mapbox::base::io::deleteFile(filename + "-wal"s);
+    mapbox::base::io::deleteFile(filename + "-journal"s);
 }
 
 static FixtureLog::Message warning(ResultCode code, const char* message) {
@@ -80,7 +80,7 @@ public:
 
     Response response(const std::string& path) {
         Response result;
-        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/offline_download/"s + path));
+        result.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/offline_download/"s + path));
         size_t uncompressed = result.data->size();
         size_t compressed = util::compress(*result.data).size();
         size += std::min(uncompressed, compressed);

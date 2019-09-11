@@ -6,7 +6,7 @@
 #include <mbgl/renderer/image_manager_observer.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/style/image_impl.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -24,8 +24,8 @@ TEST(ImageManager, Basic) {
     FixtureLog log;
     ImageManager imageManager;
 
-    auto images = parseSprite(util::read_file("test/fixtures/annotations/emerald.png"),
-                              util::read_file("test/fixtures/annotations/emerald.json"));
+    auto images = parseSprite(*mapbox::base::io::readFile("test/fixtures/annotations/emerald.png"),
+                              *mapbox::base::io::readFile("test/fixtures/annotations/emerald.json"));
     for (auto& image : images) {
         imageManager.addImage(image->baseImpl);
         auto* stored = imageManager.getImage(image->getID());

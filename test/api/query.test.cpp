@@ -4,7 +4,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/style.hpp>
@@ -25,9 +25,9 @@ namespace {
 class QueryTest {
 public:
     QueryTest() {
-        map.getStyle().loadJSON(util::read_file("test/fixtures/api/query_style.json"));
+        map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/query_style.json"));
         map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
-            decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
+            decodeImage(*mapbox::base::io::readFile("test/fixtures/sprites/default_marker.png")), 1.0));
 
         frontend.render(map);
     }
@@ -43,7 +43,7 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
     test.fileSource->sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("http://url"s, resource.url);
         Response response;
-        response.data = std::make_unique<std::string>(util::read_file("test/fixtures/supercluster/places.json"s));
+        response.data = std::make_unique<std::string>(*mapbox::base::io::readFile("test/fixtures/supercluster/places.json"s));
         return response;
     };
 

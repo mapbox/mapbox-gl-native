@@ -2,7 +2,7 @@
 
 #include <mbgl/util/premultiply.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 
 using namespace mbgl;
 
@@ -35,7 +35,7 @@ TEST(Image, PNGRoundTripAlpha) {
 }
 
 TEST(Image, PNGReadNoProfile) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/no_profile.png"));
+    PremultipliedImage image = decodeImage(*mapbox::base::io::readFile("test/fixtures/image/no_profile.png"));
     EXPECT_EQ(128, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
     EXPECT_EQ(0, image.data[2]);
@@ -43,7 +43,7 @@ TEST(Image, PNGReadNoProfile) {
 }
 
 TEST(Image, PNGReadNoProfileAlpha) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/no_profile_alpha.png"));
+    PremultipliedImage image = decodeImage(*mapbox::base::io::readFile("test/fixtures/image/no_profile_alpha.png"));
     EXPECT_EQ(64, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
     EXPECT_EQ(0, image.data[2]);
@@ -51,7 +51,7 @@ TEST(Image, PNGReadNoProfileAlpha) {
 }
 
 TEST(Image, PNGReadProfile) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/profile.png"));
+    PremultipliedImage image = decodeImage(*mapbox::base::io::readFile("test/fixtures/image/profile.png"));
     EXPECT_EQ(128, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
     EXPECT_EQ(0, image.data[2]);
@@ -59,7 +59,7 @@ TEST(Image, PNGReadProfile) {
 }
 
 TEST(Image, PNGReadProfileAlpha) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/profile_alpha.png"));
+    PremultipliedImage image = decodeImage(*mapbox::base::io::readFile("test/fixtures/image/profile_alpha.png"));
     EXPECT_EQ(64, image.data[0]);
     EXPECT_EQ(0, image.data[1]);
     EXPECT_EQ(0, image.data[2]);
@@ -67,13 +67,13 @@ TEST(Image, PNGReadProfileAlpha) {
 }
 
 TEST(Image, PNGTile) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.png"));
+    PremultipliedImage image = decodeImage(*mapbox::base::io::readFile("test/fixtures/image/tile.png"));
     EXPECT_EQ(256u, image.size.width);
     EXPECT_EQ(256u, image.size.height);
 }
 
 TEST(Image, JPEGTile) {
-    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.jpeg"));
+    PremultipliedImage image = decodeImage(*mapbox::base::io::readFile("test/fixtures/image/tile.jpeg"));
     EXPECT_EQ(256u, image.size.width);
     EXPECT_EQ(256u, image.size.height);
 }

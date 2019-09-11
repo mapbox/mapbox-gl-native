@@ -26,7 +26,7 @@
 
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/premultiply.hpp>
 #include <mbgl/util/image.hpp>
 
@@ -729,7 +729,7 @@ TEST(Source, ImageSourceImageUpdate) {
     test.fileSource->response = [&] (const Resource& resource) {
         EXPECT_EQ("http://url", resource.url);
         Response response;
-        response.data = std::make_unique<std::string>(util::read_file("test/fixtures/image/no_profile.png"));
+        response.data = std::make_unique<std::string>(*mapbox::base::io::readFile("test/fixtures/image/no_profile.png"));
         return response;
     };
     test.styleObserver.sourceChanged = [&] (Source&) {

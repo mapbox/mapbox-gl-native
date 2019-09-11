@@ -5,7 +5,7 @@
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <mbgl/storage/sqlite3.hpp>
@@ -24,9 +24,9 @@ static constexpr const char* filename_test_fs = "file:test/fixtures/offline_data
 
 static void deleteDatabaseFiles() {
     // Delete leftover journaling files as well.
-    util::deleteFile(filename);
-    util::deleteFile(filename + "-wal"s);
-    util::deleteFile(filename + "-journal"s);
+    mapbox::base::io::deleteFile(filename);
+    mapbox::base::io::deleteFile(filename + "-wal"s);
+    mapbox::base::io::deleteFile(filename + "-journal"s);
 }
 
 static std::shared_ptr<std::string> randomString(size_t size) {
@@ -238,7 +238,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
     FixtureLog log;
     deleteDatabaseFiles();
-    util::write_file(filename, "this is an invalid file");
+    mapbox::base::io::writeFile(filename, "this is an invalid file");
 
     OfflineDatabase db(filename);
     // Checking two possibilities for the error string because it apparently changes between SQLite versions.
@@ -316,7 +316,7 @@ TEST(OfflineDatabase, PutResource) {
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
     FixtureLog log;
     deleteDatabaseFiles();
-    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
+    mapbox::base::io::copyFile("test/fixtures/offline_database/satellite_test.db", filename);
 
     OfflineDatabase db(filename);
 
@@ -521,14 +521,14 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DISABLED_MaximumAmbientCacheSize)) {
     deleteDatabaseFiles();
 
     auto databaseSize = [] {
-        return util::read_file(filename).size();
+        return mapbox::base::io::readFile(filename)->size();
     };
 
     {
         OfflineDatabase db(filename);
     }
 
-    size_t initialSize = util::read_file(filename).size();
+    size_t initialSize = mapbox::base::io::readFile(filename)->size();
     size_t maximumSize = 50 * 1024 * 1024;
 
     Response response;
@@ -647,7 +647,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DISABLED_MaximumAmbientCacheSize)) {
 
     // Setting the size to zero should effectively
     // clear the cache now.
-    EXPECT_EQ(initialSize, util::read_file(filename).size());
+    EXPECT_EQ(initialSize, mapbox::base::io::readFile(filename)->size());
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
@@ -658,7 +658,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
         OfflineDatabase dbCreate(filename);
     }
 
-    size_t initialSize = util::read_file(filename).size();
+    size_t initialSize = mapbox::base::io::readFile(filename)->size();
 
     {
         Response response;
@@ -687,14 +687,14 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
         // The tiles from the offline region will migrate to the
         // ambient cache and shrink the database to the maximum
         // size defined by default.
-        EXPECT_LE(util::read_file(filename).size(), util::DEFAULT_MAX_CACHE_SIZE);
+        EXPECT_LE(mapbox::base::io::readFile(filename)->size(), util::DEFAULT_MAX_CACHE_SIZE);
 
         // After clearing the cache, the size of the database
         // should get back to the original size.
         db.clearAmbientCache();
     }
 
-    EXPECT_EQ(initialSize, util::read_file(filename).size());
+    EXPECT_EQ(initialSize, mapbox::base::io::readFile(filename)->size());
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
@@ -895,7 +895,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ClearAmbientCache)) {
         OfflineDatabase dbCreate(filename);
     }
 
-    size_t initialSize = util::read_file(filename).size();
+    size_t initialSize = mapbox::base::io::readFile(filename)->size();
 
     {
         Response response;
@@ -914,7 +914,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ClearAmbientCache)) {
         db.clearAmbientCache();
     }
 
-    EXPECT_EQ(initialSize, util::read_file(filename).size());
+    EXPECT_EQ(initialSize, mapbox::base::io::readFile(filename)->size());
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
@@ -1273,7 +1273,7 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
     // v2.db is a v2 database containing a single offline region with a small number of resources.
     FixtureLog log;
     deleteDatabaseFiles();
-    util::copyFile(filename, "test/fixtures/offline_database/v2.db");
+    mapbox::base::io::copyFile("test/fixtures/offline_database/v2.db", filename);
 
     {
         OfflineDatabase db(filename);
@@ -1297,7 +1297,7 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
     // v3.db is a v3 database, migrated from v2.
     FixtureLog log;
     deleteDatabaseFiles();
-    util::copyFile(filename, "test/fixtures/offline_database/v3.db");
+    mapbox::base::io::copyFile("test/fixtures/offline_database/v3.db", filename);
 
     {
         OfflineDatabase db(filename);
@@ -1318,7 +1318,7 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
     // v4.db is a v4 database, migrated from v2 & v3. This database used `journal_mode = WAL` and `synchronous = NORMAL`.
     FixtureLog log;
     deleteDatabaseFiles();
-    util::copyFile(filename, "test/fixtures/offline_database/v4.db");
+    mapbox::base::io::copyFile("test/fixtures/offline_database/v4.db", filename);
 
     {
         OfflineDatabase db(filename);
@@ -1346,7 +1346,7 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
     // v5.db is a v5 database, migrated from v2, v3 & v4.
     FixtureLog log;
     deleteDatabaseFiles();
-    util::copyFile(filename, "test/fixtures/offline_database/v5.db");
+    mapbox::base::io::copyFile("test/fixtures/offline_database/v5.db", filename);
 
     {
         OfflineDatabase db(filename);
@@ -1375,8 +1375,8 @@ TEST(OfflineDatabase, DowngradeSchema) {
     // v999.db is a v999 database, it should be deleted
     // and recreated with the current schema.
     FixtureLog log;
-    util::deleteFile(filename);
-    util::copyFile(filename, "test/fixtures/offline_database/v999.db");
+    mapbox::base::io::deleteFile(filename);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/v999.db", filename);
 
     {
         OfflineDatabase db(filename);
@@ -1399,8 +1399,8 @@ TEST(OfflineDatabase, DowngradeSchema) {
 
 TEST(OfflineDatabase, CorruptDatabaseOnOpen) {
     FixtureLog log;
-    util::deleteFile(filename);
-    util::copyFile(filename, "test/fixtures/offline_database/corrupt-immediate.db");
+    mapbox::base::io::deleteFile(filename);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/corrupt-immediate.db", filename);
 
     // This database is corrupt in a way that will prevent opening the database.
     OfflineDatabase db(filename);
@@ -1421,8 +1421,8 @@ TEST(OfflineDatabase, CorruptDatabaseOnOpen) {
 
 TEST(OfflineDatabase, CorruptDatabaseOnQuery) {
     FixtureLog log;
-    util::deleteFile(filename);
-    util::copyFile(filename, "test/fixtures/offline_database/corrupt-delayed.db");
+    mapbox::base::io::deleteFile(filename);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/corrupt-delayed.db", filename);
 
     // This database is corrupt in a way that won't manifest itself until we start querying it,
     // so just opening it will not cause an error.
@@ -1527,8 +1527,8 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DisallowedIO)) {
 #endif // __QT__
 
 TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_New) {
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat.db", filename_sideload);
 
     OfflineDatabase db(":memory:");
     EXPECT_EQ(0u, db.listRegions()->size());
@@ -1545,9 +1545,9 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_New) {
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithSingleRegion_Update)) {
     deleteDatabaseFiles();
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/satellite_test.db", filename);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat.db", filename_sideload);
     int64_t regionId;
 
     {
@@ -1575,11 +1575,11 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithSingleRegion_Update))
 
 TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_NoUpdate) {
     deleteDatabaseFiles();
-    util::deleteFile(filename_sideload);
+    mapbox::base::io::deleteFile(filename_sideload);
 
     //Swap sideload/main database from update test and ensure that an older tile is not copied over
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/satellite_test.db");
-    util::copyFile(filename, "test/fixtures/offline_database/sideload_sat.db");
+    mapbox::base::io::copyFile("test/fixtures/offline_database/satellite_test.db", filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat.db", filename);
 
     OfflineDatabase db(filename);
     auto result = db.mergeDatabase(filename_sideload);
@@ -1595,8 +1595,8 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_NoUpdate) {
 }
 
 TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_AmbientTiles) {
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_ambient.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_ambient.db", filename_sideload);
 
     OfflineDatabase db(":memory:");
     auto result = db.mergeDatabase(filename_sideload);
@@ -1610,8 +1610,8 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_AmbientTiles) {
 }
 
 TEST(OfflineDatabase, MergeDatabaseWithMultipleRegions_New) {
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat_multiple.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat_multiple.db", filename_sideload);
 
     OfflineDatabase db(":memory:");
     EXPECT_EQ(0u, db.listRegions()->size());
@@ -1633,9 +1633,9 @@ TEST(OfflineDatabase, MergeDatabaseWithMultipleRegions_New) {
 
 TEST(OfflineDatabase, MergeDatabaseWithMultipleRegionsWithOverlap) {
     deleteDatabaseFiles();
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename, "test/fixtures/offline_database/sideload_sat.db");
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat_multiple.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat.db", filename);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat_multiple.db", filename_sideload);
 
     {
         OfflineDatabase db(filename);
@@ -1675,8 +1675,8 @@ TEST(OfflineDatabase, MergeDatabaseWithMultipleRegionsWithOverlap) {
 
 TEST(OfflineDatabase, MergeDatabaseWithSingleRegionTooManyNewTiles) {
     FixtureLog log;
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat_multiple.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat_multiple.db", filename_sideload);
 
     OfflineDatabase db(":memory:");
     db.setOfflineMapboxTileCountLimit(1);
@@ -1690,9 +1690,9 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegionTooManyNewTiles) {
 TEST(OfflineDatabase, MergeDatabaseWithSingleRegionTooManyExistingTiles) {
     FixtureLog log;
     deleteDatabaseFiles();
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename, "test/fixtures/offline_database/sideload_sat_multiple.db");
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/satellite_test.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat_multiple.db", filename);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/satellite_test.db", filename_sideload);
 
     OfflineDatabase db(filename);
     db.setOfflineMapboxTileCountLimit(2);
@@ -1707,8 +1707,8 @@ TEST(OfflineDatabase, MergeDatabaseWithSingleRegionTooManyExistingTiles) {
 TEST(OfflineDatabase, MergeDatabaseWithInvalidPath) {
     FixtureLog log;
 
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename_sideload, "test/fixtures/offline_database");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database", filename_sideload);
 
     OfflineDatabase db(":memory:");
 
@@ -1722,8 +1722,8 @@ TEST(OfflineDatabase, MergeDatabaseWithInvalidPath) {
 TEST(OfflineDatabase, MergeDatabaseWithInvalidDb) {
     FixtureLog log;
 
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/corrupt-immediate.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/corrupt-immediate.db", filename_sideload);
 
     OfflineDatabase db(":memory:");
 
@@ -1740,9 +1740,9 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithDiskFull)) {
     test::SQLite3TestFS fs;
     
     deleteDatabaseFiles();
-    util::deleteFile(filename_sideload);
-    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
-    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat.db");
+    mapbox::base::io::deleteFile(filename_sideload);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/satellite_test.db", filename);
+    mapbox::base::io::copyFile("test/fixtures/offline_database/sideload_sat.db", filename_sideload);
 
     OfflineDatabase db(filename_test_fs);
 
@@ -1761,13 +1761,13 @@ TEST(OfflineDatabase, ChangePath) {
     OfflineDatabase db(":memory:");
     db.changePath(newPath);
     mapbox::sqlite::Database::open(newPath, mapbox::sqlite::ReadOnly);
-    util::deleteFile(newPath);
+    mapbox::base::io::deleteFile(newPath);
 }
 
 TEST(OfflineDatabase, ResetDatabase) {
     FixtureLog log;
     deleteDatabaseFiles();
-    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
+    mapbox::base::io::copyFile("test/fixtures/offline_database/satellite_test.db", filename);
 
     OfflineDatabase db(filename);
     auto result = db.resetDatabase();

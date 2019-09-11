@@ -4,7 +4,7 @@
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <algorithm>
@@ -14,7 +14,7 @@ using namespace mbgl;
 namespace {
 
 auto readImage(const std::string& name) {
-    return decodeImage(util::read_file(name));
+    return decodeImage(*mapbox::base::io::readFile(name));
 }
 
 } // namespace
@@ -22,7 +22,7 @@ auto readImage(const std::string& name) {
 TEST(Sprite, SpriteImageCreationInvalid) {
     FixtureLog log;
 
-    const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
+    const PremultipliedImage image_1x = decodeImage(*mapbox::base::io::readFile("test/fixtures/annotations/emerald.png"));
 
     ASSERT_EQ(200u, image_1x.size.width);
     ASSERT_EQ(299u, image_1x.size.height);
@@ -135,7 +135,7 @@ TEST(Sprite, SpriteImageCreationInvalid) {
 }
 
 TEST(Sprite, SpriteImageCreation1x) {
-    const PremultipliedImage image_1x = decodeImage(util::read_file("test/fixtures/annotations/emerald.png"));
+    const PremultipliedImage image_1x = decodeImage(*mapbox::base::io::readFile("test/fixtures/annotations/emerald.png"));
 
     ASSERT_EQ(200u, image_1x.size.width);
     ASSERT_EQ(299u, image_1x.size.height);
@@ -152,7 +152,7 @@ TEST(Sprite, SpriteImageCreation1x) {
 }
 
 TEST(Sprite, SpriteImageCreation2x) {
-    const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
+    const PremultipliedImage image_2x = decodeImage(*mapbox::base::io::readFile("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createStyleImage("test", image_2x, 354, 374, 36, 36, 2, false);
@@ -165,7 +165,7 @@ TEST(Sprite, SpriteImageCreation2x) {
 }
 
 TEST(Sprite, SpriteImageCreation1_5x) {
-    const PremultipliedImage image_2x = decodeImage(util::read_file("test/fixtures/annotations/emerald@2x.png"));
+    const PremultipliedImage image_2x = decodeImage(*mapbox::base::io::readFile("test/fixtures/annotations/emerald@2x.png"));
 
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createStyleImage("test", image_2x, 354, 374, 36, 36, 1.5, false);
@@ -187,8 +187,8 @@ TEST(Sprite, SpriteImageCreation1_5x) {
 }
 
 TEST(Sprite, SpriteParsing) {
-    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
-    const auto json_1x = util::read_file("test/fixtures/annotations/emerald.json");
+    const auto image_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.png");
+    const auto json_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.json");
 
     const auto images = parseSprite(image_1x, json_1x);
 
@@ -281,7 +281,7 @@ TEST(Sprite, SpriteParsing) {
 }
 
 TEST(Sprite, SpriteParsingInvalidJSON) {
-    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+    const auto image_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": " })JSON";
 
     try {
@@ -297,7 +297,7 @@ TEST(Sprite, SpriteParsingInvalidJSON) {
 TEST(Sprite, SpriteParsingEmptyImage) {
     FixtureLog log;
 
-    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+    const auto image_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": {} })JSON";
 
     const auto images = parseSprite(image_1x, json_1x);
@@ -314,7 +314,7 @@ TEST(Sprite, SpriteParsingEmptyImage) {
 TEST(Sprite, SpriteParsingSimpleWidthHeight) {
     FixtureLog log;
 
-    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+    const auto image_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": 32, "height": 32 } })JSON";
 
     const auto images = parseSprite(image_1x, json_1x);
@@ -324,7 +324,7 @@ TEST(Sprite, SpriteParsingSimpleWidthHeight) {
 TEST(Sprite, SpriteParsingWidthTooBig) {
     FixtureLog log;
 
-    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+    const auto image_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": 65536, "height": 32 } })JSON";
 
     const auto images = parseSprite(image_1x, json_1x);
@@ -347,7 +347,7 @@ TEST(Sprite, SpriteParsingWidthTooBig) {
 TEST(Sprite, SpriteParsingNegativeWidth) {
     FixtureLog log;
 
-    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+    const auto image_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": -1, "height": 32 } })JSON";
 
     const auto images = parseSprite(image_1x, json_1x);
@@ -370,7 +370,7 @@ TEST(Sprite, SpriteParsingNegativeWidth) {
 TEST(Sprite, SpriteParsingNullRatio) {
     FixtureLog log;
 
-    const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
+    const auto image_1x = *mapbox::base::io::readFile("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": { "width": 32, "height": 32, "pixelRatio": 0 } })JSON";
 
     const auto images = parseSprite(image_1x, json_1x);

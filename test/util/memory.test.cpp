@@ -5,7 +5,7 @@
 
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gfx/headless_frontend.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/style.hpp>
 
@@ -46,7 +46,7 @@ private:
             result.data = it->second;
         } else {
             auto data = std::make_shared<std::string>(
-                util::read_file("test/fixtures/resources/"s + path));
+                *mapbox::base::io::readFile("test/fixtures/resources/"s + path));
 
             cache.insert(it, std::make_pair(path, data));
             result.data = data;

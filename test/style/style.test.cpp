@@ -7,7 +7,7 @@
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <memory>
@@ -63,7 +63,7 @@ TEST(Style, DuplicateSource) {
     StubFileSource fileSource;
     Style::Impl style { fileSource, 1.0 };
 
-    style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+    style.loadJSON(*mapbox::base::io::readFile("test/fixtures/resources/style-unused-sources.json"));
 
     style.addSource(std::make_unique<VectorSource>("sourceId", "mapbox://mapbox.mapbox-terrain-v2"));
 
@@ -84,7 +84,7 @@ TEST(Style, RemoveSourceInUse) {
     StubFileSource fileSource;
     Style::Impl style { fileSource, 1.0 };
 
-    style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+    style.loadJSON(*mapbox::base::io::readFile("test/fixtures/resources/style-unused-sources.json"));
 
     style.addSource(std::make_unique<VectorSource>("sourceId", "mapbox://mapbox.mapbox-terrain-v2"));
     style.addLayer(std::make_unique<LineLayer>("layerId", "sourceId"));

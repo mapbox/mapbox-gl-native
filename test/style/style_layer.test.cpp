@@ -21,7 +21,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 
 #include <memory>
 
@@ -284,7 +284,7 @@ TEST(Layer, DuplicateLayer) {
     // Setup style
     StubFileSource fileSource;
     Style::Impl style { fileSource, 1.0 };
-    style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+    style.loadJSON(*mapbox::base::io::readFile("test/fixtures/resources/style-unused-sources.json"));
 
     // Add initial layer
     style.addLayer(std::make_unique<LineLayer>("line", "unusedsource"));

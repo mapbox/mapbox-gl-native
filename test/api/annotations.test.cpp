@@ -6,7 +6,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/renderer/renderer.hpp>
@@ -17,7 +17,7 @@ using namespace mbgl;
 namespace {
 
 PremultipliedImage namedImage(const std::string& name) {
-    return decodeImage(util::read_file("test/fixtures/sprites/" + name + ".png"));
+    return decodeImage(*mapbox::base::io::readFile("test/fixtures/sprites/" + name + ".png"));
 }
 
 std::unique_ptr<style::Image> namedMarker(const std::string& name) {
@@ -43,7 +43,7 @@ public:
 TEST(Annotations, SymbolAnnotation) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double>(0, 0), "default_marker" });
     test.checkRendering("point_annotation");
@@ -62,7 +62,7 @@ TEST(Annotations, SymbolAnnotationTileBoundary) {
     // tests precision issue from https://github.com/mapbox/mapbox-gl-native/issues/12472
     AnnotationTest test;
     
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double>(0.000000000000001, 0.00000000000001), "default_marker" });
     test.map.jumpTo(CameraOptions().withZoom(10));
@@ -77,7 +77,7 @@ TEST(Annotations, LineAnnotation) {
     annotation.color = Color::red();
     annotation.width = { 5 };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
     test.checkRendering("line_annotation");
 
@@ -92,7 +92,7 @@ TEST(Annotations, FillAnnotation) {
     FillAnnotation annotation { polygon };
     annotation.color = Color::red();
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
     test.checkRendering("fill_annotation");
 
@@ -105,7 +105,7 @@ TEST(Annotations, AntimeridianAnnotationSmall) {
 
     double antimeridian = 180;
     test.map.jumpTo(CameraOptions().withCenter(LatLng { 0, antimeridian }).withZoom(0.0));
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
 
     LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
     LineAnnotation lineAnnotation { line };
@@ -126,7 +126,7 @@ TEST(Annotations, AntimeridianAnnotationLarge) {
 
     double antimeridian = 180;
     test.map.jumpTo(CameraOptions().withCenter(mbgl::LatLng(0.0, antimeridian)).withZoom(0.0));
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
 
     LineString<double> line = {{ { antimeridian, 20 }, { antimeridian, -20 } }};
     LineAnnotation lineAnnotation { line };
@@ -151,7 +151,7 @@ TEST(Annotations, OverlappingFillAnnotation) {
     FillAnnotation overlaidAnnotation { polygon };
     overlaidAnnotation.color = Color::red();
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotation(underlaidAnnotation);
     test.map.addAnnotation(overlaidAnnotation);
     test.checkRendering("overlapping_fill_annotation");
@@ -160,7 +160,7 @@ TEST(Annotations, OverlappingFillAnnotation) {
 TEST(Annotations, AddMultiple) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
 
@@ -173,7 +173,7 @@ TEST(Annotations, AddMultiple) {
 TEST(Annotations, NonImmediateAdd) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.frontend.render(test.map);
 
     Polygon<double> polygon = { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} };
@@ -187,7 +187,7 @@ TEST(Annotations, NonImmediateAdd) {
 TEST(Annotations, UpdateSymbolAnnotationGeometry) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotationImage(namedMarker("flipped_marker"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
@@ -201,7 +201,7 @@ TEST(Annotations, UpdateSymbolAnnotationGeometry) {
 TEST(Annotations, UpdateSymbolAnnotationIcon) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotationImage(namedMarker("flipped_marker"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
@@ -219,7 +219,7 @@ TEST(Annotations, UpdateLineAnnotationGeometry) {
     annotation.color = Color::red();
     annotation.width = { 5 };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     AnnotationID line = test.map.addAnnotation(annotation);
 
     test.frontend.render(test.map);
@@ -236,7 +236,7 @@ TEST(Annotations, UpdateLineAnnotationStyle) {
     annotation.color = Color::red();
     annotation.width = { 5 };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     AnnotationID line = test.map.addAnnotation(annotation);
 
     test.frontend.render(test.map);
@@ -253,7 +253,7 @@ TEST(Annotations, UpdateFillAnnotationGeometry) {
     FillAnnotation annotation { Polygon<double> { {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} } };
     annotation.color = Color::red();
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     AnnotationID fill = test.map.addAnnotation(annotation);
 
     test.frontend.render(test.map);
@@ -270,7 +270,7 @@ TEST(Annotations, UpdateFillAnnotationStyle) {
     FillAnnotation annotation { polygon };
     annotation.color = Color::red();
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     AnnotationID fill = test.map.addAnnotation(annotation);
 
     test.frontend.render(test.map);
@@ -283,7 +283,7 @@ TEST(Annotations, UpdateFillAnnotationStyle) {
 TEST(Annotations, RemovePoint) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
@@ -301,7 +301,7 @@ TEST(Annotations, RemoveShape) {
     annotation.color = Color::red();
     annotation.width = { 5 };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     AnnotationID shape = test.map.addAnnotation(annotation);
 
     test.frontend.render(test.map);
@@ -314,7 +314,7 @@ TEST(Annotations, ImmediateRemoveShape) {
     AnnotationTest test;
 
     test.map.removeAnnotation(test.map.addAnnotation(LineAnnotation { LineString<double>() }));
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
 
     test.frontend.render(test.map);
 }
@@ -322,20 +322,20 @@ TEST(Annotations, ImmediateRemoveShape) {
 TEST(Annotations, SwitchStyle) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
     test.frontend.render(test.map);
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.checkRendering("switch_style");
 }
 
 TEST(Annotations, ReaddImage) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
@@ -348,7 +348,7 @@ TEST(Annotations, ReaddImage) {
 TEST(Annotations, QueryRenderedFeatures) {
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 50 }, "default_marker" });
@@ -372,7 +372,7 @@ TEST(Annotations, QueryFractionalZoomLevels) {
     auto viewSize = test.frontend.getSize();
     auto box = ScreenBox { {}, { double(viewSize.width), double(viewSize.height) } };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
 
     std::vector<mbgl::AnnotationID> ids;
@@ -404,7 +404,7 @@ TEST(Annotations, VisibleFeatures) {
     auto viewSize = test.frontend.getSize();
     auto box = ScreenBox { {}, { double(viewSize.width), double(viewSize.height) } };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     test.map.jumpTo(CameraOptions().withCenter(mbgl::LatLng(5.0, 5.0)).withZoom(3.0));
 
@@ -448,7 +448,7 @@ TEST(Annotations, ViewFrustumCulling) {
     auto viewSize = test.frontend.getSize();
     auto box = ScreenBox { {}, { double(viewSize.width), double(viewSize.height) } };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotationImage(namedMarker("default_marker"));
     const LatLng center = { 5.0, 5.0 };
     test.map.jumpTo(CameraOptions().withCenter(center).withZoom(3.0));
@@ -514,7 +514,7 @@ TEST(Annotations, DebugEmpty) {
     // should not render them.
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.setDebug(MapDebugOptions::TileBorders);
     test.map.jumpTo(CameraOptions().withZoom(1.0));
 
@@ -527,7 +527,7 @@ TEST(Annotations, DebugSparse) {
     // tiles because they're all empty.
     AnnotationTest test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.setDebug(MapDebugOptions::TileBorders);
     test.map.jumpTo(CameraOptions().withZoom(1.0));
     test.map.addAnnotationImage(namedMarker("default_marker"));
@@ -545,7 +545,7 @@ TEST(Annotations, ChangeMaxZoom) {
     annotation.width = { 5 };
 
     test.map.setBounds(BoundOptions().withMaxZoom(6));
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
     test.map.setBounds(BoundOptions().withMaxZoom(14));
     test.map.jumpTo(CameraOptions().withZoom(*test.map.getBounds().maxZoom));

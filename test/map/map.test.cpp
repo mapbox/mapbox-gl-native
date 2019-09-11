@@ -14,7 +14,7 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/style/style.hpp>
@@ -67,7 +67,7 @@ TEST(Map, RendererState) {
     double pitchInDegrees = 45.0;
     double bearingInDegrees = 30.0;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.map.jumpTo(CameraOptions().withCenter(coordinate).withZoom(zoom).withPitch(pitchInDegrees).withBearing(bearingInDegrees));
 
     test.runLoop.runOnce();
@@ -92,7 +92,7 @@ TEST(Map, RendererState) {
     }
 
     // RendererState::hasImage
-    test.map.getStyle().addImage(std::make_unique<style::Image>("default_marker", decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
+    test.map.getStyle().addImage(std::make_unique<style::Image>("default_marker", decodeImage(*mapbox::base::io::readFile("test/fixtures/sprites/default_marker.png")), 1.0));
 
     // The frontend has not yet been notified about the newly-added image.
     EXPECT_FALSE(test.frontend.hasImage("default_marker"));
@@ -243,7 +243,7 @@ TEST(Map, Offline) {
 
     auto expiredItem = [] (const std::string& path) {
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/offline/"s + path));
+        response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/map/offline/"s + path));
         response.expires = Timestamp{ Seconds(0) };
         return response;
     };
@@ -269,14 +269,14 @@ TEST(Map, Offline) {
 
 TEST(Map, SetStyleDefaultCamera) {
     MapTest<> test;
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     CameraOptions camera = test.map.getCameraOptions();
     EXPECT_DOUBLE_EQ(*camera.zoom, 0.0);
     EXPECT_DOUBLE_EQ(*camera.pitch, 0.0);
     EXPECT_DOUBLE_EQ(*camera.bearing, 0.0);
     EXPECT_EQ(*camera.center, LatLng {});
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty-zoomed.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty-zoomed.json"));
     camera = test.map.getCameraOptions();
     EXPECT_DOUBLE_EQ(*camera.zoom, 0.0);
 
@@ -414,7 +414,7 @@ TEST(Map, StyleFresh) {
     EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     response.expires = Timestamp::max();
 
     test.fileSource->respond(Resource::Style, response);
@@ -432,7 +432,7 @@ TEST(Map, StyleExpired) {
     EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
     test.fileSource->respond(Resource::Style, response);
@@ -468,7 +468,7 @@ TEST(Map, StyleExpiredWithAnnotations) {
     EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
     test.fileSource->respond(Resource::Style, response);
@@ -492,7 +492,7 @@ TEST(Map, StyleExpiredWithRender) {
     EXPECT_EQ(1u, test.fileSource->requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
     test.fileSource->respond(Resource::Style, response);
@@ -514,7 +514,7 @@ TEST(Map, StyleEarlyMutation) {
     test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
+    response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/api/water.json"));
     test.fileSource->respond(Resource::Style, response);
 
     EXPECT_EQ(1u, test.fileSource->requests.size());
@@ -528,7 +528,7 @@ TEST(Map, MapLoadingSignal) {
     test.observer.willStartLoadingMapCallback = [&]() {
         emitted = true;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 }
 
@@ -539,7 +539,7 @@ TEST(Map, MapLoadedSignal) {
         test.runLoop.stop();
     };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     test.runLoop.run();
 }
 
@@ -551,7 +551,7 @@ TEST(Map, StyleLoadedSignal) {
     test.observer.didFinishLoadingStyleCallback = [&]() {
         emitted = true;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 
     // But not when the style couldn't be parsed
@@ -602,7 +602,7 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
 TEST(Map, AddLayer) {
     MapTest<> test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({ { 1, 0, 0, 1 } });
@@ -621,7 +621,7 @@ TEST(Map, WithoutVAOExtension) {
     gfx::BackendScope scope { *test.frontend.getBackend() };
     static_cast<gl::Context&>(test.frontend.getBackend()->getContext()).disableVAOExtension = true;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/water.json"));
 
     test::checkImage("test/fixtures/map/no_vao", test.frontend.render(test.map), 0.002);
 }
@@ -629,7 +629,7 @@ TEST(Map, WithoutVAOExtension) {
 TEST(Map, RemoveLayer) {
     MapTest<> test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({{ 1, 0, 0, 1 }});
@@ -647,7 +647,7 @@ TEST(Map, DisabledSources) {
         if (res.url == "asset://tile.png") {
             Response response;
             response.data = std::make_shared<std::string>(
-                util::read_file("test/fixtures/map/disabled_layers/tile.png"));
+                *mapbox::base::io::readFile("test/fixtures/map/disabled_layers/tile.png"));
             return {std::move(response)};
         }
         return {};
@@ -774,7 +774,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     Map map(frontend, observer,
             MapOptions().withMapMode(MapMode::Continuous).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
+    map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/api/water.json"));
 
     runLoop.run();
 }
@@ -827,7 +827,7 @@ TEST(Map, Issue12432) {
 
     test.fileSource->tileResponse = [&](const Resource&) {
         Response result;
-        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/issue12432/0-0-0.mvt"));
+        result.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/map/issue12432/0-0-0.mvt"));
         return result;
     };
 

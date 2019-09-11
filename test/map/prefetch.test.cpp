@@ -7,7 +7,7 @@
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <algorithm>
@@ -41,7 +41,7 @@ TEST(Map, PrefetchTiles) {
     std::vector<int> tiles;
 
     fileSource->response = [&] (const Resource& res) -> optional<Response> {
-        static std::string tile = util::read_file("test/fixtures/map/prefetch/tile.png");
+        static std::string tile = *mapbox::base::io::readFile("test/fixtures/map/prefetch/tile.png");
 
         auto zoom = std::stoi(res.url);
         tiles.push_back(zoom);
@@ -55,8 +55,8 @@ TEST(Map, PrefetchTiles) {
         tiles.clear();
 
         // Force tile reloading.
-        map.getStyle().loadJSON(util::read_file("test/fixtures/map/prefetch/empty.json"));
-        map.getStyle().loadJSON(util::read_file("test/fixtures/map/prefetch/style.json"));
+        map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/map/prefetch/empty.json"));
+        map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/map/prefetch/style.json"));
         map.jumpTo(CameraOptions().withCenter(LatLng { 40.726989, -73.992857 }).withZoom(zoom)); // Manhattan
         runLoop.run();
 

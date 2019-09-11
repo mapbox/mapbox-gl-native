@@ -3,7 +3,7 @@
 #include <mbgl/test/map_adapter.hpp>
 
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/util/io.hpp>
+#include <mapbox/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/renderer/renderer.hpp>
@@ -60,10 +60,10 @@ TEST(LocalGlyphRasterizer, PingFang) {
     test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/local_glyphs/mixed.json"));
 #if defined(__APPLE__) && !defined(__QT__)
     test.checkRendering("ping_fang");
 #elif defined(__QT__)
@@ -80,11 +80,11 @@ TEST(LocalGlyphRasterizer, NotoSansCJK) {
     test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/local_glyphs/mixed.json"));
     test.checkRendering("noto_sans_cjk_kr_regular_qt");
 }
 #endif // defined(__linux__) && defined(__QT__)
@@ -97,10 +97,10 @@ TEST(LocalGlyphRasterizer, NoLocal) {
     test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/local_glyphs/mixed.json"));
     test.checkRendering("no_local", 0.001, 0.1);
 }
 
@@ -113,11 +113,11 @@ TEST(LocalGlyphRasterizer, NoLocalWithContentInsets) {
     test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
     auto viewSize = test.frontend.getSize();
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/local_glyphs/mixed.json"));
 
     // Expected image was created using center offset as in the line below - content insets,
     // with no pitch defined, should produce the same output.
@@ -136,11 +136,11 @@ TEST(LocalGlyphRasterizer, NoLocalWithContentInsetsAndPitch) {
     test.fileSource->glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = std::make_shared<std::string>(*mapbox::base::io::readFile("test/fixtures/resources/glyphs.pbf"));
         return response;
     };
     auto viewSize = test.frontend.getSize();
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.map.getStyle().loadJSON(*mapbox::base::io::readFile("test/fixtures/local_glyphs/mixed.json"));
 
     // Expected image was verified using no-padding render, offsetted to right
     // using bitmap editor.
