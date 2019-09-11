@@ -1319,26 +1319,36 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
 //    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-url-id" URL:geoJSONURL options:nil];
     
-    NSExpression *reduceExpression = [NSExpression expressionForFunction:@"sum:" arguments:@[[NSExpression expressionForVariable:@"featureAccumulated"],  [NSExpression expressionForKeyPath:@"sumVal"]]];
-
-    NSExpression *mapExpression = [NSExpression expressionForKeyPath:@"mag"];
-
-    NSArray<NSExpression *> *expressArray = @[reduceExpression, mapExpression];
-    NSDictionary *clusterProperty = @{@"sumVal" : expressArray};
-
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-id" URL:geoJSONURL options:@{
-                                                                                                                        MGLShapeSourceOptionClustered: @(YES),
-                                                                                                                        MGLShapeSourceOptionClusterRadius: @(15),
-                                                                                                                        MGLShapeSourceOptionClusterProperties: clusterProperty
-                                                                                                                        }];
+    // Input property with format {"property_name": [[reduce_operator, accumulated, expression], [map_expression]]}
+//    NSExpression *reduceExpression1 = [NSExpression expressionForFunction:@"sum:" arguments:@[[NSExpression expressionForVariable:@"featureAccumulated"], [NSExpression expressionForKeyPath:@"sumVal"]]];
+    NSExpression *reduceExpression1 =  [NSExpression expressionWithFormat:@"sum({ $featureAccumulated, sumVal })"];
+    NSExpression *mapExpression1 = [NSExpression expressionForKeyPath:@"mag"];
+    NSArray *expressArray1 = @[reduceExpression1, mapExpression1];
     
+    // Input propety with format {"property_name": [[literal(reduce_operator)], [map_expression]]}
+    NSString *reduceExpression2 = @"max";
+    NSExpression *mapExpression2 = [NSExpression expressionForKeyPath:@"mag"];
+    NSArray *expressArray2 = @[reduceExpression2, mapExpression2];
+    
+    NSDictionary *clusterProperty = @{@"sumVal" : expressArray1,
+                                      @"maxVal" : expressArray2
+                                      };
+
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"mutable-data-source-id"
+                                                                    URL:geoJSONURL
+                                                                options:@{
+                                                                         MGLShapeSourceOptionClustered: @(YES),
+                                                                         MGLShapeSourceOptionClusterRadius: @(15),
+                                                                         MGLShapeSourceOptionClusterProperties: clusterProperty
+                                                                         }];
+
     [self.mapView.style addSource:source];
     
     // Create image cluster style layer
     MGLSymbolStyleLayer *clusterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"clusteredPortsNumbers" source:source];
     clusterLayer.textColor = [NSExpression expressionForConstantValue:[UIColor redColor]];
     clusterLayer.textFontSize = [NSExpression expressionForConstantValue:@(30)];
-    clusterLayer.text = [NSExpression expressionWithFormat:@"CAST(point_count, 'NSString')"];
+    clusterLayer.text = [NSExpression expressionWithFormat:@"CAST(maxVal, 'NSString')"];
     
     [self.mapView.style addLayer:clusterLayer];
 }

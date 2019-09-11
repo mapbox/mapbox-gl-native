@@ -109,7 +109,17 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
                 [NSException raise:NSInvalidArgumentException
                             format:@"Failed to convert MGLShapeSourceOptionClusterProperties map expression."];
             }
-            NSExpression *reduceExpre = expArray[0];
+
+            NSString *reduceOperator = expArray[0];
+            NSExpression *reduceExpre;
+            // If reduceOperator is only a string instead of expression, create the integrated full expression before parsing
+            if ([reduceOperator isKindOfClass:[NSString class]]) {
+                NSString *reduceExpression = [NSString stringWithFormat:@"%@({ $featureAccumulated, %@})", reduceOperator, key];
+                reduceExpre =  [NSExpression expressionWithFormat:reduceExpression];
+            } else {
+                reduceExpre = expArray[0];
+            }
+
             auto reduce = MGLClusterPropertyFromNSExpression(reduceExpre);
             if (!reduce) {
                 [NSException raise:NSInvalidArgumentException

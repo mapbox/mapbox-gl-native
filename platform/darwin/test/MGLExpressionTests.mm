@@ -180,6 +180,13 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @1);
     }
     {
+        NSExpression *expression = [NSExpression expressionForVariable:@"featureAccumulated"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"accumulated"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureAccumulated"].mgl_jsonExpressionObject, @[@"accumulated"]);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"accumulated"]], expression);
+    }
+
+    {
         NSExpression *expression = [NSExpression expressionForVariable:@"geometryType"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"geometry-type"]);
         XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$geometryType"].mgl_jsonExpressionObject, @[@"geometry-type"]);

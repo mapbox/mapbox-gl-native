@@ -41,6 +41,18 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
+/**
+ An `NSDictionary` objcet containing custom properties on the generated clusters if clustering is enabled,
+ aggregating values from clustered points. Has the form {"property_name": [recude_operator, [map_expression]]} or
+ {"property_name": [[reduce_operator, accumulated, expression], [map_expression]]}
+
+ recude_operator is any expression function that accepts at least 2 operands (e.g. "sum" or "max", etc.).
+ It accumulates the property value from clusters/points the cluster contains. It can either be
+ a literal with single operator, or be a valid expression with two expression arguments: `accumulated` and
+ an other valid expression produces value of the same type of `accumulated`
+
+ map_expression produces the value of a single point, it shall be a valid expression
+ */
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterProperties;
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
