@@ -1,3 +1,7 @@
 [
-  "EspressoTestActivity"
+  "EspressoTestActivity",
+  "ChangeResourcesCachePathActivity",
+  "MergeOfflineRegionsActivity",
+  "CacheManagementActivity",
+  "UrlTransformActivity"
 ]
