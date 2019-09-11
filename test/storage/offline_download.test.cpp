@@ -930,8 +930,8 @@ TEST(OfflineDownload, ResourceOfflineUsageUnset) {
     };
 
     StubMapObserver mapObserver;
-    mapObserver.didFinishRenderingFrameCallback = [&] (MapObserver::RenderMode mode) {
-        if (mode == MapObserver::RenderMode::Full) {
+    mapObserver.didFinishRenderingFrameCallback = [&] (MapObserver::RenderFrameStatus status) {
+        if (status.mode == MapObserver::RenderMode::Full) {
             test.loop.stop();
         }
     };
