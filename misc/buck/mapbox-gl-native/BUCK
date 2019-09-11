@@ -22,6 +22,14 @@ mbgl = dict(
     deps = [],
 )
 
+mbgl_vendor = dict(
+    name = dict(
+        compiler_flags = [],
+    )
+)
+
+mbgl_vendor['mapbox-base'].append('-fexceptions')
+
 def mbgl_vendor_library(name):
     files = mbgl_load_file_lists('vendor/' + name)
     cxx_library(
@@ -33,7 +41,7 @@ def mbgl_vendor_library(name):
         link_style = 'static',
         compiler_flags = [
             "-Wno-tautological-unsigned-enum-zero-compare",
-        ],
+        ] + mbgl_vendor[name]['compiler_flags'],
     )
     mbgl['deps'].append(':vendor-' + name)
 
