@@ -10,7 +10,6 @@
 #include <mbgl/storage/offline_schema.hpp>
 #include <mbgl/storage/merge_sideloaded.hpp>
 
-
 namespace mbgl {
 
 OfflineDatabase::OfflineDatabase(std::string path_)
@@ -311,9 +310,13 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
         size = compressed ? compressedData.size() : response.data->size();
     }
 
-    if (evict_ && !evict(size)) {
-        Log::Info(Event::Database, "Unable to make space for entry");
-        return { false, 0 };
+    optional<DatabaseSizeChangeStats> stats;
+    if (evict_) {
+        stats = DatabaseSizeChangeStats(this);
+        if (!evict(size, *stats)) {
+            Log::Info(Event::Database, "Unable to make space for entry");
+            return {false, 0};
+        }
     }
 
     bool inserted;
@@ -327,6 +330,10 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
         inserted = putResource(resource, response,
                 compressed ? compressedData : response.data ? *response.data : "",
                 compressed);
+    }
+
+    if (stats) {
+        updateAmbientCacheSize(*stats);
     }
 
     return { inserted, size };
@@ -943,9 +950,11 @@ std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
         query.run();
     }
 
-    evict(0);
+    DatabaseSizeChangeStats stats(this);
+    evict(0, stats);
     assert(db);
     if (autopack) vacuum();
+    updateAmbientCacheSize(stats);
 
     // Ensure that the cached offlineTileCount value is recalculated.
     offlineMapboxTileCount = nullopt;
@@ -1207,19 +1216,13 @@ T OfflineDatabase::getPragma(const char* sql) {
 // and as it approaches to the hard limit (i.e. the actual file size) we
 // delete an arbitrary number of old cache entries. The free pages approach saves
 // us from calling VACUUM or keeping a running total, which can be costly.
-bool OfflineDatabase::evict(uint64_t neededFreeSize) {
+bool OfflineDatabase::evict(uint64_t neededFreeSize, DatabaseSizeChangeStats& stats) {
     checkFlags();
+    uint64_t ambientCacheSize =
+        (initAmbientCacheSize() == nullptr) ? *currentAmbientCacheSize : maximumAmbientCacheSize;
+    uint64_t newAmbientCacheSize = ambientCacheSize + neededFreeSize + stats.pageSize();
 
-    uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
-    uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");
-
-    auto usedSize = [&] {
-        return pageSize * (pageCount - getPragma<int64_t>("PRAGMA freelist_count"));
-    };
-
-    // The addition of pageSize is a fudge factor to account for non `data` column
-    // size, and because pages can get fragmented on the database.
-    while (usedSize() + neededFreeSize + pageSize > maximumAmbientCacheSize) {
+    while (newAmbientCacheSize > maximumAmbientCacheSize) {
         // clang-format off
         mapbox::sqlite::Query accessedQuery{ getStatement(
             "SELECT max(accessed) "
@@ -1275,9 +1278,11 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
         tileQuery.run();
         const uint64_t tileChanges = tileQuery.changes();
 
+        // Update current ambient cache size, based on how many bytes were released.
+        newAmbientCacheSize = std::max<int64_t>(newAmbientCacheSize - stats.bytesReleased(), 0u);
+
         // The cached value of offlineTileCount does not need to be updated
         // here because only non-offline tiles can be removed by eviction.
-
         if (resourceChanges == 0 && tileChanges == 0) {
             return false;
         }
@@ -1286,18 +1291,75 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     return true;
 }
 
+std::exception_ptr OfflineDatabase::initAmbientCacheSize() {
+    if (!currentAmbientCacheSize) {
+        try {
+            // clang-format off
+            mapbox::sqlite::Query query{ getStatement(
+            "SELECT SUM(data) "
+            "FROM ( "
+            "    SELECT SUM(IFNULL(LENGTH(data), 0) "
+            "               + IFNULL(LENGTH(id), 0) "
+            "               + IFNULL(LENGTH(url_template), 0) "
+            "               + IFNULL(LENGTH(pixel_ratio), 0) "
+            "               + IFNULL(LENGTH(x), 0) "
+            "               + IFNULL(LENGTH(y), 0) "
+            "               + IFNULL(LENGTH(z), 0) "
+            "               + IFNULL(LENGTH(expires), 0) "
+            "               + IFNULL(LENGTH(modified), 0) "
+            "               + IFNULL(LENGTH(etag), 0) "
+            "               + IFNULL(LENGTH(compressed), 0) "
+            "               + IFNULL(LENGTH(accessed), 0) "
+            "               + IFNULL(LENGTH(must_revalidate), 0) "
+            "               ) as data "
+            "    FROM tiles "
+            "    LEFT JOIN region_tiles "
+            "    ON tile_id = tiles.id "
+            "    WHERE tile_id IS NULL "
+            "  UNION ALL "
+            "    SELECT SUM(IFNULL(LENGTH(data), 0) "
+            "               + IFNULL(LENGTH(id), 0) "
+            "               + IFNULL(LENGTH(url), 0) "
+            "               + IFNULL(LENGTH(kind), 0) "
+            "               + IFNULL(LENGTH(expires), 0) "
+            "               + IFNULL(LENGTH(modified), 0) "
+            "               + IFNULL(LENGTH(etag), 0) "
+            "               + IFNULL(LENGTH(compressed), 0) "
+            "               + IFNULL(LENGTH(accessed), 0) "
+            "               + IFNULL(LENGTH(must_revalidate), 0) "
+            "               ) as data "
+            "    FROM resources "
+            "    LEFT JOIN region_resources "
+            "    ON resource_id = resources.id "
+            "    WHERE resource_id IS NULL "
+            ") ") };
+            // clang-format on
+            query.run();
+            currentAmbientCacheSize = query.get<int64_t>(0);
+        } catch (const mapbox::sqlite::Exception& ex) {
+            handleError(ex, "cannot get current ambient cache size");
+            return std::current_exception();
+        }
+    }
+
+    return nullptr;
+}
+
 std::exception_ptr OfflineDatabase::setMaximumAmbientCacheSize(uint64_t size) {
     uint64_t previousMaximumAmbientCacheSize = maximumAmbientCacheSize;
+
+    if (auto exception = initAmbientCacheSize()) {
+        return exception;
+    }
 
     try {
         maximumAmbientCacheSize = size;
 
-        uint64_t databaseSize = getPragma<int64_t>("PRAGMA page_size")
-            * getPragma<int64_t>("PRAGMA page_count");
-
-        if (databaseSize > maximumAmbientCacheSize) {
-            evict(0);
+        if (*currentAmbientCacheSize > maximumAmbientCacheSize) {
+            DatabaseSizeChangeStats stats(this);
+            evict(0, stats);
             if (autopack) vacuum();
+            updateAmbientCacheSize(stats);
         }
 
         return nullptr;
@@ -1392,6 +1454,35 @@ void OfflineDatabase::reopenDatabaseReadOnly(bool readOnly_) {
         initialize();
     } catch (...) {
         handleError("reopen database read-only");
+    }
+}
+
+OfflineDatabase::DatabaseSizeChangeStats::DatabaseSizeChangeStats(OfflineDatabase* db_) : db(db_) {
+    assert(db);
+    pageSize_ = db->getPragma<int64_t>("PRAGMA page_size");
+    pageCount_ = db->getPragma<int64_t>("PRAGMA page_count");
+    initialSize_ = pageSize_ * (pageCount_ - db->getPragma<int64_t>("PRAGMA freelist_count"));
+}
+
+uint64_t OfflineDatabase::DatabaseSizeChangeStats::pageSize() const {
+    return pageSize_;
+}
+
+int64_t OfflineDatabase::DatabaseSizeChangeStats::diff() const {
+    const uint64_t currentSize =
+        pageSize_ * (db->getPragma<int64_t>("PRAGMA page_count") - db->getPragma<int64_t>("PRAGMA freelist_count"));
+    return currentSize - initialSize_;
+}
+
+uint64_t OfflineDatabase::DatabaseSizeChangeStats::bytesReleased() const {
+    uint64_t currentSize = pageSize_ * (pageCount_ - db->getPragma<int64_t>("PRAGMA freelist_count"));
+    return std::max<int64_t>(initialSize_ - currentSize, 0u);
+}
+
+void OfflineDatabase::updateAmbientCacheSize(DatabaseSizeChangeStats& stats) {
+    assert(currentAmbientCacheSize);
+    if (currentAmbientCacheSize) {
+        *currentAmbientCacheSize = std::max<int64_t>(*currentAmbientCacheSize + stats.diff(), 0u);
     }
 }
 
