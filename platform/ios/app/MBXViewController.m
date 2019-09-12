@@ -2243,12 +2243,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     [self updateHUD];
     [self updateHelperMapViews];
-    
-//    asdf
-    MGLCoordinateBounds bounds = [self.mapView convertRect:self.mapView.bounds toCoordinateBoundsFromView:self.mapView];
-    NSLog(@"coordinate bounds = %@", MGLStringFromCoordinateBounds(bounds));
-    
-    
 }
 
 - (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocation *)userLocation {

@@ -27,7 +27,8 @@
 
     // Now try again, without asserts
     NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
-    [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+    MGLTestAssertionHandler *newHandler = [[MGLTestAssertionHandler alloc] initWithTestCase:self];
+    [[[NSThread currentThread] threadDictionary] setValue:newHandler forKey:NSAssertionHandlerKey];
 
     // Make sure this doesn't crash without asserts
     [invalidPack invalidate];

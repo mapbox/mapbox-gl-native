@@ -35,7 +35,7 @@
 
 - (void)setUp {
     [super setUp];
-
+    
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         XCTestExpectation *expectation = [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
@@ -375,7 +375,9 @@
     [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:nil];
 
     NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
-    [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+    MGLTestAssertionHandler *newHandler = [[MGLTestAssertionHandler alloc] initWithTestCase:self];
+
+    [[[NSThread currentThread] threadDictionary] setValue:newHandler forKey:NSAssertionHandlerKey];
     
     [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should be invalid in the completion handler.");
@@ -424,7 +426,9 @@
     }]];
 
     NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
-    [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+    MGLTestAssertionHandler *newHandler = [[MGLTestAssertionHandler alloc] initWithTestCase:self];
+
+    [[[NSThread currentThread] threadDictionary] setValue:newHandler forKey:NSAssertionHandlerKey];
 
     for (MGLOfflinePack *pack in validPacks) {
         [storage removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
@@ -465,7 +469,9 @@
     dispatch_async(queue, ^{
         NSArray *packs = storage.packs;
         NSAssertionHandler *oldHandler = [NSAssertionHandler currentHandler];
-        [[[NSThread currentThread] threadDictionary] setValue:[[MGLTestAssertionHandler alloc] init] forKey:NSAssertionHandlerKey];
+        MGLTestAssertionHandler *newHandler = [[MGLTestAssertionHandler alloc] initWithTestCase:self];
+
+        [[[NSThread currentThread] threadDictionary] setValue:newHandler forKey:NSAssertionHandlerKey];
                 
         NSArray *validPacks = [packs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
             MGLOfflinePack *pack = (MGLOfflinePack*)evaluatedObject;
