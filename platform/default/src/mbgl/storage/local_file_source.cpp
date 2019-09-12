@@ -44,7 +44,7 @@ std::unique_ptr<AsyncRequest> LocalFileSource::request(const Resource& resource,
 
     impl->actor().invoke(&Impl::request, resource.url, req->actor());
 
-    return std::move(req);
+    return req;
 }
 
 bool LocalFileSource::acceptsURL(const std::string& url) {

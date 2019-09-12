@@ -18,7 +18,7 @@ std::unique_ptr<gfx::Context> RendererBackend::createContext() {
     result->initializeExtensions(
             std::bind(&RendererBackend::getExtensionFunctionPointer, this, std::placeholders::_1));
     // Needs move to placate GCC 4.9
-    return std::move(result);
+    return result;
 }
 
 PremultipliedImage RendererBackend::readFramebuffer(const Size& size) {

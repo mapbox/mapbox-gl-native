@@ -283,7 +283,7 @@ std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resourc
 
     impl->actor().invoke(&Impl::request, req.get(), resource, req->actor());
 
-    return std::move(req);
+    return req;
 }
 
 void DefaultFileSource::listOfflineRegions(std::function<void (expected<OfflineRegions, std::exception_ptr>)> callback) {
