@@ -91,6 +91,7 @@ public final class CompassView extends ImageView implements Runnable {
       resetAnimation();
       setAlpha(1.0f);
       setVisibility(View.VISIBLE);
+      update(rotation);
     } else {
       resetAnimation();
       setAlpha(0.0f);
