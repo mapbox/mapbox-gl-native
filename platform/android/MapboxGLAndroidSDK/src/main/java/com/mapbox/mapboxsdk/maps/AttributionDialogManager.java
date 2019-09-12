@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.Attribution;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.lang.ref.WeakReference;
@@ -141,9 +142,24 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   private void showMapFeedbackWebPage(int which) {
     Attribution[] attributions = attributionSet.toArray(new Attribution[attributionSet.size()]);
     String url = attributions[which].getUrl();
-    if (url.contains(MAP_FEEDBACK_URL)) {
+    Logger.w("AttributionManager", "url:" + url);
+
+    Logger.w("AttributionManager", "camera position:" + mapboxMap.getCameraPosition().toString());
+    Logger.w("AttributionManager", "token:" + Mapbox.getAccessToken());
+    Logger.w("AttributionManager", "owner:" + Mapbox.getSkuToken());
+    Logger.w("AttributionManager", "package name:" + context.getPackageName());
+    mapboxMap.getStyle(new Style.OnStyleLoaded() {
+      @Override
+      public void onStyleLoaded(@NonNull Style style) {
+        String styleUri = style.getUri();
+
+        Logger.w("AttributionManager", "id:" + style.getUri());
+      }
+    });
+
       url = buildMapFeedbackMapUrl(mapboxMap.getCameraPosition());
-    }
+
+    Logger.w("AttributionManager", "final url to show:" + url);
     showWebPage(url);
   }
 
@@ -192,7 +208,8 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
         for (Source source : mapboxMap.getStyle().getSources()) {
           attribution = source.getAttribution();
           if (!attribution.isEmpty()) {
-            attributions.add(source.getAttribution());
+            Logger.w("AttributionManager", "add attribution:" + source.getAttribution());
+            attributions.add(attribution);
           }
         }
       }
