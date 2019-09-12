@@ -20,7 +20,7 @@ using TileFunction = std::function<void(const CanonicalTileID&)>;
 
 class CustomTileLoader;
 
-class CustomGeometrySource : public Source {
+class CustomGeometrySource final : public Source {
 public:
     struct TileOptions {
         double tolerance = 0.375;
@@ -46,9 +46,13 @@ public:
     // Private implementation
     class Impl;
     const Impl& impl() const;
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
 private:
     std::shared_ptr<ThreadPool> threadPool;
     std::unique_ptr<Actor<CustomTileLoader>> loader;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>

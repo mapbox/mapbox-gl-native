@@ -2,10 +2,10 @@
 #import "MGLTestUtility.h"
 #import "../../darwin/src/MGLGeometry_Private.h"
 
-@interface MBCameraTransitionTests : MGLMapViewIntegrationTest
+@interface MGLCameraTransitionTests : MGLMapViewIntegrationTest
 @end
 
-@implementation MBCameraTransitionTests
+@implementation MGLCameraTransitionTests
 
 - (void)testSetAndResetNorthWithDispatchAsyncInDelegateMethod {
 
@@ -17,7 +17,7 @@
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
-        MBCameraTransitionTests *strongSelf = weakself;
+        MGLCameraTransitionTests *strongSelf = weakself;
 
         if (!strongSelf) return;
 
@@ -48,7 +48,7 @@
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
-        MBCameraTransitionTests *strongSelf = weakself;
+        MGLCameraTransitionTests *strongSelf = weakself;
 
         if (!strongSelf) return;
 
@@ -79,7 +79,7 @@
     __block BOOL finishedReset = NO;
 
     self.regionIsChanging = ^(MGLMapView *mapView) {
-        MBCameraTransitionTests *strongSelf = weakself;
+        MGLCameraTransitionTests *strongSelf = weakself;
         if (!strongSelf) return;
 
         if (!startedReset) {
@@ -91,7 +91,7 @@
     };
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
-        MBCameraTransitionTests *strongSelf = weakself;
+        MGLCameraTransitionTests *strongSelf = weakself;
         if (!strongSelf) return;
 
         MGLTestAssert(strongSelf, startedReset);
@@ -127,7 +127,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.15 * NSEC_PER_SEC),
                    dispatch_get_main_queue(),
                    ^{
-                       MBCameraTransitionTests *strongSelf = weakself;
+                       MGLCameraTransitionTests *strongSelf = weakself;
 
                        [strongSelf.mapView setCenterCoordinate:dc zoomLevel:zoomLevel animated:NO];
                        MGLTestAssertEqualWithAccuracy(strongSelf,
@@ -160,7 +160,7 @@
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
-        MBCameraTransitionTests *strongSelf = weakself;
+        MGLCameraTransitionTests *strongSelf = weakself;
 
         if (!strongSelf) return;
 
@@ -248,7 +248,7 @@
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
-        MBCameraTransitionTests *strongSelf = weakself;
+        MGLCameraTransitionTests *strongSelf = weakself;
 
         if (!strongSelf) return;
 

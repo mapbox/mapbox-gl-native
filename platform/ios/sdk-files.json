@@ -25,7 +25,7 @@
         "platform/darwin/src/MGLCircleStyleLayer.mm",
         "platform/ios/src/UIViewController+MGLAdditions.m",
         "platform/darwin/src/NSValue+MGLStyleAttributeAdditions.mm",
-        "platform/darwin/src/MGLVectorStyleLayer.m",
+        "platform/darwin/src/MGLVectorStyleLayer.mm",
         "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEUniqueIdentifier.m",
         "platform/darwin/src/MGLShapeSource.mm",
         "platform/ios/src/UIDevice+MGLAdditions.m",

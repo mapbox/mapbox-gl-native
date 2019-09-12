@@ -42,4 +42,5 @@
 - (NSString*)validAccessToken;
 - (void)waitForMapViewToFinishLoadingStyleWithTimeout:(NSTimeInterval)timeout;
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout;
+- (MGLMapView *)mapViewForTestWithFrame:(CGRect)rect styleURL:(NSURL *)styleURL;
 @end

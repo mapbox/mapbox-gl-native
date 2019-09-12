@@ -260,7 +260,7 @@ commands:
         command: |
           mkdir -p build
           cd build
-          cmake -DWITH_CXX11ABI=${WITH_CXX11ABI:0} -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
+          cmake -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
           cd ..
   build-node:
     steps:
@@ -272,6 +272,11 @@ commands:
     - run:
         name: Build mbgl-render-test
         command: cmake --build build --config ${BUILDTYPE} --target mbgl-render-test -- -j${JOBS}
+  build-mbgl-expression-test:
+    steps:
+    - run:
+        name: Build mbgl-expression-test
+        command: cmake --build build --config ${BUILDTYPE} --target mbgl-expression-test -- -j${JOBS}
   build-linux:
     steps:
     - run:
@@ -434,6 +439,19 @@ commands:
           xvfb-run --server-args="-screen 0 1024x768x24" make run-test--Source.RenderTileSetSourceUpdate 2> >(tee sanitizer 1>&2)
           # Unfortunately, Google Test eats the status code, so we'll have to check the output.
           [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
+
+  run-expression-tests:
+    steps:
+    - run:
+        name: Run expression tests
+        command: |
+          build/mbgl-expression-test -s --seed=$RANDOM
+
+  upload-expression-tests:
+    steps:
+    - store_artifacts:
+        path: mapbox-gl-js/test/integration/expression-tests/index.html
+        destination: expression-tests
 
   publish-node-package:
     steps:
@@ -780,7 +798,6 @@ jobs:
       JOBS: 4
       BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
-      WITH_CXX11ABI: 0
     steps:
       - install-dependencies
       - build-node
@@ -837,7 +854,6 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      WITH_CXX11ABI: 1
     steps:
       - install-dependencies
       - check-if-this-job-can-be-skipped
@@ -902,7 +918,6 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      WITH_CXX11ABI: 0
       DISPLAY: :0
     steps:
       - install-dependencies
@@ -988,9 +1003,12 @@ jobs:
       - install-dependencies
       - check-if-this-job-can-be-skipped
       - configure-cmake
+      - build-mbgl-expression-test
       - build-mbgl-render-test
+      - run-expression-tests
       - run-linux-render-tests
       - save-dependencies
+      - upload-expression-tests
       - upload-render-tests
 
 # ------------------------------------------------------------------------------
@@ -1272,9 +1290,12 @@ jobs:
       - install-dependencies
       - check-if-this-job-can-be-skipped
       - configure-cmake
+      - build-mbgl-expression-test
       - build-mbgl-render-test
       - save-dependencies
+      - run-expression-tests
       - run-macos-render-tests
+      - upload-expression-tests
       - upload-render-tests
 
 # ------------------------------------------------------------------------------

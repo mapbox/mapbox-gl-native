@@ -149,8 +149,7 @@
                                           addToPendingCallback:nil];
 }
 
-// Marked as pending due to https://github.com/mapbox/mapbox-gl-native/issues/15471
-- (void)testFlyToCameraPENDING {
+- (void)testFlyToCamera {
     __typeof__(self) weakSelf = self;
     
     void (^transition)(dispatch_block_t) = ^(dispatch_block_t completion) {

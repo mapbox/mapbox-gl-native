@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -282,7 +283,7 @@ TransitionOptions RasterLayer::getRasterSaturationTransition() const {
 using namespace conversion;
 
 optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         RasterBrightnessMax,
         RasterBrightnessMin,
         RasterContrast,
@@ -302,22 +303,22 @@ optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Con
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "raster-brightness-max", static_cast<uint8_t>(Property::RasterBrightnessMax) },
-        { "raster-brightness-min", static_cast<uint8_t>(Property::RasterBrightnessMin) },
-        { "raster-contrast", static_cast<uint8_t>(Property::RasterContrast) },
-        { "raster-fade-duration", static_cast<uint8_t>(Property::RasterFadeDuration) },
-        { "raster-hue-rotate", static_cast<uint8_t>(Property::RasterHueRotate) },
-        { "raster-opacity", static_cast<uint8_t>(Property::RasterOpacity) },
-        { "raster-resampling", static_cast<uint8_t>(Property::RasterResampling) },
-        { "raster-saturation", static_cast<uint8_t>(Property::RasterSaturation) },
-        { "raster-brightness-max-transition", static_cast<uint8_t>(Property::RasterBrightnessMaxTransition) },
-        { "raster-brightness-min-transition", static_cast<uint8_t>(Property::RasterBrightnessMinTransition) },
-        { "raster-contrast-transition", static_cast<uint8_t>(Property::RasterContrastTransition) },
-        { "raster-fade-duration-transition", static_cast<uint8_t>(Property::RasterFadeDurationTransition) },
-        { "raster-hue-rotate-transition", static_cast<uint8_t>(Property::RasterHueRotateTransition) },
-        { "raster-opacity-transition", static_cast<uint8_t>(Property::RasterOpacityTransition) },
-        { "raster-resampling-transition", static_cast<uint8_t>(Property::RasterResamplingTransition) },
-        { "raster-saturation-transition", static_cast<uint8_t>(Property::RasterSaturationTransition) }
+        { "raster-brightness-max", mbgl::underlying_type(Property::RasterBrightnessMax) },
+        { "raster-brightness-min", mbgl::underlying_type(Property::RasterBrightnessMin) },
+        { "raster-contrast", mbgl::underlying_type(Property::RasterContrast) },
+        { "raster-fade-duration", mbgl::underlying_type(Property::RasterFadeDuration) },
+        { "raster-hue-rotate", mbgl::underlying_type(Property::RasterHueRotate) },
+        { "raster-opacity", mbgl::underlying_type(Property::RasterOpacity) },
+        { "raster-resampling", mbgl::underlying_type(Property::RasterResampling) },
+        { "raster-saturation", mbgl::underlying_type(Property::RasterSaturation) },
+        { "raster-brightness-max-transition", mbgl::underlying_type(Property::RasterBrightnessMaxTransition) },
+        { "raster-brightness-min-transition", mbgl::underlying_type(Property::RasterBrightnessMinTransition) },
+        { "raster-contrast-transition", mbgl::underlying_type(Property::RasterContrastTransition) },
+        { "raster-fade-duration-transition", mbgl::underlying_type(Property::RasterFadeDurationTransition) },
+        { "raster-hue-rotate-transition", mbgl::underlying_type(Property::RasterHueRotateTransition) },
+        { "raster-opacity-transition", mbgl::underlying_type(Property::RasterOpacityTransition) },
+        { "raster-resampling-transition", mbgl::underlying_type(Property::RasterResamplingTransition) },
+        { "raster-saturation-transition", mbgl::underlying_type(Property::RasterSaturationTransition) }
     });
 
     const auto it = properties.find(name.c_str());

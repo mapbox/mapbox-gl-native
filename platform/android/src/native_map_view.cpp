@@ -185,7 +185,7 @@ void NativeMapView::onWillStartRenderingFrame() {
     }
 }
 
-void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderMode mode, bool) {
+void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderFrameStatus status) {
     assert(vm != nullptr);
 
     android::UniqueEnv _env = android::AttachEnv();
@@ -193,7 +193,7 @@ void NativeMapView::onDidFinishRenderingFrame(MapObserver::RenderMode mode, bool
     static auto onDidFinishRenderingFrame = javaClass.GetMethod<void (jboolean)>(*_env, "onDidFinishRenderingFrame");
     auto weakReference = javaPeer.get(*_env);
     if (weakReference) {
-        weakReference.Call(*_env, onDidFinishRenderingFrame, (jboolean) (mode != MapObserver::RenderMode::Partial));
+        weakReference.Call(*_env, onDidFinishRenderingFrame, (jboolean) (status.mode != MapObserver::RenderMode::Partial));
     }
 }
 

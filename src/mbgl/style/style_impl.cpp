@@ -140,9 +140,8 @@ void Style::Impl::addSource(std::unique_ptr<Source> source) {
     }
 
     source->setObserver(this);
-    source->loadDescription(fileSource);
-
-    sources.add(std::move(source));
+    auto item = sources.add(std::move(source));
+    item->loadDescription(fileSource);
 }
 
 std::unique_ptr<Source> Style::Impl::removeSource(const std::string& id) {

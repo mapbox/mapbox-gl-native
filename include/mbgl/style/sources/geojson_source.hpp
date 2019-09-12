@@ -35,7 +35,7 @@ struct GeoJSONOptions {
     ClusterProperties clusterProperties;
 };
 
-class GeoJSONSource : public Source {
+class GeoJSONSource final : public Source {
 public:
     GeoJSONSource(const std::string& id, optional<GeoJSONOptions> = nullopt);
     ~GeoJSONSource() final;
@@ -50,9 +50,14 @@ public:
 
     void loadDescription(FileSource&) final;
 
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
+
 private:
     optional<std::string> url;
     std::unique_ptr<AsyncRequest> req;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>

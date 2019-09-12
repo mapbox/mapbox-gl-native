@@ -37,6 +37,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.NumberFormatOpti
 import static com.mapbox.mapboxsdk.style.expressions.Expression.NumberFormatOption.maxFractionDigits;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.NumberFormatOption.minFractionDigits;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.collator;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.format;
@@ -730,6 +731,34 @@ public class ExpressionTest extends EspressoTest {
       );
     });
 
+  }
+
+  /**
+   * Regression test for #15532
+   */
+  @Test
+  public void testDoubleConversion() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      mapboxMap.getStyle().addSource(
+        new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()))
+      );
+
+      CircleLayer layer = new CircleLayer("layer", "source");
+      mapboxMap.getStyle().addLayer(layer);
+
+      Expression input =  interpolate(
+        exponential(0.5f), zoom(),
+        stop(-0.1, color(Color.RED)),
+        stop(0, color(Color.BLUE))
+      );
+
+      layer.setProperties(circleColor(input));
+
+      Expression output = layer.getCircleColor().getExpression();
+      assertArrayEquals("Expression should match", input.toArray(), output.toArray());
+    });
   }
 
   private void setupStyle() {

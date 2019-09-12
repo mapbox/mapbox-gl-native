@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -228,7 +229,7 @@ TransitionOptions HillshadeLayer::getHillshadeShadowColorTransition() const {
 using namespace conversion;
 
 optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         HillshadeAccentColor,
         HillshadeExaggeration,
         HillshadeHighlightColor,
@@ -244,18 +245,18 @@ optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const 
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "hillshade-accent-color", static_cast<uint8_t>(Property::HillshadeAccentColor) },
-        { "hillshade-exaggeration", static_cast<uint8_t>(Property::HillshadeExaggeration) },
-        { "hillshade-highlight-color", static_cast<uint8_t>(Property::HillshadeHighlightColor) },
-        { "hillshade-illumination-anchor", static_cast<uint8_t>(Property::HillshadeIlluminationAnchor) },
-        { "hillshade-illumination-direction", static_cast<uint8_t>(Property::HillshadeIlluminationDirection) },
-        { "hillshade-shadow-color", static_cast<uint8_t>(Property::HillshadeShadowColor) },
-        { "hillshade-accent-color-transition", static_cast<uint8_t>(Property::HillshadeAccentColorTransition) },
-        { "hillshade-exaggeration-transition", static_cast<uint8_t>(Property::HillshadeExaggerationTransition) },
-        { "hillshade-highlight-color-transition", static_cast<uint8_t>(Property::HillshadeHighlightColorTransition) },
-        { "hillshade-illumination-anchor-transition", static_cast<uint8_t>(Property::HillshadeIlluminationAnchorTransition) },
-        { "hillshade-illumination-direction-transition", static_cast<uint8_t>(Property::HillshadeIlluminationDirectionTransition) },
-        { "hillshade-shadow-color-transition", static_cast<uint8_t>(Property::HillshadeShadowColorTransition) }
+        { "hillshade-accent-color", mbgl::underlying_type(Property::HillshadeAccentColor) },
+        { "hillshade-exaggeration", mbgl::underlying_type(Property::HillshadeExaggeration) },
+        { "hillshade-highlight-color", mbgl::underlying_type(Property::HillshadeHighlightColor) },
+        { "hillshade-illumination-anchor", mbgl::underlying_type(Property::HillshadeIlluminationAnchor) },
+        { "hillshade-illumination-direction", mbgl::underlying_type(Property::HillshadeIlluminationDirection) },
+        { "hillshade-shadow-color", mbgl::underlying_type(Property::HillshadeShadowColor) },
+        { "hillshade-accent-color-transition", mbgl::underlying_type(Property::HillshadeAccentColorTransition) },
+        { "hillshade-exaggeration-transition", mbgl::underlying_type(Property::HillshadeExaggerationTransition) },
+        { "hillshade-highlight-color-transition", mbgl::underlying_type(Property::HillshadeHighlightColorTransition) },
+        { "hillshade-illumination-anchor-transition", mbgl::underlying_type(Property::HillshadeIlluminationAnchorTransition) },
+        { "hillshade-illumination-direction-transition", mbgl::underlying_type(Property::HillshadeIlluminationDirectionTransition) },
+        { "hillshade-shadow-color-transition", mbgl::underlying_type(Property::HillshadeShadowColorTransition) }
     });
 
     const auto it = properties.find(name.c_str());

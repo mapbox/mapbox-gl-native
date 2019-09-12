@@ -762,7 +762,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     HeadlessFrontend frontend(1);
 
     StubMapObserver observer;
-    observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderMode) {
+    observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderFrameStatus) {
         // Start a timer that ends the test one second from now. If we are continuing to render
         // indefinitely, the timer will be constantly restarted and never trigger. Instead, the
         // emergency shutoff above will trigger, failing the test.
@@ -877,4 +877,53 @@ TEST(Map, Issue15216) {
     test.map.getStyle().addLayer(std::make_unique<RasterLayer>("RasterLayer", "ImageSource"));
     // Passes, if there is no assertion hit.
     test.runLoop.runOnce();
+}
+
+// https://github.com/mapbox/mapbox-gl-native/issues/15342
+// Tests the fix for constant repaint caused by `RenderSource::hasFadingTiles()` returning `true` all the time.
+TEST(Map, Issue15342) {
+    MapTest<> test { 1, MapMode::Continuous };
+
+    test.fileSource->tileResponse = [&](const Resource&) {
+        Response result;
+        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/issue12432/0-0-0.mvt"));
+        return result;
+    };
+    test.map.jumpTo(CameraOptions().withZoom(3.0));
+    test.map.getStyle().loadJSON(R"STYLE({
+      "version": 8,
+      "sources": {
+        "mapbox": {
+          "type": "vector",
+          "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+        }
+      },
+      "layers": [{
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox",
+        "source-layer": "water"
+      }]
+    })STYLE");
+
+    test.observer.didFinishLoadingMapCallback = [&]() {
+        test.map.getStyle().loadJSON(R"STYLE({
+          "version": 8,
+          "sources": {
+            "mapbox": {
+              "type": "vector",
+              "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+            }
+          },
+          "layers": []
+        })STYLE");
+        test.map.jumpTo(CameraOptions().withZoom(20.0));
+        test.observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderFrameStatus status) {
+            if (!status.needsRepaint) {
+                test.runLoop.stop();
+            }
+        };
+    };
+
+    test.runLoop.run();
 }

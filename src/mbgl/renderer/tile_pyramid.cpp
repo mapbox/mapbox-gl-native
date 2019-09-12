@@ -221,8 +221,6 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         pair.second->setShowCollisionBoxes(parameters.debugOptions & MapDebugOptions::Collision);
     }
 
-    fadingTiles = false;
-
     // Initialize renderable tiles and update the contained layer render data.
     for (auto& entry : renderedTiles) {
         Tile& tile = entry.second;
@@ -230,7 +228,6 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         tile.usedByRenderedLayers = false;
 
         const bool holdForFade = tile.holdForFade();
-        fadingTiles = (fadingTiles || holdForFade);
         for (const auto& layerProperties : layers) {
             const auto* typeInfo = layerProperties->baseImpl->getTypeInfo();
             if (holdForFade && typeInfo->fadingTiles == LayerTypeInfo::FadingTiles::NotRequired) {
@@ -374,6 +371,7 @@ void TilePyramid::dumpDebugLogs() const {
 }
 
 void TilePyramid::clearAll() {
+    fadingTiles = false;
     tiles.clear();
     renderedTiles.clear();
     cache.clear();
@@ -385,9 +383,11 @@ void TilePyramid::addRenderTile(const UnwrappedTileID& tileID, Tile& tile) {
 }
 
 void TilePyramid::updateFadingTiles() {
+    fadingTiles = false;
     for (auto& entry : renderedTiles) {
         Tile& tile = entry.second;
         if (tile.holdForFade()) {
+            fadingTiles = true;
             tile.performedFadePlacement();
         }
     }

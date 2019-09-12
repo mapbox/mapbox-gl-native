@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -255,7 +256,7 @@ TransitionOptions FillLayer::getFillTranslateAnchorTransition() const {
 using namespace conversion;
 
 optional<Error> FillLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         FillAntialias,
         FillColor,
         FillOpacity,
@@ -273,20 +274,20 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "fill-antialias", static_cast<uint8_t>(Property::FillAntialias) },
-        { "fill-color", static_cast<uint8_t>(Property::FillColor) },
-        { "fill-opacity", static_cast<uint8_t>(Property::FillOpacity) },
-        { "fill-outline-color", static_cast<uint8_t>(Property::FillOutlineColor) },
-        { "fill-pattern", static_cast<uint8_t>(Property::FillPattern) },
-        { "fill-translate", static_cast<uint8_t>(Property::FillTranslate) },
-        { "fill-translate-anchor", static_cast<uint8_t>(Property::FillTranslateAnchor) },
-        { "fill-antialias-transition", static_cast<uint8_t>(Property::FillAntialiasTransition) },
-        { "fill-color-transition", static_cast<uint8_t>(Property::FillColorTransition) },
-        { "fill-opacity-transition", static_cast<uint8_t>(Property::FillOpacityTransition) },
-        { "fill-outline-color-transition", static_cast<uint8_t>(Property::FillOutlineColorTransition) },
-        { "fill-pattern-transition", static_cast<uint8_t>(Property::FillPatternTransition) },
-        { "fill-translate-transition", static_cast<uint8_t>(Property::FillTranslateTransition) },
-        { "fill-translate-anchor-transition", static_cast<uint8_t>(Property::FillTranslateAnchorTransition) }
+        { "fill-antialias", mbgl::underlying_type(Property::FillAntialias) },
+        { "fill-color", mbgl::underlying_type(Property::FillColor) },
+        { "fill-opacity", mbgl::underlying_type(Property::FillOpacity) },
+        { "fill-outline-color", mbgl::underlying_type(Property::FillOutlineColor) },
+        { "fill-pattern", mbgl::underlying_type(Property::FillPattern) },
+        { "fill-translate", mbgl::underlying_type(Property::FillTranslate) },
+        { "fill-translate-anchor", mbgl::underlying_type(Property::FillTranslateAnchor) },
+        { "fill-antialias-transition", mbgl::underlying_type(Property::FillAntialiasTransition) },
+        { "fill-color-transition", mbgl::underlying_type(Property::FillColorTransition) },
+        { "fill-opacity-transition", mbgl::underlying_type(Property::FillOpacityTransition) },
+        { "fill-outline-color-transition", mbgl::underlying_type(Property::FillOutlineColorTransition) },
+        { "fill-pattern-transition", mbgl::underlying_type(Property::FillPatternTransition) },
+        { "fill-translate-transition", mbgl::underlying_type(Property::FillTranslateTransition) },
+        { "fill-translate-anchor-transition", mbgl::underlying_type(Property::FillTranslateAnchorTransition) }
     });
 
     const auto it = properties.find(name.c_str());

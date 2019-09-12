@@ -10,7 +10,7 @@ class AsyncRequest;
 
 namespace style {
 
-class ImageSource : public Source {
+class ImageSource final : public Source {
 public:
     ImageSource(std::string id, const std::array<LatLng, 4>);
     ~ImageSource() override;
@@ -27,9 +27,14 @@ public:
     const Impl& impl() const;
 
     void loadDescription(FileSource&) final;
+
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
 private:
     optional<std::string> url;
     std::unique_ptr<AsyncRequest> req;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>

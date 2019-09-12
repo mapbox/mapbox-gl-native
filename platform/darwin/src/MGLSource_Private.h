@@ -2,6 +2,7 @@
 
 #include <memory>
 
+
 NS_ASSUME_NONNULL_BEGIN
 
 namespace mbgl {
@@ -17,6 +18,20 @@ namespace mbgl {
 struct SourceWrapper {
     __weak MGLSource *source;
 };
+
+/**
+ Assert that the style source is valid.
+ 
+ This macro should be used at the beginning of any public-facing instance method
+ of `MGLSource` and its subclasses. For private methods, an assertion is more appropriate.
+ */
+#define MGLAssertStyleSourceIsValid() \
+do { \
+    if (!self.rawSource) { \
+        [NSException raise:MGLInvalidStyleSourceException \
+                    format:@"This source got invalidated after the style change"]; \
+    } \
+} while (NO);
 
 @class MGLMapView;
 

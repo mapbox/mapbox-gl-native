@@ -38,17 +38,19 @@
 }
 
 - (NSURL *)configurationURL {
+    MGLAssertStyleSourceIsValid();
     auto url = self.rawSource->getURL();
     return url ? [NSURL URLWithString:@(url->c_str())] : nil;
 }
 
 - (NSString *)attributionHTMLString {
+    MGLAssertStyleSourceIsValid();
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;
 }
 
 - (NSArray<id <MGLFeature>> *)featuresInSourceLayersWithIdentifiers:(NSSet<NSString *> *)sourceLayerIdentifiers predicate:(nullable NSPredicate *)predicate {
-    
+    MGLAssertStyleSourceIsValid();
     mbgl::optional<std::vector<std::string>> optionalSourceLayerIDs;
     if (sourceLayerIdentifiers) {
         __block std::vector<std::string> layerIDs;
