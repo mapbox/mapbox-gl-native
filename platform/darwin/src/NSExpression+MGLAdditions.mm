@@ -1066,7 +1066,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 NSExpression *count = [NSExpression expressionForFunction:@"count:" arguments:self.arguments];
                 return [NSExpression expressionForFunction:@"divide:by:" arguments:@[sum, count]].mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"sum:"]) {
-                NSArray *arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
+                NSArray *arguments;
+                if (self.expressionType == NSConstantValueExpressionType) {
+                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
+                } else {
+                    arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
+                }
                 return [@[@"+"] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"count:"]) {
                 NSArray *arguments = self.arguments.firstObject.mgl_jsonExpressionObject;
