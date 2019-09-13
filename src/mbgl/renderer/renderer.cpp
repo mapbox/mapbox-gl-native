@@ -32,6 +32,7 @@ void Renderer::setObserver(RendererObserver* observer) {
 
 void Renderer::render(const UpdateParameters& updateParameters) {
     if (auto renderTree = impl->orchestrator.createRenderTree(updateParameters)) {
+        renderTree->prepare();
         impl->render(*renderTree);
     }
 }
