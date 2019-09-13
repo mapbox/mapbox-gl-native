@@ -101,6 +101,10 @@ public:
                                  const optional<std::string>&,
                                  const std::string&) const {}
 
+    virtual void removeFeatureState(const optional<std::string>&,
+                                    const optional<std::string>&,
+                                    const optional<std::string>&) {}
+
     virtual void reduceMemoryUse() = 0;
 
     virtual void dumpDebugLogs() const = 0;
