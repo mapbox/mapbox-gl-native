@@ -123,6 +123,13 @@ void Renderer::getFeatureState(FeatureState& state,
     impl->orchestrator.getFeatureState(state, sourceID, sourceLayerID, featureID);
 }
 
+void Renderer::removeFeatureState(const std::string& sourceID,
+                                  const optional<std::string>& sourceLayerID,
+                                  const optional<std::string>& featureID,
+                                  const optional<std::string>& stateKey) {
+    impl->orchestrator.removeFeatureState(sourceID, sourceLayerID, featureID, stateKey);
+}
+
 void Renderer::dumpDebugLogs() {
     impl->orchestrator.dumpDebugLogs();
 }

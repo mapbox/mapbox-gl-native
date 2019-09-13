@@ -74,6 +74,11 @@ public:
                          const optional<std::string>& layerID,
                          const std::string& featureID) const;
 
+    void removeFeatureState(const std::string& sourceID,
+                            const optional<std::string>& sourceLayerID,
+                            const optional<std::string>& featureID,
+                            const optional<std::string>& stateKey);
+
     void reduceMemoryUse();
     void dumpDebugLogs();
 

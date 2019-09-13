@@ -580,6 +580,15 @@ void RenderOrchestrator::getFeatureState(FeatureState& state,
     }
 }
 
+void RenderOrchestrator::removeFeatureState(const std::string& sourceID,
+                                            const optional<std::string>& sourceLayerID,
+                                            const optional<std::string>& featureID,
+                                            const optional<std::string>& stateKey) {
+    if (RenderSource* renderSource = getRenderSource(sourceID)) {
+        renderSource->removeFeatureState(sourceLayerID, featureID, stateKey);
+    }
+}
+
 void RenderOrchestrator::reduceMemoryUse() {
     filteredLayersForSource.shrink_to_fit();
     for (const auto& entry : renderSources) {

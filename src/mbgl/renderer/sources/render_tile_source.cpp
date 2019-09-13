@@ -146,6 +146,12 @@ void RenderTileSource::getFeatureState(FeatureState& state,
     featureState.getState(state, sourceLayerID, featureID);
 }
 
+void RenderTileSource::removeFeatureState(const optional<std::string>& sourceLayerID,
+                                          const optional<std::string>& featureID,
+                                          const optional<std::string>& stateKey) {
+    featureState.removeState(sourceLayerID, featureID, stateKey);
+}
+
 void RenderTileSource::reduceMemoryUse() {
     tilePyramid.reduceMemoryUse();
 }
