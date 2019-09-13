@@ -964,6 +964,17 @@ float Placement::zoomAdjustment(const float zoom) const {
     return std::max(0.0, (placementZoom - zoom) / 1.5);
 }
 
+Duration Placement::getUpdatePeriod(const float zoom) const {
+    // Even if transitionOptions.duration is set to a value < 300ms, we still wait for this default transition duration
+    // before attempting another placement operation.
+    const auto fadeDuration = std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION));
+    const auto adjustedDuration = std::chrono::duration_cast<Duration>(fadeDuration * (1.0 - zoomAdjustment(zoom)));
+    if (maximumUpdatePeriod) {
+        return std::min(*maximumUpdatePeriod, adjustedDuration);
+    }
+    return adjustedDuration;
+}
+
 bool Placement::hasTransitions(TimePoint now) const {
     if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions) {
         return stale || std::chrono::duration<float>(now - fadeStartTime) < transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
@@ -973,12 +984,13 @@ bool Placement::hasTransitions(TimePoint now) const {
 }
 
 bool Placement::stillRecent(TimePoint now, const float zoom) const {
-    // Even if transitionOptions.duration is set to a value < 300ms, we still wait for this default transition duration
-    // before attempting another placement operation.
-    const auto fadeDuration = std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION));
     return mapMode == MapMode::Continuous &&
         transitionOptions.enablePlacementTransitions &&
-        commitTime + fadeDuration * (1.0 - zoomAdjustment(zoom)) > now;
+        commitTime + getUpdatePeriod(zoom) > now;
+}
+
+void Placement::setMaximumUpdatePeriod(Duration duration) {
+    maximumUpdatePeriod = duration;
 }
 
 void Placement::setStale() {

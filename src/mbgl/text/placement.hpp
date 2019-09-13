@@ -110,7 +110,7 @@ public:
     const CollisionIndex& getCollisionIndex() const;
 
     bool stillRecent(TimePoint now, const float zoom) const;
-    void setRecent(TimePoint now);
+    void setMaximumUpdatePeriod(Duration);
     void setStale();
     
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
@@ -126,6 +126,7 @@ private:
     void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, const SymbolInstance&, style::TextWritingModeType orientation);
     void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&);
     float zoomAdjustment(const float zoom) const;
+    Duration getUpdatePeriod(const float zoom) const;
 
     CollisionIndex collisionIndex;
 
@@ -147,6 +148,7 @@ private:
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
     CollisionGroups collisionGroups;
     std::unique_ptr<Placement> prevPlacement;
+    optional<Duration> maximumUpdatePeriod;
 
     // Used for debug purposes.
     std::unordered_map<const CollisionFeature*, std::vector<ProjectedCollisionBox>> collisionCircles;
