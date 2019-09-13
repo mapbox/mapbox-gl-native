@@ -100,10 +100,10 @@ public:
     
 class Placement {
 public:
-    Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, std::unique_ptr<Placement> prevPlacementOrNull = nullptr);
+    Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, std::shared_ptr<const Placement> prevPlacement = nullptr);
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
     void commit(TimePoint, const double zoom);
-    void updateLayerBuckets(const RenderLayer&, const TransformState&,  bool updateOpacities);
+    void updateLayerBuckets(const RenderLayer&, const TransformState&,  bool updateOpacities) const;
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
 
@@ -147,7 +147,7 @@ private:
     
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
     CollisionGroups collisionGroups;
-    std::unique_ptr<Placement> prevPlacement;
+    mutable std::shared_ptr<const Placement> prevPlacement;
     optional<Duration> maximumUpdatePeriod;
 
     // Used for debug purposes.

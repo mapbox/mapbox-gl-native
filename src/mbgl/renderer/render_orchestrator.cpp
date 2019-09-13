@@ -61,12 +61,25 @@ public:
                    std::set<LayerRenderItem> layerRenderItems_,
                    std::vector<std::unique_ptr<RenderItem>> sourceRenderItems_,
                    LineAtlas& lineAtlas_,
-                   PatternAtlas& patternAtlas_)
+                   PatternAtlas& patternAtlas_,
+                   std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement_,
+                   std::shared_ptr<const Placement> placement_,
+                   bool updateSymbolOpacities_)
         : RenderTree(std::move(parameters_)),
           layerRenderItems(std::move(layerRenderItems_)),
           sourceRenderItems(std::move(sourceRenderItems_)),
           lineAtlas(lineAtlas_),
-          patternAtlas(patternAtlas_) {
+          patternAtlas(patternAtlas_),
+          layersNeedPlacement(std::move(layersNeedPlacement_)),
+          placement(std::move(placement_)),
+          updateSymbolOpacities(updateSymbolOpacities_) {
+        assert(placement);
+    }
+
+    void prepare() override {
+        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
+            placement->updateLayerBuckets(*it, parameters->transformParams.state, updateSymbolOpacities);
+        }
     }
 
     RenderItems getLayerRenderItems() const override {
@@ -85,6 +98,9 @@ public:
     std::vector<std::unique_ptr<RenderItem>> sourceRenderItems;
     std::reference_wrapper<LineAtlas> lineAtlas;
     std::reference_wrapper<PatternAtlas> patternAtlas;
+    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
+    std::shared_ptr<const Placement> placement;
+    bool updateSymbolOpacities;
 };
 
 }  // namespace
@@ -354,14 +370,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         }
     }
     // Symbol placement.
+    bool symbolBucketsChanged = false;
     {
         if (!isMapModeContinuous) {
             // TODO: Think about right way for symbol index to handle still rendering
             crossTileSymbolIndex.reset();
         }
 
-        bool symbolBucketsAdded = false;
-        bool symbolBucketsChanged = false;
+        bool symbolBucketsAdded = false;   
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
             auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude()); 
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
@@ -372,10 +388,11 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         // a short period of time. Instead, we squeeze placement update period to coalesce buckets updates from several tiles.
         if (symbolBucketsAdded) placement->setMaximumUpdatePeriod(Milliseconds(30));
         renderTreeParameters->placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom());
+        symbolBucketsChanged |= renderTreeParameters->placementChanged;
 
         std::set<std::string> usedSymbolLayers;
         if (renderTreeParameters->placementChanged) {
-            placement = std::make_unique<Placement>(
+            placement = std::make_shared<Placement>(
                 updateParameters.transformState, updateParameters.mode,
                 updateParameters.transitionOptions, updateParameters.crossSourceCollisions,
                 std::move(placement));
@@ -393,12 +410,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             }
         } else {
             placement->setStale();
-        }
-
-        for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            placement->updateLayerBuckets(*it, updateParameters.transformState, renderTreeParameters->placementChanged || symbolBucketsChanged);
-        }
-
+        } 
         renderTreeParameters->symbolFadeChange = placement->symbolFadeChange(updateParameters.timePoint);
     }
 
@@ -421,7 +433,10 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         std::move(layerRenderItems),
         std::move(sourceRenderItems),
         *lineAtlas,
-        *patternAtlas);
+        *patternAtlas,
+        std::move(layersNeedPlacement),
+        placement,
+        symbolBucketsChanged);
 }
 
 std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {

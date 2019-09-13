@@ -58,7 +58,7 @@ const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& s
     }
 }
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions, std::unique_ptr<Placement> prevPlacement_)
+Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions, std::shared_ptr<const Placement> prevPlacement_)
     : collisionIndex(state_)
     , mapMode(mapMode_)
     , transitionOptions(std::move(transitionOptions_))
@@ -514,7 +514,7 @@ void Placement::commit(TimePoint now, const double zoom) {
     fadeStartTime = placementChanged ? commitTime : prevPlacement->fadeStartTime;
 }
 
-void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) {
+void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) const {
     std::set<uint32_t> seenCrossTileIDs;
     for (const auto& item : layer.getPlacementData()) {
         item.bucket.get().updateVertices(*this, updateOpacities, state, item.tile, seenCrossTileIDs);
