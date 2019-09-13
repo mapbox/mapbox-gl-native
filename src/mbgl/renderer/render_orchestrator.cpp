@@ -367,7 +367,11 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
-        renderTreeParameters->placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom()) || symbolBucketsAdded;
+        // We want new symbols to show up faster, however simple setting `placementChanged` to `true` would
+        // initiate placement too often as new buckets ususally come from several rendered tiles in a row within
+        // a short period of time. Instead, we squeeze placement update period to coalesce buckets updates from several tiles.
+        if (symbolBucketsAdded) placement->setMaximumUpdatePeriod(Milliseconds(30));
+        renderTreeParameters->placementChanged = !placement->stillRecent(updateParameters.timePoint, updateParameters.transformState.getZoom());
 
         std::set<std::string> usedSymbolLayers;
         if (renderTreeParameters->placementChanged) {
