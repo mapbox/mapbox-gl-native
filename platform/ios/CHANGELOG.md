@@ -2,6 +2,15 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+### Styles and rendering
+* Added an `-[MGLMapSnapshotter startWithOverlayHandler:completionHandler:]` method to provide the snapshot's current `CGContext` in order to perform custom drawing on `MGLMapSnapShot` objects. ([#15530](https://github.com/mapbox/mapbox-gl-native/pull/15530))
+
+### Performance improvements
+
+* Newly loaded labels appear faster on the screen. ([#15308](https://github.com/mapbox/mapbox-gl-native/pull/15308))
+
 ## 5.4.0
 
 ### Styles and rendering
