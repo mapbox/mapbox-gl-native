@@ -9,7 +9,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fixed an issue that caused the state of CompassView not up to date when `UiSettings.setCompassEnabled()` is set to true. [#15606](https://github.com/mapbox/mapbox-gl-native/pull/15606)
 
 ## 8.4.0-alpha.2 - September 11, 2019
-[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-alpha.1...android-v8.4.0-alpha.2) since [Mapbox Maps SDK for Android v8.4.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-alpha.1): 
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-alpha.1...android-v8.4.0-alpha.2) since [Mapbox Maps SDK for Android v8.4.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-alpha.1): 
 
 ### Performance improvements
  - Newly loaded labels appear faster on the screen. [#15308](https://github.com/mapbox/mapbox-gl-native/pull/15308)
