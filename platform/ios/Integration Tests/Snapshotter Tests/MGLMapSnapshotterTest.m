@@ -393,5 +393,62 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
+- (void)testSnapshotWithOverlayHandlerFailure {
+    if (![self validAccessToken]) {
+        return;
+    }
+
+    CGSize size = self.mapView.bounds.size;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot with overlay fails"];
+    expectation.expectedFulfillmentCount = 2;
+
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+    XCTAssertNotNil(snapshotter);
+
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay * _Nullable snapshotOverlay) {
+        UIGraphicsEndImageContext();
+        [expectation fulfill];
+    } completionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        XCTAssertNil(snapshot);
+        XCTAssertNotNil(error);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+}
+
+- (void)testSnapshotWithOverlayHandlerSuccess {
+    if (![self validAccessToken]) {
+        return;
+    }
+
+    CGSize size = self.mapView.bounds.size;
+    CGRect snapshotRect = CGRectMake(0, 0, size.width, size.height);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot with overlay succeeds"];
+    expectation.expectedFulfillmentCount = 2;
+
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+    XCTAssertNotNil(snapshotter);
+
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay * _Nullable snapshotOverlay) {
+        CGContextSetFillColorWithColor(snapshotOverlay.context, [UIColor.greenColor CGColor]);
+        CGContextSetAlpha(snapshotOverlay.context, 0.2);
+        CGContextAddRect(snapshotOverlay.context, snapshotRect);
+        CGContextFillRect(snapshotOverlay.context, snapshotRect);
+        [expectation fulfill];
+    } completionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(snapshot);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+}
 
 @end
