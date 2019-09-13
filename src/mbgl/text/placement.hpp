@@ -61,7 +61,7 @@ struct RetainedQueryData {
     uint32_t bucketInstanceId;
     std::shared_ptr<FeatureIndex> featureIndex;
     OverscaledTileID tileID;
-    std::shared_ptr<std::vector<size_t>> featureSortOrder;
+    mutable FeatureSortOrder featureSortOrder;
     
     RetainedQueryData(uint32_t bucketInstanceId_,
                       std::shared_ptr<FeatureIndex> featureIndex_,
@@ -122,9 +122,9 @@ private:
             std::set<uint32_t>& seenCrossTileIDs);
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
     bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
-    void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&);
-    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, const SymbolInstance&, style::TextWritingModeType orientation);
-    void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&);
+    void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&) const;
+    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, const SymbolInstance&, style::TextWritingModeType orientation) const;
+    void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&) const;
     float zoomAdjustment(const float zoom) const;
     Duration getUpdatePeriod(const float zoom) const;
 
