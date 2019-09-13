@@ -51,6 +51,8 @@ public:
     uint16_t collisionGroupId;
 };
 
+using FeatureSortOrder = std::shared_ptr<const std::vector<size_t>>;
+
 class FeatureIndex {
 public:
     FeatureIndex(std::unique_ptr<const GeometryTileData> tileData_);
@@ -79,7 +81,7 @@ public:
            const RenderedQueryOptions& options,
            const std::unordered_map<std::string, const RenderLayer*>& layers,
            const OverscaledTileID& tileID,
-           const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const;
+           const FeatureSortOrder& featureSortOrder) const;
 
 private:
     void addFeature(std::unordered_map<std::string, std::vector<Feature>>& result, const IndexedSubfeature&,

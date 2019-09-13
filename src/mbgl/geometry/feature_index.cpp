@@ -79,7 +79,7 @@ FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolF
                                    const RenderedQueryOptions& queryOptions,
                                    const std::unordered_map<std::string, const RenderLayer*>& layers,
                                    const OverscaledTileID& tileID,
-                                   const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const {
+                                   const FeatureSortOrder& featureSortOrder) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (!tileData) {
         return result;

@@ -690,7 +690,7 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
     return result;
 }
 
-void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState& state, std::set<uint32_t>& seenCrossTileIDs) {
+void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState& state, std::set<uint32_t>& seenCrossTileIDs) const {
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
     if (bucket.hasSdfIconData()) bucket.sdfIcon.opacityVertices.clear();
@@ -895,7 +895,7 @@ const style::TextJustifyType justifyTypes[] = {style::TextJustifyType::Right, st
 
 }  // namespace
 
-void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableAnchorType placedAnchor, const SymbolInstance& symbolInstance, style::TextWritingModeType orientation) {
+void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableAnchorType placedAnchor, const SymbolInstance& symbolInstance, style::TextWritingModeType orientation) const {
     style::TextJustifyType anchorJustify = getAnchorJustification(placedAnchor);
     assert(anchorJustify != style::TextJustifyType::Auto);
     const optional<size_t>& autoIndex = justificationToIndex(anchorJustify, symbolInstance, orientation);
@@ -915,7 +915,7 @@ void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableA
     }
 }
 
-void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingModeType orientation, const SymbolInstance& symbolInstance) {
+void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingModeType orientation, const SymbolInstance& symbolInstance) const {
     auto horizontal = orientation == style::TextWritingModeType::Horizontal ?
                                      optional<style::TextWritingModeType>(orientation) : nullopt;
     auto vertical = orientation == style::TextWritingModeType::Vertical ?
