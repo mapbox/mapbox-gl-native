@@ -139,10 +139,6 @@ workflows:
       #   - {build type} is typically "debug" or "release".
       #
       - nitpick
-      - clang-tidy:
-          filters:
-            branches:
-              ignore: master
       - android-debug-arm-v7-buck
       - android-arm-template:
           name: android-debug-arm-v8
@@ -856,29 +852,6 @@ jobs:
           name: Android code generation
           command: scripts/nitpick/generated-code.js android
           when: always
-
-# ------------------------------------------------------------------------------
-  clang-tidy:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-    steps:
-      - install-dependencies: { ccache: false }
-      - run:
-          name: Fetch 'origin/master' branch
-          command: git fetch origin master:refs/remotes/origin/master
-      - run:
-          name: Generate compilation database
-          command: make compdb
-      - run:
-          name: Run Clang checks
-          command: make check TARGET_BRANCH=${CIRCLE_TARGET_BRANCH:master}
-          no_output_timeout: 20m
-      - save-dependencies: { ccache: false }
 
 # ------------------------------------------------------------------------------
   android-arm-template:
