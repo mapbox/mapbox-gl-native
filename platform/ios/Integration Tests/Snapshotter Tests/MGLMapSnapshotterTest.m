@@ -26,11 +26,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
 @implementation MGLMapSnapshotterTest
 
-- (void)testMultipleSnapshotsWithASingleSnapshotter {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testMultipleSnapshotsWithASingleSnapshotter🔒 {
     CGSize size = self.mapView.bounds.size;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
@@ -60,11 +56,8 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
-- (void)testDeallocatingSnapshotterDuringSnapshot {
+- (void)testDeallocatingSnapshotterDuringSnapshot🔒 {
     // See also https://github.com/mapbox/mapbox-gl-native/issues/12336
-    if (![self validAccessToken]) {
-        return;
-    }
 
     NSTimeInterval timeout         = 10.0;
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
@@ -108,15 +101,11 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:timeout];
 }
 
-- (void)testSnapshotterUsingNestedDispatchQueues {
+- (void)testSnapshotterUsingNestedDispatchQueues🔒 {
     // This is the opposite pair to the above test `testDeallocatingSnapshotterDuringSnapshot`
     // The only significant difference is that the snapshotter is a `__block` variable, so
     // its lifetime should continue until it's set to nil in the completion block.
     // See also https://github.com/mapbox/mapbox-gl-native/issues/12336
-
-    if (![self validAccessToken]) {
-        return;
-    }
 
     NSTimeInterval timeout         = 10.0;
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
@@ -156,11 +145,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:timeout];
 }
 
-- (void)testCancellingSnapshot {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testCancellingSnapshot🔒 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
     expectation.assertForOverFulfill = YES;
     expectation.expectedFulfillmentCount = 1;
@@ -189,11 +174,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:5.0];
 }
 
-- (void)testAllocatingSnapshotOnBackgroundQueue {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testAllocatingSnapshotOnBackgroundQueue🔒 {
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
 
     CGSize size                  = self.mapView.bounds.size;
@@ -226,11 +207,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:2.0];
 }
 
-- (void)testSnapshotterFromBackgroundQueueShouldFail {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotterFromBackgroundQueueShouldFail🔒 {
     CGSize size = self.mapView.bounds.size;
     CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
 
@@ -281,12 +258,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
-- (void)testMultipleSnapshottersPENDING {
-
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testMultipleSnapshotters🔒🙁 {
     NSUInteger numSnapshots = 8;
     CGSize size = self.mapView.bounds.size;
 
@@ -340,11 +312,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
-- (void)testSnapshotPointConversion {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotPointConversion🔒 {
     CGSize size = self.mapView.bounds.size;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
@@ -382,11 +350,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
-- (void)testSnapshotPointConversionCoordinateOrdering {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotPointConversionCoordinateOrdering🔒 {
     CGSize size = self.mapView.bounds.size;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];

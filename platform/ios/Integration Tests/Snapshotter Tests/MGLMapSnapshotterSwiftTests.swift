@@ -15,12 +15,9 @@ class MGLMapSnapshotterSwiftTests: MGLMapViewIntegrationTest {
         return options
     }
 
-    func testCapturingSnapshotterInSnapshotCompletion() {
+    func testCapturingSnapshotterInSnapshotCompletion🔒() {
         // See the Obj-C testDeallocatingSnapshotterDuringSnapshot
         // This Swift test, is essentially the same except for capturing the snapshotter
-        guard validAccessToken() != nil else {
-            return
-        }
 
         let timeout: TimeInterval = 10.0
         let expectation = self.expectation(description: "snapshot")
