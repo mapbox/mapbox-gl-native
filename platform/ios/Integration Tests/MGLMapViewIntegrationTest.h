@@ -25,7 +25,6 @@
 })
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
-@property (nonatomic) NSString *accessToken;
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) UIWindow *window;
 @property (nonatomic) MGLStyle *style;

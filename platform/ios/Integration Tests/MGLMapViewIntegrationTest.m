@@ -31,10 +31,7 @@
         
         // Check for tests that require a valid access token
         if ([test.name containsString:@"🔒"]) {
-            if (accessToken) {
-                ((MGLMapViewIntegrationTest *)test).accessToken = accessToken;
-            }
-            else {
+            if (!accessToken) {
                 printf("warning: MAPBOX_ACCESS_TOKEN env var is required for test '%s' - skipping.\n", test.name.UTF8String);
                 continue;
             }
@@ -53,7 +50,17 @@
 - (void)setUp {
     [super setUp];
 
-    [MGLAccountManager setAccessToken:self.accessToken ?: @"pk.feedcafedeadbeefbadebede"];
+    NSString *accessToken;
+    
+    if ([self.name containsString:@"🔒"]) {
+        accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+        
+        if (!accessToken) {
+            printf("warning: MAPBOX_ACCESS_TOKEN env var is required for test '%s' - trying anyway.\n", self.name.UTF8String);
+        }
+    }
+
+    [MGLAccountManager setAccessToken:accessToken ?: @"pk.feedcafedeadbeefbadebede"];
     
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
 
