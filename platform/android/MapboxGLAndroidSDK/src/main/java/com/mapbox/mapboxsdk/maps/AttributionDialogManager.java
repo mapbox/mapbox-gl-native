@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -147,14 +148,14 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     String url = attributions[which].getUrl();
     Logger.d(TAG, "attribution url: " + url);
     if (url.contains(MAP_FEEDBACK_URL_OLD) || url.contains(MAP_FEEDBACK_URL)) {
-      url = buildMapFeedbackMapUrl();
+      url = buildMapFeedbackMapUrl(Mapbox.getAccessToken());
     }
     Logger.d(TAG, "final feedback url: " + url);
     showWebPage(url);
   }
 
   @NonNull
-  private String buildMapFeedbackMapUrl() {
+  String buildMapFeedbackMapUrl(@Nullable String accessToken) {
     // TODO Add Android Maps SDK version to the query parameter, currently the version API is not available.
 
     Uri.Builder builder = Uri.parse(MAP_FEEDBACK_URL).buildUpon();
@@ -171,7 +172,6 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
       builder.appendQueryParameter("referrer", packageName);
     }
 
-    String accessToken = Mapbox.getAccessToken();
     if (accessToken != null) {
       builder.appendQueryParameter("access_token", accessToken);
     }
