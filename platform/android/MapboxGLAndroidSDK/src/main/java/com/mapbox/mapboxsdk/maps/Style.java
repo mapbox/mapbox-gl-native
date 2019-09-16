@@ -520,17 +520,6 @@ public class Style {
    */
   void clear() {
     fullyLoaded = false;
-    for (Layer layer : layers.values()) {
-      if (layer != null) {
-        layer.setDetached();
-      }
-    }
-
-    for (Source source : sources.values()) {
-      if (source != null) {
-        source.setDetached();
-      }
-    }
 
     for (Map.Entry<String, Bitmap> bitmapEntry : images.entrySet()) {
       nativeMap.removeImage(bitmapEntry.getKey());

@@ -18,9 +18,9 @@ public abstract class Layer {
 
   @Keep
   private long nativePtr;
+
   @Keep
   private boolean invalidated;
-  private boolean detached;
 
   static {
     LibraryLoader.load();
@@ -44,10 +44,6 @@ public abstract class Layer {
   }
 
   public void setProperties(@NonNull PropertyValue<?>... properties) {
-    if (detached) {
-      return;
-    }
-
     checkThread();
     if (properties.length == 0) {
       return;
@@ -156,13 +152,5 @@ public abstract class Layer {
     } else {
       return value;
     }
-  }
-
-  public void setDetached() {
-    detached = true;
-  }
-
-  public boolean isDetached() {
-    return detached;
   }
 }
