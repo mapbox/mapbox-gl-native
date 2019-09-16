@@ -652,7 +652,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"let": @"MGL_LET",
         };
     });
-    
+
     if (!object || object == [NSNull null]) {
         return [NSExpression expressionForConstantValue:nil];
     }
@@ -675,7 +675,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     if ([object isKindOfClass:[NSArray class]]) {
         NSArray *array = (NSArray *)object;
         NSString *op = array.firstObject;
-        
+
         if (![op isKindOfClass:[NSString class]]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
             return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
@@ -1055,6 +1055,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
         case NSFunctionExpressionType: {
             NSString *function = self.function;
+
+            BOOL hasCollectionProperty = !(self.arguments[0].expressionType == NSConstantValueExpressionType || self.arguments[0].expressionType == NSKeyPathExpressionType
+            || self.arguments[0].expressionType == NSVariableExpressionType || !self.arguments[0].expressionType);
             NSString *op = MGLExpressionOperatorsByFunctionNames[function];
             if (op) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
@@ -1067,7 +1070,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return [NSExpression expressionForFunction:@"divide:by:" arguments:@[sum, count]].mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"sum:"]) {
                 NSArray *arguments;
-                if (self.expressionType == NSConstantValueExpressionType) {
+                if (!hasCollectionProperty) {
                     arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 } else {
                     arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
@@ -1078,7 +1081,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return @[@"length", arguments];
             } else if ([function isEqualToString:@"min:"]) {
                 NSArray *arguments;
-                if (self.expressionType == NSConstantValueExpressionType) {
+                if (!hasCollectionProperty) {
                                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 } else {
                     arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
@@ -1086,7 +1089,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return [@[@"min"] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"max:"]) {
                 NSArray *arguments;
-                if (self.expressionType == NSConstantValueExpressionType) {
+                if (!hasCollectionProperty) {
                                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 } else {
                                    arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
@@ -1099,7 +1102,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                         self.arguments.firstObject, self.arguments.firstObject].mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"mgl_join:"]) {
                 NSArray *arguments;
-                if (self.expressionType == NSConstantValueExpressionType) {
+                if (!hasCollectionProperty) {
                                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 } else {
                     arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
