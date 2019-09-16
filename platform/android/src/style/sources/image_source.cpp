@@ -33,20 +33,20 @@ namespace android {
 
     void ImageSource::setURL(jni::JNIEnv& env, const jni::String& url) {
         // Update the core source
-        source->as<mbgl::style::ImageSource>()->ImageSource::setURL(jni::Make<std::string>(env, url));
+        source(env)->as<mbgl::style::ImageSource>()->ImageSource::setURL(jni::Make<std::string>(env, url));
     }
 
     jni::Local<jni::String> ImageSource::getURL(jni::JNIEnv& env) {
-        optional<std::string> url = source->as<mbgl::style::ImageSource>()->ImageSource::getURL();
+        optional<std::string> url = source(env)->as<mbgl::style::ImageSource>()->ImageSource::getURL();
         return url ? jni::Make<jni::String>(env, *url) : jni::Local<jni::String>();
     }
 
     void ImageSource::setImage(jni::JNIEnv& env, const jni::Object<Bitmap>& bitmap) {
-        source->as<mbgl::style::ImageSource>()->setImage(Bitmap::GetImage(env, bitmap));
+        source(env)->as<mbgl::style::ImageSource>()->setImage(Bitmap::GetImage(env, bitmap));
     }
 
     void ImageSource::setCoordinates(jni::JNIEnv& env, const jni::Object<LatLngQuad>& coordinatesObject) {
-        source->as<mbgl::style::ImageSource>()->setCoordinates(
+        source(env)->as<mbgl::style::ImageSource>()->setCoordinates(
                 LatLngQuad::getLatLngArray(env, coordinatesObject));
     }
 

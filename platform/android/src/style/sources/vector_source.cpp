@@ -39,7 +39,7 @@ namespace android {
     VectorSource::~VectorSource() = default;
 
     jni::Local<jni::String> VectorSource::getURL(jni::JNIEnv& env) {
-        optional<std::string> url = source->as<mbgl::style::VectorSource>()->VectorSource::getURL();
+        optional<std::string> url = source(env)->as<mbgl::style::VectorSource>()->VectorSource::getURL();
         return url ? jni::Make<jni::String>(env, *url) : jni::Local<jni::String>();
     }
 
@@ -51,7 +51,7 @@ namespace android {
 
         std::vector<mbgl::Feature> features;
         if (rendererFrontend) {
-            features = rendererFrontend->querySourceFeatures(source->getID(),
+            features = rendererFrontend->querySourceFeatures(source(env)->getID(),
                 { toVector(env, jSourceLayerIds), toFilter(env, jfilter) });
         }
         return Feature::convert(env, features);

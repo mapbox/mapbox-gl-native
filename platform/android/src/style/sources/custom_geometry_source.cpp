@@ -143,17 +143,17 @@ namespace android {
 
         // Update the core source if not cancelled
         if (!isCancelled(z, x ,y)) {
-            source->as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::setTileData(CanonicalTileID(z, x, y), GeoJSON(geometry));
+            source(env)->as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::setTileData(CanonicalTileID(z, x, y), GeoJSON(geometry));
         }
     }
 
-    void CustomGeometrySource::invalidateTile(jni::JNIEnv&, jni::jint z, jni::jint x, jni::jint y) {
-        source->as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::invalidateTile(CanonicalTileID(z, x, y));
+    void CustomGeometrySource::invalidateTile(jni::JNIEnv& env, jni::jint z, jni::jint x, jni::jint y) {
+        source(env)->as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::invalidateTile(CanonicalTileID(z, x, y));
     }
 
     void CustomGeometrySource::invalidateBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& jBounds) {
         auto bounds = LatLngBounds::getLatLngBounds(env, jBounds);
-        source->as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::invalidateRegion(bounds);
+        source(env)->as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::invalidateRegion(bounds);
     }
 
     jni::Local<jni::Array<jni::Object<geojson::Feature>>> CustomGeometrySource::querySourceFeatures(jni::JNIEnv& env,
@@ -163,7 +163,7 @@ namespace android {
 
         std::vector<mbgl::Feature> features;
         if (rendererFrontend) {
-            features = rendererFrontend->querySourceFeatures(source->getID(), { {},  toFilter(env, jfilter) });
+            features = rendererFrontend->querySourceFeatures(source(env)->getID(), { {},  toFilter(env, jfilter) });
         }
         return Feature::convert(env, features);
     }

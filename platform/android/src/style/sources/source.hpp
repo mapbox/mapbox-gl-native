@@ -7,6 +7,8 @@
 #include "../value.hpp"
 #include "../../android_renderer_frontend.hpp"
 
+#include <mapbox/weak.hpp>
+
 #include <jni/jni.hpp>
 
 namespace mbgl {
@@ -44,17 +46,35 @@ public:
     jni::Local<jni::String> getAttribution(jni::JNIEnv&);
 
 protected:
-    // Set on newly created sources until added to the map.
-    std::unique_ptr<mbgl::style::Source> ownedSource;
 
-    // Raw pointer that is valid at all times.
-    mbgl::style::Source *source;
+    inline void source(std::unique_ptr<mbgl::style::Source> ownedSource) noexcept {
+        ownedSource_ = std::move(ownedSource);
+    }
+
+    inline void source(mbgl::style::Source *coreSource) noexcept {
+        coreSource_ = coreSource->makeWeakPtr();
+    }
+
+    inline mbgl::style::Source *source(jni::JNIEnv& env) {
+        if (ownedSource_) return ownedSource_.get();
+        if (!coreSource_) {
+            jni::ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"),
+                          "This source got invalidated after the style change");
+        }
+        return coreSource_.get();
+    }
 
     // Set when the source is added to a map.
     jni::Global<jni::Object<Source>> javaPeer;
 
     // RendererFrontend pointer is valid only when added to the map.
     AndroidRendererFrontend* rendererFrontend { nullptr };
+
+private:
+    // Set on newly created sources until added to the map.
+    std::unique_ptr<mbgl::style::Source> ownedSource_;
+
+    mapbox::base::WeakPtr<mbgl::style::Source> coreSource_;
 };
 
 } // namespace android
