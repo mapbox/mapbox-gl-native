@@ -235,7 +235,7 @@ public class MapSnapshotter {
      */
     @NonNull
     public Options withApiBaseUri(String apiBaseUri) {
-      this.apiBaseUrl = apiBaseUrl;
+      this.apiBaseUrl = apiBaseUri;
       return this;
     }
 
