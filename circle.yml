@@ -184,8 +184,6 @@ workflows:
               ignore: /.*/
       - macos-debug
       - macos-render-tests
-      - qt5-linux-gcc5-release
-      - qt5-macos-debug
   nightly:
     triggers:
       - schedule:
@@ -507,16 +505,6 @@ commands:
     - run:
         name: Build test
         command: make test
-  build-qt-app:
-    steps:
-    - run:
-        name: Build qt-app
-        command: make qt-app
-  build-qt-test:
-    steps:
-    - run:
-        name: Build qt-test
-        command: make qt-test
   build-ios-test:
     steps:
     - run:
@@ -585,18 +573,6 @@ commands:
         command: |
           brew install node@8
           brew link node@8 --force --overwrite
-
-  install-qt-macos-dependencies:
-    steps:
-    - run:
-        name: Install Qt macOS dependencies
-        command: |
-          brew install qt
-          brew link qt --force
-          export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
-          export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
-          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
-          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
 
   run-node-macos-tests:
     steps:
@@ -1186,30 +1162,6 @@ jobs:
       - run-unit-tests-sanitized
 
 # ------------------------------------------------------------------------------
-  linux-gcc49-debug:
-    docker:
-      - image: mbgl/linux-gcc-4.9:e3818a77c1
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      DISPLAY: :0
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-linux
-      - build-benchmark
-      - build-test
-      - save-dependencies
-      - run-unit-tests
-      - run:
-          name: Build offline CLI
-          command: make offline
-
-# ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
     docker:
       - image: mbgl/linux-gcc-5:54f59e3ac5
@@ -1590,54 +1542,3 @@ jobs:
           name: Collect GitHub statistics
           command: |
               scripts/publish_github_stats.js
-
-# ------------------------------------------------------------------------------
-  qt5-linux-gcc5-release:
-    docker:
-      - image: mbgl/linux-gcc-5-qt-5.9:5cd92d7d1c
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      WITH_QT_I18N: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-qt-app
-      - build-qt-test
-      - run:
-          name: Build qt-docs
-          command: make qt-docs
-      - save-dependencies
-      - run:
-          name: Run valgrind-backed tests
-          environment:
-            JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector --gtest_filter=-BiDi.*
-
-# ------------------------------------------------------------------------------
-  qt5-macos-debug:
-    macos:
-      xcode: "9.3.1"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-qt-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-qt-app
-      - build-qt-test
-      - run:
-          name: Run qt-test
-          command: make run-qt-test
-      - save-dependencies
-      - store_artifacts:
-          path: test/fixtures
-          destination: test/fixtures
