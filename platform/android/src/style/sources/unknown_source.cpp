@@ -13,7 +13,7 @@ namespace mbgl {
 namespace android {
 
     UnknownSource::UnknownSource(jni::JNIEnv& env,
-                                 mbgl::style::Source& coreSource,
+                                 mbgl::style::Source* coreSource,
                                  AndroidRendererFrontend& frontend)
         : Source(env, coreSource, createJavaPeer(env), frontend) {
     }

@@ -24,7 +24,7 @@ namespace android {
     }
 
     RasterDEMSource::RasterDEMSource(jni::JNIEnv& env,
-                               mbgl::style::Source& coreSource,
+                               mbgl::style::Source* coreSource,
                                AndroidRendererFrontend& frontend)
          : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
@@ -32,7 +32,7 @@ namespace android {
     RasterDEMSource::~RasterDEMSource() = default;
 
     jni::Local<jni::String> RasterDEMSource::getURL(jni::JNIEnv& env) {
-        optional<std::string> url = source.as<mbgl::style::RasterDEMSource>()->RasterDEMSource::getURL();
+        optional<std::string> url = source->as<mbgl::style::RasterDEMSource>()->RasterDEMSource::getURL();
         return url ? jni::Make<jni::String>(env, *url) : jni::Local<jni::String>();
     }
 

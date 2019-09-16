@@ -21,7 +21,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
     CustomGeometrySource(jni::JNIEnv&, const jni::String&, const jni::Object<>&);
-    CustomGeometrySource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    CustomGeometrySource(jni::JNIEnv&, mbgl::style::Source*, AndroidRendererFrontend&);
     ~CustomGeometrySource();
 
     bool removeFromMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map&) override;

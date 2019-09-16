@@ -15,7 +15,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
     RasterSource(jni::JNIEnv&, const jni::String&, const jni::Object<>&, jni::jint);
-    RasterSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    RasterSource(jni::JNIEnv&, mbgl::style::Source*, AndroidRendererFrontend&);
     ~RasterSource();
 
     jni::Local<jni::String> getURL(jni::JNIEnv&);

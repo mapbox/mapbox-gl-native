@@ -14,7 +14,7 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    UnknownSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    UnknownSource(jni::JNIEnv&, mbgl::style::Source*, AndroidRendererFrontend&);
 
     ~UnknownSource() = default;
 

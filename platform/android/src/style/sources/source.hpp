@@ -19,12 +19,12 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    static const jni::Object<Source>& peerForCoreSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    static const jni::Object<Source>& peerForCoreSource(jni::JNIEnv&, mbgl::style::Source*, AndroidRendererFrontend&);
 
     /*
      * Called when a Java object is created for a core source that belongs to a map.
      */
-    Source(jni::JNIEnv&, mbgl::style::Source&, const jni::Object<Source>&, AndroidRendererFrontend&);
+    Source(jni::JNIEnv&, mbgl::style::Source*, const jni::Object<Source>&, AndroidRendererFrontend&);
 
     /*
      * Called when a Java object is created for a new core source that does not belong to a map.
@@ -48,7 +48,7 @@ protected:
     std::unique_ptr<mbgl::style::Source> ownedSource;
 
     // Raw pointer that is valid at all times.
-    mbgl::style::Source& source;
+    mbgl::style::Source *source;
 
     // Set when the source is added to a map.
     jni::Global<jni::Object<Source>> javaPeer;
