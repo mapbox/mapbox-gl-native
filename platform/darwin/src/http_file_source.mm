@@ -229,6 +229,10 @@ NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountTyp
 std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
     auto request = std::make_unique<HTTPRequest>(callback);
     auto shared = request->shared; // Explicit copy so that it also gets copied into the completion handler block below.
+    
+    if ([MGLNetworkConfiguration sharedManager].stopsRequests) {
+        return std::move(request);
+    }
 
     @autoreleasepool {
         NSURL *url = resourceURLWithAccountType(resource, impl->accountType);

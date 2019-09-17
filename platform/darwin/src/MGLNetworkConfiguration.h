@@ -32,6 +32,14 @@ MGL_EXPORT
  */
 @property (atomic, strong, null_resettable) NSURLSessionConfiguration *sessionConfiguration;
 
+/**
+A Boolean value indicating whether the current `NSURLSessionConfiguration` stops
+making network requests.
+ 
+The default value of this property is `NO`.
+*/
+@property (atomic, assign) BOOL stopsRequests;
+
 @end
 
 NS_ASSUME_NONNULL_END
