@@ -52,16 +52,16 @@ protected:
     }
 
     inline void source(mbgl::style::Source *coreSource) noexcept {
-        coreSource_ = coreSource->makeWeakPtr();
+        nonOwnedSource_ = coreSource->makeWeakPtr();
     }
 
-    inline mbgl::style::Source *source(jni::JNIEnv& env) {
+    inline mbgl::style::Source* source(jni::JNIEnv& env) {
         if (ownedSource_) return ownedSource_.get();
-        if (!coreSource_) {
+        if (!nonOwnedSource_) {
             jni::ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"),
                           "This source got invalidated after the style change");
         }
-        return coreSource_.get();
+        return nonOwnedSource_.get();
     }
 
     // Set when the source is added to a map.
@@ -71,10 +71,8 @@ protected:
     AndroidRendererFrontend* rendererFrontend { nullptr };
 
 private:
-    // Set on newly created sources until added to the map.
     std::unique_ptr<mbgl::style::Source> ownedSource_ { nullptr };
-
-    mapbox::base::WeakPtr<mbgl::style::Source> coreSource_;
+    mapbox::base::WeakPtr<mbgl::style::Source> nonOwnedSource_;
 };
 
 } // namespace android

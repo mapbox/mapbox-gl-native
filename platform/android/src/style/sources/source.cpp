@@ -5,7 +5,6 @@
 #include <jni/jni.hpp>
 
 #include <mbgl/style/style.hpp>
-#include <mbgl/util/logging.hpp>
 
 // Java -> C++ conversion
 #include <mbgl/style/conversion/source.hpp>
@@ -98,11 +97,12 @@ namespace android {
             throw std::runtime_error("Cannot add source twice");
         }
 
+        // Save reference before transferring ownership
+        nonOwnedSource_ = ownedSource_->makeWeakPtr();
+        // Add peer to core source
+        ownedSource_->peer = std::unique_ptr<Source>(this);
         // Add source to map and release ownership
         map.getStyle().addSource(std::move(ownedSource_));
-
-        // Add peer to core source
-        source(env)->peer = std::unique_ptr<Source>(this);
 
         // Add strong reference to java source
         javaPeer = jni::NewGlobal(env, obj);
@@ -113,7 +113,7 @@ namespace android {
     bool Source::removeFromMap(JNIEnv& env, const jni::Object<Source>&, mbgl::Map& map) {
         // Cannot remove if not attached yet
         if (ownedSource_) {
-            throw std::runtime_error("Cannot remove detached source");
+            throw std::runtime_error("Cannot remove detached source from map");
         }
 
         // Remove the source from the map and take ownership
