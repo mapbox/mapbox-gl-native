@@ -1,0 +1,1 @@
+docker run --rm -v $PWD:$PWD:ro tmpsantos/mbgl_ci:1.5 /bin/bash -c 'cd /home/tmpsantos/Projects/mapbox-gl-native && git diff -U0 --no-color origin/master... src include |clang-tidy-diff-8.py -clang-tidy-binary clang-tidy-8 -p1 -path build'
