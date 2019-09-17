@@ -1,7 +1,7 @@
 #import "MGLCompassButton_Private.h"
 #import "MGLCompassDirectionFormatter.h"
 
-#import "MGLGeometry.h"
+#import <Mapbox/MGLGeometry.h>
 
 #import "MGLMapView_Private.h"
 #import "UIImage+MGLAdditions.h"

@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-#import "MGLTypes.h"
+#import <Mapbox/MGLTypes.h>
 
 #include <mbgl/style/image.hpp>
 

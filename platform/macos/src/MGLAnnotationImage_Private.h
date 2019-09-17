@@ -1,4 +1,4 @@
-#import "Mapbox.h"
+#import <Mapbox/Mapbox.h>
 
 @interface MGLAnnotationImage (Private)
 
