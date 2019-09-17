@@ -12,7 +12,6 @@ target_sources(mbgl-glfw
     PRIVATE platform/glfw/glfw_renderer_frontend.cpp
     PRIVATE platform/glfw/settings_json.hpp
     PRIVATE platform/glfw/settings_json.cpp
-    PRIVATE platform/default/include/mbgl/util/default_styles.hpp
 )
 
 target_include_directories(mbgl-glfw
@@ -22,8 +21,8 @@ target_include_directories(mbgl-glfw
 target_link_libraries(mbgl-glfw
     PRIVATE mbgl-core
     PRIVATE glfw
-    PRIVATE cheap-ruler-cpp
-    PRIVATE args
+    PRIVATE mbgl-vendor-cheap-ruler-cpp
+    PRIVATE Mapbox::Base::Extras::args
 )
 
 mbgl_platform_glfw()

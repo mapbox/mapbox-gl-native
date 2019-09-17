@@ -1,5 +1,4 @@
-#import <Foundation/Foundation.h>
-#import <Mapbox/Mapbox.h>
+@import Mapbox;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -12,7 +11,6 @@ FOUNDATION_EXTERN NSString *const MBXShowsZoomLevelOrnament;
 FOUNDATION_EXTERN NSString *const MBXShowsTimeFrameGraph;
 FOUNDATION_EXTERN NSString *const MBXMapFramerateMeasurementEnabled;
 FOUNDATION_EXTERN NSString *const MBXDebugMaskValue;
-FOUNDATION_EXTERN NSString *const MBXDebugLoggingEnabled;
 FOUNDATION_EXTERN NSString *const MBXReuseQueueStatsEnabled;
 
 @interface MBXState : NSObject <NSSecureCoding>
@@ -26,7 +24,6 @@ FOUNDATION_EXTERN NSString *const MBXReuseQueueStatsEnabled;
 @property (nonatomic) BOOL showsTimeFrameGraph;
 @property (nonatomic) BOOL framerateMeasurementEnabled;
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
-@property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL reuseQueueStatsEnabled;
 
 @property (nonatomic, readonly) NSString *debugDescription;

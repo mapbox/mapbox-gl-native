@@ -55,12 +55,12 @@ float CollisionIndex::approximateTileDistance(const TileDistance& tileDistance, 
         (incidenceStretch - 1) * lastSegmentTile * std::abs(std::sin(lastSegmentAngle));
 }
 
-bool CollisionIndex::isOffscreen(const CollisionBox& box) const {
-    return box.px2 < viewportPadding || box.px1 >= screenRightBoundary || box.py2 < viewportPadding || box.py1 >= screenBottomBoundary;
+bool CollisionIndex::isOffscreen(float x1, float y1, float x2, float y2) const {
+    return x2 < viewportPadding || x1 >= screenRightBoundary || y2 < viewportPadding || y1 >= screenBottomBoundary;
 }
 
-bool CollisionIndex::isInsideGrid(const CollisionBox& box) const {
-    return box.px2 >= 0 && box.px1 < gridRightBoundary && box.py2 >= 0 && box.py1 < gridBottomBoundary;
+bool CollisionIndex::isInsideGrid(float x1, float y1, float x2, float y2) const {
+    return x2 >= 0 && x1 < gridRightBoundary && y2 >= 0 && y1 < gridBottomBoundary;
 }
     
 CollisionTileBoundaries CollisionIndex::projectTileBoundaries(const mat4& posMatrix) const {
@@ -71,62 +71,66 @@ CollisionTileBoundaries CollisionIndex::projectTileBoundaries(const mat4& posMat
     
 }
 
-bool CollisionIndex::isInsideTile(const CollisionBox& box, const CollisionTileBoundaries& tileBoundaries) const {
+bool CollisionIndex::isInsideTile(float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const {
     // This check is only well defined when the tile boundaries are axis-aligned
     // We are relying on it only being used in MapMode::Tile, where that is always the case
 
-    return box.px1 >= tileBoundaries[0] && box.py1 >= tileBoundaries[1] && box.px2 < tileBoundaries[2] && box.py2 < tileBoundaries[3];
+    return x1 >= tileBoundaries[0] && y1 >= tileBoundaries[1] && x2 < tileBoundaries[2] && y2 < tileBoundaries[3];
 }
 
 
-std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
+std::pair<bool,bool> CollisionIndex::placeFeature(const CollisionFeature& feature,
                                       Point<float> shift,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
-                                      PlacedSymbol& symbol,
+                                      const PlacedSymbol& symbol,
                                       const float scale,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
                                       const bool collisionDebug,
                                       const optional<CollisionTileBoundaries>& avoidEdges,
-                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate) {
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate,
+                                      std::vector<ProjectedCollisionBox>& projectedBoxes) {
+    assert(projectedBoxes.empty());
     if (!feature.alongLine) {
-        CollisionBox& box = feature.boxes.front();
+        const CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
         const float tileToViewport = textPixelRatio * projectedPoint.second;
-        box.px1 = (box.x1 + shift.x) * tileToViewport + projectedPoint.first.x;
-        box.py1 = (box.y1 + shift.y) * tileToViewport + projectedPoint.first.y;
-        box.px2 = (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x;
-        box.py2 = (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y;
-    
+        float px1 = (box.x1 + shift.x) * tileToViewport + projectedPoint.first.x;
+        float py1 = (box.y1 + shift.y) * tileToViewport + projectedPoint.first.y;
+        float px2 = (box.x2 + shift.x) * tileToViewport + projectedPoint.first.x;
+        float py2 = (box.y2 + shift.y) * tileToViewport + projectedPoint.first.y;
+        projectedBoxes.emplace_back(px1, py1, px2, py2);
 
-        if ((avoidEdges && !isInsideTile(box, *avoidEdges)) ||
-            !isInsideGrid(box) ||
-            (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}, collisionGroupPredicate))) {
+        if ((avoidEdges && !isInsideTile(px1, py1, px2, py2, *avoidEdges)) ||
+            !isInsideGrid(px1, py1, px2, py2) ||
+            (!allowOverlap && collisionGrid.hitTest(projectedBoxes.back().box(), collisionGroupPredicate))) {
             return { false, false };
         }
 
-        return {true, isOffscreen(box)};
+        return {true, isOffscreen(px1, py1, px2, py2)};
     } else {
-        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug, avoidEdges, collisionGroupPredicate);
+        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug, avoidEdges, collisionGroupPredicate, projectedBoxes);
     }
 }
 
-std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
+std::pair<bool,bool> CollisionIndex::placeLineFeature(const CollisionFeature& feature,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
-                                      PlacedSymbol& symbol,
+                                      const PlacedSymbol& symbol,
                                       const float scale,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
                                       const bool collisionDebug,
                                       const optional<CollisionTileBoundaries>& avoidEdges,
-                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate) {
-
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate,
+                                      std::vector<ProjectedCollisionBox>& projectedBoxes) {
+    assert(feature.alongLine);
+    assert(projectedBoxes.empty());
     const auto tileUnitAnchorPoint = symbol.anchorPoint;
     const auto projectedAnchor = projectAnchor(posMatrix, tileUnitAnchorPoint);
 
@@ -163,9 +167,10 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         lastTileDistance = approximateTileDistance(*(firstAndLastGlyph->second.tileDistance), firstAndLastGlyph->second.angle, pixelsToTileUnits, projectedAnchor.second, pitchWithMap);
     }
 
-    bool atLeastOneCirclePlaced = false;
+    bool previousCirclePlaced = false;
+    projectedBoxes.resize(feature.boxes.size());
     for (size_t i = 0; i < feature.boxes.size(); i++) {
-        CollisionBox& circle = feature.boxes[i];
+        const CollisionBox& circle = feature.boxes[i];
         const float boxSignedDistanceFromAnchor = circle.signedDistanceFromAnchor;
         if (!firstAndLastGlyph ||
             (boxSignedDistanceFromAnchor < -firstTileDistance) ||
@@ -173,7 +178,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
             // The label either doesn't fit on its line or we
             // don't need to use this circle because the label
             // doesn't extend this far. Either way, mark the circle unused.
-            circle.used = false;
+            previousCirclePlaced = false;
             continue;
         }
 
@@ -181,10 +186,12 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         const float tileUnitRadius = (circle.x2 - circle.x1) / 2;
         const float radius = tileUnitRadius * tileToViewport;
 
-        if (atLeastOneCirclePlaced) {
-            const CollisionBox& previousCircle = feature.boxes[i - 1];
-            const float dx = projectedPoint.x - previousCircle.px;
-            const float dy = projectedPoint.y - previousCircle.py;
+        if (previousCirclePlaced) {
+            const ProjectedCollisionBox& previousCircle = projectedBoxes[i - 1];
+            assert(previousCircle.isCircle());
+            const auto& previousCenter = previousCircle.circle().center;
+            const float dx = projectedPoint.x - previousCenter.x;
+            const float dy = projectedPoint.y - previousCenter.y;
             // The circle edges touch when the distance between their centers is 2x the radius
             // When the distance is 1x the radius, they're doubled up, and we could remove
             // every other circle while keeping them all in touch.
@@ -202,30 +209,26 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
                         // Hide significantly overlapping circles, unless this is the last one we can
                         // use, in which case we want to keep it in place even if it's tightly packed
                         // with the one before it.
-                        circle.used = false;
+                        previousCirclePlaced = false;
                         continue;
                     }
                 }
             }
         }
 
-        atLeastOneCirclePlaced = true;
-        circle.px1 = projectedPoint.x - radius;
-        circle.px2 = projectedPoint.x + radius;
-        circle.py1 = projectedPoint.y - radius;
-        circle.py2 = projectedPoint.y + radius;
-        
-        circle.used = true;
-        
-        circle.px = projectedPoint.x;
-        circle.py = projectedPoint.y;
-        circle.radius = radius;
-        
-        entirelyOffscreen &= isOffscreen(circle);
-        inGrid |= isInsideGrid(circle);
+        previousCirclePlaced = true;
+        float px1 = projectedPoint.x - radius;
+        float px2 = projectedPoint.x + radius;
+        float py1 = projectedPoint.y - radius;
+        float py2 = projectedPoint.y + radius;
 
-        if ((avoidEdges && !isInsideTile(circle, *avoidEdges)) ||
-            (!allowOverlap && collisionGrid.hitTest({{circle.px, circle.py}, circle.radius}, collisionGroupPredicate))) {
+        projectedBoxes[i] = ProjectedCollisionBox{projectedPoint.x, projectedPoint.y, radius};
+        
+        entirelyOffscreen &= isOffscreen(px1, py1, px2, py2);
+        inGrid |= isInsideGrid(px1, py1, px2, py2);
+
+        if ((avoidEdges && !isInsideTile(px1, py1, px2, py2, *avoidEdges)) ||
+            (!allowOverlap && collisionGrid.hitTest(projectedBoxes[i].circle(), collisionGroupPredicate))) {
             if (!collisionDebug) {
                 return {false, false};
             } else {
@@ -240,37 +243,38 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
 }
 
 
-void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId) {
+void CollisionIndex::insertFeature(const CollisionFeature& feature, const std::vector<ProjectedCollisionBox>& projectedBoxes, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId) {
     if (feature.alongLine) {
-        for (auto& circle : feature.boxes) {
-            if (!circle.used) {
+        for (auto& circle : projectedBoxes) {
+            if (!circle.isCircle()) {
                 continue;
             }
 
             if (ignorePlacement) {
                 ignoredGrid.insert(
                     IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
-                    {{ circle.px, circle.py }, circle.radius}
+                    circle.circle()
                 );
             } else {
                 collisionGrid.insert(
                     IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
-                    {{ circle.px, circle.py }, circle.radius}
+                    circle.circle()
                 );
             }
         }
     } else {
-        assert(feature.boxes.size() == 1);
-        auto& box = feature.boxes[0];
+        assert(projectedBoxes.size() == 1);
+        auto& box = projectedBoxes[0];
+        assert(box.isBox());
         if (ignorePlacement) {
             ignoredGrid.insert(
                 IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
-                {{ box.px1, box.py1 }, { box.px2, box.py2 }}
+                box.box()
             );
         } else {
             collisionGrid.insert(
                 IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
-                {{ box.px1, box.py1 }, { box.px2, box.py2 }}
+                box.box()
             );
         }
     }

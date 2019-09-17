@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -363,7 +364,7 @@ TransitionOptions CircleLayer::getCircleTranslateAnchorTransition() const {
 using namespace conversion;
 
 optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         CircleBlur,
         CircleColor,
         CircleOpacity,
@@ -389,28 +390,28 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "circle-blur", static_cast<uint8_t>(Property::CircleBlur) },
-        { "circle-color", static_cast<uint8_t>(Property::CircleColor) },
-        { "circle-opacity", static_cast<uint8_t>(Property::CircleOpacity) },
-        { "circle-pitch-alignment", static_cast<uint8_t>(Property::CirclePitchAlignment) },
-        { "circle-pitch-scale", static_cast<uint8_t>(Property::CirclePitchScale) },
-        { "circle-radius", static_cast<uint8_t>(Property::CircleRadius) },
-        { "circle-stroke-color", static_cast<uint8_t>(Property::CircleStrokeColor) },
-        { "circle-stroke-opacity", static_cast<uint8_t>(Property::CircleStrokeOpacity) },
-        { "circle-stroke-width", static_cast<uint8_t>(Property::CircleStrokeWidth) },
-        { "circle-translate", static_cast<uint8_t>(Property::CircleTranslate) },
-        { "circle-translate-anchor", static_cast<uint8_t>(Property::CircleTranslateAnchor) },
-        { "circle-blur-transition", static_cast<uint8_t>(Property::CircleBlurTransition) },
-        { "circle-color-transition", static_cast<uint8_t>(Property::CircleColorTransition) },
-        { "circle-opacity-transition", static_cast<uint8_t>(Property::CircleOpacityTransition) },
-        { "circle-pitch-alignment-transition", static_cast<uint8_t>(Property::CirclePitchAlignmentTransition) },
-        { "circle-pitch-scale-transition", static_cast<uint8_t>(Property::CirclePitchScaleTransition) },
-        { "circle-radius-transition", static_cast<uint8_t>(Property::CircleRadiusTransition) },
-        { "circle-stroke-color-transition", static_cast<uint8_t>(Property::CircleStrokeColorTransition) },
-        { "circle-stroke-opacity-transition", static_cast<uint8_t>(Property::CircleStrokeOpacityTransition) },
-        { "circle-stroke-width-transition", static_cast<uint8_t>(Property::CircleStrokeWidthTransition) },
-        { "circle-translate-transition", static_cast<uint8_t>(Property::CircleTranslateTransition) },
-        { "circle-translate-anchor-transition", static_cast<uint8_t>(Property::CircleTranslateAnchorTransition) }
+        { "circle-blur", mbgl::underlying_type(Property::CircleBlur) },
+        { "circle-color", mbgl::underlying_type(Property::CircleColor) },
+        { "circle-opacity", mbgl::underlying_type(Property::CircleOpacity) },
+        { "circle-pitch-alignment", mbgl::underlying_type(Property::CirclePitchAlignment) },
+        { "circle-pitch-scale", mbgl::underlying_type(Property::CirclePitchScale) },
+        { "circle-radius", mbgl::underlying_type(Property::CircleRadius) },
+        { "circle-stroke-color", mbgl::underlying_type(Property::CircleStrokeColor) },
+        { "circle-stroke-opacity", mbgl::underlying_type(Property::CircleStrokeOpacity) },
+        { "circle-stroke-width", mbgl::underlying_type(Property::CircleStrokeWidth) },
+        { "circle-translate", mbgl::underlying_type(Property::CircleTranslate) },
+        { "circle-translate-anchor", mbgl::underlying_type(Property::CircleTranslateAnchor) },
+        { "circle-blur-transition", mbgl::underlying_type(Property::CircleBlurTransition) },
+        { "circle-color-transition", mbgl::underlying_type(Property::CircleColorTransition) },
+        { "circle-opacity-transition", mbgl::underlying_type(Property::CircleOpacityTransition) },
+        { "circle-pitch-alignment-transition", mbgl::underlying_type(Property::CirclePitchAlignmentTransition) },
+        { "circle-pitch-scale-transition", mbgl::underlying_type(Property::CirclePitchScaleTransition) },
+        { "circle-radius-transition", mbgl::underlying_type(Property::CircleRadiusTransition) },
+        { "circle-stroke-color-transition", mbgl::underlying_type(Property::CircleStrokeColorTransition) },
+        { "circle-stroke-opacity-transition", mbgl::underlying_type(Property::CircleStrokeOpacityTransition) },
+        { "circle-stroke-width-transition", mbgl::underlying_type(Property::CircleStrokeWidthTransition) },
+        { "circle-translate-transition", mbgl::underlying_type(Property::CircleTranslateTransition) },
+        { "circle-translate-anchor-transition", mbgl::underlying_type(Property::CircleTranslateAnchorTransition) }
     });
 
     const auto it = properties.find(name.c_str());

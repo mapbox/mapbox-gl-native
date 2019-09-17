@@ -46,4 +46,19 @@ public class MathUtils {
 
     return secondMod + min;
   }
+
+  /**
+   * Scale a value from an arbitrary range to a normalized range.
+   *
+   * @param x              The value to be normalized.
+   * @param dataLow        lowest expected value from a data set
+   * @param dataHigh       highest expected value from a data set
+   * @param normalizedLow  normalized lowest value
+   * @param normalizedHigh normalized highest value
+   * @return The result of the normalization.
+   */
+  public static double normalize(double x, double dataLow, double dataHigh,
+                                 double normalizedLow, double normalizedHigh) {
+    return ((x - dataLow) / (dataHigh - dataLow)) * (normalizedHigh - normalizedLow) + normalizedLow;
+  }
 }

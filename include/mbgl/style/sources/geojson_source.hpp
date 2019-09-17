@@ -1,9 +1,14 @@
 #pragma once
 
+#include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/constants.hpp>
+
+#include <memory>
+#include <unordered_map>
+#include <utility>
 
 namespace mbgl {
 
@@ -24,11 +29,15 @@ struct GeoJSONOptions {
     bool cluster = false;
     uint16_t clusterRadius = 50;
     uint8_t clusterMaxZoom = 17;
+    using ClusterExpression = std::pair<std::shared_ptr<mbgl::style::expression::Expression>,
+                                        std::shared_ptr<mbgl::style::expression::Expression>>;
+    using ClusterProperties = std::unordered_map<std::string, ClusterExpression>;
+    ClusterProperties clusterProperties;
 };
 
-class GeoJSONSource : public Source {
+class GeoJSONSource final : public Source {
 public:
-    GeoJSONSource(const std::string& id, const GeoJSONOptions& = {});
+    GeoJSONSource(const std::string& id, optional<GeoJSONOptions> = nullopt);
     ~GeoJSONSource() final;
 
     void setURL(const std::string& url);
@@ -41,9 +50,14 @@ public:
 
     void loadDescription(FileSource&) final;
 
+    mapbox::base::WeakPtr<Source> makeWeakPtr() override {
+        return weakFactory.makeWeakPtr();
+    }
+
 private:
     optional<std::string> url;
     std::unique_ptr<AsyncRequest> req;
+    mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
 template <>

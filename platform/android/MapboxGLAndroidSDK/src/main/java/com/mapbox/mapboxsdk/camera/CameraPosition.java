@@ -5,20 +5,23 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.Size;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
+
+import java.util.Arrays;
 
 /**
  * Resembles the position, angle, zoom and tilt of the user's viewpoint.
  */
 public final class CameraPosition implements Parcelable {
 
-  public static final CameraPosition DEFAULT = new CameraPosition(new LatLng(), 0, 0, 0);
+  public static final CameraPosition DEFAULT = new CameraPosition(new LatLng(), 0, 0, 0, new double[] {0, 0, 0, 0});
 
   public static final Parcelable.Creator<CameraPosition> CREATOR =
     new Parcelable.Creator<CameraPosition>() {
@@ -27,7 +30,9 @@ public final class CameraPosition implements Parcelable {
         LatLng target = in.readParcelable(LatLng.class.getClassLoader());
         double tilt = in.readDouble();
         double zoom = in.readDouble();
-        return new CameraPosition(target, zoom, tilt, bearing);
+        double[] padding = new double[4];
+        in.readDoubleArray(padding);
+        return new CameraPosition(target, zoom, tilt, bearing, padding);
       }
 
       public CameraPosition[] newArray(int size) {
@@ -49,17 +54,24 @@ public final class CameraPosition implements Parcelable {
 
   /**
    * The angle, in degrees, of the camera angle from the nadir (directly facing the Earth).
-   * See tilt(float) for details of restrictions on the range of values.
+   * See {@link Builder#tilt(double)} for details of restrictions on the range of values.
    */
   @Keep
   public final double tilt;
 
   /**
-   * Zoom level near the center of the screen. See zoom(float) for the definition of the camera's
+   * Zoom level near the center of the screen. See {@link Builder#zoom(double)} for the definition of the camera's
    * zoom level.
    */
   @Keep
   public final double zoom;
+
+  /**
+   * Padding in pixels. Specified in left, top, right, bottom order.
+   * See {@link Builder#padding(double[])} for the definition of the camera's padding.
+   */
+  @Keep
+  public final double[] padding;
 
   /**
    * Constructs a CameraPosition.
@@ -73,13 +85,34 @@ public final class CameraPosition implements Parcelable {
    *                exclusive.
    * @throws NullPointerException     if target is null
    * @throws IllegalArgumentException if tilt is outside the range of 0 to 90 degrees inclusive.
+   * @deprecated use {@link CameraPosition#CameraPosition(LatLng, double, double, double, double[])} instead.
+   */
+  @Deprecated
+  CameraPosition(LatLng target, double zoom, double tilt, double bearing) {
+    this(target, zoom, tilt, bearing, null);
+  }
+
+  /**
+   * Constructs a CameraPosition.
+   *
+   * @param target  The target location to align with the center of the screen.
+   * @param zoom    Zoom level at target. See zoom(float) for details of restrictions.
+   * @param tilt    The camera angle, in degrees, from the nadir (directly down). See tilt(float)
+   *                for details of restrictions.
+   * @param bearing Direction that the camera is pointing in, in degrees clockwise from north.
+   *                This value will be normalized to be within 0 degrees inclusive and 360 degrees
+   *                exclusive.
+   * @param padding Padding in pixels. Specified in left, top, right, bottom order.
+   * @throws NullPointerException     if target is null
+   * @throws IllegalArgumentException if tilt is outside the range of 0 to 90 degrees inclusive.
    */
   @Keep
-  CameraPosition(LatLng target, double zoom, double tilt, double bearing) {
+  CameraPosition(LatLng target, double zoom, double tilt, double bearing, double[] padding) {
     this.target = target;
     this.bearing = bearing;
     this.tilt = tilt;
     this.zoom = zoom;
+    this.padding = padding;
   }
 
   /**
@@ -106,6 +139,7 @@ public final class CameraPosition implements Parcelable {
     out.writeParcelable(target, flags);
     out.writeDouble(tilt);
     out.writeDouble(zoom);
+    out.writeDoubleArray(padding);
   }
 
   /**
@@ -115,7 +149,8 @@ public final class CameraPosition implements Parcelable {
    */
   @Override
   public String toString() {
-    return "Target: " + target + ", Zoom:" + zoom + ", Bearing:" + bearing + ", Tilt:" + tilt;
+    return "Target: " + target + ", Zoom:" + zoom + ", Bearing:" + bearing + ", Tilt:" + tilt
+      + ", Padding:" + Arrays.toString(padding);
   }
 
   /**
@@ -145,6 +180,8 @@ public final class CameraPosition implements Parcelable {
       return false;
     } else if (bearing != cameraPosition.bearing) {
       return false;
+    } else if (!Arrays.equals(padding, cameraPosition.padding)) {
+      return false;
     }
     return true;
   }
@@ -159,8 +196,16 @@ public final class CameraPosition implements Parcelable {
    */
   @Override
   public int hashCode() {
-    int result = 1;
+    int result;
+    long temp;
+    temp = Double.doubleToLongBits(bearing);
+    result = (int) (temp ^ (temp >>> 32));
     result = 31 * result + (target != null ? target.hashCode() : 0);
+    temp = Double.doubleToLongBits(tilt);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(zoom);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    result = 31 * result + Arrays.hashCode(padding);
     return result;
   }
 
@@ -174,6 +219,7 @@ public final class CameraPosition implements Parcelable {
     private LatLng target = null;
     private double tilt = -1;
     private double zoom = -1;
+    private double[] padding = null;
 
     /**
      * Create an empty builder.
@@ -194,6 +240,7 @@ public final class CameraPosition implements Parcelable {
         this.target = previous.target;
         this.tilt = previous.tilt;
         this.zoom = previous.zoom;
+        this.padding = previous.padding;
       }
     }
 
@@ -226,6 +273,7 @@ public final class CameraPosition implements Parcelable {
         target = update.getTarget();
         tilt = update.getTilt();
         zoom = update.getZoom();
+        padding = update.getPadding();
       }
     }
 
@@ -307,12 +355,43 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
+     * Padding in pixels that shifts the viewport by the specified amount.
+     * Applied padding is going to persist and impact following camera transformations.
+     * <p>
+     * Specified in left, top, right, bottom order.
+     * </p>
+     *
+     * @param padding Camera padding
+     * @return this
+     */
+    @NonNull
+    public Builder padding(@Size(4) double[] padding) {
+      this.padding = padding;
+      return this;
+    }
+
+    /**
+     * Padding in pixels that shifts the viewport by the specified amount.
+     * Applied padding is going to persist and impact following camera transformations.
+     * <p>
+     * Specified in left, top, right, bottom order.
+     * </p>
+     *
+     * @return this
+     */
+    @NonNull
+    public Builder padding(double left, double top, double right, double bottom) {
+      this.padding = new double[] {left, top, right, bottom};
+      return this;
+    }
+
+    /**
      * Builds the CameraPosition.
      *
      * @return CameraPosition
      */
     public CameraPosition build() {
-      return new CameraPosition(target, zoom, tilt, bearing);
+      return new CameraPosition(target, zoom, tilt, bearing, padding);
     }
   }
 }

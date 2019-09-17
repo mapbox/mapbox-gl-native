@@ -317,6 +317,30 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 };
 
 /**
+ The property allows control over a symbol's orientation. Note that the property
+ values act as a hint, so that a symbol whose language doesn’t support the
+ provided orientation will be laid out in its natural orientation. Example:
+ English point symbol will be rendered horizontally even if array value contains
+ single 'vertical' enum value. The order of elements in an array define priority
+ order for the placement of an orientation variant.
+
+ Values of this type are used in the `MGLSymbolStyleLayer.textWritingModes`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLTextWritingMode) {
+    /**
+     If a text's language supports horizontal writing mode, symbols with point
+     placement would be laid out horizontally.
+     */
+    MGLTextWritingModeHorizontal,
+    /**
+     If a text's language supports vertical writing mode, symbols with point
+     placement would be laid out vertically.
+     */
+    MGLTextWritingModeVertical,
+};
+
+/**
  Controls the frame of reference for `MGLSymbolStyleLayer.iconTranslation`.
 
  Values of this type are used in the `MGLSymbolStyleLayer.iconTranslationAnchor`
@@ -1380,8 +1404,7 @@ MGL_EXPORT
  ems downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textRadialOffset` is set to `nil`, and `textVariableAnchor` is set to `nil`.
- Otherwise, it is ignored.
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1404,8 +1427,7 @@ MGL_EXPORT
  ems upward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textRadialOffset` is set to `nil`, and `textVariableAnchor` is set to `nil`.
- Otherwise, it is ignored.
+ `textRadialOffset` is set to `nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
@@ -1497,8 +1519,8 @@ MGL_EXPORT
 
 /**
  Radial offset of text, in the direction of the symbol's anchor. Useful in
- combination with `textVariableAnchor`, which doesn't support the
- two-dimensional `textOffset`.
+ combination with `textVariableAnchor`, which defaults to using the
+ two-dimensional `textOffset` if present.
  
  This property is measured in ems.
  
@@ -1610,8 +1632,7 @@ MGL_EXPORT
  provide an array of `textAnchor` locations: the render will attempt to place
  the label at each location, in order, before moving onto the next label. Use
  `textJustify: auto` to choose justification based on anchor position. To apply
- an offset, use the `textRadialOffset` instead of the two-dimensional
- `textOffset`.
+ an offset, use the `textRadialOffset` or the two-dimensional `textOffset`.
  
  This property is only applied to the style if `text` is non-`nil`, and
  `symbolPlacement` is set to an expression that evaluates to or
@@ -1620,7 +1641,7 @@ MGL_EXPORT
  You can set this property to an expression containing any of the following:
  
  * Constant `MGLTextAnchor` array values
- * Constant array, whose each element is any of the following constant string
+ * Constant array, in which each element is any of the following constant string
  values:
    * `center`: The center of the text is placed closest to the anchor.
    * `left`: The left side of the text is placed closest to the anchor.
@@ -1645,6 +1666,45 @@ MGL_EXPORT
  attributes.
  */
 @property (nonatomic, null_resettable) NSExpression *textVariableAnchor;
+
+/**
+ The property allows control over a symbol's orientation. Note that the property
+ values act as a hint, so that a symbol whose language doesn’t support the
+ provided orientation will be laid out in its natural orientation. Example:
+ English point symbol will be rendered horizontally even if array value contains
+ single 'vertical' enum value. The order of elements in an array define priority
+ order for the placement of an orientation variant.
+ 
+ This property is only applied to the style if `text` is non-`nil`, and
+ `symbolPlacement` is set to an expression that evaluates to or
+ `MGLSymbolPlacementPoint`. Otherwise, it is ignored.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-writing-mode"><code>text-writing-mode</code></a>
+ layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `MGLTextWritingMode` array values
+ * Constant array, in which each element is any of the following constant string
+ values:
+   * `horizontal`: If a text's language supports horizontal writing mode,
+ symbols with point placement would be laid out horizontally.
+   * `vertical`: If a text's language supports vertical writing mode, symbols
+ with point placement would be laid out vertically.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *textWritingModes;
+
+
+@property (nonatomic, null_resettable) NSExpression *textWritingMode __attribute__((unavailable("Use textWritingModes instead.")));
 
 #pragma mark - Accessing the Paint Attributes
 
@@ -2381,6 +2441,19 @@ MGL_EXPORT
  The `MGLTextTransform` enumeration representation of the value.
  */
 @property (readonly) MGLTextTransform MGLTextTransformValue;
+
+/**
+ Creates a new value object containing the given `MGLTextWritingMode` enumeration.
+
+ @param textWritingModes The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLTextWritingMode:(MGLTextWritingMode)textWritingModes;
+
+/**
+ The `MGLTextWritingMode` enumeration representation of the value.
+ */
+@property (readonly) MGLTextWritingMode MGLTextWritingModeValue;
 
 /**
  Creates a new value object containing the given `MGLIconTranslationAnchor` enumeration.

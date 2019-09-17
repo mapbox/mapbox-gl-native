@@ -289,9 +289,16 @@ MGL_EXPORT
 /**
  A Boolean value indicating whether the map may display scale information.
 
- The scale bar may not be shown at all zoom levels. The view controlled by this
- property is available at `scaleBar`. The default value of this property is
- `NO`.
+ The scale bar may not be shown at all zoom levels. The scale bar becomes visible
+ when the maximum distance visible on the map view is less than 400 miles (800
+ kilometers). The zoom level where this occurs depends on the latitude at the map
+ view’s center coordinate, as well as the device screen width. At latitudes
+ farther from the equator, the scale bar becomes visible at lower zoom levels.
+
+ The unit of measurement is determined by the user's device locale.
+
+ The view controlled by this property is available at `scaleBar`. The default value
+ of this property is `NO`.
  */
 @property (nonatomic, assign) BOOL showsScale;
 
@@ -741,7 +748,8 @@ MGL_EXPORT
  Changes the center coordinate of the map and optionally animates the change.
 
  Changing the center coordinate centers the map on the new coordinate without
- changing the current zoom level.
+ changing the current zoom level. For animated changes, wait until the map view has 
+ finished loading before calling this method.
 
  @param coordinate The new center coordinate for the map.
  @param animated Specify `YES` if you want the map view to scroll to the new
@@ -755,7 +763,8 @@ MGL_EXPORT
 
 /**
  Changes the center coordinate and zoom level of the map and optionally animates
- the change.
+ the change. For animated changes, wait until the map view has 
+ finished loading before calling this method.
 
  @param centerCoordinate The new center coordinate for the map.
  @param zoomLevel The new zoom level for the map.
@@ -770,7 +779,8 @@ MGL_EXPORT
 
 /**
  Changes the center coordinate, zoom level, and direction of the map and
- optionally animates the change.
+ optionally animates the change. For animated changes, wait until the map view has 
+ finished loading before calling this method.
 
  @param centerCoordinate The new center coordinate for the map.
  @param zoomLevel The new zoom level for the map.
@@ -787,7 +797,8 @@ MGL_EXPORT
 
 /**
  Changes the center coordinate, zoom level, and direction of the map, calling a
- completion handler at the end of an optional animation.
+ completion handler at the end of an optional animation. For animated changes, 
+ wait until the map view has finished loading before calling this method.
 
  @param centerCoordinate The new center coordinate for the map.
  @param zoomLevel The new zoom level for the map.
@@ -1058,7 +1069,8 @@ MGL_EXPORT
 
 /**
  Moves the viewpoint to a different location with respect to the map with an
- optional transition animation.
+ optional transition animation. For animated changes, wait until the map view has 
+ finished loading before calling this method.
 
  @param camera The new viewpoint.
  @param animated Specify `YES` if you want the map view to animate the change to
@@ -1074,7 +1086,8 @@ MGL_EXPORT
 
 /**
  Moves the viewpoint to a different location with respect to the map with an
- optional transition duration and timing function.
+ optional transition duration and timing function. For animated changes, wait 
+ until the map view has finished loading before calling this method.
 
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
@@ -1093,7 +1106,8 @@ MGL_EXPORT
 
 /**
  Moves the viewpoint to a different location with respect to the map with an
- optional transition duration and timing function.
+ optional transition duration and timing function. For animated changes, wait 
+ until the map view has finished loading before calling this method.
 
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
@@ -1109,7 +1123,8 @@ MGL_EXPORT
 /**
  Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function, and optionally some additional
- padding on each side.
+ padding on each side. For animated changes, wait until the map view has 
+ finished loading before calling this method.
 
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
@@ -1299,8 +1314,8 @@ MGL_EXPORT
  property may be overridden at any time.
 
  Changing the value of this property updates the map view immediately. If you
- want to animate the change, use the `-setContentInset:animated:` method
- instead.
+ want to animate the change, use the `-setContentInset:animated:completionHandler:`
+ method instead.
  */
 @property (nonatomic, assign) UIEdgeInsets contentInset;
 

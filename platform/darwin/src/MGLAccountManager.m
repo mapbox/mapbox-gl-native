@@ -13,6 +13,8 @@ static NSString * const MGLAccountManagerExternalClassName = @"MBXAccounts";
 static NSString * const MGLAccountManagerExternalMethodName = @"skuToken";
 #endif
 
+NSString * const MGLMapboxAccountTypeKey = @"MGLMapboxAccountType";
+
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;

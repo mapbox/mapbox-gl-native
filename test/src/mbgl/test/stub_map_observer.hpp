@@ -32,9 +32,9 @@ public:
         }
     }
 
-    void onDidFinishRenderingFrame(RenderMode mode) final {
+    void onDidFinishRenderingFrame(RenderFrameStatus status) final {
         if (didFinishRenderingFrameCallback) {
-            didFinishRenderingFrameCallback(mode);
+            didFinishRenderingFrameCallback(status);
         }
     }
 
@@ -42,7 +42,7 @@ public:
     std::function<void()> didFinishLoadingMapCallback;
     std::function<void()> didFailLoadingMapCallback;
     std::function<void()> didFinishLoadingStyleCallback;
-    std::function<void(RenderMode)> didFinishRenderingFrameCallback;
+    std::function<void(RenderFrameStatus)> didFinishRenderingFrameCallback;
 };
 
 

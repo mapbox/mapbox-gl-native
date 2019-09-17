@@ -1,5 +1,9 @@
-add_library(geojson-vt-cpp INTERFACE)
+if(TARGET mbgl-vendor-geojson-vt-cpp)
+    return()
+endif()
 
-target_include_directories(geojson-vt-cpp SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/geojson-vt-cpp/include
+add_library(mbgl-vendor-geojson-vt-cpp INTERFACE)
+
+target_include_directories(mbgl-vendor-geojson-vt-cpp SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/geojson-vt-cpp/include
 )

@@ -22,21 +22,22 @@ public:
 
     explicit CollisionIndex(const TransformState&);
 
-    std::pair<bool,bool> placeFeature(CollisionFeature& feature,
+    std::pair<bool,bool> placeFeature(const CollisionFeature& feature,
                                       Point<float> shift,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
-                                      PlacedSymbol& symbol,
+                                      const PlacedSymbol& symbol,
                                       const float scale,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
                                       const bool collisionDebug,
                                       const optional<CollisionTileBoundaries>& avoidEdges,
-                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate);
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate,
+                                      std::vector<ProjectedCollisionBox>& /*out*/);
 
-    void insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId);
+    void insertFeature(const CollisionFeature& feature, const std::vector<ProjectedCollisionBox>&, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId);
 
     std::unordered_map<uint32_t, std::vector<IndexedSubfeature>> queryRenderedSymbols(const ScreenLineString&) const;
     
@@ -45,22 +46,23 @@ public:
     const TransformState& getTransformState() const { return transformState; }
 
 private:
-    bool isOffscreen(const CollisionBox&) const;
-    bool isInsideGrid(const CollisionBox&) const;
-    bool isInsideTile(const CollisionBox&, const CollisionTileBoundaries& tileBoundaries) const;
+    bool isOffscreen(float x1, float y1, float x2, float y2) const;
+    bool isInsideGrid(float x1, float y1, float x2, float y2) const;
+    bool isInsideTile(float x1, float y1, float x2, float y2, const CollisionTileBoundaries& tileBoundaries) const;
 
-    std::pair<bool,bool> placeLineFeature(CollisionFeature& feature,
+    std::pair<bool,bool> placeLineFeature(const CollisionFeature& feature,
                                   const mat4& posMatrix,
                                   const mat4& labelPlaneMatrix,
                                   const float textPixelRatio,
-                                  PlacedSymbol& symbol,
+                                  const PlacedSymbol& symbol,
                                   const float scale,
                                   const float fontSize,
                                   const bool allowOverlap,
                                   const bool pitchWithMap,
                                   const bool collisionDebug,
                                   const optional<CollisionTileBoundaries>& avoidEdges,
-                                  const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate);
+                                  const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate,
+                                  std::vector<ProjectedCollisionBox>& /*out*/);
     
     float approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap);
     

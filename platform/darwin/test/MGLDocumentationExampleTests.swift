@@ -1,10 +1,5 @@
 import XCTest
 import Mapbox
-#if os(iOS)
-    import UIKit
-#else
-    import Cocoa
-#endif
 
 /**
  Test cases that ensure the inline examples in the project documentation

@@ -12,6 +12,7 @@ namespace mbgl {
 
 class SymbolBucket;
 class SymbolInstance;
+enum class PlacedSymbolOrientation : bool;
 
 class OpacityState {
 public:
@@ -33,7 +34,7 @@ public:
 
 class VariableOffset {
 public:
-    float radialOffset;
+    std::array<float, 2> offset;
     float width;
     float height;
     style::TextVariableAnchorType anchor;
@@ -101,28 +102,31 @@ class Placement {
 public:
     Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, std::unique_ptr<Placement> prevPlacementOrNull = nullptr);
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
-    void commit(TimePoint);
+    void commit(TimePoint, const double zoom);
     void updateLayerBuckets(const RenderLayer&, const TransformState&,  bool updateOpacities);
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
 
     const CollisionIndex& getCollisionIndex() const;
 
-    bool stillRecent(TimePoint now) const;
-    void setRecent(TimePoint now);
+    bool stillRecent(TimePoint now, const float zoom) const;
+    void setMaximumUpdatePeriod(Duration);
     void setStale();
     
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
 private:
     friend SymbolBucket;
     void placeBucket(
-            SymbolBucket&,
+            const SymbolBucket&,
             const BucketPlacementParameters&,
             std::set<uint32_t>& seenCrossTileIDs);
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
-    bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile);
+    bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&);
-    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, SymbolInstance&);
+    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, const SymbolInstance&, style::TextWritingModeType orientation);
+    void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&);
+    float zoomAdjustment(const float zoom) const;
+    Duration getUpdatePeriod(const float zoom) const;
 
     CollisionIndex collisionIndex;
 
@@ -131,16 +135,23 @@ private:
 
     TimePoint fadeStartTime;
     TimePoint commitTime;
+    float placementZoom;
+    float prevZoomAdjustment = 0;
 
     std::unordered_map<uint32_t, JointPlacement> placements;
     std::unordered_map<uint32_t, JointOpacityState> opacities;
     std::unordered_map<uint32_t, VariableOffset> variableOffsets;
+    std::unordered_map<uint32_t, style::TextWritingModeType> placedOrientations;
 
     bool stale = false;
     
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
     CollisionGroups collisionGroups;
     std::unique_ptr<Placement> prevPlacement;
+    optional<Duration> maximumUpdatePeriod;
+
+    // Used for debug purposes.
+    std::unordered_map<const CollisionFeature*, std::vector<ProjectedCollisionBox>> collisionCircles;
 };
 
 } // namespace mbgl

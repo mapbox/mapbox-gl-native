@@ -115,17 +115,20 @@ TEST(Buckets, SymbolBucket) {
     gfx::BackendScope scope { backend };
 
     auto layout = makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
-    bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
     std::vector<SymbolInstance> symbolInstances;
 
     gl::Context context{ backend };
-    SymbolBucket bucket { std::move(layout), {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), 1.0f };
+    SymbolBucket bucket { std::move(layout), {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), 1.0f, false, {}};
     ASSERT_FALSE(bucket.hasIconData());
+    ASSERT_FALSE(bucket.hasSdfIconData());
     ASSERT_FALSE(bucket.hasTextData());
-    ASSERT_FALSE(bucket.hasCollisionBoxData());
+    ASSERT_FALSE(bucket.hasIconCollisionBoxData());
+    ASSERT_FALSE(bucket.hasTextCollisionBoxData());
+    ASSERT_FALSE(bucket.hasIconCollisionCircleData());
+    ASSERT_FALSE(bucket.hasTextCollisionCircleData());
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 

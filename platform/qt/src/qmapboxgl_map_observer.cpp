@@ -77,9 +77,9 @@ void QMapboxGLMapObserver::onWillStartRenderingFrame()
     emit mapChanged(QMapboxGL::MapChangeWillStartRenderingFrame);
 }
 
-void QMapboxGLMapObserver::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode)
+void QMapboxGLMapObserver::onDidFinishRenderingFrame(mbgl::MapObserver::RenderFrameStatus status)
 {
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
+    if (status.mode == mbgl::MapObserver::RenderMode::Partial) {
         emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrame);
     } else {
         emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered);

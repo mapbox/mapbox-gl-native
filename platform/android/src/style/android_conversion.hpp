@@ -47,9 +47,18 @@ public:
     }
 
     template <class Fn>
-    static optional<Error> eachMember(const mbgl::android::Value&, Fn&&) {
-        // TODO
-        mbgl::Log::Warning(mbgl::Event::Android, "eachMember not implemented");
+    static optional<Error> eachMember(const mbgl::android::Value& value, Fn&& fn) {
+        assert(value.isObject());
+        mbgl::android::Value keys = value.keyArray();
+        std::size_t length = arrayLength(keys);
+        for(std::size_t i = 0; i < length; ++i){
+            const auto k = keys.get(i).toString();
+            auto v = value.get(k.c_str());
+            optional<Error> result = fn(k, std::move(v));
+            if (result) {
+                return result;
+            }
+        }
         return {};
     }
 
@@ -94,8 +103,7 @@ public:
         } else if (value.isString()) {
             return { value.toString() };
         } else if (value.isNumber()) {
-            auto doubleVal = value.toDouble();
-            return { doubleVal - (int) doubleVal > 0.0 ? doubleVal : value.toLong() };
+            return { value.toDouble() };
         } else {
             return {};
         }

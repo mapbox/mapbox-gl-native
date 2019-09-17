@@ -26,6 +26,7 @@
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) MGLMapView *mapView;
+@property (nonatomic) UIWindow *window;
 @property (nonatomic) MGLStyle *style;
 @property (nonatomic) XCTestExpectation *styleLoadingExpectation;
 @property (nonatomic) XCTestExpectation *renderFinishedExpectation;
@@ -38,7 +39,7 @@
 @property (nonatomic) id<MGLCalloutView> (^mapViewCalloutViewForAnnotation)(MGLMapView *mapView, id<MGLAnnotation> annotation);
 
 // Utility methods
-- (NSString*)validAccessToken;
 - (void)waitForMapViewToFinishLoadingStyleWithTimeout:(NSTimeInterval)timeout;
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout;
+- (MGLMapView *)mapViewForTestWithFrame:(CGRect)rect styleURL:(NSURL *)styleURL;
 @end

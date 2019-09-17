@@ -2,13 +2,143 @@ version: 2.1
 
 workflows:
   version: 2
-  default:
+  mbgl-next:
     jobs:
+      - next-sanity-checks
+      - next-build-template:
+          name: next-android-armeabi-v7a-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
+      - next-build-template:
+          name: next-android-arm64-v8a-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-android-armeabi-v7a-release
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
+      - next-build-template:
+          name: next-android-x86-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-android-armeabi-v7a-release
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
+      - next-build-template:
+          name: next-android-x86_64-release
+          executor_name: ubuntu-disco
+          target_is_android: true
+          requires:
+            - next-android-armeabi-v7a-release
+          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
+      - next-build-template:
+          name: next-linux-gcc8-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
+      - next-build-template:
+          name: next-linux-gcc4.9-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-4.9 -DCMAKE_CXX_COMPILER=g++-4.9'
+          build_params: '--target mbgl-glfw'
+          test_params: '-N -Q'
+      - next-build-template:
+          name: next-linux-gcc8-debug-coverage
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=DebugCoverage'
+      - next-build-template:
+          name: next-linux-clang8-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+      - next-build-template:
+          name: next-linux-asan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=address'
+      - next-build-template:
+          name: next-linux-tsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=thread'
+      - next-build-template:
+          name: next-linux-memsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=memory'
+      - next-build-template:
+          name: next-linux-ubsan
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-linux-gcc8-debug-coverage
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=undefined'
+      - next-build-template:
+          name: next-qt5-linux-gcc5-release
+          executor_name: ubuntu-disco
+          target_is_linux: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
+      - next-build-template:
+          name: next-qt5-macos-gcc5-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-qt5-linux-gcc5-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMBGL_WITH_QT=ON -DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/lib/cmake)'
+          test_params: '-N -Q'
+      - next-build-template:
+          name: next-macos-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+      - next-build-template:
+          name: next-macos-xcode11-debug
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-macos-xcode11-release
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=Debug'
+      - next-build-template:
+          name: next-ios-xcode11-release
+          executor_name: macos-11_0_0
+          target_is_macos: true
+          requires:
+            - next-sanity-checks
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator'
+          test_params: '-Q -N'
+  mbgl-legacy:
+    jobs:
+      #
+      # Naming convention: {platform}-{additional description}-{build type}
+      #   - {platform} is the client platform/framework, which may differ from 
+      #     the build platform. Specify both if applicable, e.g., "qt5-macos".
+      #   - {additional description} optionally describes the compiler or other
+      #     unique aspect of the build environment.
+      #   - {build type} is typically "debug" or "release".
+      #
       - nitpick
-      - clang-tidy:
-          filters:
-            branches:
-              ignore: master
       - android-debug-arm-v7-buck
       - android-arm-template:
           name: android-debug-arm-v8
@@ -39,12 +169,11 @@ workflows:
           name: linux-clang-3.8-libcxx-debug
       - linux-clang-7-sanitize-address-undefined
       - linux-clang-7-sanitize-thread
-      - linux-gcc49-debug:
-          name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
       - linux-doxygen
       - linux-render-tests
       - ios-debug
+      - ios-debug-xcode11
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -55,8 +184,6 @@ workflows:
               ignore: /.*/
       - macos-debug
       - macos-render-tests
-      - qt5-linux-gcc5-release
-      - qt5-macos-debug
   nightly:
     triggers:
       - schedule:
@@ -72,8 +199,104 @@ workflows:
       - ios-sanitize-nightly
       - ios-sanitize-address-nightly
       - ios-static-analyzer-nightly
+      - ios-static-analyzer-nightly-xcode11
+
+executors:
+  ubuntu-disco:
+    docker:
+      # FIXME: Move the image to mbgl/
+      - image: tmpsantos/mbgl_ci:1.5
+    resource_class: xlarge
+    working_directory: /src
+    environment:
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      MSAN_OPTIONS: poison_in_dtor=1
+      ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
+      QT_INSTALL_DOCS: /usr/share/qt5/doc
+      QT_VERSION: 5
+  macos-11_0_0:
+    macos:
+      xcode: '11.0.0'
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
 
 commands:
+  next-prepare:
+    steps:
+      - restore_cache:
+          keys:
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-master'
+            - 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-'
+      - run:
+          name: Prepare
+          command: |
+            git submodule sync
+            git submodule update --init --recursive
+            npm install --ignore-scripts
+            ulimit -c unlimited
+  next-prepare-macos:
+    steps:
+      - run:
+          name: Prepare macOS
+          command: |
+            brew install cmake ccache glfw ninja pkgconfig qt
+  next-config:
+    parameters:
+      config_params:
+        type: string
+    steps:
+      - run:
+          name: Configure
+          command: |
+            cmake next -B build << parameters.config_params >>
+  next-build:
+    parameters:
+      build_params:
+        type: string
+    steps:
+      - run:
+          name: Build
+          command: |
+            ccache --zero-stats --max-size=2G
+            cmake --build build -j 8 << parameters.build_params >>
+            ccache --show-stats
+            git gc
+  next-save:
+    steps:
+      - save_cache:
+          key: 'ccache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}'
+          paths:
+            - .git/modules
+            - /Users/distiller/Library/Caches/Homebrew
+            - node_modules
+            - ~/.ccache
+            - ~/.gradle
+      - run:
+          name: Collecting artifacts
+          when: on_fail
+          command: |
+            mkdir -p /tmp/tests/coredumps
+            if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
+            mkdir -p /tmp/tests/render
+            if [ -f mapbox-gl-js/test/integration/render-tests/index.html ]; then cp mapbox-gl-js/test/integration/render-tests/index.html /tmp/tests/render; fi
+      - store_artifacts:
+          path: /tmp/tests
+          destination: tests
+  next-test:
+    parameters:
+      test_wrapper:
+        type: string
+      test_params:
+        type: string
+    steps:
+      - run:
+          name: Test
+          command: |
+            cd build
+            << parameters.test_wrapper >> ctest -j 8 --output-on-failure << parameters.test_params >>
   npm-install:
     steps:
     - run:
@@ -250,7 +473,7 @@ commands:
         command: |
           mkdir -p build
           cd build
-          cmake -DWITH_CXX11ABI=${WITH_CXX11ABI:0} -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
+          cmake -DWITH_COVERAGE=${WITH_COVERAGE:0} -DWITH_OSMESA=${WITH_OSMESA:0} -DWITH_EGL=${WITH_EGL:0} ..
           cd ..
   build-node:
     steps:
@@ -262,6 +485,11 @@ commands:
     - run:
         name: Build mbgl-render-test
         command: cmake --build build --config ${BUILDTYPE} --target mbgl-render-test -- -j${JOBS}
+  build-mbgl-expression-test:
+    steps:
+    - run:
+        name: Build mbgl-expression-test
+        command: cmake --build build --config ${BUILDTYPE} --target mbgl-expression-test -- -j${JOBS}
   build-linux:
     steps:
     - run:
@@ -277,16 +505,6 @@ commands:
     - run:
         name: Build test
         command: make test
-  build-qt-app:
-    steps:
-    - run:
-        name: Build qt-app
-        command: make qt-app
-  build-qt-test:
-    steps:
-    - run:
-        name: Build qt-test
-        command: make qt-test
   build-ios-test:
     steps:
     - run:
@@ -356,18 +574,6 @@ commands:
           brew install node@8
           brew link node@8 --force --overwrite
 
-  install-qt-macos-dependencies:
-    steps:
-    - run:
-        name: Install Qt macOS dependencies
-        command: |
-          brew install qt
-          brew link qt --force
-          export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
-          export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
-          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
-          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
-
   run-node-macos-tests:
     steps:
     - run:
@@ -425,6 +631,19 @@ commands:
           # Unfortunately, Google Test eats the status code, so we'll have to check the output.
           [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
 
+  run-expression-tests:
+    steps:
+    - run:
+        name: Run expression tests
+        command: |
+          build/mbgl-expression-test -s --seed=$RANDOM
+
+  upload-expression-tests:
+    steps:
+    - store_artifacts:
+        path: mapbox-gl-js/test/integration/expression-tests/index.html
+        destination: expression-tests
+
   publish-node-package:
     steps:
     - run:
@@ -465,7 +684,115 @@ commands:
             scripts/notify-slack.sh
           fi
 
+  #
+  # Add this step to all regular jobs to enable skipping of certain non-code-related changes.
+  #
+  # Do not include this step in nightly or release deployment jobs.
+  #
+  # To make a job potentially skippable on changes unrelated to its platform, it must:
+  #   - Target one of the skippable platforms: Android, iOS, or macOS.
+  #   - Have a job name that begins with a supported platform name.
+  #   - Not be related to core functionality or rendering tests. Job names that
+  #     contain "render-tests" cannot be skipped by platform changes.
+  #
+  # See the script in the following step for how to implement support for other platforms.
+  #
+  check-if-this-job-can-be-skipped:
+    steps:
+    - run:
+        name: Check if this job can be skipped
+        command: |
+          if [[ $CIRCLE_BRANCH != master ]] && [[ $CIRCLE_BRANCH != release-* ]] && [[ -z $CIRCLE_TAG ]]; then
+            scripts/check-ci-job-skippability.js
+          fi
+
 jobs:
+  next-sanity-checks:
+    executor: ubuntu-disco
+    steps:
+      - checkout
+      - next-prepare
+      - next-config:
+          config_params: '-DMBGL_WITH_CORE_ONLY=ON'
+      - run:
+          name: CMake Format
+          command: |
+            cmake-format -i $(find next -type f -name CMakeLists.txt -o -name '*.cmake')
+            git diff --exit-code
+      - run:
+          name: Clang Format
+          command: |
+            git diff -U0 --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
+            git diff --exit-code
+      - run:
+          name: Clang Tidy
+          command: |
+            git diff -U0 --no-color origin/master... src include | clang-tidy-diff-8.py -clang-tidy-binary clang-tidy-8 -p1 -path build
+      - run:
+          name: Code Generators
+          command: |
+            platform/android/scripts/generate-style-code.js
+            scripts/generate-file-lists.js
+            scripts/generate-shaders.js
+            scripts/generate-style-code.js
+            git add -A && git diff --staged --exit-code
+      - next-save
+  next-build-template:
+    parameters:
+      config_params:
+        type: string
+        default: ''
+      build_params:
+        type: string
+        default: ''
+      test_params:
+        type: string
+        default: ''
+      executor_name:
+        type: string
+      target_is_android:
+        type: boolean
+        default: false
+      target_is_linux:
+        type: boolean
+        default: false
+      target_is_macos:
+        type: boolean
+        default: false
+    executor: << parameters.executor_name >>
+    steps:
+      - checkout
+      - next-prepare
+      - when:
+          condition: << parameters.target_is_android >>
+          steps:
+            - next-config:
+                config_params: << parameters.config_params >>
+            - next-build:
+                build_params: << parameters.build_params >>
+      - when:
+          condition: << parameters.target_is_linux >>
+          steps:
+            - next-config:
+                config_params: << parameters.config_params >>
+            - next-build:
+                build_params: << parameters.build_params >>
+            - next-test:
+                test_wrapper: 'xvfb-run -s -noreset'
+                test_params: << parameters.test_params >>
+      - when:
+          condition: << parameters.target_is_macos >>
+          steps:
+            - next-prepare-macos
+            - next-config:
+                config_params: << parameters.config_params >>
+            - next-build:
+                build_params: << parameters.build_params >>
+            - next-test:
+                test_wrapper: ''
+                test_params: << parameters.test_params >>
+      - next-save
+
   nitpick:
     docker:
       - image: mbgl/linux-clang-7:a5a3c52107
@@ -503,29 +830,6 @@ jobs:
           when: always
 
 # ------------------------------------------------------------------------------
-  clang-tidy:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-    steps:
-      - install-dependencies: { ccache: false }
-      - run:
-          name: Fetch 'origin/master' branch
-          command: git fetch origin master:refs/remotes/origin/master
-      - run:
-          name: Generate compilation database
-          command: make compdb
-      - run:
-          name: Run Clang checks
-          command: make check TARGET_BRANCH=${CIRCLE_TARGET_BRANCH:master}
-          no_output_timeout: 20m
-      - save-dependencies: { ccache: false }
-
-# ------------------------------------------------------------------------------
   android-arm-template:
     parameters:
       stl:
@@ -555,6 +859,7 @@ jobs:
       MBGL_ANDROID_STL: << parameters.stl >>
     steps:
       - install-dependencies: { gradle: true }
+      - check-if-this-job-can-be-skipped
       - run:
           name: Initialize vendor submodules
           command: git submodule update --init platform/android/vendor
@@ -631,6 +936,7 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - install-dependencies: { gradle: true }
+      - check-if-this-job-can-be-skipped
       - run:
           name: Initialize vendor submodules
           command: git submodule update --init platform/android/vendor
@@ -729,6 +1035,9 @@ jobs:
       ANDROID_NDK: /android/sdk/ndk-bundle
     steps:
       - checkout
+      - npm-install
+      - prepare-environment
+      - check-if-this-job-can-be-skipped
       - run:
           name: Checkout submodules
           command: |
@@ -751,7 +1060,6 @@ jobs:
       JOBS: 4
       BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
-      WITH_CXX11ABI: 0
     steps:
       - install-dependencies
       - build-node
@@ -772,6 +1080,7 @@ jobs:
       WITH_EGL: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-node
       - save-dependencies
       - publish-node-package
@@ -788,6 +1097,7 @@ jobs:
       - install-macos-dependencies
       - install-node-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-node
       - save-dependencies
       - run-node-macos-tests
@@ -806,9 +1116,9 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      WITH_CXX11ABI: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - save-dependencies
 
@@ -830,6 +1140,7 @@ jobs:
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
@@ -852,34 +1163,11 @@ jobs:
       TSAN_OPTIONS: color=always:print_summary=1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
       - run-unit-tests-sanitized
-
-# ------------------------------------------------------------------------------
-  linux-gcc49-debug:
-    docker:
-      - image: mbgl/linux-gcc-4.9:e3818a77c1
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-      WITH_CXX11ABI: 0
-      DISPLAY: :0
-    steps:
-      - install-dependencies
-      - build-linux
-      - build-benchmark
-      - build-test
-      - save-dependencies
-      - run-unit-tests
-      - run:
-          name: Build offline CLI
-          command: make offline
 
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
@@ -895,6 +1183,7 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-linux
       - build-benchmark
       - build-test
@@ -925,6 +1214,7 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - run:
           name: Install doxygen
           command: apt update && apt install -y doxygen
@@ -949,10 +1239,14 @@ jobs:
       WITH_EGL: 1
     steps:
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - configure-cmake
+      - build-mbgl-expression-test
       - build-mbgl-render-test
+      - run-expression-tests
       - run-linux-render-tests
       - save-dependencies
+      - upload-expression-tests
       - upload-render-tests
 
 # ------------------------------------------------------------------------------
@@ -966,14 +1260,15 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
-      - build-ios-test
       - check-public-symbols
-      - run:
-          name: Check symbol namespacing for mapbox-events-ios
-          command: make ios-check-events-symbols
       - run:
           name: Lint podspecs and plist files
           command: make ios-lint
+      - check-if-this-job-can-be-skipped
+      - build-ios-test
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
@@ -982,19 +1277,31 @@ jobs:
       - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  metrics-nightly:
-    docker:
-      - image: mbgl/linux-gcc-5:54f59e3ac5
-    working_directory: /src
+  ios-debug-xcode11:
+    macos:
+      xcode: "11.0.0"
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
+      - install-macos-dependencies
       - install-dependencies
+      - check-public-symbols
       - run:
-          name: Collect GitHub statistics
-          command: |
-              scripts/publish_github_stats.js
+          name: Lint podspecs and plist files
+          command: make ios-lint
+      - check-if-this-job-can-be-skipped
+      - build-ios-test
+      - run:
+          name: Check symbol namespacing for mapbox-events-ios
+          command: make ios-check-events-symbols
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
@@ -1061,6 +1368,26 @@ jobs:
       - notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
+  ios-static-analyzer-nightly-xcode11:
+    macos:
+      xcode: "11.0.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      SLACK_CHANNEL: C0ACM9Q2C
+    steps:
+      - install-macos-dependencies
+      - install-dependencies
+      - run:
+          name: Build and run SDK unit tests with the static analyzer
+          command: make ios-static-analyzer
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+      - notify-slack-nightly-failure
+
+# ------------------------------------------------------------------------------
   ios-release-template:
     macos:
       xcode: "10.3.0"
@@ -1072,6 +1399,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - install-ios-packaging-dependencies
       - run:
           name: Build dynamic framework for device and simulator
@@ -1171,6 +1499,7 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - build-macos-test
       - check-public-symbols
       - run:
@@ -1198,57 +1527,27 @@ jobs:
     steps:
       - install-macos-dependencies
       - install-dependencies
+      - check-if-this-job-can-be-skipped
       - configure-cmake
+      - build-mbgl-expression-test
       - build-mbgl-render-test
       - save-dependencies
+      - run-expression-tests
       - run-macos-render-tests
+      - upload-expression-tests
       - upload-render-tests
 
 # ------------------------------------------------------------------------------
-  qt5-linux-gcc5-release:
+  metrics-nightly:
     docker:
-      - image: mbgl/linux-gcc-5-qt-5.9:5132cfd29f
-    resource_class: large
+      - image: mbgl/linux-gcc-5:54f59e3ac5
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      WITH_QT_I18N: 1
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
     steps:
       - install-dependencies
-      - build-qt-app
-      - build-qt-test
       - run:
-          name: Build qt-docs
-          command: make qt-docs
-      - save-dependencies
-      - run:
-          name: Run valgrind-backed tests
-          environment:
-            JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
+          name: Collect GitHub statistics
           command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector --gtest_filter=-BiDi.*
-
-# ------------------------------------------------------------------------------
-  qt5-macos-debug:
-    macos:
-      xcode: "9.3.1"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - install-macos-dependencies
-      - install-qt-macos-dependencies
-      - install-dependencies
-      - build-qt-app
-      - build-qt-test
-      - run:
-          name: Run qt-test
-          command: make run-qt-test
-      - save-dependencies
-      - store_artifacts:
-          path: test/fixtures
-          destination: test/fixtures
+              scripts/publish_github_stats.js

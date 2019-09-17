@@ -84,9 +84,18 @@
 
     // the attribution is reflected by the mbgl tileset
 #if TARGET_OS_IPHONE
-    NSString *html = (@"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00pt\">"
-                      @"<a href=\"https://www.mapbox.com/\">Mapbox</a> </font>"
-                      @"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00pt; background-color: #ff0000\">GL</font>\n");
+    NSString *html;
+    if (@available(iOS 13.0, *)) {
+        // TODO: investigate visual impact
+        // iOS 13 evidently changes font size from points to pixels
+        html = (@"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00px\">"
+                @"<a href=\"https://www.mapbox.com/\">Mapbox</a> </font>"
+                @"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00px; background-color: #ff0000\">GL</font>\n");
+    } else {
+        html = (@"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00pt\">"
+                @"<a href=\"https://www.mapbox.com/\">Mapbox</a> </font>"
+                @"<font style=\"font-family: 'Helvetica'; font-weight: normal; font-style: normal; font-size: 12.00pt; background-color: #ff0000\">GL</font>\n");
+    }
 #else
     NSString *html = (@"<font face=\"Helvetica\" size=\"3\" style=\"font: 12.0px Helvetica\">"
                       @"<a href=\"https://www.mapbox.com/\">Mapbox</a> </font>"
@@ -111,7 +120,7 @@
     // the scheme is reflected by the mbgl tileset
     XCTAssertEqual(tileSet.scheme, mbgl::Tileset::Scheme::TMS);
 
-    // when the dem enciding is changed using an NSNumber
+    // when the dem encoding is changed using an NSNumber
     tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
         MGLTileSourceOptionDEMEncoding: @(MGLDEMEncodingTerrarium),
     });
@@ -119,7 +128,7 @@
     // the encoding is reflected by the mbgl tileset
     XCTAssertEqual(tileSet.encoding, mbgl::Tileset::DEMEncoding::Terrarium);
 
-    // when the dem enciding is changed using an NSValue
+    // when the dem encoding is changed using an NSValue
     MGLDEMEncoding terrarium = MGLDEMEncodingTerrarium;
     tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
         MGLTileSourceOptionDEMEncoding: [NSValue value:&terrarium withObjCType:@encode(MGLDEMEncoding)],

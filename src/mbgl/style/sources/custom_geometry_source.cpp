@@ -1,6 +1,7 @@
 #include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/style/custom_tile_loader.hpp>
 #include <mbgl/style/sources/custom_geometry_source_impl.hpp>
+#include <mbgl/style/source_observer.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/tile/tile_id.hpp>
@@ -25,6 +26,7 @@ const CustomGeometrySource::Impl& CustomGeometrySource::impl() const {
 void CustomGeometrySource::loadDescription(FileSource&) {
     baseImpl = makeMutable<CustomGeometrySource::Impl>(impl(), loader->self());
     loaded = true;
+    observer->onSourceLoaded(*this);
 }
 
 void CustomGeometrySource::setTileData(const CanonicalTileID& tileID,

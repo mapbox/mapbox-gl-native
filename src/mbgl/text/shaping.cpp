@@ -68,16 +68,49 @@ style::TextJustifyType getAnchorJustification(style::SymbolAnchorType anchor) {
     }
 }
 
-PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image, const std::array<float, 2>& iconOffset, style::SymbolAnchorType iconAnchor, const float iconRotation) {
+PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image,
+                                         const std::array<float, 2>& iconOffset,
+                                         style::SymbolAnchorType iconAnchor,
+                                         const float iconRotation) {
     AnchorAlignment anchorAlign = AnchorAlignment::getAnchorAlignment(iconAnchor);
     float dx = iconOffset[0];
     float dy = iconOffset[1];
-    float x1 = dx - image.displaySize()[0] * anchorAlign.horizontalAlign;
-    float x2 = x1 + image.displaySize()[0];
-    float y1 = dy - image.displaySize()[1] * anchorAlign.verticalAlign;
-    float y2 = y1 + image.displaySize()[1];
+    float left = dx - image.displaySize()[0] * anchorAlign.horizontalAlign;
+    float right = left + image.displaySize()[0];
+    float top = dy - image.displaySize()[1] * anchorAlign.verticalAlign;
+    float bottom = top + image.displaySize()[1];
 
-    return PositionedIcon { image, y1, y2, x1, x2, iconRotation };
+    return PositionedIcon { image, top, bottom, left, right, iconRotation };
+}
+
+void PositionedIcon::fitIconToText(const style::SymbolLayoutProperties::Evaluated& layout,
+                                   const Shaping& shapedText,
+                                   float layoutTextSize) {
+   using namespace style;
+   assert(layout.get<IconTextFit>() != IconTextFitType::None);
+   if (shapedText) {
+        auto iconWidth = _right - _left;
+        auto iconHeight = _bottom - _top;
+        auto size = layoutTextSize / 24.0f;
+        auto textLeft = shapedText.left * size;
+        auto textRight = shapedText.right * size;
+        auto textTop = shapedText.top * size;
+        auto textBottom = shapedText.bottom * size;
+        auto textWidth = textRight - textLeft;
+        auto textHeight = textBottom - textTop;
+        auto padT = layout.get<IconTextFitPadding>()[0];
+        auto padR = layout.get<IconTextFitPadding>()[1];
+        auto padB = layout.get<IconTextFitPadding>()[2];
+        auto padL = layout.get<IconTextFitPadding>()[3];
+        auto offsetY = layout.get<IconTextFit>() == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
+        auto offsetX = layout.get<IconTextFit>() == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
+        auto width = layout.get<IconTextFit>() == IconTextFitType::Width || layout.get<IconTextFit>() == IconTextFitType::Both ? textWidth : iconWidth;
+        auto height = layout.get<IconTextFit>() == IconTextFitType::Height || layout.get<IconTextFit>() == IconTextFitType::Both ? textHeight : iconHeight;
+        _left = textLeft + offsetX - padL;
+        _top = textTop + offsetY - padT;
+        _right = textLeft + offsetX + padR + width;
+        _bottom = textTop + offsetY + padB + height;
+    }
 }
 
 void align(Shaping& shaping,
@@ -238,9 +271,8 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
 std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
                                           const float spacing,
                                           float maxWidth,
-                                          const WritingModeType writingMode,
                                           const GlyphMap& glyphMap) {
-    if (!maxWidth || writingMode != WritingModeType::Horizontal) {
+    if (!maxWidth) {
         return {};
     }
     
@@ -291,13 +323,10 @@ void shapeLines(Shaping& shaping,
                 const style::SymbolAnchorType textAnchor,
                 const style::TextJustifyType textJustify,
                 const WritingModeType writingMode,
-                const GlyphMap& glyphMap) {
-    
-    // the y offset *should* be part of the font metadata
-    const int32_t yOffset = -17;
-    
+                const GlyphMap& glyphMap,
+                bool allowVerticalPlacement) {
     float x = 0;
-    float y = yOffset;
+    float y = Shaping::yOffset;
     
     float maxLineLength = 0;
 
@@ -337,12 +366,17 @@ void shapeLines(Shaping& shaping,
             const double baselineOffset = (lineMaxScale - section.scale) * util::ONE_EM;
             
             const Glyph& glyph = **it->second;
-            
-            if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(codePoint)) {
+
+            if (writingMode == WritingModeType::Horizontal ||
+                // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
+                (!allowVerticalPlacement && !util::i18n::hasUprightVerticalOrientation(codePoint)) ||
+                // If vertical placement is ebabled, don't verticalize glyphs that
+                // are from complex text layout script, or whitespaces.
+                (allowVerticalPlacement && (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint)))) {
                 shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
+                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
                 x += util::ONE_EM * section.scale + spacing;
             }
         }
@@ -364,7 +398,7 @@ void shapeLines(Shaping& shaping,
 
     align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
           lineHeight, lines.size());
-    const float height = y - yOffset;
+    const float height = y - Shaping::yOffset;
 
     // Calculate the bounding box
     shaping.top += -anchorAlign.verticalAlign * height;
@@ -379,27 +413,28 @@ const Shaping getShaping(const TaggedString& formattedString,
                          const style::SymbolAnchorType textAnchor,
                          const style::TextJustifyType textJustify,
                          const float spacing,
-                         const Point<float>& translate,
+                         const std::array<float, 2>& translate,
                          const WritingModeType writingMode,
                          BiDi& bidi,
-                         const GlyphMap& glyphs) {   
+                         const GlyphMap& glyphs,
+                         bool allowVerticalPlacement) {
     std::vector<TaggedString> reorderedLines;
     if (formattedString.sectionCount() == 1) {
         auto untaggedLines = bidi.processText(formattedString.rawText(),
-                                              determineLineBreaks(formattedString, spacing, maxWidth, writingMode, glyphs));
+                                              determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
         for (const auto& line : untaggedLines) {
             reorderedLines.emplace_back(line, formattedString.sectionAt(0));
         }
     } else {
         auto processedLines = bidi.processStyledText(formattedString.getStyledText(),
-                                                     determineLineBreaks(formattedString, spacing, maxWidth, writingMode, glyphs));
+                                                     determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
         for (const auto& line : processedLines) {
             reorderedLines.emplace_back(line, formattedString.getSections());
         }
     }
-    Shaping shaping(translate.x, translate.y, writingMode, reorderedLines.size());
+    Shaping shaping(translate[0], translate[1], writingMode, reorderedLines.size());
     shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
-               textJustify, writingMode, glyphs);
+               textJustify, writingMode, glyphs, allowVerticalPlacement);
     
     return shaping;
 }

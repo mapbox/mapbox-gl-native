@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/feature.hpp>
 
 #include <cassert>
 #include <string>
@@ -39,6 +40,7 @@ public:
     static optional<Color> parse(const std::string&);
     std::string stringify() const;
     std::array<double, 4> toArray() const;
+    mbgl::Value toObject() const;
 };
 
 inline bool operator==(const Color& colorA, const Color& colorB) {

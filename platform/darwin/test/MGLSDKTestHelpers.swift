@@ -1,5 +1,4 @@
 import XCTest
-import Foundation
 
 class MGLSDKTestHelpers {
 

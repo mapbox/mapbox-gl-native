@@ -1,8 +1,5 @@
 #import "MBXBenchViewController.h"
-
 #import "MBXBenchAppDelegate.h"
-
-#import <Mapbox/Mapbox.h>
 #import "MGLMapView_Private.h"
 
 #include "locations.hpp"

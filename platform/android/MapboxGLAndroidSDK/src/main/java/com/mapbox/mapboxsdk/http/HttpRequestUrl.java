@@ -10,7 +10,10 @@ public class HttpRequestUrl {
   }
 
   /**
-   * Adapts a resource request url based on the host and query size.
+   * Adapts a resource request url based on the host, query size, and offline requirement.
+   * Mapbox resources downloaded for offline use are subject to separate Vector Tile and
+   * Raster Tile API pricing and are not included in the Maps SDK’s “unlimited” requests.
+   * See <a href="https://www.mapbox.com/pricing">our pricing page</a> for more information.
    *
    * @param host        the host used as endpoint
    * @param resourceUrl the resource to download
@@ -25,10 +28,11 @@ public class HttpRequestUrl {
       } else {
         resourceUrl = resourceUrl + "&";
       }
-      resourceUrl = resourceUrl + "sku=" + Mapbox.getSkuToken();
-
+      // Only add SKU token to requests not tagged as "offline" usage.
       if (offline) {
-        resourceUrl = resourceUrl + "&offline=true";
+        resourceUrl = resourceUrl + "offline=true";
+      } else {
+        resourceUrl = resourceUrl + "sku=" + Mapbox.getSkuToken();
       }
     }
     return resourceUrl;

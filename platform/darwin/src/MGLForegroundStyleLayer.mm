@@ -1,4 +1,5 @@
 #import "MGLForegroundStyleLayer.h"
+#import "MGLStyleLayer_Private.h"
 
 @implementation MGLForegroundStyleLayer
 
@@ -9,10 +10,17 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:
-            @"<%@: %p; identifier = %@; sourceIdentifier = %@; visible = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier,
-            self.sourceIdentifier, self.visible ? @"YES" : @"NO"];
+    if (self.rawLayer) {
+        return [NSString stringWithFormat:
+                @"<%@: %p; identifier = %@; sourceIdentifier = %@; visible = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier,
+                self.sourceIdentifier, self.visible ? @"YES" : @"NO"];
+    }
+    else {
+        return [NSString stringWithFormat:
+                @"<%@: %p; identifier = %@; sourceIdentifier = <unknown>; visible = NO>",
+                NSStringFromClass([self class]), (void *)self, self.identifier];
+    }
 }
 
 @end

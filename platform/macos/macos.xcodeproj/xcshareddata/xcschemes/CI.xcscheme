@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9EEBD19ABEE247CF8D3CF4C5"
+               BlueprintIdentifier = "9771D7F76DA54F52A89268C6"
                BuildableName = "mbgl-test"
                BlueprintName = "mbgl-test"
                ReferencedContainer = "container:../../build/macos/mbgl.xcodeproj">
@@ -70,7 +70,7 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B328AB16ECE141AAAE2A72C8"
+               BlueprintIdentifier = "D87DA13F4A80489CB4508EBD"
                BuildableName = "mbgl-benchmark"
                BlueprintName = "mbgl-benchmark"
                ReferencedContainer = "container:../../build/macos/mbgl.xcodeproj">
@@ -82,7 +82,18 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      language = "en"
+      region = "US">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "DA839E911CC2E3400062CAFB"
+            BuildableName = "Mapbox GL.app"
+            BlueprintName = "macosapp"
+            ReferencedContainer = "container:macos.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -95,17 +106,6 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DA839E911CC2E3400062CAFB"
-            BuildableName = "Mapbox GL.app"
-            BlueprintName = "macosapp"
-            ReferencedContainer = "container:macos.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -126,8 +126,6 @@
             ReferencedContainer = "container:macos.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

@@ -81,7 +81,9 @@ public class MapFragmentActivity extends AppCompatActivity implements MapFragmen
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    mapView.removeOnDidFinishRenderingFrameListener(this);
+    if (mapView != null) {
+      mapView.removeOnDidFinishRenderingFrameListener(this);
+    }
   }
 
   @Override

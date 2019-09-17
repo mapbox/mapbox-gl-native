@@ -13,7 +13,7 @@ endmacro()
 
 
 include(cmake/loop-darwin.cmake)
-initialize_ios_target(icu)
+initialize_ios_target(mbgl-vendor-icu)
 initialize_ios_target(mbgl-loop-darwin)
 
 

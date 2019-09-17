@@ -86,6 +86,7 @@ template optional<TextTransformType> Converter<TextTransformType>::operator()(co
 template optional<TranslateAnchorType> Converter<TranslateAnchorType>::operator()(const Convertible&, Error&) const;
 template optional<VisibilityType> Converter<VisibilityType>::operator()(const Convertible&, Error&) const;
 template optional<std::vector<TextVariableAnchorType>> Converter<std::vector<TextVariableAnchorType>>::operator()(const Convertible&, Error&) const;
+template optional<std::vector<TextWritingModeType>> Converter<std::vector<TextWritingModeType>>::operator()(const Convertible&, Error&) const;
 
 optional<Color> Converter<Color>::operator()(const Convertible& value, Error& error) const {
     optional<std::string> string = toString(value);

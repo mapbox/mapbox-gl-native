@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <map>
+#include <mapbox/eternal.hpp>
 
 namespace {
 
@@ -320,7 +321,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementaryPrivateUseAreaA, 0xF0000, 0xFFFFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(SupplementaryPrivateUseAreaB, 0x100000, 0x10FFFF)
 
-const std::map<char16_t, char16_t> verticalPunctuation = {
+MAPBOX_ETERNAL_CONSTEXPR const auto verticalPunctuation = mapbox::eternal::map<char16_t, char16_t>({
     { u'!', u'︕' },  { u'#', u'＃' },  { u'$', u'＄' },  { u'%', u'％' },  { u'&', u'＆' },
     { u'(', u'︵' },  { u')', u'︶' },  { u'*', u'＊' },  { u'+', u'＋' },  { u',', u'︐' },
     { u'-', u'︲' },  { u'.', u'・' },  { u'/', u'／' },  { u':', u'︓' },  { u';', u'︔' },
@@ -338,7 +339,8 @@ const std::map<char16_t, char16_t> verticalPunctuation = {
     { u'＞', u'﹀' }, { u'？', u'︖' }, { u'［', u'﹇' }, { u'］', u'﹈' }, { u'＿', u'︳' },
     { u'｛', u'︷' }, { u'｜', u'―' },  { u'｝', u'︸' }, { u'｟', u'︵' }, { u'｠', u'︶' },
     { u'｡', u'︒' },  { u'｢', u'﹁' },  { u'｣', u'﹂' },
-};
+});
+
 } // namespace
 
 namespace mbgl {
@@ -639,6 +641,14 @@ bool isStringInSupportedScript(const std::string& input) {
         }
     }
     return true;
+}
+
+bool isCharInComplexShapingScript(char16_t chr) {
+    return isInArabic(chr) ||
+           isInArabicSupplement(chr) ||
+           isInArabicExtendedA(chr) ||
+           isInArabicPresentationFormsA(chr) ||
+           isInArabicPresentationFormsB(chr);
 }
 
 bool isWhitespace(char16_t chr) {

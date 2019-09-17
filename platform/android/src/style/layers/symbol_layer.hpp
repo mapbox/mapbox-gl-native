@@ -90,6 +90,8 @@ public:
 
     jni::Local<jni::Object<jni::ObjectTag>> getTextMaxAngle(jni::JNIEnv&);
 
+    jni::Local<jni::Object<jni::ObjectTag>> getTextWritingMode(jni::JNIEnv&);
+
     jni::Local<jni::Object<jni::ObjectTag>> getTextRotate(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getTextPadding(jni::JNIEnv&);

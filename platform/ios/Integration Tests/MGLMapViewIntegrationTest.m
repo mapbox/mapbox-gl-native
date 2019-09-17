@@ -2,50 +2,76 @@
 
 @interface MGLMapView (MGLMapViewIntegrationTest)
 - (void)updateFromDisplayLink:(CADisplayLink *)displayLink;
+- (void)setNeedsRerender;
 @end
 
 @implementation MGLMapViewIntegrationTest
 
-- (void)invokeTest {
-    NSString *selector = NSStringFromSelector(self.invocation.selector);
-    BOOL isPendingTest = [selector hasSuffix:@"PENDING"];
++ (XCTestSuite*)defaultTestSuite {
     
-    if (isPendingTest) {
-        NSString *runPendingTests = [[NSProcessInfo processInfo] environment][@"MAPBOX_RUN_PENDING_TESTS"];
-        if (![runPendingTests boolValue]) {
-            printf("warning: '%s' is a pending test - skipping\n", selector.UTF8String);
-            return;
+    XCTestSuite *defaultTestSuite = [super defaultTestSuite];
+    
+    NSArray *tests = defaultTestSuite.tests;
+ 
+    XCTestSuite *newTestSuite = [XCTestSuite testSuiteWithName:defaultTestSuite.name];
+    
+    BOOL runPendingTests = [[[NSProcessInfo processInfo] environment][@"MAPBOX_RUN_PENDING_TESTS"] boolValue];
+    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+        
+    for (XCTest *test in tests) {
+        
+        // Check for pending tests
+        if ([test.name containsString:@"PENDING"] ||
+            [test.name containsString:@"🙁"]) {
+            if (!runPendingTests) {
+                printf("warning: '%s' is a pending test - skipping\n", test.name.UTF8String);
+                continue;
+            }
         }
-    }
+        
+        // Check for tests that require a valid access token
+        if ([test.name containsString:@"🔒"]) {
+            if (!accessToken) {
+                printf("warning: MAPBOX_ACCESS_TOKEN env var is required for test '%s' - skipping.\n", test.name.UTF8String);
+                continue;
+            }
+        }
 
-    [super invokeTest];
+        [newTestSuite addTest:test];
+    }
+    
+    return newTestSuite;
 }
 
-- (NSString*)validAccessToken {
-    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
-    if (!accessToken) {
-        printf("warning: MAPBOX_ACCESS_TOKEN env var is required for this test - skipping.\n");
-        return nil;
-    }
-
-    [MGLAccountManager setAccessToken:accessToken];
-    return accessToken;
+- (MGLMapView *)mapViewForTestWithFrame:(CGRect)rect styleURL:(NSURL *)styleURL {
+    return [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
 }
 
 - (void)setUp {
     [super setUp];
 
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
+    NSString *accessToken;
+    
+    if ([self.name containsString:@"🔒"]) {
+        accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+        
+        if (!accessToken) {
+            printf("warning: MAPBOX_ACCESS_TOKEN env var is required for test '%s' - trying anyway.\n", self.name.UTF8String);
+        }
+    }
+
+    [MGLAccountManager setAccessToken:accessToken ?: @"pk.feedcafedeadbeefbadebede"];
+    
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
 
-    self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
+    self.mapView = [self mapViewForTestWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
     self.mapView.delegate = self;
 
     UIView *superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];
     [superView addSubview:self.mapView];
-    UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    [window addSubview:superView];
-    [window makeKeyAndVisible];
+    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    [self.window addSubview:superView];
+    [self.window makeKeyAndVisible];
 
     if (!self.mapView.style) {
         [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
@@ -57,6 +83,7 @@
     self.renderFinishedExpectation = nil;
     self.mapView = nil;
     self.style = nil;
+    self.window = nil;
     [MGLAccountManager setAccessToken:nil];
 
     [super tearDown];
@@ -129,13 +156,15 @@
     XCTAssertNil(self.styleLoadingExpectation);
     self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
     [self waitForExpectations:@[self.styleLoadingExpectation] timeout:timeout];
+    self.styleLoadingExpectation = nil;
 }
 
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout {
     XCTAssertNil(self.renderFinishedExpectation);
-    [self.mapView setNeedsDisplay];
+    [self.mapView setNeedsRerender];
     self.renderFinishedExpectation = [self expectationWithDescription:@"Map view should be rendered"];
     [self waitForExpectations:@[self.renderFinishedExpectation] timeout:timeout];
+    self.renderFinishedExpectation = nil;
 }
 
 - (void)waitForExpectations:(NSArray<XCTestExpectation *> *)expectations timeout:(NSTimeInterval)seconds {

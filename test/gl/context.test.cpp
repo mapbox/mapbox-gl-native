@@ -91,7 +91,7 @@ TEST(GLContextMode, Shared) {
 
     util::RunLoop loop;
 
-    HeadlessFrontend frontend { 1, {}, gfx::ContextMode::Shared };
+    HeadlessFrontend frontend { 1, gfx::ContextMode::Shared };
 
     Map map(frontend, MapObserver::nullObserver(),
             MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),

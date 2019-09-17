@@ -49,7 +49,7 @@
         "platform/darwin/src/MGLCoordinateFormatter.m",
         "platform/darwin/src/MGLSource.mm",
         "platform/darwin/src/MGLMapCamera.mm",
-        "platform/darwin/src/MGLVectorStyleLayer.m",
+        "platform/darwin/src/MGLVectorStyleLayer.mm",
         "platform/darwin/src/MGLAttributedExpression.m",
         "platform/darwin/src/NSValue+MGLStyleAttributeAdditions.mm",
         "platform/darwin/src/MGLPolygon.mm",

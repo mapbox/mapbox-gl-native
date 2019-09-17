@@ -278,6 +278,7 @@ SQLite3TestFS::~SQLite3TestFS() {
     sqlite3_vfs* test_fs = sqlite3_vfs_find("test_fs");
     if (test_fs) {
         sqlite3_vfs_unregister(test_fs);
+        sqlite3_free((void*)test_fs);
     }
 }
 

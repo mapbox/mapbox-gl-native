@@ -255,3 +255,10 @@ TEST(Filter, Internal) {
 TEST(Filter, Short) {
     filter(R"(["==", ["id"], "foo"])");
 }
+
+TEST(Filter, LegacyExpressionInvalidType) {
+    const JSValue value("string");
+    conversion::Error error;
+    optional<Filter> result = conversion::convert<Filter>(conversion::Convertible(&value), error);
+    EXPECT_FALSE(result);
+}

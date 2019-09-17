@@ -195,11 +195,16 @@ ParseResult convertLegacyFilter(const Convertible& values, Error& error) {
         return {std::make_unique<Literal>(true)};
     }
 
+    if (!isArray(values) || arrayLength(values) == 0) {
+       error.message = "filter value must be a non empty array";
+       return nullopt;
+    }
+
     optional<std::string> op = toString(arrayMember(values, 0));
 
     if (!op) {
         error.message = "filter operator must be a string";
-        return {};
+        return nullopt;
     } else if (arrayLength(values) <= 1) {
         return {std::make_unique<Literal>(*op != "any")};
     } else {

@@ -36,6 +36,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
   private static final LatLng START_LAT_LNG = new LatLng(37.787947, -122.407432);
 
   private final LongSparseArray<Animator> animators = new LongSparseArray<>();
+  private Animator set;
 
   {
     AnimatorSet accelerateDecelerateAnimatorSet = new AnimatorSet();
@@ -92,7 +93,8 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
         .bearing(135)
         .build();
 
-      createExampleAnimator(mapboxMap.getCameraPosition(), animatedPosition).start();
+      set = createExampleAnimator(mapboxMap.getCameraPosition(), animatedPosition);
+      set.start();
     });
   }
 
@@ -236,6 +238,9 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     mapView.onStop();
     for (int i = 0; i < animators.size(); i++) {
       animators.get(animators.keyAt(i)).cancel();
+    }
+    if (set != null) {
+      set.cancel();
     }
   }
 

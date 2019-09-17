@@ -98,10 +98,12 @@ struct TaggedString {
     void trim();
     
     void verticalizePunctuation();
+    bool allowsVerticalWritingMode();
 
 private:
     StyledText styledText;
     std::vector<SectionOptions> sections;
+    optional<bool> supportsVerticalWritingMode;
 };
 
 } // namespace mbgl

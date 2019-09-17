@@ -4,7 +4,7 @@
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
-
+#include <mbgl/util/bitmask_operations.hpp>
 
 namespace mbgl {
 
@@ -25,11 +25,12 @@ struct SymbolInstanceSharedData {
     SymbolInstanceSharedData(GeometryCoordinates line,
                             const ShapedTextOrientations& shapedTextOrientations,
                             const optional<PositionedIcon>& shapedIcon,
+                            const optional<PositionedIcon>& verticallyShapedIcon,
                             const style::SymbolLayoutProperties::Evaluated& layout,
-                            const float layoutTextSize,
                             const style::SymbolPlacementType textPlacement,
                             const std::array<float, 2>& textOffset,
-                            const GlyphPositions& positions);
+                            const GlyphPositions& positions,
+                            bool allowVerticalPlacement);
     bool empty() const;
     GeometryCoordinates line;
     // Note: When singleLine == true, only `rightJustifiedGlyphQuads` is populated.
@@ -38,6 +39,14 @@ struct SymbolInstanceSharedData {
     SymbolQuads leftJustifiedGlyphQuads;
     SymbolQuads verticalGlyphQuads;
     optional<SymbolQuad> iconQuad;
+    optional<SymbolQuad> verticalIconQuad;
+};
+
+enum class SymbolContent : uint8_t {
+    None = 0,
+    Text = 1 << 0,
+    IconRGBA = 1 << 1,
+    IconSDF = 1 << 2
 };
 
 class SymbolInstance {
@@ -46,6 +55,7 @@ public:
                    std::shared_ptr<SymbolInstanceSharedData> sharedData,
                    const ShapedTextOrientations& shapedTextOrientations,
                    const optional<PositionedIcon>& shapedIcon,
+                   const optional<PositionedIcon>& verticallyShapedIcon,
                    const float textBoxScale,
                    const float textPadding,
                    const style::SymbolPlacementType textPlacement,
@@ -58,8 +68,11 @@ public:
                    const std::size_t dataFeatureIndex,
                    std::u16string key,
                    const float overscaling,
-                   const float rotate,
-                   float radialTextOffset);
+                   const float iconRotation,
+                   const float textRotation,
+                   const std::array<float, 2>& variableTextOffset,
+                   bool allowVerticalPlacement,
+                   const SymbolContent iconType = SymbolContent::None);
 
     optional<size_t> getDefaultHorizontalPlacedTextIndex() const;
     const GeometryCoordinates& line() const;
@@ -67,7 +80,11 @@ public:
     const SymbolQuads& leftJustifiedGlyphQuads() const;
     const SymbolQuads& centerJustifiedGlyphQuads() const;
     const SymbolQuads& verticalGlyphQuads() const;
+    bool hasText() const;
+    bool hasIcon() const;
+    bool hasSdfIcon() const;
     const optional<SymbolQuad>& iconQuad() const;
+    const optional<SymbolQuad>& verticalIconQuad() const;
     void releaseSharedData();
 
 private:
@@ -75,8 +92,7 @@ private:
 
 public:
     Anchor anchor;
-    bool hasText;
-    bool hasIcon;
+    SymbolContent symbolContent;
 
     std::size_t rightJustifiedGlyphQuadsSize;
     std::size_t centerJustifiedGlyphQuadsSize;
@@ -85,6 +101,8 @@ public:
 
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
+    optional<CollisionFeature> verticalTextCollisionFeature = nullopt;
+    optional<CollisionFeature> verticalIconCollisionFeature = nullopt;
     WritingModeType writingModes;
     std::size_t layoutFeatureIndex; // Index into the set of features included at layout time
     std::size_t dataFeatureIndex;   // Index into the underlying tile data feature set
@@ -97,8 +115,9 @@ public:
     optional<size_t> placedLeftTextIndex;
     optional<size_t> placedVerticalTextIndex;
     optional<size_t> placedIconIndex;
+    optional<size_t> placedVerticalIconIndex;
     float textBoxScale;
-    float radialTextOffset;
+    std::array<float, 2> variableTextOffset;
     bool singleLine;
     uint32_t crossTileID = 0;
 };

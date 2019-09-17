@@ -9,16 +9,53 @@
 
 namespace mbgl {
 
+class ProjectedCollisionBox {
+public:
+    enum class Type : char {
+        Unknown,
+        Box,
+        Circle
+    };
+
+    ProjectedCollisionBox() = default;
+    ProjectedCollisionBox(float x1, float y1, float x2, float y2) : geometry(x1, y1, x2, y2), type(Type::Box) {}
+    ProjectedCollisionBox(float x, float y, float r) : geometry(x, y, r), type(Type::Circle) {}
+
+    const mapbox::geometry::box<float>& box() const {
+        assert(isBox());
+        return geometry.box;
+    }
+
+    const geometry::circle<float>& circle() const {
+        assert(isCircle());
+        return geometry.circle;
+    }
+
+    bool isCircle() const { return type == Type::Circle; }
+    bool isBox() const { return type == Type::Box; }
+
+private:
+    union Geometry {
+        Geometry(float x1, float y1, float x2, float y2) : box({x1, y1}, {x2, y2}) {}
+        Geometry(float x, float y, float r) : circle({x, y}, r) {}
+        Geometry() {}
+        mapbox::geometry::box<float> box;
+        geometry::circle<float> circle;
+    } geometry;
+    Type type = Type::Unknown;
+};
+
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0, float _radius = 0) :
-        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), signedDistanceFromAnchor(_signedDistanceFromAnchor), radius(_radius) {}
+    CollisionBox(Point<float> _anchor, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0) :
+        anchor(std::move(_anchor)), x1(_x1), y1(_y1), x2(_x2), y2(_y2), signedDistanceFromAnchor(_signedDistanceFromAnchor) {}
 
     // the box is centered around the anchor point
     Point<float> anchor;
-    
-    // the offset of the box from the label's anchor point
-    Point<float> offset;
+
+    // the offset of the box from the label's anchor point.
+    // TODO: might be needed for #13526
+    // Point<float> offset;
 
     // distances to the edges from the anchor
     float x1;
@@ -26,19 +63,7 @@ public:
     float x2;
     float y2;
 
-    // Projected box geometry: generated/updated at placement time
-    float px1;
-    float py1;
-    float px2;
-    float py2;
-    
-    // Projected circle geometry: generated/updated at placement time
-    float px;
-    float py;
-    bool used;
-
     float signedDistanceFromAnchor;
-    float radius;
 };
 
 class CollisionFeature {

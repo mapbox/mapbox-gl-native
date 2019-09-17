@@ -49,10 +49,10 @@ static gfx::VertexVector<HeatmapTextureLayoutVertex> heatmapTextureVertices() {
     return result;
 }
 
-RenderStaticData::RenderStaticData(gfx::Context& context, float pixelRatio, const optional<std::string>& programCacheDir)
-    : programs(context, ProgramParameters { pixelRatio, false, programCacheDir })
+RenderStaticData::RenderStaticData(gfx::Context& context, float pixelRatio)
+    : programs(context, ProgramParameters { pixelRatio, false })
 #ifndef NDEBUG
-    , overdrawPrograms(context, ProgramParameters { pixelRatio, true, programCacheDir })
+    , overdrawPrograms(context, ProgramParameters { pixelRatio, true })
 #endif
 {
     tileTriangleSegments.emplace_back(0, 0, 4, 6);

@@ -186,6 +186,10 @@ public:
     const PropertyValue<std::vector<TextVariableAnchorType>>& getTextVariableAnchor() const;
     void setTextVariableAnchor(const PropertyValue<std::vector<TextVariableAnchorType>>&);
 
+    static PropertyValue<std::vector<TextWritingModeType>> getDefaultTextWritingMode();
+    const PropertyValue<std::vector<TextWritingModeType>>& getTextWritingMode() const;
+    void setTextWritingMode(const PropertyValue<std::vector<TextWritingModeType>>&);
+
     // Paint properties
 
     static PropertyValue<Color> getDefaultIconColor();

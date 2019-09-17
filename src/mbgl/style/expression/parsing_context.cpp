@@ -73,7 +73,8 @@ bool isConstant(const Expression& expression) {
     
     return isFeatureConstant(expression) &&
         isGlobalPropertyConstant(expression, std::array<std::string, 2>{{"zoom", "heatmap-density"}}) &&
-        isGlobalPropertyConstant(expression, std::array<std::string, 2>{{"zoom", "line-progress"}});
+        isGlobalPropertyConstant(expression, std::array<std::string, 2>{{"zoom", "line-progress"}}) &&
+        isGlobalPropertyConstant(expression, std::array<std::string, 2>{{"zoom", "accumulated"}});
 }
 
 using namespace mbgl::style::conversion;

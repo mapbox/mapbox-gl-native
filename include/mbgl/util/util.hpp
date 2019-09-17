@@ -19,3 +19,26 @@
 #else
 #define MBGL_CONSTEXPR inline
 #endif
+
+// Compiler defines for making symbols visible, otherwise they
+// will be defined as hidden by default.
+
+// clang-format off
+#if defined WIN32
+    #ifdef MBGL_BUILDING_LIB
+        #ifdef __GNUC__
+            #define MBGL_EXPORT __attribute__((dllexport))
+        #else
+            #define MBGL_EXPORT __declspec(dllexport)
+        #endif
+    #else
+        #ifdef __GNUC__
+            #define MBGL_EXPORT __attribute__((dllimport))
+        #else
+            #define MBGL_EXPORT __declspec(dllimport)
+        #endif
+    #endif
+#else
+    #define MBGL_EXPORT __attribute__((visibility ("default"))) // NOLINT
+#endif
+// clang-format on

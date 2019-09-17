@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -429,7 +430,7 @@ TransitionOptions LineLayer::getLineWidthTransition() const {
 using namespace conversion;
 
 optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         LineBlur,
         LineColor,
         LineDasharray,
@@ -455,28 +456,28 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "line-blur", static_cast<uint8_t>(Property::LineBlur) },
-        { "line-color", static_cast<uint8_t>(Property::LineColor) },
-        { "line-dasharray", static_cast<uint8_t>(Property::LineDasharray) },
-        { "line-gap-width", static_cast<uint8_t>(Property::LineGapWidth) },
-        { "line-gradient", static_cast<uint8_t>(Property::LineGradient) },
-        { "line-offset", static_cast<uint8_t>(Property::LineOffset) },
-        { "line-opacity", static_cast<uint8_t>(Property::LineOpacity) },
-        { "line-pattern", static_cast<uint8_t>(Property::LinePattern) },
-        { "line-translate", static_cast<uint8_t>(Property::LineTranslate) },
-        { "line-translate-anchor", static_cast<uint8_t>(Property::LineTranslateAnchor) },
-        { "line-width", static_cast<uint8_t>(Property::LineWidth) },
-        { "line-blur-transition", static_cast<uint8_t>(Property::LineBlurTransition) },
-        { "line-color-transition", static_cast<uint8_t>(Property::LineColorTransition) },
-        { "line-dasharray-transition", static_cast<uint8_t>(Property::LineDasharrayTransition) },
-        { "line-gap-width-transition", static_cast<uint8_t>(Property::LineGapWidthTransition) },
-        { "line-gradient-transition", static_cast<uint8_t>(Property::LineGradientTransition) },
-        { "line-offset-transition", static_cast<uint8_t>(Property::LineOffsetTransition) },
-        { "line-opacity-transition", static_cast<uint8_t>(Property::LineOpacityTransition) },
-        { "line-pattern-transition", static_cast<uint8_t>(Property::LinePatternTransition) },
-        { "line-translate-transition", static_cast<uint8_t>(Property::LineTranslateTransition) },
-        { "line-translate-anchor-transition", static_cast<uint8_t>(Property::LineTranslateAnchorTransition) },
-        { "line-width-transition", static_cast<uint8_t>(Property::LineWidthTransition) }
+        { "line-blur", mbgl::underlying_type(Property::LineBlur) },
+        { "line-color", mbgl::underlying_type(Property::LineColor) },
+        { "line-dasharray", mbgl::underlying_type(Property::LineDasharray) },
+        { "line-gap-width", mbgl::underlying_type(Property::LineGapWidth) },
+        { "line-gradient", mbgl::underlying_type(Property::LineGradient) },
+        { "line-offset", mbgl::underlying_type(Property::LineOffset) },
+        { "line-opacity", mbgl::underlying_type(Property::LineOpacity) },
+        { "line-pattern", mbgl::underlying_type(Property::LinePattern) },
+        { "line-translate", mbgl::underlying_type(Property::LineTranslate) },
+        { "line-translate-anchor", mbgl::underlying_type(Property::LineTranslateAnchor) },
+        { "line-width", mbgl::underlying_type(Property::LineWidth) },
+        { "line-blur-transition", mbgl::underlying_type(Property::LineBlurTransition) },
+        { "line-color-transition", mbgl::underlying_type(Property::LineColorTransition) },
+        { "line-dasharray-transition", mbgl::underlying_type(Property::LineDasharrayTransition) },
+        { "line-gap-width-transition", mbgl::underlying_type(Property::LineGapWidthTransition) },
+        { "line-gradient-transition", mbgl::underlying_type(Property::LineGradientTransition) },
+        { "line-offset-transition", mbgl::underlying_type(Property::LineOffsetTransition) },
+        { "line-opacity-transition", mbgl::underlying_type(Property::LineOpacityTransition) },
+        { "line-pattern-transition", mbgl::underlying_type(Property::LinePatternTransition) },
+        { "line-translate-transition", mbgl::underlying_type(Property::LineTranslateTransition) },
+        { "line-translate-anchor-transition", mbgl::underlying_type(Property::LineTranslateAnchorTransition) },
+        { "line-width-transition", mbgl::underlying_type(Property::LineWidthTransition) }
     });
 
     const auto it = properties.find(name.c_str());
@@ -670,10 +671,10 @@ optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Conv
         LineRoundLimit,
     };
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "line-cap", static_cast<uint8_t>(Property::LineCap) },
-        { "line-join", static_cast<uint8_t>(Property::LineJoin) },
-        { "line-miter-limit", static_cast<uint8_t>(Property::LineMiterLimit) },
-        { "line-round-limit", static_cast<uint8_t>(Property::LineRoundLimit) }
+        { "line-cap", mbgl::underlying_type(Property::LineCap) },
+        { "line-join", mbgl::underlying_type(Property::LineJoin) },
+        { "line-miter-limit", mbgl::underlying_type(Property::LineMiterLimit) },
+        { "line-round-limit", mbgl::underlying_type(Property::LineRoundLimit) }
     });
 
     const auto it = properties.find(name.c_str());

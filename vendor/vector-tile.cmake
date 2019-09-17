@@ -1,5 +1,9 @@
-add_library(vector-tile INTERFACE)
+if(TARGET mbgl-vendor-vector-tile)
+    return()
+endif()
 
-target_include_directories(vector-tile SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/vector-tile/include
+add_library(mbgl-vendor-vector-tile INTERFACE)
+
+target_include_directories(mbgl-vendor-vector-tile SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/vector-tile/include
 )

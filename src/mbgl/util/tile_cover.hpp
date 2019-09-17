@@ -18,9 +18,9 @@ namespace util {
 // Helper class to stream tile-cover results per row
 class TileCover {
 public:
-    TileCover(const LatLngBounds&, int32_t z);
+    TileCover(const LatLngBounds&, uint8_t z);
     // When project == true, projects the geometry points to tile coordinates
-    TileCover(const Geometry<double>&, int32_t z, bool project = true);
+    TileCover(const Geometry<double>&, uint8_t z, bool project = true);
     ~TileCover();
 
     optional<UnwrappedTileID> next();
@@ -33,9 +33,9 @@ private:
 
 int32_t coveringZoomLevel(double z, style::SourceType type, uint16_t tileSize);
 
-std::vector<UnwrappedTileID> tileCover(const TransformState&, int32_t z);
-std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, int32_t z);
-std::vector<UnwrappedTileID> tileCover(const Geometry<double>&, int32_t z);
+std::vector<UnwrappedTileID> tileCover(const TransformState&, uint8_t z);
+std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, uint8_t z);
+std::vector<UnwrappedTileID> tileCover(const Geometry<double>&, uint8_t z);
 
 // Compute only the count of tiles needed for tileCover
 uint64_t tileCount(const LatLngBounds&, uint8_t z);

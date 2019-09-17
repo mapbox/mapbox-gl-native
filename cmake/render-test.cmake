@@ -1,4 +1,5 @@
 add_executable(mbgl-render-test
+    render-test/allocation_index.cpp
     render-test/main.cpp
     render-test/parser.cpp
     render-test/runner.cpp
@@ -19,11 +20,11 @@ target_include_directories(mbgl-render-test
 target_link_libraries(mbgl-render-test PRIVATE
     mbgl-core
     mbgl-filesource
-    args
-    expected
-    filesystem
-    pixelmatch-cpp
-    rapidjson
+    Mapbox::Base::Extras::args
+    mbgl-vendor-expected
+    Mapbox::Base::Extras::filesystem
+    Mapbox::Base::pixelmatch-cpp
+    Mapbox::Base::Extras::rapidjson
 )
 
 add_definitions(-DTEST_RUNNER_ROOT_PATH="${CMAKE_SOURCE_DIR}")

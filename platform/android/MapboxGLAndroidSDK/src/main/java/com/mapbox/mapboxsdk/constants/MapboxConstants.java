@@ -44,6 +44,11 @@ public class MapboxConstants {
   public static final boolean DEFAULT_MANAGE_SKU_TOKEN = true;
 
   /**
+   * Default value for font fallback for local ideograph fonts
+   */
+  public static final String DEFAULT_FONT = "sans-serif";
+
+  /**
    * Unmeasured state
    */
   public static final float UNMEASURED = -1f;
@@ -70,8 +75,44 @@ public class MapboxConstants {
 
   /**
    * Value by which the default rotation threshold will be increased when scaling
+   *
+   * @deprecated unused, see {@link com.mapbox.mapboxsdk.maps.UiSettings#setDisableRotateWhenScaling(boolean)}
    */
+  @Deprecated
   public static final float ROTATION_THRESHOLD_INCREASE_WHEN_SCALING = 25f;
+
+  /**
+   * Maximum absolute zoom change for multi-pointer scale velocity animation
+   */
+  public static final double MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE = 2.5;
+
+  /**
+   * Maximum possible zoom change during the quick zoom gesture executed across the whole screen
+   */
+  public static final double QUICK_ZOOM_MAX_ZOOM_CHANGE = 4.0;
+
+  /**
+   * Scale velocity animation duration multiplier.
+   */
+  public static final double SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER = 150;
+
+  /**
+   * Minimum angular velocity for rotation animation
+   *
+   * @deprecated unused, see {@link #ROTATE_VELOCITY_RATIO_THRESHOLD}
+   */
+  @Deprecated
+  public static final float MINIMUM_ANGULAR_VELOCITY = 1.5f;
+
+  /**
+   * Last scale span delta to XY velocity ratio required to execute scale velocity animation.
+   */
+  public static final double SCALE_VELOCITY_RATIO_THRESHOLD = 4 * 1e-3;
+
+  /**
+   * Last rotation delta to XY velocity ratio required to execute rotation velocity animation.
+   */
+  public static final double ROTATE_VELOCITY_RATIO_THRESHOLD = 2.2 * 1e-4;
 
   /**
    * Time within which user needs to lift fingers for velocity animation to start.
@@ -79,14 +120,9 @@ public class MapboxConstants {
   public static final long SCHEDULED_ANIMATION_TIMEOUT = 150L;
 
   /**
-   * Minimum angular velocity for rotation animation
-   */
-  public static final float MINIMUM_ANGULAR_VELOCITY = 1.5f;
-
-  /**
    * Maximum angular velocity for rotation animation
    */
-  public static final float MAXIMUM_ANGULAR_VELOCITY = 20f;
+  public static final float MAXIMUM_ANGULAR_VELOCITY = 30f;
 
   /**
    * Factor to calculate tilt change based on pixel change during shove gesture.
@@ -125,12 +161,18 @@ public class MapboxConstants {
 
   /**
    * The currently used minimum scale factor to clamp to when a quick zoom gesture occurs
+   *
+   * @deprecated unused
    */
+  @Deprecated
   public static final float MINIMUM_SCALE_FACTOR_CLAMP = 0.00f;
 
   /**
    * The currently used maximum scale factor to clamp to when a quick zoom gesture occurs
+   *
+   * @deprecated unused
    */
+  @Deprecated
   public static final float MAXIMUM_SCALE_FACTOR_CLAMP = 0.15f;
 
   /**
@@ -185,5 +227,6 @@ public class MapboxConstants {
   public static final String STATE_ROTATE_ANIMATION_ENABLED = "mapbox_rotateAnimationEnabled";
   public static final String STATE_FLING_ANIMATION_ENABLED = "mapbox_flingAnimationEnabled";
   public static final String STATE_INCREASE_ROTATE_THRESHOLD = "mapbox_increaseRotateThreshold";
+  public static final String STATE_DISABLE_ROTATE_WHEN_SCALING = "mapbox_disableRotateWhenScaling";
   public static final String STATE_INCREASE_SCALE_THRESHOLD = "mapbox_increaseScaleThreshold";
 }

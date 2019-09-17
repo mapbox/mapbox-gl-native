@@ -1,7 +1,7 @@
 #import "MGLCompassButton_Private.h"
 #import "MGLCompassDirectionFormatter.h"
 
-#import <Mapbox/MGLGeometry.h>
+#import "MGLGeometry.h"
 
 #import "MGLMapView_Private.h"
 #import "UIImage+MGLAdditions.h"
@@ -63,9 +63,16 @@
     UIImage *scaleImage = [UIImage mgl_resourceImageNamed:@"Compass"];
     UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, UIScreen.mainScreen.scale);
     [scaleImage drawInRect:{CGPointZero, scaleImage.size}];
+    
+    UIFont *northFont;
+    if (@available(iOS 13.0, *)) {
+        northFont = [UIFont systemFontOfSize:11 weight:UIFontWeightLight];
+    } else {
+        northFont = [UIFont systemFontOfSize:11 weight:UIFontWeightUltraLight];
+    }
 
     NSAttributedString *north = [[NSAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"COMPASS_NORTH", nil, nil, @"N", @"Compass abbreviation for north") attributes:@{
-        NSFontAttributeName: [UIFont systemFontOfSize:11 weight:UIFontWeightUltraLight],
+        NSFontAttributeName: northFont,
         NSForegroundColorAttributeName: [UIColor whiteColor],
     }];
     CGRect stringRect = CGRectMake((scaleImage.size.width - north.size.width) / 2,

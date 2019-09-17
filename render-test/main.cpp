@@ -1,7 +1,8 @@
+#include "allocation_index.hpp"
+
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/io.hpp>
 
-#include "filesystem.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
@@ -18,27 +19,34 @@
 #define ANSI_COLOR_LIGHT_GRAY "\x1b[90m"
 #define ANSI_COLOR_RESET      "\x1b[0m"
 
+#if !defined(SANITIZE)
+void* operator new(std::size_t sz) {
+    void* ptr = AllocationIndex::allocate(sz);
+    if (!ptr) throw std::bad_alloc{};
+
+    return ptr;
+}
+
+void operator delete(void* ptr) noexcept {
+    AllocationIndex::deallocate(ptr);
+}
+
+void operator delete(void* ptr, size_t) noexcept {
+    AllocationIndex::deallocate(ptr);
+}
+#endif
+
 int main(int argc, char** argv) {
     bool recycleMap;
     bool shuffle;
     uint32_t seed;
     std::string testRootPath;
-    std::vector<std::string> ids;
+    std::vector<TestPaths> testPaths;
 
-    std::tie(recycleMap, shuffle, seed, testRootPath, ids) = parseArguments(argc, argv);
+    std::tie(recycleMap, shuffle, seed, testRootPath, testPaths) = parseArguments(argc, argv);
     const std::string::size_type rootLength = testRootPath.length();
 
     const auto ignores = parseIgnores();
-
-    // Recursively traverse through the test paths and collect test directories containing "style.json".
-    std::vector<mbgl::filesystem::path> testPaths;
-    for (const auto& id : ids) {
-        for (auto& testPath : mbgl::filesystem::recursive_directory_iterator(mbgl::filesystem::path(id))) {
-            if (testPath.path().filename() == "style.json") {
-                testPaths.push_back(testPath);
-            }
-        }
-    }
 
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
@@ -67,7 +75,7 @@ int main(int argc, char** argv) {
         std::string& status = metadata.status;
         std::string& color = metadata.color;
 
-        id = testPath.remove_filename().string();
+        id = testPath.defaultExpectations();
         id = id.substr(rootLength + 1, id.length() - rootLength - 2);
 
         bool shouldIgnore = false;
@@ -86,7 +94,7 @@ int main(int argc, char** argv) {
 
         bool errored = !metadata.errorMessage.empty();
         if (!errored) {
-            errored = runner.run(metadata) && !metadata.errorMessage.empty();
+            errored = !runner.run(metadata) || !metadata.errorMessage.empty();
         }
 
         bool passed = !errored && !metadata.diff.empty() && metadata.difference <= metadata.allowed;

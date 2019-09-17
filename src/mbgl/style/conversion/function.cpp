@@ -152,6 +152,8 @@ template optional<PropertyExpression<TranslateAnchorType>>
     
 template optional<PropertyExpression<Formatted>>
     convertFunctionToExpression<Formatted>(const Convertible&, Error&, bool);
+template optional<PropertyExpression<std::vector<TextWritingModeType>>>
+    convertFunctionToExpression<std::vector<TextWritingModeType>>(const Convertible&, Error&, bool);
 
 // Ad-hoc Converters for double and int64_t. We should replace float with double wholesale,
 // and promote the int64_t Converter to general use (and it should check that the input is

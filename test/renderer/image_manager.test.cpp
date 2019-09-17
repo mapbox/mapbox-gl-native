@@ -50,6 +50,18 @@ TEST(ImageManager, AddRemove) {
     EXPECT_EQ(nullptr, imageManager.getImage("four"));
 }
 
+TEST(ImageManager, Update) {
+    FixtureLog log;
+    ImageManager imageManager;
+
+    imageManager.addImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 16 }), 2));
+    EXPECT_EQ(0, imageManager.updatedImageVersions.size());
+    imageManager.updateImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 16 }), 2));
+    EXPECT_EQ(1, imageManager.updatedImageVersions.size());
+    imageManager.removeImage("one");
+    EXPECT_EQ(0, imageManager.updatedImageVersions.size());
+}
+
 TEST(ImageManager, RemoveReleasesBinPackRect) {
     FixtureLog log;
     ImageManager imageManager;

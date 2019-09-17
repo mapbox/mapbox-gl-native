@@ -67,7 +67,7 @@ Values makeValues(const bool isText,
     const bool rotateInShader = rotateWithMap && !pitchWithMap && !alongLine;
 
     mat4 labelPlaneMatrix;
-    if (alongLine || (isText && hasVariablePacement)) {
+    if (alongLine || hasVariablePacement) {
         // For labels that follow lines the first part of the projection is handled on the cpu.
         // Pass an identity matrix because no transformation needs to be done in the vertex shader.
         matrix::identity(labelPlaneMatrix);

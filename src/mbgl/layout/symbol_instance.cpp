@@ -21,24 +21,28 @@ const Shaping& getAnyShaping(const ShapedTextOrientations& shapedTextOrientation
 SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
                                                    const ShapedTextOrientations& shapedTextOrientations,
                                                    const optional<PositionedIcon>& shapedIcon,
+                                                   const optional<PositionedIcon>& verticallyShapedIcon,
                                                    const style::SymbolLayoutProperties::Evaluated& layout,
-                                                   const float layoutTextSize,
                                                    const style::SymbolPlacementType textPlacement,
                                                    const std::array<float, 2>& textOffset,
-                                                   const GlyphPositions& positions) : line(std::move(line_)) {
+                                                   const GlyphPositions& positions,
+						   bool allowVerticalPlacement) : line(std::move(line_)) {
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
-        iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.horizontal);
+        iconQuad = getIconQuad(*shapedIcon, getAnyShaping(shapedTextOrientations).writingMode);
+        if (verticallyShapedIcon) {
+            verticalIconQuad = getIconQuad(*verticallyShapedIcon, shapedTextOrientations.vertical.writingMode);
+        }
     }
 
     bool singleLineInitialized = false;
     const auto initHorizontalGlyphQuads = [&] (SymbolQuads& quads, const Shaping& shaping) {
         if (!shapedTextOrientations.singleLine) {
-            quads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions);
+            quads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions, allowVerticalPlacement);
             return;
         }
         if (!singleLineInitialized) {
-            rightJustifiedGlyphQuads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions);
+            rightJustifiedGlyphQuads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions, allowVerticalPlacement);
             singleLineInitialized = true;
         }
     };
@@ -56,7 +60,7 @@ SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
     }
 
     if (shapedTextOrientations.vertical) {
-        verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.vertical, textOffset, layout, textPlacement, positions);
+        verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.vertical, textOffset, layout, textPlacement, positions, allowVerticalPlacement);
     }
 }
 
@@ -68,6 +72,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                std::shared_ptr<SymbolInstanceSharedData> sharedData_,
                                const ShapedTextOrientations& shapedTextOrientations,
                                const optional<PositionedIcon>& shapedIcon,
+                               const optional<PositionedIcon>& verticallyShapedIcon,
                                const float textBoxScale_,
                                const float textPadding,
                                const SymbolPlacementType textPlacement,
@@ -80,17 +85,18 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::size_t dataFeatureIndex_,
                                std::u16string key_,
                                const float overscaling,
-                               const float rotate,
-                               float radialTextOffset_) :
+                               const float iconRotation,
+                               const float textRotation,
+                               const std::array<float, 2>& variableTextOffset_,
+                               bool allowVerticalPlacement,
+                               const SymbolContent iconType) :
     sharedData(std::move(sharedData_)),
     anchor(anchor_),
-    // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
-    hasText(!sharedData->empty()),
-    hasIcon(shapedIcon),
+    symbolContent(iconType),
     // Create the collision features that will be used to check whether this symbol instance can be placed
     // As a collision approximation, we can use either the vertical or any of the horizontal versions of the feature
-    textCollisionFeature(sharedData->line, anchor, getAnyShaping(shapedTextOrientations), textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, rotate),
-    iconCollisionFeature(sharedData->line, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature, rotate),
+    textCollisionFeature(sharedData->line, anchor, getAnyShaping(shapedTextOrientations), textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation),
+    iconCollisionFeature(sharedData->line, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature, iconRotation),
     writingModes(WritingModeType::None),
     layoutFeatureIndex(layoutFeatureIndex_),
     dataFeatureIndex(dataFeatureIndex_),
@@ -98,8 +104,22 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     iconOffset(iconOffset_),
     key(std::move(key_)),
     textBoxScale(textBoxScale_),
-    radialTextOffset(radialTextOffset_),
+    variableTextOffset(variableTextOffset_),
     singleLine(shapedTextOrientations.singleLine) {
+    // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
+    if(!sharedData->empty()) symbolContent |= SymbolContent::Text;
+    if (allowVerticalPlacement && shapedTextOrientations.vertical) {
+        const float verticalPointLabelAngle = 90.0f;
+        verticalTextCollisionFeature = CollisionFeature(line(), anchor, shapedTextOrientations.vertical, textBoxScale_, textPadding, textPlacement, indexedFeature, overscaling, textRotation + verticalPointLabelAngle);
+        if (verticallyShapedIcon) {
+            verticalIconCollisionFeature = CollisionFeature(sharedData->line,
+                                                            anchor,
+                                                            verticallyShapedIcon,
+                                                            iconBoxScale, iconPadding,
+                                                            indexedFeature,
+                                                            iconRotation + verticalPointLabelAngle);
+        }
+    }
 
     rightJustifiedGlyphQuadsSize = sharedData->rightJustifiedGlyphQuads.size();
     centerJustifiedGlyphQuadsSize = sharedData->centerJustifiedGlyphQuads.size();
@@ -143,6 +163,23 @@ const SymbolQuads& SymbolInstance::verticalGlyphQuads() const {
 const optional<SymbolQuad>& SymbolInstance::iconQuad() const {
     assert(sharedData);
     return sharedData->iconQuad;
+}
+    
+bool SymbolInstance::hasText() const {
+    return static_cast<bool>(symbolContent & SymbolContent::Text);
+}
+    
+bool SymbolInstance::hasIcon() const {
+    return static_cast<bool>(symbolContent & SymbolContent::IconRGBA) || hasSdfIcon();
+}
+    
+bool SymbolInstance::hasSdfIcon() const {
+    return static_cast<bool>(symbolContent & SymbolContent::IconSDF);
+}
+
+const optional<SymbolQuad>& SymbolInstance::verticalIconQuad() const {
+    assert(sharedData);
+    return sharedData->verticalIconQuad;
 }
 
 void SymbolInstance::releaseSharedData() {

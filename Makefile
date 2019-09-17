@@ -1,7 +1,8 @@
 export BUILDTYPE ?= Debug
 export IS_LOCAL_DEVELOPMENT ?= true
-export WITH_CXX11ABI ?= $(shell scripts/check-cxx11abi.sh)
 export TARGET_BRANCH ?= master
+
+CMAKE ?= cmake
 
 
 ifeq ($(BUILDTYPE), Release)
@@ -84,7 +85,7 @@ endif
 
 $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings
 	mkdir -p $(MACOS_OUTPUT_PATH)
-	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+	(cd $(MACOS_OUTPUT_PATH) && $(CMAKE) -G Xcode ../.. \
 		-DWITH_EGL=${WITH_EGL})
 
 $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
@@ -183,7 +184,7 @@ genstrings:
 
 $(MACOS_COMPDB_PATH)/Makefile:
 	mkdir -p $(MACOS_COMPDB_PATH)
-	(cd $(MACOS_COMPDB_PATH) && cmake ../../../.. \
+	(cd $(MACOS_COMPDB_PATH) && $(CMAKE) ../../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DWITH_EGL=${WITH_EGL})
 
@@ -274,7 +275,7 @@ endif
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
 	mkdir -p $(IOS_OUTPUT_PATH)
-	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+	(cd $(IOS_OUTPUT_PATH) && $(CMAKE) -G Xcode ../.. \
 		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
 		-DMBGL_PLATFORM=ios \
 		-DMASON_PLATFORM=ios)
@@ -374,9 +375,8 @@ LINUX_BUILD = $(LINUX_OUTPUT_PATH)/build.ninja
 
 $(LINUX_BUILD): $(BUILD_DEPS)
 	mkdir -p $(LINUX_OUTPUT_PATH)
-	(cd $(LINUX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+	(cd $(LINUX_OUTPUT_PATH) && $(CMAKE) -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
 		-DWITH_OSMESA=${WITH_OSMESA} \
 		-DWITH_EGL=${WITH_EGL})
@@ -453,111 +453,13 @@ check: compdb
 
 endif
 
-#### Qt targets #####################################################
-
-QT_QMAKE_FOUND := $(shell command -v qmake 2> /dev/null)
-ifdef QT_QMAKE_FOUND
-  export QT_INSTALL_DOCS = $(shell qmake -query QT_INSTALL_DOCS)
-  QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-endif
-
-export QT_OUTPUT_PATH = $(QT_ROOT_PATH)/$(BUILDTYPE)
-QT_BUILD = $(QT_OUTPUT_PATH)/build.ninja
-
-$(QT_BUILD): $(BUILD_DEPS)
-	@scripts/check-qt.sh
-	mkdir -p $(QT_OUTPUT_PATH)
-	(cd $(QT_OUTPUT_PATH) && cmake -G Ninja ../../.. \
-		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DMBGL_PLATFORM=qt \
-		-DMASON_PLATFORM=$(MASON_PLATFORM) \
-		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
-		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
-		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
-		-DWITH_COVERAGE=${WITH_COVERAGE})
-
-ifeq ($(HOST_PLATFORM), macos)
-
-MACOS_QT_PROJ_PATH = $(QT_ROOT_PATH)/xcode/mbgl.xcodeproj
-$(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
-	@scripts/check-qt.sh
-	mkdir -p $(QT_ROOT_PATH)/xcode
-	(cd $(QT_ROOT_PATH)/xcode && cmake -G Xcode ../../.. \
-		-DMBGL_PLATFORM=qt \
-		-DMASON_PLATFORM=$(MASON_PLATFORM) \
-		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
-		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
-		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
-		-DWITH_COVERAGE=${WITH_COVERAGE})
-
-.PHONY: qtproj
-qtproj: $(MACOS_QT_PROJ_PATH)
-	open $(MACOS_QT_PROJ_PATH)
-
-endif
-
-ifdef QNX_HOST
-export WITH_QT_DECODERS ?= ON
-export QCC_COMPILER_TARGET ?= gcc_ntox86_64
-export QCC_NTOARCH ?= x86_64
-
-export QNX_OUTPUT_PATH = build/qt-qnx-$(QCC_NTOARCH)/$(BUILDTYPE)
-QNX_QT_BUILD = $(QNX_OUTPUT_PATH)/build.ninja
-$(QNX_QT_BUILD): $(BUILD_DEPS)
-	@scripts/check-qt.sh
-	mkdir -p $(QNX_OUTPUT_PATH)
-	(cd $(QNX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
-		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DQCC_COMPILER_TARGET=${QCC_COMPILER_TARGET} \
-		-DQCC_NTOARCH=${QCC_NTOARCH} \
-		-DCMAKE_TOOLCHAIN_FILE=platform/qt/qnx.cmake \
-		-DMBGL_PLATFORM=qt \
-		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
-		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
-		-DWITH_COVERAGE=${WITH_COVERAGE})
-
-.PHONY: qnx-qt-lib
-qnx-qt-lib: $(QNX_QT_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QNX_OUTPUT_PATH) qmapboxgl
-
-endif
-
-.PHONY: qt-lib
-qt-lib: $(QT_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) qmapboxgl
-
-.PHONY: qt-app
-qt-app: $(QT_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt
-
-.PHONY: run-qt-app
-run-qt-app: qt-app
-	$(QT_OUTPUT_PATH)/mbgl-qt
-
-.PHONY: qt-test
-qt-test: $(QT_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-test
-
-run-qt-test-%: qt-test
-	$(QT_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
-
-.PHONY: run-qt-test
-run-qt-test: run-qt-test-*
-
-.PHONY: qt-docs
-qt-docs:
-	qdoc $(shell pwd)/platform/qt/config.qdocconf -outputdir $(shell pwd)/$(QT_OUTPUT_PATH)/docs
-
 #### Node targets ##############################################################
 
 .PHONY: test-node
 test-node: node
 	npm test
 	npm run test-query
-	npm run test-expressions
+	npm run test-memory
 
 #### Android targets ###########################################################
 
@@ -798,7 +700,7 @@ test-code-android:
 
 # Runs checkstyle and lint on the java code
 .PHONY: android-check
-android-check : android-checkstyle run-android-nitpick android-lint-sdk android-lint-test-app android-ktlint
+android-check : android-ktlint android-checkstyle android-lint-sdk android-lint-test-app run-android-nitpick
 
 # Runs checkstyle on the java code
 .PHONY: android-checkstyle
@@ -807,7 +709,7 @@ android-checkstyle: platform/android/gradle/configuration.gradle
 
 # Runs checkstyle on the kotlin code
 .PHONY: android-ktlint
-android-ktlint: 
+android-ktlint: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none ktlint
 
 # Runs lint on the Android SDK java code

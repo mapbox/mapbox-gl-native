@@ -1289,6 +1289,36 @@ class LocationComponentTest : EspressoTest() {
   }
 
   @Test
+  fun animators_dontZoomWhileTransitioning() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
+        component.activateLocationComponent(LocationComponentActivationOptions
+                .builder(context, style)
+                .useDefaultLocationEngine(false)
+                .build())
+        component.isLocationComponentEnabled = true
+        component.forceLocationUpdate(location)
+
+        val zoom = mapboxMap.cameraPosition.zoom
+        component.setCameraMode(CameraMode.TRACKING_GPS, 500L, null, null, null, null)
+        component.zoomWhileTracking(16.0, 1000)
+        uiController.loopMainThreadForAtLeast(1000)
+        TestingAsyncUtils.waitForLayer(uiController, mapView)
+
+        assertEquals(zoom, mapboxMap.cameraPosition.zoom, 0.0001)
+      }
+    }
+
+    executeComponentTest(componentAction)
+  }
+
+  @Test
   @Ignore
   fun animators_cancelZoomWhileTracking() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
@@ -1427,6 +1457,36 @@ class LocationComponentTest : EspressoTest() {
         TestingAsyncUtils.waitForLayer(uiController, mapView)
 
         assertEquals(tilt, mapboxMap.cameraPosition.tilt, 0.1)
+      }
+    }
+
+    executeComponentTest(componentAction)
+  }
+
+  @Test
+  fun animators_dontTiltWhileTransitioning() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(
+        component: LocationComponent,
+        mapboxMap: MapboxMap,
+        style: Style,
+        uiController: UiController,
+        context: Context
+      ) {
+        component.activateLocationComponent(LocationComponentActivationOptions
+          .builder(context, style)
+          .useDefaultLocationEngine(false)
+          .build())
+        component.isLocationComponentEnabled = true
+        component.forceLocationUpdate(location)
+
+        val tilt = mapboxMap.cameraPosition.tilt
+        component.setCameraMode(CameraMode.TRACKING_GPS, 500L, null, null, null, null)
+        component.tiltWhileTracking(30.0, 1000)
+        uiController.loopMainThreadForAtLeast(1000)
+        TestingAsyncUtils.waitForLayer(uiController, mapView)
+
+        assertEquals(tilt, mapboxMap.cameraPosition.tilt, 0.0001)
       }
     }
 

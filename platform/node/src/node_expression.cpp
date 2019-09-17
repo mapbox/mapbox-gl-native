@@ -192,6 +192,11 @@ struct ToValue {
             } else {
                 serializedSection.emplace("fontStack", mbgl::NullValue());
             }
+            if (section.textColor) {
+                serializedSection.emplace("textColor", section.textColor->toObject());
+            } else {
+                serializedSection.emplace("textColor", mbgl::NullValue());
+            }
             sections.emplace_back(serializedSection);
         }
         serialized.emplace("sections", sections);

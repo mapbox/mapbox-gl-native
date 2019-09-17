@@ -23,10 +23,14 @@ std::string formatNumber(double number, const std::string& localeId, const std::
                 .toString();
     } else {
         ustr = icu::number::NumberFormatter::with()
-                .precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits))
-                .locale(locale)
-                .formatDouble(number, status)
-                .toString();
+#if U_ICU_VERSION_MAJOR_NUM >= 62
+                   .precision(icu::number::Precision::minMaxFraction(minFractionDigits, maxFractionDigits))
+#else
+                   .rounding(icu::number::Rounder::minMaxFraction(minFractionDigits, maxFractionDigits))
+#endif
+                   .locale(locale)
+                   .formatDouble(number, status)
+                   .toString();
     }
     return ustr.toUTF8String(formatted);
 }

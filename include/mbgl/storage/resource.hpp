@@ -1,11 +1,10 @@
 #pragma once
 
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/bitmask_operations.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/tileset.hpp>
-#include <mbgl/util/util.hpp>
-#include <mbgl/util/traits.hpp>
 
 #include <string>
 
@@ -98,21 +97,8 @@ public:
     std::shared_ptr<const std::string> priorData;
 };
 
-
-MBGL_CONSTEXPR Resource::LoadingMethod operator|(Resource::LoadingMethod a, Resource::LoadingMethod b) {
-    return Resource::LoadingMethod(mbgl::underlying_type(a) | mbgl::underlying_type(b));
-}
-
-MBGL_CONSTEXPR Resource::LoadingMethod& operator|=(Resource::LoadingMethod& a, Resource::LoadingMethod b) {
-    return (a = a | b);
-}
-
-MBGL_CONSTEXPR Resource::LoadingMethod operator&(Resource::LoadingMethod a, Resource::LoadingMethod b) {
-    return Resource::LoadingMethod(mbgl::underlying_type(a) & mbgl::underlying_type(b));
-}
-
 inline bool Resource::hasLoadingMethod(Resource::LoadingMethod method) {
-    return (loadingMethod & method) != Resource::LoadingMethod::None;
+    return (loadingMethod & method);
 }
 
 } // namespace mbgl

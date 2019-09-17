@@ -2,6 +2,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// NSUserDefaults key that controls developer account type
+FOUNDATION_EXTERN NSString * const MGLMapboxAccountTypeKey;
+
 @interface MGLAccountManager (Private)
 
 /// Returns the shared instance of the `MGLAccountManager` class.

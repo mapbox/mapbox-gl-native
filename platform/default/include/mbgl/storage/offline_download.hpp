@@ -46,7 +46,7 @@ private:
      * While the request is in progress, it is recorded in `requests`. If the download
      * is deactivated, all in progress requests are cancelled.
      */
-    void ensureResource(const Resource&, std::function<void (Response)> = {});
+    void ensureResource(Resource&&, std::function<void (Response)> = {});
 
     void onMapboxTileCountLimitExceeded();
 
@@ -60,10 +60,12 @@ private:
     std::list<std::unique_ptr<AsyncRequest>> requests;
     std::unordered_set<std::string> requiredSourceURLs;
     std::deque<Resource> resourcesRemaining;
+    std::list<Resource> resourcesToBeMarkedAsUsed;
     std::list<std::tuple<Resource, Response>> buffer;
 
     void queueResource(Resource&&);
     void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);
+    void markPendingUsedResources();
 };
 
 } // namespace mbgl

@@ -19,9 +19,14 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+
 inline const HeatmapLayer::Impl& impl(const Immutable<Layer::Impl>& impl) {
+    assert(impl->getTypeInfo() == HeatmapLayer::Impl::staticTypeInfo());
     return static_cast<const HeatmapLayer::Impl&>(*impl);
 }
+
+} // namespace
 
 RenderHeatmapLayer::RenderHeatmapLayer(Immutable<HeatmapLayer::Impl> _impl)
     : RenderLayer(makeMutable<HeatmapLayerProperties>(std::move(_impl))),

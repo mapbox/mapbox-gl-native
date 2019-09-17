@@ -1,8 +1,12 @@
+#include <mbgl/test/map_adapter.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/fake_file_source.hpp>
+#include <mbgl/test/stub_map_observer.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 #include <mbgl/test/sqlite3_test_fs.hpp>
 
+#include <mbgl/gfx/headless_frontend.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
@@ -14,7 +18,6 @@
 
 #include <mbgl/storage/sqlite3.hpp>
 #include <gtest/gtest.h>
-#include <iostream>
 
 using namespace mbgl;
 using namespace std::literals::string_literals;
@@ -69,6 +72,10 @@ public:
         OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 1.0, true };
         OfflineRegionMetadata metadata;
         return db.createRegion(definition, metadata);
+    }
+
+    auto invalidateRegion(int64_t region) {
+        return db.invalidateRegion(region);
     }
 
     Response response(const std::string& path) {
@@ -150,6 +157,7 @@ TEST(OfflineDownload, InlineSource) {
 
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
+            EXPECT_EQ(1u, status.completedTileCount);
             EXPECT_EQ(2u, status.completedResourceCount);
             EXPECT_EQ(test.size, status.completedResourceSize);
             EXPECT_TRUE(status.requiredResourceCountIsPrecise);
@@ -253,6 +261,7 @@ TEST(OfflineDownload, Activate) {
 
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
+            EXPECT_EQ(status.completedTileCount, status.requiredTileCount);
             EXPECT_EQ(264u, status.completedResourceCount); // 256 glyphs, 2 sprite images, 2 sprite jsons, 1 tile, 1 style, source, image
             EXPECT_EQ(test.size, status.completedResourceSize);
 
@@ -260,6 +269,7 @@ TEST(OfflineDownload, Activate) {
             OfflineRegionStatus computedStatus = download.getStatus();
             EXPECT_EQ(OfflineRegionDownloadState::Inactive, computedStatus.downloadState);
             EXPECT_EQ(status.requiredResourceCount, computedStatus.requiredResourceCount);
+            EXPECT_EQ(status.requiredTileCount, computedStatus.requiredTileCount);
             EXPECT_EQ(status.completedResourceCount, computedStatus.completedResourceCount);
             EXPECT_EQ(status.completedResourceSize, computedStatus.completedResourceSize);
             EXPECT_EQ(status.completedTileCount, computedStatus.completedTileCount);
@@ -330,6 +340,7 @@ TEST(OfflineDownload, ExcludeIdeographs) {
     
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
+            EXPECT_EQ(status.completedTileCount, status.requiredTileCount);
             EXPECT_EQ(138u, status.completedResourceCount); // 130 glyphs, 2 sprite images, 2 sprite jsons, 1 tile, 1 style, source, image
             EXPECT_EQ(test.size, status.completedResourceSize);
             
@@ -337,6 +348,7 @@ TEST(OfflineDownload, ExcludeIdeographs) {
             OfflineRegionStatus computedStatus = download.getStatus();
             EXPECT_EQ(OfflineRegionDownloadState::Inactive, computedStatus.downloadState);
             EXPECT_EQ(status.requiredResourceCount, computedStatus.requiredResourceCount);
+            EXPECT_EQ(status.requiredTileCount, computedStatus.requiredTileCount);
             EXPECT_EQ(status.completedResourceCount, computedStatus.completedResourceCount);
             EXPECT_EQ(status.completedResourceSize, computedStatus.completedResourceSize);
             EXPECT_EQ(status.completedTileCount, computedStatus.completedTileCount);
@@ -391,6 +403,8 @@ TEST(OfflineDownload, GetStatusNoResources) {
     EXPECT_EQ(0u, status.completedResourceCount);
     EXPECT_EQ(0u, status.completedResourceSize);
     EXPECT_EQ(1u, status.requiredResourceCount);
+    EXPECT_EQ(0u, status.completedTileCount);
+    EXPECT_EQ(0u, status.requiredTileCount);
     EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
@@ -414,6 +428,8 @@ TEST(OfflineDownload, GetStatusStyleComplete) {
     EXPECT_EQ(1u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
     EXPECT_EQ(263u, status.requiredResourceCount);
+    EXPECT_EQ(0u, status.completedTileCount);
+    EXPECT_EQ(0u, status.requiredTileCount);
     EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
@@ -441,6 +457,8 @@ TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
     EXPECT_EQ(2u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
     EXPECT_EQ(264u, status.requiredResourceCount);
+    EXPECT_EQ(0u, status.completedTileCount);
+    EXPECT_EQ(1u, status.requiredTileCount);
     EXPECT_TRUE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
@@ -856,5 +874,76 @@ TEST(OfflineDownload, DiskFull) {
 
     test.loop.run();
     EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+// Test verifies that resource requests for invalidated region don't
+// have Resource::Usage::Offline tag set.
+TEST(OfflineDownload, ResourceOfflineUsageUnset) {
+    deleteDatabaseFiles();
+    test::SQLite3TestFS fs;
+
+    OfflineTest test{ filename_test_fs };
+    auto region = test.createRegion();
+    ASSERT_TRUE(region);
+
+    OfflineDownload download(
+        region->getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/inline_source.style.json",
+                                            LatLngBounds::world(), 0.0, 0.0, 1.0, false),
+        test.db, test.fileSource);
+
+    test.fileSource.styleResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
+        return test.response("inline_source.style.json");
+    };
+
+    test.fileSource.tileResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        EXPECT_TRUE(resource.usage == Resource::Usage::Offline);
+        return test.response("0-0-0.vector.pbf");
+    };
+
+    auto observer = std::make_unique<MockObserver>();
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        if (status.complete()) {
+            // Once download completes, invalidate region and try rendering map.
+            // Resource requests must not have Offline usage tag.
+            ASSERT_FALSE(test.invalidateRegion(region->getID()));
+            test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+    test.loop.run();
+
+    std::shared_ptr<StubFileSource> stubfileSource = std::make_shared<StubFileSource>();
+    stubfileSource->styleResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.usage != Resource::Usage::Offline);
+        return test.response("inline_source.style.json");
+    };
+
+    stubfileSource->tileResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.usage != Resource::Usage::Offline);
+        return test.response("0-0-0.vector.pbf");
+    };
+
+    StubMapObserver mapObserver;
+    mapObserver.didFinishRenderingFrameCallback = [&] (MapObserver::RenderFrameStatus status) {
+        if (status.mode == MapObserver::RenderMode::Full) {
+            test.loop.stop();
+        }
+    };
+
+    HeadlessFrontend frontend { 1 };
+    MapAdapter map { frontend, mapObserver, stubfileSource,
+            MapOptions()
+            .withMapMode(MapMode::Continuous)
+            .withSize(frontend.getSize())};
+
+    map.getStyle().loadURL("http://127.0.0.1:3000/inline_source.style.json");
+    map.jumpTo(CameraOptions().withCenter(LatLng{0.0, 0.0}).withZoom(0));
+    test.loop.run();
 }
 #endif // __QT__
