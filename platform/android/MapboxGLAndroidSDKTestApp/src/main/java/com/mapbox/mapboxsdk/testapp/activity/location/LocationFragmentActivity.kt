@@ -116,7 +116,7 @@ class LocationFragmentActivity : AppCompatActivity() {
     }
 
     override fun onSuccess(result: LocationEngineResult?) {
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(result?.lastLocation), 12.0))
+      if (!mapView.isDestroyed) mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(result?.lastLocation), 12.0))
     }
 
     override fun onFailure(exception: Exception) {

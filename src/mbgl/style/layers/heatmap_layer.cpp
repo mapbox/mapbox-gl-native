@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -203,7 +204,7 @@ TransitionOptions HeatmapLayer::getHeatmapWeightTransition() const {
 using namespace conversion;
 
 optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
         HeatmapColor,
         HeatmapIntensity,
         HeatmapOpacity,
@@ -217,16 +218,16 @@ optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Co
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "heatmap-color", static_cast<uint8_t>(Property::HeatmapColor) },
-        { "heatmap-intensity", static_cast<uint8_t>(Property::HeatmapIntensity) },
-        { "heatmap-opacity", static_cast<uint8_t>(Property::HeatmapOpacity) },
-        { "heatmap-radius", static_cast<uint8_t>(Property::HeatmapRadius) },
-        { "heatmap-weight", static_cast<uint8_t>(Property::HeatmapWeight) },
-        { "heatmap-color-transition", static_cast<uint8_t>(Property::HeatmapColorTransition) },
-        { "heatmap-intensity-transition", static_cast<uint8_t>(Property::HeatmapIntensityTransition) },
-        { "heatmap-opacity-transition", static_cast<uint8_t>(Property::HeatmapOpacityTransition) },
-        { "heatmap-radius-transition", static_cast<uint8_t>(Property::HeatmapRadiusTransition) },
-        { "heatmap-weight-transition", static_cast<uint8_t>(Property::HeatmapWeightTransition) }
+        { "heatmap-color", mbgl::underlying_type(Property::HeatmapColor) },
+        { "heatmap-intensity", mbgl::underlying_type(Property::HeatmapIntensity) },
+        { "heatmap-opacity", mbgl::underlying_type(Property::HeatmapOpacity) },
+        { "heatmap-radius", mbgl::underlying_type(Property::HeatmapRadius) },
+        { "heatmap-weight", mbgl::underlying_type(Property::HeatmapWeight) },
+        { "heatmap-color-transition", mbgl::underlying_type(Property::HeatmapColorTransition) },
+        { "heatmap-intensity-transition", mbgl::underlying_type(Property::HeatmapIntensityTransition) },
+        { "heatmap-opacity-transition", mbgl::underlying_type(Property::HeatmapOpacityTransition) },
+        { "heatmap-radius-transition", mbgl::underlying_type(Property::HeatmapRadiusTransition) },
+        { "heatmap-weight-transition", mbgl::underlying_type(Property::HeatmapWeightTransition) }
     });
 
     const auto it = properties.find(name.c_str());

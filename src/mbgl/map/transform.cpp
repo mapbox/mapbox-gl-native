@@ -63,7 +63,7 @@ void Transform::resize(const Size size) {
 
 #pragma mark - Camera
 
-CameraOptions Transform::getCameraOptions(const EdgeInsets& padding) const {
+CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
     return state.getCameraOptions(padding);
 }
 
@@ -96,6 +96,9 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom) || std::isnan(bearing) || std::isnan(pitch)) {
+        if (animation.transitionFinishFn) {
+            animation.transitionFinishFn();
+        }
         return;
     }
 
@@ -172,6 +175,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom) || std::isnan(bearing) || std::isnan(pitch) || state.size.isEmpty()) {
+        if (animation.transitionFinishFn) {
+            animation.transitionFinishFn();
+        }
         return;
     }
 
@@ -274,6 +280,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     if (duration == Duration::zero()) {
         // Perform an instantaneous transition.
         jumpTo(camera);
+        if (animation.transitionFinishFn) {
+            animation.transitionFinishFn();
+        }
         return;
     }
 

@@ -620,8 +620,8 @@ MGL_EXPORT IB_DESIGNABLE
  the value of this property may be overridden at any time.
 
  Changing the value of this property updates the map view immediately. If you
- want to animate the change, use the `-setContentInsets:animated:` method
- instead.
+ want to animate the change, use the `-setContentInset:animated:completionHandler:`
+ method instead.
  */
 @property (nonatomic, assign) NSEdgeInsets contentInsets;
 

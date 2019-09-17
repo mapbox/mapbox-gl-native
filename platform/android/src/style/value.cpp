@@ -63,6 +63,12 @@ namespace android {
         return Value(env, jni::Local<jni::Object<>>(env, member));
     }
 
+    Value Value::keyArray() const{
+        jni::jobject* set = jni::CallMethod<jni::jobject*>(env, value.get(), *java::Map::keySetMethodId);
+        jni::jobject* array = jni::CallMethod<jni::jobject*>(env, set, *java::Set::toArrayMethodId);
+        return Value(env, jni::Local<jni::Object<>>(env, array));
+    }
+
     int Value::getLength() const {
         auto array = (jni::jarray<jni::jobject>*) value.get();
         return jni::GetArrayLength(env, *array);

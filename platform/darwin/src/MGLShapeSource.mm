@@ -150,11 +150,13 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 }
 
 - (NSURL *)URL {
+    MGLAssertStyleSourceIsValid();
     auto url = self.rawSource->getURL();
     return url ? [NSURL URLWithString:@(url->c_str())] : nil;
 }
 
 - (void)setURL:(NSURL *)url {
+    MGLAssertStyleSourceIsValid();
     if (url) {
         self.rawSource->setURL(url.mgl_URLByStandardizingScheme.absoluteString.UTF8String);
         _shape = nil;
@@ -164,17 +166,24 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 }
 
 - (void)setShape:(MGLShape *)shape {
+    MGLAssertStyleSourceIsValid();
     self.rawSource->setGeoJSON({ shape.geoJSONObject });
     _shape = shape;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; shape = %@>",
-            NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.shape];
+    if (self.rawSource) {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = %@; shape = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.shape];
+    }
+    else {
+        return [NSString stringWithFormat:@"<%@: %p; identifier = %@; URL = <unknown>; shape = %@>",
+                NSStringFromClass([self class]), (void *)self, self.identifier, self.shape];
+    }
 }
 
 - (NSArray<id <MGLFeature>> *)featuresMatchingPredicate:(nullable NSPredicate *)predicate {
-    
+    MGLAssertStyleSourceIsValid();
     mbgl::optional<mbgl::style::Filter> optionalFilter;
     if (predicate) {
         optionalFilter = predicate.mgl_filter;
@@ -190,6 +199,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 #pragma mark - MGLCluster management
 
 - (mbgl::optional<mbgl::FeatureExtensionValue>)featureExtensionValueOfCluster:(MGLShape<MGLCluster> *)cluster extension:(std::string)extension options:(const std::map<std::string, mbgl::Value>)options {
+    MGLAssertStyleSourceIsValid();
     mbgl::optional<mbgl::FeatureExtensionValue> extensionValue;
     
     // Check parameters

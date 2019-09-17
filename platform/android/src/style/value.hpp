@@ -31,6 +31,7 @@ public:
     long toLong() const;
     bool toBool() const;
     Value get(const char* key) const;
+    Value keyArray() const;
     int getLength() const;
     Value get(const int index ) const;
 

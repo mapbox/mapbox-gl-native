@@ -1540,24 +1540,38 @@ public final class MapboxMap {
    * frame from the viewport. For instance, if the only the top edge is inset, the
    * map center is effectively shifted downward.
    * </p>
+   * <p>
+   * This method sets the padding "lazily".
+   * This means that the <b>padding is going to be applied with the next camera transformation.</b>
+   * To apply the padding immediately use {@link CameraPosition.Builder#padding(double, double, double, double)}
+   * or {@link CameraUpdateFactory#paddingTo(double, double, double, double)}.
+   * </p>
    *
    * @param left   The left margin in pixels.
    * @param top    The top margin in pixels.
    * @param right  The right margin in pixels.
    * @param bottom The bottom margin in pixels.
+   * @deprecated Use {@link CameraPosition.Builder#padding(double, double, double, double)}
+   * or {@link CameraUpdateFactory#paddingTo(double, double, double, double)} instead.
    */
+  @Deprecated
   public void setPadding(int left, int top, int right, int bottom) {
+    // TODO padding should be passed as doubles
     projection.setContentPadding(new int[] {left, top, right, bottom});
     uiSettings.invalidate();
   }
 
   /**
-   * Returns the current configured content padding on map view.
+   * Returns the current configured content padding on map view. This might return the currently visible padding
+   * or the padding cached but not yet applied by {@link #setPadding(int, int, int, int)}.
    *
    * @return An array with length 4 in the LTRB order.
+   * @deprecated Use {@link CameraPosition#padding} instead.
    */
+  @Deprecated
   @NonNull
   public int[] getPadding() {
+    // TODO this should return double[] (semver major change)
     return projection.getContentPadding();
   }
 

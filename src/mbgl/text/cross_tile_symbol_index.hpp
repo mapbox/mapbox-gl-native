@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/bitmask_operations.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/optional.hpp>
@@ -58,7 +59,13 @@ class CrossTileSymbolIndex {
 public:
     CrossTileSymbolIndex();
 
-    bool addLayer(const RenderLayer& layer, float lng);
+    enum class AddLayerResult : uint8_t {
+        NoChanges = 0,
+        BucketsAdded = 1 << 0,
+        BucketsRemoved = 1 << 1
+    };
+
+    AddLayerResult addLayer(const RenderLayer& layer, float lng);
     void pruneUnusedLayers(const std::set<std::string>&);
 
     void reset();

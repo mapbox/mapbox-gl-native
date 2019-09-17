@@ -17,12 +17,10 @@ class TransformState;
 class HeadlessFrontend : public RendererFrontend {
 public:
     HeadlessFrontend(float pixelRatio_,
-                     const optional<std::string> programCacheDir = {},
                      gfx::ContextMode mode = gfx::ContextMode::Unique,
                      const optional<std::string> localFontFamily = {});
     HeadlessFrontend(Size,
                      float pixelRatio_,
-                     const optional<std::string> programCacheDir = {},
                      gfx::ContextMode mode = gfx::ContextMode::Unique,
                      const optional<std::string> localFontFamily = {});
     ~HeadlessFrontend() override;

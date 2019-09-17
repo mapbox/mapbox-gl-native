@@ -121,10 +121,9 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
         let isRecognized = press.state == .recognized
 
         if (isRecognized) {
-            let coordinate: CLLocationCoordinate2D = mapView.convert(press.location(in: mapView), toCoordinateFrom: mapView)
             let annotation = MGLPointAnnotation()
             annotation.title = "Dropped Marker"
-            annotation.coordinate = coordinate
+            annotation.coordinate = mapView.convert(press.location(in: mapView), toCoordinateFrom: mapView)
             mapView.addAnnotation(annotation)
             mapView.showAnnotations([annotation], animated: true)
         }
@@ -133,8 +132,6 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
 }
 
 //: Create a map and its delegate
-
-let centerCoordinate = CLLocationCoordinate2D(latitude: 37.174057, longitude: -104.490984)
 
 let mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: width, height: height))
 mapView.frame = CGRect(x: 0, y: 0, width: width, height: height)
@@ -150,7 +147,7 @@ mapView.addGestureRecognizer(tapGesture)
 
 //: Zoom in to a location
 
-mapView.setCenter(centerCoordinate, zoomLevel: 12, animated: false)
+mapView.setCenter(CLLocationCoordinate2D(latitude: 37.174057, longitude: -104.490984), zoomLevel: 12, animated: false)
 
 //: Add control panel
 

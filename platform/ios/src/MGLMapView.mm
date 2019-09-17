@@ -128,6 +128,9 @@ const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
 /// Distance threshold to stop the camera while animating.
 const CLLocationDistance MGLDistanceThresholdForCameraPause = 500;
 
+/// Rotation threshold while a pinch gesture is occurring.
+static NSString * const MGLRotationThresholdWhileZoomingKey = @"MGLRotationThresholdWhileZooming";
+
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
@@ -153,6 +156,9 @@ static const NSUInteger MGLPresentsWithTransactionAnnotationCount = 0;
 
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
+
+/// The threshold used to consider when a tilt gesture should start.
+const CLLocationDegrees MGLHorizontalTiltToleranceDegrees = 45.0;
 
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
@@ -240,6 +246,10 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic) CGFloat rotationThresholdWhileZooming;
+@property (nonatomic) CGFloat rotationBeforeThresholdMet;
+@property (nonatomic) BOOL isZooming;
+@property (nonatomic) BOOL isRotating;
 @property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
@@ -247,6 +257,7 @@ public:
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
 @property (nonatomic, readonly) BOOL enablePresentsWithTransaction;
 @property (nonatomic) UIImage *lastSnapshotImage;
+@property (nonatomic) NSMutableArray *pendingCompletionBlocks;
 
 /// Experimental rendering performance measurement.
 @property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
@@ -259,6 +270,9 @@ public:
 @property (nonatomic, copy) MGLMapCamera *residualCamera;
 @property (nonatomic) MGLMapDebugMaskOptions residualDebugMask;
 @property (nonatomic, copy) NSURL *residualStyleURL;
+
+/// Tilt gesture recognizer helper
+@property (nonatomic, assign) CGPoint dragGestureMiddlePoint;
 
 - (mbgl::Map &)mbglMap;
 
@@ -457,7 +471,7 @@ public:
     // setup mbgl map
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
 
-    auto renderer = std::make_unique<mbgl::Renderer>(_mbglView->getRendererBackend(), config.scaleFactor, config.cacheDir, config.localFontFamilyName);
+    auto renderer = std::make_unique<mbgl::Renderer>(_mbglView->getRendererBackend(), config.scaleFactor, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, _mbglView->getRendererBackend());
 
@@ -569,6 +583,7 @@ public:
     _rotate.delegate = self;
     [self addGestureRecognizer:_rotate];
     _rotateEnabled = YES;
+    _rotationThresholdWhileZooming = 3;
 
     _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTapGesture:)];
     _doubleTap.numberOfTapsRequired = 2;
@@ -612,6 +627,11 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+
+    // Pending completion blocks are called *after* annotation views have been updated
+    // in updateFromDisplayLink.
+    _pendingCompletionBlocks = [NSMutableArray array];
+    
     
     // As of 3.7.5, we intentionally do not listen for `UIApplicationWillResignActiveNotification` or call `pauseRendering:` in response to it, as doing
     // so causes a loop when asking for location permission. See: https://github.com/mapbox/mapbox-gl-native/issues/11225
@@ -1033,6 +1053,34 @@ public:
     return CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
 }
 
+#pragma mark - Pending completion blocks
+
+- (void)processPendingBlocks
+{
+    NSArray *blocks = self.pendingCompletionBlocks;
+    self.pendingCompletionBlocks = [NSMutableArray array];
+
+    for (dispatch_block_t block in blocks)
+    {
+        block();
+    }
+}
+
+- (BOOL)scheduleTransitionCompletion:(dispatch_block_t)block
+{
+    // Only add a block if the display link (that calls processPendingBlocks) is
+    // running, otherwise fall back to calling immediately.
+    if (_displayLink && !_displayLink.isPaused)
+    {
+        [self willChangeValueForKey:@"pendingCompletionBlocks"];
+        [self.pendingCompletionBlocks addObject:block];
+        [self didChangeValueForKey:@"pendingCompletionBlocks"];
+        return YES;
+    }
+    
+    return NO;
+}
+
 #pragma mark - Life Cycle -
 
 - (void)updateFromDisplayLink:(CADisplayLink *)displayLink
@@ -1057,7 +1105,7 @@ public:
         return;
     }
     
-    if (_needsDisplayRefresh)
+    if (_needsDisplayRefresh || (self.pendingCompletionBlocks.count > 0))
     {
         _needsDisplayRefresh = NO;
 
@@ -1066,6 +1114,13 @@ public:
         [self updateAnnotationViews];
         [self updateCalloutView];
 
+        // Call any pending completion blocks. This is primarily to ensure
+        // that annotations are in the expected position after core rendering
+        // and map update.
+        //
+        // TODO: Consider using this same mechanism for delegate callbacks.
+        [self processPendingBlocks];
+        
         _mbglView->display();
     }
 
@@ -1132,6 +1187,7 @@ public:
     {
         [_displayLink invalidate];
         _displayLink = nil;
+        [self processPendingBlocks];
     }
 }
 
@@ -1415,6 +1471,7 @@ public:
         [MGLMapboxEvents flush];
 
         _displayLink.paused = YES;
+        [self processPendingBlocks];
 
         if ( ! self.glSnapshotView)
         {
@@ -1467,6 +1524,11 @@ public:
 {
     super.hidden = hidden;
     _displayLink.paused = hidden;
+    
+    if (hidden)
+    {
+        [self processPendingBlocks];
+    }
 }
 
 - (void)tintColorDidChange
@@ -1622,6 +1684,9 @@ public:
     {
         self.scale = powf(2, [self zoomLevel]);
 
+        if (abs(pinch.velocity) > abs(self.rotate.velocity)) {
+            self.isZooming = YES;
+        }
         [self notifyGestureDidBegin];
     }
     else if (pinch.state == UIGestureRecognizerStateChanged)
@@ -1697,6 +1762,7 @@ public:
             }
         }
 
+        self.isZooming = NO;
         [self notifyGestureDidEndWithDrift:drift];
         [self unrotateIfNeededForGesture];
     }
@@ -1716,20 +1782,30 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
 
-    if (rotate.state == UIGestureRecognizerStateBegan)
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey]) {
+        self.rotationThresholdWhileZooming = [[[NSUserDefaults standardUserDefaults] objectForKey:MGLRotationThresholdWhileZoomingKey] floatValue];
+    }
+    // Check whether a zoom triggered by a pinch gesture is occurring and if the rotation threshold has been met.
+    if (MGLDegreesFromRadians(self.rotationBeforeThresholdMet) < self.rotationThresholdWhileZooming && self.isZooming && !self.isRotating) {
+        self.rotationBeforeThresholdMet += fabs(rotate.rotation);
+        rotate.rotation = 0;
+        return;
+    }
+
+    if (rotate.state == UIGestureRecognizerStateBegan || ! self.isRotating)
     {
         self.angle = MGLRadiansFromDegrees(*self.mbglMap.getCameraOptions().bearing) * -1;
 
+        self.isRotating = YES;
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
             self.userTrackingMode = MGLUserTrackingModeFollow;
         }
 
         self.shouldTriggerHapticFeedbackForCompass = NO;
-
         [self notifyGestureDidBegin];
     }
-    else if (rotate.state == UIGestureRecognizerStateChanged)
+    if (rotate.state == UIGestureRecognizerStateChanged)
     {
         CGFloat newDegrees = MGLDegreesFromRadians(self.angle + rotate.rotation) * -1;
 
@@ -1740,14 +1816,14 @@ public:
             newDegrees = fminf(newDegrees,  30);
             newDegrees = fmaxf(newDegrees, -30);
         }
-        
+
         MGLMapCamera *toCamera = [self cameraByRotatingToDirection:newDegrees aroundAnchorPoint:centerPoint];
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-           self.mbglMap.jumpTo(mbgl::CameraOptions()
-                                   .withBearing(newDegrees)
-                                   .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
+            self.mbglMap.jumpTo(mbgl::CameraOptions()
+                                    .withBearing(newDegrees)
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
         }
 
         [self cameraIsChanging];
@@ -1768,8 +1844,12 @@ public:
             }
         }
     }
-    else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
+    else if ((rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled))
     {
+        self.rotationBeforeThresholdMet = 0;
+        if (! self.isRotating) { return; }
+        self.isRotating = NO;
+
         CGFloat velocity = rotate.velocity;
         CGFloat decelerationRate = self.decelerationRate;
         if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
@@ -1783,14 +1863,13 @@ public:
             if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
             {
                 self.mbglMap.easeTo(mbgl::CameraOptions()
-                                       .withBearing(newDegrees)
-                                       .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
+                                    .withBearing(newDegrees)
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
                                     MGLDurationFromTimeInterval(decelerationRate));
 
                 [self notifyGestureDidEndWithDrift:YES];
-                
                 __weak MGLMapView *weakSelf = self;
-                
+
                 [self animateWithDelay:decelerationRate animations:^
                  {
                      [weakSelf unrotateIfNeededForGesture];
@@ -2016,6 +2095,14 @@ public:
     
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
+        CGPoint midPoint = [twoFingerDrag translationInView:twoFingerDrag.view];
+        // In the following if and for the first execution middlePoint
+        // will be equal to dragGestureMiddlePoint and the resulting
+        // gestureSlopeAngle will be 0º causing a small delay,
+        // initializing dragGestureMiddlePoint with the current midPoint
+        // but substracting one point from 'y' forces an initial 90º angle
+        // making the gesture avoid the delay
+        self.dragGestureMiddlePoint = CGPointMake(midPoint.x, midPoint.y-1);
         initialPitch = *self.mbglMap.getCameraOptions().pitch;
         [self notifyGestureDidBegin];
     }
@@ -2027,30 +2114,45 @@ public:
             twoFingerDrag.state = UIGestureRecognizerStateEnded;
             return;
         }
-
-        CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
-        CGFloat slowdown = 2.0;
-
-        CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
-
-        CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
-
-        MGLMapCamera *oldCamera = self.camera;
-        MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
-
-        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
-        {
-            self.mbglMap.jumpTo(mbgl::CameraOptions()
+        
+        CGPoint leftTouchPoint = [twoFingerDrag locationOfTouch:0 inView:twoFingerDrag.view];
+        CGPoint rightTouchPoint = [twoFingerDrag locationOfTouch:1 inView:twoFingerDrag.view];
+        CLLocationDegrees fingerSlopeAngle = [self angleBetweenPoints:leftTouchPoint endPoint:rightTouchPoint];
+        
+        CGPoint middlePoint = [twoFingerDrag translationInView:twoFingerDrag.view];
+        
+        CLLocationDegrees gestureSlopeAngle = [self angleBetweenPoints:self.dragGestureMiddlePoint endPoint:middlePoint];
+        self.dragGestureMiddlePoint = middlePoint;
+        if (fabs(fingerSlopeAngle) < MGLHorizontalTiltToleranceDegrees && fabs(gestureSlopeAngle) > 60.0 ) {
+            
+            CGFloat gestureDistance = middlePoint.y;
+            CGFloat slowdown = 2.0;
+            
+            CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
+            
+            CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
+            
+            MGLMapCamera *oldCamera = self.camera;
+            MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
+            
+            if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
+            {
+                self.mbglMap.jumpTo(mbgl::CameraOptions()
                                     .withPitch(pitchNew)
                                     .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+            }
+            
+            [self cameraIsChanging];
+        
         }
 
-        [self cameraIsChanging];
+        
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededForGesture];
+        self.dragGestureMiddlePoint = CGPointZero;
     }
 
 }
@@ -2173,23 +2275,17 @@ public:
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
-    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]])
+    if (gestureRecognizer == _twoFingerDrag)
     {
         UIPanGestureRecognizer *panGesture = (UIPanGestureRecognizer *)gestureRecognizer;
         
         if (panGesture.minimumNumberOfTouches == 2)
         {
-            CGPoint west = [panGesture locationOfTouch:0 inView:panGesture.view];
-            CGPoint east = [panGesture locationOfTouch:1 inView:panGesture.view];
+            CGPoint leftTouchPoint = [panGesture locationOfTouch:0 inView:panGesture.view];
+            CGPoint rightTouchPoint = [panGesture locationOfTouch:1 inView:panGesture.view];
             
-            if (west.x > east.x) {
-                CGPoint swap = west;
-                west = east;
-                east = swap;
-            }
-            
-            CLLocationDegrees horizontalToleranceDegrees = 60.0;
-            if ([self angleBetweenPoints:west east:east] > horizontalToleranceDegrees) {
+            CLLocationDegrees degrees = [self angleBetweenPoints:leftTouchPoint endPoint:rightTouchPoint];
+            if (fabs(degrees) > MGLHorizontalTiltToleranceDegrees) {
                 return NO;
             }
         }
@@ -2211,18 +2307,24 @@ public:
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     NSArray *validSimultaneousGestures = @[ self.pan, self.pinch, self.rotate ];
-
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (CLLocationDegrees)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
+- (CLLocationDegrees)angleBetweenPoints:(CGPoint)originPoint endPoint:(CGPoint)endPoint
 {
-    CGFloat slope = (west.y - east.y) / (west.x - east.x);
+    if (originPoint.x > endPoint.x) {
+        CGPoint swap = originPoint;
+        originPoint = endPoint;
+        endPoint = swap;
+    }
     
-    CGFloat angle = atan(fabs(slope));
-    CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
+    CGFloat x = (endPoint.x - originPoint.x);
+    CGFloat y = (endPoint.y - originPoint.y);
     
-    return degrees;
+    CGFloat angleInRadians = atan2(y, x);
+    CLLocationDegrees angleInDegrees = MGLDegreesFromRadians(angleInRadians);
+    
+    return angleInDegrees;
 }
 
 #pragma mark - Attribution -
@@ -2302,7 +2404,7 @@ public:
     NSString *message;
     NSString *participateTitle;
     NSString *declineTitle;
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"])
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsEnabledKey])
     {
         message = NSLocalizedStringWithDefaultValue(@"TELEMETRY_ENABLED_MSG", nil, nil, @"You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.", @"Telemetry prompt message");
         participateTitle = NSLocalizedStringWithDefaultValue(@"TELEMETRY_ENABLED_ON", nil, nil, @"Keep Participating", @"Telemetry prompt button");
@@ -2330,14 +2432,14 @@ public:
     UIAlertAction *declineAction = [UIAlertAction actionWithTitle:declineTitle
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * _Nonnull action) {
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"MGLMapboxMetricsEnabled"];
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:MGLMapboxMetricsEnabledKey];
     }];
     [alertController addAction:declineAction];
     
     UIAlertAction *participateAction = [UIAlertAction actionWithTitle:participateTitle
                                                                 style:UIAlertActionStyleCancel
                                                               handler:^(UIAlertAction * _Nonnull action) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"MGLMapboxMetricsEnabled"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:MGLMapboxMetricsEnabledKey];
     }];
     [alertController addAction:participateAction];
     
@@ -3188,26 +3290,35 @@ public:
         animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf scheduleTransitionCompletion:completion])
+            {
+                completion();
+            }
+        };
+        
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
             // Must run asynchronously after the transition is completely over.
             // Otherwise, a call to -setCenterCoordinate: within the completion
             // handler would reenter the completion handler’s caller.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion();
-            });
+
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
     
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
     if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, insets))
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
@@ -3374,12 +3485,22 @@ public:
         animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf scheduleTransitionCompletion:completion])
+            {
                 completion();
-            });
+            }
+        };
+
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
 
@@ -3389,11 +3510,9 @@ public:
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
     if ([self.camera isEqualToMapCamera:camera])
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
@@ -3534,22 +3653,30 @@ public:
         animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
         animationOptions.easing.emplace(MGLUnitBezierForMediaTimingFunction(function));
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf scheduleTransitionCompletion:completion])
+            {
                 completion();
-            });
+            }
+        };
+
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
     
     if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, edgePadding))
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
@@ -3605,22 +3732,30 @@ public:
         animationOptions.minZoom = MGLZoomLevelForAltitude(peakAltitude, peakPitch,
                                                            peakLatitude, self.frame.size);
     }
+    
+    dispatch_block_t pendingCompletion;
+    
     if (completion)
     {
-        animationOptions.transitionFinishFn = [completion]() {
-            dispatch_async(dispatch_get_main_queue(), ^{
+        __weak __typeof__(self) weakSelf = self;
+        
+        pendingCompletion = ^{
+            if (![weakSelf scheduleTransitionCompletion:completion])
+            {
                 completion();
-            });
+            }
+        };
+
+        animationOptions.transitionFinishFn = [pendingCompletion]() {
+            dispatch_async(dispatch_get_main_queue(), pendingCompletion);
         };
     }
     
     if ([self.camera isEqualToMapCamera:camera] && UIEdgeInsetsEqualToEdgeInsets(_contentInset, insets))
     {
-        if (completion)
+        if (pendingCompletion)
         {
-            [self animateWithDelay:duration animations:^{
-                completion();
-            }];
+            [self animateWithDelay:duration animations:pendingCompletion];
         }
         return;
     }
@@ -5168,35 +5303,29 @@ public:
 
     if (shouldEnableLocationServices)
     {
-        if (self.locationManager.authorizationStatus == kCLAuthorizationStatusNotDetermined)
-        {
-            BOOL requiresWhenInUseUsageDescription = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){11,0,0}];
+        if (self.locationManager.authorizationStatus == kCLAuthorizationStatusNotDetermined) {
             BOOL hasWhenInUseUsageDescription = !![[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
-            BOOL hasAlwaysUsageDescription;
-            if (requiresWhenInUseUsageDescription)
-            {
-                hasAlwaysUsageDescription = !![[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"] && hasWhenInUseUsageDescription;
-            }
-            else
-            {
-                hasAlwaysUsageDescription = !![[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
-            }
 
-            if (hasAlwaysUsageDescription)
-            {
-                [self.locationManager requestAlwaysAuthorization];
-            }
-            else if (hasWhenInUseUsageDescription)
-            {
-                [self.locationManager requestWhenInUseAuthorization];
-            }
-            else
-            {
-                NSString *suggestedUsageKeys = requiresWhenInUseUsageDescription ?
-                    @"NSLocationWhenInUseUsageDescription and (optionally) NSLocationAlwaysAndWhenInUseUsageDescription" :
-                    @"NSLocationWhenInUseUsageDescription and/or NSLocationAlwaysUsageDescription";
-                [NSException raise:MGLMissingLocationServicesUsageDescriptionException
-                            format:@"This app must have a value for %@ in its Info.plist.", suggestedUsageKeys];
+            if (@available(iOS 11.0, *)) {
+                // A WhenInUse string is required in iOS 11+ and the map never has any need for Always, so it's enough to just ask for WhenInUse.
+                if (hasWhenInUseUsageDescription) {
+                    [self.locationManager requestWhenInUseAuthorization];
+                } else {
+                    [NSException raise:MGLMissingLocationServicesUsageDescriptionException
+                                format:@"To use location services this app must have a NSLocationWhenInUseUsageDescription string in its Info.plist."];
+                }
+            } else {
+                // We might have to ask for Always if the app does not provide a WhenInUse string.
+                BOOL hasAlwaysUsageDescription = !![[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
+
+                if (hasWhenInUseUsageDescription) {
+                    [self.locationManager requestWhenInUseAuthorization];
+                } else if (hasAlwaysUsageDescription) {
+                    [self.locationManager requestAlwaysAuthorization];
+                } else {
+                    [NSException raise:MGLMissingLocationServicesUsageDescriptionException
+                                format:@"To use location services this app must have a NSLocationWhenInUseUsageDescription and/or NSLocationAlwaysUsageDescription string in its Info.plist."];
+                }
             }
         }
 

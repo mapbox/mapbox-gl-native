@@ -29,7 +29,7 @@ public:
 
     // Camera
     /** Returns the current camera options. */
-    CameraOptions getCameraOptions(const EdgeInsets&) const;
+    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
 
     /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);

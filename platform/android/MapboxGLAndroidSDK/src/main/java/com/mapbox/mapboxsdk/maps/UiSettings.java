@@ -417,10 +417,6 @@ public final class UiSettings {
   }
 
   void update(@NonNull CameraPosition cameraPosition) {
-    if (!isCompassEnabled()) {
-      return;
-    }
-
     double clockwiseBearing = -cameraPosition.bearing;
     compassView.update(clockwiseBearing);
   }
@@ -1073,6 +1069,7 @@ public final class UiSettings {
    */
   public void invalidate() {
     setLogoMargins(getLogoMarginLeft(), getLogoMarginTop(), getLogoMarginRight(), getLogoMarginBottom());
+    setCompassEnabled(isCompassEnabled());
     setCompassMargins(getCompassMarginLeft(), getCompassMarginTop(), getCompassMarginRight(), getCompassMarginBottom());
     setAttributionMargins(getAttributionMarginLeft(), getAttributionMarginTop(), getAttributionMarginRight(),
       getAttributionMarginBottom());

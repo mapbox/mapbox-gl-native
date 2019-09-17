@@ -74,6 +74,7 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
 
         if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
             polygons.emplace_back(std::move(polygon));
+            polygon = GeometryCollection();
         }
 
         polygon.emplace_back(ring);
@@ -100,8 +101,8 @@ void limitHoles(GeometryCollection& polygon, uint32_t maxHoles) {
 
 static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
     const double size = util::EXTENT * std::pow(2, tileID.z);
-    const double x0 = util::EXTENT * tileID.x;
-    const double y0 = util::EXTENT * tileID.y;
+    const double x0 = util::EXTENT * static_cast<double>(tileID.x);
+    const double y0 = util::EXTENT * static_cast<double>(tileID.y);
 
     auto tileCoordinatesToLatLng = [&] (const Point<int16_t>& p) {
         double y2 = 180 - (p.y + y0) * 360 / size;

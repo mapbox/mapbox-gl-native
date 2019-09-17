@@ -4,7 +4,6 @@
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/property_value.hpp>
 
 #include <cstdint>
 #include <vector>

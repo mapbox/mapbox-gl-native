@@ -10,6 +10,10 @@
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
 
+#include <mapbox/geojsonvt.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <rapidjson/document.h>
+
 namespace mbgl {
 namespace style {
 namespace expression {
@@ -20,6 +24,25 @@ std::unique_ptr<Expression> compound(const char* op, std::vector<std::unique_ptr
     ParseResult result =  createCompoundExpression(op, std::move(args), ctx);
     assert(result);
     return std::move(*result);
+}
+    
+std::unique_ptr<Expression> createExpression(const char* expr) {
+    using JSValue = rapidjson::GenericValue<rapidjson::UTF8<>, rapidjson::CrtAllocator>;
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
+    document.Parse<0>(expr);
+    if (document.HasParseError()) return nullptr;
+
+    const JSValue* expression = &document;
+    expression::ParsingContext ctx;
+    expression::ParseResult parsed =
+    ctx.parseExpression(mbgl::style::conversion::Convertible(expression));
+    return parsed ? std::move(*parsed) : nullptr;
+}
+
+std::unique_ptr<Expression> createExpression(const mbgl::style::conversion::Convertible& expr) {
+    expression::ParsingContext ctx;
+    expression::ParseResult parsed = ctx.parseExpression(expr);
+    return parsed ? std::move(*parsed) : nullptr;
 }
 
 std::unique_ptr<Expression> error(std::string message) {

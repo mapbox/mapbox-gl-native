@@ -17,6 +17,7 @@
 namespace mbgl {
 
 class UnwrappedTileID;
+class TileCoordinate;
 
 class TransformState {
     friend class Transform;
@@ -42,7 +43,7 @@ public:
     // Viewport mode
     ViewportMode getViewportMode() const;
 
-    CameraOptions getCameraOptions(const EdgeInsets&) const;
+    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
 
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
@@ -81,6 +82,8 @@ public:
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
+    // Implements mapbox-gl-js pointCoordinate() : MercatorCoordinate.
+    TileCoordinate screenCoordinateToTileCoordinate(const ScreenCoordinate&, uint8_t atZoom) const;
 
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;

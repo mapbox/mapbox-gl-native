@@ -98,8 +98,11 @@ void GlyphManager::processResponse(const Response& res, const FontStack& fontSta
         }
 
         for (auto& glyph : glyphs) {
-            entry.glyphs.erase(glyph.id);
-            entry.glyphs.emplace(glyph.id, makeMutable<Glyph>(std::move(glyph)));
+            auto id = glyph.id;
+            if (!localGlyphRasterizer->canRasterizeGlyph(fontStack, id)) {
+                entry.glyphs.erase(id);
+                entry.glyphs.emplace(id, makeMutable<Glyph>(std::move(glyph)));
+            }
         }
     }
 

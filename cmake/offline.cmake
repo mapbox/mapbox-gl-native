@@ -12,7 +12,7 @@ target_include_directories(mbgl-offline
 
 target_link_libraries(mbgl-offline
     PRIVATE mbgl-core
-    PRIVATE args
+    PRIVATE Mapbox::Base::Extras::args
 )
 
 mbgl_platform_offline()

@@ -1,7 +1,8 @@
 package com.mapbox.mapboxsdk.utils;
 
 import android.graphics.Typeface;
-
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.log.Logger;
 
@@ -18,6 +19,14 @@ import static com.mapbox.mapboxsdk.constants.MapboxConstants.DEFAULT_FONT;
 public class FontUtils {
 
   private static final String TAG = "Mbgl-FontUtils";
+  private static final String TYPEFACE_FONTMAP_FIELD_NAME = "sSystemFontMap";
+  private static final List<String> DEFAULT_FONT_STACKS = new ArrayList<>();
+
+  static {
+    DEFAULT_FONT_STACKS.add("sans-serif");
+    DEFAULT_FONT_STACKS.add("serif");
+    DEFAULT_FONT_STACKS.add("monospace");
+  }
 
   private FontUtils() {
     // no instance
@@ -34,7 +43,13 @@ public class FontUtils {
       return null;
     }
 
-    List<String> validFonts = getAvailableFonts();
+    List<String> validFonts;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      validFonts = getDeviceFonts();
+    } else {
+      validFonts = DEFAULT_FONT_STACKS;
+    }
+
     for (String fontName : fontNames) {
       if (validFonts.contains(fontName)) {
         return fontName;
@@ -47,16 +62,18 @@ public class FontUtils {
     return DEFAULT_FONT;
   }
 
-  private static List<String> getAvailableFonts() {
+  @SuppressWarnings( {"JavaReflectionMemberAccess", "unchecked"})
+  @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+  private static List<String> getDeviceFonts() {
     List<String> fonts = new ArrayList<>();
     try {
       Typeface typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
-      Field f = Typeface.class.getDeclaredField("sSystemFontMap");
-      f.setAccessible(true);
-      Map<String, Typeface> fontMap = (Map<String, Typeface>) f.get(typeface);
+      Field field = Typeface.class.getDeclaredField(TYPEFACE_FONTMAP_FIELD_NAME);
+      field.setAccessible(true);
+      Map<String, Typeface> fontMap = (Map<String, Typeface>) field.get(typeface);
       fonts.addAll(fontMap.keySet());
     } catch (Exception exception) {
-      Logger.e(TAG,"Couldn't load fonts from Typeface", exception);
+      Logger.e(TAG, "Couldn't load fonts from Typeface", exception);
       MapStrictMode.strictModeViolation("Couldn't load fonts from Typeface", exception);
     }
     return fonts;

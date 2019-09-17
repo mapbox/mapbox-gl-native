@@ -1,5 +1,6 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
+#import "MGLMockGestureRecognizers.h"
 
 #import <mbgl/math/wrap.hpp>
 
@@ -8,12 +9,6 @@
 - (void)resetNorthAnimated:(BOOL)animated;
 @end
 
-@interface UIRotationGestureRecognizerMock : UIRotationGestureRecognizer
-@end
-
-@implementation UIRotationGestureRecognizerMock
-- (CGPoint)locationInView:(nullable UIView*)view { return view.center; }
-@end
 
 @interface MGLMapViewDirectionTests : XCTestCase
 @property (nonatomic) MGLMapView *mapView;

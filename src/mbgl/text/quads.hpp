@@ -44,9 +44,7 @@ public:
 using SymbolQuads = std::vector<SymbolQuad>;
 
 SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
-                       const style::SymbolLayoutProperties::Evaluated&,
-                       const float layoutTextSize,
-                       const Shaping& shapedText);
+                       WritingModeType writingMode);
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const std::array<float, 2> textOffset,

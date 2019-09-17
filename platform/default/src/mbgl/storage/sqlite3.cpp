@@ -125,6 +125,7 @@ mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &
     const int error = sqlite3_open_v2(filename.c_str(), &db, flags | SQLITE_OPEN_URI, nullptr);
     if (error != SQLITE_OK) {
         const auto message = sqlite3_errmsg(db);
+        sqlite3_close(db);
         return Exception { error, message };
     }
     return Database(std::make_unique<DatabaseImpl>(db));

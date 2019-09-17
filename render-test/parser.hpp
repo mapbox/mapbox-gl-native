@@ -1,5 +1,7 @@
 #pragma once
 
+#include "metadata.hpp"
+
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/variant.hpp>
 
@@ -7,24 +9,23 @@
 #include <string>
 #include <vector>
 
-#include "filesystem.hpp"
-
-struct TestMetadata;
-struct TestStatistics;
-
 using ErrorMessage = std::string;
 using JSONReply = mbgl::variant<mbgl::JSDocument, ErrorMessage>;
 
-using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::vector<std::string>>;
+using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::vector<TestPaths>>;
 
 JSONReply readJson(const mbgl::filesystem::path&);
 std::string serializeJsonValue(const mbgl::JSValue&);
+std::string serializeMetrics(const TestMetrics&);
 
 std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base);
 
+TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path);
+
 ArgumentsTuple parseArguments(int argc, char** argv);
 std::vector<std::pair<std::string, std::string>> parseIgnores();
-TestMetadata parseTestMetadata(const mbgl::filesystem::path& path);
+
+TestMetadata parseTestMetadata(const TestPaths& paths);
 
 std::string createResultPage(const TestStatistics&, const std::vector<TestMetadata>&, bool shuffle, uint32_t seed);
 

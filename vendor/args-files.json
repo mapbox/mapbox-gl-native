@@ -1,8 +1,0 @@
-{
-    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
-    "sources": [],
-    "public_headers": {
-        "args.hxx": "vendor/args/args.hxx"
-    },
-    "private_headers": {}
-}

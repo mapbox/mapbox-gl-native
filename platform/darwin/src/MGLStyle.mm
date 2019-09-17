@@ -226,12 +226,23 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     MGLLogDebug(@"Removing source: %@", source);
     
     if (!source.rawSource) {
-        [NSException raise:NSInvalidArgumentException format:
-         @"The source %@ cannot be removed from the style. "
-         @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
-         source];
+        NSString *errorMessage = [NSString stringWithFormat:
+                                  @"The source %@ cannot be removed from the style. "
+                                  @"Make sure the source was created as a member of a concrete subclass of MGLSource."
+                                  @"Automatic re-addition of sources after style changes is not currently supported.",
+                                  source];
+        
+        if (outError) {
+            *outError = [NSError errorWithDomain:MGLErrorDomain
+                                            code:MGLErrorCodeSourceCannotBeRemovedFromStyle
+                                        userInfo:@{ NSLocalizedDescriptionKey : errorMessage }];
+            return NO;
+        }
+        else {
+            [NSException raise:NSInvalidArgumentException format:@"%@", errorMessage];
+        }
     }
-
+    
     return [source removeFromMapView:self.mapView error:outError];
 }
 

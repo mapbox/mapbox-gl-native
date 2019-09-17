@@ -101,14 +101,6 @@ macro(mbgl_platform_core)
         PRIVATE nunicode
         PUBLIC -lz
     )
-
-    if(WITH_CXX11ABI)
-        # Statically link libstdc++ when we're using the new STL ABI
-        target_link_libraries(mbgl-core
-            PUBLIC -static-libstdc++
-            PUBLIC -Wl,-Bsymbolic-functions
-        )
-    endif()
 endmacro()
 
 

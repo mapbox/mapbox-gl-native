@@ -13,12 +13,13 @@ SymbolInstance makeSymbolInstance(float x, float y, std::u16string key) {
     Anchor anchor(x, y, 0, 0);
     std::array<float, 2> textOffset{{0.0f, 0.0f}};
     std::array<float, 2> iconOffset{{0.0f, 0.0f}};
+    std::array<float, 2> variableTextOffset{{0.0f, 0.0f}};
     style::SymbolPlacementType placementType = style::SymbolPlacementType::Point;
 
     auto sharedData = std::make_shared<SymbolInstanceSharedData>(std::move(line),
-                                        shaping, nullopt, layout_, 0.0f, placementType,
+                                        shaping, nullopt, nullopt, layout_, placementType,
                                         textOffset, positions, false);
-    return SymbolInstance(anchor, std::move(sharedData), shaping, nullopt, 0, 0, placementType, textOffset, 0, 0, iconOffset, subfeature, 0, 0, key, 0.0f, 0.0f, 0.0f, 0.0f, false);
+    return SymbolInstance(anchor, std::move(sharedData), shaping, nullopt, nullopt, 0, 0, placementType, textOffset, 0, 0, iconOffset, subfeature, 0, 0, key, 0.0f, 0.0f, 0.0f, variableTextOffset, false);
 }
 
 
@@ -30,7 +31,6 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
-    bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
@@ -39,7 +39,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     std::vector<SymbolInstance> mainInstances;
     mainInstances.push_back(makeSymbolInstance(1000, 1000, u"Detroit"));
     mainInstances.push_back(makeSymbolInstance(2000, 2000, u"Toronto"));
-    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(mainInstances), 1.0f, false, {} };
+    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(mainInstances), 1.0f, false, {} };
     mainBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(mainID, mainBucket, maxCrossTileID);
 
@@ -54,7 +54,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     childInstances.push_back(makeSymbolInstance(2000, 2000, u"Windsor"));
     childInstances.push_back(makeSymbolInstance(3000, 3000, u"Toronto"));
     childInstances.push_back(makeSymbolInstance(4001, 4001, u"Toronto"));
-    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(childInstances), 1.0f, false, {} };
+    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(childInstances), 1.0f, false, {} };
     childBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(childID, childBucket, maxCrossTileID);
 
@@ -70,7 +70,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     OverscaledTileID parentID(5, 0, 5, 4, 4);
     std::vector<SymbolInstance> parentInstances;
     parentInstances.push_back(makeSymbolInstance(500, 500, u"Detroit"));
-    SymbolBucket parentBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(parentInstances), 1.0f, false, {} };
+    SymbolBucket parentBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(parentInstances), 1.0f, false, {} };
     parentBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(parentID, parentBucket, maxCrossTileID);
 
@@ -86,7 +86,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     std::vector<SymbolInstance> grandchildInstances;
     grandchildInstances.push_back(makeSymbolInstance(4000, 4000, u"Detroit"));
     grandchildInstances.push_back(makeSymbolInstance(4000, 4000, u"Windsor"));
-    SymbolBucket grandchildBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(grandchildInstances), 1.0f, false, {} };
+    SymbolBucket grandchildBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(grandchildInstances), 1.0f, false, {} };
     grandchildBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(grandchildID, grandchildBucket, maxCrossTileID);
 
@@ -105,7 +105,6 @@ TEST(CrossTileSymbolLayerIndex, resetIDs) {
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
-    bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
@@ -113,13 +112,13 @@ TEST(CrossTileSymbolLayerIndex, resetIDs) {
     OverscaledTileID mainID(6, 0, 6, 8, 8);
     std::vector<SymbolInstance> mainInstances;
     mainInstances.push_back(makeSymbolInstance(1000, 1000, u"Detroit"));
-    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(mainInstances), 1.0f, false, {} };
+    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(mainInstances), 1.0f, false, {} };
     mainBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     OverscaledTileID childID(7, 0, 7, 16, 16);
     std::vector<SymbolInstance> childInstances;
     childInstances.push_back(makeSymbolInstance(2000, 2000, u"Detroit"));
-    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(childInstances), 1.0f, false, {} };
+    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(childInstances), 1.0f, false, {} };
     childBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     // assigns a new id
@@ -146,7 +145,6 @@ TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
-    bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
@@ -155,7 +153,7 @@ TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
     std::vector<SymbolInstance> mainInstances;
     mainInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // A
     mainInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // B
-    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(mainInstances), 1.0f, false, {} };
+    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(mainInstances), 1.0f, false, {} };
     mainBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     OverscaledTileID childID(7, 0, 7, 16, 16);
@@ -163,7 +161,7 @@ TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
     childInstances.push_back(makeSymbolInstance(2000, 2000, u"")); // A'
     childInstances.push_back(makeSymbolInstance(2000, 2000, u"")); // B'
     childInstances.push_back(makeSymbolInstance(2000, 2000, u"")); // C'
-    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(childInstances), 1.0f, false, {} };
+    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(childInstances), 1.0f, false, {} };
     childBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     // assigns new ids
@@ -185,7 +183,6 @@ TEST(CrossTileSymbolLayerIndex, bucketReplacement) {
 
     Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> layout =
         makeMutable<style::SymbolLayoutProperties::PossiblyEvaluated>();
-    bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
@@ -194,14 +191,14 @@ TEST(CrossTileSymbolLayerIndex, bucketReplacement) {
     std::vector<SymbolInstance> firstInstances;
     firstInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // A
     firstInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // B
-    SymbolBucket firstBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(firstInstances), 1.0f, false, {} };
+    SymbolBucket firstBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(firstInstances), 1.0f, false, {} };
     firstBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     std::vector<SymbolInstance> secondInstances;
     secondInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // A'
     secondInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // B'
     secondInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // C'
-    SymbolBucket secondBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(secondInstances), 1.0f, false, {} };
+    SymbolBucket secondBucket { layout, {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(secondInstances), 1.0f, false, {} };
     secondBucket.bucketInstanceId = ++maxBucketInstanceId;
 
     // assigns new ids

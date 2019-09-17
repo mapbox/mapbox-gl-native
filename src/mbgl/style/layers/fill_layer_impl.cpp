@@ -8,6 +8,7 @@ bool FillLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
     const auto& impl = static_cast<const style::FillLayer::Impl&>(other);
     return filter     != impl.filter ||
            visibility != impl.visibility ||
+           paint.get<FillPattern>().value != impl.paint.get<FillPattern>().value ||
            paint.hasDataDrivenPropertyDifference(impl.paint);
 }
 

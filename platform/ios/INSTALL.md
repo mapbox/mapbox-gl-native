@@ -108,7 +108,7 @@ For instructions on installing stable release versions of the Mapbox Maps SDK fo
 
 ##### Testing pre-releases with CocoaPods
 
-To test pre-releases of the dynamic framework, directly specify the version in your Podfile:
+To test pre-releases of the dynamic framework, directly specify the version in your `Podfile`:
 
 ```rb
 pod 'Mapbox-iOS-SDK', '~> x.x.x-alpha.1'
@@ -126,10 +126,20 @@ pod 'Mapbox-iOS-SDK-snapshot-dynamic', podspec: 'https://raw.githubusercontent.c
 
 1. Build from source manually, per above.
 
-1. Update your app’s `Podfile` to point to `Mapbox-iOS-SDK.podspec`.
+1. Edit [`Mapbox-iOS-SDK.podspec`](./Mapbox-iOS-SDK.podspec) to point to the local build output:
+
+    ```diff
+       m.source = {
+    -    :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-#{m.version.to_s}-dynamic.zip",
+    +    :path => "../../build/ios/pkg/dynamic/",
+         :flatten => true
+       }
+    ```
+
+1. Update your app’s `Podfile` to point to the edited `Mapbox-iOS-SDK.podspec`.
 
     ```rb
-    pod 'Mapbox-iOS-SDK', :path => '{...}/build/ios/pkg/{dynamic|static}/Mapbox-iOS-SDK.podspec'
+    pod 'Mapbox-iOS-SDK', :path => '{...}/platform/ios/Mapbox-iOS-SDK.podspec'
     ```
 
 1. Run `pod update` to grab the newly-built library.
@@ -138,10 +148,12 @@ If using the static framework, add `$(inherited)` to your target’s Other Linke
 
 ##### Using pre-stripped releases with CocoaPods
 
-If you choose to commit the contents of your `Pods` directory to source control and are encountering file size limitations, you may wish to use builds that have been pre-stripped of debug symbols.
+If you choose to commit the contents of your `Pods` directory to source control and are encountering file size limitations, you may wish to use builds that have been pre-stripped of debug symbols. We publish these to [our public podspecs repository](https://github.com/mapbox/pod-specs/), which should be added as an additional `source` in your app’s `Podfile`.
 
 ```rb
-pod 'Mapbox-iOS-SDK-stripped', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/ios-v{x.x.x}/platform/ios/Mapbox-iOS-SDK-stripped.podspec'
+source 'https://github.com/mapbox/pod-specs.git'
+
+pod 'Mapbox-iOS-SDK-stripped', '~> x.x.x'
 ```
 
 Note that these builds lack some debugging information, which could make development more difficult and result in less useful crash reports. Though initially smaller on disk, using these builds has no effect on the ultimate size of your application — see our [Understanding iOS Framework Size guide](https://www.mapbox.com/help/ios-framework-size/) for more information.

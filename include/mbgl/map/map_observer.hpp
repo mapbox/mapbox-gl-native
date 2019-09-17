@@ -34,6 +34,12 @@ public:
         Full
     };
 
+    struct RenderFrameStatus {
+        RenderMode mode;
+        bool needsRepaint; // In continous mode, shows that there are ongoig transitions.
+        bool placementChanged;
+    };
+
     virtual void onCameraWillChange(CameraChangeMode) {}
     virtual void onCameraIsChanging() {}
     virtual void onCameraDidChange(CameraChangeMode) {}
@@ -41,7 +47,7 @@ public:
     virtual void onDidFinishLoadingMap() {}
     virtual void onDidFailLoadingMap(MapLoadError, const std::string&) {}
     virtual void onWillStartRenderingFrame() {}
-    virtual void onDidFinishRenderingFrame(RenderMode) {}
+    virtual void onDidFinishRenderingFrame(RenderFrameStatus) {}
     virtual void onWillStartRenderingMap() {}
     virtual void onDidFinishRenderingMap(RenderMode) {}
     virtual void onDidFinishLoadingStyle() {}

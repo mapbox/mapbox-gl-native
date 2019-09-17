@@ -25,13 +25,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatFontScale;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextColor;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextFont;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.NumberFormatOption.currency;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.NumberFormatOption.locale;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.NumberFormatOption.maxFractionDigits;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.NumberFormatOption.minFractionDigits;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.collator;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.format;
@@ -41,6 +47,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.match;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.number;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.numberFormat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
@@ -56,8 +63,10 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOutlineColor
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @RunWith(AndroidJUnit4.class)
@@ -558,6 +567,197 @@ public class ExpressionTest extends EspressoTest {
         .isEmpty());
       assertNull(layer.getTextField().getExpression());
       assertEquals(formatted, layer.getTextField().getValue());
+    });
+  }
+
+  @Test
+  public void testNumberFormatCurrencyExpression() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      SymbolLayer layer = new SymbolLayer("layer", "source");
+      mapboxMap.getStyle().addLayer(layer);
+
+      layer.setProperties(
+        textField(
+          numberFormat(12.345, locale("en-US"), currency("USD"))
+        )
+      );
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
+
+      assertFalse(mapboxMap.queryRenderedFeatures(
+        mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
+      assertNull(layer.getTextField().getExpression());
+      assertEquals("$12.35", layer.getTextField().getValue().getFormattedSections()[0].getText());
+    });
+  }
+
+  @Test
+  public void testNumberFormatMaxExpression() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      SymbolLayer layer = new SymbolLayer("layer", "source");
+      mapboxMap.getStyle().addLayer(layer);
+
+      layer.setProperties(
+        textField(
+          numberFormat(12.34567890, maxFractionDigits(5), minFractionDigits(0))
+        )
+      );
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
+
+      assertFalse(mapboxMap.queryRenderedFeatures(
+        mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
+      assertNull(layer.getTextField().getExpression());
+      assertEquals("12.34568", layer.getTextField().getValue().getFormattedSections()[0].getText());
+    });
+  }
+
+  @Test
+  public void testNumberFormatMinExpression() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      SymbolLayer layer = new SymbolLayer("layer", "source");
+      mapboxMap.getStyle().addLayer(layer);
+
+      layer.setProperties(
+        textField(
+          numberFormat(12.0000001, maxFractionDigits(5), minFractionDigits(0))
+        )
+      );
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
+
+      assertFalse(mapboxMap.queryRenderedFeatures(
+        mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
+      assertNull(layer.getTextField().getExpression());
+      assertEquals("12", layer.getTextField().getValue().getFormattedSections()[0].getText());
+    });
+  }
+
+  @Test
+  public void testNumberFormatLocaleExpression() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      SymbolLayer layer = new SymbolLayer("layer", "source");
+      mapboxMap.getStyle().addLayer(layer);
+
+      layer.setProperties(
+        textField(
+          numberFormat(12.0000001, locale("nl-BE"), maxFractionDigits(5), minFractionDigits(1))
+        )
+      );
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
+
+      assertFalse(mapboxMap.queryRenderedFeatures(
+        mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
+      assertNull(layer.getTextField().getExpression());
+      assertEquals("12,0", layer.getTextField().getValue().getFormattedSections()[0].getText());
+    });
+  }
+
+  @Test
+  public void testNumberFormatNonConstantExpression() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      Feature feature = Feature.fromGeometry(Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()));
+      feature.addNumberProperty("number_value", 12.345678);
+      feature.addStringProperty("locale_value", "nl-BE");
+      feature.addNumberProperty("max_value", 5);
+      feature.addNumberProperty("min_value", 1);
+
+
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", feature));
+      SymbolLayer layer = new SymbolLayer("layer", "source");
+      mapboxMap.getStyle().addLayer(layer);
+
+      Expression numberFormatExpression = numberFormat(
+        number(number(get("number_value"))),
+        locale(string(get("locale_value"))),
+        maxFractionDigits(number(get("max_value"))),
+        minFractionDigits(number(get("min_value")))
+      );
+
+      layer.setProperties(textField(numberFormatExpression));
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, mapView);
+
+      assertFalse(mapboxMap.queryRenderedFeatures(
+        mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
+
+      assertNotNull(layer.getTextField().getExpression());
+
+      // Expressions evaluated to string are wrapped by a format expression, take array index 1 to get original
+      Object[] returnExpression = (Object[]) layer.getTextField().getExpression().toArray()[1];
+      Object[] setExpression = numberFormatExpression.toArray();
+      assertEquals("Number format should match",returnExpression[0], setExpression[0]);
+      assertArrayEquals("Get value expression should match",
+        (Object[]) returnExpression[1],
+        (Object[]) setExpression[1]
+      );
+
+      // number format objects
+      HashMap<String, Object> returnMap = (HashMap<String, Object>) returnExpression[2];
+      HashMap<String, Object> setMap = (HashMap<String, Object>) returnExpression[2];
+
+      assertArrayEquals("Number format min fraction digits should match ",
+        (Object[]) returnMap.get("min-fraction-digits"),
+        (Object[]) setMap.get("min-fraction-digits")
+      );
+
+      assertArrayEquals("Number format max fraction digits should match ",
+        (Object[]) returnMap.get("max-fraction-digits"),
+        (Object[]) setMap.get("max-fraction-digits")
+      );
+
+      assertArrayEquals("Number format min fraction digits should match ",
+        (Object[]) returnMap.get("locale"),
+        (Object[]) setMap.get("locale")
+      );
+    });
+
+  }
+
+  /**
+   * Regression test for #15532
+   */
+  @Test
+  public void testDoubleConversion() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      mapboxMap.getStyle().addSource(
+        new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()))
+      );
+
+      CircleLayer layer = new CircleLayer("layer", "source");
+      mapboxMap.getStyle().addLayer(layer);
+
+      Expression input =  interpolate(
+        exponential(0.5f), zoom(),
+        stop(-0.1, color(Color.RED)),
+        stop(0, color(Color.BLUE))
+      );
+
+      layer.setProperties(circleColor(input));
+
+      Expression output = layer.getCircleColor().getExpression();
+      assertArrayEquals("Expression should match", input.toArray(), output.toArray());
     });
   }
 

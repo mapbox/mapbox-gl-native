@@ -32,7 +32,7 @@ const std::string& RenderLayer::getID() const {
 }
 
 bool RenderLayer::hasRenderPass(RenderPass pass) const {
-    return bool(passes & pass);
+    return passes & pass;
 }
 
 bool RenderLayer::needsRendering() const {

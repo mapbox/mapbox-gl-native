@@ -5,8 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.view.TextureView;
+
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGL11;
@@ -15,8 +19,6 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 /**
  * The render thread is responsible for managing the communication between the
@@ -250,13 +252,13 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
         // Initialize EGL
         if (initializeEGL) {
           eglHolder.prepare();
-          if (!eglHolder.createSurface()) {
-            synchronized (lock) {
+          synchronized (lock) {
+            if (!eglHolder.createSurface()) {
               // Cleanup the surface if one could not be created
               // and wait for another to be ready.
               destroySurface = true;
+              continue;
             }
-            continue;
           }
           mapRenderer.onSurfaceCreated(gl, eglHolder.eglConfig);
           mapRenderer.onSurfaceChanged(gl, w, h);
@@ -265,7 +267,9 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
 
         // If the surface size has changed inform the map renderer.
         if (recreateSurface) {
-          eglHolder.createSurface();
+          synchronized (lock) {
+            eglHolder.createSurface();
+          }
           mapRenderer.onSurfaceChanged(gl, w, h);
           continue;
         }

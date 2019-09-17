@@ -14,6 +14,7 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/eternal.hpp>
 
@@ -176,7 +177,7 @@ TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>T
 using namespace conversion;
 
 optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property : uint8_t {
+    enum class Property {
 <% for (const property of paintProperties) { -%>
         <%- camelize(property.name) %>,
 <% } -%>
@@ -186,8 +187,8 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
     };
 
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        <%- paintProperties.map(p => `{ "${p.name}", static_cast<uint8_t>(Property::${camelize(p.name)}) }`).join(',\n        ') %>,
-        <%- paintProperties.map(p => `{ "${p.name}-transition", static_cast<uint8_t>(Property::${camelize(p.name)}Transition) }`).join(',\n        ') %>
+        <%- paintProperties.map(p => `{ "${p.name}", mbgl::underlying_type(Property::${camelize(p.name)}) }`).join(',\n        ') %>,
+        <%- paintProperties.map(p => `{ "${p.name}-transition", mbgl::underlying_type(Property::${camelize(p.name)}Transition) }`).join(',\n        ') %>
     });
 
     const auto it = properties.find(name.c_str());
@@ -254,7 +255,7 @@ optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string&
 <% } -%>
     };
     MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        <%- layoutProperties.map(p => `{ "${p.name}", static_cast<uint8_t>(Property::${camelize(p.name)}) }`).join(',\n        ') %>
+        <%- layoutProperties.map(p => `{ "${p.name}", mbgl::underlying_type(Property::${camelize(p.name)}) }`).join(',\n        ') %>
     });
 
     const auto it = properties.find(name.c_str());

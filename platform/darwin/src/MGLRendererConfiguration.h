@@ -20,9 +20,6 @@ MGL_EXPORT
  Based on the native scale where available, otherwise the standard screen scale. */
 @property (nonatomic, readonly) const float scaleFactor;
 
-/** The cache dir to use. */
-@property (nonatomic, readonly) mbgl::optional<std::string> cacheDir;
-
 /** The name of the font family to use for client-side text rendering of CJK ideographs.
  
  Set MGLIdeographicFontFamilyName in your containing application's Info.plist to

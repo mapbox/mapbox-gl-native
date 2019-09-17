@@ -33,14 +33,6 @@ TEST(DEMData, ConstructorTerrarium) {
     EXPECT_EQ(demdata.getImage()->bytes(), size_t(18*18*4));
 };
 
-TEST(DEMData, RoundTrip) {
-    PremultipliedImage image = fakeImage({16, 16});
-    DEMData demdata(image, Tileset::DEMEncoding::Mapbox);
-
-    demdata.set(4, 6, 255);
-    EXPECT_EQ(demdata.get(4, 6), 255);
-}
-
 TEST(DEMData, InitialBackfill) {
 
     PremultipliedImage image1 = fakeImage({4, 4});

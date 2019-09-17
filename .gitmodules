@@ -7,18 +7,12 @@
 [submodule "vendor/nunicode"]
 	path = vendor/nunicode
 	url = https://bitbucket.org/alekseyt/nunicode.git
-[submodule "vendor/rapidjson"]
-	path = vendor/rapidjson
-	url = https://github.com/Tencent/rapidjson.git
 [submodule "vendor/earcut.hpp"]
 	path = vendor/earcut.hpp
 	url = https://github.com/mapbox/earcut.hpp.git
 [submodule "vendor/geojson-vt-cpp"]
 	path = vendor/geojson-vt-cpp
 	url = https://github.com/mapbox/geojson-vt-cpp.git
-[submodule "vendor/geojson.hpp"]
-	path = vendor/geojson.hpp
-	url = https://github.com/mapbox/geojson.hpp.git
 [submodule "vendor/polylabel"]
 	path = vendor/polylabel
 	url = https://github.com/mapbox/polylabel.git
@@ -28,9 +22,6 @@
 [submodule "vendor/shelf-pack-cpp"]
 	path = vendor/shelf-pack-cpp
 	url = https://github.com/mapbox/shelf-pack-cpp.git
-[submodule "vendor/supercluster.hpp"]
-	path = vendor/supercluster.hpp
-	url = https://github.com/mapbox/supercluster.hpp.git
 [submodule "vendor/vector-tile"]
 	path = vendor/vector-tile
 	url = https://github.com/mapbox/vector-tile.git
@@ -40,9 +31,6 @@
 [submodule "vendor/expected-lite"]
 	path = vendor/expected
 	url = https://github.com/martinmoene/expected-lite.git
-[submodule "vendor/kdbush.hpp"]
-	path = vendor/kdbush.hpp
-	url = https://github.com/mourner/kdbush.hpp.git
 [submodule "vendor/unique_resource"]
 	path = vendor/unique_resource
 	url = https://github.com/okdshin/unique_resource.git
@@ -58,12 +46,6 @@
 [submodule "vendor/cheap-ruler-cpp"]
 	path = vendor/cheap-ruler-cpp
 	url = https://github.com/mapbox/cheap-ruler-cpp.git
-[submodule "vendor/pixelmatch-cpp"]
-	path = vendor/pixelmatch-cpp
-	url = https://github.com/mapbox/pixelmatch-cpp.git
-[submodule "vendor/jni.hpp"]
-	path = vendor/jni.hpp
-	url = https://github.com/mapbox/jni.hpp.git
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = https://github.com/glfw/glfw.git
@@ -82,18 +64,12 @@
 [submodule "platform/darwin/docs/theme"]
 	path = platform/darwin/docs/theme
 	url = https://github.com/mapbox/jazzy-theme.git
-[submodule "vendor/args"]
-	path = vendor/args
-	url = https://github.com/Taywee/args
 [submodule "vendor/mvt-fixtures"]
 	path = vendor/mvt-fixtures
 	url = https://github.com/mapbox/mvt-fixtures.git
 [submodule "vendor/mapbox-gl-styles"]
 	path = vendor/mapbox-gl-styles
 	url = https://github.com/mapbox/mapbox-gl-styles.git
-[submodule "vendor/filesystem"]
-	path = vendor/filesystem
-	url = https://github.com/gulrak/filesystem.git
 [submodule "vendor/mapbox-base"]
 	path = vendor/mapbox-base
 	url = https://github.com/mapbox/mapbox-base.git

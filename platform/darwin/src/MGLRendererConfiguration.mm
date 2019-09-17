@@ -66,10 +66,6 @@ static NSString * const MGLIdeographicFontFamilyNameKey = @"MGLIdeographicFontFa
 #endif
 }
 
-- (mbgl::optional<std::string>)cacheDir {
-    return mbgl::optional<std::string>();
-}
-
 - (mbgl::optional<std::string>)localFontFamilyName {
     return [self _localFontFamilyNameWithPropertyDictionary:[[NSBundle mainBundle] infoDictionary]];
 }

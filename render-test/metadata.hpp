@@ -7,6 +7,8 @@
 
 #include "filesystem.hpp"
 
+#include <map>
+
 struct TestStatistics {
     TestStatistics() = default;
 
@@ -17,10 +19,36 @@ struct TestStatistics {
     uint32_t passedTests = 0;
 };
 
+struct TestPaths {
+    mbgl::filesystem::path stylePath;
+    std::vector<mbgl::filesystem::path> expectations;
+
+    std::string defaultExpectations() const {
+        assert(!expectations.empty());
+        return expectations.front().string();
+    }
+};
+
+struct MemoryProbe {
+    MemoryProbe() = default;
+    MemoryProbe(size_t peak_, size_t allocations_)
+        : peak(peak_)
+        , allocations(allocations_) {}
+
+    size_t peak;
+    size_t allocations;
+};
+
+class TestMetrics {
+public:
+    bool isEmpty() const { return memory.empty(); }
+    std::map<std::string, MemoryProbe> memory;
+};
+
 struct TestMetadata {
     TestMetadata() = default;
 
-    mbgl::filesystem::path path;
+    TestPaths paths;
     mbgl::JSDocument document;
 
     mbgl::Size size{ 512u, 512u };
@@ -49,4 +77,7 @@ struct TestMetadata {
 
     std::string errorMessage;
     double difference = 0.0;
+
+    TestMetrics metrics;
+    TestMetrics expectedMetrics;
 };

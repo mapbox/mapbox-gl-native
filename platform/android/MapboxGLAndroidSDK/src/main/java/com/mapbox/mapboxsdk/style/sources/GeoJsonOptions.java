@@ -1,8 +1,11 @@
 package com.mapbox.mapboxsdk.style.sources;
 
 import android.support.annotation.NonNull;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 
 import java.util.HashMap;
+
+import static com.mapbox.mapboxsdk.style.expressions.Expression.ExpressionLiteral;
 
 /**
  * Builder class for composing GeoJsonSource objects.
@@ -107,6 +110,30 @@ public class GeoJsonOptions extends HashMap<String, Object> {
   @NonNull
   public GeoJsonOptions withClusterRadius(int clusterRadius) {
     this.put("clusterRadius", clusterRadius);
+    return this;
+  }
+
+  /**
+   * An object defining custom properties on the generated clusters if clustering is enabled,
+   * aggregating values from clustered points. Has the form {"property_name": [operator, [map_expression]]} or
+   * {"property_name": [[operator, accumulated, expression], [map_expression]]}
+   *
+   * @param propertyName name of the property
+   * @param operatorExpr operatorExpr is any expression function that accepts at least 2 operands (e.g. "+" or "max").
+   *                     It accumulates the property value from clusters/points the cluster contains. It can either be
+   *                     a literal with single operator, or be a valid expression
+   * @param mapExpr map expression produces the value of a single point, it shall be a valid expression
+   * @return the current instance for chaining
+   */
+  @NonNull
+  public GeoJsonOptions withClusterProperty(String propertyName, Expression operatorExpr, Expression mapExpr) {
+    HashMap<String, Object[]> properties = containsKey("clusterProperties")
+            ? (HashMap<String, Object[]>) get("clusterProperties") : new HashMap<String, Object[]>();
+    Object operator = (operatorExpr instanceof ExpressionLiteral)
+            ? ((ExpressionLiteral)operatorExpr).toValue() : operatorExpr.toArray();
+    Object map = mapExpr.toArray();
+    properties.put(propertyName, new Object[]{operator, map});
+    this.put("clusterProperties", properties);
     return this;
   }
 }

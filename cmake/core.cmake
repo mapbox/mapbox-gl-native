@@ -12,9 +12,7 @@ target_link_libraries(mbgl-core PRIVATE
     eternal
     expected
     geojson-vt-cpp
-    kdbush.hpp
     shelf-pack-cpp
-    supercluster.hpp
     unique_resource
     wagyu
 )
@@ -28,12 +26,12 @@ endif()
 # libraries in our public interface.
 target_link_libraries(mbgl-core PUBLIC
     boost
+    mapbox-base-extras
     mapbox-base
-    geojson.hpp
     ${ICU_LIBRARY}
     polylabel
     protozero
-    rapidjson
+    Mapbox::Base::Extras::rapidjson
     vector-tile
 )
 
