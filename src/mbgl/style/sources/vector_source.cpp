@@ -1,12 +1,13 @@
-#include <mbgl/style/sources/vector_source.hpp>
-#include <mbgl/style/sources/vector_source_impl.hpp>
-#include <mbgl/style/source_observer.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/mapbox.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/source_observer.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/vector_source_impl.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 namespace mbgl {
 namespace style {
@@ -82,6 +83,12 @@ void VectorSource::loadDescription(FileSource& fileSource) {
             }
         }
     });
+}
+
+bool VectorSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
+    return !std::strcmp(info->type, "line") || !std::strcmp(info->type, "symbol") ||
+           !std::strcmp(info->type, "circle") || !std::strcmp(info->type, "fill") ||
+           !std::strcmp(info->type, "fill-extrusion") || !std::strcmp(info->type, "heatmap");
 }
 
 } // namespace style

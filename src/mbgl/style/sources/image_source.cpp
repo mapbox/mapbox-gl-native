@@ -1,9 +1,10 @@
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/sources/image_source_impl.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/style/source_observer.hpp>
 #include <mbgl/util/premultiply.hpp>
-#include <mbgl/storage/file_source.hpp>
 
 namespace mbgl {
 namespace style {
@@ -78,6 +79,10 @@ void ImageSource::loadDescription(FileSource& fileSource) {
             observer->onSourceLoaded(*this);
         }
     });
+}
+
+bool ImageSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
+    return !std::strcmp(info->type, "raster");
 }
 
 } // namespace style

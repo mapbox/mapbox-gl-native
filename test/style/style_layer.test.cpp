@@ -299,6 +299,24 @@ TEST(Layer, DuplicateLayer) {
     }
 }
 
+TEST(Layer, IncompatibleLayer) {
+    util::RunLoop loop;
+
+    // Setup style
+    StubFileSource fileSource;
+    Style::Impl style{fileSource, 1.0};
+    style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+
+    // Try to add duplicate
+    try {
+        style.addLayer(std::make_unique<RasterLayer>("raster", "unusedsource"));
+        FAIL() << "Should not have been allowed to add an incompatible layer to the source";
+    } catch (const std::runtime_error& e) {
+        // Expected
+        ASSERT_STREQ("Layer 'raster' is not compatible with source 'unusedsource'", e.what());
+    }
+}
+
 namespace {
 
 template<template<typename> class PropertyValueType, typename LayoutType>
