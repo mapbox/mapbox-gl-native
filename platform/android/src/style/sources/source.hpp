@@ -72,7 +72,7 @@ protected:
 
 private:
     // Set on newly created sources until added to the map.
-    std::unique_ptr<mbgl::style::Source> ownedSource_;
+    std::unique_ptr<mbgl::style::Source> ownedSource_ { nullptr };
 
     mapbox::base::WeakPtr<mbgl::style::Source> coreSource_;
 };
