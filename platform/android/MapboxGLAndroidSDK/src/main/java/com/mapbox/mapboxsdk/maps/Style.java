@@ -526,12 +526,6 @@ public class Style {
       }
     }
 
-    for (Source source : sources.values()) {
-      if (source != null) {
-        source.setDetached();
-      }
-    }
-
     for (Map.Entry<String, Bitmap> bitmapEntry : images.entrySet()) {
       nativeMap.removeImage(bitmapEntry.getKey());
       bitmapEntry.getValue().recycle();
