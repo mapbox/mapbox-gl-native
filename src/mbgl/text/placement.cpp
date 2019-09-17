@@ -58,16 +58,49 @@ const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& s
     }
 }
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions, std::shared_ptr<const Placement> prevPlacement_)
+// PlacementController implemenation
+
+PlacementController::PlacementController()
+    : placement(makeMutable<Placement>(TransformState{}, MapMode::Static, style::TransitionOptions{}, true, nullopt)) {
+}
+
+void PlacementController::setPlacement(Immutable<Placement> placement_) {
+    placement = std::move(placement_);
+    stale = false;
+}
+
+bool PlacementController::placementIsRecent(TimePoint now, const float zoom, optional<Duration> maximumDuration) const {
+    if (!placement->transitionsEnabled()) return false;
+
+    auto updatePeriod = placement->getUpdatePeriod(zoom);
+
+    if (maximumDuration) {
+        updatePeriod = std::min(*maximumDuration, updatePeriod);
+    }
+
+    return placement->getCommitTime() + updatePeriod > now;
+}
+
+
+bool PlacementController::hasTransitions(TimePoint now) const {
+    if (!placement->transitionsEnabled()) return false;
+
+    if (stale) return true;
+
+    return placement->hasTransitions(now);
+}
+
+// Placement implementation
+
+Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions, optional<Immutable<Placement>> prevPlacement_)
     : collisionIndex(state_)
     , mapMode(mapMode_)
     , transitionOptions(std::move(transitionOptions_))
     , placementZoom(state_.getZoom())
     , collisionGroups(crossSourceCollisions)
-    , prevPlacement(std::move(prevPlacement_))
-{
+    , prevPlacement(std::move(prevPlacement_)) {
     if (prevPlacement) {
-        prevPlacement->prevPlacement.reset(); // Only hold on to one placement back
+        prevPlacement->get()->prevPlacement = nullopt; // Only hold on to one placement back
     }
 }
 
@@ -188,9 +221,9 @@ void Placement::placeBucket(
             const CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
 
             const auto updatePreviousOrientationIfNotPlaced = [&](bool isPlaced) {
-                    if (bucket.allowVerticalPlacement && !isPlaced && prevPlacement) {
-                        auto prevOrientation = prevPlacement->placedOrientations.find(symbolInstance.crossTileID);
-                        if (prevOrientation != prevPlacement->placedOrientations.end()) {
+                    if (bucket.allowVerticalPlacement && !isPlaced && getPrevPlacement()) {
+                        auto prevOrientation = getPrevPlacement()->placedOrientations.find(symbolInstance.crossTileID);
+                        if (prevOrientation != getPrevPlacement()->placedOrientations.end()) {
                             placedOrientations[symbolInstance.crossTileID] = prevOrientation->second;
                         }
                     }
@@ -251,9 +284,9 @@ void Placement::placeBucket(
                 // If this symbol was in the last placement, shift the previously used
                 // anchor to the front of the anchor list, only if the previous anchor
                 // is still in the anchor list.
-                if (prevPlacement) {
-                    auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                    if (prevOffset != prevPlacement->variableOffsets.end()) {
+                if (getPrevPlacement()) {
+                    auto prevOffset = getPrevPlacement()->variableOffsets.find(symbolInstance.crossTileID);
+                    if (prevOffset != getPrevPlacement()->variableOffsets.end()) {
                         const auto prevAnchor = prevOffset->second.anchor;
                         auto found = std::find(variableTextAnchors.begin(), variableTextAnchors.end(), prevAnchor);
                         if (found != variableTextAnchors.begin() && found != variableTextAnchors.end()) {
@@ -300,11 +333,11 @@ void Placement::placeBucket(
 
                             // If this label was placed in the previous placement, record the anchor position
                             // to allow us to animate the transition
-                            if (prevPlacement) {
-                                auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                                auto prevPlacements = prevPlacement->placements.find(symbolInstance.crossTileID);
-                                if (prevOffset != prevPlacement->variableOffsets.end() &&
-                                    prevPlacements != prevPlacement->placements.end() &&
+                            if (getPrevPlacement()) {
+                                auto prevOffset = getPrevPlacement()->variableOffsets.find(symbolInstance.crossTileID);
+                                auto prevPlacements = getPrevPlacement()->placements.find(symbolInstance.crossTileID);
+                                if (prevOffset != getPrevPlacement()->variableOffsets.end() &&
+                                    prevPlacements != getPrevPlacement()->placements.end() &&
                                     prevPlacements->second.text) {
                                     // TODO: The prevAnchor seems to be unused, needs to be fixed.
                                     prevAnchor = prevOffset->second.anchor;
@@ -350,9 +383,9 @@ void Placement::placeBucket(
 
                 // If we didn't get placed, we still need to copy our position from the last placement for
                 // fade animations
-                if (!placeText && prevPlacement) {
-                    auto prevOffset = prevPlacement->variableOffsets.find(symbolInstance.crossTileID);
-                    if (prevOffset != prevPlacement->variableOffsets.end()) {
+                if (!placeText && getPrevPlacement()) {
+                    auto prevOffset = getPrevPlacement()->variableOffsets.find(symbolInstance.crossTileID);
+                    if (prevOffset != getPrevPlacement()->variableOffsets.end()) {
                         variableOffsets[symbolInstance.crossTileID] = prevOffset->second;
                     }
                 }
@@ -459,19 +492,18 @@ void Placement::placeBucket(
 }
 
 void Placement::commit(TimePoint now, const double zoom) {
-    assert(prevPlacement);
     commitTime = now;
 
     bool placementChanged = false;
 
-    prevZoomAdjustment = prevPlacement->zoomAdjustment(zoom);
+    prevZoomAdjustment = getPrevPlacement()->zoomAdjustment(zoom);
 
-    float increment = prevPlacement->symbolFadeChange(commitTime);
+    float increment = getPrevPlacement()->symbolFadeChange(commitTime);
 
     // add the opacities from the current placement, and copy their current values from the previous placement
     for (auto& jointPlacement : placements) {
-        auto prevOpacity = prevPlacement->opacities.find(jointPlacement.first);
-        if (prevOpacity != prevPlacement->opacities.end()) {
+        auto prevOpacity = getPrevPlacement()->opacities.find(jointPlacement.first);
+        if (prevOpacity != getPrevPlacement()->opacities.end()) {
             opacities.emplace(jointPlacement.first, JointOpacityState(prevOpacity->second, increment, jointPlacement.second.text, jointPlacement.second.icon));
             placementChanged = placementChanged ||
                 jointPlacement.second.icon != prevOpacity->second.icon.placed ||
@@ -483,7 +515,7 @@ void Placement::commit(TimePoint now, const double zoom) {
     }
 
     // copy and update values from the previous placement that aren't in the current placement but haven't finished fading
-    for (auto& prevOpacity : prevPlacement->opacities) {
+    for (auto& prevOpacity : getPrevPlacement()->opacities) {
         if (opacities.find(prevOpacity.first) == opacities.end()) {
             JointOpacityState jointOpacity(prevOpacity.second, increment, false, false);
             if (!jointOpacity.isHidden()) {
@@ -493,7 +525,7 @@ void Placement::commit(TimePoint now, const double zoom) {
         }
     }
 
-    for (auto& prevOffset : prevPlacement->variableOffsets) {
+    for (auto& prevOffset : getPrevPlacement()->variableOffsets) {
         const uint32_t crossTileID = prevOffset.first;
         auto foundOffset = variableOffsets.find(crossTileID);
         auto foundOpacity = opacities.find(crossTileID);
@@ -502,7 +534,7 @@ void Placement::commit(TimePoint now, const double zoom) {
         }
     }
 
-    for (auto& prevOrientation : prevPlacement->placedOrientations) {
+    for (auto& prevOrientation : getPrevPlacement()->placedOrientations) {
         const uint32_t crossTileID = prevOrientation.first;
         auto foundOrientation = placedOrientations.find(crossTileID);
         auto foundOpacity = opacities.find(crossTileID);
@@ -511,7 +543,7 @@ void Placement::commit(TimePoint now, const double zoom) {
         }
     }
 
-    fadeStartTime = placementChanged ? commitTime : prevPlacement->fadeStartTime;
+    fadeStartTime = placementChanged ? commitTime : getPrevPlacement()->fadeStartTime;
 }
 
 void Placement::updateLayerBuckets(const RenderLayer& layer, const TransformState& state, bool updateOpacities) const {
@@ -948,12 +980,11 @@ void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingMode
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
-    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions &&
+    if (transitionsEnabled() &&
         transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) > Milliseconds(0)) {
         return std::chrono::duration<float>(now - commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) + prevZoomAdjustment;
-    } else {
-        return 1.0;
     }
+    return 1.0;
 }
 
 float Placement::zoomAdjustment(const float zoom) const {
@@ -968,33 +999,16 @@ Duration Placement::getUpdatePeriod(const float zoom) const {
     // Even if transitionOptions.duration is set to a value < 300ms, we still wait for this default transition duration
     // before attempting another placement operation.
     const auto fadeDuration = std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION));
-    const auto adjustedDuration = std::chrono::duration_cast<Duration>(fadeDuration * (1.0 - zoomAdjustment(zoom)));
-    if (maximumUpdatePeriod) {
-        return std::min(*maximumUpdatePeriod, adjustedDuration);
-    }
-    return adjustedDuration;
+    return std::chrono::duration_cast<Duration>(fadeDuration * (1.0 - zoomAdjustment(zoom)));
+}
+
+bool Placement::transitionsEnabled() const {
+    return mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions;
 }
 
 bool Placement::hasTransitions(TimePoint now) const {
-    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions) {
-        return stale || std::chrono::duration<float>(now - fadeStartTime) < transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
-    } else {
-        return false;
-    }
-}
-
-bool Placement::stillRecent(TimePoint now, const float zoom) const {
-    return mapMode == MapMode::Continuous &&
-        transitionOptions.enablePlacementTransitions &&
-        commitTime + getUpdatePeriod(zoom) > now;
-}
-
-void Placement::setMaximumUpdatePeriod(Duration duration) {
-    maximumUpdatePeriod = duration;
-}
-
-void Placement::setStale() {
-    stale = true;
+    assert(transitionsEnabled());
+    return std::chrono::duration<float>(now - fadeStartTime) < transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
 }
 
 const CollisionIndex& Placement::getCollisionIndex() const {
