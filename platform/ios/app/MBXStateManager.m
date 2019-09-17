@@ -1,5 +1,4 @@
 #import "MBXStateManager.h"
-#import <Mapbox/Mapbox.h>
 #import "MBXState.h"
 #import "MBXViewController.h"
 
