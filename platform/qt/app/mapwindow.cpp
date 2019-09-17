@@ -9,12 +9,15 @@
 #include <QMouseEvent>
 #include <QString>
 
+#include <cmath>
+
 int kAnimationDuration = 10000;
 
 MapWindow::MapWindow(const QMapboxGLSettings &settings)
     : m_settings(settings)
 {
     setWindowIcon(QIcon(":icon.png"));
+    setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
 MapWindow::~MapWindow()
@@ -493,4 +496,71 @@ void MapWindow::paintGL()
     m_map->resize(size());
     m_map->setFramebufferObject(defaultFramebufferObject(), size() * pixelRatio());
     m_map->render();
+}
+
+void MapWindow::touchEvent(QTouchEvent* ev) {
+    switch (ev->type()) {
+        case QTouchEvent::TouchBegin:
+            m_accumulatedTouchAngle = 0.0;
+            m_touchRotation = false;
+            // fall through
+        case QTouchEvent::TouchUpdate:
+        case QTouchEvent::TouchEnd: {
+            QList<QTouchEvent::TouchPoint> tps = ev->touchPoints();
+            if (tps.count() == 1) {
+                QPointF delta = tps.first().pos() - tps.first().lastPos();
+                m_map->moveBy(delta);
+            } else if (tps.count() == 2) {
+                QLineF last(tps.first().lastPos(), tps.last().lastPos());
+                QLineF end(tps.first().pos(), tps.last().pos());
+
+                QPointF lastCenter(0.5 * last.p1() + 0.5 * last.p2());
+                QPointF endCenter(0.5 * end.p1() + 0.5 * end.p2());
+
+                QPointF delta = endCenter - lastCenter;
+                m_map->moveBy(delta);
+
+                float s = end.length() / last.length();
+                m_map->scaleBy(s, endCenter);
+
+                if (end.length() > 75.0) {
+                    m_accumulatedTouchAngle = std::fmod(m_accumulatedTouchAngle + last.angleTo(end), 360.0);
+                    if (m_accumulatedTouchAngle >= 180.0) {
+                        m_accumulatedTouchAngle -= 360.0;
+                    }
+                }
+                if (m_touchRotation || m_accumulatedTouchAngle > 10.0 || m_accumulatedTouchAngle < -10.0) {
+                    m_touchRotation = true;
+
+                    QMapboxGLCameraOptions camera;
+                    camera.anchor = endCenter;
+                    camera.bearing = m_map->bearing() + last.angleTo(end);
+
+                    m_map->jumpTo(camera);
+
+                }
+            } else if (tps.count() == 3) {
+                float s = 100.0 * (tps.first().pos().y() - tps.first().lastPos().y()) / width();
+                m_map->pitchBy(s);
+            }
+        }; break;
+        default:
+            ev->ignore();
+            break;
+    }
+}
+
+bool MapWindow::event(QEvent* ev) {
+    switch (ev->type()) {
+        case QEvent::TouchBegin:
+        case QEvent::TouchUpdate:
+        case QEvent::TouchEnd: {
+            touchEvent(static_cast<QTouchEvent *>(ev));
+            return true;
+        }; break;
+        default:
+           break;
+    }
+
+    return QOpenGLWidget::event(ev);
 }

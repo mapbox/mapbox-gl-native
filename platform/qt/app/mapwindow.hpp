@@ -6,6 +6,7 @@
 #include <QOpenGLWidget>
 #include <QPropertyAnimation>
 #include <QScopedPointer>
+#include <QTouchEvent>
 #include <QtGlobal>
 
 class QKeyEvent;
@@ -31,6 +32,7 @@ private:
     qreal pixelRatio();
 
     // QWidget implementation.
+    bool event(QEvent *e) final;
     void keyPressEvent(QKeyEvent *ev) final;
     void mousePressEvent(QMouseEvent *ev) final;
     void mouseMoveEvent(QMouseEvent *ev) final;
@@ -39,6 +41,8 @@ private:
     // Q{,Open}GLWidget implementation.
     void initializeGL() final;
     void paintGL() final;
+
+    void touchEvent(QTouchEvent *ev);
 
     QPointF m_lastPos;
 
@@ -54,6 +58,9 @@ private:
     QVariant m_symbolAnnotationId;
     QVariant m_lineAnnotationId;
     QVariant m_fillAnnotationId;
+
+    bool m_touchRotation = false;
+    double m_accumulatedTouchAngle = 0.0;
 
     bool m_sourceAdded = false;
 };
