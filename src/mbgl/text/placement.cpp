@@ -61,8 +61,7 @@ const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& s
 // PlacementController implemenation
 
 PlacementController::PlacementController()
-    : placement(makeMutable<Placement>(TransformState{}, MapMode::Static, style::TransitionOptions{}, true, nullopt)) {
-}
+    : placement(makeMutable<Placement>(TransformState{}, MapMode::Static, style::TransitionOptions{}, true, nullopt)) {}
 
 void PlacementController::setPlacement(Immutable<Placement> placement_) {
     placement = std::move(placement_);
@@ -81,7 +80,6 @@ bool PlacementController::placementIsRecent(TimePoint now, const float zoom, opt
     return placement->getCommitTime() + updatePeriod > now;
 }
 
-
 bool PlacementController::hasTransitions(TimePoint now) const {
     if (!placement->transitionsEnabled()) return false;
 
@@ -92,13 +90,17 @@ bool PlacementController::hasTransitions(TimePoint now) const {
 
 // Placement implementation
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions, optional<Immutable<Placement>> prevPlacement_)
-    : collisionIndex(state_)
-    , mapMode(mapMode_)
-    , transitionOptions(std::move(transitionOptions_))
-    , placementZoom(state_.getZoom())
-    , collisionGroups(crossSourceCollisions)
-    , prevPlacement(std::move(prevPlacement_)) {
+Placement::Placement(const TransformState& state_,
+                     MapMode mapMode_,
+                     style::TransitionOptions transitionOptions_,
+                     const bool crossSourceCollisions,
+                     optional<Immutable<Placement>> prevPlacement_)
+    : collisionIndex(state_),
+      mapMode(mapMode_),
+      transitionOptions(std::move(transitionOptions_)),
+      placementZoom(state_.getZoom()),
+      collisionGroups(crossSourceCollisions),
+      prevPlacement(std::move(prevPlacement_)) {
     if (prevPlacement) {
         prevPlacement->get()->prevPlacement = nullopt; // Only hold on to one placement back
     }
@@ -221,12 +223,12 @@ void Placement::placeBucket(
             const CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
 
             const auto updatePreviousOrientationIfNotPlaced = [&](bool isPlaced) {
-                    if (bucket.allowVerticalPlacement && !isPlaced && getPrevPlacement()) {
-                        auto prevOrientation = getPrevPlacement()->placedOrientations.find(symbolInstance.crossTileID);
-                        if (prevOrientation != getPrevPlacement()->placedOrientations.end()) {
-                            placedOrientations[symbolInstance.crossTileID] = prevOrientation->second;
-                        }
+                if (bucket.allowVerticalPlacement && !isPlaced && getPrevPlacement()) {
+                    auto prevOrientation = getPrevPlacement()->placedOrientations.find(symbolInstance.crossTileID);
+                    if (prevOrientation != getPrevPlacement()->placedOrientations.end()) {
+                        placedOrientations[symbolInstance.crossTileID] = prevOrientation->second;
                     }
+                }
             };
 
             const auto placeTextForPlacementModes = [&] (auto& placeHorizontalFn, auto& placeVerticalFn) {
@@ -722,7 +724,9 @@ bool Placement::updateBucketDynamicVertices(SymbolBucket& bucket, const Transfor
     return result;
 }
 
-void Placement::updateBucketOpacities(SymbolBucket& bucket, const TransformState& state, std::set<uint32_t>& seenCrossTileIDs) const {
+void Placement::updateBucketOpacities(SymbolBucket& bucket,
+                                      const TransformState& state,
+                                      std::set<uint32_t>& seenCrossTileIDs) const {
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
     if (bucket.hasSdfIconData()) bucket.sdfIcon.opacityVertices.clear();
@@ -923,11 +927,15 @@ optional<size_t> justificationToIndex(style::TextJustifyType justify, const Symb
     return nullopt;
 }
 
-const style::TextJustifyType justifyTypes[] = {style::TextJustifyType::Right, style::TextJustifyType::Center, style::TextJustifyType::Left};
+const style::TextJustifyType justifyTypes[] = {
+    style::TextJustifyType::Right, style::TextJustifyType::Center, style::TextJustifyType::Left};
 
 }  // namespace
 
-void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableAnchorType placedAnchor, const SymbolInstance& symbolInstance, style::TextWritingModeType orientation) const {
+void Placement::markUsedJustification(SymbolBucket& bucket,
+                                      style::TextVariableAnchorType placedAnchor,
+                                      const SymbolInstance& symbolInstance,
+                                      style::TextWritingModeType orientation) const {
     style::TextJustifyType anchorJustify = getAnchorJustification(placedAnchor);
     assert(anchorJustify != style::TextJustifyType::Auto);
     const optional<size_t>& autoIndex = justificationToIndex(anchorJustify, symbolInstance, orientation);
@@ -947,7 +955,9 @@ void Placement::markUsedJustification(SymbolBucket& bucket, style::TextVariableA
     }
 }
 
-void Placement::markUsedOrientation(SymbolBucket& bucket, style::TextWritingModeType orientation, const SymbolInstance& symbolInstance) const {
+void Placement::markUsedOrientation(SymbolBucket& bucket,
+                                    style::TextWritingModeType orientation,
+                                    const SymbolInstance& symbolInstance) const {
     auto horizontal = orientation == style::TextWritingModeType::Horizontal ?
                                      optional<style::TextWritingModeType>(orientation) : nullopt;
     auto vertical = orientation == style::TextWritingModeType::Vertical ?
@@ -998,7 +1008,8 @@ float Placement::zoomAdjustment(const float zoom) const {
 Duration Placement::getUpdatePeriod(const float zoom) const {
     // Even if transitionOptions.duration is set to a value < 300ms, we still wait for this default transition duration
     // before attempting another placement operation.
-    const auto fadeDuration = std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION));
+    const auto fadeDuration = std::max(util::DEFAULT_TRANSITION_DURATION,
+                                       transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION));
     return std::chrono::duration_cast<Duration>(fadeDuration * (1.0 - zoomAdjustment(zoom)));
 }
 
@@ -1008,7 +1019,8 @@ bool Placement::transitionsEnabled() const {
 
 bool Placement::hasTransitions(TimePoint now) const {
     assert(transitionsEnabled());
-    return std::chrono::duration<float>(now - fadeStartTime) < transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
+    return std::chrono::duration<float>(now - fadeStartTime) <
+           transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
 }
 
 const CollisionIndex& Placement::getCollisionIndex() const {

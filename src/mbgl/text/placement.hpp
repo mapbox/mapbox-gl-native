@@ -62,7 +62,7 @@ struct RetainedQueryData {
     std::shared_ptr<FeatureIndex> featureIndex;
     OverscaledTileID tileID;
     mutable FeatureSortOrder featureSortOrder;
-    
+
     RetainedQueryData(uint32_t bucketInstanceId_,
                       std::shared_ptr<FeatureIndex> featureIndex_,
                       OverscaledTileID tileID_)
@@ -108,18 +108,22 @@ public:
     void setPlacementStale() { stale = true; }
     bool placementIsRecent(TimePoint now, const float zoom, optional<Duration> maximumDuration = nullopt) const;
     bool hasTransitions(TimePoint now) const;
-    
+
 private:
     Immutable<Placement> placement;
     bool stale = false;
 };
-    
+
 class Placement {
 public:
-    Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, optional<Immutable<Placement>> prevPlacement);
+    Placement(const TransformState&,
+              MapMode,
+              style::TransitionOptions,
+              const bool crossSourceCollisions,
+              optional<Immutable<Placement>> prevPlacement);
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
     void commit(TimePoint, const double zoom);
-    void updateLayerBuckets(const RenderLayer&, const TransformState&,  bool updateOpacities) const;
+    void updateLayerBuckets(const RenderLayer&, const TransformState&, bool updateOpacities) const;
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
     bool transitionsEnabled() const;
@@ -133,18 +137,16 @@ public:
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
 private:
     friend SymbolBucket;
-    void placeBucket(
-            const SymbolBucket&,
-            const BucketPlacementParameters&,
-            std::set<uint32_t>& seenCrossTileIDs);
+    void placeBucket(const SymbolBucket&, const BucketPlacementParameters&, std::set<uint32_t>& seenCrossTileIDs);
     // Returns `true` if bucket vertices were updated; returns `false` otherwise.
     bool updateBucketDynamicVertices(SymbolBucket&, const TransformState&, const RenderTile& tile) const;
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&) const;
-    void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, const SymbolInstance&, style::TextWritingModeType orientation) const;
+    void markUsedJustification(SymbolBucket&,
+                               style::TextVariableAnchorType,
+                               const SymbolInstance&,
+                               style::TextWritingModeType orientation) const;
     void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&) const;
-    const Placement* getPrevPlacement() const {
-        return prevPlacement ? prevPlacement->get() : nullptr;
-    }
+    const Placement* getPrevPlacement() const { return prevPlacement ? prevPlacement->get() : nullptr; }
 
     CollisionIndex collisionIndex;
 
