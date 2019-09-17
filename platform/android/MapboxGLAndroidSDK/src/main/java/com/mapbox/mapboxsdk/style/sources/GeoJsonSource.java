@@ -259,9 +259,6 @@ public class GeoJsonSource extends Source {
    * @param feature the GeoJSON {@link Feature} to set
    */
   public void setGeoJson(Feature feature) {
-    if (detached) {
-      return;
-    }
     checkThread();
     nativeSetFeature(feature);
   }
@@ -273,9 +270,6 @@ public class GeoJsonSource extends Source {
    * @param geometry the GeoJSON {@link Geometry} to set
    */
   public void setGeoJson(Geometry geometry) {
-    if (detached) {
-      return;
-    }
     checkThread();
     nativeSetGeometry(geometry);
   }
@@ -287,9 +281,6 @@ public class GeoJsonSource extends Source {
    * @param featureCollection the GeoJSON FeatureCollection
    */
   public void setGeoJson(@Nullable FeatureCollection featureCollection) {
-    if (detached) {
-      return;
-    }
     checkThread();
 
     if (featureCollection != null && featureCollection.features() != null) {
@@ -308,9 +299,6 @@ public class GeoJsonSource extends Source {
    * @param json the raw GeoJson FeatureCollection string
    */
   public void setGeoJson(String json) {
-    if (detached) {
-      return;
-    }
     checkThread();
     nativeSetGeoJsonString(json);
   }

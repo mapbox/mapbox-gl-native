@@ -15,8 +15,6 @@ public abstract class Source {
   @Keep
   private long nativePtr;
 
-  protected boolean detached;
-
   static {
     LibraryLoader.load();
   }
@@ -84,8 +82,4 @@ public abstract class Source {
   @NonNull
   @Keep
   protected native String nativeGetAttribution();
-
-  public void setDetached() {
-    detached = true;
-  }
 }
