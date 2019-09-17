@@ -63,8 +63,12 @@ void VectorSource::loadDescription(FileSource& fileSource) {
                 observer->onSourceError(*this, std::make_exception_ptr(util::StyleParseException(error.message)));
                 return;
             }
-            if (maxZoom) tileset->zoomRange.max = *maxZoom;
-            if (minZoom) tileset->zoomRange.min = *minZoom;
+            if (maxZoom) {
+                tileset->zoomRange.max = *maxZoom;
+            }
+            if (minZoom) {
+                tileset->zoomRange.min = *minZoom;
+            }
             util::mapbox::canonicalizeTileset(*tileset, url, getType(), util::tileSize);
             bool changed = impl().tileset != *tileset;
 
