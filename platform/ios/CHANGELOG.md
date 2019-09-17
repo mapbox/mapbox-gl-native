@@ -19,6 +19,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue that caused the tilt gesture to trigger too easily and conflict with pinch or pan gestures. ([#15349](https://github.com/mapbox/mapbox-gl-native/pull/15349))
 * Fixed an issue that caused the map to rotate too easily during a pinch gesture. [(#15562)](https://github.com/mapbox/mapbox-gl-native/pull/15562)
+* Fixed an issue that ornaments could be setting outside the mapview. [(#14373)](https://github.com/mapbox/mapbox-gl-native/pull/14373)
 
 ### Performance improvements
  

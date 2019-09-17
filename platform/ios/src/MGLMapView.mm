@@ -963,22 +963,14 @@ public:
 
     [self updateAttributionAlertView];
     
-    if (!CGRectContainsRect(self.bounds, self.attributionButton.mgl_frameForTransformIdentity)) {
-        [NSException raise:NSInvalidArgumentException
-                    format:@"The attribution is not in the visible area of the mapview. Please check your position and offset settings"];
-    }
-    if (!CGRectContainsRect(self.bounds, self.scaleBar.mgl_frameForTransformIdentity)) {
-        [NSException raise:NSInvalidArgumentException
-                    format:@"The scaleBar is not in the visible area of the mapview. Please check your position and offset settings"];
-    }
-    if (!CGRectContainsRect(self.bounds, self.compassView.mgl_frameForTransformIdentity)) {
-        [NSException raise:NSInvalidArgumentException
-                    format:@"The compassView is not in the visible area of the mapview. Please check your position and offset settings"];
-    }
-    if (!CGRectContainsRect(self.bounds, self.logoView.mgl_frameForTransformIdentity)) {
-        [NSException raise:NSInvalidArgumentException
-                    format:@"The logoView is not in the visible area of the mapview. Please check your position and offset settings"];
-    }
+    MGLAssert(CGRectContainsRect(self.bounds, self.attributionButton.mgl_frameForIdentifyTransform),
+              @"The attribution is not in the visible area of the mapview. Please check your position and offset settings");
+    MGLAssert(CGRectContainsRect(self.bounds, self.scaleBar.mgl_frameForIdentifyTransform),
+              @"The scaleBar is not in the visible area of the mapview. Please check your position and offset settings");
+    MGLAssert(CGRectContainsRect(self.bounds, self.compassView.mgl_frameForIdentifyTransform),
+              @"The compassView is not in the visible area of the mapview. Please check your position and offset settings");
+    MGLAssert(CGRectContainsRect(self.bounds, self.logoView.mgl_frameForIdentifyTransform),
+              @"The logoView is not in the visible area of the mapview. Please check your position and offset settings");
 }
 
 /// Updates `contentInset` to reflect the current window geometry.

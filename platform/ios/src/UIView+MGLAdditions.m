@@ -66,7 +66,7 @@
     }
 }
 
-- (CGRect)mgl_frameForTransformIdentity {
+- (CGRect)mgl_frameForIdentifyTransform {
     CGPoint center = self.center;
     CGSize size = self.bounds.size;
 

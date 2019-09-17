@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSLayoutXAxisAnchor *)mgl_safeTrailingAnchor;
 
-- (CGRect)mgl_frameForTransformIdentity;
+- (CGRect)mgl_frameForIdentifyTransform;
 
 @end
 

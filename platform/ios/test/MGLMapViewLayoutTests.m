@@ -7,13 +7,13 @@
 
 @interface UIView (MGLAdditions)
 
-- (CGRect)mgl_frameForTransformIdentity;
+- (CGRect)mgl_frameForIdentifyTransform;
 
 @end
 
 @implementation UIView (MGLAdditions)
 
-- (CGRect)mgl_frameForTransformIdentity {
+- (CGRect)mgl_frameForIdentifyTransform {
     CGPoint center = self.center;
     CGSize size = self.bounds.size;
 
@@ -190,8 +190,8 @@
         [self.superView setNeedsLayout];
         [self.superView layoutIfNeeded];
 
-        XCTAssertEqualWithAccuracy(CGRectGetMinX(compassView.mgl_frameForTransformIdentity), testData.expectedOrigin.x, accuracy);
-        XCTAssertEqualWithAccuracy(CGRectGetMinY(compassView.mgl_frameForTransformIdentity), testData.expectedOrigin.y, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(compassView.mgl_frameForIdentifyTransform), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(compassView.mgl_frameForIdentifyTransform), testData.expectedOrigin.y, accuracy);
     }
 }
 
@@ -205,14 +205,15 @@
     for (MGLOrnamentTestData *testData in testDataList) {
         self.mapView.compassViewPosition = testData.position;
         self.mapView.compassViewMargins = testData.offset;
+        // A tranform value which would led compassView's frame outside mapview's bounds
         self.mapView.compassView.transform = CGAffineTransformMake(0.7, -0.8, 0.6, 0.7, 0, 0);
 
         //invoke layout
         [self.superView setNeedsLayout];
         [self.superView layoutIfNeeded];
 
-        XCTAssertEqualWithAccuracy(CGRectGetMinX(compassView.mgl_frameForTransformIdentity), testData.expectedOrigin.x, accuracy);
-        XCTAssertEqualWithAccuracy(CGRectGetMinY(compassView.mgl_frameForTransformIdentity), testData.expectedOrigin.y, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(compassView.mgl_frameForIdentifyTransform), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(compassView.mgl_frameForIdentifyTransform), testData.expectedOrigin.y, accuracy);
     }
 }
 
@@ -231,8 +232,8 @@
         XCTAssertThrowsSpecificNamed(
                                      [self.superView layoutIfNeeded],
                                      NSException,
-                                     NSInvalidArgumentException,
-                                     @"should throw NSInvalidArgumentException"
+                                     NSInternalInconsistencyException,
+                                     @"should throw NSInternalInconsistencyException"
                                      );
     }
 }
@@ -252,8 +253,8 @@
         [self.superView setNeedsLayout];
         [self.superView layoutIfNeeded];
 
-        XCTAssertEqualWithAccuracy(CGRectGetMinX(scaleBar.mgl_frameForTransformIdentity), testData.expectedOrigin.x, accuracy);
-        XCTAssertEqualWithAccuracy(CGRectGetMinY(scaleBar.mgl_frameForTransformIdentity), testData.expectedOrigin.y, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(scaleBar.mgl_frameForIdentifyTransform), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(scaleBar.mgl_frameForIdentifyTransform), testData.expectedOrigin.y, accuracy);
     }
 }
 
@@ -272,8 +273,8 @@
         XCTAssertThrowsSpecificNamed(
                                      [self.superView layoutIfNeeded],
                                      NSException,
-                                     NSInvalidArgumentException,
-                                     @"should throw NSInvalidArgumentException"
+                                     NSInternalInconsistencyException,
+                                     @"should throw NSInternalInconsistencyException"
                                      );
     }
 }
@@ -293,8 +294,8 @@
         [self.superView setNeedsLayout];
         [self.superView layoutIfNeeded];
 
-        XCTAssertEqualWithAccuracy(CGRectGetMinX(attributionButton.mgl_frameForTransformIdentity), testData.expectedOrigin.x, accuracy);
-        XCTAssertEqualWithAccuracy(CGRectGetMinY(attributionButton.mgl_frameForTransformIdentity), testData.expectedOrigin.y, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(attributionButton.mgl_frameForIdentifyTransform), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(attributionButton.mgl_frameForIdentifyTransform), testData.expectedOrigin.y, accuracy);
     }
 }
 
@@ -313,8 +314,8 @@
         XCTAssertThrowsSpecificNamed(
                                      [self.superView layoutIfNeeded],
                                      NSException,
-                                     NSInvalidArgumentException,
-                                     @"should throw NSInvalidArgumentException"
+                                     NSInternalInconsistencyException,
+                                     @"should throw NSInternalInconsistencyException"
                                      );
     }
 }
@@ -334,8 +335,8 @@
         [self.superView setNeedsLayout];
         [self.superView layoutIfNeeded];
 
-        XCTAssertEqualWithAccuracy(CGRectGetMinX(logoView.mgl_frameForTransformIdentity), testData.expectedOrigin.x, accuracy);
-        XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.mgl_frameForTransformIdentity), testData.expectedOrigin.y, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinX(logoView.mgl_frameForIdentifyTransform), testData.expectedOrigin.x, accuracy);
+        XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.mgl_frameForIdentifyTransform), testData.expectedOrigin.y, accuracy);
     }
 }
 
@@ -354,8 +355,8 @@
         XCTAssertThrowsSpecificNamed(
                                      [self.superView layoutIfNeeded],
                                      NSException,
-                                     NSInvalidArgumentException,
-                                     @"should throw NSInvalidArgumentException"
+                                     NSInternalInconsistencyException,
+                                     @"should throw NSInternalInconsistencyException"
                                      );
     }
 }
