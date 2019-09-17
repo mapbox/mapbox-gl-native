@@ -42,12 +42,21 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
                                 [UIScreen mainScreen].bounds.size.height];
         
         NSLocale *currentLocale = [NSLocale currentLocale];
-        NSString *country = [currentLocale objectForKey:NSLocaleCountryCode];
+        
+        NSString *country = [currentLocale objectForKey:NSLocaleCountryCode] ?: @"unknown";
         
         NSString *device = deviceName();
         
-        const NXArchInfo localArchInfo = *NXGetLocalArchInfo();
-        NSString *abi = [NSString stringWithUTF8String:localArchInfo.description];
+        NSString *abi = @"unknown";
+        
+        {
+            const NXArchInfo *localArchInfo = NXGetLocalArchInfo();
+        
+            if (localArchInfo) {
+                abi = @(localArchInfo->description);
+                NXFreeArchInfo(localArchInfo);
+            }
+        }
         
         NSString *ram = [NSString stringWithFormat:@"%llu", [NSProcessInfo processInfo].physicalMemory];
         
