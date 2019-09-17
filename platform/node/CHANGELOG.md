@@ -5,6 +5,7 @@
 * Fixed a rendering issue of `collisionBox` when `text-translate` or `icon-translate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
 * Add typechecking while constructing legacy filter to prevent converting an unexpected filter type [#15389](https://github.com/mapbox/mapbox-gl-native/pull/15389).
+* Fixed an issue that `maxzoom` in style `Sources` option was ignored when URL resource is provided. It may cause problems such as extra tiles downloading at higher zoom level than `maxzoom`, or problems that wrong setting of `overscaledZ` in `OverscaledTileID` that will be passed to `SymbolLayout`, leading wrong rendering appearance. ([#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581))
 
 # 4.2.0
 - Add an option to set whether or not an image should be treated as a SDF ([#15054](https://github.com/mapbox/mapbox-gl-native/issues/15054))

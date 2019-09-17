@@ -11,10 +11,12 @@
 namespace mbgl {
 namespace style {
 
-VectorSource::VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset_)
+VectorSource::VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset_, optional<float> maxZoom_,
+                           optional<float> minZoom_)
     : Source(makeMutable<Impl>(std::move(id))),
-      urlOrTileset(std::move(urlOrTileset_)) {
-}
+      urlOrTileset(std::move(urlOrTileset_)),
+      maxZoom(std::move(maxZoom_)),
+      minZoom(std::move(minZoom_)) {}
 
 VectorSource::~VectorSource() = default;
 
@@ -61,7 +63,12 @@ void VectorSource::loadDescription(FileSource& fileSource) {
                 observer->onSourceError(*this, std::make_exception_ptr(util::StyleParseException(error.message)));
                 return;
             }
-
+            if (maxZoom) {
+                tileset->zoomRange.max = *maxZoom;
+            }
+            if (minZoom) {
+                tileset->zoomRange.min = *minZoom;
+            }
             util::mapbox::canonicalizeTileset(*tileset, url, getType(), util::tileSize);
             bool changed = impl().tileset != *tileset;
 
