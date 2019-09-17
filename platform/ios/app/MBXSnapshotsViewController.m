@@ -1,6 +1,6 @@
-#import "MBXSnapshotsViewController.h"
+@import Mapbox;
 
-#import <Mapbox/Mapbox.h>
+#import "MBXSnapshotsViewController.h"
 
 @interface MBXSnapshotsViewController ()
 

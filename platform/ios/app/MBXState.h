@@ -1,5 +1,4 @@
-#import <Foundation/Foundation.h>
-#import <Mapbox/Mapbox.h>
+@import Mapbox;
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -1,3 +1,5 @@
+@import Mapbox;
+
 #import "MBXViewController.h"
 
 #import "MBXAppDelegate.h"
@@ -12,8 +14,6 @@
 #import "MBXState.h"
 
 #import "MBXFrameTimeGraphView.h"
-
-#import <Mapbox/Mapbox.h>
 #import "../src/MGLMapView_Experimental.h"
 
 #import <objc/runtime.h>

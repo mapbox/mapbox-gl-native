@@ -1,5 +1,6 @@
+@import Mapbox;
+
 #import "MBXEmbeddedMapViewController.h"
-#import <Mapbox/Mapbox.h>
 
 typedef NS_ENUM(NSInteger, MBXEmbeddedControl) {
     MBXEmbeddedControlZoom = 0,
