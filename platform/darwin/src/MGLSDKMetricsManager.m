@@ -47,8 +47,16 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
         
         NSString *device = deviceName();
         
-        const NXArchInfo *localArchInfo = NXGetLocalArchInfo();
-        NSString *abi = (localArchInfo != NULL) ? @(localArchInfo->description) : @"unknown";
+        NSString *abi = @"unknown";
+        
+        {
+            const NXArchInfo *localArchInfo = NXGetLocalArchInfo();
+        
+            if (localArchInfo) {
+                abi = @(localArchInfo->description);
+                NXFreeArchInfo(localArchInfo);
+            }
+        }
         
         NSString *ram = [NSString stringWithFormat:@"%llu", [NSProcessInfo processInfo].physicalMemory];
         
