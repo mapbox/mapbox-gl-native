@@ -711,7 +711,7 @@ jobs:
           command: |
             export VERSION_TAG=${CIRCLE_TAG}
             export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
-            export DOCS_REPO="docs-sandbox"
+            export DOCS_REPO="android-docs"
             scripts/trigger-maps-documentation-deploy-steps.sh
           background: true
       - run:
