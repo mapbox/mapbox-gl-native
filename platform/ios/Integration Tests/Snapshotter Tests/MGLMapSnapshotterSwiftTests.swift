@@ -56,4 +56,22 @@ class MGLMapSnapshotterSwiftTests: MGLMapViewIntegrationTest {
 
         wait(for: [expectation], timeout: timeout)
     }
+    
+    func testSnapshotOverlaySwiftErgonomics🔒() {
+        let options     = MGLMapSnapshotterSwiftTests.snapshotterOptions(size: mapView.bounds.size)
+        let snapshotter = MGLMapSnapshotter(options: options)
+        let expectation = self.expectation(description: "snapshot")
+        expectation.expectedFulfillmentCount = 2
+        
+        snapshotter.start(overlayHandler: { (overlay) in
+            guard let _ = overlay.context.makeImage() else {
+                XCTFail()
+                return
+            }
+            expectation.fulfill()
+        }) { (_, _) in
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 10)
+    }
 }
