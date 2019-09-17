@@ -50,10 +50,8 @@ FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEval
 
 FillExtrusionBucket::~FillExtrusionBucket() = default;
 
-void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
-                                     const GeometryCollection& geometry,
-                                     const ImagePositions& patternPositions,
-                                     const PatternLayerMap& patternDependencies,
+void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature, const GeometryCollection& geometry,
+                                     const ImagePositions& patternPositions, const PatternLayerMap& patternDependencies,
                                      std::size_t index) {
     for (auto& polygon : classifyRings(geometry)) {
         // Optimize polygons with many interior rings for earcut tesselation.
@@ -189,7 +187,8 @@ float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
     return util::length(translate[0], translate[1]);
 }
 
-void FillExtrusionBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID, const ImagePositions& imagePositions) {
+void FillExtrusionBucket::update(const FeatureStates& states, const GeometryTileLayer& layer,
+                                 const std::string& layerID, const ImagePositions& imagePositions) {
     auto it = paintPropertyBinders.find(layerID);
     if (it != paintPropertyBinders.end()) {
         it->second.updateVertexVectors(states, layer, imagePositions);

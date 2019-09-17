@@ -562,17 +562,14 @@ FeatureExtensionValue RenderOrchestrator::queryFeatureExtensions(const std::stri
     return {};
 }
 
-void RenderOrchestrator::setFeatureState(const std::string& sourceID,
-                                         const optional<std::string>& sourceLayerID,
-                                         const std::string& featureID,
-                                         const FeatureState& state) {
+void RenderOrchestrator::setFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                                         const std::string& featureID, const FeatureState& state) {
     if (RenderSource* renderSource = getRenderSource(sourceID)) {
         renderSource->setFeatureState(sourceLayerID, featureID, state);
     }
 }
 
-void RenderOrchestrator::getFeatureState(FeatureState& state,
-                                         const std::string& sourceID,
+void RenderOrchestrator::getFeatureState(FeatureState& state, const std::string& sourceID,
                                          const optional<std::string>& sourceLayerID,
                                          const std::string& featureID) const {
     if (RenderSource* renderSource = getRenderSource(sourceID)) {
@@ -580,8 +577,7 @@ void RenderOrchestrator::getFeatureState(FeatureState& state,
     }
 }
 
-void RenderOrchestrator::removeFeatureState(const std::string& sourceID,
-                                            const optional<std::string>& sourceLayerID,
+void RenderOrchestrator::removeFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
                                             const optional<std::string>& featureID,
                                             const optional<std::string>& stateKey) {
     if (RenderSource* renderSource = getRenderSource(sourceID)) {

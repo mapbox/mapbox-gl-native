@@ -713,7 +713,8 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
             }
 
             for (auto& pair : bucket->paintProperties) {
-                pair.second.iconBinders.populateVertexVectors(feature, iconBuffer.vertices.elements(), symbolInstance.dataFeatureIndex, {}, {});
+                pair.second.iconBinders.populateVertexVectors(feature, iconBuffer.vertices.elements(),
+                                                              symbolInstance.dataFeatureIndex, {}, {});
             }
         }
 
@@ -765,7 +766,8 @@ void SymbolLayout::updatePaintPropertiesForSection(SymbolBucket& bucket,
                                                    std::size_t sectionIndex) {
     const auto& formattedSection = sectionOptionsToValue((*feature.formattedText).sectionAt(sectionIndex));
     for (auto& pair : bucket.paintProperties) {
-        pair.second.textBinders.populateVertexVectors(feature, bucket.text.vertices.elements(), feature.index, {}, {}, formattedSection);
+        pair.second.textBinders.populateVertexVectors(feature, bucket.text.vertices.elements(), feature.index, {}, {},
+                                                      formattedSection);
     }
 }
 

@@ -384,7 +384,7 @@ void GeometryTileWorker::parse() {
                     continue;
 
                 const GeometryCollection& geometries = feature->getGeometries();
-                bucket->addFeature(*feature, geometries, {}, PatternLayerMap (), i);
+                bucket->addFeature(*feature, geometries, {}, PatternLayerMap(), i);
                 featureIndex->insert(geometries, i, sourceLayerID, leaderImpl.id);
             }
 

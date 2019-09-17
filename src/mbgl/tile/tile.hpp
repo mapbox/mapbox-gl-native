@@ -68,14 +68,11 @@ public:
     virtual void setLayers(const std::vector<Immutable<style::LayerProperties>>&) {}
     virtual void setMask(TileMask&&) {}
 
-    virtual void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState&,
-            const std::unordered_map<std::string, const RenderLayer*>&,
-            const RenderedQueryOptions& options,
-            const mat4& projMatrix,
-            const SourceFeatureState& featureState);
+    virtual void queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                                       const GeometryCoordinates& queryGeometry, const TransformState&,
+                                       const std::unordered_map<std::string, const RenderLayer*>&,
+                                       const RenderedQueryOptions& options, const mat4& projMatrix,
+                                       const SourceFeatureState& featureState);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,

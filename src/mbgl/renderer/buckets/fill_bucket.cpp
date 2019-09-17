@@ -44,10 +44,8 @@ FillBucket::FillBucket(const FillBucket::PossiblyEvaluatedLayoutProperties,
 
 FillBucket::~FillBucket() = default;
 
-void FillBucket::addFeature(const GeometryTileFeature& feature,
-                            const GeometryCollection& geometry,
-                            const ImagePositions& patternPositions,
-                            const PatternLayerMap& patternDependencies,
+void FillBucket::addFeature(const GeometryTileFeature& feature, const GeometryCollection& geometry,
+                            const ImagePositions& patternPositions, const PatternLayerMap& patternDependencies,
                             std::size_t index) {
     for (auto& polygon : classifyRings(geometry)) {
         // Optimize polygons with many interior rings for earcut tesselation.
@@ -126,7 +124,8 @@ void FillBucket::upload(gfx::UploadPass& uploadPass) {
     if (!uploaded) {
         vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
         lineIndexBuffer = uploadPass.createIndexBuffer(std::move(lines));
-        triangleIndexBuffer = triangles.empty() ? optional<gfx::IndexBuffer> {} : uploadPass.createIndexBuffer(std::move(triangles));
+        triangleIndexBuffer =
+            triangles.empty() ? optional<gfx::IndexBuffer>{} : uploadPass.createIndexBuffer(std::move(triangles));
     }
 
     for (auto& pair : paintPropertyBinders) {
@@ -146,7 +145,8 @@ float FillBucket::getQueryRadius(const RenderLayer& layer) const {
     return util::length(translate[0], translate[1]);
 }
 
-void FillBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID, const ImagePositions& imagePositions) {
+void FillBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
+                        const ImagePositions& imagePositions) {
     auto it = paintPropertyBinders.find(layerID);
     if (it != paintPropertyBinders.end()) {
         it->second.updateVertexVectors(states, layer, imagePositions);

@@ -1,5 +1,6 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map_observer.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/light.hpp>
@@ -7,15 +8,14 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/light.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/util/io.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/timer.hpp>
-#include <mbgl/renderer/renderer.hpp>
 
 #include <mapbox/pixelmatch.hpp>
 
@@ -458,7 +458,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         AllocationIndex::setActive(false);
         AllocationIndex::reset();
 
-    // setFeatureState
+        // setFeatureState
     } else if (operationArray[0].GetString() == setFeatureStateOp) {
         assert(operationArray.Size() >= 3u);
         assert(operationArray[1].IsObject());
@@ -480,14 +480,15 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             sourceID = featureOptions["source"].GetString();
         }
         if (featureOptions.HasMember("sourceLayer")) {
-            sourceLayer = { featureOptions["sourceLayer"].GetString() };
+            sourceLayer = {featureOptions["sourceLayer"].GetString()};
         }
         if (featureOptions.HasMember("id")) {
             featureID = featureOptions["id"].GetString();
         }
         const JSValue* state = &operationArray[2];
 
-        const std::function<optional<Error> (const std::string&, const Convertible&)> convertFn = [&] (const std::string& k, const Convertible& v) -> optional<Error> {
+        const std::function<optional<Error>(const std::string&, const Convertible&)> convertFn =
+            [&](const std::string& k, const Convertible& v) -> optional<Error> {
             optional<Value> value = toValue(v);
             if (value) {
                 stateValue = std::move(*value);
@@ -503,7 +504,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
                     }
                 }
                 std::unordered_map<std::string, Value> result;
-                result[k]= std::move(array);
+                result[k] = std::move(array);
                 stateValue = std::move(result);
                 valueParsed = true;
                 return {};
@@ -513,7 +514,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             }
 
             if (!valueParsed) {
-                metadata.errorMessage = std::string("Could not get feature state value, state key: ")  + k;
+                metadata.errorMessage = std::string("Could not get feature state value, state key: ") + k;
                 return nullopt;
             }
             stateKey = k;
@@ -530,7 +531,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         }
         frontend.getRenderer()->setFeatureState(sourceID, sourceLayer, featureID, parsedState);
 
-    // getFeatureState
+        // getFeatureState
     } else if (operationArray[0].GetString() == getFeatureStateOp) {
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsObject());
@@ -544,7 +545,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             sourceID = featureOptions["source"].GetString();
         }
         if (featureOptions.HasMember("sourceLayer")) {
-            sourceLayer = { featureOptions["sourceLayer"].GetString() };
+            sourceLayer = {featureOptions["sourceLayer"].GetString()};
         }
         if (featureOptions.HasMember("id")) {
             featureID = featureOptions["id"].GetString();
@@ -558,7 +559,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         mbgl::FeatureState state;
         frontend.getRenderer()->getFeatureState(state, sourceID, sourceLayer, featureID);
 
-    // removeFeatureState
+        // removeFeatureState
     } else if (operationArray[0].GetString() == removeFeatureStateOp) {
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsObject());
@@ -573,7 +574,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             sourceID = featureOptions["source"].GetString();
         }
         if (featureOptions.HasMember("sourceLayer")) {
-            sourceLayer = { featureOptions["sourceLayer"].GetString() };
+            sourceLayer = {featureOptions["sourceLayer"].GetString()};
         }
         if (featureOptions.HasMember("id")) {
             featureID = featureOptions["id"].GetString();
@@ -581,7 +582,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
 
         if (operationArray.Size() >= 3u) {
             assert(operationArray[2].IsString());
-            stateKey = { operationArray[2].GetString() };
+            stateKey = {operationArray[2].GetString()};
         }
 
         try {

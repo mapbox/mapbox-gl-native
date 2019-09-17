@@ -30,10 +30,8 @@ LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layo
 
 LineBucket::~LineBucket() = default;
 
-void LineBucket::addFeature(const GeometryTileFeature& feature,
-                            const GeometryCollection& geometryCollection,
-                            const ImagePositions& patternPositions,
-                            const PatternLayerMap& patternDependencies,
+void LineBucket::addFeature(const GeometryTileFeature& feature, const GeometryCollection& geometryCollection,
+                            const ImagePositions& patternPositions, const PatternLayerMap& patternDependencies,
                             std::size_t index) {
     for (auto& line : geometryCollection) {
         addGeometry(line, feature);
@@ -48,7 +46,6 @@ void LineBucket::addFeature(const GeometryTileFeature& feature,
         }
     }
 }
-
 
 /*
  * Sharp corners cause dashed lines to tilt because the distance along the line
@@ -557,7 +554,8 @@ float LineBucket::getQueryRadius(const RenderLayer& layer) const {
     return lineWidth / 2.0f + std::abs(offset) + util::length(translate[0], translate[1]);
 }
 
-void LineBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID, const ImagePositions& imagePositions) {
+void LineBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
+                        const ImagePositions& imagePositions) {
     auto it = paintPropertyBinders.find(layerID);
     if (it != paintPropertyBinders.end()) {
         it->second.updateVertexVectors(states, layer, imagePositions);

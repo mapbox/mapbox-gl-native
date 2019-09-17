@@ -302,15 +302,11 @@ float GeometryTile::getQueryPadding(const std::unordered_map<std::string, const 
     return queryPadding;
 }
 
-void GeometryTile::queryRenderedFeatures(
-    std::unordered_map<std::string, std::vector<Feature>>& result,
-    const GeometryCoordinates& queryGeometry,
-    const TransformState& transformState,
-    const std::unordered_map<std::string, const RenderLayer*>& layers,
-    const RenderedQueryOptions& options,
-    const mat4& projMatrix,
-    const SourceFeatureState& featureState) {
-
+void GeometryTile::queryRenderedFeatures(std::unordered_map<std::string, std::vector<Feature>>& result,
+                                         const GeometryCoordinates& queryGeometry, const TransformState& transformState,
+                                         const std::unordered_map<std::string, const RenderLayer*>& layers,
+                                         const RenderedQueryOptions& options, const mat4& projMatrix,
+                                         const SourceFeatureState& featureState) {
     if (!getData()) return;
 
     const float queryPadding = getQueryPadding(layers);
@@ -319,17 +315,10 @@ void GeometryTile::queryRenderedFeatures(
     transformState.matrixFor(posMatrix, id.toUnwrapped());
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-    layoutResult->featureIndex->query(result,
-                              queryGeometry,
-                              transformState,
-                              posMatrix,
-                              util::tileSize * id.overscaleFactor(),
-                              std::pow(2, transformState.getZoom() - id.overscaledZ),
-                              options,
-                              id.toUnwrapped(),
-                              layers,
-                              queryPadding * transformState.maxPitchScaleFactor(),
-                              featureState);
+    layoutResult->featureIndex->query(result, queryGeometry, transformState, posMatrix,
+                                      util::tileSize * id.overscaleFactor(),
+                                      std::pow(2, transformState.getZoom() - id.overscaledZ), options, id.toUnwrapped(),
+                                      layers, queryPadding * transformState.maxPitchScaleFactor(), featureState);
 }
 
 void GeometryTile::querySourceFeatures(
@@ -391,7 +380,9 @@ void GeometryTile::performedFadePlacement() {
 
 void GeometryTile::setFeatureState(const LayerFeatureStates& states) {
     auto layers = getData();
-    if (!layers || states.empty() || !layoutResult) return;
+    if ((layers == nullptr) || states.empty() || !layoutResult) {
+        return;
+    }
 
     auto& layerIdToLayerRenderData = layoutResult->layerRenderData;
     for (auto& layer : layerIdToLayerRenderData) {
@@ -400,9 +391,13 @@ void GeometryTile::setFeatureState(const LayerFeatureStates& states) {
         if (sourceLayer) {
             const auto& sourceLayerID = sourceLayer->getName();
             auto entry = states.find(sourceLayerID);
-            if (entry == states.end()) continue;
+            if (entry == states.end()) {
+                continue;
+            }
             const auto& featureStates = entry->second;
-            if (featureStates.empty()) continue;
+            if (featureStates.empty()) {
+                continue;
+            }
 
             auto bucket = layer.second.bucket;
             if (bucket && bucket->hasData()) {

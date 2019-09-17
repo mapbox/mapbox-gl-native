@@ -134,14 +134,12 @@ std::vector<Feature> RenderTileSource::querySourceFeatures(const SourceQueryOpti
     return tilePyramid.querySourceFeatures(options);
 }
 
-void RenderTileSource::setFeatureState(const optional<std::string>& sourceLayerID,
-                                       const std::string& featureID,
+void RenderTileSource::setFeatureState(const optional<std::string>& sourceLayerID, const std::string& featureID,
                                        const FeatureState& state) {
     featureState.updateState(sourceLayerID, featureID, state);
 }
 
-void RenderTileSource::getFeatureState(FeatureState& state,
-                                       const optional<std::string>& sourceLayerID,
+void RenderTileSource::getFeatureState(FeatureState& state, const optional<std::string>& sourceLayerID,
                                        const std::string& featureID) const {
     featureState.getState(state, sourceLayerID, featureID);
 }

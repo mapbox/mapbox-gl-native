@@ -1,11 +1,12 @@
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/source_state.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
-void SourceFeatureState::updateState(const optional<std::string>& sourceLayerID, const std::string& featureID, const FeatureState& newState) {
+void SourceFeatureState::updateState(const optional<std::string>& sourceLayerID, const std::string& featureID,
+                                     const FeatureState& newState) {
     std::string sourceLayer = sourceLayerID.value_or(std::string());
     for (const auto& state : newState) {
         auto& layerStates = stateChanges[sourceLayer];
@@ -14,9 +15,11 @@ void SourceFeatureState::updateState(const optional<std::string>& sourceLayerID,
     }
 }
 
-void SourceFeatureState::getState(FeatureState& result, const optional<std::string>& sourceLayerID, const std::string& featureID) const {
+void SourceFeatureState::getState(FeatureState& result, const optional<std::string>& sourceLayerID,
+                                  const std::string& featureID) const {
     std::string sourceLayer = sourceLayerID.value_or(std::string());
-    FeatureState current, changes;
+    FeatureState current;
+    FeatureState changes;
     auto layerStates = currentStates.find(sourceLayer);
     if (layerStates != currentStates.end()) {
         const auto currentStateEntry = layerStates->second.find(featureID);
@@ -61,7 +64,7 @@ void SourceFeatureState::coalesceChanges(std::vector<RenderTile>& tiles) {
 
     for (const auto& layerStatesEntry : deletedStates) {
         const auto& sourceLayer = layerStatesEntry.first;
-        FeatureStates layerStates = { {}, {} };
+        FeatureStates layerStates = {{}, {}};
 
         if (deletedStates[sourceLayer].empty()) {
             for (const auto& featureStatesEntry : currentStates[sourceLayer]) {
@@ -89,25 +92,31 @@ void SourceFeatureState::coalesceChanges(std::vector<RenderTile>& tiles) {
     stateChanges.clear();
     deletedStates.clear();
 
-    if (changes.empty()) return;
+    if (changes.empty()) {
+        return;
+    }
 
     for (auto& tile : tiles) {
         tile.setFeatureState(changes);
     }
 }
 
-void SourceFeatureState::removeState(const optional<std::string>& sourceLayerID, const optional<std::string>& featureID, const optional<std::string>& stateKey) {
+void SourceFeatureState::removeState(const optional<std::string>& sourceLayerID, const optional<std::string>& featureID,
+                                     const optional<std::string>& stateKey) {
     std::string sourceLayer = sourceLayerID.value_or(std::string());
 
     bool sourceLayerDeleted = (deletedStates.count(sourceLayer) > 0) && deletedStates[sourceLayer].empty();
-    if (sourceLayerDeleted) return;
+    if (sourceLayerDeleted) {
+        return;
+    }
 
     if (stateKey && featureID) {
         if ((deletedStates.count(sourceLayer) == 0) && (deletedStates[sourceLayer].count(*featureID)) == 0) {
             deletedStates[sourceLayer][*featureID][*stateKey] = {};
         }
     } else if (featureID) {
-        bool updateInQueue = stateChanges.count(sourceLayer) && stateChanges[sourceLayer].count(*featureID);
+        bool updateInQueue =
+            (stateChanges.count(sourceLayer) != 0U) && (stateChanges[sourceLayer].count(*featureID) != 0U);
         if (updateInQueue) {
             for (const auto& changeEntry : stateChanges[sourceLayer][*featureID]) {
                 deletedStates[sourceLayer][*featureID][changeEntry.first] = {};

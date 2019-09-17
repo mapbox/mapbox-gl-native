@@ -41,11 +41,8 @@ bool CircleBucket::hasData() const {
     return !segments.empty();
 }
 
-void CircleBucket::addFeature(const GeometryTileFeature& feature,
-                                 const GeometryCollection& geometry,
-                                 const ImagePositions&,
-                                 const PatternLayerMap&,
-                                 std::size_t featureIndex) {
+void CircleBucket::addFeature(const GeometryTileFeature& feature, const GeometryCollection& geometry,
+                              const ImagePositions&, const PatternLayerMap&, std::size_t featureIndex) {
     constexpr const uint16_t vertexLength = 4;
 
     for (auto& circle : geometry) {
@@ -115,7 +112,8 @@ float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
     return radius + stroke + util::length(translate[0], translate[1]);
 }
 
-void CircleBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID, const ImagePositions& imagePositions) {
+void CircleBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
+                          const ImagePositions& imagePositions) {
     auto it = paintPropertyBinders.find(layerID);
     if (it != paintPropertyBinders.end()) {
         it->second.updateVertexVectors(states, layer, imagePositions);

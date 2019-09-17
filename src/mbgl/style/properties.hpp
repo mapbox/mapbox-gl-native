@@ -183,13 +183,8 @@ public:
         template <class T>
         static T evaluate(float z, const GeometryTileFeature& feature, const FeatureState& state,
                           const PossiblyEvaluatedPropertyValue<T>& v, const T& defaultValue) {
-            return v.match(
-                [&] (const T& t) {
-                    return t;
-                },
-                [&] (const PropertyExpression<T>& t) {
-                    return t.evaluate(z, feature, state, defaultValue);
-                });
+            return v.match([&](const T& t) { return t; },
+                           [&](const PropertyExpression<T>& t) { return t.evaluate(z, feature, state, defaultValue); });
         }
 
         template <class P>

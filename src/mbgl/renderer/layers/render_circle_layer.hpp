@@ -18,14 +18,8 @@ private:
     bool hasCrossfade() const override;
     void render(PaintParameters&) override;
 
-    bool queryIntersectsFeature(
-            const GeometryCoordinates&,
-            const GeometryTileFeature&,
-            const float,
-            const TransformState&,
-            const float,
-            const mat4&,
-            const FeatureState&) const override;
+    bool queryIntersectsFeature(const GeometryCoordinates&, const GeometryTileFeature&, const float,
+                                const TransformState&, const float, const mat4&, const FeatureState&) const override;
 
     // Paint properties
     style::CirclePaintProperties::Unevaluated unevaluated;

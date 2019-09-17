@@ -141,14 +141,10 @@ GeometryCoordinates projectQueryGeometry(const GeometryCoordinates& queryGeometr
     return projectedGeometry;
 }
 
-bool RenderCircleLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float zoom,
-        const TransformState& transformState,
-        const float pixelsToTileUnits,
-        const mat4& posMatrix,
-        const FeatureState& featureState) const {
+bool RenderCircleLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                               const GeometryTileFeature& feature, const float zoom,
+                                               const TransformState& transformState, const float pixelsToTileUnits,
+                                               const mat4& posMatrix, const FeatureState& featureState) const {
     const auto& evaluated = static_cast<const CircleLayerProperties&>(*evaluatedProperties).evaluated;
     // Translate query geometry
     const GeometryCoordinates& translatedQueryGeometry = FeatureIndex::translateQueryGeometry(

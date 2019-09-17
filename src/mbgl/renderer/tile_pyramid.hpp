@@ -49,13 +49,10 @@ public:
 
     void handleWrapJump(float lng);
 
-    std::unordered_map<std::string, std::vector<Feature>>
-    queryRenderedFeatures(const ScreenLineString& geometry,
-                          const TransformState& transformState,
-                          const std::unordered_map<std::string, const RenderLayer*>&,
-                          const RenderedQueryOptions& options,
-                          const mat4& projMatrix,
-                          const mbgl::SourceFeatureState& featureState) const;
+    std::unordered_map<std::string, std::vector<Feature>> queryRenderedFeatures(
+        const ScreenLineString& geometry, const TransformState& transformState,
+        const std::unordered_map<std::string, const RenderLayer*>&, const RenderedQueryOptions& options,
+        const mat4& projMatrix, const mbgl::SourceFeatureState& featureState) const;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;
 

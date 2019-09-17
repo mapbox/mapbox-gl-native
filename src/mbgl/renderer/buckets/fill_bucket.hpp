@@ -26,11 +26,8 @@ public:
                const float zoom,
                const uint32_t overscaling);
 
-    void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&,
-                    const mbgl::ImagePositions&,
-                    const PatternLayerMap&,
-                    std::size_t) override;
+    void addFeature(const GeometryTileFeature&, const GeometryCollection&, const mbgl::ImagePositions&,
+                    const PatternLayerMap&, std::size_t) override;
 
     bool hasData() const override;
 

@@ -13,7 +13,7 @@ using PropertyMap = mapbox::feature::property_map;
 using FeatureIdentifier = mapbox::feature::identifier;
 using Feature = mapbox::feature::feature<double>;
 using FeatureState = PropertyMap;
-using FeatureStates = std::unordered_map<std::string, FeatureState>; // <featureID, FeatureState>
+using FeatureStates = std::unordered_map<std::string, FeatureState>;       // <featureID, FeatureState>
 using LayerFeatureStates = std::unordered_map<std::string, FeatureStates>; // <sourceLayer, FeatureStates>
 
 template <class T>
@@ -39,21 +39,9 @@ inline optional<std::string> featureIDtoString(const FeatureIdentifier& id) {
     }
 
     return id.match(
-        [] (const std::string& value_) {
-            return value_;
-        },
-        [] (uint64_t value_) {
-            return util::toString(value_);
-        },
-        [] (int64_t value_) {
-            return util::toString(value_);
-        },
-        [] (double value_) {
-            return util::toString(value_);
-        },
-        [] (const auto&) -> optional<std::string> {
-            return nullopt;
-        });
+        [](const std::string& value_) { return value_; }, [](uint64_t value_) { return util::toString(value_); },
+        [](int64_t value_) { return util::toString(value_); }, [](double value_) { return util::toString(value_); },
+        [](const auto&) -> optional<std::string> { return nullopt; });
 }
 
 } // namespace mbgl
