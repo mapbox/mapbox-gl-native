@@ -109,24 +109,18 @@ FeatureExtensionValue Renderer::queryFeatureExtensions(const std::string& source
     return impl->orchestrator.queryFeatureExtensions(sourceID, feature, extension, extensionField, args);
 }
 
-void Renderer::setFeatureState(const std::string& sourceID,
-                               const optional<std::string>& sourceLayerID,
-                               const std::string& featureID,
-                               const FeatureState& state) {
+void Renderer::setFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                               const std::string& featureID, const FeatureState& state) {
     impl->orchestrator.setFeatureState(sourceID, sourceLayerID, featureID, state);
 }
 
-void Renderer::getFeatureState(FeatureState& state,
-                               const std::string& sourceID,
-                               const optional<std::string>& sourceLayerID,
-                               const std::string& featureID) const {
+void Renderer::getFeatureState(FeatureState& state, const std::string& sourceID,
+                               const optional<std::string>& sourceLayerID, const std::string& featureID) const {
     impl->orchestrator.getFeatureState(state, sourceID, sourceLayerID, featureID);
 }
 
-void Renderer::removeFeatureState(const std::string& sourceID,
-                                  const optional<std::string>& sourceLayerID,
-                                  const optional<std::string>& featureID,
-                                  const optional<std::string>& stateKey) {
+void Renderer::removeFeatureState(const std::string& sourceID, const optional<std::string>& sourceLayerID,
+                                  const optional<std::string>& featureID, const optional<std::string>& stateKey) {
     impl->orchestrator.removeFeatureState(sourceID, sourceLayerID, featureID, stateKey);
 }
 

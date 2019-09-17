@@ -17,12 +17,7 @@ bool isFeatureConstant(const Expression& expression) {
             return false;
         } else if (name == "has" && parameterCount && *parameterCount == 1) {
             return false;
-        } else if (
-            name == "properties" ||
-            name == "geometry-type" ||
-            name == "id" ||
-            name == "feature-state"
-        ) {
+        } else if (name == "properties" || name == "geometry-type" || name == "id" || name == "feature-state") {
             return false;
         } else if (0u == name.rfind(filter, 0u)) {
             // Legacy filters begin with "filter-" and are never constant.

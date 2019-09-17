@@ -105,15 +105,11 @@ public:
 
     virtual ~PaintPropertyBinder() = default;
 
-    virtual void populateVertexVector(const GeometryTileFeature& feature,
-                                      std::size_t length, std::size_t index,
-                                      const ImagePositions&,
-                                      const optional<PatternDependency>&,
+    virtual void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
+                                      const ImagePositions&, const optional<PatternDependency>&,
                                       const style::expression::Value&) = 0;
 
-    virtual void updateVertexVectors(const FeatureStates&,
-                                     const GeometryTileLayer&,
-                                     const ImagePositions&) {}
+    virtual void updateVertexVectors(const FeatureStates&, const GeometryTileLayer&, const ImagePositions&) {}
 
     virtual void updateVertexVector(std::size_t, std::size_t, const GeometryTileFeature&, const FeatureState&) = 0;
 
@@ -135,7 +131,8 @@ public:
         : constant(std::move(constant_)) {
     }
 
-    void populateVertexVector(const GeometryTileFeature&, std::size_t, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
+    void populateVertexVector(const GeometryTileFeature&, std::size_t, std::size_t, const ImagePositions&,
+                              const optional<PatternDependency>&, const style::expression::Value&) override {}
     void updateVertexVector(std::size_t, std::size_t, const GeometryTileFeature&, const FeatureState&) override {}
     void upload(gfx::UploadPass&) override {}
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
@@ -163,7 +160,8 @@ public:
         : constant(std::move(constant_)), constantPatternPositions({}) {
     }
 
-    void populateVertexVector(const GeometryTileFeature&, std::size_t, std::size_t, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value&) override {}
+    void populateVertexVector(const GeometryTileFeature&, std::size_t, std::size_t, const ImagePositions&,
+                              const optional<PatternDependency>&, const style::expression::Value&) override {}
     void updateVertexVector(std::size_t, std::size_t, const GeometryTileFeature&, const FeatureState&) override {}
     void upload(gfx::UploadPass&) override {}
 
@@ -206,7 +204,9 @@ public:
           defaultValue(std::move(defaultValue_)) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
-    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
+    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
+                              const ImagePositions&, const optional<PatternDependency>&,
+                              const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         auto evaluated = expression.evaluate(EvaluationContext(&feature).withFormattedSection(&formattedSection), defaultValue);
         this->statistics.add(evaluated);
@@ -217,11 +217,12 @@ public:
         }
         optional<std::string> idStr = featureIDtoString(feature.getID());
         if (idStr) {
-            featureMap[*idStr].emplace_back(FeatureVertexRange { index, elements, length });
+            featureMap[*idStr].emplace_back(FeatureVertexRange{index, elements, length});
         }
     }
 
-    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer, const ImagePositions&) override {
+    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer,
+                             const ImagePositions&) override {
         for (const auto& it : states) {
             const auto positions = featureMap.find(it.first);
             if (positions == featureMap.end()) {
@@ -237,14 +238,15 @@ public:
         }
     }
 
-    void updateVertexVector(std::size_t start, std::size_t end, const GeometryTileFeature& feature, const FeatureState& state) override {
+    void updateVertexVector(std::size_t start, std::size_t end, const GeometryTileFeature& feature,
+                            const FeatureState& state) override {
         using style::expression::EvaluationContext;
 
         auto evaluated = expression.evaluate(EvaluationContext(&feature).withFeatureState(&state), defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
         for (std::size_t i = start; i < end; ++i) {
-            vertexVector.at(i) = BaseVertex { value };
+            vertexVector.at(i) = BaseVertex{value};
         }
     }
 
@@ -297,7 +299,9 @@ public:
           zoomRange({zoom, zoom + 1}) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, const CrossfadeParameters&) override {};
-    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index, const ImagePositions&, const optional<PatternDependency>&, const style::expression::Value& formattedSection) override {
+    void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
+                              const ImagePositions&, const optional<PatternDependency>&,
+                              const style::expression::Value& formattedSection) override {
         using style::expression::EvaluationContext;
         Range<T> range = {
                 expression.evaluate(EvaluationContext(zoomRange.min, &feature).withFormattedSection(&formattedSection), defaultValue),
@@ -314,11 +318,12 @@ public:
         }
         optional<std::string> idStr = featureIDtoString(feature.getID());
         if (idStr) {
-            featureMap[*idStr].emplace_back(FeatureVertexRange { index, elements, length });
+            featureMap[*idStr].emplace_back(FeatureVertexRange{index, elements, length});
         }
     }
 
-    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer, const ImagePositions&) override {
+    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer,
+                             const ImagePositions&) override {
         for (const auto& it : states) {
             const auto positions = featureMap.find(it.first);
             if (positions == featureMap.end()) {
@@ -334,20 +339,19 @@ public:
         }
     }
 
-    void updateVertexVector(std::size_t start, std::size_t end, const GeometryTileFeature& feature, const FeatureState& state) override {
+    void updateVertexVector(std::size_t start, std::size_t end, const GeometryTileFeature& feature,
+                            const FeatureState& state) override {
         using style::expression::EvaluationContext;
         Range<T> range = {
-                expression.evaluate(EvaluationContext(zoomRange.min, &feature, &state), defaultValue),
-                expression.evaluate(EvaluationContext(zoomRange.max, &feature, &state), defaultValue),
+            expression.evaluate(EvaluationContext(zoomRange.min, &feature, &state), defaultValue),
+            expression.evaluate(EvaluationContext(zoomRange.max, &feature, &state), defaultValue),
         };
         this->statistics.add(range.min);
         this->statistics.add(range.max);
-        AttributeValue value = zoomInterpolatedAttributeValue(
-            attributeValue(range.min),
-            attributeValue(range.max));
+        AttributeValue value = zoomInterpolatedAttributeValue(attributeValue(range.min), attributeValue(range.max));
 
         for (std::size_t i = start; i < end; ++i) {
-            vertexVector.at(i) = Vertex { value };
+            vertexVector.at(i) = Vertex{value};
         }
     }
 
@@ -413,8 +417,10 @@ public:
         crossfade = crossfade_;
     };
 
-    void populateVertexVector(const GeometryTileFeature&, std::size_t length, std::size_t /* index */, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies, const style::expression::Value&) override {
-    
+    void populateVertexVector(const GeometryTileFeature&, std::size_t length, std::size_t /* index */,
+                              const ImagePositions& patternPositions,
+                              const optional<PatternDependency>& patternDependencies,
+                              const style::expression::Value&) override {
         if (!patternDependencies || patternDependencies->mid.empty())  {
             // Unlike other propperties with expressions that evaluate to null, the default value for `*-pattern` properties is an empty
             // string and will not have a valid entry in patternPositions. We still need to populate the attribute buffers to avoid crashes
@@ -584,16 +590,18 @@ public:
     PaintPropertyBinders(PaintPropertyBinders&&) = default;
     PaintPropertyBinders(const PaintPropertyBinders&) = delete;
 
-    void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length, std::size_t index, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies, const style::expression::Value& formattedSection = {}) {
-        util::ignore({
-            (binders.template get<Ps>()->populateVertexVector(feature, length, index, patternPositions, patternDependencies, formattedSection), 0)...
-        });
+    void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length, std::size_t index,
+                               const ImagePositions& patternPositions,
+                               const optional<PatternDependency>& patternDependencies,
+                               const style::expression::Value& formattedSection = {}) {
+        util::ignore({(binders.template get<Ps>()->populateVertexVector(feature, length, index, patternPositions,
+                                                                        patternDependencies, formattedSection),
+                       0)...});
     }
 
-    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer, const ImagePositions& imagePositions) {
-        util::ignore({
-            (binders.template get<Ps>()->updateVertexVectors(states, layer, imagePositions), 0)...
-        });
+    void updateVertexVectors(const FeatureStates& states, const GeometryTileLayer& layer,
+                             const ImagePositions& imagePositions) {
+        util::ignore({(binders.template get<Ps>()->updateVertexVectors(states, layer, imagePositions), 0)...});
     }
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, const CrossfadeParameters& crossfade) const {

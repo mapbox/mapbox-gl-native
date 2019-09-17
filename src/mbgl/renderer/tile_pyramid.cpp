@@ -278,13 +278,10 @@ void TilePyramid::handleWrapJump(float lng) {
     }
 }
 
-
-std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
-                                           const TransformState& transformState,
-                                           const std::unordered_map<std::string, const RenderLayer*>& layers,
-                                           const RenderedQueryOptions& options,
-                                           const mat4& projMatrix,
-                                           const SourceFeatureState& featureState) const {
+std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(
+    const ScreenLineString& geometry, const TransformState& transformState,
+    const std::unordered_map<std::string, const RenderLayer*>& layers, const RenderedQueryOptions& options,
+    const mat4& projMatrix, const SourceFeatureState& featureState) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderedTiles.empty() || geometry.empty()) {
         return result;
@@ -332,12 +329,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
             tileSpaceQueryGeometry.push_back(TileCoordinate::toGeometryCoordinate(id, c));
         }
 
-        tile.queryRenderedFeatures(result,
-                                   tileSpaceQueryGeometry,
-                                   transformState,
-                                   layers,
-                                   options,
-                                   projMatrix,
+        tile.queryRenderedFeatures(result, tileSpaceQueryGeometry, transformState, layers, options, projMatrix,
                                    featureState);
     }
 

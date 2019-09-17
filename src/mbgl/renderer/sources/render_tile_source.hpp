@@ -1,9 +1,9 @@
 #pragma once
 
 #include <mbgl/renderer/render_source.hpp>
+#include <mbgl/renderer/source_state.hpp>
 #include <mbgl/renderer/tile_pyramid.hpp>
 #include <mbgl/style/sources/vector_source_impl.hpp>
-#include <mbgl/renderer/source_state.hpp>
 
 namespace mbgl {
 
@@ -35,17 +35,12 @@ public:
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const override;
 
-    virtual void setFeatureState(const optional<std::string>&,
-                         const std::string&,
-                         const FeatureState&) override;
+    void setFeatureState(const optional<std::string>&, const std::string&, const FeatureState&) override;
 
-    virtual void getFeatureState(FeatureState& state,
-                                 const optional<std::string>&,
-                                 const std::string&) const override;
+    void getFeatureState(FeatureState& state, const optional<std::string>&, const std::string&) const override;
 
-    virtual void removeFeatureState(const optional<std::string>&,
-                                    const optional<std::string>&,
-                                    const optional<std::string>&) override;
+    void removeFeatureState(const optional<std::string>&, const optional<std::string>&,
+                            const optional<std::string>&) override;
 
     void reduceMemoryUse() override;
     void dumpDebugLogs() const override;
@@ -56,7 +51,9 @@ protected:
     Immutable<std::vector<RenderTile>> renderTiles;
     mutable RenderTiles filteredRenderTiles;
     mutable RenderTiles renderTilesSortedByY;
-    float bearing = 0.0f;      
+
+private:
+    float bearing = 0.0F;
     SourceFeatureState featureState;
 };
 

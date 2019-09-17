@@ -1,10 +1,10 @@
 #pragma once
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/timer.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/timer.hpp>
 
 struct GLFWwindow;
 class GLFWBackend;

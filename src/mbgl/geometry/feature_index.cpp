@@ -1,14 +1,14 @@
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/query.hpp>
+#include <mbgl/math/minmax.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/query.hpp>
+#include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/renderer/source_state.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/text/collision_index.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/math/minmax.hpp>
-#include <mbgl/style/filter.hpp>
-#include <mbgl/tile/tile_id.hpp>
-#include <mbgl/renderer/source_state.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
@@ -39,19 +39,12 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
     }
 }
 
-void FeatureIndex::query(
-        std::unordered_map<std::string, std::vector<Feature>>& result,
-        const GeometryCoordinates& queryGeometry,
-        const TransformState& transformState,
-        const mat4& posMatrix,
-        const double tileSize,
-        const double scale,
-        const RenderedQueryOptions& queryOptions,
-        const UnwrappedTileID& tileID,
-        const std::unordered_map<std::string, const RenderLayer*>& layers,
-        const float additionalQueryPadding,
-        const SourceFeatureState& sourceFeatureState) const {
-    
+void FeatureIndex::query(std::unordered_map<std::string, std::vector<Feature>>& result,
+                         const GeometryCoordinates& queryGeometry, const TransformState& transformState,
+                         const mat4& posMatrix, const double tileSize, const double scale,
+                         const RenderedQueryOptions& queryOptions, const UnwrappedTileID& tileID,
+                         const std::unordered_map<std::string, const RenderLayer*>& layers,
+                         const float additionalQueryPadding, const SourceFeatureState& sourceFeatureState) const {
     if (!tileData) {
         return;
     }
@@ -76,10 +69,11 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryOptions, tileID.canonical, layers, queryGeometry, transformState, pixelsToTileUnits, posMatrix, &sourceFeatureState);
+        addFeature(result, indexedFeature, queryOptions, tileID.canonical, layers, queryGeometry, transformState,
+                   pixelsToTileUnits, posMatrix, &sourceFeatureState);
     }
 }
-    
+
 std::unordered_map<std::string, std::vector<Feature>>
 FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolFeatures,
                                    const RenderedQueryOptions& queryOptions,
@@ -115,23 +109,19 @@ FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolF
 
     for (const auto& symbolFeature : sortedFeatures) {
         mat4 unusedMatrix;
-        addFeature(result, symbolFeature, queryOptions, tileID.canonical, layers, GeometryCoordinates(), {}, 0, unusedMatrix, nullptr);
+        addFeature(result, symbolFeature, queryOptions, tileID.canonical, layers, GeometryCoordinates(), {}, 0,
+                   unusedMatrix, nullptr);
     }
     return result;
 }
 
-void FeatureIndex::addFeature(
-    std::unordered_map<std::string, std::vector<Feature>>& result,
-    const IndexedSubfeature& indexedFeature,
-    const RenderedQueryOptions& options,
-    const CanonicalTileID& tileID,
-    const std::unordered_map<std::string, const RenderLayer*>& layers,
-    const GeometryCoordinates& queryGeometry,
-    const TransformState& transformState,
-    const float pixelsToTileUnits,
-    const mat4& posMatrix,
-    const SourceFeatureState* sourceFeatureState) const {
-
+void FeatureIndex::addFeature(std::unordered_map<std::string, std::vector<Feature>>& result,
+                              const IndexedSubfeature& indexedFeature, const RenderedQueryOptions& options,
+                              const CanonicalTileID& tileID,
+                              const std::unordered_map<std::string, const RenderLayer*>& layers,
+                              const GeometryCoordinates& queryGeometry, const TransformState& transformState,
+                              const float pixelsToTileUnits, const mat4& posMatrix,
+                              const SourceFeatureState* sourceFeatureState) const {
     // Lazily calculated.
     std::unique_ptr<GeometryTileLayer> sourceLayer;
     std::unique_ptr<GeometryTileFeature> geometryTileFeature;
@@ -152,7 +142,7 @@ void FeatureIndex::addFeature(
             assert(geometryTileFeature);
         }
         FeatureState state;
-        if (sourceFeatureState) {
+        if (sourceFeatureState != nullptr) {
             optional<std::string> idStr = featureIDtoString(geometryTileFeature->getID());
             if (idStr) {
                 sourceFeatureState->getState(state, sourceLayer->getName(), *idStr);
@@ -161,7 +151,8 @@ void FeatureIndex::addFeature(
 
         bool needsCrossTileIndex = renderLayer->baseImpl->getTypeInfo()->crossTileIndex == style::LayerTypeInfo::CrossTileIndex::Required;
         if (!needsCrossTileIndex &&
-             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, transformState, pixelsToTileUnits, posMatrix, state)) {
+            !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, transformState,
+                                                 pixelsToTileUnits, posMatrix, state)) {
             continue;
         }
 

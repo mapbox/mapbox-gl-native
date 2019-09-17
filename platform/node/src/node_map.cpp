@@ -1135,7 +1135,7 @@ void NodeMap::SetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& info) 
         if (!sourceLayerOption->IsString()) {
             return Nan::ThrowTypeError("SetFeatureState: Requires feature.sourceLayer property to be a string");
         }
-        sourceLayerID = { *Nan::Utf8String(sourceLayerOption) };
+        sourceLayerID = {*Nan::Utf8String(sourceLayerOption)};
     }
 
     if (Nan::Has(feature, Nan::New("id").ToLocalChecked()).FromJust()) {
@@ -1160,7 +1160,8 @@ void NodeMap::SetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& info) 
     bool valueParsed = false;
     FeatureState newState;
 
-    const std::function<optional<Error> (const std::string&, const Convertible&)> convertFn = [&] (const std::string& k, const Convertible& v) -> optional<Error> {
+    const std::function<optional<Error>(const std::string&, const Convertible&)> convertFn =
+        [&](const std::string& k, const Convertible& v) -> optional<Error> {
         optional<Value> value = toValue(v);
         if (value) {
             stateValue = std::move(*value);
@@ -1176,14 +1177,13 @@ void NodeMap::SetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& info) 
                 }
             }
             std::unordered_map<std::string, Value> result;
-            result[k]= std::move(array);
+            result[k] = std::move(array);
             stateValue = std::move(result);
             valueParsed = true;
             return {};
 
         } else if (isObject(v)) {
             eachMember(v, convertFn);
-
         }
         if (!valueParsed) {
             Nan::ThrowTypeError("Could not get feature state value");
@@ -1198,7 +1198,7 @@ void NodeMap::SetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& info) 
 
     try {
         nodeMap->frontend->getRenderer()->setFeatureState(sourceID, sourceLayerID, featureID, newState);
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -1235,7 +1235,7 @@ void NodeMap::GetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& info) 
         if (!sourceLayerOption->IsString()) {
             return Nan::ThrowTypeError("GetFeatureState: Requires feature.sourceLayer property to be a string");
         }
-        sourceLayerID = { *Nan::Utf8String(sourceLayerOption) };
+        sourceLayerID = {*Nan::Utf8String(sourceLayerOption)};
     }
 
     if (Nan::Has(feature, Nan::New("id").ToLocalChecked()).FromJust()) {
@@ -1251,7 +1251,7 @@ void NodeMap::GetFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& info) 
     mbgl::FeatureState state;
     try {
         nodeMap->frontend->getRenderer()->getFeatureState(state, sourceID, sourceLayerID, featureID);
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 
@@ -1292,7 +1292,7 @@ void NodeMap::RemoveFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& inf
         if (!sourceLayerOption->IsString()) {
             return Nan::ThrowTypeError("RemoveFeatureState: Requires feature.sourceLayer property to be a string");
         }
-        sourceLayerID = { *Nan::Utf8String(sourceLayerOption) };
+        sourceLayerID = {*Nan::Utf8String(sourceLayerOption)};
     }
 
     if (Nan::Has(feature, Nan::New("id").ToLocalChecked()).FromJust()) {
@@ -1300,7 +1300,7 @@ void NodeMap::RemoveFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& inf
         if (!idOption->IsString() && !(idOption->IsNumber() || idOption->IsString())) {
             return Nan::ThrowTypeError("Requires feature.id property to be a string or a number");
         }
-        featureID = { *Nan::Utf8String(idOption) };
+        featureID = {*Nan::Utf8String(idOption)};
     }
 
     if (info.Length() == 2) {
@@ -1308,12 +1308,12 @@ void NodeMap::RemoveFeatureState(const Nan::FunctionCallbackInfo<v8::Value>& inf
         if (!keyParam->IsString()) {
             return Nan::ThrowTypeError("RemoveFeatureState: Requires feature key property to be a string");
         }
-        stateKey = { *Nan::Utf8String(keyParam) };
+        stateKey = {*Nan::Utf8String(keyParam)};
     }
 
     try {
         nodeMap->frontend->getRenderer()->removeFeatureState(sourceID, sourceLayerID, featureID, stateKey);
-    } catch (const std::exception &ex) {
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 

@@ -219,14 +219,10 @@ void RenderHeatmapLayer::updateColorRamp() {
     }
 }
 
-bool RenderHeatmapLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float zoom,
-        const TransformState&,
-        const float pixelsToTileUnits,
-        const mat4&,
-        const FeatureState&) const {
+bool RenderHeatmapLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                                const GeometryTileFeature& feature, const float zoom,
+                                                const TransformState&, const float pixelsToTileUnits, const mat4&,
+                                                const FeatureState&) const {
     (void) queryGeometry;
     (void) feature;
     (void) zoom;

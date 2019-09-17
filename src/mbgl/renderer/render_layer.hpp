@@ -88,14 +88,10 @@ public:
 
     // Check wether the given geometry intersects
     // with the feature
-    virtual bool queryIntersectsFeature(
-            const GeometryCoordinates&,
-            const GeometryTileFeature&,
-            const float,
-            const TransformState&,
-            const float,
-            const mat4&,
-            const FeatureState&) const { return false; };
+    virtual bool queryIntersectsFeature(const GeometryCoordinates&, const GeometryTileFeature&, const float,
+                                        const TransformState&, const float, const mat4&, const FeatureState&) const {
+        return false;
+    };
 
     virtual void prepare(const LayerPrepareParameters&);
 

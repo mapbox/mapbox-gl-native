@@ -34,9 +34,8 @@ public:
     EvaluationContext(optional<mbgl::Value> accumulated_, GeometryTileFeature const * feature_) :
         accumulated(std::move(accumulated_)), feature(feature_)
     {}
-    EvaluationContext(float zoom_, GeometryTileFeature const * feature_, const FeatureState* state_) :
-        zoom(zoom_), feature(feature_), featureState(state_)
-    {}
+    EvaluationContext(float zoom_, GeometryTileFeature const* feature_, const FeatureState* state_)
+        : zoom(zoom_), feature(feature_), featureState(state_) {}
     EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> colorRampParameter_) :
         zoom(std::move(zoom_)), feature(feature_), colorRampParameter(std::move(colorRampParameter_))
     {}
