@@ -97,22 +97,39 @@ public:
     std::shared_ptr<FeatureIndex> featureIndex;
     bool showCollisionBoxes;
 };
+
+class Placement;
+
+class PlacementController {
+public:
+    PlacementController();
+    void setPlacement(Immutable<Placement>);
+    const Immutable<Placement>& getPlacement() const { return placement; }
+    void setPlacementStale() { stale = true; }
+    bool placementIsRecent(TimePoint now, const float zoom, optional<Duration> maximumDuration = nullopt) const;
+    bool hasTransitions(TimePoint now) const;
+    
+private:
+    Immutable<Placement> placement;
+    bool stale = false;
+};
     
 class Placement {
 public:
-    Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, std::shared_ptr<const Placement> prevPlacement = nullptr);
+    Placement(const TransformState&, MapMode, style::TransitionOptions, const bool crossSourceCollisions, optional<Immutable<Placement>> prevPlacement);
     void placeLayer(const RenderLayer&, const mat4&, bool showCollisionBoxes);
     void commit(TimePoint, const double zoom);
     void updateLayerBuckets(const RenderLayer&, const TransformState&,  bool updateOpacities) const;
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
+    bool transitionsEnabled() const;
 
     const CollisionIndex& getCollisionIndex() const;
+    TimePoint getCommitTime() const { return commitTime; }
+    Duration getUpdatePeriod(const float zoom) const;
 
-    bool stillRecent(TimePoint now, const float zoom) const;
-    void setMaximumUpdatePeriod(Duration);
-    void setStale();
-    
+    float zoomAdjustment(const float zoom) const;
+
     const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
 private:
     friend SymbolBucket;
@@ -125,8 +142,9 @@ private:
     void updateBucketOpacities(SymbolBucket&, const TransformState&, std::set<uint32_t>&) const;
     void markUsedJustification(SymbolBucket&, style::TextVariableAnchorType, const SymbolInstance&, style::TextWritingModeType orientation) const;
     void markUsedOrientation(SymbolBucket&, style::TextWritingModeType, const SymbolInstance&) const;
-    float zoomAdjustment(const float zoom) const;
-    Duration getUpdatePeriod(const float zoom) const;
+    const Placement* getPrevPlacement() const {
+        return prevPlacement ? prevPlacement->get() : nullptr;
+    }
 
     CollisionIndex collisionIndex;
 
@@ -143,12 +161,9 @@ private:
     std::unordered_map<uint32_t, VariableOffset> variableOffsets;
     std::unordered_map<uint32_t, style::TextWritingModeType> placedOrientations;
 
-    bool stale = false;
-    
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
     CollisionGroups collisionGroups;
-    mutable std::shared_ptr<const Placement> prevPlacement;
-    optional<Duration> maximumUpdatePeriod;
+    mutable optional<Immutable<Placement>> prevPlacement;
 
     // Used for debug purposes.
     std::unordered_map<const CollisionFeature*, std::vector<ProjectedCollisionBox>> collisionCircles;

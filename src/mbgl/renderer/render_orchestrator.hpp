@@ -122,7 +122,7 @@ private:
     RenderLight renderLight;
 
     CrossTileSymbolIndex crossTileSymbolIndex;
-    std::shared_ptr<Placement> placement;
+    PlacementController placementController;
 
     const bool backgroundLayerAsColor;
     bool contextLost = false;
