@@ -228,7 +228,6 @@ MGL_EXPORT
  Starts the snapshot creation and executes the specified blocks with the result
  on the specified queue. Use this option if you want to add custom drawing on top of the
  resulting `MGLMapSnapShot`.
- @param queue The queue to handle the result on.
  @param overlayHandler The block to handle manipulation of the `MGLMapSnapshotter`'s `CGContext`.
  @param completionHandler The block to handle the result in.
  */
