@@ -49,7 +49,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsDebugToolsRows) {
     MBXSettingsDebugToolsOverdrawVisualization,
     MBXSettingsDebugToolsShowZoomLevel,
     MBXSettingsDebugToolsShowFrameTimeGraph,
-    MBXSettingsDebugToolsShowReuseQueueStats
+    MBXSettingsDebugToolsShowReuseQueueStats,
+    MBXSettingsDebugToolsInvalidateAmbientCache,
+    MBXSettingsDebugToolsClearAmbientCache,
+    MBXSettingsDebugToolsResetDatabase
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
@@ -375,7 +378,10 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     (debugMask & MGLMapDebugOverdrawVisualizationMask ? @"Hide" :@"Show")],
                 [NSString stringWithFormat:@"%@ zoom level ornament", (self.zoomLevelOrnamentEnabled ? @"Hide" :@"Show")],
                 [NSString stringWithFormat:@"%@ frame time graph", (self.frameTimeGraphEnabled ? @"Hide" :@"Show")],
-                [NSString stringWithFormat:@"%@ reuse queue stats", (self.reuseQueueStatsEnabled ? @"Hide" :@"Show")]
+                [NSString stringWithFormat:@"%@ reuse queue stats", (self.reuseQueueStatsEnabled ? @"Hide" :@"Show")],
+                @"Invalidate Ambient Cache",
+                @"Clear Ambient Cache",
+                @"Reset Database",
             ]];
             break;
         case MBXSettingsAnnotations:
@@ -508,11 +514,19 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     [self updateHUD];
                     break;
                 }
+                case MBXSettingsDebugToolsInvalidateAmbientCache:
+                    [self invalidateAmbientCache];
+                    break;
+                case MBXSettingsDebugToolsClearAmbientCache:
+                    [self clearAmbientCache];
+                    break;
+                case MBXSettingsDebugToolsResetDatabase:
+                    [self resetDatabase];
+                    break;
                 default:
                     NSAssert(NO, @"All debug tools setting rows should be implemented");
                     break;
             }
-
             self.mapView.debugMask = self.currentState.debugMask;
             
             break;
@@ -1763,6 +1777,61 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", [dateFormatter stringFromDate:[NSDate date]]]];
 
     return filePath;
+}
+
+#pragma mark:
+- (void)invalidateAmbientCache {
+    CFTimeInterval start = CACurrentMediaTime();
+    [[MGLOfflineStorage sharedOfflineStorage] invalidateAmbientCacheWithCompletionHandler:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Error: %@", error.localizedDescription);
+            return;
+        } else {
+            CFTimeInterval difference = CACurrentMediaTime() - start;
+            NSLog(@"Ambient cache invalidated in %f seconds", difference);
+        }
+    }];
+}
+
+- (void)invalidateOfflinePack {
+    CFTimeInterval start = CACurrentMediaTime();
+    MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs.firstObject;
+
+    [[MGLOfflineStorage sharedOfflineStorage] invalidatePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Error: %@", error.localizedDescription);
+            return;
+        } else {
+            CFTimeInterval difference = CACurrentMediaTime() - start;
+            NSLog(@"Offline pack invalidated in %f seconds", difference);
+        }
+    }];
+}
+
+- (void)clearAmbientCache {
+    CFTimeInterval start = CACurrentMediaTime();
+    [[MGLOfflineStorage sharedOfflineStorage] clearAmbientCacheWithCompletionHandler:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Error: %@", error.localizedDescription);
+            return;
+        } else {
+            CFTimeInterval difference = CACurrentMediaTime() - start;
+            NSLog(@"Ambient cache cleared in %f seconds", difference);
+        }
+    }];
+}
+
+- (void)resetDatabase {
+    CFTimeInterval start = CACurrentMediaTime();
+    [[MGLOfflineStorage sharedOfflineStorage] resetDatabaseWithCompletionHandler:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Error: %@", error.localizedDescription);
+            return;
+        } else {
+            CFTimeInterval difference = CACurrentMediaTime() - start;
+            NSLog(@"Database reset in %f seconds", difference);
+        }
+    }];
 }
 
 #pragma mark - Random World Tour
