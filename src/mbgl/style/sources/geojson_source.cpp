@@ -1,9 +1,10 @@
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/geojson_source_impl.hpp>
-#include <mbgl/style/source_observer.hpp>
-#include <mbgl/style/conversion/json.hpp>
-#include <mbgl/style/conversion/geojson.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mbgl {
@@ -76,6 +77,12 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
             observer->onSourceLoaded(*this);
         }
     });
+}
+
+bool GeoJSONSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
+    return !std::strcmp(info->type, "line") || !std::strcmp(info->type, "symbol") ||
+           !std::strcmp(info->type, "circle") || !std::strcmp(info->type, "fill") ||
+           !std::strcmp(info->type, "fill-extrusion") || !std::strcmp(info->type, "heatmap");
 }
 
 } // namespace style
