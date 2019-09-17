@@ -61,7 +61,8 @@ public:
     }
     // Places this bucket to the given placement.
     virtual void place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) {}
-    virtual void updateVertices(const Placement&, bool /*updateOpacities*/, const TransformState&, const RenderTile&, std::set<uint32_t>&) {}
+    virtual void updateVertices(
+        const Placement&, bool /*updateOpacities*/, const TransformState&, const RenderTile&, std::set<uint32_t>&) {}
 
 protected:
     Bucket() = default;

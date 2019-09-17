@@ -303,7 +303,11 @@ void SymbolBucket::place(Placement& placement, const BucketPlacementParameters& 
     placement.placeBucket(*this, params, seenIds);
 }
 
-void SymbolBucket::updateVertices(const Placement& placement, bool updateOpacities, const TransformState& state, const RenderTile& tile, std::set<uint32_t>& seenIds) {
+void SymbolBucket::updateVertices(const Placement& placement,
+                                  bool updateOpacities,
+                                  const TransformState& state,
+                                  const RenderTile& tile,
+                                  std::set<uint32_t>& seenIds) {
     if (updateOpacities) {
         placement.updateBucketOpacities(*this, state, seenIds);
         placementChangesUploaded = false;

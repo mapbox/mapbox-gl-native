@@ -75,13 +75,13 @@ public:
             const float pixelsToTileUnits);
 
     void setBucketLayerIDs(const std::string& bucketLeaderID, const std::vector<std::string>& layerIDs);
-    
+
     std::unordered_map<std::string, std::vector<Feature>> lookupSymbolFeatures(
-           const std::vector<IndexedSubfeature>& symbolFeatures,
-           const RenderedQueryOptions& options,
-           const std::unordered_map<std::string, const RenderLayer*>& layers,
-           const OverscaledTileID& tileID,
-           const FeatureSortOrder& featureSortOrder) const;
+        const std::vector<IndexedSubfeature>& symbolFeatures,
+        const RenderedQueryOptions& options,
+        const std::unordered_map<std::string, const RenderLayer*>& layers,
+        const OverscaledTileID& tileID,
+        const FeatureSortOrder& featureSortOrder) const;
 
 private:
     void addFeature(std::unordered_map<std::string, std::vector<Feature>>& result, const IndexedSubfeature&,

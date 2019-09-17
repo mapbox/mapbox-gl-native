@@ -74,12 +74,12 @@ void FeatureIndex::query(std::unordered_map<std::string, std::vector<Feature>>& 
     }
 }
 
-std::unordered_map<std::string, std::vector<Feature>>
-FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolFeatures,
-                                   const RenderedQueryOptions& queryOptions,
-                                   const std::unordered_map<std::string, const RenderLayer*>& layers,
-                                   const OverscaledTileID& tileID,
-                                   const FeatureSortOrder& featureSortOrder) const {
+std::unordered_map<std::string, std::vector<Feature>> FeatureIndex::lookupSymbolFeatures(
+    const std::vector<IndexedSubfeature>& symbolFeatures,
+    const RenderedQueryOptions& queryOptions,
+    const std::unordered_map<std::string, const RenderLayer*>& layers,
+    const OverscaledTileID& tileID,
+    const FeatureSortOrder& featureSortOrder) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (!tileData) {
         return result;

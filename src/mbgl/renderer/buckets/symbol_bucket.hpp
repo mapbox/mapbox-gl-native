@@ -68,7 +68,8 @@ public:
     bool hasData() const override;
     std::pair<uint32_t, bool> registerAtCrossTileIndex(CrossTileSymbolLayerIndex&, const OverscaledTileID&, uint32_t& maxCrossTileID) override;
     void place(Placement&, const BucketPlacementParameters&, std::set<uint32_t>&) override;
-    void updateVertices(const Placement&, bool updateOpacities, const TransformState&, const RenderTile&, std::set<uint32_t>&) override;
+    void updateVertices(
+        const Placement&, bool updateOpacities, const TransformState&, const RenderTile&, std::set<uint32_t>&) override;
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasSdfIconData() const;
