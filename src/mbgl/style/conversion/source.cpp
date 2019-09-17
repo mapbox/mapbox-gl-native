@@ -104,7 +104,7 @@ static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& 
             return nullopt;
         }
     }
-    return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset), std::move(maxzoom), std::move(minzoom)) };
+    return {std::make_unique<VectorSource>(id, std::move(*urlOrTileset), std::move(maxzoom), std::move(minzoom))};
 }
 
 static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
