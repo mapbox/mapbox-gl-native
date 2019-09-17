@@ -2,6 +2,11 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLMapView+OpenGL.h"
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEConstants.h"
+#import "MGLMapboxEvents.h"
+#endif
+
 #include <mbgl/gl/renderable_resource.hpp>
 
 #import <GLKit/GLKit.h>
@@ -96,7 +101,7 @@ void MGLMapViewOpenGLImpl::setPresentsWithTransaction(const bool value) {
 
 void MGLMapViewOpenGLImpl::display() {
     auto& resource = getResource<MGLMapViewOpenGLRenderableResource>();
-#ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
+
     // See https://github.com/mapbox/mapbox-gl-native/issues/14232
     // glClear can be blocked for 1 second. This code is an "escape hatch",
     // an attempt to detect this situation and rebuild the GL views.
@@ -106,14 +111,22 @@ void MGLMapViewOpenGLImpl::display() {
         CFTimeInterval after = CACurrentMediaTime();
 
         if (after - before >= 1.0) {
+#ifdef MGL_RECREATE_GL_IN_AN_EMERGENCY
             dispatch_async(dispatch_get_main_queue(), ^{
               emergencyRecreateGL();
             });
-        }
-    }
-    else
+#else
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                NSError *error = [NSError errorWithDomain:MGLErrorDomain
+                                                     code:MGLErrorCodeRenderingError
+                                                 userInfo:@{ NSLocalizedFailureReasonErrorKey :
+                                                                 @"https://github.com/mapbox/mapbox-gl-native/issues/14232" }];
+                [[MMEEventsManager sharedManager] reportError:error];
+            });
 #endif
-    {
+        }
+    } else {
         [resource.glView display];
     }
 }
