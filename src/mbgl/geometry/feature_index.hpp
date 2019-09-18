@@ -16,6 +16,7 @@ namespace mbgl {
 class RenderedQueryOptions;
 class RenderLayer;
 class TransformState;
+class SourceFeatureState;
 
 class CollisionIndex;
 
@@ -58,17 +59,11 @@ public:
     
     void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketLeaderID);
 
-    void query(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState&,
-            const mat4& posMatrix,
-            const double tileSize,
-            const double scale,
-            const RenderedQueryOptions& options,
-            const UnwrappedTileID&,
-            const std::unordered_map<std::string, const RenderLayer*>&,
-            const float additionalQueryPadding) const;
+    void query(std::unordered_map<std::string, std::vector<Feature>>& result, const GeometryCoordinates& queryGeometry,
+               const TransformState&, const mat4& posMatrix, const double tileSize, const double scale,
+               const RenderedQueryOptions& options, const UnwrappedTileID&,
+               const std::unordered_map<std::string, const RenderLayer*>&, const float additionalQueryPadding,
+               const SourceFeatureState& sourceFeatureState) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
             const GeometryCoordinates& queryGeometry,
@@ -87,16 +82,12 @@ public:
            const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const;
 
 private:
-    void addFeature(
-            std::unordered_map<std::string, std::vector<Feature>>& result,
-            const IndexedSubfeature&,
-            const RenderedQueryOptions& options,
-            const CanonicalTileID&,
-            const std::unordered_map<std::string, const RenderLayer*>&,
-            const GeometryCoordinates& queryGeometry,
-            const TransformState& transformState,
-            const float pixelsToTileUnits,
-            const mat4& posMatrix) const;
+    void addFeature(std::unordered_map<std::string, std::vector<Feature>>& result, const IndexedSubfeature&,
+                    const RenderedQueryOptions& options, const CanonicalTileID&,
+                    const std::unordered_map<std::string, const RenderLayer*>&,
+                    const GeometryCoordinates& queryGeometry, const TransformState& transformState,
+                    const float pixelsToTileUnits, const mat4& posMatrix,
+                    const SourceFeatureState* sourceFeatureState) const;
 
     GridIndex<IndexedSubfeature> grid;
     unsigned int sortIndex = 0;

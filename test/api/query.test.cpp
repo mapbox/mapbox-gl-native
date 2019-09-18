@@ -126,6 +126,22 @@ TEST(Query, QuerySourceFeatures) {
     EXPECT_EQ(features1.size(), 1u);
 }
 
+TEST(Query, QuerySourceFeatureStates) {
+    QueryTest test;
+
+    FeatureState newState;
+    newState["hover"] = true;
+    newState["radius"].set<uint64_t>(20);
+    test.frontend.getRenderer()->setFeatureState("source1", {}, "feature1", newState);
+
+    FeatureState states;
+    test.frontend.getRenderer()->getFeatureState(states, "source1", {}, "feature1");
+    ASSERT_EQ(states.size(), 2u);
+    ASSERT_EQ(states["hover"], true);
+    ASSERT_EQ(states["radius"].get<uint64_t>(), 20u);
+    ASSERT_EQ(newState, states);
+}
+
 TEST(Query, QuerySourceFeaturesOptionValidation) {
     QueryTest test;
 

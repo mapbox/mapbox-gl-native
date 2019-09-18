@@ -39,10 +39,8 @@ bool HeatmapBucket::hasData() const {
     return !segments.empty();
 }
 
-void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
-                               const GeometryCollection& geometry,
-                               const ImagePositions&,
-                               const PatternLayerMap&) {
+void HeatmapBucket::addFeature(const GeometryTileFeature& feature, const GeometryCollection& geometry,
+                               const ImagePositions&, const PatternLayerMap&, std::size_t featureIndex) {
     constexpr const uint16_t vertexLength = 4;
 
     for (auto& points : geometry) {
@@ -89,7 +87,7 @@ void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
     }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.populateVertexVectors(feature, vertices.elements(), {}, {});
+        pair.second.populateVertexVectors(feature, vertices.elements(), featureIndex, {}, {});
     }
 }
 

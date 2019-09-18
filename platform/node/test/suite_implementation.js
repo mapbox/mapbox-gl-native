@@ -122,6 +122,12 @@ export default function (style, options, callback) {
             map.load(operation[1]);
             applyOperations(operations.slice(1), callback);
 
+        } else if (operation[0] ==='setFeatureState' || operation[0] ==='getFeatureState' || operation[0] ==='removeFeatureState') {
+            map.render(options, function () {
+                map[operation[0]].apply(map, operation.slice(1));
+                applyOperations(operations.slice(1), callback);
+            });
+
         } else {
             // Ensure that the next `map.render(options)` does not overwrite this change.
             if (operation[0] === 'setCenter') {

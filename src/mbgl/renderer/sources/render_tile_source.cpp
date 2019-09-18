@@ -68,6 +68,7 @@ void RenderTileSource::prepare(const SourcePrepareParameters& parameters) {
         tiles->emplace_back(entry.first, entry.second);
         tiles->back().prepare(parameters);
     }
+    featureState.coalesceChanges(*tiles);
     renderTiles = std::move(tiles);
 }
 
@@ -126,11 +127,27 @@ RenderTileSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                           const std::unordered_map<std::string, const RenderLayer*>& layers,
                                           const RenderedQueryOptions& options,
                                           const mat4& projMatrix) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix, featureState);
 }
 
 std::vector<Feature> RenderTileSource::querySourceFeatures(const SourceQueryOptions& options) const {
     return tilePyramid.querySourceFeatures(options);
+}
+
+void RenderTileSource::setFeatureState(const optional<std::string>& sourceLayerID, const std::string& featureID,
+                                       const FeatureState& state) {
+    featureState.updateState(sourceLayerID, featureID, state);
+}
+
+void RenderTileSource::getFeatureState(FeatureState& state, const optional<std::string>& sourceLayerID,
+                                       const std::string& featureID) const {
+    featureState.getState(state, sourceLayerID, featureID);
+}
+
+void RenderTileSource::removeFeatureState(const optional<std::string>& sourceLayerID,
+                                          const optional<std::string>& featureID,
+                                          const optional<std::string>& stateKey) {
+    featureState.removeState(sourceLayerID, featureID, stateKey);
 }
 
 void RenderTileSource::reduceMemoryUse() {

@@ -20,6 +20,11 @@ public:
         v.resize(v.size() + n, val);
     }
 
+    Vertex& at(std::size_t n) {
+        assert(n < v.size());
+        return v.at(n);
+    }
+
     std::size_t elements() const {
         return v.size();
     }

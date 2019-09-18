@@ -25,8 +25,10 @@ CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector
 CircleBucket::~CircleBucket() = default;
 
 void CircleBucket::upload(gfx::UploadPass& uploadPass) {
-    vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
-    indexBuffer = uploadPass.createIndexBuffer(std::move(triangles));
+    if (!uploaded) {
+        vertexBuffer = uploadPass.createVertexBuffer(std::move(vertices));
+        indexBuffer = uploadPass.createIndexBuffer(std::move(triangles));
+    }
 
     for (auto& pair : paintPropertyBinders) {
         pair.second.upload(uploadPass);
@@ -39,10 +41,8 @@ bool CircleBucket::hasData() const {
     return !segments.empty();
 }
 
-void CircleBucket::addFeature(const GeometryTileFeature& feature,
-                                 const GeometryCollection& geometry,
-                                 const ImagePositions&,
-                                 const PatternLayerMap&) {
+void CircleBucket::addFeature(const GeometryTileFeature& feature, const GeometryCollection& geometry,
+                              const ImagePositions&, const PatternLayerMap&, std::size_t featureIndex) {
     constexpr const uint16_t vertexLength = 4;
 
     for (auto& circle : geometry) {
@@ -90,7 +90,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
     }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.populateVertexVectors(feature, vertices.elements(), {}, {});
+        pair.second.populateVertexVectors(feature, vertices.elements(), featureIndex, {}, {});
     }
 }
 
@@ -110,6 +110,15 @@ float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
     float stroke = get<CircleStrokeWidth>(evaluated, layer.getID(), paintPropertyBinders);
     auto translate = evaluated.get<CircleTranslate>();
     return radius + stroke + util::length(translate[0], translate[1]);
+}
+
+void CircleBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
+                          const ImagePositions& imagePositions) {
+    auto it = paintPropertyBinders.find(layerID);
+    if (it != paintPropertyBinders.end()) {
+        it->second.updateVertexVectors(states, layer, imagePositions);
+        uploaded = false;
+    }
 }
 
 } // namespace mbgl

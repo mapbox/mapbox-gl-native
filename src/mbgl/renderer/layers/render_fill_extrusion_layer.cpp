@@ -224,13 +224,11 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters) {
     }
 }
 
-bool RenderFillExtrusionLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float,
-        const TransformState& transformState,
-        const float pixelsToTileUnits,
-        const mat4&) const {
+bool RenderFillExtrusionLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                                      const GeometryTileFeature& feature, const float,
+                                                      const TransformState& transformState,
+                                                      const float pixelsToTileUnits, const mat4&,
+                                                      const FeatureState&) const {
     const auto& evaluated = static_cast<const FillExtrusionLayerProperties&>(*evaluatedProperties).evaluated;
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,

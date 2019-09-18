@@ -227,4 +227,8 @@ void RenderTile::finishRender(PaintParameters& parameters) const {
     }
 }
 
+void RenderTile::setFeatureState(const LayerFeatureStates& states) {
+    tile.setFeatureState(states);
+}
+
 } // namespace mbgl
