@@ -725,10 +725,6 @@ jobs:
             git diff -U0 --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
             git diff --exit-code
       - run:
-          name: Clang Tidy
-          command: |
-            git diff -U0 --no-color origin/master... src include | clang-tidy-diff-8.py -clang-tidy-binary clang-tidy-8 -p1 -path build
-      - run:
           name: Code Generators
           command: |
             platform/android/scripts/generate-style-code.js
