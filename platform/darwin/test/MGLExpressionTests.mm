@@ -356,6 +356,12 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *expression = [NSExpression expressionForFunction:@"sum:" arguments:@[@1, @2, @2, @3, @4, @7, @9]];
+        NSArray *jsonExpression = @[@"+", @1, @2, @2, @3, @4, @7, @9];
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @28);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
         NSExpression *expression = [NSExpression expressionWithFormat:@"count({1, 2, 2, 3, 4, 7, 9})"];
         NSArray *jsonExpression = @[@"length", @[@"literal", @[@1, @2, @2, @3, @4, @7, @9]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
