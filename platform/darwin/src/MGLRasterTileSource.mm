@@ -34,7 +34,7 @@ static const CGFloat MGLRasterTileSourceRetinaTileSize = 512;
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
     NSString *configurationURLString = configurationURL.mgl_URLByStandardizingScheme.absoluteString;
-    auto source = [self pendingSourceWithIdentifier:identifier urlOrTileset:configurationURLString.UTF8String tileSize:tileSize];
+    auto source = [self pendingSourceWithIdentifier:identifier urlOrTileset:configurationURLString.UTF8String tileSize:uint16_t(round(tileSize))];
     return self = [super initWithPendingSource:std::move(source)];
 }
 
