@@ -187,7 +187,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapboxMap.injectAnnotationManager(annotationManager);
 
     // user input
-    mapGestureDetector = new MapGestureDetector(view, context, transform, proj, uiSettings,
+    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
       annotationManager, cameraDispatcher);
     mapKeyListener = new MapKeyListener(transform, uiSettings, mapGestureDetector);
 

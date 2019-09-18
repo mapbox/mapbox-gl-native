@@ -5,8 +5,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewConfiguration;
 
 import com.mapbox.mapboxsdk.log.Logger;
@@ -88,8 +90,19 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        if (event.isShiftPressed()) {
-          // Increase map camera pitch value
+        if (event.isAltPressed()) {
+          if (!uiSettings.isZoomGesturesEnabled()) {
+            return false;
+          }
+          // Zoom the map camera out away from the map (i.e. decrease the map camera zoom level number)
+          // if the alt button is held down while the up arrow is pressed
+          zoomMapCameraOut();
+        } else if (event.isShiftPressed()) {
+          if (!uiSettings.isTiltGesturesEnabled()) {
+            return false;
+          }
+
+          // Increase map camera pitch value if shift is held down
           transform.setTilt(transform.getTilt() + 1);
         } else {
           // Move map target up
@@ -105,11 +118,21 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        if (event.isShiftPressed()) {
-          // Decrease map camera pitch value
+        if (event.isAltPressed()) {
+          if (!uiSettings.isZoomGesturesEnabled()) {
+            return false;
+          }
+          // Zoom the map camera closer to the map (i.e. increase the map camera zoom level number)
+          // if the alt button is held down while the down arrow is pressed
+          zoomMapCameraIn();
+        } else if (event.isShiftPressed()) {
+          if (!uiSettings.isTiltGesturesEnabled()) {
+            return false;
+          }
+          // Decrease map camera pitch value if shift is held down
           transform.setTilt(transform.getTilt() - 1);
         } else {
-          // Move map target up
+          // Move map target down
           transform.moveBy(0.0, -scrollDist, 0 /*no animation*/);
         }
         return true;
@@ -139,7 +162,7 @@ final class MapKeyListener {
         }
 
         // Zoom out
-        zoomMapCameraIn();
+        zoomMapCameraOut();
         return true;
 
       default:
@@ -172,11 +195,9 @@ final class MapKeyListener {
         if (!uiSettings.isZoomGesturesEnabled()) {
           return false;
         }
-
         zoomMapCameraIn();
         return true;
     }
-
     // We are not interested in this key
     return false;
   }
@@ -266,8 +287,7 @@ final class MapKeyListener {
       // Check if the trackball is still pressed
       if (!cancelled) {
         // Zoom out
-        PointF pointF = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        mapGestureDetector.zoomOutAnimated(pointF, true);
+        zoomMapCameraOut();
 
         // Ensure the up action is not run
         currentTrackballLongPressTimeOut = null;
@@ -276,10 +296,18 @@ final class MapKeyListener {
   }
 
   /**
-   * Zooms the map camera in. Used at several places within this class.
+   * Moves the map camera towards from the map plane.
    */
   private void zoomMapCameraIn() {
     PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
     mapGestureDetector.zoomInAnimated(focalPoint, true);
+  }
+
+  /**
+   * Moves the map camera away from the map plane
+   */
+  private void zoomMapCameraOut() {
+    PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+    mapGestureDetector.zoomOutAnimated(focalPoint, true);
   }
 }

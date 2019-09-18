@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -35,8 +36,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAXIMUM_ANGULAR_VELOCITY;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.MAX_ABSOLUTE_SCALE_VELOCITY_CHANGE;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.QUICK_ZOOM_MAX_ZOOM_CHANGE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.QUICK_ZOOM_MAX_ZOOM_CHANGE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.QUICK_ZOOM_MAX_ZOOM_CHANGE;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.QUICK_ZOOM_MAX_ZOOM_CHANGE;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.ROTATE_VELOCITY_RATIO_THRESHOLD;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_ANIMATION_DURATION_MULTIPLIER;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_RATIO_THRESHOLD;
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_RATIO_THRESHOLD;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.SCALE_VELOCITY_RATIO_THRESHOLD;
 import static com.mapbox.mapboxsdk.constants.MapboxConstants.ZOOM_RATE;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
@@ -45,14 +51,13 @@ import static com.mapbox.mapboxsdk.utils.MathUtils.normalize;
 /**
  * Manages gestures events on a MapView.
  */
-final class MapGestureDetector implements View.OnKeyListener {
+final class MapGestureDetector {
 
   private final Transform transform;
   private final Projection projection;
   private final UiSettings uiSettings;
   private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
-  private boolean isZHeldDown = false;
 
   // new map touch API
   private final CopyOnWriteArrayList<MapboxMap.OnMapClickListener> onMapClickListenerList
@@ -107,7 +112,6 @@ final class MapGestureDetector implements View.OnKeyListener {
     this.projection = projection;
     this.uiSettings = uiSettings;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
-    view.setOnKeyListener(this);
 
     // Checking for context != null for testing purposes
     if (context != null) {
@@ -118,12 +122,6 @@ final class MapGestureDetector implements View.OnKeyListener {
       // Initialize gesture listeners
       initializeGestureListeners(context, true);
     }
-  }
-
-  @Override
-  public boolean onKey(View view, int i, KeyEvent keyEvent) {
-    MapGestureDetector.this.isZHeldDown = keyEvent.getKeyCode() == keyEvent.KEYCODE_Z;
-    return false;
   }
 
   private void initializeGestureListeners(@NonNull Context context, boolean attachDefaultListeners) {
