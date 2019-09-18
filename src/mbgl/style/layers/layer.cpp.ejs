@@ -80,10 +80,8 @@ layerCapabilities['raster']         = defaults.require('Source').set('TileKind',
 %>
 // static
 const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"<%- type %>",
-          <%-`${layerCapabilities[type].map(cap => `LayerTypeInfo::${cap}`).join(',\n          ')}` %>
-        };
+    const static LayerTypeInfo typeInfo{"<%- type %>",
+                                        <%-`${layerCapabilities[type].map(cap => `LayerTypeInfo::${cap}`).join(',\n                                        ')}` %>};
     return &typeInfo;
 }
 

@@ -19,15 +19,13 @@ namespace style {
 
 // static
 const LayerTypeInfo* HeatmapLayer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"heatmap",
-          LayerTypeInfo::Source::Required,
-          LayerTypeInfo::Pass3D::Required,
-          LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::FadingTiles::NotRequired,
-          LayerTypeInfo::CrossTileIndex::NotRequired,
-          LayerTypeInfo::TileKind::Geometry
-        };
+    const static LayerTypeInfo typeInfo{"heatmap",
+                                        LayerTypeInfo::Source::Required,
+                                        LayerTypeInfo::Pass3D::Required,
+                                        LayerTypeInfo::Layout::NotRequired,
+                                        LayerTypeInfo::FadingTiles::NotRequired,
+                                        LayerTypeInfo::CrossTileIndex::NotRequired,
+                                        LayerTypeInfo::TileKind::Geometry};
     return &typeInfo;
 }
 

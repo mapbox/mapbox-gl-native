@@ -19,15 +19,13 @@ namespace style {
 
 // static
 const LayerTypeInfo* HillshadeLayer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"hillshade",
-          LayerTypeInfo::Source::Required,
-          LayerTypeInfo::Pass3D::Required,
-          LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::FadingTiles::NotRequired,
-          LayerTypeInfo::CrossTileIndex::NotRequired,
-          LayerTypeInfo::TileKind::RasterDEM
-        };
+    const static LayerTypeInfo typeInfo{"hillshade",
+                                        LayerTypeInfo::Source::Required,
+                                        LayerTypeInfo::Pass3D::Required,
+                                        LayerTypeInfo::Layout::NotRequired,
+                                        LayerTypeInfo::FadingTiles::NotRequired,
+                                        LayerTypeInfo::CrossTileIndex::NotRequired,
+                                        LayerTypeInfo::TileKind::RasterDEM};
     return &typeInfo;
 }
 
