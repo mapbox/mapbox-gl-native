@@ -183,8 +183,8 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
     return (MGLEqualFloatWithAccuracy(_centerCoordinate.latitude, otherCamera.centerCoordinate.latitude, 1e-6)
             && MGLEqualFloatWithAccuracy(_centerCoordinate.longitude, otherCamera.centerCoordinate.longitude, 1e-6)
             && MGLEqualFloatWithAccuracy(_altitude, otherCamera.altitude, 1e-6)
-            && MGLEqualFloatWithAccuracy(_pitch, otherCamera.pitch, 1)
-            && MGLEqualFloatWithAccuracy(_heading, otherCamera.heading, 1));
+            && MGLEqualFloatWithAccuracy(_pitch, otherCamera.pitch, 1e-6)
+            && MGLEqualFloatWithAccuracy(_heading, otherCamera.heading, 1e-6));
 }
 
 - (NSUInteger)hash
