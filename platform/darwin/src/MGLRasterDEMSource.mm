@@ -7,11 +7,10 @@
 
 @implementation MGLRasterDEMSource
 
-- (std::unique_ptr<mbgl::style::RasterSource>)pendingSourceWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
-    NSString *configurationURLString = configurationURL.mgl_URLByStandardizingScheme.absoluteString;
-    return std::make_unique<mbgl::style::RasterDEMSource>(identifier.UTF8String,
-                                                          configurationURLString.UTF8String,
-                                                          uint16_t(round(tileSize)));
+- (std::unique_ptr<mbgl::style::RasterSource>)pendingSourceWithIdentifier:(NSString *)identifier urlOrTileset:(mbgl::variant<std::string, mbgl::Tileset>)urlOrTileset tileSize:(uint16_t)tileSize {
+    auto source = std::make_unique<mbgl::style::RasterDEMSource>(identifier.UTF8String,
+                                                                 urlOrTileset,
+                                                                 tileSize);
+    return source;
 }
-
 @end
