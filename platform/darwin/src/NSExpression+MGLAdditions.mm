@@ -1057,7 +1057,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSString *function = self.function;
 
             BOOL hasCollectionProperty = !(self.arguments.firstObject.expressionType == NSConstantValueExpressionType || self.arguments.firstObject.expressionType == NSKeyPathExpressionType
-            || self.arguments.firstObject.expressionType == NSVariableExpressionType ||  !self.arguments.firstObject.expressionType);
+            || self.arguments.firstObject.expressionType == NSVariableExpressionType ||  !self.arguments.firstObject.expressionType
+                );
             NSString *op = MGLExpressionOperatorsByFunctionNames[function];
             if (op) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
@@ -1082,7 +1083,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"min:"]) {
                 NSArray *arguments;
                 if (!hasCollectionProperty) {
-                                   arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
+                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 } else {
                     arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
                 }
@@ -1090,9 +1091,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"max:"]) {
                 NSArray *arguments;
                 if (!hasCollectionProperty) {
-                                   arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
+                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 } else {
-                                   arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
+                    arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
                 }
                 return [@[@"max"] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"exp:"]) {
@@ -1103,7 +1104,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"mgl_join:"]) {
                 NSArray *arguments;
                 if (!hasCollectionProperty) {
-                                   arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
+                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 } else {
                     arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
                 }
