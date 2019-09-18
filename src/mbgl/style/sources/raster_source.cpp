@@ -5,6 +5,7 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/style/sources/raster_source_impl.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/mapbox.hpp>
 
@@ -82,7 +83,7 @@ void RasterSource::loadDescription(FileSource& fileSource) {
 }
 
 bool RasterSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
-    return !std::strcmp(info->type, "raster");
+    return mbgl::underlying_type(Tile::Kind::Raster) == mbgl::underlying_type(info->tileKind);
 }
 
 } // namespace style

@@ -7,6 +7,7 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/style/sources/custom_geometry_source_impl.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <tuple>
 
@@ -32,9 +33,7 @@ void CustomGeometrySource::loadDescription(FileSource&) {
 }
 
 bool CustomGeometrySource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
-    return !std::strcmp(info->type, "line") || !std::strcmp(info->type, "symbol") ||
-           !std::strcmp(info->type, "circle") || !std::strcmp(info->type, "fill") ||
-           !std::strcmp(info->type, "fill-extrusion") || !std::strcmp(info->type, "heatmap");
+    return mbgl::underlying_type(Tile::Kind::Geometry) == mbgl::underlying_type(info->tileKind);
 }
 
 void CustomGeometrySource::setTileData(const CanonicalTileID& tileID,
