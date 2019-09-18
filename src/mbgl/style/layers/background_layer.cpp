@@ -25,7 +25,8 @@ const LayerTypeInfo* BackgroundLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Pass3D::NotRequired,
           LayerTypeInfo::Layout::NotRequired,
           LayerTypeInfo::FadingTiles::NotRequired,
-          LayerTypeInfo::CrossTileIndex::NotRequired
+          LayerTypeInfo::CrossTileIndex::NotRequired,
+          LayerTypeInfo::TileKind::NotRequired
         };
     return &typeInfo;
 }

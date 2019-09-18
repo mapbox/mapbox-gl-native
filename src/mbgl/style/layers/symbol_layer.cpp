@@ -25,7 +25,8 @@ const LayerTypeInfo* SymbolLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Pass3D::NotRequired,
           LayerTypeInfo::Layout::Required,
           LayerTypeInfo::FadingTiles::Required,
-          LayerTypeInfo::CrossTileIndex::Required
+          LayerTypeInfo::CrossTileIndex::Required,
+          LayerTypeInfo::TileKind::Geometry
         };
     return &typeInfo;
 }

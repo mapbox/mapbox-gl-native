@@ -27,13 +27,20 @@ let defaults = { caps: { 'Source':   'NotRequired',
                          'Pass3D':   'NotRequired',
                          'Layout':   'NotRequired',
                          'FadingTiles': 'NotRequired',
-                         'CrossTileIndex': 'NotRequired'
+                         'CrossTileIndex': 'NotRequired',
+                         'TileKind' : 'NotRequired'
                  },
                  require: function(cap) {
-                             let copy = Object.assign({}, this);
-                             copy.caps = Object.assign({}, this.caps);
-                             copy.caps[cap] = 'Required';
-                             return copy;
+                            let copy = Object.assign({}, this);
+                            copy.caps = Object.assign({}, this.caps);
+                            copy.caps[cap] = 'Required';
+                            return copy;
+                 },
+                 set: function(cap, value) {
+                            let copy = Object.assign({}, this);
+                            copy.caps = Object.assign({}, this.caps);
+                            copy.caps[cap] = value;
+                            return copy;
                  },
                  finalize: function() {
                     return Object.keys(this.caps).reduce((acc, key) => {
@@ -46,23 +53,30 @@ let defaults = { caps: { 'Source':   'NotRequired',
 layerCapabilities['background']     = defaults.finalize();
 layerCapabilities['fill']           = defaults.require('Source')
                                               .require('Layout')
+                                              .set('TileKind', 'Geometry')
                                               .finalize();
 layerCapabilities['fill-extrusion'] = defaults.require('Source')
                                               .require('Pass3D')
                                               .require('Layout')
+                                              .set('TileKind', 'Geometry')
                                               .finalize();
 layerCapabilities['hillshade']      = defaults.require('Source')
                                               .require('Pass3D')
+                                              .set('TileKind', 'RasterDEM')
                                               .finalize();
 layerCapabilities['symbol']         = defaults.require('Source')
                                               .require('Layout')
                                               .require('FadingTiles')
                                               .require('CrossTileIndex')
+                                              .set('TileKind', 'Geometry')
                                               .finalize();
-layerCapabilities['circle']         = defaults.require('Source').finalize();
+layerCapabilities['circle']         = defaults.require('Source').set('TileKind', 'Geometry').finalize();
 layerCapabilities['line']           = layerCapabilities['fill'];
-layerCapabilities['heatmap']        = layerCapabilities['hillshade'];
-layerCapabilities['raster']         = layerCapabilities['circle'];
+layerCapabilities['heatmap']        = defaults.require('Source')
+                                              .require('Pass3D')
+                                              .set('TileKind', 'Geometry')
+                                              .finalize();
+layerCapabilities['raster']         = defaults.require('Source').set('TileKind', 'Raster').finalize();
 %>
 // static
 const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::staticTypeInfo() noexcept {
