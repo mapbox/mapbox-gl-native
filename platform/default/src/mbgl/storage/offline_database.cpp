@@ -124,7 +124,7 @@ void OfflineDatabase::handleError(const util::IOException& ex, const char* actio
     Log::Error(Event::Database, ex.code, "Can't %s: %s", action, ex.what());
 }
 
-void OfflineDatabase::handleError(const std::runtime_error &ex, const char* action) {
+void OfflineDatabase::handleError(const std::runtime_error& ex, const char* action) {
     Log::Error(Event::Database, -1, "Can't %s: %s", action, ex.what());
 }
 
