@@ -153,6 +153,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   @NonNull
   String buildMapFeedbackMapUrl(@Nullable String accessToken) {
     // TODO Add Android Maps SDK version to the query parameter, currently the version API is not available.
+    // TODO Keep track of this issue at [#15632](https://github.com/mapbox/mapbox-gl-native/issues/15632)
 
     Uri.Builder builder = Uri.parse(MAP_FEEDBACK_URL).buildUpon();
 
