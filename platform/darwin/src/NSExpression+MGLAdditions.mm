@@ -1056,8 +1056,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         case NSFunctionExpressionType: {
             NSString *function = self.function;
 
-            BOOL hasCollectionProperty = !(self.arguments[0].expressionType == NSConstantValueExpressionType || self.arguments[0].expressionType == NSKeyPathExpressionType
-            || self.arguments[0].expressionType == NSVariableExpressionType || !self.arguments[0].expressionType);
+            BOOL hasCollectionProperty = !(self.arguments.firstObject.expressionType == NSConstantValueExpressionType || self.arguments.firstObject.expressionType == NSKeyPathExpressionType
+            || self.arguments.firstObject.expressionType == NSVariableExpressionType ||  !self.arguments.firstObject.expressionType);
             NSString *op = MGLExpressionOperatorsByFunctionNames[function];
             if (op) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
