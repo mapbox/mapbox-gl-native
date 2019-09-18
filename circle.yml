@@ -722,7 +722,7 @@ jobs:
       - run:
           name: Clang Format
           command: |
-            git diff -U0 --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
+            git diff -U0 --ignore-submodules=all --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
             git diff --exit-code
       - run:
           name: Code Generators
