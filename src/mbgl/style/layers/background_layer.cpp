@@ -19,15 +19,13 @@ namespace style {
 
 // static
 const LayerTypeInfo* BackgroundLayer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"background",
-          LayerTypeInfo::Source::NotRequired,
-          LayerTypeInfo::Pass3D::NotRequired,
-          LayerTypeInfo::Layout::NotRequired,
-          LayerTypeInfo::FadingTiles::NotRequired,
-          LayerTypeInfo::CrossTileIndex::NotRequired,
-          LayerTypeInfo::TileKind::NotRequired
-        };
+    const static LayerTypeInfo typeInfo{"background",
+                                        LayerTypeInfo::Source::NotRequired,
+                                        LayerTypeInfo::Pass3D::NotRequired,
+                                        LayerTypeInfo::Layout::NotRequired,
+                                        LayerTypeInfo::FadingTiles::NotRequired,
+                                        LayerTypeInfo::CrossTileIndex::NotRequired,
+                                        LayerTypeInfo::TileKind::NotRequired};
     return &typeInfo;
 }
 
