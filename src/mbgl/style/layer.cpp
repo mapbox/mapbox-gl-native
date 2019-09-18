@@ -4,11 +4,16 @@
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/tile/tile.hpp>
 
 #include <mbgl/renderer/render_layer.hpp>
 
 namespace mbgl {
 namespace style {
+
+static_assert(mbgl::underlying_type(Tile::Kind::Geometry) == mbgl::underlying_type(LayerTypeInfo::TileKind::Geometry), "tile kind error");
+static_assert(mbgl::underlying_type(Tile::Kind::Raster) == mbgl::underlying_type(LayerTypeInfo::TileKind::Raster), "tile kind error");
+static_assert(mbgl::underlying_type(Tile::Kind::RasterDEM) == mbgl::underlying_type(LayerTypeInfo::TileKind::RasterDEM), "tile kind error");
 
 static LayerObserver nullObserver;
 

@@ -25,7 +25,8 @@ const LayerTypeInfo* HeatmapLayer::Impl::staticTypeInfo() noexcept {
           LayerTypeInfo::Pass3D::Required,
           LayerTypeInfo::Layout::NotRequired,
           LayerTypeInfo::FadingTiles::NotRequired,
-          LayerTypeInfo::CrossTileIndex::NotRequired
+          LayerTypeInfo::CrossTileIndex::NotRequired,
+          LayerTypeInfo::TileKind::Geometry
         };
     return &typeInfo;
 }
