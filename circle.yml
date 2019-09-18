@@ -1009,6 +1009,14 @@ jobs:
               fi
             fi
       - run:
+          name: Trigger external deploy steps
+          command: |
+            export VERSION_TAG=${CIRCLE_TAG}
+            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
+            export DOCS_REPO="android-docs"
+            scripts/trigger-maps-documentation-deploy-steps.sh
+          background: true
+      - run:
           name: Record size
           command: platform/android/scripts/metrics.sh
 # ------------------------------------------------------------------------------
@@ -1447,7 +1455,8 @@ jobs:
           command: |
             export VERSION_TAG=${CIRCLE_TAG}
             export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
-            platform/ios/scripts/trigger-external-deploy-steps.sh
+            export DOCS_REPO="ios-sdk"
+            scripts/trigger-maps-documentation-deploy-steps.sh
       - run:
           name: Build, package, and upload iOS release
           command: |
