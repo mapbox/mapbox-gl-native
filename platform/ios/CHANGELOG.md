@@ -2,7 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 5.3.1
+## 5.3.1 - September 18, 2019
+
+### Styles and rendering
+
+* Fixed an issue where connecting coincident holes in a polygon could lead to a race condition. ([#15660](https://github.com/mapbox/mapbox-gl-native/pull/15660))
+
+### Other changes
 
 * Fixed an issue where the scale bar text would become illegible if iOS 13 dark mode was enabled. ([#15524](https://github.com/mapbox/mapbox-gl-native/pull/15524))
 * Fixed an issue with the appearance of the compass text in iOS 13. ([#15547](https://github.com/mapbox/mapbox-gl-native/pull/15547))
