@@ -70,8 +70,7 @@ const PropertyValue<LineCapType>& LineLayer::getLineCap() const {
 }
 
 void LineLayer::setLineCap(const PropertyValue<LineCapType>& value) {
-    if (value == getLineCap())
-        return;
+    if (value == getLineCap()) return;
     auto impl_ = mutableImpl();
     impl_->layout.get<LineCap>() = value;
     baseImpl = std::move(impl_);
@@ -86,8 +85,7 @@ const PropertyValue<LineJoinType>& LineLayer::getLineJoin() const {
 }
 
 void LineLayer::setLineJoin(const PropertyValue<LineJoinType>& value) {
-    if (value == getLineJoin())
-        return;
+    if (value == getLineJoin()) return;
     auto impl_ = mutableImpl();
     impl_->layout.get<LineJoin>() = value;
     baseImpl = std::move(impl_);
@@ -102,8 +100,7 @@ const PropertyValue<float>& LineLayer::getLineMiterLimit() const {
 }
 
 void LineLayer::setLineMiterLimit(const PropertyValue<float>& value) {
-    if (value == getLineMiterLimit())
-        return;
+    if (value == getLineMiterLimit()) return;
     auto impl_ = mutableImpl();
     impl_->layout.get<LineMiterLimit>() = value;
     baseImpl = std::move(impl_);
@@ -118,10 +115,24 @@ const PropertyValue<float>& LineLayer::getLineRoundLimit() const {
 }
 
 void LineLayer::setLineRoundLimit(const PropertyValue<float>& value) {
-    if (value == getLineRoundLimit())
-        return;
+    if (value == getLineRoundLimit()) return;
     auto impl_ = mutableImpl();
     impl_->layout.get<LineRoundLimit>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+PropertyValue<float> LineLayer::getDefaultLineSortKey() {
+    return LineSortKey::defaultValue();
+}
+
+const PropertyValue<float>& LineLayer::getLineSortKey() const {
+    return impl().layout.get<LineSortKey>();
+}
+
+void LineLayer::setLineSortKey(const PropertyValue<float>& value) {
+    if (value == getLineSortKey()) return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<LineSortKey>() = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -457,6 +468,7 @@ enum class Property : uint8_t {
     LineJoin,
     LineMiterLimit,
     LineRoundLimit,
+    LineSortKey,
 };
 
 template <typename T>
@@ -490,7 +502,8 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"line-cap", toUint8(Property::LineCap)},
      {"line-join", toUint8(Property::LineJoin)},
      {"line-miter-limit", toUint8(Property::LineMiterLimit)},
-     {"line-round-limit", toUint8(Property::LineRoundLimit)}});
+     {"line-round-limit", toUint8(Property::LineRoundLimit)},
+     {"line-sort-key", toUint8(Property::LineSortKey)}});
 } // namespace
 
 optional<Error> LineLayer::setProperty(const std::string& name, const Convertible& value) {
@@ -503,7 +516,7 @@ optional<Error> LineLayer::setProperty(const std::string& name, const Convertibl
     auto property = static_cast<Property>(it->second);
 
     if (property == Property::LineBlur || property == Property::LineGapWidth || property == Property::LineOffset ||
-        property == Property::LineOpacity || property == Property::LineWidth) {
+        property == Property::LineOpacity || property == Property::LineWidth || property == Property::LineSortKey) {
         Error error;
         const auto& typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
@@ -532,6 +545,11 @@ optional<Error> LineLayer::setProperty(const std::string& name, const Convertibl
 
         if (property == Property::LineWidth) {
             setLineWidth(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::LineSortKey) {
+            setLineSortKey(*typedValue);
             return nullopt;
         }
     }
@@ -756,6 +774,8 @@ StyleProperty LineLayer::getProperty(const std::string& name) const {
             return makeStyleProperty(getLineMiterLimit());
         case Property::LineRoundLimit:
             return makeStyleProperty(getLineRoundLimit());
+        case Property::LineSortKey:
+            return makeStyleProperty(getLineSortKey());
     }
     return {};
 }

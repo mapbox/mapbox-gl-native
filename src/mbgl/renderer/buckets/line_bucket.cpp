@@ -10,8 +10,8 @@ namespace mbgl {
 
 using namespace style;
 
-LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layout_,
-                       const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
+LineBucket::LineBucket(const LineBucket::PossiblyEvaluatedLayoutProperties layout_,
+                       const std::map<std::string, Immutable<LayerProperties>>& layerPaintProperties,
                        const float zoom_,
                        const uint32_t overscaling_)
     : layout(layout_), zoom(zoom_), overscaling(overscaling_) {

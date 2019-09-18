@@ -16,6 +16,11 @@
 namespace mbgl {
 namespace style {
 
+struct FillSortKey : DataDrivenLayoutProperty<float> {
+    static constexpr const char *name() { return "fill-sort-key"; }
+    static float defaultValue() { return 0; }
+};
+
 struct FillAntialias : PaintProperty<bool> {
     static bool defaultValue() { return true; }
 };
@@ -43,6 +48,10 @@ struct FillTranslate : PaintProperty<std::array<float, 2>> {
 struct FillTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
+
+class FillLayoutProperties : public Properties<
+    FillSortKey
+> {};
 
 class FillPaintProperties : public Properties<
     FillAntialias,

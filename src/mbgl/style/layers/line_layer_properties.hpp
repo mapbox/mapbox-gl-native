@@ -36,6 +36,11 @@ struct LineRoundLimit : LayoutProperty<float> {
     static float defaultValue() { return 1; }
 };
 
+struct LineSortKey : DataDrivenLayoutProperty<float> {
+    static constexpr const char *name() { return "line-sort-key"; }
+    static float defaultValue() { return 0; }
+};
+
 struct LineBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
     static float defaultValue() { return 0; }
 };
@@ -88,7 +93,8 @@ class LineLayoutProperties : public Properties<
     LineCap,
     LineJoin,
     LineMiterLimit,
-    LineRoundLimit
+    LineRoundLimit,
+    LineSortKey
 > {};
 
 class LinePaintProperties : public Properties<

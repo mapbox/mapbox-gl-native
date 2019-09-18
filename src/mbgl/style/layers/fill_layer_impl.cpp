@@ -6,8 +6,7 @@ namespace style {
 bool FillLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
     assert(other.getTypeInfo() == getTypeInfo());
     const auto& impl = static_cast<const style::FillLayer::Impl&>(other);
-    return filter     != impl.filter ||
-           visibility != impl.visibility ||
+    return filter != impl.filter || visibility != impl.visibility || layout != impl.layout ||
            paint.get<FillPattern>().value != impl.paint.get<FillPattern>().value ||
            paint.hasDataDrivenPropertyDifference(impl.paint);
 }

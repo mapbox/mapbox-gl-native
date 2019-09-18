@@ -17,7 +17,6 @@ class RenderLineLayer;
 
 class LineBucket final : public Bucket {
 public:
-    using PossiblyEvaluatedPaintProperties = style::LinePaintProperties::PossiblyEvaluated;
     using PossiblyEvaluatedLayoutProperties = style::LineLayoutProperties::PossiblyEvaluated;
 
     LineBucket(const PossiblyEvaluatedLayoutProperties layout,

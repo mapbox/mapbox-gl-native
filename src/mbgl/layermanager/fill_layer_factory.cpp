@@ -29,8 +29,14 @@ FillLayerFactory::createLayout(const LayoutParameters& parameters,
                                std::unique_ptr<GeometryTileLayer> layer,
                                const std::vector<Immutable<style::LayerProperties>>& group) noexcept {
     using namespace style;
-    using LayoutType = PatternLayout<FillBucket, FillLayerProperties, FillPattern>;
-    return std::make_unique<LayoutType>(parameters.bucketParameters, group, std::move(layer), parameters);
+    using LayoutTypeUnsorted = PatternLayout<FillBucket, FillLayerProperties, FillPattern, FillLayoutProperties>;
+    using LayoutTypeSorted =
+        PatternLayout<FillBucket, FillLayerProperties, FillPattern, FillLayoutProperties, FillSortKey>;
+    auto layerProperties = staticImmutableCast<FillLayerProperties>(group.front());
+    if (layerProperties->layerImpl().layout.get<FillSortKey>().isUndefined()) {
+        return std::make_unique<LayoutTypeUnsorted>(parameters.bucketParameters, group, std::move(layer), parameters);
+    }
+    return std::make_unique<LayoutTypeSorted>(parameters.bucketParameters, group, std::move(layer), parameters);
 }
 
 std::unique_ptr<RenderLayer> FillLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
