@@ -42,7 +42,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
 /**
- An `NSDictionary` objcet containing custom properties on the generated clusters if clustering is enabled,
+ An `NSDictionary` object containing custom properties on the generated clusters if clustering is enabled,
  aggregating values from clustered points. Has the form {"property_name": [recude_operator, [map_expression]]} or
  {"property_name": [[reduce_operator, accumulated, expression], [map_expression]]}
 

@@ -96,36 +96,50 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
         NSString *key;
 
         while (key = [stringEnumerator nextObject]) {
-            // check that array has only 2 values
             NSArray *expArray = value[key];
+            if (![expArray isKindOfClass:[NSArray class]]) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"MGLShapeSourceOptionClusterProperties dictinary member value must be an array containing two objects."];
+            }
+            // check that array has only 2 values
             if ([expArray count] != 2) {
                 [NSException raise:NSInvalidArgumentException
-                            format:@"MGLShapeSourceOptionClusterProperties requires two NSExpression objects."];
+                            format:@"MGLShapeSourceOptionClusterProperties member value requires array of two objects."];
             }
 
-            NSExpression *mapExpre = expArray[1];
-            auto map = MGLClusterPropertyFromNSExpression(mapExpre);
-            if (!map) {
-                [NSException raise:NSInvalidArgumentException
-                            format:@"Failed to convert MGLShapeSourceOptionClusterProperties map expression."];
-            }
-
+            // reduceExpression could be either a string of operator, or a valid NSExpression
             NSString *reduceOperator = expArray[0];
             NSExpression *reduceExpre;
-            // If reduceOperator is only a string instead of expression, create the integrated full expression before parsing
             if ([reduceOperator isKindOfClass:[NSString class]]) {
+                // If reduceOperator is a string, prepare a full NSExpression before parsing
                 NSString *reduceExpression = [NSString stringWithFormat:@"%@({ $featureAccumulated, %@})", reduceOperator, key];
                 reduceExpre =  [NSExpression expressionWithFormat:reduceExpression];
             } else {
                 reduceExpre = expArray[0];
             }
 
+            if (![reduceExpre isKindOfClass:[NSExpression class]]) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"MGLShapeSourceOptionClusterProperties member value shall contain a valid reduceExpression."];
+            }
             auto reduce = MGLClusterPropertyFromNSExpression(reduceExpre);
             if (!reduce) {
                 [NSException raise:NSInvalidArgumentException
                             format:@"Failed to convert MGLShapeSourceOptionClusterProperties reduce expression."];
             }
-            
+
+            // mapExpression shall be a valid NSExpression
+            NSExpression *mapExpre = expArray[1];
+            if (![mapExpre isKindOfClass:[NSExpression class]]) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"MGLShapeSourceOptionClusterProperties member value shall contain a valid mapExpression.."];
+            }
+            auto map = MGLClusterPropertyFromNSExpression(mapExpre);
+            if (!map) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Failed to convert MGLShapeSourceOptionClusterProperties map expression."];
+            }
+
             std::string keyString = std::string([key UTF8String]);
 
             geoJSONOptions.clusterProperties.emplace(keyString, std::make_pair(std::move(map), std::move(reduce)));
