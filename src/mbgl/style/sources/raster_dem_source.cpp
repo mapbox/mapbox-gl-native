@@ -4,6 +4,7 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/raster_dem_source.hpp>
 #include <mbgl/style/sources/raster_source_impl.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/mapbox.hpp>
 
 namespace mbgl {
@@ -14,7 +15,7 @@ RasterDEMSource::RasterDEMSource(std::string id, variant<std::string, Tileset> u
 }
 
 bool RasterDEMSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
-    return !std::strcmp(info->type, "hillshade");
+    return mbgl::underlying_type(Tile::Kind::RasterDEM) == mbgl::underlying_type(info->tileKind);
 }
 
 } // namespace style

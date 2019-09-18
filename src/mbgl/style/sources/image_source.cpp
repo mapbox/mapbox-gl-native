@@ -3,6 +3,7 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/sources/image_source_impl.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/premultiply.hpp>
 
@@ -82,7 +83,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
 }
 
 bool ImageSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
-    return !std::strcmp(info->type, "raster");
+    return mbgl::underlying_type(Tile::Kind::Raster) == mbgl::underlying_type(info->tileKind);
 }
 
 } // namespace style
