@@ -18,7 +18,6 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.Attribution;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.lang.ref.WeakReference;
@@ -43,7 +42,6 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   private static final String MAP_FEEDBACK_URL_OLD = "https://www.mapbox.com/map-feedback";
   private static final String MAP_FEEDBACK_URL_LOCATION_FRAGMENT_FORMAT = "/%f/%f/%f/%f/%d";
   private static final String MAP_FEEDBACK_STYLE_URI_REGEX = "^(.*://[^:^/]*)/(.*)/(.*)";
-  private final String TAG = this.getClass().getName();
 
   @NonNull
   private final Context context;
@@ -146,11 +144,9 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   private void showMapAttributionWebPage(int which) {
     Attribution[] attributions = attributionSet.toArray(new Attribution[attributionSet.size()]);
     String url = attributions[which].getUrl();
-    Logger.d(TAG, "attribution url: " + url);
     if (url.contains(MAP_FEEDBACK_URL_OLD) || url.contains(MAP_FEEDBACK_URL)) {
       url = buildMapFeedbackMapUrl(Mapbox.getAccessToken());
     }
-    Logger.d(TAG, "final feedback url: " + url);
     showWebPage(url);
   }
 
@@ -179,18 +175,12 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     Style style = mapboxMap.getStyle();
     if (style != null) {
       String styleUri = style.getUri();
-      Logger.d(TAG, "style uri:" + styleUri);
-
       Pattern pattern = Pattern.compile(MAP_FEEDBACK_STYLE_URI_REGEX);
       Matcher matcher = pattern.matcher(styleUri);
 
       if (matcher.find()) {
-        String styleApi = matcher.group(1);
         String styleOwner = matcher.group(2);
         String styleId = matcher.group(3);
-        Logger.d(TAG, "style API: " + styleApi);
-        Logger.d(TAG, "style owner: " + styleOwner);
-        Logger.d(TAG, "style id: " + styleId);
 
         builder.appendQueryParameter("owner", styleOwner)
                 .appendQueryParameter("id", styleId);
