@@ -67,7 +67,7 @@ TEST(Buckets, CircleBucket) {
 TEST(Buckets, FillBucket) {
     gl::HeadlessBackend backend({ 512, 256 });
     gfx::BackendScope scope { backend };
-    style::Properties<>::PossiblyEvaluated layout;
+    FillBucket::PossiblyEvaluatedLayoutProperties layout;
 
     gl::Context context{ backend };
     FillBucket bucket { layout, {}, 5.0f, 1};
@@ -89,7 +89,7 @@ TEST(Buckets, FillBucket) {
 TEST(Buckets, LineBucket) {
     gl::HeadlessBackend backend({ 512, 256 });
     gfx::BackendScope scope { backend };
-    style::LineLayoutProperties::PossiblyEvaluated layout;
+    LineBucket::PossiblyEvaluatedLayoutProperties layout;
 
     gl::Context context{ backend };
     LineBucket bucket { layout, {}, 10.0f, 1 };

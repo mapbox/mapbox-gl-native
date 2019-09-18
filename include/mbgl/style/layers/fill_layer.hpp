@@ -25,6 +25,12 @@ public:
 
     StyleProperty getProperty(const std::string& name) const final;
 
+    // Layout properties
+
+    static PropertyValue<float> getDefaultFillSortKey();
+    const PropertyValue<float>& getFillSortKey() const;
+    void setFillSortKey(const PropertyValue<float>&);
+
     // Paint properties
 
     static PropertyValue<bool> getDefaultFillAntialias();

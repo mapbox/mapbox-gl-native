@@ -149,8 +149,7 @@ const <%- propertyValueType(property) %>& <%- camelize(type) %>Layer::get<%- cam
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(const <%- propertyValueType(property) %>& value) {
-    if (value == get<%- camelize(property.name) %>())
-        return;
+    if (value == get<%- camelize(property.name) %>()) return;
     auto impl_ = mutableImpl();
     impl_->layout.get<<%- camelize(property.name) %>>() = value;
     baseImpl = std::move(impl_);

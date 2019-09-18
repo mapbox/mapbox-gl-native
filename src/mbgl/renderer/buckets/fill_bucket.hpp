@@ -18,8 +18,7 @@ class RenderFillLayer;
 class FillBucket final : public Bucket {
 public:
     ~FillBucket() override;
-    using PossiblyEvaluatedPaintProperties = style::FillPaintProperties::PossiblyEvaluated;
-    using PossiblyEvaluatedLayoutProperties = style::Properties<>::PossiblyEvaluated;
+    using PossiblyEvaluatedLayoutProperties = style::FillLayoutProperties::PossiblyEvaluated;
 
     FillBucket(const PossiblyEvaluatedLayoutProperties layout,
                const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,

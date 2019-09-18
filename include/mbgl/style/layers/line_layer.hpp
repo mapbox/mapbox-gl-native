@@ -46,6 +46,10 @@ public:
     const PropertyValue<float>& getLineRoundLimit() const;
     void setLineRoundLimit(const PropertyValue<float>&);
 
+    static PropertyValue<float> getDefaultLineSortKey();
+    const PropertyValue<float>& getLineSortKey() const;
+    void setLineSortKey(const PropertyValue<float>&);
+
     // Paint properties
 
     static PropertyValue<float> getDefaultLineBlur();
