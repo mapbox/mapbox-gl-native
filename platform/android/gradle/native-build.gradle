@@ -1,6 +1,12 @@
 ext.nativeBuild = { nativeTargets ->
     android {
-        defaultPublishConfig project.hasProperty("mapbox.buildtype") ? project.getProperty("mapbox.buildtype") : "debug"
+        def buildType = "debug"
+        if (project.hasProperty("mapbox.buildtype")) {
+            buildType = project.getProperty("mapbox.buildtype")
+        }
+
+
+        defaultPublishConfig buildType
 
         // We sometimes want to invoke Gradle without building a native dependency, e.g. when we just want
         // to invoke the Java tests. When we explicitly specify an ABI of 'none', no native dependencies are
@@ -37,6 +43,7 @@ ext.nativeBuild = { nativeTargets ->
             if (abi != 'none') {
                 externalNativeBuild {
                     cmake {
+                        arguments "-DCMAKE_BUILD_TYPE=" + buildType
                         arguments "-DANDROID_TOOLCHAIN=clang"
                         arguments "-DANDROID_STL=" + stl
                         arguments "-DANDROID_CPP_FEATURES=exceptions"

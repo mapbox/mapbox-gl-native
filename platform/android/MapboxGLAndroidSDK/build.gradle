@@ -75,6 +75,12 @@ android {
             testCoverageEnabled true
             jniDebuggable true
         }
+        RelWithDebInfo {
+            initWith release
+        }
+        MinSizeRel {
+            initWith release
+        }
     }
 }
 
