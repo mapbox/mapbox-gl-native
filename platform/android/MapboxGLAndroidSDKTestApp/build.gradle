@@ -77,7 +77,7 @@ dependencies {
     implementation dependenciesList.gmsLocation
     implementation dependenciesList.timber
     debugImplementation dependenciesList.leakCanaryDebug
-    releaseImplementation dependenciesList.leakCanaryRelease
+    implementation dependenciesList.leakCanaryRelease
 
     androidTestImplementation dependenciesList.supportAnnotations
     androidTestImplementation dependenciesList.testRunner
