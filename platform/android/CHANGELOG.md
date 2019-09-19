@@ -9,6 +9,8 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fixed an issue that caused the state of CompassView not up to date when `UiSettings.setCompassEnabled()` is set to true. [#15606](https://github.com/mapbox/mapbox-gl-native/pull/15606)
  - Fixed an issue that `maxzoom` in style `Sources` option was ignored when URL resource is provided. It may cause problems such as extra tiles downloading at higher zoom level than `maxzoom`, or problems that wrong setting of `overscaledZ` in `OverscaledTileID` that will be passed to `SymbolLayout`, leading wrong rendering appearance. [#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581)
  - Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. [#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644)
+ - Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. [#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560)
+
 
 ## 8.3.1 - September 18, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0...android-v8.3.1) since [Mapbox Maps SDK for Android v8.3.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0): 
