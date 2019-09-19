@@ -1,8 +1,11 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/source.hpp>
+
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include "../value.hpp"
 #include "../../android_renderer_frontend.hpp"
@@ -47,28 +50,26 @@ public:
 
 protected:
 
-    inline void source(std::unique_ptr<mbgl::style::Source> ownedSource) noexcept {
-        ownedSource_ = std::move(ownedSource);
+    inline void source(std::unique_ptr<mbgl::style::Source> source) noexcept {
+        ownedSource_ = std::move(source);
     }
 
-    inline void source(mbgl::style::Source *coreSource) noexcept {
-        nonOwnedSource_ = coreSource->makeWeakPtr();
+    inline void source(mbgl::style::Source *source) noexcept {
+        nonOwnedSource_ = source->makeWeakPtr();
     }
 
-    inline mbgl::style::Source* source(jni::JNIEnv& env) {
+    inline mbgl::style::Source* source(optional<jni::JNIEnv&> env = nullopt) {
         if (ownedSource_) return ownedSource_.get();
-        if (!nonOwnedSource_) {
-            jni::ThrowNew(env, jni::FindClass(env, "java/lang/IllegalStateException"),
-                          "This source got invalidated after the style change");
-        }
-        return nonOwnedSource_.get();
-    }
 
-    inline mbgl::style::Source* source() {
-        if (ownedSource_) return ownedSource_.get();
+        const auto msg = "The source got invalidated after the style change";
         if (!nonOwnedSource_) {
-            return nullptr;
+            if (env) {
+                jni::ThrowNew(*env, jni::FindClass(*env, "java/lang/IllegalStateException"), msg);
+            } else {
+                mbgl::Log::Error(mbgl::Event::JNI, msg);
+            }
         }
+
         return nonOwnedSource_.get();
     }
 
