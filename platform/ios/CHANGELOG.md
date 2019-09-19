@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Styles and rendering
 * Added an `-[MGLMapSnapshotter startWithOverlayHandler:completionHandler:]` method to provide the snapshot's current `CGContext` in order to perform custom drawing on `MGLMapSnapShot` objects. ([#15530](https://github.com/mapbox/mapbox-gl-native/pull/15530))
 * Fixed an issue that `maxzoom` in style `Sources` option was ignored when URL resource is provided. It may cause problems such as extra tiles downloading at higher zoom level than `maxzoom`, or problems that wrong setting of `overscaledZ` in `OverscaledTileID` that will be passed to `SymbolLayout`, leading wrong rendering appearance. ([#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581))
+* Improve camera accuracy when user tilt the map as zoom in. ([#15674](https://github.com/mapbox/mapbox-gl-native/pull/15674))
 
 ### Performance improvements
 
