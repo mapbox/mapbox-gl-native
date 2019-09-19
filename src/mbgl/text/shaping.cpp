@@ -365,8 +365,8 @@ void shapeLines(Shaping& shaping,
             // from the horizontal baseline to the highest ‘character’ coordinate in a font face.
             // Since we're laying out at 24 points, we need also calculate how much it will move
             // when we scale up or down.
-            const double baselineOffset = -glyph.metrics.ascender * section.scale +
-                                          (lineMaxScale - section.scale) * util::ONE_EM;
+            const double baselineOffset =
+                -glyph.metrics.ascender * section.scale + (lineMaxScale - section.scale) * util::ONE_EM;
 
             if (writingMode == WritingModeType::Horizontal ||
                 // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
@@ -374,9 +374,8 @@ void shapeLines(Shaping& shaping,
                 // If vertical placement is ebabled, don't verticalize glyphs that
                 // are from complex text layout script, or whitespaces.
                 (allowVerticalPlacement && (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint)))) {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false,
-                                                      section.fontStackHash, section.scale,
-                                                      sectionIndex);
+                shaping.positionedGlyphs.emplace_back(
+                    codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
                 shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
