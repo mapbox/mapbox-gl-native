@@ -2,21 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-### Styles and rendering
-* Added an `-[MGLMapSnapshotter startWithOverlayHandler:completionHandler:]` method to provide the snapshot's current `CGContext` in order to perform custom drawing on `MGLMapSnapShot` objects. ([#15530](https://github.com/mapbox/mapbox-gl-native/pull/15530))
-* Fixed an issue that `maxzoom` in style `Sources` option was ignored when URL resource is provided. It may cause problems such as extra tiles downloading at higher zoom level than `maxzoom`, or problems that wrong setting of `overscaledZ` in `OverscaledTileID` that will be passed to `SymbolLayout`, leading wrong rendering appearance. ([#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581))
-* Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. ([#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644))
-
-### Performance improvements
-
-* Newly loaded labels appear faster on the screen. ([#15308](https://github.com/mapbox/mapbox-gl-native/pull/15308))
-
 ## 5.4.0
 
 ### Styles and rendering
 
+* Added an `-[MGLMapSnapshotter startWithOverlayHandler:completionHandler:]` method to provide the snapshot's current `CGContext` in order to perform custom drawing on `MGLMapSnapShot` objects. ([#15530](https://github.com/mapbox/mapbox-gl-native/pull/15530))
+* Fixed an issue that caused `MGLTileSourceOptionMaximumZoomLevel` to be ignored when setting `MGLTileSource.configurationURL`. ([#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581))
+* Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. ([#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644))
 * Fixed crashes triggered when `MGLSource` and `MGLStyleLayer` objects are accessed after having been invalidated after a style change. ([#15539](https://github.com/mapbox/mapbox-gl-native/pull/15539))
 * Fixed a rendering issue of `collisionBox` when `MGLSymbolStyleLayer.textTranslate` or `MGLSymbolStyleLayer.iconTranslate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Enabled use of `MGLSymbolStyleLayer.textOffset` option together with `MGLSymbolStyleLayer.textVariableAnchor` (if `MGLSymbolStyleLayer.textRadialOffset` option is not provided). ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))
