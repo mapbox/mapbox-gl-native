@@ -176,7 +176,7 @@ workflows:
       - linux-doxygen
       - linux-render-tests
       - ios-debug
-      - ios-debug-xcode11
+      - ios-debug-xcode10
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -202,7 +202,7 @@ workflows:
       - ios-sanitize-nightly
       - ios-sanitize-address-nightly
       - ios-static-analyzer-nightly
-      - ios-static-analyzer-nightly-xcode11
+      - ios-static-analyzer-nightly-xcode10
 
 executors:
   ubuntu-disco:
@@ -1089,7 +1089,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1253,7 +1253,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1278,9 +1278,9 @@ jobs:
       - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  ios-debug-xcode11:
+  ios-debug-xcode10:
     macos:
-      xcode: "11.0.0"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1307,7 +1307,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1331,7 +1331,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1351,7 +1351,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1369,9 +1369,9 @@ jobs:
       - notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
-  ios-static-analyzer-nightly-xcode11:
+  ios-static-analyzer-nightly-xcode10:
     macos:
-      xcode: "11.0.0"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1391,7 +1391,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-template:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     shell: /bin/bash --login -eo pipefail
     environment:
       BUILDTYPE: Release
@@ -1440,7 +1440,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-tag:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     shell: /bin/bash --login -eo pipefail
     environment:
       BUILDTYPE: Release
@@ -1521,7 +1521,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-render-tests:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
