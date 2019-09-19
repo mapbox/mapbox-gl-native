@@ -48,7 +48,7 @@ if [[ -z `which jazzy` || $(jazzy -v) != "jazzy version: ${JAZZY_VERSION}" ]]; t
     step "Installing jazzy…"
 
     if [[ "${CIRCLECI}" == true ]]; then
-        sudo gem install jazzy -v $JAZZY_VERSION --no-document -- --with-sqlite3-lib=/usr/lib
+        sudo gem install jazzy -v $JAZZY_VERSION --no-document
     else
         gem install jazzy -v $JAZZY_VERSION --no-document
     fi
