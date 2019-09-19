@@ -167,6 +167,12 @@ v8::Local<v8::Object> toJS(const Feature& feature) {
         Nan::Set(result, Nan::New("id").ToLocalChecked(), FeatureIdentifier::visit(feature.id, ToValue()));
     }
 
+    Nan::Set(result, Nan::New("source").ToLocalChecked(), toJS(feature.source));
+    if (!feature.sourceLayer.empty()) {
+        Nan::Set(result, Nan::New("sourceLayer").ToLocalChecked(), toJS(feature.sourceLayer));
+    }
+    Nan::Set(result, Nan::New("state").ToLocalChecked(), toJS(feature.state));
+
     return scope.Escape(result);
 }
 

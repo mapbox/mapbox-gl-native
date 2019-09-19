@@ -19,14 +19,13 @@ namespace style {
 
 // static
 const LayerTypeInfo* SymbolLayer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"symbol",
-          LayerTypeInfo::Source::Required,
-          LayerTypeInfo::Pass3D::NotRequired,
-          LayerTypeInfo::Layout::Required,
-          LayerTypeInfo::FadingTiles::Required,
-          LayerTypeInfo::CrossTileIndex::Required
-        };
+    const static LayerTypeInfo typeInfo{"symbol",
+                                        LayerTypeInfo::Source::Required,
+                                        LayerTypeInfo::Pass3D::NotRequired,
+                                        LayerTypeInfo::Layout::Required,
+                                        LayerTypeInfo::FadingTiles::Required,
+                                        LayerTypeInfo::CrossTileIndex::Required,
+                                        LayerTypeInfo::TileKind::Geometry};
     return &typeInfo;
 }
 

@@ -1,6 +1,6 @@
-#import "MBXCustomLocationViewController.h"
+@import Mapbox;
 
-#import <Mapbox/Mapbox.h>
+#import "MBXCustomLocationViewController.h"
 
 @interface MBXCustomLocationManager : NSObject<MGLLocationManager>
 @end

@@ -1,11 +1,14 @@
 #include "qmapboxgl.test.hpp"
 
-#include <mbgl/util/io.hpp>
-
 #include <QMapbox>
 
+#include <QFile>
+#include <QGuiApplication>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
+#include <QTextStream>
+
+#include <mbgl/test/util.hpp>
 
 QMapboxGLTest::QMapboxGLTest() : size(512, 512), fbo((assert(widget.context()->isValid()), widget.makeCurrent(), size)), map(nullptr, settings, size) {
     connect(&map, SIGNAL(mapChanged(QMapboxGL::MapChange)),
@@ -43,8 +46,12 @@ void QMapboxGLTest::onNeedsRendering() {
 
 
 TEST_F(QMapboxGLTest, TEST_DISABLED_ON_CI(styleJson)) {
-    QString json = QString::fromStdString(
-        mbgl::util::read_file("test/fixtures/resources/style_vector.json"));
+    QFile f("test/fixtures/resources/style_vector.json");
+
+    ASSERT_TRUE(f.open(QFile::ReadOnly | QFile::Text));
+
+    QTextStream in(&f);
+    QString json = in.readAll();
 
     map.setStyleJson(json);
     ASSERT_EQ(map.styleJson(), json);

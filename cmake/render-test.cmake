@@ -21,7 +21,7 @@ target_link_libraries(mbgl-render-test PRIVATE
     mbgl-core
     mbgl-filesource
     Mapbox::Base::Extras::args
-    expected
+    mbgl-vendor-expected
     Mapbox::Base::Extras::filesystem
     Mapbox::Base::pixelmatch-cpp
     Mapbox::Base::Extras::rapidjson

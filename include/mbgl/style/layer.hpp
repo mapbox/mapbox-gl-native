@@ -57,6 +57,12 @@ struct LayerTypeInfo {
      * requires cross-tile indexing and placement. Contains \c CrossTileIndex::NotRequired otherwise.
      */
     const enum class CrossTileIndex { Required, NotRequired } crossTileIndex;
+
+    /**
+     * @brief contains the Id of the supported tile type. Used for internal checks.
+     * The contained values correspond to \c Tile::Kind enum.
+     */
+    const enum class TileKind : uint8_t { Geometry, Raster, RasterDEM, NotRequired } tileKind;
 };
 
 /**

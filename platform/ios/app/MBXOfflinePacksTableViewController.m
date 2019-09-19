@@ -1,6 +1,7 @@
+@import Mapbox;
+
 #import "MBXOfflinePacksTableViewController.h"
 
-#import <Mapbox/Mapbox.h>
 
 static NSString * const MBXOfflinePackContextNameKey = @"Name";
 

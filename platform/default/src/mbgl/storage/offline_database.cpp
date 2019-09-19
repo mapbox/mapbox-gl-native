@@ -124,6 +124,10 @@ void OfflineDatabase::handleError(const util::IOException& ex, const char* actio
     Log::Error(Event::Database, ex.code, "Can't %s: %s", action, ex.what());
 }
 
+void OfflineDatabase::handleError(const std::runtime_error& ex, const char* action) {
+    Log::Error(Event::Database, -1, "Can't %s: %s", action, ex.what());
+}
+
 void OfflineDatabase::removeExisting() {
     Log::Warning(Event::Database, "Removing existing incompatible offline database");
 
@@ -1057,6 +1061,11 @@ expected<OfflineRegionDefinition, std::exception_ptr> OfflineDatabase::getRegion
 
     return decodeOfflineRegionDefinition(query.get<std::string>(0));
 } catch (const mapbox::sqlite::Exception& ex) {
+    handleError(ex, "load region");
+    return unexpected<std::exception_ptr>(std::current_exception());
+} catch (const std::runtime_error& ex) {
+    // Catch errors from malformed offline region definitions
+    // and skip them (as above).
     handleError(ex, "load region");
     return unexpected<std::exception_ptr>(std::current_exception());
 }

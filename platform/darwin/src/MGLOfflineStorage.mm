@@ -432,11 +432,15 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 - (void)_removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
     mbgl::OfflineRegion *mbglOfflineRegion = pack.mbglOfflineRegion;
+
     [pack invalidate];
+
     if (!mbglOfflineRegion) {
+        MGLAssert(pack.state == MGLOfflinePackStateInvalid, @"State should be invalid");
         completion(nil);
         return;
     }
+    
     _mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {

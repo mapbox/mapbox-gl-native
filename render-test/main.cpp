@@ -19,6 +19,7 @@
 #define ANSI_COLOR_LIGHT_GRAY "\x1b[90m"
 #define ANSI_COLOR_RESET      "\x1b[0m"
 
+#if !defined(SANITIZE)
 void* operator new(std::size_t sz) {
     void* ptr = AllocationIndex::allocate(sz);
     if (!ptr) throw std::bad_alloc{};
@@ -33,6 +34,7 @@ void operator delete(void* ptr) noexcept {
 void operator delete(void* ptr, size_t) noexcept {
     AllocationIndex::deallocate(ptr);
 }
+#endif
 
 int main(int argc, char** argv) {
     bool recycleMap;

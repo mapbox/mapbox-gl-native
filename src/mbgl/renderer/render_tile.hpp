@@ -68,6 +68,9 @@ public:
                             style::TranslateAnchorType anchor,
                             const TransformState& state,
                             const bool inViewportPixelUnits) const;
+
+    void setFeatureState(const LayerFeatureStates&);
+
 private:
     Tile& tile;
     // The following members are reset at placement stage.

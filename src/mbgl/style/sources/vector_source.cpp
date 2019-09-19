@@ -1,20 +1,24 @@
-#include <mbgl/style/sources/vector_source.hpp>
-#include <mbgl/style/sources/vector_source_impl.hpp>
-#include <mbgl/style/source_observer.hpp>
+#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/mapbox.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/source_observer.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/vector_source_impl.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 namespace mbgl {
 namespace style {
 
-VectorSource::VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset_)
+VectorSource::VectorSource(std::string id, variant<std::string, Tileset> urlOrTileset_, optional<float> maxZoom_,
+                           optional<float> minZoom_)
     : Source(makeMutable<Impl>(std::move(id))),
-      urlOrTileset(std::move(urlOrTileset_)) {
-}
+      urlOrTileset(std::move(urlOrTileset_)),
+      maxZoom(std::move(maxZoom_)),
+      minZoom(std::move(minZoom_)) {}
 
 VectorSource::~VectorSource() = default;
 
@@ -61,7 +65,12 @@ void VectorSource::loadDescription(FileSource& fileSource) {
                 observer->onSourceError(*this, std::make_exception_ptr(util::StyleParseException(error.message)));
                 return;
             }
-
+            if (maxZoom) {
+                tileset->zoomRange.max = *maxZoom;
+            }
+            if (minZoom) {
+                tileset->zoomRange.min = *minZoom;
+            }
             util::mapbox::canonicalizeTileset(*tileset, url, getType(), util::tileSize);
             bool changed = impl().tileset != *tileset;
 
@@ -75,6 +84,10 @@ void VectorSource::loadDescription(FileSource& fileSource) {
             }
         }
     });
+}
+
+bool VectorSource::supportsLayerType(const mbgl::style::LayerTypeInfo* info) const {
+    return mbgl::underlying_type(Tile::Kind::Geometry) == mbgl::underlying_type(info->tileKind);
 }
 
 } // namespace style

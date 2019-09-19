@@ -8,13 +8,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoCustom
-    { "",
-      LayerTypeInfo::Source::NotRequired,
-      LayerTypeInfo::Pass3D::NotRequired,
-      LayerTypeInfo::Layout::NotRequired,
-      LayerTypeInfo::FadingTiles::NotRequired,
-      LayerTypeInfo::CrossTileIndex::NotRequired };
+const LayerTypeInfo typeInfoCustom{"",
+                                   LayerTypeInfo::Source::NotRequired,
+                                   LayerTypeInfo::Pass3D::NotRequired,
+                                   LayerTypeInfo::Layout::NotRequired,
+                                   LayerTypeInfo::FadingTiles::NotRequired,
+                                   LayerTypeInfo::CrossTileIndex::NotRequired,
+                                   LayerTypeInfo::TileKind::NotRequired};
 }  // namespace
 
 CustomLayer::CustomLayer(const std::string& layerID,

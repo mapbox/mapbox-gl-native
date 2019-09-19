@@ -22,6 +22,7 @@ class RasterSource;
 class RasterDEMSource;
 class GeoJSONSource;
 class SourceObserver;
+struct LayerTypeInfo;
 
 /**
  * The runtime representation of a [source](https://www.mapbox.com/mapbox-gl-style-spec/#sources) from the Mapbox Style
@@ -73,6 +74,8 @@ public:
 
     virtual void loadDescription(FileSource&) = 0;
     void dumpDebugLogs() const;
+
+    virtual bool supportsLayerType(const mbgl::style::LayerTypeInfo*) const = 0;
 
     bool loaded = false;
 

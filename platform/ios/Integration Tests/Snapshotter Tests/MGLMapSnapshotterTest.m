@@ -393,11 +393,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
-- (void)testSnapshotWithOverlayHandlerFailure {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotWithOverlayHandlerFailure🔒 {
     CGSize size = self.mapView.bounds.size;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot with overlay fails"];
@@ -408,23 +404,25 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
     XCTAssertNotNil(snapshotter);
 
-    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay * _Nullable snapshotOverlay) {
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay *snapshotOverlay) {
+        XCTAssertNotNil(snapshotOverlay);
+        
         UIGraphicsEndImageContext();
         [expectation fulfill];
     } completionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
         XCTAssertNil(snapshot);
         XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MGLErrorDomain);
+        XCTAssertEqual(error.code, MGLErrorCodeSnapshotFailed);
+        XCTAssertEqualObjects(error.localizedDescription, @"Failed to generate composited snapshot.");
+                
         [expectation fulfill];
     }];
 
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
-- (void)testSnapshotWithOverlayHandlerSuccess {
-    if (![self validAccessToken]) {
-        return;
-    }
-
+- (void)testSnapshotWithOverlayHandlerSuccess🔒 {
     CGSize size = self.mapView.bounds.size;
     CGRect snapshotRect = CGRectMake(0, 0, size.width, size.height);
 
@@ -435,8 +433,21 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
     MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
     XCTAssertNotNil(snapshotter);
+    
+    CGFloat scale = snapshotter.options.scale;
+    
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay *snapshotOverlay) {
+        XCTAssertNotNil(snapshotOverlay);
+        
+        CGFloat width = CGBitmapContextGetWidth(snapshotOverlay.context);
+        CGFloat height = CGBitmapContextGetHeight(snapshotOverlay.context);
 
-    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay * _Nullable snapshotOverlay) {
+        CGRect contextRect = CGContextConvertRectToDeviceSpace(snapshotOverlay.context, CGRectMake(0, 0, 1, 0));
+        CGFloat scaleFromContext = contextRect.size.width;
+        XCTAssertEqual(scale, scaleFromContext);
+        XCTAssertEqual(width, size.width*scale);
+        XCTAssertEqual(height, size.height*scale);
+        
         CGContextSetFillColorWithColor(snapshotOverlay.context, [UIColor.greenColor CGColor]);
         CGContextSetAlpha(snapshotOverlay.context, 0.2);
         CGContextAddRect(snapshotOverlay.context, snapshotRect);

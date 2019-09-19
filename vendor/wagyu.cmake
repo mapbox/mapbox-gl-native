@@ -1,5 +1,9 @@
-add_library(wagyu INTERFACE)
+if(TARGET mbgl-vendor-wagyu)
+    return()
+endif()
 
-target_include_directories(wagyu SYSTEM INTERFACE
-    ${CMAKE_SOURCE_DIR}/vendor/wagyu/include
+add_library(mbgl-vendor-wagyu INTERFACE)
+
+target_include_directories(mbgl-vendor-wagyu SYSTEM INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/wagyu/include
 )
