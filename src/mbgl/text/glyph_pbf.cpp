@@ -11,10 +11,8 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
     protozero::pbf_reader glyphs_pbf(data);
 
     while (glyphs_pbf.next(1)) {
-        auto fontstack_pbf = glyphs_pbf.get_message();
-        while (fontstack_pbf.next(3)) {
+        auto readGlyphMetrics = [glyphRange, &result](protozero::pbf_reader& fontstack_pbf) {
             auto glyph_pbf = fontstack_pbf.get_message();
-
             Glyph glyph;
             protozero::data_view glyphData;
 
@@ -64,27 +62,58 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
                 glyph.metrics.width >= 256 || glyph.metrics.height >= 256 ||
                 glyph.metrics.left < -128 || glyph.metrics.left >= 128 ||
                 glyph.metrics.top < -128 || glyph.metrics.top >= 128 ||
-                glyph.metrics.advance >= 256 ||
-                glyph.id < glyphRange.first || glyph.id > glyphRange.second) {
-                continue;
+                glyph.metrics.advance >= 256 || glyph.id < glyphRange.first ||
+                glyph.id > glyphRange.second) {
+                return;
             }
 
             // If the area of width/height is non-zero, we need to adjust the expected size
             // with the implicit border size, otherwise we expect there to be no bitmap at all.
             if (glyph.metrics.width && glyph.metrics.height) {
-                const Size size {
-                    glyph.metrics.width + 2 * Glyph::borderSize,
-                    glyph.metrics.height + 2 * Glyph::borderSize
-                };
+                const Size size{ glyph.metrics.width + 2 * Glyph::borderSize,
+                                 glyph.metrics.height + 2 * Glyph::borderSize };
 
                 if (size.area() != glyphData.size()) {
-                    continue;
+                    return;
                 }
 
-                glyph.bitmap = AlphaImage(size, reinterpret_cast<const uint8_t*>(glyphData.data()), glyphData.size());
+                glyph.bitmap = AlphaImage(size, reinterpret_cast<const uint8_t*>(glyphData.data()),
+                                          glyphData.size());
             }
 
             result.push_back(std::move(glyph));
+        };
+
+        double ascender{ 0.0 }, descender{ 0.0 };
+        uint16_t count{ 0 };
+        auto fontstack_pbf = glyphs_pbf.get_message();
+        while (fontstack_pbf.next()) {
+            switch (fontstack_pbf.tag()) {
+            case 3: {
+                readGlyphMetrics(fontstack_pbf);
+                ++count;
+                break;
+            }
+            case 4: {
+                ascender = fontstack_pbf.get_double();
+                break;
+            }
+            case 5: {
+                descender = fontstack_pbf.get_double();
+                break;
+            }
+            default: {
+                fontstack_pbf.skip();
+                break;
+            }
+            }
+        }
+        if (ascender != 0.0 || descender != 0.0) {
+            assert(count <= result.size());
+            for (uint16_t i = result.size() - count; i <= result.size() - 1; ++i) {
+                result[i].metrics.ascender = ascender;
+                result[i].metrics.descender = descender;
+            }
         }
     }
 

@@ -326,8 +326,7 @@ void shapeLines(Shaping& shaping,
                 const GlyphMap& glyphMap,
                 bool allowVerticalPlacement) {
     float x = 0;
-    float y = Shaping::yOffset;
-    
+    float y = 0;
     float maxLineLength = 0;
 
 
@@ -359,13 +358,15 @@ void shapeLines(Shaping& shaping,
             if (it == glyphs->second.end() || !it->second) {
                 continue;
             }
-            
-            // We don't know the baseline, but since we're laying out
-            // at 24 points, we can calculate how much it will move when
-            // we scale up or down.
-            const double baselineOffset = (lineMaxScale - section.scale) * util::ONE_EM;
-            
+
             const Glyph& glyph = **it->second;
+
+            // Each glyph's baseline is starting from its acsender, which is the vertical distance
+            // from the horizontal baseline to the highest ‘character’ coordinate in a font face.
+            // Since we're laying out at 24 points, we need also calculate how much it will move
+            // when we scale up or down.
+            const double baselineOffset = -glyph.metrics.ascender * section.scale +
+                                          (lineMaxScale - section.scale) * util::ONE_EM;
 
             if (writingMode == WritingModeType::Horizontal ||
                 // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
@@ -373,7 +374,9 @@ void shapeLines(Shaping& shaping,
                 // If vertical placement is ebabled, don't verticalize glyphs that
                 // are from complex text layout script, or whitespaces.
                 (allowVerticalPlacement && (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint)))) {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
+                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false,
+                                                      section.fontStackHash, section.scale,
+                                                      sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
                 shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
@@ -399,7 +402,6 @@ void shapeLines(Shaping& shaping,
     align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
           lineHeight, lines.size());
     const float height = y - Shaping::yOffset;
-
     // Calculate the bounding box
     shaping.top += -anchorAlign.verticalAlign * height;
     shaping.bottom = shaping.top + height;

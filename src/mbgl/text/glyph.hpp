@@ -30,6 +30,8 @@ struct GlyphMetrics {
     int32_t left = 0;
     int32_t top = 0;
     uint32_t advance = 0;
+    double ascender = 0.0;
+    double descender = 0.0;
 };
 
 inline bool operator==(const GlyphMetrics& lhs, const GlyphMetrics& rhs) {
