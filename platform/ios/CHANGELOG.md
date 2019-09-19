@@ -39,6 +39,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
 * Fixed constant repainting for the sources with invisible layers, caused by `RenderSource::hasFadingTiles()` returning `true` all the time. ([#15600](https://github.com/mapbox/mapbox-gl-native/pull/15600))
 
+## 5.3.2 - September 18, 2019
+
+* Fixed an issue where `-[MGLMapView visibleFeaturesInRect:]` and `-[MGLShapeSource featuresMatchingPredicate:]` could return incorrect coordinates at zoom levels 20 and higher. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
+
 ## 5.3.1 - September 18, 2019
 
 ### Styles and rendering
