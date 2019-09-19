@@ -41,7 +41,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 5.3.2 - September 18, 2019
 
-* Fixed a potential integer overflow at high zoom levels. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
+* Fixed an issue where `-[MGLMapView visibleFeaturesInRect:]` and `-[MGLShapeSource featuresMatchingPredicate:]` could return incorrect coordinates at zoom levels 20 and higher. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
 
 ## 5.3.1 - September 18, 2019
 
