@@ -25,11 +25,18 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fixed MapSnapshotter so that `MapSnapshotter.withApiBaseUri` works again. [#15642](https://github.com/mapbox/mapbox-gl-native/pull/15642)
  - Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. [#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644)
 
+## 8.3.2 - September 19, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.1...android-v8.3.2) since [Mapbox Maps SDK for Android v8.3.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.1):
+
+### Bug fixes
+ - Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. [#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560)
+
 ## 8.3.1 - September 18, 2019
-[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0...android-v8.3.1) since [Mapbox Maps SDK for Android v8.3.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0): 
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0...android-v8.3.1) since [Mapbox Maps SDK for Android v8.3.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0):
 
 ### Bug fixes
  - Updated earcut.hpp submodule file [#15660](https://github.com/mapbox/mapbox-gl-native/pull/15660)
+ - Fixed a wrong variable assignment of `MapSnapshotter.Options.withApiBaseUri`. [#15642](https://github.com/mapbox/mapbox-gl-native/pull/15642)
 
 ## 8.4.0-alpha.2 - September 11, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-alpha.1...android-v8.4.0-alpha.2) since [Mapbox Maps SDK for Android v8.4.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-alpha.1): 
