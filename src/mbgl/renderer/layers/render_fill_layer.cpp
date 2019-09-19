@@ -249,13 +249,10 @@ void RenderFillLayer::render(PaintParameters& parameters) {
     }
 }
 
-bool RenderFillLayer::queryIntersectsFeature(
-        const GeometryCoordinates& queryGeometry,
-        const GeometryTileFeature& feature,
-        const float,
-        const TransformState& transformState,
-        const float pixelsToTileUnits,
-        const mat4&) const {
+bool RenderFillLayer::queryIntersectsFeature(const GeometryCoordinates& queryGeometry,
+                                             const GeometryTileFeature& feature, const float,
+                                             const TransformState& transformState, const float pixelsToTileUnits,
+                                             const mat4&, const FeatureState&) const {
     const auto& evaluated = getEvaluated<FillLayerProperties>(evaluatedProperties);
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
@@ -266,6 +263,5 @@ bool RenderFillLayer::queryIntersectsFeature(
 
     return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries());
 }
-
 
 } // namespace mbgl

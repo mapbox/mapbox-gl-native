@@ -126,6 +126,9 @@ test('Map', function(t) {
             'setAxonometric',
             'setXSkew',
             'setYSkew',
+            'setFeatureState',
+            'getFeatureState',
+            'removeFeatureState',
             'dumpDebugLogs',
             'queryRenderedFeatures'
         ]);

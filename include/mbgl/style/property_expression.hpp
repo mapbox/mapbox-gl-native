@@ -61,6 +61,10 @@ public:
         return evaluate(expression::EvaluationContext(zoom, &feature), finalDefaultValue);
     }
 
+    T evaluate(float zoom, const GeometryTileFeature& feature, const FeatureState& state, T finalDefaultValue) const {
+        return evaluate(expression::EvaluationContext(zoom, &feature, &state), finalDefaultValue);
+    }
+
     std::vector<optional<T>> possibleOutputs() const {
         return expression::fromExpressionValues<T>(expression->possibleOutputs());
     }

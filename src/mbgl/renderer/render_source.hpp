@@ -93,6 +93,13 @@ public:
         return {};
     }
 
+    virtual void setFeatureState(const optional<std::string>&, const std::string&, const FeatureState&) {}
+
+    virtual void getFeatureState(FeatureState&, const optional<std::string>&, const std::string&) const {}
+
+    virtual void removeFeatureState(const optional<std::string>&, const optional<std::string>&,
+                                    const optional<std::string>&) {}
+
     virtual void reduceMemoryUse() = 0;
 
     virtual void dumpDebugLogs() const = 0;

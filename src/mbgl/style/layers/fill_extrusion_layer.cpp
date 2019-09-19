@@ -19,14 +19,13 @@ namespace style {
 
 // static
 const LayerTypeInfo* FillExtrusionLayer::Impl::staticTypeInfo() noexcept {
-    const static LayerTypeInfo typeInfo
-        {"fill-extrusion",
-          LayerTypeInfo::Source::Required,
-          LayerTypeInfo::Pass3D::Required,
-          LayerTypeInfo::Layout::Required,
-          LayerTypeInfo::FadingTiles::NotRequired,
-          LayerTypeInfo::CrossTileIndex::NotRequired
-        };
+    const static LayerTypeInfo typeInfo{"fill-extrusion",
+                                        LayerTypeInfo::Source::Required,
+                                        LayerTypeInfo::Pass3D::Required,
+                                        LayerTypeInfo::Layout::Required,
+                                        LayerTypeInfo::FadingTiles::NotRequired,
+                                        LayerTypeInfo::CrossTileIndex::NotRequired,
+                                        LayerTypeInfo::TileKind::Geometry};
     return &typeInfo;
 }
 

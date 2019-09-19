@@ -229,23 +229,23 @@
 
 - (void)testRemovingSourceInUse {
     // Add a raster tile source
-    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
-    [self.style addSource:rasterTileSource];
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style addSource:vectorTileSource];
     
     // Add a layer using it
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:rasterTileSource];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:vectorTileSource];
     [self.style addLayer:fillLayer];
 
     // Attempt to remove the raster tile source
     NSError *error;
-    BOOL result = [self.style removeSource:rasterTileSource error:&error];
+    BOOL result = [self.style removeSource:vectorTileSource error:&error];
     
     XCTAssertFalse(result);
     XCTAssertEqualObjects(error.domain, MGLErrorDomain);
     XCTAssertEqual(error.code, MGLErrorCodeSourceIsInUseCannotRemove);
     
     // Ensure it is still there
-    XCTAssertTrue([[self.style sourceWithIdentifier:rasterTileSource.identifier] isMemberOfClass:[MGLRasterTileSource class]]);
+    XCTAssertTrue([[self.style sourceWithIdentifier:vectorTileSource.identifier] isMemberOfClass:[MGLVectorTileSource class]]);
 }
 
 - (void)testLayers {
@@ -311,54 +311,61 @@
 }
 
 - (void)testRemovingLayerBeforeAddingSameLayer {
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source-removing-before-adding" shape:nil options:nil];
-
-    // Attempting to find a layer with identifier will trigger an exception if the source associated with the layer is not added
-    [self.style addSource:source];
-
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fill-layer" source:source];
-    [self.style removeLayer:fillLayer];
-    [self.style addLayer:fillLayer];
-    XCTAssertNotNil([self.style layerWithIdentifier:fillLayer.identifier]);
-
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"raster-layer" source:source];
-    [self.style removeLayer:rasterLayer];
-    [self.style addLayer:rasterLayer];
-    XCTAssertNotNil([self.style layerWithIdentifier:rasterLayer.identifier]);
-
-    MGLSymbolStyleLayer *symbolLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"symbol-layer" source:source];
-    [self.style removeLayer:symbolLayer];
-    [self.style addLayer:symbolLayer];
-    XCTAssertNotNil([self.style layerWithIdentifier:symbolLayer.identifier]);
-
-    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"line-layer" source:source];
-    [self.style removeLayer:lineLayer];
-    [self.style addLayer:lineLayer];
-    XCTAssertNotNil([self.style layerWithIdentifier:lineLayer.identifier]);
-
-    MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"circle-layer" source:source];
-    [self.style removeLayer:circleLayer];
-    [self.style addLayer:circleLayer];
-    XCTAssertNotNil([self.style layerWithIdentifier:circleLayer.identifier]);
-
-    MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"background-layer"];
-    [self.style removeLayer:backgroundLayer];
-    [self.style addLayer:backgroundLayer];
-    XCTAssertNotNil([self.style layerWithIdentifier:backgroundLayer.identifier]);
+    {
+        MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source-removing-before-adding" shape:nil options:nil];
+        
+        // Attempting to find a layer with identifier will trigger an exception if the source associated with the layer is not added
+        [self.style addSource:source];
+        
+        MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fill-layer" source:source];
+        [self.style removeLayer:fillLayer];
+        [self.style addLayer:fillLayer];
+        XCTAssertNotNil([self.style layerWithIdentifier:fillLayer.identifier]);
+        
+        MGLSymbolStyleLayer *symbolLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"symbol-layer" source:source];
+        [self.style removeLayer:symbolLayer];
+        [self.style addLayer:symbolLayer];
+        XCTAssertNotNil([self.style layerWithIdentifier:symbolLayer.identifier]);
+        
+        MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"line-layer" source:source];
+        [self.style removeLayer:lineLayer];
+        [self.style addLayer:lineLayer];
+        XCTAssertNotNil([self.style layerWithIdentifier:lineLayer.identifier]);
+        
+        MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"circle-layer" source:source];
+        [self.style removeLayer:circleLayer];
+        [self.style addLayer:circleLayer];
+        XCTAssertNotNil([self.style layerWithIdentifier:circleLayer.identifier]);
+        
+        MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"background-layer"];
+        [self.style removeLayer:backgroundLayer];
+        [self.style addLayer:backgroundLayer];
+        XCTAssertNotNil([self.style layerWithIdentifier:backgroundLayer.identifier]);
+    }
+    
+    {
+        MGLRasterTileSource *rasterSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"raster-tile-source" tileURLTemplates:@[] options:nil];
+        [self.style addSource:rasterSource];
+        
+        MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"raster-layer" source:rasterSource];
+        [self.style removeLayer:rasterLayer];
+        [self.style addLayer:rasterLayer];
+        XCTAssertNotNil([self.style layerWithIdentifier:rasterLayer.identifier]);
+    }
 }
 
 - (void)testAddingLayerOfTypeABeforeRemovingLayerOfTypeBWithSameIdentifier {
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source-identifier" shape:nil options:nil];
     [self.style addSource:source];
-
+    
     // Add a fill layer
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"some-identifier" source:source];
     [self.style addLayer:fillLayer];
-
+    
     // Attempt to remove a line layer with the same identifier as the fill layer
     MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:fillLayer.identifier source:source];
     [self.style removeLayer:lineLayer];
-
+    
     XCTAssertTrue([[self.style layerWithIdentifier:fillLayer.identifier] isMemberOfClass:[MGLFillStyleLayer class]]);
 }
 
@@ -382,10 +389,10 @@
     MGLImage *image = [[NSBundle bundleForClass:[self class]] imageForResource:imageName];
 #endif
     XCTAssertNotNil(image);
-
+    
     [self.style setImage:image forName:imageName];
     MGLImage *styleImage = [self.style imageForName:imageName];
-
+    
     XCTAssertNotNil(styleImage);
     XCTAssertEqual(image.size.width, styleImage.size.width);
     XCTAssertEqual(image.size.height, styleImage.size.height);

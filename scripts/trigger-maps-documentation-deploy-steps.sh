@@ -10,6 +10,7 @@ SDK_FLAVOR=${SDK_FLAVOR:-"maps"}
 
 step "Triggering automated site and documentation generation for ${SDK_FLAVOR} SDK ${VERSION_TAG}"
 
+# No branch specified, so default branch will be used
 request_body="{
   \"request\": {
     \"message\": \"[${SDK_FLAVOR}] ${VERSION_TAG} automated site and documentation generation\",
@@ -25,10 +26,11 @@ request_body="{
 
 step "Making request…"
 
+# Request URL set to docs-sandbox while testing
 curl -s -X POST \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
   -H "Travis-API-Version: 3" \
   -H "Authorization: token ${TRAVISCI_API_TOKEN}" \
   -d "${request_body}" \
-  https://api.travis-ci.com/repo/mapbox%2Fios-sdk/requests
+  https://api.travis-ci.com/repo/mapbox%2F${DOCS_REPO}/requests

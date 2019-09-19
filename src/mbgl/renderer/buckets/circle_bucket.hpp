@@ -18,16 +18,16 @@ public:
     CircleBucket(const BucketParameters&, const std::vector<Immutable<style::LayerProperties>>&);
     ~CircleBucket() override;
 
-    void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&,
-                    const ImagePositions&,
-                    const PatternLayerMap&) override;
+    void addFeature(const GeometryTileFeature&, const GeometryCollection&, const ImagePositions&,
+                    const PatternLayerMap&, std::size_t) override;
 
     bool hasData() const override;
 
     void upload(gfx::UploadPass&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
+
+    void update(const FeatureStates&, const GeometryTileLayer&, const std::string&, const ImagePositions&) override;
 
     gfx::VertexVector<CircleLayoutVertex> vertices;
     gfx::IndexVector<gfx::Triangles> triangles;
