@@ -65,6 +65,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private final MapChangeReceiver mapChangeReceiver = new MapChangeReceiver();
   private final MapCallback mapCallback = new MapCallback();
   private final InitialRenderCallback initialRenderCallback = new InitialRenderCallback();
+  private static final String TAG = "Mbgl-MapView";
 
   @Nullable
   private NativeMap nativeMapView;
@@ -131,9 +132,20 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
+    view.setNextFocusForwardId(R.id.compassView);
+    view.setNextFocusRightId(R.id.compassView);
+    view.setNextFocusLeftId(R.id.attributionView);
     compassView = view.findViewById(R.id.compassView);
+    compassView.setNextFocusForwardId(R.id.attributionView);
+    compassView.setNextFocusRightId(R.id.attributionView);
+    compassView.setNextFocusLeftId(view.getId());
     attrView = view.findViewById(R.id.attributionView);
     attrView.setImageDrawable(BitmapUtils.getDrawableFromRes(getContext(), R.drawable.mapbox_info_bg_selector));
+    attrView = view.findViewById(R.id.attributionView);
+    attrView.setImageDrawable(BitmapUtils.getDrawableFromRes(getContext(), R.drawable.mapbox_info_bg_selector));
+    attrView.setNextFocusForwardId(view.getId());
+    attrView.setNextFocusRightId(R.id.compassView);
+    attrView.setNextFocusLeftId(view.getId());
     logoView = view.findViewById(R.id.logoView);
     logoView.setImageDrawable(BitmapUtils.getDrawableFromRes(getContext(), R.drawable.mapbox_logo_icon));
 
@@ -180,7 +192,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
       annotationManager, cameraDispatcher);
     mapKeyListener = new MapKeyListener(transform, uiSettings, mapGestureDetector);
-
     // compass
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraDispatcher));
     compassView.setOnClickListener(createCompassClickListener(cameraDispatcher));

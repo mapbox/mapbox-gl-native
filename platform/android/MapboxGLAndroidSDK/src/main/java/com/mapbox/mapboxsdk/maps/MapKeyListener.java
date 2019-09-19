@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
@@ -20,9 +21,11 @@ import android.view.ViewConfiguration;
  */
 final class MapKeyListener {
 
+  private final String TAG = "MapKeyListener";
   private final Transform transform;
   private final UiSettings uiSettings;
   private final MapGestureDetector mapGestureDetector;
+  private int bearingIndex = 1;
 
   @Nullable
   private TrackballLongPressTimeOut currentTrackballLongPressTimeOut;
@@ -34,16 +37,18 @@ final class MapKeyListener {
   }
 
   /**
-   * Called when the user presses a key, alse called for repeated keys held down.
+   * Called when the user presses a key, also called for repeated keys held down.
    *
    * @param keyCode the id of the pressed key
    * @param event   the related key event
-   * @return true if the wevent is handled
+   * @return true if the event is handled
    */
   boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
     // If the user has held the scroll key down for a while then accelerate
-    // the scroll speed
-    double scrollDist = event.getRepeatCount() >= 5 ? 50.0 : 10.0;
+    // the map camera movement speeds
+    double scrollDist = event.getRepeatCount() >= 5 ? 90.0 : 50.0;
+    double pitchDist = event.getRepeatCount() >= 5 ? 5.00 : 1.0;
+    double rotateDist = event.getRepeatCount() >= 5 ? 20.0 : 1.0;
 
     // Check which key was pressed via hardware/real key code
     switch (keyCode) {
@@ -62,8 +67,18 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        // Move left
-        transform.moveBy(scrollDist, 0.0, 0 /*no animation*/);
+        // Check if the shift key is being held down
+        if (event.isShiftPressed()) {
+          if (!uiSettings.isRotateGesturesEnabled()) {
+            return false;
+          }
+          transform.setBearing(bearingIndex * rotateDist);
+          Log.d(TAG, "transform.getBearing() = " + transform.getBearing());
+          bearingIndex++;
+        } else {
+          // Move map camera left
+          transform.moveBy(scrollDist, 0.0, 0 /*no animation*/);
+        }
         return true;
 
       case KeyEvent.KEYCODE_DPAD_RIGHT:
@@ -74,8 +89,19 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        // Move right
-        transform.moveBy(-scrollDist, 0.0, 0 /*no animation*/);
+        // Check if the shift key is being held down
+        if (event.isShiftPressed()) {
+          if (!uiSettings.isRotateGesturesEnabled()) {
+            return false;
+          }
+          transform.setBearing(180 - (bearingIndex * rotateDist));
+          Log.d(TAG, "transform.getBearing() = " + transform.getBearing());
+          bearingIndex++;
+        } else {
+          // Move map camera right
+          transform.moveBy(-scrollDist, 0.0, 0 /*no animation*/);
+        }
+
         return true;
 
       case KeyEvent.KEYCODE_DPAD_UP:
@@ -86,8 +112,20 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        // Move up
-        transform.moveBy(0.0, scrollDist, 0 /*no animation*/);
+        // Check if the shift key is being held down
+        if (event.isShiftPressed()) {
+          if (!uiSettings.isTiltGesturesEnabled()) {
+            return false;
+          }
+
+          // Increase map camera pitch value
+          transform.setTilt(transform.getTilt() + pitchDist);
+
+        } else {
+          // Move map camera target up
+          transform.moveBy(0.0, scrollDist, 0 /*no animation*/);
+        }
+
         return true;
 
       case KeyEvent.KEYCODE_DPAD_DOWN:
@@ -98,10 +136,52 @@ final class MapKeyListener {
         // Cancel any animation
         transform.cancelTransitions();
 
-        // Move down
-        transform.moveBy(0.0, -scrollDist, 0 /*no animation*/);
+        // Check if the shift key is being held down
+        if (event.isShiftPressed()) {
+          if (!uiSettings.isTiltGesturesEnabled()) {
+            return false;
+          }
+
+          // Decrease map camera pitch value
+          transform.setTilt(transform.getTilt() - pitchDist);
+
+        } else {
+          // Move map target down
+          transform.moveBy(0.0, -scrollDist, 0 /*no animation*/);
+        }
+
         return true;
 
+      case KeyEvent.KEYCODE_EQUALS:
+
+        // We're interested in the equals sign because most keyboards have the
+        // + and = symbols on the same key. KeyEvent.KEYCODE_EQUALS fires when
+        // this key is tapped.
+
+        // Cancel any animation
+        transform.cancelTransitions();
+
+        if (!uiSettings.isZoomGesturesEnabled()) {
+          return false;
+        }
+        // Zoom the map camera closer to the map (i.e. increase the map camera zoom level number)
+        zoomMapCameraIn();
+
+        return true;
+
+      case KeyEvent.KEYCODE_MINUS:
+
+        // Cancel any animation
+        transform.cancelTransitions();
+
+        if (!uiSettings.isZoomGesturesEnabled()) {
+          return false;
+        }
+
+        // Pull the map camera out away from the map (i.e. decrease the map camera zoom level number)
+        zoomMapCameraOut();
+
+        return true;
       default:
         // We are not interested in this key
         return false;
@@ -127,8 +207,7 @@ final class MapKeyListener {
         }
 
         // Zoom out
-        PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        mapGestureDetector.zoomOutAnimated(focalPoint, true);
+        zoomMapCameraOut();
         return true;
 
       default:
@@ -163,8 +242,7 @@ final class MapKeyListener {
         }
 
         // Zoom in
-        PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        mapGestureDetector.zoomInAnimated(focalPoint, true);
+        zoomMapCameraIn();
         return true;
     }
 
@@ -191,7 +269,7 @@ final class MapKeyListener {
         transform.cancelTransitions();
 
         // Scroll the map
-        transform.moveBy(-10.0 * event.getX(), -10.0 * event.getY(), 0 /*no animation*/);
+        zoomMapCameraIn();
         return true;
 
       // Trackball was pushed in so start tracking and tell system we are
@@ -218,8 +296,7 @@ final class MapKeyListener {
         // Only handle if we have not already long pressed
         if (currentTrackballLongPressTimeOut != null) {
           // Zoom in
-          PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-          mapGestureDetector.zoomInAnimated(focalPoint, true);
+          zoomMapCameraIn();
         }
         return true;
 
@@ -260,12 +337,27 @@ final class MapKeyListener {
       // Check if the trackball is still pressed
       if (!cancelled) {
         // Zoom out
-        PointF pointF = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        mapGestureDetector.zoomOutAnimated(pointF, true);
+        zoomMapCameraOut();
 
         // Ensure the up action is not run
         currentTrackballLongPressTimeOut = null;
       }
     }
+  }
+
+  /**
+   * Moves the map camera towards from the map plane.
+   */
+  private void zoomMapCameraIn() {
+    PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+    mapGestureDetector.zoomInAnimated(focalPoint, true);
+  }
+
+  /**
+   * Moves the map camera away from the map plane
+   */
+  private void zoomMapCameraOut() {
+    PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+    mapGestureDetector.zoomOutAnimated(focalPoint, true);
   }
 }
