@@ -3,7 +3,7 @@
 set -euo pipefail
 
 COCOAPODS_VERSION="1.7.5"
-JAZZY_VERSION="0.10.0"
+JAZZY_VERSION="0.11.1"
 CIRCLECI=${CIRCLECI:-false}
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
