@@ -77,11 +77,7 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
 
 - (BOOL)stopsRequests {
     auto status = mbgl::NetworkStatus::Get();
-    if (status == mbgl::NetworkStatus::Status::Offline) {
-        return YES;
-    } else {
-        return NO;
-    }
+    return status == mbgl::NetworkStatus::Status::Offline;
 }
 
 - (void)startDownloadEvent:(NSString *)urlString type:(NSString *)resourceType {

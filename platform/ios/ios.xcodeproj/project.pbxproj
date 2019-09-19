@@ -521,7 +521,7 @@
 		CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.mm */; };
 		CA7766832229C10E0008DE9E /* MGLCompactCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848451CBAFB9800AB86E3 /* MGLCompactCalloutView.m */; };
 		CA7766842229C11A0008DE9E /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */; };
-		CA86FF0E22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */; };
+		CA86FF0E22D8D5A0009EB14A /* MGLNetworkConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.mm */; };
 		CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */; };
 		CA8FBC0921A47BB100D1203C /* MGLRendererConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
@@ -1216,7 +1216,7 @@
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
 		CA65C4F721E9BB080068B0D4 /* MGLCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCluster.h; sourceTree = "<group>"; };
 		CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLAnnotationViewIntegrationTests.mm; path = "Annotation Tests/MGLAnnotationViewIntegrationTests.mm"; sourceTree = "<group>"; };
-		CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfigurationTests.m; sourceTree = "<group>"; };
+		CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLNetworkConfigurationTests.mm; sourceTree = "<group>"; };
 		CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleURLIntegrationTest.m; sourceTree = "<group>"; };
 		CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRendererConfigurationTests.mm; path = ../../darwin/test/MGLRendererConfigurationTests.mm; sourceTree = "<group>"; };
 		CAAA65D72321BBA900F08A39 /* MGLTestAssertionHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestAssertionHandler.h; path = ../../darwin/test/MGLTestAssertionHandler.h; sourceTree = "<group>"; };
@@ -2096,6 +2096,7 @@
 				9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */,
 				076171C22139C70900668A35 /* MGLMapViewTests.m */,
 				9686D1BC22D9357700194EA0 /* MGLMapViewZoomTests.mm */,
+				CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.mm */,
 				1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */,
 				96036A0520059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m */,
 				DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */,
@@ -2112,7 +2113,6 @@
 				357579811D502AD4000B822E /* Styling */,
 				409F43FB1E9E77D10048729D /* Swift Integration */,
 				4031ACFD1E9FD26900A3EA26 /* Test Helpers */,
-				CA86FF0D22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m */,
 			);
 			name = "SDK Tests";
 			path = test;
@@ -3300,7 +3300,7 @@
 				DA2DBBCE1D51E80400D38FF9 /* MGLStyleLayerTests.m in Sources */,
 				DA35A2C61CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m in Sources */,
 				DAE7DEC21E245455007505A6 /* MGLNSStringAdditionsTests.m in Sources */,
-				CA86FF0E22D8D5A0009EB14A /* MGLNetworkConfigurationTests.m in Sources */,
+				CA86FF0E22D8D5A0009EB14A /* MGLNetworkConfigurationTests.mm in Sources */,
 				4085AF091D933DEA00F11B22 /* MGLTileSetTests.mm in Sources */,
 				DAEDC4341D603417000224FF /* MGLAttributionInfoTests.m in Sources */,
 				1F7454A91ED08AB400021D39 /* MGLLightTest.mm in Sources */,

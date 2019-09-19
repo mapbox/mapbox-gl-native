@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 #import "MGLNetworkConfiguration_Private.h"
+#include <mbgl/storage/network_status.hpp>
 
 @interface MGLNetworkConfigurationTests : XCTestCase
 @end
@@ -39,5 +40,20 @@
     }
     
     [self waitForExpectations:@[expectation] timeout:10.0];
+}
+
+- (void)testStopsRequests {
+    auto networkStatus = mbgl::NetworkStatus::Get();
+    BOOL offline = networkStatus == mbgl::NetworkStatus::Status::Offline ? YES : NO;
+    XCTAssertEqual([MGLNetworkConfiguration sharedManager].stopsRequests, offline);
+    
+    [MGLNetworkConfiguration sharedManager].stopsRequests = YES;
+    XCTAssertTrue([MGLNetworkConfiguration sharedManager].stopsRequests);
+    
+    networkStatus = mbgl::NetworkStatus::Get();
+    offline = networkStatus == mbgl::NetworkStatus::Status::Offline ? YES : NO;
+    // TODO: When the double linking framework fix lands this should be replaced to an equal assert
+    XCTAssertNotEqual([MGLNetworkConfiguration sharedManager].stopsRequests, offline);
+    
 }
 @end
