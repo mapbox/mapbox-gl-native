@@ -762,8 +762,8 @@
 		DAF2571B201901E200367EF5 /* MGLHillshadeStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF25718201901E200367EF5 /* MGLHillshadeStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAF2571C201901E200367EF5 /* MGLHillshadeStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF25718201901E200367EF5 /* MGLHillshadeStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAF25720201902BC00367EF5 /* MGLHillshadeStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAF2571F201902BB00367EF5 /* MGLHillshadeStyleLayerTests.mm */; };
-		DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */; };
-		DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */; };
+		DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.mm */; };
+		DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.mm */; };
 		DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD4823751D94AE6C00EB71B7 /* fill_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */; };
 		DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823731D94AE6C00EB71B7 /* line_filter_style.json */; };
@@ -1470,7 +1470,7 @@
 		DAFEB3762093AE6800A86A83 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ko; path = ko.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DAFEB3772093AE7900A86A83 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAFEB3782093AE9200A86A83 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ko; path = ko.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
-		DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
+		DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLNetworkConfiguration.mm; sourceTree = "<group>"; };
 		DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration.h; sourceTree = "<group>"; };
 		DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = fill_filter_style.json; sourceTree = "<group>"; };
 		DD4823731D94AE6C00EB71B7 /* line_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = line_filter_style.json; sourceTree = "<group>"; };
@@ -2164,7 +2164,7 @@
 				927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */,
 				DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */,
 				1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */,
-				DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */,
+				DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.mm */,
 				3EA9337830C7738BF7F5493C /* MGLRendererConfiguration.h */,
 				3EA931BC4F087E166D538F21 /* MGLRendererConfiguration.mm */,
 				92F2C3EC1F0E3C3A00268EC0 /* MGLRendererFrontend.h */,
@@ -3418,7 +3418,7 @@
 				40834BF01FE05E1800C1BD0D /* MMELocationManager.m in Sources */,
 				DA8848281CBAFA6200AB86E3 /* MGLShape.mm in Sources */,
 				DA35A2B31CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
-				DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */,
+				DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.mm in Sources */,
 				35D13AB91D3D15E300AFB4E0 /* MGLStyleLayer.mm in Sources */,
 				74CB5EB3219B252C00102936 /* MGLStyleLayerManager.mm in Sources */,
 				DA35A2CB1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
@@ -3539,7 +3539,7 @@
 				9C6E282C22A981580056B7BE /* MGLMapboxEvents.m in Sources */,
 				DAA4E41F1CBB730400178DFB /* MGLMultiPoint.mm in Sources */,
 				96E6145C22CC169000109F14 /* MGLCompassButton.mm in Sources */,
-				DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */,
+				DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.mm in Sources */,
 				40834C041FE05E1800C1BD0D /* MMELocationManager.m in Sources */,
 				9C6E281F22A980AC0056B7BE /* CLLocation+MMEMobileEvents.m in Sources */,
 				DA35A2B41CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,

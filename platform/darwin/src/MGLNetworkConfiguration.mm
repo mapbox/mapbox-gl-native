@@ -1,6 +1,7 @@
 #import "MGLNetworkConfiguration_Private.h"
 
 #include <mbgl/storage/reachability.h>
+#include <mbgl/storage/network_status.hpp>
 
 static NSString * const MGLStartTime = @"start_time";
 static NSString * const MGLResourceType = @"resource_type";
@@ -64,6 +65,23 @@ NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
     sessionConfiguration.URLCache = nil;
     
     return sessionConfiguration;
+}
+
+- (void)setStopsRequests:(BOOL)stopsRequests {
+    if (stopsRequests) {
+        mbgl::NetworkStatus::Set(mbgl::NetworkStatus::Status::Offline);
+    } else {
+        mbgl::NetworkStatus::Set(mbgl::NetworkStatus::Status::Online);
+    }
+}
+
+- (BOOL)stopsRequests {
+    auto status = mbgl::NetworkStatus::Get();
+    if (status == mbgl::NetworkStatus::Status::Offline) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 - (void)startDownloadEvent:(NSString *)urlString type:(NSString *)resourceType {
