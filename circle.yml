@@ -560,7 +560,9 @@ commands:
     steps:
     - run:
         name: Install iOS packaging dependencies
-        command: ./platform/ios/scripts/install-packaging-dependencies.sh
+        command: |
+          echo "ruby-2.6" > ~/.ruby-version
+          ./platform/ios/scripts/install-packaging-dependencies.sh
         background: true
 
   install-macos-dependencies:
@@ -1390,6 +1392,7 @@ jobs:
   ios-release-template:
     macos:
       xcode: "10.3.0"
+    shell: /bin/bash --login -eo pipefail
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1438,6 +1441,7 @@ jobs:
   ios-release-tag:
     macos:
       xcode: "10.3.0"
+    shell: /bin/bash --login -eo pipefail
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
