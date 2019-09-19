@@ -183,7 +183,11 @@ namespace android {
                             android::UniqueEnv _env = android::AttachEnv();
 
                             // Update the core source
-                            source(*_env)->as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(geoJSON);
+                            auto coreSource = source();
+                            if (!coreSource) {
+                                return;
+                            }
+                            coreSource->as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setGeoJSON(geoJSON);
 
                             // if there is an awaiting update, execute it, otherwise, release resources
                             if (awaitingUpdate) {

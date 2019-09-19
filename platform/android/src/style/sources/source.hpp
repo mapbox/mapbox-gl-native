@@ -64,6 +64,14 @@ protected:
         return nonOwnedSource_.get();
     }
 
+    inline mbgl::style::Source* source() {
+        if (ownedSource_) return ownedSource_.get();
+        if (!nonOwnedSource_) {
+            return nullptr;
+        }
+        return nonOwnedSource_.get();
+    }
+
     // Set when the source is added to a map.
     jni::Global<jni::Object<Source>> javaPeer;
 
