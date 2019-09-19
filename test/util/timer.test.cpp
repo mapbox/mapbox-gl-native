@@ -3,7 +3,6 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/chrono.hpp>
 
 #include <memory>
 
@@ -129,6 +128,73 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(DestroyShouldStop)) {
 
     EXPECT_GE(totalTime, expectedTotalTime * 0.8);
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
+}
+
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StoppedDuringExpiration)) {
+    // The idea is to have original timer cancellation and expiration roughly at the same time.
+    // In this case some timer backens (e.g. asio::high_resolution_timer)
+    // may call the expiration callback with good status while the timer may not expect it.
+
+    RunLoop loop;
+
+    auto timer = std::make_unique<Timer>();
+    auto loopStopTimer = std::make_unique<Timer>();
+    auto expireTimeout = mbgl::Milliseconds(50);
+
+    auto timerCallback = [&] {
+        // we cannot expect much here as in some cases timer may be finished earlier
+        // than the loop stop timer (and thus the callback will be called)
+    };
+
+    auto loopStopTimerCallback = [&] {
+        timer->stop();
+        loop.stop();
+    };
+
+    auto first = mbgl::Clock::now();
+
+    loopStopTimer->start(expireTimeout, mbgl::Milliseconds(0), loopStopTimerCallback);
+    timer->start(expireTimeout, mbgl::Milliseconds(0), timerCallback);
+
+    loop.run();
+
+    auto totalTime = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - first);
+
+    EXPECT_GE(totalTime, expireTimeout * 0.8);
+    EXPECT_LE(totalTime, expireTimeout * 1.2);
+}
+
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StoppedAfterExpiration)) {
+    RunLoop loop;
+
+    auto timer = std::make_unique<Timer>();
+    auto loopStopTimer = std::make_unique<Timer>();
+    auto expireTimeout = mbgl::Milliseconds(50);
+
+    bool callbackFired = false;
+
+    auto timerCallback = [&] { callbackFired = true; };
+
+    auto first = mbgl::Clock::now();
+
+    timer->start(expireTimeout, mbgl::Milliseconds(0), timerCallback);
+
+    // poll until the timer expires
+    auto expireWaitInterval = expireTimeout * 2;
+    auto startWaitTime = mbgl::Clock::now();
+    auto waitDuration = mbgl::Duration::zero();
+    while (waitDuration < expireWaitInterval) {
+        waitDuration = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - startWaitTime);
+    }
+    timer->stop();
+
+    loop.runOnce();
+
+    auto totalTime = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - first);
+
+    EXPECT_TRUE(!callbackFired);
+    EXPECT_GE(totalTime, expireWaitInterval * 0.8);
+    EXPECT_LE(totalTime, expireWaitInterval * 1.2);
 }
 
 TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) {
