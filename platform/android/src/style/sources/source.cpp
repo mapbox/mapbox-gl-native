@@ -100,7 +100,7 @@ namespace android {
         // Save reference before transferring ownership
         nonOwnedSource_ = ownedSource_->makeWeakPtr();
         // Add peer to core source
-        ownedSource_->peer = weakFactory_.makeWeakPtr();
+        ownedSource_->peer = std::unique_ptr<Source>(this);
         // Add source to map and release ownership
         map.getStyle().addSource(std::move(ownedSource_));
 

@@ -82,7 +82,6 @@ protected:
 private:
     std::unique_ptr<mbgl::style::Source> ownedSource_ { nullptr };
     mapbox::base::WeakPtr<mbgl::style::Source> nonOwnedSource_;
-    mapbox::base::WeakPtrFactory<Source> weakFactory_ {this};
 };
 
 } // namespace android
