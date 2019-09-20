@@ -4,10 +4,16 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+
+## 8.4.0-beta.1 - September 19, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-alpha.2...android-v8.4.0-beta.1) since [Mapbox Maps SDK for Android v8.4.0-alpha.2](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-alpha.2): 
+
 ### Bug fixes
+ - Fixed an issue that `maxzoom` in style `Sources` option was ignored when URL resource is provided. It may cause problems such as extra tiles downloading at higher zoom level than `maxzoom`, or problems that wrong setting of `overscaledZ` in `OverscaledTileID` that will be passed to `SymbolLayout`, leading wrong rendering appearance. [#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581)
  - Fixed constant repainting for the sources with invisible layers, caused by `RenderSource::hasFadingTiles()` returning `true` all the time. [#15600](https://github.com/mapbox/mapbox-gl-native/pull/15600)
  - Fixed an issue that caused the state of CompassView not up to date when `UiSettings.setCompassEnabled()` is set to true. [#15606](https://github.com/mapbox/mapbox-gl-native/pull/15606)
- - Fixed an issue that `maxzoom` in style `Sources` option was ignored when URL resource is provided. It may cause problems such as extra tiles downloading at higher zoom level than `maxzoom`, or problems that wrong setting of `overscaledZ` in `OverscaledTileID` that will be passed to `SymbolLayout`, leading wrong rendering appearance. [#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581)
+ - Ignore location tracking mode based animations when the camera is transitioning. [#15641](https://github.com/mapbox/mapbox-gl-native/pull/15641)
+ - Fixed MapSnapshotter so that `MapSnapshotter.withApiBaseUri` works again. [#15642](https://github.com/mapbox/mapbox-gl-native/pull/15642)
  - Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. [#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644)
 
 ## 8.3.1 - September 18, 2019

@@ -18,11 +18,13 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Styles and rendering
 
+* Added an `-[MGLMapSnapshotter startWithOverlayHandler:completionHandler:]` method to provide the snapshot's current `CGContext` in order to perform custom drawing on `MGLMapSnapshot` objects. ([#15530](https://github.com/mapbox/mapbox-gl-native/pull/15530))
+* Fixed an issue that caused `MGLTileSourceOptionMaximumZoomLevel` to be ignored when setting `MGLTileSource.configurationURL`. ([#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581))
+* Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. ([#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644))
 * Fixed crashes triggered when `MGLSource` and `MGLStyleLayer` objects are accessed after having been invalidated after a style change. ([#15539](https://github.com/mapbox/mapbox-gl-native/pull/15539))
-* Fixed a rendering issue of `collisionBox` when `MGLSymbolStyleLayer.textTranslate` or `MGLSymbolStyleLayer.iconTranslate` is enabled. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
+* Fixed an issue where the collision boxes for symbols would not be updated when `MGLSymbolStyleLayer.textTranslation` or `MGLSymbolStyleLayer.iconTranslation` were used. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Enabled use of `MGLSymbolStyleLayer.textOffset` option together with `MGLSymbolStyleLayer.textVariableAnchor` (if `MGLSymbolStyleLayer.textRadialOffset` option is not provided). ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))
-* Fixed a bug where the completion block passed to `-[MGLMapView flyToCamera:completionHandler:` (and related methods) wouldn't be called. ([#15473](https://github.com/mapbox/mapbox-gl-native/pull/15473))
-* Fixed a crash when `-[MGLOfflinePack invalidate]` is called on different threads. ([#15582](https://github.com/mapbox/mapbox-gl-native/pull/15582))
+* Fixed an issue that caused constant repainting for sources with invisible layers. ([#15600](https://github.com/mapbox/mapbox-gl-native/pull/15600))
 
 ### User interaction
 
@@ -36,9 +38,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
+* Fixed a bug where the completion block passed to `-[MGLMapView flyToCamera:completionHandler:]` (and related methods) wouldn't be called. ([#15473](https://github.com/mapbox/mapbox-gl-native/pull/15473))
+* Fixed a crash when offline pack invalidation happened on different threads. ([#15582](https://github.com/mapbox/mapbox-gl-native/pull/15582))
 * Fixed a potential integer overflow at high zoom levels. ([#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560))
 * Fixed a bug with annotation view positions after camera transitions. ([#15122](https://github.com/mapbox/mapbox-gl-native/pull/15122/))
-* Fixed constant repainting for the sources with invisible layers, caused by `RenderSource::hasFadingTiles()` returning `true` all the time. ([#15600](https://github.com/mapbox/mapbox-gl-native/pull/15600))
 
 ## 5.3.2 - September 18, 2019
 

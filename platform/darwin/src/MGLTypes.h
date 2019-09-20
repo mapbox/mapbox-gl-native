@@ -57,7 +57,9 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     /** An error occurred while modifying the offline storage database */
     MGLErrorCodeModifyingOfflineStorageFailed = 9,
     /** Source is invalid and cannot be removed from the style (e.g. after a style change) */
-    MGLErrorCodeSourceCannotBeRemovedFromStyle  = 10
+    MGLErrorCodeSourceCannotBeRemovedFromStyle  = 10,
+    /** An error occurred while rendering */
+    MGLErrorCodeRenderingError = 11,
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */
