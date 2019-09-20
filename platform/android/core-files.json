@@ -92,6 +92,7 @@
         "platform/default/src/mbgl/gl/headless_backend.cpp",
         "platform/default/src/mbgl/map/map_snapshotter.cpp",
         "platform/default/src/mbgl/text/bidi.cpp",
+        "platform/default/src/mbgl/util/compression.cpp",
         "platform/default/src/mbgl/util/png_writer.cpp",
         "platform/default/src/mbgl/util/thread_local.cpp",
         "platform/default/src/mbgl/util/utf.cpp",

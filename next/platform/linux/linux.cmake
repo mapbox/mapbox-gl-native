@@ -33,6 +33,7 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/unaccent.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/async_task.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/format_number.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/image.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/jpeg_reader.cpp
