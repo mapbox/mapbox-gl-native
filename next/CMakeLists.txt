@@ -777,7 +777,6 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/tile/vector_tile_data.hpp
     ${MBGL_ROOT}/src/mbgl/util/chrono.cpp
     ${MBGL_ROOT}/src/mbgl/util/color.cpp
-    ${MBGL_ROOT}/src/mbgl/util/compression.cpp
     ${MBGL_ROOT}/src/mbgl/util/constants.cpp
     ${MBGL_ROOT}/src/mbgl/util/convert.cpp
     ${MBGL_ROOT}/src/mbgl/util/dtoa.cpp

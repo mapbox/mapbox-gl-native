@@ -284,7 +284,6 @@
         "src/mbgl/tile/vector_tile_data.cpp",
         "src/mbgl/util/chrono.cpp",
         "src/mbgl/util/color.cpp",
-        "src/mbgl/util/compression.cpp",
         "src/mbgl/util/constants.cpp",
         "src/mbgl/util/convert.cpp",
         "src/mbgl/util/dtoa.cpp",

@@ -103,6 +103,7 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/online_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/sqlite3.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/bidi.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/png_writer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/thread_local.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/utf.cpp
