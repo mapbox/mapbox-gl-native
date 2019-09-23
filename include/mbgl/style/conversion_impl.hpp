@@ -90,6 +90,7 @@ public:
     }
 
     Convertible(Convertible&& v) : vtable(v.vtable) {
+        // NOLINTNEXTLINE(performance-move-const-arg)
         vtable->move(std::move(v.storage), storage);
     }
 
@@ -101,6 +102,7 @@ public:
         if (this != &v) {
             vtable->destroy(storage);
             vtable = v.vtable;
+            // NOLINTNEXTLINE(performance-move-const-arg)
             vtable->move(std::move(v.storage), storage);
         }
         return *this;

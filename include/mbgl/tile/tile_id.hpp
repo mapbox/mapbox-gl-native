@@ -141,7 +141,7 @@ inline std::array<CanonicalTileID, 4> CanonicalTileID::children() const {
 }
 
 inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, int16_t wrap_, CanonicalTileID canonical_)
-    : overscaledZ(overscaledZ_), wrap(wrap_), canonical(std::move(canonical_)) {
+    : overscaledZ(overscaledZ_), wrap(wrap_), canonical(canonical_) {
     assert(overscaledZ >= canonical.z);
 }
 
@@ -207,8 +207,7 @@ inline UnwrappedTileID::UnwrappedTileID(uint8_t z_, int64_t x_, int64_t y_)
 }
 
 inline UnwrappedTileID::UnwrappedTileID(int16_t wrap_, CanonicalTileID canonical_)
-    : wrap(wrap_), canonical(std::move(canonical_)) {
-}
+    : wrap(wrap_), canonical(canonical_) {}
 
 inline bool UnwrappedTileID::operator==(const UnwrappedTileID& rhs) const {
     return wrap == rhs.wrap && canonical == rhs.canonical;

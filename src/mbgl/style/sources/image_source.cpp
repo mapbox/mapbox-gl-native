@@ -30,7 +30,7 @@ std::array<LatLng, 4> ImageSource::getCoordinates() const {
 }
 
 void ImageSource::setURL(const std::string& url_) {
-    url = std::move(url_);
+    url = url_;
     // Signal that the source description needs a reload
     if (loaded || req) {
         loaded = false;

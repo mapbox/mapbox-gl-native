@@ -124,7 +124,7 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
             requestors.emplace(&requestor, std::move(pair));
         }
     } else {
-        checkMissingAndNotify(requestor, std::move(pair));
+        checkMissingAndNotify(requestor, pair);
     }
 }
 

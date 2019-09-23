@@ -18,7 +18,7 @@ FillLayerProperties::FillLayerProperties(
     CrossfadeParameters crossfade_,
     FillPaintProperties::PossiblyEvaluated evaluated_)
   : LayerProperties(std::move(impl_)),
-    crossfade(std::move(crossfade_)),
+    crossfade(crossfade_),
     evaluated(std::move(evaluated_)) {}
 
 FillLayerProperties::~FillLayerProperties() = default;

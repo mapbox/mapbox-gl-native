@@ -67,13 +67,13 @@ struct RenderableSegment {
                       const LayerRenderData& renderData_,
                       const SymbolBucket::PaintProperties& bucketPaintProperties_,
                       float sortKey_,
-                      const SymbolType type_) :
-    segment(std::move(segment_)),
-    tile(tile_),
-    renderData(renderData_),
-    bucketPaintProperties(bucketPaintProperties_),
-    sortKey(sortKey_),
-    type(type_) {}
+                      const SymbolType type_)
+        : segment(segment_),
+          tile(tile_),
+          renderData(renderData_),
+          bucketPaintProperties(bucketPaintProperties_),
+          sortKey(sortKey_),
+          type(type_) {}
 
     SegmentWrapper segment;
     const RenderTile& tile;

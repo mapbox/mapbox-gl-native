@@ -27,18 +27,8 @@ class BiDi;
 
 class PositionedIcon {
 private:
-    PositionedIcon(ImagePosition image_,
-                   float top_,
-                   float bottom_,
-                   float left_,
-                   float right_,
-                   float angle_)
-        : _image(std::move(image_)),
-          _top(top_),
-          _bottom(bottom_),
-          _left(left_),
-          _right(right_),
-          _angle(angle_) {}
+    PositionedIcon(ImagePosition image_, float top_, float bottom_, float left_, float right_, float angle_)
+        : _image(image_), _top(top_), _bottom(bottom_), _left(left_), _right(right_), _angle(angle_) {}
 
     ImagePosition _image;
     float _top;

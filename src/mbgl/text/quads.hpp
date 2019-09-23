@@ -22,14 +22,14 @@ public:
                WritingModeType writingMode_,
                Point<float> glyphOffset_,
                size_t sectionIndex_ = 0)
-        : tl(std::move(tl_)),
-        tr(std::move(tr_)),
-        bl(std::move(bl_)),
-        br(std::move(br_)),
-        tex(std::move(tex_)),
-        writingMode(writingMode_),
-        glyphOffset(glyphOffset_),
-        sectionIndex(sectionIndex_){}
+        : tl(tl_),
+          tr(tr_),
+          bl(bl_),
+          br(br_),
+          tex(tex_),
+          writingMode(writingMode_),
+          glyphOffset(glyphOffset_),
+          sectionIndex(sectionIndex_) {}
 
     Point<float> tl;
     Point<float> tr;

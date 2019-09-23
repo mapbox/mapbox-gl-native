@@ -18,7 +18,7 @@ BackgroundLayerProperties::BackgroundLayerProperties(
     CrossfadeParameters crossfade_,
     BackgroundPaintProperties::PossiblyEvaluated evaluated_)
   : LayerProperties(std::move(impl_)),
-    crossfade(std::move(crossfade_)),
+    crossfade(crossfade_),
     evaluated(std::move(evaluated_)) {}
 
 BackgroundLayerProperties::~BackgroundLayerProperties() = default;

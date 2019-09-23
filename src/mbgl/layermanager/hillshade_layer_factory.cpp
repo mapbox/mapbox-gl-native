@@ -22,7 +22,7 @@ std::unique_ptr<style::Layer> HillshadeLayerFactory::createLayer(const std::stri
 
 std::unique_ptr<RenderLayer> HillshadeLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderHillshadeLayer>(staticImmutableCast<style::HillshadeLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderHillshadeLayer>(staticImmutableCast<style::HillshadeLayer::Impl>(impl));
 }
 
 } // namespace mbgl

@@ -16,9 +16,7 @@ namespace mbgl {
 
 using namespace style;
 
-RenderTile::RenderTile(UnwrappedTileID id_, Tile& tile_) 
-    : id(std::move(id_)), tile(tile_) {
-}
+RenderTile::RenderTile(UnwrappedTileID id_, Tile& tile_) : id(id_), tile(tile_) {}
 
 RenderTile::~RenderTile() = default;
 

@@ -16,7 +16,7 @@ std::unique_ptr<style::Layer> CustomLayerFactory::createLayer(const std::string&
 }
 
 std::unique_ptr<RenderLayer> CustomLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    return std::make_unique<RenderCustomLayer>(staticImmutableCast<style::CustomLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderCustomLayer>(staticImmutableCast<style::CustomLayer::Impl>(impl));
 }
 
 } // namespace mbgl

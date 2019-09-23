@@ -138,7 +138,7 @@ void Parser::parseLight(const JSValue& value) {
         return;
     }
 
-    light = std::move(*converted);
+    light = *converted;
 }
 
 void Parser::parseSources(const JSValue& value) {

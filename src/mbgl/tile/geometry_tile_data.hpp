@@ -24,8 +24,7 @@ public:
 
     template <class... Args>
     GeometryCoordinates(Args&&... args) : std::vector<GeometryCoordinate>(std::forward<Args>(args)...) {}
-    GeometryCoordinates(std::initializer_list<GeometryCoordinate> args)
-      : std::vector<GeometryCoordinate>(std::move(args)) {}
+    GeometryCoordinates(std::initializer_list<GeometryCoordinate> args) : std::vector<GeometryCoordinate>(args) {}
 };
 
 class GeometryCollection : public std::vector<GeometryCoordinates> {
@@ -33,8 +32,7 @@ public:
     using coordinate_type = int16_t;
     template <class... Args>
     GeometryCollection(Args&&... args) : std::vector<GeometryCoordinates>(std::forward<Args>(args)...) {}
-    GeometryCollection(std::initializer_list<GeometryCoordinates> args)
-      : std::vector<GeometryCoordinates>(std::move(args)) {}
+    GeometryCollection(std::initializer_list<GeometryCoordinates> args) : std::vector<GeometryCoordinates>(args) {}
     GeometryCollection(GeometryCollection&&) = default;
     GeometryCollection& operator=(GeometryCollection&&) = default;
 

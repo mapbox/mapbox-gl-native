@@ -30,7 +30,7 @@ std::unique_ptr<Bucket> CircleLayerFactory::createBucket(const BucketParameters&
 
 std::unique_ptr<RenderLayer> CircleLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderCircleLayer>(staticImmutableCast<style::CircleLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderCircleLayer>(staticImmutableCast<style::CircleLayer::Impl>(impl));
 }
 
 } // namespace mbgl

@@ -35,7 +35,7 @@ FillLayerFactory::createLayout(const LayoutParameters& parameters,
 
 std::unique_ptr<RenderLayer> FillLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderFillLayer>(staticImmutableCast<style::FillLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderFillLayer>(staticImmutableCast<style::FillLayer::Impl>(impl));
 }
 
 } // namespace mbgl

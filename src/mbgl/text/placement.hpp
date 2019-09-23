@@ -63,12 +63,8 @@ struct RetainedQueryData {
     OverscaledTileID tileID;
     mutable FeatureSortOrder featureSortOrder;
 
-    RetainedQueryData(uint32_t bucketInstanceId_,
-                      std::shared_ptr<FeatureIndex> featureIndex_,
-                      OverscaledTileID tileID_)
-        : bucketInstanceId(bucketInstanceId_)
-        , featureIndex(std::move(featureIndex_))
-        , tileID(std::move(tileID_)) {}
+    RetainedQueryData(uint32_t bucketInstanceId_, std::shared_ptr<FeatureIndex> featureIndex_, OverscaledTileID tileID_)
+        : bucketInstanceId(bucketInstanceId_), featureIndex(std::move(featureIndex_)), tileID(tileID_) {}
 };
     
 class CollisionGroups {

@@ -474,7 +474,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 
     map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr eptr) {
         if (eptr) {
-            error = std::move(eptr);
+            error = eptr;
             uv_async_send(async);
         } else {
             assert(!image.data);

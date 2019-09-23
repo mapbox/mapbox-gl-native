@@ -24,18 +24,17 @@ public:
     DEMEncoding encoding;
     optional<LatLngBounds> bounds;
 
-
     Tileset(std::vector<std::string> tiles_ = std::vector<std::string>(),
-            Range<uint8_t> zoomRange_ = { 0, util::DEFAULT_MAX_ZOOM },
+            Range<uint8_t> zoomRange_ = {0, util::DEFAULT_MAX_ZOOM},
             std::string attribution_ = {},
             Scheme scheme_ = Scheme::XYZ,
             DEMEncoding encoding_ = DEMEncoding::Mapbox)
         : tiles(std::move(tiles_)),
-          zoomRange(std::move(zoomRange_)),
+          zoomRange(zoomRange_),
           attribution(std::move(attribution_)),
           scheme(scheme_),
           encoding(encoding_),
-          bounds() {};
+          bounds(){};
 
     // TileJSON also includes center and zoom but they are not used by mbgl.
 
