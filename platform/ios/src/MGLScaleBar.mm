@@ -82,15 +82,16 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic, assign) MGLRow row;
 @property (nonatomic) UIColor *primaryColor;
 @property (nonatomic) UIColor *secondaryColor;
-@property (nonatomic) CALayer *borderLayer;
 @property (nonatomic, assign) CGFloat borderWidth;
 @property (nonatomic) NSMutableDictionary* labelImageCache;
 @property (nonatomic) MGLScaleBarLabel* prototypeLabel;
 @property (nonatomic) CGFloat lastLabelWidth;
+@property (nonatomic, readwrite) CGSize size;
 @end
 
 static const CGFloat MGLBarHeight = 4;
 static const CGFloat MGLFeetPerMeter = 3.28084;
+static const CGFloat MGLScaleBarLabelWidthHint = 30.0;
 
 @interface MGLScaleBarLabel : UILabel
 
@@ -136,6 +137,8 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)commonInit {
+    _size = CGSizeZero;
+    
     _primaryColor = [UIColor colorWithRed:18.0/255.0 green:45.0/255.0 blue:17.0/255.0 alpha:1];
     _secondaryColor = [UIColor colorWithRed:247.0/255.0 green:247.0/255.0 blue:247.0/255.0 alpha:1];
     _borderWidth = 1.0f;
@@ -144,15 +147,12 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     self.hidden = YES;
     
     _containerView = [[UIView alloc] init];
-    _containerView.clipsToBounds = YES;
-    _containerView.backgroundColor = self.secondaryColor;
+    _containerView.clipsToBounds     = YES;
+    _containerView.backgroundColor   = _secondaryColor;
+    _containerView.layer.borderColor = _primaryColor.CGColor;
+    _containerView.layer.borderWidth = _borderWidth / [[UIScreen mainScreen] scale];
+
     [self addSubview:_containerView];
-    
-    _borderLayer = [CAShapeLayer layer];
-    _borderLayer.borderColor = [self.primaryColor CGColor];
-    _borderLayer.borderWidth = 1.0f / [[UIScreen mainScreen] scale];
-    
-    [_containerView.layer addSublayer:_borderLayer];
     
     _formatter = [[MGLDistanceFormatter alloc] init];
 
@@ -175,6 +175,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
         [self addSubview:view];
     }
     _labelViews = [labelViews copy];
+    _lastLabelWidth = MGLScaleBarLabelWidthHint;
 
     // Zero is a special case (no formatting)
     [self addZeroLabel];
@@ -192,6 +193,11 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 #pragma mark - Dimensions
+
+- (void)setBorderWidth:(CGFloat)borderWidth {
+    _borderWidth = borderWidth;
+    _containerView.layer.borderWidth = borderWidth / [[UIScreen mainScreen] scale];
+}
 
 - (CGSize)intrinsicContentSize {
     return self.actualWidth > 0 ? CGSizeMake(ceil(self.actualWidth + self.lastLabelWidth/2), 16) : CGSizeZero;
@@ -420,12 +426,6 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
                                           self.intrinsicContentSize.height-MGLBarHeight,
                                           self.actualWidth,
                                           MGLBarHeight+self.borderWidth*2);
-    
-    [CATransaction begin];
-    [CATransaction setDisableActions:YES];
-    self.borderLayer.frame = CGRectInset(self.containerView.bounds, self.borderWidth, self.borderWidth);
-    self.borderLayer.zPosition = FLT_MAX;
-    [CATransaction commit];
 }
 
 - (void)layoutLabels {

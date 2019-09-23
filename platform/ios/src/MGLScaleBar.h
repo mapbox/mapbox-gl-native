@@ -10,5 +10,5 @@
 @property (nonatomic, readonly) NSArray<UIView *> *labelViews;
 @property (nonatomic, readonly) NSArray<UIView *> *bars;
 @property (nonatomic, readonly) UIView *containerView;
-
+@property (nonatomic, readonly) CGSize size;
 @end
