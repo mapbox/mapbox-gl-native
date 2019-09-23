@@ -195,7 +195,6 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer_jni.hpp
         ${MBGL_ROOT}/platform/android/src/thread.cpp
         ${MBGL_ROOT}/platform/android/src/timer.cpp
-        ${MBGL_ROOT}/platform/android/src/unaccent.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_backend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_frontend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gl/headless_backend.cpp

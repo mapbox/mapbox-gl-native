@@ -86,7 +86,6 @@
         "platform/android/src/gl_functions.cpp",
         "platform/android/src/thread.cpp",
         "platform/android/src/timer.cpp",
-        "platform/android/src/unaccent.cpp",
         "platform/default/src/mbgl/gfx/headless_backend.cpp",
         "platform/default/src/mbgl/gfx/headless_frontend.cpp",
         "platform/default/src/mbgl/gl/headless_backend.cpp",
@@ -103,8 +102,7 @@
         "mbgl/gfx/headless_backend.hpp": "platform/default/include/mbgl/gfx/headless_backend.hpp",
         "mbgl/gfx/headless_frontend.hpp": "platform/default/include/mbgl/gfx/headless_frontend.hpp",
         "mbgl/gl/headless_backend.hpp": "platform/default/include/mbgl/gl/headless_backend.hpp",
-        "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp",
-        "mbgl/text/unaccent.hpp": "platform/default/include/mbgl/text/unaccent.hpp"
+        "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp"
     },
     "private_headers": {
         "android_renderer_backend.hpp": "platform/android/src/android_renderer_backend.hpp",
