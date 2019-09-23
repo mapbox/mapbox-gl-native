@@ -1,3 +1,4 @@
 Checks: '-*,bugprone-*,clang-analyzer-*,google-*,modernize-*,performance-*,-clang-analyzer-osx.*,-google-readability-braces-around-statements,-google-readability-todo,-google-runtime-int,-google-runtime-references'
+WarningsAsErrors: 'bugprone-use-after-move'
 HeaderFilterRegex: '.*'
 FormatStyle: file
