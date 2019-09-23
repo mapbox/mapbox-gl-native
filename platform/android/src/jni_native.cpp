@@ -51,9 +51,9 @@
 #include "snapshotter/map_snapshot.hpp"
 #endif
 #include "i18n/collator_jni.hpp"
+#include "i18n/number_format_jni.hpp"
 #include "logger.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
-#include "text/format_number_jni.hpp"
 
 namespace mbgl {
 namespace android {

@@ -45,7 +45,7 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp
         ${MBGL_ROOT}/platform/qt/src/async_task.cpp
         ${MBGL_ROOT}/platform/qt/src/async_task_impl.hpp
-        ${MBGL_ROOT}/platform/qt/src/format_number.cpp
+        ${MBGL_ROOT}/platform/qt/src/number_format.cpp
         ${MBGL_ROOT}/platform/qt/src/gl_functions.cpp
         ${MBGL_ROOT}/platform/qt/src/headless_backend_qt.cpp
         ${MBGL_ROOT}/platform/qt/src/http_file_source.cpp

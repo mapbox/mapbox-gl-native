@@ -1,11 +1,10 @@
-#include <mbgl/style/expression/collator.hpp>
+#include <mbgl/i18n/number_format.hpp>
 #include <mbgl/text/language_tag.hpp>
-#include <mbgl/util/platform.hpp>
 
 #include <jni/jni.hpp>
 
 #include "../attach_env.hpp"
-#include "format_number_jni.hpp"
+#include "number_format_jni.hpp"
 
 namespace mbgl {
 namespace android {

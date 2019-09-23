@@ -15,6 +15,8 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_backend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_frontend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gl/headless_backend.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/i18n/collator.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/i18n/number_format.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/layermanager/layer_manager.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/asset_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/default_file_source.cpp
@@ -29,11 +31,9 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/online_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/sqlite3.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/bidi.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/i18n/collator.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/async_task.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/util/format_number.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/image.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/jpeg_reader.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/logging_stderr.cpp

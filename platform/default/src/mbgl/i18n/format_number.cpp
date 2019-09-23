@@ -1,4 +1,4 @@
-#include <mbgl/util/platform.hpp>
+#include <mbgl/i18n/number_format.hpp>
 
 #include <unicode/numberformatter.h>
 
