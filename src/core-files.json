@@ -178,6 +178,7 @@
         "src/mbgl/style/expression/check_subtype.cpp",
         "src/mbgl/style/expression/coalesce.cpp",
         "src/mbgl/style/expression/coercion.cpp",
+        "src/mbgl/style/expression/collator.cpp",
         "src/mbgl/style/expression/collator_expression.cpp",
         "src/mbgl/style/expression/comparison.cpp",
         "src/mbgl/style/expression/compound_expression.cpp",

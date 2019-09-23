@@ -29,7 +29,7 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/online_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/sqlite3.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/bidi.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/text/collator.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/i18n/collator.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/async_task.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp

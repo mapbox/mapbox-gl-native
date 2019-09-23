@@ -1,7 +1,6 @@
-#include <mbgl/style/expression/collator.hpp>
-#include <mbgl/util/platform.hpp>
 #include <libnu/strcoll.h>
 #include <libnu/unaccent.h>
+#include <mbgl/i18n/collator.hpp>
 
 #include <cstring>
 #include <sstream>
@@ -20,31 +19,24 @@
 */
 
 namespace {
-std::string unaccent(const std::string& str)
-{
+std::string unaccent(const std::string& str) {
     std::stringstream output;
     char const *itr = str.c_str(), *nitr;
-    char const *end = itr + str.length();
-    char lo[5] = { 0 };
+    char const* end = itr + str.length();
+    char lo[5] = {0};
 
-    for (; itr < end; itr = nitr)
-    {
+    for (; itr < end; itr = nitr) {
         uint32_t code_point = 0;
         char const* buf = nullptr;
 
         nitr = _nu_tounaccent(itr, end, nu_utf8_read, &code_point, &buf, nullptr);
-        if (buf != nullptr)
-        {
-            do
-            {
+        if (buf != nullptr) {
+            do {
                 buf = NU_CASEMAP_DECODING_FUNCTION(buf, &code_point);
                 if (code_point == 0) break;
                 output.write(lo, nu_utf8_write(code_point, lo) - lo);
-            }
-            while (code_point != 0);
-        }
-        else
-        {
+            } while (code_point != 0);
+        } else {
             output.write(itr, nitr - itr);
         }
     }
@@ -54,8 +46,7 @@ std::string unaccent(const std::string& str)
 } // namespace
 
 namespace mbgl {
-namespace style {
-namespace expression {
+namespace platform {
 
 class Collator::Impl {
 public:
@@ -65,8 +56,7 @@ public:
     {}
 
     bool operator==(const Impl& other) const {
-        return caseSensitive == other.caseSensitive &&
-            diacriticSensitive == other.diacriticSensitive;
+        return caseSensitive == other.caseSensitive && diacriticSensitive == other.diacriticSensitive;
     }
 
     int compare(const std::string& lhs, const std::string& rhs) const {
@@ -77,40 +67,35 @@ public:
             return nu_strcasecoll(lhs.c_str(), rhs.c_str(),
                                   nu_utf8_read, nu_utf8_read);
         } else if (caseSensitive && !diacriticSensitive) {
-            return nu_strcoll(unaccent(lhs).c_str(), unaccent(rhs).c_str(),
-                              nu_utf8_read, nu_utf8_read);
+            return nu_strcoll(unaccent(lhs).c_str(), unaccent(rhs).c_str(), nu_utf8_read, nu_utf8_read);
         } else {
-            return nu_strcasecoll(unaccent(lhs).c_str(), unaccent(rhs).c_str(),
-                                  nu_utf8_read, nu_utf8_read);
+            return nu_strcasecoll(unaccent(lhs).c_str(), unaccent(rhs).c_str(), nu_utf8_read, nu_utf8_read);
         }
     }
 
     std::string resolvedLocale() const {
         return "";
     }
+
 private:
     bool caseSensitive;
     bool diacriticSensitive;
 };
 
-
-Collator::Collator(bool caseSensitive, bool diacriticSensitive, optional<std::string> locale_)
-    : impl(std::make_shared<Impl>(caseSensitive, diacriticSensitive, std::move(locale_)))
-{}
+int Collator::compare(const std::string& lhs, const std::string& rhs) const {
+    return impl->compare(lhs, rhs);
+}
 
 bool Collator::operator==(const Collator& other) const {
     return *impl == *(other.impl);
-}
-
-int Collator::compare(const std::string& lhs, const std::string& rhs) const {
-    return impl->compare(lhs, rhs);
 }
 
 std::string Collator::resolvedLocale() const {
     return impl->resolvedLocale();
 }
 
+Collator::Collator(bool caseSensitive, bool diacriticSensitive, optional<std::string> locale)
+    : impl(std::make_shared<Impl>(caseSensitive, diacriticSensitive, std::move(locale))) {}
 
-} // namespace expression
-} // namespace style
+} // namespace platform
 } // namespace mbgl

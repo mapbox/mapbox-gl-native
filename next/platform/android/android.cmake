@@ -187,8 +187,8 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/style/transition_options.hpp
         ${MBGL_ROOT}/platform/android/src/style/value.cpp
         ${MBGL_ROOT}/platform/android/src/style/value.hpp
-        ${MBGL_ROOT}/platform/android/src/text/collator.cpp
-        ${MBGL_ROOT}/platform/android/src/text/collator_jni.hpp
+        ${MBGL_ROOT}/platform/android/src/i18n/collator.cpp
+        ${MBGL_ROOT}/platform/android/src/i18n/collator_jni.hpp
         ${MBGL_ROOT}/platform/android/src/text/format_number.cpp
         ${MBGL_ROOT}/platform/android/src/text/format_number_jni.hpp
         ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer.cpp

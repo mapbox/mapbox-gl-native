@@ -50,7 +50,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/src/mbgl/util/string_stdlib.cpp
         PRIVATE platform/default/src/mbgl/util/thread.cpp
         PRIVATE platform/default/src/mbgl/text/bidi.cpp
-        PRIVATE platform/default/src/mbgl/text/collator.cpp
+        PRIVATE platform/default/src/mbgl/i18n/collator.cpp
         PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
         PRIVATE platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
         PRIVATE platform/default/src/mbgl/util/thread_local.cpp
