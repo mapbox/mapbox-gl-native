@@ -333,6 +333,8 @@
         "mbgl/gfx/renderer_backend.hpp": "include/mbgl/gfx/renderer_backend.hpp",
         "mbgl/gl/renderable_resource.hpp": "include/mbgl/gl/renderable_resource.hpp",
         "mbgl/gl/renderer_backend.hpp": "include/mbgl/gl/renderer_backend.hpp",
+        "mbgl/i18n/collator.hpp": "include/mbgl/i18n/collator.hpp",
+        "mbgl/i18n/number_format.hpp": "include/mbgl/i18n/number_format.hpp",
         "mbgl/layermanager/background_layer_factory.hpp": "include/mbgl/layermanager/background_layer_factory.hpp",
         "mbgl/layermanager/circle_layer_factory.hpp": "include/mbgl/layermanager/circle_layer_factory.hpp",
         "mbgl/layermanager/custom_layer_factory.hpp": "include/mbgl/layermanager/custom_layer_factory.hpp",

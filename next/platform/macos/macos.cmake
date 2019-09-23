@@ -83,6 +83,7 @@ target_sources(
         ${MBGL_ROOT}/platform/darwin/src/local_glyph_rasterizer.mm
         ${MBGL_ROOT}/platform/darwin/src/logging_nslog.mm
         ${MBGL_ROOT}/platform/darwin/src/nsthread.mm
+        ${MBGL_ROOT}/platform/darwin/src/number_format.mm
         ${MBGL_ROOT}/platform/darwin/src/reachability.m
         ${MBGL_ROOT}/platform/darwin/src/run_loop.cpp
         ${MBGL_ROOT}/platform/darwin/src/string_nsstring.mm

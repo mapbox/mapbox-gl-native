@@ -85,6 +85,10 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/gson/json_primitive.cpp
         ${MBGL_ROOT}/platform/android/src/gson/json_primitive.hpp
         ${MBGL_ROOT}/platform/android/src/http_file_source.cpp
+        ${MBGL_ROOT}/platform/android/src/i18n/collator.cpp
+        ${MBGL_ROOT}/platform/android/src/i18n/collator_jni.hpp
+        ${MBGL_ROOT}/platform/android/src/i18n/number_format.cpp
+        ${MBGL_ROOT}/platform/android/src/i18n/number_format_jni.hpp
         ${MBGL_ROOT}/platform/android/src/image.cpp
         ${MBGL_ROOT}/platform/android/src/java/util.cpp
         ${MBGL_ROOT}/platform/android/src/java/util.hpp
@@ -187,10 +191,6 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/style/transition_options.hpp
         ${MBGL_ROOT}/platform/android/src/style/value.cpp
         ${MBGL_ROOT}/platform/android/src/style/value.hpp
-        ${MBGL_ROOT}/platform/android/src/i18n/collator.cpp
-        ${MBGL_ROOT}/platform/android/src/i18n/collator_jni.hpp
-        ${MBGL_ROOT}/platform/android/src/text/format_number.cpp
-        ${MBGL_ROOT}/platform/android/src/text/format_number_jni.hpp
         ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer.cpp
         ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer_jni.hpp
         ${MBGL_ROOT}/platform/android/src/thread.cpp

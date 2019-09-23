@@ -7,6 +7,7 @@
         "platform/darwin/src/image.mm",
         "platform/darwin/src/local_glyph_rasterizer.mm",
         "platform/darwin/src/logging_nslog.mm",
+        "platform/darwin/src/number_format.mm",
         "platform/darwin/src/nsthread.mm",
         "platform/darwin/src/reachability.m",
         "platform/darwin/src/string_nsstring.mm",
