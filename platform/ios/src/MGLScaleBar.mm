@@ -92,6 +92,7 @@ static const MGLRow MGLImperialTable[] ={
 static const CGFloat MGLBarHeight = 4;
 static const CGFloat MGLFeetPerMeter = 3.28084;
 static const CGFloat MGLScaleBarLabelWidthHint = 30.0;
+static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
 
 @interface MGLScaleBarLabel : UILabel
 
@@ -146,11 +147,14 @@ static const CGFloat MGLScaleBarLabelWidthHint = 30.0;
     self.clipsToBounds = NO;
     self.hidden = YES;
     
-    _containerView = [[UIView alloc] init];
-    _containerView.clipsToBounds     = YES;
-    _containerView.backgroundColor   = _secondaryColor;
-    _containerView.layer.borderColor = _primaryColor.CGColor;
-    _containerView.layer.borderWidth = _borderWidth / [[UIScreen mainScreen] scale];
+    _containerView                     = [[UIView alloc] init];
+    _containerView.clipsToBounds       = YES;
+    _containerView.backgroundColor     = _secondaryColor;
+    _containerView.layer.borderColor   = _primaryColor.CGColor;
+    _containerView.layer.borderWidth   = _borderWidth / [[UIScreen mainScreen] scale];
+
+    _containerView.layer.cornerRadius  = MGLBarHeight / 2.0;
+    _containerView.layer.masksToBounds = YES;
 
     [self addSubview:_containerView];
     
@@ -203,12 +207,28 @@ static const CGFloat MGLScaleBarLabelWidthHint = 30.0;
     return self.actualWidth > 0 ? CGSizeMake(ceil(self.actualWidth + self.lastLabelWidth/2), 16) : CGSizeZero;
 }
 
+// Determines the width of the bars NOT the size of the entire scale bar,
+// which includes space for (half) a label.
+// Uses the current set `row`
 - (CGFloat)actualWidth {
-    CGFloat width = self.row.distance / [self unitsPerPoint];
-    return !isnan(width) ? width : 0;
+    CGFloat unitsPerPoint = [self unitsPerPoint];
+    
+    if (unitsPerPoint == 0.0) {
+        return 0.0;
+    }
+        
+    CGFloat width = self.row.distance / unitsPerPoint;
+
+    if (width <= MGLScaleBarMinimumBarWidth) {
+        return 0.0;
+    }
+
+    // Round, so that each bar section has an integer width
+    return self.row.numberOfBars * floor(width/self.row.numberOfBars);
 }
 
 - (CGFloat)maximumWidth {
+    // TODO: Consider taking Scale Bar margins into account here.
     CGFloat fullWidth = CGRectGetWidth(self.superview.bounds);
     return floorf(fullWidth / 2);
 }
