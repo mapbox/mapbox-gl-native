@@ -18,7 +18,7 @@ LineLayerProperties::LineLayerProperties(
     CrossfadeParameters crossfade_,
     LinePaintProperties::PossiblyEvaluated evaluated_)
   : LayerProperties(std::move(impl_)),
-    crossfade(std::move(crossfade_)),
+    crossfade(crossfade_),
     evaluated(std::move(evaluated_)) {}
 
 LineLayerProperties::~LineLayerProperties() = default;

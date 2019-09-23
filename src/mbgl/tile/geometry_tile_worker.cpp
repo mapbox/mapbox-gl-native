@@ -37,13 +37,12 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        const bool showCollisionBoxes_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
-      id(std::move(id_)),
+      id(id_),
       sourceID(std::move(sourceID_)),
       obsolete(obsolete_),
       mode(mode_),
       pixelRatio(pixelRatio_),
-      showCollisionBoxes(showCollisionBoxes_) {
-}
+      showCollisionBoxes(showCollisionBoxes_) {}
 
 GeometryTileWorker::~GeometryTileWorker() = default;
 

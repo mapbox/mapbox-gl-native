@@ -210,7 +210,8 @@ UniqueTexture Context::createUniqueTexture() {
 
     TextureID id = pooledTextures.back();
     pooledTextures.pop_back();
-    return UniqueTexture{ std::move(id), { this } };
+    // NOLINTNEXTLINE(performance-move-const-arg)
+    return UniqueTexture{std::move(id), {this}};
 }
 
 bool Context::supportsVertexArrays() const {
@@ -224,6 +225,7 @@ VertexArray Context::createVertexArray() {
     if (supportsVertexArrays()) {
         VertexArrayID id = 0;
         MBGL_CHECK_ERROR(vertexArray->genVertexArrays(1, &id));
+        // NOLINTNEXTLINE(performance-move-const-arg)
         UniqueVertexArray vao(std::move(id), { this });
         return { UniqueVertexArrayState(new VertexArrayState(std::move(vao)), VertexArrayStateDeleter { true })};
     } else {
@@ -236,6 +238,7 @@ VertexArray Context::createVertexArray() {
 UniqueFramebuffer Context::createFramebuffer() {
     FramebufferID id = 0;
     MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
+    // NOLINTNEXTLINE(performance-move-const-arg)
     return UniqueFramebuffer{ std::move(id), { this } };
 }
 
@@ -269,6 +272,7 @@ std::unique_ptr<gfx::RenderbufferResource>
 Context::createRenderbufferResource(const gfx::RenderbufferPixelType type, const Size size) {
     RenderbufferID id = 0;
     MBGL_CHECK_ERROR(glGenRenderbuffers(1, &id));
+    // NOLINTNEXTLINE(performance-move-const-arg)
     UniqueRenderbuffer renderbuffer{ std::move(id), { this } };
 
     bindRenderbuffer = renderbuffer;

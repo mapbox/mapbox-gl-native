@@ -16,8 +16,7 @@ Programs::Programs(gfx::Context& context_, const ProgramParameters& programParam
     : debug(context_, programParameters_),
       clippingMask(context_, programParameters_),
       context(context_),
-      programParameters(std::move(programParameters_)) {
-}
+      programParameters(programParameters_) {}
 
 Programs::~Programs() = default;
 

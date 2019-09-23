@@ -12,8 +12,7 @@ namespace mbgl {
 namespace style {
 
 GeoJSONSource::GeoJSONSource(const std::string& id, optional<GeoJSONOptions> options)
-    : Source(makeMutable<Impl>(std::move(id), options)) {
-}
+    : Source(makeMutable<Impl>(id, options)) {}
 
 GeoJSONSource::~GeoJSONSource() = default;
 
@@ -22,7 +21,7 @@ const GeoJSONSource::Impl& GeoJSONSource::impl() const {
 }
 
 void GeoJSONSource::setURL(const std::string& url_) {
-    url = std::move(url_);
+    url = url_;
 
     // Signal that the source description needs a reload
     if (loaded || req) {

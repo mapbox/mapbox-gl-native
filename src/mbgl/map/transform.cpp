@@ -356,7 +356,7 @@ void Transform::setLatLngBounds(LatLngBounds bounds) {
     if (!bounds.valid()) {
         throw std::runtime_error("failed to set bounds: bounds are invalid");
     }
-    state.setLatLngBounds(std::move(bounds));
+    state.setLatLngBounds(bounds);
 }
 
 void Transform::setMinZoom(const double minZoom) {

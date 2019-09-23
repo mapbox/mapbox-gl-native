@@ -26,7 +26,7 @@ namespace style {
     <%- camelize(type) %>PaintProperties::PossiblyEvaluated evaluated_)
   : LayerProperties(std::move(impl_)),
 <% if (type === 'background' || type === 'fill' || type === 'line' || type === 'fill-extrusion') { -%>
-    crossfade(std::move(crossfade_)),
+    crossfade(crossfade_),
 <% } -%>
     evaluated(std::move(evaluated_)) {}
 

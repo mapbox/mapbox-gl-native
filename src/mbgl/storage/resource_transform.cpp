@@ -6,8 +6,8 @@ ResourceTransform::ResourceTransform(ActorRef<ResourceTransform>, TransformCallb
     : transformCallback(std::move(callback)) {
 }
 
-void ResourceTransform::transform(Resource::Kind kind, const std::string&& url, FinishedCallback&& finished) {
-    finished(transformCallback(kind, std::move(url)));
+void ResourceTransform::transform(Resource::Kind kind, const std::string& url, FinishedCallback&& finished) {
+    finished(transformCallback(kind, url));
 }
 
 } // namespace mbgl

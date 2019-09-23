@@ -105,7 +105,7 @@ private:
         for (std::size_t i = 0; i < sizeof...(Params); ++i) {
             const EvaluationResult evaluatedArg = args.at(i)->evaluate(evaluationParameters);
             if (!evaluatedArg) return evaluatedArg.error();
-            evaluated[i] = std::move(*evaluatedArg);
+            evaluated[i] = *evaluatedArg;
         }
         const R value = evaluate(*fromExpressionValue<std::decay_t<Params>>(evaluated[I])...);
         if (!value) return value.error();
@@ -165,7 +165,7 @@ private:
         for (std::size_t i = 0; i < sizeof...(Params); ++i) {
             const EvaluationResult evaluatedArg = args.at(i)->evaluate(evaluationParameters);
             if (!evaluatedArg) return evaluatedArg.error();
-            evaluated[i] = std::move(*evaluatedArg);
+            evaluated[i] = *evaluatedArg;
         }
         const R value = evaluate(evaluationParameters, *fromExpressionValue<std::decay_t<Params>>(evaluated[I])...);
         if (!value) return value.error();

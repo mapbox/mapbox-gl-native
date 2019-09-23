@@ -34,7 +34,7 @@ std::unique_ptr<Layout> LineLayerFactory::createLayout(const LayoutParameters& p
 
 std::unique_ptr<RenderLayer> LineLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderLineLayer>(staticImmutableCast<style::LineLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderLineLayer>(staticImmutableCast<style::LineLayer::Impl>(impl));
 }
 
 } // namespace mbgl

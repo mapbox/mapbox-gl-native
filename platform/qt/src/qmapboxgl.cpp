@@ -439,8 +439,7 @@ void QMapboxGLSettings::setLocalFontFamily(const QString &family)
 /*!
     Returns resource transformation callback used to transform requested URLs.
 */
-std::function<std::string(const std::string &&)> QMapboxGLSettings::resourceTransform() const
-{
+std::function<std::string(const std::string &)> QMapboxGLSettings::resourceTransform() const {
     return m_resourceTransform;
 }
 
@@ -452,8 +451,7 @@ std::function<std::string(const std::string &&)> QMapboxGLSettings::resourceTran
     used add or remove custom parameters, or reroute certain requests to other
     servers or endpoints.
 */
-void QMapboxGLSettings::setResourceTransform(const std::function<std::string(const std::string &&)> &transform)
-{
+void QMapboxGLSettings::setResourceTransform(const std::function<std::string(const std::string &)> &transform) {
     m_resourceTransform = transform;
 }
 
@@ -1744,8 +1742,9 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
                                          resourceOptions);
 
      if (settings.resourceTransform()) {
-         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
-             [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
+         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(
+             *mbgl::Scheduler::GetCurrent(),
+             [callback = settings.resourceTransform()](mbgl::Resource::Kind, const std::string &url_) -> std::string {
                  return callback(std::move(url_));
              });
          auto fs = mbgl::FileSource::getSharedFileSource(resourceOptions);

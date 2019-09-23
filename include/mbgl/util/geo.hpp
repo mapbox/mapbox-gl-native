@@ -170,8 +170,7 @@ private:
     LatLng ne;
     bool bounded = true;
 
-    LatLngBounds(LatLng sw_, LatLng ne_)
-        : sw(std::move(sw_)), ne(std::move(ne_)) {}
+    LatLngBounds(LatLng sw_, LatLng ne_) : sw(sw_), ne(ne_) {}
 
     LatLngBounds()
         : sw({-90, -180}), ne({90, 180}), bounded(false) {}
