@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Responsible for managing attribution interactions on the map.
@@ -36,9 +38,10 @@ import java.util.Set;
  * </p>
  */
 public class AttributionDialogManager implements View.OnClickListener, DialogInterface.OnClickListener {
-
   private static final String MAP_FEEDBACK_URL = "https://apps.mapbox.com/feedback";
-  private static final String MAP_FEEDBACK_LOCATION_FORMAT = MAP_FEEDBACK_URL + "/#/%f/%f/%d";
+  private static final String MAP_FEEDBACK_URL_OLD = "https://www.mapbox.com/map-feedback";
+  private static final String MAP_FEEDBACK_URL_LOCATION_FRAGMENT_FORMAT = "/%f/%f/%f/%f/%d";
+  private static final String MAP_FEEDBACK_STYLE_URI_REGEX = "^(.*://[^:^/]*)/(.*)/(.*)";
 
   @NonNull
   private final Context context;
@@ -90,7 +93,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     if (isLatestEntry(which)) {
       showTelemetryDialog();
     } else {
-      showMapFeedbackWebPage(which);
+      showMapAttributionWebPage(which);
     }
   }
 
@@ -138,21 +141,54 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     builder.show();
   }
 
-  private void showMapFeedbackWebPage(int which) {
+  private void showMapAttributionWebPage(int which) {
     Attribution[] attributions = attributionSet.toArray(new Attribution[attributionSet.size()]);
     String url = attributions[which].getUrl();
-    if (url.contains(MAP_FEEDBACK_URL)) {
-      url = buildMapFeedbackMapUrl(mapboxMap.getCameraPosition());
+    if (url.contains(MAP_FEEDBACK_URL_OLD) || url.contains(MAP_FEEDBACK_URL)) {
+      url = buildMapFeedbackMapUrl(Mapbox.getAccessToken());
     }
     showWebPage(url);
   }
 
   @NonNull
-  private String buildMapFeedbackMapUrl(@Nullable CameraPosition cameraPosition) {
-    // appends current location to the map feedback url if available
-    return cameraPosition != null ? String.format(Locale.getDefault(),
-      MAP_FEEDBACK_LOCATION_FORMAT, cameraPosition.target.getLongitude(), cameraPosition.target.getLatitude(),
-      (int) cameraPosition.zoom) : MAP_FEEDBACK_URL;
+  String buildMapFeedbackMapUrl(@Nullable String accessToken) {
+    // TODO Add Android Maps SDK version to the query parameter, currently the version API is not available.
+    // TODO Keep track of this issue at [#15632](https://github.com/mapbox/mapbox-gl-native/issues/15632)
+
+    Uri.Builder builder = Uri.parse(MAP_FEEDBACK_URL).buildUpon();
+
+    CameraPosition cameraPosition = mapboxMap.getCameraPosition();
+    if (cameraPosition != null) {
+      builder.encodedFragment(String.format(Locale.getDefault(), MAP_FEEDBACK_URL_LOCATION_FRAGMENT_FORMAT,
+              cameraPosition.target.getLongitude(), cameraPosition.target.getLatitude(),
+              cameraPosition.zoom, cameraPosition.bearing, (int) cameraPosition.tilt));
+    }
+
+    String packageName = context.getApplicationContext().getPackageName();
+    if (packageName != null) {
+      builder.appendQueryParameter("referrer", packageName);
+    }
+
+    if (accessToken != null) {
+      builder.appendQueryParameter("access_token", accessToken);
+    }
+
+    Style style = mapboxMap.getStyle();
+    if (style != null) {
+      String styleUri = style.getUri();
+      Pattern pattern = Pattern.compile(MAP_FEEDBACK_STYLE_URI_REGEX);
+      Matcher matcher = pattern.matcher(styleUri);
+
+      if (matcher.find()) {
+        String styleOwner = matcher.group(2);
+        String styleId = matcher.group(3);
+
+        builder.appendQueryParameter("owner", styleOwner)
+                .appendQueryParameter("id", styleId);
+      }
+    }
+
+    return builder.build().toString();
   }
 
   private void showWebPage(@NonNull String url) {
@@ -189,10 +225,10 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
       Style style = mapboxMap.getStyle();
       if (style != null) {
-        for (Source source : mapboxMap.getStyle().getSources()) {
+        for (Source source : style.getSources()) {
           attribution = source.getAttribution();
           if (!attribution.isEmpty()) {
-            attributions.add(source.getAttribution());
+            attributions.add(attribution);
           }
         }
       }
