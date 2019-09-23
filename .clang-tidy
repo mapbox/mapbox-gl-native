@@ -1,4 +1,3 @@
-Checks: 'bugprone-*,clang-analyzer-*,cppcoreguidelines-*,google-*,misc-*,modernize-*,performance-*,readability-*,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-special-member-functions,-google-readability-todo,-google-runtime-int,-misc-non-private-member-variables-in-classes,-readability-magic-numbers,-readability-named-parameter'
-WarningsAsErrors: '*'
+Checks: '-*,bugprone-*,clang-analyzer-*,google-*,modernize-*,performance-*,-clang-analyzer-osx.*,-google-readability-braces-around-statements,-google-readability-todo,-google-runtime-int,-google-runtime-references'
 HeaderFilterRegex: '.*'
 FormatStyle: file
