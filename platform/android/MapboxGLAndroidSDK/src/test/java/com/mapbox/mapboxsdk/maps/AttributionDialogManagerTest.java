@@ -61,6 +61,7 @@ public class AttributionDialogManagerTest {
 
   @Test
   public void testBuildMapFeedbackMapUrl() {
+    when(context.getApplicationContext()).thenReturn(context);
     when(context.getPackageName()).thenReturn(ASSERT_MAPBOX_PACKAGE_NAME);
     when(style.getUri()).thenReturn(ASSERT_MAPBOX_STYLE_URI);
     when(mapboxMap.getCameraPosition()).thenReturn(cameraPosition);
@@ -72,6 +73,7 @@ public class AttributionDialogManagerTest {
 
   @Test
   public void testBuildMapFeedbackMapUrlWithLocalStyleJson() {
+    when(context.getApplicationContext()).thenReturn(context);
     when(context.getPackageName()).thenReturn(ASSERT_MAPBOX_PACKAGE_NAME);
     when(style.getUri()).thenReturn(ASSERT_MAPBOX_LOCAL_STYLE_URI);
     when(mapboxMap.getCameraPosition()).thenReturn(cameraPosition);
@@ -83,6 +85,7 @@ public class AttributionDialogManagerTest {
 
   @Test
   public void testBuildMapFeedbackMapUrlWithNullCameraPosition() {
+    when(context.getApplicationContext()).thenReturn(context);
     when(context.getPackageName()).thenReturn(ASSERT_MAPBOX_PACKAGE_NAME);
     when(style.getUri()).thenReturn(ASSERT_MAPBOX_LOCAL_STYLE_URI);
     when(mapboxMap.getCameraPosition()).thenReturn(null);

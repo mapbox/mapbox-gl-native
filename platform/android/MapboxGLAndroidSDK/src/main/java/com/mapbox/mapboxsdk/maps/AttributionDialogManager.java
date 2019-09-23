@@ -164,7 +164,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
               cameraPosition.zoom, cameraPosition.bearing, (int) cameraPosition.tilt));
     }
 
-    String packageName = context.getPackageName();
+    String packageName = context.getApplicationContext().getPackageName();
     if (packageName != null) {
       builder.appendQueryParameter("referrer", packageName);
     }
