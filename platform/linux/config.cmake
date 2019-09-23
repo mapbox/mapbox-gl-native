@@ -54,8 +54,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
         PRIVATE platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
         PRIVATE platform/default/src/mbgl/util/thread_local.cpp
-        PRIVATE platform/default/src/mbgl/text/unaccent.cpp
-        PRIVATE platform/default/include/mbgl/text/unaccent.hpp
         PRIVATE platform/default/src/mbgl/util/utf.cpp
         PRIVATE platform/default/src/mbgl/util/format_number.cpp
 
