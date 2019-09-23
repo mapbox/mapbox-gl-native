@@ -2,7 +2,7 @@
 
 #include <jni/jni.hpp>
 
-#include "collator_jni.hpp"
+#include "../i18n/collator_jni.hpp"
 
 /*
     android::NumberFormat is the JNI wrapper

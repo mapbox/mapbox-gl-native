@@ -1,6 +1,5 @@
-#include <mbgl/style/expression/collator.hpp>
+#include <mbgl/i18n/collator.hpp>
 #include <mbgl/text/language_tag.hpp>
-#include <mbgl/util/platform.hpp>
 
 #include <jni/jni.hpp>
 
@@ -94,8 +93,7 @@ jni::Local<jni::Object<Locale>> Locale::New(jni::JNIEnv& env, const jni::String&
 
 } // namespace android
 
-namespace style {
-namespace expression {
+namespace platform {
 
 class Collator::Impl {
 public:
@@ -142,10 +140,12 @@ public:
         // Because of the difference in locale-awareness, this means turning on case-sensitivity
         // can _potentially_ change compare results for strings that don't actually have any case
         // differences.
-        jni::Local<jni::String> jlhs = useUnaccent ? android::StringUtils::unaccent(*env, jni::Make<jni::String>(*env, lhs))
-                                                     : jni::Make<jni::String>(*env, lhs);
-        jni::Local<jni::String> jrhs = useUnaccent ? android::StringUtils::unaccent(*env, jni::Make<jni::String>(*env, rhs))
-                                                     : jni::Make<jni::String>(*env, rhs);
+        jni::Local<jni::String> jlhs = useUnaccent
+                                           ? android::StringUtils::unaccent(*env, jni::Make<jni::String>(*env, lhs))
+                                           : jni::Make<jni::String>(*env, lhs);
+        jni::Local<jni::String> jrhs = useUnaccent
+                                           ? android::StringUtils::unaccent(*env, jni::Make<jni::String>(*env, rhs))
+                                           : jni::Make<jni::String>(*env, rhs);
 
         jni::jint result = android::Collator::compare(*env, collator, jlhs, jrhs);
 
@@ -190,6 +190,5 @@ std::string Collator::resolvedLocale() const {
     return impl->resolvedLocale();
 }
 
-} // namespace expression
-} // namespace style
+} // namespace platform
 } // namespace mbgl

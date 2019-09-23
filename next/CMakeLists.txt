@@ -596,6 +596,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/style/expression/check_subtype.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/coalesce.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/coercion.cpp
+    ${MBGL_ROOT}/src/mbgl/style/expression/collator.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/collator_expression.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/comparison.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/compound_expression.cpp

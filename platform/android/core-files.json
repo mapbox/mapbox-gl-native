@@ -80,7 +80,7 @@
         "platform/android/src/style/sources/vector_source.cpp",
         "platform/android/src/style/transition_options.cpp",
         "platform/android/src/style/value.cpp",
-        "platform/android/src/text/collator.cpp",
+        "platform/android/src/i18n/collator.cpp",
         "platform/android/src/text/local_glyph_rasterizer.cpp",
         "platform/android/src/text/format_number.cpp",
         "platform/android/src/gl_functions.cpp",
@@ -185,7 +185,7 @@
         "style/sources/vector_source.hpp": "platform/android/src/style/sources/vector_source.hpp",
         "style/transition_options.hpp": "platform/android/src/style/transition_options.hpp",
         "style/value.hpp": "platform/android/src/style/value.hpp",
-        "text/collator_jni.hpp": "platform/android/src/text/collator_jni.hpp",
+        "text/collator_jni.hpp": "platform/android/src/i18n/collator_jni.hpp",
         "text/local_glyph_rasterizer_jni.hpp": "platform/android/src/text/local_glyph_rasterizer_jni.hpp"
     }
 }

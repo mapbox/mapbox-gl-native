@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mbgl/util/image.hpp>
-
 #include <jni/jni.hpp>
 
 /*
