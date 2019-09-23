@@ -240,6 +240,10 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
 #pragma mark - Convenience methods
 
 - (BOOL)usesRightToLeftLayout {
+    if (self.testingRightToLeftOverride) {
+        return [self.testingRightToLeftOverride boolValue];
+    }
+
     return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
 }
 

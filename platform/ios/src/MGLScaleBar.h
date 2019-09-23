@@ -11,4 +11,5 @@
 @property (nonatomic, readonly) NSArray<UIView *> *bars;
 @property (nonatomic, readonly) UIView *containerView;
 @property (nonatomic, readonly) CGSize size;
+@property (nonatomic) NSNumber *testingRightToLeftOverride;
 @end

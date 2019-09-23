@@ -201,8 +201,8 @@
     
     MGLScaleBar *scaleBar = (MGLScaleBar*)self.mapView.scaleBar;
     
-//    for (NSInteger rtl = 0; rtl <= 1; rtl++) {
-//        scaleBar.rightToLeftOverrideForTesting = @((BOOL)rtl);
+    for (NSInteger rtl = 0; rtl <= 1; rtl++) {
+        scaleBar.testingRightToLeftOverride = @((BOOL)rtl);
         
         NSString *positions[] = {
             @"MGLOrnamentPositionTopLeft",
@@ -236,9 +236,8 @@
                 XCTAssert(CGSizeEqualToSize(initialSize, scaleBar.bounds.size));
                 
                 NSString *activityName = [NSString stringWithFormat:
-                                          @"Scalebar subview tests: Zoom=%ld, POS=%@, Visible=%@",
-//                                          @"Scalebar subview tests: RTL=%@, Zoom=%ld, POS=%@, Visible=%@",
-//                                          (rtl == 0 ? @"NO" : @"YES"),
+                                          @"Scalebar subview tests: RTL=%@, Zoom=%ld, POS=%@, Visible=%@",
+                                          (rtl == 0 ? @"NO" : @"YES"),
                                           (long)zoomLevel,
                                           positions[testData.position],
                                           scaleBar.alpha > 0.0 ? @"YES" : @"NO"];
@@ -262,7 +261,7 @@
                 }];
             }
         }
-//    }
+    }
 }
 
 - (void)testAttributionButtonPlacement {
