@@ -4,13 +4,10 @@ workflows:
   version: 2
   mbgl-next:
     jobs:
-      - next-sanity-checks
       - next-build-template:
           name: next-android-armeabi-v7a-release
           executor_name: ubuntu-disco
           target_is_android: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
       - next-build-template:
           name: next-android-arm64-v8a-release
@@ -37,8 +34,6 @@ workflows:
           name: next-linux-gcc8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
       - next-build-template:
           name: next-linux-gcc4.9-release
@@ -60,8 +55,6 @@ workflows:
           name: next-linux-clang8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
       - next-build-template:
           name: next-FIXME-linux-asan
@@ -98,8 +91,6 @@ workflows:
           name: next-qt5-linux-gcc5-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
       - next-build-template:
           name: next-qt5-macos-gcc5-release
@@ -113,8 +104,6 @@ workflows:
           name: next-macos-xcode11-release
           executor_name: macos-11_0_0
           target_is_macos: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
       - next-build-template:
           name: next-macos-xcode11-debug
@@ -127,10 +116,11 @@ workflows:
           name: next-ios-xcode11-release
           executor_name: macos-11_0_0
           target_is_macos: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator'
           test_params: '-Q -N'
+      - next-sanity-checks:
+          requires:
+            - next-linux-gcc8-debug-coverage
   mbgl-legacy:
     jobs:
       #
@@ -727,6 +717,13 @@ jobs:
           command: |
             git diff -U0 --ignore-submodules=all --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
             git diff --exit-code
+      - run:
+          name: Clang Tidy
+          command: |
+            run-clang-tidy-8 -quiet -j8 -p build $PWD/src/.*cpp $PWD/platform/.*cpp -header-filter $PWD/.*hpp |tee clang-tidy.log
+            grep -o \\[[a-z].*-.*\] clang-tidy.log  |sort  |uniq -c |sort -n
+            mkdir -p /tmp/tests/clang-tidy
+            cp clang-tidy.log /tmp/tests/clang-tidy
       - run:
           name: Code Generators
           command: |
