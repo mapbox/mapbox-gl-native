@@ -256,43 +256,46 @@ TransitionOptions FillLayer::getFillTranslateAnchorTransition() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property {
+    FillAntialias,
+    FillColor,
+    FillOpacity,
+    FillOutlineColor,
+    FillPattern,
+    FillTranslate,
+    FillTranslateAnchor,
+    FillAntialiasTransition,
+    FillColorTransition,
+    FillOpacityTransition,
+    FillOutlineColorTransition,
+    FillPatternTransition,
+    FillTranslateTransition,
+    FillTranslateAnchorTransition,
+};
+
+MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"fill-antialias", mbgl::underlying_type(Property::FillAntialias)},
+     {"fill-color", mbgl::underlying_type(Property::FillColor)},
+     {"fill-opacity", mbgl::underlying_type(Property::FillOpacity)},
+     {"fill-outline-color", mbgl::underlying_type(Property::FillOutlineColor)},
+     {"fill-pattern", mbgl::underlying_type(Property::FillPattern)},
+     {"fill-translate", mbgl::underlying_type(Property::FillTranslate)},
+     {"fill-translate-anchor", mbgl::underlying_type(Property::FillTranslateAnchor)},
+     {"fill-antialias-transition", mbgl::underlying_type(Property::FillAntialiasTransition)},
+     {"fill-color-transition", mbgl::underlying_type(Property::FillColorTransition)},
+     {"fill-opacity-transition", mbgl::underlying_type(Property::FillOpacityTransition)},
+     {"fill-outline-color-transition", mbgl::underlying_type(Property::FillOutlineColorTransition)},
+     {"fill-pattern-transition", mbgl::underlying_type(Property::FillPatternTransition)},
+     {"fill-translate-transition", mbgl::underlying_type(Property::FillTranslateTransition)},
+     {"fill-translate-anchor-transition", mbgl::underlying_type(Property::FillTranslateAnchorTransition)}});
+
+} // namespace
+
 optional<Error> FillLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        FillAntialias,
-        FillColor,
-        FillOpacity,
-        FillOutlineColor,
-        FillPattern,
-        FillTranslate,
-        FillTranslateAnchor,
-        FillAntialiasTransition,
-        FillColorTransition,
-        FillOpacityTransition,
-        FillOutlineColorTransition,
-        FillPatternTransition,
-        FillTranslateTransition,
-        FillTranslateAnchorTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "fill-antialias", mbgl::underlying_type(Property::FillAntialias) },
-        { "fill-color", mbgl::underlying_type(Property::FillColor) },
-        { "fill-opacity", mbgl::underlying_type(Property::FillOpacity) },
-        { "fill-outline-color", mbgl::underlying_type(Property::FillOutlineColor) },
-        { "fill-pattern", mbgl::underlying_type(Property::FillPattern) },
-        { "fill-translate", mbgl::underlying_type(Property::FillTranslate) },
-        { "fill-translate-anchor", mbgl::underlying_type(Property::FillTranslateAnchor) },
-        { "fill-antialias-transition", mbgl::underlying_type(Property::FillAntialiasTransition) },
-        { "fill-color-transition", mbgl::underlying_type(Property::FillColorTransition) },
-        { "fill-opacity-transition", mbgl::underlying_type(Property::FillOpacityTransition) },
-        { "fill-outline-color-transition", mbgl::underlying_type(Property::FillOutlineColorTransition) },
-        { "fill-pattern-transition", mbgl::underlying_type(Property::FillPatternTransition) },
-        { "fill-translate-transition", mbgl::underlying_type(Property::FillTranslateTransition) },
-        { "fill-translate-anchor-transition", mbgl::underlying_type(Property::FillTranslateAnchorTransition) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -422,6 +425,45 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
     
 
     return Error { "layer doesn't support this property" };
+}
+
+LayerProperty FillLayer::getPaintProperty(const std::string& name) const {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::FillAntialias:
+            return conversion::makeLayerProperty(getFillAntialias());
+        case Property::FillColor:
+            return conversion::makeLayerProperty(getFillColor());
+        case Property::FillOpacity:
+            return conversion::makeLayerProperty(getFillOpacity());
+        case Property::FillOutlineColor:
+            return conversion::makeLayerProperty(getFillOutlineColor());
+        case Property::FillPattern:
+            return conversion::makeLayerProperty(getFillPattern());
+        case Property::FillTranslate:
+            return conversion::makeLayerProperty(getFillTranslate());
+        case Property::FillTranslateAnchor:
+            return conversion::makeLayerProperty(getFillTranslateAnchor());
+        case Property::FillAntialiasTransition:
+            return conversion::makeLayerProperty(getFillAntialiasTransition());
+        case Property::FillColorTransition:
+            return conversion::makeLayerProperty(getFillColorTransition());
+        case Property::FillOpacityTransition:
+            return conversion::makeLayerProperty(getFillOpacityTransition());
+        case Property::FillOutlineColorTransition:
+            return conversion::makeLayerProperty(getFillOutlineColorTransition());
+        case Property::FillPatternTransition:
+            return conversion::makeLayerProperty(getFillPatternTransition());
+        case Property::FillTranslateTransition:
+            return conversion::makeLayerProperty(getFillTranslateTransition());
+        case Property::FillTranslateAnchorTransition:
+            return conversion::makeLayerProperty(getFillTranslateAnchorTransition());
+    }
+    return {};
 }
 
 optional<Error> FillLayer::setLayoutProperty(const std::string& name, const Convertible& value) {

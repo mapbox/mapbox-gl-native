@@ -47,6 +47,10 @@ optional<Error> CustomLayer::setLayoutProperty(const std::string&, const Convert
     return Error { "layer doesn't support this property" };
 }
 
+LayerProperty CustomLayer::getPaintProperty(const std::string&) const {
+    return {};
+}
+
 Mutable<Layer::Impl> CustomLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }

@@ -45,10 +45,7 @@ std::array<double, 4> Color::toArray() const {
 }
 
 mbgl::Value Color::toObject() const {
-    return mapbox::base::ValueObject{{"r", double(r)},
-                                     {"g", double(g)},
-                                     {"b", double(b)},
-                                     {"a", double(a)}};
+    return mapbox::base::ValueObject{{"r", double(r)}, {"g", double(g)}, {"b", double(b)}, {"a", double(a)}};
 }
 
 } // namespace mbgl

@@ -148,27 +148,30 @@ TransitionOptions BackgroundLayer::getBackgroundPatternTransition() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property {
+    BackgroundColor,
+    BackgroundOpacity,
+    BackgroundPattern,
+    BackgroundColorTransition,
+    BackgroundOpacityTransition,
+    BackgroundPatternTransition,
+};
+
+MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"background-color", mbgl::underlying_type(Property::BackgroundColor)},
+     {"background-opacity", mbgl::underlying_type(Property::BackgroundOpacity)},
+     {"background-pattern", mbgl::underlying_type(Property::BackgroundPattern)},
+     {"background-color-transition", mbgl::underlying_type(Property::BackgroundColorTransition)},
+     {"background-opacity-transition", mbgl::underlying_type(Property::BackgroundOpacityTransition)},
+     {"background-pattern-transition", mbgl::underlying_type(Property::BackgroundPatternTransition)}});
+
+} // namespace
+
 optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        BackgroundColor,
-        BackgroundOpacity,
-        BackgroundPattern,
-        BackgroundColorTransition,
-        BackgroundOpacityTransition,
-        BackgroundPatternTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "background-color", mbgl::underlying_type(Property::BackgroundColor) },
-        { "background-opacity", mbgl::underlying_type(Property::BackgroundOpacity) },
-        { "background-pattern", mbgl::underlying_type(Property::BackgroundPattern) },
-        { "background-color-transition", mbgl::underlying_type(Property::BackgroundColorTransition) },
-        { "background-opacity-transition", mbgl::underlying_type(Property::BackgroundOpacityTransition) },
-        { "background-pattern-transition", mbgl::underlying_type(Property::BackgroundPatternTransition) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -235,6 +238,29 @@ optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const
     
 
     return Error { "layer doesn't support this property" };
+}
+
+LayerProperty BackgroundLayer::getPaintProperty(const std::string& name) const {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::BackgroundColor:
+            return conversion::makeLayerProperty(getBackgroundColor());
+        case Property::BackgroundOpacity:
+            return conversion::makeLayerProperty(getBackgroundOpacity());
+        case Property::BackgroundPattern:
+            return conversion::makeLayerProperty(getBackgroundPattern());
+        case Property::BackgroundColorTransition:
+            return conversion::makeLayerProperty(getBackgroundColorTransition());
+        case Property::BackgroundOpacityTransition:
+            return conversion::makeLayerProperty(getBackgroundOpacityTransition());
+        case Property::BackgroundPatternTransition:
+            return conversion::makeLayerProperty(getBackgroundPatternTransition());
+    }
+    return {};
 }
 
 optional<Error> BackgroundLayer::setLayoutProperty(const std::string& name, const Convertible& value) {

@@ -204,35 +204,38 @@ TransitionOptions HeatmapLayer::getHeatmapWeightTransition() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property {
+    HeatmapColor,
+    HeatmapIntensity,
+    HeatmapOpacity,
+    HeatmapRadius,
+    HeatmapWeight,
+    HeatmapColorTransition,
+    HeatmapIntensityTransition,
+    HeatmapOpacityTransition,
+    HeatmapRadiusTransition,
+    HeatmapWeightTransition,
+};
+
+MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"heatmap-color", mbgl::underlying_type(Property::HeatmapColor)},
+     {"heatmap-intensity", mbgl::underlying_type(Property::HeatmapIntensity)},
+     {"heatmap-opacity", mbgl::underlying_type(Property::HeatmapOpacity)},
+     {"heatmap-radius", mbgl::underlying_type(Property::HeatmapRadius)},
+     {"heatmap-weight", mbgl::underlying_type(Property::HeatmapWeight)},
+     {"heatmap-color-transition", mbgl::underlying_type(Property::HeatmapColorTransition)},
+     {"heatmap-intensity-transition", mbgl::underlying_type(Property::HeatmapIntensityTransition)},
+     {"heatmap-opacity-transition", mbgl::underlying_type(Property::HeatmapOpacityTransition)},
+     {"heatmap-radius-transition", mbgl::underlying_type(Property::HeatmapRadiusTransition)},
+     {"heatmap-weight-transition", mbgl::underlying_type(Property::HeatmapWeightTransition)}});
+
+} // namespace
+
 optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        HeatmapColor,
-        HeatmapIntensity,
-        HeatmapOpacity,
-        HeatmapRadius,
-        HeatmapWeight,
-        HeatmapColorTransition,
-        HeatmapIntensityTransition,
-        HeatmapOpacityTransition,
-        HeatmapRadiusTransition,
-        HeatmapWeightTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "heatmap-color", mbgl::underlying_type(Property::HeatmapColor) },
-        { "heatmap-intensity", mbgl::underlying_type(Property::HeatmapIntensity) },
-        { "heatmap-opacity", mbgl::underlying_type(Property::HeatmapOpacity) },
-        { "heatmap-radius", mbgl::underlying_type(Property::HeatmapRadius) },
-        { "heatmap-weight", mbgl::underlying_type(Property::HeatmapWeight) },
-        { "heatmap-color-transition", mbgl::underlying_type(Property::HeatmapColorTransition) },
-        { "heatmap-intensity-transition", mbgl::underlying_type(Property::HeatmapIntensityTransition) },
-        { "heatmap-opacity-transition", mbgl::underlying_type(Property::HeatmapOpacityTransition) },
-        { "heatmap-radius-transition", mbgl::underlying_type(Property::HeatmapRadiusTransition) },
-        { "heatmap-weight-transition", mbgl::underlying_type(Property::HeatmapWeightTransition) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -323,6 +326,37 @@ optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Co
     
 
     return Error { "layer doesn't support this property" };
+}
+
+LayerProperty HeatmapLayer::getPaintProperty(const std::string& name) const {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::HeatmapColor:
+            return conversion::makeLayerProperty(getHeatmapColor());
+        case Property::HeatmapIntensity:
+            return conversion::makeLayerProperty(getHeatmapIntensity());
+        case Property::HeatmapOpacity:
+            return conversion::makeLayerProperty(getHeatmapOpacity());
+        case Property::HeatmapRadius:
+            return conversion::makeLayerProperty(getHeatmapRadius());
+        case Property::HeatmapWeight:
+            return conversion::makeLayerProperty(getHeatmapWeight());
+        case Property::HeatmapColorTransition:
+            return conversion::makeLayerProperty(getHeatmapColorTransition());
+        case Property::HeatmapIntensityTransition:
+            return conversion::makeLayerProperty(getHeatmapIntensityTransition());
+        case Property::HeatmapOpacityTransition:
+            return conversion::makeLayerProperty(getHeatmapOpacityTransition());
+        case Property::HeatmapRadiusTransition:
+            return conversion::makeLayerProperty(getHeatmapRadiusTransition());
+        case Property::HeatmapWeightTransition:
+            return conversion::makeLayerProperty(getHeatmapWeightTransition());
+    }
+    return {};
 }
 
 optional<Error> HeatmapLayer::setLayoutProperty(const std::string& name, const Convertible& value) {

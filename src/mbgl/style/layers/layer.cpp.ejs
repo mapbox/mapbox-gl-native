@@ -190,23 +190,26 @@ TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>T
 
 using namespace conversion;
 
+namespace {
+
+enum class Property {
+<% for (const property of paintProperties) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
+<% for (const property of paintProperties) { -%>
+    <%- camelize(property.name) %>Transition,
+<% } -%>
+};
+
+MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {<%- paintProperties.map(p => `{"${p.name}", mbgl::underlying_type(Property::${camelize(p.name)})}`).join(',\n     ') %>,
+     <%- paintProperties.map(p => `{"${p.name}-transition", mbgl::underlying_type(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>});
+
+} // namespace
+
 optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-<% for (const property of paintProperties) { -%>
-        <%- camelize(property.name) %>,
-<% } -%>
-<% for (const property of paintProperties) { -%>
-        <%- camelize(property.name) %>Transition,
-<% } -%>
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        <%- paintProperties.map(p => `{ "${p.name}", mbgl::underlying_type(Property::${camelize(p.name)}) }`).join(',\n        ') %>,
-        <%- paintProperties.map(p => `{ "${p.name}-transition", mbgl::underlying_type(Property::${camelize(p.name)}Transition) }`).join(',\n        ') %>
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -256,6 +259,25 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
     <% } %>
 
     return Error { "layer doesn't support this property" };
+}
+
+LayerProperty <%- camelize(type) %>Layer::getPaintProperty(const std::string& name) const {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+<% for (const property of paintProperties) { -%>
+        case Property::<%- camelize(property.name) %>:
+            return conversion::makeLayerProperty(get<%- camelize(property.name) %>());
+<% } -%>
+<% for (const property of paintProperties) { -%>
+        case Property::<%- camelize(property.name) %>Transition:
+            return conversion::makeLayerProperty(get<%- camelize(property.name) %>Transition());
+<% } -%>
+    }
+    return {};
 }
 
 optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string& name, const Convertible& value) {

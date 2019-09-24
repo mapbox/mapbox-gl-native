@@ -1102,71 +1102,74 @@ TransitionOptions SymbolLayer::getTextTranslateAnchorTransition() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property {
+    IconColor,
+    IconHaloBlur,
+    IconHaloColor,
+    IconHaloWidth,
+    IconOpacity,
+    IconTranslate,
+    IconTranslateAnchor,
+    TextColor,
+    TextHaloBlur,
+    TextHaloColor,
+    TextHaloWidth,
+    TextOpacity,
+    TextTranslate,
+    TextTranslateAnchor,
+    IconColorTransition,
+    IconHaloBlurTransition,
+    IconHaloColorTransition,
+    IconHaloWidthTransition,
+    IconOpacityTransition,
+    IconTranslateTransition,
+    IconTranslateAnchorTransition,
+    TextColorTransition,
+    TextHaloBlurTransition,
+    TextHaloColorTransition,
+    TextHaloWidthTransition,
+    TextOpacityTransition,
+    TextTranslateTransition,
+    TextTranslateAnchorTransition,
+};
+
+MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"icon-color", mbgl::underlying_type(Property::IconColor)},
+     {"icon-halo-blur", mbgl::underlying_type(Property::IconHaloBlur)},
+     {"icon-halo-color", mbgl::underlying_type(Property::IconHaloColor)},
+     {"icon-halo-width", mbgl::underlying_type(Property::IconHaloWidth)},
+     {"icon-opacity", mbgl::underlying_type(Property::IconOpacity)},
+     {"icon-translate", mbgl::underlying_type(Property::IconTranslate)},
+     {"icon-translate-anchor", mbgl::underlying_type(Property::IconTranslateAnchor)},
+     {"text-color", mbgl::underlying_type(Property::TextColor)},
+     {"text-halo-blur", mbgl::underlying_type(Property::TextHaloBlur)},
+     {"text-halo-color", mbgl::underlying_type(Property::TextHaloColor)},
+     {"text-halo-width", mbgl::underlying_type(Property::TextHaloWidth)},
+     {"text-opacity", mbgl::underlying_type(Property::TextOpacity)},
+     {"text-translate", mbgl::underlying_type(Property::TextTranslate)},
+     {"text-translate-anchor", mbgl::underlying_type(Property::TextTranslateAnchor)},
+     {"icon-color-transition", mbgl::underlying_type(Property::IconColorTransition)},
+     {"icon-halo-blur-transition", mbgl::underlying_type(Property::IconHaloBlurTransition)},
+     {"icon-halo-color-transition", mbgl::underlying_type(Property::IconHaloColorTransition)},
+     {"icon-halo-width-transition", mbgl::underlying_type(Property::IconHaloWidthTransition)},
+     {"icon-opacity-transition", mbgl::underlying_type(Property::IconOpacityTransition)},
+     {"icon-translate-transition", mbgl::underlying_type(Property::IconTranslateTransition)},
+     {"icon-translate-anchor-transition", mbgl::underlying_type(Property::IconTranslateAnchorTransition)},
+     {"text-color-transition", mbgl::underlying_type(Property::TextColorTransition)},
+     {"text-halo-blur-transition", mbgl::underlying_type(Property::TextHaloBlurTransition)},
+     {"text-halo-color-transition", mbgl::underlying_type(Property::TextHaloColorTransition)},
+     {"text-halo-width-transition", mbgl::underlying_type(Property::TextHaloWidthTransition)},
+     {"text-opacity-transition", mbgl::underlying_type(Property::TextOpacityTransition)},
+     {"text-translate-transition", mbgl::underlying_type(Property::TextTranslateTransition)},
+     {"text-translate-anchor-transition", mbgl::underlying_type(Property::TextTranslateAnchorTransition)}});
+
+} // namespace
+
 optional<Error> SymbolLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        IconColor,
-        IconHaloBlur,
-        IconHaloColor,
-        IconHaloWidth,
-        IconOpacity,
-        IconTranslate,
-        IconTranslateAnchor,
-        TextColor,
-        TextHaloBlur,
-        TextHaloColor,
-        TextHaloWidth,
-        TextOpacity,
-        TextTranslate,
-        TextTranslateAnchor,
-        IconColorTransition,
-        IconHaloBlurTransition,
-        IconHaloColorTransition,
-        IconHaloWidthTransition,
-        IconOpacityTransition,
-        IconTranslateTransition,
-        IconTranslateAnchorTransition,
-        TextColorTransition,
-        TextHaloBlurTransition,
-        TextHaloColorTransition,
-        TextHaloWidthTransition,
-        TextOpacityTransition,
-        TextTranslateTransition,
-        TextTranslateAnchorTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "icon-color", mbgl::underlying_type(Property::IconColor) },
-        { "icon-halo-blur", mbgl::underlying_type(Property::IconHaloBlur) },
-        { "icon-halo-color", mbgl::underlying_type(Property::IconHaloColor) },
-        { "icon-halo-width", mbgl::underlying_type(Property::IconHaloWidth) },
-        { "icon-opacity", mbgl::underlying_type(Property::IconOpacity) },
-        { "icon-translate", mbgl::underlying_type(Property::IconTranslate) },
-        { "icon-translate-anchor", mbgl::underlying_type(Property::IconTranslateAnchor) },
-        { "text-color", mbgl::underlying_type(Property::TextColor) },
-        { "text-halo-blur", mbgl::underlying_type(Property::TextHaloBlur) },
-        { "text-halo-color", mbgl::underlying_type(Property::TextHaloColor) },
-        { "text-halo-width", mbgl::underlying_type(Property::TextHaloWidth) },
-        { "text-opacity", mbgl::underlying_type(Property::TextOpacity) },
-        { "text-translate", mbgl::underlying_type(Property::TextTranslate) },
-        { "text-translate-anchor", mbgl::underlying_type(Property::TextTranslateAnchor) },
-        { "icon-color-transition", mbgl::underlying_type(Property::IconColorTransition) },
-        { "icon-halo-blur-transition", mbgl::underlying_type(Property::IconHaloBlurTransition) },
-        { "icon-halo-color-transition", mbgl::underlying_type(Property::IconHaloColorTransition) },
-        { "icon-halo-width-transition", mbgl::underlying_type(Property::IconHaloWidthTransition) },
-        { "icon-opacity-transition", mbgl::underlying_type(Property::IconOpacityTransition) },
-        { "icon-translate-transition", mbgl::underlying_type(Property::IconTranslateTransition) },
-        { "icon-translate-anchor-transition", mbgl::underlying_type(Property::IconTranslateAnchorTransition) },
-        { "text-color-transition", mbgl::underlying_type(Property::TextColorTransition) },
-        { "text-halo-blur-transition", mbgl::underlying_type(Property::TextHaloBlurTransition) },
-        { "text-halo-color-transition", mbgl::underlying_type(Property::TextHaloColorTransition) },
-        { "text-halo-width-transition", mbgl::underlying_type(Property::TextHaloWidthTransition) },
-        { "text-opacity-transition", mbgl::underlying_type(Property::TextOpacityTransition) },
-        { "text-translate-transition", mbgl::underlying_type(Property::TextTranslateTransition) },
-        { "text-translate-anchor-transition", mbgl::underlying_type(Property::TextTranslateAnchorTransition) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -1358,6 +1361,73 @@ optional<Error> SymbolLayer::setPaintProperty(const std::string& name, const Con
     
 
     return Error { "layer doesn't support this property" };
+}
+
+LayerProperty SymbolLayer::getPaintProperty(const std::string& name) const {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::IconColor:
+            return conversion::makeLayerProperty(getIconColor());
+        case Property::IconHaloBlur:
+            return conversion::makeLayerProperty(getIconHaloBlur());
+        case Property::IconHaloColor:
+            return conversion::makeLayerProperty(getIconHaloColor());
+        case Property::IconHaloWidth:
+            return conversion::makeLayerProperty(getIconHaloWidth());
+        case Property::IconOpacity:
+            return conversion::makeLayerProperty(getIconOpacity());
+        case Property::IconTranslate:
+            return conversion::makeLayerProperty(getIconTranslate());
+        case Property::IconTranslateAnchor:
+            return conversion::makeLayerProperty(getIconTranslateAnchor());
+        case Property::TextColor:
+            return conversion::makeLayerProperty(getTextColor());
+        case Property::TextHaloBlur:
+            return conversion::makeLayerProperty(getTextHaloBlur());
+        case Property::TextHaloColor:
+            return conversion::makeLayerProperty(getTextHaloColor());
+        case Property::TextHaloWidth:
+            return conversion::makeLayerProperty(getTextHaloWidth());
+        case Property::TextOpacity:
+            return conversion::makeLayerProperty(getTextOpacity());
+        case Property::TextTranslate:
+            return conversion::makeLayerProperty(getTextTranslate());
+        case Property::TextTranslateAnchor:
+            return conversion::makeLayerProperty(getTextTranslateAnchor());
+        case Property::IconColorTransition:
+            return conversion::makeLayerProperty(getIconColorTransition());
+        case Property::IconHaloBlurTransition:
+            return conversion::makeLayerProperty(getIconHaloBlurTransition());
+        case Property::IconHaloColorTransition:
+            return conversion::makeLayerProperty(getIconHaloColorTransition());
+        case Property::IconHaloWidthTransition:
+            return conversion::makeLayerProperty(getIconHaloWidthTransition());
+        case Property::IconOpacityTransition:
+            return conversion::makeLayerProperty(getIconOpacityTransition());
+        case Property::IconTranslateTransition:
+            return conversion::makeLayerProperty(getIconTranslateTransition());
+        case Property::IconTranslateAnchorTransition:
+            return conversion::makeLayerProperty(getIconTranslateAnchorTransition());
+        case Property::TextColorTransition:
+            return conversion::makeLayerProperty(getTextColorTransition());
+        case Property::TextHaloBlurTransition:
+            return conversion::makeLayerProperty(getTextHaloBlurTransition());
+        case Property::TextHaloColorTransition:
+            return conversion::makeLayerProperty(getTextHaloColorTransition());
+        case Property::TextHaloWidthTransition:
+            return conversion::makeLayerProperty(getTextHaloWidthTransition());
+        case Property::TextOpacityTransition:
+            return conversion::makeLayerProperty(getTextOpacityTransition());
+        case Property::TextTranslateTransition:
+            return conversion::makeLayerProperty(getTextTranslateTransition());
+        case Property::TextTranslateAnchorTransition:
+            return conversion::makeLayerProperty(getTextTranslateAnchorTransition());
+    }
+    return {};
 }
 
 optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Convertible& value) {

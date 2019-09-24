@@ -283,47 +283,50 @@ TransitionOptions RasterLayer::getRasterSaturationTransition() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property {
+    RasterBrightnessMax,
+    RasterBrightnessMin,
+    RasterContrast,
+    RasterFadeDuration,
+    RasterHueRotate,
+    RasterOpacity,
+    RasterResampling,
+    RasterSaturation,
+    RasterBrightnessMaxTransition,
+    RasterBrightnessMinTransition,
+    RasterContrastTransition,
+    RasterFadeDurationTransition,
+    RasterHueRotateTransition,
+    RasterOpacityTransition,
+    RasterResamplingTransition,
+    RasterSaturationTransition,
+};
+
+MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"raster-brightness-max", mbgl::underlying_type(Property::RasterBrightnessMax)},
+     {"raster-brightness-min", mbgl::underlying_type(Property::RasterBrightnessMin)},
+     {"raster-contrast", mbgl::underlying_type(Property::RasterContrast)},
+     {"raster-fade-duration", mbgl::underlying_type(Property::RasterFadeDuration)},
+     {"raster-hue-rotate", mbgl::underlying_type(Property::RasterHueRotate)},
+     {"raster-opacity", mbgl::underlying_type(Property::RasterOpacity)},
+     {"raster-resampling", mbgl::underlying_type(Property::RasterResampling)},
+     {"raster-saturation", mbgl::underlying_type(Property::RasterSaturation)},
+     {"raster-brightness-max-transition", mbgl::underlying_type(Property::RasterBrightnessMaxTransition)},
+     {"raster-brightness-min-transition", mbgl::underlying_type(Property::RasterBrightnessMinTransition)},
+     {"raster-contrast-transition", mbgl::underlying_type(Property::RasterContrastTransition)},
+     {"raster-fade-duration-transition", mbgl::underlying_type(Property::RasterFadeDurationTransition)},
+     {"raster-hue-rotate-transition", mbgl::underlying_type(Property::RasterHueRotateTransition)},
+     {"raster-opacity-transition", mbgl::underlying_type(Property::RasterOpacityTransition)},
+     {"raster-resampling-transition", mbgl::underlying_type(Property::RasterResamplingTransition)},
+     {"raster-saturation-transition", mbgl::underlying_type(Property::RasterSaturationTransition)}});
+
+} // namespace
+
 optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        RasterBrightnessMax,
-        RasterBrightnessMin,
-        RasterContrast,
-        RasterFadeDuration,
-        RasterHueRotate,
-        RasterOpacity,
-        RasterResampling,
-        RasterSaturation,
-        RasterBrightnessMaxTransition,
-        RasterBrightnessMinTransition,
-        RasterContrastTransition,
-        RasterFadeDurationTransition,
-        RasterHueRotateTransition,
-        RasterOpacityTransition,
-        RasterResamplingTransition,
-        RasterSaturationTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "raster-brightness-max", mbgl::underlying_type(Property::RasterBrightnessMax) },
-        { "raster-brightness-min", mbgl::underlying_type(Property::RasterBrightnessMin) },
-        { "raster-contrast", mbgl::underlying_type(Property::RasterContrast) },
-        { "raster-fade-duration", mbgl::underlying_type(Property::RasterFadeDuration) },
-        { "raster-hue-rotate", mbgl::underlying_type(Property::RasterHueRotate) },
-        { "raster-opacity", mbgl::underlying_type(Property::RasterOpacity) },
-        { "raster-resampling", mbgl::underlying_type(Property::RasterResampling) },
-        { "raster-saturation", mbgl::underlying_type(Property::RasterSaturation) },
-        { "raster-brightness-max-transition", mbgl::underlying_type(Property::RasterBrightnessMaxTransition) },
-        { "raster-brightness-min-transition", mbgl::underlying_type(Property::RasterBrightnessMinTransition) },
-        { "raster-contrast-transition", mbgl::underlying_type(Property::RasterContrastTransition) },
-        { "raster-fade-duration-transition", mbgl::underlying_type(Property::RasterFadeDurationTransition) },
-        { "raster-hue-rotate-transition", mbgl::underlying_type(Property::RasterHueRotateTransition) },
-        { "raster-opacity-transition", mbgl::underlying_type(Property::RasterOpacityTransition) },
-        { "raster-resampling-transition", mbgl::underlying_type(Property::RasterResamplingTransition) },
-        { "raster-saturation-transition", mbgl::underlying_type(Property::RasterSaturationTransition) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -435,6 +438,49 @@ optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Con
     
 
     return Error { "layer doesn't support this property" };
+}
+
+LayerProperty RasterLayer::getPaintProperty(const std::string& name) const {
+    const auto it = paintProperties.find(name.c_str());
+    if (it == paintProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::RasterBrightnessMax:
+            return conversion::makeLayerProperty(getRasterBrightnessMax());
+        case Property::RasterBrightnessMin:
+            return conversion::makeLayerProperty(getRasterBrightnessMin());
+        case Property::RasterContrast:
+            return conversion::makeLayerProperty(getRasterContrast());
+        case Property::RasterFadeDuration:
+            return conversion::makeLayerProperty(getRasterFadeDuration());
+        case Property::RasterHueRotate:
+            return conversion::makeLayerProperty(getRasterHueRotate());
+        case Property::RasterOpacity:
+            return conversion::makeLayerProperty(getRasterOpacity());
+        case Property::RasterResampling:
+            return conversion::makeLayerProperty(getRasterResampling());
+        case Property::RasterSaturation:
+            return conversion::makeLayerProperty(getRasterSaturation());
+        case Property::RasterBrightnessMaxTransition:
+            return conversion::makeLayerProperty(getRasterBrightnessMaxTransition());
+        case Property::RasterBrightnessMinTransition:
+            return conversion::makeLayerProperty(getRasterBrightnessMinTransition());
+        case Property::RasterContrastTransition:
+            return conversion::makeLayerProperty(getRasterContrastTransition());
+        case Property::RasterFadeDurationTransition:
+            return conversion::makeLayerProperty(getRasterFadeDurationTransition());
+        case Property::RasterHueRotateTransition:
+            return conversion::makeLayerProperty(getRasterHueRotateTransition());
+        case Property::RasterOpacityTransition:
+            return conversion::makeLayerProperty(getRasterOpacityTransition());
+        case Property::RasterResamplingTransition:
+            return conversion::makeLayerProperty(getRasterResamplingTransition());
+        case Property::RasterSaturationTransition:
+            return conversion::makeLayerProperty(getRasterSaturationTransition());
+    }
+    return {};
 }
 
 optional<Error> RasterLayer::setLayoutProperty(const std::string& name, const Convertible& value) {

@@ -1,9 +1,10 @@
 #pragma once
 
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/types.hpp>
+#include <mbgl/util/feature.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/style/types.hpp>
-#include <mbgl/style/conversion.hpp>
 
 #include <mapbox/weak.hpp>
 #include <mapbox/type_wrapper.hpp>
@@ -65,6 +66,14 @@ struct LayerTypeInfo {
     const enum class TileKind : uint8_t { Geometry, Raster, RasterDEM, NotRequired } tileKind;
 };
 
+struct LayerProperty {
+    enum class Kind : uint8_t { Undefined, Constant, Expression, Transition };
+    LayerProperty(Value value_, Kind kind_) : value(std::move(value_)), kind(kind_) {}
+    LayerProperty() = default;
+    const Value value;
+    const Kind kind = Kind::Undefined;
+};
+
 /**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
  * Specification.
@@ -110,8 +119,11 @@ public:
 
     // Dynamic properties
     virtual optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) = 0;
-    virtual optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) = 0;
+    virtual optional<conversion::Error> setPaintProperty(const std::string& name,
+                                                         const conversion::Convertible& value) = 0;
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
+
+    virtual LayerProperty getPaintProperty(const std::string&) const = 0;
 
     // Private implementation
     // TODO : We should not have public mutable data members.

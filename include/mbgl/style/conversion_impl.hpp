@@ -2,7 +2,9 @@
 
 #include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/optional.hpp>
@@ -10,6 +12,7 @@
 #include <mapbox/value.hpp>
 
 #include <array>
+#include <chrono>
 #include <string>
 #include <type_traits>
 
@@ -314,6 +317,18 @@ struct ValueFactory<ColorRampPropertyValue> {
 };
 
 template <>
+struct ValueFactory<TransitionOptions> {
+    static Value make(const TransitionOptions& value) {
+        return mapbox::base::ValueArray{
+            {std::chrono::duration_cast<std::chrono::milliseconds>(value.duration.value_or(mbgl::Duration::zero()))
+                 .count(),
+             std::chrono::duration_cast<std::chrono::milliseconds>(value.delay.value_or(mbgl::Duration::zero()))
+                 .count(),
+             value.enablePlacementTransitions}};
+    }
+};
+
+template <>
 struct ValueFactory<Color> {
     static Value make(const Color& color) { return color.toObject(); }
 };
@@ -334,10 +349,22 @@ Value makeValue(T&& arg) {
 }
 
 template <typename T>
-Value makeValue(const PropertyValue<T>& value) {
-    return value.match([](const Undefined&) -> Value { return {}; },
-                       [](const T& t) -> Value { return makeValue(t); },
-                       [](const PropertyExpression<T>& fn) { return fn.getExpression().serialize(); });
+LayerProperty makeLayerProperty(const PropertyValue<T>& value) {
+    return value.match([](const Undefined&) -> LayerProperty { return {}; },
+                       [](const T& t) -> LayerProperty {
+                           return {makeValue(t), LayerProperty::Kind::Constant};
+                       },
+                       [](const PropertyExpression<T>& fn) -> LayerProperty {
+                           return {fn.getExpression().serialize(), LayerProperty::Kind::Expression};
+                       });
+}
+
+inline LayerProperty makeLayerProperty(const TransitionOptions& value) {
+    return {makeValue(value), LayerProperty::Kind::Transition};
+}
+
+inline LayerProperty makeLayerProperty(const ColorRampPropertyValue& value) {
+    return {makeValue(value), LayerProperty::Kind::Expression};
 }
 
 } // namespace conversion
