@@ -246,26 +246,31 @@ enum class Property {
     HillshadeShadowColorTransition,
 };
 
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
 MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
-    {{"hillshade-accent-color", mbgl::underlying_type(Property::HillshadeAccentColor)},
-     {"hillshade-exaggeration", mbgl::underlying_type(Property::HillshadeExaggeration)},
-     {"hillshade-highlight-color", mbgl::underlying_type(Property::HillshadeHighlightColor)},
-     {"hillshade-illumination-anchor", mbgl::underlying_type(Property::HillshadeIlluminationAnchor)},
-     {"hillshade-illumination-direction", mbgl::underlying_type(Property::HillshadeIlluminationDirection)},
-     {"hillshade-shadow-color", mbgl::underlying_type(Property::HillshadeShadowColor)},
-     {"hillshade-accent-color-transition", mbgl::underlying_type(Property::HillshadeAccentColorTransition)},
-     {"hillshade-exaggeration-transition", mbgl::underlying_type(Property::HillshadeExaggerationTransition)},
-     {"hillshade-highlight-color-transition", mbgl::underlying_type(Property::HillshadeHighlightColorTransition)},
-     {"hillshade-illumination-anchor-transition", mbgl::underlying_type(Property::HillshadeIlluminationAnchorTransition)},
-     {"hillshade-illumination-direction-transition", mbgl::underlying_type(Property::HillshadeIlluminationDirectionTransition)},
-     {"hillshade-shadow-color-transition", mbgl::underlying_type(Property::HillshadeShadowColorTransition)}});
+    {{"hillshade-accent-color", toUint8(Property::HillshadeAccentColor)},
+     {"hillshade-exaggeration", toUint8(Property::HillshadeExaggeration)},
+     {"hillshade-highlight-color", toUint8(Property::HillshadeHighlightColor)},
+     {"hillshade-illumination-anchor", toUint8(Property::HillshadeIlluminationAnchor)},
+     {"hillshade-illumination-direction", toUint8(Property::HillshadeIlluminationDirection)},
+     {"hillshade-shadow-color", toUint8(Property::HillshadeShadowColor)},
+     {"hillshade-accent-color-transition", toUint8(Property::HillshadeAccentColorTransition)},
+     {"hillshade-exaggeration-transition", toUint8(Property::HillshadeExaggerationTransition)},
+     {"hillshade-highlight-color-transition", toUint8(Property::HillshadeHighlightColorTransition)},
+     {"hillshade-illumination-anchor-transition", toUint8(Property::HillshadeIlluminationAnchorTransition)},
+     {"hillshade-illumination-direction-transition", toUint8(Property::HillshadeIlluminationDirectionTransition)},
+     {"hillshade-shadow-color-transition", toUint8(Property::HillshadeShadowColorTransition)}});
 
 } // namespace
 
 optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const Convertible& value) {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
-        return Error { "layer doesn't support this property" };
+        return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
@@ -332,39 +337,38 @@ optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const 
     if (!transition) {
         return error;
     }
-    
+
     if (property == Property::HillshadeAccentColorTransition) {
         setHillshadeAccentColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HillshadeExaggerationTransition) {
         setHillshadeExaggerationTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HillshadeHighlightColorTransition) {
         setHillshadeHighlightColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HillshadeIlluminationAnchorTransition) {
         setHillshadeIlluminationAnchorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HillshadeIlluminationDirectionTransition) {
         setHillshadeIlluminationDirectionTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HillshadeShadowColorTransition) {
         setHillshadeShadowColorTransition(*transition);
         return nullopt;
     }
-    
 
-    return Error { "layer doesn't support this property" };
+    return Error{"layer doesn't support this property"};
 }
 
 LayerProperty HillshadeLayer::getPaintProperty(const std::string& name) const {
@@ -375,29 +379,29 @@ LayerProperty HillshadeLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::HillshadeAccentColor:
-            return conversion::makeLayerProperty(getHillshadeAccentColor());
+            return makeLayerProperty(getHillshadeAccentColor());
         case Property::HillshadeExaggeration:
-            return conversion::makeLayerProperty(getHillshadeExaggeration());
+            return makeLayerProperty(getHillshadeExaggeration());
         case Property::HillshadeHighlightColor:
-            return conversion::makeLayerProperty(getHillshadeHighlightColor());
+            return makeLayerProperty(getHillshadeHighlightColor());
         case Property::HillshadeIlluminationAnchor:
-            return conversion::makeLayerProperty(getHillshadeIlluminationAnchor());
+            return makeLayerProperty(getHillshadeIlluminationAnchor());
         case Property::HillshadeIlluminationDirection:
-            return conversion::makeLayerProperty(getHillshadeIlluminationDirection());
+            return makeLayerProperty(getHillshadeIlluminationDirection());
         case Property::HillshadeShadowColor:
-            return conversion::makeLayerProperty(getHillshadeShadowColor());
+            return makeLayerProperty(getHillshadeShadowColor());
         case Property::HillshadeAccentColorTransition:
-            return conversion::makeLayerProperty(getHillshadeAccentColorTransition());
+            return makeLayerProperty(getHillshadeAccentColorTransition());
         case Property::HillshadeExaggerationTransition:
-            return conversion::makeLayerProperty(getHillshadeExaggerationTransition());
+            return makeLayerProperty(getHillshadeExaggerationTransition());
         case Property::HillshadeHighlightColorTransition:
-            return conversion::makeLayerProperty(getHillshadeHighlightColorTransition());
+            return makeLayerProperty(getHillshadeHighlightColorTransition());
         case Property::HillshadeIlluminationAnchorTransition:
-            return conversion::makeLayerProperty(getHillshadeIlluminationAnchorTransition());
+            return makeLayerProperty(getHillshadeIlluminationAnchorTransition());
         case Property::HillshadeIlluminationDirectionTransition:
-            return conversion::makeLayerProperty(getHillshadeIlluminationDirectionTransition());
+            return makeLayerProperty(getHillshadeIlluminationDirectionTransition());
         case Property::HillshadeShadowColorTransition:
-            return conversion::makeLayerProperty(getHillshadeShadowColorTransition());
+            return makeLayerProperty(getHillshadeShadowColorTransition());
     }
     return {};
 }

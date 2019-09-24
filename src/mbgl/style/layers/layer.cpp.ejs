@@ -201,16 +201,21 @@ enum class Property {
 <% } -%>
 };
 
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
 MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
-    {<%- paintProperties.map(p => `{"${p.name}", mbgl::underlying_type(Property::${camelize(p.name)})}`).join(',\n     ') %>,
-     <%- paintProperties.map(p => `{"${p.name}-transition", mbgl::underlying_type(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>});
+    {<%- paintProperties.map(p => `{"${p.name}", toUint8(Property::${camelize(p.name)})}`).join(',\n     ') %>,
+     <%- paintProperties.map(p => `{"${p.name}-transition", toUint8(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>});
 
 } // namespace
 
 optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
-        return Error { "layer doesn't support this property" };
+        return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
@@ -251,14 +256,13 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
     if (!transition) {
         return error;
     }
-    <% for (const property of paintProperties) { %>
+<% for (const property of paintProperties) { %>
     if (property == Property::<%- camelize(property.name) %>Transition) {
         set<%- camelize(property.name) %>Transition(*transition);
         return nullopt;
     }
-    <% } %>
-
-    return Error { "layer doesn't support this property" };
+<% } %>
+    return Error{"layer doesn't support this property"};
 }
 
 LayerProperty <%- camelize(type) %>Layer::getPaintProperty(const std::string& name) const {
@@ -270,11 +274,11 @@ LayerProperty <%- camelize(type) %>Layer::getPaintProperty(const std::string& na
     switch (static_cast<Property>(it->second)) {
 <% for (const property of paintProperties) { -%>
         case Property::<%- camelize(property.name) %>:
-            return conversion::makeLayerProperty(get<%- camelize(property.name) %>());
+            return makeLayerProperty(get<%- camelize(property.name) %>());
 <% } -%>
 <% for (const property of paintProperties) { -%>
         case Property::<%- camelize(property.name) %>Transition:
-            return conversion::makeLayerProperty(get<%- camelize(property.name) %>Transition());
+            return makeLayerProperty(get<%- camelize(property.name) %>Transition());
 <% } -%>
     }
     return {};
