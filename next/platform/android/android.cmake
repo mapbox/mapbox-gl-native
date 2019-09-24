@@ -267,6 +267,7 @@ target_link_libraries(
         GLESv2
         Mapbox::Base::optional
         Mapbox::Base::typewrapper
+        Mapbox::Base::value
         Mapbox::Base::weak
         log
 )
