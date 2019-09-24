@@ -852,9 +852,11 @@ public:
             break;
     }
 
-    [updatedConstraints addObject:[view.widthAnchor constraintEqualToConstant:size.width]];
-    [updatedConstraints addObject:[view.heightAnchor constraintEqualToConstant:size.height]];
-
+    if (!CGSizeEqualToSize(size, CGSizeZero)) {
+        [updatedConstraints addObject:[view.widthAnchor constraintEqualToConstant:size.width]];
+        [updatedConstraints addObject:[view.heightAnchor constraintEqualToConstant:size.height]];
+    }
+    
     [NSLayoutConstraint deactivateConstraints:constraints];
     [constraints removeAllObjects];
     [NSLayoutConstraint activateConstraints:updatedConstraints];
@@ -883,7 +885,7 @@ public:
     [self updateConstraintsForOrnament:self.scaleBar
                            constraints:self.scaleBarConstraints
                               position:self.scaleBarPosition
-                                  size:self.scaleBar.intrinsicContentSize
+                                  size:CGSizeZero
                                margins:self.scaleBarMargins];
 }
 
@@ -6642,11 +6644,11 @@ public:
     // setting this property.
     if ( ! self.scaleBar.hidden)
     {
-        CGSize originalSize = self.scaleBar.intrinsicContentSize;
+//        CGSize originalSize = self.scaleBar.intrinsicContentSize;
         [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
-        if ( ! CGSizeEqualToSize(originalSize, self.scaleBar.intrinsicContentSize)) {
-            [self installScaleBarConstraints];
-        }
+//        if ( ! CGSizeEqualToSize(originalSize, self.scaleBar.intrinsicContentSize)) {
+//            [self installScaleBarConstraints];
+//        }
     }
 }
 

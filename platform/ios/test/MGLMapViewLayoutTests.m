@@ -178,6 +178,8 @@
     CGFloat margin = 4.0;
     
     UIView *scaleBar = self.mapView.scaleBar;
+    XCTAssertFalse(CGSizeEqualToSize(scaleBar.bounds.size, CGSizeZero));
+    
     NSArray *testDataList = [self makeTestDataListWithView:scaleBar margin:margin];
     
     for (MGLOrnamentTestData *testData in testDataList) {
@@ -200,7 +202,8 @@
     CGFloat margin = 20.0;
     
     MGLScaleBar *scaleBar = (MGLScaleBar*)self.mapView.scaleBar;
-    
+    XCTAssertFalse(CGSizeEqualToSize(scaleBar.bounds.size, CGSizeZero));
+
     for (NSInteger rtl = 0; rtl <= 1; rtl++) {
         scaleBar.testingRightToLeftOverride = @((BOOL)rtl);
         

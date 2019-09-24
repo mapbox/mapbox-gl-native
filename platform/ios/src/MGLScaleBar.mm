@@ -87,6 +87,7 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic) MGLScaleBarLabel* prototypeLabel;
 @property (nonatomic) CGFloat lastLabelWidth;
 @property (nonatomic, readwrite) CGSize size;
+@property (nonatomic) BOOL shouldLayoutBars;
 @end
 
 static const CGFloat MGLBarHeight = 4;
@@ -203,10 +204,6 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
     _containerView.layer.borderWidth = borderWidth / [[UIScreen mainScreen] scale];
 }
 
-- (CGSize)intrinsicContentSize {
-    return self.actualWidth > 0 ? CGSizeMake(ceil(self.actualWidth + self.lastLabelWidth/2), 16) : CGSizeZero;
-}
-
 // Determines the width of the bars NOT the size of the entire scale bar,
 // which includes space for (half) a label.
 // Uses the current set `row`
@@ -293,11 +290,55 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
     _metersPerPoint = metersPerPoint;
     
     [self updateVisibility];
-    
+    [self invalidateIntrinsicContentSize];
+}
+
+- (CGSize)intrinsicContentSize {
+    // Size is calculated elsewhere - since intrinsicContentSize is part of the
+    // constraint system, this should be done in updateConstraints
+    if (self.size.width < 0.0) {
+        return CGSizeZero;
+    }
+    return self.size;
+}
+
+/// updateConstraints
+///
+/// The primary job of updateConstraints here is to recalculate the
+/// intrinsicContentSize: _metersPerPoint and the maximum width determine the
+/// current "row", which in turn determines the "actualWidth". To obtain the full
+/// width of the scale bar, we also need to include some space for the "last"
+/// label
+
+- (void)updateConstraints {
+    // TODO: Improve this (and the side-effects)
     self.row = [self preferredRow];
 
-    [self invalidateIntrinsicContentSize];
+    NSAssert(self.row.numberOfBars > 0, @"");
+
+    CGFloat totalBarWidth = self.actualWidth;
+    
+    if (totalBarWidth <= 0.0) {
+        [super updateConstraints];
+        return;
+    }
+
+    // Determine the "lastLabelWidth". This has changed to take a maximum of each
+    // label, to ensure that the size does not change in LTR & RTL layouts, and
+    // also to stop jiggling when the scale bar is on the right hand of the screen
+    // This will most likely be a constant, as we take a max using a "hint" for
+    // the initial value
+    
+    if (self.shouldLayoutBars) {
+        [self updateLabels];
+    }
+    
+    CGFloat halfLabelWidth = ceil(self.lastLabelWidth/2);
+       
+    self.size = CGSizeMake(totalBarWidth + halfLabelWidth, 16);
+       
     [self setNeedsLayout];
+    [super updateConstraints];
 }
 
 - (void)updateVisibility {
@@ -326,11 +367,9 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
         return;
     }
     
+    self.shouldLayoutBars = YES;
+    
     _row = row;
-    [_bars makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    _bars = nil;
-
-    [self updateLabels];
 }
 
 #pragma mark - Views
@@ -407,9 +446,9 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
 
         CLLocationDistance barDistance = multiplier * i;
         UIImage *image = [self cachedLabelImageForDistance:barDistance];
-        if (i == self.row.numberOfBars) {
-            self.lastLabelWidth = image.size.width;
-        }
+        
+        self.lastLabelWidth = MAX(self.lastLabelWidth, image.size.width);
+
         labelView.layer.contents      = (id)image.CGImage;
         labelView.layer.contentsScale = image.scale;
     }
@@ -426,15 +465,65 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
 - (void)layoutSubviews {
     [super layoutSubviews];
 
-    if (!self.row.numberOfBars) {
-        // Current distance is not within allowed range
+
+    // If size is 0, then we keep the existing layout (which will fade out)
+    if (self.size.width <= 0.0) {
         return;
     }
 
-    [self layoutBars];
-    [self layoutLabels];
-}
+    CGFloat totalBarWidth = self.actualWidth;
 
+    if (totalBarWidth <= 0.0) {
+        return;
+    }
+    
+    if (self.shouldLayoutBars) {
+        self.shouldLayoutBars = NO;
+        [_bars makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        _bars = nil;
+    }
+
+    // Re-layout the component bars and labels of the scale bar
+    BOOL RTL               = [self usesRightToLeftLayout];
+    CGFloat barWidth       = totalBarWidth/self.bars.count;
+    CGFloat halfLabelWidth = ceil(self.lastLabelWidth/2);
+
+    CGFloat barOffset = RTL ? halfLabelWidth : 0.0;
+    CGFloat intrinsicContentHeight = self.intrinsicContentSize.height;
+    
+    self.containerView.frame = CGRectMake(barOffset,//CGRectGetMinX(self.bars.firstObject.frame),
+                                          intrinsicContentHeight-MGLBarHeight,
+                                          totalBarWidth,//self.actualWidth,
+                                          MGLBarHeight/*+self.borderWidth*2*/);
+
+    
+    NSUInteger i = 0;
+    for (UIView *bar in self.bars) {
+        CGFloat xPosition = barWidth * i /*+ self.borderWidth*/;
+        bar.backgroundColor = (i % 2 == 0) ? self.primaryColor : self.secondaryColor;
+        bar.frame = CGRectMake(xPosition, /*self.borderWidth*/0, barWidth, MGLBarHeight);
+        i++;
+    }
+
+    
+     i = RTL ? self.bars.count : 0;
+     for (UIView *label in self.labelViews) {
+         CGFloat xPosition = (barOffset + (barWidth * i) /*- CGRectGetMidX(label.bounds)*/ /*+ self.borderWidth*/);
+         CGFloat yPosition = round(0.5 * ( intrinsicContentHeight - MGLBarHeight));
+
+         CGRect frame = label.frame;
+         frame.origin.x = xPosition;
+         frame.origin.y = yPosition;
+         frame.size.width = 0;
+         frame.size.height = 0;
+         label.frame = frame;
+
+         i = RTL ? i-1 : i+1;
+     }
+    
+    
+}
+/*
 - (void)layoutBars {
     CGFloat barWidth = round((self.intrinsicContentSize.width - self.borderWidth * 2.0f) / self.bars.count);
     
@@ -468,5 +557,5 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
         i = RTL ? i-1 : i+1;
     }
 }
-
+*/
 @end
