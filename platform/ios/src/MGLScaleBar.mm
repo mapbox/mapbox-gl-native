@@ -484,78 +484,59 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
     }
 
     // Re-layout the component bars and labels of the scale bar
-    BOOL RTL               = [self usesRightToLeftLayout];
-    CGFloat barWidth       = totalBarWidth/self.bars.count;
-    CGFloat halfLabelWidth = ceil(self.lastLabelWidth/2);
-
-    CGFloat barOffset = RTL ? halfLabelWidth : 0.0;
     CGFloat intrinsicContentHeight = self.intrinsicContentSize.height;
-    
-    self.containerView.frame = CGRectMake(barOffset,//CGRectGetMinX(self.bars.firstObject.frame),
-                                          intrinsicContentHeight-MGLBarHeight,
-                                          totalBarWidth,//self.actualWidth,
-                                          MGLBarHeight/*+self.borderWidth*2*/);
+    CGFloat barWidth               = totalBarWidth/self.bars.count;
 
+    BOOL RTL               = [self usesRightToLeftLayout];
+    CGFloat halfLabelWidth = ceil(self.lastLabelWidth/2);
+    CGFloat barOffset      = RTL ? halfLabelWidth : 0.0;
     
-    NSUInteger i = 0;
-    for (UIView *bar in self.bars) {
-        CGFloat xPosition = barWidth * i /*+ self.borderWidth*/;
-        bar.backgroundColor = (i % 2 == 0) ? self.primaryColor : self.secondaryColor;
-        bar.frame = CGRectMake(xPosition, /*self.borderWidth*/0, barWidth, MGLBarHeight);
-        i++;
-    }
+    self.containerView.frame = CGRectMake(barOffset,
+                                          intrinsicContentHeight - MGLBarHeight,
+                                          totalBarWidth,
+                                          MGLBarHeight);
 
+    [self layoutBarsWithWidth:barWidth];
     
-     i = RTL ? self.bars.count : 0;
-     for (UIView *label in self.labelViews) {
-         CGFloat xPosition = (barOffset + (barWidth * i) /*- CGRectGetMidX(label.bounds)*/ /*+ self.borderWidth*/);
-         CGFloat yPosition = round(0.5 * ( intrinsicContentHeight - MGLBarHeight));
-
-         CGRect frame = label.frame;
-         frame.origin.x = xPosition;
-         frame.origin.y = yPosition;
-         frame.size.width = 0;
-         frame.size.height = 0;
-         label.frame = frame;
-
-         i = RTL ? i-1 : i+1;
-     }
-    
-    
-}
-/*
-- (void)layoutBars {
-    CGFloat barWidth = round((self.intrinsicContentSize.width - self.borderWidth * 2.0f) / self.bars.count);
-    
-    NSUInteger i = 0;
-    for (UIView *bar in self.bars) {
-        CGFloat xPosition = barWidth * i + self.borderWidth;
-        bar.backgroundColor = (i % 2 == 0) ? self.primaryColor : self.secondaryColor;
-        bar.frame = CGRectMake(xPosition, self.borderWidth, barWidth, MGLBarHeight);
-        i++;
-    }
-    
-    self.containerView.frame = CGRectMake(CGRectGetMinX(self.bars.firstObject.frame),
-                                          self.intrinsicContentSize.height-MGLBarHeight,
-                                          self.actualWidth,
-                                          MGLBarHeight+self.borderWidth*2);
+    CGFloat yPosition = round(0.5 * ( intrinsicContentHeight - MGLBarHeight));
+    CGFloat barDelta = RTL ? -barWidth : barWidth;
+    [self layoutLabelsWithOffset:barOffset delta:barDelta yPosition:yPosition];
 }
 
-- (void)layoutLabels {
-    CGFloat barWidth = round(self.actualWidth / self.bars.count);
-    BOOL RTL = [self usesRightToLeftLayout];
-    NSUInteger i = RTL ? self.bars.count : 0;
+- (void)layoutBarsWithWidth:(CGFloat)barWidth {
+    NSUInteger i = 0;
+    for (UIView *bar in self.bars) {
+        CGFloat xPosition = barWidth * i;
+        bar.backgroundColor = (i % 2 == 0) ? self.primaryColor : self.secondaryColor;
+        bar.frame = CGRectMake(xPosition, 0, barWidth, MGLBarHeight);
+        i++;
+    }
+}
+
+- (void)layoutLabelsWithOffset:(CGFloat)barOffset delta:(CGFloat)barDelta yPosition:(CGFloat)yPosition {
+#if !defined(NS_BLOCK_ASSERTIONS)
+    NSUInteger countOfVisibleLabels = 0;
+    for (UIView *view in self.labelViews) {
+        if (!view.isHidden) {
+            countOfVisibleLabels++;
+        }
+    }
+    NSAssert(self.bars.count == countOfVisibleLabels - 1, @"");
+#endif
+    
+    CGFloat xPosition = barOffset;
+    
+    if (barDelta < 0) {
+        xPosition -= (barDelta*self.bars.count);
+    }
+    
     for (UIView *label in self.labelViews) {
-        CGFloat xPosition = round(barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth);
-        CGFloat yPosition = round(0.5 * (self.intrinsicContentSize.height - MGLBarHeight));
-
-        CGRect frame = label.frame;
-        frame.origin.x = xPosition;
-        frame.origin.y = yPosition;
-        label.frame = frame;
-
-        i = RTL ? i-1 : i+1;
+        // Label frames have 0 size - though the layer contents use "center" and do
+        // not clip to bounds. This way we don't need to worry about positioning the
+        // label. (Though you won't see the label in the view debugger)
+        label.frame = CGRectMake(xPosition, yPosition, 0.0, 0.0);
+        
+        xPosition += barDelta;
     }
 }
-*/
 @end
