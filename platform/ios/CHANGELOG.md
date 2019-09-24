@@ -19,6 +19,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue where the collision boxes for symbols would not be updated when `MGLSymbolStyleLayer.textTranslation` or `MGLSymbolStyleLayer.iconTranslation` were used. ([#15467](https://github.com/mapbox/mapbox-gl-native/pull/15467))
 * Enabled use of `MGLSymbolStyleLayer.textOffset` option together with `MGLSymbolStyleLayer.textVariableAnchor` (if `MGLSymbolStyleLayer.textRadialOffset` option is not provided). ([#15542](https://github.com/mapbox/mapbox-gl-native/pull/15542))
 * Fixed an issue that caused constant repainting for sources with invisible layers. ([#15600](https://github.com/mapbox/mapbox-gl-native/pull/15600))
+* Fixed incorrect `MGLScaleBar` component rendering, resizing on rotation. ([#15703](https://github.com/mapbox/mapbox-gl-native/pull/15703))
 
 ### User interaction
 

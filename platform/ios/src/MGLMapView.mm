@@ -6643,11 +6643,7 @@ public:
     // setting this property.
     if ( ! self.scaleBar.hidden)
     {
-//        CGSize originalSize = self.scaleBar.intrinsicContentSize;
         [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
-//        if ( ! CGSizeEqualToSize(originalSize, self.scaleBar.intrinsicContentSize)) {
-//            [self installScaleBarConstraints];
-//        }
     }
 }
 
