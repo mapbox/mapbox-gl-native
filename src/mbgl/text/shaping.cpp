@@ -328,11 +328,34 @@ void shapeLines(Shaping& shaping,
     float x = 0;
     float y = 0;
     float maxLineLength = 0;
+    bool hasBaseline{false};
+
+    for (std::size_t i = 0; i < lines.size(); ++i) {
+        TaggedString& line = lines[i];
+        line.trim();
+        for (std::size_t j = 0; j < line.length(); ++j) {
+            const std::size_t sectionIndex = line.getSectionIndex(j);
+            const SectionOptions& section = line.sectionAt(sectionIndex);
+            char16_t codePoint = line.getCharCodeAt(i);
+            auto glyphs = glyphMap.find(section.fontStackHash);
+            if (glyphs == glyphMap.end()) {
+                continue;
+            }
+            auto it = glyphs->second.find(codePoint);
+            if (it == glyphs->second.end() || !it->second) {
+                continue;
+            }
+            const Glyph& glyph = **it->second;
+            hasBaseline = glyph.metrics.ascender != 0 && glyph.metrics.descender != 0;
+            if (!hasBaseline) break;
+        }
+        if (!hasBaseline) break;
+    }
 
     const float justify = textJustify == style::TextJustifyType::Right ? 1 :
         textJustify == style::TextJustifyType::Left ? 0 :
         0.5;
-    
+
     for (TaggedString& line : lines) {
         // Collapse whitespace so it doesn't throw off justification
         line.trim();
@@ -360,13 +383,17 @@ void shapeLines(Shaping& shaping,
 
             const Glyph& glyph = **it->second;
 
-            // Each glyph's baseline is starting from its acsender, which is the vertical distance
-            // from the horizontal baseline to the highest ‘character’ coordinate in a font face.
-            // Since we're laying out at 24 points, we need also calculate how much it will move
-            // when we scale up or down.
-            const bool hasBaseline = glyph.metrics.ascender != 0 && glyph.metrics.descender != 0;
-            const double baselineOffset = (hasBaseline ? (-glyph.metrics.ascender * section.scale) : shaping.yOffset) +
-                                          (lineMaxScale - section.scale) * util::ONE_EM;
+            // In order to make different fonts aligned, they must share a general baseline that starts from the midline
+            // of each font face.  Baseline offset is the vertical distance from font face's baseline to its top most
+            // position, which is the half size of the sum (ascender + descender). Since glyph's position is counted
+            // from the top left corner, the negative shift is needed. So different fonts shares the same baseline but
+            // with different offset shift. If font's baseline is not applicable, fall back to use a default baseline
+            // offset, see shaping.yOffset. Since we're laying out at 24 points, we need also calculate how much it will
+            // move when we scale up or down.
+            const double baselineOffset =
+                (hasBaseline ? ((-glyph.metrics.ascender + glyph.metrics.descender) / 2 * section.scale)
+                             : shaping.yOffset) +
+                (lineMaxScale - section.scale) * util::ONE_EM;
 
             if (writingMode == WritingModeType::Horizontal ||
                 // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
@@ -407,6 +434,7 @@ void shapeLines(Shaping& shaping,
     shaping.bottom = shaping.top + height;
     shaping.left += -anchorAlign.horizontalAlign * maxLineLength;
     shaping.right = shaping.left + maxLineLength;
+    shaping.hasBaseline = hasBaseline;
 }
 
 const Shaping getShaping(const TaggedString& formattedString,

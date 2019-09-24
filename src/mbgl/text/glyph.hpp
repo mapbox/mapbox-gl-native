@@ -94,6 +94,7 @@ class Shaping {
     explicit operator bool() const { return !positionedGlyphs.empty(); }
     // The y offset *should* be part of the font metadata.
     static constexpr int32_t yOffset = -17;
+    bool hasBaseline{false};
 };
 
 enum class WritingModeType : uint8_t {

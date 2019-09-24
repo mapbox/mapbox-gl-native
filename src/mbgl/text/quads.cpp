@@ -80,7 +80,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         const GlyphPosition& glyph = positionsIt->second;
         const Rect<uint16_t>& rect = glyph.rect;
 
-        // The rects have an addditional buffer that is not included in their size;
+        // The rects have an additional buffer that is not included in their size;
         const float glyphPadding = 1.0f;
         const float rectBuffer = 3.0f + glyphPadding;
 
@@ -115,8 +115,9 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
 
         if (rotateVerticalGlyph) {
             // Vertical-supporting glyphs are laid out in 24x24 point boxes (1 square em)
-            // In horizontal orientation, the y values for glyphs are below the midline
-            // and we use a "yOffset" of -17 to pull them up to the middle.
+            // In horizontal orientation, the y values for glyphs are below the midline.
+            // If the glyph's baseline is applicable, we take the value of the baseline offset.
+            // Otherwise, we use a "yOffset" of -17 to pull them up to the middle.
             // By rotating counter-clockwise around the point at the center of the left
             // edge of a 24x24 layout box centered below the midline, we align the center
             // of the glyphs with the horizontal midline, so the yOffset is no longer
@@ -124,14 +125,16 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
             // The y coordinate includes baseline yOffset, therefore, needs to be accounted
             // for when glyph is rotated and translated.
 
-            const Point<float> center{ -halfAdvance, halfAdvance - Shaping::yOffset };
+            float yShift =
+                shapedText.hasBaseline ? (-glyph.metrics.ascender + glyph.metrics.descender) / 2 : Shaping::yOffset;
+            const Point<float> center{-halfAdvance, halfAdvance - yShift};
             const float verticalRotation = -M_PI_2;
 
             // xHalfWidhtOffsetcorrection is a difference between full-width and half-width
             // advance, should be 0 for full-width glyphs and will pull up half-width glyphs.
             const float xHalfWidhtOffsetcorrection = util::ONE_EM / 2 - halfAdvance;
-            const Point<float> xOffsetCorrection{ 5.0f - Shaping::yOffset - xHalfWidhtOffsetcorrection, 0.0f };
-            
+            const Point<float> xOffsetCorrection{5.0f - yShift - xHalfWidhtOffsetcorrection, 0.0f};
+
             tl = util::rotate(tl - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
             tr = util::rotate(tr - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
             bl = util::rotate(bl - center, verticalRotation) + center + xOffsetCorrection + verticalizedLabelOffset;
