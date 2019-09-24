@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #pragma once
@@ -70,3 +72,5 @@ protected:
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

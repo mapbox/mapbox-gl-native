@@ -1,6 +1,8 @@
 <%
   const properties = locals.properties;
 -%>
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #include <mbgl/style/light.hpp>
@@ -136,3 +138,5 @@ TransitionOptions Light::get<%- camelize(property.name) %>Transition() const {
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Do not edit.
 
 #include <mbgl/style/light.hpp>
@@ -251,3 +253,5 @@ TransitionOptions Light::getPositionTransition() const {
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

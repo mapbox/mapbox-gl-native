@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #pragma once
@@ -89,3 +91,5 @@ public:
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on
