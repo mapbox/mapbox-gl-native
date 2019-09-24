@@ -87,6 +87,7 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic) MGLScaleBarLabel* prototypeLabel;
 @property (nonatomic) CGFloat lastLabelWidth;
 @property (nonatomic, readwrite) CGSize size;
+@property (nonatomic) BOOL recalculateSize;
 @property (nonatomic) BOOL shouldLayoutBars;
 @end
 
@@ -290,6 +291,8 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
     _metersPerPoint = metersPerPoint;
     
     [self updateVisibility];
+    
+    self.recalculateSize = YES;
     [self invalidateIntrinsicContentSize];
 }
 
@@ -311,6 +314,11 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
 /// label
 
 - (void)updateConstraints {
+    if (self.isHidden || !self.recalculateSize) {
+        [super updateConstraints];
+        return;
+    }
+        
     // TODO: Improve this (and the side-effects)
     self.row = [self preferredRow];
 
@@ -338,7 +346,7 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
     self.size = CGSizeMake(totalBarWidth + halfLabelWidth, 16);
        
     [self setNeedsLayout];
-    [super updateConstraints];
+    [super updateConstraints]; // This calls intrinsicContentSize
 }
 
 - (void)updateVisibility {
@@ -465,6 +473,11 @@ static const CGFloat MGLScaleBarMinimumBarWidth = 30.0; // Arbitrary
 - (void)layoutSubviews {
     [super layoutSubviews];
 
+    if (!self.recalculateSize) {
+        return;
+    }
+
+    self.recalculateSize = NO;
 
     // If size is 0, then we keep the existing layout (which will fade out)
     if (self.size.width <= 0.0) {
