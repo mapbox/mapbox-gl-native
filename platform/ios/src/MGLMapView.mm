@@ -931,15 +931,14 @@ public:
 // This gets called when the view dimension changes, e.g. because the device is being rotated.
 - (void)layoutSubviews
 {
+    [super layoutSubviews];
+
     // Calling this here instead of in the scale bar itself because if this is done in the
     // scale bar instance, it triggers a call to this `layoutSubviews` method that calls
     // `_mbglMap->setSize()` just below that triggers rendering update which triggers
     // another scale bar update which causes a rendering update loop and a major performace
-    // degradation. The only time the scale bar's intrinsic content size _must_ invalidated
-    // is here as a reaction to this object's view dimension changes.
+    // degradation.
     [self.scaleBar invalidateIntrinsicContentSize];
-    
-    [super layoutSubviews];
 
     [self adjustContentInset];
 
