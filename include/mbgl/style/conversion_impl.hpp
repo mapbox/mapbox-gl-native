@@ -1,11 +1,17 @@
 #pragma once
 
+#include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
-#include <mbgl/util/optional.hpp>
+#include <mbgl/style/property_value.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/optional.hpp>
 
+#include <mapbox/value.hpp>
+
+#include <array>
 #include <string>
+#include <type_traits>
 
 namespace mbgl {
 namespace style {
@@ -286,6 +292,52 @@ private:
 template <class T, class...Args>
 optional<T> convert(const Convertible& value, Error& error, Args&&...args) {
     return Converter<T>()(value, error, std::forward<Args>(args)...);
+}
+
+template <typename T, typename = void>
+struct ValueFactory;
+
+template <typename T>
+struct ValueArrayFactory {
+    static Value make(const T& arg) { return mapbox::base::ValueArray(arg.begin(), arg.end()); }
+};
+
+template <>
+struct ValueFactory<std::array<float, 2>> : public ValueArrayFactory<std::array<float, 2>> {};
+
+template <>
+struct ValueFactory<std::vector<float>> : public ValueArrayFactory<std::vector<float>> {};
+
+template <>
+struct ValueFactory<ColorRampPropertyValue> {
+    static Value make(const ColorRampPropertyValue& value) { return value.getExpression().serialize(); }
+};
+
+template <>
+struct ValueFactory<Color> {
+    static Value make(const Color& color) { return color.toObject(); }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<!std::is_enum<T>::value>::type> {
+    static Value make(const T& arg) { return {arg}; }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+    static Value make(T arg) { return {int64_t(arg)}; }
+};
+
+template <typename T>
+Value makeValue(T&& arg) {
+    return ValueFactory<std::decay_t<T>>::make(std::forward<T>(arg));
+}
+
+template <typename T>
+Value makeValue(const PropertyValue<T>& value) {
+    return value.match([](const Undefined&) -> Value { return {}; },
+                       [](const T& t) -> Value { return makeValue(t); },
+                       [](const PropertyExpression<T>& fn) { return fn.getExpression().serialize(); });
 }
 
 } // namespace conversion

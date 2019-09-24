@@ -912,6 +912,7 @@ target_link_libraries(
         Mapbox::Base::geometry.hpp
         Mapbox::Base::optional
         Mapbox::Base::typewrapper
+        Mapbox::Base::value
         Mapbox::Base::variant
         Mapbox::Base::weak
         mbgl-vendor-expected
