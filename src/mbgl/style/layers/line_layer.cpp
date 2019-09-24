@@ -457,36 +457,41 @@ enum class Property {
     LineWidthTransition,
 };
 
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
 MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
-    {{"line-blur", mbgl::underlying_type(Property::LineBlur)},
-     {"line-color", mbgl::underlying_type(Property::LineColor)},
-     {"line-dasharray", mbgl::underlying_type(Property::LineDasharray)},
-     {"line-gap-width", mbgl::underlying_type(Property::LineGapWidth)},
-     {"line-gradient", mbgl::underlying_type(Property::LineGradient)},
-     {"line-offset", mbgl::underlying_type(Property::LineOffset)},
-     {"line-opacity", mbgl::underlying_type(Property::LineOpacity)},
-     {"line-pattern", mbgl::underlying_type(Property::LinePattern)},
-     {"line-translate", mbgl::underlying_type(Property::LineTranslate)},
-     {"line-translate-anchor", mbgl::underlying_type(Property::LineTranslateAnchor)},
-     {"line-width", mbgl::underlying_type(Property::LineWidth)},
-     {"line-blur-transition", mbgl::underlying_type(Property::LineBlurTransition)},
-     {"line-color-transition", mbgl::underlying_type(Property::LineColorTransition)},
-     {"line-dasharray-transition", mbgl::underlying_type(Property::LineDasharrayTransition)},
-     {"line-gap-width-transition", mbgl::underlying_type(Property::LineGapWidthTransition)},
-     {"line-gradient-transition", mbgl::underlying_type(Property::LineGradientTransition)},
-     {"line-offset-transition", mbgl::underlying_type(Property::LineOffsetTransition)},
-     {"line-opacity-transition", mbgl::underlying_type(Property::LineOpacityTransition)},
-     {"line-pattern-transition", mbgl::underlying_type(Property::LinePatternTransition)},
-     {"line-translate-transition", mbgl::underlying_type(Property::LineTranslateTransition)},
-     {"line-translate-anchor-transition", mbgl::underlying_type(Property::LineTranslateAnchorTransition)},
-     {"line-width-transition", mbgl::underlying_type(Property::LineWidthTransition)}});
+    {{"line-blur", toUint8(Property::LineBlur)},
+     {"line-color", toUint8(Property::LineColor)},
+     {"line-dasharray", toUint8(Property::LineDasharray)},
+     {"line-gap-width", toUint8(Property::LineGapWidth)},
+     {"line-gradient", toUint8(Property::LineGradient)},
+     {"line-offset", toUint8(Property::LineOffset)},
+     {"line-opacity", toUint8(Property::LineOpacity)},
+     {"line-pattern", toUint8(Property::LinePattern)},
+     {"line-translate", toUint8(Property::LineTranslate)},
+     {"line-translate-anchor", toUint8(Property::LineTranslateAnchor)},
+     {"line-width", toUint8(Property::LineWidth)},
+     {"line-blur-transition", toUint8(Property::LineBlurTransition)},
+     {"line-color-transition", toUint8(Property::LineColorTransition)},
+     {"line-dasharray-transition", toUint8(Property::LineDasharrayTransition)},
+     {"line-gap-width-transition", toUint8(Property::LineGapWidthTransition)},
+     {"line-gradient-transition", toUint8(Property::LineGradientTransition)},
+     {"line-offset-transition", toUint8(Property::LineOffsetTransition)},
+     {"line-opacity-transition", toUint8(Property::LineOpacityTransition)},
+     {"line-pattern-transition", toUint8(Property::LinePatternTransition)},
+     {"line-translate-transition", toUint8(Property::LineTranslateTransition)},
+     {"line-translate-anchor-transition", toUint8(Property::LineTranslateAnchorTransition)},
+     {"line-width-transition", toUint8(Property::LineWidthTransition)}});
 
 } // namespace
 
 optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
-        return Error { "layer doesn't support this property" };
+        return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
@@ -604,64 +609,63 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     if (!transition) {
         return error;
     }
-    
+
     if (property == Property::LineBlurTransition) {
         setLineBlurTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineColorTransition) {
         setLineColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineDasharrayTransition) {
         setLineDasharrayTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineGapWidthTransition) {
         setLineGapWidthTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineGradientTransition) {
         setLineGradientTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineOffsetTransition) {
         setLineOffsetTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineOpacityTransition) {
         setLineOpacityTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LinePatternTransition) {
         setLinePatternTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineTranslateTransition) {
         setLineTranslateTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineTranslateAnchorTransition) {
         setLineTranslateAnchorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::LineWidthTransition) {
         setLineWidthTransition(*transition);
         return nullopt;
     }
-    
 
-    return Error { "layer doesn't support this property" };
+    return Error{"layer doesn't support this property"};
 }
 
 LayerProperty LineLayer::getPaintProperty(const std::string& name) const {
@@ -672,49 +676,49 @@ LayerProperty LineLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::LineBlur:
-            return conversion::makeLayerProperty(getLineBlur());
+            return makeLayerProperty(getLineBlur());
         case Property::LineColor:
-            return conversion::makeLayerProperty(getLineColor());
+            return makeLayerProperty(getLineColor());
         case Property::LineDasharray:
-            return conversion::makeLayerProperty(getLineDasharray());
+            return makeLayerProperty(getLineDasharray());
         case Property::LineGapWidth:
-            return conversion::makeLayerProperty(getLineGapWidth());
+            return makeLayerProperty(getLineGapWidth());
         case Property::LineGradient:
-            return conversion::makeLayerProperty(getLineGradient());
+            return makeLayerProperty(getLineGradient());
         case Property::LineOffset:
-            return conversion::makeLayerProperty(getLineOffset());
+            return makeLayerProperty(getLineOffset());
         case Property::LineOpacity:
-            return conversion::makeLayerProperty(getLineOpacity());
+            return makeLayerProperty(getLineOpacity());
         case Property::LinePattern:
-            return conversion::makeLayerProperty(getLinePattern());
+            return makeLayerProperty(getLinePattern());
         case Property::LineTranslate:
-            return conversion::makeLayerProperty(getLineTranslate());
+            return makeLayerProperty(getLineTranslate());
         case Property::LineTranslateAnchor:
-            return conversion::makeLayerProperty(getLineTranslateAnchor());
+            return makeLayerProperty(getLineTranslateAnchor());
         case Property::LineWidth:
-            return conversion::makeLayerProperty(getLineWidth());
+            return makeLayerProperty(getLineWidth());
         case Property::LineBlurTransition:
-            return conversion::makeLayerProperty(getLineBlurTransition());
+            return makeLayerProperty(getLineBlurTransition());
         case Property::LineColorTransition:
-            return conversion::makeLayerProperty(getLineColorTransition());
+            return makeLayerProperty(getLineColorTransition());
         case Property::LineDasharrayTransition:
-            return conversion::makeLayerProperty(getLineDasharrayTransition());
+            return makeLayerProperty(getLineDasharrayTransition());
         case Property::LineGapWidthTransition:
-            return conversion::makeLayerProperty(getLineGapWidthTransition());
+            return makeLayerProperty(getLineGapWidthTransition());
         case Property::LineGradientTransition:
-            return conversion::makeLayerProperty(getLineGradientTransition());
+            return makeLayerProperty(getLineGradientTransition());
         case Property::LineOffsetTransition:
-            return conversion::makeLayerProperty(getLineOffsetTransition());
+            return makeLayerProperty(getLineOffsetTransition());
         case Property::LineOpacityTransition:
-            return conversion::makeLayerProperty(getLineOpacityTransition());
+            return makeLayerProperty(getLineOpacityTransition());
         case Property::LinePatternTransition:
-            return conversion::makeLayerProperty(getLinePatternTransition());
+            return makeLayerProperty(getLinePatternTransition());
         case Property::LineTranslateTransition:
-            return conversion::makeLayerProperty(getLineTranslateTransition());
+            return makeLayerProperty(getLineTranslateTransition());
         case Property::LineTranslateAnchorTransition:
-            return conversion::makeLayerProperty(getLineTranslateAnchorTransition());
+            return makeLayerProperty(getLineTranslateAnchorTransition());
         case Property::LineWidthTransition:
-            return conversion::makeLayerProperty(getLineWidthTransition());
+            return makeLayerProperty(getLineWidthTransition());
     }
     return {};
 }
