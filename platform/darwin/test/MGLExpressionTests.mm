@@ -431,6 +431,20 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *expression = [NSExpression expressionForFunction:@"max:" arguments:arguments];
+        NSArray *jsonExpression = @[@"max", @1, @1];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        // Getting exception
+//        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @1);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"min:" arguments:arguments];
+        NSArray *jsonExpression = @[@"min", @1, @1];
+    XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+// -[__NSCFNumber count]: unrecognized selector sent to instance 0xd2b9e475c245aa2a
+//        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @1);
+    }
+    {
         NSExpression *expression = [NSExpression expressionForFunction:@"ceiling:" arguments:@[MGLConstantExpression(@1.5)]];
         NSArray *jsonExpression = @[@"ceil", @1.5];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
@@ -633,6 +647,16 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @"OldMacDonald");
         XCTAssertEqualObjects([aftermarketExpression expressionValueWithObject:nil context:nil], @"OldMacDonald");
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], aftermarketExpression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_join:" arguments:@[@"Old", @"MacDonald"]];
+        NSExpression *aftermarketExpression = [NSExpression expressionWithFormat:@"mgl_join({'Old', 'MacDonald'})"];
+        NSArray *jsonExpression = @[@"concat", @"Old", @"MacDonald"];
+    XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+
+    XCTAssertEqualObjects(aftermarketExpression.mgl_jsonExpressionObject, expression.mgl_jsonExpressionObject);
+        // Getting exception
+//        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @"OldMacDonald");
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"uppercase:" arguments:arguments];
