@@ -434,15 +434,11 @@ using namespace std::string_literals;
         NSExpression *expression = [NSExpression expressionForFunction:@"max:" arguments:arguments];
         NSArray *jsonExpression = @[@"max", @1, @1];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        // Getting exception
-//        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @1);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"min:" arguments:arguments];
         NSArray *jsonExpression = @[@"min", @1, @1];
     XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-// -[__NSCFNumber count]: unrecognized selector sent to instance 0xd2b9e475c245aa2a
-//        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @1);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"ceiling:" arguments:@[MGLConstantExpression(@1.5)]];
@@ -655,8 +651,6 @@ using namespace std::string_literals;
     XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
 
     XCTAssertEqualObjects(aftermarketExpression.mgl_jsonExpressionObject, expression.mgl_jsonExpressionObject);
-        // Getting exception
-//        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @"OldMacDonald");
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"uppercase:" arguments:arguments];
