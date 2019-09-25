@@ -101,6 +101,8 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/logger.cpp
         ${MBGL_ROOT}/platform/android/src/logger.hpp
         ${MBGL_ROOT}/platform/android/src/logging_android.cpp
+        ${MBGL_ROOT}/platform/android/src/mapbox.cpp
+        ${MBGL_ROOT}/platform/android/src/mapbox.hpp
         ${MBGL_ROOT}/platform/android/src/map/camera_position.cpp
         ${MBGL_ROOT}/platform/android/src/map/camera_position.hpp
         ${MBGL_ROOT}/platform/android/src/map/image.cpp
