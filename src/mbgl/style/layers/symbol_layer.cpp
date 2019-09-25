@@ -1104,7 +1104,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     IconColor,
     IconHaloBlur,
     IconHaloColor,
@@ -1367,7 +1367,7 @@ optional<Error> SymbolLayer::setPaintProperty(const std::string& name, const Con
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty SymbolLayer::getPaintProperty(const std::string& name) const {
+StyleProperty SymbolLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -1375,61 +1375,61 @@ LayerProperty SymbolLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::IconColor:
-            return makeLayerProperty(getIconColor());
+            return makeStyleProperty(getIconColor());
         case Property::IconHaloBlur:
-            return makeLayerProperty(getIconHaloBlur());
+            return makeStyleProperty(getIconHaloBlur());
         case Property::IconHaloColor:
-            return makeLayerProperty(getIconHaloColor());
+            return makeStyleProperty(getIconHaloColor());
         case Property::IconHaloWidth:
-            return makeLayerProperty(getIconHaloWidth());
+            return makeStyleProperty(getIconHaloWidth());
         case Property::IconOpacity:
-            return makeLayerProperty(getIconOpacity());
+            return makeStyleProperty(getIconOpacity());
         case Property::IconTranslate:
-            return makeLayerProperty(getIconTranslate());
+            return makeStyleProperty(getIconTranslate());
         case Property::IconTranslateAnchor:
-            return makeLayerProperty(getIconTranslateAnchor());
+            return makeStyleProperty(getIconTranslateAnchor());
         case Property::TextColor:
-            return makeLayerProperty(getTextColor());
+            return makeStyleProperty(getTextColor());
         case Property::TextHaloBlur:
-            return makeLayerProperty(getTextHaloBlur());
+            return makeStyleProperty(getTextHaloBlur());
         case Property::TextHaloColor:
-            return makeLayerProperty(getTextHaloColor());
+            return makeStyleProperty(getTextHaloColor());
         case Property::TextHaloWidth:
-            return makeLayerProperty(getTextHaloWidth());
+            return makeStyleProperty(getTextHaloWidth());
         case Property::TextOpacity:
-            return makeLayerProperty(getTextOpacity());
+            return makeStyleProperty(getTextOpacity());
         case Property::TextTranslate:
-            return makeLayerProperty(getTextTranslate());
+            return makeStyleProperty(getTextTranslate());
         case Property::TextTranslateAnchor:
-            return makeLayerProperty(getTextTranslateAnchor());
+            return makeStyleProperty(getTextTranslateAnchor());
         case Property::IconColorTransition:
-            return makeLayerProperty(getIconColorTransition());
+            return makeStyleProperty(getIconColorTransition());
         case Property::IconHaloBlurTransition:
-            return makeLayerProperty(getIconHaloBlurTransition());
+            return makeStyleProperty(getIconHaloBlurTransition());
         case Property::IconHaloColorTransition:
-            return makeLayerProperty(getIconHaloColorTransition());
+            return makeStyleProperty(getIconHaloColorTransition());
         case Property::IconHaloWidthTransition:
-            return makeLayerProperty(getIconHaloWidthTransition());
+            return makeStyleProperty(getIconHaloWidthTransition());
         case Property::IconOpacityTransition:
-            return makeLayerProperty(getIconOpacityTransition());
+            return makeStyleProperty(getIconOpacityTransition());
         case Property::IconTranslateTransition:
-            return makeLayerProperty(getIconTranslateTransition());
+            return makeStyleProperty(getIconTranslateTransition());
         case Property::IconTranslateAnchorTransition:
-            return makeLayerProperty(getIconTranslateAnchorTransition());
+            return makeStyleProperty(getIconTranslateAnchorTransition());
         case Property::TextColorTransition:
-            return makeLayerProperty(getTextColorTransition());
+            return makeStyleProperty(getTextColorTransition());
         case Property::TextHaloBlurTransition:
-            return makeLayerProperty(getTextHaloBlurTransition());
+            return makeStyleProperty(getTextHaloBlurTransition());
         case Property::TextHaloColorTransition:
-            return makeLayerProperty(getTextHaloColorTransition());
+            return makeStyleProperty(getTextHaloColorTransition());
         case Property::TextHaloWidthTransition:
-            return makeLayerProperty(getTextHaloWidthTransition());
+            return makeStyleProperty(getTextHaloWidthTransition());
         case Property::TextOpacityTransition:
-            return makeLayerProperty(getTextOpacityTransition());
+            return makeStyleProperty(getTextOpacityTransition());
         case Property::TextTranslateTransition:
-            return makeLayerProperty(getTextTranslateTransition());
+            return makeStyleProperty(getTextTranslateTransition());
         case Property::TextTranslateAnchorTransition:
-            return makeLayerProperty(getTextTranslateAnchorTransition());
+            return makeStyleProperty(getTextTranslateAnchorTransition());
     }
     return {};
 }

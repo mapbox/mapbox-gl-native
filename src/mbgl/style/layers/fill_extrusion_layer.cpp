@@ -285,7 +285,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     FillExtrusionBase,
     FillExtrusionColor,
     FillExtrusionHeight,
@@ -479,7 +479,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty FillExtrusionLayer::getPaintProperty(const std::string& name) const {
+StyleProperty FillExtrusionLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -487,37 +487,37 @@ LayerProperty FillExtrusionLayer::getPaintProperty(const std::string& name) cons
 
     switch (static_cast<Property>(it->second)) {
         case Property::FillExtrusionBase:
-            return makeLayerProperty(getFillExtrusionBase());
+            return makeStyleProperty(getFillExtrusionBase());
         case Property::FillExtrusionColor:
-            return makeLayerProperty(getFillExtrusionColor());
+            return makeStyleProperty(getFillExtrusionColor());
         case Property::FillExtrusionHeight:
-            return makeLayerProperty(getFillExtrusionHeight());
+            return makeStyleProperty(getFillExtrusionHeight());
         case Property::FillExtrusionOpacity:
-            return makeLayerProperty(getFillExtrusionOpacity());
+            return makeStyleProperty(getFillExtrusionOpacity());
         case Property::FillExtrusionPattern:
-            return makeLayerProperty(getFillExtrusionPattern());
+            return makeStyleProperty(getFillExtrusionPattern());
         case Property::FillExtrusionTranslate:
-            return makeLayerProperty(getFillExtrusionTranslate());
+            return makeStyleProperty(getFillExtrusionTranslate());
         case Property::FillExtrusionTranslateAnchor:
-            return makeLayerProperty(getFillExtrusionTranslateAnchor());
+            return makeStyleProperty(getFillExtrusionTranslateAnchor());
         case Property::FillExtrusionVerticalGradient:
-            return makeLayerProperty(getFillExtrusionVerticalGradient());
+            return makeStyleProperty(getFillExtrusionVerticalGradient());
         case Property::FillExtrusionBaseTransition:
-            return makeLayerProperty(getFillExtrusionBaseTransition());
+            return makeStyleProperty(getFillExtrusionBaseTransition());
         case Property::FillExtrusionColorTransition:
-            return makeLayerProperty(getFillExtrusionColorTransition());
+            return makeStyleProperty(getFillExtrusionColorTransition());
         case Property::FillExtrusionHeightTransition:
-            return makeLayerProperty(getFillExtrusionHeightTransition());
+            return makeStyleProperty(getFillExtrusionHeightTransition());
         case Property::FillExtrusionOpacityTransition:
-            return makeLayerProperty(getFillExtrusionOpacityTransition());
+            return makeStyleProperty(getFillExtrusionOpacityTransition());
         case Property::FillExtrusionPatternTransition:
-            return makeLayerProperty(getFillExtrusionPatternTransition());
+            return makeStyleProperty(getFillExtrusionPatternTransition());
         case Property::FillExtrusionTranslateTransition:
-            return makeLayerProperty(getFillExtrusionTranslateTransition());
+            return makeStyleProperty(getFillExtrusionTranslateTransition());
         case Property::FillExtrusionTranslateAnchorTransition:
-            return makeLayerProperty(getFillExtrusionTranslateAnchorTransition());
+            return makeStyleProperty(getFillExtrusionTranslateAnchorTransition());
         case Property::FillExtrusionVerticalGradientTransition:
-            return makeLayerProperty(getFillExtrusionVerticalGradientTransition());
+            return makeStyleProperty(getFillExtrusionVerticalGradientTransition());
     }
     return {};
 }

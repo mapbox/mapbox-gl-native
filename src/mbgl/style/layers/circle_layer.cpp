@@ -366,7 +366,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     CircleBlur,
     CircleColor,
     CircleOpacity,
@@ -597,7 +597,7 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty CircleLayer::getPaintProperty(const std::string& name) const {
+StyleProperty CircleLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -605,49 +605,49 @@ LayerProperty CircleLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::CircleBlur:
-            return makeLayerProperty(getCircleBlur());
+            return makeStyleProperty(getCircleBlur());
         case Property::CircleColor:
-            return makeLayerProperty(getCircleColor());
+            return makeStyleProperty(getCircleColor());
         case Property::CircleOpacity:
-            return makeLayerProperty(getCircleOpacity());
+            return makeStyleProperty(getCircleOpacity());
         case Property::CirclePitchAlignment:
-            return makeLayerProperty(getCirclePitchAlignment());
+            return makeStyleProperty(getCirclePitchAlignment());
         case Property::CirclePitchScale:
-            return makeLayerProperty(getCirclePitchScale());
+            return makeStyleProperty(getCirclePitchScale());
         case Property::CircleRadius:
-            return makeLayerProperty(getCircleRadius());
+            return makeStyleProperty(getCircleRadius());
         case Property::CircleStrokeColor:
-            return makeLayerProperty(getCircleStrokeColor());
+            return makeStyleProperty(getCircleStrokeColor());
         case Property::CircleStrokeOpacity:
-            return makeLayerProperty(getCircleStrokeOpacity());
+            return makeStyleProperty(getCircleStrokeOpacity());
         case Property::CircleStrokeWidth:
-            return makeLayerProperty(getCircleStrokeWidth());
+            return makeStyleProperty(getCircleStrokeWidth());
         case Property::CircleTranslate:
-            return makeLayerProperty(getCircleTranslate());
+            return makeStyleProperty(getCircleTranslate());
         case Property::CircleTranslateAnchor:
-            return makeLayerProperty(getCircleTranslateAnchor());
+            return makeStyleProperty(getCircleTranslateAnchor());
         case Property::CircleBlurTransition:
-            return makeLayerProperty(getCircleBlurTransition());
+            return makeStyleProperty(getCircleBlurTransition());
         case Property::CircleColorTransition:
-            return makeLayerProperty(getCircleColorTransition());
+            return makeStyleProperty(getCircleColorTransition());
         case Property::CircleOpacityTransition:
-            return makeLayerProperty(getCircleOpacityTransition());
+            return makeStyleProperty(getCircleOpacityTransition());
         case Property::CirclePitchAlignmentTransition:
-            return makeLayerProperty(getCirclePitchAlignmentTransition());
+            return makeStyleProperty(getCirclePitchAlignmentTransition());
         case Property::CirclePitchScaleTransition:
-            return makeLayerProperty(getCirclePitchScaleTransition());
+            return makeStyleProperty(getCirclePitchScaleTransition());
         case Property::CircleRadiusTransition:
-            return makeLayerProperty(getCircleRadiusTransition());
+            return makeStyleProperty(getCircleRadiusTransition());
         case Property::CircleStrokeColorTransition:
-            return makeLayerProperty(getCircleStrokeColorTransition());
+            return makeStyleProperty(getCircleStrokeColorTransition());
         case Property::CircleStrokeOpacityTransition:
-            return makeLayerProperty(getCircleStrokeOpacityTransition());
+            return makeStyleProperty(getCircleStrokeOpacityTransition());
         case Property::CircleStrokeWidthTransition:
-            return makeLayerProperty(getCircleStrokeWidthTransition());
+            return makeStyleProperty(getCircleStrokeWidthTransition());
         case Property::CircleTranslateTransition:
-            return makeLayerProperty(getCircleTranslateTransition());
+            return makeStyleProperty(getCircleTranslateTransition());
         case Property::CircleTranslateAnchorTransition:
-            return makeLayerProperty(getCircleTranslateAnchorTransition());
+            return makeStyleProperty(getCircleTranslateAnchorTransition());
     }
     return {};
 }

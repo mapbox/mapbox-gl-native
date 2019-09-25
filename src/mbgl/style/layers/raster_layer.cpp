@@ -285,7 +285,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     RasterBrightnessMax,
     RasterBrightnessMin,
     RasterContrast,
@@ -444,7 +444,7 @@ optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Con
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty RasterLayer::getPaintProperty(const std::string& name) const {
+StyleProperty RasterLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -452,37 +452,37 @@ LayerProperty RasterLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::RasterBrightnessMax:
-            return makeLayerProperty(getRasterBrightnessMax());
+            return makeStyleProperty(getRasterBrightnessMax());
         case Property::RasterBrightnessMin:
-            return makeLayerProperty(getRasterBrightnessMin());
+            return makeStyleProperty(getRasterBrightnessMin());
         case Property::RasterContrast:
-            return makeLayerProperty(getRasterContrast());
+            return makeStyleProperty(getRasterContrast());
         case Property::RasterFadeDuration:
-            return makeLayerProperty(getRasterFadeDuration());
+            return makeStyleProperty(getRasterFadeDuration());
         case Property::RasterHueRotate:
-            return makeLayerProperty(getRasterHueRotate());
+            return makeStyleProperty(getRasterHueRotate());
         case Property::RasterOpacity:
-            return makeLayerProperty(getRasterOpacity());
+            return makeStyleProperty(getRasterOpacity());
         case Property::RasterResampling:
-            return makeLayerProperty(getRasterResampling());
+            return makeStyleProperty(getRasterResampling());
         case Property::RasterSaturation:
-            return makeLayerProperty(getRasterSaturation());
+            return makeStyleProperty(getRasterSaturation());
         case Property::RasterBrightnessMaxTransition:
-            return makeLayerProperty(getRasterBrightnessMaxTransition());
+            return makeStyleProperty(getRasterBrightnessMaxTransition());
         case Property::RasterBrightnessMinTransition:
-            return makeLayerProperty(getRasterBrightnessMinTransition());
+            return makeStyleProperty(getRasterBrightnessMinTransition());
         case Property::RasterContrastTransition:
-            return makeLayerProperty(getRasterContrastTransition());
+            return makeStyleProperty(getRasterContrastTransition());
         case Property::RasterFadeDurationTransition:
-            return makeLayerProperty(getRasterFadeDurationTransition());
+            return makeStyleProperty(getRasterFadeDurationTransition());
         case Property::RasterHueRotateTransition:
-            return makeLayerProperty(getRasterHueRotateTransition());
+            return makeStyleProperty(getRasterHueRotateTransition());
         case Property::RasterOpacityTransition:
-            return makeLayerProperty(getRasterOpacityTransition());
+            return makeStyleProperty(getRasterOpacityTransition());
         case Property::RasterResamplingTransition:
-            return makeLayerProperty(getRasterResamplingTransition());
+            return makeStyleProperty(getRasterResamplingTransition());
         case Property::RasterSaturationTransition:
-            return makeLayerProperty(getRasterSaturationTransition());
+            return makeStyleProperty(getRasterSaturationTransition());
     }
     return {};
 }

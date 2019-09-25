@@ -953,17 +953,17 @@ TEST(Map, UniversalStyleGetter) {
     Layer* lineLayer = test.map.getStyle().getLayer("line");
     ASSERT_TRUE(lineLayer);
 
-    LayerProperty nonexistent = lineLayer->getPaintProperty("nonexistent");
+    StyleProperty nonexistent = lineLayer->getPaintProperty("nonexistent");
     ASSERT_FALSE(nonexistent.value);
-    EXPECT_EQ(LayerProperty::Kind::Undefined, nonexistent.kind);
+    EXPECT_EQ(StyleProperty::Kind::Undefined, nonexistent.kind);
 
-    LayerProperty undefined = lineLayer->getPaintProperty("line-blur");
+    StyleProperty undefined = lineLayer->getPaintProperty("line-blur");
     ASSERT_FALSE(undefined.value);
-    EXPECT_EQ(LayerProperty::Kind::Undefined, undefined.kind);
+    EXPECT_EQ(StyleProperty::Kind::Undefined, undefined.kind);
 
-    LayerProperty lineColor = lineLayer->getPaintProperty("line-color");
+    StyleProperty lineColor = lineLayer->getPaintProperty("line-color");
     ASSERT_TRUE(lineColor.value);
-    EXPECT_EQ(LayerProperty::Kind::Constant, lineColor.kind);
+    EXPECT_EQ(StyleProperty::Kind::Constant, lineColor.kind);
     ASSERT_TRUE(lineColor.value.getObject());
     const auto& color = *(lineColor.value.getObject());
     EXPECT_EQ(1.0, *color.at("r").getDouble());
@@ -971,21 +971,21 @@ TEST(Map, UniversalStyleGetter) {
     EXPECT_EQ(0.0, *color.at("b").getDouble());
     EXPECT_EQ(1.0, *color.at("a").getDouble());
 
-    LayerProperty lineOpacity = lineLayer->getPaintProperty("line-opacity");
+    StyleProperty lineOpacity = lineLayer->getPaintProperty("line-opacity");
     ASSERT_TRUE(lineOpacity.value);
-    EXPECT_EQ(LayerProperty::Kind::Constant, lineOpacity.kind);
+    EXPECT_EQ(StyleProperty::Kind::Constant, lineOpacity.kind);
     ASSERT_TRUE(lineOpacity.value.getDouble());
     EXPECT_EQ(0.5, *lineOpacity.value.getDouble());
 
-    LayerProperty lineOpacityTransition = lineLayer->getPaintProperty("line-opacity-transition");
+    StyleProperty lineOpacityTransition = lineLayer->getPaintProperty("line-opacity-transition");
     ASSERT_TRUE(lineOpacityTransition.value);
-    EXPECT_EQ(LayerProperty::Kind::Transition, lineOpacityTransition.kind);
+    EXPECT_EQ(StyleProperty::Kind::Transition, lineOpacityTransition.kind);
     ASSERT_TRUE(lineOpacityTransition.value.getArray());
     EXPECT_EQ(3u, lineOpacityTransition.value.getArray()->size());
 
-    LayerProperty lineWidth = lineLayer->getPaintProperty("line-width");
+    StyleProperty lineWidth = lineLayer->getPaintProperty("line-width");
     ASSERT_TRUE(lineWidth.value);
-    EXPECT_EQ(LayerProperty::Kind::Expression, lineWidth.kind);
+    EXPECT_EQ(StyleProperty::Kind::Expression, lineWidth.kind);
     ASSERT_TRUE(lineWidth.value.getArray());
 
     const auto& expression = *lineWidth.value.getArray();
