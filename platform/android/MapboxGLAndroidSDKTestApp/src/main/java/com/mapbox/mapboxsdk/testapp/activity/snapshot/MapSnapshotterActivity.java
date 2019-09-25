@@ -89,6 +89,7 @@ public class MapSnapshotterActivity extends AppCompatActivity {
         .bearing(randomInRange(0, 360))
         .tilt(randomInRange(0, 60))
         .zoom(randomInRange(0, 20))
+        .padding(1, 1, 1, 1)
         .build()
       );
     }
