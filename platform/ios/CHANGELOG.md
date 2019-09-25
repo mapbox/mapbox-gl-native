@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 5.4.0
+## 5.4.0 - September 25, 2019
 
 ### Styles and rendering
 
