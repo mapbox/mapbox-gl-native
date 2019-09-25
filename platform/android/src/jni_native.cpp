@@ -6,8 +6,8 @@
 #include "bitmap.hpp"
 #include "bitmap_factory.hpp"
 #include "connectivity_listener.hpp"
-#include "conversion/conversion.hpp"
 #include "conversion/collection.hpp"
+#include "conversion/conversion.hpp"
 #include "file_source.hpp"
 #include "geojson/feature.hpp"
 #include "geojson/feature_collection.hpp"
@@ -32,6 +32,7 @@
 #include "java_types.hpp"
 #include "map_renderer.hpp"
 #include "map_renderer_runnable.hpp"
+#include "mapbox.hpp"
 #include "native_map_view.hpp"
 #ifndef MBGL_MODULE_OFFLINE_DISABLE
 #include "offline/offline_manager.hpp"
@@ -158,6 +159,9 @@ void registerNatives(JavaVM *vm) {
 
     // Logger
     Logger::registerNative(env);
+
+    // AssetManager
+    Mapbox::registerNative(env);
 }
 
 } // namespace android

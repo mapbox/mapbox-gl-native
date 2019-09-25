@@ -41,7 +41,7 @@ public:
                               const jni::String&);
     };
 
-    FileSource(jni::JNIEnv&, const jni::String&, const jni::String&, const jni::Object<AssetManager>&);
+    FileSource(jni::JNIEnv&, const jni::String&, const jni::String&);
 
     ~FileSource();
 
