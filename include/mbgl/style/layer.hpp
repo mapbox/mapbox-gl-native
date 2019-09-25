@@ -66,10 +66,10 @@ struct LayerTypeInfo {
     const enum class TileKind : uint8_t { Geometry, Raster, RasterDEM, NotRequired } tileKind;
 };
 
-struct LayerProperty {
+struct StyleProperty {
     enum class Kind : uint8_t { Undefined, Constant, Expression, Transition };
-    LayerProperty(Value value_, Kind kind_) : value(std::move(value_)), kind(kind_) {}
-    LayerProperty() = default;
+    StyleProperty(Value value_, Kind kind_) : value(std::move(value_)), kind(kind_) {}
+    StyleProperty() = default;
     const Value value;
     const Kind kind = Kind::Undefined;
 };
@@ -123,7 +123,7 @@ public:
                                                          const conversion::Convertible& value) = 0;
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
 
-    virtual LayerProperty getPaintProperty(const std::string&) const = 0;
+    virtual StyleProperty getPaintProperty(const std::string&) const = 0;
 
     // Private implementation
     // TODO : We should not have public mutable data members.

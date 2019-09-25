@@ -231,7 +231,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     HillshadeAccentColor,
     HillshadeExaggeration,
     HillshadeHighlightColor,
@@ -371,7 +371,7 @@ optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const 
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty HillshadeLayer::getPaintProperty(const std::string& name) const {
+StyleProperty HillshadeLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -379,29 +379,29 @@ LayerProperty HillshadeLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::HillshadeAccentColor:
-            return makeLayerProperty(getHillshadeAccentColor());
+            return makeStyleProperty(getHillshadeAccentColor());
         case Property::HillshadeExaggeration:
-            return makeLayerProperty(getHillshadeExaggeration());
+            return makeStyleProperty(getHillshadeExaggeration());
         case Property::HillshadeHighlightColor:
-            return makeLayerProperty(getHillshadeHighlightColor());
+            return makeStyleProperty(getHillshadeHighlightColor());
         case Property::HillshadeIlluminationAnchor:
-            return makeLayerProperty(getHillshadeIlluminationAnchor());
+            return makeStyleProperty(getHillshadeIlluminationAnchor());
         case Property::HillshadeIlluminationDirection:
-            return makeLayerProperty(getHillshadeIlluminationDirection());
+            return makeStyleProperty(getHillshadeIlluminationDirection());
         case Property::HillshadeShadowColor:
-            return makeLayerProperty(getHillshadeShadowColor());
+            return makeStyleProperty(getHillshadeShadowColor());
         case Property::HillshadeAccentColorTransition:
-            return makeLayerProperty(getHillshadeAccentColorTransition());
+            return makeStyleProperty(getHillshadeAccentColorTransition());
         case Property::HillshadeExaggerationTransition:
-            return makeLayerProperty(getHillshadeExaggerationTransition());
+            return makeStyleProperty(getHillshadeExaggerationTransition());
         case Property::HillshadeHighlightColorTransition:
-            return makeLayerProperty(getHillshadeHighlightColorTransition());
+            return makeStyleProperty(getHillshadeHighlightColorTransition());
         case Property::HillshadeIlluminationAnchorTransition:
-            return makeLayerProperty(getHillshadeIlluminationAnchorTransition());
+            return makeStyleProperty(getHillshadeIlluminationAnchorTransition());
         case Property::HillshadeIlluminationDirectionTransition:
-            return makeLayerProperty(getHillshadeIlluminationDirectionTransition());
+            return makeStyleProperty(getHillshadeIlluminationDirectionTransition());
         case Property::HillshadeShadowColorTransition:
-            return makeLayerProperty(getHillshadeShadowColorTransition());
+            return makeStyleProperty(getHillshadeShadowColorTransition());
     }
     return {};
 }

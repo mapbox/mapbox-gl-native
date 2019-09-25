@@ -258,7 +258,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     FillAntialias,
     FillColor,
     FillOpacity,
@@ -431,7 +431,7 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty FillLayer::getPaintProperty(const std::string& name) const {
+StyleProperty FillLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -439,33 +439,33 @@ LayerProperty FillLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::FillAntialias:
-            return makeLayerProperty(getFillAntialias());
+            return makeStyleProperty(getFillAntialias());
         case Property::FillColor:
-            return makeLayerProperty(getFillColor());
+            return makeStyleProperty(getFillColor());
         case Property::FillOpacity:
-            return makeLayerProperty(getFillOpacity());
+            return makeStyleProperty(getFillOpacity());
         case Property::FillOutlineColor:
-            return makeLayerProperty(getFillOutlineColor());
+            return makeStyleProperty(getFillOutlineColor());
         case Property::FillPattern:
-            return makeLayerProperty(getFillPattern());
+            return makeStyleProperty(getFillPattern());
         case Property::FillTranslate:
-            return makeLayerProperty(getFillTranslate());
+            return makeStyleProperty(getFillTranslate());
         case Property::FillTranslateAnchor:
-            return makeLayerProperty(getFillTranslateAnchor());
+            return makeStyleProperty(getFillTranslateAnchor());
         case Property::FillAntialiasTransition:
-            return makeLayerProperty(getFillAntialiasTransition());
+            return makeStyleProperty(getFillAntialiasTransition());
         case Property::FillColorTransition:
-            return makeLayerProperty(getFillColorTransition());
+            return makeStyleProperty(getFillColorTransition());
         case Property::FillOpacityTransition:
-            return makeLayerProperty(getFillOpacityTransition());
+            return makeStyleProperty(getFillOpacityTransition());
         case Property::FillOutlineColorTransition:
-            return makeLayerProperty(getFillOutlineColorTransition());
+            return makeStyleProperty(getFillOutlineColorTransition());
         case Property::FillPatternTransition:
-            return makeLayerProperty(getFillPatternTransition());
+            return makeStyleProperty(getFillPatternTransition());
         case Property::FillTranslateTransition:
-            return makeLayerProperty(getFillTranslateTransition());
+            return makeStyleProperty(getFillTranslateTransition());
         case Property::FillTranslateAnchorTransition:
-            return makeLayerProperty(getFillTranslateAnchorTransition());
+            return makeStyleProperty(getFillTranslateAnchorTransition());
     }
     return {};
 }

@@ -26,7 +26,7 @@ public:
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
     optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
 
-    LayerProperty getPaintProperty(const std::string& name) const final;
+    StyleProperty getPaintProperty(const std::string& name) const final;
 
     // Layout properties
 

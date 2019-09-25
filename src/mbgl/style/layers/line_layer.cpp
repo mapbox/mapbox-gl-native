@@ -432,7 +432,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     LineBlur,
     LineColor,
     LineDasharray,
@@ -668,7 +668,7 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty LineLayer::getPaintProperty(const std::string& name) const {
+StyleProperty LineLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -676,49 +676,49 @@ LayerProperty LineLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::LineBlur:
-            return makeLayerProperty(getLineBlur());
+            return makeStyleProperty(getLineBlur());
         case Property::LineColor:
-            return makeLayerProperty(getLineColor());
+            return makeStyleProperty(getLineColor());
         case Property::LineDasharray:
-            return makeLayerProperty(getLineDasharray());
+            return makeStyleProperty(getLineDasharray());
         case Property::LineGapWidth:
-            return makeLayerProperty(getLineGapWidth());
+            return makeStyleProperty(getLineGapWidth());
         case Property::LineGradient:
-            return makeLayerProperty(getLineGradient());
+            return makeStyleProperty(getLineGradient());
         case Property::LineOffset:
-            return makeLayerProperty(getLineOffset());
+            return makeStyleProperty(getLineOffset());
         case Property::LineOpacity:
-            return makeLayerProperty(getLineOpacity());
+            return makeStyleProperty(getLineOpacity());
         case Property::LinePattern:
-            return makeLayerProperty(getLinePattern());
+            return makeStyleProperty(getLinePattern());
         case Property::LineTranslate:
-            return makeLayerProperty(getLineTranslate());
+            return makeStyleProperty(getLineTranslate());
         case Property::LineTranslateAnchor:
-            return makeLayerProperty(getLineTranslateAnchor());
+            return makeStyleProperty(getLineTranslateAnchor());
         case Property::LineWidth:
-            return makeLayerProperty(getLineWidth());
+            return makeStyleProperty(getLineWidth());
         case Property::LineBlurTransition:
-            return makeLayerProperty(getLineBlurTransition());
+            return makeStyleProperty(getLineBlurTransition());
         case Property::LineColorTransition:
-            return makeLayerProperty(getLineColorTransition());
+            return makeStyleProperty(getLineColorTransition());
         case Property::LineDasharrayTransition:
-            return makeLayerProperty(getLineDasharrayTransition());
+            return makeStyleProperty(getLineDasharrayTransition());
         case Property::LineGapWidthTransition:
-            return makeLayerProperty(getLineGapWidthTransition());
+            return makeStyleProperty(getLineGapWidthTransition());
         case Property::LineGradientTransition:
-            return makeLayerProperty(getLineGradientTransition());
+            return makeStyleProperty(getLineGradientTransition());
         case Property::LineOffsetTransition:
-            return makeLayerProperty(getLineOffsetTransition());
+            return makeStyleProperty(getLineOffsetTransition());
         case Property::LineOpacityTransition:
-            return makeLayerProperty(getLineOpacityTransition());
+            return makeStyleProperty(getLineOpacityTransition());
         case Property::LinePatternTransition:
-            return makeLayerProperty(getLinePatternTransition());
+            return makeStyleProperty(getLinePatternTransition());
         case Property::LineTranslateTransition:
-            return makeLayerProperty(getLineTranslateTransition());
+            return makeStyleProperty(getLineTranslateTransition());
         case Property::LineTranslateAnchorTransition:
-            return makeLayerProperty(getLineTranslateAnchorTransition());
+            return makeStyleProperty(getLineTranslateAnchorTransition());
         case Property::LineWidthTransition:
-            return makeLayerProperty(getLineWidthTransition());
+            return makeStyleProperty(getLineWidthTransition());
     }
     return {};
 }

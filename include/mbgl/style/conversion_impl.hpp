@@ -349,22 +349,22 @@ Value makeValue(T&& arg) {
 }
 
 template <typename T>
-LayerProperty makeLayerProperty(const PropertyValue<T>& value) {
-    return value.match([](const Undefined&) -> LayerProperty { return {}; },
-                       [](const T& t) -> LayerProperty {
-                           return {makeValue(t), LayerProperty::Kind::Constant};
+StyleProperty makeStyleProperty(const PropertyValue<T>& value) {
+    return value.match([](const Undefined&) -> StyleProperty { return {}; },
+                       [](const T& t) -> StyleProperty {
+                           return {makeValue(t), StyleProperty::Kind::Constant};
                        },
-                       [](const PropertyExpression<T>& fn) -> LayerProperty {
-                           return {fn.getExpression().serialize(), LayerProperty::Kind::Expression};
+                       [](const PropertyExpression<T>& fn) -> StyleProperty {
+                           return {fn.getExpression().serialize(), StyleProperty::Kind::Expression};
                        });
 }
 
-inline LayerProperty makeLayerProperty(const TransitionOptions& value) {
-    return {makeValue(value), LayerProperty::Kind::Transition};
+inline StyleProperty makeStyleProperty(const TransitionOptions& value) {
+    return {makeValue(value), StyleProperty::Kind::Transition};
 }
 
-inline LayerProperty makeLayerProperty(const ColorRampPropertyValue& value) {
-    return {makeValue(value), LayerProperty::Kind::Expression};
+inline StyleProperty makeStyleProperty(const ColorRampPropertyValue& value) {
+    return {makeValue(value), StyleProperty::Kind::Expression};
 }
 
 } // namespace conversion

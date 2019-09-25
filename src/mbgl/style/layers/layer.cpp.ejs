@@ -192,7 +192,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
 <% for (const property of paintProperties) { -%>
     <%- camelize(property.name) %>,
 <% } -%>
@@ -265,7 +265,7 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty <%- camelize(type) %>Layer::getPaintProperty(const std::string& name) const {
+StyleProperty <%- camelize(type) %>Layer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -274,11 +274,11 @@ LayerProperty <%- camelize(type) %>Layer::getPaintProperty(const std::string& na
     switch (static_cast<Property>(it->second)) {
 <% for (const property of paintProperties) { -%>
         case Property::<%- camelize(property.name) %>:
-            return makeLayerProperty(get<%- camelize(property.name) %>());
+            return makeStyleProperty(get<%- camelize(property.name) %>());
 <% } -%>
 <% for (const property of paintProperties) { -%>
         case Property::<%- camelize(property.name) %>Transition:
-            return makeLayerProperty(get<%- camelize(property.name) %>Transition());
+            return makeStyleProperty(get<%- camelize(property.name) %>Transition());
 <% } -%>
     }
     return {};

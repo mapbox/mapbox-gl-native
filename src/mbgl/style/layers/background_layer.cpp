@@ -150,7 +150,7 @@ using namespace conversion;
 
 namespace {
 
-enum class Property {
+enum class Property : uint8_t {
     BackgroundColor,
     BackgroundOpacity,
     BackgroundPattern,
@@ -244,7 +244,7 @@ optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const
     return Error{"layer doesn't support this property"};
 }
 
-LayerProperty BackgroundLayer::getPaintProperty(const std::string& name) const {
+StyleProperty BackgroundLayer::getPaintProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
@@ -252,17 +252,17 @@ LayerProperty BackgroundLayer::getPaintProperty(const std::string& name) const {
 
     switch (static_cast<Property>(it->second)) {
         case Property::BackgroundColor:
-            return makeLayerProperty(getBackgroundColor());
+            return makeStyleProperty(getBackgroundColor());
         case Property::BackgroundOpacity:
-            return makeLayerProperty(getBackgroundOpacity());
+            return makeStyleProperty(getBackgroundOpacity());
         case Property::BackgroundPattern:
-            return makeLayerProperty(getBackgroundPattern());
+            return makeStyleProperty(getBackgroundPattern());
         case Property::BackgroundColorTransition:
-            return makeLayerProperty(getBackgroundColorTransition());
+            return makeStyleProperty(getBackgroundColorTransition());
         case Property::BackgroundOpacityTransition:
-            return makeLayerProperty(getBackgroundOpacityTransition());
+            return makeStyleProperty(getBackgroundOpacityTransition());
         case Property::BackgroundPatternTransition:
-            return makeLayerProperty(getBackgroundPatternTransition());
+            return makeStyleProperty(getBackgroundPatternTransition());
     }
     return {};
 }

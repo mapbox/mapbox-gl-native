@@ -47,7 +47,7 @@ optional<Error> CustomLayer::setLayoutProperty(const std::string&, const Convert
     return Error { "layer doesn't support this property" };
 }
 
-LayerProperty CustomLayer::getPaintProperty(const std::string&) const {
+StyleProperty CustomLayer::getPaintProperty(const std::string&) const {
     return {};
 }
 
