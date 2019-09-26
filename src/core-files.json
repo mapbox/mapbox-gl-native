@@ -452,6 +452,7 @@
         "mbgl/style/sources/raster_source.hpp": "include/mbgl/style/sources/raster_source.hpp",
         "mbgl/style/sources/vector_source.hpp": "include/mbgl/style/sources/vector_source.hpp",
         "mbgl/style/style.hpp": "include/mbgl/style/style.hpp",
+        "mbgl/style/style_property.hpp": "include/mbgl/style/style_property.hpp",
         "mbgl/style/transition_options.hpp": "include/mbgl/style/transition_options.hpp",
         "mbgl/style/types.hpp": "include/mbgl/style/types.hpp",
         "mbgl/style/undefined.hpp": "include/mbgl/style/undefined.hpp",
