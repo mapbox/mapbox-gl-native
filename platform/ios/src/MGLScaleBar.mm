@@ -75,9 +75,9 @@ static const MGLRow MGLImperialTable[] ={
 @class MGLScaleBarLabel;
 
 @interface MGLScaleBar()
-@property (nonatomic, readwrite) NSArray<UIView *> *labelViews;
-@property (nonatomic, readwrite) NSArray<UIView *> *bars;
-@property (nonatomic, readwrite) UIView *containerView;
+@property (nonatomic) NSArray<UIView *> *labelViews;
+@property (nonatomic) NSArray<UIView *> *bars;
+@property (nonatomic) UIView *containerView;
 @property (nonatomic) MGLDistanceFormatter *formatter;
 @property (nonatomic, assign) MGLRow row;
 @property (nonatomic) UIColor *primaryColor;
@@ -86,7 +86,7 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic) NSMutableDictionary* labelImageCache;
 @property (nonatomic) MGLScaleBarLabel* prototypeLabel;
 @property (nonatomic) CGFloat lastLabelWidth;
-@property (nonatomic, readwrite) CGSize size;
+@property (nonatomic) CGSize size;
 @property (nonatomic) BOOL recalculateSize;
 @property (nonatomic) BOOL shouldLayoutBars;
 @property (nonatomic) NSNumber *testingRightToLeftOverride;
