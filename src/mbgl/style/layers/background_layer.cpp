@@ -244,7 +244,7 @@ optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty BackgroundLayer::getPaintProperty(const std::string& name) const {
+StyleProperty BackgroundLayer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};

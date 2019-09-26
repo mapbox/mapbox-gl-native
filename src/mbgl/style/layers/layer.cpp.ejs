@@ -265,7 +265,7 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty <%- camelize(type) %>Layer::getPaintProperty(const std::string& name) const {
+StyleProperty <%- camelize(type) %>Layer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};

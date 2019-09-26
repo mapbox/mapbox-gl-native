@@ -953,15 +953,15 @@ TEST(Map, UniversalStyleGetter) {
     Layer* lineLayer = test.map.getStyle().getLayer("line");
     ASSERT_TRUE(lineLayer);
 
-    StyleProperty nonexistent = lineLayer->getPaintProperty("nonexistent");
+    StyleProperty nonexistent = lineLayer->getProperty("nonexistent");
     ASSERT_FALSE(nonexistent.value);
     EXPECT_EQ(StyleProperty::Kind::Undefined, nonexistent.kind);
 
-    StyleProperty undefined = lineLayer->getPaintProperty("line-blur");
+    StyleProperty undefined = lineLayer->getProperty("line-blur");
     ASSERT_FALSE(undefined.value);
     EXPECT_EQ(StyleProperty::Kind::Undefined, undefined.kind);
 
-    StyleProperty lineColor = lineLayer->getPaintProperty("line-color");
+    StyleProperty lineColor = lineLayer->getProperty("line-color");
     ASSERT_TRUE(lineColor.value);
     EXPECT_EQ(StyleProperty::Kind::Constant, lineColor.kind);
     ASSERT_TRUE(lineColor.value.getObject());
@@ -971,19 +971,19 @@ TEST(Map, UniversalStyleGetter) {
     EXPECT_EQ(0.0, *color.at("b").getDouble());
     EXPECT_EQ(1.0, *color.at("a").getDouble());
 
-    StyleProperty lineOpacity = lineLayer->getPaintProperty("line-opacity");
+    StyleProperty lineOpacity = lineLayer->getProperty("line-opacity");
     ASSERT_TRUE(lineOpacity.value);
     EXPECT_EQ(StyleProperty::Kind::Constant, lineOpacity.kind);
     ASSERT_TRUE(lineOpacity.value.getDouble());
     EXPECT_EQ(0.5, *lineOpacity.value.getDouble());
 
-    StyleProperty lineOpacityTransition = lineLayer->getPaintProperty("line-opacity-transition");
+    StyleProperty lineOpacityTransition = lineLayer->getProperty("line-opacity-transition");
     ASSERT_TRUE(lineOpacityTransition.value);
     EXPECT_EQ(StyleProperty::Kind::Transition, lineOpacityTransition.kind);
     ASSERT_TRUE(lineOpacityTransition.value.getArray());
     EXPECT_EQ(3u, lineOpacityTransition.value.getArray()->size());
 
-    StyleProperty lineWidth = lineLayer->getPaintProperty("line-width");
+    StyleProperty lineWidth = lineLayer->getProperty("line-width");
     ASSERT_TRUE(lineWidth.value);
     EXPECT_EQ(StyleProperty::Kind::Expression, lineWidth.kind);
     ASSERT_TRUE(lineWidth.value.getArray());

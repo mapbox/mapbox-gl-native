@@ -431,7 +431,7 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty FillLayer::getPaintProperty(const std::string& name) const {
+StyleProperty FillLayer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};

@@ -332,7 +332,7 @@ optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Co
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty HeatmapLayer::getPaintProperty(const std::string& name) const {
+StyleProperty HeatmapLayer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};

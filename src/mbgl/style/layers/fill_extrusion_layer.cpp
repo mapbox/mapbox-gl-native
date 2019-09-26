@@ -479,7 +479,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty FillExtrusionLayer::getPaintProperty(const std::string& name) const {
+StyleProperty FillExtrusionLayer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};

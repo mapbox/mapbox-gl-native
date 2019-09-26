@@ -71,7 +71,7 @@ public:
     // Dynamic properties
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
     optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
-    StyleProperty getPaintProperty(const std::string&) const final;
+    StyleProperty getProperty(const std::string&) const final;
     // Private implementation
 
     class Impl;

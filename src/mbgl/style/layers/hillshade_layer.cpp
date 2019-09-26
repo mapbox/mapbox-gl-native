@@ -371,7 +371,7 @@ optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const 
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty HillshadeLayer::getPaintProperty(const std::string& name) const {
+StyleProperty HillshadeLayer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};

@@ -597,7 +597,7 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty CircleLayer::getPaintProperty(const std::string& name) const {
+StyleProperty CircleLayer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};

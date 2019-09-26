@@ -668,7 +668,7 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     return Error{"layer doesn't support this property"};
 }
 
-StyleProperty LineLayer::getPaintProperty(const std::string& name) const {
+StyleProperty LineLayer::getProperty(const std::string& name) const {
     const auto it = paintProperties.find(name.c_str());
     if (it == paintProperties.end()) {
         return {};
