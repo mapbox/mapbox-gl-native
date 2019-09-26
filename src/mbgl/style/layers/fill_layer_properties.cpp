@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/fill_layer_properties.hpp>
@@ -16,7 +18,7 @@ FillLayerProperties::FillLayerProperties(
     CrossfadeParameters crossfade_,
     FillPaintProperties::PossiblyEvaluated evaluated_)
   : LayerProperties(std::move(impl_)),
-    crossfade(std::move(crossfade_)),
+    crossfade(crossfade_),
     evaluated(std::move(evaluated_)) {}
 
 FillLayerProperties::~FillLayerProperties() = default;
@@ -31,3 +33,5 @@ const FillLayer::Impl& FillLayerProperties::layerImpl() const {
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

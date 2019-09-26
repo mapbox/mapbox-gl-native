@@ -22,12 +22,9 @@ class Image : private util::noncopyable {
 public:
     Image() = default;
 
-    Image(Size size_)
-        : size(std::move(size_)),
-          data(std::make_unique<uint8_t[]>(bytes())) {}
+    Image(Size size_) : size(size_), data(std::make_unique<uint8_t[]>(bytes())) {}
 
-    Image(Size size_, const uint8_t* srcData, std::size_t srcLength)
-        : size(std::move(size_)) {
+    Image(Size size_, const uint8_t* srcData, std::size_t srcLength) : size(size_) {
         if (srcLength != bytes()) {
             throw std::invalid_argument("mismatched image size");
         }
@@ -35,9 +32,7 @@ public:
         std::copy(srcData, srcData + srcLength, data.get());
     }
 
-    Image(Size size_, std::unique_ptr<uint8_t[]> data_)
-        : size(std::move(size_)),
-          data(std::move(data_)) {}
+    Image(Size size_, std::unique_ptr<uint8_t[]> data_) : size(size_), data(std::move(data_)) {}
 
     Image(Image&& o)
         : size(o.size),

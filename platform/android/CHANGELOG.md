@@ -4,6 +4,15 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 8.4.0 - September 25, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-beta.1...android-v8.4.0) since [Mapbox Maps SDK for Android v8.4.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-beta.1): 
+
+### Bug fixes
+ - Fixing a crash when `CameraPosition` padding is set when using `MapSnapshotter`. [#15699](https://github.com/mapbox/mapbox-gl-native/pull/15699)
+
+### Other Changes
+ - Bumped Java SDK dependency to stable 4.9.0 [#15700](https://github.com/mapbox/mapbox-gl-native/pull/15700)
+ - Migrate map feedback to GL JS–powered feedback form [#15623](https://github.com/mapbox/mapbox-gl-native/pull/15623)
 
 ## 8.4.0-beta.1 - September 19, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-alpha.2...android-v8.4.0-beta.1) since [Mapbox Maps SDK for Android v8.4.0-alpha.2](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-alpha.2): 

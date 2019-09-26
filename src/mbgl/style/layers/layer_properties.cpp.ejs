@@ -3,6 +3,8 @@
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
 -%>
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_properties.hpp>
@@ -24,7 +26,7 @@ namespace style {
     <%- camelize(type) %>PaintProperties::PossiblyEvaluated evaluated_)
   : LayerProperties(std::move(impl_)),
 <% if (type === 'background' || type === 'fill' || type === 'line' || type === 'fill-extrusion') { -%>
-    crossfade(std::move(crossfade_)),
+    crossfade(crossfade_),
 <% } -%>
     evaluated(std::move(evaluated_)) {}
 
@@ -40,3 +42,5 @@ const <%- camelize(type) %>Layer::Impl& <%- camelize(type) %>LayerProperties::la
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

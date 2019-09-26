@@ -14,10 +14,7 @@ LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layo
                        const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
                        const float zoom_,
                        const uint32_t overscaling_)
-    : layout(std::move(layout_)),
-      zoom(zoom_),
-      overscaling(overscaling_) {
-
+    : layout(layout_), zoom(zoom_), overscaling(overscaling_) {
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,

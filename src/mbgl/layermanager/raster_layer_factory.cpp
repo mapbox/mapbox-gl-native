@@ -22,7 +22,7 @@ std::unique_ptr<style::Layer> RasterLayerFactory::createLayer(const std::string&
 
 std::unique_ptr<RenderLayer> RasterLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderRasterLayer>(staticImmutableCast<style::RasterLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderRasterLayer>(staticImmutableCast<style::RasterLayer::Impl>(impl));
 }
 
 } // namespace mbgl

@@ -72,8 +72,8 @@ public:
     QString localFontFamily() const;
     void setLocalFontFamily(const QString &);
 
-    std::function<std::string(const std::string &&)> resourceTransform() const;
-    void setResourceTransform(const std::function<std::string(const std::string &&)> &);
+    std::function<std::string(const std::string &)> resourceTransform() const;
+    void setResourceTransform(const std::function<std::string(const std::string &)> &);
 
 private:
     GLContextMode m_contextMode;
@@ -87,7 +87,7 @@ private:
     QString m_accessToken;
     QString m_apiBaseUrl;
     QString m_localFontFamily;
-    std::function<std::string(const std::string &&)> m_resourceTransform;
+    std::function<std::string(const std::string &)> m_resourceTransform;
 };
 
 struct Q_MAPBOXGL_EXPORT QMapboxGLCameraOptions {

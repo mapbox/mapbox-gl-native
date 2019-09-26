@@ -3,7 +3,7 @@
 set -euo pipefail
 
 COCOAPODS_VERSION="1.7.5"
-JAZZY_VERSION="0.10.0"
+JAZZY_VERSION="0.11.1"
 CIRCLECI=${CIRCLECI:-false}
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
@@ -48,7 +48,7 @@ if [[ -z `which jazzy` || $(jazzy -v) != "jazzy version: ${JAZZY_VERSION}" ]]; t
     step "Installing jazzy…"
 
     if [[ "${CIRCLECI}" == true ]]; then
-        sudo gem install jazzy -v $JAZZY_VERSION --no-document -- --with-sqlite3-lib=/usr/lib
+        sudo gem install jazzy -v $JAZZY_VERSION --no-document
     else
         gem install jazzy -v $JAZZY_VERSION --no-document
     fi

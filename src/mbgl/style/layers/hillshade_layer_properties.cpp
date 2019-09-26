@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/hillshade_layer_properties.hpp>
@@ -29,3 +31,5 @@ const HillshadeLayer::Impl& HillshadeLayerProperties::layerImpl() const {
 
 } // namespace style
 } // namespace mbgl
+
+// clang-format on

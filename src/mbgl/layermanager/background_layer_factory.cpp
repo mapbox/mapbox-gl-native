@@ -17,7 +17,7 @@ std::unique_ptr<style::Layer> BackgroundLayerFactory::createLayer(const std::str
 
 std::unique_ptr<RenderLayer> BackgroundLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderBackgroundLayer>(staticImmutableCast<style::BackgroundLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderBackgroundLayer>(staticImmutableCast<style::BackgroundLayer::Impl>(impl));
 }
 
 } // namespace mbgl

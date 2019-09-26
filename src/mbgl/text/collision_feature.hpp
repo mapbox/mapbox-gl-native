@@ -47,8 +47,8 @@ private:
 
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0) :
-        anchor(std::move(_anchor)), x1(_x1), y1(_y1), x2(_x2), y2(_y2), signedDistanceFromAnchor(_signedDistanceFromAnchor) {}
+    CollisionBox(Point<float> _anchor, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0)
+        : anchor(_anchor), x1(_x1), y1(_y1), x2(_x2), y2(_y2), signedDistanceFromAnchor(_signedDistanceFromAnchor) {}
 
     // the box is centered around the anchor point
     Point<float> anchor;

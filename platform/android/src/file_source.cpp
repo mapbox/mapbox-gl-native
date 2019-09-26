@@ -58,14 +58,15 @@ void FileSource::setAPIBaseUrl(jni::JNIEnv& env, const jni::String& url) {
 void FileSource::setResourceTransform(jni::JNIEnv& env, const jni::Object<FileSource::ResourceTransformCallback>& transformCallback) {
     if (transformCallback) {
         auto global = jni::NewGlobal<jni::EnvAttachingDeleter>(env, transformCallback);
-        resourceTransform = std::make_unique<Actor<ResourceTransform>>(*Scheduler::GetCurrent(),
+        resourceTransform = std::make_unique<Actor<ResourceTransform>>(
+            *Scheduler::GetCurrent(),
             // Capture the ResourceTransformCallback object as a managed global into
             // the lambda. It is released automatically when we're setting a new ResourceTransform in
             // a subsequent call.
             // Note: we're converting it to shared_ptr because this lambda is converted to a std::function,
             // which requires copyability of its captured variables.
-            [callback = std::make_shared<decltype(global)>(std::move(global))]
-            (mbgl::Resource::Kind kind, const std::string&& url_) {
+            [callback = std::make_shared<decltype(global)>(std::move(global))](mbgl::Resource::Kind kind,
+                                                                               const std::string& url_) {
                 android::UniqueEnv _env = android::AttachEnv();
                 return FileSource::ResourceTransformCallback::onURL(*_env, *callback, int(kind), url_);
             });

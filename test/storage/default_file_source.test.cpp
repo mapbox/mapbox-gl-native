@@ -528,11 +528,11 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     DefaultFileSource fs(":memory:", ".");
 
     // Translates the URL "localhost://test to http://127.0.0.1:3000/test
-    Actor<ResourceTransform> transform(loop, [](Resource::Kind, const std::string&& url) -> std::string {
+    Actor<ResourceTransform> transform(loop, [](Resource::Kind, const std::string& url) -> std::string {
         if (url == "localhost://test") {
             return "http://127.0.0.1:3000/test";
         } else {
-            return std::move(url);
+            return url;
         }
     });
 

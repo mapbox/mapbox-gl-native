@@ -36,7 +36,7 @@ std::unique_ptr<Layout> SymbolLayerFactory::createLayout(const LayoutParameters&
 
 std::unique_ptr<RenderLayer> SymbolLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderSymbolLayer>(staticImmutableCast<style::SymbolLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderSymbolLayer>(staticImmutableCast<style::SymbolLayer::Impl>(impl));
 }
 
 } // namespace mbgl

@@ -45,6 +45,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/linux/src/gl_functions.cpp
 
         # Misc
+        PRIVATE platform/default/src/mbgl/util/compression.cpp
         PRIVATE platform/default/src/mbgl/util/logging_stderr.cpp
         PRIVATE platform/default/src/mbgl/util/string_stdlib.cpp
         PRIVATE platform/default/src/mbgl/util/thread.cpp

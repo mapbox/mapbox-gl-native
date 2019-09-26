@@ -9,8 +9,6 @@ workflows:
           name: next-android-armeabi-v7a-release
           executor_name: ubuntu-disco
           target_is_android: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
       - next-build-template:
           name: next-android-arm64-v8a-release
@@ -37,8 +35,6 @@ workflows:
           name: next-linux-gcc8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
       - next-build-template:
           name: next-linux-gcc4.9-release
@@ -60,15 +56,13 @@ workflows:
           name: next-linux-clang8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
       - next-build-template:
           name: next-FIXME-linux-asan
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-linux-gcc8-debug-coverage
+            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=address'
           test_params: '|| true'
       - next-build-template:
@@ -76,14 +70,14 @@ workflows:
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-linux-gcc8-debug-coverage
+            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=thread'
       - next-build-template:
           name: next-FIXME-linux-memsan
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-linux-gcc8-debug-coverage
+            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=memory'
           test_params: '|| true'
       - next-build-template:
@@ -91,15 +85,13 @@ workflows:
           executor_name: ubuntu-disco
           target_is_linux: true
           requires:
-            - next-linux-gcc8-debug-coverage
+            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=undefined'
           test_params: '|| true'
       - next-build-template:
           name: next-qt5-linux-gcc5-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5 -DMBGL_WITH_QT=ON'
       - next-build-template:
           name: next-qt5-macos-gcc5-release
@@ -113,8 +105,6 @@ workflows:
           name: next-macos-xcode11-release
           executor_name: macos-11_0_0
           target_is_macos: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
       - next-build-template:
           name: next-macos-xcode11-debug
@@ -127,8 +117,6 @@ workflows:
           name: next-ios-xcode11-release
           executor_name: macos-11_0_0
           target_is_macos: true
-          requires:
-            - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_SYSROOT=iphonesimulator'
           test_params: '-Q -N'
   mbgl-legacy:
@@ -176,7 +164,7 @@ workflows:
       - linux-doxygen
       - linux-render-tests
       - ios-debug
-      - ios-debug-xcode11
+      - ios-debug-xcode10
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -202,7 +190,7 @@ workflows:
       - ios-sanitize-nightly
       - ios-sanitize-address-nightly
       - ios-static-analyzer-nightly
-      - ios-static-analyzer-nightly-xcode11
+      - ios-static-analyzer-nightly-xcode10
 
 executors:
   ubuntu-disco:
@@ -281,10 +269,10 @@ commands:
           name: Collecting artifacts
           when: on_fail
           command: |
-            mkdir -p /tmp/tests/coredumps
-            if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
             mkdir -p /tmp/tests/render
             if [ -f mapbox-gl-js/test/integration/render-tests/index.html ]; then cp mapbox-gl-js/test/integration/render-tests/index.html /tmp/tests/render; fi
+            mkdir -p /tmp/tests/coredumps
+            if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
       - store_artifacts:
           path: /tmp/tests
           destination: tests
@@ -560,7 +548,9 @@ commands:
     steps:
     - run:
         name: Install iOS packaging dependencies
-        command: ./platform/ios/scripts/install-packaging-dependencies.sh
+        command: |
+          echo "ruby-2.6" > ~/.ruby-version
+          ./platform/ios/scripts/install-packaging-dependencies.sh
         background: true
 
   install-macos-dependencies:
@@ -716,7 +706,15 @@ jobs:
       - checkout
       - next-prepare
       - next-config:
-          config_params: '-DMBGL_WITH_CORE_ONLY=ON'
+          config_params: '-G Ninja -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+      - run:
+          name: Code Generators
+          command: |
+            platform/android/scripts/generate-style-code.js
+            scripts/generate-file-lists.js
+            scripts/generate-shaders.js
+            scripts/generate-style-code.js
+            git add -A && git diff --staged --exit-code
       - run:
           name: CMake Format
           command: |
@@ -728,13 +726,12 @@ jobs:
             git diff -U0 --ignore-submodules=all --no-color origin/master... *.cpp *.hpp | clang-format-diff-8 -p1 -i
             git diff --exit-code
       - run:
-          name: Code Generators
+          name: Clang Tidy
           command: |
-            platform/android/scripts/generate-style-code.js
-            scripts/generate-file-lists.js
-            scripts/generate-shaders.js
-            scripts/generate-style-code.js
-            git add -A && git diff --staged --exit-code
+            run-clang-tidy-8 -quiet -j24 -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
+            grep -o \\[[a-z].*-.*[a-z]\] clang-tidy.log |sort |uniq -c |sort -n
+            mkdir -p /tmp/tests/clang-tidy
+            if [ -f clang-tidy.log ]; then cp clang-tidy.log /tmp/tests/clang-tidy; fi
       - next-save
   next-build-template:
     parameters:
@@ -1087,7 +1084,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1251,7 +1248,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1276,9 +1273,9 @@ jobs:
       - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  ios-debug-xcode11:
+  ios-debug-xcode10:
     macos:
-      xcode: "11.0.0"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1305,7 +1302,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1329,7 +1326,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1349,7 +1346,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1367,9 +1364,9 @@ jobs:
       - notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
-  ios-static-analyzer-nightly-xcode11:
+  ios-static-analyzer-nightly-xcode10:
     macos:
-      xcode: "11.0.0"
+      xcode: "10.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1389,7 +1386,8 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-template:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
+    shell: /bin/bash --login -eo pipefail
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1437,7 +1435,8 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-tag:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
+    shell: /bin/bash --login -eo pipefail
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1517,7 +1516,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-render-tests:
     macos:
-      xcode: "10.3.0"
+      xcode: "11.0.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1

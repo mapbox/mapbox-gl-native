@@ -8,8 +8,7 @@ namespace mbgl {
 
 static TileObserver nullObserver;
 
-Tile::Tile(Kind kind_, OverscaledTileID id_) : kind(kind_), id(std::move(id_)), observer(&nullObserver) {
-}
+Tile::Tile(Kind kind_, OverscaledTileID id_) : kind(kind_), id(id_), observer(&nullObserver) {}
 
 Tile::~Tile() = default;
 

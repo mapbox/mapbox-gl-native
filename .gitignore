@@ -11,6 +11,7 @@ xcuserdata
 /platform/node/test/diff
 /mason_packages
 /build
+/next/build
 /lib
 /test/node_modules
 /test/fixtures/*/*_actual.*

@@ -89,21 +89,20 @@ public:
                 drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
-            program->draw(
-                    context,
-                    renderPass,
-                    std::move(drawMode),
-                    std::move(depthMode),
-                    std::move(stencilMode),
-                    std::move(colorMode),
-                    std::move(cullFaceMode),
-                    uniformValues,
-                    drawScopeIt->second,
-                    allAttributeBindings.offset(segment.vertexOffset),
-                    textureBindings,
-                    indexBuffer,
-                    segment.indexOffset,
-                    segment.indexLength);
+            program->draw(context,
+                          renderPass,
+                          drawMode,
+                          depthMode,
+                          stencilMode,
+                          colorMode,
+                          cullFaceMode,
+                          uniformValues,
+                          drawScopeIt->second,
+                          allAttributeBindings.offset(segment.vertexOffset),
+                          textureBindings,
+                          indexBuffer,
+                          segment.indexOffset,
+                          segment.indexLength);
         }
     }
 };
@@ -173,21 +172,20 @@ public:
                 drawScopeIt = segment.drawScopes.emplace(layerID, context.createDrawScope()).first;
             }
 
-            program->draw(
-                    context,
-                    renderPass,
-                    std::move(drawMode),
-                    std::move(depthMode),
-                    std::move(stencilMode),
-                    std::move(colorMode),
-                    std::move(cullFaceMode),
-                    uniformValues,
-                    drawScopeIt->second,
-                    allAttributeBindings.offset(segment.vertexOffset),
-                    textureBindings,
-                    indexBuffer,
-                    segment.indexOffset,
-                    segment.indexLength);
+            program->draw(context,
+                          renderPass,
+                          drawMode,
+                          depthMode,
+                          stencilMode,
+                          colorMode,
+                          cullFaceMode,
+                          uniformValues,
+                          drawScopeIt->second,
+                          allAttributeBindings.offset(segment.vertexOffset),
+                          textureBindings,
+                          indexBuffer,
+                          segment.indexOffset,
+                          segment.indexLength);
         }
     }
 };

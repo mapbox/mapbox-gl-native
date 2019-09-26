@@ -34,7 +34,7 @@ std::unique_ptr<Layout> FillExtrusionLayerFactory::createLayout(const LayoutPara
 
 std::unique_ptr<RenderLayer> FillExtrusionLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
     assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<style::FillExtrusionLayer::Impl>(std::move(impl)));
+    return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<style::FillExtrusionLayer::Impl>(impl));
 }
 
 } // namespace mbgl

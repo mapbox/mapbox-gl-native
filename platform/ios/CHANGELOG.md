@@ -14,7 +14,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Newly loaded labels appear faster on the screen. ([#15308](https://github.com/mapbox/mapbox-gl-native/pull/15308))
 
-## 5.4.0
+## 5.4.0 - September 25, 2019
 
 ### Styles and rendering
 

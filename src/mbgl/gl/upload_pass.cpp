@@ -20,6 +20,7 @@ std::unique_ptr<gfx::VertexBufferResource> UploadPass::createVertexBufferResourc
     const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+    // NOLINTNEXTLINE(performance-move-const-arg)
     UniqueBuffer result{ std::move(id), { commandEncoder.context } };
     commandEncoder.context.vertexBuffer = result;
     MBGL_CHECK_ERROR(
@@ -38,6 +39,7 @@ std::unique_ptr<gfx::IndexBufferResource> UploadPass::createIndexBufferResource(
     const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+    // NOLINTNEXTLINE(performance-move-const-arg)
     UniqueBuffer result{ std::move(id), { commandEncoder.context } };
     commandEncoder.context.bindVertexArray = 0;
     commandEncoder.context.globalVertexArrayState.indexBuffer = result;

@@ -433,7 +433,7 @@ void OfflineDownload::ensureResource(Resource&& resource,
                 }
             }
 
-            if (result) resourcesToBeMarkedAsUsed.emplace_back(std::move(resource));
+            if (result) resourcesToBeMarkedAsUsed.emplace_back(resource);
             return result;
         };
 
