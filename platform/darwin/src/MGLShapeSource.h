@@ -42,16 +42,21 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
 /**
- An `NSDictionary` object containing custom properties on the generated clusters if clustering is enabled,
- aggregating values from clustered points. Has the form {"property_name": [recude_operator, [map_expression]]} or
- {"property_name": [[reduce_operator, accumulated, expression], [map_expression]]}
+ An `NSDictionary` object where the key is an `NSString`. The dictionary key will be the attribute feature attribute key. The resulting attribute value is aggregated from the clustered points.
 
- recude_operator is any expression function that accepts at least 2 operands (e.g. "sum" or "max", etc.).
- It accumulates the property value from clusters/points the cluster contains. It can either be
- a literal with single operator, or be a valid expression with two expression arguments: `accumulated` and
- an other valid expression produces value of the same type of `accumulated`
+ The dictionary key is an `NSString` that will be an attribute key for the clusters. The dictionary value is an `NSArray` consisting of a reduce operator and a map expression.
 
- map_expression produces the value of a single point, it shall be a valid expression
+ The reduce operator is any expression function that accepts at least two operands. It can be a string containing a single operator, such as `sum:`, or a valid expression with two expression arguments: `featureAccumulated` and
+ another valid expression.
+
+ The map expression produces the value of a single point.
+
+ This option corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-clusterProperties"><code>clusterProperties</code></a>
+ source property in the Mapbox Style Specification.
+
+ This option only affects point features within an `MGLShapeSource` object; it
+ is ignored when creating an `MGLComputedShapeSource` object.
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterProperties;
 /**
