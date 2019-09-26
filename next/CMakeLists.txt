@@ -189,6 +189,7 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/style/sources/raster_source.hpp
     ${MBGL_ROOT}/include/mbgl/style/sources/vector_source.hpp
     ${MBGL_ROOT}/include/mbgl/style/style.hpp
+    ${MBGL_ROOT}/include/mbgl/style/style_property.hpp
     ${MBGL_ROOT}/include/mbgl/style/transition_options.hpp
     ${MBGL_ROOT}/include/mbgl/style/types.hpp
     ${MBGL_ROOT}/include/mbgl/style/undefined.hpp

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/style_property.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/util/feature.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -64,14 +64,6 @@ struct LayerTypeInfo {
      * The contained values correspond to \c Tile::Kind enum.
      */
     const enum class TileKind : uint8_t { Geometry, Raster, RasterDEM, NotRequired } tileKind;
-};
-
-struct StyleProperty {
-    enum class Kind : uint8_t { Undefined, Constant, Expression, Transition };
-    StyleProperty(Value value_, Kind kind_) : value(std::move(value_)), kind(kind_) {}
-    StyleProperty() = default;
-    const Value value;
-    const Kind kind = Kind::Undefined;
 };
 
 /**
