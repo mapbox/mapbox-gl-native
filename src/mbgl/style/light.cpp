@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Do not edit.
 
 #include <mbgl/style/light.hpp>
@@ -36,29 +34,37 @@ Mutable<Light::Impl> Light::mutableImpl() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property : uint8_t {
+    Anchor,
+    Color,
+    Intensity,
+    Position,
+    AnchorTransition,
+    ColorTransition,
+    IntensityTransition,
+    PositionTransition,
+};
+
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
+MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"anchor", toUint8(Property::Anchor)},
+     {"color", toUint8(Property::Color)},
+     {"intensity", toUint8(Property::Intensity)},
+     {"position", toUint8(Property::Position)},
+     {"anchor-transition", toUint8(Property::AnchorTransition)},
+     {"color-transition", toUint8(Property::ColorTransition)},
+     {"intensity-transition", toUint8(Property::IntensityTransition)},
+     {"position-transition", toUint8(Property::PositionTransition)}});
+
+} // namespace
+
 optional<Error> Light::setProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Anchor,
-        Color,
-        Intensity,
-        Position,
-        AnchorTransition,
-        ColorTransition,
-        IntensityTransition,
-        PositionTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "anchor", mbgl::underlying_type(Property::Anchor) },
-        { "color", mbgl::underlying_type(Property::Color) },
-        { "intensity", mbgl::underlying_type(Property::Intensity) },
-        { "position", mbgl::underlying_type(Property::Position) },
-        { "anchor-transition", mbgl::underlying_type(Property::AnchorTransition) },
-        { "color-transition", mbgl::underlying_type(Property::ColorTransition) },
-        { "intensity-transition", mbgl::underlying_type(Property::IntensityTransition) },
-        { "position-transition", mbgl::underlying_type(Property::PositionTransition) }
-    });
-
     const auto it = properties.find(name.c_str());
     if (it == properties.end()) {
         return Error { "light doesn't support this property" };
@@ -144,6 +150,33 @@ optional<Error> Light::setProperty(const std::string& name, const Convertible& v
     
 
     return Error { "light doesn't support this property" };
+}
+
+StyleProperty Light::getProperty(const std::string& name) const {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::Anchor:
+            return makeStyleProperty(getAnchor());
+        case Property::Color:
+            return makeStyleProperty(getColor());
+        case Property::Intensity:
+            return makeStyleProperty(getIntensity());
+        case Property::Position:
+            return makeStyleProperty(getPosition());
+        case Property::AnchorTransition:
+            return makeStyleProperty(getAnchorTransition());
+        case Property::ColorTransition:
+            return makeStyleProperty(getColorTransition());
+        case Property::IntensityTransition:
+            return makeStyleProperty(getIntensityTransition());
+        case Property::PositionTransition:
+            return makeStyleProperty(getPositionTransition());
+    }
+    return {};
 }
 
 LightAnchorType Light::getDefaultAnchor() {
@@ -253,5 +286,3 @@ TransitionOptions Light::getPositionTransition() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on

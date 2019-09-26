@@ -1,8 +1,6 @@
 <%
   const properties = locals.properties;
 -%>
-// clang-format off
-
 // This file is generated. Do not edit.
 
 #include <mbgl/style/light.hpp>
@@ -39,21 +37,29 @@ Mutable<Light::Impl> Light::mutableImpl() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property : uint8_t {
+<% for (const property of properties) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
+<% for (const property of properties) { -%>
+    <%- camelize(property.name) %>Transition,
+<% } -%>
+};
+
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
+MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {<%- properties.map(p => `{"${p.name}", toUint8(Property::${camelize(p.name)})}`).join(',\n     ') %>,
+     <%- properties.map(p => `{"${p.name}-transition", toUint8(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>});
+
+} // namespace
+
 optional<Error> Light::setProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-<% for (const property of properties) { -%>
-        <%- camelize(property.name) %>,
-<% } -%>
-<% for (const property of properties) { -%>
-        <%- camelize(property.name) %>Transition,
-<% } -%>
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        <%- properties.map(p => `{ "${p.name}", mbgl::underlying_type(Property::${camelize(p.name)}) }`).join(',\n        ') %>,
-        <%- properties.map(p => `{ "${p.name}-transition", mbgl::underlying_type(Property::${camelize(p.name)}Transition) }`).join(',\n        ') %>
-    });
-
     const auto it = properties.find(name.c_str());
     if (it == properties.end()) {
         return Error { "light doesn't support this property" };
@@ -107,6 +113,25 @@ optional<Error> Light::setProperty(const std::string& name, const Convertible& v
     return Error { "light doesn't support this property" };
 }
 
+StyleProperty Light::getProperty(const std::string& name) const {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+<% for (const property of properties) { -%>
+        case Property::<%- camelize(property.name) %>:
+            return makeStyleProperty(get<%- camelize(property.name) %>());
+<% } -%>
+<% for (const property of properties) { -%>
+        case Property::<%- camelize(property.name) %>Transition:
+            return makeStyleProperty(get<%- camelize(property.name) %>Transition());
+<% } -%>
+    }
+    return {};
+}
+
 <% for (const property of properties) { -%>
 <%- evaluatedType(property) %> Light::getDefault<%- camelize(property.name) %>() {
     return Light<%- camelize(property.name) %>::defaultValue();
@@ -138,5 +163,3 @@ TransitionOptions Light::get<%- camelize(property.name) %>Transition() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on
