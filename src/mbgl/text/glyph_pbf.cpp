@@ -4,14 +4,14 @@
 
 namespace mbgl {
 
-std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
-    std::vector<Glyph> result;
-    result.reserve(256);
+std::pair<std::vector<Glyph>, bool> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
+    std::vector<Glyph> glyphs;
+    glyphs.reserve(256);
 
     protozero::pbf_reader glyphs_pbf(data);
-
+    bool hasBaseline{true};
     while (glyphs_pbf.next(1)) {
-        auto readGlyphMetrics = [glyphRange, &result](protozero::pbf_reader& fontstack_pbf) {
+        auto readGlyphMetrics = [glyphRange, &glyphs](protozero::pbf_reader& fontstack_pbf) {
             auto glyph_pbf = fontstack_pbf.get_message();
             Glyph glyph;
             protozero::data_view glyphData;
@@ -78,10 +78,10 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
                 glyph.bitmap = AlphaImage(size, reinterpret_cast<const uint8_t*>(glyphData.data()), glyphData.size());
             }
 
-            result.push_back(std::move(glyph));
+            glyphs.push_back(std::move(glyph));
         };
 
-        double ascender{0.0}, descender{0.0};
+        int32_t ascender{0}, descender{0};
         uint16_t count{0};
         auto fontstack_pbf = glyphs_pbf.get_message();
         while (fontstack_pbf.next()) {
@@ -92,11 +92,11 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
                     break;
                 }
                 case 4: {
-                    ascender = fontstack_pbf.get_double();
+                    ascender = fontstack_pbf.get_sint32();
                     break;
                 }
                 case 5: {
-                    descender = fontstack_pbf.get_double();
+                    descender = fontstack_pbf.get_sint32();
                     break;
                 }
                 default: {
@@ -105,16 +105,19 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
                 }
             }
         }
-        if (ascender != 0.0 || descender != 0.0) {
-            assert(count <= result.size());
-            for (uint16_t i = result.size() - count; i <= result.size() - 1; ++i) {
-                result[i].metrics.ascender = ascender;
-                result[i].metrics.descender = descender;
+        if (hasBaseline && (ascender != 0.0 || descender != 0.0)) {
+            assert(count <= glyphs.size());
+            const auto lastIndex = glyphs.size() - 1;
+            for (uint16_t i = glyphs.size() - count; i <= lastIndex; ++i) {
+                glyphs[i].metrics.ascender = ascender;
+                glyphs[i].metrics.descender = descender;
             }
+        } else {
+            hasBaseline = false;
         }
     }
 
-    return result;
+    return std::make_pair(std::move(glyphs), hasBaseline);
 }
 
 } // namespace mbgl

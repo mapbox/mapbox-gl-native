@@ -144,8 +144,8 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     if (glyphs == glyphMap.end()) {
         return;
     }
-    auto it = glyphs->second.find(glyph.glyph);
-    if (it != glyphs->second.end() && it->second) {
+    auto it = glyphs->second.glyphs.find(glyph.glyph);
+    if (it != glyphs->second.glyphs.end() && it->second) {
         const float lastAdvance = (*it->second)->metrics.advance * glyph.scale;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
         
@@ -168,11 +168,11 @@ float determineAverageLineWidth(const TaggedString& logicalInput,
         if (glyphs == glyphMap.end()) {
             continue;
         }
-        auto it = glyphs->second.find(codePoint);
-        if (it == glyphs->second.end() || !it->second) {
+        auto it = glyphs->second.glyphs.find(codePoint);
+        if (it == glyphs->second.glyphs.end() || !it->second) {
             continue;
         }
-        
+
         totalWidth += (*it->second)->metrics.advance * section.scale + spacing;
     }
     
@@ -294,11 +294,11 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
         if (glyphs == glyphMap.end()) {
             continue;
         }
-        auto it = glyphs->second.find(codePoint);
-        if (it != glyphs->second.end() && it->second && !util::i18n::isWhitespace(codePoint)) {
+        auto it = glyphs->second.glyphs.find(codePoint);
+        if (it != glyphs->second.glyphs.end() && it->second && !util::i18n::isWhitespace(codePoint)) {
             currentX += (*it->second)->metrics.advance * section.scale + spacing;
         }
-        
+
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
         if (i < logicalInput.length() - 1) {
@@ -325,28 +325,19 @@ void shapeLines(Shaping& shaping,
                 const WritingModeType writingMode,
                 const GlyphMap& glyphMap,
                 bool allowVerticalPlacement) {
-    float x = 0;
-    float y = 0;
-    float maxLineLength = 0;
+    float x = 0.0f;
+    float y = 0.0f;
+    float maxLineLength = 0.0f;
     bool hasBaseline{false};
 
-    for (std::size_t i = 0; i < lines.size(); ++i) {
-        TaggedString& line = lines[i];
-        line.trim();
-        for (std::size_t j = 0; j < line.length(); ++j) {
-            const std::size_t sectionIndex = line.getSectionIndex(j);
-            const SectionOptions& section = line.sectionAt(sectionIndex);
-            char16_t codePoint = line.getCharCodeAt(i);
+    for (const auto& line : lines) {
+        const auto& sections = line.getSections();
+        for (const auto& section : sections) {
             auto glyphs = glyphMap.find(section.fontStackHash);
             if (glyphs == glyphMap.end()) {
                 continue;
             }
-            auto it = glyphs->second.find(codePoint);
-            if (it == glyphs->second.end() || !it->second) {
-                continue;
-            }
-            const Glyph& glyph = **it->second;
-            hasBaseline = glyph.metrics.ascender != 0 && glyph.metrics.descender != 0;
+            hasBaseline = glyphs->second.hasBaseline;
             if (!hasBaseline) break;
         }
         if (!hasBaseline) break;
@@ -366,7 +357,7 @@ void shapeLines(Shaping& shaping,
             y += lineHeight; // Still need a line feed after empty line
             continue;
         }
-        
+
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
         for (std::size_t i = 0; i < line.length(); i++) {
             const std::size_t sectionIndex = line.getSectionIndex(i);
@@ -376,8 +367,8 @@ void shapeLines(Shaping& shaping,
             if (glyphs == glyphMap.end()) {
                 continue;
             }
-            auto it = glyphs->second.find(codePoint);
-            if (it == glyphs->second.end() || !it->second) {
+            auto it = glyphs->second.glyphs.find(codePoint);
+            if (it == glyphs->second.glyphs.end() || !it->second) {
                 continue;
             }
 
@@ -386,7 +377,7 @@ void shapeLines(Shaping& shaping,
             // In order to make different fonts aligned, they must share a general baseline that starts from the midline
             // of each font face.  Baseline offset is the vertical distance from font face's baseline to its top most
             // position, which is the half size of the sum (ascender + descender). Since glyph's position is counted
-            // from the top left corner, the negative shift is needed. So different fonts shares the same baseline but
+            // from the top left corner, the negative shift is needed. So different fonts share the same baseline but
             // with different offset shift. If font's baseline is not applicable, fall back to use a default baseline
             // offset, see shaping.yOffset. Since we're laying out at 24 points, we need also calculate how much it will
             // move when we scale up or down.
@@ -410,7 +401,7 @@ void shapeLines(Shaping& shaping,
                 x += util::ONE_EM * section.scale + spacing;
             }
         }
-        
+
         // Only justify if we placed at least one glyph
         if (shaping.positionedGlyphs.size() != lineStartIndex) {
             float lineLength = x - spacing; // Don't count trailing spacing

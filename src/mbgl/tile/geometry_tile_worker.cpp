@@ -259,18 +259,20 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
         Glyphs& newGlyphs = newFontGlyphs.second;
 
         Glyphs& glyphs = glyphMap[fontStack];
+        glyphs.hasBaseline =
+            glyphs.glyphs.empty() ? newGlyphs.hasBaseline : glyphs.hasBaseline && newGlyphs.hasBaseline;
         for (auto& pendingGlyphDependency : pendingGlyphDependencies) {
             // Linear lookup here to handle reverse of FontStackHash -> FontStack,
             // since dependencies need the full font stack name to make a request
             // There should not be many fontstacks to look through
             if (FontStackHasher()(pendingGlyphDependency.first) == fontStack) {
                 GlyphIDs& pendingGlyphIDs = pendingGlyphDependency.second;
-                for (auto& newGlyph : newGlyphs) {
+                for (auto& newGlyph : newGlyphs.glyphs) {
                     const GlyphID& glyphID = newGlyph.first;
                     optional<Immutable<Glyph>>& glyph = newGlyph.second;
 
                     if (pendingGlyphIDs.erase(glyphID)) {
-                        glyphs.emplace(glyphID, std::move(glyph));
+                        glyphs.glyphs.emplace(glyphID, std::move(glyph));
                     }
                 }
             }
@@ -294,7 +296,8 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
     for (auto& fontDependencies : glyphDependencies) {
         auto fontGlyphs = glyphMap.find(FontStackHasher()(fontDependencies.first));
         for (auto glyphID : fontDependencies.second) {
-            if (fontGlyphs == glyphMap.end() || fontGlyphs->second.find(glyphID) == fontGlyphs->second.end()) {
+            if (fontGlyphs == glyphMap.end() ||
+                fontGlyphs->second.glyphs.find(glyphID) == fontGlyphs->second.glyphs.end()) {
                 pendingGlyphDependencies[fontDependencies.first].insert(glyphID);
             }
         }

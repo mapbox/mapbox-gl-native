@@ -17,7 +17,7 @@ GlyphAtlas makeGlyphAtlas(const GlyphMap& glyphs) {
         FontStackHash fontStack = glyphMapEntry.first;
         GlyphPositionMap& positions = result.positions[fontStack];
 
-        for (const auto& entry : glyphMapEntry.second) {
+        for (const auto& entry : glyphMapEntry.second.glyphs) {
             if (entry.second && (*entry.second)->bitmap.valid()) {
                 const Glyph& glyph = **entry.second;
 

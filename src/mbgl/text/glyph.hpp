@@ -25,21 +25,18 @@ using GlyphIDs = std::set<GlyphID>;
 GlyphRange getGlyphRange(GlyphID glyph);
 
 struct GlyphMetrics {
-    uint32_t width = 0;
-    uint32_t height = 0;
+    uint32_t width = 0U;
+    uint32_t height = 0U;
     int32_t left = 0;
     int32_t top = 0;
-    uint32_t advance = 0;
-    double ascender = 0.0;
-    double descender = 0.0;
+    uint32_t advance = 0U;
+    int32_t ascender = 0;
+    int32_t descender = 0;
 };
 
 inline bool operator==(const GlyphMetrics& lhs, const GlyphMetrics& rhs) {
-    return lhs.width == rhs.width &&
-        lhs.height == rhs.height &&
-        lhs.left == rhs.left &&
-        lhs.top == rhs.top &&
-        lhs.advance == rhs.advance;
+    return lhs.width == rhs.width && lhs.height == rhs.height && lhs.left == rhs.left && lhs.top == rhs.top &&
+           lhs.advance == rhs.advance && lhs.ascender == rhs.ascender && lhs.descender == rhs.descender;
 }
 
 class Glyph {
@@ -57,7 +54,10 @@ public:
     GlyphMetrics metrics;
 };
 
-using Glyphs = std::map<GlyphID, optional<Immutable<Glyph>>>;
+struct Glyphs {
+    std::map<GlyphID, optional<Immutable<Glyph>>> glyphs;
+    bool hasBaseline;
+};
 using GlyphMap = std::map<FontStackHash, Glyphs>;
 
 class PositionedGlyph {
