@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -396,7 +394,7 @@ constexpr uint8_t toUint8(T t) noexcept {
     return uint8_t(mbgl::underlying_type(t));
 }
 
-MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
     {{"circle-blur", toUint8(Property::CircleBlur)},
      {"circle-color", toUint8(Property::CircleColor)},
      {"circle-opacity", toUint8(Property::CircleOpacity)},
@@ -420,11 +418,12 @@ MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<
      {"circle-translate-transition", toUint8(Property::CircleTranslateTransition)},
      {"circle-translate-anchor-transition", toUint8(Property::CircleTranslateAnchorTransition)}});
 
+constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::CircleTranslateAnchorTransition);
 } // namespace
 
 optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
         return Error{"layer doesn't support this property"};
     }
 
@@ -598,8 +597,8 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
 }
 
 StyleProperty CircleLayer::getProperty(const std::string& name) const {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
         return {};
     }
 
@@ -666,5 +665,3 @@ Mutable<Layer::Impl> CircleLayer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on

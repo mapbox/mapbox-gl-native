@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -309,7 +307,7 @@ constexpr uint8_t toUint8(T t) noexcept {
     return uint8_t(mbgl::underlying_type(t));
 }
 
-MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
     {{"raster-brightness-max", toUint8(Property::RasterBrightnessMax)},
      {"raster-brightness-min", toUint8(Property::RasterBrightnessMin)},
      {"raster-contrast", toUint8(Property::RasterContrast)},
@@ -327,11 +325,12 @@ MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<
      {"raster-resampling-transition", toUint8(Property::RasterResamplingTransition)},
      {"raster-saturation-transition", toUint8(Property::RasterSaturationTransition)}});
 
+constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::RasterSaturationTransition);
 } // namespace
 
 optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
         return Error{"layer doesn't support this property"};
     }
 
@@ -445,8 +444,8 @@ optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Con
 }
 
 StyleProperty RasterLayer::getProperty(const std::string& name) const {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
         return {};
     }
 
@@ -501,5 +500,3 @@ Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on
