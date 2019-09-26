@@ -8,6 +8,7 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <mapbox/value.hpp>
 
@@ -297,20 +298,6 @@ optional<T> convert(const Convertible& value, Error& error, Args&&...args) {
     return Converter<T>()(value, error, std::forward<Args>(args)...);
 }
 
-template <typename T, typename = void>
-struct ValueFactory;
-
-template <typename T>
-struct ValueArrayFactory {
-    static Value make(const T& arg) { return mapbox::base::ValueArray(arg.begin(), arg.end()); }
-};
-
-template <>
-struct ValueFactory<std::array<float, 2>> : public ValueArrayFactory<std::array<float, 2>> {};
-
-template <>
-struct ValueFactory<std::vector<float>> : public ValueArrayFactory<std::vector<float>> {};
-
 template <>
 struct ValueFactory<ColorRampPropertyValue> {
     static Value make(const ColorRampPropertyValue& value) { return value.getExpression().serialize(); }
@@ -334,13 +321,25 @@ struct ValueFactory<Color> {
 };
 
 template <typename T>
-struct ValueFactory<T, typename std::enable_if<!std::is_enum<T>::value>::type> {
+struct ValueFactory<T, typename std::enable_if<(!std::is_enum<T>::value && !is_linear_container<T>::value)>::type> {
     static Value make(const T& arg) { return {arg}; }
 };
 
 template <typename T>
 struct ValueFactory<T, typename std::enable_if<std::is_enum<T>::value>::type> {
     static Value make(T arg) { return {int64_t(arg)}; }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<is_linear_container<T>::value>::type> {
+    static Value make(const T& arg) {
+        mapbox::base::ValueArray result;
+        result.reserve(arg.size());
+        for (const auto& item : arg) {
+            result.emplace_back(ValueFactory<std::decay_t<decltype(item)>>::make(item));
+        }
+        return result;
+    }
 };
 
 template <typename T>
