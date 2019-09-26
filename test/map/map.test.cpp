@@ -946,6 +946,9 @@ TEST(Map, UniversalStyleGetter) {
                 "line-color": "red",
                 "line-opacity": 0.5,
                 "line-width": ["get", "width"]
+            },
+            "layout": {
+                "line-cap": "butt"
             }
         }]
         })STYLE");
@@ -999,4 +1002,10 @@ TEST(Map, UniversalStyleGetter) {
     EXPECT_EQ("get", *operation[0].getString());
     ASSERT_TRUE(operation[1].getString());
     EXPECT_EQ("width", *operation[1].getString());
+
+    StyleProperty lineCap = lineLayer->getProperty("line-cap");
+    ASSERT_TRUE(lineCap.value);
+    EXPECT_EQ(StyleProperty::Kind::Constant, lineCap.kind);
+    ASSERT_TRUE(lineCap.value.getInt());
+    EXPECT_EQ(mbgl::underlying_type(mbgl::style::LineCapType::Butt), *lineCap.value.getInt());
 }

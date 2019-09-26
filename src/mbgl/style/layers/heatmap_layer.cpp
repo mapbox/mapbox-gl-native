@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/heatmap_layer.hpp>
@@ -224,7 +222,7 @@ constexpr uint8_t toUint8(T t) noexcept {
     return uint8_t(mbgl::underlying_type(t));
 }
 
-MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
     {{"heatmap-color", toUint8(Property::HeatmapColor)},
      {"heatmap-intensity", toUint8(Property::HeatmapIntensity)},
      {"heatmap-opacity", toUint8(Property::HeatmapOpacity)},
@@ -236,11 +234,12 @@ MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<
      {"heatmap-radius-transition", toUint8(Property::HeatmapRadiusTransition)},
      {"heatmap-weight-transition", toUint8(Property::HeatmapWeightTransition)}});
 
+constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::HeatmapWeightTransition);
 } // namespace
 
 optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
         return Error{"layer doesn't support this property"};
     }
 
@@ -333,8 +332,8 @@ optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Co
 }
 
 StyleProperty HeatmapLayer::getProperty(const std::string& name) const {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
         return {};
     }
 
@@ -377,5 +376,3 @@ Mutable<Layer::Impl> HeatmapLayer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on

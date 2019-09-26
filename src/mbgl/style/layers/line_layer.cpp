@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/line_layer.hpp>
@@ -455,6 +453,10 @@ enum class Property : uint8_t {
     LineTranslateTransition,
     LineTranslateAnchorTransition,
     LineWidthTransition,
+    LineCap,
+    LineJoin,
+    LineMiterLimit,
+    LineRoundLimit,
 };
 
 template <typename T>
@@ -462,7 +464,7 @@ constexpr uint8_t toUint8(T t) noexcept {
     return uint8_t(mbgl::underlying_type(t));
 }
 
-MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
     {{"line-blur", toUint8(Property::LineBlur)},
      {"line-color", toUint8(Property::LineColor)},
      {"line-dasharray", toUint8(Property::LineDasharray)},
@@ -484,13 +486,18 @@ MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<
      {"line-pattern-transition", toUint8(Property::LinePatternTransition)},
      {"line-translate-transition", toUint8(Property::LineTranslateTransition)},
      {"line-translate-anchor-transition", toUint8(Property::LineTranslateAnchorTransition)},
-     {"line-width-transition", toUint8(Property::LineWidthTransition)}});
+     {"line-width-transition", toUint8(Property::LineWidthTransition)},
+     {"line-cap", toUint8(Property::LineCap)},
+     {"line-join", toUint8(Property::LineJoin)},
+     {"line-miter-limit", toUint8(Property::LineMiterLimit)},
+     {"line-round-limit", toUint8(Property::LineRoundLimit)}});
 
+constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::LineWidthTransition);
 } // namespace
 
 optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
         return Error{"layer doesn't support this property"};
     }
 
@@ -669,8 +676,8 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
 }
 
 StyleProperty LineLayer::getProperty(const std::string& name) const {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
         return {};
     }
 
@@ -719,6 +726,14 @@ StyleProperty LineLayer::getProperty(const std::string& name) const {
             return makeStyleProperty(getLineTranslateAnchorTransition());
         case Property::LineWidthTransition:
             return makeStyleProperty(getLineWidthTransition());
+        case Property::LineCap:
+            return makeStyleProperty(getLineCap());
+        case Property::LineJoin:
+            return makeStyleProperty(getLineJoin());
+        case Property::LineMiterLimit:
+            return makeStyleProperty(getLineMiterLimit());
+        case Property::LineRoundLimit:
+            return makeStyleProperty(getLineRoundLimit());
     }
     return {};
 }
@@ -727,21 +742,8 @@ optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Conv
     if (name == "visibility") {
         return Layer::setVisibility(value);
     }
-    enum class Property {
-        LineCap,
-        LineJoin,
-        LineMiterLimit,
-        LineRoundLimit,
-    };
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "line-cap", mbgl::underlying_type(Property::LineCap) },
-        { "line-join", mbgl::underlying_type(Property::LineJoin) },
-        { "line-miter-limit", mbgl::underlying_type(Property::LineMiterLimit) },
-        { "line-round-limit", mbgl::underlying_type(Property::LineRoundLimit) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second <= lastPaintPropertyIndex) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -801,5 +803,3 @@ Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on

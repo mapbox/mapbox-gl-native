@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -280,7 +278,7 @@ constexpr uint8_t toUint8(T t) noexcept {
     return uint8_t(mbgl::underlying_type(t));
 }
 
-MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
     {{"fill-antialias", toUint8(Property::FillAntialias)},
      {"fill-color", toUint8(Property::FillColor)},
      {"fill-opacity", toUint8(Property::FillOpacity)},
@@ -296,11 +294,12 @@ MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<
      {"fill-translate-transition", toUint8(Property::FillTranslateTransition)},
      {"fill-translate-anchor-transition", toUint8(Property::FillTranslateAnchorTransition)}});
 
+constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::FillTranslateAnchorTransition);
 } // namespace
 
 optional<Error> FillLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
         return Error{"layer doesn't support this property"};
     }
 
@@ -432,8 +431,8 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
 }
 
 StyleProperty FillLayer::getProperty(const std::string& name) const {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
         return {};
     }
 
@@ -484,5 +483,3 @@ Mutable<Layer::Impl> FillLayer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on

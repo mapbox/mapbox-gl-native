@@ -3,8 +3,6 @@
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
 -%>
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
@@ -199,6 +197,9 @@ enum class Property : uint8_t {
 <% for (const property of paintProperties) { -%>
     <%- camelize(property.name) %>Transition,
 <% } -%>
+<% for (const property of layoutProperties) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
 };
 
 template <typename T>
@@ -206,15 +207,22 @@ constexpr uint8_t toUint8(T t) noexcept {
     return uint8_t(mbgl::underlying_type(t));
 }
 
-MAPBOX_ETERNAL_CONSTEXPR const auto paintProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
     {<%- paintProperties.map(p => `{"${p.name}", toUint8(Property::${camelize(p.name)})}`).join(',\n     ') %>,
+<% if (!layoutProperties.length) { -%>
      <%- paintProperties.map(p => `{"${p.name}-transition", toUint8(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>});
+<% } else { -%>
+     <%- paintProperties.map(p => `{"${p.name}-transition", toUint8(Property::${camelize(p.name)}Transition)}`).join(',\n     ') %>,
+     <%- layoutProperties.map(p => `{"${p.name}", toUint8(Property::${camelize(p.name)})}`).join(',\n     ') %>});
+<% } -%>
 
+<% const lastPaintProperty = paintProperties[paintProperties.length - 1]; -%>
+<%-`constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::${camelize(lastPaintProperty.name)}Transition);` %>
 } // namespace
 
 optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
         return Error{"layer doesn't support this property"};
     }
 
@@ -266,8 +274,8 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
 }
 
 StyleProperty <%- camelize(type) %>Layer::getProperty(const std::string& name) const {
-    const auto it = paintProperties.find(name.c_str());
-    if (it == paintProperties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
         return {};
     }
 
@@ -280,6 +288,10 @@ StyleProperty <%- camelize(type) %>Layer::getProperty(const std::string& name) c
         case Property::<%- camelize(property.name) %>Transition:
             return makeStyleProperty(get<%- camelize(property.name) %>Transition());
 <% } -%>
+<% for (const property of layoutProperties) { -%>
+        case Property::<%- camelize(property.name) %>:
+            return makeStyleProperty(get<%- camelize(property.name) %>());
+<% } -%>
     }
     return {};
 }
@@ -289,17 +301,8 @@ optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string&
         return Layer::setVisibility(value);
     }
 <% if (layoutProperties.length) { -%>
-    enum class Property {
-<% for (const property of layoutProperties) { -%>
-        <%- camelize(property.name) %>,
-<% } -%>
-    };
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        <%- layoutProperties.map(p => `{ "${p.name}", mbgl::underlying_type(Property::${camelize(p.name)}) }`).join(',\n        ') %>
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second <= lastPaintPropertyIndex) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -345,5 +348,3 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on
