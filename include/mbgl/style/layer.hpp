@@ -115,7 +115,7 @@ public:
                                                          const conversion::Convertible& value) = 0;
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
 
-    virtual StyleProperty getPaintProperty(const std::string&) const = 0;
+    virtual StyleProperty getProperty(const std::string&) const = 0;
 
     // Private implementation
     // TODO : We should not have public mutable data members.
