@@ -89,6 +89,7 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic, readwrite) CGSize size;
 @property (nonatomic) BOOL recalculateSize;
 @property (nonatomic) BOOL shouldLayoutBars;
+@property (nonatomic) NSNumber *testingRightToLeftOverride;
 @end
 
 static const CGFloat MGLBarHeight = 4;

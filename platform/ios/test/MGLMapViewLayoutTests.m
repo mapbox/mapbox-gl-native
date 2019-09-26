@@ -5,7 +5,6 @@
 
 #import "MGLScaleBar.h"
 
-
 @interface MGLOrnamentTestData : NSObject
 
 @property (nonatomic) MGLOrnamentPosition position;
@@ -24,6 +23,14 @@
     return data;
 }
 
+@end
+
+@interface MGLScaleBar (Tests)
+@property (nonatomic, readonly) NSArray<UIView *> *labelViews;
+@property (nonatomic, readonly) NSArray<UIView *> *bars;
+@property (nonatomic, readonly) UIView *containerView;
+@property (nonatomic, readonly) CGSize size;
+@property (nonatomic) NSNumber *testingRightToLeftOverride;
 @end
 
 
