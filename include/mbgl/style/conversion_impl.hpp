@@ -342,6 +342,13 @@ struct ValueFactory<T, typename std::enable_if<is_linear_container<T>::value>::t
     }
 };
 
+template <>
+struct ValueFactory<Position> {
+    static Value make(const Position& position) {
+        return ValueFactory<std::array<float, 3>>::make(position.getSpherical());
+    }
+};
+
 template <typename T>
 Value makeValue(T&& arg) {
     return ValueFactory<std::decay_t<T>>::make(std::forward<T>(arg));
