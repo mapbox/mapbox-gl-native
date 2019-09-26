@@ -35,6 +35,35 @@ std::string Formatted::toString() const {
     return result;
 }
 
+mbgl::Value Formatted::toObject() const {
+    mapbox::base::ValueObject result;
+    mapbox::base::ValueArray sectionValues;
+    sectionValues.reserve(sections.size());
+    for (const auto& section : sections) {
+        mapbox::base::ValueObject serializedSection;
+        serializedSection.emplace("text", section.text);
+        if (section.fontScale) {
+            serializedSection.emplace("scale", *section.fontScale);
+        } else {
+            serializedSection.emplace("scale", NullValue());
+        }
+        if (section.fontStack) {
+            std::string fontStackString;
+            serializedSection.emplace("fontStack", fontStackToString(*section.fontStack));
+        } else {
+            serializedSection.emplace("fontStack", NullValue());
+        }
+        if (section.textColor) {
+            serializedSection.emplace("textColor", section.textColor->toObject());
+        } else {
+            serializedSection.emplace("textColor", NullValue());
+        }
+        sectionValues.emplace_back(serializedSection);
+    }
+    result.emplace("sections", std::move(sectionValues));
+    return result;
+}
+
 } // namespace expression
 
 namespace conversion {

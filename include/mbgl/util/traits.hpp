@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <type_traits>
+#include <vector>
 
 namespace mbgl {
 
@@ -24,5 +26,13 @@ typename std::enable_if<is_utf16char_like<InChar>::value && is_utf16char_like_po
 {
     return reinterpret_cast<OutPointer>(in);
 }
+
+template <typename T>
+struct is_linear_container : std::false_type {};
+
+template <typename T, std::size_t N>
+struct is_linear_container<std::array<T, N>> : std::true_type {};
+template <typename... Ts>
+struct is_linear_container<std::vector<Ts...>> : std::true_type {};
 
 } // namespace mbgl

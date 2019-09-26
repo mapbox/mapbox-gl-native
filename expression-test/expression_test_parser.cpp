@@ -439,33 +439,7 @@ optional<Value> toValue(const expression::Value& exprValue) {
             std::vector<Value> color { double(c.r), double(c.g), double(c.b), double(c.a) };
             return {Value{std::move(color)}};
         },
-        [](const expression::Formatted& formatted) -> optional<Value> {
-            std::unordered_map<std::string, Value> serialized;
-            std::vector<Value> sections;
-            for (const auto& section : formatted.sections) {
-                std::unordered_map<std::string, Value> serializedSection;
-                serializedSection.emplace("text", section.text);
-                if (section.fontScale) {
-                    serializedSection.emplace("scale", *section.fontScale);
-                } else {
-                    serializedSection.emplace("scale", NullValue());
-                }
-                if (section.fontStack) {
-                    std::string fontStackString;
-                    serializedSection.emplace("fontStack", fontStackToString(*section.fontStack));
-                } else {
-                    serializedSection.emplace("fontStack", NullValue());
-                }
-                if (section.textColor) {
-                    serializedSection.emplace("textColor", section.textColor->toObject());
-                } else {
-                    serializedSection.emplace("textColor", NullValue());
-                }
-                sections.emplace_back(serializedSection);
-            }
-            serialized.emplace("sections", sections);
-            return {Value{std::move(serialized)}};
-        },
+        [](const expression::Formatted& formatted) -> optional<Value> { return {formatted.toObject()}; },
         [](const std::vector<expression::Value>& values) -> optional<Value> {
             std::vector<Value> mbglValues;
             for (const auto& value : values) {
