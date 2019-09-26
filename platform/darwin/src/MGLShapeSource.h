@@ -46,10 +46,10 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
 
  The dictionary key is an `NSString` that will be an attribute key for the clusters. The dictionary value is an `NSArray` consisting of a reduce operator and a map expression.
 
- The reduce operator is any expression function that accepts at least two operands. It can be a string containing a single operator, such as `sum:`, or a valid expression with two expression arguments: `featureAccumulated` and
+ The reduce operator is any `NSExpression` function that accepts at least two operands. It can be a string containing a single function, such as `sum:`, or a valid expression with two expression arguments: `featureAccumulated` and
  another valid expression.
 
- The map expression produces the value of a single point.
+ The map expression is an `NSExpression` that produces the value of a single point within the cluster.
 
  This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-clusterProperties"><code>clusterProperties</code></a>
