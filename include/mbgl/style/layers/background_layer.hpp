@@ -15,7 +15,7 @@ namespace style {
 
 class TransitionOptions;
 
-class BackgroundLayer : public Layer {
+class MBGL_EXPORT BackgroundLayer : public Layer {
 public:
     BackgroundLayer(const std::string& layerID);
     ~BackgroundLayer() final;

@@ -15,7 +15,7 @@ namespace style {
 
 class TransitionOptions;
 
-class FillLayer : public Layer {
+class MBGL_EXPORT FillLayer : public Layer {
 public:
     FillLayer(const std::string& layerID, const std::string& sourceID);
     ~FillLayer() final;

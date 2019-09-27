@@ -1,6 +1,8 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 #import "MGLNetworkConfiguration_Private.h"
+#include <mbgl/storage/network_status.hpp>
+
 
 @interface MGLNetworkConfigurationTests : XCTestCase
 @end
@@ -39,5 +41,19 @@
     }
     
     [self waitForExpectations:@[expectation] timeout:10.0];
+}
+
+- (void)testMBGLNetworkStatus
+{
+    auto currentStatus = mbgl::NetworkStatus::Get();
+
+    mbgl::NetworkStatus::Set(mbgl::NetworkStatus::Status::Offline);
+    auto networkStatus = mbgl::NetworkStatus::Get();
+    
+    // This will fail if libmbgl-core is linked twice.
+    XCTAssertEqual(networkStatus, mbgl::NetworkStatus::Status::Offline);
+
+    // Reset
+    mbgl::NetworkStatus::Set(currentStatus);
 }
 @end

@@ -3,6 +3,7 @@
 #include <atomic>
 #include <mutex>
 #include <unordered_set>
+#include <mbgl/util/util.hpp>
 
 namespace mbgl {
 
@@ -10,7 +11,7 @@ namespace util {
 class AsyncTask;
 } // namespace util
 
-class NetworkStatus {
+class MBGL_EXPORT NetworkStatus {
 public:
     enum class Status : uint8_t {
         Online,

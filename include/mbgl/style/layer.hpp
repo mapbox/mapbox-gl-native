@@ -5,6 +5,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <mapbox/weak.hpp>
 #include <mapbox/type_wrapper.hpp>
@@ -82,7 +83,7 @@ struct LayerTypeInfo {
  *
  *     auto circleLayer = LayerManager::get()->createLayer("circle", ...);
  */
-class Layer {
+class MBGL_EXPORT Layer {
 public:
     Layer(const Layer& ) = delete;
     Layer& operator=(const Layer&) = delete;

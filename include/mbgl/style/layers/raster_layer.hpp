@@ -15,7 +15,7 @@ namespace style {
 
 class TransitionOptions;
 
-class RasterLayer : public Layer {
+class MBGL_EXPORT RasterLayer  : public Layer {
 public:
     RasterLayer(const std::string& layerID, const std::string& sourceID);
     ~RasterLayer() final;

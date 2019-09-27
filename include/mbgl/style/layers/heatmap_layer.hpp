@@ -16,7 +16,7 @@ namespace style {
 
 class TransitionOptions;
 
-class HeatmapLayer : public Layer {
+class MBGL_EXPORT HeatmapLayer : public Layer {
 public:
     HeatmapLayer(const std::string& layerID, const std::string& sourceID);
     ~HeatmapLayer() final;

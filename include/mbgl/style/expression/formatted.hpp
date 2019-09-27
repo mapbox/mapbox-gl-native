@@ -4,6 +4,7 @@
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <vector>
 #include <string>
@@ -33,7 +34,7 @@ struct FormattedSection {
     optional<Color> textColor;
 };
 
-class Formatted {
+class MBGL_EXPORT Formatted {
 public:
     Formatted() = default;
     

@@ -2,13 +2,14 @@
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <string>
 #include <memory>
 
 namespace mbgl {
 
-class Response {
+class MBGL_EXPORT Response {
 public:
     Response() = default;
     Response(const Response&);

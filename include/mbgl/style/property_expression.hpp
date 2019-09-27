@@ -6,11 +6,12 @@
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/find_zoom_curve.hpp>
 #include <mbgl/util/range.hpp>
+#include <mbgl/util/util.hpp>
 
 namespace mbgl {
 namespace style {
 
-class PropertyExpressionBase {
+class MBGL_EXPORT PropertyExpressionBase {
 public:
     explicit PropertyExpressionBase(std::unique_ptr<expression::Expression>);
 

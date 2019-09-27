@@ -15,7 +15,7 @@ namespace style {
 
 class TransitionOptions;
 
-class FillExtrusionLayer : public Layer {
+class MBGL_EXPORT FillExtrusionLayer : public Layer {
 public:
     FillExtrusionLayer(const std::string& layerID, const std::string& sourceID);
     ~FillExtrusionLayer() final;
