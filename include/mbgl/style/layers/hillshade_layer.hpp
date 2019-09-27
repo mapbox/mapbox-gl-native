@@ -15,7 +15,6 @@ namespace style {
 
 class TransitionOptions;
 
-
 class MBGL_EXPORT HillshadeLayer : public Layer {
 public:
     HillshadeLayer(const std::string& layerID, const std::string& sourceID);

@@ -54,7 +54,7 @@ class FillPaintProperties : public Properties<
     FillTranslateAnchor
 > {};
 
-class FillLayerProperties final : public LayerProperties {
+class MBGL_EXPORT FillLayerProperties final : public LayerProperties {
 public:
     explicit FillLayerProperties(Immutable<FillLayer::Impl>);
     FillLayerProperties(

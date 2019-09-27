@@ -43,7 +43,7 @@ class HeatmapPaintProperties : public Properties<
     HeatmapWeight
 > {};
 
-class HeatmapLayerProperties final : public LayerProperties {
+class MBGL_EXPORT HeatmapLayerProperties final : public LayerProperties {
 public:
     explicit HeatmapLayerProperties(Immutable<HeatmapLayer::Impl>);
     HeatmapLayerProperties(

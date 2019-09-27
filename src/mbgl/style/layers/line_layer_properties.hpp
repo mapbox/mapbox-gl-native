@@ -106,7 +106,7 @@ class LinePaintProperties : public Properties<
     LineWidth
 > {};
 
-class LineLayerProperties final : public LayerProperties {
+class MBGL_EXPORT LineLayerProperties final : public LayerProperties {
 public:
     explicit LineLayerProperties(Immutable<LineLayer::Impl>);
     LineLayerProperties(

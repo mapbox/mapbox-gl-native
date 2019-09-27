@@ -12,7 +12,6 @@
 #include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/util/util.hpp>
 
 namespace mbgl {
 namespace style {

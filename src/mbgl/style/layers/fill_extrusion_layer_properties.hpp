@@ -59,7 +59,7 @@ class FillExtrusionPaintProperties : public Properties<
     FillExtrusionVerticalGradient
 > {};
 
-class FillExtrusionLayerProperties final : public LayerProperties {
+class MBGL_EXPORT FillExtrusionLayerProperties final : public LayerProperties {
 public:
     explicit FillExtrusionLayerProperties(Immutable<FillExtrusionLayer::Impl>);
     FillExtrusionLayerProperties(

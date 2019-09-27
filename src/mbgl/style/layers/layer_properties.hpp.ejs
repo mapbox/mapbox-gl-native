@@ -63,7 +63,7 @@ class <%- camelize(type) %>PaintProperties : public Properties<
     <%- camelize(paintProperties.slice(-1)[0].name) %>
 > {};
 
-class <%- camelize(type) %>LayerProperties final : public LayerProperties {
+class MBGL_EXPORT <%- camelize(type) %>LayerProperties final : public LayerProperties {
 public:
     explicit <%- camelize(type) %>LayerProperties(Immutable<<%- camelize(type) %>Layer::Impl>);
     <%- camelize(type) %>LayerProperties(

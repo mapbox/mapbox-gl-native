@@ -18,7 +18,7 @@ namespace style {
 
 class TransitionOptions;
 
-class MBGL_EXPORT LineLayer  : public Layer {
+class MBGL_EXPORT LineLayer : public Layer {
 public:
     LineLayer(const std::string& layerID, const std::string& sourceID);
     ~LineLayer() final;

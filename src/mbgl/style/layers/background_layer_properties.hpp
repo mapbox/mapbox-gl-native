@@ -34,7 +34,7 @@ class BackgroundPaintProperties : public Properties<
     BackgroundPattern
 > {};
 
-class BackgroundLayerProperties final : public LayerProperties {
+class MBGL_EXPORT BackgroundLayerProperties final : public LayerProperties {
 public:
     explicit BackgroundLayerProperties(Immutable<BackgroundLayer::Impl>);
     BackgroundLayerProperties(

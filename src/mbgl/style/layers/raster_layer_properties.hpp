@@ -59,7 +59,7 @@ class RasterPaintProperties : public Properties<
     RasterSaturation
 > {};
 
-class RasterLayerProperties final : public LayerProperties {
+class MBGL_EXPORT RasterLayerProperties final : public LayerProperties {
 public:
     explicit RasterLayerProperties(Immutable<RasterLayer::Impl>);
     RasterLayerProperties(

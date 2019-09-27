@@ -74,7 +74,7 @@ class CirclePaintProperties : public Properties<
     CircleTranslateAnchor
 > {};
 
-class CircleLayerProperties final : public LayerProperties {
+class MBGL_EXPORT CircleLayerProperties final : public LayerProperties {
 public:
     explicit CircleLayerProperties(Immutable<CircleLayer::Impl>);
     CircleLayerProperties(

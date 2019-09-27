@@ -49,7 +49,7 @@ class HillshadePaintProperties : public Properties<
     HillshadeShadowColor
 > {};
 
-class HillshadeLayerProperties final : public LayerProperties {
+class MBGL_EXPORT HillshadeLayerProperties final : public LayerProperties {
 public:
     explicit HillshadeLayerProperties(Immutable<HillshadeLayer::Impl>);
     HillshadeLayerProperties(
