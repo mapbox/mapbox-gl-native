@@ -337,7 +337,7 @@ void shapeLines(Shaping& shaping,
             if (glyphs == glyphMap.end()) {
                 continue;
             }
-            hasBaseline = glyphs->second.hasBaseline;
+            hasBaseline = (glyphs->second.ascender.has_value() && glyphs->second.descender.has_value());
             if (!hasBaseline) break;
         }
         if (!hasBaseline) break;
@@ -381,9 +381,10 @@ void shapeLines(Shaping& shaping,
             // with different offset shift. If font's baseline is not applicable, fall back to use a default baseline
             // offset, see shaping.yOffset. Since we're laying out at 24 points, we need also calculate how much it will
             // move when we scale up or down.
-            const double baselineOffset =
-                (hasBaseline ? ((-glyph.metrics.ascender + glyph.metrics.descender) / 2 * section.scale)
-                             : shaping.yOffset) +
+            const float baselineOffset =
+                (hasBaseline
+                     ? ((-(glyphs->second.ascender.value()) + glyphs->second.descender.value()) / 2.0 * section.scale)
+                     : shaping.yOffset) +
                 (lineMaxScale - section.scale) * util::ONE_EM;
 
             if (writingMode == WritingModeType::Horizontal ||
@@ -417,8 +418,13 @@ void shapeLines(Shaping& shaping,
 
     auto anchorAlign = AnchorAlignment::getAnchorAlignment(textAnchor);
 
-    align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
-          lineHeight, lines.size());
+    align(shaping,
+          justify,
+          anchorAlign.horizontalAlign,
+          anchorAlign.verticalAlign,
+          maxLineLength,
+          lineHeight,
+          lines.size());
     const float height = y;
     // Calculate the bounding box
     shaping.top += -anchorAlign.verticalAlign * height;

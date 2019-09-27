@@ -4,11 +4,11 @@
 #include <mbgl/text/glyph_range.hpp>
 
 #include <string>
-#include <utility>
+#include <tuple>
 #include <vector>
 
 namespace mbgl {
 
-std::pair<std::vector<Glyph>, bool> parseGlyphPBF(const GlyphRange&, const std::string& data);
+std::tuple<std::vector<Glyph>, int32_t, int32_t> parseGlyphPBF(const GlyphRange&, const std::string& data);
 
 } // namespace mbgl

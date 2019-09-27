@@ -32,8 +32,6 @@ public:
         stub.metrics.left = 0;
         stub.metrics.top = -8;
         stub.metrics.advance = 24;
-        stub.metrics.ascender = 0;
-        stub.metrics.descender = 0;
 
         stub.bitmap = AlphaImage(Size(30, 30), stubBitmap, stubBitmapLength);
 

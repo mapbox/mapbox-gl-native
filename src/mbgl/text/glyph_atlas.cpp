@@ -15,8 +15,9 @@ GlyphAtlas makeGlyphAtlas(const GlyphMap& glyphs) {
 
     for (const auto& glyphMapEntry : glyphs) {
         FontStackHash fontStack = glyphMapEntry.first;
-        GlyphPositionMap& positions = result.positions[fontStack];
-
+        GlyphPositionData& positions = result.positions[fontStack];
+        positions.ascender = glyphMapEntry.second.ascender;
+        positions.descender = glyphMapEntry.second.descender;
         for (const auto& entry : glyphMapEntry.second.glyphs) {
             if (entry.second && (*entry.second)->bitmap.valid()) {
                 const Glyph& glyph = **entry.second;
@@ -39,16 +40,12 @@ GlyphAtlas makeGlyphAtlas(const GlyphMap& glyphs) {
                                  },
                                  glyph.bitmap.size);
 
-                positions.emplace(glyph.id,
-                                  GlyphPosition {
-                                     Rect<uint16_t> {
-                                         static_cast<uint16_t>(bin.x),
-                                         static_cast<uint16_t>(bin.y),
-                                         static_cast<uint16_t>(bin.w),
-                                         static_cast<uint16_t>(bin.h)
-                                     },
-                                     glyph.metrics
-                                  });
+                positions.glyphPositionMap.emplace(glyph.id,
+                                                   GlyphPosition{Rect<uint16_t>{static_cast<uint16_t>(bin.x),
+                                                                                static_cast<uint16_t>(bin.y),
+                                                                                static_cast<uint16_t>(bin.w),
+                                                                                static_cast<uint16_t>(bin.h)},
+                                                                 glyph.metrics});
             }
         }
     }

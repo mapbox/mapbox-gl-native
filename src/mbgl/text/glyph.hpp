@@ -30,13 +30,11 @@ struct GlyphMetrics {
     int32_t left = 0;
     int32_t top = 0;
     uint32_t advance = 0U;
-    int32_t ascender = 0;
-    int32_t descender = 0;
 };
 
 inline bool operator==(const GlyphMetrics& lhs, const GlyphMetrics& rhs) {
     return lhs.width == rhs.width && lhs.height == rhs.height && lhs.left == rhs.left && lhs.top == rhs.top &&
-           lhs.advance == rhs.advance && lhs.ascender == rhs.ascender && lhs.descender == rhs.descender;
+           lhs.advance == rhs.advance;
 }
 
 class Glyph {
@@ -55,8 +53,9 @@ public:
 };
 
 struct Glyphs {
-    std::map<GlyphID, optional<Immutable<Glyph>>> glyphs;
-    bool hasBaseline;
+    std::map<GlyphID, optional<Immutable<Glyph>>> glyphs{};
+    optional<int32_t> ascender{nullopt};
+    optional<int32_t> descender{nullopt};
 };
 using GlyphMap = std::map<FontStackHash, Glyphs>;
 

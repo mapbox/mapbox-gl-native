@@ -259,8 +259,9 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
         Glyphs& newGlyphs = newFontGlyphs.second;
 
         Glyphs& glyphs = glyphMap[fontStack];
-        glyphs.hasBaseline =
-            glyphs.glyphs.empty() ? newGlyphs.hasBaseline : glyphs.hasBaseline && newGlyphs.hasBaseline;
+        glyphs.ascender = newGlyphs.ascender;
+        glyphs.descender = newGlyphs.descender;
+
         for (auto& pendingGlyphDependency : pendingGlyphDependencies) {
             // Linear lookup here to handle reverse of FontStackHash -> FontStack,
             // since dependencies need the full font stack name to make a request

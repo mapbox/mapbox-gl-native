@@ -6,6 +6,8 @@
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/util/constants.hpp>
 
+#include <vector>
+
 using namespace mbgl;
 using namespace util;
 
@@ -17,8 +19,6 @@ TEST(Shaping, ZWSP) {
     glyph.metrics.left = 2;
     glyph.metrics.top = -8;
     glyph.metrics.advance = 21;
-    glyph.metrics.ascender = 0;
-    glyph.metrics.descender = 0;
 
     BiDi bidi;
     auto immutableGlyph = Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph)));
@@ -26,7 +26,6 @@ TEST(Shaping, ZWSP) {
     const SectionOptions sectionOptions(1.0f, fontStack);
     Glyphs glyphData;
     glyphData.glyphs.emplace(u'中', std::move(immutableGlyph));
-    glyphData.hasBaseline = false;
     GlyphMap glyphs = {{FontStackHasher()(fontStack), std::move(glyphData)}};
 
     const auto testGetShaping = [&](const TaggedString& string, unsigned maxWidthInChars) {
@@ -111,8 +110,6 @@ TEST(Shaping, FontWithBaseline) {
     glyph1.metrics.left = 2;
     glyph1.metrics.top = -8;
     glyph1.metrics.advance = 21;
-    glyph1.metrics.ascender = 26;
-    glyph1.metrics.descender = -6;
 
     Glyph glyph2;
     glyph2.id = u'光';
@@ -121,17 +118,26 @@ TEST(Shaping, FontWithBaseline) {
     glyph2.metrics.left = 2;
     glyph2.metrics.top = -8;
     glyph2.metrics.advance = 21;
-    glyph2.metrics.ascender = 25;
-    glyph2.metrics.descender = -5;
 
     BiDi bidi;
-    const std::vector<std::string> fontStack{{"font-stack"}};
-    const SectionOptions sectionOptions(1.0f, fontStack);
-    Glyphs glyphData;
-    glyphData.glyphs.emplace(u'阳', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph1))));
-    glyphData.glyphs.emplace(u'光', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph2))));
-    glyphData.hasBaseline = true;
-    GlyphMap glyphs = {{FontStackHasher()(fontStack), std::move(glyphData)}};
+    std::vector<SectionOptions> sectionOptions;
+    const std::vector<std::string> fontStack1{{"font-stack1"}};
+    sectionOptions.emplace_back(1.0f, fontStack1);
+    Glyphs glyphData1;
+    glyphData1.glyphs.emplace(u'阳', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph1))));
+    glyphData1.ascender = 26;
+    glyphData1.descender = -6;
+
+    const std::vector<std::string> fontStack2{{"font-stack2"}};
+    sectionOptions.emplace_back(1.0f, fontStack2);
+    Glyphs glyphData2;
+    glyphData2.glyphs.emplace(u'光', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph2))));
+    glyphData2.ascender = 25;
+    glyphData2.descender = -5;
+
+    GlyphMap glyphs;
+    glyphs.emplace(FontStackHasher()(fontStack1), std::move(glyphData1));
+    glyphs.emplace(FontStackHasher()(fontStack2), std::move(glyphData2));
 
     const auto testGetShaping = [&](const TaggedString& string, unsigned maxWidthInChars) {
         return getShaping(string,
@@ -148,7 +154,13 @@ TEST(Shaping, FontWithBaseline) {
     };
 
     {
-        TaggedString string(u"阳光\u200b", sectionOptions);
+        std::u16string text{u"阳光\u200b"};
+        StyledText styledText;
+        styledText.second = std::vector<uint8_t>{0, 1, 0};
+        styledText.first = std::move(text);
+
+        TaggedString string{styledText, sectionOptions};
+
         auto shaping = testGetShaping(string, 5);
         ASSERT_EQ(shaping.lineCount, 1);
         ASSERT_EQ(shaping.top, -12);

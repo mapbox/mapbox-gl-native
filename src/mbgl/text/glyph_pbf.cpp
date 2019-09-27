@@ -4,12 +4,14 @@
 
 namespace mbgl {
 
-std::pair<std::vector<Glyph>, bool> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
+std::tuple<std::vector<Glyph>, int32_t, int32_t> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
     std::vector<Glyph> glyphs;
     glyphs.reserve(256);
+    int32_t ascender{0}, descender{0};
+    bool ascenderSet{false}, descenderSet{0};
 
     protozero::pbf_reader glyphs_pbf(data);
-    bool hasBaseline{true};
+
     while (glyphs_pbf.next(1)) {
         auto readGlyphMetrics = [glyphRange, &glyphs](protozero::pbf_reader& fontstack_pbf) {
             auto glyph_pbf = fontstack_pbf.get_message();
@@ -81,7 +83,6 @@ std::pair<std::vector<Glyph>, bool> parseGlyphPBF(const GlyphRange& glyphRange, 
             glyphs.push_back(std::move(glyph));
         };
 
-        int32_t ascender{0}, descender{0};
         uint16_t count{0};
         auto fontstack_pbf = glyphs_pbf.get_message();
         while (fontstack_pbf.next()) {
@@ -92,11 +93,27 @@ std::pair<std::vector<Glyph>, bool> parseGlyphPBF(const GlyphRange& glyphRange, 
                     break;
                 }
                 case 4: {
-                    ascender = fontstack_pbf.get_sint32();
+                    // ascender value for one fontstack shall keep the same, if different values appear, set ascender to
+                    // be 0.
+                    const auto value = fontstack_pbf.get_sint32();
+                    if (!ascenderSet) {
+                        ascender = value;
+                        ascenderSet = true;
+                    } else if (ascender != value) {
+                        ascender = 0;
+                    }
                     break;
                 }
                 case 5: {
-                    descender = fontstack_pbf.get_sint32();
+                    // descender value for one fontstack shall keep the same, if different values appear, set descender
+                    // to be 0.
+                    const auto value = fontstack_pbf.get_sint32();
+                    if (!descenderSet) {
+                        descender = value;
+                        descenderSet = true;
+                    } else if (descender != value) {
+                        descender = 0;
+                    }
                     break;
                 }
                 default: {
@@ -105,19 +122,9 @@ std::pair<std::vector<Glyph>, bool> parseGlyphPBF(const GlyphRange& glyphRange, 
                 }
             }
         }
-        if (hasBaseline && (ascender != 0.0 || descender != 0.0)) {
-            assert(count <= glyphs.size());
-            const auto lastIndex = glyphs.size() - 1;
-            for (uint16_t i = glyphs.size() - count; i <= lastIndex; ++i) {
-                glyphs[i].metrics.ascender = ascender;
-                glyphs[i].metrics.descender = descender;
-            }
-        } else {
-            hasBaseline = false;
-        }
     }
 
-    return std::make_pair(std::move(glyphs), hasBaseline);
+    return std::make_tuple(std::move(glyphs), ascender, descender);
 }
 
 } // namespace mbgl
