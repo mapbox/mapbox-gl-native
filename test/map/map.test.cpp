@@ -1006,6 +1006,6 @@ TEST(Map, UniversalStyleGetter) {
     StyleProperty lineCap = lineLayer->getProperty("line-cap");
     ASSERT_TRUE(lineCap.value);
     EXPECT_EQ(StyleProperty::Kind::Constant, lineCap.kind);
-    ASSERT_TRUE(lineCap.value.getInt());
-    EXPECT_EQ(mbgl::underlying_type(mbgl::style::LineCapType::Butt), *lineCap.value.getInt());
+    ASSERT_TRUE(lineCap.value.getString());
+    EXPECT_EQ(std::string("butt"), *lineCap.value.getString());
 }
