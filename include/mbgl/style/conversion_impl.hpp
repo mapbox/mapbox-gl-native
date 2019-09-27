@@ -327,7 +327,7 @@ struct ValueFactory<T, typename std::enable_if<(!std::is_enum<T>::value && !is_l
 
 template <typename T>
 struct ValueFactory<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-    static Value make(T arg) { return {int64_t(arg)}; }
+    static Value make(T arg) { return {Enum<T>::toString(arg)}; }
 };
 
 template <typename T>
