@@ -9,10 +9,9 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils
+import java.lang.IllegalStateException
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.lang.IllegalStateException
-
 
 @RunWith(AndroidJUnit4::class)
 class StyleLoadTest : EspressoTest() {
