@@ -957,41 +957,41 @@ TEST(Map, UniversalStyleGetter) {
     ASSERT_TRUE(lineLayer);
 
     StyleProperty nonexistent = lineLayer->getProperty("nonexistent");
-    ASSERT_FALSE(nonexistent.value);
-    EXPECT_EQ(StyleProperty::Kind::Undefined, nonexistent.kind);
+    ASSERT_FALSE(nonexistent.getValue());
+    EXPECT_EQ(StyleProperty::Kind::Undefined, nonexistent.getKind());
 
     StyleProperty undefined = lineLayer->getProperty("line-blur");
-    ASSERT_FALSE(undefined.value);
-    EXPECT_EQ(StyleProperty::Kind::Undefined, undefined.kind);
+    ASSERT_FALSE(undefined.getValue());
+    EXPECT_EQ(StyleProperty::Kind::Undefined, undefined.getKind());
 
     StyleProperty lineColor = lineLayer->getProperty("line-color");
-    ASSERT_TRUE(lineColor.value);
-    EXPECT_EQ(StyleProperty::Kind::Constant, lineColor.kind);
-    ASSERT_TRUE(lineColor.value.getObject());
-    const auto& color = *(lineColor.value.getObject());
+    ASSERT_TRUE(lineColor.getValue());
+    EXPECT_EQ(StyleProperty::Kind::Constant, lineColor.getKind());
+    ASSERT_TRUE(lineColor.getValue().getObject());
+    const auto& color = *(lineColor.getValue().getObject());
     EXPECT_EQ(1.0, *color.at("r").getDouble());
     EXPECT_EQ(0.0, *color.at("g").getDouble());
     EXPECT_EQ(0.0, *color.at("b").getDouble());
     EXPECT_EQ(1.0, *color.at("a").getDouble());
 
     StyleProperty lineOpacity = lineLayer->getProperty("line-opacity");
-    ASSERT_TRUE(lineOpacity.value);
-    EXPECT_EQ(StyleProperty::Kind::Constant, lineOpacity.kind);
-    ASSERT_TRUE(lineOpacity.value.getDouble());
-    EXPECT_EQ(0.5, *lineOpacity.value.getDouble());
+    ASSERT_TRUE(lineOpacity.getValue());
+    EXPECT_EQ(StyleProperty::Kind::Constant, lineOpacity.getKind());
+    ASSERT_TRUE(lineOpacity.getValue().getDouble());
+    EXPECT_EQ(0.5, *lineOpacity.getValue().getDouble());
 
     StyleProperty lineOpacityTransition = lineLayer->getProperty("line-opacity-transition");
-    ASSERT_TRUE(lineOpacityTransition.value);
-    EXPECT_EQ(StyleProperty::Kind::Transition, lineOpacityTransition.kind);
-    ASSERT_TRUE(lineOpacityTransition.value.getArray());
-    EXPECT_EQ(3u, lineOpacityTransition.value.getArray()->size());
+    ASSERT_TRUE(lineOpacityTransition.getValue());
+    EXPECT_EQ(StyleProperty::Kind::Transition, lineOpacityTransition.getKind());
+    ASSERT_TRUE(lineOpacityTransition.getValue().getArray());
+    EXPECT_EQ(3u, lineOpacityTransition.getValue().getArray()->size());
 
     StyleProperty lineWidth = lineLayer->getProperty("line-width");
-    ASSERT_TRUE(lineWidth.value);
-    EXPECT_EQ(StyleProperty::Kind::Expression, lineWidth.kind);
-    ASSERT_TRUE(lineWidth.value.getArray());
+    ASSERT_TRUE(lineWidth.getValue());
+    EXPECT_EQ(StyleProperty::Kind::Expression, lineWidth.getKind());
+    ASSERT_TRUE(lineWidth.getValue().getArray());
 
-    const auto& expression = *lineWidth.value.getArray();
+    const auto& expression = *lineWidth.getValue().getArray();
     EXPECT_EQ(2u, expression.size());
     ASSERT_TRUE(expression[0].getString());
     EXPECT_EQ("number", *expression[0].getString());
@@ -1004,8 +1004,8 @@ TEST(Map, UniversalStyleGetter) {
     EXPECT_EQ("width", *operation[1].getString());
 
     StyleProperty lineCap = lineLayer->getProperty("line-cap");
-    ASSERT_TRUE(lineCap.value);
-    EXPECT_EQ(StyleProperty::Kind::Constant, lineCap.kind);
-    ASSERT_TRUE(lineCap.value.getString());
-    EXPECT_EQ(std::string("butt"), *lineCap.value.getString());
+    ASSERT_TRUE(lineCap.getValue());
+    EXPECT_EQ(StyleProperty::Kind::Constant, lineCap.getKind());
+    ASSERT_TRUE(lineCap.getValue().getString());
+    EXPECT_EQ(std::string("butt"), *lineCap.getValue().getString());
 }
