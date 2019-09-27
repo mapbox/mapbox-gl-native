@@ -11,11 +11,13 @@ import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.IllegalStateException
+
 
 @RunWith(AndroidJUnit4::class)
 class StyleLoadTest : EspressoTest() {
 
-    @Test
+    @Test(expected = IllegalStateException::class)
     fun updateSourceAfterStyleLoad() {
         validateTestSetup()
         MapboxMapAction.invoke(mapboxMap) { uiController: UiController, mapboxMap: MapboxMap ->
