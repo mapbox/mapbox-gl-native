@@ -99,9 +99,9 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             NSArray *expressionsArray = value[key];
             if (![expressionsArray isKindOfClass:[NSArray class]]) {
                 [NSException raise:NSInvalidArgumentException
-                            format:@"MGLShapeSourceOptionClusterProperties dictinary member value must be an array containing two objects."];
+                            format:@"MGLShapeSourceOptionClusterProperties dictionary member value must be an array containing two objects."];
             }
-            // check that array has only 2 values
+            // Check that the array has 2 values. One should be a the reduce expression and one should be the map expression.
             if ([expressionsArray count] != 2) {
                 [NSException raise:NSInvalidArgumentException
                             format:@"MGLShapeSourceOptionClusterProperties member value requires array of two objects."];
@@ -132,7 +132,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             NSExpression *mapExpression = expressionsArray[1];
             if (![mapExpression isKindOfClass:[NSExpression class]]) {
                 [NSException raise:NSInvalidArgumentException
-                            format:@"MGLShapeSourceOptionClusterProperties member value shall contain a valid mapExpression.."];
+                            format:@"MGLShapeSourceOptionClusterProperties member value shall contain a valid mapExpression."];
             }
             auto map = MGLClusterPropertyFromNSExpression(mapExpression);
             if (!map) {

@@ -42,12 +42,12 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
 /**
- An `NSDictionary` object where the key is an `NSString`. The dictionary key will be the attribute feature attribute key. The resulting attribute value is aggregated from the clustered points.
+ An `NSDictionary` object where the key is an `NSString`. The dictionary key will be the attribute feature attribute key. The resulting attribute value is aggregated from the clustered points. The dictionary value is an `NSArray` consisting of a reduce operator and a map expression.
 
- The dictionary key is an `NSString` that will be an attribute key for the clusters. The dictionary value is an `NSArray` consisting of a reduce operator and a map expression.
+ The reduce operator is any `NSExpression` function that accepts at least two operands. You can use one of the following:
 
- The reduce operator is any `NSExpression` function that accepts at least two operands. It can be a string containing a single function, such as `sum:`, or a valid expression with two expression arguments: `featureAccumulated` and
- another valid expression.
+ * An `NSString` containing a single function, such as `sum` or `max`.
+ * An `NSExpression` that takes two expression arguments: `featureAccumulated` and another valid expression.
 
  The map expression is an `NSExpression` that produces the value of a single point within the cluster.
 
