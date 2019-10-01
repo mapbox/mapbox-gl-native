@@ -71,6 +71,7 @@
   "render-tests/circle-sort-key/literal": "https://github.com/mapbox/mapbox-gl-native/issues/15008",
   "render-tests/fill-sort-key/literal": "https://github.com/mapbox/mapbox-gl-native/issues/15008",
   "render-tests/line-sort-key/literal": "https://github.com/mapbox/mapbox-gl-native/issues/15008",
+  "render-tests/regressions/mapbox-gl-js#8817": "skip - https://github.com/mapbox/mapbox-gl-native/issues/15737",
   "query-tests/fill-extrusion/base-in": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/fill-extrusion/box-in": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/fill-extrusion/side-in": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
