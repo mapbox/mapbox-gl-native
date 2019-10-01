@@ -117,7 +117,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         if (rotateVerticalGlyph) {
             // Vertical-supporting glyphs are laid out in 24x24 point boxes (1 square em)
             // In horizontal orientation, the y values for glyphs are below the midline.
-            // If the glyph's baseline is applicable, we take the value of the baseline offset.
+            // If the glyph's baseline is applicable, we take the y value of the glyph.
             // Otherwise, we use a "yOffset" of -17 to pull them up to the middle.
             // By rotating counter-clockwise around the point at the center of the left
             // edge of a 24x24 layout box centered below the midline, we align the center
@@ -125,14 +125,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
             // necessary, but we also pull the glyph to the left along the x axis.
             // The y coordinate includes baseline yOffset, therefore, needs to be accounted
             // for when glyph is rotated and translated.
-            if (shapedText.hasBaseline) {
-                assert(fontPositions->second.ascender && fontPositions->second.descender);
-            }
-            const float yShift =
-                (shapedText.hasBaseline
-                     ? ((-(fontPositions->second.ascender.value()) + fontPositions->second.descender.value()) / 2.0 *
-                        positionedGlyph.scale)
-                     : Shaping::yOffset);
+            const float yShift = (shapedText.hasBaseline ? positionedGlyph.y : Shaping::yOffset);
             const Point<float> center{-halfAdvance, halfAdvance - yShift};
             const float verticalRotation = -M_PI_2;
 

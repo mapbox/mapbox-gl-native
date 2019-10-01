@@ -134,11 +134,12 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
                  const GlyphMap& glyphMap,
                  std::size_t start,
                  std::size_t end,
-                 float justify) {
-    if (!justify) {
+                 float justify,
+                 float baselineOffset) {
+    if (!justify && !baselineOffset) {
         return;
     }
-    
+
     PositionedGlyph& glyph = positionedGlyphs[end];
     auto glyphs = glyphMap.find(glyph.font);
     if (glyphs == glyphMap.end()) {
@@ -151,6 +152,7 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
         
         for (std::size_t j = start; j <= end; j++) {
             positionedGlyphs[j].x -= lineIndent;
+            positionedGlyphs[j].y += baselineOffset;
         }
     }
 }
@@ -358,6 +360,7 @@ void shapeLines(Shaping& shaping,
             continue;
         }
 
+        float biggestHeight{0}, baselineOffset{0};
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
         for (std::size_t i = 0; i < line.length(); i++) {
             const std::size_t sectionIndex = line.getSectionIndex(i);
@@ -374,21 +377,29 @@ void shapeLines(Shaping& shaping,
 
             const Glyph& glyph = **it->second;
 
-            // In order to make different fonts aligned, they must share a general baseline that starts from the midline
-            // of each font face.  Baseline offset is the vertical distance from font face's baseline to its top most
-            // position, which is the half size of the sum (ascender + descender). Since glyph's position is counted
-            // from the top left corner, the negative shift is needed. So different fonts share the same baseline but
-            // with different offset shift. If font's baseline is not applicable, fall back to use a default baseline
-            // offset, see shaping.yOffset. Since we're laying out at 24 points, we need also calculate how much it will
-            // move when we scale up or down.
+            double ascender{0}, descender{0}, glyphOffset{0};
+            // In order to make different fonts aligned, they must share a general baseline that aligns with every
+            // font's real baseline. Glyph's position is counted from the top left corner, where is the ascender line
+            // starts. Since ascender is above the baseline, the glyphOffset is the negative shift. In order to make all
+            // the glyphs aligned with shaping box, for each line, we lock the heighest glyph (with scale) locating
+            // at the middle of the line, which will lead to a baseline shift. Then adjust the whole line with the
+            // baseline offset we calculated from the shift.
             if (hasBaseline) {
                 assert(glyphs->second.ascender && glyphs->second.descender);
+                ascender = std::abs(glyphs->second.ascender.value());
+                descender = std::abs(glyphs->second.descender.value());
+                auto value = (ascender + descender) * section.scale;
+                if (biggestHeight < value) {
+                    biggestHeight = value;
+                    baselineOffset = (ascender - descender) / 2 * section.scale;
+                }
+                glyphOffset = -ascender * section.scale;
+            } else {
+                // If font's baseline is not applicable, fall back to use a default baseline
+                // offset, see shaping.yOffset. Since we're laying out at 24 points, we need also calculate how much it
+                // will move when we scale up or down.
+                glyphOffset = Shaping::yOffset + (lineMaxScale - section.scale) * util::ONE_EM;
             }
-            const float baselineOffset =
-                (hasBaseline
-                     ? ((-(glyphs->second.ascender.value()) + glyphs->second.descender.value()) / 2.0 * section.scale)
-                     : shaping.yOffset) +
-                (lineMaxScale - section.scale) * util::ONE_EM;
 
             if (writingMode == WritingModeType::Horizontal ||
                 // Don't verticalize glyphs that have no upright orientation if vertical placement is disabled.
@@ -398,10 +409,11 @@ void shapeLines(Shaping& shaping,
                 (allowVerticalPlacement &&
                  (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint)))) {
                 shaping.positionedGlyphs.emplace_back(
-                    codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale, sectionIndex);
+                    codePoint, x, y + glyphOffset, false, section.fontStackHash, section.scale, sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, true, section.fontStackHash, section.scale, sectionIndex);
+                shaping.positionedGlyphs.emplace_back(
+                    codePoint, x, y + glyphOffset, true, section.fontStackHash, section.scale, sectionIndex);
                 x += util::ONE_EM * section.scale + spacing;
             }
         }
@@ -410,9 +422,13 @@ void shapeLines(Shaping& shaping,
         if (shaping.positionedGlyphs.size() != lineStartIndex) {
             float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
-            
-            justifyLine(shaping.positionedGlyphs, glyphMap, lineStartIndex,
-                        shaping.positionedGlyphs.size() - 1, justify);
+
+            justifyLine(shaping.positionedGlyphs,
+                        glyphMap,
+                        lineStartIndex,
+                        shaping.positionedGlyphs.size() - 1,
+                        justify,
+                        baselineOffset);
         }
         
         x = 0;
