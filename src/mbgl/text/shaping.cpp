@@ -381,6 +381,9 @@ void shapeLines(Shaping& shaping,
             // with different offset shift. If font's baseline is not applicable, fall back to use a default baseline
             // offset, see shaping.yOffset. Since we're laying out at 24 points, we need also calculate how much it will
             // move when we scale up or down.
+            if (hasBaseline) {
+                assert(glyphs->second.ascender && glyphs->second.descender);
+            }
             const float baselineOffset =
                 (hasBaseline
                      ? ((-(glyphs->second.ascender.value()) + glyphs->second.descender.value()) / 2.0 * section.scale)

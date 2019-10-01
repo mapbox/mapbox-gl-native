@@ -8,7 +8,7 @@ std::tuple<std::vector<Glyph>, int32_t, int32_t> parseGlyphPBF(const GlyphRange&
     std::vector<Glyph> glyphs;
     glyphs.reserve(256);
     int32_t ascender{0}, descender{0};
-    bool ascenderSet{false}, descenderSet{0};
+    bool ascenderSet{false}, descenderSet{false};
 
     protozero::pbf_reader glyphs_pbf(data);
 
