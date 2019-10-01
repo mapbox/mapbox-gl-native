@@ -105,8 +105,8 @@ void GlyphManager::processResponse(const Response& res, const FontStack& fontSta
             }
         }
         if (ascender != 0 || descender != 0) {
-            entry.ascender = std::move(ascender);
-            entry.descender = std::move(descender);
+            entry.ascender = ascender;
+            entry.descender = descender;
         }
     }
 
