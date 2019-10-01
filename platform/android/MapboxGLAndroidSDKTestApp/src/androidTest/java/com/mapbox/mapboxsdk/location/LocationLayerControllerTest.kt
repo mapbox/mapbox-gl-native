@@ -290,7 +290,7 @@ class LocationLayerControllerTest : EspressoTest() {
         assertThat(mapboxMap.isLayerVisible(SHADOW_LAYER), `is`(true))
         assertThat(mapboxMap.isLayerVisible(ACCURACY_LAYER), `is`(true))
         assertThat(mapboxMap.isLayerVisible(BEARING_LAYER), `is`(false))
-        assertThat(mapboxMap.isLayerVisible(PULSING_CIRCLE_LAYER), `is`(false))
+        assertThat(mapboxMap.isLayerVisible(PULSING_CIRCLE_LAYER), `is`(true))
       }
     }
     executeComponentTest(componentAction)

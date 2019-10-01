@@ -1239,6 +1239,7 @@ public final class LocationComponent {
     if (compassEngine != null) {
       updateCompassListenerState(false);
     }
+    cancelPulsingLocationCircle();
     locationAnimatorCoordinator.cancelAllAnimations();
     if (locationEngine != null) {
       locationEngine.removeLocationUpdates(currentLocationEngineListener);
