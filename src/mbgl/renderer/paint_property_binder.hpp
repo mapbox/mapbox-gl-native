@@ -370,11 +370,10 @@ public:
     }
 
     std::tuple<float> interpolationFactor(float currentZoom) const override {
-        const float possiblyRoundedZoom = expression.useIntegerZoom ?
-            std::floor(currentZoom) :
-            currentZoom;
+        const float possiblyRoundedZoom = expression.useIntegerZoom ? std::floor(currentZoom) : currentZoom;
 
-        return std::tuple<float> { std::fmax(0.0, std::fmin(1.0, expression.interpolationFactor(zoomRange, possiblyRoundedZoom))) };
+        return std::tuple<float> {
+            std::fmax(0.0, std::fmin(1.0, expression.interpolationFactor(zoomRange, possiblyRoundedZoom)))};
     }
 
     std::tuple<T> uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
