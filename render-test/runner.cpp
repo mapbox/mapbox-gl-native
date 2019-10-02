@@ -186,6 +186,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
     static const std::string setCenterOp("setCenter");
     static const std::string setZoomOp("setZoom");
     static const std::string setBearingOp("setBearing");
+    static const std::string setPitchOp("setPitch");
     static const std::string setFilterOp("setFilter");
     static const std::string setLayerZoomRangeOp("setLayerZoomRange");
     static const std::string setLightOp("setLight");
@@ -306,6 +307,12 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsNumber());
         map.jumpTo(mbgl::CameraOptions().withBearing(operationArray[1].GetDouble()));
+
+    // setPitch
+    } else if (operationArray[0].GetString() == setPitchOp) {
+        assert(operationArray.Size() >= 2u);
+        assert(operationArray[1].IsNumber());
+        map.jumpTo(mbgl::CameraOptions().withPitch(operationArray[1].GetDouble()));
 
     // setFilter
     } else if (operationArray[0].GetString() == setFilterOp) {
