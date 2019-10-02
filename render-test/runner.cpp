@@ -490,7 +490,11 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             sourceLayer = {featureOptions["sourceLayer"].GetString()};
         }
         if (featureOptions.HasMember("id")) {
-            featureID = featureOptions["id"].GetString();
+            if (featureOptions["id"].IsString()) {
+                featureID = featureOptions["id"].GetString();
+            } else if (featureOptions["id"].IsNumber()) {
+                featureID = mbgl::util::toString(featureOptions["id"].GetUint64());
+            }
         }
         const JSValue* state = &operationArray[2];
 
@@ -514,7 +518,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
                 result[k] = std::move(array);
                 stateValue = std::move(result);
                 valueParsed = true;
-                return {};
+                return nullopt;
 
             } else if (isObject(v)) {
                 eachMember(v, convertFn);
@@ -555,7 +559,11 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             sourceLayer = {featureOptions["sourceLayer"].GetString()};
         }
         if (featureOptions.HasMember("id")) {
-            featureID = featureOptions["id"].GetString();
+            if (featureOptions["id"].IsString()) {
+                featureID = featureOptions["id"].GetString();
+            } else if (featureOptions["id"].IsNumber()) {
+                featureID = mbgl::util::toString(featureOptions["id"].GetUint64());
+            }
         }
 
         try {
@@ -584,7 +592,11 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             sourceLayer = {featureOptions["sourceLayer"].GetString()};
         }
         if (featureOptions.HasMember("id")) {
-            featureID = featureOptions["id"].GetString();
+            if (featureOptions["id"].IsString()) {
+                featureID = featureOptions["id"].GetString();
+            } else if (featureOptions["id"].IsNumber()) {
+                featureID = mbgl::util::toString(featureOptions["id"].GetUint64());
+            }
         }
 
         if (operationArray.Size() >= 3u) {
