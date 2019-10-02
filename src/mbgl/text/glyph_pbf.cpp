@@ -83,18 +83,16 @@ std::tuple<std::vector<Glyph>, int32_t, int32_t> parseGlyphPBF(const GlyphRange&
             glyphs.push_back(std::move(glyph));
         };
 
-        uint16_t count{0};
         auto fontstack_pbf = glyphs_pbf.get_message();
         while (fontstack_pbf.next()) {
             switch (fontstack_pbf.tag()) {
                 case 3: {
                     readGlyphMetrics(fontstack_pbf);
-                    ++count;
                     break;
                 }
                 case 4: {
                     // ascender value for one fontstack shall keep the same, if different values appear, set ascender to
-                    // be 0.
+                    // be 0/invalid.
                     const auto value = fontstack_pbf.get_sint32();
                     if (!ascenderSet) {
                         ascender = value;
@@ -106,7 +104,7 @@ std::tuple<std::vector<Glyph>, int32_t, int32_t> parseGlyphPBF(const GlyphRange&
                 }
                 case 5: {
                     // descender value for one fontstack shall keep the same, if different values appear, set descender
-                    // to be 0.
+                    // to be 0/invalid.
                     const auto value = fontstack_pbf.get_sint32();
                     if (!descenderSet) {
                         descender = value;

@@ -360,7 +360,7 @@ void shapeLines(Shaping& shaping,
             continue;
         }
 
-        float biggestHeight{0}, baselineOffset{0};
+        float biggestHeight{0.0f}, baselineOffset{0.0f};
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
         for (std::size_t i = 0; i < line.length(); i++) {
             const std::size_t sectionIndex = line.getSectionIndex(i);
@@ -377,13 +377,14 @@ void shapeLines(Shaping& shaping,
 
             const Glyph& glyph = **it->second;
 
-            double ascender{0}, descender{0}, glyphOffset{0};
+            float ascender{0.0f}, descender{0.0f}, glyphOffset{0.0f};
             // In order to make different fonts aligned, they must share a general baseline that aligns with every
-            // font's real baseline. Glyph's position is counted from the top left corner, where is the ascender line
-            // starts. Since ascender is above the baseline, the glyphOffset is the negative shift. In order to make all
-            // the glyphs aligned with shaping box, for each line, we lock the heighest glyph (with scale) locating
-            // at the middle of the line, which will lead to a baseline shift. Then adjust the whole line with the
-            // baseline offset we calculated from the shift.
+            // font's real baseline. Glyph's offset is counted from the top left corner, where is the ascender line
+            // starts. First of all, every glyph's baseline lies on the middle line of each shaping line. Since ascender
+            // is above the baseline, the glyphOffset is the negative shift. Then, in order to make glyphs fit in the
+            // shaping box, for each line, we shift the glyph with biggest height(with scale) to make its middle line
+            // lie on the middle line of the line, which will lead to a baseline shift. Then adjust the whole line with
+            // the baseline offset we calculated from the shift.
             if (hasBaseline) {
                 assert(glyphs->second.ascender && glyphs->second.descender);
                 ascender = std::abs(glyphs->second.ascender.value());
@@ -395,9 +396,9 @@ void shapeLines(Shaping& shaping,
                 }
                 glyphOffset = -ascender * section.scale;
             } else {
-                // If font's baseline is not applicable, fall back to use a default baseline
-                // offset, see shaping.yOffset. Since we're laying out at 24 points, we need also calculate how much it
-                // will move when we scale up or down.
+                // If font's baseline is not applicable, fall back to use a default baseline offset, see
+                // Shaping::yOffset. Since we're laying out at 24 points, we need also calculate how much it will move
+                // when we scale up or down.
                 glyphOffset = Shaping::yOffset + (lineMaxScale - section.scale) * util::ONE_EM;
             }
 
