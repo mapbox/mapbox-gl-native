@@ -1,9 +1,11 @@
 #pragma once
 
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/size.hpp>
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/renderer/query.hpp>
 
 #include "filesystem.hpp"
 
@@ -50,6 +52,7 @@ struct TestMetadata {
 
     TestPaths paths;
     mbgl::JSDocument document;
+    bool renderTest = true;
 
     mbgl::Size size{ 512u, 512u };
     float pixelRatio = 1.0f;
@@ -61,6 +64,9 @@ struct TestMetadata {
     bool axonometric = false;
     double xSkew = 0.0;
     double ySkew = 1.0;
+    mbgl::ScreenCoordinate queryGeometry{0u, 0u};
+    mbgl::ScreenBox queryGeometryBox{{0u, 0u}, {0u, 0u}};
+    mbgl::RenderedQueryOptions queryOptions;
 
     // TODO
     uint32_t fadeDuration = 0;
@@ -72,6 +78,7 @@ struct TestMetadata {
     std::string color;
 
     std::string actual;
+    std::string actualJson;
     std::string expected;
     std::string diff;
 

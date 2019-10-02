@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
         bool shouldIgnore = false;
         std::string ignoreReason;
 
-        const std::string ignoreName = "render-tests/" + id;
+        const std::string ignoreName = id;
         const auto it = std::find_if(ignores.cbegin(), ignores.cend(), [&ignoreName](auto pair) { return pair.first == ignoreName; });
         if (it != ignores.end()) {
             shouldIgnore = true;
