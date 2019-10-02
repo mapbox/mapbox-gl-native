@@ -31,5 +31,8 @@ std::string createResultPage(const TestStatistics&, const std::vector<TestMetada
 
 std::string localizeURL(const std::string& url);
 
+std::string toJSON(const mbgl::Value& value, unsigned indent, bool singleLine);
+std::string toJSON(const std::vector<mbgl::Feature>& features, unsigned indent, bool singleLine);
+
 void localizeSourceURLs(mbgl::JSValue& root, mbgl::JSDocument& document);
 void localizeStyleURLs(mbgl::JSValue& root, mbgl::JSDocument& document);

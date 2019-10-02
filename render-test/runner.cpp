@@ -30,10 +30,11 @@
 #include <utility>
 #include <sstream>
 
+using namespace mbgl;
+
 // static 
 const std::string& TestRunner::getBasePath() {
-    const static std::string result =
-        std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration/render-tests");
+    const static std::string result = std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration");
     return result;
 }
 
@@ -46,7 +47,236 @@ const std::vector<std::string>& TestRunner::getPlatformExpectationsPaths() {
     return result;
 }
 
-bool TestRunner::checkResults(mbgl::PremultipliedImage&& actualImage, TestMetadata& metadata) {
+// Strip precision for numbers, so that we can compare evaluated results with fixtures.
+// Copied from JS expression harness.
+Value stripPrecision(const Value& value) {
+    const double decimalSigFigs = 6;
+    if (auto num = numericValue<double>(value)) {
+        if (*num == 0) {
+            return *num;
+        }
+
+        const double multiplier = std::pow(10, std::max(0.0, decimalSigFigs - std::ceil(std::log10(std::fabs(*num)))));
+
+        // We strip precision twice in a row here to avoid cases where
+        // stripping an already stripped number will modify its value
+        // due to bad floating point precision luck
+        // eg `Math.floor(8.16598 * 100000) / 100000` -> 8.16597
+        const double firstStrip = std::floor(*num * multiplier) / multiplier;
+        return std::floor(firstStrip * multiplier) / multiplier;
+    }
+
+    if (value.getArray()) {
+        std::vector<Value> stripped;
+        const auto& vec = *value.getArray();
+        stripped.reserve(vec.size());
+        for (const auto& val : vec) {
+            stripped.emplace_back(stripPrecision(val));
+        }
+        return stripped;
+    } else if (value.getObject()) {
+        std::unordered_map<std::string, Value> stripped;
+        const auto& map = *value.getObject();
+        for (const auto& pair : map) {
+            stripped.emplace(pair.first, stripPrecision(pair.second));
+        }
+        return stripped;
+    }
+
+    return value;
+}
+
+bool deepEqual(const Value& a, const Value& b) {
+    const auto& anum = numericValue<double>(a);
+    const auto& bnum = numericValue<double>(b);
+    if (anum && bnum) {
+        return stripPrecision(*anum) == stripPrecision(*bnum);
+    }
+
+    if (a.which() != b.which()) {
+        return false;
+    }
+
+    if (a.getArray() && b.getArray()) {
+        const auto& avec = *a.getArray();
+        const auto& bvec = *b.getArray();
+        if (avec.size() != bvec.size()) {
+            return false;
+        }
+        for (std::size_t i = 0; i < avec.size(); ++i) {
+            if (!deepEqual(avec[i], bvec[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (a.getObject() && b.getObject()) {
+        const auto& amap = *a.getObject();
+        const auto& bmap = *b.getObject();
+        if (amap.size() != bmap.size()) {
+            return false;
+        }
+        for (const auto& pair : amap) {
+            auto it = bmap.find(pair.first);
+            if (it == bmap.end()) {
+                return false;
+            }
+            if (!deepEqual(pair.second, it->second)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (a == b) {
+        return true;
+    }
+
+    if (a.getString() && b.getString()) {
+        const auto& strA = *a.getString();
+        const auto& strB = *b.getString();
+        if (strA == strB) {
+            return true;
+        }
+
+        try {
+            double numA = std::stod(strA);
+            double numB = std::stod(strB);
+            return stripPrecision(numA) == stripPrecision(numB);
+        } catch (...) {
+        }
+    }
+
+    return false;
+}
+
+std::vector<std::string> tokenize(std::string str) {
+    std::vector<std::string> tokens;
+    std::regex re("\n");
+    std::copy(std::regex_token_iterator<std::string::iterator>(str.begin(), str.end(), re, -1),
+              std::regex_token_iterator<std::string::iterator>(),
+              std::back_inserter(tokens));
+    return tokens;
+}
+
+std::string simpleDiff(const Value& result, const Value& expected) {
+    std::vector<std::string> resultTokens{tokenize(toJSON(result, 2, false))};
+    std::vector<std::string> expectedTokens{tokenize(toJSON(expected, 2, false))};
+    std::size_t maxLength = std::max(resultTokens.size(), expectedTokens.size());
+    std::ostringstream diff;
+
+    diff << "<pre>" << std::endl;
+    const auto flush =
+        [](const std::vector<std::string>& vec, std::size_t pos, std::ostringstream& out, std::string separator) {
+            for (std::size_t j = pos; j < vec.size(); ++j) {
+                out << separator << vec[j] << std::endl;
+            }
+        };
+
+    for (std::size_t i = 0; i < maxLength; ++i) {
+        if (resultTokens.size() <= i) {
+            flush(expectedTokens, i, diff, "-");
+            break;
+        }
+
+        if (expectedTokens.size() <= i) {
+            flush(resultTokens, i, diff, "+");
+            break;
+        }
+
+        if (!deepEqual(resultTokens[i], expectedTokens[i])) {
+            diff << "<b>"
+                 << "-" << expectedTokens[i] << "</b>" << std::endl;
+            diff << "<b>"
+                 << "+" << resultTokens[i] << "</b>" << std::endl;
+        } else {
+            diff << resultTokens[i] << std::endl;
+        }
+    }
+    diff << "</pre>" << std::endl;
+    return diff.str();
+}
+
+bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
+                                       std::vector<mbgl::Feature>&& features,
+                                       TestMetadata& metadata) {
+    const std::string& base = metadata.paths.defaultExpectations();
+    const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
+
+    metadata.actual = mbgl::encodePNG(actualImage);
+
+    if (actualImage.size.isEmpty()) {
+        metadata.errorMessage = "Invalid size for actual image";
+        return false;
+    }
+
+    metadata.actualJson = toJSON(features, 2, false);
+
+    if (metadata.actualJson.empty()) {
+        metadata.errorMessage = "Invalid size for actual JSON";
+        return false;
+    }
+
+#if !TEST_READ_ONLY
+    if (getenv("UPDATE_PLATFORM")) {
+        mbgl::filesystem::create_directories(expectations.back());
+        mbgl::util::write_file(expectations.back().string() + "/expected.json", metadata.actualJson);
+        return true;
+    } else if (getenv("UPDATE_DEFAULT")) {
+        mbgl::util::write_file(base + "/expected.json", metadata.actualJson);
+        return true;
+    }
+
+    mbgl::util::write_file(base + "/actual.json", metadata.actualJson);
+#endif
+
+    std::vector<std::string> expectedJsonPaths;
+    mbgl::filesystem::path expectedMetricsPath;
+    for (auto rit = expectations.rbegin(); rit != expectations.rend(); ++rit) {
+        if (mbgl::filesystem::exists(*rit)) {
+            expectedJsonPaths = readExpectedEntries(*rit);
+            if (!expectedJsonPaths.empty()) break;
+        }
+    }
+
+    if (expectedJsonPaths.empty()) {
+        metadata.errorMessage = "Failed to find expectations for: " + metadata.paths.stylePath.string();
+        return false;
+    }
+
+    for (const auto& entry : expectedJsonPaths) {
+        auto maybeExpectedJson = readJson(entry);
+        if (maybeExpectedJson.is<mbgl::JSDocument>()) {
+            auto& expected = maybeExpectedJson.get<mbgl::JSDocument>();
+
+            mbgl::JSDocument actual;
+            actual.Parse<0>(metadata.actualJson);
+            if (actual.HasParseError()) {
+                metadata.errorMessage = "Error parsing actual JSON for: " + metadata.paths.stylePath.string();
+                return false;
+            }
+
+            auto actualVal = mapbox::geojson::convert<mapbox::geojson::value>(actual);
+            auto expectedVal = mapbox::geojson::convert<mapbox::geojson::value>(expected);
+            bool equal = deepEqual(actualVal, expectedVal);
+
+            metadata.difference = !equal;
+            if (equal) {
+                metadata.diff = "Match";
+            } else {
+                metadata.diff = simpleDiff(actualVal, expectedVal);
+            }
+        } else {
+            metadata.errorMessage = "Failed to load expected JSON " + entry;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, TestMetadata& metadata) {
     const std::string& base = metadata.paths.defaultExpectations();
     const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
 
@@ -308,13 +538,13 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(operationArray[1].IsNumber());
         map.jumpTo(mbgl::CameraOptions().withBearing(operationArray[1].GetDouble()));
 
-    // setPitch
+        // setPitch
     } else if (operationArray[0].GetString() == setPitchOp) {
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsNumber());
         map.jumpTo(mbgl::CameraOptions().withPitch(operationArray[1].GetDouble()));
 
-    // setFilter
+        // setFilter
     } else if (operationArray[0].GetString() == setFilterOp) {
         assert(operationArray.Size() >= 3u);
         assert(operationArray[1].IsString());
@@ -665,7 +895,19 @@ bool TestRunner::run(TestMetadata& metadata) {
         return false;
     }
 
-    return checkResults(std::move(image), metadata);
+    if (metadata.renderTest) {
+        return checkRenderTestResults(std::move(image), metadata);
+    } else {
+        std::vector<mbgl::Feature> features;
+        assert(metadata.document["metadata"]["test"]["queryGeometry"].IsArray());
+        if (metadata.document["metadata"]["test"]["queryGeometry"][0].IsNumber() &&
+            metadata.document["metadata"]["test"]["queryGeometry"][1].IsNumber()) {
+            features = frontend.getRenderer()->queryRenderedFeatures(metadata.queryGeometry, metadata.queryOptions);
+        } else {
+            features = frontend.getRenderer()->queryRenderedFeatures(metadata.queryGeometryBox, metadata.queryOptions);
+        }
+        return checkQueryTestResults(std::move(image), std::move(features), metadata);
+    }
 }
 
 void TestRunner::reset() {
