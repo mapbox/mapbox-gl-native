@@ -6,8 +6,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
-* Suppress network requests for expired tiles update, if these tiles are invisible. ([#15741](https://github.com/mapbox/mapbox-gl-native/pull/15741))
 * Added `-[MGLMapSnapshotOverlay coordinateForPoint:]` and `-[MGLMapSnapshotOverlay pointForCoordinate:]` that mirrors those of `MGLMapSnapshot`. ([#15746](https://github.com/mapbox/mapbox-gl-native/pull/15746))
+* Suppress network requests for expired tiles update, if these tiles are invisible. ([#15741](https://github.com/mapbox/mapbox-gl-native/pull/15741))
 
 ## 5.4.0 - September 25, 2019
 
