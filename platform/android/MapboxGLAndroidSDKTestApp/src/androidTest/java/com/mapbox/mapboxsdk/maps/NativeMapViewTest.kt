@@ -254,7 +254,7 @@ class NativeMapViewTest : AppCenter() {
     @Test
     @UiThreadTest
     fun testGetProjectedMetersAtLatitude() {
-        val expected = 38986.83510557766
+        val expected = 77973.67021115532
         val actual = nativeMapView.getMetersPerPixelAtLatitude(5.0)
         assertEquals("Get projected meters should match", expected, actual)
     }
