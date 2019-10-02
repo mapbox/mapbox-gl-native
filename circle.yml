@@ -591,7 +591,15 @@ commands:
     - run:
         name: Run render tests (mbgl-render-test)
         command: |
-          build/mbgl-render-test --recycle-map --shuffle
+          build/mbgl-render-test render-tests render-tests --recycle-map --shuffle
+        no_output_timeout: 2m
+
+  run-macos-query-tests:
+    steps:
+    - run:
+        name: Run query tests
+        command: |
+          build/mbgl-render-test query-tests
         no_output_timeout: 2m
 
   run-linux-render-tests:
@@ -604,7 +612,19 @@ commands:
         name: Run render tests (mbgl-render-test)
         command: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v build/mbgl-render-test --recycle-map --shuffle
+            logbt -- apitrace trace --api=egl -v build/mbgl-render-test render-tests --recycle-map --shuffle
+
+  run-linux-query-tests:
+    parameters:
+      node_version:
+        type: string
+        default: v8
+    steps:
+    - run:
+        name: Run query tests
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            logbt -- apitrace trace --api=egl -v build/mbgl-render-test query-tests
 
   run-unit-tests:
     steps:
@@ -647,8 +667,14 @@ commands:
   upload-render-tests:
     steps:
     - store_artifacts:
-        path: mapbox-gl-js/test/integration/render-tests/index.html
+        path: mapbox-gl-js/test/integration/index.html
         destination: render-tests
+
+  upload-query-tests:
+    steps:
+    - store_artifacts:
+        path: mapbox-gl-js/test/integration/index.html
+        destination: query-tests
 
   collect-xcode-build-logs:
     steps:
@@ -1240,10 +1266,12 @@ jobs:
       - build-mbgl-expression-test
       - build-mbgl-render-test
       - run-expression-tests
-      - run-linux-render-tests
-      - save-dependencies
       - upload-expression-tests
+      - run-linux-render-tests
       - upload-render-tests
+      - run-linux-query-tests
+      - upload-query-tests
+      - save-dependencies
 
 # ------------------------------------------------------------------------------
   ios-debug:
@@ -1534,9 +1562,11 @@ jobs:
       - build-mbgl-render-test
       - save-dependencies
       - run-expression-tests
-      - run-macos-render-tests
       - upload-expression-tests
+      - run-macos-render-tests
       - upload-render-tests
+      - run-macos-query-tests
+      - upload-query-tests
 
 # ------------------------------------------------------------------------------
   metrics-nightly:

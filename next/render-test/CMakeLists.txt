@@ -42,9 +42,12 @@ add_test(
     NAME mbgl-render-test
     COMMAND
         mbgl-render-test
+        render-tests
         --recycle-map
         --shuffle
         --seed
         ${MBGL_RENDER_TEST_SEED}
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
+
+add_test(NAME mbgl-query-test COMMAND mbgl-render-test query-tests WORKING_DIRECTORY ${MBGL_ROOT})
