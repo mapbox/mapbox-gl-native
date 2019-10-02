@@ -136,12 +136,12 @@ std::string simpleDiff(const Value& result, const Value& expected) {
 
     for (std::size_t i = 0; i < maxLength; ++i) {
         if (resultTokens.size() <= i) {
-            flush(expectedTokens, i, diff, "+"s);
+            flush(expectedTokens, i, diff, "-"s);
             break;
         }
 
         if (expectedTokens.size() <= i) {
-            flush(expectedTokens, i, diff, "-"s);
+            flush(resultTokens, i, diff, "+"s);
             break;
         }
 
