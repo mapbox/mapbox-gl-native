@@ -35,10 +35,11 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/range.hpp>
 
-#include <mbgl/map/transform.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_source.hpp>
+#include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/renderer/tile_render_data.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 
 #include <cstdint>
@@ -792,6 +793,79 @@ TEST(Source, CustomGeometrySourceSetTileData) {
     });
 
     test.run();
+}
+namespace {
+
+class FakeTileSource;
+
+class FakeTile : public Tile {
+public:
+    FakeTile(FakeTileSource& source_, const OverscaledTileID& tileID)
+        : Tile(Tile::Kind::Geometry, tileID), source(source_) {
+        renderable = true;
+    }
+    void setNecessity(TileNecessity necessity) override;
+    bool layerPropertiesUpdated(const Immutable<style::LayerProperties>&) override { return true; }
+
+    std::unique_ptr<TileRenderData> createRenderData() override { return nullptr; }
+
+private:
+    FakeTileSource& source;
+};
+
+class FakeTileSource : public RenderTileSetSource {
+public:
+    MOCK_METHOD1(tileSetNecessity, void(TileNecessity));
+
+    explicit FakeTileSource(Immutable<style::Source::Impl> impl_) : RenderTileSetSource(std::move(impl_)) {}
+    void updateInternal(const Tileset& tileset,
+                        const std::vector<Immutable<style::LayerProperties>>& layers,
+                        const bool needsRendering,
+                        const bool needsRelayout,
+                        const TileParameters& parameters) override {
+        tilePyramid.update(layers,
+                           needsRendering,
+                           needsRelayout,
+                           parameters,
+                           SourceType::Vector,
+                           util::tileSize,
+                           tileset.zoomRange,
+                           tileset.bounds,
+                           [&](const OverscaledTileID& tileID) { return std::make_unique<FakeTile>(*this, tileID); });
+    }
+
+    const optional<Tileset>& getTileset() const override {
+        return static_cast<const style::VectorSource::Impl&>(*baseImpl).tileset;
+    }
+};
+
+void FakeTile::setNecessity(TileNecessity necessity) {
+    source.tileSetNecessity(necessity);
+}
+
+} // namespace
+
+TEST(Source, InvisibleSourcesTileNecessity) {
+    SourceTest test;
+    VectorSource initialized("source", Tileset{{"tiles"}});
+    initialized.loadDescription(*test.fileSource);
+
+    FakeTileSource renderTilesetSource{initialized.baseImpl};
+    RenderSource* renderSource = &renderTilesetSource;
+    LineLayer layer("id", "source");
+    Immutable<LayerProperties> layerProperties =
+        makeMutable<LineLayerProperties>(staticImmutableCast<LineLayer::Impl>(layer.baseImpl));
+    std::vector<Immutable<LayerProperties>> layers{layerProperties};
+    EXPECT_CALL(renderTilesetSource, tileSetNecessity(TileNecessity::Required)).Times(1);
+    renderSource->update(initialized.baseImpl, layers, true, true, test.tileParameters);
+
+    // Necessity for invisible tiles must be set to `optional`.
+    EXPECT_CALL(renderTilesetSource, tileSetNecessity(TileNecessity::Optional)).Times(1);
+    renderSource->update(initialized.baseImpl, layers, false, false, test.tileParameters);
+
+    // Necessity is again `required` once tiles get back visible.
+    EXPECT_CALL(renderTilesetSource, tileSetNecessity(TileNecessity::Required)).Times(1);
+    renderSource->update(initialized.baseImpl, layers, true, false, test.tileParameters);
 }
 
 TEST(Source, RenderTileSetSourceUpdate) {
