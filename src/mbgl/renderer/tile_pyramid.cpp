@@ -68,6 +68,10 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
     if (!needsRendering) {
         if (!needsRelayout) {
             for (auto& entry : tiles) {
+                // These tiles are invisible, we set optional necessity
+                // for them and thus suppress network requests on
+                // tiles expiration (see `OnlineFileRequest`).
+                entry.second->setNecessity(TileNecessity::Optional);
                 cache.add(entry.first, std::move(entry.second));
             }
         }
