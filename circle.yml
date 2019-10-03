@@ -1317,7 +1317,10 @@ jobs:
       - run:
           name: Get iOS code coverage
           command: |
-              platform/ios/scripts/ios-code-coverage.sh CI
+            echo "Skipping iOS code coverage"
+          # Currently failing, need to update for Xcode 11
+          # platform/ios/scripts/ios-code-coverage.sh CI
+          #
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
