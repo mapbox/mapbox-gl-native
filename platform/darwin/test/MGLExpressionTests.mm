@@ -670,11 +670,11 @@ using namespace std::string_literals;
         NSExpression *expression = [NSExpression expressionForFunction:@"mgl_join:" arguments:@[@"Old", @"MacDonald"]];
         NSExpression *aftermarketExpression = [NSExpression expressionWithFormat:@"mgl_join({'Old', 'MacDonald'})"];
         NSArray *jsonExpression = @[@"concat", @"Old", @"MacDonald"];
-    XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
 
-    XCTAssertEqualObjects(aftermarketExpression.mgl_jsonExpressionObject, expression.mgl_jsonExpressionObject);
-    NSExpression *aggregateExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
-    XCTAssertEqualObjects(aggregateExpression.operand, expression.operand);
+        XCTAssertEqualObjects(aftermarketExpression.mgl_jsonExpressionObject, expression.mgl_jsonExpressionObject);
+        NSExpression *aggregateExpression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+        XCTAssertEqualObjects(aggregateExpression.operand, expression.operand);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"uppercase:" arguments:arguments];

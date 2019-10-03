@@ -1067,10 +1067,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return [NSExpression expressionForFunction:@"divide:by:" arguments:@[sum, count]].mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"sum:"]) {
                 NSArray *arguments;
-                if (!hasCollectionProperty) {
-                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
-                } else {
+                if (hasCollectionProperty) {
                     arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
+                } else {
+                    arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 }
                 return [@[@"+"] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"count:"]) {
