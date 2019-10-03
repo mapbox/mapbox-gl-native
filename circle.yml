@@ -1268,6 +1268,9 @@ jobs:
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
+      - run:
+          name: Record size
+          command: platform/ios/scripts/metrics.sh          
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs

@@ -51,6 +51,9 @@ function getPriorSize() {
         const run = data.check_runs.find(run => run.name === name);
         if (!run) {
             console.log('No matching check found.');
+            console.log('BROKEN')
+            console.log(data.JSON.stringify())
+            console.log('BROKEN');
             return Promise.resolve(null);
         }
         return +run.output.summary.match(/`.*` is (\d+) bytes/)[1];

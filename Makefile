@@ -311,7 +311,7 @@ ios-integration-test: $(IOS_PROJ_PATH)
 
 .PHONY: ios-sanitize
 ios-sanitize: $(IOS_PROJ_PATH)
-	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES -enableUndefinedBehaviorSanitizer YES test $(XCPRETTY)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES -enableUndefinedBehaviorSanitizer YES test $(XCPRETTY) -resultBundlePath $(IOS_PROJ_PATH)/$(XCPRETTY).xcresult
 
 .PHONY: ios-sanitize-address
 ios-sanitize-address: $(IOS_PROJ_PATH)
