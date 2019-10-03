@@ -27,14 +27,9 @@ make node
 To test the Node.js bindings:
 
 ```bash
-make test-node
+npm test
 ```
 
-To run the visual render test suite:
-
-```bash
-npm run test-suite
-```
 
 ## Merging your pull request
 
