@@ -252,14 +252,20 @@ std::string toJSON(const std::vector<mbgl::Feature>& features, unsigned indent, 
     }
     writer.SetIndent(' ', indent);
     writer.StartArray();
-    for (size_t i = 0; i < features.size(); ++i) {
-        auto result = mapbox::geojson::convert(features[i], allocator);
-
-        result.AddMember("source", features[i].source, allocator);
-        if (!features[i].sourceLayer.empty()) {
-            result.AddMember("sourceLayer", features[i].sourceLayer, allocator);
+    for (const auto& feature : features) {
+        mbgl::JSValue result(rapidjson::kObjectType);
+        result.AddMember("type", "Feature", allocator);
+        if (!feature.id.is<mbgl::NullValue>()) {
+            result.AddMember(
+                "id", mapbox::geojson::identifier::visit(feature.id, mapbox::geojson::to_value{allocator}), allocator);
         }
-        result.AddMember("state", mapbox::geojson::to_value{allocator}(features[i].state), allocator);
+        result.AddMember("geometry", mapbox::geojson::convert(feature.geometry, allocator), allocator);
+        result.AddMember("properties", mapbox::geojson::to_value{allocator}(feature.properties), allocator);
+        result.AddMember("source", feature.source, allocator);
+        if (!feature.sourceLayer.empty()) {
+            result.AddMember("sourceLayer", feature.sourceLayer, allocator);
+        }
+        result.AddMember("state", mapbox::geojson::to_value{allocator}(feature.state), allocator);
         result.Accept(writer);
     }
     writer.EndArray();

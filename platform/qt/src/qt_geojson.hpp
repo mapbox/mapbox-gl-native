@@ -22,6 +22,6 @@ mbgl::Polygon<double> asMapboxGLPolygon(const QMapbox::CoordinatesCollection &po
 mbgl::MultiPolygon<double> asMapboxGLMultiPolygon(const QMapbox::CoordinatesCollections &multiPolygon);
 mbgl::Value asMapboxGLPropertyValue(const QVariant &value);
 mbgl::FeatureIdentifier asMapboxGLFeatureIdentifier(const QVariant &id);
-mbgl::Feature asMapboxGLFeature(const QMapbox::Feature &feature);
+mbgl::GeoJSONFeature asMapboxGLFeature(const QMapbox::Feature &feature);
 
 } // namespace QMapbox
