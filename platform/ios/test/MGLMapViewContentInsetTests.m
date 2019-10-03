@@ -145,7 +145,7 @@
     expectedAttributionOrigin = CGPointMake(x, y);
     XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
     
-    self.mapView.automaticallyAdjustContentInset = YES;
+    self.mapView.automaticallyAdjustsContentInset = YES;
     insets = UIEdgeInsetsMake(100, 100, 100, 100);
     self.mapView.contentInset = insets;
     XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(self.mapView.contentInset, insets));
@@ -153,7 +153,7 @@
     [self.mapView setNeedsLayout];
     [self.mapView layoutIfNeeded];
     
-    // when automaticallyAdjustContentInset = YES the content insets should be overwrited
+    // when automaticallyAdjustsContentInset = YES the content insets should be overwriten
     XCTAssertFalse(UIEdgeInsetsEqualToEdgeInsets(self.mapView.contentInset, insets));
     
     expectedScaleBarOrigin = CGPointMake(margin, margin);

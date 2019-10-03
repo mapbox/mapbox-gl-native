@@ -526,8 +526,11 @@ public:
     
     // TODO: This warning should be removed when automaticallyAdjustsScrollViewInsets is removed from
     // the UIViewController api.
-    NSLog(@"%@ WARNING UIViewController.automaticallyAdjustsScrollViewInsets is deprecated use MGLMapView.automaticallyAdjustContentInset instead.",
-          NSStringFromClass(self.class));
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSLog(@"%@ WARNING UIViewController.automaticallyAdjustsScrollViewInsets is deprecated use MGLMapView.automaticallyAdjustContentInset instead.",
+        NSStringFromClass(self.class));
+    });
 
     // setup logo
     //
@@ -1051,12 +1054,12 @@ public:
     return viewController;
 }
 
-- (void)setAutomaticallyAdjustContentInset:(BOOL)automaticallyAdjustContentInset {
-    MGLLogDebug(@"Setting automaticallyAdjustContentInset: %@", MGLStringFromBOOL(automaticallyAdjustContentInset));
-    _automaticallyAdjustContentInsetHolder = [NSNumber numberWithBool:automaticallyAdjustContentInset];
+- (void)setAutomaticallyAdjustsContentInset:(BOOL)automaticallyAdjustsContentInset {
+    MGLLogDebug(@"Setting automaticallyAdjustsContentInset: %@", MGLStringFromBOOL(automaticallyAdjustsContentInset));
+    _automaticallyAdjustContentInsetHolder = [NSNumber numberWithBool:automaticallyAdjustsContentInset];
 }
 
-- (BOOL)automaticallyAdjustContentInset {
+- (BOOL)automaticallyAdjustsContentInset {
     return _automaticallyAdjustContentInsetHolder.boolValue;
 }
 
@@ -3873,27 +3876,6 @@ public:
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     mbgl::CameraOptions cameraOptions = self.mbglMap.cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
-    return [self cameraForCameraOptions:cameraOptions];
-}
-
-- (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinate:(CLLocationCoordinate2D)coordinate edgePadding:(UIEdgeInsets)insets {
-    if (!_mbglMap)
-    {
-        return self.residualCamera;
-    }
-    
-    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
-    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    
-    MGLMapCamera *currentCamera = self.camera;
-    CGFloat pitch = camera.pitch < 0 ? currentCamera.pitch : camera.pitch;
-    CLLocationDirection direction = camera.heading < 0 ? currentCamera.heading : camera.heading;
-    
-    std::vector<mbgl::LatLng> latLngs;
-    latLngs.reserve(1);
-    latLngs.push_back({coordinate.latitude, coordinate.longitude});
-    
-    mbgl::CameraOptions cameraOptions = self.mbglMap.cameraForLatLngs(latLngs, padding, direction, pitch);
     return [self cameraForCameraOptions:cameraOptions];
 }
 

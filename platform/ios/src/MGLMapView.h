@@ -295,7 +295,7 @@ MGL_EXPORT
  tab bars, toolbars, and other ancestors that obscure the map view.
  
  */
-@property (assign) BOOL automaticallyAdjustContentInset;
+@property (assign) BOOL automaticallyAdjustsContentInset;
 
 /**
  A Boolean value indicating whether the map may display scale information.
@@ -1324,8 +1324,8 @@ MGL_EXPORT
  `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
  property may be overridden at any time.
  
- The usage of `automaticallyAdjustsScrollViewInsets` it is been deprecated
- use the map view’s property `automaticallyAdjustContentInset`instead.
+ The usage of `automaticallyAdjustsScrollViewInsets` has been deprecated
+ use the map view’s property `MGLMapView.automaticallyAdjustsContentInset`instead.
 
  Changing the value of this property updates the map view immediately. If you
  want to animate the change, use the `-setContentInset:animated:completionHandler:`
@@ -1347,8 +1347,8 @@ MGL_EXPORT
  `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
  property may be overridden at any time.
  
- The usage of `automaticallyAdjustsScrollViewInsets` it is been deprecated
- use the map view’s property `automaticallyAdjustContentInset`instead.
+ The usage of `automaticallyAdjustsScrollViewInsets` has been deprecated
+ use the map view’s property `MGLMapView.automaticallyAdjustsContentInset`instead.
  
  To specify a completion handler to execute after the animation finishes, use
  the `-setContentInset:animated:completionHandler:` method.
@@ -1375,8 +1375,8 @@ MGL_EXPORT
  `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
  property may be overridden at any time.
  
- The usage of `automaticallyAdjustsScrollViewInsets` it is been deprecated
- use the map view’s property `automaticallyAdjustContentInset`instead.
+ The usage of `automaticallyAdjustsScrollViewInsets` has been deprecated
+ use the map view’s property `MGLMapView.automaticallyAdjustsContentInset`instead.
 
  @param contentInset The new values to inset the content by.
  @param animated Specify `YES` if you want the map view to animate the change to
