@@ -9,7 +9,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ### Bug fixes
  - Suppress network requests for expired tiles update, if these tiles are invisible. [#15741](https://github.com/mapbox/mapbox-gl-native/pull/15741)
  - Fixed opacity interpolation for composition expressions [#15738](https://github.com/mapbox/mapbox-gl-native/pull/15738)
-### Other Changes
  - Remove projected meters per pixel and pixel ratio relation [#15742](https://github.com/mapbox/mapbox-gl-native/pull/15742)
 
 ## 8.4.0 - September 25, 2019
