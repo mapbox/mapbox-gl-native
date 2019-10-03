@@ -9,7 +9,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ### Bug fixes
  - Suppress network requests for expired tiles update, if these tiles are invisible. [#15741](https://github.com/mapbox/mapbox-gl-native/pull/15741)
  - Fixed opacity interpolation for composition expressions [#15738](https://github.com/mapbox/mapbox-gl-native/pull/15738)
- - Remove projected meters per pixel and pixel ratio relation [#15742](https://github.com/mapbox/mapbox-gl-native/pull/15742)
+ - Fixed an issue where `Projection#getMetersPerPixelAtLatitude` returned a value incorrectly divided by the pixel ratio. This also fixes an issue where `LocationComponent` accuracy circle's radius was artificially increased. [#15742](https://github.com/mapbox/mapbox-gl-native/pull/15742)
 
 ## 8.4.0 - September 25, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-beta.1...android-v8.4.0) since [Mapbox Maps SDK for Android v8.4.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-beta.1): 
