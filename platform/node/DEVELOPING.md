@@ -8,25 +8,31 @@ To develop these bindings, you’ll need to build them from source. Building req
 the [macOS](../macos/INSTALL.md#requirements) or [Linux](../linux/README.md#prerequisites) install documentation, depending
 on the target platform.
 
-To compile the Node.js bindings and install module dependencies, from the repository root directory, run:
+To compile the Node.js bindings and install module dependencies, from the repository root directory, first run:
 
-    npm install --build-from-source
+```
+make distclean
+```
 
-To recompile just the C++ code while developing, run `make node`.
+If you are rebuilding after time has passed.
 
-To create an Xcode project and use a GUI debugger in the case of a crash, run `make xnode`.
+Then do:
+
+```bash
+make node
+```
 
 ## Testing
 
 To test the Node.js bindings:
 
-```
-npm test
+```bash
+make test-node
 ```
 
 To run the visual render test suite:
 
-```
+```bash
 npm run test-suite
 ```
 
