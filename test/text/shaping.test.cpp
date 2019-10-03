@@ -50,11 +50,12 @@ TEST(Shaping, ZWSP) {
         TaggedString string(u"中中\u200b中中\u200b中中\u200b中中中中中中\u200b中中", sectionOptions);
         auto shaping = testGetShaping(string, 5);
         ASSERT_EQ(shaping.lineCount, 3);
-        ASSERT_EQ(shaping.top, -36);
-        ASSERT_EQ(shaping.bottom, 36);
-        ASSERT_EQ(shaping.left, -63);
-        ASSERT_EQ(shaping.right, 63);
+        ASSERT_FLOAT_EQ(-36.0f, shaping.top);
+        ASSERT_FLOAT_EQ(36.0f, shaping.bottom);
+        ASSERT_FLOAT_EQ(-63.0f, shaping.left);
+        ASSERT_FLOAT_EQ(63.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_FALSE(shaping.hasBaseline);
     }
 
     // 2 lines
@@ -64,11 +65,12 @@ TEST(Shaping, ZWSP) {
         TaggedString string(u"中中\u200b中", sectionOptions);
         auto shaping = testGetShaping(string, 1);
         ASSERT_EQ(shaping.lineCount, 2);
-        ASSERT_EQ(shaping.top, -24);
-        ASSERT_EQ(shaping.bottom, 24);
-        ASSERT_EQ(shaping.left, -21);
-        ASSERT_EQ(shaping.right, 21);
+        ASSERT_FLOAT_EQ(-24.0f, shaping.top);
+        ASSERT_FLOAT_EQ(24.0f, shaping.bottom);
+        ASSERT_FLOAT_EQ(-21.0f, shaping.left);
+        ASSERT_FLOAT_EQ(21.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_FALSE(shaping.hasBaseline);
     }
 
     // 1 line
@@ -77,16 +79,17 @@ TEST(Shaping, ZWSP) {
         TaggedString string(u"中中\u200b", sectionOptions);
         auto shaping = testGetShaping(string, 2);
         ASSERT_EQ(shaping.lineCount, 1);
-        ASSERT_EQ(shaping.top, -12);
-        ASSERT_EQ(shaping.bottom, 12);
-        ASSERT_EQ(shaping.left, -21);
-        ASSERT_EQ(shaping.right, 21);
+        ASSERT_FLOAT_EQ(-12.0f, shaping.top);
+        ASSERT_FLOAT_EQ(12.0f, shaping.bottom);
+        ASSERT_FLOAT_EQ(-21.0f, shaping.left);
+        ASSERT_FLOAT_EQ(21.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
         ASSERT_EQ(2, shaping.positionedGlyphs.size());
-        EXPECT_FLOAT_EQ(-21, shaping.positionedGlyphs[0].x);
-        EXPECT_FLOAT_EQ(-17, shaping.positionedGlyphs[0].y);
-        EXPECT_FLOAT_EQ(0, shaping.positionedGlyphs[1].x);
-        EXPECT_FLOAT_EQ(-17, shaping.positionedGlyphs[1].y);
+        ASSERT_FLOAT_EQ(-21.0f, shaping.positionedGlyphs[0].x);
+        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[0].y);
+        ASSERT_FLOAT_EQ(0.0f, shaping.positionedGlyphs[1].x);
+        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_FALSE(shaping.hasBaseline);
     }
 
     // 5 'new' lines.
@@ -94,15 +97,16 @@ TEST(Shaping, ZWSP) {
         TaggedString string(u"\u200b\u200b\u200b\u200b\u200b", sectionOptions);
         auto shaping = testGetShaping(string, 1);
         ASSERT_EQ(shaping.lineCount, 5);
-        ASSERT_EQ(shaping.top, -60);
-        ASSERT_EQ(shaping.bottom, 60);
-        ASSERT_EQ(shaping.left, 0);
-        ASSERT_EQ(shaping.right, 0);
+        ASSERT_FLOAT_EQ(-60.0f, shaping.top);
+        ASSERT_FLOAT_EQ(60.0f, shaping.bottom);
+        ASSERT_FLOAT_EQ(-0.0f, shaping.left);
+        ASSERT_FLOAT_EQ(0.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_FALSE(shaping.hasBaseline);
     }
 }
 
-TEST(Shaping, FontWithBaseline) {
+TEST(Shaping, MixedFontsBothWithBaselines) {
     Glyph glyph1;
     glyph1.id = u'阳';
     glyph1.metrics.width = 18;
@@ -163,15 +167,165 @@ TEST(Shaping, FontWithBaseline) {
 
         auto shaping = testGetShaping(string, 5);
         ASSERT_EQ(shaping.lineCount, 1);
-        ASSERT_EQ(shaping.top, -12);
-        ASSERT_EQ(shaping.bottom, 12);
-        ASSERT_EQ(shaping.left, -21);
-        ASSERT_EQ(shaping.right, 21);
+        ASSERT_FLOAT_EQ(-12.0f, shaping.top);
+        ASSERT_FLOAT_EQ(12.0f, shaping.bottom);
+        ASSERT_FLOAT_EQ(-21.0f, shaping.left);
+        ASSERT_FLOAT_EQ(21.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
         ASSERT_EQ(2, shaping.positionedGlyphs.size());
-        EXPECT_FLOAT_EQ(-21, shaping.positionedGlyphs[0].x);
-        EXPECT_FLOAT_EQ(-16, shaping.positionedGlyphs[0].y);
-        EXPECT_FLOAT_EQ(0, shaping.positionedGlyphs[1].x);
-        EXPECT_FLOAT_EQ(-15, shaping.positionedGlyphs[1].y);
+        ASSERT_FLOAT_EQ(-21.0f, shaping.positionedGlyphs[0].x);
+        ASSERT_FLOAT_EQ(-16.0f, shaping.positionedGlyphs[0].y);
+        ASSERT_FLOAT_EQ(0.0f, shaping.positionedGlyphs[1].x);
+        ASSERT_FLOAT_EQ(-15.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_TRUE(shaping.hasBaseline);
+    }
+}
+
+TEST(Shaping, MixedFontsOneWithBaselineOneWithout) {
+    Glyph glyph1;
+    glyph1.id = u'阳';
+    glyph1.metrics.width = 18;
+    glyph1.metrics.height = 19;
+    glyph1.metrics.left = 2;
+    glyph1.metrics.top = -8;
+    glyph1.metrics.advance = 21;
+
+    Glyph glyph2;
+    glyph2.id = u'光';
+    glyph2.metrics.width = 18;
+    glyph2.metrics.height = 18;
+    glyph2.metrics.left = 2;
+    glyph2.metrics.top = -8;
+    glyph2.metrics.advance = 21;
+
+    BiDi bidi;
+    std::vector<SectionOptions> sectionOptions;
+    const std::vector<std::string> fontStack1{{"font-stack1"}};
+    sectionOptions.emplace_back(1.0f, fontStack1);
+    Glyphs glyphData1;
+    glyphData1.glyphs.emplace(u'阳', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph1))));
+    glyphData1.ascender = 26;
+    glyphData1.descender = -6;
+
+    const std::vector<std::string> fontStack2{{"font-stack2"}};
+    sectionOptions.emplace_back(1.0f, fontStack2);
+    Glyphs glyphData2;
+    glyphData2.glyphs.emplace(u'光', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph2))));
+
+    GlyphMap glyphs;
+    glyphs.emplace(FontStackHasher()(fontStack1), std::move(glyphData1));
+    glyphs.emplace(FontStackHasher()(fontStack2), std::move(glyphData2));
+
+    const auto testGetShaping = [&](const TaggedString& string, unsigned maxWidthInChars) {
+        return getShaping(string,
+                          maxWidthInChars * ONE_EM,
+                          ONE_EM, // lineHeight
+                          style::SymbolAnchorType::Center,
+                          style::TextJustifyType::Center,
+                          0,              // spacing
+                          {{0.0f, 0.0f}}, // translate
+                          WritingModeType::Horizontal,
+                          bidi,
+                          glyphs,
+                          /*allowVerticalPlacement*/ false);
+    };
+
+    {
+        std::u16string text{u"阳光\u200b"};
+        StyledText styledText;
+        styledText.second = std::vector<uint8_t>{0, 1, 0};
+        styledText.first = std::move(text);
+
+        TaggedString string{styledText, sectionOptions};
+
+        auto shaping = testGetShaping(string, 5);
+        ASSERT_EQ(shaping.lineCount, 1);
+        ASSERT_FLOAT_EQ(-12.0f, shaping.top);
+        ASSERT_FLOAT_EQ(12.0f, shaping.bottom);
+        ASSERT_FLOAT_EQ(-21.0f, shaping.left);
+        ASSERT_FLOAT_EQ(21.0f, shaping.right);
+        ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_EQ(2, shaping.positionedGlyphs.size());
+        ASSERT_FLOAT_EQ(-21.0f, shaping.positionedGlyphs[0].x);
+        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[0].y);
+        ASSERT_FLOAT_EQ(0.0f, shaping.positionedGlyphs[1].x);
+        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_FALSE(shaping.hasBaseline);
+    }
+}
+
+TEST(Shaping, MixedFontsWithBaselineWithFontScale) {
+    Glyph glyph1;
+    glyph1.id = u'阳';
+    glyph1.metrics.width = 18;
+    glyph1.metrics.height = 19;
+    glyph1.metrics.left = 2;
+    glyph1.metrics.top = -8;
+    glyph1.metrics.advance = 21;
+
+    Glyph glyph2;
+    glyph2.id = u'光';
+    glyph2.metrics.width = 18;
+    glyph2.metrics.height = 18;
+    glyph2.metrics.left = 2;
+    glyph2.metrics.top = -8;
+    glyph2.metrics.advance = 21;
+
+    BiDi bidi;
+    std::vector<SectionOptions> sectionOptions;
+    const std::vector<std::string> fontStack1{{"font-stack1"}};
+    sectionOptions.emplace_back(1.0f, fontStack1);
+    sectionOptions.back().scale = 1.5;
+    Glyphs glyphData1;
+    glyphData1.glyphs.emplace(u'阳', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph1))));
+    glyphData1.ascender = 26;
+    glyphData1.descender = -6;
+
+    const std::vector<std::string> fontStack2{{"font-stack2"}};
+    sectionOptions.emplace_back(1.0f, fontStack2);
+    Glyphs glyphData2;
+    glyphData2.glyphs.emplace(u'光', Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph2))));
+    glyphData2.ascender = 25;
+    glyphData2.descender = -5;
+
+    GlyphMap glyphs;
+    glyphs.emplace(FontStackHasher()(fontStack1), std::move(glyphData1));
+    glyphs.emplace(FontStackHasher()(fontStack2), std::move(glyphData2));
+
+    const auto testGetShaping = [&](const TaggedString& string, unsigned maxWidthInChars) {
+        return getShaping(string,
+                          maxWidthInChars * ONE_EM,
+                          ONE_EM, // lineHeight
+                          style::SymbolAnchorType::Center,
+                          style::TextJustifyType::Center,
+                          0,              // spacing
+                          {{0.0f, 0.0f}}, // translate
+                          WritingModeType::Horizontal,
+                          bidi,
+                          glyphs,
+                          /*allowVerticalPlacement*/ false);
+    };
+
+    {
+        std::u16string text{u"阳光\u200b"};
+        StyledText styledText;
+        styledText.second = std::vector<uint8_t>{0, 1, 0};
+        styledText.first = std::move(text);
+
+        TaggedString string{styledText, sectionOptions};
+
+        auto shaping = testGetShaping(string, 5);
+        ASSERT_EQ(shaping.lineCount, 1);
+        ASSERT_FLOAT_EQ(-18.0f, shaping.top);
+        ASSERT_FLOAT_EQ(18.0f, shaping.bottom);
+        ASSERT_FLOAT_EQ(-26.25f, shaping.left);
+        ASSERT_FLOAT_EQ(26.25f, shaping.right);
+        ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_EQ(2, shaping.positionedGlyphs.size());
+        ASSERT_FLOAT_EQ(-26.25f, shaping.positionedGlyphs[0].x);
+        ASSERT_FLOAT_EQ(-24.0f, shaping.positionedGlyphs[0].y);
+        ASSERT_FLOAT_EQ(5.25f, shaping.positionedGlyphs[1].x);
+        ASSERT_FLOAT_EQ(-10.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_TRUE(shaping.hasBaseline);
     }
 }
