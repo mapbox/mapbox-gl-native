@@ -132,6 +132,11 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     }
 
     [self.offlinePacksArrayController bind:@"content" toObject:[MGLOfflineStorage sharedOfflineStorage] withKeyPath:@"packs" options:nil];
+    
+    NSInteger maximumAllowedMapboxTiles = [[NSUserDefaults standardUserDefaults] integerForKey:@"MBXMaximumAllowedMapboxTiles"];
+    if (maximumAllowedMapboxTiles) {
+        [[MGLOfflineStorage sharedOfflineStorage] setMaximumAllowedMapboxTiles:maximumAllowedMapboxTiles];
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
