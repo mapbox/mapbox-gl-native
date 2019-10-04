@@ -26,11 +26,10 @@ ThreadPool::ThreadPool(std::size_t count) {
                     return;
                 }
 
-                auto mailbox = queue.front();
+                auto function = std::move(queue.front());
                 queue.pop();
                 lock.unlock();
-
-                Mailbox::maybeReceive(mailbox);
+                if (function) function();
             }
         });
     }
@@ -49,10 +48,10 @@ ThreadPool::~ThreadPool() {
     }
 }
 
-void ThreadPool::schedule(std::weak_ptr<Mailbox> mailbox) {
+void ThreadPool::schedule(std::function<void()> fn) {
     {
         std::lock_guard<std::mutex> lock(mutex);
-        queue.push(mailbox);
+        queue.push(std::move(fn));
     }
 
     cv.notify_one();

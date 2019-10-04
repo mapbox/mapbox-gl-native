@@ -43,7 +43,7 @@ ActorRef<Renderer> MapRenderer::actor() const {
     return *rendererRef;
 }
 
-void MapRenderer::schedule(std::weak_ptr<Mailbox> scheduled) {
+void MapRenderer::schedule(std::function<void()> scheduled) {
     // Create a runnable
     android::UniqueEnv _env = android::AttachEnv();
     auto runnable = std::make_unique<MapRendererRunnable>(*_env, std::move(scheduled));
