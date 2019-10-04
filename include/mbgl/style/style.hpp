@@ -21,7 +21,7 @@ class Layer;
 
 class Style {
 public:
-    Style(FileSource&, float pixelRatio);
+    Style(std::shared_ptr<FileSource>, float pixelRatio);
     ~Style();
 
     void loadJSON(const std::string&);

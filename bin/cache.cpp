@@ -1,5 +1,6 @@
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -89,9 +90,9 @@ int main(int argc, char* argv[]) {
     }
 
     mbgl::util::RunLoop loop;
-    mbgl::DefaultFileSource fileSource(args::get(cacheValue), ".");
-
-    fileSource.put(resource, response);
-
+    auto dbfs = mbgl::FileSourceManager::get()->getFileSource(
+        mbgl::FileSourceType::Database, mbgl::ResourceOptions().withCachePath(args::get(cacheValue)));
+    dbfs->forward(resource, response, [&loop] { loop.stop(); });
+    loop.run();
     return 0;
 }

@@ -2,7 +2,8 @@
 
 ## Master
 
-### New features
+### ✨ New features
+
 - [core] Port line-sort-key and fill-sort-key ([#15839](https://github.com/mapbox/mapbox-gl-native/pull/15839))
 
   The new feature allows to sort line and fill layer features. Similar to `symbol-sort-key`.
@@ -27,7 +28,8 @@
 
   This patch introduces batch conversion between LatLng and ScreenCoordinate in Gl-Native core, so for multiple conversions with single point/latLng previously now it can be done with invoking one function call by passing vector of points/latLngs.
 
-### Bug fixes
+### 🐞 Bug fixes
+
 - [core] Stable position of labels at tile borders in tile mode ([#16040](https://github.com/mapbox/mapbox-gl-native/pull/16040))
 
   These changes allow to avoid cutting-off labels on tile borders if the variable text placement is enabled.
@@ -78,7 +80,8 @@
 
   This fixes rendering by account for the 1px texture padding around icons that were stretched with icon-text-fit.
 
-### Performance improvements
+### 🏁 Performance improvements
+
 - [core] Calculate GeoJSON tile geometries in a background thread ([#15953](https://github.com/mapbox/mapbox-gl-native/pull/15953))
 
   Call `mapbox::geojsonvt::GeoJSONVT::getTile()` in a background thread, so that the rendering thread is not blocked.
@@ -97,11 +100,22 @@
 
   Before this fix, repeated request for an already obtained image was erroneously treated as pending, and it prevented from the tiles load completion.
 
-### Architectural changes
-- [core] Remove Map::cycleDebugOptions ([#16005](https://github.com/mapbox/mapbox-gl-native/pull/16005))
-
-  This function was mostly used by the Android API, which is no longer necessary.
+### 🧩  Architectural changes
 
 - [core] Merge style::Layer::set{Layout,Paint}Property ([#15997](https://github.com/mapbox/mapbox-gl-native/pull/15997))
 
 - [core] Use expected.hpp from mapbox-base ([#15898](https://github.com/mapbox/mapbox-gl-native/pull/15898))
+
+##### ⚠️  Breaking changes
+
+- [core] Refactor DefaultFileSource codebase ([#15768](https://github.com/mapbox/mapbox-gl-native/pull/15768)) 
+  - Adds `FileSourceManager` interface that provides access to `FileSource` instances and means of registering / unregistering `FileSource` factories
+  - Splits `DefaultFileSource` into smaller parts
+  - Adds `DatabaseFileSource` interface and it's default implementation
+  - Removes inter-dependencies between concrete `FileSource` classes
+  - All sources operate on dedicated thread, except `MainResourceLoader` that acts as a dispatcher and works on thread that requested it.
+  - Removes `ResourceOptions::withCacheOnlyRequestsSupport` method
+
+- [core] Remove Map::cycleDebugOptions ([#16005](https://github.com/mapbox/mapbox-gl-native/pull/16005))
+
+  This function was mostly used by the Android API, which is no longer necessary.

@@ -1,11 +1,12 @@
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/io.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_impl.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/test/map_adapter.hpp>
+#include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <unordered_map>
 
 #include <gtest/gtest.h>
@@ -14,7 +15,7 @@ using namespace mbgl;
 
 class SyncFileSource : public FileSource {
 public:
-    std::unique_ptr<AsyncRequest> request(const Resource& resource, FileSource::Callback callback) {
+    std::unique_ptr<AsyncRequest> request(const Resource& resource, FileSource::Callback callback) override {
         Response response;
         auto it = assets.find(resource.url);
         if (it == assets.end()) {
@@ -26,6 +27,8 @@ public:
         callback(response);
         return nullptr;
     }
+
+    bool canRequest(const Resource&) const override { return true; }
 
     void add(std::string const& key, std::string const& data) {
         assets.emplace(key, std::make_shared<std::string>(data));

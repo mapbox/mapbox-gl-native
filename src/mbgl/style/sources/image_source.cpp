@@ -4,6 +4,7 @@
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/sources/image_source_impl.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/premultiply.hpp>
 

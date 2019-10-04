@@ -1,19 +1,34 @@
 #pragma once
 
-#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/storage/resource.hpp>
 
-#include <mbgl/util/async_request.hpp>
+#include <mapbox/value.hpp>
 
 #include <functional>
 #include <memory>
 
 namespace mbgl {
 
-class ResourceOptions;
-class ResourceTransform;
+class AsyncRequest;
+class Resource;
 
+// TODO: Rename to ResourceProviderType
+enum FileSourceType : uint8_t {
+    Asset,
+    // TODO: split to separate types
+    // - Cache for fast KV store (FASTER, LevelDB, RocksDB)
+    // - Database for read-only offline use-cases
+    Database,
+    FileSystem,
+    Network,
+    // Resource loader acts as a proxy and has logic
+    // for request delegation to Asset, Cache, and other
+    // file sources.
+    ResourceLoader
+};
+
+// TODO: Rename to ResourceProvider to avoid confusion with
+// GeoJSONSource, RasterSource, VectorSource, CustomGeometrySource and other *Sources.
 class FileSource {
 public:
     FileSource(const FileSource&) = delete;
@@ -29,22 +44,44 @@ public:
     // not be executed.
     virtual std::unique_ptr<AsyncRequest> request(const Resource&, Callback) = 0;
 
+    // Allows to forward response from one source to another.
+    // Optionally, callback can be provided to receive notification for forward
+    // operation.
+    virtual void forward(const Resource&, const Response&, std::function<void()> = {}) {}
+
     // When a file source supports consulting a local cache only, it must return true.
     // Cache-only requests are requests that aren't as urgent, but could be useful, e.g.
     // to cover part of the map while loading. The FileSource should only do cheap actions to
     // retrieve the data, e.g. load it from a cache, but not from the internet.
-    virtual bool supportsCacheOnlyRequests() const {
-        return false;
-    }
+    virtual bool supportsCacheOnlyRequests() const { return false; }
 
-    // Singleton for obtaining the shared platform-specific file source. A single instance of a file source is provided
-    // for each unique combination of a Mapbox API base URL, access token, cache path and platform context.
-    static std::shared_ptr<FileSource> getSharedFileSource(const ResourceOptions&);
+    // Checks whether a resource could be requested from this file source.
+    virtual bool canRequest(const Resource&) const = 0;
+
+    /*
+     * Pause file request activity.
+     *
+     * If pause is called then no revalidation or network request activity
+     * will occur.
+     */
+    virtual void pause() {}
+
+    /*
+     * Resume file request activity.
+     *
+     * Calling resume will unpause the file source and process any tasks that
+     * expired while the file source was paused.
+     */
+    virtual void resume() {}
+
+    /*
+     * Generic property setter / getter methods.
+     */
+    virtual void setProperty(const std::string&, const mapbox::base::Value&){};
+    virtual mapbox::base::Value getProperty(const std::string&) const { return {}; };
 
 protected:
     FileSource() = default;
-    // Factory for creating a platform-specific file source.
-    static std::shared_ptr<FileSource> createPlatformFileSource(const ResourceOptions&);
 };
 
 } // namespace mbgl

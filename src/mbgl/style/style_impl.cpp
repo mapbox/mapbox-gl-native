@@ -19,6 +19,7 @@
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
@@ -29,8 +30,8 @@ namespace style {
 
 static Observer nullObserver;
 
-Style::Impl::Impl(FileSource& fileSource_, float pixelRatio)
-    : fileSource(fileSource_),
+Style::Impl::Impl(std::shared_ptr<FileSource> fileSource_, float pixelRatio)
+    : fileSource(std::move(fileSource_)),
       spriteLoader(std::make_unique<SpriteLoader>(pixelRatio)),
       light(std::make_unique<Light>()),
       observer(&nullObserver) {
@@ -49,13 +50,19 @@ void Style::Impl::loadJSON(const std::string& json_) {
 }
 
 void Style::Impl::loadURL(const std::string& url_) {
+    if (!fileSource) {
+        observer->onStyleError(
+            std::make_exception_ptr(util::StyleLoadException("Unable to find resource provider for style url.")));
+        return;
+    }
+
     lastError = nullptr;
     observer->onStyleLoading();
 
     loaded = false;
     url = url_;
 
-    styleRequest = fileSource.request(Resource::style(url), [this](Response res) {
+    styleRequest = fileSource->request(Resource::style(url), [this](Response res) {
         // Don't allow a loaded, mutated style to be overwritten with a new version.
         if (mutated && loaded) {
             return;
@@ -112,7 +119,11 @@ void Style::Impl::parse(const std::string& json_) {
     setLight(std::make_unique<Light>(parser.light));
 
     spriteLoaded = false;
-    spriteLoader->load(parser.spriteURL, fileSource);
+    if (fileSource) {
+        spriteLoader->load(parser.spriteURL, *fileSource);
+    } else {
+        onSpriteError(std::make_exception_ptr(std::runtime_error("Unable to find resource provider for sprite url.")));
+    }
     glyphURL = parser.glyphURL;
 
     loaded = true;
@@ -143,7 +154,9 @@ void Style::Impl::addSource(std::unique_ptr<Source> source) {
 
     source->setObserver(this);
     auto item = sources.add(std::move(source));
-    item->loadDescription(fileSource);
+    if (fileSource) {
+        item->loadDescription(*fileSource);
+    }
 }
 
 std::unique_ptr<Source> Style::Impl::removeSource(const std::string& id) {
@@ -301,8 +314,8 @@ void Style::Impl::onSourceError(Source& source, std::exception_ptr error) {
 void Style::Impl::onSourceDescriptionChanged(Source& source) {
     sources.update(source);
     observer->onSourceDescriptionChanged(source);
-    if (!source.loaded) {
-        source.loadDescription(fileSource);
+    if (!source.loaded && fileSource) {
+        source.loadDescription(*fileSource);
     }
 }
 

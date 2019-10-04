@@ -53,6 +53,7 @@ private:
                                TestMetadata&);
     void checkRenderTestResults(mbgl::PremultipliedImage&& image, TestMetadata&);
     void checkProbingResults(TestMetadata&);
+    void registerProxyFileSource();
 
     struct Impl {
         Impl(const TestMetadata&, const mbgl::ResourceOptions&);

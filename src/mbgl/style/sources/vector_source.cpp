@@ -6,6 +6,7 @@
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/vector_source_impl.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/mapbox.hpp>

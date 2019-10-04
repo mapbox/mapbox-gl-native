@@ -1,24 +1,24 @@
-#include <mbgl/map/map.hpp>
-#include <mbgl/map/map_impl.hpp>
-#include <mbgl/map/camera.hpp>
-#include <mbgl/map/transform.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/layermanager/layer_manager.hpp>
-#include <mbgl/style/style_impl.hpp>
-#include <mbgl/style/observer.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/map/camera.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/map_impl.hpp>
+#include <mbgl/map/transform.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/storage/file_source_manager.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/style/observer.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/mapbox.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/math/log2.hpp>
+#include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
 #include <utility>
 
@@ -30,9 +30,11 @@ Map::Map(RendererFrontend& frontend,
          MapObserver& observer,
          const MapOptions& mapOptions,
          const ResourceOptions& resourceOptions)
-    : impl(std::make_unique<Impl>(frontend, observer,
-                                  FileSource::getSharedFileSource(resourceOptions),
-                                  mapOptions)) {}
+    : impl(std::make_unique<Impl>(
+          frontend,
+          observer,
+          FileSourceManager::get() ? FileSourceManager::get()->getFileSource(ResourceLoader, resourceOptions) : nullptr,
+          mapOptions)) {}
 
 Map::Map(std::unique_ptr<Impl> impl_) : impl(std::move(impl_)) {}
 

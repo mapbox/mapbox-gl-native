@@ -8,9 +8,8 @@
 namespace mbgl {
 namespace style {
 
-Style::Style(FileSource& fileSource, float pixelRatio)
-    : impl(std::make_unique<Impl>(fileSource, pixelRatio)) {
-}
+Style::Style(std::shared_ptr<FileSource> fileSource, float pixelRatio)
+    : impl(std::make_unique<Impl>(std::move(fileSource), pixelRatio)) {}
 
 Style::~Style() = default;
 

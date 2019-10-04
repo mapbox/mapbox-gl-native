@@ -8,6 +8,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/layer.hpp>
