@@ -9,10 +9,11 @@ set -o pipefail
 # is generated via CI or locally.
 #
 cov_result="";
-if [ -f build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport ]; then 
-    cov_result=build/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
-elif [ -f build/ios/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport ]; then
-    cov_result=build/ios/ios/Logs/Test/*.xcresult/*_Test/*.xccovreport
+ls -l build/ios/ios/Logs/Test/
+if [[ -d /build/ios/Logs/Test/*.xcresult ]]; then 
+    cov_result=/build/ios/Logs/Test/*.xcresult
+elif [[ -d /build/ios/ios/Logs/Test/*.xcresult ]]; then
+    cov_result=/build/ios/ios/Logs/Test/*.xcresult
 else
     echo "Coverage file does not exist. Please run tests before executing"
     exit 1
@@ -28,4 +29,4 @@ percentage=`node -e "console.log(require('./output.json').lineCoverage)"`
 cov=$(printf "%.2f" $(echo "$percentage*100" | bc -l))
 
 # Generate a formatted JSON file and upload it to S3.
-./././scripts/code-coverage.sh $cov "iOS" "$1"
+# ./././scripts/code-coverage.sh $cov "iOS" "$1"
