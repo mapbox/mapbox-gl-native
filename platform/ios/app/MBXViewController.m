@@ -2202,6 +2202,23 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
     _localizingLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+
+    NSURL *url = [NSURL URLWithString:@"https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"];
+
+    NSExpression *reduceExpression1 =  [NSExpression expressionWithFormat:@"sum:"];
+
+    NSExpression *mapExpression1 = [NSExpression expressionForKeyPath:@"mag"];
+    NSArray *expressArray1 = @[reduceExpression1, mapExpression1];
+
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"earthquakes" URL:url options:@{
+    MGLShapeSourceOptionClustered: @(YES),
+    MGLShapeSourceOptionClusterRadius: @(15),
+    MGLShapeSourceOptionClusterProperties: @{@"sumVal" : expressArray1 }}];
+    [mapView.style addSource:source];
+    MGLSymbolStyleLayer *clusterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"clusteredPortsNumbers" source:source];
+    clusterLayer.text = [NSExpression expressionWithFormat:@"CAST(sumVal, 'NSString')"];
+    [self.mapView.style addLayer:clusterLayer];
+
 }
 
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera {

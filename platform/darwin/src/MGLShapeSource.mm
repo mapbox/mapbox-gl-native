@@ -108,20 +108,20 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             }
 
             // reduceExpression could be either a string of operator, or a valid NSExpression
-            NSString *reduceOperator = expressionsArray[0];
+            if (![expressionsArray.firstObject isKindOfClass:[NSExpression class]]) {
+                [NSException raise:NSInvalidArgumentException
+                format:@"MGLShapeSourceOptionClusterProperties array value requires two expression objects."];
+            }
+            NSExpression *reduceOperator = expressionsArray[0];
             NSExpression *reduceExpression;
-            if ([reduceOperator isKindOfClass:[NSString class]]) {
+            if (reduceOperator.expressionType == NSConstantValueExpressionType) {
                 // If reduceOperator is a string, prepare a full NSExpression before parsing
-                NSString *reduceString = [NSString stringWithFormat:@"%@({ $featureAccumulated, %@})", reduceOperator, key];
+                NSString *reduceString = [NSString stringWithFormat:@"%@({ $featureAccumulated, %@})", reduceOperator.constantValue, key];
                 reduceExpression =  [NSExpression expressionWithFormat:reduceString];
             } else {
                 reduceExpression = expressionsArray[0];
             }
 
-            if (![reduceExpression isKindOfClass:[NSExpression class]]) {
-                [NSException raise:NSInvalidArgumentException
-                            format:@"MGLShapeSourceOptionClusterProperties member value shall contain a valid reduceExpression."];
-            }
             auto reduce = MGLClusterPropertyFromNSExpression(reduceExpression);
             if (!reduce) {
                 [NSException raise:NSInvalidArgumentException
@@ -132,7 +132,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             NSExpression *mapExpression = expressionsArray[1];
             if (![mapExpression isKindOfClass:[NSExpression class]]) {
                 [NSException raise:NSInvalidArgumentException
-                            format:@"MGLShapeSourceOptionClusterProperties member value shall contain a valid mapExpression."];
+                            format:@"MGLShapeSourceOptionClusterProperties member value must contain a valid NSExpression."];
             }
             auto map = MGLClusterPropertyFromNSExpression(mapExpression);
             if (!map) {
