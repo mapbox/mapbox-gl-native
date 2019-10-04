@@ -1,4 +1,5 @@
 #import "MGLMapViewIntegrationTest.h"
+#import "MGLMapSnapshotter_Private.h"
 
 @interface MGLMapSnapshotter ()
 @property (nonatomic) BOOL cancelled;
@@ -23,6 +24,21 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     MGLMapSnapshotter* snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
     return snapshotter;
 }
+
+MGLMapSnapshotter* snapshotterWithBounds(MGLCoordinateBounds bounds, CGSize size) {
+
+    MGLMapCamera* mapCamera = [[MGLMapCamera alloc] init];
+    MGLMapSnapshotOptions* options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:[MGLStyle satelliteStreetsStyleURL]
+                                                                              camera:mapCamera
+                                                                                size:size];
+    options.coordinateBounds = bounds;
+
+    // Create and start the snapshotter
+    MGLMapSnapshotter* snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
+    return snapshotter;
+}
+
+
 
 @implementation MGLMapSnapshotterTest
 
@@ -461,5 +477,61 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
+
+- (void)testSnapshotCoordinatesWithOverlayHandler🔒 {
+    CGSize size = self.mapView.bounds.size;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot with overlay succeeds"];
+    expectation.expectedFulfillmentCount = 2;
+
+    CLLocationCoordinate2D london = { .latitude = 51.5074, .longitude = -0.1278 };
+    CLLocationCoordinate2D paris  = { .latitude = 48.8566, .longitude = 2.3522 };
+
+    MGLCoordinateBounds bounds = {
+        .ne = london,
+        .sw = paris
+    };
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithBounds(bounds, size);
+    XCTAssertNotNil(snapshotter);
+
+    void (^testCoordinates)(id<MGLMapSnapshotProtocol>) = ^(id<MGLMapSnapshotProtocol> snapshot){
+        XCTAssertNotNil(snapshot);
+
+        CGPoint londonPoint = [snapshot pointForCoordinate:london];
+        CGPoint parisPoint  = [snapshot pointForCoordinate:paris];
+
+        XCTAssertEqualWithAccuracy(londonPoint.x, 0, 0.1);
+        XCTAssertEqualWithAccuracy(parisPoint.x, size.width, 0.1);
+
+        // Vertically, London and Paris are inset (due to the size vs coordinate bounds)
+        XCTAssert(parisPoint.y > londonPoint.y);
+        XCTAssert(londonPoint.y > 0.0);
+        XCTAssert(parisPoint.y < size.height);
+
+        CLLocationCoordinate2D london2 = [snapshot coordinateForPoint:londonPoint];
+        CLLocationCoordinate2D paris2  = [snapshot coordinateForPoint:parisPoint];
+
+        XCTAssertEqualWithAccuracy(london.latitude,  london2.latitude,  0.0000001);
+        XCTAssertEqualWithAccuracy(london.longitude, london2.longitude, 0.0000001);
+        XCTAssertEqualWithAccuracy(paris.latitude,   paris2.latitude,   0.0000001);
+        XCTAssertEqualWithAccuracy(paris.longitude,  paris2.longitude,  0.0000001);
+    };
+
+    [snapshotter startWithOverlayHandler:^(MGLMapSnapshotOverlay *snapshotOverlay) {
+        XCTAssert([snapshotOverlay conformsToProtocol:@protocol(MGLMapSnapshotProtocol)]);
+        testCoordinates((id<MGLMapSnapshotProtocol>)snapshotOverlay);
+
+        [expectation fulfill];
+    } completionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        XCTAssert([snapshot conformsToProtocol:@protocol(MGLMapSnapshotProtocol)]);
+        testCoordinates((id<MGLMapSnapshotProtocol>)snapshot);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:10.0];
+}
+
 
 @end
