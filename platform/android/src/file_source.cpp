@@ -17,9 +17,14 @@ namespace mbgl {
 
 std::shared_ptr<FileSource> FileSource::createPlatformFileSource(const ResourceOptions& options) {
     auto env{android::AttachEnv()};
-    auto assetManager = android::Mapbox::getAssetManager(*env);
-    auto fileSource = std::make_shared<DefaultFileSource>(options.cachePath(),
-                                                          std::make_unique<AssetManagerFileSource>(*env, assetManager));
+    std::shared_ptr<DefaultFileSource> fileSource;
+    if (android::Mapbox::hasInstance(*env)) {
+        auto assetManager = android::Mapbox::getAssetManager(*env);
+        fileSource = std::make_shared<DefaultFileSource>(options.cachePath(),
+                                                         std::make_unique<AssetManagerFileSource>(*env, assetManager));
+    } else {
+        fileSource = std::make_shared<DefaultFileSource>(options.cachePath(), options.assetPath());
+    }
     fileSource->setAccessToken(options.accessToken());
     return fileSource;
 }
