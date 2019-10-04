@@ -55,6 +55,7 @@ TEST(Shaping, ZWSP) {
         ASSERT_FLOAT_EQ(-63.0f, shaping.left);
         ASSERT_FLOAT_EQ(63.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_EQ(shaping.lineCount, shaping.positionedGlyphs.size());
         ASSERT_FALSE(shaping.hasBaseline);
     }
 
@@ -70,6 +71,7 @@ TEST(Shaping, ZWSP) {
         ASSERT_FLOAT_EQ(-21.0f, shaping.left);
         ASSERT_FLOAT_EQ(21.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_EQ(shaping.lineCount, shaping.positionedGlyphs.size());
         ASSERT_FALSE(shaping.hasBaseline);
     }
 
@@ -84,11 +86,14 @@ TEST(Shaping, ZWSP) {
         ASSERT_FLOAT_EQ(-21.0f, shaping.left);
         ASSERT_FLOAT_EQ(21.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
-        ASSERT_EQ(2, shaping.positionedGlyphs.size());
-        ASSERT_FLOAT_EQ(-21.0f, shaping.positionedGlyphs[0].x);
-        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[0].y);
-        ASSERT_FLOAT_EQ(0.0f, shaping.positionedGlyphs[1].x);
-        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_EQ(shaping.lineCount, shaping.positionedGlyphs.size());
+        ASSERT_EQ(1, shaping.positionedGlyphs.count(0));
+        ASSERT_EQ(2, shaping.positionedGlyphs[0].size());
+        const auto& glyphs = shaping.positionedGlyphs[0];
+        ASSERT_FLOAT_EQ(-21.0f, glyphs[0].x);
+        ASSERT_FLOAT_EQ(-17.0f, glyphs[0].y);
+        ASSERT_FLOAT_EQ(0.0f, glyphs[1].x);
+        ASSERT_FLOAT_EQ(-17.0f, glyphs[1].y);
         ASSERT_FALSE(shaping.hasBaseline);
     }
 
@@ -102,6 +107,7 @@ TEST(Shaping, ZWSP) {
         ASSERT_FLOAT_EQ(-0.0f, shaping.left);
         ASSERT_FLOAT_EQ(0.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
+        ASSERT_EQ(shaping.lineCount, shaping.positionedGlyphs.size());
         ASSERT_FALSE(shaping.hasBaseline);
     }
 }
@@ -172,11 +178,14 @@ TEST(Shaping, MixedFontsBothWithBaselines) {
         ASSERT_FLOAT_EQ(-21.0f, shaping.left);
         ASSERT_FLOAT_EQ(21.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
-        ASSERT_EQ(2, shaping.positionedGlyphs.size());
-        ASSERT_FLOAT_EQ(-21.0f, shaping.positionedGlyphs[0].x);
-        ASSERT_FLOAT_EQ(-16.0f, shaping.positionedGlyphs[0].y);
-        ASSERT_FLOAT_EQ(0.0f, shaping.positionedGlyphs[1].x);
-        ASSERT_FLOAT_EQ(-15.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_EQ(shaping.lineCount, shaping.positionedGlyphs.size());
+        ASSERT_EQ(1, shaping.positionedGlyphs.count(0));
+        ASSERT_EQ(2, shaping.positionedGlyphs[0].size());
+        const auto& glyphs = shaping.positionedGlyphs[0];
+        ASSERT_FLOAT_EQ(-21.0f, glyphs[0].x);
+        ASSERT_FLOAT_EQ(-16.0f, glyphs[0].y);
+        ASSERT_FLOAT_EQ(0.0f, glyphs[1].x);
+        ASSERT_FLOAT_EQ(-15.0f, glyphs[1].y);
         ASSERT_TRUE(shaping.hasBaseline);
     }
 }
@@ -245,11 +254,14 @@ TEST(Shaping, MixedFontsOneWithBaselineOneWithout) {
         ASSERT_FLOAT_EQ(-21.0f, shaping.left);
         ASSERT_FLOAT_EQ(21.0f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
-        ASSERT_EQ(2, shaping.positionedGlyphs.size());
-        ASSERT_FLOAT_EQ(-21.0f, shaping.positionedGlyphs[0].x);
-        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[0].y);
-        ASSERT_FLOAT_EQ(0.0f, shaping.positionedGlyphs[1].x);
-        ASSERT_FLOAT_EQ(-17.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_EQ(shaping.lineCount, shaping.positionedGlyphs.size());
+        ASSERT_EQ(1, shaping.positionedGlyphs.count(0));
+        ASSERT_EQ(2, shaping.positionedGlyphs[0].size());
+        const auto& glyphs = shaping.positionedGlyphs[0];
+        ASSERT_FLOAT_EQ(-21.0f, glyphs[0].x);
+        ASSERT_FLOAT_EQ(-17.0f, glyphs[0].y);
+        ASSERT_FLOAT_EQ(0.0f, glyphs[1].x);
+        ASSERT_FLOAT_EQ(-17.0f, glyphs[1].y);
         ASSERT_FALSE(shaping.hasBaseline);
     }
 }
@@ -321,11 +333,14 @@ TEST(Shaping, MixedFontsWithBaselineWithFontScale) {
         ASSERT_FLOAT_EQ(-26.25f, shaping.left);
         ASSERT_FLOAT_EQ(26.25f, shaping.right);
         ASSERT_EQ(shaping.writingMode, WritingModeType::Horizontal);
-        ASSERT_EQ(2, shaping.positionedGlyphs.size());
-        ASSERT_FLOAT_EQ(-26.25f, shaping.positionedGlyphs[0].x);
-        ASSERT_FLOAT_EQ(-24.0f, shaping.positionedGlyphs[0].y);
-        ASSERT_FLOAT_EQ(5.25f, shaping.positionedGlyphs[1].x);
-        ASSERT_FLOAT_EQ(-10.0f, shaping.positionedGlyphs[1].y);
+        ASSERT_EQ(shaping.lineCount, shaping.positionedGlyphs.size());
+        ASSERT_EQ(1, shaping.positionedGlyphs.count(0));
+        ASSERT_EQ(2, shaping.positionedGlyphs[0].size());
+        const auto& glyphs = shaping.positionedGlyphs[0];
+        ASSERT_FLOAT_EQ(-26.25f, glyphs[0].x);
+        ASSERT_FLOAT_EQ(-24.0f, glyphs[0].y);
+        ASSERT_FLOAT_EQ(5.25f, glyphs[1].x);
+        ASSERT_FLOAT_EQ(-10.0f, glyphs[1].y);
         ASSERT_TRUE(shaping.hasBaseline);
     }
 }

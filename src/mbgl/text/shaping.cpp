@@ -122,10 +122,12 @@ void align(Shaping& shaping,
            const std::size_t lineCount) {
     const float shiftX = (justify - horizontalAlign) * maxLineLength;
     const float shiftY = (-verticalAlign * lineCount + 0.5) * lineHeight;
-    
-    for (auto& glyph : shaping.positionedGlyphs) {
-        glyph.x += shiftX;
-        glyph.y += shiftY;
+
+    for (auto& glyphs : shaping.positionedGlyphs) {
+        for (auto& glyph : glyphs.second) {
+            glyph.x += shiftX;
+            glyph.y += shiftY;
+        }
     }
 }
 
@@ -149,7 +151,7 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     if (it != glyphs->second.glyphs.end() && it->second) {
         const float lastAdvance = (*it->second)->metrics.advance * glyph.scale;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
-        
+
         for (std::size_t j = start; j <= end; j++) {
             positionedGlyphs[j].x -= lineIndent;
             positionedGlyphs[j].y += baselineOffset;
@@ -349,6 +351,7 @@ void shapeLines(Shaping& shaping,
         textJustify == style::TextJustifyType::Left ? 0 :
         0.5;
 
+    uint32_t lineIndex{0};
     for (TaggedString& line : lines) {
         // Collapse whitespace so it doesn't throw off justification
         line.trim();
@@ -357,11 +360,11 @@ void shapeLines(Shaping& shaping,
         
         if (line.empty()) {
             y += lineHeight; // Still need a line feed after empty line
+            ++lineIndex;
             continue;
         }
 
         float biggestHeight{0.0f}, baselineOffset{0.0f};
-        std::size_t lineStartIndex = shaping.positionedGlyphs.size();
         for (std::size_t i = 0; i < line.length(); i++) {
             const std::size_t sectionIndex = line.getSectionIndex(i);
             const SectionOptions& section = line.sectionAt(sectionIndex);
@@ -409,31 +412,32 @@ void shapeLines(Shaping& shaping,
                 // are from complex text layout script, or whitespaces.
                 (allowVerticalPlacement &&
                  (util::i18n::isWhitespace(codePoint) || util::i18n::isCharInComplexShapingScript(codePoint)))) {
-                shaping.positionedGlyphs.emplace_back(
+                shaping.positionedGlyphs[lineIndex].emplace_back(
                     codePoint, x, y + glyphOffset, false, section.fontStackHash, section.scale, sectionIndex);
                 x += glyph.metrics.advance * section.scale + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(
+                shaping.positionedGlyphs[lineIndex].emplace_back(
                     codePoint, x, y + glyphOffset, true, section.fontStackHash, section.scale, sectionIndex);
                 x += util::ONE_EM * section.scale + spacing;
             }
         }
 
         // Only justify if we placed at least one glyph
-        if (shaping.positionedGlyphs.size() != lineStartIndex) {
+        if (!shaping.positionedGlyphs[lineIndex].empty()) {
             float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
 
-            justifyLine(shaping.positionedGlyphs,
+            justifyLine(shaping.positionedGlyphs[lineIndex],
                         glyphMap,
-                        lineStartIndex,
-                        shaping.positionedGlyphs.size() - 1,
+                        0,
+                        shaping.positionedGlyphs[lineIndex].size() - 1,
                         justify,
                         baselineOffset);
         }
-        
+
         x = 0;
         y += lineHeight * lineMaxScale;
+        ++lineIndex;
     }
 
     auto anchorAlign = AnchorAlignment::getAnchorAlignment(textAnchor);

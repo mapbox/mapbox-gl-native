@@ -83,7 +83,7 @@ class Shaping {
     Shaping() = default;
     explicit Shaping(float x, float y, WritingModeType writingMode_, std::size_t lineCount_)
         : top(y), bottom(y), left(x), right(x), writingMode(writingMode_), lineCount(lineCount_) {}
-    std::vector<PositionedGlyph> positionedGlyphs;
+    std::unordered_map<uint32_t, std::vector<PositionedGlyph>> positionedGlyphs;
     float top = 0;
     float bottom = 0;
     float left = 0;
