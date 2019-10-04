@@ -43,19 +43,20 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
 
 /**
  An `NSDictionary` object where the key is an `NSString`. The dictionary key will
- be the attribute feature attribute key. The resulting attribute value is
+ be the feature attribute key. The resulting attribute value is
  aggregated from the clustered points. The dictionary value is an `NSArray`
  consisting of two objects.
 
- The first object determines how the attributes are accumulated from the cluster
- points. You can use one of the following:
+ The first object determines how the attribute values are accumulated from the
+ cluster points. The resulting value is assigned to the specified attribute key.
+ You can use one of the following:
 
  * An `[NSExpression expressionForConstantValue:]` containing a single function string, such as `sum:` or `max:`, which takes at least two operands.
  * An `NSExpression` that takes two expression arguments: `featureAccumulated` and
  another valid expression.
 
- The second object in the array is an `NSExpression` that produces the value of a
- single point within the cluster.
+ The second `NSExpression` in the array determines which
+ attribute values are accessed from individual features within a cluster.
 
  This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-clusterProperties"><code>clusterProperties</code></a>
