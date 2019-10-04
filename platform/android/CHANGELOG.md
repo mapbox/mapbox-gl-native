@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+### Performance improvements
+ - Improved rendering performance for the styles with multiple sources [#15756](https://github.com/mapbox/mapbox-gl-native/pull/15756)
+
 ## 8.5.0-alpha.1 - October 3, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0...android-v8.5.0-alpha.1) since [Mapbox Maps SDK for Android v8.4.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0):
 ### Bug fixes
