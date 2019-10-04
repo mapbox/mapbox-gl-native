@@ -26,7 +26,6 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
  */
 @UiThread
 @SuppressLint("StaticFieldLeak")
-@Keep
 public final class Mapbox {
 
   private static final String TAG = "Mbgl-Mapbox";
@@ -53,6 +52,7 @@ public final class Mapbox {
    */
   @UiThread
   @NonNull
+  @Keep
   public static synchronized Mapbox getInstance(@NonNull Context context, @Nullable String accessToken) {
     ThreadUtils.init(context);
     ThreadUtils.checkThread(TAG);
@@ -231,6 +231,7 @@ public final class Mapbox {
    *
    * @return the asset manager
    */
+  @Keep
   private static AssetManager getAssetManager() {
     return getApplicationContext().getResources().getAssets();
   }
