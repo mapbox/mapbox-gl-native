@@ -64,7 +64,7 @@ public:
     void setPriority(Priority p) { priority = p; }
     void setUsage(Usage u) { usage = u; }
 
-    bool hasLoadingMethod(LoadingMethod method);
+    bool hasLoadingMethod(LoadingMethod method) const;
 
     static Resource style(const std::string& url);
     static Resource source(const std::string& url);
@@ -97,7 +97,7 @@ public:
     std::shared_ptr<const std::string> priorData;
 };
 
-inline bool Resource::hasLoadingMethod(Resource::LoadingMethod method) {
+inline bool Resource::hasLoadingMethod(Resource::LoadingMethod method) const {
     return (loadingMethod & method);
 }
 

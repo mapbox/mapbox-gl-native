@@ -3,17 +3,17 @@
         [
             "mbgl-glfw",
             "/tmp/attach/install/next-linux-clang8-release/bin/mbgl-glfw",
-            6380744
+            6442184
         ],
         [
             "mbgl-offline",
             "/tmp/attach/install/next-linux-clang8-release/bin/mbgl-offline",
-            5651144
+            5720776
         ],
         [
             "mbgl-render",
             "/tmp/attach/install/next-linux-clang8-release/bin/mbgl-render",
-            6282152
+            6343592
         ]
     ]
 }

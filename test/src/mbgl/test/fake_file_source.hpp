@@ -2,6 +2,8 @@
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/util/async_request.hpp>
 
 #include <algorithm>
 #include <list>
@@ -42,6 +44,8 @@ public:
         return std::make_unique<FakeFileRequest>(resource, callback, requests);
     }
 
+    bool canRequest(const Resource&) const override { return true; }
+
     bool respond(Resource::Kind kind, const Response& response) {
         auto it = std::find_if(requests.begin(), requests.end(), [&] (FakeFileRequest* fakeRequest) {
             return fakeRequest->resource.kind == kind;
@@ -60,7 +64,7 @@ public:
 
 };
 
-class FakeOnlineFileSource : public OnlineFileSource, public FakeFileSource {
+class FakeOnlineFileSource : public FakeFileSource {
 public:
     std::unique_ptr<AsyncRequest> request(const Resource& resource, Callback callback) override {
         return FakeFileSource::request(resource, callback);
@@ -69,7 +73,12 @@ public:
     bool respond(Resource::Kind kind, const Response& response) {
         return FakeFileSource::respond(kind, response);
     }
-};
 
+    mapbox::base::Value getProperty(const std::string& property) const override {
+        return onlineFs.getProperty(property);
+    }
+
+    OnlineFileSource onlineFs;
+};
 
 } // namespace mbgl

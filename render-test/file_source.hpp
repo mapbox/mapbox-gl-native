@@ -1,15 +1,18 @@
 #pragma once
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/file_source.hpp>
 
 namespace mbgl {
 
-class ProxyFileSource : public DefaultFileSource {
+class ResourceOptions;
+
+class ProxyFileSource : public FileSource {
 public:
-    ProxyFileSource(const std::string& cachePath, const std::string& assetPath);
+    ProxyFileSource(std::shared_ptr<FileSource>, const ResourceOptions&);
     ~ProxyFileSource();
 
-    std::unique_ptr<AsyncRequest> request(const Resource&, Callback);
+    std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
+    bool canRequest(const Resource&) const override { return true; }
 
     /**
      * @brief Flag to change the networking mode of the file source.
@@ -39,6 +42,9 @@ public:
      * @return size_t
      */
     static size_t getTransferredSize();
+
+private:
+    std::shared_ptr<FileSource> defaultResourceLoader;
 };
 
 } // namespace mbgl

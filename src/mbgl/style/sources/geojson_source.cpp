@@ -6,6 +6,7 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/thread_pool.hpp>
 
