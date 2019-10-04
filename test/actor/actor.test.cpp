@@ -101,7 +101,7 @@ TEST(Actor, DestructionBlocksOnSend) {
             EXPECT_TRUE(waited.load());
         }
 
-        void schedule(std::weak_ptr<Mailbox>) final {
+        void schedule(std::function<void()>) final {
             promise.set_value();
             future.wait();
             std::this_thread::sleep_for(1ms);

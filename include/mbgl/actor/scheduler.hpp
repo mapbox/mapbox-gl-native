@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 namespace mbgl {
@@ -31,12 +32,9 @@ class Mailbox;
 class Scheduler {
 public:
     virtual ~Scheduler() = default;
-    
-    // Used by a Mailbox when it has a message in its queue to request that it
-    // be scheduled. Specifically, the scheduler is expected to asynchronously
-    // call `receive() on the given mailbox, provided it still exists at that
-    // time.
-    virtual void schedule(std::weak_ptr<Mailbox>) = 0;
+
+    // Enqueues a function for execution.
+    virtual void schedule(std::function<void()>) = 0;
 
     // Set/Get the current Scheduler for this thread
     static Scheduler* GetCurrent();

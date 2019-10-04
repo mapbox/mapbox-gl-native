@@ -67,7 +67,7 @@ public:
 
     // From Scheduler. Schedules by using callbacks to the
     // JVM to process the mailbox on the right thread.
-    void schedule(std::weak_ptr<Mailbox> scheduled) override;
+    void schedule(std::function<void()> scheduled) override;
 
     void requestRender();
 

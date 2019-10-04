@@ -72,12 +72,8 @@ public:
         push(Priority::Default, task);
         return std::make_unique<WorkRequest>(task);
     }
-                    
-    void schedule(std::weak_ptr<Mailbox> mailbox) override {
-        invoke([mailbox] () {
-            Mailbox::maybeReceive(mailbox);
-        });
-    }
+
+    void schedule(std::function<void()> fn) override { invoke(std::move(fn)); }
 
     class Impl;
 

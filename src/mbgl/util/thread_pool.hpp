@@ -15,11 +15,11 @@ public:
     explicit ThreadPool(std::size_t count);
     ~ThreadPool() override;
 
-    void schedule(std::weak_ptr<Mailbox>) override;
+    void schedule(std::function<void()>) override;
 
 private:
     std::vector<std::thread> threads;
-    std::queue<std::weak_ptr<Mailbox>> queue;
+    std::queue<std::function<void()>> queue;
     std::mutex mutex;
     std::condition_variable cv;
     bool terminate{ false };
