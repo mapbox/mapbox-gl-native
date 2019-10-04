@@ -36,11 +36,14 @@
     XCTAssertFalse(scaleBar.hidden);
 
     // Scale bar should not be visible at default zoom (~z0), but it should be ready.
-    XCTAssertFalse(CGSizeEqualToSize(scaleBar.intrinsicContentSize, CGSizeZero));
+    // Size is not a measure of readiness here though.
+    XCTAssertTrue(CGSizeEqualToSize(scaleBar.intrinsicContentSize, CGSizeZero));
     XCTAssertEqual(scaleBar.alpha, 0);
 
     self.mapView.zoomLevel = 15;
+    [self.mapView layoutIfNeeded];
     XCTAssertGreaterThan(scaleBar.alpha, 0);
+    XCTAssertFalse(CGSizeEqualToSize(scaleBar.intrinsicContentSize, CGSizeZero));
 }
 
 - (void)testDirectlySettingScaleBarViewHiddenProperty {
@@ -54,10 +57,14 @@
 
     // ... but triggering any camera event will update it.
     self.mapView.zoomLevel = 1;
-    XCTAssertFalse(CGSizeEqualToSize(scaleBar.intrinsicContentSize, CGSizeZero));
+    [self.mapView layoutIfNeeded];
+    
+    XCTAssertTrue(CGSizeEqualToSize(scaleBar.intrinsicContentSize, CGSizeZero));
     XCTAssertEqual(scaleBar.alpha, 0);
 
     self.mapView.zoomLevel = 15;
+    [self.mapView layoutIfNeeded];
+
     XCTAssertGreaterThan(scaleBar.alpha, 0);
-}
-@end
+    XCTAssertFalse(CGSizeEqualToSize(scaleBar.intrinsicContentSize, CGSizeZero));
+}@end

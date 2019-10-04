@@ -13,6 +13,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Other changes
 
 * Suppress network requests for expired tiles update, if these tiles are invisible. ([#15741](https://github.com/mapbox/mapbox-gl-native/pull/15741))
+* Fixed an issue that caused `MGLScaleBar` to have an incorrect size when resizing or rotating. ([#15703](https://github.com/mapbox/mapbox-gl-native/pull/15703))
 
 ## 5.4.0 - September 25, 2019
 
