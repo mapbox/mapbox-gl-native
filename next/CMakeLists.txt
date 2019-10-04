@@ -877,8 +877,9 @@ target_include_directories(
     PUBLIC ${MBGL_ROOT}/include
 )
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/mapbox)
-add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/extras)
+if(NOT TARGET mapbox-base)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base)
+endif()
 
 include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/earcut.hpp.cmake)

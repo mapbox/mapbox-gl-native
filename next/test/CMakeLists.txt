@@ -1,3 +1,5 @@
+configure_file(${PROJECT_SOURCE_DIR}/test/CTestCustom.cmake ${CMAKE_BINARY_DIR})
+
 add_library(
     mbgl-test SHARED EXCLUDE_FROM_ALL
     ${MBGL_ROOT}/test/actor/actor.test.cpp
