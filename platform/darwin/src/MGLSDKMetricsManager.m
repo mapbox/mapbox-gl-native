@@ -19,6 +19,7 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
 }
 
 // Taken verbatim from NXFreeArchInfo header documentation
+#if TARGET_OS_IOS
 static void MGLFreeArchInfo(const NXArchInfo *x)
 {
     const NXArchInfo *p;
@@ -32,6 +33,7 @@ static void MGLFreeArchInfo(const NXArchInfo *x)
     free((char *)x->description);
     free((NXArchInfo *)x);
 }
+#endif
 
 @interface MGLMetricsManager() <MGLNetworkConfigurationMetricsDelegate>
 
