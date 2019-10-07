@@ -638,7 +638,9 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @param enable true to enable
    * @return This
+   * @deprecated Use {@link #setPrefetchZoomDelta(int)} instead.
    */
+  @Deprecated
   @NonNull
   public MapboxMapOptions setPrefetchesTiles(boolean enable) {
     this.prefetchesTiles = enable;
@@ -652,7 +654,6 @@ public class MapboxMapOptions implements Parcelable {
    * Note: This operation will override the MapboxMapOptions#setPrefetchesTiles(boolean)
    *       Setting zoom delta to 0 will disable pre-fetching.
    * Default zoom delta is 4.
-   *
    *
    * @param delta zoom delta
    * @return This

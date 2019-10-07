@@ -1051,7 +1051,7 @@ jni::jboolean NativeMapView::getPrefetchTiles(JNIEnv&) {
 }
 
 void NativeMapView::setPrefetchZoomDelta(JNIEnv&, jni::jint delta) {
-    map->setPrefetchZoomDelta(uint8_t(abs(delta)));
+    map->setPrefetchZoomDelta(uint8_t(delta));
 }
 
 jni::jint NativeMapView::getPrefetchZoomDelta(JNIEnv&) {
