@@ -168,6 +168,16 @@ public class MapboxMapOptionsTest {
   }
 
   @Test
+  public void testPrefetchZoomDelta() {
+    // Default value
+    assertEquals(4, new MapboxMapOptions().getPrefetchZoomDelta());
+
+    // Check mutations
+    assertEquals(5, new MapboxMapOptions().setPrefetchZoomDelta(5).getPrefetchZoomDelta());
+  }
+
+
+  @Test
   public void testCrossSourceCollisions() {
     // Default value
     assertTrue(new MapboxMapOptions().getCrossSourceCollisions());

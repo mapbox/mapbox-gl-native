@@ -109,6 +109,7 @@
         <attr name="mapbox_foregroundLoadColor" format="color"/>
 
         <attr name="mapbox_enableTilePrefetch" format="boolean"/>
+        <attr name="mapbox_prefetchZoomDelta" format="integer"/>
         <attr name="mapbox_enableZMediaOverlay" format="boolean"/>
         <attr name="mapbox_pixelRatio" format="float"/>
 

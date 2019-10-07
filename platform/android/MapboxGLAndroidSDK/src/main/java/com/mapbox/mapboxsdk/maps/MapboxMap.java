@@ -101,6 +101,7 @@ public final class MapboxMap {
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
     setPrefetchesTiles(options);
+    setPrefetchZoomDelta(options);
   }
 
   /**
@@ -276,9 +277,19 @@ public final class MapboxMap {
   }
 
   /**
+   * Sets tile pre-fetching zoom delta from MapboxOptions.
+   *
+   * @param options the options object
+   */
+  private void setPrefetchZoomDelta(@NonNull MapboxMapOptions options) {
+    setPrefetchZoomDelta(options.getPrefetchZoomDelta());
+  }
+
+  /**
    * Set the tile pre-fetching zoom delta. Pre-fetching makes sure that a low-resolution
    * tile at the (current_zoom_level - delta) is rendered as soon as possible at the
    * expense of a little bandwidth.
+   * Note: Setting zoom delta to 0 will disable pre-fetching.
    *
    * @param delta zoom delta
    */
