@@ -51,7 +51,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
  cluster points. The resulting value is assigned to the specified attribute key.
  You can use one of the following:
 
- * An `[NSExpression expressionForConstantValue:]` containing a single function string, such as `sum:` or `max:`, which takes at least two operands.
+ * An `[NSExpression expressionForConstantValue:]` containing a single function string, such as `sum` or `max`, which takes at least two operands.
  * An `NSExpression` that takes two expression arguments: `featureAccumulated` and
  another valid expression.
 

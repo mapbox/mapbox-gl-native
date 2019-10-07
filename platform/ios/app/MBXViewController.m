@@ -2205,7 +2205,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     NSURL *url = [NSURL URLWithString:@"https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"];
 
-    NSExpression *reduceExpression1 =  [NSExpression expressionWithFormat:@"sum:"];
+    NSExpression *reduceExpression1 =  [NSExpression expressionForConstantValue:@"sum"];
 
     NSExpression *mapExpression1 = [NSExpression expressionForKeyPath:@"mag"];
     NSArray *expressArray1 = @[reduceExpression1, mapExpression1];
