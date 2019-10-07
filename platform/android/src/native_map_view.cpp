@@ -50,7 +50,7 @@
 #include "java/util.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
-#include  "map/image.hpp"
+#include "map/image.hpp"
 #include "style/light.hpp"
 #include "bitmap_factory.hpp"
 
@@ -1050,6 +1050,14 @@ jni::jboolean NativeMapView::getPrefetchTiles(JNIEnv&) {
     return jni::jboolean(map->getPrefetchZoomDelta() > 0);
 }
 
+void NativeMapView::setPrefetchZoomDelta(JNIEnv&, jni::jint delta) {
+    map->setPrefetchZoomDelta(uint8_t(abs(delta)));
+}
+
+jni::jint NativeMapView::getPrefetchZoomDelta(JNIEnv&) {
+    return jni::jint(map->getPrefetchZoomDelta());
+}
+
 mbgl::Map& NativeMapView::getMap() {
     return *map;
 }
@@ -1145,7 +1153,9 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getImage, "nativeGetImage"),
             METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds"),
             METHOD(&NativeMapView::setPrefetchTiles, "nativeSetPrefetchTiles"),
-            METHOD(&NativeMapView::getPrefetchTiles, "nativeGetPrefetchTiles")
+            METHOD(&NativeMapView::getPrefetchTiles, "nativeGetPrefetchTiles"),
+            METHOD(&NativeMapView::setPrefetchZoomDelta, "nativeSetPrefetchZoomDelta"),
+            METHOD(&NativeMapView::getPrefetchZoomDelta, "nativeGetPrefetchZoomDelta")
     );
 }
 
