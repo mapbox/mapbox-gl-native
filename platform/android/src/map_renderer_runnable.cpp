@@ -5,9 +5,8 @@
 namespace mbgl {
 namespace android {
 
-MapRendererRunnable::MapRendererRunnable(jni::JNIEnv& env, std::weak_ptr<Mailbox> mailbox_)
-    : mailbox(std::move(mailbox_)) {
-
+MapRendererRunnable::MapRendererRunnable(jni::JNIEnv& env, std::function<void()> function_)
+    : function(std::move(function_)) {
     // Create the Java peer and hold on to a global reference
     // Not using a weak reference here as this might oerflow
     // the weak reference table on some devices
@@ -21,7 +20,7 @@ MapRendererRunnable::MapRendererRunnable(jni::JNIEnv& env, std::weak_ptr<Mailbox
 MapRendererRunnable::~MapRendererRunnable() = default;
 
 void MapRendererRunnable::run(jni::JNIEnv&) {
-    Mailbox::maybeReceive(mailbox);
+    if (function) function();
 }
 
 jni::Global<jni::Object<MapRendererRunnable>> MapRendererRunnable::peer() {

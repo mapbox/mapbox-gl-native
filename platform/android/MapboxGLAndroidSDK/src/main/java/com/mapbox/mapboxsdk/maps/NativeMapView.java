@@ -620,7 +620,7 @@ final class NativeMapView implements NativeMap {
     if (checkState("getMetersPerPixelAtLatitude")) {
       return 0;
     }
-    return nativeGetMetersPerPixelAtLatitude(lat, getZoom()) / pixelRatio;
+    return nativeGetMetersPerPixelAtLatitude(lat, getZoom());
   }
 
   @Override

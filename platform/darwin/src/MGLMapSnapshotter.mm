@@ -17,6 +17,8 @@
 #import "MGLAttributionInfo_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLRendererConfiguration.h"
+#import "MGLMapSnapshotter_Private.h"
+
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
 #endif
@@ -33,23 +35,61 @@ const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
 const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 
-@interface MGLMapSnapshotOverlay()
-
-- (instancetype)initWithContext:(CGContextRef)context;
+@interface MGLMapSnapshotOverlay() <MGLMapSnapshotProtocol>
+@property (nonatomic, assign) CGFloat scale;
+- (instancetype)initWithContext:(CGContextRef)context scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn;
 
 @end
 
-@implementation MGLMapSnapshotOverlay
+@implementation MGLMapSnapshotOverlay {
+    mbgl::MapSnapshotter::PointForFn _pointForFn;
+    mbgl::MapSnapshotter::LatLngForFn _latLngForFn;
+}
 
-- (instancetype) initWithContext:(CGContextRef)context {
+- (instancetype) initWithContext:(CGContextRef)context scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn {
     self = [super init];
     if (self) {
         _context = context;
+        _scale = scale;
+        _pointForFn = pointForFn;
+        _latLngForFn = latLngForFn;
     }
 
     return self;
 }
 
+#if TARGET_OS_IPHONE
+
+- (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
+    return CGPointMake(sc.x, sc.y);
+}
+
+- (CLLocationCoordinate2D)coordinateForPoint:(CGPoint)point
+{
+    mbgl::LatLng latLng = _latLngForFn(mbgl::ScreenCoordinate(point.x, point.y));
+    return MGLLocationCoordinate2DFromLatLng(latLng);
+}
+
+#else
+
+- (NSPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
+    CGFloat height = ((CGFloat)CGBitmapContextGetHeight(self.context))/self.scale;
+    return NSMakePoint(sc.x, height - sc.y);
+}
+
+- (CLLocationCoordinate2D)coordinateForPoint:(NSPoint)point
+{
+    CGFloat height = ((CGFloat)CGBitmapContextGetHeight(self.context))/self.scale;
+    auto screenCoord = mbgl::ScreenCoordinate(point.x, height - point.y);
+    mbgl::LatLng latLng = _latLngForFn(screenCoord);
+    return MGLLocationCoordinate2DFromLatLng(latLng);
+}
+
+#endif
 @end
 
 @implementation MGLMapSnapshotOptions
@@ -78,7 +118,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @end
 
-@interface MGLMapSnapshot()
+@interface MGLMapSnapshot() <MGLMapSnapshotProtocol>
 - (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn;
 
 @property (nonatomic) CGFloat scale;
@@ -93,8 +133,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 {
     self = [super init];
     if (self) {
-        _pointForFn = std::move(pointForFn);
-        _latLngForFn = std::move(latLngForFn);
+        _pointForFn = pointForFn;
+        _latLngForFn = latLngForFn;
         _scale = scale;
         _image = image;
     }
@@ -328,7 +368,10 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     CGContextRef currentContext = UIGraphicsGetCurrentContext();
 
     if (currentContext && overlayHandler) {
-        MGLMapSnapshotOverlay *snapshotOverlay = [[MGLMapSnapshotOverlay alloc] initWithContext:currentContext];
+        MGLMapSnapshotOverlay *snapshotOverlay = [[MGLMapSnapshotOverlay alloc] initWithContext:currentContext
+                                                                                          scale:scale
+                                                                                     pointForFn:pointForFn
+                                                                                    latLngForFn:latLngForFn];
         CGContextSaveGState(snapshotOverlay.context);
         overlayHandler(snapshotOverlay);
         CGContextRestoreGState(snapshotOverlay.context);
@@ -409,7 +452,10 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     
     NSGraphicsContext *currentContext = [NSGraphicsContext currentContext];
     if (currentContext && overlayHandler) {
-        MGLMapSnapshotOverlay *snapshotOverlay = [[MGLMapSnapshotOverlay alloc] initWithContext:currentContext.CGContext];
+        MGLMapSnapshotOverlay *snapshotOverlay = [[MGLMapSnapshotOverlay alloc] initWithContext:currentContext.CGContext
+                                                                                          scale:scale
+                                                                                     pointForFn:pointForFn
+                                                                                    latLngForFn:latLngForFn];
         [currentContext saveGraphicsState];
         overlayHandler(snapshotOverlay);
         [currentContext restoreGraphicsState];

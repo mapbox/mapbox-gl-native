@@ -1,6 +1,7 @@
 #import "MGLVectorTileSource_Private.h"
 
 #import "MGLFeature_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLTileSource_Private.h"
 #import "MGLStyle_Private.h"
@@ -44,7 +45,11 @@
 }
 
 - (NSString *)attributionHTMLString {
-    MGLAssertStyleSourceIsValid();
+    if (!self.rawSource) {
+        MGLAssert(0, @"Source with identifier `%@` was invalidated after a style change", self.identifier);
+        return nil;
+    }
+
     auto attribution = self.rawSource->getAttribution();
     return attribution ? @(attribution->c_str()) : nil;
 }

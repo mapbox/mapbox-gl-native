@@ -5,8 +5,13 @@
 
 #include <args.hxx>
 
+#include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+
+#include <mapbox/geojson_impl.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion/json.hpp>
 
 #include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/insert_linebreaks.hpp>
@@ -179,7 +184,66 @@ TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
     };
 }
 
+void writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer>& writer, const mbgl::Value& value) {
+    value.match([&writer](const mbgl::NullValue&) { writer.Null(); },
+                [&writer](bool b) { writer.Bool(b); },
+                [&writer](uint64_t u) { writer.Uint64(u); },
+                [&writer](int64_t i) { writer.Int64(i); },
+                [&writer](double d) { d == std::floor(d) ? writer.Int64(d) : writer.Double(d); },
+                [&writer](const std::string& s) { writer.String(s); },
+                [&writer](const std::vector<mbgl::Value>& arr) {
+                    writer.StartArray();
+                    for (const auto& item : arr) {
+                        writeJSON(writer, item);
+                    }
+                    writer.EndArray();
+                },
+                [&writer](const std::unordered_map<std::string, mbgl::Value>& obj) {
+                    writer.StartObject();
+                    std::map<std::string, mbgl::Value> sorted(obj.begin(), obj.end());
+                    for (const auto& entry : sorted) {
+                        writer.Key(entry.first.c_str());
+                        writeJSON(writer, entry.second);
+                    }
+                    writer.EndObject();
+                });
+}
+
 } // namespace
+
+std::string toJSON(const mbgl::Value& value, unsigned indent, bool singleLine) {
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    if (singleLine) {
+        writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+    }
+    writer.SetIndent(' ', indent);
+    writeJSON(writer, value);
+    return buffer.GetString();
+}
+
+std::string toJSON(const std::vector<mbgl::Feature>& features, unsigned indent, bool singleLine) {
+    rapidjson::CrtAllocator allocator;
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    if (singleLine) {
+        writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+    }
+    writer.SetIndent(' ', indent);
+    writer.StartArray();
+    for (size_t i = 0; i < features.size(); ++i) {
+        auto result = mapbox::geojson::convert(features[i], allocator);
+
+        result.AddMember("source", features[i].source, allocator);
+        if (!features[i].sourceLayer.empty()) {
+            result.AddMember("sourceLayer", features[i].sourceLayer, allocator);
+        }
+        result.AddMember("state", mapbox::geojson::to_value{allocator}(features[i].state), allocator);
+        result.Accept(writer);
+    }
+    writer.EndArray();
+    return buffer.GetString();
+}
 
 JSONReply readJson(const mbgl::filesystem::path& jsonPath) {
     auto maybeJSON = mbgl::util::readFile(jsonPath);
@@ -228,7 +292,7 @@ std::string serializeMetrics(const TestMetrics& metrics) {
 }
 
 std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base) {
-    static const std::regex regex(".*expected.*.png");
+    static const std::regex regex(".*expected.*.png|.*expected.*.json");
 
     std::vector<std::string> expectedImages;
     for (const auto& entry : mbgl::filesystem::directory_iterator(base)) {
@@ -476,6 +540,45 @@ TestMetadata parseTestMetadata(const TestPaths& paths) {
         metadata.ySkew = testValue["skew"][1].GetDouble();
     }
 
+    if (testValue.HasMember("queryGeometry")) {
+        assert(testValue["queryGeometry"].IsArray());
+        if (testValue["queryGeometry"][0].IsNumber() && testValue["queryGeometry"][1].IsNumber()) {
+            metadata.queryGeometry.x = testValue["queryGeometry"][0].GetDouble();
+            metadata.queryGeometry.y = testValue["queryGeometry"][1].GetDouble();
+        } else if (testValue["queryGeometry"][0].IsArray() && testValue["queryGeometry"][1].IsArray()) {
+            metadata.queryGeometryBox.min.x = testValue["queryGeometry"][0][0].GetDouble();
+            metadata.queryGeometryBox.min.y = testValue["queryGeometry"][0][1].GetDouble();
+            metadata.queryGeometryBox.max.x = testValue["queryGeometry"][1][0].GetDouble();
+            metadata.queryGeometryBox.max.y = testValue["queryGeometry"][1][1].GetDouble();
+        }
+        metadata.renderTest = false;
+    }
+
+    if (testValue.HasMember("queryOptions")) {
+        assert(testValue["queryOptions"].IsObject());
+
+        if (testValue["queryOptions"].HasMember("layers")) {
+            assert(testValue["queryOptions"]["layers"].IsArray());
+            auto layersArray = testValue["queryOptions"]["layers"].GetArray();
+            std::vector<std::string> layersVec;
+            for (uint32_t i = 0; i < layersArray.Size(); i++) {
+                layersVec.emplace_back(testValue["queryOptions"]["layers"][i].GetString());
+            }
+            metadata.queryOptions.layerIDs = layersVec;
+        }
+
+        using namespace mbgl::style;
+        using namespace mbgl::style::conversion;
+        if (testValue["queryOptions"].HasMember("filter")) {
+            assert(testValue["queryOptions"]["filter"].IsArray());
+            auto& filterVal = testValue["queryOptions"]["filter"];
+            Error error;
+            mbgl::optional<Filter> converted = convert<Filter>(filterVal, error);
+            assert(converted);
+            metadata.queryOptions.filter = std::move(*converted);
+        }
+    }
+
     // TODO: fadeDuration
     // TODO: addFakeCanvas
 
@@ -499,20 +602,31 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
     html.append("<div class=\"test " + metadata.status + (shouldHide ? " hide" : "") + "\">\n");
     html.append(R"(<h2><span class="label" style="background: )" + metadata.color + "\">" + metadata.status + "</span> " + metadata.id + "</h2>\n");
     if (metadata.status != "errored") {
-        html.append("<img width=" + mbgl::util::toString(metadata.size.width));
-        html.append(" height=" + mbgl::util::toString(metadata.size.height));
-        html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\"");
-        html.append(" data-alt-src=\"data:image/png;base64," + encodeBase64(metadata.expected) + "\">\n");
+        if (metadata.renderTest) {
+            html.append("<img width=" + mbgl::util::toString(metadata.size.width));
+            html.append(" height=" + mbgl::util::toString(metadata.size.height));
+            html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\"");
+            html.append(" data-alt-src=\"data:image/png;base64," + encodeBase64(metadata.expected) + "\">\n");
 
-        html.append("<img width=" + mbgl::util::toString(metadata.size.width));
-        html.append(" height=" + mbgl::util::toString(metadata.size.height));
-        html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.diff) + "\">\n");
+            html.append("<img width=" + mbgl::util::toString(metadata.size.width));
+            html.append(" height=" + mbgl::util::toString(metadata.size.height));
+            html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.diff) + "\">\n");
+        } else {
+            html.append("<img width=" + mbgl::util::toString(metadata.size.width));
+            html.append(" height=" + mbgl::util::toString(metadata.size.height));
+            html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\">\n");
+        }
     } else {
         assert(!metadata.errorMessage.empty());
         html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
     }
     if (metadata.difference != 0.0) {
-        html.append("<p class=\"diff\"><strong>Diff:</strong> " + mbgl::util::toString(metadata.difference) + "</p>\n");
+        if (metadata.renderTest) {
+            html.append("<p class=\"diff\"><strong>Diff:</strong> " + mbgl::util::toString(metadata.difference) +
+                        "</p>\n");
+        } else {
+            html.append("<p class=\"diff\"><strong>Diff:</strong> " + metadata.diff + "</p>\n");
+        }
     }
     html.append("</div>\n");
 

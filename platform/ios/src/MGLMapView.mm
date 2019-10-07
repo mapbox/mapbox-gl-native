@@ -274,6 +274,11 @@ public:
 /// Tilt gesture recognizer helper
 @property (nonatomic, assign) CGPoint dragGestureMiddlePoint;
 
+/// This property is used to keep track of the view's safe edge insets
+/// and calculate the ornament's position
+@property (nonatomic, assign) UIEdgeInsets safeMapViewContentInsets;
+@property (nonatomic, strong) NSNumber *automaticallyAdjustContentInsetHolder;
+
 - (mbgl::Map &)mbglMap;
 
 @end
@@ -518,6 +523,14 @@ public:
     _annotationViewReuseQueueByIdentifier = [NSMutableDictionary dictionary];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
+    
+    // TODO: This warning should be removed when automaticallyAdjustsScrollViewInsets is removed from
+    // the UIViewController api.
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSLog(@"%@ WARNING UIViewController.automaticallyAdjustsScrollViewInsets is deprecated use MGLMapView.automaticallyAdjustContentInset instead.",
+        NSStringFromClass(self.class));
+    });
 
     // setup logo
     //
@@ -832,29 +845,54 @@ public:
                                 size:(CGSize)size
                              margins:(CGPoint)margins {
     NSMutableArray *updatedConstraints = [NSMutableArray array];
+    UIEdgeInsets inset = UIEdgeInsetsZero;
+    
+    BOOL automaticallyAdjustContentInset;
+    if (_automaticallyAdjustContentInsetHolder) {
+        automaticallyAdjustContentInset = _automaticallyAdjustContentInsetHolder.boolValue;
+    } else {
+        UIViewController *viewController = [self rootViewController];
+        automaticallyAdjustContentInset = viewController.automaticallyAdjustsScrollViewInsets;
+    }
+    
+    if (! automaticallyAdjustContentInset) {
+        inset = UIEdgeInsetsMake(self.contentInset.top - self.safeMapViewContentInsets.top,
+                                 self.contentInset.left - self.safeMapViewContentInsets.left,
+                                 self.contentInset.bottom - self.safeMapViewContentInsets.bottom,
+                                 self.contentInset.right - self.safeMapViewContentInsets.right);
+        
+        // makes sure the insets don't have negative values that could hide the ornaments
+        // thus violating our ToS
+        inset = UIEdgeInsetsMake(fmaxf(inset.top, 0),
+                                 fmaxf(inset.left, 0),
+                                 fmaxf(inset.bottom, 0),
+                                 fmaxf(inset.right, 0));
+    }
     
     switch (position) {
         case MGLOrnamentPositionTopLeft:
-            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y]];
-            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y + inset.top]];
+            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x + inset.left]];
             break;
         case MGLOrnamentPositionTopRight:
-            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y]];
-            [updatedConstraints addObject:[self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[view.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:margins.y + inset.top]];
+            [updatedConstraints addObject:[self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x + inset.right]];
             break;
         case MGLOrnamentPositionBottomLeft:
-            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y]];
-            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y + inset.bottom]];
+            [updatedConstraints addObject:[view.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:margins.x + inset.left]];
             break;
         case MGLOrnamentPositionBottomRight:
-            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y]];
-            [updatedConstraints addObject: [self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x]];
+            [updatedConstraints addObject:[self.mgl_safeBottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:margins.y + inset.bottom]];
+            [updatedConstraints addObject: [self.mgl_safeTrailingAnchor constraintEqualToAnchor:view.trailingAnchor constant:margins.x + inset.right]];
             break;
     }
 
-    [updatedConstraints addObject:[view.widthAnchor constraintEqualToConstant:size.width]];
-    [updatedConstraints addObject:[view.heightAnchor constraintEqualToConstant:size.height]];
-
+    if (!CGSizeEqualToSize(size, CGSizeZero)) {
+        [updatedConstraints addObject:[view.widthAnchor constraintEqualToConstant:size.width]];
+        [updatedConstraints addObject:[view.heightAnchor constraintEqualToConstant:size.height]];
+    }
+    
     [NSLayoutConstraint deactivateConstraints:constraints];
     [constraints removeAllObjects];
     [NSLayoutConstraint activateConstraints:updatedConstraints];
@@ -883,7 +921,7 @@ public:
     [self updateConstraintsForOrnament:self.scaleBar
                            constraints:self.scaleBarConstraints
                               position:self.scaleBarPosition
-                                  size:self.scaleBar.intrinsicContentSize
+                                  size:CGSizeZero
                                margins:self.scaleBarMargins];
 }
 
@@ -929,15 +967,14 @@ public:
 // This gets called when the view dimension changes, e.g. because the device is being rotated.
 - (void)layoutSubviews
 {
+    [super layoutSubviews];
+
     // Calling this here instead of in the scale bar itself because if this is done in the
     // scale bar instance, it triggers a call to this `layoutSubviews` method that calls
     // `_mbglMap->setSize()` just below that triggers rendering update which triggers
     // another scale bar update which causes a rendering update loop and a major performace
-    // degradation. The only time the scale bar's intrinsic content size _must_ invalidated
-    // is here as a reaction to this object's view dimension changes.
+    // degradation.
     [self.scaleBar invalidateIntrinsicContentSize];
-    
-    [super layoutSubviews];
 
     [self adjustContentInset];
 
@@ -967,6 +1004,38 @@ public:
 /// Updates `contentInset` to reflect the current window geometry.
 - (void)adjustContentInset
 {
+    UIEdgeInsets adjustedContentInsets = UIEdgeInsetsZero;
+    UIViewController *viewController = [self rootViewController];
+    BOOL automaticallyAdjustContentInset;
+    if (@available(iOS 11.0, *))
+    {
+        adjustedContentInsets = self.safeAreaInsets;
+        
+    } else {
+        adjustedContentInsets.top = viewController.topLayoutGuide.length;
+        CGFloat bottomPoint = CGRectGetMaxY(viewController.view.bounds) -
+                                (CGRectGetMaxY(viewController.view.bounds)
+                                - viewController.bottomLayoutGuide.length);
+        adjustedContentInsets.bottom = bottomPoint;
+
+    }
+    
+    if (_automaticallyAdjustContentInsetHolder) {
+        automaticallyAdjustContentInset = _automaticallyAdjustContentInsetHolder.boolValue;
+    } else {
+        automaticallyAdjustContentInset = viewController.automaticallyAdjustsScrollViewInsets;
+    }
+    
+    self.safeMapViewContentInsets = adjustedContentInsets;
+    if ( ! automaticallyAdjustContentInset)
+    {
+        return;
+    }
+    
+    self.contentInset = adjustedContentInsets;
+}
+
+- (UIViewController *)rootViewController {
     // We could crawl all the way up the responder chain using
     // -viewControllerForLayoutGuides, but an intervening view means that any
     // manual contentInset should not be overridden; something other than the
@@ -982,25 +1051,16 @@ public:
         // This map view is an immediate child of a view controller’s content view.
         viewController = (UIViewController *)self.superview.nextResponder;
     }
+    return viewController;
+}
 
-    if ( ! viewController.automaticallyAdjustsScrollViewInsets)
-    {
-        return;
-    }
+- (void)setAutomaticallyAdjustsContentInset:(BOOL)automaticallyAdjustsContentInset {
+    MGLLogDebug(@"Setting automaticallyAdjustsContentInset: %@", MGLStringFromBOOL(automaticallyAdjustsContentInset));
+    _automaticallyAdjustContentInsetHolder = [NSNumber numberWithBool:automaticallyAdjustsContentInset];
+}
 
-    UIEdgeInsets contentInset = UIEdgeInsetsZero;
-    CGPoint topPoint = CGPointMake(0, viewController.topLayoutGuide.length);
-    contentInset.top = [self convertPoint:topPoint fromView:viewController.view].y;
-    CGPoint bottomPoint = CGPointMake(0, CGRectGetMaxY(viewController.view.bounds)
-                                      - viewController.bottomLayoutGuide.length);
-    contentInset.bottom = (CGRectGetMaxY(self.bounds)
-                           - [self convertPoint:bottomPoint fromView:viewController.view].y);
-
-    // Negative insets are invalid, replace with 0.
-    contentInset.top = fmaxf(contentInset.top, 0);
-    contentInset.bottom = fmaxf(contentInset.bottom, 0);
-
-    self.contentInset = contentInset;
+- (BOOL)automaticallyAdjustsContentInset {
+    return _automaticallyAdjustContentInsetHolder.boolValue;
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
@@ -1700,7 +1760,10 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-            self.mbglMap.jumpTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+            self.mbglMap.jumpTo(mbgl::CameraOptions()
+                                .withZoom(newZoom)
+                                .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y })
+                                .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)));
 
             // The gesture recognizer only reports the gesture’s current center
             // point, so use the previous center point to anchor the transition.
@@ -1758,7 +1821,10 @@ public:
         {
             if (drift)
             {
-                self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(zoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }), MGLDurationFromTimeInterval(duration));
+                self.mbglMap.easeTo(mbgl::CameraOptions()
+                                    .withZoom(zoom)
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y })
+                                    .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)), MGLDurationFromTimeInterval(duration));
             }
         }
 
@@ -1823,7 +1889,8 @@ public:
         {
             self.mbglMap.jumpTo(mbgl::CameraOptions()
                                     .withBearing(newDegrees)
-                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y}));
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y})
+                                    .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)));
         }
 
         [self cameraIsChanging];
@@ -1864,7 +1931,8 @@ public:
             {
                 self.mbglMap.easeTo(mbgl::CameraOptions()
                                     .withBearing(newDegrees)
-                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }),
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y })
+                                    .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)),
                                     MGLDurationFromTimeInterval(decelerationRate));
 
                 [self notifyGestureDidEndWithDrift:YES];
@@ -1992,7 +2060,10 @@ public:
     if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
     {
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(center), MGLDurationFromTimeInterval(MGLAnimationDuration));
+        self.mbglMap.easeTo(mbgl::CameraOptions()
+                            .withZoom(newZoom)
+                            .withAnchor(center)
+                            .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)), MGLDurationFromTimeInterval(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
@@ -2030,7 +2101,10 @@ public:
     if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
     {
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-        self.mbglMap.easeTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(center), MGLDurationFromTimeInterval(MGLAnimationDuration));
+        self.mbglMap.easeTo(mbgl::CameraOptions()
+                            .withZoom(newZoom)
+                            .withAnchor(center)
+                            .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)), MGLDurationFromTimeInterval(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
@@ -2072,7 +2146,10 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-            self.mbglMap.jumpTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+            self.mbglMap.jumpTo(mbgl::CameraOptions()
+                                .withZoom(newZoom)
+                                .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y })
+                                .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)));
         }
 
         [self cameraIsChanging];
@@ -2139,7 +2216,8 @@ public:
             {
                 self.mbglMap.jumpTo(mbgl::CameraOptions()
                                     .withPitch(pitchNew)
-                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+                                    .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y })
+                                    .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)));
             }
             
             [self cameraIsChanging];
@@ -3199,7 +3277,10 @@ public:
         centerPoint = self.userLocationAnnotationViewCenter;
     }
     double newZoom = round(self.zoomLevel) + log2(scaleFactor);
-    self.mbglMap.jumpTo(mbgl::CameraOptions().withZoom(newZoom).withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }));
+    self.mbglMap.jumpTo(mbgl::CameraOptions()
+                        .withZoom(newZoom)
+                        .withAnchor(mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y })
+                        .withPadding(MGLEdgeInsetsFromNSEdgeInsets(self.contentInset)));
     [self unrotateIfNeededForGesture];
 
     _accessibilityValueAnnouncementIsPending = YES;
@@ -6642,11 +6723,7 @@ public:
     // setting this property.
     if ( ! self.scaleBar.hidden)
     {
-        CGSize originalSize = self.scaleBar.intrinsicContentSize;
         [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
-        if ( ! CGSizeEqualToSize(originalSize, self.scaleBar.intrinsicContentSize)) {
-            [self installScaleBarConstraints];
-        }
     }
 }
 

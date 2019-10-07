@@ -21,7 +21,10 @@ public:
 
 private:
     bool runOperations(const std::string& key, TestMetadata&);
-    bool checkResults(mbgl::PremultipliedImage&& image, TestMetadata&);
+    bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
+                               std::vector<mbgl::Feature>&& features,
+                               TestMetadata&);
+    bool checkRenderTestResults(mbgl::PremultipliedImage&& image, TestMetadata&);
 
     struct Impl {
         Impl(const TestMetadata&);

@@ -2,6 +2,7 @@
 #import <XCTest/XCTest.h>
 
 @interface MockUIPanGestureRecognizer : UIPanGestureRecognizer
+@property(nonatomic, readwrite) UIGestureRecognizerState state;
 @property NSUInteger mbx_numberOfFingersForGesture;
 @property CGPoint mbx_middlePoint;
 @property CGPoint mbx_westPoint;
@@ -9,6 +10,9 @@
 @end
 
 @implementation MockUIPanGestureRecognizer
+
+@synthesize state;
+
 - (instancetype)initWithTarget:(id)target action:(SEL)action {
     if (self = [super initWithTarget:target action:action]) {
         self.mbx_numberOfFingersForGesture = 2;

@@ -27,7 +27,7 @@ void Mailbox::open(Scheduler& scheduler_) {
     }
     
     if (!queue.empty()) {
-        (*scheduler)->schedule(shared_from_this());
+        (*scheduler)->schedule(makeClosure(shared_from_this()));
     }
 }
 
@@ -57,7 +57,7 @@ void Mailbox::push(std::unique_ptr<Message> message) {
     bool wasEmpty = queue.empty();
     queue.push(std::move(message));
     if (wasEmpty && scheduler) {
-        (*scheduler)->schedule(shared_from_this());
+        (*scheduler)->schedule(makeClosure(shared_from_this()));
     }
 }
 
@@ -84,14 +84,20 @@ void Mailbox::receive() {
     (*message)();
 
     if (!wasEmpty) {
-        (*scheduler)->schedule(shared_from_this());
+        (*scheduler)->schedule(makeClosure(shared_from_this()));
     }
 }
 
+// static
 void Mailbox::maybeReceive(std::weak_ptr<Mailbox> mailbox) {
     if (auto locked = mailbox.lock()) {
         locked->receive();
     }
+}
+
+// static
+std::function<void()> Mailbox::makeClosure(std::weak_ptr<Mailbox> mailbox) {
+    return [mailbox]() { maybeReceive(mailbox); };
 }
 
 } // namespace mbgl
