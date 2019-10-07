@@ -6,8 +6,9 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/util/async_request.hpp>
 
 namespace node_mbgl {
 

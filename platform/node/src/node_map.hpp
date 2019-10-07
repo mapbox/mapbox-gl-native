@@ -2,6 +2,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/image.hpp>
 
 #include <exception>
@@ -98,6 +99,7 @@ struct NodeFileSource : public mbgl::FileSource {
     NodeFileSource(NodeMap* nodeMap_) : nodeMap(nodeMap_) {}
     ~NodeFileSource() {}
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback) final;
+    bool canRequest(const mbgl::Resource&) const override;
     NodeMap* nodeMap;
 };
 
