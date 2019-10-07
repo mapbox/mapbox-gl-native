@@ -55,5 +55,8 @@
     // TODO: When the double linking framework fix lands this should be replaced to an equal assert
     XCTAssertNotEqual([MGLNetworkConfiguration sharedManager].stopsRequests, offline);
     
+    // Resets to the default value in order to let other tests run properly
+    [MGLNetworkConfiguration sharedManager].stopsRequests = NO;
+    
 }
 @end
