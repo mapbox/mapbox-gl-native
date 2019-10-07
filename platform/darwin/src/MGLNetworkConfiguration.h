@@ -36,6 +36,9 @@ MGL_EXPORT
 A Boolean value indicating whether the current `NSURLSessionConfiguration` stops
 making network requests.
  
+When this property is set to `YES` `MGLMapView` will rely solely on pre-cached
+tiles.
+ 
 The default value of this property is `NO`.
 */
 @property (atomic, assign) BOOL stopsRequests;
