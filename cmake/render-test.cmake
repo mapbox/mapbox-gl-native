@@ -3,6 +3,8 @@ add_executable(mbgl-render-test
     render-test/main.cpp
     render-test/parser.cpp
     render-test/runner.cpp
+    expression-test/test_runner_common.cpp
+    expression-test/test_runner_common.hpp
 )
 
 if(APPLE)

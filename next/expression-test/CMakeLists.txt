@@ -6,6 +6,8 @@ add_executable(
     ${MBGL_ROOT}/expression-test/expression_test_parser.hpp
     ${MBGL_ROOT}/expression-test/expression_test_runner.cpp
     ${MBGL_ROOT}/expression-test/expression_test_runner.hpp
+    ${MBGL_ROOT}/expression-test/test_runner_common.cpp
+    ${MBGL_ROOT}/expression-test/test_runner_common.hpp
     ${MBGL_ROOT}/expression-test/main.cpp
 )
 
