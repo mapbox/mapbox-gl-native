@@ -19,6 +19,7 @@
 
 #include <mapbox/pixelmatch.hpp>
 
+#include <../expression-test/test_runner_common.hpp>
 #include "allocation_index.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
@@ -26,7 +27,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <regex>
 #include <utility>
 #include <sstream>
 
@@ -45,119 +45,6 @@ const std::vector<std::string>& TestRunner::getPlatformExpectationsPaths() {
         std::string(TEST_RUNNER_ROOT_PATH).append("/render-test/expected")
     };
     return result;
-}
-
-// Strip precision for numbers, so that we can compare evaluated results with fixtures.
-// Copied from JS expression harness.
-Value stripPrecision(const Value& value) {
-    const double decimalSigFigs = 6;
-    if (auto num = numericValue<double>(value)) {
-        if (*num == 0) {
-            return *num;
-        }
-
-        const double multiplier = std::pow(10, std::max(0.0, decimalSigFigs - std::ceil(std::log10(std::fabs(*num)))));
-
-        // We strip precision twice in a row here to avoid cases where
-        // stripping an already stripped number will modify its value
-        // due to bad floating point precision luck
-        // eg `Math.floor(8.16598 * 100000) / 100000` -> 8.16597
-        const double firstStrip = std::floor(*num * multiplier) / multiplier;
-        return std::floor(firstStrip * multiplier) / multiplier;
-    }
-
-    if (value.getArray()) {
-        std::vector<Value> stripped;
-        const auto& vec = *value.getArray();
-        stripped.reserve(vec.size());
-        for (const auto& val : vec) {
-            stripped.emplace_back(stripPrecision(val));
-        }
-        return stripped;
-    } else if (value.getObject()) {
-        std::unordered_map<std::string, Value> stripped;
-        const auto& map = *value.getObject();
-        for (const auto& pair : map) {
-            stripped.emplace(pair.first, stripPrecision(pair.second));
-        }
-        return stripped;
-    }
-
-    return value;
-}
-
-bool deepEqual(const Value& a, const Value& b) {
-    const auto& anum = numericValue<double>(a);
-    const auto& bnum = numericValue<double>(b);
-    if (anum && bnum) {
-        return stripPrecision(*anum) == stripPrecision(*bnum);
-    }
-
-    if (a.which() != b.which()) {
-        return false;
-    }
-
-    if (a.getArray() && b.getArray()) {
-        const auto& avec = *a.getArray();
-        const auto& bvec = *b.getArray();
-        if (avec.size() != bvec.size()) {
-            return false;
-        }
-        for (std::size_t i = 0; i < avec.size(); ++i) {
-            if (!deepEqual(avec[i], bvec[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    if (a.getObject() && b.getObject()) {
-        const auto& amap = *a.getObject();
-        const auto& bmap = *b.getObject();
-        if (amap.size() != bmap.size()) {
-            return false;
-        }
-        for (const auto& pair : amap) {
-            auto it = bmap.find(pair.first);
-            if (it == bmap.end()) {
-                return false;
-            }
-            if (!deepEqual(pair.second, it->second)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    if (a == b) {
-        return true;
-    }
-
-    if (a.getString() && b.getString()) {
-        const auto& strA = *a.getString();
-        const auto& strB = *b.getString();
-        if (strA == strB) {
-            return true;
-        }
-
-        try {
-            double numA = std::stod(strA);
-            double numB = std::stod(strB);
-            return stripPrecision(numA) == stripPrecision(numB);
-        } catch (...) {
-        }
-    }
-
-    return false;
-}
-
-std::vector<std::string> tokenize(std::string str) {
-    std::vector<std::string> tokens;
-    std::regex re("\n");
-    std::copy(std::regex_token_iterator<std::string::iterator>(str.begin(), str.end(), re, -1),
-              std::regex_token_iterator<std::string::iterator>(),
-              std::back_inserter(tokens));
-    return tokens;
 }
 
 std::string simpleDiff(const Value& result, const Value& expected) {

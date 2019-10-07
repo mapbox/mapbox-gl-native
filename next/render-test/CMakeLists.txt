@@ -9,6 +9,8 @@ add_executable(
     ${MBGL_ROOT}/render-test/parser.hpp
     ${MBGL_ROOT}/render-test/runner.cpp
     ${MBGL_ROOT}/render-test/runner.hpp
+    ${MBGL_ROOT}/expression-test/test_runner_common.cpp
+    ${MBGL_ROOT}/expression-test/test_runner_common.hpp
 )
 
 target_compile_definitions(

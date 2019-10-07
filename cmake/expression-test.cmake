@@ -3,6 +3,8 @@ add_executable(mbgl-expression-test
     expression-test/expression_test_parser.cpp
     expression-test/expression_test_runner.cpp
     expression-test/expression_test_logger.cpp
+    expression-test/test_runner_common.cpp
+    expression-test/test_runner_common.hpp
 )
 
 if(APPLE)
