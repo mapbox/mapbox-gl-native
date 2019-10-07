@@ -1,10 +1,11 @@
 #include "asset_manager_file_source.hpp"
 
 #include <mbgl/storage/file_source_request.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/util.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/url.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
@@ -52,6 +53,10 @@ std::unique_ptr<AsyncRequest> AssetManagerFileSource::request(const Resource& re
     impl->actor().invoke(&Impl::request, resource.url, req->actor());
 
     return std::move(req);
+}
+
+bool AssetManagerFileSource::canRequest(const Resource& resource) const {
+    return 0 == resource.url.rfind(mbgl::util::ASSET_PROTOCOL, 0);
 }
 
 } // namespace mbgl

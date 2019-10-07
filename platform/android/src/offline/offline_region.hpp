@@ -85,7 +85,7 @@ public:
 
 private:
     std::unique_ptr<mbgl::OfflineRegion> region;
-    std::shared_ptr<mbgl::DefaultFileSource> fileSource;
+    std::shared_ptr<mbgl::DatabaseFileSource> fileSource;
 };
 
 } // namespace android
