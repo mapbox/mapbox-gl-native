@@ -33,7 +33,7 @@ target_sources(
         ${MBGL_ROOT}/platform/darwin/src/MGLMapCamera.mm
         ${MBGL_ROOT}/platform/darwin/src/MGLMapSnapshotter.mm
         ${MBGL_ROOT}/platform/darwin/src/MGLMultiPoint.mm
-        ${MBGL_ROOT}/platform/darwin/src/MGLNetworkConfiguration.m
+        ${MBGL_ROOT}/platform/darwin/src/MGLNetworkConfiguration.mm
         ${MBGL_ROOT}/platform/darwin/src/MGLOfflinePack.mm
         ${MBGL_ROOT}/platform/darwin/src/MGLOfflineStorage.mm
         ${MBGL_ROOT}/platform/darwin/src/MGLOpenGLStyleLayer.mm
