@@ -554,7 +554,21 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         
         XCTAssertNotNil(attributedExpression)
     }
-    
+
+    func testMGLShapeSourceOptionClusterProperties() {
+
+
+        //#-example-code
+        let key = "sumValue"
+        let firstExpression = NSExpression(format: "sum({ $featureAccumulated, %@ })", key)
+        let secondExpression = NSExpression(forKeyPath: "magnitude")
+        let clusterPropertiesDictionary = [key : [firstExpression, secondExpression]]
+
+        let options : [MGLShapeSourceOption : Any] = [.clustered : true,
+                                                   .clusterProperties: clusterPropertiesDictionary]
+        //#-end-example-code
+
+    }
     // For testMGLMapView().
     func myCustomFunction() {}
 }

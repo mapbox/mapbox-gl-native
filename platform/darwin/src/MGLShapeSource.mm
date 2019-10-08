@@ -107,28 +107,19 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
                             format:@"MGLShapeSourceOptionClusterProperties member value requires array of two objects."];
             }
 
-            // reduceExpression could be either a string of operator, or a valid NSExpression
-            if (![expressionsArray.firstObject isKindOfClass:[NSExpression class]]) {
+            // reduceExpression should be a valid NSExpression
+            NSExpression *reduceExpression = expressionsArray[0];
+            if (![reduceExpression isKindOfClass:[NSExpression class]]) {
                 [NSException raise:NSInvalidArgumentException
                 format:@"MGLShapeSourceOptionClusterProperties array value requires two expression objects."];
             }
-            NSExpression *reduceOperator = expressionsArray[0];
-            NSExpression *reduceExpression;
-            if (reduceOperator.expressionType == NSConstantValueExpressionType) {
-                // If reduceOperator is a string, prepare a full NSExpression before parsing
-                NSString *reduceString = [NSString stringWithFormat:@"%@({ $featureAccumulated, %@})", reduceOperator.constantValue, key];
-                reduceExpression =  [NSExpression expressionWithFormat:reduceString];
-            } else {
-                reduceExpression = expressionsArray[0];
-            }
-
             auto reduce = MGLClusterPropertyFromNSExpression(reduceExpression);
             if (!reduce) {
                 [NSException raise:NSInvalidArgumentException
                             format:@"Failed to convert MGLShapeSourceOptionClusterProperties reduce expression."];
             }
 
-            // mapExpression shall be a valid NSExpression
+            // mapExpression should be a valid NSExpression
             NSExpression *mapExpression = expressionsArray[1];
             if (![mapExpression isKindOfClass:[NSExpression class]]) {
                 [NSException raise:NSInvalidArgumentException
