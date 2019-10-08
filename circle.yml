@@ -1446,8 +1446,11 @@ jobs:
               platform/ios/scripts/deploy-to-cocoapods.sh
             fi
       - run:
-          name: Record size
-          command: platform/ios/scripts/metrics.sh
+         name: Record size
+         command: |
+              echo "Skipping Record size step"
+              # Skipping due to https://github.com/mapbox/mapbox-gl-native/issues/15751
+              #platform/ios/scripts/metrics.sh
       - run:
           name: Trigger metrics
           command: |
