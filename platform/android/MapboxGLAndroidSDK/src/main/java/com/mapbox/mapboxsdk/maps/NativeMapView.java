@@ -724,6 +724,23 @@ final class NativeMapView implements NativeMap {
     return nativeGetPrefetchTiles();
   }
 
+  @Override
+  public void setPrefetchZoomDelta(@IntRange(from = 0) int delta) {
+    if (checkState("nativeSetPrefetchZoomDelta")) {
+      return;
+    }
+    nativeSetPrefetchZoomDelta(delta);
+  }
+
+  @Override
+  @IntRange(from = 0)
+  public int getPrefetchZoomDelta() {
+    if (checkState("nativeGetPrefetchZoomDelta")) {
+      return 0;
+    }
+    return nativeGetPrefetchZoomDelta();
+  }
+
   // Runtime style Api
 
   @Override
@@ -1382,6 +1399,12 @@ final class NativeMapView implements NativeMap {
 
   @Keep
   private native boolean nativeGetPrefetchTiles();
+
+  @Keep
+  private native void nativeSetPrefetchZoomDelta(int delta);
+
+  @Keep
+  private native int nativeGetPrefetchZoomDelta();
 
   @Override
   public long getNativePtr() {
