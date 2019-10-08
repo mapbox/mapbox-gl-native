@@ -49,7 +49,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
 
  The first object determines how the attribute values are accumulated from the
  cluster points. It is an `NSExpression` with an expression function that accepts
- two or more arguments (such as `sum` or `max`). The arguments should be
+ two or more arguments, such as `sum` or `max`. The arguments should be
  `featureAccumulated` and the previously defined feature attribute key. The
  resulting value is assigned to the specified attribute key.
 
