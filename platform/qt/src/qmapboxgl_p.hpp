@@ -56,7 +56,7 @@ private:
 
     std::unique_ptr<QMapboxGLMapObserver> m_mapObserver;
     std::unique_ptr<QMapboxGLMapRenderer> m_mapRenderer;
-    std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform>> m_resourceTransform;
+    std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform::TransformCallback>> m_resourceTransform;
 
     QMapboxGLSettings::GLContextMode m_mode;
     qreal m_pixelRatio;
