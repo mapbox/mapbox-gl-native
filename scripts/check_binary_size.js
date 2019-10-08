@@ -50,6 +50,8 @@ function getPriorSize() {
         ref: mergeBase
     }).then(({data}) => {
         const run = data.check_runs.find(run => run.name === name);
+        
+        console.log(data)
         if (!run) {
             console.log('No matching check found.');
             return Promise.resolve(null);
