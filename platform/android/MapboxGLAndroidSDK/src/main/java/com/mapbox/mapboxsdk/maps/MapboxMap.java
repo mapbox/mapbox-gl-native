@@ -276,7 +276,9 @@ public final class MapboxMap {
    *
    * @return true if enabled
    * @see MapboxMap#setPrefetchesTiles(boolean)
+   * @deprecated Use {@link #getPrefetchZoomDelta()} instead.
    */
+  @Deprecated
   public boolean getPrefetchesTiles() {
     return nativeMapView.getPrefetchTiles();
   }

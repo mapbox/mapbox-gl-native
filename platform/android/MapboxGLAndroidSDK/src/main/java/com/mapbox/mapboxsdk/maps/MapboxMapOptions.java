@@ -745,7 +745,9 @@ public class MapboxMapOptions implements Parcelable {
    * Check whether tile pre-fetching is enabled.
    *
    * @return true if enabled
+   * @deprecated Use {@link #getPrefetchZoomDelta()} instead.
    */
+  @Deprecated
   public boolean getPrefetchesTiles() {
     return prefetchesTiles;
   }
