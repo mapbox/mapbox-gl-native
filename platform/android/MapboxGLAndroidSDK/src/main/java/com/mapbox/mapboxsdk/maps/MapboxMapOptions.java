@@ -757,6 +757,7 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @return current zoom delta.
    */
+  @IntRange(from = 0)
   public int getPrefetchZoomDelta() {
     return prefetchZoomDelta;
   }
