@@ -140,39 +140,39 @@ function query(after) {
     });
 }
 
-github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
-    .then(({data}) => {
-      github.authenticate({type: 'token', token: data.token});
-
-      return query().then(function() {
-        // Uploads to data source used by 
-        // http://mapbox.github.io/mapbox-gl-native/metrics/binary-size/
-        var firstPromise = new AWS.S3({region: 'us-east-1'}).putObject({
-            Body: zlib.gzipSync(JSON.stringify(rows.reverse())),
-            Bucket: 'mapbox',
-            Key: 'mapbox-gl-native/metrics/binary-size/data.json',
-            ACL: 'public-read',
-            CacheControl: 'max-age=300',
-            ContentEncoding: 'gzip',
-            ContentType: 'application/json'
-        }).promise();
-        // Uploads to data source used by Mapbox internal metrics dashboards
-        var secondPromise = new AWS.S3({region: 'us-east-1'}).putObject({
-            Body: zlib.gzipSync(sizeCheckInfo.join('\n')),
-            Bucket: 'mapbox-loading-dock',
-            Key: `raw/mobile.binarysize/${date.substring(0,10)}/mapbox-maps-ios-android-${process.env['CIRCLE_SHA1']}.json.gz`,
-            CacheControl: 'max-age=300',
-            ContentEncoding: 'gzip',
-            ContentType: 'application/json'
-        }).promise();
-        
-        return Promise.all([firstPromise, secondPromise]).then(data => {
-          return console.log("Successfully uploaded all binary size metrics to S3");
-        }).catch(err => {
-          console.log("Error uploading binary size metrics to S3 " + err.message);
-          return err;
-        });
-      });
-});
+// github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
+//     .then(({data}) => {
+//       github.authenticate({type: 'token', token: data.token});
+// 
+//       return query().then(function() {
+//         // Uploads to data source used by 
+//         // http://mapbox.github.io/mapbox-gl-native/metrics/binary-size/
+//         // var firstPromise = new AWS.S3({region: 'us-east-1'}).putObject({
+//         //     Body: zlib.gzipSync(JSON.stringify(rows.reverse())),
+//         //     Bucket: 'mapbox',
+//         //     Key: 'mapbox-gl-native/metrics/binary-size/data.json',
+//         //     ACL: 'public-read',
+//         //     CacheControl: 'max-age=300',
+//         //     ContentEncoding: 'gzip',
+//         //     ContentType: 'application/json'
+//         // }).promise();
+//         // // Uploads to data source used by Mapbox internal metrics dashboards
+//         // var secondPromise = new AWS.S3({region: 'us-east-1'}).putObject({
+//         //     Body: zlib.gzipSync(sizeCheckInfo.join('\n')),
+//         //     Bucket: 'mapbox-loading-dock',
+//         //     Key: `raw/mobile.binarysize/${date.substring(0,10)}/mapbox-maps-ios-android-${process.env['CIRCLE_SHA1']}.json.gz`,
+//         //     CacheControl: 'max-age=300',
+//         //     ContentEncoding: 'gzip',
+//         //     ContentType: 'application/json'
+//         // }).promise();
+//         // 
+//         // return Promise.all([firstPromise, secondPromise]).then(data => {
+//         //   return console.log("Successfully uploaded all binary size metrics to S3");
+//         // }).catch(err => {
+//         //   console.log("Error uploading binary size metrics to S3 " + err.message);
+//         //   return err;
+//         // });
+//       });
+// });
 
   

@@ -47,7 +47,7 @@ function getPriorSize() {
     return github.checks.listForRef({
         owner: 'mapbox',
         repo: 'mapbox-gl-native',
-        ref: 'master'
+        ref: mergeBase
     }).then(({data}) => {
         const run = data.check_runs.find(run => run.name === name);
         if (!run) {

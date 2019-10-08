@@ -21,6 +21,6 @@ scripts/check_binary_size.js "build/ios/pkg/dynamic/Mapbox-stripped"         "iO
 # if [[ $CIRCLE_BRANCH == master ]]; then
 #   # Build source data for http://mapbox.github.io/mapbox-gl-native/metrics/binary-size/
 #   # and log binary sizes to metrics warehouse
-#   scripts/publish_binary_size.js
+  scripts/publish_binary_size.js
 # fi
 
