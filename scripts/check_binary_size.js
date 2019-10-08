@@ -38,6 +38,7 @@ github.authenticate({type: 'app', token});
 
 function getPriorSize() {
     const mergeBase = process.env['CIRCLE_MERGE_BASE'];
+    
     if (!mergeBase) {
         console.log('No merge base available.');
         return Promise.resolve(null);
@@ -46,14 +47,11 @@ function getPriorSize() {
     return github.checks.listForRef({
         owner: 'mapbox',
         repo: 'mapbox-gl-native',
-        ref: mergeBase
+        ref: 'master'
     }).then(({data}) => {
         const run = data.check_runs.find(run => run.name === name);
         if (!run) {
             console.log('No matching check found.');
-            console.log('BROKEN')
-            console.log(data.JSON.stringify())
-            console.log('BROKEN');
             return Promise.resolve(null);
         }
         return +run.output.summary.match(/`.*` is (\d+) bytes/)[1];
