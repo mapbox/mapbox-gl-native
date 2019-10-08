@@ -101,6 +101,27 @@ macro(mbgl_platform_test)
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
+
+    target_sources(mbgl-test-render
+        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
+        PRIVATE platform/default/src/mbgl/test/main.cpp
+    )
+
+    target_include_directories(mbgl-test
+        PRIVATE platform/macos
+    )
+
+    set_source_files_properties(
+        platform/default/src/mbgl/test/main.cpp
+            PROPERTIES
+        COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
+    )
+
+    target_link_libraries(mbgl-test
+        PRIVATE mbgl-filesource
+        PRIVATE mbgl-loop-darwin
+    )
+
 endmacro()
 
 macro(mbgl_platform_benchmark)
