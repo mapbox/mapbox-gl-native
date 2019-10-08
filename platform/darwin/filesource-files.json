@@ -4,8 +4,6 @@
         "platform/darwin/src/MGLLoggingConfiguration.mm",
         "platform/darwin/src/MGLNetworkConfiguration.m",
         "platform/darwin/src/http_file_source.mm",
-        "platform/default/src/mbgl/storage/file_source.cpp",
-        "platform/default/src/mbgl/storage/file_source_manager.cpp",
         "platform/default/src/mbgl/storage/sqlite3.cpp"
     ],
     "public_headers": {},

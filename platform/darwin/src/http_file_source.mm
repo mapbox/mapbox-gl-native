@@ -4,6 +4,7 @@
 
 #include <mbgl/util/http_header.hpp>
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/util/async_request.hpp>
 #include <mbgl/util/version.hpp>
 
 #import <Foundation/Foundation.h>
