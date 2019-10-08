@@ -874,3 +874,5 @@ https://github.com/nfarina/calloutview/blob/master/LICENSE
 ===========================================================================
 
 Mapbox GL uses portions of software listed in [platform/android/LICENSE.md](https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/LICENSE.md).
+
+Mapbox GL uses portions of software listed in [platform/ios/vendor/mapbox-events-ios/LICENSE.md](https://github.com/mapbox/mobile-telemetry-events-ios/blob/master/LICENSE.md).
