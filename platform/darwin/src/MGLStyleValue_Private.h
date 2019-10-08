@@ -48,17 +48,7 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
     return options;
 }
 
-NS_INLINE std::unique_ptr<mbgl::style::expression::Expression> MGLClusterPropertyFromNSExpression(NSExpression *expression) {
-    if (!expression) {
-        return nullptr;
-    }
-    
-    NSArray *jsonExpression = expression.mgl_jsonExpressionObject;
-    
-    auto expr = mbgl::style::expression::dsl::createExpression(mbgl::style::conversion::makeConvertible(jsonExpression));
-    
-    return expr;
-}
+std::unique_ptr<mbgl::style::expression::Expression> MGLClusterPropertyFromNSExpression(NSExpression *expression);
 
 id MGLJSONObjectFromMBGLExpression(const mbgl::style::expression::Expression &mbglExpression);
 
