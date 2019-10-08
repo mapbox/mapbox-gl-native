@@ -170,20 +170,21 @@ void ImageManager::reduceMemoryUseIfCacheSizeExceedsLimit() {
 }
 
 void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageRequestPair& pair) {
-    std::vector<std::string> missingImages;
-    missingImages.reserve(pair.first.size());
+    ImageDependencies missingDependencies;
+
     for (const auto& dependency : pair.first) {
         if (images.find(dependency.first) == images.end()) {
-            missingImages.push_back(dependency.first);
+            missingDependencies.emplace(dependency);
         }
     }
 
-    if (!missingImages.empty()) {
+    if (!missingDependencies.empty()) {
         ImageRequestor* requestorPtr = &requestor;
         assert(!missingImageRequestors.count(requestorPtr));
         missingImageRequestors.emplace(requestorPtr, pair);
 
-        for (const auto& missingImage : missingImages) {
+        for (const auto& dependency : missingDependencies) {
+            const std::string& missingImage = dependency.first;
             assert(observer != nullptr);
 
             auto existingRequestorsIt = requestedImages.find(missingImage);
@@ -191,8 +192,15 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
                 if (!existingRequestorsIt->second.empty()) {     // Still waiting for the client response.
                     existingRequestorsIt->second.emplace(requestorPtr);
                     requestor.addPendingRequest(missingImage);
+                    continue;
                 }
-                continue;
+                // Unlike icons, pattern changes are not caught
+                // with style-diff meaning that the existing request
+                // could be from the previous style and we cannot
+                // coalesce requests for them.
+                if (dependency.second != ImageType::Pattern) {
+                    continue;
+                }
             }
             requestedImages[missingImage].emplace(requestorPtr);
             requestor.addPendingRequest(missingImage);
