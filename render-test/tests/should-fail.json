@@ -1,0 +1,5 @@
+{
+  "tests/filesize/fail-size-is-over": "Should fail, size is bigger than expected.",
+  "tests/filesize/fail-size-is-under": "Should fail, size is smaller than expected.",
+  "tests/filesize/fail-file-doesnt-match": "Should fail, file not found."
+}
