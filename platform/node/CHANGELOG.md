@@ -1,4 +1,6 @@
-# master
+
+# 5.0.0
+* No longer supporting source-compile fallback ([#15748](https://github.com/mapbox/mapbox-gl-native/pull/15748))
 * Add support for feature state APIs. ([#15480](https://github.com/mapbox/mapbox-gl-native/pull/15480))
 
 # 4.3.0
