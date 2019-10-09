@@ -18,7 +18,8 @@ JSONReply readJson(const mbgl::filesystem::path&);
 std::string serializeJsonValue(const mbgl::JSValue&);
 std::string serializeMetrics(const TestMetrics&);
 
-std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base);
+std::vector<std::string> readExpectedImageEntries(const mbgl::filesystem::path& base);
+std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& base);
 
 TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path);
 

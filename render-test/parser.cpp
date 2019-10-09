@@ -291,9 +291,8 @@ std::string serializeMetrics(const TestMetrics& metrics) {
     return s.GetString();
 }
 
-std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base) {
-    static const std::regex regex(".*expected.*.png|.*expected.*.json");
-
+namespace {
+std::vector<std::string> readExpectedEntries(const std::regex& regex, const mbgl::filesystem::path& base) {
     std::vector<std::string> expectedImages;
     for (const auto& entry : mbgl::filesystem::directory_iterator(base)) {
         if (entry.is_regular_file()) {
@@ -305,7 +304,17 @@ std::vector<std::string> readExpectedEntries(const mbgl::filesystem::path& base)
     }
     return expectedImages;
 }
+} // namespace
 
+std::vector<std::string> readExpectedImageEntries(const mbgl::filesystem::path& base) {
+    static const std::regex regex(".*expected.*.png");
+    return readExpectedEntries(regex, base);
+}
+
+std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& base) {
+    static const std::regex regex(".*expected.*.json");
+    return readExpectedEntries(regex, base);
+}
 
 ArgumentsTuple parseArguments(int argc, char** argv) {
     args::ArgumentParser argumentParser("Mapbox GL Test Runner");

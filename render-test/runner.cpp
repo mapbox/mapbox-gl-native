@@ -122,7 +122,7 @@ bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
     mbgl::filesystem::path expectedMetricsPath;
     for (auto rit = expectations.rbegin(); rit != expectations.rend(); ++rit) {
         if (mbgl::filesystem::exists(*rit)) {
-            expectedJsonPaths = readExpectedEntries(*rit);
+            expectedJsonPaths = readExpectedJSONEntries(*rit);
             if (!expectedJsonPaths.empty()) break;
         }
     }
@@ -206,7 +206,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
                 maybeExpectedMetricsPath.replace_filename("metrics.json");
                 metadata.expectedMetrics = readExpectedMetrics(maybeExpectedMetricsPath);
             }
-            expectedImagesPaths = readExpectedEntries(*rit);
+            expectedImagesPaths = readExpectedImageEntries(*rit);
             if (!expectedImagesPaths.empty()) break;
         }
     }
