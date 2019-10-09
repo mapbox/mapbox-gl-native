@@ -346,15 +346,15 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
     static const std::string getFeatureStateOp("getFeatureState");
     static const std::string removeFeatureStateOp("removeFeatureState");
 
-    // wait
     if (operationArray[0].GetString() == waitOp) {
+        // wait
         try {
             frontend.render(map);
         } catch (const std::exception&) {
             return false;
         }
-    // sleep
     } else if (operationArray[0].GetString() == sleepOp) {
+        // sleep
         mbgl::util::Timer sleepTimer;
         bool sleeping = true;
 
@@ -370,9 +370,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         while (sleeping) {
             mbgl::util::RunLoop::Get()->runOnce();
         }
-
-    // addImage | updateImage
     } else if (operationArray[0].GetString() == addImageOp || operationArray[0].GetString() == updateImageOp) {
+        // addImage | updateImage
         assert(operationArray.Size() >= 3u);
 
         float pixelRatio = 1.0f;
@@ -404,17 +403,15 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         }
 
         map.getStyle().addImage(std::make_unique<mbgl::style::Image>(imageName, mbgl::decodeImage(*maybeImage), pixelRatio, sdf));
-
-    // removeImage
     } else if (operationArray[0].GetString() == removeImageOp) {
+        // removeImage
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsString());
 
         const std::string imageName { operationArray[1].GetString(), operationArray[1].GetStringLength() };
         map.getStyle().removeImage(imageName);
-
-    // setStyle
     } else if (operationArray[0].GetString() == setStyleOp) {
+        // setStyle
         assert(operationArray.Size() >= 2u);
         if (operationArray[1].IsString()) {
             std::string stylePath = localizeURL(operationArray[1].GetString());
@@ -428,9 +425,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             localizeStyleURLs(operationArray[1], metadata.document);
             map.getStyle().loadJSON(serializeJsonValue(operationArray[1]));
         }
-
-    // setCenter
     } else if (operationArray[0].GetString() == setCenterOp) {
+        // setCenter
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsArray());
 
@@ -438,27 +434,23 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(centerArray.Size() == 2u);
 
         map.jumpTo(mbgl::CameraOptions().withCenter(mbgl::LatLng(centerArray[1].GetDouble(), centerArray[0].GetDouble())));
-
-    // setZoom
     } else if (operationArray[0].GetString() == setZoomOp) {
+        // setZoom
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsNumber());
         map.jumpTo(mbgl::CameraOptions().withZoom(operationArray[1].GetDouble()));
-
-    // setBearing
     } else if (operationArray[0].GetString() == setBearingOp) {
+        // setBearing
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsNumber());
         map.jumpTo(mbgl::CameraOptions().withBearing(operationArray[1].GetDouble()));
-
-        // setPitch
     } else if (operationArray[0].GetString() == setPitchOp) {
+        // setPitch
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsNumber());
         map.jumpTo(mbgl::CameraOptions().withPitch(operationArray[1].GetDouble()));
-
-        // setFilter
     } else if (operationArray[0].GetString() == setFilterOp) {
+        // setFilter
         assert(operationArray.Size() >= 3u);
         assert(operationArray[1].IsString());
 
@@ -478,9 +470,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
                 layer->setFilter(std::move(*converted));
             }
         }
-
-    // setLayerZoomRange
     } else if (operationArray[0].GetString() == setLayerZoomRangeOp) {
+        // setLayerZoomRange
         assert(operationArray.Size() >= 4u);
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsNumber());
@@ -495,9 +486,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             layer->setMinZoom(operationArray[2].GetFloat());
             layer->setMaxZoom(operationArray[3].GetFloat());
         }
-
-    // setLight
     } else if (operationArray[0].GetString() == setLightOp) {
+        // setLight
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsObject());
 
@@ -509,9 +499,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         } else {
             map.getStyle().setLight(std::make_unique<mbgl::style::Light>(std::move(*converted)));
         }
-
-    // addLayer
     } else if (operationArray[0].GetString() == addLayerOp) {
+        // addLayer
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsObject());
 
@@ -523,15 +512,13 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         } else {
             map.getStyle().addLayer(std::move(*converted));
         }
-
-    // removeLayer
     } else if (operationArray[0].GetString() == removeLayerOp) {
+        // removeLayer
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsString());
         map.getStyle().removeLayer(operationArray[1].GetString());
-
-    // addSource
     } else if (operationArray[0].GetString() == addSourceOp) {
+        // addSource
         assert(operationArray.Size() >= 3u);
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsObject());
@@ -546,15 +533,13 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         } else {
             map.getStyle().addSource(std::move(*converted));
         }
-
-    // removeSource
     } else if (operationArray[0].GetString() == removeSourceOp) {
+        // removeSource
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsString());
         map.getStyle().removeSource(operationArray[1].GetString());
-
-    // setPaintProperty
     } else if (operationArray[0].GetString() == setPaintPropertyOp) {
+        // setPaintProperty
         assert(operationArray.Size() >= 4u);
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsString());
@@ -570,9 +555,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             const mbgl::JSValue* propertyValue = &operationArray[3];
             layer->setPaintProperty(propertyName, propertyValue);
         }
-
-    // setLayoutProperty
     } else if (operationArray[0].GetString() == setLayoutPropertyOp) {
+        // setLayoutProperty
         assert(operationArray.Size() >= 4u);
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsString());
@@ -588,8 +572,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             const mbgl::JSValue* propertyValue = &operationArray[3];
             layer->setLayoutProperty(propertyName, propertyValue);
         }
-    // probeFileSize
     } else if (operationArray[0].GetString() == fileSizeProbeOp) {
+        // probeFileSize
         assert(operationArray.Size() >= 3u);
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsString());
@@ -611,12 +595,12 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             metadata.errorMessage = std::string("File not found: ") + path.string();
             return false;
         }
-    // probeMemoryStart
     } else if (operationArray[0].GetString() == memoryProbeStartOp) {
+        // probeMemoryStart
         assert(!AllocationIndex::isActive());
         AllocationIndex::setActive(true);
-    // probeMemory
     } else if (operationArray[0].GetString() == memoryProbeOp) {
+        // probeMemory
         assert(AllocationIndex::isActive());
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsString());
@@ -625,14 +609,13 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         metadata.metrics.memory.emplace(std::piecewise_construct,
                                         std::forward_as_tuple(std::move(mark)), 
                                         std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(), AllocationIndex::getAllocationsCount()));
-    // probeMemoryEnd
     } else if (operationArray[0].GetString() == memoryProbeEndOp) {
+        // probeMemoryEnd
         assert(AllocationIndex::isActive());
         AllocationIndex::setActive(false);
         AllocationIndex::reset();
-
-        // setFeatureState
     } else if (operationArray[0].GetString() == setFeatureStateOp) {
+        // setFeatureState
         assert(operationArray.Size() >= 3u);
         assert(operationArray[1].IsObject());
         assert(operationArray[2].IsObject());
@@ -707,9 +690,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             return false;
         }
         frontend.getRenderer()->setFeatureState(sourceID, sourceLayer, featureID, parsedState);
-
-        // getFeatureState
     } else if (operationArray[0].GetString() == getFeatureStateOp) {
+        // getFeatureState
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsObject());
 
@@ -739,9 +721,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         }
         mbgl::FeatureState state;
         frontend.getRenderer()->getFeatureState(state, sourceID, sourceLayer, featureID);
-
-        // removeFeatureState
     } else if (operationArray[0].GetString() == removeFeatureStateOp) {
+        // removeFeatureState
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsObject());
 
