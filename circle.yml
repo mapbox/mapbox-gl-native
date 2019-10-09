@@ -591,7 +591,7 @@ commands:
     - run:
         name: Run render tests (mbgl-render-test)
         command: |
-          build/mbgl-render-test render-tests render-tests --recycle-map --shuffle
+          build/mbgl-render-test render-tests --recycle-map --shuffle
         no_output_timeout: 2m
 
   run-macos-query-tests:
