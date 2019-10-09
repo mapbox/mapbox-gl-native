@@ -365,11 +365,11 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
 
     std::vector<mbgl::filesystem::path> paths;
     for (const auto& id : args::get(testNameValues)) {
-        paths.emplace_back(TestRunner::getBasePath() + "/" + id);
+        paths.emplace_back(rootPath / id);
     }
 
     if (paths.empty()) {
-        paths.emplace_back(TestRunner::getBasePath());
+        paths.emplace_back(rootPath);
     }
 
     // Recursively traverse through the test paths and collect test directories containing "style.json".
