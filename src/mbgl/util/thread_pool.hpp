@@ -52,8 +52,11 @@ public:
         }
     }
 
+    mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
+
 private:
     std::array<std::thread, N> threads;
+    mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
     static_assert(N > 0, "Thread count must be more than zero.");
 };
 

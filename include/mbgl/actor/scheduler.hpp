@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mapbox/weak.hpp>
+
 #include <functional>
 #include <memory>
 
@@ -35,6 +37,8 @@ public:
 
     // Enqueues a function for execution.
     virtual void schedule(std::function<void()>) = 0;
+    // Makes a weak pointer to this Scheduler.
+    virtual mapbox::base::WeakPtr<Scheduler> makeWeakPtr() = 0;
 
     // Set/Get the current Scheduler for this thread
     static Scheduler* GetCurrent();
