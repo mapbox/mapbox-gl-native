@@ -273,6 +273,21 @@ std::string serializeMetrics(const TestMetrics& metrics) {
     rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
     writer.StartObject();
+
+    // Start fileSize section.
+    writer.Key("fileSize");
+    writer.StartArray();
+    for (const auto& fileSizeProbe : metrics.fileSize) {
+        assert(!fileSizeProbe.first.empty());
+        writer.StartArray();
+        writer.String(fileSizeProbe.first.c_str());
+        writer.String(fileSizeProbe.second.path);
+        writer.Uint64(fileSizeProbe.second.size);
+        writer.EndArray();
+    }
+    // End fileSize section.
+    writer.EndArray();
+
     // Start memory section.
     writer.Key("memory");
     writer.StartArray();
@@ -286,6 +301,7 @@ std::string serializeMetrics(const TestMetrics& metrics) {
     }
     // End memory section.
     writer.EndArray();
+
     writer.EndObject();
 
     return s.GetString();
@@ -439,6 +455,29 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
     }
 
     const auto& document = maybeJson.get<mbgl::JSDocument>();
+
+    if (document.HasMember("fileSize")) {
+        const mbgl::JSValue& fileSizeValue = document["fileSize"];
+        assert(fileSizeValue.IsArray());
+        for (auto& probeValue : fileSizeValue.GetArray()) {
+            assert(probeValue.IsArray());
+            assert(probeValue.Size() >= 3u);
+            assert(probeValue[0].IsString());
+            assert(probeValue[1].IsString());
+            assert(probeValue[2].IsNumber());
+
+            std::string mark{probeValue[0].GetString(), probeValue[0].GetStringLength()};
+            assert(!mark.empty());
+
+            std::string filePath{probeValue[1].GetString(), probeValue[1].GetStringLength()};
+            assert(!filePath.empty());
+
+            result.fileSize.emplace(std::piecewise_construct,
+                                    std::forward_as_tuple(std::move(mark)),
+                                    std::forward_as_tuple(std::move(filePath), probeValue[2].GetUint64()));
+        }
+    }
+
     if (document.HasMember("memory")) {
         const mbgl::JSValue& memoryValue = document["memory"];
         assert(memoryValue.IsArray());
