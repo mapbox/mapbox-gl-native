@@ -242,6 +242,31 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             break;
         }
     }
+    // Check file size metrics.
+    for (const auto& expected : metadata.expectedMetrics.fileSize) {
+        auto actual = metadata.metrics.fileSize.find(expected.first);
+        if (actual == metadata.metrics.fileSize.end()) {
+            metadata.errorMessage = "Failed to find fileSize probe: " + expected.first;
+            return false;
+        }
+        if (actual->second.path != expected.second.path) {
+            std::stringstream ss;
+            ss << "Comparing different files at probe \"" << expected.first << "\": " << actual->second.path
+               << ", expected is " << expected.second.path << ".";
+            metadata.errorMessage = ss.str();
+
+            return false;
+        }
+
+        if (actual->second.size != expected.second.size) {
+            std::stringstream ss;
+            ss << "File size does not match at probe \"" << expected.first << "\": " << actual->second.size
+               << ", expected is " << expected.second.size << ".";
+
+            metadata.errorMessage = ss.str();
+            return false;
+        }
+    }
     // Check memory metrics.
     for (const auto& expected : metadata.expectedMetrics.memory) {
         auto actual = metadata.metrics.memory.find(expected.first);
@@ -313,6 +338,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
     static const std::string removeSourceOp("removeSource");
     static const std::string setPaintPropertyOp("setPaintProperty");
     static const std::string setLayoutPropertyOp("setLayoutProperty");
+    static const std::string fileSizeProbeOp("probeFileSize");
     static const std::string memoryProbeOp("probeMemory");
     static const std::string memoryProbeStartOp("probeMemoryStart");
     static const std::string memoryProbeEndOp("probeMemoryEnd");
@@ -561,6 +587,29 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         } else {
             const mbgl::JSValue* propertyValue = &operationArray[3];
             layer->setLayoutProperty(propertyName, propertyValue);
+        }
+    // probeFileSize
+    } else if (operationArray[0].GetString() == fileSizeProbeOp) {
+        assert(operationArray.Size() >= 3u);
+        assert(operationArray[1].IsString());
+        assert(operationArray[2].IsString());
+
+        std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
+        mbgl::filesystem::path path = std::string(operationArray[2].GetString(), operationArray[2].GetStringLength());
+        assert(!path.empty());
+
+        if (!path.is_absolute()) {
+            path = metadata.paths.defaultExpectations() / path;
+        }
+
+        if (mbgl::filesystem::exists(path)) {
+            auto size = mbgl::filesystem::file_size(path);
+            metadata.metrics.fileSize.emplace(std::piecewise_construct,
+                                              std::forward_as_tuple(std::move(mark)),
+                                              std::forward_as_tuple(std::move(path), size));
+        } else {
+            metadata.errorMessage = std::string("File not found: ") + path.string();
+            return false;
         }
     // probeMemoryStart
     } else if (operationArray[0].GetString() == memoryProbeStartOp) {

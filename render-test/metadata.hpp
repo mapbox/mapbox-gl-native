@@ -31,6 +31,14 @@ struct TestPaths {
     }
 };
 
+struct FileSizeProbe {
+    FileSizeProbe() = default;
+    FileSizeProbe(std::string path_, uintmax_t size_) : path(std::move(path_)), size(size_) {}
+
+    std::string path;
+    uintmax_t size;
+};
+
 struct MemoryProbe {
     MemoryProbe() = default;
     MemoryProbe(size_t peak_, size_t allocations_)
@@ -43,7 +51,8 @@ struct MemoryProbe {
 
 class TestMetrics {
 public:
-    bool isEmpty() const { return memory.empty(); }
+    bool isEmpty() const { return fileSize.empty() && memory.empty(); }
+    std::map<std::string, FileSizeProbe> fileSize;
     std::map<std::string, MemoryProbe> memory;
 };
 
