@@ -129,7 +129,6 @@ workflows:
       #     unique aspect of the build environment.
       #   - {build type} is typically "debug" or "release".
       #
-      - nitpick
       - android-debug-arm-v7-buck
       - android-arm-template:
           name: android-debug-arm-v8
@@ -144,25 +143,14 @@ workflows:
           filters:
             tags:
               only: /android-v.*/
-      - node-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node-gcc8-debug:
-          filters:
-            tags:
-              only: /node-.*/
       - node-macos-release:
           filters:
             tags:
               only: /node-.*/
-      - linux-clang-38-libcxx-debug:
-          name: linux-clang-3.8-libcxx-debug
       - linux-clang-7-sanitize-address-undefined
       - linux-clang-7-sanitize-thread
       - linux-gcc5-debug-coverage
       - linux-doxygen
-      - linux-render-tests
       - ios-debug
       - ios-debug-xcode10
       - ios-release-template:
@@ -174,7 +162,6 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug
-      - macos-render-tests
   nightly:
     triggers:
       - schedule:
@@ -471,16 +458,6 @@ commands:
     - run:
         name: Build node
         command: make node-all
-  build-mbgl-render-test:
-    steps:
-    - run:
-        name: Build mbgl-render-test
-        command: cmake --build build --config ${BUILDTYPE} --target mbgl-render-test -- -j${JOBS}
-  build-mbgl-expression-test:
-    steps:
-    - run:
-        name: Build mbgl-expression-test
-        command: cmake --build build --config ${BUILDTYPE} --target mbgl-expression-test -- -j${JOBS}
   build-linux:
     steps:
     - run:
@@ -573,59 +550,6 @@ commands:
         name: Run node tests
         command: make test-node
 
-  run-node-linux-tests:
-    parameters:
-      node_version:
-        type: string
-        default: v8
-    steps:
-    - run:
-        name: Run node tests
-        command: |
-          . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v make test-node
-
-  run-macos-render-tests:
-    steps:
-    - run:
-        name: Run render tests (mbgl-render-test)
-        command: |
-          build/mbgl-render-test render-tests --recycle-map --shuffle
-        no_output_timeout: 2m
-
-  run-macos-query-tests:
-    steps:
-    - run:
-        name: Run query tests
-        command: |
-          build/mbgl-render-test query-tests
-        no_output_timeout: 2m
-
-  run-linux-render-tests:
-    parameters:
-      node_version:
-        type: string
-        default: v8
-    steps:
-    - run:
-        name: Run render tests (mbgl-render-test)
-        command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v build/mbgl-render-test render-tests --recycle-map --shuffle
-
-  run-linux-query-tests:
-    parameters:
-      node_version:
-        type: string
-        default: v8
-    steps:
-    - run:
-        name: Run query tests
-        command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v build/mbgl-render-test query-tests
-
   run-unit-tests:
     steps:
     - run:
@@ -644,37 +568,12 @@ commands:
           # Unfortunately, Google Test eats the status code, so we'll have to check the output.
           [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
 
-  run-expression-tests:
-    steps:
-    - run:
-        name: Run expression tests
-        command: |
-          build/mbgl-expression-test -s --seed=$RANDOM
-
-  upload-expression-tests:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/expression-tests/index.html
-        destination: expression-tests
-
   publish-node-package:
     steps:
     - run:
         name: Publish node package
         when: on_success
         command: platform/node/scripts/publish.sh
-
-  upload-render-tests:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/index.html
-        destination: render-tests
-
-  upload-query-tests:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/index.html
-        destination: query-tests
 
   collect-xcode-build-logs:
     steps:
@@ -814,42 +713,6 @@ jobs:
                 test_wrapper: ''
                 test_params: << parameters.test_params >>
       - next-save
-
-  nitpick:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Debug
-    steps:
-      - install-dependencies: { mason: false, ccache: false }
-      - run:
-          name: Initialize submodules
-          command: |
-            git submodule update --init
-            git submodule foreach git submodule update --init
-      - run:
-          name: Verify submodule pin
-          command: scripts/nitpick/submodule-pin.js
-          when: always
-      - run:
-          name: Source file list generation
-          command: scripts/nitpick/generated-code.js sources
-          when: always
-      - run:
-          name: Shader code generation
-          command: scripts/nitpick/generated-code.js shader
-          when: always
-      - run:
-          name: Style code generation
-          command: scripts/nitpick/generated-code.js style
-          when: always
-      - run:
-          name: Android code generation
-          command: scripts/nitpick/generated-code.js android
-          when: always
 
 # ------------------------------------------------------------------------------
   android-arm-template:
@@ -1072,42 +935,6 @@ jobs:
             buck build mapbox-gl-native:android-core
 
 # ------------------------------------------------------------------------------
-  node-clang39-release:
-    docker:
-      - image: mbgl/linux-clang-3.9:2077f965ed
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: RelWithDebInfo
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - build-node
-      - save-dependencies
-      - run-node-linux-tests
-      - publish-node-package
-
-# ------------------------------------------------------------------------------
-  node-gcc8-debug:
-    docker:
-      - image: mbgl/linux-gcc-8:d2b1553d2f
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-node
-      - save-dependencies
-      - publish-node-package
-
-# ------------------------------------------------------------------------------
   node-macos-release:
     macos:
       xcode: "11.0.0"
@@ -1126,23 +953,6 @@ jobs:
       - publish-node-package
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  linux-clang-38-libcxx-debug:
-    docker:
-      - image: mbgl/linux-clang-3.8-libcxx:d6800bdbb4
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-linux
-      - save-dependencies
 
 # ------------------------------------------------------------------------------
   linux-clang-7-sanitize-address-undefined:
@@ -1249,31 +1059,6 @@ jobs:
               scripts/publish_doxygen_coverage.js "build/linux-$(uname -m)/Debug/doxygen-coverage.json"
 
 # ------------------------------------------------------------------------------
-  linux-render-tests:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: RelWithDebInfo
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - configure-cmake
-      - build-mbgl-expression-test
-      - build-mbgl-render-test
-      - run-expression-tests
-      - upload-expression-tests
-      - run-linux-render-tests
-      - upload-render-tests
-      - run-linux-query-tests
-      - upload-query-tests
-      - save-dependencies
-
-# ------------------------------------------------------------------------------
   ios-debug:
     macos:
       xcode: "11.0.0"
@@ -1293,9 +1078,6 @@ jobs:
       - run:
           name: Check symbol namespacing for mapbox-events-ios
           command: make ios-check-events-symbols
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1320,9 +1102,6 @@ jobs:
       - run:
           name: Check symbol namespacing for mapbox-events-ios
           command: make ios-check-events-symbols
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1546,30 +1325,6 @@ jobs:
           destination: test/fixtures
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  macos-render-tests:
-    macos:
-      xcode: "11.0.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      JOBS: 2
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - configure-cmake
-      - build-mbgl-expression-test
-      - build-mbgl-render-test
-      - save-dependencies
-      - run-expression-tests
-      - upload-expression-tests
-      - run-macos-render-tests
-      - upload-render-tests
-      - run-macos-query-tests
-      - upload-query-tests
 
 # ------------------------------------------------------------------------------
   metrics-nightly:
