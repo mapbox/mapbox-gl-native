@@ -72,7 +72,7 @@
         "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMELocationManager.m",
         "platform/darwin/src/MGLShape.mm",
         "platform/darwin/src/MGLCompassDirectionFormatter.m",
-        "platform/darwin/src/MGLNetworkConfiguration.m",
+        "platform/darwin/src/MGLNetworkConfiguration.mm",
         "platform/darwin/src/MGLStyleLayer.mm",
         "platform/darwin/src/MGLStyleLayerManager.mm",
         "platform/darwin/src/NSValue+MGLAdditions.m",
