@@ -47,8 +47,19 @@ add_test(
         render-tests
         --recycle-map
         --shuffle
-        --seed
-        ${MBGL_RENDER_TEST_SEED}
+        --seed=${MBGL_RENDER_TEST_SEED}
+    WORKING_DIRECTORY ${MBGL_ROOT}
+)
+
+add_test(
+    NAME mbgl-render-test-probes
+    COMMAND
+        mbgl-render-test
+        render-tests
+        --recycle-map
+        --shuffle
+        --seed=${MBGL_RENDER_TEST_SEED}
+        --rootPath=render-test
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
 

@@ -421,15 +421,17 @@ std::vector<std::pair<std::string, std::string>> parseIgnores() {
     auto mainIgnoresPath = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("platform/node/test/ignores.json");
 
     mbgl::filesystem::path platformSpecificIgnores;
+    mbgl::filesystem::path ownTestsIgnores =
+        mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("render-test/tests/should-fail.json");
 
 #ifdef __APPLE__
     platformSpecificIgnores = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("render-test/mac-ignores.json");
 #elif __linux__
     platformSpecificIgnores = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("render-test/linux-ignores.json");
 #endif
-    
-    std::vector<mbgl::filesystem::path> ignoresPaths = { mainIgnoresPath, platformSpecificIgnores };
-    for (auto path: ignoresPaths) {
+
+    std::vector<mbgl::filesystem::path> ignoresPaths = {mainIgnoresPath, platformSpecificIgnores, ownTestsIgnores};
+    for (const auto& path : ignoresPaths) {
         auto maybeIgnores = readJson(path);
         if (!maybeIgnores.is<mbgl::JSDocument>()) {
             continue;
