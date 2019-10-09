@@ -68,6 +68,7 @@ public:
     // From Scheduler. Schedules by using callbacks to the
     // JVM to process the mailbox on the right thread.
     void schedule(std::function<void()> scheduled) override;
+    mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
 
     void requestRender();
 
@@ -122,6 +123,7 @@ private:
     std::atomic<bool> destroyed {false};
 
     std::unique_ptr<SnapshotCallback> snapshotCallback;
+    mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 };
 
 } // namespace android

@@ -19,6 +19,7 @@ public:
 
     // mbgl::Scheduler implementation.
     void schedule(std::function<void()> scheduled) final;
+    mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
 
     void processEvents();
 
@@ -30,4 +31,5 @@ private:
 
     std::mutex m_taskQueueMutex;
     std::queue<std::function<void()>> m_taskQueue;
+    mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 };

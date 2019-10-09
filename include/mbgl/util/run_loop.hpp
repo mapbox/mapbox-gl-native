@@ -74,6 +74,7 @@ public:
     }
 
     void schedule(std::function<void()> fn) override { invoke(std::move(fn)); }
+    ::mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
 
     class Impl;
 
@@ -121,6 +122,7 @@ private:
     std::mutex mutex;
 
     std::unique_ptr<Impl> impl;
+    ::mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 };
 
 } // namespace util
