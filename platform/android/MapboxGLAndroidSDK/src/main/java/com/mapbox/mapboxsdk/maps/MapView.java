@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -125,7 +124,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     }
 
     // hide surface until map is fully loaded #10990
-    setForeground(new ColorDrawable(options.getForegroundLoadColor()));
+    //setForeground(new ColorDrawable(options.getForegroundLoadColor()));
 
     mapboxMapOptions = options;
 
@@ -283,9 +282,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private void initialiseDrawingSurface(MapboxMapOptions options) {
     String localFontFamily = options.getLocalIdeographFontFamily();
+    boolean translucentSurface = options.getTranslucentSurface();
     if (options.getTextureMode()) {
       TextureView textureView = new TextureView(getContext());
-      boolean translucentSurface = options.getTranslucentTextureSurface();
+      if (!translucentSurface) {
+        translucentSurface = options.getTranslucentTextureSurface();
+      }
       mapRenderer = new TextureViewMapRenderer(getContext(),
         textureView, localFontFamily, translucentSurface) {
         @Override
@@ -299,7 +301,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     } else {
       MapboxGLSurfaceView glSurfaceView = new MapboxGLSurfaceView(getContext());
       glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-      mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, localFontFamily) {
+      mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, localFontFamily, translucentSurface) {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
           MapView.this.onSurfaceCreated();
@@ -1106,13 +1108,13 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     @Override
     public void onDidFinishRenderingFrame(boolean fully) {
-      if (mapboxMap != null && mapboxMap.getStyle() != null && mapboxMap.getStyle().isFullyLoaded()) {
-        renderCount++;
-        if (renderCount == 3) {
-          MapView.this.setForeground(null);
-          removeOnDidFinishRenderingFrameListener(this);
-        }
-      }
+//      if (mapboxMap != null && mapboxMap.getStyle() != null && mapboxMap.getStyle().isFullyLoaded()) {
+//        renderCount++;
+//        if (renderCount == 3) {
+//          MapView.this.setForeground(null);
+//          removeOnDidFinishRenderingFrameListener(this);
+//        }
+//      }
     }
 
     private void onDestroy() {

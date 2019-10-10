@@ -81,7 +81,10 @@ public class MapboxMapOptions implements Parcelable {
   private String apiBaseUri;
 
   private boolean textureMode;
+
+  @Deprecated
   private boolean translucentTextureSurface;
+  private boolean translucentSurface;
 
   @ColorInt
   private int foregroundLoadColor;
@@ -144,6 +147,7 @@ public class MapboxMapOptions implements Parcelable {
     pixelRatio = in.readFloat();
     foregroundLoadColor = in.readInt();
     crossSourceCollisions = in.readByte() != 0;
+    translucentSurface = in.readByte() != 0;
   }
 
   /**
@@ -261,7 +265,7 @@ public class MapboxMapOptions implements Parcelable {
       mapboxMapOptions.setPrefetchesTiles(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
       mapboxMapOptions.setPrefetchZoomDelta(
-              typedArray.getInt(R.styleable.mapbox_MapView_mapbox_prefetchZoomDelta, 4));
+        typedArray.getInt(R.styleable.mapbox_MapView_mapbox_prefetchZoomDelta, 4));
       mapboxMapOptions.renderSurfaceOnTop(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
 
@@ -291,6 +295,9 @@ public class MapboxMapOptions implements Parcelable {
       );
       mapboxMapOptions.crossSourceCollisions(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_cross_source_collisions, true)
+      );
+      mapboxMapOptions.translucentSurface(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_translucentSurface, false)
       );
     } finally {
       typedArray.recycle();
@@ -613,7 +620,13 @@ public class MapboxMapOptions implements Parcelable {
     return this;
   }
 
+  /**
+   * @deprecated use {{@link #translucentSurface}} instead
+   * @param translucentTextureSurface
+   * @return
+   */
   @NonNull
+  @Deprecated
   public MapboxMapOptions translucentTextureSurface(boolean translucentTextureSurface) {
     this.translucentTextureSurface = translucentTextureSurface;
     return this;
@@ -652,7 +665,7 @@ public class MapboxMapOptions implements Parcelable {
    * tile at the (current_zoom_level - delta) is rendered as soon as possible at the
    * expense of a little bandwidth.
    * Note: This operation will override the MapboxMapOptions#setPrefetchesTiles(boolean)
-   *       Setting zoom delta to 0 will disable pre-fetching.
+   * Setting zoom delta to 0 will disable pre-fetching.
    * Default zoom delta is 4.
    *
    * @param delta zoom delta
@@ -1027,6 +1040,15 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Returns true if GLSurfaceView and TextureView support a translucent surface
+   *
+   * @return True if translucent surface is active
+   */
+  public boolean getTranslucentSurface() {
+    return translucentSurface;
+  }
+
+  /**
    * Returns the current configured foreground color that is used during map creation.
    *
    * @return the load color
@@ -1125,6 +1147,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeFloat(pixelRatio);
     dest.writeInt(foregroundLoadColor);
     dest.writeByte((byte) (crossSourceCollisions ? 1 : 0));
+    dest.writeByte((byte) (translucentSurface ? 1 : 0));
   }
 
   @Override
@@ -1236,6 +1259,9 @@ public class MapboxMapOptions implements Parcelable {
       return false;
     }
 
+    if (translucentSurface != options.translucentSurface) {
+      return false;
+    }
     return false;
   }
 
@@ -1278,6 +1304,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + Arrays.hashCode(localIdeographFontFamilies);
     result = 31 * result + (int) pixelRatio;
     result = 31 * result + (crossSourceCollisions ? 1 : 0);
+    result = 31 * result + (translucentSurface ? 1 : 0);
     return result;
   }
 }

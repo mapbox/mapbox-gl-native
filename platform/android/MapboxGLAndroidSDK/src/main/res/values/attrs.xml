@@ -105,6 +105,7 @@
 
         <!-- Use TextureView-->
         <attr name="mapbox_renderTextureMode" format="boolean"/>
+        <!-- Deprecated -->
         <attr name="mapbox_renderTextureTranslucentSurface" format="boolean"/>
         <attr name="mapbox_foregroundLoadColor" format="color"/>
 
@@ -112,6 +113,7 @@
         <attr name="mapbox_prefetchZoomDelta" format="integer"/>
         <attr name="mapbox_enableZMediaOverlay" format="boolean"/>
         <attr name="mapbox_pixelRatio" format="float"/>
+        <attr name="mapbox_translucentSurface" format="boolean"/>
 
     </declare-styleable>
 

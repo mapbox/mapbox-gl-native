@@ -67,6 +67,7 @@
     <public name="mapbox_renderTextureMode" type="attr" />
     <public name="mapbox_renderTextureTranslucentSurface" type="attr" />
     <public name="mapbox_foregroundLoadColor" type="attr" />
+    <public name="mapbox_translucentSurface" type="attr" />
 
     <public name="mapbox_enableTilePrefetch" type="attr" />
     <public name="mapbox_prefetchZoomDelta" type="attr"/>
