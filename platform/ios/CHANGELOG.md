@@ -2,11 +2,17 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+### Other changes
+
+* Coalesce requests to the client for the same missing image ([#15778](https://github.com/mapbox/mapbox-gl-native/pull/15778))
+
 ## 5.5.0
 
 ### Performance improvements
 
- * Improved rendering performance for the styles with multiple sources ([#15756](https://github.com/mapbox/mapbox-gl-native/pull/15756))
+* Improved rendering performance for the styles with multiple sources ([#15756](https://github.com/mapbox/mapbox-gl-native/pull/15756))
 
 ### Other changes
 
