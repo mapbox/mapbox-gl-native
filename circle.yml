@@ -280,7 +280,7 @@ commands:
           name: Test
           command: |
             cd build
-            << parameters.test_wrapper >> ctest -j 8 --output-on-failure << parameters.test_params >>
+            << parameters.test_wrapper >> ctest --output-on-failure << parameters.test_params >>
   npm-install:
     steps:
     - run:
