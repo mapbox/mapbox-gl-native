@@ -642,6 +642,7 @@ jobs:
           name: Code Generators
           command: |
             platform/android/scripts/generate-style-code.js
+            platform/default/include/mbgl/storage/offline_schema.js
             scripts/generate-file-lists.js
             scripts/generate-shaders.js
             scripts/generate-style-code.js
