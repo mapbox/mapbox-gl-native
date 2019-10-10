@@ -275,32 +275,34 @@ std::string serializeMetrics(const TestMetrics& metrics) {
     writer.StartObject();
 
     // Start fileSize section.
-    writer.Key("fileSize");
-    writer.StartArray();
-    for (const auto& fileSizeProbe : metrics.fileSize) {
-        assert(!fileSizeProbe.first.empty());
+    if (!metrics.fileSize.empty()) {
+        writer.Key("fileSize");
         writer.StartArray();
-        writer.String(fileSizeProbe.first.c_str());
-        writer.String(fileSizeProbe.second.path);
-        writer.Uint64(fileSizeProbe.second.size);
+        for (const auto& fileSizeProbe : metrics.fileSize) {
+            assert(!fileSizeProbe.first.empty());
+            writer.StartArray();
+            writer.String(fileSizeProbe.first.c_str());
+            writer.String(fileSizeProbe.second.path);
+            writer.Uint64(fileSizeProbe.second.size);
+            writer.EndArray();
+        }
         writer.EndArray();
     }
-    // End fileSize section.
-    writer.EndArray();
 
     // Start memory section.
-    writer.Key("memory");
-    writer.StartArray();
-    for (const auto& memoryProbe : metrics.memory) {
-        assert(!memoryProbe.first.empty());       
+    if (!metrics.memory.empty()) {
+        writer.Key("memory");
         writer.StartArray();
-        writer.String(memoryProbe.first.c_str());
-        writer.Uint64(memoryProbe.second.peak);
-        writer.Uint64(memoryProbe.second.allocations);
+        for (const auto& memoryProbe : metrics.memory) {
+            assert(!memoryProbe.first.empty());
+            writer.StartArray();
+            writer.String(memoryProbe.first.c_str());
+            writer.Uint64(memoryProbe.second.peak);
+            writer.Uint64(memoryProbe.second.allocations);
+            writer.EndArray();
+        }
         writer.EndArray();
     }
-    // End memory section.
-    writer.EndArray();
 
     writer.EndObject();
 
