@@ -30,8 +30,16 @@ public final class CameraPosition implements Parcelable {
         LatLng target = in.readParcelable(LatLng.class.getClassLoader());
         double tilt = in.readDouble();
         double zoom = in.readDouble();
-        double[] padding = new double[4];
-        in.readDoubleArray(padding);
+
+        double[] padding = null;
+        int paddingSize = in.readInt();
+        if (paddingSize > 0) {
+          padding = new double[paddingSize];
+          for (int i = 0; i < paddingSize; i++) {
+            padding[i] = in.readDouble();
+          }
+        }
+
         return new CameraPosition(target, zoom, tilt, bearing, padding);
       }
 
@@ -139,7 +147,16 @@ public final class CameraPosition implements Parcelable {
     out.writeParcelable(target, flags);
     out.writeDouble(tilt);
     out.writeDouble(zoom);
-    out.writeDoubleArray(padding);
+
+    if (padding != null) {
+      int length = padding.length;
+      out.writeInt(length);
+      for (double v : padding) {
+        out.writeDouble(v);
+      }
+    } else {
+      out.writeInt(-1);
+    }
   }
 
   /**
