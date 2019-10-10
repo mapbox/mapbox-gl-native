@@ -4,7 +4,8 @@ add_library(
     ${MBGL_ROOT}/expression-test/test_runner_common.hpp
     ${MBGL_ROOT}/render-test/allocation_index.cpp
     ${MBGL_ROOT}/render-test/allocation_index.hpp
-    ${MBGL_ROOT}/render-test/filesystem.hpp
+    ${MBGL_ROOT}/render-test/file_source.cpp
+    ${MBGL_ROOT}/render-test/file_source.hpp
     ${MBGL_ROOT}/render-test/filesystem.hpp
     ${MBGL_ROOT}/render-test/include/mbgl/render_test.hpp
     ${MBGL_ROOT}/render-test/metadata.hpp

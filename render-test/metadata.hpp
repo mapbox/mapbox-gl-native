@@ -57,11 +57,20 @@ struct MemoryProbe {
     size_t allocations;
 };
 
+struct NetworkProbe {
+    NetworkProbe() = default;
+    NetworkProbe(size_t requests_, size_t transferred_) : requests(requests_), transferred(transferred_) {}
+
+    size_t requests;
+    size_t transferred;
+};
+
 class TestMetrics {
 public:
-    bool isEmpty() const { return fileSize.empty() && memory.empty(); }
+    bool isEmpty() const { return fileSize.empty() && memory.empty() && network.empty(); }
     std::map<std::string, FileSizeProbe> fileSize;
     std::map<std::string, MemoryProbe> memory;
+    std::map<std::string, NetworkProbe> network;
 };
 
 struct TestMetadata {
