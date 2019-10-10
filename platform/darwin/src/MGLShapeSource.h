@@ -57,10 +57,9 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClus
  attribute values are accessed from individual features within a cluster.
 
  ```swift
- let key = "sumValue"
- let firstExpression = NSExpression(format: "sum({ $featureAccumulated, %@ })", key)
+ let firstExpression = NSExpression(format: "sum:({$featureAccumulated, sumValue})")
  let secondExpression = NSExpression(forKeyPath: "magnitude")
- let clusterPropertiesDictionary = [key : [firstExpression, secondExpression]]
+ let clusterPropertiesDictionary = ["sumValue" : [firstExpression, secondExpression]]
  
  let options : [MGLShapeSourceOption : Any] = [.clustered : true,
                                             .clusterProperties: clusterPropertiesDictionary]

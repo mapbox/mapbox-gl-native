@@ -556,13 +556,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLShapeSourceOptionClusterProperties() {
-
-
         //#-example-code
-        let key = "sumValue"
-        let firstExpression = NSExpression(format: "sum({ $featureAccumulated, %@ })", key)
+        let firstExpression = NSExpression(format: "sum:({$featureAccumulated, sumValue})")
         let secondExpression = NSExpression(forKeyPath: "magnitude")
-        let clusterPropertiesDictionary = [key : [firstExpression, secondExpression]]
+        let clusterPropertiesDictionary = ["sumValue" : [firstExpression, secondExpression]]
 
         let options : [MGLShapeSourceOption : Any] = [.clustered : true,
                                                    .clusterProperties: clusterPropertiesDictionary]
