@@ -567,6 +567,27 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         let options : [MGLShapeSourceOption : Any] = [.clustered : true,
                                                    .clusterProperties: clusterPropertiesDictionary]
         //#-end-example-code
+        let geoJSON: [String: Any] = [
+            "type" : "Feature",
+            "geometry" : [
+                "coordinates" : [
+                    -77.00896639534831,
+                    38.87031006108791,
+                    0.0
+                ],
+                "type" : "Point"
+            ],
+            "properties" : [
+                "cluster" : true,
+                "cluster_id" : 123,
+                "point_count" : 4567,
+            ]
+        ]
+
+        let clusterShapeData = try! JSONSerialization.data(withJSONObject: geoJSON, options: [])
+        let shape = MGLShape(data: clusterShapeData, encoding: String.Encoding.utf8.rawValue)
+        let source = MGLShapeSource(identifier: "source", shape: shape, options: options)
+        mapView.style?.addSource(source)
 
     }
     // For testMGLMapView().
