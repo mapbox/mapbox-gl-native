@@ -21,6 +21,7 @@
 
 #include <../expression-test/test_runner_common.hpp>
 #include "allocation_index.hpp"
+#include "file_source.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
@@ -294,6 +295,35 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         }
     }
 
+    // Check network metrics.
+    for (const auto& expected : metadata.expectedMetrics.network) {
+        auto actual = metadata.metrics.network.find(expected.first);
+        if (actual == metadata.metrics.network.end()) {
+            metadata.errorMessage = "Failed to find network probe: " + expected.first;
+            return false;
+        }
+        bool failed = false;
+        if (actual->second.requests != expected.second.requests) {
+            std::stringstream ss;
+            ss << "Number of requests at probe \"" << expected.first << "\" is " << actual->second.requests
+               << ", expected is " << expected.second.requests << ". ";
+
+            metadata.errorMessage = ss.str();
+            failed = true;
+        }
+        if (actual->second.transferred != expected.second.transferred) {
+            std::stringstream ss;
+            ss << "Transferred data at probe \"" << expected.first << "\" is " << actual->second.transferred
+               << " bytes, expected is " << expected.second.transferred << " bytes.";
+
+            metadata.errorMessage += ss.str();
+            failed = true;
+        }
+        if (failed) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -343,6 +373,9 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
     static const std::string memoryProbeOp("probeMemory");
     static const std::string memoryProbeStartOp("probeMemoryStart");
     static const std::string memoryProbeEndOp("probeMemoryEnd");
+    static const std::string networkProbeOp("probeNetwork");
+    static const std::string networkProbeStartOp("probeNetworkStart");
+    static const std::string networkProbeEndOp("probeNetworkEnd");
     static const std::string setFeatureStateOp("setFeatureState");
     static const std::string getFeatureStateOp("getFeatureState");
     static const std::string removeFeatureStateOp("removeFeatureState");
@@ -619,6 +652,25 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(AllocationIndex::isActive());
         AllocationIndex::setActive(false);
         AllocationIndex::reset();
+    } else if (operationArray[0].GetString() == networkProbeStartOp) {
+        // probeNetworkStart
+        assert(!ProxyFileSource::isTrackingActive());
+        ProxyFileSource::setTrackingActive(true);
+    } else if (operationArray[0].GetString() == networkProbeOp) {
+        // probeNetwork
+        assert(ProxyFileSource::isTrackingActive());
+        assert(operationArray.Size() >= 2u);
+        assert(operationArray[1].IsString());
+        std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
+
+        metadata.metrics.network.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(std::move(mark)),
+            std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
+    } else if (operationArray[0].GetString() == networkProbeEndOp) {
+        // probeNetworkEnd
+        assert(ProxyFileSource::isTrackingActive());
+        ProxyFileSource::setTrackingActive(false);
     } else if (operationArray[0].GetString() == setFeatureStateOp) {
         // setFeatureState
         assert(operationArray.Size() >= 3u);
@@ -786,6 +838,7 @@ TestRunner::Impl::Impl(const TestMetadata& metadata)
 bool TestRunner::run(TestMetadata& metadata) {
     AllocationIndex::setActive(false);
     AllocationIndex::reset();
+    ProxyFileSource::setTrackingActive(false);
     std::string key = mbgl::util::toString(uint32_t(metadata.mapMode))
         + "/" + mbgl::util::toString(metadata.pixelRatio)
         + "/" + mbgl::util::toString(uint32_t(metadata.crossSourceCollisions));

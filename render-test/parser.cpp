@@ -304,6 +304,21 @@ std::string serializeMetrics(const TestMetrics& metrics) {
         writer.EndArray();
     }
 
+    // Start network section
+    if (!metrics.network.empty()) {
+        writer.Key("network");
+        writer.StartArray();
+        for (const auto& networkProbe : metrics.network) {
+            assert(!networkProbe.first.empty());
+            writer.StartArray();
+            writer.String(networkProbe.first.c_str());
+            writer.Uint64(networkProbe.second.requests);
+            writer.Uint64(networkProbe.second.transferred);
+            writer.EndArray();
+        }
+        writer.EndArray();
+    }
+
     writer.EndObject();
 
     return s.GetString();
@@ -497,6 +512,25 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
             result.memory.emplace(std::piecewise_construct,
                                   std::forward_as_tuple(std::move(mark)), 
                                   std::forward_as_tuple(probeValue[1].GetUint64(), probeValue[2].GetUint64()));
+        }
+    }
+
+    if (document.HasMember("network")) {
+        const mbgl::JSValue& networkValue = document["network"];
+        assert(networkValue.IsArray());
+        for (auto& probeValue : networkValue.GetArray()) {
+            assert(probeValue.IsArray());
+            assert(probeValue.Size() >= 3u);
+            assert(probeValue[0].IsString());
+            assert(probeValue[1].IsNumber());
+            assert(probeValue[2].IsNumber());
+
+            std::string mark{probeValue[0].GetString(), probeValue[0].GetStringLength()};
+            assert(!mark.empty());
+
+            result.network.emplace(std::piecewise_construct,
+                                   std::forward_as_tuple(std::move(mark)),
+                                   std::forward_as_tuple(probeValue[1].GetUint64(), probeValue[2].GetUint64()));
         }
     }
 
