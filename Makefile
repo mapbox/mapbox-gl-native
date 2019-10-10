@@ -470,11 +470,13 @@ MBGL_ANDROID_ABIS += x86-64;x86_64
 
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 MBGL_ANDROID_LOCAL_BENCHMARK_DIR = /data/local/tmp/benchmark
+MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR = /data/local/tmp/test-runner
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
 MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
 MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release,debug)
 MBGL_ANDROID_CORE_TEST_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/core-tests
 MBGL_ANDROID_BENCHMARK_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/benchmark
+MBGL_ANDROID_TEST_RUNNER_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/test-runner
 MBGL_ANDROID_STL ?= c++_static
 MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildtype=$(buildtype) -Pmapbox.stl=$(MBGL_ANDROID_STL)
 
@@ -503,6 +505,10 @@ android-test-lib-$1: platform/android/gradle/configuration.gradle
 .PHONY: android-benchmark-$1
 android-benchmark-$1: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_benchmark=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
+
+.PHONY: android-test-runner-$1
+android-test-runner-$1: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_test_runner=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
 # Build SDK for for specified abi
 .PHONY: android-lib-$1
@@ -572,6 +578,41 @@ run-android-benchmark-$1-%: android-benchmark-$1
 	# Pull results.json from the device
 	rm -rf $(MBGL_ANDROID_BENCHMARK_DIR)/results && mkdir -p $(MBGL_ANDROID_BENCHMARK_DIR)/results
 	adb pull $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/results.json $(MBGL_ANDROID_BENCHMARK_DIR)/results > /dev/null 2>&1
+
+# Run render tests for specified abi
+.PHONY: run-android-test-runner-$1
+run-android-test-runner-$1: run-android-test-runner-$1-*
+
+run-android-test-runner-$1-%: android-test-runner-$1
+	mkdir -p $(MBGL_ANDROID_TEST_RUNNER_DIR)
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/$(buildtype)/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_TEST_RUNNER_DIR)
+
+	# Delete old test folder and create new one
+	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)"
+	adb shell "mkdir -p $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/platform && mkdir -p $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/platform/node && mkdir -p $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/platform/node/tests"
+	# Push compiled java sources, test data and executable to device
+	adb push $(MBGL_ANDROID_TEST_RUNNER_DIR)/classes.dex $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR) > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/intermediate-jars/$(buildtype)/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR) > /dev/null 2>&1
+	# Push all the necessary test resources
+	# adb push mapbox-gl-js/test/integration/render-tests $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/render-tests > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/query-tests $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/query-tests > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/tiles $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/tiles  > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/glyphs $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/glyphs  > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/sprites $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/sprites  > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/styles $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/styles   > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/tilesets $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/tilesets   > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/image $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/image   > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/video $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/video   > /dev/null 2>&1
+	adb push vendor/mapbox-gl-styles/styles $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/mapbox-gl-styles/styles   > /dev/null 2>&1
+	adb push render-test/expected $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/render-test/expected > /dev/null 2>&1
+	adb push platform/node/test/ignores.json $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/platform/node/tests > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/$(buildtype)/obj/$2/mbgl-render-test $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR) > /dev/null 2>&1
+
+	# Run render tests.
+	adb shell "export LD_LIBRARY_PATH=$(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR) && cd $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR) && chmod +x mbgl-render-test && ./mbgl-render-test --class_path=$(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/classes.dex --rootPath=$(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)"
+
+	# Pull index.html from the device
+	adb pull $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/index.html $(MBGL_ANDROID_TEST_RUNNER_DIR) > /dev/null 2>&1
 
 # Run the test app on connected android device with specified abi
 .PHONY: run-android-$1

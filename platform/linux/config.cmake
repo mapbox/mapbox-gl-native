@@ -168,6 +168,20 @@ macro(mbgl_platform_test)
     )
 endmacro()
 
+macro(mbgl_platform_render_test)
+    target_sources(mbgl-render-test
+        PRIVATE platform/default/src/mbgl/render-test/main.cpp
+    )
+
+    target_include_directories(mbgl-render-test
+        PRIVATE platform/linux
+    )
+
+    target_link_libraries(mbgl-render-test
+        PRIVATE mbgl-filesource
+        PRIVATE mbgl-loop-uv
+    )
+endmacro()
 
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark

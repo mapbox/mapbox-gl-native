@@ -44,6 +44,9 @@ android {
     if (project.hasProperty("mapbox.with_benchmark")) {
         nativeTargets.add("mbgl-benchmark")
     }
+    if (project.hasProperty("mapbox.with_test_runner")) {
+        nativeTargets.add("mbgl-render-test")
+    }
     nativeBuild(nativeTargets)
 
     // avoid naming conflicts, force usage of prefix

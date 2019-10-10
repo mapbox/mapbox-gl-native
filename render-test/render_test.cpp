@@ -1,24 +1,24 @@
 #include "allocation_index.hpp"
 
-#include <mbgl/util/run_loop.hpp>
+#include <mbgl/render_test.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
-#include "test_runner.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
 
 #include <random>
 
-#define ANSI_COLOR_RED        "\x1b[31m"
-#define ANSI_COLOR_GREEN      "\x1b[32m"
-#define ANSI_COLOR_YELLOW     "\x1b[33m"
-#define ANSI_COLOR_BLUE       "\x1b[34m"
-#define ANSI_COLOR_MAGENTA    "\x1b[35m"
-#define ANSI_COLOR_CYAN       "\x1b[36m"
-#define ANSI_COLOR_GRAY       "\x1b[37m"
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_GRAY "\x1b[37m"
 #define ANSI_COLOR_LIGHT_GRAY "\x1b[90m"
-#define ANSI_COLOR_RESET      "\x1b[0m"
+#define ANSI_COLOR_RESET "\x1b[0m"
 
 #if !defined(SANITIZE)
 void* operator new(std::size_t sz) {
@@ -37,9 +37,9 @@ void operator delete(void* ptr, size_t) noexcept {
 }
 #endif
 
-namespace mbgl{
+namespace mbgl {
 
-int runTests(int argc, char* argv[]) {
+int runRenderTests(int argc, char* argv[]) {
     bool recycleMap;
     bool shuffle;
     uint32_t seed;
@@ -49,18 +49,18 @@ int runTests(int argc, char* argv[]) {
     std::tie(recycleMap, shuffle, seed, testRootPath, testPaths) = parseArguments(argc, argv);
     const std::string::size_type rootLength = testRootPath.length();
 
-    const auto ignores = parseIgnores();
+    const auto ignores = parseIgnores(testRootPath);
 
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
 
-        std::seed_seq sequence { seed };
+        std::seed_seq sequence{seed};
         std::mt19937 shuffler(sequence);
         std::shuffle(testPaths.begin(), testPaths.end(), shuffler);
     }
 
     mbgl::util::RunLoop runLoop;
-    TestRunner runner;
+    TestRunner runner(testRootPath);
 
     std::vector<TestMetadata> metadatas;
     metadatas.reserve(testPaths.size());
@@ -68,7 +68,7 @@ int runTests(int argc, char* argv[]) {
     TestStatistics stats;
 
     for (auto& testPath : testPaths) {
-        TestMetadata metadata = parseTestMetadata(testPath);
+        TestMetadata metadata = parseTestMetadata(testPath, testRootPath);
 
         if (!recycleMap) {
             runner.reset();
@@ -77,7 +77,9 @@ int runTests(int argc, char* argv[]) {
         std::string& id = metadata.id;
         std::string& status = metadata.status;
         std::string& color = metadata.color;
-
+#ifdef __ANDROID__
+        metadata.allowed = 0.0009;
+#endif
         id = testPath.defaultExpectations();
         id = id.substr(rootLength + 1, id.length() - rootLength - 2);
 
@@ -85,7 +87,8 @@ int runTests(int argc, char* argv[]) {
         std::string ignoreReason;
 
         const std::string ignoreName = id;
-        const auto it = std::find_if(ignores.cbegin(), ignores.cend(), [&ignoreName](auto pair) { return pair.first == ignoreName; });
+        const auto it = std::find_if(
+            ignores.cbegin(), ignores.cend(), [&ignoreName](auto pair) { return pair.first == ignoreName; });
         if (it != ignores.end()) {
             shouldIgnore = true;
             ignoreReason = it->second;
@@ -112,7 +115,8 @@ int runTests(int argc, char* argv[]) {
                 status = "ignored failed";
                 color = "#9E9E9E";
                 stats.ignoreFailedTests++;
-                printf(ANSI_COLOR_LIGHT_GRAY "* ignore %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
+                printf(
+                    ANSI_COLOR_LIGHT_GRAY "* ignore %s (%s)" ANSI_COLOR_RESET "\n", id.c_str(), ignoreReason.c_str());
             }
         } else {
             if (passed) {
@@ -135,28 +139,37 @@ int runTests(int argc, char* argv[]) {
 
         metadatas.push_back(std::move(metadata));
     }
-
+    printf("Finished processing, creating result page now");
     std::string resultsHTML = createResultPage(stats, metadatas, shuffle, seed);
     mbgl::util::write_file(testRootPath + "/index.html", resultsHTML);
 
-    const uint32_t count = stats.erroredTests + stats.failedTests +
-                           stats.ignoreFailedTests + stats.ignorePassedTests +
-                           stats.passedTests;
+    const uint32_t count =
+        stats.erroredTests + stats.failedTests + stats.ignoreFailedTests + stats.ignorePassedTests + stats.passedTests;
 
     if (stats.passedTests) {
-        printf(ANSI_COLOR_GREEN "%u passed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.passedTests, 100.0 * stats.passedTests / count);
+        printf(ANSI_COLOR_GREEN "%u passed (%.1lf%%)" ANSI_COLOR_RESET "\n",
+               stats.passedTests,
+               100.0 * stats.passedTests / count);
     }
     if (stats.ignorePassedTests) {
-        printf(ANSI_COLOR_YELLOW "%u passed but were ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignorePassedTests, 100.0 * stats.ignorePassedTests / count);
+        printf(ANSI_COLOR_YELLOW "%u passed but were ignored (%.1lf%%)" ANSI_COLOR_RESET "\n",
+               stats.ignorePassedTests,
+               100.0 * stats.ignorePassedTests / count);
     }
     if (stats.ignoreFailedTests) {
-        printf(ANSI_COLOR_LIGHT_GRAY "%u ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignoreFailedTests, 100.0 * stats.ignoreFailedTests / count);
+        printf(ANSI_COLOR_LIGHT_GRAY "%u ignored (%.1lf%%)" ANSI_COLOR_RESET "\n",
+               stats.ignoreFailedTests,
+               100.0 * stats.ignoreFailedTests / count);
     }
     if (stats.failedTests) {
-        printf(ANSI_COLOR_RED "%u failed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.failedTests, 100.0 * stats.failedTests / count);
+        printf(ANSI_COLOR_RED "%u failed (%.1lf%%)" ANSI_COLOR_RESET "\n",
+               stats.failedTests,
+               100.0 * stats.failedTests / count);
     }
     if (stats.erroredTests) {
-        printf(ANSI_COLOR_RED "%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.erroredTests, 100.0 * stats.erroredTests / count);
+        printf(ANSI_COLOR_RED "%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n",
+               stats.erroredTests,
+               100.0 * stats.erroredTests / count);
     }
 
     printf("Results at: %s%s\n", testRootPath.c_str(), "/index.html");

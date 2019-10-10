@@ -32,20 +32,6 @@
 
 using namespace mbgl;
 
-// static 
-const std::string& TestRunner::getBasePath() {
-    const static std::string result = std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration");
-    return result;
-}
-
-// static
-const std::vector<std::string>& TestRunner::getPlatformExpectationsPaths() {
-    // TODO: Populate from command line.
-    const static std::vector<std::string> result {
-        std::string(TEST_RUNNER_ROOT_PATH).append("/render-test/expected")
-    };
-    return result;
-}
 
 std::string simpleDiff(const Value& result, const Value& expected) {
     std::vector<std::string> resultTokens{tokenize(toJSON(result, 2, false))};
@@ -84,6 +70,8 @@ std::string simpleDiff(const Value& result, const Value& expected) {
     diff << "</pre>" << std::endl;
     return diff.str();
 }
+
+TestRunner::TestRunner(const std::string& rootPath_) : rootPath(rootPath_) {}
 
 bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                        std::vector<mbgl::Feature>&& features,
@@ -354,6 +342,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         } catch (const std::exception&) {
             return false;
         }
+
     } else if (operationArray[0].GetString() == sleepOp) {
         // sleep
         mbgl::util::Timer sleepTimer;
@@ -395,7 +384,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         std::string imagePath = operationArray[2].GetString();
         imagePath.erase(std::remove(imagePath.begin(), imagePath.end(), '"'), imagePath.end());
 
-        const mbgl::filesystem::path filePath(std::string(TEST_RUNNER_ROOT_PATH) + "/mapbox-gl-js/test/integration/" + imagePath);
+        const mbgl::filesystem::path filePath(rootPath + "/mapbox-gl-js/test/integration/" + imagePath);
 
         mbgl::optional<std::string> maybeImage = mbgl::util::readFile(filePath.string());
         if (!maybeImage) {
@@ -415,17 +404,18 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         // setStyle
         assert(operationArray.Size() >= 2u);
         if (operationArray[1].IsString()) {
-            std::string stylePath = localizeURL(operationArray[1].GetString());
+            std::string stylePath = localizeURL(operationArray[1].GetString(), rootPath);
             auto maybeStyle = readJson(stylePath);
             if (maybeStyle.is<mbgl::JSDocument>()) {
                 auto& style = maybeStyle.get<mbgl::JSDocument>();
-                localizeStyleURLs((mbgl::JSValue&)style, style);
+                localizeStyleURLs((mbgl::JSValue&)style, style, rootPath);
                 map.getStyle().loadJSON(serializeJsonValue(style));
             }
         } else {
-            localizeStyleURLs(operationArray[1], metadata.document);
+            localizeStyleURLs(operationArray[1], metadata.document, rootPath);
             map.getStyle().loadJSON(serializeJsonValue(operationArray[1]));
         }
+
     } else if (operationArray[0].GetString() == setCenterOp) {
         // setCenter
         assert(operationArray.Size() >= 2u);
@@ -524,7 +514,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsObject());
 
-        localizeSourceURLs(operationArray[2], metadata.document);
+        localizeSourceURLs(operationArray[2], metadata.document, rootPath);
 
         mbgl::style::conversion::Error error;
         auto converted = mbgl::style::conversion::convert<std::unique_ptr<mbgl::style::Source>>(operationArray[2], error, operationArray[1].GetString());

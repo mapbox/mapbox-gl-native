@@ -106,6 +106,29 @@ macro(mbgl_platform_test)
     )
 endmacro()
 
+## Render Test executable ##
+macro(mbgl_platform_render_test)
+    target_sources(mbgl-render-test
+        PRIVATE platform/android/src/test/render_test_runner.cpp
+        PRIVATE platform/android/src/test/runtime.cpp
+    )
+
+    target_include_directories(mbgl-render-test
+        PRIVATE platform/android/include
+    )
+
+    set_target_properties(mbgl-render-test
+        PROPERTIES
+        LINK_FLAGS
+        "-fPIE -pie \
+        -Wl,--export-dynamic \
+        -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/src/test/version-script")
+
+    target_link_libraries(mbgl-render-test
+        PRIVATE mbgl-filesource
+    )
+endmacro()
+
 ## Benchmark ##
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark
