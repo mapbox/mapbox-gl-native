@@ -263,7 +263,7 @@ commands:
           when: on_fail
           command: |
             mkdir -p /tmp/tests/render
-            if [ -f mapbox-gl-js/test/integration/render-tests/index.html ]; then cp mapbox-gl-js/test/integration/render-tests/index.html /tmp/tests/render; fi
+            if [ -f mapbox-gl-js/test/integration/index.html ]; then cp mapbox-gl-js/test/integration/index.html /tmp/tests/render; fi
             mkdir -p /tmp/tests/coredumps
             if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
       - store_artifacts:
