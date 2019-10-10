@@ -585,7 +585,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         ]
 
         let clusterShapeData = try! JSONSerialization.data(withJSONObject: geoJSON, options: [])
-        let shape = MGLShape(data: clusterShapeData, encoding: String.Encoding.utf8.rawValue)
+        let shape = try! MGLShape(data: clusterShapeData, encoding: String.Encoding.utf8.rawValue)
         let source = MGLShapeSource(identifier: "source", shape: shape, options: options)
         mapView.style?.addSource(source)
 
