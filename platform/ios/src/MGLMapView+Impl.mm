@@ -4,7 +4,7 @@
 #import "NSBundle+MGLAdditions.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "MMEEventsManager.h"
+#import <MapboxMobileEvents/MapboxMobileEvents.h>
 #endif
 
 std::unique_ptr<MGLMapViewImpl> MGLMapViewImpl::Create(MGLMapView* nativeView) {

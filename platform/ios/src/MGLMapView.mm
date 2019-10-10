@@ -68,7 +68,8 @@
 #import "MGLMapAccessibilityElement.h"
 #import "MGLLocationManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
-#import "MMEConstants.h"
+
+#import <MapboxMobileEvents/MapboxMobileEvents.h>
 
 #include <algorithm>
 #include <cstdlib>

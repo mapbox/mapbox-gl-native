@@ -3,7 +3,7 @@
 #import "MGLMapView+OpenGL.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "MMEConstants.h"
+#import <MapboxMobileEvents/MapboxMobileEvents.h>
 #import "MGLMapboxEvents.h"
 #endif
 

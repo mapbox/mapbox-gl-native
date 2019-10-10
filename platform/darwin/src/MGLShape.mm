@@ -6,7 +6,7 @@
 #import "MGLTypes.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "MMEEventsManager.h"
+#import <MapboxMobileEvents/MapboxMobileEvents.h>
 #endif
 
 #import <mbgl/util/geo.hpp>

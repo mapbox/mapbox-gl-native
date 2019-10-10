@@ -11,7 +11,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "MMEConstants.h"
+#import <MapboxMobileEvents/MMEConstants.h>
 #endif
 
 @interface MGLTilePyramidOfflineRegion () <MGLOfflineRegion_Private, MGLTilePyramidOfflineRegion_Private>

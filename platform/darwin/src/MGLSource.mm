@@ -4,7 +4,7 @@
 #import "NSBundle+MGLAdditions.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-#import "MMEEventsManager.h"
+#import <MapboxMobileEvents/MapboxMobileEvents.h>
 #endif
 
 #include <mbgl/style/style.hpp>
