@@ -1,7 +1,7 @@
 #pragma once
 
 // THIS IS A GENERATED FILE; EDIT offline_schema.sql INSTEAD
-// To regenerate, run `node platform/default/mbgl/storage/offline_schema.js`
+// To regenerate, run `node platform/default/include/mbgl/storage/offline_schema.js`
 
 namespace mbgl {
 
