@@ -4,7 +4,14 @@
 
 namespace mbgl {
 
-util::ThreadLocal<Scheduler> g_currentScheduler;
+std::function<void()> Scheduler::bindOnce(std::function<void()> fn) {
+    assert(fn);
+    return [scheduler = makeWeakPtr(), scheduled = std::move(fn)]() mutable {
+        if (!scheduled) return; // Repeated call.
+        auto schedulerGuard = scheduler.lock();
+        if (scheduler) scheduler->schedule(std::move(scheduled));
+    };
+}
 
 static auto& current() {
     static util::ThreadLocal<Scheduler> scheduler;

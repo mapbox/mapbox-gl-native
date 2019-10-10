@@ -204,6 +204,7 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
             }
             requestedImages[missingImage].emplace(requestorPtr);
             requestor.addPendingRequest(missingImage);
+
             auto removePendingRequests = [this, missingImage] {
                 auto existingRequest = requestedImages.find(missingImage);
                 if (existingRequest == requestedImages.end()) {
@@ -214,11 +215,8 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
                     req->removePendingRequest(missingImage);
                 }
             };
-
-            Scheduler& scheduler = *Scheduler::GetCurrent();
-            auto callback = [&scheduler, removePendingRequests]() { scheduler.schedule(removePendingRequests); };
-
-            observer->onStyleImageMissing(missingImage, std::move(callback));
+            observer->onStyleImageMissing(missingImage,
+                                          Scheduler::GetCurrent()->bindOnce(std::move(removePendingRequests)));
         }
     } else {
         // Associate requestor with an image that was provided by the client.

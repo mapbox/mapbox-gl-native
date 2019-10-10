@@ -40,6 +40,16 @@ public:
     // Makes a weak pointer to this Scheduler.
     virtual mapbox::base::WeakPtr<Scheduler> makeWeakPtr() = 0;
 
+    // Returns a closure wrapping the given one.
+    //
+    // When the returned closure is invoked for the first time, it schedules
+    // the given closure to this scheduler, the consequent calls of the
+    // returned closure are ignored.
+    //
+    // If this scheduler is already deleted by the time the returnded closure is
+    // first invoked, the call is ignored.
+    std::function<void()> bindOnce(std::function<void()>);
+
     // Set/Get the current Scheduler for this thread
     static Scheduler* GetCurrent();
     static void SetCurrent(Scheduler*);
