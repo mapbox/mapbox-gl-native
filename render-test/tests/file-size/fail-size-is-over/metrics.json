@@ -1,14 +1,14 @@
 {
-    "fileSize": [
+    "file-size": [
         [
             "image",
             "expected.png",
-            169
+            999
         ],
         [
             "style",
             "style.json",
-            510
+            999
         ]
     ]
 }
