@@ -3,6 +3,7 @@ export IS_LOCAL_DEVELOPMENT ?= true
 export TARGET_BRANCH ?= master
 
 CMAKE ?= cmake
+ROOT ?= .
 
 
 ifeq ($(BUILDTYPE), Release)
@@ -56,8 +57,8 @@ endif
 .PHONY: default
 default: test
 
-BUILD_DEPS += Makefile
-BUILD_DEPS += CMakeLists.txt
+BUILD_DEPS += $(ROOT)/Makefile
+BUILD_DEPS += $(ROOT)/CMakeLists.txt
 
 BUILD_DOCS ?= true
 
@@ -205,9 +206,9 @@ endif
 
 ifeq ($(HOST_PLATFORM), macos)
 
-IOS_OUTPUT_PATH = build/ios
+IOS_OUTPUT_PATH ?= build/ios
 IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/mbgl.xcodeproj
-IOS_WORK_PATH = platform/ios/ios.xcworkspace
+IOS_WORK_PATH ?= platform/ios/ios.xcworkspace
 IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 IOS_XCODEBUILD_SIM = xcodebuild \
@@ -275,8 +276,8 @@ endif
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
 	mkdir -p $(IOS_OUTPUT_PATH)
-	(cd $(IOS_OUTPUT_PATH) && $(CMAKE) -G Xcode ../.. \
-		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
+	(cd $(IOS_OUTPUT_PATH) && $(CMAKE) -G Xcode ../../$(ROOT) \
+		-DCMAKE_TOOLCHAIN_FILE=../../$(ROOT)/platform/ios/toolchain.cmake \
 		-DMBGL_PLATFORM=ios \
 		-DMASON_PLATFORM=ios)
 
@@ -533,7 +534,7 @@ run-android-core-test-$1-%: android-core-test-$1
 	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/$(buildtype)/obj/$2/mbgl-test $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 
 # Create gtest filter for skipped tests.
-	$(eval SKIPPED_TESTS := -$(shell sed -n '/#\|^$$/!p' platform/android/tests/skipped.txt | sed ':a;$!N;s/\n/:/g;ta'))
+	$(eval SKIPPED_TESTS := -$(shell sed -n '/#\|^$$/!p' $(ROOT)/platform/android/tests/skipped.txt | sed ':a;$!N;s/\n/:/g;ta'))
 
 	# Kick off the tests
 	adb shell "export LD_LIBRARY_PATH=$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && chmod +x mbgl-test && ./mbgl-test --class_path=$(MBGL_ANDROID_LOCAL_WORK_DIR)/classes.dex --gtest_filter=$$*:$(SKIPPED_TESTS)"
@@ -778,7 +779,7 @@ codestyle:
 .PHONY: clean
 clean:
 	-rm -rf ./build \
-	        ./lib/*.node \
+	        $(ROOT)/lib/*.node \
 	        ./platform/android/gradle/configuration.gradle \
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \
