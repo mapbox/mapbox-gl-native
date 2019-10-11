@@ -274,9 +274,9 @@ std::string serializeMetrics(const TestMetrics& metrics) {
 
     writer.StartObject();
 
-    // Start fileSize section.
+    // Start file-size section.
     if (!metrics.fileSize.empty()) {
-        writer.Key("fileSize");
+        writer.Key("file-size");
         writer.StartArray();
         for (const auto& fileSizeProbe : metrics.fileSize) {
             assert(!fileSizeProbe.first.empty());
@@ -460,8 +460,8 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
 
     const auto& document = maybeJson.get<mbgl::JSDocument>();
 
-    if (document.HasMember("fileSize")) {
-        const mbgl::JSValue& fileSizeValue = document["fileSize"];
+    if (document.HasMember("file-size")) {
+        const mbgl::JSValue& fileSizeValue = document["file-size"];
         assert(fileSizeValue.IsArray());
         for (auto& probeValue : fileSizeValue.GetArray()) {
             assert(probeValue.IsArray());
