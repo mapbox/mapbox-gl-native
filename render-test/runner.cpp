@@ -292,7 +292,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         if (!passed) {
             std::stringstream ss;
             ss << "Number of allocations at probe \"" << expected.first << "\" is " << actual->second.allocations
-               << ", expected is " << expected.second.allocations << "±" << delta << " allocations.";
+               << ", expected is " << expected.second.allocations << "±" << std::round(delta) << " allocations.";
 
             metadata.errorMessage = ss.str();
             return false;
