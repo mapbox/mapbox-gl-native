@@ -270,7 +270,7 @@ std::string serializeJsonValue(const mbgl::JSValue& value) {
 
 std::string serializeMetrics(const TestMetrics& metrics) {
     rapidjson::StringBuffer s;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 
     writer.StartObject();
 
