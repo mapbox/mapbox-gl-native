@@ -14,6 +14,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Improved rendering performance for the styles with multiple sources ([#15756](https://github.com/mapbox/mapbox-gl-native/pull/15756))
 
+### Styles and rendering
+
+* Added an `MGLShapeSourceOptionClusterProperties` option that allows styling individual clusters based on aggregated feature data. ([#15515](https://github.com/mapbox/mapbox-gl-native/pull/15515))
+
 ### Other changes
 
 * Added `-[MGLMapSnapshotOverlay coordinateForPoint:]` and `-[MGLMapSnapshotOverlay pointForCoordinate:]` to convert between context and map coordinates, mirroring those of `MGLMapSnapshot`. ([#15746](https://github.com/mapbox/mapbox-gl-native/pull/15746))

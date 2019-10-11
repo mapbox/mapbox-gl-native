@@ -13,8 +13,12 @@
 @implementation MGLShapeSourceTests
 
 - (void)testGeoJSONOptionsFromDictionary {
+    NSExpression *reduceExpression = [NSExpression expressionForFunction:@"sum:" arguments:@[[NSExpression expressionForKeyPath:@"featureAccumulated"], [NSExpression expressionForKeyPath:@"sumValue"]]];
+    NSExpression *mapExpression = [NSExpression expressionForKeyPath:@"mag"];
+    NSArray *clusterPropertyArray = @[reduceExpression, mapExpression];
     NSDictionary *options = @{MGLShapeSourceOptionClustered: @YES,
                               MGLShapeSourceOptionClusterRadius: @42,
+                              MGLShapeSourceOptionClusterProperties: @{@"sumValue": clusterPropertyArray},
                               MGLShapeSourceOptionMaximumZoomLevelForClustering: @98,
                               MGLShapeSourceOptionMaximumZoomLevel: @99,
                               MGLShapeSourceOptionBuffer: @1976,
@@ -29,6 +33,7 @@
     XCTAssertEqual(mbglOptions.buffer, 1976);
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
     XCTAssertTrue(mbglOptions.lineMetrics);
+    XCTAssertTrue(!mbglOptions.clusterProperties.empty());
 
     options = @{MGLShapeSourceOptionClustered: @"number 1"};
     XCTAssertThrows(MGLGeoJSONOptionsFromDictionary(options));
