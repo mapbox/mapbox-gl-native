@@ -5,5 +5,7 @@
   "tests/file-size/fail-file-not-found": "Should fail, file not found.",
   "tests/network/fail-requests": "Should fail, number of requests higher than expected.",
   "tests/network/fail-transferred": "Should fail, amount of transferred data higher than expected.",
-  "tests/network/fail-requests-transferred": "Should fail, number of requests higher than expected and amount of transferred data less than expected."
+  "tests/network/fail-requests-transferred": "Should fail, number of requests higher than expected and amount of transferred data less than expected.",
+  "tests/memory/fail-memory-size-is-too-big": "Should fail, memory size is bigger than expected.",
+  "tests/memory/fail-memory-size-is-too-small": "Should fail, memory size is smaller than expected."
 }
