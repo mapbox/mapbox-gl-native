@@ -269,6 +269,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             return false;
         }
     }
+#if !defined(SANITIZE)
     // Check memory metrics.
     for (const auto& expected : metadata.expectedMetrics.memory) {
         auto actual = metadata.metrics.memory.find(expected.first);
@@ -327,7 +328,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             return false;
         }
     }
-
+#endif // !defined(SANITIZE)
     return true;
 }
 
