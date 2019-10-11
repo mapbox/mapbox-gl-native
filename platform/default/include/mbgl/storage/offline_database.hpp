@@ -9,10 +9,10 @@
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/expected.hpp>
 
-#include <unordered_map>
+#include <list>
+#include <map>
 #include <memory>
 #include <string>
-#include <list>
 
 namespace mapbox {
 namespace sqlite {
@@ -140,7 +140,7 @@ private:
 
     std::string path;
     std::unique_ptr<mapbox::sqlite::Database> db;
-    std::unordered_map<const char *, const std::unique_ptr<mapbox::sqlite::Statement>> statements;
+    std::map<const char*, const std::unique_ptr<mapbox::sqlite::Statement>> statements;
 
     template <class T>
     T getPragma(const char *);

@@ -58,7 +58,7 @@ private:
     std::unique_ptr<OfflineRegionObserver> observer;
 
     std::list<std::unique_ptr<AsyncRequest>> requests;
-    std::unordered_set<std::string> requiredSourceURLs;
+    std::set<std::string> requiredSourceURLs;
     std::deque<Resource> resourcesRemaining;
     std::list<Resource> resourcesToBeMarkedAsUsed;
     std::list<std::tuple<Resource, Response>> buffer;

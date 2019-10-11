@@ -11,6 +11,8 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/thread.hpp>
 
+#include <map>
+
 namespace mbgl {
 
 // For testing use only
@@ -143,7 +145,7 @@ private:
     }
 
     std::unique_ptr<OfflineDatabase> db;
-    std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
+    std::map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
     std::shared_ptr<FileSource> onlineFileSource;
 };
 

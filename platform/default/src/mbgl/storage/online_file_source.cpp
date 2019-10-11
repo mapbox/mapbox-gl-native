@@ -24,8 +24,6 @@
 #include <cassert>
 #include <list>
 #include <map>
-#include <unordered_map>
-#include <unordered_set>
 
 namespace mbgl {
 
@@ -277,11 +275,11 @@ private:
      * Requests in any state are in `allRequests`. Requests in the pending state are in
      * `pendingRequests`. Requests in the active state are in `activeRequests`.
      */
-    std::unordered_set<OnlineFileRequest*> allRequests;
+    std::set<OnlineFileRequest*> allRequests;
 
     PendingRequests pendingRequests;
 
-    std::unordered_set<OnlineFileRequest*> activeRequests;
+    std::set<OnlineFileRequest*> activeRequests;
 
     bool online = true;
     uint32_t maximumConcurrentRequests;

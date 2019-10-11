@@ -10,6 +10,7 @@
 #include <mbgl/util/thread.hpp>
 
 #include <cassert>
+#include <map>
 
 namespace mbgl {
 
@@ -117,7 +118,7 @@ private:
     const std::shared_ptr<FileSource> databaseFileSource;
     const std::shared_ptr<FileSource> localFileSource;
     const std::shared_ptr<FileSource> onlineFileSource;
-    std::unordered_map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
+    std::map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
 };
 
 class MainResourceLoader::Impl {
