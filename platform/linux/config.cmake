@@ -52,6 +52,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
         PRIVATE platform/default/src/mbgl/util/compression.cpp
         PRIVATE platform/default/src/mbgl/util/logging_stderr.cpp
+        PRIVATE platform/default/src/mbgl/util/monotonic_timer.cpp
         PRIVATE platform/default/src/mbgl/util/string_stdlib.cpp
         PRIVATE platform/default/src/mbgl/util/thread.cpp
         PRIVATE platform/default/src/mbgl/util/thread_local.cpp

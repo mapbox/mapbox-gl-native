@@ -483,6 +483,7 @@
         "mbgl/util/indexed_tuple.hpp": "include/mbgl/util/indexed_tuple.hpp",
         "mbgl/util/interpolate.hpp": "include/mbgl/util/interpolate.hpp",
         "mbgl/util/logging.hpp": "include/mbgl/util/logging.hpp",
+        "mbgl/util/monotonic_timer.hpp": "include/mbgl/util/monotonic_timer.hpp",
         "mbgl/util/noncopyable.hpp": "include/mbgl/util/noncopyable.hpp",
         "mbgl/util/optional.hpp": "include/mbgl/util/optional.hpp",
         "mbgl/util/platform.hpp": "include/mbgl/util/platform.hpp",
