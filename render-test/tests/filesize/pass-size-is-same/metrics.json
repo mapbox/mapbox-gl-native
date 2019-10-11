@@ -1,1 +1,14 @@
-{"fileSize":[["image","expected.png",169],["style","style.json",510]]}
+{
+    "fileSize": [
+        [
+            "image",
+            "expected.png",
+            169
+        ],
+        [
+            "style",
+            "style.json",
+            510
+        ]
+    ]
+}
