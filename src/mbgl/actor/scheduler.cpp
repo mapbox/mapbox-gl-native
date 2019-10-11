@@ -4,13 +4,30 @@
 
 namespace mbgl {
 
-std::function<void()> Scheduler::bindOnce(std::function<void()> fn) {
-    assert(fn);
-    return [scheduler = makeWeakPtr(), scheduled = std::move(fn)]() mutable {
+namespace {
+
+class BindContext {
+public:
+    BindContext(std::function<void()> scheduled_, mapbox::base::WeakPtr<Scheduler> scheduler_)
+        : scheduled(std::move(scheduled_)), scheduler(std::move(scheduler_)) {}
+
+    std::function<void()> scheduled;
+    mapbox::base::WeakPtr<Scheduler> scheduler;
+
+    void scheduleOnce() {
         if (!scheduled) return; // Repeated call.
         auto schedulerGuard = scheduler.lock();
         if (scheduler) scheduler->schedule(std::move(scheduled));
-    };
+        assert(!scheduled);
+    }
+};
+
+} // namespace
+
+std::function<void()> Scheduler::bindOnce(std::function<void()> fn) {
+    assert(fn);
+    auto ctx = new BindContext(std::move(fn), makeWeakPtr());
+    return [ctx]() { ctx->scheduleOnce(); };
 }
 
 static auto& current() {
