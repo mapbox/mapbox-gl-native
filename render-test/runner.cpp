@@ -579,20 +579,22 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(operationArray[2].IsString());
 
         std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
-        mbgl::filesystem::path path = std::string(operationArray[2].GetString(), operationArray[2].GetStringLength());
+        std::string path = std::string(operationArray[2].GetString(), operationArray[2].GetStringLength());
         assert(!path.empty());
 
-        if (!path.is_absolute()) {
-            path = metadata.paths.defaultExpectations() / path;
+        mbgl::filesystem::path filePath(path);
+
+        if (!filePath.is_absolute()) {
+            filePath = metadata.paths.defaultExpectations() / filePath;
         }
 
-        if (mbgl::filesystem::exists(path)) {
-            auto size = mbgl::filesystem::file_size(path);
+        if (mbgl::filesystem::exists(filePath)) {
+            auto size = mbgl::filesystem::file_size(filePath);
             metadata.metrics.fileSize.emplace(std::piecewise_construct,
                                               std::forward_as_tuple(std::move(mark)),
                                               std::forward_as_tuple(std::move(path), size));
         } else {
-            metadata.errorMessage = std::string("File not found: ") + path.string();
+            metadata.errorMessage = std::string("File not found: ") + path;
             return false;
         }
     } else if (operationArray[0].GetString() == memoryProbeStartOp) {
