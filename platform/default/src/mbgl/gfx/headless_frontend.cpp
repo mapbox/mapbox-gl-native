@@ -10,34 +10,35 @@
 namespace mbgl {
 
 HeadlessFrontend::HeadlessFrontend(float pixelRatio_,
+                                   gfx::HeadlessBackend::SwapBehaviour swapBehavior,
                                    const gfx::ContextMode contextMode,
                                    const optional<std::string> localFontFamily)
-    : HeadlessFrontend(
-          { 256, 256 }, pixelRatio_, contextMode, localFontFamily) {
-}
+    : HeadlessFrontend({256, 256}, pixelRatio_, swapBehavior, contextMode, localFontFamily) {}
 
 HeadlessFrontend::HeadlessFrontend(Size size_,
                                    float pixelRatio_,
+                                   gfx::HeadlessBackend::SwapBehaviour swapBehavior,
                                    const gfx::ContextMode contextMode,
                                    const optional<std::string> localFontFamily)
     : size(size_),
       pixelRatio(pixelRatio_),
-      backend(gfx::HeadlessBackend::Create({ static_cast<uint32_t>(size.width * pixelRatio),
-                                             static_cast<uint32_t>(size.height * pixelRatio) }, contextMode)),
-    asyncInvalidate([this] {
-        if (renderer && updateParameters) {
-            gfx::BackendScope guard { *getBackend() };
+      backend(gfx::HeadlessBackend::Create(
+          {static_cast<uint32_t>(size.width * pixelRatio), static_cast<uint32_t>(size.height * pixelRatio)},
+          swapBehavior,
+          contextMode)),
+      asyncInvalidate([this] {
+          if (renderer && updateParameters) {
+              gfx::BackendScope guard{*getBackend()};
 
-            // onStyleImageMissing might be called during a render. The user implemented method
-            // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.
-            // Copy the shared pointer here so that the parameters aren't destroyed while `render(...)` is
-            // still using them.
-            auto updateParameters_ = updateParameters;
-            renderer->render(*updateParameters_);
-        }
-    }),
-    renderer(std::make_unique<Renderer>(*getBackend(), pixelRatio, localFontFamily)) {
-}
+              // onStyleImageMissing might be called during a render. The user implemented method
+              // could trigger a call to MGLRenderFrontend#update which overwrites `updateParameters`.
+              // Copy the shared pointer here so that the parameters aren't destroyed while `render(...)` is
+              // still using them.
+              auto updateParameters_ = updateParameters;
+              renderer->render(*updateParameters_);
+          }
+      }),
+      renderer(std::make_unique<Renderer>(*getBackend(), pixelRatio, localFontFamily)) {}
 
 HeadlessFrontend::~HeadlessFrontend() = default;
 

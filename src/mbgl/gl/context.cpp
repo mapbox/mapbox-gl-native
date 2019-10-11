@@ -583,6 +583,10 @@ std::unique_ptr<gfx::CommandEncoder> Context::createCommandEncoder() {
     return std::make_unique<gl::CommandEncoder>(*this);
 }
 
+void Context::finish() {
+    MBGL_CHECK_ERROR(glFinish());
+}
+
 void Context::draw(const gfx::DrawMode& drawMode,
                    std::size_t indexOffset,
                    std::size_t indexLength) {

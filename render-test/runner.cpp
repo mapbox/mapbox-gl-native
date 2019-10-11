@@ -39,6 +39,12 @@ const std::string& TestRunner::getBasePath() {
     return result;
 }
 
+// static
+gfx::HeadlessBackend::SwapBehaviour swapBehavior(MapMode mode) {
+    return mode == MapMode::Continuous ? gfx::HeadlessBackend::SwapBehaviour::Flush
+                                       : gfx::HeadlessBackend::SwapBehaviour::NoFlush;
+}
+
 std::string simpleDiff(const Value& result, const Value& expected) {
     std::vector<std::string> resultTokens{tokenize(toJSON(result, 2, false))};
     std::vector<std::string> expectedTokens{tokenize(toJSON(expected, 2, false))};
@@ -824,7 +830,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
 }
 
 TestRunner::Impl::Impl(const TestMetadata& metadata)
-    : frontend(metadata.size, metadata.pixelRatio),
+    : frontend(metadata.size, metadata.pixelRatio, swapBehavior(metadata.mapMode)),
       map(frontend,
           mbgl::MapObserver::nullObserver(),
           mbgl::MapOptions()
