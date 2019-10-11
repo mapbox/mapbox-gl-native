@@ -2,5 +2,8 @@
   "tests/file-size/fail-size-is-over": "Should fail, size is bigger than expected.",
   "tests/file-size/fail-size-is-under": "Should fail, size is smaller than expected.",
   "tests/file-size/fail-file-doesnt-match": "Should fail, doesn't match the expectation.",
-  "tests/file-size/fail-file-not-found": "Should fail, file not found."
+  "tests/file-size/fail-file-not-found": "Should fail, file not found.",
+  "tests/network/fail-requests": "Should fail, number of requests higher than expected.",
+  "tests/network/fail-transferred": "Should fail, amount of transferred data higher than expected.",
+  "tests/network/fail-requests-transferred": "Should fail, number of requests higher than expected and amount of transferred data less than expected."
 }
