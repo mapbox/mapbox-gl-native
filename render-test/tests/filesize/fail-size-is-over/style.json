@@ -22,15 +22,11 @@
       }
     }
   },
-  "sprite": "local://sprites/sprite",
   "layers": [
     {
-      "id": "symbol",
-      "type": "symbol",
-      "source": "geojson",
-      "layout": {
-        "icon-image": "circle-12"
-      }
+      "id": "circle",
+      "type": "circle",
+      "source": "geojson"
     }
   ]
 }
