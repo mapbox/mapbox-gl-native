@@ -276,19 +276,23 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             metadata.errorMessage = "Failed to find memory probe: " + expected.first;
             return false;
         }
-        if (actual->second.peak > expected.second.peak) {
+        bool passed{false};
+        float delta{0.0f};
+        std::tie(passed, delta) = MemoryProbe::checkPeak(expected.second, actual->second);
+        if (!passed) {
             std::stringstream ss;
-            ss << "Allocated memory peak size at probe \"" << expected.first << "\" is "
-               << actual->second.peak << " bytes, expected is " << expected.second.peak << " bytes.";
+            ss << "Allocated memory peak size at probe \"" << expected.first << "\" is " << actual->second.peak
+               << " bytes, expected is " << expected.second.peak << "±" << delta << " bytes.";
 
             metadata.errorMessage = ss.str();
             return false;
         }
 
-        if (actual->second.allocations > expected.second.allocations) {
+        std::tie(passed, delta) = MemoryProbe::checkAllocations(expected.second, actual->second);
+        if (!passed) {
             std::stringstream ss;
-            ss << "Number of allocations at probe \"" << expected.first << "\" is "
-               << actual->second.allocations << ", expected is " << expected.second.allocations << ".";
+            ss << "Number of allocations at probe \"" << expected.first << "\" is " << actual->second.allocations
+               << ", expected is " << expected.second.allocations << "±" << delta << " allocations.";
 
             metadata.errorMessage = ss.str();
             return false;
@@ -644,9 +648,15 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(operationArray[1].IsString());
         std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
 
-        metadata.metrics.memory.emplace(std::piecewise_construct,
-                                        std::forward_as_tuple(std::move(mark)), 
-                                        std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(), AllocationIndex::getAllocationsCount()));
+        auto emplaced = metadata.metrics.memory.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(std::move(mark)),
+            std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(), AllocationIndex::getAllocationsCount()));
+        assert(emplaced.second);
+        if (operationArray.Size() >= 3u) {
+            assert(operationArray[2].IsNumber());
+            emplaced.first->second.tolerance = float(operationArray[2].GetDouble());
+        }
     } else if (operationArray[0].GetString() == memoryProbeEndOp) {
         // probeMemoryEnd
         assert(AllocationIndex::isActive());

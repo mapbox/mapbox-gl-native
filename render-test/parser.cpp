@@ -507,7 +507,7 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
             assert(probeValue[1].IsNumber());
             assert(probeValue[2].IsNumber());
 
-            const std::string mark { probeValue[0].GetString(), probeValue[0].GetStringLength() };
+            std::string mark{probeValue[0].GetString(), probeValue[0].GetStringLength()};
             assert(!mark.empty());
             result.memory.emplace(std::piecewise_construct,
                                   std::forward_as_tuple(std::move(mark)), 
