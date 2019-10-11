@@ -1,1 +1,1 @@
-{"fileSize":[["image","../render-test/tests/filesize/fail-size-is-over/expected.png",100],["style","../render-test/tests/filesize/fail-size-is-over/style.json",100]]}
+{"fileSize":[["image","expected.png",999],["style","style.json",999]]}
