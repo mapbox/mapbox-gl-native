@@ -125,6 +125,9 @@ int runRenderTests(int argc, char** argv) {
                 color = "red";
                 stats.erroredTests++;
                 printf(ANSI_COLOR_RED "* errored %s" ANSI_COLOR_RESET "\n", id.c_str());
+                if (!metadata.errorMessage.empty()) {
+                    printf(ANSI_COLOR_RED "* error: %s" ANSI_COLOR_RESET "\n", metadata.errorMessage.c_str());
+                }
             } else {
                 status = "failed";
                 color = "red";
