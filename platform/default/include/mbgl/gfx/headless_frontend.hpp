@@ -1,11 +1,12 @@
 #pragma once
 
+#include <mbgl/gfx/headless_backend.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
-#include <mbgl/gfx/headless_backend.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/optional.hpp>
 
+#include <atomic>
 #include <memory>
 
 namespace mbgl {
@@ -31,6 +32,7 @@ public:
     void update(std::shared_ptr<UpdateParameters>) override;
     void setObserver(RendererObserver&) override;
 
+    double getFrameTime() const;
     Size getSize() const;
     void setSize(Size);
 
@@ -54,6 +56,7 @@ private:
     Size size;
     float pixelRatio;
 
+    std::atomic<double> frameTime;
     std::unique_ptr<gfx::HeadlessBackend> backend;
     util::AsyncTask asyncInvalidate;
 

@@ -1,10 +1,11 @@
-#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
+#include <mbgl/map/map.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_state.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
-#include <mbgl/map/map.hpp>
-#include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/monotonic_timer.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
@@ -22,12 +23,14 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
                                    const optional<std::string> localFontFamily)
     : size(size_),
       pixelRatio(pixelRatio_),
+      frameTime(0),
       backend(gfx::HeadlessBackend::Create(
           {static_cast<uint32_t>(size.width * pixelRatio), static_cast<uint32_t>(size.height * pixelRatio)},
           swapBehavior,
           contextMode)),
       asyncInvalidate([this] {
           if (renderer && updateParameters) {
+              auto startTime = mbgl::util::MonotonicTimer::now();
               gfx::BackendScope guard{*getBackend()};
 
               // onStyleImageMissing might be called during a render. The user implemented method
@@ -36,6 +39,9 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
               // still using them.
               auto updateParameters_ = updateParameters;
               renderer->render(*updateParameters_);
+
+              auto endTime = mbgl::util::MonotonicTimer::now();
+              frameTime = (endTime - startTime).count();
           }
       }),
       renderer(std::make_unique<Renderer>(*getBackend(), pixelRatio, localFontFamily)) {}
@@ -55,6 +61,10 @@ void HeadlessFrontend::update(std::shared_ptr<UpdateParameters> updateParameters
 void HeadlessFrontend::setObserver(RendererObserver& observer_) {
     assert(renderer);
     renderer->setObserver(&observer_);
+}
+
+double HeadlessFrontend::getFrameTime() const {
+    return frameTime;
 }
 
 Size HeadlessFrontend::getSize() const {
