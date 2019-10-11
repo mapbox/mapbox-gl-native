@@ -165,81 +165,97 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
     const std::string& base = metadata.paths.defaultExpectations();
     const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
 
-    metadata.actual = mbgl::encodePNG(actualImage);
+    if (metadata.outputsImage) {
+        metadata.actual = mbgl::encodePNG(actualImage);
 
-    if (actualImage.size.isEmpty()) {
-        metadata.errorMessage = "Invalid size for actual image";
-        return false;
+        if (actualImage.size.isEmpty()) {
+            metadata.errorMessage = "Invalid size for actual image";
+            return false;
+        }
+
+#if !TEST_READ_ONLY
+        if (getenv("UPDATE_PLATFORM")) {
+            mbgl::filesystem::create_directories(expectations.back());
+            mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actualImage));
+            return true;
+        } else if (getenv("UPDATE_DEFAULT")) {
+            mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actualImage));
+            return true;
+        }
+
+        mbgl::util::write_file(base + "/actual.png", metadata.actual);
+#endif
+
+        mbgl::PremultipliedImage expectedImage{actualImage.size};
+        mbgl::PremultipliedImage imageDiff{actualImage.size};
+
+        double pixels = 0.0;
+        std::vector<std::string> expectedImagesPaths;
+        for (auto rit = expectations.rbegin(); rit != expectations.rend(); ++rit) {
+            if (mbgl::filesystem::exists(*rit)) {
+                expectedImagesPaths = readExpectedImageEntries(*rit);
+                if (!expectedImagesPaths.empty()) break;
+            }
+        }
+
+        if (expectedImagesPaths.empty()) {
+            metadata.errorMessage = "Failed to find expectations for: " + metadata.paths.stylePath.string();
+            return false;
+        }
+
+        for (const auto& entry : expectedImagesPaths) {
+            mbgl::optional<std::string> maybeExpectedImage = mbgl::util::readFile(entry);
+            if (!maybeExpectedImage) {
+                metadata.errorMessage = "Failed to load expected image " + entry;
+                return false;
+            }
+
+            metadata.expected = *maybeExpectedImage;
+
+            expectedImage = mbgl::decodeImage(*maybeExpectedImage);
+
+            pixels = // implicitly converting from uint64_t
+                mapbox::pixelmatch(actualImage.data.get(),
+                                   expectedImage.data.get(),
+                                   expectedImage.size.width,
+                                   expectedImage.size.height,
+                                   imageDiff.data.get(),
+                                   0.1285); // Defined in GL JS
+
+            metadata.diff = mbgl::encodePNG(imageDiff);
+
+#if !TEST_READ_ONLY
+            mbgl::util::write_file(base + "/diff.png", metadata.diff);
+#endif
+
+            metadata.difference = pixels / expectedImage.size.area();
+            if (metadata.difference <= metadata.allowed) {
+                break;
+            }
+        }
     }
 
 #if !TEST_READ_ONLY
-    if (getenv("UPDATE_PLATFORM")) {
-        mbgl::filesystem::create_directories(expectations.back());
-        mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actualImage));
-        return true;
-    } else if (getenv("UPDATE_DEFAULT")) {
-        mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actualImage));
-        return true;
-    } else if (getenv("UPDATE_METRICS")) {
+    if (getenv("UPDATE_METRICS")) {
         if (!metadata.metrics.isEmpty()) {
             mbgl::filesystem::create_directories(expectations.back());
             mbgl::util::write_file(expectations.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
             return true;
         }
     }
-
-    mbgl::util::write_file(base + "/actual.png", metadata.actual);
 #endif
 
-    mbgl::PremultipliedImage expectedImage { actualImage.size };
-    mbgl::PremultipliedImage imageDiff { actualImage.size };
-
-    double pixels = 0.0;
-    std::vector<std::string> expectedImagesPaths;
     mbgl::filesystem::path expectedMetricsPath;
-    for (auto rit = expectations.rbegin(); rit!= expectations.rend(); ++rit) {
+    for (auto rit = expectations.rbegin(); rit != expectations.rend(); ++rit) {
         if (mbgl::filesystem::exists(*rit)) {
             if (metadata.expectedMetrics.isEmpty()) {
-                mbgl::filesystem::path maybeExpectedMetricsPath{ *rit };
+                mbgl::filesystem::path maybeExpectedMetricsPath{*rit};
                 maybeExpectedMetricsPath.replace_filename("metrics.json");
                 metadata.expectedMetrics = readExpectedMetrics(maybeExpectedMetricsPath);
             }
-            expectedImagesPaths = readExpectedImageEntries(*rit);
-            if (!expectedImagesPaths.empty()) break;
         }
     }
 
-    if (expectedImagesPaths.empty()) {
-        metadata.errorMessage = "Failed to find expectations for: " + metadata.paths.stylePath.string();
-        return false;
-    }
-    
-    for (const auto& entry: expectedImagesPaths) {
-        mbgl::optional<std::string> maybeExpectedImage = mbgl::util::readFile(entry);
-        if (!maybeExpectedImage) {
-            metadata.errorMessage = "Failed to load expected image " + entry;
-            return false;
-        }
-
-        metadata.expected = *maybeExpectedImage;
-
-        expectedImage = mbgl::decodeImage(*maybeExpectedImage);
-
-        pixels = // implicitly converting from uint64_t
-            mapbox::pixelmatch(actualImage.data.get(), expectedImage.data.get(), expectedImage.size.width,
-                               expectedImage.size.height, imageDiff.data.get(), 0.1285); // Defined in GL JS
-
-        metadata.diff = mbgl::encodePNG(imageDiff);
-
-#if !TEST_READ_ONLY
-        mbgl::util::write_file(base + "/diff.png", metadata.diff);
-#endif
-
-        metadata.difference = pixels / expectedImage.size.area();
-        if (metadata.difference <= metadata.allowed) {
-            break;
-        }
-    }
     // Check file size metrics.
     for (const auto& expected : metadata.expectedMetrics.fileSize) {
         auto actual = metadata.metrics.fileSize.find(expected.first);
@@ -870,7 +886,7 @@ bool TestRunner::run(TestMetadata& metadata) {
 
     mbgl::PremultipliedImage image;
     try {
-        image = frontend.render(map);
+        if (metadata.outputsImage) image = frontend.render(map);
     } catch (const std::exception&) {
         return false;
     }

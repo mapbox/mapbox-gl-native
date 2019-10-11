@@ -100,7 +100,8 @@ int runRenderTests(int argc, char** argv) {
             errored = !runner.run(metadata) || !metadata.errorMessage.empty();
         }
 
-        bool passed = !errored && !metadata.diff.empty() && metadata.difference <= metadata.allowed;
+        bool passed =
+            !errored && (!metadata.outputsImage || !metadata.diff.empty()) && metadata.difference <= metadata.allowed;
 
         if (shouldIgnore) {
             if (passed) {

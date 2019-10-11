@@ -90,6 +90,7 @@ struct TestMetadata {
     TestPaths paths;
     mbgl::JSDocument document;
     bool renderTest = true;
+    bool outputsImage = true;
 
     mbgl::Size size{ 512u, 512u };
     float pixelRatio = 1.0f;
