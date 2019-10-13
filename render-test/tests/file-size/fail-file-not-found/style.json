@@ -3,8 +3,8 @@
   "metadata": {
     "test": {
       "operations": [
-        ["probeFileSize", "style", "style.aaaa"],
-        ["probeFileSize", "image", "expected.bbb"]
+        ["probeFileSize", "style", "style.aaaa", 0],
+        ["probeFileSize", "image", "expected.bbb", 0]
       ],
       "width": 64,
       "height": 64

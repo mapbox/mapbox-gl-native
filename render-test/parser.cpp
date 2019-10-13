@@ -478,7 +478,7 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
 
             result.fileSize.emplace(std::piecewise_construct,
                                     std::forward_as_tuple(std::move(mark)),
-                                    std::forward_as_tuple(std::move(filePath), probeValue[2].GetUint64()));
+                                    std::forward_as_tuple(std::move(filePath), probeValue[2].GetUint64(), 0.f));
         }
     }
 
