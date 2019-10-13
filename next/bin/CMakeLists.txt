@@ -18,6 +18,8 @@ target_link_libraries(
     PRIVATE Mapbox::Base::Extras::args mbgl-core
 )
 
+install(TARGETS mbgl-offline mbgl-render RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 # FIXME: CI must have a valid token
 #
 # add_test(NAME mbgl-offline-tool-test COMMAND mbgl-offline -s mapbox://styles/mapbox/satellite-v9 --maxZoom=0 WORKING_DIRECTORY

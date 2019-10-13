@@ -36,3 +36,5 @@ set_property(TARGET mbgl-expression-test PROPERTY FOLDER Executables)
 string(RANDOM LENGTH 5 ALPHABET 0123456789 MBGL_EXPRESSION_TEST_SEED)
 
 add_test(NAME mbgl-expression-test COMMAND mbgl-expression-test -s --seed=${MBGL_EXPRESSION_TEST_SEED} WORKING_DIRECTORY ${MBGL_ROOT})
+
+install(TARGETS mbgl-expression-test RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

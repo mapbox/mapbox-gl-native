@@ -39,6 +39,9 @@ if(MBGL_WITH_QT)
     set(CMAKE_AUTORCC ON)
 endif()
 
+# Install on [bin,lib,...]
+include(GNUInstallDirs)
+
 # Avoid warnings when setting visibility
 cmake_policy(SET CMP0063 NEW)
 

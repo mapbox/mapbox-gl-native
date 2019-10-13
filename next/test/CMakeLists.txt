@@ -165,3 +165,5 @@ if(CMAKE_SYSTEM_NAME STREQUAL Android)
 endif()
 
 set_property(TARGET mbgl-test PROPERTY FOLDER Core)
+
+install(TARGETS mbgl-test LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
