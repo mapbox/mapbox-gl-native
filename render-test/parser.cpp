@@ -168,7 +168,7 @@ mbgl::optional<std::string> localizeMapboxTilesetURL(const std::string& url) {
     return getIntegrationPath(url, "tilesets/", regex);
 }
 
-TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
+TestPaths makeTestPaths(mbgl::filesystem::path stylePath, std::string id) {
     std::vector<mbgl::filesystem::path> expectations{ stylePath };
     expectations.front().remove_filename();
 
@@ -180,7 +180,8 @@ TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
 
     return {
         std::move(stylePath),
-        std::move(expectations)
+        std::move(expectations),
+        std::move(id)
     };
 }
 
@@ -335,38 +336,32 @@ std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& b
 }
 
 ArgumentsTuple parseArguments(int argc, char** argv) {
-    args::ArgumentParser argumentParser("Mapbox GL Test Runner");
-
-    args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", { 'h', "help" });
-
-    args::Flag recycleMapFlag(argumentParser, "recycle map", "Toggle reusing the map object",
-                              { 'r', "recycle-map" });
-    args::Flag shuffleFlag(argumentParser, "shuffle", "Toggle shuffling the tests order",
-                           { 's', "shuffle" });
-    args::ValueFlag<uint32_t> seedValue(argumentParser, "seed", "Shuffle seed (default: random)",
-                                        { "seed" });
-    args::ValueFlag<std::string> testPathValue(argumentParser, "rootPath", "Test root rootPath",
-                                               { 'p', "rootPath" });
-    args::ValueFlag<std::regex> testFilterValue(argumentParser, "filter", "Test filter regex",
-                                               { 'f', "filter" });
-    args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
+    args::ArgumentParser argParser("Mapbox GL Test Runner");
+    args::HelpFlag helpFlag(argParser, "help", "Display this help menu", {'h', "help"});
+    args::Flag recycleMapFlag(argParser, "recycle map", "Toggle reusing the map object", {'r', "recycle-map"});
+    args::Flag shuffleFlag(argParser, "shuffle", "Toggle shuffling the tests order", {'s', "shuffle"});
+    args::ValueFlag<uint32_t> seedValue(argParser, "seed", "Shuffle seed (default: random)", {"seed"});
+    args::ValueFlag<std::string> testPathValue(argParser, "rootPath", "Test root rootPath", {'p', "rootPath"});
+    args::ValueFlag<std::string> idValue(argParser, "id", "Unique id for specialized expectations", {'i', "id"});
+    args::ValueFlag<std::regex> testFilterValue(argParser, "filter", "Test filter regex", {'f', "filter"});
+    args::PositionalList<std::string> testNameValues(argParser, "URL", "Test name(s)");
 
     try {
-        argumentParser.ParseCLI(argc, argv);
+        argParser.ParseCLI(argc, argv);
     } catch (const args::Help&) {
         std::ostringstream stream;
-        stream << argumentParser;
+        stream << argParser;
         mbgl::Log::Info(mbgl::Event::General, stream.str());
         exit(0);
     } catch (const args::ParseError& e) {
         std::ostringstream stream;
-        stream << argumentParser;
+        stream << argParser;
         mbgl::Log::Info(mbgl::Event::General, stream.str());
         mbgl::Log::Error(mbgl::Event::General, e.what());
         exit(1);
     } catch (const args::ValidationError& e) {
         std::ostringstream stream;
-        stream << argumentParser;
+        stream << argParser;
         mbgl::Log::Info(mbgl::Event::General, stream.str());
         mbgl::Log::Error(mbgl::Event::General, e.what());
         exit(2);
@@ -393,6 +388,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     // Recursively traverse through the test paths and collect test directories containing "style.json".
     std::vector<TestPaths> testPaths;
     testPaths.reserve(paths.size());
+    std::string id = idValue ? args::get(idValue) : std::string();
     for (const auto& path : paths) {
         if (!mbgl::filesystem::exists(path)) {
             mbgl::Log::Warning(mbgl::Event::General, "Provided test folder '%s' does not exist.", path.string().c_str());
@@ -404,7 +400,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                 continue;
             }
             if (testPath.path().filename() == "style.json") {
-                testPaths.emplace_back(makeTestPaths(testPath));
+                testPaths.emplace_back(makeTestPaths(testPath, id));
             }
         }
     }

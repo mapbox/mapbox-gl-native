@@ -24,6 +24,7 @@ struct TestStatistics {
 struct TestPaths {
     mbgl::filesystem::path stylePath;
     std::vector<mbgl::filesystem::path> expectations;
+    std::string id;
 
     std::string defaultExpectations() const {
         assert(!expectations.empty());
