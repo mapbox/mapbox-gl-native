@@ -31,12 +31,20 @@ struct TestPaths {
     }
 };
 
+inline std::tuple<bool, float> checkValue(float expected, float actual, float tolerance) {
+    float delta = expected * tolerance;
+    assert(delta >= 0.0f);
+    return std::make_tuple(std::abs(expected - actual) <= delta, delta);
+}
+
 struct FileSizeProbe {
     FileSizeProbe() = default;
-    FileSizeProbe(std::string path_, uintmax_t size_) : path(std::move(path_)), size(size_) {}
+    FileSizeProbe(std::string path_, uintmax_t size_, float tolerance_)
+        : path(std::move(path_)), size(size_), tolerance(tolerance_) {}
 
     std::string path;
     uintmax_t size;
+    float tolerance;
 };
 
 struct MemoryProbe {

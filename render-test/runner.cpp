@@ -258,7 +258,8 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             return false;
         }
 
-        if (actual->second.size != expected.second.size) {
+        auto result = checkValue(expected.second.size, actual->second.size, actual->second.tolerance);
+        if (!std::get<bool>(result)) {
             std::stringstream ss;
             ss << "File size does not match at probe \"" << expected.first << "\": " << actual->second.size
                << ", expected is " << expected.second.size << ".";
@@ -574,14 +575,16 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         }
     } else if (operationArray[0].GetString() == fileSizeProbeOp) {
         // probeFileSize
-        assert(operationArray.Size() >= 3u);
+        assert(operationArray.Size() >= 4u);
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsString());
+        assert(operationArray[3].IsNumber());
 
         std::string mark = std::string(operationArray[1].GetString(), operationArray[1].GetStringLength());
         std::string path = std::string(operationArray[2].GetString(), operationArray[2].GetStringLength());
         assert(!path.empty());
 
+        float tolerance = operationArray[3].GetDouble();
         mbgl::filesystem::path filePath(path);
 
         if (!filePath.is_absolute()) {
@@ -592,7 +595,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             auto size = mbgl::filesystem::file_size(filePath);
             metadata.metrics.fileSize.emplace(std::piecewise_construct,
                                               std::forward_as_tuple(std::move(mark)),
-                                              std::forward_as_tuple(std::move(path), size));
+                                              std::forward_as_tuple(std::move(path), size, tolerance));
         } else {
             metadata.errorMessage = std::string("File not found: ") + path;
             return false;
