@@ -104,7 +104,8 @@ optional<Value> toValue(const JSValue& jsvalue) {
 
 style::expression::type::Type stringToType(const std::string& type) {
     using namespace style::expression;
-    if (type == "string"s || type == "number-format"s) {
+    if (type == "string"s || type == "number-format"s ||
+        type == "image"s) { // TODO: replace once we implement image expressions
         return type::String;
     } else if (type == "number"s) {
         return type::Number;
