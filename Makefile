@@ -594,7 +594,7 @@ run-android-test-runner-$1-%: android-test-runner-$1
 	adb push $(MBGL_ANDROID_TEST_RUNNER_DIR)/classes.dex $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR) > /dev/null 2>&1
 	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/intermediate-jars/$(buildtype)/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR) > /dev/null 2>&1
 	# Push all the necessary test resources
-	# adb push mapbox-gl-js/test/integration/render-tests $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/render-tests > /dev/null 2>&1
+	adb push mapbox-gl-js/test/integration/render-tests $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/render-tests > /dev/null 2>&1
 	adb push mapbox-gl-js/test/integration/query-tests $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/query-tests > /dev/null 2>&1
 	adb push mapbox-gl-js/test/integration/tiles $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/tiles  > /dev/null 2>&1
 	adb push mapbox-gl-js/test/integration/glyphs $(MBGL_ANDROID_LOCAL_TEST_RUNNER_DIR)/mapbox-gl-js/test/integration/glyphs  > /dev/null 2>&1

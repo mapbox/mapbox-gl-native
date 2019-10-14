@@ -693,11 +693,7 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
             html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\">\n");
         }
     } else {
-        if (metadata.errorMessage.empty()) {
-            html.append("<p style=\"color: red\"><strong>Error:</strong> " + "metadata.errorMessage is empty" + "</p>\n");
-        } else {
-            html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
-        }
+        html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
     }
     if (metadata.difference != 0.0) {
         if (metadata.renderTest) {

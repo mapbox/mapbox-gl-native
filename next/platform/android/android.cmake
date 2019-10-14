@@ -302,7 +302,8 @@ add_library(
 
 target_include_directories(
     mbgl-render-test-runner
-    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp ${MBGL_ROOT}/platform/android/src/test/runtime.cpp
+    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp
+    ${MBGL_ROOT}/platform/android/src/test/runtime.cpp
     ${MBGL_ROOT}/platform/android/src/test/runtime.hpp
 )
 
