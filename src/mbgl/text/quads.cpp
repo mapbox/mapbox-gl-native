@@ -20,12 +20,28 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
     // pixels. The quad needs to be padded to account for this, otherwise they'll look slightly clipped
     // on one edge in some cases.
-    const float border = 1.0;
+    constexpr const float border = 1.0f;
 
-    float top = shapedIcon.top() - border / image.pixelRatio;
-    float left = shapedIcon.left() - border / image.pixelRatio;
-    float bottom = shapedIcon.bottom() + border / image.pixelRatio;
-    float right = shapedIcon.right() + border / image.pixelRatio;
+    // Expand the box to respect the 1 pixel border in the atlas image. We're using `image.paddedRect - border`
+    // instead of image.displaySize because we only pad with one pixel for retina images as well, and the
+    // displaySize uses the logical dimensions, not the physical pixel dimensions.
+    // Unlike the JavaScript version, we're _not_ including the padding in the texture rect, so the
+    // logic "dimension * padded / non-padded - dimension" is swapped.
+    const float iconWidth = shapedIcon.right() - shapedIcon.left();
+    const float expandX = (iconWidth * (static_cast<float>(image.textureRect.w) + 2.0f * border) /
+                               static_cast<float>(image.textureRect.w) -
+                           iconWidth) /
+                          2.0f;
+    const float left = shapedIcon.left() - expandX;
+    const float right = shapedIcon.right() + expandX;
+
+    const float iconHeight = shapedIcon.bottom() - shapedIcon.top();
+    const float expandY = (iconHeight * (static_cast<float>(image.textureRect.h) + 2.0f * border) /
+                               static_cast<float>(image.textureRect.h) -
+                           iconHeight) /
+                          2.0f;
+    const float top = shapedIcon.top() - expandY;
+    const float bottom = shapedIcon.bottom() + expandY;
 
     Point<float> tl{left, top};
     Point<float> tr{right, top};
