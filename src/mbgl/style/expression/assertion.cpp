@@ -16,12 +16,12 @@ Assertion::Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> 
 }
 
 ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
-    static std::unordered_map<std::string, type::Type> types {
+    static std::unordered_map<std::string, type::Type> types{
         {"string", type::String},
+        {"image", type::String}, // TODO: replace once we implement image expressions
         {"number", type::Number},
         {"boolean", type::Boolean},
-        {"object", type::Object}
-    };
+        {"object", type::Object}};
 
     std::size_t length = arrayLength(value);
 

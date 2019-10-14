@@ -32,7 +32,7 @@ AnchorAlignment AnchorAlignment::getAnchorAlignment(style::SymbolAnchorType anch
         result.horizontalAlign = 0.0f;
         break;
     default:
-	break;
+        break;
     }
 
     switch (anchor) {
