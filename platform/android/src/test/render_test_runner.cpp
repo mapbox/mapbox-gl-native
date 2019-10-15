@@ -1,6 +1,8 @@
 #include <mbgl/render_test.hpp>
 #include "runtime.hpp"
 
+#include <string>
+
 int main(int argc, char *argv[]) {
     if (!mbgl::android::initRuntime(argc, argv)) {
         return 1;

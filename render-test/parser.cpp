@@ -446,7 +446,7 @@ std::vector<std::pair<std::string, std::string>> parseIgnores(const std::string&
 
     mbgl::filesystem::path platformSpecificIgnores;
     mbgl::filesystem::path ownTestsIgnores =
-        mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH).append("render-test/tests/should-fail.json");
+        mbgl::filesystem::path(testRootPath).append("render-test/tests/should-fail.json");
 
 #ifdef __APPLE__
     platformSpecificIgnores = mbgl::filesystem::path(testRootPath).append("render-test/mac-ignores.json");

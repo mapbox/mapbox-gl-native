@@ -297,13 +297,7 @@ target_link_libraries(
 
 add_library(
     mbgl-render-test-runner SHARED
-    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
-)
-
-target_include_directories(
-    mbgl-render-test-runner
-    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp
-    ${MBGL_ROOT}/platform/android/src/test/runtime.cpp
+    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp ${MBGL_ROOT}/platform/android/src/test/runtime.cpp
     ${MBGL_ROOT}/platform/android/src/test/runtime.hpp
 )
 
@@ -311,6 +305,7 @@ target_link_libraries(
     mbgl-render-test-runner
     PRIVATE
         Mapbox::Base::jni.hpp
+        mapbox-gl
         mbgl-render-test
         android
         log
