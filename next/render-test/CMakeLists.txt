@@ -23,7 +23,7 @@ target_compile_definitions(
 # FIXME: Should not use core private interface
 target_include_directories(
     mbgl-render-test
-    PRIVATE ${MBGL_ROOT}/src ${MBGL_ROOT}/platform/default/include
+    PRIVATE ${MBGL_ROOT}/src
 )
 
 target_include_directories(
