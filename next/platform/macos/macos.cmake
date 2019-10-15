@@ -155,7 +155,6 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(${PROJECT_SOURCE_DIR}/expression-test)
 add_subdirectory(${PROJECT_SOURCE_DIR}/platform/glfw)
 add_subdirectory(${PROJECT_SOURCE_DIR}/platform/node)
-add_subdirectory(${PROJECT_SOURCE_DIR}/render-test)
 
 add_executable(
     mbgl-test-runner
@@ -182,8 +181,35 @@ target_link_libraries(
     PRIVATE mbgl-benchmark
 )
 
+add_executable(
+    mbgl-render-test-runner
+    ${MBGL_ROOT}/platform/default/src/mbgl/render-test/main.cpp
+)
+
+target_link_libraries(
+    mbgl-render-test-runner
+    PRIVATE mbgl-render-test
+)
+
 set_property(TARGET mbgl-benchmark-runner PROPERTY FOLDER Executables)
 set_property(TARGET mbgl-test-runner PROPERTY FOLDER Executables)
+set_property(TARGET mbgl-render-test-runner PROPERTY FOLDER Executables)
 
 add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${MBGL_ROOT})
 add_test(NAME mbgl-test-runner COMMAND mbgl-test-runner WORKING_DIRECTORY ${MBGL_ROOT})
+
+string(RANDOM LENGTH 5 ALPHABET 0123456789 MBGL_RENDER_TEST_SEED)
+
+add_test(
+    NAME mbgl-render-test
+    COMMAND
+        mbgl-render-test-runner
+        render-tests
+        --recycle-map
+        --shuffle
+        --seed=${MBGL_RENDER_TEST_SEED}
+    WORKING_DIRECTORY ${MBGL_ROOT}
+)
+
+add_test(NAME mbgl-render-test-probes COMMAND mbgl-render-test-runner tests --rootPath=render-test WORKING_DIRECTORY ${MBGL_ROOT})
+add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests WORKING_DIRECTORY ${MBGL_ROOT})
