@@ -43,7 +43,9 @@ public:
 
     void checkRendering(const char * name, double imageMatchPixelsThreshold = 0.015, double pixelMatchThreshold = 0.1) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
-                         frontend.render(map), imageMatchPixelsThreshold, pixelMatchThreshold);
+                         frontend.render(map).image,
+                         imageMatchPixelsThreshold,
+                         pixelMatchThreshold);
     }
 };
 

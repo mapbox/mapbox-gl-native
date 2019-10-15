@@ -33,8 +33,7 @@ public:
                   MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
     void checkRendering(const char * name) {
-        test::checkImage(std::string("test/fixtures/annotations/") + name,
-                         frontend.render(map), 0.0002, 0.1);
+        test::checkImage(std::string("test/fixtures/annotations/") + name, frontend.render(map).image, 0.0002, 0.1);
     }
 };
 

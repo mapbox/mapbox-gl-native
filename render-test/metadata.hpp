@@ -11,6 +11,12 @@
 
 #include <map>
 
+namespace mbgl {
+namespace gfx {
+struct RenderingStats;
+}
+} // namespace mbgl
+
 struct TestStatistics {
     TestStatistics() = default;
 
@@ -82,13 +88,36 @@ struct NetworkProbe {
     size_t transferred;
 };
 
+struct GfxProbe {
+    struct Memory {
+        Memory() = default;
+        Memory(int allocated_, int peak_) : allocated(allocated_), peak(peak_) {}
+
+        int allocated;
+        int peak;
+    };
+
+    GfxProbe() = default;
+    GfxProbe(const mbgl::gfx::RenderingStats&, const GfxProbe&);
+
+    int numDrawCalls;
+    int numTextures;
+    int numBuffers;
+    int numFrameBuffers;
+
+    Memory memTextures;
+    Memory memIndexBuffers;
+    Memory memVertexBuffers;
+};
+
 class TestMetrics {
 public:
-    bool isEmpty() const { return fileSize.empty() && memory.empty() && network.empty() && fps.empty(); }
+    bool isEmpty() const { return fileSize.empty() && memory.empty() && network.empty() && fps.empty() && gfx.empty(); }
     std::map<std::string, FileSizeProbe> fileSize;
     std::map<std::string, MemoryProbe> memory;
     std::map<std::string, NetworkProbe> network;
     std::map<std::string, FpsProbe> fps;
+    std::map<std::string, GfxProbe> gfx;
 };
 
 struct TestMetadata {

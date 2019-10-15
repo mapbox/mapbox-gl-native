@@ -259,10 +259,7 @@ TEST(Map, Offline) {
 
     test.map.getStyle().loadURL(prefix + "style.json");
 
-    test::checkImage("test/fixtures/map/offline",
-                     test.frontend.render(test.map),
-                     0.0015,
-                     0.1);
+    test::checkImage("test/fixtures/map/offline", test.frontend.render(test.map).image, 0.0015, 0.1);
 
     NetworkStatus::Set(NetworkStatus::Status::Online);
 }
@@ -608,7 +605,7 @@ TEST(Map, AddLayer) {
     layer->setBackgroundColor({ { 1, 0, 0, 1 } });
     test.map.getStyle().addLayer(std::move(layer));
 
-    test::checkImage("test/fixtures/map/add_layer", test.frontend.render(test.map));
+    test::checkImage("test/fixtures/map/add_layer", test.frontend.render(test.map).image);
 }
 
 TEST(Map, WithoutVAOExtension) {
@@ -623,7 +620,7 @@ TEST(Map, WithoutVAOExtension) {
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 
-    test::checkImage("test/fixtures/map/no_vao", test.frontend.render(test.map), 0.002);
+    test::checkImage("test/fixtures/map/no_vao", test.frontend.render(test.map).image, 0.002);
 }
 
 TEST(Map, RemoveLayer) {
@@ -636,7 +633,7 @@ TEST(Map, RemoveLayer) {
     test.map.getStyle().addLayer(std::move(layer));
     test.map.getStyle().removeLayer("background");
 
-    test::checkImage("test/fixtures/map/remove_layer", test.frontend.render(test.map));
+    test::checkImage("test/fixtures/map/remove_layer", test.frontend.render(test.map).image);
 }
 
 TEST(Map, DisabledSources) {
@@ -694,9 +691,9 @@ TEST(Map, DisabledSources) {
 }
 )STYLE");
 
-    test::checkImage("test/fixtures/map/disabled_layers/first", test.frontend.render(test.map));
+    test::checkImage("test/fixtures/map/disabled_layers/first", test.frontend.render(test.map).image);
     test.map.jumpTo(CameraOptions().withZoom(0.5));
-    test::checkImage("test/fixtures/map/disabled_layers/second", test.frontend.render(test.map));
+    test::checkImage("test/fixtures/map/disabled_layers/second", test.frontend.render(test.map).image);
 }
 
 TEST(Map, DontLoadUnneededTiles) {
@@ -815,10 +812,7 @@ TEST(Map, NoContentTiles) {
       }]
     })STYLE");
 
-    test::checkImage("test/fixtures/map/nocontent",
-                     test.frontend.render(test.map),
-                     0.0015,
-                     0.1);
+    test::checkImage("test/fixtures/map/nocontent", test.frontend.render(test.map).image, 0.0015, 0.1);
 }
 
 // https://github.com/mapbox/mapbox-gl-native/issues/12432
