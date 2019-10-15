@@ -1,12 +1,13 @@
 #pragma once
 
 #include <mbgl/gfx/backend.hpp>
-#include <mbgl/gfx/renderbuffer.hpp>
 #include <mbgl/gfx/command_encoder.hpp>
 #include <mbgl/gfx/draw_scope.hpp>
 #include <mbgl/gfx/program.hpp>
-#include <mbgl/gfx/types.hpp>
+#include <mbgl/gfx/renderbuffer.hpp>
+#include <mbgl/gfx/rendering_stats.hpp>
 #include <mbgl/gfx/texture.hpp>
+#include <mbgl/gfx/types.hpp>
 
 namespace mbgl {
 
@@ -84,6 +85,8 @@ public:
 
 public:
     virtual std::unique_ptr<CommandEncoder> createCommandEncoder() = 0;
+
+    virtual const RenderingStats& renderingStats() const = 0;
 
 #if not defined(NDEBUG)
 public:

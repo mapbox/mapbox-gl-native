@@ -43,6 +43,9 @@ public:
 
     std::unique_ptr<gfx::CommandEncoder> createCommandEncoder() override;
 
+    gfx::RenderingStats& renderingStats();
+    const gfx::RenderingStats& renderingStats() const override;
+
     void initializeExtensions(const std::function<gl::ProcAddress(const char*)>&);
 
     void enableDebugging();
@@ -132,6 +135,7 @@ private:
     RendererBackend& backend;
     bool cleanupOnDestruction = true;
 
+    gfx::RenderingStats stats;
     std::unique_ptr<extension::Debugging> debugging;
     std::unique_ptr<extension::VertexArray> vertexArray;
 

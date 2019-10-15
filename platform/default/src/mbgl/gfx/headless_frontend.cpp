@@ -1,5 +1,6 @@
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gfx/headless_frontend.hpp>
+#include <mbgl/gfx/context.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/renderer/renderer.hpp>

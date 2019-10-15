@@ -20,12 +20,14 @@ std::unique_ptr<gfx::VertexBufferResource> UploadPass::createVertexBufferResourc
     const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+    commandEncoder.context.renderingStats().numBuffers++;
+    commandEncoder.context.renderingStats().memVertexBuffers += size;
     // NOLINTNEXTLINE(performance-move-const-arg)
     UniqueBuffer result{ std::move(id), { commandEncoder.context } };
     commandEncoder.context.vertexBuffer = result;
     MBGL_CHECK_ERROR(
         glBufferData(GL_ARRAY_BUFFER, size, data, Enum<gfx::BufferUsageType>::to(usage)));
-    return std::make_unique<gl::VertexBufferResource>(std::move(result));
+    return std::make_unique<gl::VertexBufferResource>(std::move(result), size);
 }
 
 void UploadPass::updateVertexBufferResource(gfx::VertexBufferResource& resource,
@@ -39,13 +41,15 @@ std::unique_ptr<gfx::IndexBufferResource> UploadPass::createIndexBufferResource(
     const void* data, std::size_t size, const gfx::BufferUsageType usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+    commandEncoder.context.renderingStats().numBuffers++;
+    commandEncoder.context.renderingStats().memIndexBuffers += size;
     // NOLINTNEXTLINE(performance-move-const-arg)
     UniqueBuffer result{ std::move(id), { commandEncoder.context } };
     commandEncoder.context.bindVertexArray = 0;
     commandEncoder.context.globalVertexArrayState.indexBuffer = result;
     MBGL_CHECK_ERROR(
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, Enum<gfx::BufferUsageType>::to(usage)));
-    return std::make_unique<gl::IndexBufferResource>(std::move(result));
+    return std::make_unique<gl::IndexBufferResource>(std::move(result), size);
 }
 
 void UploadPass::updateIndexBufferResource(gfx::IndexBufferResource& resource,
@@ -65,8 +69,10 @@ UploadPass::createTextureResource(const Size size,
                                   gfx::TexturePixelType format,
                                   gfx::TextureChannelDataType type) {
     auto obj = commandEncoder.context.createUniqueTexture();
+    int textureByteSize = gl::TextureResource::getStorageSize(size, format, type);
+    commandEncoder.context.renderingStats().memTextures += textureByteSize;
     std::unique_ptr<gfx::TextureResource> resource =
-        std::make_unique<gl::TextureResource>(std::move(obj));
+        std::make_unique<gl::TextureResource>(std::move(obj), textureByteSize);
     commandEncoder.context.pixelStoreUnpack = { 1 };
     updateTextureResource(*resource, size, data, format, type);
     // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
