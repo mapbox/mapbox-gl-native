@@ -119,5 +119,5 @@ TEST(GLContextMode, Shared) {
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 3));
     }
 
-    test::checkImage("test/fixtures/shared_context", frontend.render(map), 0.5, 0.1);
+    test::checkImage("test/fixtures/shared_context", frontend.render(map).image, 0.5, 0.1);
 }

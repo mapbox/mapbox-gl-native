@@ -238,6 +238,36 @@ std::string serializeMetrics(const TestMetrics& metrics) {
         // End fps section
     }
 
+    if (!metrics.gfx.empty()) {
+        // Start gfx section
+        writer.Key("gfx");
+        writer.StartArray();
+        for (const auto& gfxProbe : metrics.gfx) {
+            assert(!gfxProbe.first.empty());
+            writer.StartArray();
+            writer.String(gfxProbe.first.c_str());
+            writer.Int(gfxProbe.second.numDrawCalls);
+            writer.Int(gfxProbe.second.numTextures);
+            writer.Int(gfxProbe.second.numBuffers);
+            writer.Int(gfxProbe.second.numFrameBuffers);
+            writer.StartArray();
+            writer.Int(gfxProbe.second.memTextures.allocated);
+            writer.Int(gfxProbe.second.memTextures.peak);
+            writer.EndArray();
+            writer.StartArray();
+            writer.Int(gfxProbe.second.memIndexBuffers.allocated);
+            writer.Int(gfxProbe.second.memIndexBuffers.peak);
+            writer.EndArray();
+            writer.StartArray();
+            writer.Int(gfxProbe.second.memVertexBuffers.allocated);
+            writer.Int(gfxProbe.second.memVertexBuffers.peak);
+            writer.EndArray();
+            writer.EndArray();
+        }
+        writer.EndArray();
+        // End gfx section
+    }
+
     writer.EndObject();
 
     return s.GetString();
@@ -351,6 +381,40 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
             assert(!mark.empty());
             result.fps.insert(
                 {std::move(mark), {probeValue[1].GetFloat(), probeValue[2].GetFloat(), probeValue[3].GetFloat()}});
+        }
+    }
+
+    if (document.HasMember("gfx")) {
+        const mbgl::JSValue& gfxValue = document["gfx"];
+        assert(gfxValue.IsArray());
+        for (auto& probeValue : gfxValue.GetArray()) {
+            assert(probeValue.IsArray());
+            assert(probeValue.Size() >= 8u);
+            assert(probeValue[0].IsString());
+            assert(probeValue[1].IsInt());
+            assert(probeValue[2].IsInt());
+            assert(probeValue[3].IsInt());
+            assert(probeValue[4].IsInt());
+            assert(probeValue[5].IsArray());
+            assert(probeValue[6].IsArray());
+            assert(probeValue[7].IsArray());
+
+            const std::string mark{probeValue[0].GetString(), probeValue[0].GetStringLength()};
+            assert(!mark.empty());
+
+            GfxProbe probe;
+            probe.numDrawCalls = probeValue[1].GetInt();
+            probe.numTextures = probeValue[2].GetInt();
+            probe.numBuffers = probeValue[3].GetInt();
+            probe.numFrameBuffers = probeValue[4].GetInt();
+            probe.memTextures.allocated = probeValue[5].GetArray()[0].GetInt();
+            probe.memTextures.peak = probeValue[5].GetArray()[1].GetInt();
+            probe.memIndexBuffers.allocated = probeValue[6].GetArray()[0].GetInt();
+            probe.memIndexBuffers.peak = probeValue[6].GetArray()[1].GetInt();
+            probe.memVertexBuffers.allocated = probeValue[7].GetArray()[0].GetInt();
+            probe.memVertexBuffers.peak = probeValue[7].GetArray()[1].GetInt();
+
+            result.gfx.insert({mark, std::move(probe)});
         }
     }
 

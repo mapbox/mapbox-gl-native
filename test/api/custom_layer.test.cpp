@@ -108,5 +108,5 @@ TEST(CustomLayer, Basic) {
     layer->setFillColor(Color{ 1.0, 1.0, 0.0, 1.0 });
     map.getStyle().addLayer(std::move(layer));
 
-    test::checkImage("test/fixtures/custom_layer/basic", frontend.render(map), 0.0006, 0.1);
+    test::checkImage("test/fixtures/custom_layer/basic", frontend.render(map).image, 0.0006, 0.1);
 }

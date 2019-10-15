@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 
+struct RunContext;
 class TestRunnerMapObserver;
 struct TestMetadata;
 
@@ -22,7 +23,7 @@ public:
     void doShuffle(uint32_t seed);
 
 private:
-    bool runOperations(const std::string& key, TestMetadata&);
+    bool runOperations(const std::string& key, TestMetadata&, RunContext&);
     bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                std::vector<mbgl::Feature>&& features,
                                TestMetadata&);

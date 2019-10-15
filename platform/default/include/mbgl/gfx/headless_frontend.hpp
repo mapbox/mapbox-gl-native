@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/gfx/headless_backend.hpp>
+#include <mbgl/gfx/rendering_stats.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/util/async_task.hpp>
@@ -17,6 +18,11 @@ class TransformState;
 
 class HeadlessFrontend : public RendererFrontend {
 public:
+    struct RenderResult {
+        PremultipliedImage image;
+        gfx::RenderingStats stats;
+    };
+
     HeadlessFrontend(float pixelRatio_,
                      gfx::HeadlessBackend::SwapBehaviour swapBehviour = gfx::HeadlessBackend::SwapBehaviour::NoFlush,
                      gfx::ContextMode mode = gfx::ContextMode::Unique,
@@ -48,7 +54,7 @@ public:
     LatLng latLngForPixel(const ScreenCoordinate&);
 
     PremultipliedImage readStillImage();
-    PremultipliedImage render(Map&);
+    RenderResult render(Map&);
     void renderOnce(Map&);
 
     optional<TransformState> getTransformState() const;
