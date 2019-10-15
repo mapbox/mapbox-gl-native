@@ -1,6 +1,6 @@
 #include <mbgl/gfx/backend_scope.hpp>
-#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/gfx/context.hpp>
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/renderer/renderer.hpp>
@@ -140,19 +140,20 @@ PremultipliedImage HeadlessFrontend::readStillImage() {
     return backend->readStillImage();
 }
 
-PremultipliedImage HeadlessFrontend::render(Map& map) {
-    PremultipliedImage result;
+HeadlessFrontend::RenderResult HeadlessFrontend::render(Map& map) {
+    HeadlessFrontend::RenderResult result;
     std::exception_ptr error;
 
     map.renderStill([&](std::exception_ptr e) {
         if (e) {
             error = e;
         } else {
-            result = backend->readStillImage();
+            result.image = backend->readStillImage();
+            result.stats = getBackend()->getContext().renderingStats();
         }
     });
 
-    while (!result.valid() && !error) {
+    while (!result.image.valid() && !error) {
         util::RunLoop::Get()->runOnce();
     }
 
