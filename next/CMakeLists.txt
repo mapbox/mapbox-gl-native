@@ -70,6 +70,7 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/gfx/backend_scope.hpp
     ${MBGL_ROOT}/include/mbgl/gfx/renderable.hpp
     ${MBGL_ROOT}/include/mbgl/gfx/renderer_backend.hpp
+    ${MBGL_ROOT}/include/mbgl/gfx/rendering_stats.hpp
     ${MBGL_ROOT}/include/mbgl/gl/renderable_resource.hpp
     ${MBGL_ROOT}/include/mbgl/gl/renderer_backend.hpp
     ${MBGL_ROOT}/include/mbgl/layermanager/background_layer_factory.hpp
@@ -285,6 +286,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gfx/render_pass.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/renderbuffer.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/renderer_backend.cpp
+    ${MBGL_ROOT}/src/mbgl/gfx/rendering_stats.cpp
     ${MBGL_ROOT}/src/mbgl/gfx/stencil_mode.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/texture.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/types.hpp
@@ -306,6 +308,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gl/enum.hpp
     ${MBGL_ROOT}/src/mbgl/gl/extension.hpp
     ${MBGL_ROOT}/src/mbgl/gl/framebuffer.hpp
+    ${MBGL_ROOT}/src/mbgl/gl/index_buffer_resource.cpp
     ${MBGL_ROOT}/src/mbgl/gl/index_buffer_resource.hpp
     ${MBGL_ROOT}/src/mbgl/gl/object.cpp
     ${MBGL_ROOT}/src/mbgl/gl/object.hpp
@@ -319,6 +322,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gl/state.hpp
     ${MBGL_ROOT}/src/mbgl/gl/texture.cpp
     ${MBGL_ROOT}/src/mbgl/gl/texture.hpp
+    ${MBGL_ROOT}/src/mbgl/gl/texture_resource.cpp
     ${MBGL_ROOT}/src/mbgl/gl/texture_resource.hpp
     ${MBGL_ROOT}/src/mbgl/gl/types.hpp
     ${MBGL_ROOT}/src/mbgl/gl/uniform.cpp
@@ -330,6 +334,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gl/vertex_array.cpp
     ${MBGL_ROOT}/src/mbgl/gl/vertex_array.hpp
     ${MBGL_ROOT}/src/mbgl/gl/vertex_array_extension.hpp
+    ${MBGL_ROOT}/src/mbgl/gl/vertex_buffer_resource.cpp
     ${MBGL_ROOT}/src/mbgl/gl/vertex_buffer_resource.hpp
     ${MBGL_ROOT}/src/mbgl/layermanager/background_layer_factory.cpp
     ${MBGL_ROOT}/src/mbgl/layermanager/circle_layer_factory.cpp
