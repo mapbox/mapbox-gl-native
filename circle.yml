@@ -892,17 +892,6 @@ jobs:
           path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so.gz
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so.gz
-      - deploy:
-          name: Publish to Bintray
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
-              version=$(cat platform/android/MapboxGLAndroidSDK/gradle.properties | grep "VERSION_NAME")
-              if [[ $version != *"SNAPSHOT"* ]]; then
-                make run-android-upload-to-bintray
-              else
-                make run-android-upload-to-artifactory
-              fi
-            fi
       - run:
           name: Trigger external deploy steps
           command: |
@@ -911,9 +900,9 @@ jobs:
             export DOCS_REPO="android-docs"
             scripts/trigger-maps-documentation-deploy-steps.sh
           background: true
-      - run:
-          name: Record size
-          command: platform/android/scripts/metrics.sh
+#      - run:
+#          name: Record size
+#          command: platform/android/scripts/metrics.sh
 # ------------------------------------------------------------------------------
   android-debug-arm-v7-buck:
     docker:
