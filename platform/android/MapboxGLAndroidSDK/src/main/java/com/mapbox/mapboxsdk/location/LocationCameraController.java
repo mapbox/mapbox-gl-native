@@ -3,9 +3,9 @@ package com.mapbox.mapboxsdk.location;
 import android.content.Context;
 import android.graphics.PointF;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import android.view.MotionEvent;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;

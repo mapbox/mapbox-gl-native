@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

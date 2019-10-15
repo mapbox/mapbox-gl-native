@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.animation.TypeEvaluator;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 

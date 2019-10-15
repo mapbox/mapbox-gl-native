@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps.renderer;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 /**
  * Peer class for {@link Runnable}s to be scheduled on the {@link MapRenderer} thread.

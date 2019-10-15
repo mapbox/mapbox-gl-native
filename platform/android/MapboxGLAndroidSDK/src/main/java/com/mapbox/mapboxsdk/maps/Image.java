@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 @Keep
 class Image {

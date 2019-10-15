@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.storage
 
 import android.os.Bundle
 import android.os.Looper
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_cache_management.*

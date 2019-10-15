@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.location;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.animation.Interpolator;
 
 import java.util.List;

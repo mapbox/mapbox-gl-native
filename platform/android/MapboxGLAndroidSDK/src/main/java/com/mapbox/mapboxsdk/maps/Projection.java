@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
-import android.support.annotation.FloatRange;
-import android.support.annotation.NonNull;
+import androidx.annotation.FloatRange;
+import androidx.annotation.NonNull;
 
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;

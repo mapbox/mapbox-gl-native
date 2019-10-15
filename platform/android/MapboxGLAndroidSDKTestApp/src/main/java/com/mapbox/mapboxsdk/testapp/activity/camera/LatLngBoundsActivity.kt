@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.camera
 
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.FeatureCollection.fromJson

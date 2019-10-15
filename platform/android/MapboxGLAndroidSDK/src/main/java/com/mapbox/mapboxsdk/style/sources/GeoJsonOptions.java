@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 
 import java.util.HashMap;

@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.testapp.model.other;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 import com.mapbox.mapboxsdk.testapp.R;

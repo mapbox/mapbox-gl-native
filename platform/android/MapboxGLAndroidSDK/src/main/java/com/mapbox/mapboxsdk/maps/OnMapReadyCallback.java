@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Interface definition for a callback to be invoked when the map is ready to be used.
