@@ -1,7 +1,8 @@
 #include "allocation_index.hpp"
 
-#include <mbgl/util/run_loop.hpp>
+#include <mbgl/render_test.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include "metadata.hpp"
 #include "parser.hpp"
@@ -36,7 +37,9 @@ void operator delete(void* ptr, size_t) noexcept {
 }
 #endif
 
-int main(int argc, char** argv) {
+namespace mbgl {
+
+int runRenderTests(int argc, char** argv) {
     bool recycleMap;
     bool shuffle;
     uint32_t seed;
@@ -160,3 +163,5 @@ int main(int argc, char** argv) {
 
     return stats.failedTests + stats.erroredTests == 0 ? 0 : 1;
 }
+
+} // namespace mbgl
