@@ -230,6 +230,9 @@ HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context_, Resource resource_, Fil
       callback(std::move(callback_)),
       handle(context->getHandle()) {
 
+    // print url for debug purposes
+    Log::Warning(Event::General, resource.url);
+
     // If there's already a response, set the correct etags/modified headers to make sure we are
     // getting a 304 response if possible. This avoids redownloading unchanged data.
     if (resource.priorEtag) {
