@@ -367,10 +367,8 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                            { 's', "shuffle" });
     args::ValueFlag<uint32_t> seedValue(argumentParser, "seed", "Shuffle seed (default: random)",
                                         { "seed" });
-    args::ValueFlag<std::string> testRootPathValue(argumentParser, "rootPath", "Test root rootPath",
-                                                   { 'p', "rootPath" });
-    args::ValueFlag<std::regex> testFilterValue(argumentParser, "filter", "Test filter regex",
-                                               { 'f', "filter" });
+    args::ValueFlag<std::string> testRootPathValue(argumentParser, "rootPath", "Test root rootPath", {'p', "rootPath"});
+    args::ValueFlag<std::regex> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
 
     try {
@@ -786,7 +784,7 @@ std::string createResultPage(const TestStatistics& stats, const std::vector<Test
 }
 
 std::string localizeURL(const std::string& url, const std::string& rootPath) {
-    static const std::regex regex { "local://" };
+    static const std::regex regex{"local://"};
     if (auto vendorPath = getVendorPath(url, regex, rootPath)) {
         return *vendorPath;
     } else {

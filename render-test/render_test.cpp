@@ -3,7 +3,6 @@
 #include <mbgl/render_test.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/render_test.hpp>
 
 #include "metadata.hpp"
 #include "parser.hpp"

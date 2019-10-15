@@ -147,7 +147,7 @@ PremultipliedImage HeadlessFrontend::render(Map& map) {
     if (error) {
         std::rethrow_exception(error);
     }
-    
+      
     return result;
 }
 
