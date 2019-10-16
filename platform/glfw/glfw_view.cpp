@@ -811,3 +811,28 @@ void GLFWView::toggleCustomSource() {
                              mbgl::style::VisibilityType::None : mbgl::style::VisibilityType::Visible);
     }
 }
+
+void GLFWView::onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode) {
+    if (mode == mbgl::MapObserver::RenderMode::Partial) {
+        mbgl::Log::Info(mbgl::Event::General, "MapChangeDidFinishRenderingMap");
+    } else {
+        mbgl::Log::Info(mbgl::Event::General, "MapChangeDidFinishRenderingMapFullyRendered");
+    }
+}
+
+void GLFWView::onDidFinishRenderingFrame(mbgl::MapObserver::RenderFrameStatus status) {
+    std::string mode = status.mode == mbgl::MapObserver::RenderMode::Partial ? "Partial" : "Full";
+    mbgl::Log::Info(mbgl::Event::General,
+                    "onDidFinishRenderingFrame - mode: %s, needsRepaint: %d, placementChanged: %d",
+                    mode.c_str(),
+                    status.needsRepaint,
+                    status.placementChanged);
+}
+
+void GLFWView::onDidBecomeIdle() {
+    mbgl::Log::Info(mbgl::Event::General, "onDidBecomeIdle");
+}
+
+void GLFWView::onDidFinishSourceLoad(const std::string &source) {
+    mbgl::Log::Info(mbgl::Event::General, "onDidFinishSourceLoad: %s", source.c_str());
+}

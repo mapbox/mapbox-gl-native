@@ -71,6 +71,11 @@ private:
     static void onMouseMove(GLFWwindow *window, double x, double y);
     static void onWindowFocus(GLFWwindow *window, int focused);
 
+    void onDidFinishRenderingMap(mbgl::MapObserver::RenderMode) final;
+    void onDidFinishRenderingFrame(mbgl::MapObserver::RenderFrameStatus) final;
+    void onDidBecomeIdle() final;
+    void onDidFinishSourceLoad(const std::string &) final;
+
     // Internal
     void report(float duration);
 
