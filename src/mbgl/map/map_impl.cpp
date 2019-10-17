@@ -154,14 +154,18 @@ void Map::Impl::onWillStartRenderingMap() {
 }
 
 void Map::Impl::onDidFinishRenderingMap() {
-    if (mode == MapMode::Continuous && loading) {
+    if (mode == MapMode::Continuous) {
         observer.onDidFinishRenderingMap(MapObserver::RenderMode::Full);
         if (loading) {
             loading = false;
             observer.onDidFinishLoadingMap();
         }
     }
-};
+}
+
+void Map::Impl::onRenderSourceLoaded(const std::string& source) {
+    observer.onDidFinishSourceLoad(source);
+}
 
 void Map::Impl::jumpTo(const CameraOptions& camera) {
     cameraMutated = true;

@@ -52,6 +52,7 @@ public:
     virtual void onDidFinishRenderingMap(RenderMode) {}
     virtual void onDidFinishLoadingStyle() {}
     virtual void onSourceChanged(style::Source&) {}
+    virtual void onDidFinishSourceLoad(const std::string&) {}
     virtual void onDidBecomeIdle() {}
     virtual void onStyleImageMissing(const std::string&) {}
     // This method should return true if unused image can be removed,

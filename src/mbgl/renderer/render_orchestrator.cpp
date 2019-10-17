@@ -698,6 +698,10 @@ void RenderOrchestrator::onTileChanged(RenderSource&, const OverscaledTileID&) {
     observer->onInvalidate();
 }
 
+void RenderOrchestrator::onIdealTilesLoaded(RenderSource& source) {
+    observer->onRenderSourceLoaded(source.baseImpl->id);
+}
+
 void RenderOrchestrator::onStyleImageMissing(const std::string& id, std::function<void()> done) {
     observer->onStyleImageMissing(id, std::move(done));
 }

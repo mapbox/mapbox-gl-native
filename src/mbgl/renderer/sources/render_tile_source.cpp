@@ -1,3 +1,4 @@
+#include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/sources/render_tile_source.hpp>
 
 #include <mbgl/renderer/buckets/debug_bucket.hpp>
@@ -156,6 +157,22 @@ void RenderTileSource::reduceMemoryUse() {
 
 void RenderTileSource::dumpDebugLogs() const {
     tilePyramid.dumpDebugLogs();
+}
+
+void RenderTileSource::onTileChanged(Tile& tile) {
+    observer->onTileChanged(*this, tile.id);
+    if (tile.isComplete()) {
+        const auto& idealTiles = tilePyramid.getIdealTileIDs();
+        const auto tileID = tile.id.toUnwrapped();
+        if (idealTiles.count(tileID)) {
+            idealTilesLoaded.insert(tileID);
+        }
+        if (idealTilesLoaded.size() < idealTiles.size()) {
+            return;
+        }
+        observer->onIdealTilesLoaded(*this);
+        idealTilesLoaded.clear();
+    }
 }
 
 // RenderTileSetSource implementation

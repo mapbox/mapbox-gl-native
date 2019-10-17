@@ -68,6 +68,8 @@ public:
     void updateFadingTiles();
     bool hasFadingTiles() const { return fadingTiles; }
 
+    const std::set<UnwrappedTileID>& getIdealTileIDs() const { return idealTileIDs; }
+
 private:
     void addRenderTile(const UnwrappedTileID& tileID, Tile& tile);
 
@@ -80,6 +82,7 @@ private:
     float prevLng = 0;
 
     bool fadingTiles = false;
+    std::set<UnwrappedTileID> idealTileIDs;
 };
 
 } // namespace mbgl

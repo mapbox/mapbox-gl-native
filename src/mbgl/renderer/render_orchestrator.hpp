@@ -98,6 +98,7 @@ private:
     // RenderSourceObserver implementation.
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
+    void onIdealTilesLoaded(RenderSource&) override;
 
     // ImageManagerObserver implementation
     void onStyleImageMissing(const std::string&, std::function<void()>) override;

@@ -115,6 +115,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
         }
 
         idealTiles = util::tileCover(parameters.transformState, idealZoom);
+        idealTileIDs = std::set<UnwrappedTileID>(idealTiles.begin(), idealTiles.end());
     }
 
     // Stores a list of all the tiles that we're definitely going to retain. There are two
@@ -179,7 +180,7 @@ void TilePyramid::update(const std::vector<Immutable<style::LayerProperties>>& l
 
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
                                  idealTiles, zoomRange, tileZoom);
-    
+
     for (auto previouslyRenderedTile : previouslyRenderedTiles) {
         Tile& tile = previouslyRenderedTile.second;
         tile.markRenderedPreviously();

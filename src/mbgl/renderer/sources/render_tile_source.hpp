@@ -46,6 +46,8 @@ public:
     void dumpDebugLogs() const override;
 
 protected:
+    void onTileChanged(Tile&) override;
+
     RenderTileSource(Immutable<style::Source::Impl>);
     TilePyramid tilePyramid;
     Immutable<std::vector<RenderTile>> renderTiles;
@@ -55,6 +57,7 @@ protected:
 private:
     float bearing = 0.0F;
     SourceFeatureState featureState;
+    std::set<UnwrappedTileID> idealTilesLoaded;
 };
 
 /**

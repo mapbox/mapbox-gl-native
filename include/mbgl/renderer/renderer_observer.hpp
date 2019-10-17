@@ -32,6 +32,9 @@ public:
     // Final frame
     virtual void onDidFinishRenderingMap() {}
 
+    // Source loaded
+    virtual void onRenderSourceLoaded(const std::string&) {}
+
     // Style is missing an image
     using StyleImageMissingCallback = std::function<void()>;
     virtual void onStyleImageMissing(const std::string&, StyleImageMissingCallback done) { done(); }
