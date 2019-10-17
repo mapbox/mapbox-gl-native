@@ -40,8 +40,6 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/conversion/constant.cpp
         ${MBGL_ROOT}/platform/android/src/conversion/constant.hpp
         ${MBGL_ROOT}/platform/android/src/conversion/conversion.hpp
-        ${MBGL_ROOT}/platform/android/src/file_source.cpp
-        ${MBGL_ROOT}/platform/android/src/file_source.hpp
         ${MBGL_ROOT}/platform/android/src/geojson/feature.cpp
         ${MBGL_ROOT}/platform/android/src/geojson/feature.hpp
         ${MBGL_ROOT}/platform/android/src/geojson/feature_collection.cpp
@@ -85,10 +83,6 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/gson/json_primitive.cpp
         ${MBGL_ROOT}/platform/android/src/gson/json_primitive.hpp
         ${MBGL_ROOT}/platform/android/src/http_file_source.cpp
-        ${MBGL_ROOT}/platform/android/src/i18n/collator.cpp
-        ${MBGL_ROOT}/platform/android/src/i18n/collator_jni.hpp
-        ${MBGL_ROOT}/platform/android/src/i18n/number_format.cpp
-        ${MBGL_ROOT}/platform/android/src/i18n/number_format_jni.hpp
         ${MBGL_ROOT}/platform/android/src/image.cpp
         ${MBGL_ROOT}/platform/android/src/java/util.cpp
         ${MBGL_ROOT}/platform/android/src/java/util.hpp
@@ -98,9 +92,6 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/jni.hpp
         ${MBGL_ROOT}/platform/android/src/jni_native.cpp
         ${MBGL_ROOT}/platform/android/src/jni_native.hpp
-        ${MBGL_ROOT}/platform/android/src/logger.cpp
-        ${MBGL_ROOT}/platform/android/src/logger.hpp
-        ${MBGL_ROOT}/platform/android/src/logging_android.cpp
         ${MBGL_ROOT}/platform/android/src/mapbox.cpp
         ${MBGL_ROOT}/platform/android/src/mapbox.hpp
         ${MBGL_ROOT}/platform/android/src/map/camera_position.cpp
@@ -193,8 +184,6 @@ target_sources(
         ${MBGL_ROOT}/platform/android/src/style/transition_options.hpp
         ${MBGL_ROOT}/platform/android/src/style/value.cpp
         ${MBGL_ROOT}/platform/android/src/style/value.hpp
-        ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer.cpp
-        ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer_jni.hpp
         ${MBGL_ROOT}/platform/android/src/thread.cpp
         ${MBGL_ROOT}/platform/android/src/timer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_backend.cpp
@@ -217,6 +206,11 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/util/thread_local.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/utf.cpp
         ${MBGL_ROOT}/platform/linux/src/headless_backend_egl.cpp
+        # These files are added temporarily for enabling running mbgl-render-test-runner on android
+        ${MBGL_ROOT}/render-test/android-test-runner/render_test_collator.cpp
+        ${MBGL_ROOT}/render-test/android-test-runner/render_test_number_format.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
 )
 
 target_include_directories(
@@ -245,6 +239,18 @@ target_link_libraries(
 add_library(
     mapbox-gl SHARED
     ${MBGL_ROOT}/platform/android/src/main.cpp
+    # These files are added temporarily for enabling running mbgl-render-test-runner on android
+    ${MBGL_ROOT}/platform/android/src/logger.cpp
+    ${MBGL_ROOT}/platform/android/src/logger.hpp
+    ${MBGL_ROOT}/platform/android/src/logging_android.cpp
+    ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer.cpp
+    ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer_jni.hpp
+    ${MBGL_ROOT}/platform/android/src/file_source.cpp
+    ${MBGL_ROOT}/platform/android/src/file_source.hpp
+    ${MBGL_ROOT}/platform/android/src/i18n/collator.cpp
+    ${MBGL_ROOT}/platform/android/src/i18n/collator_jni.hpp
+    ${MBGL_ROOT}/platform/android/src/i18n/number_format.cpp
+    ${MBGL_ROOT}/platform/android/src/i18n/number_format_jni.hpp
 )
 
 target_link_libraries(
@@ -295,12 +301,34 @@ target_link_libraries(
     PRIVATE Mapbox::Base::jni.hpp mapbox-gl mbgl-benchmark
 )
 
+add_library(
+    mbgl-render-test-runner SHARED
+    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+)
+
+target_include_directories(
+    mbgl-render-test-runner
+    PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue ${MBGL_ROOT}/platform/android/src ${MBGL_ROOT}/include
+)
+
+target_link_libraries(
+    mbgl-render-test-runner
+    PRIVATE
+        Mapbox::Base::jni.hpp
+        mbgl-render-test
+        android
+        log
+        Mapbox::Base::geometry.hpp
+        Mapbox::Base::variant
+)
+
 # Android has no concept of MinSizeRel on android.toolchain.cmake and provides configurations tuned for binary size. We can push it a bit
 # more with code folding and LTO.
 set_target_properties(example-custom-layer PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 set_target_properties(mapbox-gl PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 set_target_properties(mbgl-benchmark-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 set_target_properties(mbgl-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
+set_target_properties(mbgl-render-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 
 target_compile_options(example-custom-layer PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
 target_compile_options(mapbox-gl PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)

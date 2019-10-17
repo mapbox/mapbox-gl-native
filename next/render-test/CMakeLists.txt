@@ -1,5 +1,5 @@
 add_library(
-    mbgl-render-test SHARED EXCLUDE_FROM_ALL
+    mbgl-render-test STATIC EXCLUDE_FROM_ALL
     ${MBGL_ROOT}/expression-test/test_runner_common.cpp
     ${MBGL_ROOT}/expression-test/test_runner_common.hpp
     ${MBGL_ROOT}/render-test/allocation_index.cpp
@@ -24,7 +24,7 @@ target_compile_definitions(
 # FIXME: Should not use core private interface
 target_include_directories(
     mbgl-render-test
-    PRIVATE ${MBGL_ROOT}/src
+    PRIVATE ${MBGL_ROOT}/src ${MBGL_ROOT}/platform/default/include
 )
 
 target_include_directories(
