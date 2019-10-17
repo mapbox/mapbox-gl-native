@@ -207,6 +207,7 @@ add_test(
         render-tests
         --recycle-map
         --shuffle
+        --expectationsPath=render-test/expected/render-tests
         --seed=${MBGL_RENDER_TEST_SEED}
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
