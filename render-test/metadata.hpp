@@ -22,6 +22,10 @@ struct TestStatistics {
 };
 
 struct TestPaths {
+    TestPaths() = default;
+    TestPaths(mbgl::filesystem::path stylePath_, std::vector<mbgl::filesystem::path> expectations_)
+        : stylePath(std::move(stylePath_)), expectations(std::move(expectations_)) {}
+
     mbgl::filesystem::path stylePath;
     std::vector<mbgl::filesystem::path> expectations;
 

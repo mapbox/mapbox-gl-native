@@ -168,22 +168,6 @@ mbgl::optional<std::string> localizeMapboxTilesetURL(const std::string& url) {
     return getIntegrationPath(url, "tilesets/", regex);
 }
 
-TestPaths makeTestPaths(mbgl::filesystem::path stylePath) {
-    std::vector<mbgl::filesystem::path> expectations{ stylePath };
-    expectations.front().remove_filename();
-
-    const static std::regex regex{ TestRunner::getBasePath() };
-    for (const std::string& path : TestRunner::getPlatformExpectationsPaths()) {
-        expectations.emplace_back(std::regex_replace(expectations.front().string(), regex, path));
-        assert(!expectations.back().empty());
-    }
-
-    return {
-        std::move(stylePath),
-        std::move(expectations)
-    };
-}
-
 void writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer>& writer, const mbgl::Value& value) {
     value.match([&writer](const mbgl::NullValue&) { writer.Null(); },
                 [&writer](bool b) { writer.Bool(b); },
@@ -349,6 +333,25 @@ std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& b
     return readExpectedEntries(regex, base);
 }
 
+namespace {
+
+std::vector<mbgl::filesystem::path> getTestExpectations(mbgl::filesystem::path testPath,
+                                                        const mbgl::filesystem::path& testsRootPath,
+                                                        std::vector<mbgl::filesystem::path> expectationsPaths) {
+    std::vector<mbgl::filesystem::path> expectations{std::move(testPath.remove_filename())};
+    const auto& defaultTestExpectationsPath = expectations.front().string();
+
+    const std::regex regex{testsRootPath.string()};
+    for (const auto& path : expectationsPaths) {
+        expectations.emplace_back(std::regex_replace(defaultTestExpectationsPath, regex, path.string()));
+        assert(!expectations.back().empty());
+    }
+
+    return expectations;
+}
+
+} // namespace
+
 ArgumentsTuple parseArguments(int argc, char** argv) {
     args::ArgumentParser argumentParser("Mapbox GL Test Runner");
 
@@ -362,8 +365,9 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                                         { "seed" });
     args::ValueFlag<std::string> testPathValue(argumentParser, "rootPath", "Test root rootPath",
                                                { 'p', "rootPath" });
-    args::ValueFlag<std::regex> testFilterValue(argumentParser, "filter", "Test filter regex",
-                                               { 'f', "filter" });
+    args::ValueFlag<std::regex> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
+    args::ValueFlag<std::string> expectationsPathValue(
+        argumentParser, "expectationsPath", "Test expectations path", {'e', "expectationsPath"});
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
 
     try {
@@ -395,6 +399,17 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         mbgl::Log::Error(mbgl::Event::General, "Provided rootPath '%s' does not exist.", rootPath.string().c_str());
         exit(4);
     }
+    std::vector<mbgl::filesystem::path> expectationsPaths;
+    if (expectationsPathValue) {
+        auto expectationsPath = mbgl::filesystem::path(TEST_RUNNER_ROOT_PATH) / args::get(expectationsPathValue);
+        if (!mbgl::filesystem::exists(expectationsPath)) {
+            mbgl::Log::Error(mbgl::Event::General,
+                             "Provided expectationsPath '%s' does not exist.",
+                             expectationsPath.string().c_str());
+            exit(5);
+        }
+        expectationsPaths.emplace_back(std::move(expectationsPath));
+    }
 
     std::vector<mbgl::filesystem::path> paths;
     for (const auto& id : args::get(testNameValues)) {
@@ -419,7 +434,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                 continue;
             }
             if (testPath.path().filename() == "style.json") {
-                testPaths.emplace_back(makeTestPaths(testPath));
+                testPaths.emplace_back(testPath, getTestExpectations(testPath, path, expectationsPaths));
             }
         }
     }

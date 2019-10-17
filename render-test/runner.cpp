@@ -39,15 +39,6 @@ const std::string& TestRunner::getBasePath() {
     return result;
 }
 
-// static
-const std::vector<std::string>& TestRunner::getPlatformExpectationsPaths() {
-    // TODO: Populate from command line.
-    const static std::vector<std::string> result {
-        std::string(TEST_RUNNER_ROOT_PATH).append("/render-test/expected")
-    };
-    return result;
-}
-
 std::string simpleDiff(const Value& result, const Value& expected) {
     std::vector<std::string> resultTokens{tokenize(toJSON(result, 2, false))};
     std::vector<std::string> expectedTokens{tokenize(toJSON(expected, 2, false))};
