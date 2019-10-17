@@ -2,6 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 8.5.0-alpha.3 - October 17, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.5.0-alpha.2...android-v8.5.0-alpha.3) since [Mapbox Maps SDK for Android v8.5.0-alpha.2](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.5.0-alpha.2):
+
+### Bug fixes
+ - Fixed icon-text-fit [#15634](https://github.com/mapbox/mapbox-gl-native/pull/15634)
+ - Fixing occasional crashes during downloading big number (thousands) of offline regions [#15818](https://github.com/mapbox/mapbox-gl-native/pull/15818)
+
 ## 8.5.0-alpha.2 - October 10, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.5.0-alpha.1...android-v8.5.0-alpha.2) since [Mapbox Maps SDK for Android v8.5.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.5.0-alpha.1):
 
