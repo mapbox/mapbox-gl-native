@@ -189,9 +189,12 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
 
             auto existingRequestorsIt = requestedImages.find(missingImage);
             if (existingRequestorsIt != requestedImages.end()) { // Already asked client about this image.
-                if (!existingRequestorsIt->second.empty()) {     // Still waiting for the client response.
-                    existingRequestorsIt->second.emplace(requestorPtr);
-                    requestor.addPendingRequest(missingImage);
+                std::set<ImageRequestor*>& existingRequestors = existingRequestorsIt->second;
+                if (!existingRequestors.empty() &&
+                    (*existingRequestors.begin())
+                        ->hasPendingRequest(missingImage)) { // Still waiting for the client response for this image.
+                    requestorPtr->addPendingRequest(missingImage);
+                    existingRequestors.emplace(requestorPtr);
                     continue;
                 }
                 // Unlike icons, pattern changes are not caught
