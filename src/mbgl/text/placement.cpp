@@ -305,7 +305,9 @@ void Placement::placeBucket(
                     }
                 }
 
-                const auto placeFeatureForVariableAnchors = [&] (const CollisionFeature& collisionFeature, style::TextWritingModeType orientation) {
+                const bool doVariableIconPlacement = hasIconTextFit && !iconAllowOverlap && symbolInstance.placedIconIndex;
+
+                const auto placeFeatureForVariableAnchors = [&] (const CollisionFeature& collisionFeature, style::TextWritingModeType orientation, const CollisionFeature& iconCollisionFeature) {
                     const CollisionBox& textBox = collisionFeature.boxes[0];
                     const float width = textBox.x2 - textBox.x1;
                     const float height = textBox.y2 - textBox.y1;
@@ -329,6 +331,15 @@ void Placement::placeBucket(
                                                                     allowOverlap,
                                                                     pitchWithMap,
                                                                     params.showCollisionBoxes, avoidEdges, collisionGroup.second, textBoxes);
+
+                        if (doVariableIconPlacement) {
+                            auto placedIconFeature = collisionIndex.placeFeature(iconCollisionFeature, shift,
+                                    posMatrix, iconLabelPlaneMatrix, pixelRatio, placedSymbol, scale, fontSize, iconAllowOverlap, pitchWithMap,
+                                    params.showCollisionBoxes, avoidEdges, collisionGroup.second, iconBoxes);
+                            iconBoxes.clear();
+                            if (!placedIconFeature.first) continue;
+                        }
+
                         if (placedFeature.first) {
                             assert(symbolInstance.crossTileID != 0u);
                             optional<style::TextVariableAnchorType> prevAnchor;
@@ -366,12 +377,13 @@ void Placement::placeBucket(
                 };
 
                 const auto placeHorizontal = [&] {
-                    return placeFeatureForVariableAnchors(symbolInstance.textCollisionFeature, style::TextWritingModeType::Horizontal);
+                    return placeFeatureForVariableAnchors(symbolInstance.textCollisionFeature, style::TextWritingModeType::Horizontal, symbolInstance.iconCollisionFeature);
                 };
 
                 const auto placeVertical = [&] {
                     if (bucket.allowVerticalPlacement && !placed.first && symbolInstance.verticalTextCollisionFeature) {
-                        return placeFeatureForVariableAnchors(*symbolInstance.verticalTextCollisionFeature, style::TextWritingModeType::Vertical);
+                        return placeFeatureForVariableAnchors(*symbolInstance.verticalTextCollisionFeature, style::TextWritingModeType::Vertical,
+                                symbolInstance.verticalIconCollisionFeature ? *symbolInstance.verticalIconCollisionFeature : symbolInstance.iconCollisionFeature);
                     }
                     return std::pair<bool, bool>{false, false};
                 };
