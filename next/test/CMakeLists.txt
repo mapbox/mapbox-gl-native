@@ -153,6 +153,7 @@ target_link_libraries(
         Mapbox::Base::Extras::args
         Mapbox::Base::pixelmatch-cpp
         mbgl-core
+        $<$<PLATFORM_ID:Android>:mbgl-core-android>
 )
 
 target_link_libraries(

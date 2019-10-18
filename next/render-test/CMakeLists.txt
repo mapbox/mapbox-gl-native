@@ -40,8 +40,8 @@ target_link_libraries(
         Mapbox::Base::Extras::args
         Mapbox::Base::Extras::filesystem
         Mapbox::Base::pixelmatch-cpp
-        mbgl-core
         mbgl-vendor-boost
+    PUBLIC mbgl-core
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL Android)

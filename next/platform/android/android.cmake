@@ -206,11 +206,6 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/util/thread_local.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/utf.cpp
         ${MBGL_ROOT}/platform/linux/src/headless_backend_egl.cpp
-        # These files are added temporarily for enabling running mbgl-render-test-runner on android
-        ${MBGL_ROOT}/render-test/android-test-runner/render_test_collator.cpp
-        ${MBGL_ROOT}/render-test/android-test-runner/render_test_number_format.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/storage/file_source.cpp
 )
 
 target_include_directories(
@@ -237,25 +232,43 @@ target_link_libraries(
 )
 
 add_library(
-    mapbox-gl SHARED
-    ${MBGL_ROOT}/platform/android/src/main.cpp
-    # These files are added temporarily for enabling running mbgl-render-test-runner on android
-    ${MBGL_ROOT}/platform/android/src/logger.cpp
-    ${MBGL_ROOT}/platform/android/src/logger.hpp
-    ${MBGL_ROOT}/platform/android/src/logging_android.cpp
-    ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer.cpp
-    ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer_jni.hpp
+    mbgl-core-android STATIC
     ${MBGL_ROOT}/platform/android/src/file_source.cpp
     ${MBGL_ROOT}/platform/android/src/file_source.hpp
     ${MBGL_ROOT}/platform/android/src/i18n/collator.cpp
     ${MBGL_ROOT}/platform/android/src/i18n/collator_jni.hpp
     ${MBGL_ROOT}/platform/android/src/i18n/number_format.cpp
     ${MBGL_ROOT}/platform/android/src/i18n/number_format_jni.hpp
+    ${MBGL_ROOT}/platform/android/src/logger.cpp
+    ${MBGL_ROOT}/platform/android/src/logger.hpp
+    ${MBGL_ROOT}/platform/android/src/logging_android.cpp
+    ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer.cpp
+    ${MBGL_ROOT}/platform/android/src/text/local_glyph_rasterizer_jni.hpp
+)
+
+target_include_directories(
+    mbgl-core-android
+    PRIVATE ${MBGL_ROOT}/platform/default/include ${MBGL_ROOT}/src
+)
+
+target_link_libraries(
+    mbgl-core-android
+    PRIVATE Mapbox::Base::jni.hpp mbgl-core
+)
+
+add_library(
+    mapbox-gl SHARED
+    ${MBGL_ROOT}/platform/android/src/main.cpp
+)
+
+target_include_directories(
+    mapbox-gl
+    PRIVATE ${MBGL_ROOT}/platform/default/include ${MBGL_ROOT}/src
 )
 
 target_link_libraries(
     mapbox-gl
-    PRIVATE Mapbox::Base::jni.hpp mbgl-core
+    PRIVATE Mapbox::Base::jni.hpp mbgl-core mbgl-core-android
 )
 
 add_library(
@@ -303,23 +316,25 @@ target_link_libraries(
 
 add_library(
     mbgl-render-test-runner SHARED
-    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+    ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp
+    ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
+    ${MBGL_ROOT}/render-test/android-test-runner/render_test_collator.cpp
+    ${MBGL_ROOT}/render-test/android-test-runner/render_test_number_format.cpp
 )
 
 target_include_directories(
     mbgl-render-test-runner
-    PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue ${MBGL_ROOT}/platform/android/src ${MBGL_ROOT}/include
+    PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue ${MBGL_ROOT}/platform/android/src ${MBGL_ROOT}/src
 )
 
 target_link_libraries(
     mbgl-render-test-runner
     PRIVATE
         Mapbox::Base::jni.hpp
-        mbgl-render-test
         android
         log
-        Mapbox::Base::geometry.hpp
-        Mapbox::Base::variant
+        mbgl-render-test
 )
 
 # Android has no concept of MinSizeRel on android.toolchain.cmake and provides configurations tuned for binary size. We can push it a bit
@@ -327,11 +342,12 @@ target_link_libraries(
 set_target_properties(example-custom-layer PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 set_target_properties(mapbox-gl PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 set_target_properties(mbgl-benchmark-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
-set_target_properties(mbgl-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 set_target_properties(mbgl-render-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
+set_target_properties(mbgl-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 
 target_compile_options(example-custom-layer PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
 target_compile_options(mapbox-gl PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
 target_compile_options(mbgl-core PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
+target_compile_options(mbgl-render-test-runner PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
 target_compile_options(mbgl-vendor-icu PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
 target_compile_options(mbgl-vendor-sqlite PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
