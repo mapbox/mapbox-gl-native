@@ -3,6 +3,8 @@ target_compile_definitions(
     PUBLIC MBGL_USE_GLES2 GLES_SILENCE_DEPRECATION
 )
 
+set_target_properties(mbgl-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
+
 target_sources(
     mbgl-core
     PRIVATE
