@@ -12,7 +12,7 @@
 using ErrorMessage = std::string;
 using JSONReply = mbgl::variant<mbgl::JSDocument, ErrorMessage>;
 
-using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::vector<TestPaths>>;
+using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::string, std::vector<TestPaths>>;
 
 JSONReply readJson(const mbgl::filesystem::path&);
 std::string serializeJsonValue(const mbgl::JSValue&);
@@ -23,17 +23,20 @@ std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& b
 
 TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path);
 
-ArgumentsTuple parseArguments(int argc, char** argv);
-std::vector<std::pair<std::string, std::string>> parseIgnores();
+const std::string getTestPath(const std::string& rootTestPath);
 
-TestMetadata parseTestMetadata(const TestPaths& paths);
+ArgumentsTuple parseArguments(int argc, char** argv);
+std::vector<std::pair<std::string, std::string>> parseIgnores(const std::string& rootPath,
+                                                              const std::string& ignorePath);
+
+TestMetadata parseTestMetadata(const TestPaths& paths, const std::string& testRootPath);
 
 std::string createResultPage(const TestStatistics&, const std::vector<TestMetadata>&, bool shuffle, uint32_t seed);
 
-std::string localizeURL(const std::string& url);
+std::string localizeURL(const std::string& url, const std::string& testPath);
 
 std::string toJSON(const mbgl::Value& value, unsigned indent, bool singleLine);
 std::string toJSON(const std::vector<mbgl::Feature>& features, unsigned indent, bool singleLine);
 
-void localizeSourceURLs(mbgl::JSValue& root, mbgl::JSDocument& document);
-void localizeStyleURLs(mbgl::JSValue& root, mbgl::JSDocument& document);
+void localizeSourceURLs(mbgl::JSValue& root, mbgl::JSDocument& document, const std::string& testPath);
+void localizeStyleURLs(mbgl::JSValue& root, mbgl::JSDocument& document, const std::string& testPath);

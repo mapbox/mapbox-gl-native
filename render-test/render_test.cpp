@@ -44,12 +44,13 @@ int runRenderTests(int argc, char** argv) {
     bool shuffle;
     uint32_t seed;
     std::string testRootPath;
+    std::string ignorePath;
+    std::string expectPath;
     std::vector<TestPaths> testPaths;
 
-    std::tie(recycleMap, shuffle, seed, testRootPath, testPaths) = parseArguments(argc, argv);
-    const std::string::size_type rootLength = testRootPath.length();
+    std::tie(recycleMap, shuffle, seed, testRootPath, ignorePath, testPaths) = parseArguments(argc, argv);
 
-    const auto ignores = parseIgnores();
+    const auto ignores = parseIgnores(testRootPath, ignorePath);
 
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
@@ -60,7 +61,7 @@ int runRenderTests(int argc, char** argv) {
     }
 
     mbgl::util::RunLoop runLoop;
-    TestRunner runner;
+    TestRunner runner(testRootPath);
 
     std::vector<TestMetadata> metadatas;
     metadatas.reserve(testPaths.size());
@@ -68,7 +69,7 @@ int runRenderTests(int argc, char** argv) {
     TestStatistics stats;
 
     for (auto& testPath : testPaths) {
-        TestMetadata metadata = parseTestMetadata(testPath);
+        TestMetadata metadata = parseTestMetadata(testPath, testRootPath);
 
         if (!recycleMap) {
             runner.reset();
@@ -78,6 +79,7 @@ int runRenderTests(int argc, char** argv) {
         std::string& status = metadata.status;
         std::string& color = metadata.color;
 
+        const std::string::size_type rootLength = getTestPath(testRootPath).length();
         id = testPath.defaultExpectations();
         id = id.substr(rootLength + 1, id.length() - rootLength - 2);
 
