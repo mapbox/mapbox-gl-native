@@ -30,6 +30,7 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/renderer/renderer.hpp>
@@ -1295,7 +1296,7 @@ bool QMapboxGL::sourceExists(const QString& sourceID)
     Updates the source \a id with new \a params.
 
     If the source does not exist, it will be added like in addSource(). Only
-    GeoJSON sources can be updated.
+    image and GeoJSON sources can be updated.
 */
 void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
 {
@@ -1309,12 +1310,17 @@ void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
     }
 
     auto sourceGeoJSON = source->as<GeoJSONSource>();
-    if (!sourceGeoJSON) {
-        qWarning() << "Unable to update source: only GeoJSON sources are mutable.";
+    auto sourceImage = source->as<ImageSource>();
+    if (!sourceGeoJSON && !sourceImage) {
+        qWarning() << "Unable to update source: only GeoJSON and Image sources are mutable.";
         return;
     }
 
-    if (params.contains("data")) {
+    if (sourceImage) {
+        if (params.contains("url")) {
+            sourceImage->setURL(params["url"].toString().toStdString());
+        }
+    } else if (sourceGeoJSON && params.contains("data")) {
         Error error;
         auto result = convert<mbgl::GeoJSON>(params["data"], error);
         if (result) {
