@@ -158,8 +158,12 @@ PremultipliedImage HeadlessFrontend::render(Map& map) {
     if (error) {
         std::rethrow_exception(error);
     }
-      
+
     return result;
+}
+
+void HeadlessFrontend::renderOnce(Map&) {
+    util::RunLoop::Get()->runOnce();
 }
 
 optional<TransformState> HeadlessFrontend::getTransformState() const {

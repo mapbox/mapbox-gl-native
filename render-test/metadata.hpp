@@ -68,6 +68,12 @@ struct MemoryProbe {
     }
 };
 
+struct FpsProbe {
+    float average = 0.0;
+    float minOnePc = 0.0;
+    float tolerance = 0.0f;
+};
+
 struct NetworkProbe {
     NetworkProbe() = default;
     NetworkProbe(size_t requests_, size_t transferred_) : requests(requests_), transferred(transferred_) {}
@@ -78,10 +84,11 @@ struct NetworkProbe {
 
 class TestMetrics {
 public:
-    bool isEmpty() const { return fileSize.empty() && memory.empty() && network.empty(); }
+    bool isEmpty() const { return fileSize.empty() && memory.empty() && network.empty() && fps.empty(); }
     std::map<std::string, FileSizeProbe> fileSize;
     std::map<std::string, MemoryProbe> memory;
     std::map<std::string, NetworkProbe> network;
+    std::map<std::string, FpsProbe> fps;
 };
 
 struct TestMetadata {

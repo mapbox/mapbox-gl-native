@@ -49,6 +49,7 @@ public:
 
     PremultipliedImage readStillImage();
     PremultipliedImage render(Map&);
+    void renderOnce(Map&);
 
     optional<TransformState> getTransformState() const;
 

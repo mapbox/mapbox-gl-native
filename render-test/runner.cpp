@@ -1,6 +1,7 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/light.hpp>
@@ -33,7 +34,30 @@
 
 using namespace mbgl;
 
-// static 
+class TestRunnerMapObserver : public MapObserver {
+public:
+    TestRunnerMapObserver() : mapLoadFailure(false), finishRenderingMap(false), idle(false) {}
+
+    void onDidFailLoadingMap(MapLoadError, const std::string&) override { mapLoadFailure = true; }
+
+    void onDidFinishRenderingMap(RenderMode mode) override final {
+        if (!finishRenderingMap) finishRenderingMap = mode == RenderMode::Full;
+    }
+
+    void onDidBecomeIdle() override final { idle = true; }
+
+    void reset() {
+        mapLoadFailure = false;
+        finishRenderingMap = false;
+        idle = false;
+    }
+
+    bool mapLoadFailure;
+    bool finishRenderingMap;
+    bool idle;
+};
+
+// static
 const std::string& TestRunner::getBasePath() {
     const static std::string result = std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration");
     return result;
@@ -339,16 +363,38 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         }
     }
 #endif // !defined(SANITIZE)
+    // Check fps metrics
+    for (const auto& expected : metadata.expectedMetrics.fps) {
+        auto actual = metadata.metrics.fps.find(expected.first);
+        if (actual == metadata.metrics.fps.end()) {
+            metadata.errorMessage = "Failed to find fps probe: " + expected.first;
+            return false;
+        }
+        auto result = checkValue(expected.second.average, actual->second.average, expected.second.tolerance);
+        if (!std::get<bool>(result)) {
+            std::stringstream ss;
+            ss << "Average fps at probe \"" << expected.first << "\" is " << actual->second.average
+               << ", expected to be " << expected.second.average << " with tolerance of " << expected.second.tolerance;
+            metadata.errorMessage = ss.str();
+            return false;
+        }
+        result = checkValue(expected.second.minOnePc, actual->second.minOnePc, expected.second.tolerance);
+        if (!std::get<bool>(result)) {
+            std::stringstream ss;
+            ss << "Minimum(1%) fps at probe \"" << expected.first << "\" is " << actual->second.minOnePc
+               << ", expected to be " << expected.second.minOnePc << " with tolerance of " << expected.second.tolerance;
+            metadata.errorMessage = ss.str();
+            return false;
+        }
+    }
     return true;
 }
 
 bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
-    if (!metadata.document.HasMember("metadata") ||
-        !metadata.document["metadata"].HasMember("test") ||
+    if (!metadata.document.HasMember("metadata") || !metadata.document["metadata"].HasMember("test") ||
         !metadata.document["metadata"]["test"].HasMember("operations")) {
         return true;
     }
-
     assert(metadata.document["metadata"]["test"]["operations"].IsArray());
 
     const auto& operationsArray = metadata.document["metadata"]["test"]["operations"].GetArray();
@@ -364,6 +410,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
 
     auto& frontend = maps[key]->frontend;
     auto& map = maps[key]->map;
+    auto& observer = maps[key]->observer;
 
     static const std::string waitOp("wait");
     static const std::string sleepOp("sleep");
@@ -394,6 +441,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
     static const std::string setFeatureStateOp("setFeatureState");
     static const std::string getFeatureStateOp("getFeatureState");
     static const std::string removeFeatureStateOp("removeFeatureState");
+    static const std::string panGestureOp("panGesture");
 
     if (operationArray[0].GetString() == waitOp) {
         // wait
@@ -835,9 +883,76 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
             return false;
         }
         frontend.getRenderer()->removeFeatureState(sourceID, sourceLayer, featureID, stateKey);
+    } else if (operationArray[0].GetString() == panGestureOp) {
+        // benchmarkPanGesture
+        assert(operationArray.Size() >= 4u);
+        assert(operationArray[1].IsString()); // identifier
+        assert(operationArray[2].IsNumber()); // duration
+        assert(operationArray[3].IsArray());  // start [lat, lng, zoom]
+        assert(operationArray[4].IsArray());  // end [lat, lng, zoom]
+
+        if (metadata.mapMode != mbgl::MapMode::Continuous) {
+            metadata.errorMessage = "Map mode must be Continous for " + panGestureOp + " operation";
+            return false;
+        }
+
+        std::string mark = operationArray[1].GetString();
+        int duration = operationArray[2].GetFloat();
+        LatLng startPos, endPos;
+        double startZoom, endZoom;
+        std::vector<float> samples;
+
+        auto parsePosition = [](auto arr) -> std::tuple<LatLng, double> {
+            assert(arr.Size() >= 3);
+            return {{arr[1].GetDouble(), arr[0].GetDouble()}, arr[2].GetDouble()};
+        };
+
+        std::tie(startPos, startZoom) = parsePosition(operationArray[3].GetArray());
+        std::tie(endPos, endZoom) = parsePosition(operationArray[4].GetArray());
+
+        // Jump to the starting point of the segment and make sure there's something to render
+        map.jumpTo(mbgl::CameraOptions().withCenter(startPos).withZoom(startZoom));
+
+        observer->reset();
+        while (!observer->finishRenderingMap) {
+            frontend.renderOnce(map);
+        }
+
+        if (observer->mapLoadFailure) return false;
+
+        size_t frames = 0;
+        float totalTime = 0.0;
+        bool transitionFinished = false;
+
+        mbgl::AnimationOptions animationOptions(mbgl::Milliseconds(duration * 1000));
+        animationOptions.minZoom = util::min(startZoom, endZoom);
+        animationOptions.transitionFinishFn = [&]() { transitionFinished = true; };
+
+        map.flyTo(mbgl::CameraOptions().withCenter(endPos).withZoom(endZoom), animationOptions);
+
+        for (; !transitionFinished; frames++) {
+            frontend.renderOnce(map);
+            float frameTime = (float)frontend.getFrameTime();
+            totalTime += frameTime;
+
+            samples.push_back(frameTime);
+        }
+
+        float averageFps = totalTime > 0.0 ? frames / totalTime : 0.0;
+        float minFrameTime = 0.0;
+
+        // Use 1% of the longest frames to compute the minimum fps
+        std::sort(samples.begin(), samples.end());
+
+        int sampleCount = util::max(1, (int)samples.size() / 100);
+        for (auto it = samples.rbegin(); it != samples.rbegin() + sampleCount; it++) minFrameTime += *it;
+
+        float minOnePcFps = sampleCount / minFrameTime;
+
+        metadata.metrics.fps.insert({std::move(mark), {averageFps, minOnePcFps, 0.0f}});
 
     } else {
-        metadata.errorMessage = std::string("Unsupported operation: ")  + operationArray[0].GetString();
+        metadata.errorMessage = std::string("Unsupported operation: ") + operationArray[0].GetString();
         return false;
     }
 
@@ -846,15 +961,18 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
 }
 
 TestRunner::Impl::Impl(const TestMetadata& metadata)
-    : frontend(metadata.size, metadata.pixelRatio, swapBehavior(metadata.mapMode)),
+    : observer(std::make_unique<TestRunnerMapObserver>()),
+      frontend(metadata.size, metadata.pixelRatio, swapBehavior(metadata.mapMode)),
       map(frontend,
-          mbgl::MapObserver::nullObserver(),
+          *observer.get(),
           mbgl::MapOptions()
               .withMapMode(metadata.mapMode)
               .withSize(metadata.size)
               .withPixelRatio(metadata.pixelRatio)
               .withCrossSourceCollisions(metadata.crossSourceCollisions),
           mbgl::ResourceOptions().withCacheOnlyRequestsSupport(false)) {}
+
+TestRunner::Impl::~Impl() {}
 
 bool TestRunner::run(TestMetadata& metadata) {
     AllocationIndex::setActive(false);

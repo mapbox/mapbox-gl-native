@@ -303,6 +303,22 @@ std::string serializeMetrics(const TestMetrics& metrics) {
         writer.EndArray();
     }
 
+    if (!metrics.fps.empty()) {
+        // Start fps section
+        writer.Key("fps");
+        writer.StartArray();
+        for (const auto& fpsProbe : metrics.fps) {
+            assert(!fpsProbe.first.empty());
+            writer.StartArray();
+            writer.String(fpsProbe.first.c_str());
+            writer.Double(fpsProbe.second.average);
+            writer.Double(fpsProbe.second.minOnePc);
+            writer.EndArray();
+        }
+        writer.EndArray();
+        // End fps section
+    }
+
     writer.EndObject();
 
     return s.GetString();
@@ -433,6 +449,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
             if (testFilterValue && !std::regex_match(testPath.path().string(), args::get(testFilterValue))) {
                 continue;
             }
+
             if (testPath.path().filename() == "style.json") {
                 testPaths.emplace_back(testPath, getTestExpectations(testPath, path, expectationsPaths));
             }
@@ -546,6 +563,23 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
             result.network.emplace(std::piecewise_construct,
                                    std::forward_as_tuple(std::move(mark)),
                                    std::forward_as_tuple(probeValue[1].GetUint64(), probeValue[2].GetUint64()));
+        }
+    }
+
+    if (document.HasMember("fps")) {
+        const mbgl::JSValue& fpsValue = document["fps"];
+        assert(fpsValue.IsArray());
+        for (auto& probeValue : fpsValue.GetArray()) {
+            assert(probeValue.IsArray());
+            assert(probeValue.Size() >= 4u);
+            assert(probeValue[0].IsString());
+            assert(probeValue[1].IsNumber()); // Average
+            assert(probeValue[2].IsNumber()); // Minimum
+            assert(probeValue[3].IsNumber()); // Tolerance
+            const std::string mark{probeValue[0].GetString(), probeValue[0].GetStringLength()};
+            assert(!mark.empty());
+            result.fps.insert(
+                {std::move(mark), {probeValue[1].GetFloat(), probeValue[2].GetFloat(), probeValue[3].GetFloat()}});
         }
     }
 
