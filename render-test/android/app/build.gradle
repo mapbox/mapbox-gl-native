@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        applicationId = 'com.example.native_activity'
+        applicationId = 'com.mapbox.mapboxsdk.maps.render_test_runner'
         minSdkVersion 14
         targetSdkVersion 28
         externalNativeBuild {
@@ -13,13 +13,6 @@ android {
                 arguments '-DANDROID_STL=c++_static'
                 targets 'mbgl-render-test-runner'
             }
-        }
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'),
-                    'proguard-rules.pro'
         }
     }
     externalNativeBuild {
@@ -31,7 +24,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 }

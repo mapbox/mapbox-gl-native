@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- BEGIN_INCLUDE(manifest) -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.example.native_activity"
           android:versionCode="1"
           android:versionName="1.0">
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <!-- This .apk has no Java code itself, so set hasCode to false. -->
   <application
       android:allowBackup="false"
       android:fullBackupContent="false"
@@ -13,12 +11,9 @@
       android:label="@string/app_name"
       android:hasCode="false">
 
-    <!-- Our activity is the built-in NativeActivity framework class.
-         This will take care of integrating with our NDK code. -->
     <activity android:name="android.app.NativeActivity"
               android:label="@string/app_name"
-              android:configChanges="orientation|keyboardHidden">
-      <!-- Tell NativeActivity the name of our .so -->
+              android:screenOrientation="portrait">
       <meta-data android:name="android.app.lib_name"
                  android:value="mbgl-render-test-runner" />
       <intent-filter>
@@ -29,4 +24,3 @@
   </application>
 
 </manifest>
-<!-- END_INCLUDE(manifest) -->

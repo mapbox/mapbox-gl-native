@@ -319,8 +319,8 @@ add_library(
     ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
     ${MBGL_ROOT}/platform/android/src/test/render_test_runner.cpp
     ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
-    ${MBGL_ROOT}/render-test/android-test-runner/render_test_collator.cpp
-    ${MBGL_ROOT}/render-test/android-test-runner/render_test_number_format.cpp
+    ${MBGL_ROOT}/platform/android/src/test/render_test_collator.cpp
+    ${MBGL_ROOT}/platform/android/src/test/render_test_number_format.cpp
 )
 
 target_include_directories(
