@@ -140,11 +140,12 @@ void OfflineDatabase::removeExisting() {
 void OfflineDatabase::removeOldCacheTable() {
     assert(db);
     db->exec("DROP TABLE IF EXISTS http_cache");
-    db->exec("VACUUM");
+    vacuum();
 }
 
 void OfflineDatabase::createSchema() {
     assert(db);
+    vacuum();
     db->exec("PRAGMA journal_mode = DELETE");
     db->exec("PRAGMA synchronous = FULL");
     mapbox::sqlite::Transaction transaction(*db);
@@ -155,7 +156,7 @@ void OfflineDatabase::createSchema() {
 
 void OfflineDatabase::migrateToVersion3() {
     assert(db);
-    db->exec("VACUUM");
+    vacuum();
     db->exec("PRAGMA user_version = 3");
 }
 
@@ -179,6 +180,15 @@ void OfflineDatabase::migrateToVersion6() {
     db->exec("ALTER TABLE tiles ADD COLUMN must_revalidate INTEGER NOT NULL DEFAULT 0");
     db->exec("PRAGMA user_version = 6");
     transaction.commit();
+}
+
+void OfflineDatabase::vacuum() {
+    if (getPragma<int64_t>("PRAGMA auto_vacuum") != 2 /*INCREMENTAL*/) {
+        db->exec("PRAGMA auto_vacuum = INCREMENTAL");
+        db->exec("VACUUM");
+    } else {
+        db->exec("PRAGMA incremental_vacuum");
+    }
 }
 
 mapbox::sqlite::Statement& OfflineDatabase::getStatement(const char* sql) {
@@ -683,7 +693,7 @@ std::exception_ptr OfflineDatabase::clearAmbientCache() try {
 
     resourceQuery.run();
 
-    db->exec("VACUUM");
+    vacuum();
 
     return nullptr;
 } catch (const mapbox::sqlite::Exception& ex) {
@@ -871,7 +881,7 @@ std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
 
     evict(0);
     assert(db);
-    db->exec("VACUUM");
+    vacuum();
 
     // Ensure that the cached offlineTileCount value is recalculated.
     offlineMapboxTileCount = {};
@@ -1218,7 +1228,7 @@ std::exception_ptr OfflineDatabase::setMaximumAmbientCacheSize(uint64_t size) {
 
         if (databaseSize > maximumAmbientCacheSize) {
             evict(0);
-            db->exec("VACUUM");
+            vacuum();
         }
 
         return nullptr;
