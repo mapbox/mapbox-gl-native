@@ -58,12 +58,6 @@ public:
 };
 
 // static
-const std::string& TestRunner::getBasePath() {
-    const static std::string result = std::string(TEST_RUNNER_ROOT_PATH).append("/mapbox-gl-js/test/integration");
-    return result;
-}
-
-// static
 gfx::HeadlessBackend::SwapBehaviour swapBehavior(MapMode mode) {
     return mode == MapMode::Continuous ? gfx::HeadlessBackend::SwapBehaviour::Flush
                                        : gfx::HeadlessBackend::SwapBehaviour::NoFlush;
@@ -493,7 +487,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         std::string imagePath = operationArray[2].GetString();
         imagePath.erase(std::remove(imagePath.begin(), imagePath.end(), '"'), imagePath.end());
 
-        const mbgl::filesystem::path filePath(testRootPath + "/mapbox-gl-js/test/integration/" + imagePath);
+        const mbgl::filesystem::path filePath = mbgl::filesystem::path(getTestPath(testRootPath)) / imagePath;
 
         mbgl::optional<std::string> maybeImage = mbgl::util::readFile(filePath.string());
         if (!maybeImage) {

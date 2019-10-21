@@ -100,7 +100,7 @@ mbgl::optional<std::string> getVendorPath(const std::string& url,
                                           const std::regex& regex,
                                           const std::string& testRootPath,
                                           bool glyphsPath = false) {
-    static const mbgl::filesystem::path vendorPath(std::string(testRootPath) + "/vendor/");
+    static const mbgl::filesystem::path vendorPath = getValidPath(testRootPath, std::string("vendor/"));
 
     mbgl::filesystem::path file = std::regex_replace(url, regex, vendorPath.string());
     if (mbgl::filesystem::exists(file.parent_path())) {
@@ -119,7 +119,8 @@ mbgl::optional<std::string> getIntegrationPath(const std::string& url,
                                                const std::regex& regex,
                                                const std::string& testRootPath,
                                                bool glyphsPath = false) {
-    static const mbgl::filesystem::path integrationPath(std::string(testRootPath) + "/mapbox-gl-js/test/integration/");
+    static const mbgl::filesystem::path integrationPath =
+        getValidPath(testRootPath, std::string("mapbox-gl-js/test/integration/"));
 
     mbgl::filesystem::path file = std::regex_replace(url, regex, integrationPath.string() + parent);
     if (mbgl::filesystem::exists(file.parent_path())) {
@@ -136,7 +137,7 @@ mbgl::optional<std::string> getIntegrationPath(const std::string& url,
 mbgl::optional<std::string> localizeLocalURL(const std::string& url,
                                              const std::string& testRootPath,
                                              bool glyphsPath = false) {
-    static const std::regex regex { "local://" };
+    static const std::regex regex{"local://"};
     if (auto vendorPath = getVendorPath(url, regex, testRootPath, glyphsPath)) {
         return vendorPath;
     } else {
@@ -145,7 +146,7 @@ mbgl::optional<std::string> localizeLocalURL(const std::string& url,
 }
 
 mbgl::optional<std::string> localizeHttpURL(const std::string& url, const std::string& testRootPath) {
-    static const std::regex regex { "http://localhost:2900" };
+    static const std::regex regex{"http://localhost:2900"};
     if (auto vendorPath = getVendorPath(url, regex, testRootPath)) {
         return vendorPath;
     } else {
@@ -154,17 +155,17 @@ mbgl::optional<std::string> localizeHttpURL(const std::string& url, const std::s
 }
 
 mbgl::optional<std::string> localizeMapboxSpriteURL(const std::string& url, const std::string& testRootPath) {
-    static const std::regex regex { "mapbox://" };
+    static const std::regex regex{"mapbox://"};
     return getIntegrationPath(url, "", regex, testRootPath);
 }
 
 mbgl::optional<std::string> localizeMapboxFontsURL(const std::string& url, const std::string& testRootPath) {
-    static const std::regex regex { "mapbox://fonts" };
+    static const std::regex regex{"mapbox://fonts"};
     return getIntegrationPath(url, "glyphs/", regex, testRootPath, true);
 }
 
 mbgl::optional<std::string> localizeMapboxTilesURL(const std::string& url, const std::string& testRootPath) {
-    static const std::regex regex { "mapbox://" };
+    static const std::regex regex{"mapbox://"};
     if (auto vendorPath = getVendorPath(url, regex, testRootPath)) {
         return vendorPath;
     } else {
@@ -173,7 +174,7 @@ mbgl::optional<std::string> localizeMapboxTilesURL(const std::string& url, const
 }
 
 mbgl::optional<std::string> localizeMapboxTilesetURL(const std::string& url, const std::string& testRootPath) {
-    static const std::regex regex { "mapbox://" };
+    static const std::regex regex{"mapbox://"};
     return getIntegrationPath(url, "tilesets/", regex, testRootPath);
 }
 
@@ -204,16 +205,31 @@ void writeJSON(rapidjson::PrettyWriter<rapidjson::StringBuffer>& writer, const m
 
 } // namespace
 
+static const mbgl::filesystem::path DefaultRootPath{std::string(TEST_RUNNER_ROOT_PATH)};
+
+const mbgl::filesystem::path getValidPath(const std::string& basePath, const std::string& subPath) {
+    auto filePath = mbgl::filesystem::path(basePath) / subPath;
+    if (mbgl::filesystem::exists(filePath)) {
+        return filePath;
+    }
+    // Fall back to check default path
+    filePath = DefaultRootPath / subPath;
+    if (mbgl::filesystem::exists(filePath)) {
+        return filePath;
+    }
+    mbgl::Log::Warning(mbgl::Event::General, "Failed to find path: %s", subPath.c_str());
+    return mbgl::filesystem::path{};
+}
+
 /// Returns path of the render test cases directory.
 const std::string getTestPath(const std::string& rootTestPath) {
-    const std::string path = std::string(rootTestPath).append("/mapbox-gl-js/test/integration");
-
-    auto testBasePath = mbgl::filesystem::path(path);
-    if (!mbgl::filesystem::exists(testBasePath)) {
-        // fall back to root path
-        return std::string(rootTestPath);
+    // Check if sub-directory exits or not
+    auto testBasePath = mbgl::filesystem::path(rootTestPath) / ("mapbox-gl-js/test/integration");
+    if (mbgl::filesystem::exists(testBasePath)) {
+        return testBasePath.string();
     }
-    return path;
+    // Use root test path for further processing
+    return rootTestPath;
 }
 
 std::string toJSON(const mbgl::Value& value, unsigned indent, bool singleLine) {
@@ -394,19 +410,16 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
 
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", { 'h', "help" });
 
-    args::Flag recycleMapFlag(argumentParser, "recycle map", "Toggle reusing the map object",
-                              { 'r', "recycle-map" });
-    args::Flag shuffleFlag(argumentParser, "shuffle", "Toggle shuffling the tests order",
-                           { 's', "shuffle" });
+    args::Flag recycleMapFlag(argumentParser, "recycle map", "Toggle reusing the map object", {'r', "recycle-map"});
+    args::Flag shuffleFlag(argumentParser, "shuffle", "Toggle shuffling the tests order", {'s', "shuffle"});
     args::ValueFlag<uint32_t> seedValue(argumentParser, "seed", "Shuffle seed (default: random)",
                                         { "seed" });
-    args::ValueFlag<std::string> testPathValue(argumentParser, "rootPath", "Test root rootPath",
-                                               { 'p', "rootPath" });
+    args::ValueFlag<std::string> testPathValue(argumentParser, "rootPath", "Test root rootPath", {'p', "rootPath"});
     args::ValueFlag<std::regex> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
     args::ValueFlag<std::string> expectationsPathValue(
         argumentParser, "expectationsPath", "Test expectations path", {'e', "expectationsPath"});
-    args::ValueFlag<std::string> ignorePathValue(
-        argumentParser, "ignorePath", "Test ignore list path", {'i', "ignorePath"});
+    args::ValueFlag<std::string> ignoresPathValue(
+        argumentParser, "ignoresPath", "Test ignore list path", {'i', "ignoresPath"});
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
 
     try {
@@ -436,7 +449,8 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     const auto testRootPath = testPathValue ? args::get(testPathValue) : std::string{TEST_RUNNER_ROOT_PATH};
     mbgl::filesystem::path rootPath{testRootPath};
     if (!mbgl::filesystem::exists(rootPath)) {
-        mbgl::Log::Error(mbgl::Event::General, "Provided rootPath '%s' does not exist.", rootPath.string().c_str());
+        mbgl::Log::Error(
+            mbgl::Event::General, "Provided test rootPath '%s' does not exist.", rootPath.string().c_str());
         exit(4);
     }
     std::vector<mbgl::filesystem::path> expectationsPaths;
@@ -451,19 +465,19 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         expectationsPaths.emplace_back(std::move(expectationsPath));
     }
 
-    auto userSpecifiedIgnorePath = mbgl::filesystem::path(testRootPath);
-    if (ignorePathValue) {
-        userSpecifiedIgnorePath /= args::get(ignorePathValue);
-        if (!mbgl::filesystem::exists(userSpecifiedIgnorePath)) {
-            mbgl::Log::Error(mbgl::Event::General,
-                             "Provided extra ignore path '%s' does not exist.",
-                             userSpecifiedIgnorePath.string().c_str());
+    std::string ignoresPath{};
+    if (ignoresPathValue) {
+        auto path = mbgl::filesystem::path(testRootPath) / args::get(ignoresPathValue);
+        if (!mbgl::filesystem::exists(path)) {
+            mbgl::Log::Error(
+                mbgl::Event::General, "Provided ignore list path '%s' does not exist.", path.string().c_str());
             exit(6);
         }
+        ignoresPath = path.string();
     }
 
-    auto testBasePath = mbgl::filesystem::path(getTestPath(testRootPath));
     std::vector<mbgl::filesystem::path> paths;
+    auto testBasePath = mbgl::filesystem::path(getTestPath(testRootPath));
     for (const auto& id : args::get(testNameValues)) {
         paths.emplace_back(testBasePath / id);
     }
@@ -496,28 +510,28 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                           shuffleFlag ? args::get(shuffleFlag) : false,
                           seedValue ? args::get(seedValue) : 1u,
                           testRootPath,
-                          ignorePathValue ? userSpecifiedIgnorePath.string() : std::string{},
+                          ignoresPath,
                           std::move(testPaths)};
 }
 
 std::vector<std::pair<std::string, std::string>> parseIgnores(const std::string& testRootPath,
-                                                              const std::string& ignorePath) {
+                                                              const std::string& ignoresPath) {
     std::vector<std::pair<std::string, std::string>> ignores;
-    auto mainIgnoresPath = mbgl::filesystem::path(testRootPath).append("platform/node/test/ignores.json");
+    auto mainIgnoresPath = getValidPath(testRootPath, "platform/node/test/ignores.json");
 
     mbgl::filesystem::path platformSpecificIgnores;
-    mbgl::filesystem::path ownTestsIgnores =
-        mbgl::filesystem::path(testRootPath).append("render-test/tests/should-fail.json");
+    mbgl::filesystem::path ownTestsIgnores = getValidPath(testRootPath, "render-test/tests/should-fail.json");
 
 #ifdef __APPLE__
-    platformSpecificIgnores = mbgl::filesystem::path(testRootPath).append("render-test/mac-ignores.json");
+    platformSpecificIgnores = getValidPath(testRootPath, "render-test/mac-ignores.json");
 #elif __linux__
-    platformSpecificIgnores = mbgl::filesystem::path(testRootPath).append("render-test/linux-ignores.json");
+    platformSpecificIgnores = getValidPath(testRootPath, "render-test/linux-ignores.json");
 #endif
 
     std::vector<mbgl::filesystem::path> ignoresPaths = {mainIgnoresPath, platformSpecificIgnores, ownTestsIgnores};
-    if (!ignorePath.empty()) {
-        ignoresPaths.push_back(mbgl::filesystem::path(ignorePath).append("ignores.json"));
+
+    if (!ignoresPath.empty()) {
+        ignoresPaths.emplace_back(ignoresPath);
     }
     for (const auto& path : ignoresPaths) {
         auto maybeIgnores = readJson(path);
@@ -639,8 +653,7 @@ TestMetadata parseTestMetadata(const TestPaths& paths, const std::string& testRo
     localizeStyleURLs(metadata.document, metadata.document, testRootPath);
 
     if (!metadata.document.HasMember("metadata")) {
-        mbgl::Log::Warning(mbgl::Event::ParseStyle, "Style has no 'metadata': %s",
-                           paths.stylePath.c_str());
+        mbgl::Log::Warning(mbgl::Event::ParseStyle, "Style has no 'metadata': %s", paths.stylePath.c_str());
         return metadata;
     }
 
@@ -901,7 +914,7 @@ std::string createResultPage(const TestStatistics& stats, const std::vector<Test
 }
 
 std::string localizeURL(const std::string& url, const std::string& testRootPath) {
-    static const std::regex regex { "local://" };
+    static const std::regex regex{"local://"};
     if (auto vendorPath = getVendorPath(url, regex, testRootPath)) {
         return *vendorPath;
     } else {

@@ -16,9 +16,6 @@ public:
     bool run(TestMetadata&);
     void reset();
 
-    /// Returns path of the render tests root directory.
-    static const std::string& getBasePath();
-
 private:
     bool runOperations(const std::string& key, TestMetadata&);
     bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,

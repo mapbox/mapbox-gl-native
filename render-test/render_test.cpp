@@ -44,13 +44,12 @@ int runRenderTests(int argc, char** argv) {
     bool shuffle;
     uint32_t seed;
     std::string testRootPath;
-    std::string ignorePath;
-    std::string expectPath;
+    std::string ignoresPath;
     std::vector<TestPaths> testPaths;
 
-    std::tie(recycleMap, shuffle, seed, testRootPath, ignorePath, testPaths) = parseArguments(argc, argv);
+    std::tie(recycleMap, shuffle, seed, testRootPath, ignoresPath, testPaths) = parseArguments(argc, argv);
 
-    const auto ignores = parseIgnores(testRootPath, ignorePath);
+    const auto ignores = parseIgnores(testRootPath, ignoresPath);
 
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);

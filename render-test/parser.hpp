@@ -24,10 +24,11 @@ std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& b
 TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path);
 
 const std::string getTestPath(const std::string& rootTestPath);
+const mbgl::filesystem::path getValidPath(const std::string& basePath, const std::string& subPath);
 
 ArgumentsTuple parseArguments(int argc, char** argv);
-std::vector<std::pair<std::string, std::string>> parseIgnores(const std::string& rootPath,
-                                                              const std::string& ignorePath);
+std::vector<std::pair<std::string, std::string>> parseIgnores(const std::string& testRootPath,
+                                                              const std::string& ignoresPath);
 
 TestMetadata parseTestMetadata(const TestPaths& paths, const std::string& testRootPath);
 

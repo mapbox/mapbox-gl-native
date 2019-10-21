@@ -149,5 +149,9 @@ add_test(
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
 
-add_test(NAME mbgl-render-test-probes COMMAND mbgl-render-test-runner tests --rootPath=${MBGL_ROOT}/render-test WORKING_DIRECTORY ${MBGL_ROOT})
+add_test(
+    NAME mbgl-render-test-probes
+    COMMAND mbgl-render-test-runner tests --rootPath=${MBGL_ROOT}/render-test
+    WORKING_DIRECTORY ${MBGL_ROOT}
+)
 add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests WORKING_DIRECTORY ${MBGL_ROOT})
