@@ -270,25 +270,22 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         }
         bool passed{false};
         float delta{0.0f};
+        std::stringstream errorStream;
         std::tie(passed, delta) = MemoryProbe::checkPeak(expected.second, actual->second);
         if (!passed) {
-            std::stringstream ss;
-            ss << "Allocated memory peak size at probe \"" << expected.first << "\" is " << actual->second.peak
-               << " bytes, expected is " << expected.second.peak << "±" << delta << " bytes.";
-
-            metadata.errorMessage = ss.str();
-            return false;
+            errorStream << "Allocated memory peak size at probe \"" << expected.first << "\" is " << actual->second.peak
+                        << " bytes, expected is " << expected.second.peak << "±" << delta << " bytes.";
         }
 
         std::tie(passed, delta) = MemoryProbe::checkAllocations(expected.second, actual->second);
         if (!passed) {
-            std::stringstream ss;
-            ss << "Number of allocations at probe \"" << expected.first << "\" is " << actual->second.allocations
-               << ", expected is " << expected.second.allocations << "±" << std::round(delta) << " allocations.";
-
-            metadata.errorMessage = ss.str();
-            return false;
+            errorStream << "Number of allocations at probe \"" << expected.first << "\" is "
+                        << actual->second.allocations << ", expected is " << expected.second.allocations << "±"
+                        << std::round(delta) << " allocations.";
         }
+
+        metadata.errorMessage = errorStream.str();
+        if (!metadata.errorMessage.empty()) return false;
     }
 
     // Check network metrics.
