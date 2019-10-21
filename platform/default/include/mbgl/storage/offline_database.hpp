@@ -108,6 +108,7 @@ private:
     void migrateToVersion6();
     void cleanup();
     bool disabled();
+    void vacuum();
 
     mapbox::sqlite::Statement& getStatement(const char *);
 

@@ -92,6 +92,14 @@ static std::vector<std::string> databaseTableColumns(const std::string& path, co
     return columns;
 }
 
+static int databaseAutoVacuum(const std::string& path) {
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadOnly);
+    mapbox::sqlite::Statement stmt{db, "pragma auto_vacuum"};
+    mapbox::sqlite::Query query{stmt};
+    query.run();
+    return query.get<int>(0);
+}
+
 namespace fixture {
 
 const Resource resource{ Resource::Style, "mapbox://test" };
@@ -1360,13 +1368,45 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
 
     EXPECT_EQ(6, databaseUserVersion(filename));
 
-    EXPECT_EQ((std::vector<std::string>{ "id", "url_template", "pixel_ratio", "z", "x", "y",
-                                         "expires", "modified", "etag", "data", "compressed",
-                                         "accessed", "must_revalidate" }),
+    EXPECT_EQ((std::vector<std::string>{"id",
+                                        "url_template",
+                                        "pixel_ratio",
+                                        "z",
+                                        "x",
+                                        "y",
+                                        "expires",
+                                        "modified",
+                                        "etag",
+                                        "data",
+                                        "compressed",
+                                        "accessed",
+                                        "must_revalidate"}),
               databaseTableColumns(filename, "tiles"));
-    EXPECT_EQ((std::vector<std::string>{ "id", "url", "kind", "expires", "modified", "etag", "data",
-                                         "compressed", "accessed", "must_revalidate" }),
-              databaseTableColumns(filename, "resources"));
+    EXPECT_EQ(
+        (std::vector<std::string>{
+            "id", "url", "kind", "expires", "modified", "etag", "data", "compressed", "accessed", "must_revalidate"}),
+        databaseTableColumns(filename, "resources"));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+TEST(OfflineDatabase, IncrementalVacuum) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+    util::copyFile(filename, "test/fixtures/offline_database/no_auto_vacuum.db");
+    EXPECT_EQ(0, databaseAutoVacuum(filename));
+
+    {
+        OfflineDatabase db(filename);
+        db.setMaximumAmbientCacheSize(0);
+
+        auto regions = db.listRegions().value();
+        for (auto& region : regions) {
+            db.deleteRegion(std::move(region));
+        }
+    }
+
+    EXPECT_EQ(2, databaseAutoVacuum(filename));
 
     EXPECT_EQ(0u, log.uncheckedCount());
 }
