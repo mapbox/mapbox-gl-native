@@ -42,7 +42,6 @@ void Log::platformRecord(EventSeverity severity, const std::string& msg) {
 } // namespace mbgl
 
 void android_main(struct android_app* app) {
-    using FindClassFN = jclass (*)(JNIEnv*, const char*);
     mbgl::android::theJVM = app->activity->vm;
     JNIEnv* env;
     app->activity->vm->AttachCurrentThread(&env, NULL);
