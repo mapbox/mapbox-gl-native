@@ -220,7 +220,6 @@ void Placement::placeBucket(
         if (horizontalTextIndex) {
             const PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*horizontalTextIndex);
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
-            const CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
 
             const auto updatePreviousOrientationIfNotPlaced = [&](bool isPlaced) {
                 if (bucket.allowVerticalPlacement && !isPlaced && getPrevPlacement()) {
@@ -282,7 +281,7 @@ void Placement::placeBucket(
 
                 placeText = placed.first;
                 offscreen &= placed.second;
-            } else if (!textCollisionFeature.alongLine && !textCollisionFeature.boxes.empty()) {
+            } else if (!symbolInstance.textCollisionFeature.alongLine && !symbolInstance.textCollisionFeature.boxes.empty()) {
                 // If this symbol was in the last placement, shift the previously used
                 // anchor to the front of the anchor list, only if the previous anchor
                 // is still in the anchor list.
@@ -308,10 +307,10 @@ void Placement::placeBucket(
                 const bool doVariableIconPlacement =
                     hasIconTextFit && !iconAllowOverlap && symbolInstance.placedIconIndex;
 
-                const auto placeFeatureForVariableAnchors = [&](const CollisionFeature& collisionFeature,
+                const auto placeFeatureForVariableAnchors = [&](const CollisionFeature& textCollisionFeature,
                                                                 style::TextWritingModeType orientation,
                                                                 const CollisionFeature& iconCollisionFeature) {
-                    const CollisionBox& textBox = collisionFeature.boxes[0];
+                    const CollisionBox& textBox = textCollisionFeature.boxes[0];
                     const float width = textBox.x2 - textBox.x1;
                     const float height = textBox.y2 - textBox.y1;
                     const float textBoxScale = symbolInstance.textBoxScale;
@@ -328,7 +327,7 @@ void Placement::placeBucket(
                         }
 
                         textBoxes.clear();
-                        placedFeature = collisionIndex.placeFeature(collisionFeature, shift,
+                        placedFeature = collisionIndex.placeFeature(textCollisionFeature, shift,
                                                                     posMatrix, mat4(), pixelRatio,
                                                                     placedSymbol, scale, fontSize,
                                                                     allowOverlap,
