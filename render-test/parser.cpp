@@ -767,7 +767,8 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
             }
         }
     } else {
-        assert(!metadata.errorMessage.empty());
+        // FIXME: there are several places that errorMessage is not filled
+        // comment out assert(!metadata.errorMessage.empty());
         html.append("<p style=\"color: red\"><strong>Error:</strong> " + metadata.errorMessage + "</p>\n");
     }
     if (metadata.difference != 0.0) {
