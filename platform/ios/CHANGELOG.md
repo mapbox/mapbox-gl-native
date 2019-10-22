@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Other changes
 
 * Coalesce requests to the client for the same missing image ([#15778](https://github.com/mapbox/mapbox-gl-native/pull/15778))
+* Enable incremental vacuum for the offline database in order to make data removal requests faster and to avoid the excessive disk space usage (creating a backup file on VACUUM call). ([#15837](https://github.com/mapbox/mapbox-gl-native/pull/15837))
 
 ## 5.5.0
 
