@@ -183,7 +183,7 @@ executors:
   ubuntu-disco:
     docker:
       # FIXME: Move the image to mbgl/
-      - image: tmpsantos/mbgl_ci:1.5
+      - image: tmpsantos/mbgl_ci:1.6
     resource_class: xlarge
     working_directory: /src
     environment:
