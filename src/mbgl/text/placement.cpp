@@ -281,7 +281,8 @@ void Placement::placeBucket(
 
                 placeText = placed.first;
                 offscreen &= placed.second;
-            } else if (!symbolInstance.textCollisionFeature.alongLine && !symbolInstance.textCollisionFeature.boxes.empty()) {
+            } else if (!symbolInstance.textCollisionFeature.alongLine &&
+                       !symbolInstance.textCollisionFeature.boxes.empty()) {
                 // If this symbol was in the last placement, shift the previously used
                 // anchor to the front of the anchor list, only if the previous anchor
                 // is still in the anchor list.
@@ -327,12 +328,20 @@ void Placement::placeBucket(
                         }
 
                         textBoxes.clear();
-                        placedFeature = collisionIndex.placeFeature(textCollisionFeature, shift,
-                                                                    posMatrix, mat4(), pixelRatio,
-                                                                    placedSymbol, scale, fontSize,
+                        placedFeature = collisionIndex.placeFeature(textCollisionFeature,
+                                                                    shift,
+                                                                    posMatrix,
+                                                                    mat4(),
+                                                                    pixelRatio,
+                                                                    placedSymbol,
+                                                                    scale,
+                                                                    fontSize,
                                                                     allowOverlap,
                                                                     pitchWithMap,
-                                                                    params.showCollisionBoxes, avoidEdges, collisionGroup.second, textBoxes);
+                                                                    params.showCollisionBoxes,
+                                                                    avoidEdges,
+                                                                    collisionGroup.second,
+                                                                    textBoxes);
 
                         if (doVariableIconPlacement) {
                             auto placedIconFeature = collisionIndex.placeFeature(iconCollisionFeature,
