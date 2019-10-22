@@ -3,6 +3,17 @@ target_compile_definitions(
     PUBLIC MBGL_USE_GLES2 GLES_SILENCE_DEPRECATION
 )
 
+if(NOT DEFINED IOS_DEPLOYMENT_TARGET)
+    set(IOS_DEPLOYMENT_TARGET "9.0")
+endif()
+
+macro(initialize_ios_target target)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${IOS_DEPLOYMENT_TARGET}")
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "YES")
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+endmacro()
+
 set_target_properties(mbgl-core PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
 
 target_sources(
@@ -52,6 +63,9 @@ target_include_directories(
 
 include(${PROJECT_SOURCE_DIR}/vendor/icu.cmake)
 
+initialize_ios_target(mbgl-core)
+initialize_ios_target(mbgl-vendor-icu)
+
 target_link_libraries(
     mbgl-core
     PRIVATE
@@ -73,3 +87,5 @@ target_link_libraries(
         sqlite3
         z
 )
+
+unset(IOS_DEPLOYMENT_TARGET CACHE)
