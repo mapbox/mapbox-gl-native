@@ -5,6 +5,7 @@
 
 #include <memory>
 
+class TestRunnerMapObserver;
 struct TestMetadata;
 
 class TestRunner {
@@ -26,7 +27,9 @@ private:
 
     struct Impl {
         Impl(const TestMetadata&);
+        ~Impl();
 
+        std::unique_ptr<TestRunnerMapObserver> observer;
         mbgl::HeadlessFrontend frontend;
         mbgl::Map map;
     };

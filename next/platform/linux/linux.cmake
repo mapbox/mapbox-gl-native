@@ -37,6 +37,7 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/util/image.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/jpeg_reader.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/logging_stderr.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/monotonic_timer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/png_reader.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/png_writer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/run_loop.cpp

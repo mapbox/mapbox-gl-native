@@ -92,6 +92,8 @@ public:
               std::size_t indexOffset,
               std::size_t indexLength);
 
+    void finish();
+
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup() override;

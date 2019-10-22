@@ -303,6 +303,22 @@ std::string serializeMetrics(const TestMetrics& metrics) {
         writer.EndArray();
     }
 
+    if (!metrics.fps.empty()) {
+        // Start fps section
+        writer.Key("fps");
+        writer.StartArray();
+        for (const auto& fpsProbe : metrics.fps) {
+            assert(!fpsProbe.first.empty());
+            writer.StartArray();
+            writer.String(fpsProbe.first.c_str());
+            writer.Double(fpsProbe.second.average);
+            writer.Double(fpsProbe.second.minOnePc);
+            writer.EndArray();
+        }
+        writer.EndArray();
+        // End fps section
+    }
+
     writer.EndObject();
 
     return s.GetString();
@@ -433,6 +449,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
             if (testFilterValue && !std::regex_match(testPath.path().string(), args::get(testFilterValue))) {
                 continue;
             }
+
             if (testPath.path().filename() == "style.json") {
                 testPaths.emplace_back(testPath, getTestExpectations(testPath, path, expectationsPaths));
             }
@@ -549,6 +566,23 @@ TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
         }
     }
 
+    if (document.HasMember("fps")) {
+        const mbgl::JSValue& fpsValue = document["fps"];
+        assert(fpsValue.IsArray());
+        for (auto& probeValue : fpsValue.GetArray()) {
+            assert(probeValue.IsArray());
+            assert(probeValue.Size() >= 4u);
+            assert(probeValue[0].IsString());
+            assert(probeValue[1].IsNumber()); // Average
+            assert(probeValue[2].IsNumber()); // Minimum
+            assert(probeValue[3].IsNumber()); // Tolerance
+            const std::string mark{probeValue[0].GetString(), probeValue[0].GetStringLength()};
+            assert(!mark.empty());
+            result.fps.insert(
+                {std::move(mark), {probeValue[1].GetFloat(), probeValue[2].GetFloat(), probeValue[3].GetFloat()}});
+        }
+    }
+
     return result;
 }
 
@@ -607,8 +641,21 @@ TestMetadata parseTestMetadata(const TestPaths& paths) {
     }
 
     if (testValue.HasMember("mapMode")) {
+        metadata.outputsImage = true;
         assert(testValue["mapMode"].IsString());
-        metadata.mapMode = testValue["mapMode"].GetString() == std::string("tile") ? mbgl::MapMode::Tile : mbgl::MapMode::Static;
+        std::string mapModeStr = testValue["mapMode"].GetString();
+        if (mapModeStr == "tile")
+            metadata.mapMode = mbgl::MapMode::Tile;
+        else if (mapModeStr == "continuous") {
+            metadata.mapMode = mbgl::MapMode::Continuous;
+            metadata.outputsImage = false;
+        } else if (mapModeStr == "static")
+            metadata.mapMode = mbgl::MapMode::Static;
+        else {
+            mbgl::Log::Warning(
+                mbgl::Event::ParseStyle, "Unknown map mode: %s. Falling back to static mode", mapModeStr.c_str());
+            metadata.mapMode = mbgl::MapMode::Static;
+        }
     }
 
     // Test operations handled in runner.cpp.
@@ -703,19 +750,21 @@ std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) 
     html.append("<div class=\"test " + metadata.status + (shouldHide ? " hide" : "") + "\">\n");
     html.append(R"(<h2><span class="label" style="background: )" + metadata.color + "\">" + metadata.status + "</span> " + metadata.id + "</h2>\n");
     if (metadata.status != "errored") {
-        if (metadata.renderTest) {
-            html.append("<img width=" + mbgl::util::toString(metadata.size.width));
-            html.append(" height=" + mbgl::util::toString(metadata.size.height));
-            html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\"");
-            html.append(" data-alt-src=\"data:image/png;base64," + encodeBase64(metadata.expected) + "\">\n");
+        if (metadata.outputsImage) {
+            if (metadata.renderTest) {
+                html.append("<img width=" + mbgl::util::toString(metadata.size.width));
+                html.append(" height=" + mbgl::util::toString(metadata.size.height));
+                html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\"");
+                html.append(" data-alt-src=\"data:image/png;base64," + encodeBase64(metadata.expected) + "\">\n");
 
-            html.append("<img width=" + mbgl::util::toString(metadata.size.width));
-            html.append(" height=" + mbgl::util::toString(metadata.size.height));
-            html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.diff) + "\">\n");
-        } else {
-            html.append("<img width=" + mbgl::util::toString(metadata.size.width));
-            html.append(" height=" + mbgl::util::toString(metadata.size.height));
-            html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\">\n");
+                html.append("<img width=" + mbgl::util::toString(metadata.size.width));
+                html.append(" height=" + mbgl::util::toString(metadata.size.height));
+                html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.diff) + "\">\n");
+            } else {
+                html.append("<img width=" + mbgl::util::toString(metadata.size.width));
+                html.append(" height=" + mbgl::util::toString(metadata.size.height));
+                html.append(" src=\"data:image/png;base64," + encodeBase64(metadata.actual) + "\">\n");
+            }
         }
     } else {
         assert(!metadata.errorMessage.empty());

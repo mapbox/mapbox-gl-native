@@ -51,8 +51,8 @@ MapSnapshotter::Impl::Impl(const std::pair<bool, std::string> style,
                            const optional<LatLngBounds> region,
                            const optional<std::string> localFontFamily,
                            const ResourceOptions& resourceOptions)
-     : frontend(
-          size, pixelRatio, gfx::ContextMode::Unique, localFontFamily),
+    : frontend(
+          size, pixelRatio, gfx::HeadlessBackend::SwapBehaviour::NoFlush, gfx::ContextMode::Unique, localFontFamily),
       map(frontend,
           MapObserver::nullObserver(),
           MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),

@@ -43,6 +43,7 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/online_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/sqlite3.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/monotonic_timer.cpp
         ${MBGL_ROOT}/platform/qt/src/async_task.cpp
         ${MBGL_ROOT}/platform/qt/src/async_task_impl.hpp
         ${MBGL_ROOT}/platform/qt/src/number_format.cpp

@@ -10,12 +10,16 @@ namespace gl {
 
 class HeadlessBackend final : public gl::RendererBackend, public gfx::HeadlessBackend {
 public:
-    HeadlessBackend(Size = { 256, 256 }, gfx::ContextMode = gfx::ContextMode::Unique);
+    HeadlessBackend(Size = {256, 256},
+                    SwapBehaviour = SwapBehaviour::NoFlush,
+                    gfx::ContextMode = gfx::ContextMode::Unique);
     ~HeadlessBackend() override;
     void updateAssumedState() override;
     gfx::Renderable& getDefaultRenderable() override;
     PremultipliedImage readStillImage() override;
     RendererBackend* getRendererBackend() override;
+
+    void swap();
 
     class Impl {
     public:
@@ -37,6 +41,7 @@ private:
 private:
     std::unique_ptr<Impl> impl;
     bool active = false;
+    SwapBehaviour swapBehaviour = SwapBehaviour::NoFlush;
 };
 
 } // namespace gl
