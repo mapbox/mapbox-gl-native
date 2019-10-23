@@ -164,12 +164,12 @@ void Placement::placeBucket(
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
     optional<CollisionTileBoundaries> avoidEdges;
-    if (mapMode == MapMode::Tile &&
-        (layout.get<style::SymbolAvoidEdges>() ||
-         layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
+    if (mapMode == MapMode::Tile && (layout.get<style::SymbolAvoidEdges>() ||
+                                     layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line ||
+                                     !layout.get<style::TextVariableAnchor>().empty())) {
         avoidEdges = collisionIndex.projectTileBoundaries(posMatrix);
     }
-    
+
     const bool textAllowOverlap = layout.get<style::TextAllowOverlap>();
     const bool iconAllowOverlap = layout.get<style::IconAllowOverlap>();
     // This logic is similar to the "defaultOpacityState" logic below in updateBucketOpacities
