@@ -4,6 +4,7 @@
 #include <mbgl/map/map.hpp>
 
 #include <memory>
+#include <string>
 
 class TestRunnerMapObserver;
 struct TestMetadata;
@@ -11,12 +12,9 @@ struct TestMetadata;
 class TestRunner {
 public:
     TestRunner() = default;
-
+    explicit TestRunner(const std::string& testRootPath);
     bool run(TestMetadata&);
     void reset();
-
-    /// Returns path of the render tests root directory.
-    static const std::string& getBasePath();
 
 private:
     bool runOperations(const std::string& key, TestMetadata&);
@@ -34,4 +32,5 @@ private:
         mbgl::Map map;
     };
     std::unordered_map<std::string, std::unique_ptr<Impl>> maps;
+    std::string testRootPath{TEST_RUNNER_ROOT_PATH};
 };

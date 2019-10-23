@@ -218,8 +218,8 @@ add_test(
     COMMAND
         mbgl-render-test-runner
         tests
-        --rootPath=render-test
-        --expectationsPath=render-test/tests/mac
+        --rootPath=${MBGL_ROOT}/render-test
+        --expectationsPath=tests/mac
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
 
