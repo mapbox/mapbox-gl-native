@@ -122,6 +122,19 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     return position;
 }
 
+void LineAtlas::clear() {
+  positions.clear();
+  nextRow = 0;
+  dirty = true;
+}
+
+uint32_t LineAtlas::getSpace() const {
+  if (image.size.height > nextRow) {
+    return image.size.height - nextRow;
+  }
+  return 0;
+}
+
 Size LineAtlas::getSize() const {
     return image.size;
 }
