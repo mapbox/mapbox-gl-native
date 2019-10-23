@@ -50,7 +50,7 @@ private:
     bool hasRenderPass(RenderPass pass) const override { return layer.get().hasRenderPass(pass); }
     void upload(gfx::UploadPass& pass) const override { layer.get().upload(pass); }
     void render(PaintParameters& parameters) const override { layer.get().render(parameters); }
-    const std::string& getName() const override { return layer.get().getID(); } 
+    const std::string& getName() const override { return layer.get().getID(); }
 
     uint32_t index;
 };
@@ -142,6 +142,10 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     if (!isMapModeContinuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
+        if (lineAtlas->getSpace() < 32) {
+          Log::Warning(Event::OpenGL, "Line atlas free space hit %d: was cleared to avoid overflowing", lineAtlas->getSpace());
+          lineAtlas->clear();
+        }
     }
 
     if (LayerManager::annotationsEnabled) {
@@ -329,7 +333,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                     }
                 }
                 continue;
-            } 
+            }
 
             // Handle layers without source.
             if (layerIsVisible && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
@@ -337,7 +341,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
                     const auto& solidBackground = layer.getSolidBackground();
                     if (solidBackground) {
                         renderTreeParameters->backgroundColor = *solidBackground;
-                        continue; // This layer is shown with background color, and it shall not be added to render items. 
+                        continue; // This layer is shown with background color, and it shall not be added to render items.
                     }
                 }
                 renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, layer, nullptr, index);
@@ -387,7 +391,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
 
         bool symbolBucketsAdded = false;
         for (auto it = layersNeedPlacement.rbegin(); it != layersNeedPlacement.rend(); ++it) {
-            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude()); 
+            auto result = crossTileSymbolIndex.addLayer(*it, updateParameters.transformState.getLatLng().longitude());
             symbolBucketsAdded = symbolBucketsAdded || (result & CrossTileSymbolIndex::AddLayerResult::BucketsAdded);
             symbolBucketsChanged = symbolBucketsChanged || (result != CrossTileSymbolIndex::AddLayerResult::NoChanges);
         }
@@ -467,7 +471,7 @@ std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineS
 
     return queryRenderedFeatures(geometry, options, layers);
 }
-    
+
 void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, std::vector<Feature>>& resultsByLayer,
                                           const ScreenLineString& geometry,
                                           const std::unordered_map<std::string, const RenderLayer*>& layers,
@@ -498,7 +502,7 @@ void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, st
             std::tie(a.tileID.canonical.z, a.tileID.canonical.y, a.tileID.wrap, a.tileID.canonical.x) <
             std::tie(b.tileID.canonical.z, b.tileID.canonical.y, b.tileID.wrap, b.tileID.canonical.x);
     });
-    
+
     for (auto wrappedQueryData : bucketQueryData) {
         auto& queryData = wrappedQueryData.get();
         auto bucketSymbols = queryData.featureIndex->lookupSymbolFeatures(renderedSymbols[queryData.bucketInstanceId],
@@ -506,7 +510,7 @@ void RenderOrchestrator::queryRenderedSymbols(std::unordered_map<std::string, st
                                                                           crossTileSymbolIndexLayers,
                                                                           queryData.tileID,
                                                                           queryData.featureSortOrder);
-        
+
         for (auto layer : bucketSymbols) {
             auto& resultFeatures = resultsByLayer[layer.first];
             std::move(layer.second.begin(), layer.second.end(), std::inserter(resultFeatures, resultFeatures.end()));
@@ -535,7 +539,7 @@ std::vector<Feature> RenderOrchestrator::queryRenderedFeatures(const ScreenLineS
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
-    
+
     queryRenderedSymbols(resultsByLayer, geometry, filteredLayers, options);
 
     std::vector<Feature> result;
