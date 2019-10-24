@@ -138,8 +138,9 @@ void ImageManager::removeRequestor(ImageRequestor& requestor) {
 
 void ImageManager::notifyIfMissingImageAdded() {
     for (auto it = missingImageRequestors.begin(); it != missingImageRequestors.end();) {
-        if (it->second.callbacks.empty()) {
-            notify(*it->first, it->second.pair);
+        ImageRequestor& requestor = *it->first;
+        if (!requestor.hasPendingRequests()) {
+            notify(requestor, it->second);
             it = missingImageRequestors.erase(it);
         } else {
             ++it;
@@ -169,35 +170,56 @@ void ImageManager::reduceMemoryUseIfCacheSizeExceedsLimit() {
 }
 
 void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageRequestPair& pair) {
-    std::vector<std::string> missingImages;
-    missingImages.reserve(pair.first.size());
+    ImageDependencies missingDependencies;
+
     for (const auto& dependency : pair.first) {
         if (images.find(dependency.first) == images.end()) {
-            missingImages.push_back(dependency.first);
+            missingDependencies.emplace(dependency);
         }
     }
 
-    if (!missingImages.empty()) {
+    if (!missingDependencies.empty()) {
         ImageRequestor* requestorPtr = &requestor;
+        assert(!missingImageRequestors.count(requestorPtr));
+        missingImageRequestors.emplace(requestorPtr, pair);
 
-        auto emplaced = missingImageRequestors.emplace(requestorPtr, MissingImageRequestPair{pair, {}});
-        assert(emplaced.second);
-
-        for (const auto& missingImage : missingImages) {
+        for (const auto& dependency : missingDependencies) {
+            const std::string& missingImage = dependency.first;
             assert(observer != nullptr);
-            requestedImages[missingImage].emplace(&requestor);
-            auto callback =
-                std::make_unique<ActorCallback>(*Scheduler::GetCurrent(), [this, requestorPtr, missingImage] {
-                    auto requestorIt = missingImageRequestors.find(requestorPtr);
-                    if (requestorIt != missingImageRequestors.end()) {
-                        assert(requestorIt->second.callbacks.find(missingImage) != requestorIt->second.callbacks.end());
-                        requestorIt->second.callbacks.erase(missingImage);
-                    }
-                });
 
-            auto actorRef = callback->self();
-            emplaced.first->second.callbacks.emplace(missingImage, std::move(callback));
-            observer->onStyleImageMissing(missingImage, [actorRef] { actorRef.invoke(&Callback::operator()); });
+            auto existingRequestorsIt = requestedImages.find(missingImage);
+            if (existingRequestorsIt != requestedImages.end()) { // Already asked client about this image.
+                std::set<ImageRequestor*>& existingRequestors = existingRequestorsIt->second;
+                if (!existingRequestors.empty() &&
+                    (*existingRequestors.begin())
+                        ->hasPendingRequest(missingImage)) { // Still waiting for the client response for this image.
+                    requestorPtr->addPendingRequest(missingImage);
+                    existingRequestors.emplace(requestorPtr);
+                    continue;
+                }
+                // Unlike icons, pattern changes are not caught
+                // with style-diff meaning that the existing request
+                // could be from the previous style and we cannot
+                // coalesce requests for them.
+                if (dependency.second != ImageType::Pattern) {
+                    continue;
+                }
+            }
+            requestedImages[missingImage].emplace(requestorPtr);
+            requestor.addPendingRequest(missingImage);
+
+            auto removePendingRequests = [this, missingImage] {
+                auto existingRequest = requestedImages.find(missingImage);
+                if (existingRequest == requestedImages.end()) {
+                    return;
+                }
+
+                for (auto* req : existingRequest->second) {
+                    req->removePendingRequest(missingImage);
+                }
+            };
+            observer->onStyleImageMissing(missingImage,
+                                          Scheduler::GetCurrent()->bindOnce(std::move(removePendingRequests)));
         }
     } else {
         // Associate requestor with an image that was provided by the client.
@@ -227,7 +249,7 @@ void ImageManager::notify(ImageRequestor& requestor, const ImageRequestPair& pai
         }
     }
 
-    requestor.onImagesAvailable(iconMap, patternMap, std::move(versionMap), pair.second);
+    requestor.onImagesAvailable(std::move(iconMap), std::move(patternMap), std::move(versionMap), pair.second);
 }
 
 void ImageManager::dumpDebugLogs() const {
