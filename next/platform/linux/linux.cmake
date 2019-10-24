@@ -144,14 +144,9 @@ add_test(
         render-tests
         --recycle-map
         --shuffle
-        --expectationsPath=render-test/expected/render-tests
+        --rootPath=${MBGL_ROOT}/render-test
         --seed=${MBGL_RENDER_TEST_SEED}
-    WORKING_DIRECTORY ${MBGL_ROOT}
 )
 
-add_test(
-    NAME mbgl-render-test-probes
-    COMMAND mbgl-render-test-runner tests --rootPath=${MBGL_ROOT}/render-test
-    WORKING_DIRECTORY ${MBGL_ROOT}
-)
-add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests WORKING_DIRECTORY ${MBGL_ROOT})
+add_test(NAME mbgl-render-test-probes COMMAND mbgl-render-test-runner tests --rootPath=${MBGL_ROOT}/render-test)
+add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests --rootPath=${MBGL_ROOT}/render-test)

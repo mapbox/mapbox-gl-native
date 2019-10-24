@@ -4,6 +4,7 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
+#include "manifest_parser.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
@@ -43,13 +44,11 @@ int runRenderTests(int argc, char** argv) {
     bool recycleMap;
     bool shuffle;
     uint32_t seed;
-    std::string testRootPath;
-    std::string ignoresPath;
     std::vector<TestPaths> testPaths;
 
-    std::tie(recycleMap, shuffle, seed, testRootPath, ignoresPath, testPaths) = parseArguments(argc, argv);
+    std::tie(recycleMap, shuffle, seed, testPaths) = parseArguments(argc, argv);
 
-    const auto ignores = parseIgnores(testRootPath, ignoresPath);
+    const auto ignores = parseIgnores();
 
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
@@ -60,7 +59,7 @@ int runRenderTests(int argc, char** argv) {
     }
 
     mbgl::util::RunLoop runLoop;
-    TestRunner runner(testRootPath);
+    TestRunner runner{};
 
     std::vector<TestMetadata> metadatas;
     metadatas.reserve(testPaths.size());
@@ -68,7 +67,7 @@ int runRenderTests(int argc, char** argv) {
     TestStatistics stats;
 
     for (auto& testPath : testPaths) {
-        TestMetadata metadata = parseTestMetadata(testPath, testRootPath);
+        TestMetadata metadata = parseTestMetadata(testPath);
 
         if (!recycleMap) {
             runner.reset();
@@ -78,7 +77,7 @@ int runRenderTests(int argc, char** argv) {
         std::string& status = metadata.status;
         std::string& color = metadata.color;
 
-        const std::string::size_type rootLength = getTestPath(testRootPath).length();
+        const std::string::size_type rootLength = ManifestParser::getInstance().getTestPath().length();
         id = testPath.defaultExpectations();
         id = id.substr(rootLength + 1, id.length() - rootLength - 2);
 
@@ -138,7 +137,7 @@ int runRenderTests(int argc, char** argv) {
 
         metadatas.push_back(std::move(metadata));
     }
-
+    const auto& testRootPath = ManifestParser::getInstance().getTestPath();
     std::string resultsHTML = createResultPage(stats, metadatas, shuffle, seed);
     mbgl::util::write_file(testRootPath + "/index.html", resultsHTML);
 
