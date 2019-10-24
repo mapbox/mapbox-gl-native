@@ -123,7 +123,7 @@ workflows:
     jobs:
       #
       # Naming convention: {platform}-{additional description}-{build type}
-      #   - {platform} is the client platform/framework, which may differ from 
+      #   - {platform} is the client platform/framework, which may differ from
       #     the build platform. Specify both if applicable, e.g., "qt5-macos".
       #   - {additional description} optionally describes the compiler or other
       #     unique aspect of the build environment.
@@ -143,6 +143,10 @@ workflows:
           filters:
             tags:
               only: /android-v.*/
+      - node-linux-release:
+          filters:
+            tags:
+              only: /node-.*/
       - node-macos-release:
           filters:
             tags:
@@ -556,6 +560,19 @@ commands:
         name: Run node tests
         command: make test-node
 
+  run-node-linux-tests:
+    parameters:
+      node_version:
+        type: string
+        default: 10
+    steps:
+    - run:
+        name: Run node tests
+        command: |
+          . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            logbt -- apitrace trace --api=egl -v make test-node
+
   run-unit-tests:
     steps:
     - run:
@@ -929,6 +946,24 @@ jobs:
           command: |
             cd misc/buck
             buck build mapbox-gl-native:android-core
+
+# ------------------------------------------------------------------------------
+  node-linux-release:
+    docker:
+      - image: mbgl/linux-clang-3.9:2077f965ed
+    resource_class: large
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: RelWithDebInfo
+      WITH_EGL: 1
+    steps:
+      - install-dependencies
+      - build-node
+      - save-dependencies
+      - run-node-linux-tests
+      - publish-node-package
 
 # ------------------------------------------------------------------------------
   node-macos-release:
