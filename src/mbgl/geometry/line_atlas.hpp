@@ -41,7 +41,6 @@ public:
     LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
     LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);
 
-    uint32_t getSpace() const;
     void clear();
     Size getSize() const;
 
