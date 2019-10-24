@@ -180,27 +180,24 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
     if (!missingImages.empty()) {
         ImageRequestor* requestorPtr = &requestor;
 
-        auto emplaced = missingImageRequestors.emplace(requestorPtr, MissingImageRequestPair { pair, {} });
+        auto emplaced = missingImageRequestors.emplace(requestorPtr, MissingImageRequestPair{pair, {}});
         assert(emplaced.second);
 
         for (const auto& missingImage : missingImages) {
             assert(observer != nullptr);
             requestedImages[missingImage].emplace(&requestor);
-            auto callback = std::make_unique<ActorCallback>(
-                *Scheduler::GetCurrent(),
-                [this, requestorPtr, missingImage] {
+            auto callback =
+                std::make_unique<ActorCallback>(*Scheduler::GetCurrent(), [this, requestorPtr, missingImage] {
                     auto requestorIt = missingImageRequestors.find(requestorPtr);
                     if (requestorIt != missingImageRequestors.end()) {
                         assert(requestorIt->second.callbacks.find(missingImage) != requestorIt->second.callbacks.end());
                         requestorIt->second.callbacks.erase(missingImage);
                     }
-            });
+                });
 
             auto actorRef = callback->self();
             emplaced.first->second.callbacks.emplace(missingImage, std::move(callback));
-            observer->onStyleImageMissing(missingImage, [actorRef] {
-                actorRef.invoke(&Callback::operator());
-            });
+            observer->onStyleImageMissing(missingImage, [actorRef] { actorRef.invoke(&Callback::operator()); });
         }
     } else {
         // Associate requestor with an image that was provided by the client.
