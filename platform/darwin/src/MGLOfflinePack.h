@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidOfflinePackException;
 
+@class MGLOfflinePack;
+
 /**
  The state an offline pack is currently in.
  */
@@ -95,6 +97,12 @@ typedef struct __attribute__((objc_boxable)) MGLOfflinePackProgress {
      */
     uint64_t maximumResourcesExpected;
 } MGLOfflinePackProgress;
+
+@protocol MGLOfflinePackObserver <NSObject>
+
+-(void)didUpdateStateForMGLOfflinePack:(MGLOfflinePack*)offlinePack;
+
+@end
 
 /**
  An `MGLOfflinePack` represents a collection of resources necessary for viewing
@@ -197,6 +205,15 @@ MGL_EXPORT
  come from the default notification center.
  */
 - (void)requestProgress;
+
+@end
+
+
+@interface MGLOfflinePack (Observers)
+
+-(void)addObserver:(id<MGLOfflinePackObserver>)observer;
+
+-(void)removeObserver:(id<MGLOfflinePackObserver>)observer;
 
 @end
 

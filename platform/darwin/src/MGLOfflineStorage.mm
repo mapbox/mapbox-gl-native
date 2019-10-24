@@ -492,7 +492,40 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             [pack invalidate];
         }
         self.packs = [packs mutableCopy];
+        MGLLogInfo(@"Packs reloaded.");
+        __weak MGLOfflineStorage *weakSelf = self;
+        [self requestPackProgressWithCompletionHandler:^{
+            MGLOfflineStorage *strongSelf = weakSelf;
+             if([strongSelf.delegate respondsToSelector:@selector(didReloadPackagesForOfflineStorage:)]) {
+                 [strongSelf.delegate didReloadPackagesForOfflineStorage:strongSelf];
+             }
+        }];
     }];
+}
+
+-(void)requestPackProgressWithCompletionHandler:(void (^)())completion {
+    __block NSUInteger count = 0;
+    __block NSUInteger expectedCount = self.packs.count;
+    if (self.packs == nil) {
+        //TODO: completion with error?
+        return;
+    }
+    if( self.packs.count == 0) {
+        completion();
+        return;
+    }
+    for (MGLOfflinePack *pack in self.packs) {
+        if(pack.state == MGLOfflinePackStateComplete) {
+            count++;
+            return;
+        }
+        [pack requestProgressWithCompletionHandler:^{
+            count++;
+            if(count == expectedCount) {
+                completion();
+            }
+        }];
+    }
 }
 
 - (void)getPacksWithCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> *packs, NSError * _Nullable error))completion {

@@ -10,8 +10,34 @@
 
 #pragma clang diagnostic ignored "-Wshadow"
 
+@interface MGLOfflineStorageBlockDelegate : NSObject <MGLOfflineStorageDelegate>
+@property (nonatomic, copy, nullable) NSURL* (^URLForResourceOfKind)(MGLOfflineStorage *storage, MGLResourceKind kind, NSURL *url);
+@property (nonatomic, copy, nullable) void (^didReloadPackagesForOfflineStorage)(MGLOfflineStorage *storage);
 
-@interface MGLOfflineStorageTests : XCTestCase <MGLOfflineStorageDelegate>
+@end
+
+
+@implementation MGLOfflineStorageBlockDelegate
+
+- (NSURL *)offlineStorage:(MGLOfflineStorage *)storage
+     URLForResourceOfKind:(MGLResourceKind)kind
+                  withURL:(NSURL *)url {
+    if(self.URLForResourceOfKind != nil) {
+        return self.URLForResourceOfKind(storage, kind, url);
+    } else {
+        return url;
+    }
+}
+
+- (void)didReloadPackagesForOfflineStorage:(nonnull MGLOfflineStorage *)storage {
+    if(self.didReloadPackagesForOfflineStorage != nil) {
+        self.didReloadPackagesForOfflineStorage(storage);
+    }
+}
+
+@end
+
+@interface MGLOfflineStorageTests : XCTestCase
 @end
 
 @implementation MGLOfflineStorageTests
@@ -31,26 +57,6 @@
     
     [[NSFileManager defaultManager] removeItemAtURL:cacheURL error:nil];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:cacheURL.path], @"Cache subdirectory should not exist.");
-}
-
-- (void)setUp {
-    [super setUp];
-    
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        XCTestExpectation *expectation = [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
-            const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
-            return changeKind == NSKeyValueChangeSetting;
-        }];
-        if ([MGLOfflineStorage sharedOfflineStorage].packs) {
-            [expectation fulfill];
-            [self waitForExpectationsWithTimeout:0 handler:nil];
-        } else {
-            [self waitForExpectationsWithTimeout:10 handler:nil];
-        }
-
-        XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
-    });
 }
 
 - (void)testSharedObject {
@@ -506,19 +512,17 @@
     XCTAssertGreaterThan([MGLOfflineStorage sharedOfflineStorage].countOfBytesCompleted, 0UL);
 }
 
-- (NSURL *)offlineStorage:(MGLOfflineStorage *)storage
-     URLForResourceOfKind:(MGLResourceKind)kind
-                  withURL:(NSURL *)url {
-    if ([url.scheme isEqual: @"test"] && [url.host isEqual: @"api"]) {
-        return [NSURL URLWithString:@"https://api.mapbox.com"];
-    } else {
-        return url;
-    }
-}
-
 - (void)testResourceTransform {
     MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
-    [os setDelegate:self];
+    MGLOfflineStorageBlockDelegate* delegate = [[MGLOfflineStorageBlockDelegate alloc] init];
+    delegate.URLForResourceOfKind = ^NSURL *(MGLOfflineStorage *storage, MGLResourceKind kind, NSURL *url) {
+        if ([url.scheme isEqual: @"test"] && [url.host isEqual: @"api"]) {
+            return [NSURL URLWithString:@"https://api.mapbox.com"];
+        } else {
+            return url;
+        }
+    };
+    [os setDelegate:delegate];
 
     auto fs = os.mbglFileSource;
 
@@ -534,8 +538,27 @@
     });
 
     CFRunLoopRun();
-
     [os setDelegate:nil];
+}
+
+-(void)testDidCallReloadPackagesForOfflineStorage {
+    __block XCTestExpectation* didReceiveCallbackExpectation = [self expectationWithDescription:@"didReceiveCallback"];
+    MGLOfflineStorageBlockDelegate* delegate = [[MGLOfflineStorageBlockDelegate alloc] init];
+    delegate.URLForResourceOfKind = ^NSURL *(MGLOfflineStorage *storage, MGLResourceKind kind, NSURL *url) {
+        return [NSURL URLWithString:@"https://api.mapbox.com"];
+    };
+    delegate.didReloadPackagesForOfflineStorage = ^void(MGLOfflineStorage *storage) {
+        [didReceiveCallbackExpectation fulfill];
+    };
+
+    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    [os setDelegate:delegate];
+
+    [self waitForExpectationsWithTimeout:60 handler:nil];
+
+    XCTAssertNotNil(os.packs);
+    [os setDelegate:nil];
+    NSLog(@"Delegate %@ didReceiveCallback was called for packages %@", delegate, os.packs);
 }
 
 - (void)testAddFileContent {

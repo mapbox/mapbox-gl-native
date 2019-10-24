@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region;
 
+- (void)requestProgressWithCompletionHandler:(void (^)())completion;
+
 /**
  Invalidates the pack and ensures that no future progress update can ever
  revalidate it. This method must be called before the pack is deallocated.

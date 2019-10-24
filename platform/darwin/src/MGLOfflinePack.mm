@@ -54,6 +54,7 @@ private:
 
 @property (nonatomic, nullable, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
 @property (nonatomic, readwrite) MGLOfflinePackProgress progress;
+@property (nonatomic, strong) NSHashTable<id<MGLOfflinePackObserver>>* observers;
 
 @end
 
@@ -76,6 +77,7 @@ private:
         _mbglOfflineRegion = region;
         _state = MGLOfflinePackStateUnknown;
 
+        _observers = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
         _mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
         _mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
     }
@@ -161,20 +163,34 @@ private:
     if (!_isSuspending || state != MGLOfflinePackStateActive) {
         _isSuspending = NO;
         _state = state;
+        for (id<MGLOfflinePackObserver> observer in self.observers) {
+            if ([observer conformsToProtocol:@protocol(MGLOfflinePackObserver)]) {
+                [observer didUpdateStateForMGLOfflinePack:self];
+            } else {
+                MGLLogError(@"One of observers of MGLOfflinePack was dealoceted and not removed form observers.");
+            }
+        }
     }
 }
 
 - (void)requestProgress {
+    [self requestProgressWithCompletionHandler:^{}];
+}
+
+- (void)requestProgressWithCompletionHandler:(void (^)())completion {
     MGLLogInfo(@"Requesting pack progress.");
     MGLAssertOfflinePackIsValid();
 
     __weak MGLOfflinePack *weakSelf = self;
-    _mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) {
+    _mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf, completion](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) {
         if (status) {
             mbgl::OfflineRegionStatus checkedStatus = *status;
             dispatch_async(dispatch_get_main_queue(), ^{
                 MGLOfflinePack *strongSelf = weakSelf;
                 [strongSelf offlineRegionStatusDidChange:checkedStatus];
+                if (completion) {
+                    completion();
+                }
             });
         }
     });
@@ -280,3 +296,15 @@ void MBGLOfflineRegionObserver::mapboxTileCountLimitExceeded(uint64_t limit) {
         [weakPack didReceiveMaximumAllowedMapboxTiles:limit];
     });
 }
+
+@implementation MGLOfflinePack (Observers)
+
+-(void)addObserver:(id<MGLOfflinePackObserver>)observer {
+    [self.observers addObject:observer];
+}
+
+-(void)removeObserver:(id<MGLOfflinePackObserver>)observer {
+    [self.observers removeObject:observer];
+}
+
+@end

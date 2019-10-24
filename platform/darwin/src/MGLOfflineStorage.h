@@ -469,6 +469,15 @@ MGL_EXPORT
      URLForResourceOfKind:(MGLResourceKind)kind
                   withURL:(NSURL *)url;
 
+@optional
+/**
+ Notifies about package reload
+
+ @param storage The storage object processing the reload.
+
+ */
+- (void)didReloadPackagesForOfflineStorage:(MGLOfflineStorage *)storage;
+
 @end
 
 NS_ASSUME_NONNULL_END
