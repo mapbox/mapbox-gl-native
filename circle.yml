@@ -564,7 +564,7 @@ commands:
     parameters:
       node_version:
         type: string
-        default: 10
+        default: v8
     steps:
     - run:
         name: Run node tests
