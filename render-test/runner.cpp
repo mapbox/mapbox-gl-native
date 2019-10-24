@@ -966,7 +966,11 @@ TestRunner::Impl::Impl(const TestMetadata& metadata)
               .withSize(metadata.size)
               .withPixelRatio(metadata.pixelRatio)
               .withCrossSourceCollisions(metadata.crossSourceCollisions),
-          mbgl::ResourceOptions().withCacheOnlyRequestsSupport(false)) {}
+          mbgl::ResourceOptions().withCacheOnlyRequestsSupport(false)) {
+#ifndef NDEBUG
+    map.setDebug(MapDebugOptions::NoDebug);
+#endif
+}
 
 TestRunner::Impl::~Impl() {}
 
