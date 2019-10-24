@@ -260,7 +260,7 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
         conversion::Error error;
         optional<std::unique_ptr<Layer>> converted = conversion::convert<std::unique_ptr<Layer>>(value, error);
         if (!converted) {
-            Log::Warning(Event::ParseStyle, error.message);
+            Log::Warning(Event::ParseStyle, "error parsing layer '%s': '%s'", id.c_str(), error.message.c_str());
             return;
         }
         layer = std::move(*converted);
