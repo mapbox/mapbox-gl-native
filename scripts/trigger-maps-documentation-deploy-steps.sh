@@ -6,7 +6,7 @@ function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
-SDK_FLAVOR=${SDK_FLAVOR:-"mapbox-gl-native"}
+SDK_FLAVOR=${SDK_FLAVOR:-"maps"}
 
 step "Triggering automated site and documentation generation for ${SDK_FLAVOR} SDK ${VERSION_TAG}"
 
@@ -19,6 +19,7 @@ request_body="{
       \"env\": {
         \"SDK_FLAVOR\": \"${SDK_FLAVOR}\",
         \"RELEASE_TAG\": \"${VERSION_TAG}\"
+        \"SDK_REPO\": \"mapbox-gl-native"
       }
     }
   }
