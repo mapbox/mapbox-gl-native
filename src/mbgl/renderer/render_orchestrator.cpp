@@ -142,10 +142,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     if (!isMapModeContinuous) {
         // Reset zoom history state.
         zoomHistory.first = true;
-        if (lineAtlas->getSpace() < 32) {
-          Log::Warning(Event::OpenGL, "Line atlas free space hit %d: was cleared to avoid overflowing", lineAtlas->getSpace());
-          lineAtlas->clear();
-        }
+        lineAtlas->clear();
     }
 
     if (LayerManager::annotationsEnabled) {

@@ -40,6 +40,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     const uint8_t offset = 128;
 
     if (dasharray.size() < 2) {
+        Log::Warning(Event::OpenGL, "line atlas dasharray too small");
         return LinePatternPos();
     }
 
@@ -76,6 +77,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
             while (right < x / stretch) {
                 left = right;
                 if (partIndex >= dasharray.size()) {
+                    Log::Warning(Event::OpenGL, "line atlas dasharray invalid");
                     return LinePatternPos();
                 }
                 right = right + dasharray[partIndex];
@@ -126,13 +128,6 @@ void LineAtlas::clear() {
   positions.clear();
   nextRow = 0;
   dirty = true;
-}
-
-uint32_t LineAtlas::getSpace() const {
-  if (image.size.height > nextRow) {
-    return image.size.height - nextRow;
-  }
-  return 0;
 }
 
 Size LineAtlas::getSize() const {
