@@ -187,20 +187,14 @@ TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
     EXPECT_EQ(observer.count, 1);
     ASSERT_TRUE(notified);
 
-    // Repeated request of the same image shall not result another
-    // `ImageManagerObserver.onStyleImageMissing()` call.
-    imageManager.getImages(requestor, std::make_pair(dependencies, ++imageCorrelationID));
-    runLoop.runOnce();
-
-    EXPECT_EQ(observer.count, 1);
-
     // Request for updated dependencies must be dispatched to the
     // observer.
     dependencies.emplace("post", ImageType::Icon);
     imageManager.getImages(requestor, std::make_pair(dependencies, ++imageCorrelationID));
-    runLoop.runOnce();
+    ASSERT_TRUE(requestor.hasPendingRequests());
 
-    EXPECT_EQ(observer.count, 2);
+    runLoop.runOnce();
+    ASSERT_FALSE(requestor.hasPendingRequests());
 
     // Another requestor shall not have pending requests for already obtained images.
     StubImageRequestor anotherRequestor(imageManager);
