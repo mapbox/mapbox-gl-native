@@ -1,50 +1,33 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/gfx/upload_pass.hpp>
+#include <mbgl/math/minmax.hpp>
+#include <mbgl/util/hash.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
-#include <mbgl/util/hash.hpp>
 
 #include <cmath>
 
 namespace mbgl {
+namespace {
 
-LineAtlas::LineAtlas(const Size size)
-    : image(size),
-      dirty(true) {
-}
-
-LineAtlas::~LineAtlas() = default;
-
-LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray,
-                                          LinePatternCap patternCap) {
-    size_t key = patternCap == LinePatternCap::Round ? std::numeric_limits<size_t>::min()
-                                                     : std::numeric_limits<size_t>::max();
+size_t getDashPatternHash(const std::vector<float>& dasharray, const LinePatternCap patternCap) {
+    size_t key =
+        patternCap == LinePatternCap::Round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
         util::hash_combine<float>(key, part);
     }
-
-    // Note: We're not handling hash collisions here.
-    const auto it = positions.find(key);
-    if (it == positions.end()) {
-        auto inserted = positions.emplace(key, addDash(dasharray, patternCap));
-        assert(inserted.second);
-        return inserted.first->second;
-    } else {
-        return it->second;
-    }
+    return key;
 }
 
-LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatternCap patternCap) {
+LinePatternPos addDashPattern(AlphaImage& image,
+                              const int32_t yOffset,
+                              const std::vector<float>& dasharray,
+                              const LinePatternCap patternCap) {
     const uint8_t n = patternCap == LinePatternCap::Round ? 7 : 0;
-    const uint8_t dashheight = 2 * n + 1;
-    const uint8_t offset = 128;
+    constexpr const uint8_t offset = 128;
 
     if (dasharray.size() < 2) {
-        return LinePatternPos();
-    }
-
-    if (nextRow + dashheight > image.size.height) {
-        Log::Warning(Event::OpenGL, "line atlas bitmap overflow");
+        Log::Warning(Event::ParseStyle, "line dasharray requires at least two elements");
         return LinePatternPos();
     }
 
@@ -60,7 +43,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     bool oddLength = dasharray.size() % 2 == 1;
 
     for (int y = -n; y <= n; y++) {
-        int row = nextRow + n + y;
+        int row = yOffset + n + y;
         int index = image.size.width * row;
 
         float left = 0;
@@ -72,7 +55,6 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
         }
 
         for (uint32_t x = 0; x < image.size.width; x++) {
-
             while (right < x / stretch) {
                 left = right;
                 if (partIndex >= dasharray.size()) {
@@ -111,37 +93,79 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     }
 
     LinePatternPos position;
-    position.y = (0.5 + nextRow + n) / image.size.height;
-    position.height = (2.0 * n) / image.size.height;
+    position.y = (0.5 + yOffset + n) / image.size.height;
+    position.height = (2.0 * n + 1) / image.size.height;
     position.width = length;
-
-    nextRow += dashheight;
-
-    dirty = true;
 
     return position;
 }
 
-Size LineAtlas::getSize() const {
-    return image.size;
+} // namespace
+
+DashPatternTexture::DashPatternTexture(const std::vector<float>& from_,
+                                       const std::vector<float>& to_,
+                                       const LinePatternCap cap) {
+    const bool patternsIdentical = from_ == to_;
+    const int32_t patternHeight = cap == LinePatternCap::Round ? 15 : 1;
+
+    AlphaImage image({256, static_cast<uint32_t>((patternsIdentical ? 1 : 2) * patternHeight)});
+
+    from = addDashPattern(image, 0, from_, cap);
+    to = patternsIdentical ? from : addDashPattern(image, patternHeight, to_, cap);
+
+    texture = std::move(image);
+}
+
+void DashPatternTexture::upload(gfx::UploadPass& uploadPass) {
+    if (texture.is<AlphaImage>()) {
+        texture = uploadPass.createTexture(texture.get<AlphaImage>());
+    }
+}
+
+gfx::TextureBinding DashPatternTexture::textureBinding() const {
+    // The texture needs to have been uploaded already.
+    assert(texture.is<gfx::Texture>());
+    return {texture.get<gfx::Texture>().getResource(),
+            gfx::TextureFilterType::Linear,
+            gfx::TextureMipMapType::No,
+            gfx::TextureWrapType::Repeat,
+            gfx::TextureWrapType::Clamp};
+}
+
+Size DashPatternTexture::getSize() const {
+    return texture.match([](const auto& obj) { return obj.size; });
+}
+
+LineAtlas::LineAtlas() = default;
+
+LineAtlas::~LineAtlas() = default;
+
+DashPatternTexture& LineAtlas::getDashPatternTexture(const std::vector<float>& from,
+                                                     const std::vector<float>& to,
+                                                     const LinePatternCap cap) {
+    const size_t hash = util::hash(getDashPatternHash(from, cap), getDashPatternHash(to, cap));
+
+    // Note: We're not handling hash collisions here.
+    const auto it = textures.find(hash);
+    if (it == textures.end()) {
+        auto inserted = textures.emplace(
+            std::piecewise_construct, std::forward_as_tuple(hash), std::forward_as_tuple(from, to, cap));
+        assert(inserted.second);
+        needsUpload.emplace_back(hash);
+        return inserted.first->second;
+    } else {
+        return it->second;
+    }
 }
 
 void LineAtlas::upload(gfx::UploadPass& uploadPass) {
-    if (!texture) {
-        texture = uploadPass.createTexture(image);
-    } else if (dirty) {
-        uploadPass.updateTexture(*texture, image);
+    for (const size_t hash : needsUpload) {
+        const auto it = textures.find(hash);
+        if (it != textures.end()) {
+            it->second.upload(uploadPass);
+        }
     }
-
-    dirty = false;
-}
-
-gfx::TextureBinding LineAtlas::textureBinding() {
-    assert(texture);
-    // All _changes_ to the texture should've been made and uploaded already.
-    assert(!dirty);
-    return { texture->getResource(), gfx::TextureFilterType::Linear, gfx::TextureMipMapType::No,
-             gfx::TextureWrapType::Repeat, gfx::TextureWrapType::Clamp };
+    needsUpload.clear();
 }
 
 } // namespace mbgl

@@ -103,19 +103,17 @@ public:
 
 }  // namespace
 
-RenderOrchestrator::RenderOrchestrator(
-                     bool backgroundLayerAsColor_,
-                     optional<std::string> localFontFamily_)
-    : observer(&nullObserver())
-    , glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_))))
-    , imageManager(std::make_unique<ImageManager>())
-    , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
-    , patternAtlas(std::make_unique<PatternAtlas>())
-    , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
-    , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
-    , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
-    , renderLight(makeMutable<Light::Impl>())
-    , backgroundLayerAsColor(backgroundLayerAsColor_) {
+RenderOrchestrator::RenderOrchestrator(bool backgroundLayerAsColor_, optional<std::string> localFontFamily_)
+    : observer(&nullObserver()),
+      glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_)))),
+      imageManager(std::make_unique<ImageManager>()),
+      lineAtlas(std::make_unique<LineAtlas>()),
+      patternAtlas(std::make_unique<PatternAtlas>()),
+      imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>()),
+      sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>()),
+      layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>()),
+      renderLight(makeMutable<Light::Impl>()),
+      backgroundLayerAsColor(backgroundLayerAsColor_) {
     glyphManager->setObserver(this);
     imageManager->setObserver(this);
 }
