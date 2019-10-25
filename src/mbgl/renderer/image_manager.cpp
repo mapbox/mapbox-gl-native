@@ -197,16 +197,13 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
                     existingRequestors.emplace(requestorPtr);
                     continue;
                 }
-                // Unlike icons, pattern changes are not caught
-                // with style-diff meaning that the existing request
-                // could be from the previous style and we cannot
-                // coalesce requests for them.
-                if (dependency.second != ImageType::Pattern) {
-                    continue;
-                }
+                // The request for this image has been already delivered
+                // to the client, so we do not treat it as pending.
+                existingRequestors.emplace(requestorPtr);
+            } else {
+                requestedImages[missingImage].emplace(requestorPtr);
+                requestor.addPendingRequest(missingImage);
             }
-            requestedImages[missingImage].emplace(requestorPtr);
-            requestor.addPendingRequest(missingImage);
 
             auto removePendingRequests = [this, missingImage] {
                 auto existingRequest = requestedImages.find(missingImage);
