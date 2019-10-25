@@ -78,8 +78,8 @@ void RenderLineLayer::prepare(const LayerPrepareParameters& params) {
         const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
             ? LinePatternCap::Round : LinePatternCap::Square;
         // Ensures that the dash data gets added to the atlas.
-        params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
-        params.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+        params.lineAtlas.getDashPatternTexture(
+            evaluated.get<LineDasharray>().from, evaluated.get<LineDasharray>().to, cap);
     }
 }
 
@@ -146,27 +146,26 @@ void RenderLineLayer::render(PaintParameters& parameters) {
         };
 
         if (!evaluated.get<LineDasharray>().from.empty()) {
-            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
-                ? LinePatternCap::Round : LinePatternCap::Square;
-            LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
-            LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+            const LinePatternCap cap =
+                bucket.layout.get<LineCap>() == LineCapType::Round ? LinePatternCap::Round : LinePatternCap::Square;
+            const auto& dashPatternTexture = parameters.lineAtlas.getDashPatternTexture(
+                evaluated.get<LineDasharray>().from, evaluated.get<LineDasharray>().to, cap);
 
             draw(parameters.programs.getLineLayerPrograms().lineSDF,
-                 LineSDFProgram::layoutUniformValues(
-                     evaluated,
-                     parameters.pixelRatio,
-                     tile,
-                     parameters.state,
-                     parameters.pixelsToGLUnits,
-                     posA,
-                     posB,
-                     crossfade,
-                     parameters.lineAtlas.getSize().width),
-                     {},
-                     {},
-                     LineSDFProgram::TextureBindings{
-                         parameters.lineAtlas.textureBinding(),
-                     });
+                 LineSDFProgram::layoutUniformValues(evaluated,
+                                                     parameters.pixelRatio,
+                                                     tile,
+                                                     parameters.state,
+                                                     parameters.pixelsToGLUnits,
+                                                     dashPatternTexture.getFrom(),
+                                                     dashPatternTexture.getTo(),
+                                                     crossfade,
+                                                     dashPatternTexture.getSize().width),
+                 {},
+                 {},
+                 LineSDFProgram::TextureBindings{
+                     dashPatternTexture.textureBinding(),
+                 });
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto& linePatternValue = evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
