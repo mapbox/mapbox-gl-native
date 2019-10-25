@@ -1,35 +1,51 @@
 #pragma once
 
+#include "metadata.hpp"
+
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/rapidjson.hpp>
+
+#include <regex>
 #include <string>
+#include <utility>
 #include <vector>
-#include "filesystem.hpp"
+
+struct Manifest {
+public:
+    const std::vector<std::pair<std::string, std::string>>& getIgnores() const;
+    const std::vector<TestPaths>& getTestPaths() const;
+    const std::string& getTestRootPath() const;
+    void doShuffle(uint32_t seed);
+
+    std::string localizeURL(const std::string& url) const;
+    void localizeSourceURLs(mbgl::JSValue& root, mbgl::JSDocument& document) const;
+    void localizeStyleURLs(mbgl::JSValue& root, mbgl::JSDocument& document) const;
+
+private:
+    friend class ManifestParser;
+    mbgl::optional<std::string> localizeLocalURL(const std::string& url, bool glyphsPath = false) const;
+    mbgl::optional<std::string> localizeHttpURL(const std::string& url) const;
+    mbgl::optional<std::string> localizeMapboxSpriteURL(const std::string& url) const;
+    mbgl::optional<std::string> localizeMapboxFontsURL(const std::string& url) const;
+    mbgl::optional<std::string> localizeMapboxTilesURL(const std::string& url) const;
+    mbgl::optional<std::string> localizeMapboxTilesetURL(const std::string& url) const;
+    mbgl::optional<std::string> getVendorPath(const std::string& url,
+                                              const std::regex& regex,
+                                              bool glyphsPath = false) const;
+    mbgl::optional<std::string> getIntegrationPath(const std::string& url,
+                                                   const std::string& parent,
+                                                   const std::regex& regex,
+                                                   bool glyphsPath = false) const;
+    std::string testRootPath{};
+    std::string vendorPath{};
+    std::string assetPath{};
+    std::vector<std::pair<std::string, std::string>> ignores{};
+    std::vector<TestPaths> testPaths{};
+};
 
 class ManifestParser {
 public:
-    static ManifestParser& getInstance() {
-        static ManifestParser instance;
-        return instance;
-    }
-    const std::string getVendorPath() const;
-    const std::string getIntegrationPath() const;
-    const mbgl::filesystem::path getBaseTestPath() const;
-    const mbgl::filesystem::path getProbeTestPath() const;
-    const std::vector<mbgl::filesystem::path> getExpectationsPaths() const;
-    const std::vector<mbgl::filesystem::path> getIgnoresPaths() const;
-    bool parseManifest(const std::string& rootPath_);
-    const std::string getTestPath() const;
-    void setTestPath(const std::string& testPath_);
-
-private:
-    ManifestParser() = default;
-    mbgl::filesystem::path getValidPath(const std::string& path);
-
-    std::string rootPath{};
-    std::string testPath{};
-    std::string vendorPath{};
-    std::string assetPath{};
-    mbgl::filesystem::path baseTestPath{};
-    mbgl::filesystem::path probeTestPath{};
-    std::vector<mbgl::filesystem::path> expectationPaths{};
-    std::vector<mbgl::filesystem::path> ignorePaths{};
+    static mbgl::optional<Manifest> parseManifest(const std::string& rootPath_,
+                                                  const std::vector<std::string>& testNames,
+                                                  const std::string& testFilter);
 };

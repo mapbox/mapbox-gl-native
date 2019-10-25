@@ -11,10 +11,9 @@ struct TestMetadata;
 
 class TestRunner {
 public:
-    TestRunner() = default;
+    explicit TestRunner(const Manifest& manifest_);
     bool run(TestMetadata&);
     void reset();
-
 private:
     bool runOperations(const std::string& key, TestMetadata&);
     bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
@@ -31,4 +30,5 @@ private:
         mbgl::Map map;
     };
     std::unordered_map<std::string, std::unique_ptr<Impl>> maps;
+    const Manifest& manifest;
 };

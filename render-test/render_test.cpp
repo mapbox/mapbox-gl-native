@@ -9,8 +9,6 @@
 #include "parser.hpp"
 #include "runner.hpp"
 
-#include <random>
-
 #define ANSI_COLOR_RED        "\x1b[31m"
 #define ANSI_COLOR_GREEN      "\x1b[32m"
 #define ANSI_COLOR_YELLOW     "\x1b[33m"
@@ -42,24 +40,23 @@ namespace mbgl {
 
 int runRenderTests(int argc, char** argv) {
     bool recycleMap;
+    mbgl::optional<Manifest> manifestData;
     bool shuffle;
     uint32_t seed;
-    std::vector<TestPaths> testPaths;
+    std::string manifestPath;
 
-    std::tie(recycleMap, shuffle, seed, testPaths) = parseArguments(argc, argv);
-
-    const auto ignores = parseIgnores();
+    std::tie(recycleMap, shuffle, seed, manifestPath, manifestData) = parseArguments(argc, argv);
+    assert(manifestData);
 
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
-
-        std::seed_seq sequence { seed };
-        std::mt19937 shuffler(sequence);
-        std::shuffle(testPaths.begin(), testPaths.end(), shuffler);
     }
+    const auto& manifest = manifestData.value();
+    const auto& ignores = manifest.getIgnores();
+    const auto& testPaths = manifest.getTestPaths();
 
     mbgl::util::RunLoop runLoop;
-    TestRunner runner{};
+    TestRunner runner(manifest);
 
     std::vector<TestMetadata> metadatas;
     metadatas.reserve(testPaths.size());
@@ -67,7 +64,7 @@ int runRenderTests(int argc, char** argv) {
     TestStatistics stats;
 
     for (auto& testPath : testPaths) {
-        TestMetadata metadata = parseTestMetadata(testPath);
+        TestMetadata metadata = parseTestMetadata(testPath, manifest);
 
         if (!recycleMap) {
             runner.reset();
@@ -77,7 +74,7 @@ int runRenderTests(int argc, char** argv) {
         std::string& status = metadata.status;
         std::string& color = metadata.color;
 
-        const std::string::size_type rootLength = ManifestParser::getInstance().getTestPath().length();
+        const std::string::size_type rootLength = manifest.getTestRootPath().length();
         id = testPath.defaultExpectations();
         id = id.substr(rootLength + 1, id.length() - rootLength - 2);
 
@@ -137,13 +134,12 @@ int runRenderTests(int argc, char** argv) {
 
         metadatas.push_back(std::move(metadata));
     }
-    const auto& testRootPath = ManifestParser::getInstance().getTestPath();
+    const auto& testRootPath = manifestPath;
     std::string resultsHTML = createResultPage(stats, metadatas, shuffle, seed);
     mbgl::util::write_file(testRootPath + "/index.html", resultsHTML);
 
-    const uint32_t count = stats.erroredTests + stats.failedTests +
-                           stats.ignoreFailedTests + stats.ignorePassedTests +
-                           stats.passedTests;
+    const uint32_t count =
+        stats.erroredTests + stats.failedTests + stats.ignoreFailedTests + stats.ignorePassedTests + stats.passedTests;
 
     if (stats.passedTests) {
         printf(ANSI_COLOR_GREEN "%u passed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.passedTests, 100.0 * stats.passedTests / count);

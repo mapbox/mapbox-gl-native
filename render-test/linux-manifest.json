@@ -1,6 +1,6 @@
 {
     "base_test_path":"../mapbox-gl-js/test/integration",
-    "probe_test_path":"",
+    "probe_test_path":".",
     "expectation_paths":["expected/render-tests"],
     "ignore_paths":["../platform/node/test/ignores.json", "../render-test/linux-ignores.json", "../render-test/tests/should-fail.json"],
     "vendor_path":"../vendor",

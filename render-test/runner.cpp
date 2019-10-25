@@ -102,6 +102,8 @@ std::string simpleDiff(const Value& result, const Value& expected) {
     return diff.str();
 }
 
+TestRunner::TestRunner(const Manifest& manifest_) : maps{}, manifest(manifest_) {}
+
 bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                        std::vector<mbgl::Feature>&& features,
                                        TestMetadata& metadata) {
@@ -486,8 +488,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         std::string imagePath = operationArray[2].GetString();
         imagePath.erase(std::remove(imagePath.begin(), imagePath.end(), '"'), imagePath.end());
 
-        const mbgl::filesystem::path filePath =
-            mbgl::filesystem::path(ManifestParser::getInstance().getTestPath()) / imagePath;
+        const mbgl::filesystem::path filePath = mbgl::filesystem::path(manifest.getTestRootPath()) / imagePath;
 
         mbgl::optional<std::string> maybeImage = mbgl::util::readFile(filePath.string());
         if (!maybeImage) {
@@ -507,15 +508,15 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         // setStyle
         assert(operationArray.Size() >= 2u);
         if (operationArray[1].IsString()) {
-            std::string stylePath = localizeURL(operationArray[1].GetString());
+            std::string stylePath = manifest.localizeURL(operationArray[1].GetString());
             auto maybeStyle = readJson(stylePath);
             if (maybeStyle.is<mbgl::JSDocument>()) {
                 auto& style = maybeStyle.get<mbgl::JSDocument>();
-                localizeStyleURLs((mbgl::JSValue&)style, style);
+                manifest.localizeStyleURLs((mbgl::JSValue&)style, style);
                 map.getStyle().loadJSON(serializeJsonValue(style));
             }
         } else {
-            localizeStyleURLs(operationArray[1], metadata.document);
+            manifest.localizeStyleURLs(operationArray[1], metadata.document);
             map.getStyle().loadJSON(serializeJsonValue(operationArray[1]));
         }
     } else if (operationArray[0].GetString() == setCenterOp) {
@@ -616,7 +617,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata) {
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsObject());
 
-        localizeSourceURLs(operationArray[2], metadata.document);
+        manifest.localizeSourceURLs(operationArray[2], metadata.document);
 
         mbgl::style::conversion::Error error;
         auto converted = mbgl::style::conversion::convert<std::unique_ptr<mbgl::style::Source>>(operationArray[2], error, operationArray[1].GetString());
