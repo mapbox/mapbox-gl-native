@@ -1009,3 +1009,54 @@ TEST(Map, UniversalStyleGetter) {
     ASSERT_TRUE(lineCap.getValue().getString());
     EXPECT_EQ(std::string("butt"), *lineCap.getValue().getString());
 }
+
+TEST(Map, NoHangOnMissingImage) {
+    MapTest<> test;
+
+    test.fileSource->tileResponse = [&](const Resource&) {
+        Response result;
+        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/issue12432/0-0-0.mvt"));
+        return result;
+    };
+
+    test.fileSource->spriteImageResponse = [&](const Resource&) {
+        Response result;
+        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/sprite.png"));
+        return result;
+    };
+
+    test.fileSource->spriteJSONResponse = [&](const Resource&) {
+        Response result;
+        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/sprite.json"));
+        return result;
+    };
+
+    const std::string style{R"STYLE({
+      "version": 8,
+      "sprite": "http://example.com/sprites/sprite",
+      "sources": {
+        "mapbox": {
+          "type": "vector",
+          "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+        }
+      },
+      "layers": [{
+            "id": "background",
+            "type": "background",
+            "paint": {"background-color": "white"}
+        },{
+            "id": "water",
+            "type": "fill",
+            "source": "mapbox",
+            "source-layer": "water",
+            "paint": {"fill-pattern": "missing"}
+      }]
+    })STYLE"};
+    test.map.getStyle().loadJSON(style);
+    test.frontend.render(test.map);
+
+    test.map.getStyle().loadJSON(style);
+    test.map.jumpTo(test.map.getStyle().getDefaultCamera());
+    // The test passes if the following call does not hang.
+    test.frontend.render(test.map);
+}
