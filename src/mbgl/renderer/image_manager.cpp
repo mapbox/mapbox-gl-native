@@ -190,6 +190,7 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
             auto existingRequestorsIt = requestedImages.find(missingImage);
             if (existingRequestorsIt != requestedImages.end()) { // Already asked client about this image.
                 std::set<ImageRequestor*>& existingRequestors = existingRequestorsIt->second;
+                // existingRequestors is empty if all the previous requestors are deleted.
                 if (!existingRequestors.empty() &&
                     (*existingRequestors.begin())
                         ->hasPendingRequest(missingImage)) { // Still waiting for the client response for this image.
@@ -200,6 +201,8 @@ void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageR
                 // The request for this image has been already delivered
                 // to the client, so we do not treat it as pending.
                 existingRequestors.emplace(requestorPtr);
+                // TODO: we could `continue;` here, but we need to call `observer->onStyleImageMissing`,
+                // so that rendering is re-launched from the handler at Map::Impl.
             } else {
                 requestedImages[missingImage].emplace(requestorPtr);
                 requestor.addPendingRequest(missingImage);
