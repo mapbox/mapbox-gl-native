@@ -151,3 +151,22 @@ TEST(AsyncTask, ThreadSafety) {
     // a valid result, although very unlikely (I hope).
     EXPECT_GT(count, 0u);
 }
+
+TEST(AsyncTask, scheduleAndReplyValue) {
+    RunLoop loop;
+    std::thread::id caller_id = std::this_thread::get_id();
+
+    auto runInBackground = [caller_id]() -> int {
+        EXPECT_NE(caller_id, std::this_thread::get_id());
+        return 42;
+    };
+    auto onResult = [caller_id, &loop](int res) {
+        EXPECT_EQ(caller_id, std::this_thread::get_id());
+        EXPECT_EQ(42, res);
+        loop.stop();
+    };
+
+    auto sheduler = Scheduler::GetBackground();
+    sheduler->scheduleAndReplyValue(runInBackground, onResult);
+    loop.run();
+}
