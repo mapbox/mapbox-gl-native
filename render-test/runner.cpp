@@ -23,7 +23,6 @@
 #include <../expression-test/test_runner_common.hpp>
 #include "allocation_index.hpp"
 #include "file_source.hpp"
-#include "manifest_parser.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
@@ -102,7 +101,15 @@ std::string simpleDiff(const Value& result, const Value& expected) {
     return diff.str();
 }
 
-TestRunner::TestRunner(const Manifest& manifest_) : maps{}, manifest(manifest_) {}
+TestRunner::TestRunner(Manifest manifest_) : manifest(std::move(manifest_)) {}
+
+const Manifest& TestRunner::getManifest() const {
+    return manifest;
+}
+
+void TestRunner::doShuffle(uint32_t seed) {
+    manifest.doShuffle(seed);
+}
 
 bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                        std::vector<mbgl::Feature>&& features,

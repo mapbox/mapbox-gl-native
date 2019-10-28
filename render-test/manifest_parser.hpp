@@ -10,11 +10,14 @@
 #include <utility>
 #include <vector>
 
-struct Manifest {
+class Manifest {
 public:
+    Manifest();
+    ~Manifest();
     const std::vector<std::pair<std::string, std::string>>& getIgnores() const;
     const std::vector<TestPaths>& getTestPaths() const;
     const std::string& getTestRootPath() const;
+    const std::string& getManifestPath() const;
     void doShuffle(uint32_t seed);
 
     std::string localizeURL(const std::string& url) const;
@@ -36,16 +39,17 @@ private:
                                                    const std::string& parent,
                                                    const std::regex& regex,
                                                    bool glyphsPath = false) const;
-    std::string testRootPath{};
-    std::string vendorPath{};
-    std::string assetPath{};
-    std::vector<std::pair<std::string, std::string>> ignores{};
-    std::vector<TestPaths> testPaths{};
+    std::string manifestPath;
+    std::string testRootPath;
+    std::string vendorPath;
+    std::string assetPath;
+    std::vector<std::pair<std::string, std::string>> ignores;
+    std::vector<TestPaths> testPaths;
 };
 
 class ManifestParser {
 public:
-    static mbgl::optional<Manifest> parseManifest(const std::string& rootPath_,
+    static mbgl::optional<Manifest> parseManifest(const std::string& manifestPath,
                                                   const std::vector<std::string>& testNames,
                                                   const std::string& testFilter);
 };

@@ -3,8 +3,6 @@
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <args.hxx>
-
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -19,7 +17,6 @@
 #include <boost/archive/iterators/ostream_iterator.hpp>
 
 #include "filesystem.hpp"
-#include "manifest_parser.hpp"
 #include "metadata.hpp"
 #include "parser.hpp"
 #include "runner.hpp"
@@ -271,66 +268,6 @@ std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& b
     return readExpectedEntries(regex, base);
 }
 
-ArgumentsTuple parseArguments(int argc, char** argv) {
-    args::ArgumentParser argumentParser("Mapbox GL Test Runner");
-
-    args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", { 'h', "help" });
-
-    args::Flag recycleMapFlag(argumentParser, "recycle map", "Toggle reusing the map object", {'r', "recycle-map"});
-    args::Flag shuffleFlag(argumentParser, "shuffle", "Toggle shuffling the tests order", {'s', "shuffle"});
-    args::ValueFlag<uint32_t> seedValue(argumentParser, "seed", "Shuffle seed (default: random)", {"seed"});
-    args::ValueFlag<std::string> testPathValue(argumentParser, "rootPath", "Test root rootPath", {'p', "rootPath"});
-    args::ValueFlag<std::string> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
-    args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
-
-    try {
-        argumentParser.ParseCLI(argc, argv);
-    } catch (const args::Help&) {
-        std::ostringstream stream;
-        stream << argumentParser;
-        mbgl::Log::Info(mbgl::Event::General, stream.str());
-        exit(0);
-    } catch (const args::ParseError& e) {
-        std::ostringstream stream;
-        stream << argumentParser;
-        mbgl::Log::Info(mbgl::Event::General, stream.str());
-        mbgl::Log::Error(mbgl::Event::General, e.what());
-        exit(1);
-    } catch (const args::ValidationError& e) {
-        std::ostringstream stream;
-        stream << argumentParser;
-        mbgl::Log::Info(mbgl::Event::General, stream.str());
-        mbgl::Log::Error(mbgl::Event::General, e.what());
-        exit(2);
-    } catch (const std::regex_error& e) {
-        mbgl::Log::Error(mbgl::Event::General, "Invalid filter regular expression: %s", e.what());
-        exit(3);
-    }
-
-    const auto testRootPath = testPathValue ? args::get(testPathValue) : std::string{TEST_RUNNER_ROOT_PATH};
-    mbgl::filesystem::path rootPath{testRootPath};
-    if (!mbgl::filesystem::exists(rootPath)) {
-        mbgl::Log::Error(
-            mbgl::Event::General, "Provided test rootPath '%s' does not exist.", rootPath.string().c_str());
-        exit(4);
-    }
-
-    const auto testNames = testNameValues ? args::get(testNameValues) : std::vector<std::string>{};
-    const auto testFilter = testFilterValue ? args::get(testFilterValue) : std::string{};
-    const auto shuffle = shuffleFlag ? args::get(shuffleFlag) : false;
-    const auto seed = seedValue ? args::get(seedValue) : 1u;
-    auto manifestData = ManifestParser::parseManifest(testRootPath, testNames, testFilter);
-    if (!manifestData) {
-        exit(5);
-    }
-    if (shuffle) {
-        manifestData->doShuffle(seed);
-    }
-
-    return ArgumentsTuple{
-        recycleMapFlag ? args::get(recycleMapFlag) : false, shuffle, seed, testRootPath, std::move(manifestData)};
-}
-
 TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path) {
     TestMetrics result;
 
@@ -576,7 +513,8 @@ std::string encodeBase64(const std::string& data) {
 }
 
 std::string createResultItem(const TestMetadata& metadata, bool hasFailedTests) {
-    const bool shouldHide = (hasFailedTests && metadata.status == "passed") || (metadata.status.find("ignored") != std::string::npos);
+    const bool shouldHide =
+        (hasFailedTests && metadata.status == "passed") || (metadata.status.find("ignored") != std::string::npos);
 
     std::string html;
     html.append("<div class=\"test " + metadata.status + (shouldHide ? " hide" : "") + "\">\n");

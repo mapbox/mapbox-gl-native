@@ -208,10 +208,10 @@ add_test(
         render-tests
         --recycle-map
         --shuffle
-        --rootPath=${MBGL_ROOT}/render-test
+        --manifestPath=${MBGL_ROOT}/render-test/mac-manifest.json
         --seed=${MBGL_RENDER_TEST_SEED}
 )
 
-add_test(NAME mbgl-render-test-probes COMMAND mbgl-render-test-runner tests --rootPath=${MBGL_ROOT}/render-test)
+add_test(NAME mbgl-render-test-probes COMMAND mbgl-render-test-runner tests --manifestPath=${MBGL_ROOT}/render-test/probe-manifest.json)
 
-add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests --rootPath=${MBGL_ROOT}/render-test)
+add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests --manifestPath=${MBGL_ROOT}/render-test/mac-manifest.json)

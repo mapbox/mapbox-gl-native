@@ -2,7 +2,6 @@
 
 #include "metadata.hpp"
 
-#include <mbgl/util/optional.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/variant.hpp>
 
@@ -15,8 +14,6 @@ class Manifest;
 using ErrorMessage = std::string;
 using JSONReply = mbgl::variant<mbgl::JSDocument, ErrorMessage>;
 
-using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, mbgl::optional<Manifest>>;
-
 JSONReply readJson(const mbgl::filesystem::path&);
 std::string serializeJsonValue(const mbgl::JSValue&);
 std::string serializeMetrics(const TestMetrics&);
@@ -25,8 +22,6 @@ std::vector<std::string> readExpectedImageEntries(const mbgl::filesystem::path& 
 std::vector<std::string> readExpectedJSONEntries(const mbgl::filesystem::path& base);
 
 TestMetrics readExpectedMetrics(const mbgl::filesystem::path& path);
-
-ArgumentsTuple parseArguments(int argc, char** argv);
 
 TestMetadata parseTestMetadata(const TestPaths& paths, const Manifest& manifest);
 

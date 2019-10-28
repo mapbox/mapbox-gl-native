@@ -46,7 +46,7 @@ void android_main(struct android_app* app) {
     JNIEnv* env;
     app->activity->vm->AttachCurrentThread(&env, NULL);
 
-    std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", "/sdcard/render-test"};
+    std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", "/sdcard/render-test/android-manifest.json"};
     std::vector<char*> argv;
     for (const auto& arg : arguments) {
         argv.push_back((char*)arg.data());
