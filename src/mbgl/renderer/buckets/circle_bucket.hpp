@@ -15,15 +15,12 @@ class BucketParameters;
 
 class CircleBucket final : public Bucket {
 public:
-    CircleBucket(const BucketParameters&, const std::vector<Immutable<style::LayerProperties>>&);
-    ~CircleBucket() override;
+    using PossiblyEvaluatedLayoutProperties = style::CircleLayoutProperties::PossiblyEvaluated;
 
-    void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&,
-                    const ImagePositions&,
-                    const PatternLayerMap&,
-                    std::size_t,
-                    const CanonicalTileID&) override;
+    CircleBucket(const std::map<std::string, Immutable<style::LayerProperties>>& layerPaintProperties,
+                 const MapMode mode,
+                 const float zoom);
+    ~CircleBucket() override;
 
     bool hasData() const override;
 

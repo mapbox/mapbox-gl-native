@@ -19,6 +19,12 @@ public:
     CircleLayer(const std::string& layerID, const std::string& sourceID);
     ~CircleLayer() final;
 
+    // Layout properties
+
+    static PropertyValue<float> getDefaultCircleSortKey();
+    const PropertyValue<float>& getCircleSortKey() const;
+    void setCircleSortKey(const PropertyValue<float>&);
+
     // Paint properties
 
     static PropertyValue<float> getDefaultCircleBlur();

@@ -16,6 +16,11 @@
 namespace mbgl {
 namespace style {
 
+struct CircleSortKey : DataDrivenLayoutProperty<float> {
+    static constexpr const char *name() { return "circle-sort-key"; }
+    static float defaultValue() { return 0; }
+};
+
 struct CircleBlur : DataDrivenPaintProperty<float, attributes::blur, uniforms::blur> {
     static float defaultValue() { return 0; }
 };
@@ -59,6 +64,10 @@ struct CircleTranslate : PaintProperty<std::array<float, 2>> {
 struct CircleTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
+
+class CircleLayoutProperties : public Properties<
+    CircleSortKey
+> {};
 
 class CirclePaintProperties : public Properties<
     CircleBlur,

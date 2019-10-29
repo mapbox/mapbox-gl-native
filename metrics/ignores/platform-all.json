@@ -55,7 +55,6 @@
     "render-tests/background-color/transition": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
     "render-tests/canvas/default": "skip - js specific",
     "render-tests/canvas/update": "skip - js specific",
-    "render-tests/circle-sort-key/literal": "https://github.com/mapbox/mapbox-gl-native/issues/15008",
     "render-tests/collator/default": "Some test platforms don't resolve 'en' locale",
     "render-tests/collator/resolved-locale": "Some test platforms don't resolve 'en' locale",
     "render-tests/custom-layer-js/depth": "skip - js specific",

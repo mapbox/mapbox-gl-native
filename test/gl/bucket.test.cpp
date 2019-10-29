@@ -47,10 +47,11 @@ TEST(Buckets, CircleBucket) {
     gfx::BackendScope scope { backend };
 
     gl::Context context{ backend };
-    CircleBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0, nullptr }, {} };
+    CircleBucket bucket{{}, MapMode::Static, 1.0};
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
+    // CircleBucket::addFeature() is a no-op.
     GeometryCollection point { { { 0, 0 } } };
     bucket.addFeature(StubGeometryTileFeature{{}, FeatureType::Point, point, properties},
                       point,
@@ -58,6 +59,10 @@ TEST(Buckets, CircleBucket) {
                       PatternLayerMap(),
                       0,
                       CanonicalTileID(0, 0, 0));
+    ASSERT_FALSE(bucket.hasData());
+    ASSERT_FALSE(bucket.needsUpload());
+
+    bucket.segments.emplace_back(0, 0);
     ASSERT_TRUE(bucket.hasData());
     ASSERT_TRUE(bucket.needsUpload());
 
