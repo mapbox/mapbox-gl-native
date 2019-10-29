@@ -8,6 +8,8 @@ add_library(
     ${MBGL_ROOT}/render-test/file_source.hpp
     ${MBGL_ROOT}/render-test/filesystem.hpp
     ${MBGL_ROOT}/render-test/include/mbgl/render_test.hpp
+    ${MBGL_ROOT}/render-test/manifest_parser.cpp
+    ${MBGL_ROOT}/render-test/manifest_parser.hpp
     ${MBGL_ROOT}/render-test/metadata.hpp
     ${MBGL_ROOT}/render-test/parser.cpp
     ${MBGL_ROOT}/render-test/parser.hpp

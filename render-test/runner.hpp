@@ -3,6 +3,8 @@
 #include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
 
+#include "manifest_parser.hpp"
+
 #include <memory>
 #include <string>
 
@@ -11,10 +13,13 @@ struct TestMetadata;
 
 class TestRunner {
 public:
-    TestRunner() = default;
-    explicit TestRunner(const std::string& testRootPath);
+    explicit TestRunner(Manifest);
     bool run(TestMetadata&);
     void reset();
+
+    // Manifest
+    const Manifest& getManifest() const;
+    void doShuffle(uint32_t seed);
 
 private:
     bool runOperations(const std::string& key, TestMetadata&);
@@ -32,5 +37,5 @@ private:
         mbgl::Map map;
     };
     std::unordered_map<std::string, std::unique_ptr<Impl>> maps;
-    std::string testRootPath{TEST_RUNNER_ROOT_PATH};
+    Manifest manifest;
 };

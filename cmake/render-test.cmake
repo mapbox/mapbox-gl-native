@@ -8,6 +8,8 @@ add_executable(
     render-test/filesystem.hpp
     render-test/filesystem.hpp
     render-test/include/mbgl/render_test.hpp
+    render-test/manifest_parser.cpp
+    render-test/manifest_parser.hpp
     render-test/metadata.hpp
     render-test/parser.cpp
     render-test/parser.hpp
