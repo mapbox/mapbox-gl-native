@@ -267,7 +267,9 @@ commands:
           when: on_fail
           command: |
             mkdir -p /tmp/tests/render
-            if [ -f render-test/index.html ]; then cp render-test/index.html /tmp/tests/render; fi
+            if [ -f render-test/tests_index.html ]; then cp render-test/tests_index.html /tmp/tests/render; fi
+            if [ -f render-test/render-tests_index.html ]; then cp render-test/render-tests_index.html /tmp/tests/render; fi
+            if [ -f render-test/query-tests_index.html ]; then cp render-test/query-tests_index.html /tmp/tests/render; fi
             mkdir -p /tmp/tests/coredumps
             if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
       - store_artifacts:

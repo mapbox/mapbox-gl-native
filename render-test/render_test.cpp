@@ -200,8 +200,10 @@ int runRenderTests(int argc, char** argv) {
         metadatas.push_back(std::move(metadata));
     }
     const auto& testRootPath = manifest.getManifestPath();
+    const auto resultPath =
+        testRootPath + "/" + (testNames.empty() ? "render-tests" : testNames.front()) + "_index.html";
     std::string resultsHTML = createResultPage(stats, metadatas, shuffle, seed);
-    mbgl::util::write_file(testRootPath + "/index.html", resultsHTML);
+    mbgl::util::write_file(resultPath, resultsHTML);
 
     const uint32_t count =
         stats.erroredTests + stats.failedTests + stats.ignoreFailedTests + stats.ignorePassedTests + stats.passedTests;
@@ -222,7 +224,7 @@ int runRenderTests(int argc, char** argv) {
         printf(ANSI_COLOR_RED "%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.erroredTests, 100.0 * stats.erroredTests / count);
     }
 
-    printf("Results at: %s%s\n", testRootPath.c_str(), "/index.html");
+    printf("Results at: %s\n", resultPath.c_str());
 
     return stats.failedTests + stats.erroredTests == 0 ? 0 : 1;
 }

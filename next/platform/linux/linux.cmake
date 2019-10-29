@@ -148,5 +148,8 @@ add_test(
         --seed=${MBGL_RENDER_TEST_SEED}
 )
 
-add_test(NAME mbgl-render-test-probes COMMAND mbgl-render-test-runner tests --manifestPath=${MBGL_ROOT}/render-test/probe-manifest.json)
+add_test(
+    NAME mbgl-render-test-probes
+    COMMAND mbgl-render-test-runner tests --manifestPath=${MBGL_ROOT}/render-test/linux-probe-manifest.json
+)
 add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests --manifestPath=${MBGL_ROOT}/render-test/linux-manifest.json)
