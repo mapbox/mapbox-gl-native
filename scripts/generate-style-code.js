@@ -6,9 +6,6 @@ const ejs = require('ejs');
 const spec = require('./style-spec');
 const colorParser = require('csscolorparser');
 
-// FIXME: https://github.com/mapbox/mapbox-gl-native/issues/15008
-delete spec.layout_circle["circle-sort-key"]
-
 require('./style-code');
 
 function parseCSSColor(str) {

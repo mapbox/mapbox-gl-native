@@ -73,7 +73,10 @@ layerCapabilities['symbol']         = defaults.require('Source')
                                               .require('CrossTileIndex')
                                               .set('TileKind', 'Geometry')
                                               .finalize();
-layerCapabilities['circle']         = defaults.require('Source').set('TileKind', 'Geometry').finalize();
+layerCapabilities['circle']         = defaults.require('Source')
+                                              .require('Layout')
+                                              .set('TileKind', 'Geometry')
+                                              .finalize();
 layerCapabilities['line']           = layerCapabilities['fill'];
 layerCapabilities['heatmap']        = defaults.require('Source')
                                               .require('Pass3D')

@@ -24,7 +24,7 @@ const LayerTypeInfo* CircleLayer::Impl::staticTypeInfo() noexcept {
     const static LayerTypeInfo typeInfo{"circle",
                                         LayerTypeInfo::Source::Required,
                                         LayerTypeInfo::Pass3D::NotRequired,
-                                        LayerTypeInfo::Layout::NotRequired,
+                                        LayerTypeInfo::Layout::Required,
                                         LayerTypeInfo::FadingTiles::NotRequired,
                                         LayerTypeInfo::CrossTileIndex::NotRequired,
                                         LayerTypeInfo::TileKind::Geometry};
@@ -57,11 +57,27 @@ std::unique_ptr<Layer> CircleLayer::cloneRef(const std::string& id_) const {
     return std::make_unique<CircleLayer>(std::move(impl_));
 }
 
-void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
+void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>& writer) const {
+    layout.stringify(writer);
 }
 
 // Layout properties
 
+PropertyValue<float> CircleLayer::getDefaultCircleSortKey() {
+    return CircleSortKey::defaultValue();
+}
+
+const PropertyValue<float>& CircleLayer::getCircleSortKey() const {
+    return impl().layout.get<CircleSortKey>();
+}
+
+void CircleLayer::setCircleSortKey(const PropertyValue<float>& value) {
+    if (value == getCircleSortKey()) return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<CircleSortKey>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 
 // Paint properties
 
@@ -391,6 +407,7 @@ enum class Property : uint8_t {
     CircleStrokeWidthTransition,
     CircleTranslateTransition,
     CircleTranslateAnchorTransition,
+    CircleSortKey = kPaintPropertyCount,
 };
 
 template <typename T>
@@ -420,7 +437,8 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"circle-stroke-opacity-transition", toUint8(Property::CircleStrokeOpacityTransition)},
      {"circle-stroke-width-transition", toUint8(Property::CircleStrokeWidthTransition)},
      {"circle-translate-transition", toUint8(Property::CircleTranslateTransition)},
-     {"circle-translate-anchor-transition", toUint8(Property::CircleTranslateAnchorTransition)}});
+     {"circle-translate-anchor-transition", toUint8(Property::CircleTranslateAnchorTransition)},
+     {"circle-sort-key", toUint8(Property::CircleSortKey)}});
 
 StyleProperty getLayerProperty(const CircleLayer& layer, Property property) {
     switch (property) {
@@ -468,6 +486,8 @@ StyleProperty getLayerProperty(const CircleLayer& layer, Property property) {
             return makeStyleProperty(layer.getCircleTranslateTransition());
         case Property::CircleTranslateAnchorTransition:
             return makeStyleProperty(layer.getCircleTranslateAnchorTransition());
+        case Property::CircleSortKey:
+            return makeStyleProperty(layer.getCircleSortKey());
     }
     return {};
 }
@@ -500,7 +520,8 @@ optional<Error> CircleLayer::setPropertyInternal(const std::string& name, const 
     auto property = static_cast<Property>(it->second);
 
     if (property == Property::CircleBlur || property == Property::CircleOpacity || property == Property::CircleRadius ||
-        property == Property::CircleStrokeOpacity || property == Property::CircleStrokeWidth) {
+        property == Property::CircleStrokeOpacity || property == Property::CircleStrokeWidth ||
+        property == Property::CircleSortKey) {
         Error error;
         const auto& typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
@@ -529,6 +550,11 @@ optional<Error> CircleLayer::setPropertyInternal(const std::string& name, const 
 
         if (property == Property::CircleStrokeWidth) {
             setCircleStrokeWidth(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::CircleSortKey) {
+            setCircleSortKey(*typedValue);
             return nullopt;
         }
     }

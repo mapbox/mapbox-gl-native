@@ -341,6 +341,7 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/mbgl/layermanager/line_layer_factory.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/layermanager/raster_layer_factory.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/layermanager/symbol_layer_factory.cpp
+    ${PROJECT_SOURCE_DIR}/src/mbgl/layout/circle_layout.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/layout/clip_lines.cpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/layout/clip_lines.hpp
     ${PROJECT_SOURCE_DIR}/src/mbgl/layout/layout.hpp
