@@ -20,7 +20,7 @@ class CollisionIndex {
 public:
     using CollisionGrid = GridIndex<IndexedSubfeature>;
 
-    explicit CollisionIndex(const TransformState&);
+    explicit CollisionIndex(const TransformState&, const MapMode&);
 
     std::pair<bool,bool> placeFeature(const CollisionFeature& feature,
                                       Point<float> shift,
@@ -72,6 +72,7 @@ private:
 
     const TransformState transformState;
 
+    const float viewportPadding;
     CollisionGrid collisionGrid;
     CollisionGrid ignoredGrid;
     
