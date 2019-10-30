@@ -257,11 +257,35 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
 }
 
 void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) {
-    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), std::move(patterns), std::move(versionMap), imageCorrelationID);
+    if (!missingImagesRequested) {
+        worker.self().invoke(&GeometryTileWorker::onImagesAvailable,
+                             std::move(images),
+                             std::move(patterns),
+                             std::move(versionMap),
+                             imageCorrelationID);
+    } else {
+        layoutResult->iconAtlas = makeImageAtlas(images, patterns, versionMap);
+        missingImagesRequested = false;
+    }
 }
 
 void GeometryTile::getImages(ImageRequestPair pair) {
     imageManager.getImages(*this, std::move(pair));
+}
+
+void GeometryTile::getMissingImages(ImageDependencies& dependencies) {
+    if (dependencies.empty()) {
+        return;
+    }
+    missingImagesRequested = true;
+    for (const auto& pos : layoutResult->iconAtlas.patternPositions) {
+        dependencies.emplace(pos.first, ImageType::Pattern);
+    }
+    for (const auto& pos : layoutResult->iconAtlas.iconPositions) {
+        dependencies.emplace(pos.first, ImageType::Icon);
+    }
+    ImageRequestPair request = std::make_pair(dependencies, correlationID);
+    imageManager.getImages(*this, std::move(request));
 }
 
 const std::shared_ptr<FeatureIndex> GeometryTile::getFeatureIndex() const {

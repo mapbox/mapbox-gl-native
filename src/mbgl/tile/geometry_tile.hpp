@@ -45,6 +45,7 @@ public:
     
     void getGlyphs(GlyphDependencies);
     void getImages(ImageRequestPair);
+    void getMissingImages(ImageDependencies&);
 
     bool layerPropertiesUpdated(const Immutable<style::LayerProperties>&) override;
 
@@ -128,6 +129,7 @@ private:
     };
 
     FadeState fadeState = FadeState::Loaded;
+    bool missingImagesRequested = false;
 };
 
 } // namespace mbgl
