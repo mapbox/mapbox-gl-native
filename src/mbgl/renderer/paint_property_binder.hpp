@@ -453,7 +453,9 @@ public:
         crossfade = crossfade_;
     };
 
-    void populateVertexVector(const GeometryTileFeature&, std::size_t length, std::size_t /* index */,
+    void populateVertexVector(const GeometryTileFeature& feature,
+                              std::size_t length,
+                              std::size_t index,
                               const ImagePositions& patternPositions,
                               const optional<PatternDependency>& patternDependencies,
                               const style::expression::Value&) override {
@@ -461,10 +463,15 @@ public:
             // Unlike other propperties with expressions that evaluate to null, the default value for `*-pattern` properties is an empty
             // string and will not have a valid entry in patternPositions. We still need to populate the attribute buffers to avoid crashes
             // when we try to draw the layer because we don't know at draw time if all features were evaluated to valid pattern dependencies.
-            for (std::size_t i = zoomInVertexVector.elements(); i < length; ++i) {
+            auto elements = zoomInVertexVector.elements();
+            for (std::size_t i = elements; i < length; ++i) {
                 patternToVertexVector.emplace_back(Vertex { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
                 zoomInVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} } );
                 zoomOutVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
+            }
+            optional<std::string> idStr = featureIDtoString(feature.getID());
+            if (idStr) {
+                featureMap[*idStr].emplace_back(FeatureVertexRange{index, elements, length});
             }
         } else if (!patternPositions.empty()) {
             const auto min = patternPositions.find(patternDependencies->min);
@@ -478,20 +485,88 @@ public:
             const ImagePosition imageMid = mid->second;
             const ImagePosition imageMax = max->second;
 
-            for (std::size_t i = zoomInVertexVector.elements(); i < length; ++i) {
+            auto elements = zoomInVertexVector.elements();
+            for (std::size_t i = elements; i < length; ++i) {
                 patternToVertexVector.emplace_back(Vertex { imageMid.tlbr() });
                 zoomInVertexVector.emplace_back(Vertex2 { imageMin.tlbr() });
                 zoomOutVertexVector.emplace_back(Vertex2 { imageMax.tlbr() });
             }
+            optional<std::string> idStr = featureIDtoString(feature.getID());
+            if (idStr) {
+                featureMap[*idStr].emplace_back(FeatureVertexRange{index, elements, length});
+            }
         }
     }
 
-    void updateVertexVector(std::size_t,
-                            std::size_t,
-                            const GeometryTileFeature&,
-                            const FeatureState&,
-                            const ImagePositions&,
-                            GeometryTile&) override {}
+    bool updateVertexVectors(const FeatureStates& states,
+                             const GeometryTileLayer& layer,
+                             const ImagePositions& patternPositions,
+                             GeometryTile& tile) override {
+        bool updated = false;
+        for (const auto& it : states) {
+            const auto positions = featureMap.find(it.first);
+            if (positions == featureMap.end()) {
+                continue;
+            }
+
+            for (const auto& pos : positions->second) {
+                std::unique_ptr<GeometryTileFeature> feature = layer.getFeature(pos.featureIndex);
+                if (feature) {
+                    updateVertexVector(pos.start, pos.end, *feature, it.second, patternPositions, tile);
+                    updated = true;
+                }
+            }
+        }
+        return updated;
+    }
+
+    void updateVertexVector(std::size_t start,
+                            std::size_t end,
+                            const GeometryTileFeature& feature,
+                            const FeatureState& state,
+                            const ImagePositions& patternPositions,
+                            GeometryTile& tile) override {
+        if (!patternPositions.empty()) {
+            using style::expression::EvaluationContext;
+            const auto evaluatedMin =
+                toString(expression.evaluate(EvaluationContext(zoomRange.min - 1, &feature, &state), defaultValue));
+            const auto evaluatedMid =
+                toString(expression.evaluate(EvaluationContext(zoomRange.min, &feature, &state), defaultValue));
+            const auto evaluatedMax =
+                toString(expression.evaluate(EvaluationContext(zoomRange.max, &feature, &state), defaultValue));
+
+            auto min = patternPositions.find(evaluatedMin);
+            auto mid = patternPositions.find(evaluatedMid);
+            auto max = patternPositions.find(evaluatedMax);
+
+            auto endPos = patternPositions.end();
+            if (min == endPos || mid == endPos || max == endPos) {
+                ImageDependencies dependencies;
+                dependencies.emplace(evaluatedMin, ImageType::Pattern);
+                dependencies.emplace(evaluatedMid, ImageType::Pattern);
+                dependencies.emplace(evaluatedMax, ImageType::Pattern);
+
+                tile.getMissingImages(dependencies);
+
+                min = patternPositions.find(evaluatedMin);
+                mid = patternPositions.find(evaluatedMid);
+                max = patternPositions.find(evaluatedMax);
+
+                endPos = patternPositions.end();
+                if (min == endPos || mid == endPos || max == endPos) return;
+            }
+
+            const ImagePosition imageMin = min->second;
+            const ImagePosition imageMid = mid->second;
+            const ImagePosition imageMax = max->second;
+
+            for (std::size_t i = start; i < end; ++i) {
+                patternToVertexVector.at(i) = Vertex{imageMid.tlbr()};
+                zoomInVertexVector.at(i) = Vertex2{imageMin.tlbr()};
+                zoomOutVertexVector.at(i) = Vertex2{imageMax.tlbr()};
+            }
+        }
+    }
 
     void upload(gfx::UploadPass& uploadPass) override {
         if (!patternToVertexVector.empty()) {
@@ -540,6 +615,7 @@ private:
     optional<gfx::VertexBuffer<Vertex2>> zoomInVertexBuffer;
     optional<gfx::VertexBuffer<Vertex2>> zoomOutVertexBuffer;
     CrossfadeParameters crossfade;
+    FeatureVertexRangeMap featureMap;
 };
 
 template <class T, class PossiblyEvaluatedType>
