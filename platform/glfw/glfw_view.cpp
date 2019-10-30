@@ -130,6 +130,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `B` to cycle through the color, stencil, and depth buffer\n");
     printf("- Press `D` to cycle through camera bounds: inside, crossing IDL at left, crossing IDL at right, and disabled\n");
     printf("- Press `T` to add custom geometry source\n");
+    printf("- Press `F` to enable feature-state demo\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
@@ -606,39 +607,9 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     view->lastX = x;
     view->lastY = y;
 
-    auto &style = view->map->getStyle();
-    if (style.getLayer("state-fills")) {
-        auto screenCoordinate = mbgl::ScreenCoordinate{view->lastX, view->lastY};
-        const mbgl::RenderedQueryOptions queryOptions({{{"state-fills"}}, {}});
-        auto result = view->rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate, queryOptions);
-        using namespace mbgl;
-        FeatureState newState;
-
-        if (result.size() > 0) {
-            FeatureIdentifier id = result[0].id;
-            optional<std::string> idStr = featureIDtoString(id);
-
-            if (idStr) {
-                if (view->featureID && (*view->featureID != *idStr)) {
-                    newState["hover"] = false;
-                    view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
-                    view->featureID = nullopt;
-                }
-
-                if (!view->featureID) {
-                    newState["hover"] = true;
-                    view->featureID = featureIDtoString(id);
-                    view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
-                }
-            }
-        } else {
-            if (view->featureID) {
-                newState["hover"] = false;
-                view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
-                view->featureID = nullopt;
-            }
-        }
-        view->invalidate();
+    auto layer = view->map->getStyle().getLayer("state-fills");
+    if (layer && layer->getVisibility() == mbgl::style::VisibilityType::Visible) {
+        view->updateFeatureState(window);
     }
 }
 
@@ -809,4 +780,37 @@ void GLFWView::toggleCustomSource() {
         layer->setVisibility(layer->getVisibility() == mbgl::style::VisibilityType::Visible ?
                              mbgl::style::VisibilityType::None : mbgl::style::VisibilityType::Visible);
     }
+}
+
+void GLFWView::updateFeatureState(GLFWwindow *window_) {
+    auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window_));
+    auto screenCoordinate = mbgl::ScreenCoordinate{view->lastX, view->lastY};
+    const mbgl::RenderedQueryOptions queryOptions({{{"state-fills"}}, {}});
+    auto result = view->rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate, queryOptions);
+    using namespace mbgl;
+    FeatureState newState;
+
+    if (!result.empty()) {
+        FeatureIdentifier id = result[0].id;
+        optional<std::string> idStr = featureIDtoString(id);
+
+        if (idStr) {
+            if (view->featureID && (*view->featureID != *idStr)) {
+                newState["hover"] = false;
+                view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
+                view->featureID = nullopt;
+            }
+
+            if (!view->featureID) {
+                newState["hover"] = true;
+                view->featureID = featureIDtoString(id);
+                view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
+            }
+        }
+    } else if (view->featureID) {
+        newState["hover"] = false;
+        view->rendererFrontend->getRenderer()->setFeatureState("states", {}, *view->featureID, newState);
+        view->featureID = nullopt;
+    }
+    view->invalidate();
 }

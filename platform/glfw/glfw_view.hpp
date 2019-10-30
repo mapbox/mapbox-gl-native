@@ -87,6 +87,7 @@ private:
     void addAnimatedAnnotation();
     void updateAnimatedAnnotations();
     void toggleCustomSource();
+    void updateFeatureState(GLFWwindow *window);
 
     void clearAnnotations();
     void popAnnotation();
