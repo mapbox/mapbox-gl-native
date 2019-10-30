@@ -22,7 +22,7 @@ namespace mbgl {
 // the viewport for collision detection so that the bulk of the changes
 // occur offscreen. Making this constant greater increases label
 // stability, but it's expensive.
-static const float viewportPadding = 100;
+static const float viewportPadding = 1024;
 
 CollisionIndex::CollisionIndex(const TransformState& transformState_)
     : transformState(transformState_)
