@@ -8,8 +8,22 @@ namespace expression {
 
 EvaluationResult Coalesce::evaluate(const EvaluationContext& params) const {
     EvaluationResult result = Null;
+    std::size_t argsCount = args.size();
+    optional<Image> requestedImage;
     for (const auto& arg : args) {
+        --argsCount;
         result = arg->evaluate(params);
+        // We need to keep track of the first requested image in a coalesce statement.
+        // If coalesce can't find a valid image, we return the first requested image.
+        if (getType() == type::Image && result) {
+            const auto image = fromExpressionValue<Image>(*result);
+            if (image && !image->isAvailable()) {
+                if (!requestedImage) requestedImage = Image(image->id());
+                if (!argsCount) result = *requestedImage;
+                continue;
+            }
+        }
+
         if (!result || *result != Null) break;
     }
     return result;

@@ -52,9 +52,9 @@ public:
     void setFillExtrusionOpacityTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionOpacityTransition() const;
 
-    static PropertyValue<std::string> getDefaultFillExtrusionPattern();
-    const PropertyValue<std::string>& getFillExtrusionPattern() const;
-    void setFillExtrusionPattern(const PropertyValue<std::string>&);
+    static PropertyValue<expression::Image> getDefaultFillExtrusionPattern();
+    const PropertyValue<expression::Image>& getFillExtrusionPattern() const;
+    void setFillExtrusionPattern(const PropertyValue<expression::Image>&);
     void setFillExtrusionPatternTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionPatternTransition() const;
 

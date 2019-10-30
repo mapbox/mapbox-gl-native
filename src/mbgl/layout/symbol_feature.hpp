@@ -1,8 +1,9 @@
 #pragma once
 
+#include <mbgl/style/expression/image.hpp>
+#include <mbgl/text/tagged_string.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/text/tagged_string.hpp>
 
 #include <array>
 #include <string>
@@ -29,7 +30,7 @@ public:
     std::unique_ptr<GeometryTileFeature> feature;
     GeometryCollection geometry;
     optional<TaggedString> formattedText;
-    optional<std::string> icon;
+    optional<style::expression::Image> icon;
     float sortKey = 0.0f;
     std::size_t index;
     bool allowsVerticalWritingMode = false;

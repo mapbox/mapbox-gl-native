@@ -81,8 +81,7 @@ inline Immutable<style::SymbolLayoutProperties::PossiblyEvaluated> createLayout(
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<Immutable<style::LayerProperties>>& layers,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
-                           ImageDependencies& imageDependencies,
-                           GlyphDependencies& glyphDependencies)
+                           const LayoutParameters& layoutParameters)
     : bucketLeaderID(layers.front()->baseImpl->id),
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
@@ -141,7 +140,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         ft.index = i;
 
         if (hasText) {
-            auto formatted = layout->evaluate<TextField>(zoom, ft);
+            auto formatted = layout->evaluate<TextField>(zoom, ft, layoutParameters.availableImages);
             auto textTransform = layout->evaluate<TextTransform>(zoom, ft);
             FontStack baseFontStack = layout->evaluate<TextFont>(zoom, ft);
 
@@ -168,7 +167,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             // Loop through all characters of this text and collect unique codepoints.
             for (std::size_t j = 0; j < ft.formattedText->length(); j++) {
                 const auto& sectionFontStack = formatted.sections[ft.formattedText->getSectionIndex(j)].fontStack;
-                GlyphIDs& dependencies = glyphDependencies[sectionFontStack ? *sectionFontStack : baseFontStack];
+                GlyphIDs& dependencies =
+                    layoutParameters.glyphDependencies[sectionFontStack ? *sectionFontStack : baseFontStack];
                 char16_t codePoint = ft.formattedText->getCharCodeAt(j);
                 dependencies.insert(codePoint);
                 if (canVerticalizeText || (allowVerticalPlacement && ft.formattedText->allowsVerticalWritingMode())) {
@@ -180,8 +180,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (hasIcon) {
-            ft.icon = layout->evaluate<IconImage>(zoom, ft);
-            imageDependencies.emplace(*ft.icon, ImageType::Icon);
+            ft.icon = layout->evaluate<IconImage>(zoom, ft, layoutParameters.availableImages);
+            layoutParameters.imageDependencies.emplace(ft.icon->id(), ImageType::Icon);
         }
 
         if (ft.formattedText || ft.icon) {
@@ -448,14 +448,13 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
         // if feature has icon, get sprite atlas position
         SymbolContent iconType{SymbolContent::None};
         if (feature.icon) {
-            auto image = imageMap.find(*feature.icon);
+            auto image = imageMap.find(feature.icon->id());
             if (image != imageMap.end()) {
                 iconType = SymbolContent::IconRGBA;
-                shapedIcon = PositionedIcon::shapeIcon(
-                    imagePositions.at(*feature.icon),
-                    layout->evaluate<IconOffset>(zoom, feature),
-                    layout->evaluate<IconAnchor>(zoom, feature),
-                    layout->evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
+                shapedIcon = PositionedIcon::shapeIcon(imagePositions.at(feature.icon->id()),
+                                                       layout->evaluate<IconOffset>(zoom, feature),
+                                                       layout->evaluate<IconAnchor>(zoom, feature),
+                                                       layout->evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
                 if (image->second->sdf) {
                     iconType = SymbolContent::IconSDF;
                 }

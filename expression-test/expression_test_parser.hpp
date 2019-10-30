@@ -7,18 +7,24 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
-#include <vector>
+#include <set>
 #include <string>
+#include <vector>
 
 using namespace mbgl;
 
 struct Input {
-    Input(optional<float> zoom_, optional<double> heatmapDensity_, Feature feature_)
+    Input(optional<float> zoom_,
+          optional<double> heatmapDensity_,
+          std::set<std::string> availableImages_,
+          Feature feature_)
         : zoom(std::move(zoom_)),
           heatmapDensity(std::move(heatmapDensity_)),
+          availableImages(std::move(availableImages_)),
           feature(std::move(feature_)) {}
     optional<float> zoom;
     optional<double> heatmapDensity;
+    std::set<std::string> availableImages;
     Feature feature;
 };
 

@@ -43,6 +43,7 @@ void ImageManager::addImage(Immutable<style::Image::Impl> image_) {
     if (requestedImages.find(image_->id) != requestedImages.end()) {
         requestedImagesCacheSize += image_->image.bytes();
     }
+    availableImages.emplace(image_->id);
     images.emplace(image_->id, std::move(image_));
 }
 
@@ -81,6 +82,7 @@ void ImageManager::removeImage(const std::string& id) {
         requestedImages.erase(requestedIt);
     }
     images.erase(it);
+    availableImages.erase(id);
     updatedImageVersions.erase(id);
 }
 
@@ -167,6 +169,10 @@ void ImageManager::reduceMemoryUseIfCacheSizeExceedsLimit() {
     if (requestedImagesCacheSize > util::DEFAULT_ON_DEMAND_IMAGES_CACHE_SIZE) {
         reduceMemoryUse();
     }
+}
+
+const std::set<std::string>& ImageManager::getAvailableImages() const {
+    return availableImages;
 }
 
 void ImageManager::checkMissingAndNotify(ImageRequestor& requestor, const ImageRequestPair& pair) {

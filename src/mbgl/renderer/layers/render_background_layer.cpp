@@ -105,8 +105,10 @@ void RenderBackgroundLayer::render(PaintParameters& parameters) {
     const auto& evaluated = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).evaluated;
     const auto& crossfade = static_cast<const BackgroundLayerProperties&>(*evaluatedProperties).crossfade;
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
-        optional<ImagePosition> imagePosA = parameters.patternAtlas.getPattern(evaluated.get<BackgroundPattern>().from);
-        optional<ImagePosition> imagePosB = parameters.patternAtlas.getPattern(evaluated.get<BackgroundPattern>().to);
+        optional<ImagePosition> imagePosA =
+            parameters.patternAtlas.getPattern(evaluated.get<BackgroundPattern>().from.id());
+        optional<ImagePosition> imagePosB =
+            parameters.patternAtlas.getPattern(evaluated.get<BackgroundPattern>().to.id());
 
         if (!imagePosA || !imagePosB)
             return;
@@ -176,8 +178,8 @@ void RenderBackgroundLayer::prepare(const LayerPrepareParameters& params) {
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
         // Ensures that the pattern bitmap gets copied to atlas bitmap. 
         // Atlas bitmap is uploaded to atlas texture in upload.
-        addPatternIfNeeded(evaluated.get<BackgroundPattern>().from, params);
-        addPatternIfNeeded(evaluated.get<BackgroundPattern>().to, params);
+        addPatternIfNeeded(evaluated.get<BackgroundPattern>().from.id(), params);
+        addPatternIfNeeded(evaluated.get<BackgroundPattern>().to.id(), params);
     }
 }
 

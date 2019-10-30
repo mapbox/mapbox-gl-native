@@ -28,9 +28,7 @@ public:
     EvaluationContext() = default;
     explicit EvaluationContext(float zoom_) : zoom(zoom_) {}
     explicit EvaluationContext(GeometryTileFeature const * feature_) : feature(feature_) {}
-    EvaluationContext(float zoom_, GeometryTileFeature const * feature_) :
-        zoom(zoom_), feature(feature_)
-    {}
+    EvaluationContext(float zoom_, GeometryTileFeature const* feature_) : zoom(zoom_), feature(feature_) {}
     EvaluationContext(optional<mbgl::Value> accumulated_, GeometryTileFeature const * feature_) :
         accumulated(std::move(accumulated_)), feature(feature_)
     {}
@@ -50,6 +48,11 @@ public:
         return *this;
     };
 
+    EvaluationContext& withAvailableImages(const std::set<std::string>* availableImages_) noexcept {
+        availableImages = availableImages_;
+        return *this;
+    };
+
     optional<float> zoom;
     optional<mbgl::Value> accumulated;
     GeometryTileFeature const * feature = nullptr;
@@ -57,6 +60,7 @@ public:
     // Contains formatted section object, std::unordered_map<std::string, Value>.
     const Value* formattedSection = nullptr;
     const FeatureState* featureState = nullptr;
+    const std::set<std::string>* availableImages = nullptr;
 };
 
 template <typename T>
@@ -155,7 +159,8 @@ enum class Kind : int32_t {
     Comparison,
     FormatExpression,
     FormatSectionOverride,
-    NumberFormat
+    NumberFormat,
+    ImageExpression
 };
 
 class Expression {
@@ -172,9 +177,14 @@ public:
 
     Kind getKind() const { return kind; };
     type::Type getType() const { return type; };
-    
+
     EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> colorRampParameter) const;
+    EvaluationResult evaluate(optional<float> zoom,
+                              const Feature& feature,
+                              optional<double> colorRampParameter,
+                              const std::set<std::string>& availableImages) const;
     EvaluationResult evaluate(optional<mbgl::Value> accumulated, const Feature& feature) const;
+
     /**
      * Statically analyze the expression, attempting to enumerate possible outputs. Returns
      * an array of values plus the sentinel null optional value, used to indicate that the

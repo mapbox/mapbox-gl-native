@@ -26,14 +26,14 @@ public:
 
     ResultType operator()(const style::PropertyExpression<T>& expression) const {
         if (useIntegerZoom) {  // Compiler will optimize out the unused branch.
-            if (!expression.isFeatureConstant()) {
+            if (!expression.isFeatureConstant() || !expression.isRuntimeConstant()) {
                 auto returnExpression = expression;
                 returnExpression.useIntegerZoom = true;
                 return ResultType(returnExpression);
-            } 
+            }
             return ResultType(expression.evaluate(floor(parameters.z)));
         } else {
-            if (!expression.isFeatureConstant()) {
+            if (!expression.isFeatureConstant() || !expression.isRuntimeConstant()) {
                 return ResultType(expression);
             }
             return ResultType(expression.evaluate(parameters.z));
@@ -63,7 +63,7 @@ public:
     }
 
     ResultType operator()(const style::PropertyExpression<T>& expression) const {
-        if (!expression.isFeatureConstant()) {
+        if (!expression.isFeatureConstant() || !expression.isRuntimeConstant()) {
             return ResultType(expression);
         } else {
             const T evaluated = expression.evaluate(floor(parameters.z));

@@ -64,7 +64,7 @@ void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBu
 // Paint properties
 
 PropertyValue<Color> HillshadeLayer::getDefaultHillshadeAccentColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& HillshadeLayer::getHillshadeAccentColor() const {
@@ -91,7 +91,7 @@ TransitionOptions HillshadeLayer::getHillshadeAccentColorTransition() const {
 }
 
 PropertyValue<float> HillshadeLayer::getDefaultHillshadeExaggeration() {
-    return { 0.5 };
+    return {0.5};
 }
 
 const PropertyValue<float>& HillshadeLayer::getHillshadeExaggeration() const {
@@ -118,7 +118,7 @@ TransitionOptions HillshadeLayer::getHillshadeExaggerationTransition() const {
 }
 
 PropertyValue<Color> HillshadeLayer::getDefaultHillshadeHighlightColor() {
-    return { Color::white() };
+    return {Color::white()};
 }
 
 const PropertyValue<Color>& HillshadeLayer::getHillshadeHighlightColor() const {
@@ -145,7 +145,7 @@ TransitionOptions HillshadeLayer::getHillshadeHighlightColorTransition() const {
 }
 
 PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getDefaultHillshadeIlluminationAnchor() {
-    return { HillshadeIlluminationAnchorType::Viewport };
+    return {HillshadeIlluminationAnchorType::Viewport};
 }
 
 const PropertyValue<HillshadeIlluminationAnchorType>& HillshadeLayer::getHillshadeIlluminationAnchor() const {
@@ -172,7 +172,7 @@ TransitionOptions HillshadeLayer::getHillshadeIlluminationAnchorTransition() con
 }
 
 PropertyValue<float> HillshadeLayer::getDefaultHillshadeIlluminationDirection() {
-    return { 335 };
+    return {335};
 }
 
 const PropertyValue<float>& HillshadeLayer::getHillshadeIlluminationDirection() const {
@@ -199,7 +199,7 @@ TransitionOptions HillshadeLayer::getHillshadeIlluminationDirectionTransition() 
 }
 
 PropertyValue<Color> HillshadeLayer::getDefaultHillshadeShadowColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& HillshadeLayer::getHillshadeShadowColor() const {
@@ -320,7 +320,8 @@ optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const 
     
     if (property == Property::HillshadeIlluminationAnchor) {
         Error error;
-        optional<PropertyValue<HillshadeIlluminationAnchorType>> typedValue = convert<PropertyValue<HillshadeIlluminationAnchorType>>(value, error, false, false);
+        optional<PropertyValue<HillshadeIlluminationAnchorType>> typedValue =
+            convert<PropertyValue<HillshadeIlluminationAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }

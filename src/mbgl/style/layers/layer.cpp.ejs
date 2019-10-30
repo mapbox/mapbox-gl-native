@@ -77,6 +77,15 @@ layerCapabilities['heatmap']        = defaults.require('Source')
                                               .set('TileKind', 'Geometry')
                                               .finalize();
 layerCapabilities['raster']         = defaults.require('Source').set('TileKind', 'Raster').finalize();
+
+// Splits lines that are over 120 characters at the firts occurance of '='.
+const split120Line = line => {
+    if (line.length > 120) {
+        return line.replace('=', '=\n           ');
+    }
+    return line;
+};
+
 %>
 // static
 const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::staticTypeInfo() noexcept {
@@ -155,7 +164,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(const <%- pro
     std::string rawValue = R"JSON(<%- JSON.stringify(property.default) %>)JSON";
     return *conversion::convertJSON<<%- propertyValueType(property)%>>(rawValue, error);
 <% } else { -%>
-    return { <%- defaultValue(property) %> };
+    return {<%- defaultValue(property) %>};
 <% } -%>
 }
 
@@ -243,7 +252,7 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
     %>
     if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
         Error error;
-        <%- key %>;
+        <%- split120Line(key) %>;
         if (!typedValue) {
             return error;
         }
@@ -323,7 +332,7 @@ optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string&
     %>
     if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
         Error error;
-        <%- key %>;
+        <%- split120Line(key) %>;
         if (!typedValue) {
             return error;
         }

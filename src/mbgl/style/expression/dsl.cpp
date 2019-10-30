@@ -1,14 +1,15 @@
-#include <mbgl/style/expression/dsl.hpp>
-#include <mbgl/style/expression/dsl_impl.hpp>
-#include <mbgl/style/expression/error.hpp>
-#include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/assertion.hpp>
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/comparison.hpp>
-#include <mbgl/style/expression/step.hpp>
-#include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/dsl_impl.hpp>
+#include <mbgl/style/expression/error.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
+#include <mbgl/style/expression/image_expression.hpp>
+#include <mbgl/style/expression/interpolate.hpp>
+#include <mbgl/style/expression/literal.hpp>
+#include <mbgl/style/expression/step.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <mbgl/style/conversion/json.hpp>
@@ -122,7 +123,11 @@ std::unique_ptr<Expression> toFormatted(std::unique_ptr<Expression> value,
                                         std::unique_ptr<Expression> def) {
     return coercion(type::Formatted, std::move(value), std::move(def));
 }
-    
+
+std::unique_ptr<Expression> toImage(std::unique_ptr<Expression> value, std::unique_ptr<Expression> def) {
+    return coercion(type::Image, std::move(value), std::move(def));
+}
+
 std::unique_ptr<Expression> get(const char* value) {
     return get(literal(value));
 }
@@ -235,6 +240,14 @@ std::unique_ptr<Expression> format(std::unique_ptr<Expression> input) {
     std::vector<FormatExpressionSection> sections;
     sections.emplace_back(std::move(input), nullopt, nullopt, nullopt);
     return std::make_unique<FormatExpression>(sections);
+}
+
+std::unique_ptr<Expression> image(const char* value) {
+    return std::make_unique<Literal>(Image(value));
+}
+
+std::unique_ptr<Expression> image(std::unique_ptr<Expression> expression) {
+    return std::make_unique<ImageExpression>(std::move(expression));
 }
 
 } // namespace dsl

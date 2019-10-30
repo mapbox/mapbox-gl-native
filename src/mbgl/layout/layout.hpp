@@ -38,6 +38,7 @@ public:
     const BucketParameters& bucketParameters;
     GlyphDependencies& glyphDependencies;
     ImageDependencies& imageDependencies;
+    std::set<std::string>& availableImages;
 };
 
 } // namespace mbgl

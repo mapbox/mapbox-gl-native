@@ -129,7 +129,7 @@ void LineLayer::setLineRoundLimit(const PropertyValue<float>& value) {
 // Paint properties
 
 PropertyValue<float> LineLayer::getDefaultLineBlur() {
-    return { 0 };
+    return {0};
 }
 
 const PropertyValue<float>& LineLayer::getLineBlur() const {
@@ -156,7 +156,7 @@ TransitionOptions LineLayer::getLineBlurTransition() const {
 }
 
 PropertyValue<Color> LineLayer::getDefaultLineColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& LineLayer::getLineColor() const {
@@ -183,7 +183,7 @@ TransitionOptions LineLayer::getLineColorTransition() const {
 }
 
 PropertyValue<std::vector<float>> LineLayer::getDefaultLineDasharray() {
-    return { {  } };
+    return {{}};
 }
 
 const PropertyValue<std::vector<float>>& LineLayer::getLineDasharray() const {
@@ -210,7 +210,7 @@ TransitionOptions LineLayer::getLineDasharrayTransition() const {
 }
 
 PropertyValue<float> LineLayer::getDefaultLineGapWidth() {
-    return { 0 };
+    return {0};
 }
 
 const PropertyValue<float>& LineLayer::getLineGapWidth() const {
@@ -237,7 +237,7 @@ TransitionOptions LineLayer::getLineGapWidthTransition() const {
 }
 
 ColorRampPropertyValue LineLayer::getDefaultLineGradient() {
-    return { {} };
+    return {{}};
 }
 
 const ColorRampPropertyValue& LineLayer::getLineGradient() const {
@@ -264,7 +264,7 @@ TransitionOptions LineLayer::getLineGradientTransition() const {
 }
 
 PropertyValue<float> LineLayer::getDefaultLineOffset() {
-    return { 0 };
+    return {0};
 }
 
 const PropertyValue<float>& LineLayer::getLineOffset() const {
@@ -291,7 +291,7 @@ TransitionOptions LineLayer::getLineOffsetTransition() const {
 }
 
 PropertyValue<float> LineLayer::getDefaultLineOpacity() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& LineLayer::getLineOpacity() const {
@@ -317,15 +317,15 @@ TransitionOptions LineLayer::getLineOpacityTransition() const {
     return impl().paint.template get<LineOpacity>().options;
 }
 
-PropertyValue<std::string> LineLayer::getDefaultLinePattern() {
-    return { "" };
+PropertyValue<expression::Image> LineLayer::getDefaultLinePattern() {
+    return {{}};
 }
 
-const PropertyValue<std::string>& LineLayer::getLinePattern() const {
+const PropertyValue<expression::Image>& LineLayer::getLinePattern() const {
     return impl().paint.template get<LinePattern>().value;
 }
 
-void LineLayer::setLinePattern(const PropertyValue<std::string>& value) {
+void LineLayer::setLinePattern(const PropertyValue<expression::Image>& value) {
     if (value == getLinePattern())
         return;
     auto impl_ = mutableImpl();
@@ -345,7 +345,7 @@ TransitionOptions LineLayer::getLinePatternTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> LineLayer::getDefaultLineTranslate() {
-    return { {{ 0, 0 }} };
+    return {{{0, 0}}};
 }
 
 const PropertyValue<std::array<float, 2>>& LineLayer::getLineTranslate() const {
@@ -372,7 +372,7 @@ TransitionOptions LineLayer::getLineTranslateTransition() const {
 }
 
 PropertyValue<TranslateAnchorType> LineLayer::getDefaultLineTranslateAnchor() {
-    return { TranslateAnchorType::Map };
+    return {TranslateAnchorType::Map};
 }
 
 const PropertyValue<TranslateAnchorType>& LineLayer::getLineTranslateAnchor() const {
@@ -399,7 +399,7 @@ TransitionOptions LineLayer::getLineTranslateAnchorTransition() const {
 }
 
 PropertyValue<float> LineLayer::getDefaultLineWidth() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& LineLayer::getLineWidth() const {
@@ -552,7 +552,8 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::LineDasharray) {
         Error error;
-        optional<PropertyValue<std::vector<float>>> typedValue = convert<PropertyValue<std::vector<float>>>(value, error, false, false);
+        optional<PropertyValue<std::vector<float>>> typedValue =
+            convert<PropertyValue<std::vector<float>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
@@ -576,7 +577,8 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::LinePattern) {
         Error error;
-        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, false);
+        optional<PropertyValue<expression::Image>> typedValue =
+            convert<PropertyValue<expression::Image>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
@@ -588,7 +590,8 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::LineTranslate) {
         Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        optional<PropertyValue<std::array<float, 2>>> typedValue =
+            convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
@@ -600,7 +603,8 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::LineTranslateAnchor) {
         Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        optional<PropertyValue<TranslateAnchorType>> typedValue =
+            convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }

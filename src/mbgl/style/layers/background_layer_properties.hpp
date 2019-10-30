@@ -24,8 +24,8 @@ struct BackgroundOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct BackgroundPattern : CrossFadedPaintProperty<std::string> {
-    static std::string defaultValue() { return ""; }
+struct BackgroundPattern : CrossFadedPaintProperty<expression::Image> {
+    static expression::Image defaultValue() { return {}; }
 };
 
 class BackgroundPaintProperties : public Properties<

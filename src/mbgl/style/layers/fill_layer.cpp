@@ -64,7 +64,7 @@ void FillLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>
 // Paint properties
 
 PropertyValue<bool> FillLayer::getDefaultFillAntialias() {
-    return { true };
+    return {true};
 }
 
 const PropertyValue<bool>& FillLayer::getFillAntialias() const {
@@ -91,7 +91,7 @@ TransitionOptions FillLayer::getFillAntialiasTransition() const {
 }
 
 PropertyValue<Color> FillLayer::getDefaultFillColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& FillLayer::getFillColor() const {
@@ -118,7 +118,7 @@ TransitionOptions FillLayer::getFillColorTransition() const {
 }
 
 PropertyValue<float> FillLayer::getDefaultFillOpacity() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& FillLayer::getFillOpacity() const {
@@ -145,7 +145,7 @@ TransitionOptions FillLayer::getFillOpacityTransition() const {
 }
 
 PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
-    return { {} };
+    return {{}};
 }
 
 const PropertyValue<Color>& FillLayer::getFillOutlineColor() const {
@@ -171,15 +171,15 @@ TransitionOptions FillLayer::getFillOutlineColorTransition() const {
     return impl().paint.template get<FillOutlineColor>().options;
 }
 
-PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
-    return { "" };
+PropertyValue<expression::Image> FillLayer::getDefaultFillPattern() {
+    return {{}};
 }
 
-const PropertyValue<std::string>& FillLayer::getFillPattern() const {
+const PropertyValue<expression::Image>& FillLayer::getFillPattern() const {
     return impl().paint.template get<FillPattern>().value;
 }
 
-void FillLayer::setFillPattern(const PropertyValue<std::string>& value) {
+void FillLayer::setFillPattern(const PropertyValue<expression::Image>& value) {
     if (value == getFillPattern())
         return;
     auto impl_ = mutableImpl();
@@ -199,7 +199,7 @@ TransitionOptions FillLayer::getFillPatternTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
-    return { {{ 0, 0 }} };
+    return {{{0, 0}}};
 }
 
 const PropertyValue<std::array<float, 2>>& FillLayer::getFillTranslate() const {
@@ -226,7 +226,7 @@ TransitionOptions FillLayer::getFillTranslateTransition() const {
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
-    return { TranslateAnchorType::Map };
+    return {TranslateAnchorType::Map};
 }
 
 const PropertyValue<TranslateAnchorType>& FillLayer::getFillTranslateAnchor() const {
@@ -351,7 +351,8 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::FillPattern) {
         Error error;
-        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, false);
+        optional<PropertyValue<expression::Image>> typedValue =
+            convert<PropertyValue<expression::Image>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
@@ -363,7 +364,8 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::FillTranslate) {
         Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        optional<PropertyValue<std::array<float, 2>>> typedValue =
+            convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
@@ -375,7 +377,8 @@ optional<Error> FillLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::FillTranslateAnchor) {
         Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        optional<PropertyValue<TranslateAnchorType>> typedValue =
+            convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }

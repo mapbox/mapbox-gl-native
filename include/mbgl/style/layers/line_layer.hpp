@@ -91,9 +91,9 @@ public:
     void setLineOpacityTransition(const TransitionOptions&);
     TransitionOptions getLineOpacityTransition() const;
 
-    static PropertyValue<std::string> getDefaultLinePattern();
-    const PropertyValue<std::string>& getLinePattern() const;
-    void setLinePattern(const PropertyValue<std::string>&);
+    static PropertyValue<expression::Image> getDefaultLinePattern();
+    const PropertyValue<expression::Image>& getLinePattern() const;
+    void setLinePattern(const PropertyValue<expression::Image>&);
     void setLinePatternTransition(const TransitionOptions&);
     TransitionOptions getLinePatternTransition() const;
 

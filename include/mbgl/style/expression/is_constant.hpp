@@ -30,6 +30,8 @@ bool isGlobalPropertyConstant(const Expression& expression, const T& properties)
 bool isFeatureConstant(const Expression& expression);
 bool isZoomConstant(const Expression& e);
 
+// Returns true if expression does not depend on information provided by the runtime.
+bool isRuntimeConstant(const Expression& e);
 
 } // namespace expression
 } // namespace style

@@ -40,9 +40,9 @@ public:
     void setBackgroundOpacityTransition(const TransitionOptions&);
     TransitionOptions getBackgroundOpacityTransition() const;
 
-    static PropertyValue<std::string> getDefaultBackgroundPattern();
-    const PropertyValue<std::string>& getBackgroundPattern() const;
-    void setBackgroundPattern(const PropertyValue<std::string>&);
+    static PropertyValue<expression::Image> getDefaultBackgroundPattern();
+    const PropertyValue<expression::Image>& getBackgroundPattern() const;
+    void setBackgroundPattern(const PropertyValue<expression::Image>&);
     void setBackgroundPatternTransition(const TransitionOptions&);
     TransitionOptions getBackgroundPatternTransition() const;
 
