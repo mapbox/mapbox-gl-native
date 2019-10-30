@@ -684,6 +684,7 @@ jobs:
             mkdir abc
             cp -r mapbox-gl-js/test/integration/query-tests/fill/default/ abc/
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              gcloud components update
               gcloud alpha firebase test android models list
               gcloud alpha firebase test android run --app render-test/android/app/build/outputs/apk/debug/app-debug.apk \
                 --device-ids flo --os-version-ids 21 --locales en \
