@@ -45,6 +45,10 @@ optional<std::string> GeoJSONSource::getURL() const {
     return url;
 }
 
+const GeoJSONOptions& GeoJSONSource::getOptions() const {
+    return impl().getOptions();
+}
+
 void GeoJSONSource::loadDescription(FileSource& fileSource) {
     if (!url) {
         loaded = true;
