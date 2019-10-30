@@ -95,7 +95,7 @@ Placement::Placement(const TransformState& state_,
                      style::TransitionOptions transitionOptions_,
                      const bool crossSourceCollisions,
                      optional<Immutable<Placement>> prevPlacement_)
-    : collisionIndex(state_),
+    : collisionIndex(state_, mapMode_),
       mapMode(mapMode_),
       transitionOptions(std::move(transitionOptions_)),
       placementZoom(state_.getZoom()),
