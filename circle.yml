@@ -687,8 +687,7 @@ jobs:
               gcloud alpha firebase test android models list
               gcloud alpha firebase test android run --app render-test/android/app/build/outputs/apk/debug/app-debug.apk \
                 --device-ids flo --os-version-ids 21 --locales en \
-                --other-files abc/default/expected.json=/sdcard/render-test/mapbox-gl-js/test/integration/query-tests/default/ \
-                --other-files abc/default/style.json=/sdcard/render-test/mapbox-gl-js/test/integration/query-tests/default/
+                --other-files [abc/default=/sdcard/render-test/mapbox-gl-js/test/integration/query-tests/default/]
             fi
       - next-save    
   next-sanity-checks:
