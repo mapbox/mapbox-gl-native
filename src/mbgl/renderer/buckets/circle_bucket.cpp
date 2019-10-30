@@ -113,12 +113,15 @@ float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
     return radius + stroke + util::length(translate[0], translate[1]);
 }
 
-void CircleBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
-                          const ImagePositions& imagePositions) {
+void CircleBucket::update(const FeatureStates& states,
+                          const GeometryTileLayer& layer,
+                          const std::string& layerID,
+                          const ImagePositions& imagePositions,
+                          GeometryTile& tile) {
     auto it = paintPropertyBinders.find(layerID);
     bool updated = false;
     if (it != paintPropertyBinders.end()) {
-        updated |= it->second.updateVertexVectors(states, layer, imagePositions);
+        updated |= it->second.updateVertexVectors(states, layer, imagePositions, tile);
     }
     stateChanged = updated;
 }

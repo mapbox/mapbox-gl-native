@@ -552,12 +552,15 @@ float LineBucket::getQueryRadius(const RenderLayer& layer) const {
     return lineWidth / 2.0f + std::abs(offset) + util::length(translate[0], translate[1]);
 }
 
-void LineBucket::update(const FeatureStates& states, const GeometryTileLayer& layer, const std::string& layerID,
-                        const ImagePositions& imagePositions) {
+void LineBucket::update(const FeatureStates& states,
+                        const GeometryTileLayer& layer,
+                        const std::string& layerID,
+                        const ImagePositions& imagePositions,
+                        GeometryTile& tile) {
     auto it = paintPropertyBinders.find(layerID);
     bool updated = false;
     if (it != paintPropertyBinders.end()) {
-        updated |= it->second.updateVertexVectors(states, layer, imagePositions);
+        updated |= it->second.updateVertexVectors(states, layer, imagePositions, tile);
     }
     stateChanged = updated;
 }

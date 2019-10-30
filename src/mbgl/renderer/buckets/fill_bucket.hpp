@@ -35,7 +35,11 @@ public:
 
     float getQueryRadius(const RenderLayer&) const override;
 
-    void update(const FeatureStates&, const GeometryTileLayer&, const std::string&, const ImagePositions&) override;
+    void update(const FeatureStates&,
+                const GeometryTileLayer&,
+                const std::string&,
+                const ImagePositions&,
+                GeometryTile&) override;
 
     gfx::VertexVector<FillLayoutVertex> vertices;
     gfx::IndexVector<gfx::Lines> lines;

@@ -27,7 +27,11 @@ public:
 
     float getQueryRadius(const RenderLayer&) const override;
 
-    void update(const FeatureStates&, const GeometryTileLayer&, const std::string&, const ImagePositions&) override;
+    void update(const FeatureStates&,
+                const GeometryTileLayer&,
+                const std::string&,
+                const ImagePositions&,
+                GeometryTile&) override;
 
     gfx::VertexVector<CircleLayoutVertex> vertices;
     gfx::IndexVector<gfx::Triangles> triangles;
