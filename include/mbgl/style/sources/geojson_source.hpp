@@ -60,6 +60,7 @@ public:
     void setGeoJSONData(std::shared_ptr<GeoJSONData>);
 
     optional<std::string> getURL() const;
+    const GeoJSONOptions& getOptions() const;
 
     class Impl;
     const Impl& impl() const;
