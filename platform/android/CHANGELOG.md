@@ -9,6 +9,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ### Performance improvements
  - Enable incremental vacuum for the offline database in order to make data removal requests faster and to avoid the excessive disk space usage (creating a backup file on VACUUM call) [#15837](https://github.com/mapbox/mapbox-gl-native/pull/15837)
+ - Convert GeoJSON features to tiles in a background thread and thus unblock the UI thread on updating the GeoJsonSource [#15871](https://github.com/mapbox/mapbox-gl-native/pull/15871)
 
 ## 8.5.0-alpha.2 - October 10, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.5.0-alpha.1...android-v8.5.0-alpha.2) since [Mapbox Maps SDK for Android v8.5.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.5.0-alpha.1):
