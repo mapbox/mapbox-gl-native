@@ -53,7 +53,7 @@ struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::stroke_wid
 };
 
 struct CircleTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct CircleTranslateAnchor : PaintProperty<TranslateAnchorType> {

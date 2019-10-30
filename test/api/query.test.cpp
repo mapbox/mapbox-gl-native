@@ -55,7 +55,7 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
     source->loadDescription(*test.fileSource);
 
     auto clusterLayer = std::make_unique<SymbolLayer>("cluster_layer"s, "cluster_source"s);
-    clusterLayer->setIconImage("test-icon"s);
+    clusterLayer->setIconImage({"test-icon"s});
     clusterLayer->setIconSize(12.0f);
 
     test.map.jumpTo(CameraOptions().withCenter(coordinate).withZoom(0.0));

@@ -104,7 +104,8 @@ TestRunOutput runExpressionTest(TestData& data, const std::string& rootPath, con
         std::vector<Value> outputs;
         if (!data.inputs.empty()) {
             for (const auto& input : data.inputs) {
-                auto evaluationResult = expression->evaluate(input.zoom, input.feature, input.heatmapDensity);
+                auto evaluationResult =
+                    expression->evaluate(input.zoom, input.feature, input.heatmapDensity, input.availableImages);
                 if (!evaluationResult) {
                     std::unordered_map<std::string, Value> error{{"error", Value{evaluationResult.error().message}}};
                     outputs.emplace_back(Value{std::move(error)});

@@ -42,9 +42,9 @@ public:
     const PropertyValue<bool>& getIconIgnorePlacement() const;
     void setIconIgnorePlacement(const PropertyValue<bool>&);
 
-    static PropertyValue<std::string> getDefaultIconImage();
-    const PropertyValue<std::string>& getIconImage() const;
-    void setIconImage(const PropertyValue<std::string>&);
+    static PropertyValue<expression::Image> getDefaultIconImage();
+    const PropertyValue<expression::Image>& getIconImage() const;
+    void setIconImage(const PropertyValue<expression::Image>&);
 
     static PropertyValue<bool> getDefaultIconKeepUpright();
     const PropertyValue<bool>& getIconKeepUpright() const;

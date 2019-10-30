@@ -151,6 +151,8 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/style/expression/format_section_override.hpp
     ${MBGL_ROOT}/include/mbgl/style/expression/formatted.hpp
     ${MBGL_ROOT}/include/mbgl/style/expression/get_covering_stops.hpp
+    ${MBGL_ROOT}/include/mbgl/style/expression/image.hpp
+    ${MBGL_ROOT}/include/mbgl/style/expression/image_expression.hpp
     ${MBGL_ROOT}/include/mbgl/style/expression/interpolate.hpp
     ${MBGL_ROOT}/include/mbgl/style/expression/interpolator.hpp
     ${MBGL_ROOT}/include/mbgl/style/expression/is_constant.hpp
@@ -613,6 +615,8 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/style/expression/format_expression.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/formatted.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/get_covering_stops.cpp
+    ${MBGL_ROOT}/src/mbgl/style/expression/image.cpp
+    ${MBGL_ROOT}/src/mbgl/style/expression/image_expression.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/interpolate.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/is_constant.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/is_expression.cpp

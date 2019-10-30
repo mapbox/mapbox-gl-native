@@ -1,7 +1,7 @@
 #include <mbgl/style/expression/dsl.hpp>
-#include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/format_expression.hpp>
-#include <mbgl/style/style_impl.hpp>
+#include <mbgl/style/expression/image.hpp>
+#include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -16,12 +16,13 @@
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/test/util.hpp>
-#include <mbgl/test/stub_layer_observer.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/stub_layer_observer.hpp>
+#include <mbgl/test/util.hpp>
 #include <mbgl/util/color.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <memory>
 
@@ -37,7 +38,7 @@ const auto color = Color { 1, 0, 0, 1 };
 const auto opacity = 1.0f;
 const auto radius = 1.0f;
 const auto blur = 1.0f;
-const auto pattern = std::string { "foo" };
+const auto pattern = PropertyValue<expression::Image>{"foo"};
 const auto antialias = false;
 const auto translate = std::array<float, 2> {{ 0, 0 }};
 const auto translateAnchor = TranslateAnchorType::Map;

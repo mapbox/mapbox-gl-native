@@ -30,7 +30,7 @@ FillLayerFactory::createLayout(const LayoutParameters& parameters,
                                const std::vector<Immutable<style::LayerProperties>>& group) noexcept {
     using namespace style;
     using LayoutType = PatternLayout<FillBucket, FillLayerProperties, FillPattern>;
-    return std::make_unique<LayoutType>(parameters.bucketParameters, group, std::move(layer), parameters.imageDependencies);
+    return std::make_unique<LayoutType>(parameters.bucketParameters, group, std::move(layer), parameters);
 }
 
 std::unique_ptr<RenderLayer> FillLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {

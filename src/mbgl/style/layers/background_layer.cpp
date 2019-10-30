@@ -64,7 +64,7 @@ void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringB
 // Paint properties
 
 PropertyValue<Color> BackgroundLayer::getDefaultBackgroundColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& BackgroundLayer::getBackgroundColor() const {
@@ -91,7 +91,7 @@ TransitionOptions BackgroundLayer::getBackgroundColorTransition() const {
 }
 
 PropertyValue<float> BackgroundLayer::getDefaultBackgroundOpacity() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& BackgroundLayer::getBackgroundOpacity() const {
@@ -117,15 +117,15 @@ TransitionOptions BackgroundLayer::getBackgroundOpacityTransition() const {
     return impl().paint.template get<BackgroundOpacity>().options;
 }
 
-PropertyValue<std::string> BackgroundLayer::getDefaultBackgroundPattern() {
-    return { "" };
+PropertyValue<expression::Image> BackgroundLayer::getDefaultBackgroundPattern() {
+    return {{}};
 }
 
-const PropertyValue<std::string>& BackgroundLayer::getBackgroundPattern() const {
+const PropertyValue<expression::Image>& BackgroundLayer::getBackgroundPattern() const {
     return impl().paint.template get<BackgroundPattern>().value;
 }
 
-void BackgroundLayer::setBackgroundPattern(const PropertyValue<std::string>& value) {
+void BackgroundLayer::setBackgroundPattern(const PropertyValue<expression::Image>& value) {
     if (value == getBackgroundPattern())
         return;
     auto impl_ = mutableImpl();
@@ -208,7 +208,8 @@ optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const
     
     if (property == Property::BackgroundPattern) {
         Error error;
-        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
+        optional<PropertyValue<expression::Image>> typedValue =
+            convert<PropertyValue<expression::Image>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }

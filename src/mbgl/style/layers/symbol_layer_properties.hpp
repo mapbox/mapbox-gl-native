@@ -31,9 +31,9 @@ struct IconIgnorePlacement : LayoutProperty<bool> {
     static bool defaultValue() { return false; }
 };
 
-struct IconImage : DataDrivenLayoutProperty<std::string> {
+struct IconImage : DataDrivenLayoutProperty<expression::Image> {
     static constexpr const char *name() { return "icon-image"; }
-    static std::string defaultValue() { return ""; }
+    static expression::Image defaultValue() { return {}; }
 };
 
 struct IconKeepUpright : LayoutProperty<bool> {
@@ -43,7 +43,7 @@ struct IconKeepUpright : LayoutProperty<bool> {
 
 struct IconOffset : DataDrivenLayoutProperty<std::array<float, 2>> {
     static constexpr const char *name() { return "icon-offset"; }
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct IconOptional : LayoutProperty<bool> {
@@ -83,7 +83,7 @@ struct IconTextFit : LayoutProperty<IconTextFitType> {
 
 struct IconTextFitPadding : LayoutProperty<std::array<float, 4>> {
     static constexpr const char *name() { return "icon-text-fit-padding"; }
-    static std::array<float, 4> defaultValue() { return {{ 0, 0, 0, 0 }}; }
+    static std::array<float, 4> defaultValue() { return {{0, 0, 0, 0}}; }
 };
 
 struct SymbolAvoidEdges : LayoutProperty<bool> {
@@ -123,12 +123,12 @@ struct TextAnchor : DataDrivenLayoutProperty<SymbolAnchorType> {
 
 struct TextField : DataDrivenLayoutProperty<expression::Formatted> {
     static constexpr const char *name() { return "text-field"; }
-    static expression::Formatted defaultValue() { return ""; }
+    static expression::Formatted defaultValue() { return {}; }
 };
 
 struct TextFont : DataDrivenLayoutProperty<std::vector<std::string>> {
     static constexpr const char *name() { return "text-font"; }
-    static std::vector<std::string> defaultValue() { return { "Open Sans Regular", "Arial Unicode MS Regular" }; }
+    static std::vector<std::string> defaultValue() { return {{"Open Sans Regular"}, {"Arial Unicode MS Regular"}}; }
 };
 
 struct TextIgnorePlacement : LayoutProperty<bool> {
@@ -168,7 +168,7 @@ struct TextMaxWidth : DataDrivenLayoutProperty<float> {
 
 struct TextOffset : DataDrivenLayoutProperty<std::array<float, 2>> {
     static constexpr const char *name() { return "text-offset"; }
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct TextOptional : LayoutProperty<bool> {
@@ -213,12 +213,12 @@ struct TextTransform : DataDrivenLayoutProperty<TextTransformType> {
 
 struct TextVariableAnchor : LayoutProperty<std::vector<TextVariableAnchorType>> {
     static constexpr const char *name() { return "text-variable-anchor"; }
-    static std::vector<TextVariableAnchorType> defaultValue() { return {  }; }
+    static std::vector<TextVariableAnchorType> defaultValue() { return {}; }
 };
 
 struct TextWritingMode : LayoutProperty<std::vector<TextWritingModeType>> {
     static constexpr const char *name() { return "text-writing-mode"; }
-    static std::vector<TextWritingModeType> defaultValue() { return {  }; }
+    static std::vector<TextWritingModeType> defaultValue() { return {}; }
 };
 
 struct IconColor : DataDrivenPaintProperty<Color, attributes::fill_color, uniforms::fill_color> {
@@ -242,7 +242,7 @@ struct IconOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniform
 };
 
 struct IconTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct IconTranslateAnchor : PaintProperty<TranslateAnchorType> {
@@ -273,7 +273,7 @@ struct TextOpacity : DataDrivenPaintProperty<float, attributes::opacity, uniform
 };
 
 struct TextTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return {{0, 0}}; }
 };
 
 struct TextTranslateAnchor : PaintProperty<TranslateAnchorType> {

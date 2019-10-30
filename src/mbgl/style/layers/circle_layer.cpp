@@ -64,7 +64,7 @@ void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffe
 // Paint properties
 
 PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
-    return { 0 };
+    return {0};
 }
 
 const PropertyValue<float>& CircleLayer::getCircleBlur() const {
@@ -91,7 +91,7 @@ TransitionOptions CircleLayer::getCircleBlurTransition() const {
 }
 
 PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& CircleLayer::getCircleColor() const {
@@ -118,7 +118,7 @@ TransitionOptions CircleLayer::getCircleColorTransition() const {
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& CircleLayer::getCircleOpacity() const {
@@ -145,7 +145,7 @@ TransitionOptions CircleLayer::getCircleOpacityTransition() const {
 }
 
 PropertyValue<AlignmentType> CircleLayer::getDefaultCirclePitchAlignment() {
-    return { AlignmentType::Viewport };
+    return {AlignmentType::Viewport};
 }
 
 const PropertyValue<AlignmentType>& CircleLayer::getCirclePitchAlignment() const {
@@ -172,7 +172,7 @@ TransitionOptions CircleLayer::getCirclePitchAlignmentTransition() const {
 }
 
 PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
-    return { CirclePitchScaleType::Map };
+    return {CirclePitchScaleType::Map};
 }
 
 const PropertyValue<CirclePitchScaleType>& CircleLayer::getCirclePitchScale() const {
@@ -199,7 +199,7 @@ TransitionOptions CircleLayer::getCirclePitchScaleTransition() const {
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleRadius() {
-    return { 5 };
+    return {5};
 }
 
 const PropertyValue<float>& CircleLayer::getCircleRadius() const {
@@ -226,7 +226,7 @@ TransitionOptions CircleLayer::getCircleRadiusTransition() const {
 }
 
 PropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& CircleLayer::getCircleStrokeColor() const {
@@ -253,7 +253,7 @@ TransitionOptions CircleLayer::getCircleStrokeColorTransition() const {
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& CircleLayer::getCircleStrokeOpacity() const {
@@ -280,7 +280,7 @@ TransitionOptions CircleLayer::getCircleStrokeOpacityTransition() const {
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
-    return { 0 };
+    return {0};
 }
 
 const PropertyValue<float>& CircleLayer::getCircleStrokeWidth() const {
@@ -307,7 +307,7 @@ TransitionOptions CircleLayer::getCircleStrokeWidthTransition() const {
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
-    return { {{ 0, 0 }} };
+    return {{{0, 0}}};
 }
 
 const PropertyValue<std::array<float, 2>>& CircleLayer::getCircleTranslate() const {
@@ -334,7 +334,7 @@ TransitionOptions CircleLayer::getCircleTranslateTransition() const {
 }
 
 PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor() {
-    return { TranslateAnchorType::Map };
+    return {TranslateAnchorType::Map};
 }
 
 const PropertyValue<TranslateAnchorType>& CircleLayer::getCircleTranslateAnchor() const {
@@ -497,7 +497,8 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
     
     if (property == Property::CirclePitchScale) {
         Error error;
-        optional<PropertyValue<CirclePitchScaleType>> typedValue = convert<PropertyValue<CirclePitchScaleType>>(value, error, false, false);
+        optional<PropertyValue<CirclePitchScaleType>> typedValue =
+            convert<PropertyValue<CirclePitchScaleType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
@@ -509,7 +510,8 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
     
     if (property == Property::CircleTranslate) {
         Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        optional<PropertyValue<std::array<float, 2>>> typedValue =
+            convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
@@ -521,7 +523,8 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
     
     if (property == Property::CircleTranslateAnchor) {
         Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        optional<PropertyValue<TranslateAnchorType>> typedValue =
+            convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }

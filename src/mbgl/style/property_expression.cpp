@@ -8,6 +8,7 @@ PropertyExpressionBase::PropertyExpressionBase(std::unique_ptr<expression::Expre
       zoomCurve(expression::findZoomCurveChecked(expression.get())) {
     isZoomConstant_ = expression::isZoomConstant(*expression);
     isFeatureConstant_ = expression::isFeatureConstant(*expression);
+    isRuntimeConstant_ = expression::isRuntimeConstant(*expression);
 }
 
 bool PropertyExpressionBase::isZoomConstant() const noexcept {
@@ -18,19 +19,8 @@ bool PropertyExpressionBase::isFeatureConstant() const noexcept {
     return isFeatureConstant_;
 }
 
-bool PropertyExpressionBase::canEvaluateWith(const expression::EvaluationContext& context) const noexcept {
-    if (context.zoom) {
-        if (context.feature != nullptr) {
-            return !isFeatureConstant();
-        }
-        return !isZoomConstant() && isFeatureConstant();
-    }
-
-    if (context.feature != nullptr) {
-        return isZoomConstant() && !isFeatureConstant();
-    }
-
-    return true;
+bool PropertyExpressionBase::isRuntimeConstant() const noexcept {
+    return isRuntimeConstant_;
 }
 
 float PropertyExpressionBase::interpolationFactor(const Range<float>& inputLevels, const float inputValue) const noexcept {

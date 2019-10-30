@@ -49,6 +49,19 @@ bool isZoomConstant(const Expression& e) {
     return isGlobalPropertyConstant(e, std::array<std::string, 1>{{"zoom"}});
 }
 
+bool isRuntimeConstant(const Expression& expression) {
+    if (expression.getKind() == Kind::ImageExpression) {
+        return false;
+    }
+
+    bool runtimeConstant = true;
+    expression.eachChild([&](const Expression& e) {
+        if (runtimeConstant && !isRuntimeConstant(e)) {
+            runtimeConstant = false;
+        }
+    });
+    return runtimeConstant;
+}
 
 } // namespace expression
 } // namespace style

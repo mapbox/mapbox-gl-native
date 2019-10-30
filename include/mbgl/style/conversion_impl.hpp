@@ -2,6 +2,7 @@
 
 #include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/expression/image.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/transition_options.hpp>

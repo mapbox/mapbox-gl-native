@@ -19,11 +19,15 @@ LineString<int16_t> emptyLine;
 
 class SymbolFeatureStub : public SymbolFeature {
 public:
-    SymbolFeatureStub(FeatureIdentifier id_, FeatureType type_, GeometryCollection geometry_,
-                      PropertyMap properties_, optional<std::u16string> text_,
-                      optional<std::string> icon_, std::size_t index_) :
-        SymbolFeature(std::make_unique<StubGeometryTileFeature>(std::move(id_), type_, std::move(geometry_), std::move(properties_)))
-    {
+    SymbolFeatureStub(FeatureIdentifier id_,
+                      FeatureType type_,
+                      GeometryCollection geometry_,
+                      PropertyMap properties_,
+                      optional<std::u16string> text_,
+                      optional<style::expression::Image> icon_,
+                      std::size_t index_)
+        : SymbolFeature(std::make_unique<StubGeometryTileFeature>(
+              std::move(id_), type_, std::move(geometry_), std::move(properties_))) {
         if (text_) {
             formattedText = TaggedString(*text_, SectionOptions(1.0, {}));
         }

@@ -64,7 +64,7 @@ void FillExtrusionLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::Stri
 // Paint properties
 
 PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
-    return { 0 };
+    return {0};
 }
 
 const PropertyValue<float>& FillExtrusionLayer::getFillExtrusionBase() const {
@@ -91,7 +91,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionBaseTransition() const {
 }
 
 PropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
-    return { Color::black() };
+    return {Color::black()};
 }
 
 const PropertyValue<Color>& FillExtrusionLayer::getFillExtrusionColor() const {
@@ -118,7 +118,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionColorTransition() const {
 }
 
 PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
-    return { 0 };
+    return {0};
 }
 
 const PropertyValue<float>& FillExtrusionLayer::getFillExtrusionHeight() const {
@@ -145,7 +145,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionHeightTransition() const {
 }
 
 PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionOpacity() {
-    return { 1 };
+    return {1};
 }
 
 const PropertyValue<float>& FillExtrusionLayer::getFillExtrusionOpacity() const {
@@ -171,15 +171,15 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionOpacityTransition() const 
     return impl().paint.template get<FillExtrusionOpacity>().options;
 }
 
-PropertyValue<std::string> FillExtrusionLayer::getDefaultFillExtrusionPattern() {
-    return { "" };
+PropertyValue<expression::Image> FillExtrusionLayer::getDefaultFillExtrusionPattern() {
+    return {{}};
 }
 
-const PropertyValue<std::string>& FillExtrusionLayer::getFillExtrusionPattern() const {
+const PropertyValue<expression::Image>& FillExtrusionLayer::getFillExtrusionPattern() const {
     return impl().paint.template get<FillExtrusionPattern>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionPattern(const PropertyValue<std::string>& value) {
+void FillExtrusionLayer::setFillExtrusionPattern(const PropertyValue<expression::Image>& value) {
     if (value == getFillExtrusionPattern())
         return;
     auto impl_ = mutableImpl();
@@ -199,7 +199,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionPatternTransition() const 
 }
 
 PropertyValue<std::array<float, 2>> FillExtrusionLayer::getDefaultFillExtrusionTranslate() {
-    return { {{ 0, 0 }} };
+    return {{{0, 0}}};
 }
 
 const PropertyValue<std::array<float, 2>>& FillExtrusionLayer::getFillExtrusionTranslate() const {
@@ -226,7 +226,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateTransition() cons
 }
 
 PropertyValue<TranslateAnchorType> FillExtrusionLayer::getDefaultFillExtrusionTranslateAnchor() {
-    return { TranslateAnchorType::Map };
+    return {TranslateAnchorType::Map};
 }
 
 const PropertyValue<TranslateAnchorType>& FillExtrusionLayer::getFillExtrusionTranslateAnchor() const {
@@ -253,7 +253,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateAnchorTransition(
 }
 
 PropertyValue<bool> FillExtrusionLayer::getDefaultFillExtrusionVerticalGradient() {
-    return { true };
+    return {true};
 }
 
 const PropertyValue<bool>& FillExtrusionLayer::getFillExtrusionVerticalGradient() const {
@@ -382,7 +382,8 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     
     if (property == Property::FillExtrusionPattern) {
         Error error;
-        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, false);
+        optional<PropertyValue<expression::Image>> typedValue =
+            convert<PropertyValue<expression::Image>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
@@ -394,7 +395,8 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     
     if (property == Property::FillExtrusionTranslate) {
         Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        optional<PropertyValue<std::array<float, 2>>> typedValue =
+            convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
@@ -406,7 +408,8 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     
     if (property == Property::FillExtrusionTranslateAnchor) {
         Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        optional<PropertyValue<TranslateAnchorType>> typedValue =
+            convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }

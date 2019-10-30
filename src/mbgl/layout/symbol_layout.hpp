@@ -27,9 +27,8 @@ public:
     SymbolLayout(const BucketParameters&,
                  const std::vector<Immutable<style::LayerProperties>>&,
                  std::unique_ptr<GeometryTileLayer>,
-                 ImageDependencies&,
-                 GlyphDependencies&);
-    
+                 const LayoutParameters& parameters);
+
     ~SymbolLayout() final = default;
 
     void prepareSymbols(const GlyphMap&, const GlyphPositions&,

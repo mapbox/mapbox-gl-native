@@ -36,7 +36,7 @@ struct FormattedSection {
 class Formatted {
 public:
     Formatted() = default;
-    
+
     Formatted(const char* plainU8String) {
         sections.emplace_back(std::string(plainU8String), nullopt, nullopt, nullopt);
     }
