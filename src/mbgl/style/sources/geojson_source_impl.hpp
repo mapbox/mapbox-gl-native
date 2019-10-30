@@ -11,27 +11,15 @@ class CanonicalTileID;
 
 namespace style {
 
-class GeoJSONData {
-public:
-    virtual ~GeoJSONData() = default;
-    virtual mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
-
-    // SuperclusterData
-    virtual mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) = 0;
-    virtual mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
-                                                                   const std::uint32_t limit  = 10u,
-                                                                   const std::uint32_t offset = 0u) = 0;
-    virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
-};
-
 class GeoJSONSource::Impl : public Source::Impl {
 public:
     Impl(std::string id, optional<GeoJSONOptions>);
-    Impl(const GeoJSONSource::Impl&, const GeoJSON&);
+    Impl(const GeoJSONSource::Impl&, std::shared_ptr<GeoJSONData>);
     ~Impl() final;
 
     Range<uint8_t> getZoomRange() const;
     std::weak_ptr<GeoJSONData> getData() const;
+    const GeoJSONOptions& getOptions() const { return options; }
 
     optional<std::string> getAttribution() const final;
 

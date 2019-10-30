@@ -32,8 +32,12 @@ void GeoJSONSource::setURL(const std::string& url_) {
 }
 
 void GeoJSONSource::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
+    setGeoJSONData(GeoJSONData::create(geoJSON, impl().getOptions()));
+}
+
+void GeoJSONSource::setGeoJSONData(std::shared_ptr<GeoJSONData> geoJSONData) {
     req.reset();
-    baseImpl = makeMutable<Impl>(impl(), geoJSON);
+    baseImpl = makeMutable<Impl>(impl(), std::move(geoJSONData));
     observer->onSourceChanged(*this);
 }
 
@@ -62,17 +66,15 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
                 *this, std::make_exception_ptr(std::runtime_error("unexpectedly empty GeoJSON")));
         } else {
             conversion::Error error;
-            optional<GeoJSON> geoJSON = conversion::convertJSON<GeoJSON>(*res.data, error);
-            if (!geoJSON) {
+            std::shared_ptr<GeoJSONData> geoJSONData;
+            if (optional<GeoJSON> geoJSON = conversion::convertJSON<GeoJSON>(*res.data, error)) {
+                geoJSONData = GeoJSONData::create(*geoJSON, impl().getOptions());
+            } else {
+                // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for tiles to load.
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s",
                            error.message.c_str());
-                // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
-                // tiles to load.
-                baseImpl = makeMutable<Impl>(impl(), GeoJSON{ FeatureCollection{} });
-            } else {
-                baseImpl = makeMutable<Impl>(impl(), *geoJSON);
             }
-
+            baseImpl = makeMutable<Impl>(impl(), std::move(geoJSONData));
             loaded = true;
             observer->onSourceLoaded(*this);
         }
