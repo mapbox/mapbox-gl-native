@@ -1,6 +1,6 @@
 {
   "name": "@mapbox/mapbox-gl-native",
-  "version": "4.3.0",
+  "version": "5.0.0",
   "description": "Renders map tiles with Mapbox GL",
   "keywords": [
     "mapbox",
@@ -49,7 +49,7 @@
     "node": ">=6"
   },
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build=false || make node",
+    "install": "node-pre-gyp install --fallback-to-build=false",
     "test": "tape platform/node/test/js/**/*.test.js",
     "test-memory": "node --expose-gc platform/node/test/memory.test.js",
     "test-expressions": "node -r esm platform/node/test/expression.test.js",

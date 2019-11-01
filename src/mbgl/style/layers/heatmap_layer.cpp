@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/heatmap_layer.hpp>
@@ -204,36 +202,45 @@ TransitionOptions HeatmapLayer::getHeatmapWeightTransition() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property : uint8_t {
+    HeatmapColor,
+    HeatmapIntensity,
+    HeatmapOpacity,
+    HeatmapRadius,
+    HeatmapWeight,
+    HeatmapColorTransition,
+    HeatmapIntensityTransition,
+    HeatmapOpacityTransition,
+    HeatmapRadiusTransition,
+    HeatmapWeightTransition,
+};
+
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"heatmap-color", toUint8(Property::HeatmapColor)},
+     {"heatmap-intensity", toUint8(Property::HeatmapIntensity)},
+     {"heatmap-opacity", toUint8(Property::HeatmapOpacity)},
+     {"heatmap-radius", toUint8(Property::HeatmapRadius)},
+     {"heatmap-weight", toUint8(Property::HeatmapWeight)},
+     {"heatmap-color-transition", toUint8(Property::HeatmapColorTransition)},
+     {"heatmap-intensity-transition", toUint8(Property::HeatmapIntensityTransition)},
+     {"heatmap-opacity-transition", toUint8(Property::HeatmapOpacityTransition)},
+     {"heatmap-radius-transition", toUint8(Property::HeatmapRadiusTransition)},
+     {"heatmap-weight-transition", toUint8(Property::HeatmapWeightTransition)}});
+
+constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::HeatmapWeightTransition);
+} // namespace
+
 optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        HeatmapColor,
-        HeatmapIntensity,
-        HeatmapOpacity,
-        HeatmapRadius,
-        HeatmapWeight,
-        HeatmapColorTransition,
-        HeatmapIntensityTransition,
-        HeatmapOpacityTransition,
-        HeatmapRadiusTransition,
-        HeatmapWeightTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "heatmap-color", mbgl::underlying_type(Property::HeatmapColor) },
-        { "heatmap-intensity", mbgl::underlying_type(Property::HeatmapIntensity) },
-        { "heatmap-opacity", mbgl::underlying_type(Property::HeatmapOpacity) },
-        { "heatmap-radius", mbgl::underlying_type(Property::HeatmapRadius) },
-        { "heatmap-weight", mbgl::underlying_type(Property::HeatmapWeight) },
-        { "heatmap-color-transition", mbgl::underlying_type(Property::HeatmapColorTransition) },
-        { "heatmap-intensity-transition", mbgl::underlying_type(Property::HeatmapIntensityTransition) },
-        { "heatmap-opacity-transition", mbgl::underlying_type(Property::HeatmapOpacityTransition) },
-        { "heatmap-radius-transition", mbgl::underlying_type(Property::HeatmapRadiusTransition) },
-        { "heatmap-weight-transition", mbgl::underlying_type(Property::HeatmapWeightTransition) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
-        return Error { "layer doesn't support this property" };
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
+        return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
@@ -295,34 +302,64 @@ optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Co
     if (!transition) {
         return error;
     }
-    
+
     if (property == Property::HeatmapColorTransition) {
         setHeatmapColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HeatmapIntensityTransition) {
         setHeatmapIntensityTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HeatmapOpacityTransition) {
         setHeatmapOpacityTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HeatmapRadiusTransition) {
         setHeatmapRadiusTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::HeatmapWeightTransition) {
         setHeatmapWeightTransition(*transition);
         return nullopt;
     }
-    
 
-    return Error { "layer doesn't support this property" };
+    return Error{"layer doesn't support this property"};
+}
+
+StyleProperty HeatmapLayer::getProperty(const std::string& name) const {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::HeatmapColor:
+            return makeStyleProperty(getHeatmapColor());
+        case Property::HeatmapIntensity:
+            return makeStyleProperty(getHeatmapIntensity());
+        case Property::HeatmapOpacity:
+            return makeStyleProperty(getHeatmapOpacity());
+        case Property::HeatmapRadius:
+            return makeStyleProperty(getHeatmapRadius());
+        case Property::HeatmapWeight:
+            return makeStyleProperty(getHeatmapWeight());
+        case Property::HeatmapColorTransition:
+            return makeStyleProperty(getHeatmapColorTransition());
+        case Property::HeatmapIntensityTransition:
+            return makeStyleProperty(getHeatmapIntensityTransition());
+        case Property::HeatmapOpacityTransition:
+            return makeStyleProperty(getHeatmapOpacityTransition());
+        case Property::HeatmapRadiusTransition:
+            return makeStyleProperty(getHeatmapRadiusTransition());
+        case Property::HeatmapWeightTransition:
+            return makeStyleProperty(getHeatmapWeightTransition());
+    }
+    return {};
 }
 
 optional<Error> HeatmapLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
@@ -339,5 +376,3 @@ Mutable<Layer::Impl> HeatmapLayer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on

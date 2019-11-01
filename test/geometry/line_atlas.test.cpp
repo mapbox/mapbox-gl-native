@@ -13,7 +13,7 @@ TEST(LineAtlas, Random) {
     std::normal_distribution<float> lengthDistribution(3, 5);
 
     for (size_t it = 0; it < 100; it++) {
-        LineAtlas atlas{ Size{ 128, 1024 } };
+        LineAtlas atlas;
         std::vector<float> dasharray;
         dasharray.reserve(8);
         for (size_t j = 0; j < 100; j++) {
@@ -25,7 +25,7 @@ TEST(LineAtlas, Random) {
             const LinePatternCap patternCap =
                 capStyleDistribution(generator) > 0 ? LinePatternCap::Round : LinePatternCap::Square;
 
-            atlas.addDash(dasharray, patternCap);
+            atlas.getDashPatternTexture(dasharray, dasharray, patternCap);
         }
     }
 }

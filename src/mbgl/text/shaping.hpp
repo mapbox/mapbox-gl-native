@@ -45,9 +45,11 @@ public:
 
     // Updates shaped icon's bounds based on shaped text's bounds and provided
     // layout properties.
-    void fitIconToText(const style::SymbolLayoutProperties::Evaluated& layout,
-                       const Shaping& shapedText,
-                       float layoutTextSize);
+    void fitIconToText(const Shaping& shapedText,
+                       const style::IconTextFitType textFit,
+                       const std::array<float, 4>& padding,
+                       const std::array<float, 2>& iconOffset,
+                       const float fontScale);
 
     const ImagePosition& image() const { return _image; }
     float top() const { return _top; }

@@ -164,12 +164,12 @@ void Placement::placeBucket(
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
     optional<CollisionTileBoundaries> avoidEdges;
-    if (mapMode == MapMode::Tile &&
-        (layout.get<style::SymbolAvoidEdges>() ||
-         layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
+    if (mapMode == MapMode::Tile && (layout.get<style::SymbolAvoidEdges>() ||
+                                     layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line ||
+                                     !layout.get<style::TextVariableAnchor>().empty())) {
         avoidEdges = collisionIndex.projectTileBoundaries(posMatrix);
     }
-    
+
     const bool textAllowOverlap = layout.get<style::TextAllowOverlap>();
     const bool iconAllowOverlap = layout.get<style::IconAllowOverlap>();
     // This logic is similar to the "defaultOpacityState" logic below in updateBucketOpacities
@@ -220,7 +220,6 @@ void Placement::placeBucket(
         if (horizontalTextIndex) {
             const PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*horizontalTextIndex);
             const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
-            const CollisionFeature& textCollisionFeature = symbolInstance.textCollisionFeature;
 
             const auto updatePreviousOrientationIfNotPlaced = [&](bool isPlaced) {
                 if (bucket.allowVerticalPlacement && !isPlaced && getPrevPlacement()) {
@@ -282,7 +281,8 @@ void Placement::placeBucket(
 
                 placeText = placed.first;
                 offscreen &= placed.second;
-            } else if (!textCollisionFeature.alongLine && !textCollisionFeature.boxes.empty()) {
+            } else if (!symbolInstance.textCollisionFeature.alongLine &&
+                       !symbolInstance.textCollisionFeature.boxes.empty()) {
                 // If this symbol was in the last placement, shift the previously used
                 // anchor to the front of the anchor list, only if the previous anchor
                 // is still in the anchor list.
@@ -305,8 +305,13 @@ void Placement::placeBucket(
                     }
                 }
 
-                const auto placeFeatureForVariableAnchors = [&] (const CollisionFeature& collisionFeature, style::TextWritingModeType orientation) {
-                    const CollisionBox& textBox = collisionFeature.boxes[0];
+                const bool doVariableIconPlacement =
+                    hasIconTextFit && !iconAllowOverlap && symbolInstance.placedIconIndex;
+
+                const auto placeFeatureForVariableAnchors = [&](const CollisionFeature& textCollisionFeature,
+                                                                style::TextWritingModeType orientation,
+                                                                const CollisionFeature& iconCollisionFeature) {
+                    const CollisionBox& textBox = textCollisionFeature.boxes[0];
                     const float width = textBox.x2 - textBox.x1;
                     const float height = textBox.y2 - textBox.y1;
                     const float textBoxScale = symbolInstance.textBoxScale;
@@ -323,12 +328,40 @@ void Placement::placeBucket(
                         }
 
                         textBoxes.clear();
-                        placedFeature = collisionIndex.placeFeature(collisionFeature, shift,
-                                                                    posMatrix, mat4(), pixelRatio,
-                                                                    placedSymbol, scale, fontSize,
+                        placedFeature = collisionIndex.placeFeature(textCollisionFeature,
+                                                                    shift,
+                                                                    posMatrix,
+                                                                    mat4(),
+                                                                    pixelRatio,
+                                                                    placedSymbol,
+                                                                    scale,
+                                                                    fontSize,
                                                                     allowOverlap,
                                                                     pitchWithMap,
-                                                                    params.showCollisionBoxes, avoidEdges, collisionGroup.second, textBoxes);
+                                                                    params.showCollisionBoxes,
+                                                                    avoidEdges,
+                                                                    collisionGroup.second,
+                                                                    textBoxes);
+
+                        if (doVariableIconPlacement) {
+                            auto placedIconFeature = collisionIndex.placeFeature(iconCollisionFeature,
+                                                                                 shift,
+                                                                                 posMatrix,
+                                                                                 iconLabelPlaneMatrix,
+                                                                                 pixelRatio,
+                                                                                 placedSymbol,
+                                                                                 scale,
+                                                                                 fontSize,
+                                                                                 iconAllowOverlap,
+                                                                                 pitchWithMap,
+                                                                                 params.showCollisionBoxes,
+                                                                                 avoidEdges,
+                                                                                 collisionGroup.second,
+                                                                                 iconBoxes);
+                            iconBoxes.clear();
+                            if (!placedIconFeature.first) continue;
+                        }
+
                         if (placedFeature.first) {
                             assert(symbolInstance.crossTileID != 0u);
                             optional<style::TextVariableAnchorType> prevAnchor;
@@ -366,12 +399,18 @@ void Placement::placeBucket(
                 };
 
                 const auto placeHorizontal = [&] {
-                    return placeFeatureForVariableAnchors(symbolInstance.textCollisionFeature, style::TextWritingModeType::Horizontal);
+                    return placeFeatureForVariableAnchors(symbolInstance.textCollisionFeature,
+                                                          style::TextWritingModeType::Horizontal,
+                                                          symbolInstance.iconCollisionFeature);
                 };
 
                 const auto placeVertical = [&] {
                     if (bucket.allowVerticalPlacement && !placed.first && symbolInstance.verticalTextCollisionFeature) {
-                        return placeFeatureForVariableAnchors(*symbolInstance.verticalTextCollisionFeature, style::TextWritingModeType::Vertical);
+                        return placeFeatureForVariableAnchors(*symbolInstance.verticalTextCollisionFeature,
+                                                              style::TextWritingModeType::Vertical,
+                                                              symbolInstance.verticalIconCollisionFeature
+                                                                  ? *symbolInstance.verticalIconCollisionFeature
+                                                                  : symbolInstance.iconCollisionFeature);
                     }
                     return std::pair<bool, bool>{false, false};
                 };

@@ -19,6 +19,31 @@ MGL_EXPORT
  */
 @property (nonatomic, readonly) CGContextRef context;
 
+#if TARGET_OS_IPHONE
+/**
+ Converts the specified map coordinate to a point in the coordinate space of the
+ context.
+ */
+- (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
+
+/**
+ Converts the specified context point to a map coordinate.
+ */
+- (CLLocationCoordinate2D)coordinateForPoint:(CGPoint)point;
+
+#else
+/**
+ Converts the specified map coordinate to a point in the coordinate space of the
+ context.
+ */
+- (NSPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
+
+/**
+ Converts the specified context point to a map coordinate.
+ */
+- (CLLocationCoordinate2D)coordinateForPoint:(NSPoint)point;
+#endif
+
 @end
 
 /**

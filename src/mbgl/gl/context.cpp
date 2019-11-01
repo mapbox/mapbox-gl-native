@@ -54,13 +54,15 @@ Context::Context(RendererBackend& backend_)
           GLint value;
           MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
           return value;
-      }()), backend(backend_) {
-}
+      }()),
+      backend(backend_),
+      stats() {}
 
 Context::~Context() {
     if (cleanupOnDestruction) {
         reset();
     }
+    assert(stats.isZero());
 }
 
 void Context::initializeExtensions(const std::function<gl::ProcAddress(const char*)>& getProcAddress) {
@@ -206,10 +208,12 @@ UniqueTexture Context::createUniqueTexture() {
     if (pooledTextures.empty()) {
         pooledTextures.resize(TextureMax);
         MBGL_CHECK_ERROR(glGenTextures(TextureMax, pooledTextures.data()));
+        stats.numCreatedTextures += TextureMax;
     }
 
     TextureID id = pooledTextures.back();
     pooledTextures.pop_back();
+    stats.numActiveTextures++;
     // NOLINTNEXTLINE(performance-move-const-arg)
     return UniqueTexture{std::move(id), {this}};
 }
@@ -238,6 +242,7 @@ VertexArray Context::createVertexArray() {
 UniqueFramebuffer Context::createFramebuffer() {
     FramebufferID id = 0;
     MBGL_CHECK_ERROR(glGenFramebuffers(1, &id));
+    stats.numFrameBuffers++;
     // NOLINTNEXTLINE(performance-move-const-arg)
     return UniqueFramebuffer{ std::move(id), { this } };
 }
@@ -245,8 +250,10 @@ UniqueFramebuffer Context::createFramebuffer() {
 std::unique_ptr<gfx::TextureResource> Context::createTextureResource(
     const Size size, const gfx::TexturePixelType format, const gfx::TextureChannelDataType type) {
     auto obj = createUniqueTexture();
+    int textureByteSize = gl::TextureResource::getStorageSize(size, format, type);
+    stats.memTextures += textureByteSize;
     std::unique_ptr<gfx::TextureResource> resource =
-        std::make_unique<gl::TextureResource>(std::move(obj));
+        std::make_unique<gl::TextureResource>(std::move(obj), textureByteSize);
 
     // Always use texture unit 0 for manipulating it.
     activeTextureUnit = 0;
@@ -517,6 +524,8 @@ void Context::clear(optional<mbgl::Color> color,
     }
 
     MBGL_CHECK_ERROR(glClear(mask));
+
+    stats.numDrawCalls = 0;
 }
 
 void Context::setCullFaceMode(const gfx::CullFaceMode& mode) {
@@ -583,6 +592,18 @@ std::unique_ptr<gfx::CommandEncoder> Context::createCommandEncoder() {
     return std::make_unique<gl::CommandEncoder>(*this);
 }
 
+gfx::RenderingStats& Context::renderingStats() {
+    return stats;
+}
+
+const gfx::RenderingStats& Context::renderingStats() const {
+    return stats;
+}
+
+void Context::finish() {
+    MBGL_CHECK_ERROR(glFinish());
+}
+
 void Context::draw(const gfx::DrawMode& drawMode,
                    std::size_t indexOffset,
                    std::size_t indexLength) {
@@ -607,6 +628,8 @@ void Context::draw(const gfx::DrawMode& drawMode,
         static_cast<GLsizei>(indexLength),
         GL_UNSIGNED_SHORT,
         reinterpret_cast<GLvoid*>(sizeof(uint16_t) * indexOffset)));
+
+    stats.numDrawCalls++;
 }
 
 void Context::performCleanup() {
@@ -643,6 +666,7 @@ void Context::performCleanup() {
             }
         }
         MBGL_CHECK_ERROR(glDeleteBuffers(int(abandonedBuffers.size()), abandonedBuffers.data()));
+        stats.numBuffers -= int(abandonedBuffers.size());
         abandonedBuffers.clear();
     }
 
@@ -655,6 +679,8 @@ void Context::performCleanup() {
             }
         }
         MBGL_CHECK_ERROR(glDeleteTextures(int(abandonedTextures.size()), abandonedTextures.data()));
+        stats.numCreatedTextures -= int(abandonedTextures.size());
+        assert(stats.numCreatedTextures >= 0);
         abandonedTextures.clear();
     }
 
@@ -678,6 +704,8 @@ void Context::performCleanup() {
         }
         MBGL_CHECK_ERROR(
             glDeleteFramebuffers(int(abandonedFramebuffers.size()), abandonedFramebuffers.data()));
+        stats.numFrameBuffers -= int(abandonedFramebuffers.size());
+        assert(stats.numFrameBuffers >= 0);
         abandonedFramebuffers.clear();
     }
 

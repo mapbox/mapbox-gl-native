@@ -2,6 +2,7 @@
 
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/optional.hpp>
@@ -34,6 +35,20 @@ struct GeoJSONOptions {
     using ClusterProperties = std::unordered_map<std::string, ClusterExpression>;
     ClusterProperties clusterProperties;
 };
+class GeoJSONData {
+public:
+    static std::shared_ptr<GeoJSONData> create(const GeoJSON&, const GeoJSONOptions&);
+
+    virtual ~GeoJSONData() = default;
+    virtual mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
+
+    // SuperclusterData
+    virtual mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) = 0;
+    virtual mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
+                                                                  const std::uint32_t limit = 10u,
+                                                                  const std::uint32_t offset = 0u) = 0;
+    virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
+};
 
 class GeoJSONSource final : public Source {
 public:
@@ -42,8 +57,10 @@ public:
 
     void setURL(const std::string& url);
     void setGeoJSON(const GeoJSON&);
+    void setGeoJSONData(std::shared_ptr<GeoJSONData>);
 
     optional<std::string> getURL() const;
+    const GeoJSONOptions& getOptions() const;
 
     class Impl;
     const Impl& impl() const;

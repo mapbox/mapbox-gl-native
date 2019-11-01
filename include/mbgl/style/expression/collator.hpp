@@ -1,10 +1,9 @@
 #pragma once
 
-#include <mbgl/util/feature.hpp>
+#include <mbgl/i18n/collator.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <string>
-#include <memory>
 
 namespace mbgl {
 namespace style {
@@ -20,8 +19,7 @@ public:
 
     std::string resolvedLocale() const;
 private:
-    class Impl;
-    std::shared_ptr<Impl> impl;
+    platform::Collator collator;
 };
 
 } // namespace expression

@@ -121,7 +121,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                                     allowVerticalPlacement = allowVerticalPlacement || placementMode == style::TextWritingModeType::Vertical;
                                     return !seen.insert(placementMode).second;
                                   });
-	    modes.erase(end, modes.end());
+        modes.erase(end, modes.end());
         placementModes = std::move(modes);
     }
 
@@ -525,21 +525,22 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float textRepeatDistance = symbolSpacing / 2;
     const auto evaluatedLayoutProperties = layout->evaluate(zoom, feature);
     IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketLeaderID, symbolInstances.size());
-    const bool hasIconTextFit = evaluatedLayoutProperties.get<style::IconTextFit>() != IconTextFitType::None;
 
+    const auto iconTextFit = evaluatedLayoutProperties.get<style::IconTextFit>();
     // Adjust shaped icon size when icon-text-fit is used.
     optional<PositionedIcon> verticallyShapedIcon;
-    if (shapedIcon && hasIconTextFit) {
+    if (shapedIcon && iconTextFit != IconTextFitType::None) {
         // Create vertically shaped icon for vertical writing mode if needed.
         if (allowVerticalPlacement && shapedTextOrientations.vertical) {
             verticallyShapedIcon = shapedIcon;
-            verticallyShapedIcon->fitIconToText(evaluatedLayoutProperties,
-                                                shapedTextOrientations.vertical,
-                                                layoutTextSize);
+            verticallyShapedIcon->fitIconToText(
+                shapedTextOrientations.vertical, iconTextFit, layout->get<IconTextFitPadding>(), iconOffset, fontScale);
         }
-        shapedIcon->fitIconToText(evaluatedLayoutProperties,
-                                  getDefaultHorizontalShaping(shapedTextOrientations),
-                                  layoutTextSize);
+        const auto shapedText = getDefaultHorizontalShaping(shapedTextOrientations);
+        if (shapedText) {
+            shapedIcon->fitIconToText(
+                shapedText, iconTextFit, layout->get<IconTextFitPadding>(), iconOffset, fontScale);
+        }
     }
 
     auto addSymbolInstance = [&] (Anchor& anchor, std::shared_ptr<SymbolInstanceSharedData> sharedData) {

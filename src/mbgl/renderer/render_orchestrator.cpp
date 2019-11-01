@@ -103,19 +103,17 @@ public:
 
 }  // namespace
 
-RenderOrchestrator::RenderOrchestrator(
-                     bool backgroundLayerAsColor_,
-                     optional<std::string> localFontFamily_)
-    : observer(&nullObserver())
-    , glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_))))
-    , imageManager(std::make_unique<ImageManager>())
-    , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
-    , patternAtlas(std::make_unique<PatternAtlas>())
-    , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
-    , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
-    , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
-    , renderLight(makeMutable<Light::Impl>())
-    , backgroundLayerAsColor(backgroundLayerAsColor_) {
+RenderOrchestrator::RenderOrchestrator(bool backgroundLayerAsColor_, optional<std::string> localFontFamily_)
+    : observer(&nullObserver()),
+      glyphManager(std::make_unique<GlyphManager>(std::make_unique<LocalGlyphRasterizer>(std::move(localFontFamily_)))),
+      imageManager(std::make_unique<ImageManager>()),
+      lineAtlas(std::make_unique<LineAtlas>()),
+      patternAtlas(std::make_unique<PatternAtlas>()),
+      imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>()),
+      sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>()),
+      layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>()),
+      renderLight(makeMutable<Light::Impl>()),
+      backgroundLayerAsColor(backgroundLayerAsColor_) {
     glyphManager->setObserver(this);
     imageManager->setObserver(this);
 }
@@ -220,6 +218,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
 
     const LayerDifference layerDiff = diffLayers(layerImpls, updateParameters.layers);
     layerImpls = updateParameters.layers;
+    const bool layersAddedOrRemoved = !layerDiff.added.empty() || !layerDiff.removed.empty();
 
     // Remove render layers for removed layers.
     for (const auto& entry : layerDiff.removed) {
@@ -238,20 +237,31 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         renderLayers.at(entry.first)->transition(transitionParameters, entry.second.after);
     }
 
-    if (!layerDiff.removed.empty() || !layerDiff.added.empty() || !layerDiff.changed.empty()) {
-        glyphManager->evict(fontStacks(*updateParameters.layers));
+    if (layersAddedOrRemoved) {
+        orderedLayers.clear();
+        orderedLayers.reserve(layerImpls->size());
+        for (const auto& layerImpl : *layerImpls) {
+            RenderLayer* layer = renderLayers.at(layerImpl->id).get();
+            assert(layer);
+            orderedLayers.emplace_back(*layer);
+        }
+    }
+    assert(orderedLayers.size() == renderLayers.size());
+
+    if (layersAddedOrRemoved || !layerDiff.changed.empty()) {
+        glyphManager->evict(fontStacks(*layerImpls));
     }
 
     // Update layers for class and zoom changes.
     std::unordered_set<std::string> constantsMaskChanged;
-    for (const auto& entry : renderLayers) {
-        RenderLayer& layer = *entry.second;
-        const bool layerAddedOrChanged = layerDiff.added.count(entry.first) || layerDiff.changed.count(entry.first);
+    for (RenderLayer& layer : orderedLayers) {
+        const std::string& id = layer.getID();
+        const bool layerAddedOrChanged = layerDiff.added.count(id) || layerDiff.changed.count(id);
         if (layerAddedOrChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
             auto previousMask = layer.evaluatedProperties->constantsMask();
             layer.evaluate(evaluationParameters);
             if (previousMask != layer.evaluatedProperties->constantsMask()) {
-                constantsMaskChanged.insert(layer.getID());
+                constantsMaskChanged.insert(id);
             }
         }
     }
@@ -281,7 +291,7 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
         renderLight.getEvaluated());
 
     std::set<LayerRenderItem> layerRenderItems;
-    std::vector<std::reference_wrapper<RenderLayer>> layersNeedPlacement;
+    layersNeedPlacement.clear();
     auto renderItemsEmplaceHint = layerRenderItems.begin();
 
     // Reserve size for filteredLayersForSource if there are sources.
@@ -293,27 +303,26 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
     for (const auto& sourceImpl : *sourceImpls) {
         RenderSource* source = renderSources.at(sourceImpl->id).get();
         bool sourceNeedsRendering = false;
-        bool sourceNeedsRelayout = false;       
-        
-        uint32_t index = 0u;
-        const auto begin = layerImpls->begin();
-        const auto end = layerImpls->end();
-        for (auto it = begin; it != end; ++it, ++index) {
-            const Immutable<Layer::Impl>& layerImpl = *it;
-            RenderLayer* layer = getRenderLayer(layerImpl->id);
-            const auto* layerInfo = layerImpl->getTypeInfo();
-            const bool layerIsVisible = layer->baseImpl->visibility != style::VisibilityType::None;
-            const bool zoomFitsLayer = layer->supportsZoom(zoomHistory.lastZoom);
+        bool sourceNeedsRelayout = false;
+
+        for (uint32_t index = 0u; index < orderedLayers.size(); ++index) {
+            RenderLayer& layer = orderedLayers[index];
+            const auto* layerInfo = layer.baseImpl->getTypeInfo();
+            const bool layerIsVisible = layer.baseImpl->visibility != style::VisibilityType::None;
+            const bool zoomFitsLayer = layer.supportsZoom(zoomHistory.lastZoom);
             renderTreeParameters->has3D |= (layerInfo->pass3d == LayerTypeInfo::Pass3D::Required);
 
             if (layerInfo->source != LayerTypeInfo::Source::NotRequired) {
-                if (layerImpl->source == sourceImpl->id) {
-                    sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || constantsMaskChanged.count(layerImpl->id) || hasLayoutDifference(layerDiff, layerImpl->id));
+                if (layer.baseImpl->source == sourceImpl->id) {
+                    const std::string& layerId = layer.getID();
+                    sourceNeedsRelayout = (sourceNeedsRelayout || hasImageDiff || constantsMaskChanged.count(layerId) ||
+                                           hasLayoutDifference(layerDiff, layerId));
                     if (layerIsVisible) {
-                        filteredLayersForSource.push_back(layer->evaluatedProperties);
+                        filteredLayersForSource.push_back(layer.evaluatedProperties);
                         if (zoomFitsLayer) {
                             sourceNeedsRendering = true;
-                            renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, source, index);
+                            renderItemsEmplaceHint =
+                                layerRenderItems.emplace_hint(renderItemsEmplaceHint, layer, source, index);
                         }
                     }
                 }
@@ -322,14 +331,14 @@ std::unique_ptr<RenderTree> RenderOrchestrator::createRenderTree(const UpdatePar
 
             // Handle layers without source.
             if (layerIsVisible && zoomFitsLayer && sourceImpl.get() == sourceImpls->at(0).get()) {
-                if (backgroundLayerAsColor && layerImpl.get() == layerImpls->at(0).get()) {
-                    const auto& solidBackground = layer->getSolidBackground();
+                if (backgroundLayerAsColor && layer.baseImpl == layerImpls->front()) {
+                    const auto& solidBackground = layer.getSolidBackground();
                     if (solidBackground) {
                         renderTreeParameters->backgroundColor = *solidBackground;
                         continue; // This layer is shown with background color, and it shall not be added to render items. 
                     }
                 }
-                renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, *layer, nullptr, index);
+                renderItemsEmplaceHint = layerRenderItems.emplace_hint(renderItemsEmplaceHint, layer, nullptr, index);
             }
         }
         source->update(sourceImpl,

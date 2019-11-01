@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 
     try {
         std::ofstream out(output, std::ios::binary);
-        out << encodePNG(frontend.render(map));
+        out << encodePNG(frontend.render(map).image);
         out.close();
     } catch(std::exception& e) {
         std::cout << "Error: " << e.what() << std::endl;

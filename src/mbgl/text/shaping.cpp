@@ -32,7 +32,7 @@ AnchorAlignment AnchorAlignment::getAnchorAlignment(style::SymbolAnchorType anch
         result.horizontalAlign = 0.0f;
         break;
     default:
-	break;
+        break;
     }
 
     switch (anchor) {
@@ -83,33 +83,41 @@ PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image,
     return PositionedIcon { image, top, bottom, left, right, iconRotation };
 }
 
-void PositionedIcon::fitIconToText(const style::SymbolLayoutProperties::Evaluated& layout,
-                                   const Shaping& shapedText,
-                                   float layoutTextSize) {
-   using namespace style;
-   assert(layout.get<IconTextFit>() != IconTextFitType::None);
-   if (shapedText) {
-        auto iconWidth = _right - _left;
-        auto iconHeight = _bottom - _top;
-        auto size = layoutTextSize / 24.0f;
-        auto textLeft = shapedText.left * size;
-        auto textRight = shapedText.right * size;
-        auto textTop = shapedText.top * size;
-        auto textBottom = shapedText.bottom * size;
-        auto textWidth = textRight - textLeft;
-        auto textHeight = textBottom - textTop;
-        auto padT = layout.get<IconTextFitPadding>()[0];
-        auto padR = layout.get<IconTextFitPadding>()[1];
-        auto padB = layout.get<IconTextFitPadding>()[2];
-        auto padL = layout.get<IconTextFitPadding>()[3];
-        auto offsetY = layout.get<IconTextFit>() == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
-        auto offsetX = layout.get<IconTextFit>() == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
-        auto width = layout.get<IconTextFit>() == IconTextFitType::Width || layout.get<IconTextFit>() == IconTextFitType::Both ? textWidth : iconWidth;
-        auto height = layout.get<IconTextFit>() == IconTextFitType::Height || layout.get<IconTextFit>() == IconTextFitType::Both ? textHeight : iconHeight;
-        _left = textLeft + offsetX - padL;
-        _top = textTop + offsetY - padT;
-        _right = textLeft + offsetX + padR + width;
-        _bottom = textTop + offsetY + padB + height;
+void PositionedIcon::fitIconToText(const Shaping& shapedText,
+                                   const style::IconTextFitType textFit,
+                                   const std::array<float, 4>& padding,
+                                   const std::array<float, 2>& iconOffset,
+                                   const float fontScale) {
+    assert(textFit != style::IconTextFitType::None);
+    assert(shapedText);
+
+    // We don't respect the icon-anchor, because icon-text-fit is set. Instead,
+    // the icon will be centered on the text, then stretched in the given
+    // dimensions.
+
+    const float textLeft = shapedText.left * fontScale;
+    const float textRight = shapedText.right * fontScale;
+
+    if (textFit == style::IconTextFitType::Width || textFit == style::IconTextFitType::Both) {
+        // Stretched horizontally to the text width
+        _left = iconOffset[0] + textLeft - padding[3];
+        _right = iconOffset[0] + textRight + padding[1];
+    } else {
+        // Centered on the text
+        _left = iconOffset[0] + (textLeft + textRight - image().displaySize()[0]) / 2.0f;
+        _right = _left + image().displaySize()[0];
+    }
+
+    const float textTop = shapedText.top * fontScale;
+    const float textBottom = shapedText.bottom * fontScale;
+    if (textFit == style::IconTextFitType::Height || textFit == style::IconTextFitType::Both) {
+        // Stretched vertically to the text height
+        _top = iconOffset[1] + textTop - padding[0];
+        _bottom = iconOffset[1] + textBottom + padding[2];
+    } else {
+        // Centered on the text
+        _top = iconOffset[1] + (textTop + textBottom - image().displaySize()[1]) / 2.0f;
+        _bottom = _top + image().displaySize()[1];
     }
 }
 

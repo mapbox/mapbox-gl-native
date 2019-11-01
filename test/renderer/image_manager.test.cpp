@@ -187,6 +187,24 @@ TEST(ImageManager, OnStyleImageMissingBeforeSpriteLoaded) {
     EXPECT_EQ(observer.count, 1);
     ASSERT_TRUE(notified);
 
+    // Request for updated dependencies must be dispatched to the
+    // observer.
+    dependencies.emplace("post", ImageType::Icon);
+    imageManager.getImages(requestor, std::make_pair(dependencies, ++imageCorrelationID));
+    ASSERT_TRUE(requestor.hasPendingRequests());
+
+    runLoop.runOnce();
+    ASSERT_FALSE(requestor.hasPendingRequests());
+
+    // Another requestor shall not have pending requests for already obtained images.
+    StubImageRequestor anotherRequestor(imageManager);
+    imageManager.getImages(anotherRequestor, std::make_pair(dependencies, ++imageCorrelationID));
+    ASSERT_FALSE(anotherRequestor.hasPendingRequests());
+
+    dependencies.emplace("unfamiliar", ImageType::Icon);
+    imageManager.getImages(anotherRequestor, std::make_pair(dependencies, ++imageCorrelationID));
+    EXPECT_TRUE(anotherRequestor.hasPendingRequests());
+    EXPECT_TRUE(anotherRequestor.hasPendingRequest("unfamiliar"));
 }
 
 TEST(ImageManager, OnStyleImageMissingAfterSpriteLoaded) {

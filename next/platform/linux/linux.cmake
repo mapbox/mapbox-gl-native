@@ -15,6 +15,8 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_backend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_frontend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gl/headless_backend.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/i18n/collator.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/i18n/number_format.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/layermanager/layer_manager.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/asset_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/default_file_source.cpp
@@ -29,15 +31,13 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/online_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/sqlite3.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/bidi.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/text/collator.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/text/unaccent.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/async_task.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/util/format_number.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/image.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/jpeg_reader.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/logging_stderr.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/monotonic_timer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/png_reader.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/png_writer.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/run_loop.cpp
@@ -96,7 +96,6 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(${PROJECT_SOURCE_DIR}/expression-test)
 add_subdirectory(${PROJECT_SOURCE_DIR}/platform/glfw)
 add_subdirectory(${PROJECT_SOURCE_DIR}/platform/node)
-add_subdirectory(${PROJECT_SOURCE_DIR}/render-test)
 
 add_executable(
     mbgl-test-runner
@@ -123,5 +122,34 @@ target_link_libraries(
     PRIVATE mbgl-benchmark
 )
 
+add_executable(
+    mbgl-render-test-runner
+    ${MBGL_ROOT}/platform/default/src/mbgl/render-test/main.cpp
+)
+
+target_link_libraries(
+    mbgl-render-test-runner
+    PRIVATE mbgl-render-test
+)
+
 add_test(NAME mbgl-benchmark-runner COMMAND mbgl-benchmark-runner WORKING_DIRECTORY ${MBGL_ROOT})
 add_test(NAME mbgl-test-runner COMMAND mbgl-test-runner WORKING_DIRECTORY ${MBGL_ROOT})
+
+string(RANDOM LENGTH 5 ALPHABET 0123456789 MBGL_RENDER_TEST_SEED)
+
+add_test(
+    NAME mbgl-render-test
+    COMMAND
+        mbgl-render-test-runner
+        render-tests
+        --recycle-map
+        --shuffle
+        --manifestPath=${MBGL_ROOT}/render-test/linux-manifest.json
+        --seed=${MBGL_RENDER_TEST_SEED}
+)
+
+add_test(
+    NAME mbgl-render-test-probes
+    COMMAND mbgl-render-test-runner tests --manifestPath=${MBGL_ROOT}/render-test/linux-probe-manifest.json
+)
+add_test(NAME mbgl-query-test COMMAND mbgl-render-test-runner query-tests --manifestPath=${MBGL_ROOT}/render-test/linux-manifest.json)

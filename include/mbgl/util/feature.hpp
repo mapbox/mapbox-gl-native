@@ -3,18 +3,32 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <mapbox/feature.hpp>
+#include <mapbox/value.hpp>
 
 namespace mbgl {
 
-using Value = mapbox::feature::value;
-using NullValue = mapbox::feature::null_value_t;
-using PropertyMap = mapbox::feature::property_map;
+using Value = mapbox::base::Value;
+using NullValue = mapbox::base::NullValue;
+using PropertyMap = mapbox::base::ValueObject;
 using FeatureIdentifier = mapbox::feature::identifier;
-using Feature = mapbox::feature::feature<double>;
-using FeatureState = PropertyMap;
+using GeoJSONFeature = mapbox::feature::feature<double>;
+using FeatureState = mapbox::base::ValueObject;
 using FeatureStates = std::unordered_map<std::string, FeatureState>;       // <featureID, FeatureState>
 using LayerFeatureStates = std::unordered_map<std::string, FeatureStates>; // <sourceLayer, FeatureStates>
+
+class Feature : public GeoJSONFeature {
+public:
+    std::string source;
+    std::string sourceLayer;
+    PropertyMap state;
+
+    using GeometryType = mapbox::geometry::geometry<double>;
+
+    Feature() = default;
+    Feature(const GeoJSONFeature& f) : GeoJSONFeature(f) {}
+    Feature(const GeometryType& geom_) : GeoJSONFeature(geom_) {}
+    Feature(GeometryType&& geom_) : GeoJSONFeature(std::move(geom_)) {}
+};
 
 template <class T>
 optional<T> numericValue(const Value& value) {

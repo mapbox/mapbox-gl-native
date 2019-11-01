@@ -1,11 +1,21 @@
 #pragma once
 
+#include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
-#include <mbgl/util/optional.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/traits.hpp>
 
+#include <mapbox/value.hpp>
+
+#include <array>
+#include <chrono>
 #include <string>
+#include <type_traits>
 
 namespace mbgl {
 namespace style {
@@ -286,6 +296,81 @@ private:
 template <class T, class...Args>
 optional<T> convert(const Convertible& value, Error& error, Args&&...args) {
     return Converter<T>()(value, error, std::forward<Args>(args)...);
+}
+
+template <>
+struct ValueFactory<ColorRampPropertyValue> {
+    static Value make(const ColorRampPropertyValue& value) { return value.getExpression().serialize(); }
+};
+
+template <>
+struct ValueFactory<TransitionOptions> {
+    static Value make(const TransitionOptions& value) {
+        return mapbox::base::ValueArray{
+            {std::chrono::duration_cast<std::chrono::milliseconds>(value.duration.value_or(mbgl::Duration::zero()))
+                 .count(),
+             std::chrono::duration_cast<std::chrono::milliseconds>(value.delay.value_or(mbgl::Duration::zero()))
+                 .count(),
+             value.enablePlacementTransitions}};
+    }
+};
+
+template <>
+struct ValueFactory<Color> {
+    static Value make(const Color& color) { return color.toObject(); }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<(!std::is_enum<T>::value && !is_linear_container<T>::value)>::type> {
+    static Value make(const T& arg) { return {arg}; }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+    static Value make(T arg) { return {Enum<T>::toString(arg)}; }
+};
+
+template <typename T>
+struct ValueFactory<T, typename std::enable_if<is_linear_container<T>::value>::type> {
+    static Value make(const T& arg) {
+        mapbox::base::ValueArray result;
+        result.reserve(arg.size());
+        for (const auto& item : arg) {
+            result.emplace_back(ValueFactory<std::decay_t<decltype(item)>>::make(item));
+        }
+        return result;
+    }
+};
+
+template <>
+struct ValueFactory<Position> {
+    static Value make(const Position& position) {
+        return ValueFactory<std::array<float, 3>>::make(position.getSpherical());
+    }
+};
+
+template <typename T>
+Value makeValue(T&& arg) {
+    return ValueFactory<std::decay_t<T>>::make(std::forward<T>(arg));
+}
+
+template <typename T>
+StyleProperty makeStyleProperty(const PropertyValue<T>& value) {
+    return value.match([](const Undefined&) -> StyleProperty { return {}; },
+                       [](const T& t) -> StyleProperty {
+                           return {makeValue(t), StyleProperty::Kind::Constant};
+                       },
+                       [](const PropertyExpression<T>& fn) -> StyleProperty {
+                           return {fn.getExpression().serialize(), StyleProperty::Kind::Expression};
+                       });
+}
+
+inline StyleProperty makeStyleProperty(const TransitionOptions& value) {
+    return {makeValue(value), StyleProperty::Kind::Transition};
+}
+
+inline StyleProperty makeStyleProperty(const ColorRampPropertyValue& value) {
+    return {makeValue(value), StyleProperty::Kind::Expression};
 }
 
 } // namespace conversion

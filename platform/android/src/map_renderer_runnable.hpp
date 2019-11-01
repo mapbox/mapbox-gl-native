@@ -24,7 +24,7 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    MapRendererRunnable(jni::JNIEnv&, std::weak_ptr<Mailbox>);
+    MapRendererRunnable(jni::JNIEnv&, std::function<void()>);
 
     // Only for jni registration, unused
     MapRendererRunnable(jni::JNIEnv&) {
@@ -40,7 +40,7 @@ public:
 
 private:
     jni::Global<jni::Object<MapRendererRunnable>> javaPeer;
-    std::weak_ptr<Mailbox> mailbox;
+    std::function<void()> function;
 };
 
 } // namespace android

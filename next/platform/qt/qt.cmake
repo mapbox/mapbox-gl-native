@@ -26,10 +26,10 @@ target_sources(
         ${MBGL_ROOT}/platform/default/include/mbgl/gfx/headless_backend.hpp
         ${MBGL_ROOT}/platform/default/include/mbgl/gfx/headless_frontend.hpp
         ${MBGL_ROOT}/platform/default/include/mbgl/gl/headless_backend.hpp
-        ${MBGL_ROOT}/platform/default/include/mbgl/text/unaccent.hpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_backend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gfx/headless_frontend.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/gl/headless_backend.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/i18n/collator.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/layermanager/layer_manager.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/asset_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/default_file_source.cpp
@@ -42,12 +42,11 @@ target_sources(
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/offline_download.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/online_file_source.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/storage/sqlite3.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/text/collator.cpp
-        ${MBGL_ROOT}/platform/default/src/mbgl/text/unaccent.cpp
         ${MBGL_ROOT}/platform/default/src/mbgl/util/compression.cpp
+        ${MBGL_ROOT}/platform/default/src/mbgl/util/monotonic_timer.cpp
         ${MBGL_ROOT}/platform/qt/src/async_task.cpp
         ${MBGL_ROOT}/platform/qt/src/async_task_impl.hpp
-        ${MBGL_ROOT}/platform/qt/src/format_number.cpp
+        ${MBGL_ROOT}/platform/qt/src/number_format.cpp
         ${MBGL_ROOT}/platform/qt/src/gl_functions.cpp
         ${MBGL_ROOT}/platform/qt/src/headless_backend_qt.cpp
         ${MBGL_ROOT}/platform/qt/src/http_file_source.cpp

@@ -4,6 +4,34 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+### Bug fixes
+ - Fixed the rendering bug caused by redundant pending requests for already requested images [#15864](https://github.com/mapbox/mapbox-gl-native/pull/15864)
+
+### Performance improvements
+ - Enable incremental vacuum for the offline database in order to make data removal requests faster and to avoid the excessive disk space usage (creating a backup file on VACUUM call) [#15837](https://github.com/mapbox/mapbox-gl-native/pull/15837)
+ - Convert GeoJSON features to tiles in a background thread and thus unblock the UI thread on updating the GeoJsonSource [#15871](https://github.com/mapbox/mapbox-gl-native/pull/15871)
+
+## 8.5.0-alpha.2 - October 10, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.5.0-alpha.1...android-v8.5.0-alpha.2) since [Mapbox Maps SDK for Android v8.5.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.5.0-alpha.1):
+
+### Features
+ - Expose pre-fetching zoom delta, allows to granular control the delta on which we prefetch tiles [#15769](https://github.com/mapbox/mapbox-gl-native/pull/15769)
+
+### Performance improvements
+ - Improved rendering performance for the styles with multiple sources [#15756](https://github.com/mapbox/mapbox-gl-native/pull/15756)
+
+### Bug fixes
+ - Fixed runtime exceptions that occurred when a manually built camera object without padding was serialized. [#15788](https://github.com/mapbox/mapbox-gl-native/pull/15788)
+ - Keep Mapbox when obfuscating code with proguard [#15762](https://github.com/mapbox/mapbox-gl-native/pull/15762)
+
+## 8.5.0-alpha.1 - October 3, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0...android-v8.5.0-alpha.1) since [Mapbox Maps SDK for Android v8.4.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0):
+### Bug fixes
+ - Suppress network requests for expired tiles update, if these tiles are invisible. [#15741](https://github.com/mapbox/mapbox-gl-native/pull/15741)
+ - Fixed opacity interpolation for composition expressions [#15738](https://github.com/mapbox/mapbox-gl-native/pull/15738)
+ - Fixed an issue where `Projection#getMetersPerPixelAtLatitude` returned a value incorrectly divided by the pixel ratio. This also fixes an issue where `LocationComponent` accuracy circle's radius was artificially increased. [#15742](https://github.com/mapbox/mapbox-gl-native/pull/15742)
+ - Coalesce requests to the client for the same missing image [#15778](https://github.com/mapbox/mapbox-gl-native/pull/15778)
+
 ## 8.4.0 - September 25, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-beta.1...android-v8.4.0) since [Mapbox Maps SDK for Android v8.4.0-beta.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-beta.1): 
 
@@ -25,11 +53,18 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Fixed MapSnapshotter so that `MapSnapshotter.withApiBaseUri` works again. [#15642](https://github.com/mapbox/mapbox-gl-native/pull/15642)
  - Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. [#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644)
 
+## 8.3.2 - September 19, 2019
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.1...android-v8.3.2) since [Mapbox Maps SDK for Android v8.3.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.1):
+
+### Bug fixes
+ - Fixed an issue of integer overflow when converting `tileCoordinates` to `LatLon`, which caused issues such as `queryRenderedFeatures` and `querySourceFeatures` returning incorrect coordinates at zoom levels 20 and higher. [#15560](https://github.com/mapbox/mapbox-gl-native/pull/15560)
+
 ## 8.3.1 - September 18, 2019
-[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0...android-v8.3.1) since [Mapbox Maps SDK for Android v8.3.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0): 
+[Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.3.0...android-v8.3.1) since [Mapbox Maps SDK for Android v8.3.0](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.3.0):
 
 ### Bug fixes
  - Updated earcut.hpp submodule file [#15660](https://github.com/mapbox/mapbox-gl-native/pull/15660)
+ - Fixed a wrong variable assignment of `MapSnapshotter.Options.withApiBaseUri`. [#15642](https://github.com/mapbox/mapbox-gl-native/pull/15642)
 
 ## 8.4.0-alpha.2 - September 11, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.4.0-alpha.1...android-v8.4.0-alpha.2) since [Mapbox Maps SDK for Android v8.4.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.4.0-alpha.1): 

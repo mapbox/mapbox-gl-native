@@ -5,14 +5,34 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 ### Styles and rendering
-* Added an `-[MGLMapSnapshotter startWithOverlayHandler:completionHandler:]` method to provide the snapshot's current `CGContext` in order to perform custom drawing on `MGLMapSnapShot` objects. ([#15530](https://github.com/mapbox/mapbox-gl-native/pull/15530))
-* Fixed an issue that `maxzoom` in style `Sources` option was ignored when URL resource is provided. It may cause problems such as extra tiles downloading at higher zoom level than `maxzoom`, or problems that wrong setting of `overscaledZ` in `OverscaledTileID` that will be passed to `SymbolLayout`, leading wrong rendering appearance. ([#15581](https://github.com/mapbox/mapbox-gl-native/pull/15581))
-* Fixed an assertion hit caused by possibility of adding a layer to an incompatible source. ([#15644](https://github.com/mapbox/mapbox-gl-native/pull/15644))
 * Improve camera accuracy when user tilt the map as zoom in. ([#15674](https://github.com/mapbox/mapbox-gl-native/pull/15674))
+
+### Other changes
+
+### Bug fixes
+* Fixed the rendering bug caused by redundant pending requests for already requested images [#15864](https://github.com/mapbox/mapbox-gl-native/pull/15864)
+* Enable incremental vacuum for the offline database in order to make data removal requests faster and to avoid the excessive disk space usage (creating a backup file on VACUUM call). ([#15837](https://github.com/mapbox/mapbox-gl-native/pull/15837))
+
+## 5.5.0
 
 ### Performance improvements
 
-* Newly loaded labels appear faster on the screen. ([#15308](https://github.com/mapbox/mapbox-gl-native/pull/15308))
+* Improved rendering performance for the styles with multiple sources ([#15756](https://github.com/mapbox/mapbox-gl-native/pull/15756))
+
+### Styles and rendering
+
+* Added an `MGLShapeSourceOptionClusterProperties` option that allows styling individual clusters based on aggregated feature data. ([#15515](https://github.com/mapbox/mapbox-gl-native/pull/15515))
+
+### Other changes
+
+* Added `-[MGLMapSnapshotOverlay coordinateForPoint:]` and `-[MGLMapSnapshotOverlay pointForCoordinate:]` to convert between context and map coordinates, mirroring those of `MGLMapSnapshot`. ([#15746](https://github.com/mapbox/mapbox-gl-native/pull/15746))
+* Suppress network requests for expired tiles update, if these tiles are invisible. ([#15741](https://github.com/mapbox/mapbox-gl-native/pull/15741))
+* Fixed an issue that cause the ornaments to ignore `MGLMapView.contentInset` property. ([#15584](https://github.com/mapbox/mapbox-gl-native/pull/15584))
+* Fixed an issue that cause `-[MGLMapView setCamere:withDuration:animationTimingFunction:edgePadding:completionHandler:]` persist the value of `edgePadding`. ([#15584](https://github.com/mapbox/mapbox-gl-native/pull/15584))
+* Added `MGLMapView.automaticallyAdjustsContentInset` property that indicates if wether the map view should automatically adjust its content insets. ([#15584](https://github.com/mapbox/mapbox-gl-native/pull/15584))
+* Fixed an issue that caused `MGLScaleBar` to have an incorrect size when resizing or rotating. ([#15703](https://github.com/mapbox/mapbox-gl-native/pull/15703))
+* Fixed crash at launch seen on iOS 9 simulator. ([#15771](https://github.com/mapbox/mapbox-gl-native/pull/15771))
+
 
 ## 5.4.0 - September 25, 2019
 

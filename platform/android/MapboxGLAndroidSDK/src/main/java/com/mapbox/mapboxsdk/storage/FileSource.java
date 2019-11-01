@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.Keep;
@@ -90,7 +89,7 @@ public class FileSource {
   @UiThread
   public static synchronized FileSource getInstance(@NonNull Context context) {
     if (INSTANCE == null) {
-      INSTANCE = new FileSource(getResourcesCachePath(context), context.getResources().getAssets());
+      INSTANCE = new FileSource(getResourcesCachePath(context));
     }
 
     return INSTANCE;
@@ -366,8 +365,8 @@ public class FileSource {
   @Keep
   private long nativePtr;
 
-  private FileSource(String cachePath, AssetManager assetManager) {
-    initialize(Mapbox.getAccessToken(), cachePath, assetManager);
+  private FileSource(String cachePath) {
+    initialize(Mapbox.getAccessToken(), cachePath);
   }
 
   @Keep
@@ -404,7 +403,7 @@ public class FileSource {
   private native void setResourceCachePath(String path, ResourcesCachePathChangeCallback callback);
 
   @Keep
-  private native void initialize(String accessToken, String cachePath, AssetManager assetManager);
+  private native void initialize(String accessToken, String cachePath);
 
   @Override
   @Keep

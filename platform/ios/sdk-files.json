@@ -243,6 +243,7 @@
         "MMEDate.h": "platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEDate.h",
         "NSString+MGLAdditions.h": "platform/darwin/src/NSString+MGLAdditions.h",
         "UIDevice+MGLAdditions.h": "platform/ios/src/UIDevice+MGLAdditions.h",
+        "MGLMapSnapshotter_Private.h": "platform/darwin/src/MGLMapSnapshotter_Private.h",
         "MGLRendererFrontend.h": "platform/darwin/src/MGLRendererFrontend.h",
         "MGLStyleValue_Private.h": "platform/darwin/src/MGLStyleValue_Private.h",
         "MGLFillExtrusionStyleLayer_Private.h": "platform/darwin/src/MGLFillExtrusionStyleLayer_Private.h",

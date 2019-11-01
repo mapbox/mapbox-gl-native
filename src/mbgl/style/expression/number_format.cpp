@@ -1,6 +1,6 @@
-#include <mbgl/style/expression/number_format.hpp>
+#include <mbgl/i18n/number_format.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/platform.hpp>
+#include <mbgl/style/expression/number_format.hpp>
 
 namespace mbgl {
 namespace style {

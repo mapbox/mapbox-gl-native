@@ -4,6 +4,9 @@
 *.gcno
 *.gcda
 *~
+**/actual.png
+**/diff.png
+render-test/index.html
 offline.db
 new_offline.db
 xcuserdata
@@ -19,8 +22,6 @@ xcuserdata
 /test/fixtures/api/2.png
 /test/fixtures/offline_database/offline.db
 /test/fixtures/offline_database/offline.db-*
-/test/fixtures/**/actual.png
-/test/fixtures/**/diff.png
 /test/output
 /node_modules
 /platform/ios/benchmark/assets/glyphs/DIN*

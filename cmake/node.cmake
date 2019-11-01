@@ -20,13 +20,13 @@ create_source_groups(mbgl-loop-node)
 
 add_node_module(mbgl-node
     INSTALL_PATH "lib/{node_abi}/mbgl.node"
-    NAN_VERSION "2.10.0"
-    
-    # Don't build for Node 4.x, 5.x, 7.x, 9.x, 11.x and 12.x
+    NAN_VERSION "2.14.0"
+
+    # Don't build for Node 4.x, 5.x, 7.x, 9.x, 11.x, 12.x and 13.x
     # See https://nodejs.org/en/download/releases/ for mapping of Node version to ABI number.
     # Changes to this property should happen in tandem with updates to the version targets
     # in platform/node/scripts/publish.sh and the "node" engines property in package.json.
-    EXCLUDE_NODE_ABIS 46 47 51 59 67 72
+    EXCLUDE_NODE_ABIS 46 47 51 59 67 72 79
 )
 
 target_sources(mbgl-node INTERFACE

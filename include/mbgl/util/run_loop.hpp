@@ -72,12 +72,9 @@ public:
         push(Priority::Default, task);
         return std::make_unique<WorkRequest>(task);
     }
-                    
-    void schedule(std::weak_ptr<Mailbox> mailbox) override {
-        invoke([mailbox] () {
-            Mailbox::maybeReceive(mailbox);
-        });
-    }
+
+    void schedule(std::function<void()> fn) override { invoke(std::move(fn)); }
+    ::mapbox::base::WeakPtr<Scheduler> makeWeakPtr() override { return weakFactory.makeWeakPtr(); }
 
     class Impl;
 
@@ -125,6 +122,7 @@ private:
     std::mutex mutex;
 
     std::unique_ptr<Impl> impl;
+    ::mapbox::base::WeakPtrFactory<Scheduler> weakFactory{this};
 };
 
 } // namespace util

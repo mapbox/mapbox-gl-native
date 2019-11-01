@@ -3,6 +3,7 @@
 #import "MGLMapViewDelegate.h"
 #import "MGLAccountManager.h"
 
+#import "MGLScaleBar.h"
 
 @interface MGLOrnamentTestData : NSObject
 
@@ -22,6 +23,14 @@
     return data;
 }
 
+@end
+
+@interface MGLScaleBar (Tests)
+@property (nonatomic, readonly) NSArray<UIView *> *labelViews;
+@property (nonatomic, readonly) NSArray<UIView *> *bars;
+@property (nonatomic, readonly) UIView *containerView;
+@property (nonatomic, readonly) CGSize size;
+@property (nonatomic) NSNumber *testingRightToLeftOverride;
 @end
 
 
@@ -140,7 +149,7 @@
                                       expectedOrigin:CGPointMake(margin, margin)],
              [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionTopRight
                                               offset:CGPointMake(margin, margin)
-                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame), 4)],
+                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame), margin)],
              [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionBottomLeft
                                               offset:CGPointMake(margin, margin)
                                       expectedOrigin:CGPointMake(margin,  CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))],
@@ -176,6 +185,8 @@
     CGFloat margin = 4.0;
 
     UIView *scaleBar = self.mapView.scaleBar;
+    XCTAssertFalse(CGSizeEqualToSize(scaleBar.bounds.size, CGSizeZero));
+
     NSArray *testDataList = [self makeTestDataListWithView:scaleBar margin:margin];
 
     for (MGLOrnamentTestData *testData in testDataList) {
@@ -188,6 +199,78 @@
 
         XCTAssertEqualWithAccuracy(CGRectGetMinX(scaleBar.frame), testData.expectedOrigin.x, accuracy);
         XCTAssertEqualWithAccuracy(CGRectGetMinY(scaleBar.frame), testData.expectedOrigin.y, accuracy);
+    }
+}
+
+// This test checks the frames of the scalebar's subviews, based on the positions
+// as above, but also with forced Right-to-Left reading, and modifying zoom levels.
+- (void)testScalebarSubviewPlacement {
+    double accuracy = 0.01;
+    CGFloat margin = 20.0;
+
+    MGLScaleBar *scaleBar = (MGLScaleBar*)self.mapView.scaleBar;
+    XCTAssertFalse(CGSizeEqualToSize(scaleBar.bounds.size, CGSizeZero));
+
+    for (NSInteger rtl = 0; rtl <= 1; rtl++) {
+        scaleBar.testingRightToLeftOverride = @((BOOL)rtl);
+
+        NSString *positions[] = {
+            @"MGLOrnamentPositionTopLeft",
+            @"MGLOrnamentPositionTopRight",
+            @"MGLOrnamentPositionBottomLeft",
+            @"MGLOrnamentPositionBottomRight"
+        };
+
+        for (CGFloat zoomLevel = 0; zoomLevel < 20; zoomLevel++)
+        {
+            self.mapView.zoomLevel = zoomLevel;
+            [self.superView setNeedsLayout];
+            [self.superView layoutIfNeeded];
+
+            // Following method assumes scaleBar has an up-to-date frame, based
+            // on the current zoom level. Modifying the position and margins
+            // should not affect the overall size of the scalebar.
+
+            NSArray *testDataList = [self makeTestDataListWithView:scaleBar margin:margin];
+
+            CGSize initialSize = scaleBar.intrinsicContentSize;
+            XCTAssert(CGSizeEqualToSize(initialSize, scaleBar.bounds.size));
+
+            for (MGLOrnamentTestData *testData in testDataList) {
+                self.mapView.scaleBarPosition = testData.position;
+                self.mapView.scaleBarMargins = testData.offset;
+
+                [self.superView setNeedsLayout];
+                [self.superView layoutIfNeeded];
+
+                XCTAssert(CGSizeEqualToSize(initialSize, scaleBar.bounds.size));
+
+                NSString *activityName = [NSString stringWithFormat:
+                                          @"Scalebar subview tests: RTL=%@, Zoom=%ld, POS=%@, Visible=%@",
+                                          (rtl == 0 ? @"NO" : @"YES"),
+                                          (long)zoomLevel,
+                                          positions[testData.position],
+                                          scaleBar.alpha > 0.0 ? @"YES" : @"NO"];
+
+                [XCTContext runActivityNamed:activityName
+                                       block:^(id<XCTActivity> activity) {
+
+                    // Check the subviews
+                    XCTAssertEqualWithAccuracy(CGRectGetMinX(scaleBar.frame), testData.expectedOrigin.x, accuracy);
+                    XCTAssertEqualWithAccuracy(CGRectGetMinY(scaleBar.frame), testData.expectedOrigin.y, accuracy);
+
+                    XCTAssertTrue(CGRectContainsRect(scaleBar.bounds, scaleBar.containerView.frame));
+                    for (UIView *bar in scaleBar.bars) {
+                        XCTAssertTrue(CGRectContainsRect(scaleBar.containerView.bounds, bar.frame));
+                    }
+                    for (UIView *label in scaleBar.labelViews) {
+                        if (!label.isHidden) {
+                            XCTAssertTrue(CGRectContainsRect(scaleBar.bounds, label.frame));
+                        }
+                    }
+                }];
+            }
+        }
     }
 }
 

@@ -127,6 +127,18 @@ class MapboxMapTest {
   }
 
   @Test
+  fun testGetPrefetchZoomDelta() {
+    every { nativeMapView.prefetchZoomDelta } answers { 3 }
+    assertEquals(3, mapboxMap.prefetchZoomDelta)
+  }
+
+  @Test
+  fun testSetPrefetchZoomDelta() {
+    mapboxMap.prefetchZoomDelta = 2
+    verify { nativeMapView.prefetchZoomDelta = 2 }
+  }
+
+  @Test
   fun testCameraForLatLngBounds() {
     val bounds = LatLngBounds.Builder().include(LatLng()).include(LatLng(1.0, 1.0)).build()
     mapboxMap.setLatLngBoundsForCameraTarget(bounds)

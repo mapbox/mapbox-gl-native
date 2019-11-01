@@ -3,10 +3,11 @@
 #include <mbgl/gfx/texture.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
 
-#include <vector>
-#include <unordered_map>
+#include <map>
 #include <memory>
+#include <vector>
 
 namespace mbgl {
 
@@ -26,29 +27,46 @@ enum class LinePatternCap : bool {
     Round = true,
 };
 
-class LineAtlas {
+class DashPatternTexture {
 public:
-    LineAtlas(Size);
-    ~LineAtlas();
-
-    // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    gfx::TextureBinding textureBinding();
+    DashPatternTexture(const std::vector<float>& from, const std::vector<float>& to, LinePatternCap);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
-    // the texture is only bound when the data is out of date (=dirty).
+    // the texture is only bound when the data is uploaded for the first time.
     void upload(gfx::UploadPass&);
 
-    LinePatternPos getDashPosition(const std::vector<float>&, LinePatternCap);
-    LinePatternPos addDash(const std::vector<float>& dasharray, LinePatternCap);
+    // Binds the atlas texture to the GPU, and uploads data if it is out of date.
+    gfx::TextureBinding textureBinding() const;
 
+    // Returns the size of the texture image.
     Size getSize() const;
 
+    const LinePatternPos& getFrom() const { return from; }
+    const LinePatternPos& getTo() const { return to; }
+
 private:
-    const AlphaImage image;
-    bool dirty;
-    optional<gfx::Texture> texture;
-    uint32_t nextRow = 0;
-    std::unordered_map<size_t, LinePatternPos> positions;
+    LinePatternPos from, to;
+    variant<AlphaImage, gfx::Texture> texture;
+};
+
+class LineAtlas {
+public:
+    LineAtlas();
+    ~LineAtlas();
+
+    // Obtains or creates a texture that has both line patterns in it
+    DashPatternTexture& getDashPatternTexture(const std::vector<float>& from,
+                                              const std::vector<float>& to,
+                                              LinePatternCap);
+
+    // Uploads the textures to the GPU to be available when we need it.
+    void upload(gfx::UploadPass&);
+
+private:
+    std::map<size_t, DashPatternTexture> textures;
+
+    // Stores a list of hashes of texture objcts that need uploading.
+    std::vector<size_t> needsUpload;
 };
 
 } // namespace mbgl

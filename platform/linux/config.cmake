@@ -45,19 +45,18 @@ macro(mbgl_platform_core)
         PRIVATE platform/linux/src/gl_functions.cpp
 
         # Misc
+        PRIVATE platform/default/src/mbgl/i18n/collator.cpp
+        PRIVATE platform/default/src/mbgl/i18n/number_format.cpp
+        PRIVATE platform/default/src/mbgl/text/bidi.cpp
+        PRIVATE platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
+        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
         PRIVATE platform/default/src/mbgl/util/compression.cpp
         PRIVATE platform/default/src/mbgl/util/logging_stderr.cpp
+        PRIVATE platform/default/src/mbgl/util/monotonic_timer.cpp
         PRIVATE platform/default/src/mbgl/util/string_stdlib.cpp
         PRIVATE platform/default/src/mbgl/util/thread.cpp
-        PRIVATE platform/default/src/mbgl/text/bidi.cpp
-        PRIVATE platform/default/src/mbgl/text/collator.cpp
-        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
-        PRIVATE platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
         PRIVATE platform/default/src/mbgl/util/thread_local.cpp
-        PRIVATE platform/default/src/mbgl/text/unaccent.cpp
-        PRIVATE platform/default/include/mbgl/text/unaccent.hpp
         PRIVATE platform/default/src/mbgl/util/utf.cpp
-        PRIVATE platform/default/src/mbgl/util/format_number.cpp
 
         # Image handling
         PRIVATE platform/default/src/mbgl/util/image.cpp
@@ -88,7 +87,7 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PRIVATE icu)
 
     # Ignore warning caused by ICU header unistr.h in some CI environments
-    set_source_files_properties(platform/default/src/mbgl/util/format_number.cpp PROPERTIES COMPILE_FLAGS -Wno-error=shadow)
+    set_source_files_properties(platform/default/src/mbgl/i18n/number_format.cpp PROPERTIES COMPILE_FLAGS -Wno-error=shadow)
 
     # Link all ICU libraries (by default only libicuuc is linked)
     find_library(LIBICUI18N NAMES icui18n HINTS ${MASON_PACKAGE_icu_INCLUDE_DIRS}/../lib)

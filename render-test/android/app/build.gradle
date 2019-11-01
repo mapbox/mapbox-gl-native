@@ -1,0 +1,29 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        applicationId = 'com.mapbox.mapboxsdk.maps.render_test_runner'
+        minSdkVersion 14
+        targetSdkVersion 28
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_CCACHE=ccache'
+                arguments '-DANDROID_STL=c++_static'
+                targets 'mbgl-render-test-runner'
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            version '3.10.2'
+            path '../../../next/CMakeLists.txt'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+}

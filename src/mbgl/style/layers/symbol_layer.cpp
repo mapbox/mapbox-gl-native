@@ -1,5 +1,3 @@
-// clang-format off
-
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -1102,72 +1100,163 @@ TransitionOptions SymbolLayer::getTextTranslateAnchorTransition() const {
 
 using namespace conversion;
 
+namespace {
+
+enum class Property : uint8_t {
+    IconColor,
+    IconHaloBlur,
+    IconHaloColor,
+    IconHaloWidth,
+    IconOpacity,
+    IconTranslate,
+    IconTranslateAnchor,
+    TextColor,
+    TextHaloBlur,
+    TextHaloColor,
+    TextHaloWidth,
+    TextOpacity,
+    TextTranslate,
+    TextTranslateAnchor,
+    IconColorTransition,
+    IconHaloBlurTransition,
+    IconHaloColorTransition,
+    IconHaloWidthTransition,
+    IconOpacityTransition,
+    IconTranslateTransition,
+    IconTranslateAnchorTransition,
+    TextColorTransition,
+    TextHaloBlurTransition,
+    TextHaloColorTransition,
+    TextHaloWidthTransition,
+    TextOpacityTransition,
+    TextTranslateTransition,
+    TextTranslateAnchorTransition,
+    IconAllowOverlap,
+    IconAnchor,
+    IconIgnorePlacement,
+    IconImage,
+    IconKeepUpright,
+    IconOffset,
+    IconOptional,
+    IconPadding,
+    IconPitchAlignment,
+    IconRotate,
+    IconRotationAlignment,
+    IconSize,
+    IconTextFit,
+    IconTextFitPadding,
+    SymbolAvoidEdges,
+    SymbolPlacement,
+    SymbolSortKey,
+    SymbolSpacing,
+    SymbolZOrder,
+    TextAllowOverlap,
+    TextAnchor,
+    TextField,
+    TextFont,
+    TextIgnorePlacement,
+    TextJustify,
+    TextKeepUpright,
+    TextLetterSpacing,
+    TextLineHeight,
+    TextMaxAngle,
+    TextMaxWidth,
+    TextOffset,
+    TextOptional,
+    TextPadding,
+    TextPitchAlignment,
+    TextRadialOffset,
+    TextRotate,
+    TextRotationAlignment,
+    TextSize,
+    TextTransform,
+    TextVariableAnchor,
+    TextWritingMode,
+};
+
+template <typename T>
+constexpr uint8_t toUint8(T t) noexcept {
+    return uint8_t(mbgl::underlying_type(t));
+}
+
+MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>(
+    {{"icon-color", toUint8(Property::IconColor)},
+     {"icon-halo-blur", toUint8(Property::IconHaloBlur)},
+     {"icon-halo-color", toUint8(Property::IconHaloColor)},
+     {"icon-halo-width", toUint8(Property::IconHaloWidth)},
+     {"icon-opacity", toUint8(Property::IconOpacity)},
+     {"icon-translate", toUint8(Property::IconTranslate)},
+     {"icon-translate-anchor", toUint8(Property::IconTranslateAnchor)},
+     {"text-color", toUint8(Property::TextColor)},
+     {"text-halo-blur", toUint8(Property::TextHaloBlur)},
+     {"text-halo-color", toUint8(Property::TextHaloColor)},
+     {"text-halo-width", toUint8(Property::TextHaloWidth)},
+     {"text-opacity", toUint8(Property::TextOpacity)},
+     {"text-translate", toUint8(Property::TextTranslate)},
+     {"text-translate-anchor", toUint8(Property::TextTranslateAnchor)},
+     {"icon-color-transition", toUint8(Property::IconColorTransition)},
+     {"icon-halo-blur-transition", toUint8(Property::IconHaloBlurTransition)},
+     {"icon-halo-color-transition", toUint8(Property::IconHaloColorTransition)},
+     {"icon-halo-width-transition", toUint8(Property::IconHaloWidthTransition)},
+     {"icon-opacity-transition", toUint8(Property::IconOpacityTransition)},
+     {"icon-translate-transition", toUint8(Property::IconTranslateTransition)},
+     {"icon-translate-anchor-transition", toUint8(Property::IconTranslateAnchorTransition)},
+     {"text-color-transition", toUint8(Property::TextColorTransition)},
+     {"text-halo-blur-transition", toUint8(Property::TextHaloBlurTransition)},
+     {"text-halo-color-transition", toUint8(Property::TextHaloColorTransition)},
+     {"text-halo-width-transition", toUint8(Property::TextHaloWidthTransition)},
+     {"text-opacity-transition", toUint8(Property::TextOpacityTransition)},
+     {"text-translate-transition", toUint8(Property::TextTranslateTransition)},
+     {"text-translate-anchor-transition", toUint8(Property::TextTranslateAnchorTransition)},
+     {"icon-allow-overlap", toUint8(Property::IconAllowOverlap)},
+     {"icon-anchor", toUint8(Property::IconAnchor)},
+     {"icon-ignore-placement", toUint8(Property::IconIgnorePlacement)},
+     {"icon-image", toUint8(Property::IconImage)},
+     {"icon-keep-upright", toUint8(Property::IconKeepUpright)},
+     {"icon-offset", toUint8(Property::IconOffset)},
+     {"icon-optional", toUint8(Property::IconOptional)},
+     {"icon-padding", toUint8(Property::IconPadding)},
+     {"icon-pitch-alignment", toUint8(Property::IconPitchAlignment)},
+     {"icon-rotate", toUint8(Property::IconRotate)},
+     {"icon-rotation-alignment", toUint8(Property::IconRotationAlignment)},
+     {"icon-size", toUint8(Property::IconSize)},
+     {"icon-text-fit", toUint8(Property::IconTextFit)},
+     {"icon-text-fit-padding", toUint8(Property::IconTextFitPadding)},
+     {"symbol-avoid-edges", toUint8(Property::SymbolAvoidEdges)},
+     {"symbol-placement", toUint8(Property::SymbolPlacement)},
+     {"symbol-sort-key", toUint8(Property::SymbolSortKey)},
+     {"symbol-spacing", toUint8(Property::SymbolSpacing)},
+     {"symbol-z-order", toUint8(Property::SymbolZOrder)},
+     {"text-allow-overlap", toUint8(Property::TextAllowOverlap)},
+     {"text-anchor", toUint8(Property::TextAnchor)},
+     {"text-field", toUint8(Property::TextField)},
+     {"text-font", toUint8(Property::TextFont)},
+     {"text-ignore-placement", toUint8(Property::TextIgnorePlacement)},
+     {"text-justify", toUint8(Property::TextJustify)},
+     {"text-keep-upright", toUint8(Property::TextKeepUpright)},
+     {"text-letter-spacing", toUint8(Property::TextLetterSpacing)},
+     {"text-line-height", toUint8(Property::TextLineHeight)},
+     {"text-max-angle", toUint8(Property::TextMaxAngle)},
+     {"text-max-width", toUint8(Property::TextMaxWidth)},
+     {"text-offset", toUint8(Property::TextOffset)},
+     {"text-optional", toUint8(Property::TextOptional)},
+     {"text-padding", toUint8(Property::TextPadding)},
+     {"text-pitch-alignment", toUint8(Property::TextPitchAlignment)},
+     {"text-radial-offset", toUint8(Property::TextRadialOffset)},
+     {"text-rotate", toUint8(Property::TextRotate)},
+     {"text-rotation-alignment", toUint8(Property::TextRotationAlignment)},
+     {"text-size", toUint8(Property::TextSize)},
+     {"text-transform", toUint8(Property::TextTransform)},
+     {"text-variable-anchor", toUint8(Property::TextVariableAnchor)},
+     {"text-writing-mode", toUint8(Property::TextWritingMode)}});
+
+constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::TextTranslateAnchorTransition);
+} // namespace
+
 optional<Error> SymbolLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        IconColor,
-        IconHaloBlur,
-        IconHaloColor,
-        IconHaloWidth,
-        IconOpacity,
-        IconTranslate,
-        IconTranslateAnchor,
-        TextColor,
-        TextHaloBlur,
-        TextHaloColor,
-        TextHaloWidth,
-        TextOpacity,
-        TextTranslate,
-        TextTranslateAnchor,
-        IconColorTransition,
-        IconHaloBlurTransition,
-        IconHaloColorTransition,
-        IconHaloWidthTransition,
-        IconOpacityTransition,
-        IconTranslateTransition,
-        IconTranslateAnchorTransition,
-        TextColorTransition,
-        TextHaloBlurTransition,
-        TextHaloColorTransition,
-        TextHaloWidthTransition,
-        TextOpacityTransition,
-        TextTranslateTransition,
-        TextTranslateAnchorTransition,
-    };
-
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "icon-color", mbgl::underlying_type(Property::IconColor) },
-        { "icon-halo-blur", mbgl::underlying_type(Property::IconHaloBlur) },
-        { "icon-halo-color", mbgl::underlying_type(Property::IconHaloColor) },
-        { "icon-halo-width", mbgl::underlying_type(Property::IconHaloWidth) },
-        { "icon-opacity", mbgl::underlying_type(Property::IconOpacity) },
-        { "icon-translate", mbgl::underlying_type(Property::IconTranslate) },
-        { "icon-translate-anchor", mbgl::underlying_type(Property::IconTranslateAnchor) },
-        { "text-color", mbgl::underlying_type(Property::TextColor) },
-        { "text-halo-blur", mbgl::underlying_type(Property::TextHaloBlur) },
-        { "text-halo-color", mbgl::underlying_type(Property::TextHaloColor) },
-        { "text-halo-width", mbgl::underlying_type(Property::TextHaloWidth) },
-        { "text-opacity", mbgl::underlying_type(Property::TextOpacity) },
-        { "text-translate", mbgl::underlying_type(Property::TextTranslate) },
-        { "text-translate-anchor", mbgl::underlying_type(Property::TextTranslateAnchor) },
-        { "icon-color-transition", mbgl::underlying_type(Property::IconColorTransition) },
-        { "icon-halo-blur-transition", mbgl::underlying_type(Property::IconHaloBlurTransition) },
-        { "icon-halo-color-transition", mbgl::underlying_type(Property::IconHaloColorTransition) },
-        { "icon-halo-width-transition", mbgl::underlying_type(Property::IconHaloWidthTransition) },
-        { "icon-opacity-transition", mbgl::underlying_type(Property::IconOpacityTransition) },
-        { "icon-translate-transition", mbgl::underlying_type(Property::IconTranslateTransition) },
-        { "icon-translate-anchor-transition", mbgl::underlying_type(Property::IconTranslateAnchorTransition) },
-        { "text-color-transition", mbgl::underlying_type(Property::TextColorTransition) },
-        { "text-halo-blur-transition", mbgl::underlying_type(Property::TextHaloBlurTransition) },
-        { "text-halo-color-transition", mbgl::underlying_type(Property::TextHaloColorTransition) },
-        { "text-halo-width-transition", mbgl::underlying_type(Property::TextHaloWidthTransition) },
-        { "text-opacity-transition", mbgl::underlying_type(Property::TextOpacityTransition) },
-        { "text-translate-transition", mbgl::underlying_type(Property::TextTranslateTransition) },
-        { "text-translate-anchor-transition", mbgl::underlying_type(Property::TextTranslateAnchorTransition) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
-        return Error { "layer doesn't support this property" };
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
+        return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
@@ -1285,174 +1374,235 @@ optional<Error> SymbolLayer::setPaintProperty(const std::string& name, const Con
     if (!transition) {
         return error;
     }
-    
+
     if (property == Property::IconColorTransition) {
         setIconColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::IconHaloBlurTransition) {
         setIconHaloBlurTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::IconHaloColorTransition) {
         setIconHaloColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::IconHaloWidthTransition) {
         setIconHaloWidthTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::IconOpacityTransition) {
         setIconOpacityTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::IconTranslateTransition) {
         setIconTranslateTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::IconTranslateAnchorTransition) {
         setIconTranslateAnchorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::TextColorTransition) {
         setTextColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::TextHaloBlurTransition) {
         setTextHaloBlurTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::TextHaloColorTransition) {
         setTextHaloColorTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::TextHaloWidthTransition) {
         setTextHaloWidthTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::TextOpacityTransition) {
         setTextOpacityTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::TextTranslateTransition) {
         setTextTranslateTransition(*transition);
         return nullopt;
     }
-    
+
     if (property == Property::TextTranslateAnchorTransition) {
         setTextTranslateAnchorTransition(*transition);
         return nullopt;
     }
-    
 
-    return Error { "layer doesn't support this property" };
+    return Error{"layer doesn't support this property"};
+}
+
+StyleProperty SymbolLayer::getProperty(const std::string& name) const {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end()) {
+        return {};
+    }
+
+    switch (static_cast<Property>(it->second)) {
+        case Property::IconColor:
+            return makeStyleProperty(getIconColor());
+        case Property::IconHaloBlur:
+            return makeStyleProperty(getIconHaloBlur());
+        case Property::IconHaloColor:
+            return makeStyleProperty(getIconHaloColor());
+        case Property::IconHaloWidth:
+            return makeStyleProperty(getIconHaloWidth());
+        case Property::IconOpacity:
+            return makeStyleProperty(getIconOpacity());
+        case Property::IconTranslate:
+            return makeStyleProperty(getIconTranslate());
+        case Property::IconTranslateAnchor:
+            return makeStyleProperty(getIconTranslateAnchor());
+        case Property::TextColor:
+            return makeStyleProperty(getTextColor());
+        case Property::TextHaloBlur:
+            return makeStyleProperty(getTextHaloBlur());
+        case Property::TextHaloColor:
+            return makeStyleProperty(getTextHaloColor());
+        case Property::TextHaloWidth:
+            return makeStyleProperty(getTextHaloWidth());
+        case Property::TextOpacity:
+            return makeStyleProperty(getTextOpacity());
+        case Property::TextTranslate:
+            return makeStyleProperty(getTextTranslate());
+        case Property::TextTranslateAnchor:
+            return makeStyleProperty(getTextTranslateAnchor());
+        case Property::IconColorTransition:
+            return makeStyleProperty(getIconColorTransition());
+        case Property::IconHaloBlurTransition:
+            return makeStyleProperty(getIconHaloBlurTransition());
+        case Property::IconHaloColorTransition:
+            return makeStyleProperty(getIconHaloColorTransition());
+        case Property::IconHaloWidthTransition:
+            return makeStyleProperty(getIconHaloWidthTransition());
+        case Property::IconOpacityTransition:
+            return makeStyleProperty(getIconOpacityTransition());
+        case Property::IconTranslateTransition:
+            return makeStyleProperty(getIconTranslateTransition());
+        case Property::IconTranslateAnchorTransition:
+            return makeStyleProperty(getIconTranslateAnchorTransition());
+        case Property::TextColorTransition:
+            return makeStyleProperty(getTextColorTransition());
+        case Property::TextHaloBlurTransition:
+            return makeStyleProperty(getTextHaloBlurTransition());
+        case Property::TextHaloColorTransition:
+            return makeStyleProperty(getTextHaloColorTransition());
+        case Property::TextHaloWidthTransition:
+            return makeStyleProperty(getTextHaloWidthTransition());
+        case Property::TextOpacityTransition:
+            return makeStyleProperty(getTextOpacityTransition());
+        case Property::TextTranslateTransition:
+            return makeStyleProperty(getTextTranslateTransition());
+        case Property::TextTranslateAnchorTransition:
+            return makeStyleProperty(getTextTranslateAnchorTransition());
+        case Property::IconAllowOverlap:
+            return makeStyleProperty(getIconAllowOverlap());
+        case Property::IconAnchor:
+            return makeStyleProperty(getIconAnchor());
+        case Property::IconIgnorePlacement:
+            return makeStyleProperty(getIconIgnorePlacement());
+        case Property::IconImage:
+            return makeStyleProperty(getIconImage());
+        case Property::IconKeepUpright:
+            return makeStyleProperty(getIconKeepUpright());
+        case Property::IconOffset:
+            return makeStyleProperty(getIconOffset());
+        case Property::IconOptional:
+            return makeStyleProperty(getIconOptional());
+        case Property::IconPadding:
+            return makeStyleProperty(getIconPadding());
+        case Property::IconPitchAlignment:
+            return makeStyleProperty(getIconPitchAlignment());
+        case Property::IconRotate:
+            return makeStyleProperty(getIconRotate());
+        case Property::IconRotationAlignment:
+            return makeStyleProperty(getIconRotationAlignment());
+        case Property::IconSize:
+            return makeStyleProperty(getIconSize());
+        case Property::IconTextFit:
+            return makeStyleProperty(getIconTextFit());
+        case Property::IconTextFitPadding:
+            return makeStyleProperty(getIconTextFitPadding());
+        case Property::SymbolAvoidEdges:
+            return makeStyleProperty(getSymbolAvoidEdges());
+        case Property::SymbolPlacement:
+            return makeStyleProperty(getSymbolPlacement());
+        case Property::SymbolSortKey:
+            return makeStyleProperty(getSymbolSortKey());
+        case Property::SymbolSpacing:
+            return makeStyleProperty(getSymbolSpacing());
+        case Property::SymbolZOrder:
+            return makeStyleProperty(getSymbolZOrder());
+        case Property::TextAllowOverlap:
+            return makeStyleProperty(getTextAllowOverlap());
+        case Property::TextAnchor:
+            return makeStyleProperty(getTextAnchor());
+        case Property::TextField:
+            return makeStyleProperty(getTextField());
+        case Property::TextFont:
+            return makeStyleProperty(getTextFont());
+        case Property::TextIgnorePlacement:
+            return makeStyleProperty(getTextIgnorePlacement());
+        case Property::TextJustify:
+            return makeStyleProperty(getTextJustify());
+        case Property::TextKeepUpright:
+            return makeStyleProperty(getTextKeepUpright());
+        case Property::TextLetterSpacing:
+            return makeStyleProperty(getTextLetterSpacing());
+        case Property::TextLineHeight:
+            return makeStyleProperty(getTextLineHeight());
+        case Property::TextMaxAngle:
+            return makeStyleProperty(getTextMaxAngle());
+        case Property::TextMaxWidth:
+            return makeStyleProperty(getTextMaxWidth());
+        case Property::TextOffset:
+            return makeStyleProperty(getTextOffset());
+        case Property::TextOptional:
+            return makeStyleProperty(getTextOptional());
+        case Property::TextPadding:
+            return makeStyleProperty(getTextPadding());
+        case Property::TextPitchAlignment:
+            return makeStyleProperty(getTextPitchAlignment());
+        case Property::TextRadialOffset:
+            return makeStyleProperty(getTextRadialOffset());
+        case Property::TextRotate:
+            return makeStyleProperty(getTextRotate());
+        case Property::TextRotationAlignment:
+            return makeStyleProperty(getTextRotationAlignment());
+        case Property::TextSize:
+            return makeStyleProperty(getTextSize());
+        case Property::TextTransform:
+            return makeStyleProperty(getTextTransform());
+        case Property::TextVariableAnchor:
+            return makeStyleProperty(getTextVariableAnchor());
+        case Property::TextWritingMode:
+            return makeStyleProperty(getTextWritingMode());
+    }
+    return {};
 }
 
 optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
     if (name == "visibility") {
         return Layer::setVisibility(value);
     }
-    enum class Property {
-        IconAllowOverlap,
-        IconAnchor,
-        IconIgnorePlacement,
-        IconImage,
-        IconKeepUpright,
-        IconOffset,
-        IconOptional,
-        IconPadding,
-        IconPitchAlignment,
-        IconRotate,
-        IconRotationAlignment,
-        IconSize,
-        IconTextFit,
-        IconTextFitPadding,
-        SymbolAvoidEdges,
-        SymbolPlacement,
-        SymbolSortKey,
-        SymbolSpacing,
-        SymbolZOrder,
-        TextAllowOverlap,
-        TextAnchor,
-        TextField,
-        TextFont,
-        TextIgnorePlacement,
-        TextJustify,
-        TextKeepUpright,
-        TextLetterSpacing,
-        TextLineHeight,
-        TextMaxAngle,
-        TextMaxWidth,
-        TextOffset,
-        TextOptional,
-        TextPadding,
-        TextPitchAlignment,
-        TextRadialOffset,
-        TextRotate,
-        TextRotationAlignment,
-        TextSize,
-        TextTransform,
-        TextVariableAnchor,
-        TextWritingMode,
-    };
-    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
-        { "icon-allow-overlap", mbgl::underlying_type(Property::IconAllowOverlap) },
-        { "icon-anchor", mbgl::underlying_type(Property::IconAnchor) },
-        { "icon-ignore-placement", mbgl::underlying_type(Property::IconIgnorePlacement) },
-        { "icon-image", mbgl::underlying_type(Property::IconImage) },
-        { "icon-keep-upright", mbgl::underlying_type(Property::IconKeepUpright) },
-        { "icon-offset", mbgl::underlying_type(Property::IconOffset) },
-        { "icon-optional", mbgl::underlying_type(Property::IconOptional) },
-        { "icon-padding", mbgl::underlying_type(Property::IconPadding) },
-        { "icon-pitch-alignment", mbgl::underlying_type(Property::IconPitchAlignment) },
-        { "icon-rotate", mbgl::underlying_type(Property::IconRotate) },
-        { "icon-rotation-alignment", mbgl::underlying_type(Property::IconRotationAlignment) },
-        { "icon-size", mbgl::underlying_type(Property::IconSize) },
-        { "icon-text-fit", mbgl::underlying_type(Property::IconTextFit) },
-        { "icon-text-fit-padding", mbgl::underlying_type(Property::IconTextFitPadding) },
-        { "symbol-avoid-edges", mbgl::underlying_type(Property::SymbolAvoidEdges) },
-        { "symbol-placement", mbgl::underlying_type(Property::SymbolPlacement) },
-        { "symbol-sort-key", mbgl::underlying_type(Property::SymbolSortKey) },
-        { "symbol-spacing", mbgl::underlying_type(Property::SymbolSpacing) },
-        { "symbol-z-order", mbgl::underlying_type(Property::SymbolZOrder) },
-        { "text-allow-overlap", mbgl::underlying_type(Property::TextAllowOverlap) },
-        { "text-anchor", mbgl::underlying_type(Property::TextAnchor) },
-        { "text-field", mbgl::underlying_type(Property::TextField) },
-        { "text-font", mbgl::underlying_type(Property::TextFont) },
-        { "text-ignore-placement", mbgl::underlying_type(Property::TextIgnorePlacement) },
-        { "text-justify", mbgl::underlying_type(Property::TextJustify) },
-        { "text-keep-upright", mbgl::underlying_type(Property::TextKeepUpright) },
-        { "text-letter-spacing", mbgl::underlying_type(Property::TextLetterSpacing) },
-        { "text-line-height", mbgl::underlying_type(Property::TextLineHeight) },
-        { "text-max-angle", mbgl::underlying_type(Property::TextMaxAngle) },
-        { "text-max-width", mbgl::underlying_type(Property::TextMaxWidth) },
-        { "text-offset", mbgl::underlying_type(Property::TextOffset) },
-        { "text-optional", mbgl::underlying_type(Property::TextOptional) },
-        { "text-padding", mbgl::underlying_type(Property::TextPadding) },
-        { "text-pitch-alignment", mbgl::underlying_type(Property::TextPitchAlignment) },
-        { "text-radial-offset", mbgl::underlying_type(Property::TextRadialOffset) },
-        { "text-rotate", mbgl::underlying_type(Property::TextRotate) },
-        { "text-rotation-alignment", mbgl::underlying_type(Property::TextRotationAlignment) },
-        { "text-size", mbgl::underlying_type(Property::TextSize) },
-        { "text-transform", mbgl::underlying_type(Property::TextTransform) },
-        { "text-variable-anchor", mbgl::underlying_type(Property::TextVariableAnchor) },
-        { "text-writing-mode", mbgl::underlying_type(Property::TextWritingMode) }
-    });
-
-    const auto it = properties.find(name.c_str());
-    if (it == properties.end()) {
+    const auto it = layerProperties.find(name.c_str());
+    if (it == layerProperties.end() || it->second <= lastPaintPropertyIndex) {
         return Error { "layer doesn't support this property" };
     }
 
@@ -1805,5 +1955,3 @@ Mutable<Layer::Impl> SymbolLayer::mutableBaseImpl() const {
 
 } // namespace style
 } // namespace mbgl
-
-// clang-format on

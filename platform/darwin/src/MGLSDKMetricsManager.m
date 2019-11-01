@@ -18,6 +18,23 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
     return eventName;
 }
 
+// Taken verbatim from NXFreeArchInfo header documentation
+#if TARGET_OS_IOS
+static void MGLFreeArchInfo(const NXArchInfo *x)
+{
+    const NXArchInfo *p;
+
+    p = NXGetAllArchInfos();
+    while(p->name != NULL){
+        if(x == p)
+            return;
+        p++;
+    }
+    free((char *)x->description);
+    free((NXArchInfo *)x);
+}
+#endif
+
 @interface MGLMetricsManager() <MGLNetworkConfigurationMetricsDelegate>
 
 @property (strong, nonatomic) NSDictionary *metadata;
@@ -54,7 +71,16 @@ NSString* MGLStringFromMetricType(MGLMetricType metricType) {
         
             if (localArchInfo) {
                 abi = @(localArchInfo->description);
-                NXFreeArchInfo(localArchInfo);
+
+                NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+
+                // Although NXFreeArchInfo appears to be weakly linked, it does
+                // not have the weak_import attribute, so check the OS version.
+                if (&NXFreeArchInfo && [processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 0, 0}]) {
+                    NXFreeArchInfo(localArchInfo);
+                } else {
+                    MGLFreeArchInfo(localArchInfo);
+                }
             }
         }
         

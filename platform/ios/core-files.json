@@ -7,6 +7,7 @@
         "platform/darwin/src/image.mm",
         "platform/darwin/src/local_glyph_rasterizer.mm",
         "platform/darwin/src/logging_nslog.mm",
+        "platform/darwin/src/number_format.mm",
         "platform/darwin/src/nsthread.mm",
         "platform/darwin/src/reachability.m",
         "platform/darwin/src/string_nsstring.mm",
@@ -16,6 +17,7 @@
         "platform/default/src/mbgl/map/map_snapshotter.cpp",
         "platform/default/src/mbgl/text/bidi.cpp",
         "platform/default/src/mbgl/util/compression.cpp",
+        "platform/default/src/mbgl/util/monotonic_timer.cpp",
         "platform/default/src/mbgl/util/png_writer.cpp",
         "platform/default/src/mbgl/util/thread_local.cpp",
         "platform/default/src/mbgl/util/utf.cpp"

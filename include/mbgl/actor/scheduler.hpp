@@ -1,5 +1,8 @@
 #pragma once
 
+#include <mapbox/weak.hpp>
+
+#include <functional>
 #include <memory>
 
 namespace mbgl {
@@ -31,12 +34,21 @@ class Mailbox;
 class Scheduler {
 public:
     virtual ~Scheduler() = default;
-    
-    // Used by a Mailbox when it has a message in its queue to request that it
-    // be scheduled. Specifically, the scheduler is expected to asynchronously
-    // call `receive() on the given mailbox, provided it still exists at that
-    // time.
-    virtual void schedule(std::weak_ptr<Mailbox>) = 0;
+
+    // Enqueues a function for execution.
+    virtual void schedule(std::function<void()>) = 0;
+    // Makes a weak pointer to this Scheduler.
+    virtual mapbox::base::WeakPtr<Scheduler> makeWeakPtr() = 0;
+
+    // Returns a closure wrapping the given one.
+    //
+    // When the returned closure is invoked for the first time, it schedules
+    // the given closure to this scheduler, the consequent calls of the
+    // returned closure are ignored.
+    //
+    // If this scheduler is already deleted by the time the returnded closure is
+    // first invoked, the call is ignored.
+    std::function<void()> bindOnce(std::function<void()>);
 
     // Set/Get the current Scheduler for this thread
     static Scheduler* GetCurrent();

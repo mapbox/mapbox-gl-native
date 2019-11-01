@@ -27,6 +27,8 @@ public:
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
     optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
 
+    StyleProperty getProperty(const std::string& name) const final;
+
     // Layout properties
 
     static PropertyValue<LineCapType> getDefaultLineCap();

@@ -82,13 +82,8 @@ T evaluateFeature(const mapbox::feature::feature<double>& f,
     return T();
 }
 
-GeoJSONSource::Impl::Impl(std::string id_, optional<GeoJSONOptions> options_)
-    : Source::Impl(SourceType::GeoJSON, std::move(id_)) {
-    options = options_ ? std::move(*options_) : GeoJSONOptions{};
-}
-
-GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
-    : Source::Impl(other), options(other.options) {
+// static
+std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON, const GeoJSONOptions& options) {
     constexpr double scale = util::EXTENT / util::tileSize;
     if (options.cluster && geoJSON.is<mapbox::feature::feature_collection<double>>() &&
         !geoJSON.get<mapbox::feature::feature_collection<double>>().empty()) {
@@ -99,6 +94,7 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
         Feature feature;
         clusterOptions.map = [&](const PropertyMap& properties) -> PropertyMap {
             PropertyMap ret{};
+            if (properties.empty()) return ret;
             for (const auto& p : options.clusterProperties) {
                 feature.properties = properties;
                 ret[p.first] = evaluateFeature<Value>(feature, p.second.first);
@@ -115,18 +111,26 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
                 toReturn[p.first] = evaluateFeature<Value>(feature, p.second.second, accumulated);
             }
         };
-        data = std::make_shared<SuperclusterData>(
-            geoJSON.get<mapbox::feature::feature_collection<double>>(), clusterOptions);
-    } else {
-        mapbox::geojsonvt::Options vtOptions;
-        vtOptions.maxZoom = options.maxzoom;
-        vtOptions.extent = util::EXTENT;
-        vtOptions.buffer = ::round(scale * options.buffer);
-        vtOptions.tolerance = scale * options.tolerance;
-        vtOptions.lineMetrics = options.lineMetrics;
-        data = std::make_shared<GeoJSONVTData>(geoJSON, vtOptions);
+        return std::make_shared<SuperclusterData>(geoJSON.get<mapbox::feature::feature_collection<double>>(),
+                                                  clusterOptions);
     }
+
+    mapbox::geojsonvt::Options vtOptions;
+    vtOptions.maxZoom = options.maxzoom;
+    vtOptions.extent = util::EXTENT;
+    vtOptions.buffer = ::round(scale * options.buffer);
+    vtOptions.tolerance = scale * options.tolerance;
+    vtOptions.lineMetrics = options.lineMetrics;
+    return std::make_shared<GeoJSONVTData>(geoJSON, vtOptions);
 }
+
+GeoJSONSource::Impl::Impl(std::string id_, optional<GeoJSONOptions> options_)
+    : Source::Impl(SourceType::GeoJSON, std::move(id_)) {
+    options = options_ ? std::move(*options_) : GeoJSONOptions{};
+}
+
+GeoJSONSource::Impl::Impl(const GeoJSONSource::Impl& other, std::shared_ptr<GeoJSONData> data_)
+    : Source::Impl(other), options(other.options), data(std::move(data_)) {}
 
 GeoJSONSource::Impl::~Impl() = default;
 

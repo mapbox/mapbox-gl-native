@@ -123,13 +123,12 @@ workflows:
     jobs:
       #
       # Naming convention: {platform}-{additional description}-{build type}
-      #   - {platform} is the client platform/framework, which may differ from 
+      #   - {platform} is the client platform/framework, which may differ from
       #     the build platform. Specify both if applicable, e.g., "qt5-macos".
       #   - {additional description} optionally describes the compiler or other
       #     unique aspect of the build environment.
       #   - {build type} is typically "debug" or "release".
       #
-      - nitpick
       - android-debug-arm-v7-buck
       - android-arm-template:
           name: android-debug-arm-v8
@@ -144,11 +143,7 @@ workflows:
           filters:
             tags:
               only: /android-v.*/
-      - node-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node-gcc8-debug:
+      - node-linux-release:
           filters:
             tags:
               only: /node-.*/
@@ -156,13 +151,10 @@ workflows:
           filters:
             tags:
               only: /node-.*/
-      - linux-clang-38-libcxx-debug:
-          name: linux-clang-3.8-libcxx-debug
       - linux-clang-7-sanitize-address-undefined
       - linux-clang-7-sanitize-thread
       - linux-gcc5-debug-coverage
       - linux-doxygen
-      - linux-render-tests
       - ios-debug
       - ios-debug-xcode10
       - ios-release-template:
@@ -174,7 +166,6 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug
-      - macos-render-tests
   nightly:
     triggers:
       - schedule:
@@ -196,7 +187,7 @@ executors:
   ubuntu-disco:
     docker:
       # FIXME: Move the image to mbgl/
-      - image: tmpsantos/mbgl_ci:1.5
+      - image: tmpsantos/mbgl_ci:1.6
     resource_class: xlarge
     working_directory: /src
     environment:
@@ -207,7 +198,7 @@ executors:
       QT_VERSION: 5
   macos-11_0_0:
     macos:
-      xcode: '11.0.0'
+      xcode: '11.1.0'
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
       HOMEBREW_NO_INSTALL_CLEANUP: 1
@@ -234,6 +225,12 @@ commands:
           name: Prepare macOS
           command: |
             brew install cmake ccache glfw ninja pkgconfig qt
+      - run:
+          name: Code Generators macOS
+          command: |
+              platform/darwin/scripts/generate-style-code.js
+              platform/darwin/scripts/update-examples.js
+              git add -A && git diff --staged --exit-code
   next-config:
     parameters:
       config_params:
@@ -270,7 +267,9 @@ commands:
           when: on_fail
           command: |
             mkdir -p /tmp/tests/render
-            if [ -f mapbox-gl-js/test/integration/render-tests/index.html ]; then cp mapbox-gl-js/test/integration/render-tests/index.html /tmp/tests/render; fi
+            if [ -f render-test/tests_index.html ]; then cp render-test/tests_index.html /tmp/tests/render; fi
+            if [ -f render-test/render-tests_index.html ]; then cp render-test/render-tests_index.html /tmp/tests/render; fi
+            if [ -f render-test/query-tests_index.html ]; then cp render-test/query-tests_index.html /tmp/tests/render; fi
             mkdir -p /tmp/tests/coredumps
             if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
       - store_artifacts:
@@ -287,7 +286,7 @@ commands:
           name: Test
           command: |
             cd build
-            << parameters.test_wrapper >> ctest -j 8 --output-on-failure << parameters.test_params >>
+            << parameters.test_wrapper >> ctest -V << parameters.test_params >>
   npm-install:
     steps:
     - run:
@@ -471,16 +470,6 @@ commands:
     - run:
         name: Build node
         command: make node-all
-  build-mbgl-render-test:
-    steps:
-    - run:
-        name: Build mbgl-render-test
-        command: cmake --build build --config ${BUILDTYPE} --target mbgl-render-test -- -j${JOBS}
-  build-mbgl-expression-test:
-    steps:
-    - run:
-        name: Build mbgl-expression-test
-        command: cmake --build build --config ${BUILDTYPE} --target mbgl-expression-test -- -j${JOBS}
   build-linux:
     steps:
     - run:
@@ -586,26 +575,6 @@ commands:
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node
 
-  run-macos-render-tests:
-    steps:
-    - run:
-        name: Run render tests (mbgl-render-test)
-        command: |
-          build/mbgl-render-test --recycle-map --shuffle
-        no_output_timeout: 2m
-
-  run-linux-render-tests:
-    parameters:
-      node_version:
-        type: string
-        default: v8
-    steps:
-    - run:
-        name: Run render tests (mbgl-render-test)
-        command: |
-          xvfb-run --server-args="-screen 0 1024x768x24" \
-            logbt -- apitrace trace --api=egl -v build/mbgl-render-test --recycle-map --shuffle
-
   run-unit-tests:
     steps:
     - run:
@@ -619,23 +588,10 @@ commands:
     - run:
         name: Run tests
         command: |
-          # Source.RenderTileSetSourceUpdate is filtered out due to #15294
-          xvfb-run --server-args="-screen 0 1024x768x24" make run-test--Source.RenderTileSetSourceUpdate 2> >(tee sanitizer 1>&2)
+          # Source.RenderTileSetSourceUpdate and Source.InvisibleSourcesTileNecessity are filtered out due to #15294
+          xvfb-run --server-args="-screen 0 1024x768x24" make run-test--Source.RenderTileSetSourceUpdate:Source.InvisibleSourcesTileNecessity 2> >(tee sanitizer 1>&2)
           # Unfortunately, Google Test eats the status code, so we'll have to check the output.
           [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
-
-  run-expression-tests:
-    steps:
-    - run:
-        name: Run expression tests
-        command: |
-          build/mbgl-expression-test -s --seed=$RANDOM
-
-  upload-expression-tests:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/expression-tests/index.html
-        destination: expression-tests
 
   publish-node-package:
     steps:
@@ -643,12 +599,6 @@ commands:
         name: Publish node package
         when: on_success
         command: platform/node/scripts/publish.sh
-
-  upload-render-tests:
-    steps:
-    - store_artifacts:
-        path: mapbox-gl-js/test/integration/render-tests/index.html
-        destination: render-tests
 
   collect-xcode-build-logs:
     steps:
@@ -711,6 +661,7 @@ jobs:
           name: Code Generators
           command: |
             platform/android/scripts/generate-style-code.js
+            platform/default/include/mbgl/storage/offline_schema.js
             scripts/generate-file-lists.js
             scripts/generate-shaders.js
             scripts/generate-style-code.js
@@ -788,42 +739,6 @@ jobs:
                 test_wrapper: ''
                 test_params: << parameters.test_params >>
       - next-save
-
-  nitpick:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Debug
-    steps:
-      - install-dependencies: { mason: false, ccache: false }
-      - run:
-          name: Initialize submodules
-          command: |
-            git submodule update --init
-            git submodule foreach git submodule update --init
-      - run:
-          name: Verify submodule pin
-          command: scripts/nitpick/submodule-pin.js
-          when: always
-      - run:
-          name: Source file list generation
-          command: scripts/nitpick/generated-code.js sources
-          when: always
-      - run:
-          name: Shader code generation
-          command: scripts/nitpick/generated-code.js shader
-          when: always
-      - run:
-          name: Style code generation
-          command: scripts/nitpick/generated-code.js style
-          when: always
-      - run:
-          name: Android code generation
-          command: scripts/nitpick/generated-code.js android
-          when: always
 
 # ------------------------------------------------------------------------------
   android-arm-template:
@@ -944,7 +859,7 @@ jobs:
           command: |
             if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
               if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+                curl -u ${MOBILE_METRICS_TOKEN}: -d build_parameters[CIRCLE_JOB]=android-core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
               fi
             fi
       - run:
@@ -952,7 +867,7 @@ jobs:
           command: |
             if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
               if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+                curl -u ${MOBILE_METRICS_TOKEN}: -d build_parameters[CIRCLE_JOB]=android-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
               fi
             fi
       - run:
@@ -997,17 +912,6 @@ jobs:
           path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so.gz
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so.gz
-      - deploy:
-          name: Publish to Bintray
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
-              version=$(cat platform/android/MapboxGLAndroidSDK/gradle.properties | grep "VERSION_NAME")
-              if [[ $version != *"SNAPSHOT"* ]]; then
-                make run-android-upload-to-bintray
-              else
-                make run-android-upload-to-artifactory
-              fi
-            fi
       - run:
           name: Trigger external deploy steps
           command: |
@@ -1016,9 +920,9 @@ jobs:
             export DOCS_REPO="android-docs"
             scripts/trigger-maps-documentation-deploy-steps.sh
           background: true
-      - run:
-          name: Record size
-          command: platform/android/scripts/metrics.sh
+#      - run:
+#          name: Record size
+#          command: platform/android/scripts/metrics.sh
 # ------------------------------------------------------------------------------
   android-debug-arm-v7-buck:
     docker:
@@ -1046,7 +950,7 @@ jobs:
             buck build mapbox-gl-native:android-core
 
 # ------------------------------------------------------------------------------
-  node-clang39-release:
+  node-linux-release:
     docker:
       - image: mbgl/linux-clang-3.9:2077f965ed
     resource_class: large
@@ -1064,27 +968,9 @@ jobs:
       - publish-node-package
 
 # ------------------------------------------------------------------------------
-  node-gcc8-debug:
-    docker:
-      - image: mbgl/linux-gcc-8:d2b1553d2f
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-node
-      - save-dependencies
-      - publish-node-package
-
-# ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.1.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1100,23 +986,6 @@ jobs:
       - publish-node-package
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  linux-clang-38-libcxx-debug:
-    docker:
-      - image: mbgl/linux-clang-3.8-libcxx:d6800bdbb4
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - build-linux
-      - save-dependencies
 
 # ------------------------------------------------------------------------------
   linux-clang-7-sanitize-address-undefined:
@@ -1223,32 +1092,9 @@ jobs:
               scripts/publish_doxygen_coverage.js "build/linux-$(uname -m)/Debug/doxygen-coverage.json"
 
 # ------------------------------------------------------------------------------
-  linux-render-tests:
-    docker:
-      - image: mbgl/linux-clang-7:a5a3c52107
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: RelWithDebInfo
-      WITH_EGL: 1
-    steps:
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - configure-cmake
-      - build-mbgl-expression-test
-      - build-mbgl-render-test
-      - run-expression-tests
-      - run-linux-render-tests
-      - save-dependencies
-      - upload-expression-tests
-      - upload-render-tests
-
-# ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1265,9 +1111,6 @@ jobs:
       - run:
           name: Check symbol namespacing for mapbox-events-ios
           command: make ios-check-events-symbols
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1292,9 +1135,6 @@ jobs:
       - run:
           name: Check symbol namespacing for mapbox-events-ios
           command: make ios-check-events-symbols
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1302,7 +1142,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1317,7 +1157,10 @@ jobs:
       - run:
           name: Get iOS code coverage
           command: |
-              platform/ios/scripts/ios-code-coverage.sh CI
+            echo "Skipping iOS code coverage"
+          # Currently failing, need to update for Xcode 11
+          # platform/ios/scripts/ios-code-coverage.sh CI
+          #
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
@@ -1326,7 +1169,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1346,7 +1189,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1386,7 +1229,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-template:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.1.0"
     shell: /bin/bash --login -eo pipefail
     environment:
       BUILDTYPE: Release
@@ -1415,14 +1258,17 @@ jobs:
               platform/ios/scripts/deploy-to-cocoapods.sh
             fi
       - run:
-          name: Record size
-          command: platform/ios/scripts/metrics.sh
+         name: Record size
+         command: |
+              echo "Skipping Record size step"
+              # Skipping due to https://github.com/mapbox/mapbox-gl-native/issues/15751
+              #platform/ios/scripts/metrics.sh
       - run:
           name: Trigger metrics
           command: |
             if [[ $CIRCLE_BRANCH == master ]]; then
               if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=ios-maps-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+                curl -u ${MOBILE_METRICS_TOKEN}: -d build_parameters[CIRCLE_JOB]=ios-maps-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
               else
                 echo "MOBILE_METRICS_TOKEN not provided"
               fi
@@ -1512,28 +1358,6 @@ jobs:
           destination: test/fixtures
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  macos-render-tests:
-    macos:
-      xcode: "11.0.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-      JOBS: 2
-    steps:
-      - install-macos-dependencies
-      - install-dependencies
-      - check-if-this-job-can-be-skipped
-      - configure-cmake
-      - build-mbgl-expression-test
-      - build-mbgl-render-test
-      - save-dependencies
-      - run-expression-tests
-      - run-macos-render-tests
-      - upload-expression-tests
-      - upload-render-tests
 
 # ------------------------------------------------------------------------------
   metrics-nightly:

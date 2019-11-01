@@ -31,7 +31,7 @@ set(CMAKE_CXX_FLAGS_DEBUGCOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
 set(CMAKE_C_FLAGS_DEBUGCOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
 
 set(CMAKE_CXX_FLAGS_SANITIZE "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=${MBGL_WITH_SANITIZER}")
-set(CMAKE_C_FLAGS_SANITIZE "-DSANITEIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=${MBGL_WITH_SANITIZER}")
+set(CMAKE_C_FLAGS_SANITIZE "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=${MBGL_WITH_SANITIZER}")
 
 if(MBGL_WITH_QT)
     find_package(Qt5Core REQUIRED)
@@ -70,6 +70,7 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/gfx/backend_scope.hpp
     ${MBGL_ROOT}/include/mbgl/gfx/renderable.hpp
     ${MBGL_ROOT}/include/mbgl/gfx/renderer_backend.hpp
+    ${MBGL_ROOT}/include/mbgl/gfx/rendering_stats.hpp
     ${MBGL_ROOT}/include/mbgl/gl/renderable_resource.hpp
     ${MBGL_ROOT}/include/mbgl/gl/renderer_backend.hpp
     ${MBGL_ROOT}/include/mbgl/layermanager/background_layer_factory.hpp
@@ -189,6 +190,7 @@ add_library(
     ${MBGL_ROOT}/include/mbgl/style/sources/raster_source.hpp
     ${MBGL_ROOT}/include/mbgl/style/sources/vector_source.hpp
     ${MBGL_ROOT}/include/mbgl/style/style.hpp
+    ${MBGL_ROOT}/include/mbgl/style/style_property.hpp
     ${MBGL_ROOT}/include/mbgl/style/transition_options.hpp
     ${MBGL_ROOT}/include/mbgl/style/types.hpp
     ${MBGL_ROOT}/include/mbgl/style/undefined.hpp
@@ -284,6 +286,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gfx/render_pass.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/renderbuffer.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/renderer_backend.cpp
+    ${MBGL_ROOT}/src/mbgl/gfx/rendering_stats.cpp
     ${MBGL_ROOT}/src/mbgl/gfx/stencil_mode.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/texture.hpp
     ${MBGL_ROOT}/src/mbgl/gfx/types.hpp
@@ -305,6 +308,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gl/enum.hpp
     ${MBGL_ROOT}/src/mbgl/gl/extension.hpp
     ${MBGL_ROOT}/src/mbgl/gl/framebuffer.hpp
+    ${MBGL_ROOT}/src/mbgl/gl/index_buffer_resource.cpp
     ${MBGL_ROOT}/src/mbgl/gl/index_buffer_resource.hpp
     ${MBGL_ROOT}/src/mbgl/gl/object.cpp
     ${MBGL_ROOT}/src/mbgl/gl/object.hpp
@@ -318,6 +322,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gl/state.hpp
     ${MBGL_ROOT}/src/mbgl/gl/texture.cpp
     ${MBGL_ROOT}/src/mbgl/gl/texture.hpp
+    ${MBGL_ROOT}/src/mbgl/gl/texture_resource.cpp
     ${MBGL_ROOT}/src/mbgl/gl/texture_resource.hpp
     ${MBGL_ROOT}/src/mbgl/gl/types.hpp
     ${MBGL_ROOT}/src/mbgl/gl/uniform.cpp
@@ -329,6 +334,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/gl/vertex_array.cpp
     ${MBGL_ROOT}/src/mbgl/gl/vertex_array.hpp
     ${MBGL_ROOT}/src/mbgl/gl/vertex_array_extension.hpp
+    ${MBGL_ROOT}/src/mbgl/gl/vertex_buffer_resource.cpp
     ${MBGL_ROOT}/src/mbgl/gl/vertex_buffer_resource.hpp
     ${MBGL_ROOT}/src/mbgl/layermanager/background_layer_factory.cpp
     ${MBGL_ROOT}/src/mbgl/layermanager/circle_layer_factory.cpp
@@ -596,6 +602,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/style/expression/check_subtype.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/coalesce.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/coercion.cpp
+    ${MBGL_ROOT}/src/mbgl/style/expression/collator.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/collator_expression.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/comparison.cpp
     ${MBGL_ROOT}/src/mbgl/style/expression/compound_expression.cpp
@@ -875,8 +882,10 @@ target_include_directories(
     PUBLIC ${MBGL_ROOT}/include
 )
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/mapbox)
-add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/extras)
+if(NOT TARGET mapbox-base)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/mapbox)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/vendor/mapbox-base/extras)
+endif(NOT TARGET mapbox-base)
 
 include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/earcut.hpp.cmake)
@@ -911,6 +920,7 @@ target_link_libraries(
         Mapbox::Base::geometry.hpp
         Mapbox::Base::optional
         Mapbox::Base::typewrapper
+        Mapbox::Base::value
         Mapbox::Base::variant
         Mapbox::Base::weak
         mbgl-vendor-expected
@@ -940,3 +950,4 @@ endif()
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 add_subdirectory(${PROJECT_SOURCE_DIR}/benchmark)
+add_subdirectory(${PROJECT_SOURCE_DIR}/render-test)

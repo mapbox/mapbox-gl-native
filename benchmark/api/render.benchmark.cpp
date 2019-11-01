@@ -1,17 +1,21 @@
 #include <benchmark/benchmark.h>
 
+#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/gfx/headless_frontend.hpp>
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/image.hpp>
-#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/storage/resource_options.hpp>
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+
+#include <sstream>
 
 using namespace mbgl;
 
@@ -94,7 +98,39 @@ static void API_renderStill_recreate_map(::benchmark::State& state) {
     }
 }
 
+static void API_renderStill_multiple_sources(::benchmark::State& state) {
+    using namespace mbgl::style;
+    RenderBenchmark bench;
+    HeadlessFrontend frontend{size, pixelRatio};
+    Map map{frontend,
+            MapObserver::nullObserver(),
+            MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
+            ResourceOptions().withCachePath(cachePath).withAccessToken("foobar")};
+    prepare(map);
+    auto& style = map.getStyle();
+    const int kSourcesCount = 50;
+    const int kLayersCount = 50;
+    for (int i = 0; i < kSourcesCount; ++i) {
+        std::ostringstream sourceOss;
+        sourceOss << "GeoJSONSource" << i;
+        std::string sourceId{sourceOss.str()};
+        auto source = std::make_unique<GeoJSONSource>(sourceId);
+        style.addSource(std::move(source));
+        for (int j = 0; j < kLayersCount; ++j) {
+            std::ostringstream layerOss;
+            layerOss << sourceId << '#' << j;
+            auto layer = std::make_unique<SymbolLayer>(layerOss.str(), sourceId);
+            style.addLayer(std::move(layer));
+        }
+    }
+
+    while (state.KeepRunning()) {
+        frontend.render(map);
+    }
+}
+
 BENCHMARK(API_renderStill_reuse_map);
 BENCHMARK(API_renderStill_reuse_map_formatted_labels);
 BENCHMARK(API_renderStill_reuse_map_switch_styles);
 BENCHMARK(API_renderStill_recreate_map);
+BENCHMARK(API_renderStill_multiple_sources);

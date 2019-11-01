@@ -58,13 +58,7 @@ private:
     bool loaded = false;
 
     std::map<ImageRequestor*, ImageRequestPair> requestors;
-    using Callback = std::function<void()>;
-    using ActorCallback = Actor<Callback>;
-    struct MissingImageRequestPair {
-        ImageRequestPair pair;
-        std::map<std::string, std::unique_ptr<ActorCallback>> callbacks;
-    };
-    std::map<ImageRequestor*, MissingImageRequestPair> missingImageRequestors;
+    std::map<ImageRequestor*, ImageRequestPair> missingImageRequestors;
     std::map<std::string, std::set<ImageRequestor*>> requestedImages;
     std::size_t requestedImagesCacheSize = 0ul;
     ImageMap images;
@@ -77,8 +71,17 @@ public:
     explicit ImageRequestor(ImageManager&);
     virtual ~ImageRequestor();
     virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, ImageVersionMap versionMap, uint64_t imageCorrelationID) = 0;
+
+    void addPendingRequest(const std::string& imageId) { pendingRequests.insert(imageId); }
+    bool hasPendingRequest(const std::string& imageId) const { return pendingRequests.count(imageId); }
+    bool hasPendingRequests() const { return !pendingRequests.empty(); }
+    void removePendingRequest(const std::string& imageId) { pendingRequests.erase(imageId); }
+
 private:
     ImageManager& imageManager;
+
+    // Pending requests are image requests that are waiting to be dispatched to the client.
+    std::set<std::string> pendingRequests;
 };
 
 } // namespace mbgl

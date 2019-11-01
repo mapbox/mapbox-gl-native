@@ -12,11 +12,14 @@
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/position.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #import <mbgl/style/transition_options.hpp>
 #import <mbgl/style/types.hpp>
 
 #import <mbgl/util/enum.hpp>
 #include <mbgl/util/interpolate.hpp>
+
+#include <memory>
 
 #if TARGET_OS_IPHONE
     #import "UIColor+MGLAdditions.h"
@@ -44,6 +47,8 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     return options;
 }
+
+std::unique_ptr<mbgl::style::expression::Expression> MGLClusterPropertyFromNSExpression(NSExpression *expression);
 
 id MGLJSONObjectFromMBGLExpression(const mbgl::style::expression::Expression &mbglExpression);
 
