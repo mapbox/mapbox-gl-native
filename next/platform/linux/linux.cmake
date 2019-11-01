@@ -79,19 +79,6 @@ target_link_libraries(
         mbgl-vendor-sqlite
 )
 
-add_custom_target(mbgl-ca-bundle)
-add_dependencies(mbgl-core mbgl-ca-bundle)
-
-add_custom_command(
-    TARGET mbgl-ca-bundle PRE_BUILD
-    COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy
-        ${MBGL_ROOT}/misc/ca-bundle.crt
-        ${CMAKE_BINARY_DIR}
-)
-
 add_subdirectory(${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(${PROJECT_SOURCE_DIR}/expression-test)
 add_subdirectory(${PROJECT_SOURCE_DIR}/platform/glfw)
