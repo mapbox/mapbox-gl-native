@@ -14,6 +14,11 @@ android {
                 targets 'mbgl-render-test-runner'
             }
         }
+        ndk {
+            // Tells Gradle to build outputs for the following ABIs and package
+            // them into your APK.
+            abiFilters 'arm64-v8a'
+        }
     }
     externalNativeBuild {
         cmake {
@@ -26,4 +31,6 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-beta01'
+    androidTestImplementation 'androidx.test:rules:1.2.0-beta01'
 }
