@@ -182,24 +182,27 @@ int runRenderTests(int argc, char** argv) {
                 status = "passed";
                 color = "green";
                 stats.passedTests++;
+                mbgl::Log::Warning(mbgl::Event::General, "* passed %s" ANSI_COLOR_RESET "\n", id.c_str());
                 printf(ANSI_COLOR_GREEN "* passed %s" ANSI_COLOR_RESET "\n", id.c_str());
             } else if (errored) {
                 status = "errored";
                 color = "red";
                 stats.erroredTests++;
+                mbgl::Log::Warning(mbgl::Event::General, "* errored %s" ANSI_COLOR_RESET "\n", id.c_str());
                 printf(ANSI_COLOR_RED "* errored %s" ANSI_COLOR_RESET "\n", id.c_str());
                 printf(ANSI_COLOR_RED "* error: %s" ANSI_COLOR_RESET "\n", metadata.errorMessage.c_str());
             } else {
                 status = "failed";
                 color = "red";
                 stats.failedTests++;
+                mbgl::Log::Warning(mbgl::Event::General, "* failed %s" ANSI_COLOR_RESET "\n", id.c_str());
                 printf(ANSI_COLOR_RED "* failed %s" ANSI_COLOR_RESET "\n", id.c_str());
             }
         }
 
         metadatas.push_back(std::move(metadata));
     }
-    const auto& testRootPath = manifest.getManifestPath();
+const auto& testRootPath = manifest.getManifestPath();
     const auto resultPath =
         testRootPath + "/" + (testNames.empty() ? "render-tests" : testNames.front()) + "_index.html";
     std::string resultsHTML = createResultPage(stats, metadatas, shuffle, seed);
@@ -209,18 +212,23 @@ int runRenderTests(int argc, char** argv) {
         stats.erroredTests + stats.failedTests + stats.ignoreFailedTests + stats.ignorePassedTests + stats.passedTests;
 
     if (stats.passedTests) {
+        mbgl::Log::Warning(mbgl::Event::General, "%u passed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.passedTests, 100.0 * stats.passedTests / count);
         printf(ANSI_COLOR_GREEN "%u passed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.passedTests, 100.0 * stats.passedTests / count);
     }
     if (stats.ignorePassedTests) {
+        mbgl::Log::Warning(mbgl::Event::General,"%u passed but were ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignorePassedTests, 100.0 * stats.ignorePassedTests / count);
         printf(ANSI_COLOR_YELLOW "%u passed but were ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignorePassedTests, 100.0 * stats.ignorePassedTests / count);
     }
     if (stats.ignoreFailedTests) {
+        mbgl::Log::Warning(mbgl::Event::General,"%u ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignoreFailedTests, 100.0 * stats.ignoreFailedTests / count);
         printf(ANSI_COLOR_LIGHT_GRAY "%u ignored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.ignoreFailedTests, 100.0 * stats.ignoreFailedTests / count);
     }
     if (stats.failedTests) {
+        mbgl::Log::Warning(mbgl::Event::General, "%u failed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.failedTests, 100.0 * stats.failedTests / count);
         printf(ANSI_COLOR_RED "%u failed (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.failedTests, 100.0 * stats.failedTests / count);
     }
     if (stats.erroredTests) {
+        mbgl::Log::Warning(mbgl::Event::General,"%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.erroredTests, 100.0 * stats.erroredTests / count);
         printf(ANSI_COLOR_RED "%u errored (%.1lf%%)" ANSI_COLOR_RESET "\n", stats.erroredTests, 100.0 * stats.erroredTests / count);
     }
 
