@@ -10,11 +10,7 @@
 namespace mbgl {
 
 TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewportMode_)
-    : bounds(LatLngBounds::unbounded())
-    , constrainMode(constrainMode_)
-    , viewportMode(viewportMode_)
-{
-}
+    : bounds(LatLngBounds()), constrainMode(constrainMode_), viewportMode(viewportMode_) {}
 
 #pragma mark - Matrix
 

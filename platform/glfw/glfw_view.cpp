@@ -288,11 +288,10 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_D: {
             static const std::vector<mbgl::LatLngBounds> bounds = {
-                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -170.0 }, mbgl::LatLng { 45.0, 170.0 }),  // inside
-                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -200.0 }, mbgl::LatLng { 45.0, -160.0 }), // left IDL
-                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, 160.0 }, mbgl::LatLng { 45.0, 200.0 }),   // right IDL
-                mbgl::LatLngBounds::unbounded()
-            };
+                mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, -170.0}, mbgl::LatLng{45.0, 170.0}),  // inside
+                mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, -200.0}, mbgl::LatLng{45.0, -160.0}), // left IDL
+                mbgl::LatLngBounds::hull(mbgl::LatLng{-45.0, 160.0}, mbgl::LatLng{45.0, 200.0}),   // right IDL
+                mbgl::LatLngBounds()};
             static size_t nextBound = 0u;
             static mbgl::AnnotationID boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
 
@@ -301,7 +300,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
 
             view->map->setBounds(mbgl::BoundOptions().withLatLngBounds(bound));
 
-            if (bound == mbgl::LatLngBounds::unbounded()) {
+            if (bound == mbgl::LatLngBounds()) {
                 view->map->removeAnnotation(boundAnnotationID);
                 boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
             } else {
