@@ -1,6 +1,7 @@
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/tileset.hpp>
 #include <mbgl/util/projection.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <mapbox/geojson.hpp>
 #include <mapbox/geojson/rapidjson.hpp>
@@ -50,6 +51,8 @@ OfflineGeometryRegionDefinition::OfflineGeometryRegionDefinition(std::string sty
 }
 
 OfflineRegionDefinition decodeOfflineRegionDefinition(const std::string& region) {
+    Log::Warning(Event::General, "OfflineRegionDefinition: %s", region.c_str());
+
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
     doc.Parse<0>(region.c_str());
 
