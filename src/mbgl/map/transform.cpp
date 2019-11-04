@@ -83,14 +83,14 @@ void Transform::jumpTo(const CameraOptions& camera) {
  */
 void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
     Duration duration = animation.duration.value_or(Duration::zero());
-    if (state.bounds == LatLngBounds::unbounded() && !isGestureInProgress() && duration != Duration::zero()) {
+    if (state.bounds == LatLngBounds() && !isGestureInProgress() && duration != Duration::zero()) {
         // reuse flyTo, without exaggerated animation, to achieve constant ground speed.
         return flyTo(camera, animation, true);
     }
     const EdgeInsets& padding = camera.padding.value_or(state.edgeInsets);
     LatLng startLatLng = getLatLng(LatLng::Unwrapped);
     const LatLng& unwrappedLatLng = camera.center.value_or(startLatLng);
-    const LatLng& latLng = state.bounds != LatLngBounds::unbounded() ? unwrappedLatLng : unwrappedLatLng.wrapped();
+    const LatLng& latLng = state.bounds != LatLngBounds() ? unwrappedLatLng : unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
     double bearing = camera.bearing ? -*camera.bearing * util::DEG2RAD : getBearing();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
@@ -102,7 +102,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         return;
     }
 
-    if (state.bounds == LatLngBounds::unbounded()) {
+    if (state.bounds == LatLngBounds()) {
         if (isGestureInProgress()) {
             // If gesture in progress, we transfer the wrap rounds from the end longitude into
             // start, so the "scroll effect" of rounding the world is the same while assuring the

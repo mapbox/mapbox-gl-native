@@ -316,7 +316,7 @@ TEST(Map, DefaultBoundOptions) {
 
     EXPECT_EQ(*bounds.minZoom, util::MIN_ZOOM);
     EXPECT_EQ(*bounds.maxZoom, util::DEFAULT_MAX_ZOOM);
-    EXPECT_EQ(*bounds.bounds, LatLngBounds::unbounded());
+    EXPECT_EQ(*bounds.bounds, LatLngBounds());
 }
 
 TEST(Map, MapOptions) {
