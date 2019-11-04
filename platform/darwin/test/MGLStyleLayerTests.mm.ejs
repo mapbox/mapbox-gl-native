@@ -73,6 +73,8 @@
 
 <% if (property.type === 'formatted') { -%>
         NSExpression *constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, 'string', true, 3) %>];
+<% } else if (property.type === 'resolvedImage'){ -%>
+        NSExpression *constantExpression = [NSExpression expressionForConstantValue:<%- objCTestValue(property, 'string', true, 3) %>];
 <% } else { -%>
         NSExpression *constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, true, 3) %>];
 <% } -%>
@@ -98,6 +100,8 @@
             propertyValue = mbgl::style::PropertyExpression<<%- mbglType(property) %>>(
 <% if (property.type === 'formatted') { -%>
                 step(zoom(), format(<%- mbglExpressionTestValue(property, type) %>), 18.0, format(<%- mbglExpressionTestValue(property, type) %>))
+<% } else if (property.type === 'resolvedImage') { -%>
+                step(zoom(), image(literal(<%- mbglExpressionTestValue(property, type) %>)), 18.0, image(literal(<%- mbglExpressionTestValue(property, type) %>)))
 <% } else { -%>
                 step(zoom(), literal(<%- mbglExpressionTestValue(property, type) %>), 18.0, literal(<%- mbglExpressionTestValue(property, type) %>))
 <% } -%>
@@ -179,6 +183,8 @@
             propertyValue = mbgl::style::PropertyExpression<<%- mbglType(property) %>>(
 <% if (property.type === 'formatted') { -%>
                 format(toString(get(literal("token"))))
+<% } else if (property.type === 'resolvedImage') { -%>
+                image(toString(get(literal("token"))))
 <% } else { -%>
                 toString(get(literal("token")))
 <% } -%>
@@ -192,6 +198,8 @@
         MGLAttributedExpression *tokenAttibutedExpression = [[MGLAttributedExpression alloc] initWithExpression:[NSExpression expressionWithFormat:@"CAST(token, 'NSString')"]
                                                                                                      attributes:@{}];
         NSExpression* tokenExpression = [NSExpression mgl_expressionForAttributedExpressions:@[[NSExpression expressionForConstantValue:tokenAttibutedExpression]]];
+<% } else if (property.type === 'resolvedImage') { -%>
+        NSExpression* tokenExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('image', CAST(token, \"NSString\"))"];
 <% } else { -%>
         NSExpression* tokenExpression = [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"];
 <% } -%>

@@ -659,7 +659,7 @@
                       @"line-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.linePattern;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"Line Pattern"];
+        NSExpression *constantExpression = [NSExpression expressionForConstantValue:@"Line Pattern"];
         layer.linePattern = constantExpression;
         mbgl::style::PropertyValue<mbgl::style::expression::Image> propertyValue = { "Line Pattern" };
         XCTAssertEqual(rawLayer->getLinePattern(), propertyValue,
@@ -667,14 +667,14 @@
         XCTAssertEqualObjects(layer.linePattern, constantExpression,
                               @"linePattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"Line Pattern"];
+        constantExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('image', 'Line Pattern')"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.linePattern = functionExpression;
 
         {
             using namespace mbgl::style::expression::dsl;
             propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Image>(
-                step(zoom(), literal("Line Pattern"), 18.0, literal("Line Pattern"))
+                step(zoom(), image(literal("Line Pattern")), 18.0, image(literal("Line Pattern")))
             );
         }
 
