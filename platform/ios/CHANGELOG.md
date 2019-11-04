@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## master
 
 ### Other changes
+* Convert GeoJSON features to tiles for the loaded source description in a background thread and thus unblock the UI thread ([#15885](https://github.com/mapbox/mapbox-gl-native/pull/15885))
 
 ### Bug fixes
 * Fixed the rendering bug caused by redundant pending requests for already requested images [#15864](https://github.com/mapbox/mapbox-gl-native/pull/15864)
