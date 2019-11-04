@@ -1229,6 +1229,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     
                     return expressionObject;
                 }
+
                 return self.arguments.mgl_jsonExpressionObject;
             } else if (op == [MGLColor class] && [function isEqualToString:@"colorWithRed:green:blue:alpha:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;

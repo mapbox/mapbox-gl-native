@@ -333,7 +333,7 @@
                       @"fill-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.fillPattern;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"Fill Pattern"];
+        NSExpression *constantExpression = [NSExpression expressionForConstantValue:@"Fill Pattern"];
         layer.fillPattern = constantExpression;
         mbgl::style::PropertyValue<mbgl::style::expression::Image> propertyValue = { "Fill Pattern" };
         XCTAssertEqual(rawLayer->getFillPattern(), propertyValue,
@@ -341,14 +341,14 @@
         XCTAssertEqualObjects(layer.fillPattern, constantExpression,
                               @"fillPattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"Fill Pattern"];
+        constantExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('image', 'Fill Pattern')"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillPattern = functionExpression;
 
         {
             using namespace mbgl::style::expression::dsl;
             propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Image>(
-                step(zoom(), literal("Fill Pattern"), 18.0, literal("Fill Pattern"))
+                step(zoom(), image(literal("Fill Pattern")), 18.0, image(literal("Fill Pattern")))
             );
         }
 

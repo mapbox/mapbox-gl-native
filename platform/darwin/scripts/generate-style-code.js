@@ -153,12 +153,15 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
         case 'number':
             return '@"1"';
         case 'formatted':
-        case 'resolvedImage':
             // Special 'string' case to handle constant expression text-field that automatically
             // converts Formatted back to string.
             return layerType === 'string' ?
                 `@"'${_.startCase(propertyName)}'"` :
                 `@"${_.startCase(propertyName)}"`;
+        case 'resolvedImage':
+            return layerType === 'string' ?
+                `@"${_.startCase(propertyName)}"` :
+                `@"MGL_FUNCTION('image', '${_.startCase(propertyName)}')"`;
         case 'string':
             return `@"'${_.startCase(propertyName)}'"`;
         case 'enum':
@@ -209,7 +212,7 @@ global.mbglTestValue = function (property, layerType) {
             return '1.0';
         case 'formatted':
         case 'string':
-        case 'resolvedImage': // TODO: replace once we implement image expressions
+        case 'resolvedImage':
             return `"${_.startCase(propertyName)}"`;
         case 'enum': {
             let type = camelize(originalPropertyName(property));
@@ -477,7 +480,7 @@ global.describeType = function (property) {
             return 'numeric';
         case 'formatted':
         case 'string':
-        case 'resolvedImage': // TODO: replace once we implement image expressions
+        case 'resolvedImage':
             return 'string';
         case 'enum':
             return '`MGL' + camelize(property.name) + '`';
@@ -613,7 +616,7 @@ global.propertyType = function (property) {
             return 'NSNumber *';
         case 'formatted':
         case 'string':
-        case 'resolvedImage': // TODO: replace once we implement image expressions
+        case 'resolvedImage':
             return 'NSString *';
         case 'enum':
             return 'NSValue *';
