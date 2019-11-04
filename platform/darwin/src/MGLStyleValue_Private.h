@@ -217,6 +217,11 @@ private: // Private utilities for converting from mgl to mbgl values
         mbglValue = rawValue.mgl_color;
     }
 
+    // Image
+    void getMBGLValue(NSString *rawValue, mbgl::style::expression::Image &mbglValue) {
+        mbglValue = mbgl::style::expression::Image(rawValue.UTF8String);
+    }
+
     // Array
     void getMBGLValue(ObjCType rawValue, std::vector<MBGLElement> &mbglValue) {
         mbglValue.reserve(rawValue.count);
@@ -293,6 +298,11 @@ private: // Private utilities for converting from mbgl to mgl values
     // Color
     static MGLColor *toMGLRawStyleValue(const mbgl::Color mbglStopValue) {
         return [MGLColor mgl_colorWithColor:mbglStopValue];
+    }
+
+    // Image
+    static NSString *toMGLRawStyleValue(const mbgl::style::expression::Image &mbglImageValue) {
+        return @(mbglImageValue.id().c_str());
     }
 
     // Array

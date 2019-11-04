@@ -106,7 +106,7 @@
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting backgroundPattern: %@", backgroundPattern);
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(backgroundPattern, false);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::expression::Image>>(backgroundPattern, false);
     self.rawLayer->setBackgroundPattern(mbglValue);
 }
 
@@ -117,7 +117,7 @@
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultBackgroundPattern();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setBackgroundPatternTransition:(MGLTransition )transition {

@@ -182,21 +182,21 @@
                       @"icon-image should be unset initially.");
         NSExpression *defaultExpression = layer.iconImageName;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'Icon Image'"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"Icon Image"];
         layer.iconImageName = constantExpression;
-        mbgl::style::PropertyValue<std::string> propertyValue = { "Icon Image" };
+        mbgl::style::PropertyValue<mbgl::style::expression::Image> propertyValue = { "Icon Image" };
         XCTAssertEqual(rawLayer->getIconImage(), propertyValue,
                        @"Setting iconImageName to a constant value expression should update icon-image.");
         XCTAssertEqualObjects(layer.iconImageName, constantExpression,
                               @"iconImageName should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"'Icon Image'"];
+        constantExpression = [NSExpression expressionWithFormat:@"Icon Image"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.iconImageName = functionExpression;
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::PropertyExpression<std::string>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Image>(
                 step(zoom(), literal("Icon Image"), 18.0, literal("Icon Image"))
             );
         }
@@ -218,7 +218,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::PropertyExpression<std::string>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Image>(
                 toString(get(literal("token")))
             );
         }

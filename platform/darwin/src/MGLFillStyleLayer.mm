@@ -211,7 +211,7 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillPattern: %@", fillPattern);
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillPattern, true);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::expression::Image>>(fillPattern, true);
     self.rawLayer->setFillPattern(mbglValue);
 }
 
@@ -222,7 +222,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultFillPattern();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setFillPatternTransition:(MGLTransition )transition {
