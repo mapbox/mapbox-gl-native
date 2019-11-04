@@ -7,6 +7,7 @@
 #include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/thread_pool.hpp>
 
 namespace mbgl {
 namespace style {
@@ -69,18 +70,29 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
             observer->onSourceError(
                 *this, std::make_exception_ptr(std::runtime_error("unexpectedly empty GeoJSON")));
         } else {
-            conversion::Error error;
-            std::shared_ptr<GeoJSONData> geoJSONData;
-            if (optional<GeoJSON> geoJSON = conversion::convertJSON<GeoJSON>(*res.data, error)) {
-                geoJSONData = GeoJSONData::create(*geoJSON, impl().getOptions());
-            } else {
-                // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for tiles to load.
-                Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s",
-                           error.message.c_str());
-            }
-            baseImpl = makeMutable<Impl>(impl(), std::move(geoJSONData));
-            loaded = true;
-            observer->onSourceLoaded(*this);
+            auto makeImplInBackground = [currentImpl = baseImpl, data = res.data]() -> Immutable<Source::Impl> {
+                assert(data);
+                auto& impl = static_cast<const Impl&>(*currentImpl);
+                conversion::Error error;
+                std::shared_ptr<GeoJSONData> geoJSONData;
+                if (optional<GeoJSON> geoJSON = conversion::convertJSON<GeoJSON>(*data, error)) {
+                    geoJSONData = GeoJSONData::create(*geoJSON, impl.getOptions());
+                } else {
+                    // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for tiles to load.
+                    Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", error.message.c_str());
+                }
+                return makeMutable<Impl>(impl, std::move(geoJSONData));
+            };
+            auto onImplReady = [this, self = makeWeakPtr(), capturedReq = req.get()](Immutable<Source::Impl> newImpl) {
+                assert(capturedReq);
+                if (!self) return;                    // This source has been deleted.
+                if (capturedReq != req.get()) return; // A new request is being processed, ignore this impl.
+
+                baseImpl = std::move(newImpl);
+                loaded = true;
+                observer->onSourceLoaded(*this);
+            };
+            Scheduler::GetBackground()->scheduleAndReplyValue(makeImplInBackground, onImplReady);
         }
     });
 }
