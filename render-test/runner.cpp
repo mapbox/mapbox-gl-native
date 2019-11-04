@@ -596,7 +596,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
         std::string imagePath = operationArray[2].GetString();
         imagePath.erase(std::remove(imagePath.begin(), imagePath.end(), '"'), imagePath.end());
 
-        const mbgl::filesystem::path filePath = mbgl::filesystem::path(manifest.getTestRootPath()) / imagePath;
+        const mbgl::filesystem::path filePath = (mbgl::filesystem::path(manifest.getAssetPath()) / imagePath);
 
         mbgl::optional<std::string> maybeImage = mbgl::util::readFile(filePath.string());
         if (!maybeImage) {

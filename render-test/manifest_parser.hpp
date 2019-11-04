@@ -17,7 +17,9 @@ public:
     const std::vector<std::pair<std::string, std::string>>& getIgnores() const;
     const std::vector<TestPaths>& getTestPaths() const;
     const std::string& getTestRootPath() const;
+    const std::string& getAssetPath() const;
     const std::string& getManifestPath() const;
+    const std::string& getResultPath() const;
     void doShuffle(uint32_t seed);
 
     std::string localizeURL(const std::string& url) const;
@@ -43,6 +45,7 @@ private:
     std::string testRootPath;
     std::string vendorPath;
     std::string assetPath;
+    std::string resultPath;
     std::vector<std::pair<std::string, std::string>> ignores;
     std::vector<TestPaths> testPaths;
 };

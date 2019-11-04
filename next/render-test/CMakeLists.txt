@@ -38,8 +38,12 @@ include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
 
 target_link_libraries(
     mbgl-render-test
-    PRIVATE Mapbox::Base::Extras::args Mapbox::Base::pixelmatch-cpp
-    PUBLIC mbgl-core mbgl-vendor-boost Mapbox::Base::Extras::filesystem
+    PRIVATE
+        Mapbox::Base::Extras::args
+        Mapbox::Base::Extras::filesystem
+        Mapbox::Base::pixelmatch-cpp
+        mbgl-vendor-boost
+    PUBLIC mbgl-core
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL Android)
