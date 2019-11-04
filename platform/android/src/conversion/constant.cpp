@@ -52,6 +52,11 @@ Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, std::vect
     return result;
 }
 
+Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, style::expression::Image>::operator()(
+    jni::JNIEnv& env, const style::expression::Image& value) const {
+    return jni::Make<jni::String>(env, value.id());
+}
+
 } // namespace conversion
 } // namespace style
 } // namespace mbgl

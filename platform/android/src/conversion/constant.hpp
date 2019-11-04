@@ -6,6 +6,7 @@
 #include <mbgl/util/enum.hpp>
 
 #include <mbgl/style/expression/formatted.hpp>
+#include <mbgl/style/expression/image.hpp>
 
 #include <jni/jni.hpp>
 
@@ -97,6 +98,11 @@ struct Converter<jni::Local<jni::Object<>>, std::vector<T>, typename std::enable
         }
         return result;
     }
+};
+
+template <>
+struct Converter<jni::Local<jni::Object<>>, style::expression::Image> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const style::expression::Image& value) const;
 };
 
 } // namespace conversion
