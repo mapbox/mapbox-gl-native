@@ -34,8 +34,14 @@ const std::vector<std::pair<std::string, std::string>>& Manifest::getIgnores() c
 const std::string& Manifest::getTestRootPath() const {
     return testRootPath;
 }
+const std::string& Manifest::getAssetPath() const {
+    return assetPath;
+}
 const std::string& Manifest::getManifestPath() const {
     return manifestPath;
+}
+const std::string& Manifest::getResultPath() const {
+    return resultPath;
 }
 
 void Manifest::doShuffle(uint32_t seed) {
@@ -239,7 +245,7 @@ mbgl::filesystem::path getValidPath(const std::string& manifestPath, const std::
         result = BasePath / result;
     }
     if (mbgl::filesystem::exists(result)) {
-        return result;
+        return result.lexically_normal();
     }
     mbgl::Log::Warning(mbgl::Event::General, "Invalid path is provoided inside the manifest file: %s", path.c_str());
     return mbgl::filesystem::path{};
@@ -282,6 +288,18 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         }
         manifest.vendorPath = (getValidPath(manifest.manifestPath, vendorPathValue.GetString()) / "").string();
         if (manifest.vendorPath.empty()) {
+            return mbgl::nullopt;
+        }
+    }
+    if (document.HasMember("result_path")) {
+        const auto& resultPathValue = document["result_path"];
+        if (!resultPathValue.IsString()) {
+            mbgl::Log::Warning(
+                mbgl::Event::General, "Invalid assetPath is provoided inside the manifest file: %s", filePath.c_str());
+            return mbgl::nullopt;
+        }
+        manifest.resultPath = (getValidPath(manifest.manifestPath, resultPathValue.GetString()) / "").string();
+        if (manifest.resultPath.empty()) {
             return mbgl::nullopt;
         }
     }
@@ -365,6 +383,11 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
     }
     if (manifest.manifestPath.back() == '/') {
         manifest.manifestPath.pop_back();
+    }
+    if (manifest.resultPath.empty()) {
+        manifest.resultPath = manifest.manifestPath;
+    } else if (manifest.resultPath.back() == '/') {
+        manifest.resultPath.pop_back();
     }
 
     std::vector<mbgl::filesystem::path> paths;

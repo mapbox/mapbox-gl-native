@@ -1,7 +1,8 @@
 {
-    "base_test_path":".",
+    "base_test_path":"mapbox-gl-js/test/integration",
     "expectation_paths":[],
     "ignore_paths":["ignores/ignores.json", "ignores/linux-ignores.json"],
     "vendor_path":"vendor",
-    "asset_path": "."
+    "asset_path": "mapbox-gl-js/test/integration",
+    "result_path": "/sdcard/"
 }

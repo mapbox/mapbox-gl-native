@@ -1,5 +1,4 @@
 #include <android_native_app_glue.h>
-#include <ghc/filesystem.hpp>
 #include <mbgl/render_test.hpp>
 #include <mbgl/util/logging.hpp>
 
@@ -8,6 +7,7 @@
 
 #include "jni.hpp"
 
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -42,34 +42,11 @@ void Log::platformRecord(EventSeverity severity, const std::string& msg) {
 
 } // namespace mbgl
 
-void copyFile(AAssetManager* assetManager, const std::string& filePath, const std::string& fileName) {
-    if (ghc::filesystem::exists(filePath)) {
-        mbgl::Log::Warning(mbgl::Event::General, "File '%s' already exists", filePath.c_str());
-    } else {
-        AAsset* fileAsset = AAssetManager_open(assetManager, fileName.c_str(), AASSET_MODE_BUFFER);
-        const void* fileData = AAsset_getBuffer(fileAsset);
-        const off_t fileLen = AAsset_getLength(fileAsset);
-
-        FILE* newFile = std::fopen(filePath.c_str(), "w+");
-        if (NULL == newFile) {
-            mbgl::Log::Warning(mbgl::Event::General, "Failed to create new file entry %s", fileName.c_str());
-        } else {
-            auto res = std::fwrite(fileData, sizeof(char), fileLen, newFile);
-            if (fileLen != res) {
-                mbgl::Log::Warning(
-                    mbgl::Event::General, "Failed to generate file entry %s from assets", fileName.c_str());
-            }
-        }
-        std::fclose(newFile);
-        AAsset_close(fileAsset);
-    }
-}
-
+namespace {
 std::string jstring2string(JNIEnv* env, jstring jStr) {
     if (!jStr) {
         return "";
     }
-
     const jclass stringClass = env->GetObjectClass(jStr);
     const jmethodID getBytes = env->GetMethodID(stringClass, "getBytes", "(Ljava/lang/String;)[B");
     const jbyteArray stringJbytes = (jbyteArray)env->CallObjectMethod(jStr, getBytes, env->NewStringUTF("UTF-8"));
@@ -85,17 +62,52 @@ std::string jstring2string(JNIEnv* env, jstring jStr) {
     return ret;
 }
 
-void android_main(struct android_app* app) {
-    mbgl::android::theJVM = app->activity->vm;
-    JNIEnv* env = nullptr;
-    app->activity->vm->AttachCurrentThread(&env, NULL);
-    const char* storage_chars = app->activity->internalDataPath;
-    std::string storagePath(storage_chars);
+bool copyFile(JNIEnv* env,
+              AAssetManager* assetManager,
+              const std::string& filePath,
+              const std::string& destinationPath,
+              const std::string& fileName) {
+    jclass fileClass = env->FindClass("java/io/File");
+    jmethodID fileCtor = env->GetMethodID(fileClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+    jmethodID fileExists = env->GetMethodID(fileClass, "exists", "()Z");
 
-    std::string zipFile = storagePath + "/res.zip";
+    jstring destination = env->NewStringUTF(destinationPath.c_str());
+    jstring file = env->NewStringUTF(fileName.c_str());
+    jobject fileToCopy = env->NewObject(fileClass, fileCtor, destination, file);
+    bool stateOk = true;
+    if (env->CallBooleanMethod(fileToCopy, fileExists)) {
+        mbgl::Log::Warning(mbgl::Event::General, "File '%s' already exists", filePath.c_str());
+    } else {
+        AAsset* fileAsset = AAssetManager_open(assetManager, fileName.c_str(), AASSET_MODE_BUFFER);
+        const void* fileData = AAsset_getBuffer(fileAsset);
+        const off_t fileLen = AAsset_getLength(fileAsset);
 
-    AAssetManager* assetManager = app->activity->assetManager;
-    copyFile(assetManager, zipFile, "res.zip");
+        FILE* newFile = std::fopen(filePath.c_str(), "w+");
+        stateOk = newFile != NULL;
+        if (!stateOk) {
+            mbgl::Log::Warning(mbgl::Event::General, "Failed to create new file entry %s", fileName.c_str());
+        } else {
+            auto res = std::fwrite(fileData, sizeof(char), fileLen, newFile);
+            if (fileLen != res) {
+                mbgl::Log::Warning(
+                    mbgl::Event::General, "Failed to generate file entry %s from assets", fileName.c_str());
+            }
+        }
+        std::fclose(newFile);
+        AAsset_close(fileAsset);
+    }
+    env->DeleteLocalRef(fileClass);
+    return stateOk;
+}
+
+void unZipFile(JNIEnv* env, const std::string& zipFilePath, const std::string& destinationPath) {
+    jclass fileClass = env->FindClass("java/io/File");
+    jmethodID fileCtor = env->GetMethodID(fileClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+    jmethodID fileExists = env->GetMethodID(fileClass, "exists", "()Z");
+    jmethodID fileIsDirectory = env->GetMethodID(fileClass, "isDirectory", "()Z");
+    jmethodID deleteFile = env->GetMethodID(fileClass, "delete", "()Z");
+    jmethodID createNewFile = env->GetMethodID(fileClass, "createNewFile", "()Z");
+    jmethodID fileGetName = env->GetMethodID(fileClass, "getName", "()Ljava/lang/String;");
 
     jclass fileInputStream = env->FindClass("java/io/FileInputStream");
     jmethodID finCtor = env->GetMethodID(fileInputStream, "<init>", "(Ljava/lang/String;)V");
@@ -112,69 +124,90 @@ void android_main(struct android_app* app) {
     jmethodID zinCloseEntry = env->GetMethodID(zipInputStream, "closeEntry", "()V");
 
     jclass zipEntry = env->FindClass("java/util/zip/ZipEntry");
-    jmethodID getName = env->GetMethodID(zipEntry, "getName", "()Ljava/lang/String;");
+    jmethodID zipGetName = env->GetMethodID(zipEntry, "getName", "()Ljava/lang/String;");
     jmethodID zipIsDirectory = env->GetMethodID(zipEntry, "isDirectory", "()Z");
 
-    jclass fileClass = env->FindClass("java/io/File");
-    jmethodID fileCtor = env->GetMethodID(fileClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
-    jmethodID fileIsDirectory = env->GetMethodID(fileClass, "isDirectory", "()Z");
-    jmethodID exists = env->GetMethodID(fileClass, "exists", "()Z");
-    jmethodID createNewFile = env->GetMethodID(fileClass, "createNewFile", "()Z");
-    jmethodID fileGetName = env->GetMethodID(fileClass, "getName", "()Ljava/lang/String;");
-
     // Upzip the resource folder to destination path
-    jstring destination = env->NewStringUTF(storage_chars);
-    jstring jstr = env->NewStringUTF(zipFile.c_str());
-    jobject fin = env->NewObject(fileInputStream, finCtor, jstr);
-    jobject zin = env->NewObject(zipInputStream, zinCtor, fin);
-    jobject ze = NULL;
-    while ((ze = env->CallObjectMethod(zin, zinGetNextEntry)) != NULL) {
-        jstring dir = (jstring)env->CallObjectMethod(ze, getName);
+
+    jstring destination = env->NewStringUTF(destinationPath.c_str());
+    jstring zipFile = env->NewStringUTF(zipFilePath.c_str());
+    jobject fileIn = env->NewObject(fileInputStream, finCtor, zipFile);
+    jobject zipIn = env->NewObject(zipInputStream, zinCtor, fileIn);
+    jobject zEntry = NULL;
+    while ((zEntry = env->CallObjectMethod(zipIn, zinGetNextEntry)) != NULL) {
+        jstring dir = (jstring)env->CallObjectMethod(zEntry, zipGetName);
         std::string name = jstring2string(env, dir);
-        bool ok = env->CallBooleanMethod(ze, zipIsDirectory);
+        bool isDir = env->CallBooleanMethod(zEntry, zipIsDirectory);
 
         jobject f = env->NewObject(fileClass, fileCtor, destination, dir);
-        if (ok) {
+        if (isDir) {
             if (!(env->CallBooleanMethod(f, fileIsDirectory))) {
                 jmethodID mkdirs = env->GetMethodID(fileClass, "mkdirs", "()Z");
-                jboolean success = (env->CallBooleanMethod(f, mkdirs));
+                bool success = (env->CallBooleanMethod(f, mkdirs));
                 std::string fileName = jstring2string(env, (jstring)env->CallObjectMethod(f, fileGetName));
                 if (!success) {
                     mbgl::Log::Warning(
                         mbgl::Event::General, "Failed to create folder entry %s from zip", fileName.c_str());
                 }
             }
-        } else {
-            if (!(env->CallBooleanMethod(f, exists))) {
-                jboolean success = env->CallBooleanMethod(f, createNewFile);
-                std::string fileName = jstring2string(env, (jstring)env->CallObjectMethod(f, fileGetName));
-                if (!success) {
-                    mbgl::Log::Warning(
-                        mbgl::Event::General, "Failed to create folder entry %s from zip", fileName.c_str());
-                    continue;
-                }
-                jobject fout = env->NewObject(fileOutputStream, foutCtor, f);
-                jbyteArray jBuff = env->NewByteArray(2048);
-                int count;
-                while ((count = env->CallIntMethod(zin, zinRead, jBuff)) != -1) {
-                    env->CallVoidMethod(fout, foutWrite, jBuff, 0, count);
-                }
-                env->CallVoidMethod(zin, zinCloseEntry);
-                env->CallVoidMethod(fout, foutClose);
-                env->DeleteLocalRef(jBuff);
+        } else if (!(env->CallBooleanMethod(f, fileExists))) {
+            bool success = env->CallBooleanMethod(f, createNewFile);
+            std::string fileName = jstring2string(env, (jstring)env->CallObjectMethod(f, fileGetName));
+            if (!success) {
+                mbgl::Log::Warning(mbgl::Event::General, "Failed to create folder entry %s from zip", fileName.c_str());
+                continue;
             }
+            jobject fout = env->NewObject(fileOutputStream, foutCtor, f);
+            jbyteArray jBuff = env->NewByteArray(2048);
+            int count;
+            while ((count = env->CallIntMethod(zipIn, zinRead, jBuff)) != -1) {
+                env->CallVoidMethod(fout, foutWrite, jBuff, 0, count);
+            }
+            env->CallVoidMethod(zipIn, zinCloseEntry);
+            env->CallVoidMethod(fout, foutClose);
+            env->DeleteLocalRef(jBuff);
         }
     }
 
-    std::string configFile = storagePath + "/android-manifest.json";
-
-    std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", configFile};
-    std::vector<char*> argv;
-    for (const auto& arg : arguments) {
-        argv.push_back((char*)arg.data());
+    jobject fileToDelete = env->NewObject(fileClass, fileCtor, destination, zipFile);
+    if (env->CallBooleanMethod(fileToDelete, fileExists)) {
+        jboolean success = (env->CallBooleanMethod(fileToDelete, deleteFile));
+        if (!success) {
+            mbgl::Log::Warning(mbgl::Event::General, "Failed to delete file entry %s", zipFilePath.c_str());
+        }
     }
-    argv.push_back(nullptr);
-    (void)mbgl::runRenderTests(argv.size() - 1, argv.data());
+
+    env->DeleteLocalRef(fileInputStream);
+    env->DeleteLocalRef(fileOutputStream);
+    env->DeleteLocalRef(zipInputStream);
+    env->DeleteLocalRef(zipEntry);
+    env->DeleteLocalRef(fileClass);
+}
+} // namespace
+
+void android_main(struct android_app* app) {
+    mbgl::android::theJVM = app->activity->vm;
+    JNIEnv* env = nullptr;
+    app->activity->vm->AttachCurrentThread(&env, NULL);
+    const char* storage_chars = app->activity->internalDataPath;
+    std::string storagePath(storage_chars);
+    std::string zipFile = storagePath + "/data.zip";
+
+    if (!copyFile(env, app->activity->assetManager, zipFile, storagePath, "data.zip")) {
+        mbgl::Log::Error(
+            mbgl::Event::General, "Failed to copy zip File '%s' to external storage for upzipping", zipFile.c_str());
+    } else {
+        unZipFile(env, zipFile, storagePath);
+        std::string configFile = storagePath + "/android-manifest.json";
+
+        std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", configFile};
+        std::vector<char*> argv;
+        for (const auto& arg : arguments) {
+            argv.push_back((char*)arg.data());
+        }
+        argv.push_back(nullptr);
+        (void)mbgl::runRenderTests(argv.size() - 1, argv.data());
+    }
 
     app->activity->vm->DetachCurrentThread();
 }
