@@ -136,6 +136,9 @@ namespace mbgl {
 <% if (property.type === 'formatted') { -%>
             self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbgl::style::PropertyValue<mbgl::style::expression::Formatted>(
                 mbgl::style::conversion::convertTokenStringToFormatExpression(string)));
+<% } else if (property.type === 'resolvedImage') { -%>
+            self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbgl::style::PropertyValue<mbgl::style::expression::Image>(
+                mbgl::style::conversion::convertTokenStringToImageExpression(string)));
 <% } else { -%>
             self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbgl::style::PropertyValue<std::string>(
                 mbgl::style::conversion::convertTokenStringToExpression(string)));

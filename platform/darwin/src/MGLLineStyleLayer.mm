@@ -396,7 +396,7 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting linePattern: %@", linePattern);
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(linePattern, true);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::expression::Image>>(linePattern, true);
     self.rawLayer->setLinePattern(mbglValue);
 }
 
@@ -407,7 +407,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultLinePattern();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::expression::Image, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setLinePatternTransition:(MGLTransition )transition {
