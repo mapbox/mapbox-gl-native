@@ -385,8 +385,8 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
             continue;
         }
         for (auto& testPath : mbgl::filesystem::recursive_directory_iterator(path)) {
-            // Skip paths that fail regexp match.
-            if (!testFilter.empty() && !std::regex_match(testPath.path().string(), std::regex(testFilter))) {
+            // Skip paths that fail regexp search.
+            if (!testFilter.empty() && !std::regex_search(testPath.path().string(), std::regex(testFilter))) {
                 continue;
             }
 
