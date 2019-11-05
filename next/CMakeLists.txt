@@ -28,21 +28,24 @@ option(MBGL_WITH_QT "Build Mapbox GL Qt bindings" OFF)
 option(MBGL_WITH_SANITIZER "Use [address|thread|memory|undefined] here" OFF)
 
 set(CMAKE_CXX_FLAGS_DEBUGCOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
-set(CMAKE_C_FLAGS_DEBUGCOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
+set(CMAKE_C_FLAGS_DEBUGCOVERAGE "${CMAKE_C_FLAGS_DEBUG} --coverage")
 
 set(CMAKE_CXX_FLAGS_SANITIZE "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=${MBGL_WITH_SANITIZER}")
 set(CMAKE_C_FLAGS_SANITIZE "-DSANITIZE -g -O1 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=${MBGL_WITH_SANITIZER}")
 
-if(MBGL_WITH_QT)
-    find_package(Qt5Core REQUIRED)
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_AUTORCC ON)
-endif()
+add_compile_options(
+    $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
+    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wall>
+    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Wextra>
+    $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<PLATFORM_ID:Windows>>>:-Werror>
+    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=maybe-uninitialized>
+    $<$<CXX_COMPILER_ID:GNU>:-Wno-error=unknown-pragmas>
+    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=deprecated-declarations>
+    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-parameter>
+    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-error=unused-property-ivar>
+)
 
-# Avoid warnings when setting visibility
 cmake_policy(SET CMP0063 NEW)
-
-# Compiler/linker configuration
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -55,6 +58,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+if(MBGL_WITH_QT)
+    find_package(Qt5Core REQUIRED)
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTORCC ON)
+endif()
 
 add_library(
     mbgl-core STATIC

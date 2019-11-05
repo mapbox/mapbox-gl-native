@@ -140,7 +140,7 @@ private: // Private utilities for converting from mgl to mbgl values
     class = typename std::enable_if<!std::is_enum<MBGLEnum>::value>::type,
     typename MGLEnum = ObjCEnum,
     class = typename std::enable_if<!std::is_enum<MGLEnum>::value>::type>
-    NSObject* toRawStyleSpecValue(NSObject *rawMGLValue, MBGLEnum &mbglValue) {
+    NSObject* toRawStyleSpecValue(NSObject *rawMGLValue, MBGLEnum &) {
         if ([rawMGLValue isKindOfClass:[NSValue class]]) {
             const auto rawNSValue = (NSValue *)rawMGLValue;
             if (strcmp([rawNSValue objCType], @encode(CGVector)) == 0) {
@@ -157,13 +157,13 @@ private: // Private utilities for converting from mgl to mbgl values
     class = typename std::enable_if<std::is_enum<MBGLEnum>::value>::type,
     typename MGLEnum = ObjCEnum,
     class = typename std::enable_if<std::is_enum<MGLEnum>::value>::type>
-    NSString* toRawStyleSpecValue(ObjCType rawValue, MBGLEnum &mbglValue) {
+    NSString* toRawStyleSpecValue(ObjCType rawValue, MBGLEnum &) {
         MGLEnum mglEnum;
         [rawValue getValue:&mglEnum];
         return @(mbgl::Enum<MGLEnum>::toString(mglEnum));
     }
 
-    NSObject* toRawStyleSpecValue(MGLColor *color, MBGLType &mbglValue) {
+    NSObject* toRawStyleSpecValue(MGLColor *color, MBGLType &) {
         return @(color.mgl_color.stringify().c_str());
     }
 
