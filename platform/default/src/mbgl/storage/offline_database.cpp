@@ -1070,12 +1070,7 @@ expected<OfflineRegionDefinition, std::exception_ptr> OfflineDatabase::getRegion
     query.run();
 
     return decodeOfflineRegionDefinition(query.get<std::string>(0));
-} catch (const mapbox::sqlite::Exception& ex) {
-    handleError(ex, "load region");
-    return unexpected<std::exception_ptr>(std::current_exception());
 } catch (const std::runtime_error& ex) {
-    // Catch errors from malformed offline region definitions
-    // and skip them (as above).
     handleError(ex, "load region");
     return unexpected<std::exception_ptr>(std::current_exception());
 }
