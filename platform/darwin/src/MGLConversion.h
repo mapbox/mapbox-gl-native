@@ -124,7 +124,7 @@ public:
         }
     }
 
-    static optional<GeoJSON> toGeoJSON(const Holder& holder, Error& error) {
+    static optional<GeoJSON> toGeoJSON(const Holder&, Error& error) {
         error = { "toGeoJSON not implemented" };
         return {};
     }
