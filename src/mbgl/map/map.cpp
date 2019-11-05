@@ -183,8 +183,8 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
     ScreenCoordinate nePixel = {-INFINITY, -INFINITY};
     ScreenCoordinate swPixel = {INFINITY, INFINITY};
     double viewportHeight = size.height;
-    for (LatLng latLng : latLngs) {
-        ScreenCoordinate pixel = transform.latLngToScreenCoordinate(latLng);
+    const std::vector<ScreenCoordinate> pixels = transform.latLngsToScreenCoordinates(latLngs);
+    for (const auto& pixel : pixels) {
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
         swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
@@ -362,6 +362,21 @@ ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
 
 LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
     return impl->transform.screenCoordinateToLatLng(pixel);
+}
+
+std::vector<ScreenCoordinate> Map::pixelsForLatLngs(const std::vector<LatLng>& latLngs) const {
+    std::vector<LatLng> unwrappedLatLngs;
+    unwrappedLatLngs.reserve(latLngs.size());
+    for (const auto& latLng : latLngs) {
+        LatLng unwrappedLatLng = latLng.wrapped();
+        unwrappedLatLng.unwrapForShortestPath(impl->transform.getLatLng());
+        unwrappedLatLngs.emplace_back(unwrappedLatLng);
+    }
+    return impl->transform.latLngsToScreenCoordinates(unwrappedLatLngs);
+}
+
+std::vector<LatLng> Map::latLngsForPixels(const std::vector<ScreenCoordinate>& screenCoords) const {
+    return impl->transform.screenCoordinatesToLatLngs(screenCoords);
 }
 
 #pragma mark - Annotations

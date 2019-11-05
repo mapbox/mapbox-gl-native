@@ -75,10 +75,22 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
 TEST(Query, QueryRenderedFeatures) {
     QueryTest test;
 
-    auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
+    // Batch conversion of latLngs to pixels
+    auto points = test.map.pixelsForLatLngs({{0, 0}, {9, 9}});
+    ASSERT_EQ(2, points.size());
+    // Single conversion of latLng to pixel
+    auto point0 = test.map.pixelForLatLng({0, 0});
+    ASSERT_NEAR(points[0].x, point0.x, 1e-8);
+    ASSERT_NEAR(points[0].y, point0.y, 1e-8);
+
+    auto point1 = test.map.pixelForLatLng({9, 9});
+    ASSERT_NEAR(points[1].x, point1.x, 1e-8);
+    ASSERT_NEAR(points[1].y, point1.y, 1e-8);
+
+    auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(point0);
     EXPECT_EQ(features1.size(), 4u);
 
-    auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(test.map.pixelForLatLng({ 9, 9 }));
+    auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(point1);
     EXPECT_EQ(features2.size(), 0u);
 }
 
