@@ -46,8 +46,8 @@ void Manifest::doShuffle(uint32_t seed) {
 
 std::string Manifest::localizeURL(const std::string& url) const {
     static const std::regex regex{"local://"};
-    if (auto vendorPath = getVendorPath(url, regex)) {
-        return *vendorPath;
+    if (auto path = getVendorPath(url, regex)) {
+        return *path;
     }
     return getIntegrationPath(url, "", regex).value_or(url);
 }
@@ -131,16 +131,16 @@ void Manifest::localizeStyleURLs(mbgl::JSValue& root, mbgl::JSDocument& document
 
 mbgl::optional<std::string> Manifest::localizeLocalURL(const std::string& url, bool glyphsPath) const {
     static const std::regex regex{"local://"};
-    if (auto vendorPath = getVendorPath(url, regex, glyphsPath)) {
-        return vendorPath;
+    if (auto path = getVendorPath(url, regex, glyphsPath)) {
+        return path;
     }
     return getIntegrationPath(url, "", regex, glyphsPath);
 }
 
 mbgl::optional<std::string> Manifest::localizeHttpURL(const std::string& url) const {
     static const std::regex regex{"http://localhost:2900"};
-    if (auto vendorPath = getVendorPath(url, regex)) {
-        return vendorPath;
+    if (auto path = getVendorPath(url, regex)) {
+        return path;
     }
     return getIntegrationPath(url, "", regex);
 }
@@ -157,8 +157,8 @@ mbgl::optional<std::string> Manifest::localizeMapboxFontsURL(const std::string& 
 
 mbgl::optional<std::string> Manifest::localizeMapboxTilesURL(const std::string& url) const {
     static const std::regex regex{"mapbox://"};
-    if (auto vendorPath = getVendorPath(url, regex)) {
-        return vendorPath;
+    if (auto path = getVendorPath(url, regex)) {
+        return path;
     }
     return getIntegrationPath(url, "tiles/", regex);
 }
