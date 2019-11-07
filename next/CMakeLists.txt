@@ -885,7 +885,6 @@ endif(NOT TARGET mapbox-base)
 include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/earcut.hpp.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/eternal.cmake)
-include(${PROJECT_SOURCE_DIR}/vendor/expected.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/geojson-vt-cpp.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/polylabel.cmake)
 include(${PROJECT_SOURCE_DIR}/vendor/protozero.cmake)
@@ -910,6 +909,7 @@ target_link_libraries(
         mbgl-vendor-vector-tile
         mbgl-vendor-wagyu
     PUBLIC
+        Mapbox::Base::Extras::expected-lite
         Mapbox::Base::Extras::rapidjson
         Mapbox::Base::geojson.hpp
         Mapbox::Base::geometry.hpp
@@ -918,7 +918,6 @@ target_link_libraries(
         Mapbox::Base::value
         Mapbox::Base::variant
         Mapbox::Base::weak
-        mbgl-vendor-expected
 )
 
 set_property(TARGET mbgl-core PROPERTY FOLDER Core)

@@ -150,7 +150,6 @@ OfflineRegion::OfflineRegion(int64_t id_,
       metadata(std::move(metadata_)) {
 }
 
-OfflineRegion::OfflineRegion(OfflineRegion&&) = default;
 OfflineRegion::~OfflineRegion() = default;
 
 const OfflineRegionDefinition& OfflineRegion::getDefinition() const {
