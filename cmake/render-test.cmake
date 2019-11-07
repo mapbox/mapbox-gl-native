@@ -49,7 +49,7 @@ target_link_libraries(
         mbgl-core
         mbgl-filesource
         Mapbox::Base::Extras::args
-        mbgl-vendor-expected
+        Mapbox::Base::Extras::expected-lite
         Mapbox::Base::Extras::filesystem
         Mapbox::Base::pixelmatch-cpp
         Mapbox::Base::Extras::rapidjson

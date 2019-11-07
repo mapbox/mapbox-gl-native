@@ -2,6 +2,7 @@
     "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
     "sources": [],
     "public_headers": {
+        "nonstd/expected.hpp": "vendor/mapbox-base/extras/expected-lite/include/nonstd/expected.hpp",
         "ghc/filesystem.hpp": "vendor/mapbox-base/extras/filesystem/include/ghc/filesystem.hpp",
         "ghc/fs_fwd.hpp": "vendor/mapbox-base/extras/filesystem/include/ghc/fs_fwd.hpp",
         "ghc/fs_impl.hpp": "vendor/mapbox-base/extras/filesystem/include/ghc/fs_impl.hpp",
