@@ -590,23 +590,6 @@ LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng
     return state.screenCoordinateToLatLng(flippedPoint, wrapMode);
 }
 
-std::vector<ScreenCoordinate> Transform::latLngsToScreenCoordinates(const std::vector<LatLng>& latLngs) const {
-    std::vector<ScreenCoordinate> points = state.latLngsToScreenCoordinates(latLngs);
-    for (auto& point : points) {
-        point.y = state.size.height - point.y;
-    }
-    return points;
-}
-
-std::vector<LatLng> Transform::screenCoordinatesToLatLngs(const std::vector<ScreenCoordinate>& points,
-                                                          LatLng::WrapMode wrapMode) const {
-    auto flippedPoints = points;
-    for (auto& flippedPoint : flippedPoints) {
-        flippedPoint.y = state.size.height - flippedPoint.y;
-    }
-    return state.screenCoordinatesToLatLngs(flippedPoints, wrapMode);
-}
-
 double Transform::getMaxPitchForEdgeInsets(const EdgeInsets &insets) const
 {
     double centerOffsetY = 0.5 * (insets.top() - insets.bottom()); // See TransformState::getCenterOffset.

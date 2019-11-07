@@ -276,40 +276,6 @@ double TransformState::zoomScale(double zoom) const {
 double TransformState::scaleZoom(double s) const {
     return util::log2(s);
 }
-namespace {
-mbgl::TileCoordinate getTileCoordinate(const ScreenCoordinate& point,
-                                       const mbgl::Size& size,
-                                       const mbgl::mat4& inverted,
-                                       const uint8_t atZoom,
-                                       const double scale) {
-    float targetZ = 0;
-    double flippedY = size.height - point.y;
-
-    // since we don't know the correct projected z value for the point,
-    // unproject two points to get a line and then find the point on that
-    // line with z=0
-
-    vec4 coord0;
-    vec4 coord1;
-    vec4 point0 = {{point.x, flippedY, 0, 1}};
-    vec4 point1 = {{point.x, flippedY, 1, 1}};
-    matrix::transformMat4(coord0, point0, inverted);
-    matrix::transformMat4(coord1, point1, inverted);
-
-    double w0 = coord0[3];
-    double w1 = coord1[3];
-
-    Point<double> p0 = Point<double>(coord0[0], coord0[1]) / w0;
-    Point<double> p1 = Point<double>(coord1[0], coord1[1]) / w1;
-
-    double z0 = coord0[2] / w0;
-    double z1 = coord1[2] / w1;
-    double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
-
-    Point<double> p = util::interpolate(p0, p1, t) / scale * static_cast<double>(1 << atZoom);
-    return {{p.x, p.y}, static_cast<double>(atZoom)};
-}
-} // namespace
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
     if (size.isEmpty()) {
@@ -324,41 +290,12 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
     return { p[0] / p[3], size.height - p[1] / p[3] };
 }
 
-std::vector<ScreenCoordinate> TransformState::latLngsToScreenCoordinates(const std::vector<LatLng>& latLngs) const {
-    if (size.isEmpty()) {
-        return {};
-    }
-    std::vector<ScreenCoordinate> points;
-    points.reserve(latLngs.size());
-    mat4 mat = coordinatePointMatrix();
-    vec4 p;
-    for (const auto& latLng : latLngs) {
-        Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
-        vec4 c = {{pt.x, pt.y, 0, 1}};
-        matrix::transformMat4(p, c, mat);
-        points.emplace_back(p[0] / p[3], size.height - p[1] / p[3]);
-    }
-    return points;
-}
-
 TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoordinate& point, uint8_t atZoom) const {
     if (size.isEmpty()) {
         return { {}, 0 };
     }
-    mat4 mat = coordinatePointMatrix();
 
-    mat4 inverted;
-    bool err = matrix::invert(inverted, mat);
-
-    if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
-    return getTileCoordinate(point, size, inverted, atZoom, scale);
-}
-
-std::vector<TileCoordinate> TransformState::screenCoordinatesToTileCoordinates(
-    const std::vector<ScreenCoordinate>& points, uint8_t atZoom) const {
-    if (size.isEmpty()) {
-        return {{{}, 0}};
-    }
+    float targetZ = 0;
     mat4 mat = coordinatePointMatrix();
 
     mat4 inverted;
@@ -366,28 +303,36 @@ std::vector<TileCoordinate> TransformState::screenCoordinatesToTileCoordinates(
 
     if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
 
-    std::vector<TileCoordinate> coords;
-    coords.reserve(points.size());
-    for (const auto& point : points) {
-        coords.emplace_back(getTileCoordinate(point, size, inverted, atZoom, scale));
-    }
-    return coords;
+    double flippedY = size.height - point.y;
+
+    // since we don't know the correct projected z value for the point,
+    // unproject two points to get a line and then find the point on that
+    // line with z=0
+
+    vec4 coord0;
+    vec4 coord1;
+    vec4 point0 = {{ point.x, flippedY, 0, 1 }};
+    vec4 point1 = {{ point.x, flippedY, 1, 1 }};
+    matrix::transformMat4(coord0, point0, inverted);
+    matrix::transformMat4(coord1, point1, inverted);
+
+    double w0 = coord0[3];
+    double w1 = coord1[3];
+
+    Point<double> p0 = Point<double>(coord0[0], coord0[1]) / w0;
+    Point<double> p1 = Point<double>(coord1[0], coord1[1]) / w1;
+
+    double z0 = coord0[2] / w0;
+    double z1 = coord1[2] / w1;
+    double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
+
+    Point<double> p = util::interpolate(p0, p1, t) / scale * static_cast<double>(1 << atZoom);
+    return { { p.x, p.y }, static_cast<double>(atZoom) };
 }
 
 LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
     auto coord = screenCoordinateToTileCoordinate(point, 0);
     return Projection::unproject(coord.p, 1 / util::tileSize, wrapMode);
-}
-
-std::vector<LatLng> TransformState::screenCoordinatesToLatLngs(const std::vector<ScreenCoordinate>& points,
-                                                               LatLng::WrapMode wrapMode) const {
-    const auto coords = screenCoordinatesToTileCoordinates(points, 0);
-    std::vector<LatLng> latLngs;
-    latLngs.reserve(coords.size());
-    for (const auto& coord : coords) {
-        latLngs.emplace_back(Projection::unproject(coord.p, 1 / util::tileSize, wrapMode));
-    }
-    return latLngs;
 }
 
 mat4 TransformState::coordinatePointMatrix() const {

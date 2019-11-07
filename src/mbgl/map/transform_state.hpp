@@ -82,13 +82,8 @@ public:
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
-    std::vector<ScreenCoordinate> latLngsToScreenCoordinates(const std::vector<LatLng>&) const;
-    std::vector<LatLng> screenCoordinatesToLatLngs(const std::vector<ScreenCoordinate>&,
-                                                   LatLng::WrapMode = LatLng::Unwrapped) const;
     // Implements mapbox-gl-js pointCoordinate() : MercatorCoordinate.
     TileCoordinate screenCoordinateToTileCoordinate(const ScreenCoordinate&, uint8_t atZoom) const;
-    std::vector<TileCoordinate> screenCoordinatesToTileCoordinates(const std::vector<ScreenCoordinate>&,
-                                                                   uint8_t atZoom) const;
 
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;

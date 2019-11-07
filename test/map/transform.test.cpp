@@ -123,14 +123,6 @@ TEST(Transform, PerspectiveProjection) {
     ASSERT_NEAR(-76.75823239205641, loc.longitude(), 1e-6);
     ASSERT_NEAR(37.692872969426375, loc.latitude(), 1e-6);
 
-    // Using batch conversion
-    const auto locs = transform.getState().screenCoordinatesToLatLngs({{0, 1000}, {1000, 0}});
-    ASSERT_EQ(2, locs.size());
-    ASSERT_NEAR(-77.59198961199148, locs.front().longitude(), 1e-6);
-    ASSERT_NEAR(38.74661326302018, locs.front().latitude(), 1e-6);
-    ASSERT_NEAR(-76.75823239205641, locs.back().longitude(), 1e-6);
-    ASSERT_NEAR(37.692872969426375, locs.back().latitude(), 1e-6);
-
     ScreenCoordinate point = transform.getState().latLngToScreenCoordinate({38.74661326302018, -77.59198961199148});
     ASSERT_NEAR(point.x, 0.0, 1e-5);
     ASSERT_NEAR(point.y, 1000.0, 1e-4);
@@ -138,15 +130,6 @@ TEST(Transform, PerspectiveProjection) {
     point = transform.getState().latLngToScreenCoordinate({37.692872969426375, -76.75823239205641});
     ASSERT_NEAR(point.x, 1000.0, 1e-5);
     ASSERT_NEAR(point.y, 0.0, 1e-4);
-
-    // Using batch conversion
-    const auto points = transform.getState().latLngsToScreenCoordinates(
-        {{38.74661326302018, -77.59198961199148}, {37.692872969426375, -76.75823239205641}});
-    ASSERT_EQ(2, points.size());
-    ASSERT_NEAR(points.front().x, 0.0, 1e-5);
-    ASSERT_NEAR(points.front().y, 1000.0, 1e-4);
-    ASSERT_NEAR(points.back().x, 1000.0, 1e-5);
-    ASSERT_NEAR(points.back().y, 0.0, 1e-4);
 }
 
 TEST(Transform, UnwrappedLatLng) {
@@ -177,26 +160,6 @@ TEST(Transform, UnwrappedLatLng) {
     ASSERT_NEAR(wrappedLeftwards.longitude(), -437.0, 1e-8);
     wrappedLeftwards.wrap();
     ASSERT_NEAR(wrappedLeftwards.longitude(), -77.0, 1e-8);
-
-    // Using batch conversion
-    std::vector<ScreenCoordinate> coords{{500, 500}};
-    auto tempCoords = state.latLngsToScreenCoordinates({{38, 283}, {38, -437}});
-    coords.insert(coords.end(), tempCoords.begin(), tempCoords.end());
-    auto latLngs = state.screenCoordinatesToLatLngs(coords);
-    ASSERT_EQ(3, latLngs.size());
-
-    ASSERT_NEAR(38.0, latLngs[0].latitude(), 1e-8);
-    ASSERT_NEAR(-77.0, latLngs[0].longitude(), 1e-8);
-
-    ASSERT_NEAR(38.0, latLngs[1].latitude(), 1e-8);
-    ASSERT_NEAR(283.0, latLngs[1].longitude(), 1e-8);
-    latLngs[1].wrap();
-    ASSERT_NEAR(-77.0, latLngs[1].longitude(), 1e-8);
-
-    ASSERT_DOUBLE_EQ(latLngs[1].latitude(), latLngs[2].latitude());
-    ASSERT_NEAR(-437.0, latLngs[2].longitude(), 1e-8);
-    latLngs[2].wrap();
-    ASSERT_NEAR(-77.0, latLngs[2].longitude(), 1e-8);
 }
 
 TEST(Transform, ConstrainHeightOnly) {

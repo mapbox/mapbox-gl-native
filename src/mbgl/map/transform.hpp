@@ -109,9 +109,6 @@ public:
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Wrapped) const;
-    std::vector<ScreenCoordinate> latLngsToScreenCoordinates(const std::vector<LatLng>&) const;
-    std::vector<LatLng> screenCoordinatesToLatLngs(const std::vector<ScreenCoordinate>&,
-                                                   LatLng::WrapMode = LatLng::Wrapped) const;
 
 private:
     MapObserver& observer;
