@@ -10,7 +10,6 @@ target_include_directories(mbgl-core
 target_link_libraries(mbgl-core PRIVATE
     mbgl-vendor-earcut.hpp
     mbgl-vendor-eternal
-    mbgl-vendor-expected
     mbgl-vendor-geojson-vt-cpp
     mbgl-vendor-shelf-pack-cpp
     mbgl-vendor-unique_resource
@@ -32,6 +31,7 @@ target_link_libraries(mbgl-core PUBLIC
     mbgl-vendor-polylabel
     mbgl-vendor-protozero
     Mapbox::Base::Extras::rapidjson
+    Mapbox::Base::Extras::expected-lite
     mbgl-vendor-vector-tile
 )
 
