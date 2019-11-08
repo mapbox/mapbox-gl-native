@@ -74,7 +74,7 @@ public:
     expected<OfflineRegionMetadata, std::exception_ptr>
     updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
-    std::exception_ptr deleteRegion(OfflineRegion&&);
+    std::exception_ptr deleteRegion(OfflineRegion&&, bool pack = true);
     std::exception_ptr invalidateRegion(int64_t regionID);
 
     // Return value is (response, stored size)
@@ -93,6 +93,7 @@ public:
     uint64_t getOfflineMapboxTileCount();
     bool exceedsOfflineMapboxTileCountLimit(const Resource&);
     void markUsedResources(int64_t regionID, const std::list<Resource>&);
+    std::exception_ptr pack();
 
 private:
     void initialize();
