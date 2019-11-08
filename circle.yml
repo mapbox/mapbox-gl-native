@@ -129,20 +129,7 @@ workflows:
       #     unique aspect of the build environment.
       #   - {build type} is typically "debug" or "release".
       #
-      - android-debug-arm-v7-buck
-      - android-arm-template:
-          name: android-debug-arm-v8
-      - android-arm-template:
-          name: android-gnustl-arm-v7
-          stl: gnustl_shared
-          firebase_device_id: "flo"
-          firebase_device_os: "21"
-          image: android-ndk-r17c:1d5db0eb34
-          abi: arm-v7
-      - android-release:
-          filters:
-            tags:
-              only: /android-v.*/
+      - android-downstream
       - node-linux-release:
           filters:
             tags:
@@ -739,27 +726,10 @@ jobs:
                 test_wrapper: ''
                 test_params: << parameters.test_params >>
       - next-save
-
 # ------------------------------------------------------------------------------
-  android-arm-template:
-    parameters:
-      stl:
-        type: string
-        default: "c++_static"
-      image:
-        type: string
-        default: android-ndk-r20:7b7c4b42cf
-      firebase_device_id:
-        type: string
-        default: sailfish
-      firebase_device_os:
-        type: string
-        default: "26"
-      abi:
-        type: string
-        default: "arm-v8"
+  android-downstream:
     docker:
-      - image: mbgl/<< parameters.image >>
+      - image: mbgl/android-ndk-r20:7b7c4b42cf
     resource_class: xlarge
     working_directory: /src
     environment:
@@ -767,34 +737,24 @@ jobs:
       JOBS: 8
       BUILDTYPE: Debug
       IS_LOCAL_DEVELOPMENT: false
-      MBGL_ANDROID_STL: << parameters.stl >>
     steps:
       - install-dependencies: { gradle: true }
-      - check-if-this-job-can-be-skipped
       - run:
-          name: Initialize vendor submodules
-          command: git submodule update --init platform/android/vendor
+          name: Checkout downstream
+          command: mkdir downstream && cd downstream && git clone git@github.com:mapbox/mapbox-gl-native-android.git
       - run:
-          name: Check code style
-          command: make android-check
+          name: Init submodules downstream
+          command: cd downstream/mapbox-gl-native-android && git submodule update --init --recursive
       - run:
-          name: Run Android unit tests
-          command: make run-android-unit-test
+          name: Update submodule pin of gl-native
+          command: cd downstream/mapbox-gl-native-android/vendor/mapbox-gl-native && git fetch && git checkout $CIRCLE_SHA1 && cd .. && git submodule update --init --recursive
       - run:
-          name: Build libmapbox-gl.so for << parameters.abi >>
-          command: make android-lib-<< parameters.abi >>
-      - run:
-          name: Generate Espresso sanity tests
-          command: make test-code-android
-      - run:
-          name: Build Test APK
-          command: |
+          name: Build APK
+          command: |       
             if [ -n "${MAPBOX_DEVELOPER_CONFIG_XML}" ]; then
-              echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
-              make android-ui-test-<< parameters.abi >>
+              echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > downstream/mapbox-gl-native-android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+              cd downstream/mapbox-gl-native-android && make android-ui-test-arm-v8
             fi
-      - save-dependencies: { gradle: true }
-      - conditionally-skip-firebase
       - login-google-cloud-platform
       - run:
           name: Run instrumentation tests on Firebase
@@ -803,152 +763,10 @@ jobs:
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
               gcloud firebase test android models list
               gcloud firebase test android run --type instrumentation \
-                --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
-                --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-                --device-ids  << parameters.firebase_device_id >> --os-version-ids << parameters.firebase_device_os >> --locales en --orientations portrait --timeout 20m \
-                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" --directories-to-pull /sdcard --results-dir mapbox-android-sdk-${CIRCLE_BUILD_NUM}
-              coverageFile=`gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/mapbox-android-sdk-${CIRCLE_BUILD_NUM}/**/*.ec | tail -1`
-              gsutil cp $coverageFile $PWD/platform/android/MapboxGLAndroidSDK/build/jacoco | true
-            fi
-      - run:
-          name: Parse and send Jacoco reports
-          command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
-              make android-create-jacoco-report && make android-parse-and-send-jacoco-report
-            fi
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
-          destination: .
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.html
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/lint-baseline.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.html
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj
-
-# ------------------------------------------------------------------------------
-  android-release:
-    docker:
-      - image: mbgl/android-ndk-r20:7b7c4b42cf
-    resource_class: xlarge
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 8
-      JOBS: 8
-      BUILDTYPE: Release
-      IS_LOCAL_DEVELOPMENT: false
-    steps:
-      - install-dependencies: { gradle: true }
-      - check-if-this-job-can-be-skipped
-      - run:
-          name: Initialize vendor submodules
-          command: git submodule update --init platform/android/vendor
-      - run:
-          name: Android nitpick
-          command: make run-android-nitpick
-      - run:
-          name: Trigger core benchmark run
-          command: |
-            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-              if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u ${MOBILE_METRICS_TOKEN}: -d build_parameters[CIRCLE_JOB]=android-core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
-              fi
-            fi
-      - run:
-          name: Trigger android benchmark run
-          command: |
-            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
-              if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u ${MOBILE_METRICS_TOKEN}: -d build_parameters[CIRCLE_JOB]=android-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
-              fi
-            fi
-      - run:
-          name: Generate Maven credentials
-          command: |
-            if [ -n "${BINTRAY_USER}" ]; then
-              echo "BINTRAY_USER=$BINTRAY_USER
-              BINTRAY_API_KEY=$BINTRAY_API_KEY
-              GPG_PASSPHRASE=$GPG_PASSPHRASE"
-            fi
-      - run:
-          name: Update version name
-          command: |
-            if [[ $CIRCLE_TAG == android-v* ]]; then
-              sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:9}/" platform/android/MapboxGLAndroidSDK/gradle.properties
-            fi
-      - run:
-          name: Build package
-          command: make apackage
-      - run:
-          name: Build release Test App
-          command: make android
-      - run:
-          name: Generate javadoc
-          command: make android-javadoc
-      - save-dependencies: { gradle: true }
-      - run:
-          name: gzip debugable .so files
-          command: |
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/arm64-v8a/libmapbox-gl.so && \
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/armeabi-v7a/libmapbox-gl.so && \
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so && \
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
-          destination: .
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/arm64-v8a/libmapbox-gl.so.gz
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/armeabi-v7a/libmapbox-gl.so.gz
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so.gz
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so.gz
-      - run:
-          name: Trigger external deploy steps
-          command: |
-            export VERSION_TAG=${CIRCLE_TAG}
-            export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
-            export DOCS_REPO="android-docs"
-            scripts/trigger-maps-documentation-deploy-steps.sh
-          background: true
-#      - run:
-#          name: Record size
-#          command: platform/android/scripts/metrics.sh
-# ------------------------------------------------------------------------------
-  android-debug-arm-v7-buck:
-    docker:
-      - image: mbgl/android-ndk-r17c-buck:07c5ef2e71
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Debug
-      ANDROID_NDK: /android/sdk/ndk-bundle
-    steps:
-      - checkout
-      - npm-install
-      - prepare-environment
-      - check-if-this-job-can-be-skipped
-      - run:
-          name: Checkout submodules
-          command: |
-            git submodule update --init
-            git submodule foreach git submodule update --init
-      - run:
-          name: Build Android library
-          command: |
-            cd misc/buck
-            buck build mapbox-gl-native:android-core
-
+                --app downstream/mapbox-gl-native-android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
+                --test downstream/mapbox-gl-native-android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
+                --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m 
+            fi            
 # ------------------------------------------------------------------------------
   node-linux-release:
     docker:
