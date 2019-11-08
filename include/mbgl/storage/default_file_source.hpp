@@ -121,6 +121,11 @@ public:
      * Eviction works by removing the least-recently requested resources not also required
      * by other regions, until the database shrinks below a certain size.
      *
+     * If the |pack| argument is `false` the database file packing is skipped and the
+     * database file does not shrink after this operation completes. Database file
+     * packing can be done later with `packDatabase()`. It is a useful optimization
+     * e.g. when several regions should be deleted in a row.
+     *
      * Note that this method takes ownership of the input, reflecting the fact that once
      * region deletion is initiated, it is not legal to perform further actions with the
      * region.
@@ -129,7 +134,7 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    void deleteOfflineRegion(OfflineRegion&&, std::function<void (std::exception_ptr)>);
+    void deleteOfflineRegion(OfflineRegion&&, std::function<void(std::exception_ptr)>, bool pack = true);
 
     /*
      * Invalidate all the tiles from an offline region forcing Mapbox GL to revalidate
@@ -137,7 +142,7 @@ public:
      * offline region and downloading it again because if the data on the cache matches
      * the server, no new data gets transmitted.
      */
-    void invalidateOfflineRegion(OfflineRegion&, std::function<void (std::exception_ptr)>);
+    void invalidateOfflineRegion(OfflineRegion&, std::function<void(std::exception_ptr)>);
 
     /*
      * Changing or bypassing this limit without permission from Mapbox is prohibited
@@ -179,7 +184,16 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    void resetDatabase(std::function<void (std::exception_ptr)>);
+    void resetDatabase(std::function<void(std::exception_ptr)>);
+
+    /*
+     * Packs the existing database file into a minimal amount of disk space.
+     *
+     * When the operation is complete or encounters an error, the given callback will be
+     * executed on the database thread; it is the responsibility of the SDK bindings
+     * to re-execute a user-provided callback on the main thread.
+     */
+    void packDatabase(std::function<void(std::exception_ptr)> callback);
 
     /*
      * Forces revalidation of the ambient cache.

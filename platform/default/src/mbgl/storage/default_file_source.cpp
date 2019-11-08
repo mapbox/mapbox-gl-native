@@ -82,9 +82,9 @@ public:
         }
     }
 
-    void deleteRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
+    void deleteRegion(OfflineRegion&& region, std::function<void(std::exception_ptr)> callback, bool pack) {
         downloads.erase(region.getID());
-        callback(offlineDatabase->deleteRegion(std::move(region)));
+        callback(offlineDatabase->deleteRegion(std::move(region), pack));
     }
 
     void invalidateRegion(int64_t regionID, std::function<void (std::exception_ptr)> callback) {
@@ -200,6 +200,8 @@ public:
         callback(offlineDatabase->setMaximumAmbientCacheSize(size));
     }
 
+    void packDatabase(std::function<void(std::exception_ptr)> callback) { callback(offlineDatabase->pack()); }
+
 private:
     expected<OfflineDownload*, std::exception_ptr> getDownload(int64_t regionID) {
         auto it = downloads.find(regionID);
@@ -308,11 +310,14 @@ void DefaultFileSource::updateOfflineMetadata(const int64_t regionID,
     impl->actor().invoke(&Impl::updateMetadata, regionID, metadata, callback);
 }
 
-void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::deleteRegion, std::move(region), callback);
+void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region,
+                                            std::function<void(std::exception_ptr)> callback,
+                                            bool pack) {
+    impl->actor().invoke(&Impl::deleteRegion, std::move(region), callback, pack);
 }
 
-void DefaultFileSource::invalidateOfflineRegion(OfflineRegion& region, std::function<void (std::exception_ptr)> callback) {
+void DefaultFileSource::invalidateOfflineRegion(OfflineRegion& region,
+                                                std::function<void(std::exception_ptr)> callback) {
     impl->actor().invoke(&Impl::invalidateRegion, region.getID(), callback);
 }
 
@@ -348,11 +353,15 @@ void DefaultFileSource::resetDatabase(std::function<void (std::exception_ptr)> c
     impl->actor().invoke(&Impl::resetDatabase, std::move(callback));
 }
 
+void DefaultFileSource::packDatabase(std::function<void(std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::packDatabase, std::move(callback));
+}
+
 void DefaultFileSource::invalidateAmbientCache(std::function<void (std::exception_ptr)> callback) {
     impl->actor().invoke(&Impl::invalidateAmbientCache, std::move(callback));
 }
 
-void DefaultFileSource::clearAmbientCache(std::function<void (std::exception_ptr)> callback) {
+void DefaultFileSource::clearAmbientCache(std::function<void(std::exception_ptr)> callback) {
     impl->actor().invoke(&Impl::clearAmbientCache, std::move(callback));
 }
 
