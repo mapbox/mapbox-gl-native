@@ -95,6 +95,8 @@ public:
 
     void resetDatabase(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
 
+    void packDatabase(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
+
     void invalidateAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
 
     void clearAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
