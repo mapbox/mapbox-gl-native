@@ -85,4 +85,20 @@ class CacheTest {
     }
     countDownLatch.await()
   }
+
+  @Test
+  fun testSetPackDatabase() {
+    rule.activity.runOnUiThread {
+      OfflineManager.getInstance(context).packDatabase(object : OfflineManager.FileSourceCallback {
+        override fun onSuccess() {
+          countDownLatch.countDown()
+        }
+
+        override fun onError(message: String) {
+          Assert.assertNull("onError should not be called", message)
+        }
+      })
+    }
+    countDownLatch.await()
+  }
 }

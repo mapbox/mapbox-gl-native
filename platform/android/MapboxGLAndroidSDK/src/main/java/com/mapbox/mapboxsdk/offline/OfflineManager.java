@@ -307,6 +307,47 @@ public class OfflineManager {
   }
 
   /**
+   * Packs the existing database file into a minimal amount of disk space.
+   * <p>
+   * When the operation is complete or encounters an error, the given callback will be
+   * executed on the database thread; it is the responsibility of the SDK bindings
+   * to re-execute a user-provided callback on the main thread.
+   * </p>
+   *
+   * @param callback the callback to be invoked when the database was reset or when the operation erred.
+   */
+  public void packDatabase(@Nullable final FileSourceCallback callback) {
+    fileSource.activate();
+    nativePackDatabase(new FileSourceCallback() {
+      @Override
+      public void onSuccess() {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onSuccess();
+            }
+          }
+        });
+      }
+
+      @Override
+      public void onError(@NonNull final String message) {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onError(message);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  /**
    * Forces re-validation of the ambient cache.
    * <p>
    * Forces Mapbox GL Native to revalidate resources stored in the ambient
@@ -647,6 +688,9 @@ public class OfflineManager {
 
   @Keep
   private native void nativeResetDatabase(@Nullable FileSourceCallback callback);
+
+  @Keep
+  private native void nativePackDatabase(@Nullable FileSourceCallback callback);
 
   @Keep
   private native void nativeInvalidateAmbientCache(@Nullable FileSourceCallback callback);
