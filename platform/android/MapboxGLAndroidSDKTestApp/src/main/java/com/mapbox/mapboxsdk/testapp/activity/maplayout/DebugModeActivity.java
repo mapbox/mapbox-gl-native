@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -17,17 +18,28 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.LineString;
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import timber.log.Timber;
 
@@ -56,6 +68,39 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     Style.TRAFFIC_NIGHT
   };
   private TextView fpsView;
+
+  private static final FeatureCollection featureCollection;
+
+  static {
+    LatLngBounds bounds = LatLngBounds.from(60, 100, -60, -100);
+    List<Point> points = new ArrayList<>();
+    for (int i = 0; i < 1_000; i++) {
+      LatLng latLng = getLatLngInBounds(bounds);
+      points.add(Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()));
+    }
+    featureCollection = FeatureCollection.fromFeature(Feature.fromGeometry(LineString.fromLngLats(points)));
+  }
+
+  private void setupLayer() {
+    GeoJsonSource source = new GeoJsonSource("source", featureCollection);
+    LineLayer lineLayer = new LineLayer("layer", "source")
+      .withProperties(
+        PropertyFactory.lineColor(Color.RED),
+        PropertyFactory.lineWidth(10f)
+      );
+
+    mapboxMap.getStyle().addSource(source);
+    mapboxMap.getStyle().addLayer(lineLayer);
+  }
+
+  private static LatLng getLatLngInBounds(LatLngBounds bounds) {
+    Random generator = new Random();
+    double randomLat = bounds.getLatSouth() + generator.nextDouble()
+      * (bounds.getLatNorth() - bounds.getLatSouth());
+    double randomLon = bounds.getLonWest() + generator.nextDouble()
+      * (bounds.getLonEast() - bounds.getLonWest());
+    return new LatLng(randomLat, randomLon);
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +135,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     mapView.addOnDidFinishLoadingStyleListener(() -> {
       if (mapboxMap != null) {
         setupNavigationView(mapboxMap.getStyle().getLayers());
+        setupLayer();
       }
     });
 
