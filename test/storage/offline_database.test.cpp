@@ -658,6 +658,22 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DISABLED_MaximumAmbientCacheSize)) {
     EXPECT_EQ(initialSize, util::read_file(filename).size());
 }
 
+namespace {
+std::list<std::tuple<Resource, Response>> generateResources(const std::string& tilePrefix,
+                                                            const std::string& stylePrefix) {
+    static const auto responseData = randomString(.5 * 1024 * 1024);
+    Response response;
+    response.data = responseData;
+    std::list<std::tuple<Resource, Response>> resources;
+    for (unsigned i = 0; i < 50; ++i) {
+        resources.emplace_back(Resource::tile(tilePrefix + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ),
+                               response);
+        resources.emplace_back(Resource::style(stylePrefix + std::to_string(i)), response);
+    }
+    return resources;
+}
+} // namespace
+
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
     FixtureLog log;
     deleteDatabaseFiles();
@@ -677,25 +693,35 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
         OfflineTilePyramidRegionDefinition definition{ "mapbox://style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0, true };
         OfflineRegionMetadata metadata{{ 1, 2, 3 }};
 
-        auto region = db.createRegion(definition, metadata);
+        auto region1 = db.createRegion(definition, metadata);
+        auto region2 = db.createRegion(definition, metadata);
 
-        for (unsigned i = 0; i < 50; ++i) {
-            const Resource tile = Resource::tile("mapbox://tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
-            db.putRegionResource(region->getID(), tile, response);
+        OfflineRegionStatus status;
+        db.putRegionResources(region1->getID(), generateResources("mapbox://tile_1", "mapbox://style_1"), status);
+        db.putRegionResources(region2->getID(), generateResources("mapbox://tile_2", "mapbox://style_2"), status);
+        const size_t sizeWithTwoRegions = util::read_file(filename).size();
 
-            const Resource style = Resource::style("mapbox://style_" + std::to_string(i));
-            db.putRegionResource(region->getID(), style, response);
-        }
+        db.deleteRegion(std::move(*region1), false /*pack*/);
 
-        db.deleteRegion(std::move(*region));
+        ASSERT_EQ(1u, db.listRegions().value().size());
+        // Region is removed but the size of the database is the same.
+        EXPECT_EQ(sizeWithTwoRegions, util::read_file(filename).size());
 
-        auto regions = db.listRegions().value();
-        ASSERT_EQ(0u, regions.size());
+        db.pack();
+        // The size of the database has shrunk after pack().
+        const size_t sizeWithOneRegion = util::read_file(filename).size();
+        EXPECT_LT(sizeWithOneRegion, sizeWithTwoRegions);
+
+        db.deleteRegion(std::move(*region2));
+        // The size of the database has shrunk right away.
+        const size_t sizeWithoutRegions = util::read_file(filename).size();
+        ASSERT_EQ(0u, db.listRegions().value().size());
+        EXPECT_LT(sizeWithoutRegions, sizeWithOneRegion);
 
         // The tiles from the offline region will migrate to the
         // ambient cache and shrink the database to the maximum
         // size defined by default.
-        EXPECT_LE(util::read_file(filename).size(), util::DEFAULT_MAX_CACHE_SIZE);
+        EXPECT_LE(sizeWithoutRegions, util::DEFAULT_MAX_CACHE_SIZE);
 
         // After clearing the cache, the size of the database
         // should get back to the original size.

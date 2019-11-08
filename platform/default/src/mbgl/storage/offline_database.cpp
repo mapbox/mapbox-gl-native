@@ -183,6 +183,7 @@ void OfflineDatabase::migrateToVersion6() {
 }
 
 void OfflineDatabase::vacuum() {
+    assert(db);
     if (getPragma<int64_t>("PRAGMA auto_vacuum") != 2 /*INCREMENTAL*/) {
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
         db->exec("VACUUM");
@@ -872,7 +873,7 @@ OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetad
     return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
+std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region, bool pack) try {
     {
         mapbox::sqlite::Query query{ getStatement("DELETE FROM regions WHERE id = ?") };
         query.bind(1, region.getID());
@@ -881,10 +882,10 @@ std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
 
     evict(0);
     assert(db);
-    vacuum();
+    if (pack) vacuum();
 
     // Ensure that the cached offlineTileCount value is recalculated.
-    offlineMapboxTileCount = {};
+    offlineMapboxTileCount = nullopt;
     return nullptr;
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "delete region");
@@ -1296,6 +1297,15 @@ void OfflineDatabase::markUsedResources(int64_t regionID, const std::list<Resour
     transaction.commit();
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "mark resources as used");
+}
+
+std::exception_ptr OfflineDatabase::pack() try {
+    if (!db) initialize();
+    vacuum();
+    return nullptr;
+} catch (const mapbox::sqlite::Exception& ex) {
+    handleError(ex, "pack storage");
+    return std::current_exception();
 }
 
 std::exception_ptr OfflineDatabase::resetDatabase() try {
