@@ -8,7 +8,6 @@ namespace mbgl {
 namespace android {
 
 // OfflineManager //
-
 OfflineManager::OfflineManager(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource)
     : fileSource(std::static_pointer_cast<DefaultFileSource>(mbgl::FileSource::getSharedFileSource(FileSource::getSharedResourceOptions(env, jFileSource)))) {}
 
@@ -123,6 +122,26 @@ void OfflineManager::resetDatabase(jni::JNIEnv& env_, const jni::Object<FileSour
     });
 }
 
+void OfflineManager::packDatabase(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
+    auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
+
+    fileSource->packDatabase(
+        [
+            // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
+            std::exception_ptr exception) mutable {
+            // Reattach, the callback comes from a different thread
+            android::UniqueEnv env = android::AttachEnv();
+
+            if (exception) {
+                OfflineManager::FileSourceCallback::onError(
+                    *env, *callback, jni::Make<jni::String>(*env, mbgl::util::toString(exception)));
+            } else {
+                OfflineManager::FileSourceCallback::onSuccess(*env, *callback);
+            }
+        });
+}
+
 void OfflineManager::invalidateAmbientCache(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
@@ -207,7 +226,10 @@ void OfflineManager::registerNative(jni::JNIEnv& env) {
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-    jni::RegisterNativePeer<OfflineManager>( env, javaClass, "nativePtr",
+    jni::RegisterNativePeer<OfflineManager>(
+        env,
+        javaClass,
+        "nativePtr",
         jni::MakePeer<OfflineManager, const jni::Object<FileSource>&>,
         "initialize",
         "finalize",
@@ -216,6 +238,7 @@ void OfflineManager::registerNative(jni::JNIEnv& env) {
         METHOD(&OfflineManager::createOfflineRegion, "createOfflineRegion"),
         METHOD(&OfflineManager::mergeOfflineRegions, "mergeOfflineRegions"),
         METHOD(&OfflineManager::resetDatabase, "nativeResetDatabase"),
+        METHOD(&OfflineManager::packDatabase, "nativePackDatabase"),
         METHOD(&OfflineManager::invalidateAmbientCache, "nativeInvalidateAmbientCache"),
         METHOD(&OfflineManager::clearAmbientCache, "nativeClearAmbientCache"),
         METHOD(&OfflineManager::setMaximumAmbientCacheSize, "nativeSetMaximumAmbientCacheSize"),
