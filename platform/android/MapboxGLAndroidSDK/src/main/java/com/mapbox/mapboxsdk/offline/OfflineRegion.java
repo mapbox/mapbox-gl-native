@@ -401,7 +401,55 @@ public class OfflineRegion {
     if (!isDeleted) {
       isDeleted = true;
       fileSource.activate();
-      deleteOfflineRegion(new OfflineRegionDeleteCallback() {
+      deleteOfflineRegion(true /*pack*/, new OfflineRegionDeleteCallback() {
+        @Override
+        public void onDelete() {
+          handler.post(new Runnable() {
+            @Override
+            public void run() {
+              fileSource.deactivate();
+              callback.onDelete();
+              OfflineRegion.this.finalize();
+            }
+          });
+        }
+
+        @Override
+        public void onError(final String error) {
+          handler.post(new Runnable() {
+            @Override
+            public void run() {
+              isDeleted = false;
+              fileSource.deactivate();
+              callback.onError(error);
+            }
+          });
+        }
+      });
+    }
+  }
+
+  /**
+   * Same as {@link OfflineRegion#delete} but skipping database file packing for performance reasons.
+   * <p>
+   * Database file packing can be done later with {@link OfflineManager#packDatabase}.
+   * This method is a useful optimization e.g. when several regions should be deleted in a row.
+   * </p>
+   * <p>
+   * When the operation is complete or encounters an error, the given callback will be
+   * executed on the main thread.
+   * </p>
+   * <p>
+   * After you call this method, you may not call any additional methods on this object.
+   * </p>
+   *
+   * @param callback the callback to be invoked
+   */
+  public void deleteAndSkipPackDatabase(@NonNull final OfflineRegionDeleteCallback callback) {
+    if (!isDeleted) {
+      isDeleted = true;
+      fileSource.activate();
+      deleteOfflineRegion(false /*pack*/, new OfflineRegionDeleteCallback() {
         @Override
         public void onDelete() {
           handler.post(new Runnable() {
@@ -521,7 +569,7 @@ public class OfflineRegion {
   private native void getOfflineRegionStatus(OfflineRegionStatusCallback callback);
 
   @Keep
-  private native void deleteOfflineRegion(OfflineRegionDeleteCallback callback);
+  private native void deleteOfflineRegion(boolean pack, OfflineRegionDeleteCallback callback);
 
   @Keep
   private native void updateOfflineRegionMetadata(byte[] metadata, OfflineRegionUpdateMetadataCallback callback);

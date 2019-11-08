@@ -69,7 +69,7 @@ public:
 
     void getOfflineRegionStatus(jni::JNIEnv&, const jni::Object<OfflineRegion::OfflineRegionStatusCallback>&);
 
-    void deleteOfflineRegion(jni::JNIEnv&, const jni::Object<OfflineRegionDeleteCallback>&);
+    void deleteOfflineRegion(jni::JNIEnv&, jni::jboolean pack, const jni::Object<OfflineRegionDeleteCallback>&);
 
     void invalidateOfflineRegion(jni::JNIEnv&, const jni::Object<OfflineRegionInvalidateCallback>&);
 
