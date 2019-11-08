@@ -7,6 +7,20 @@
 namespace mbgl {
 namespace android {
 
+namespace {
+// Reattach, the callback comes from a different thread
+void handleException(std::exception_ptr exception,
+                     const jni::Object<OfflineManager::FileSourceCallback>& callback,
+                     android::UniqueEnv env = android::AttachEnv()) {
+    if (exception) {
+        OfflineManager::FileSourceCallback::onError(
+            *env, callback, jni::Make<jni::String>(*env, mbgl::util::toString(exception)));
+    } else {
+        OfflineManager::FileSourceCallback::onSuccess(*env, callback);
+    }
+}
+} // namespace
+
 // OfflineManager //
 OfflineManager::OfflineManager(jni::JNIEnv& env, const jni::Object<FileSource>& jFileSource)
     : fileSource(std::static_pointer_cast<DefaultFileSource>(mbgl::FileSource::getSharedFileSource(FileSource::getSharedResourceOptions(env, jFileSource)))) {}
@@ -106,20 +120,11 @@ void OfflineManager::mergeOfflineRegions(jni::JNIEnv& env_, const jni::Object<Fi
 void OfflineManager::resetDatabase(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->resetDatabase([
-        //Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
-    ](std::exception_ptr exception) mutable {
-
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
-
-        if (exception) {
-            OfflineManager::FileSourceCallback::onError(*env, *callback, jni::Make<jni::String>(*env, mbgl::util::toString(exception)));
-        } else {
-            OfflineManager::FileSourceCallback::onSuccess(*env, *callback);
-        }
-    });
+    fileSource->resetDatabase(
+        [
+            // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
+            std::exception_ptr exception) mutable { handleException(exception, *callback); });
 }
 
 void OfflineManager::packDatabase(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
@@ -129,74 +134,38 @@ void OfflineManager::packDatabase(jni::JNIEnv& env_, const jni::Object<FileSourc
         [
             // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
             callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
-            std::exception_ptr exception) mutable {
-            // Reattach, the callback comes from a different thread
-            android::UniqueEnv env = android::AttachEnv();
-
-            if (exception) {
-                OfflineManager::FileSourceCallback::onError(
-                    *env, *callback, jni::Make<jni::String>(*env, mbgl::util::toString(exception)));
-            } else {
-                OfflineManager::FileSourceCallback::onSuccess(*env, *callback);
-            }
-        });
+            std::exception_ptr exception) mutable { handleException(exception, *callback); });
 }
 
 void OfflineManager::invalidateAmbientCache(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->invalidateAmbientCache([
-        //Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
-    ](std::exception_ptr exception) mutable {
-
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
-
-        if (exception) {
-            OfflineManager::FileSourceCallback::onError(*env, *callback, jni::Make<jni::String>(*env, mbgl::util::toString(exception)));
-        } else {
-            OfflineManager::FileSourceCallback::onSuccess(*env, *callback);
-        }
-    });
+    fileSource->invalidateAmbientCache(
+        [
+            // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
+            std::exception_ptr exception) mutable { handleException(exception, *callback); });
 }
 
 void OfflineManager::clearAmbientCache(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->clearAmbientCache([
-        //Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
-    ](std::exception_ptr exception) mutable {
-
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
-
-        if (exception) {
-            OfflineManager::FileSourceCallback::onError(*env, *callback, jni::Make<jni::String>(*env, mbgl::util::toString(exception)));
-        } else {
-            OfflineManager::FileSourceCallback::onSuccess(*env, *callback);
-        }
-    });
+    fileSource->clearAmbientCache(
+        [
+            // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
+            std::exception_ptr exception) mutable { handleException(exception, *callback); });
 }
 
 void OfflineManager::setMaximumAmbientCacheSize(jni::JNIEnv& env_, const jni::jlong size_, const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
-    fileSource->setMaximumAmbientCacheSize(size_, [
-        //Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
-        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
-    ](std::exception_ptr exception) mutable {
-
-        // Reattach, the callback comes from a different thread
-        android::UniqueEnv env = android::AttachEnv();
-
-        if (exception) {
-            OfflineManager::FileSourceCallback::onError(*env, *callback, jni::Make<jni::String>(*env, mbgl::util::toString(exception)));
-        } else {
-            OfflineManager::FileSourceCallback::onSuccess(*env, *callback);
-        }
-    });
+    fileSource->setMaximumAmbientCacheSize(
+        size_,
+        [
+            // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
+            callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
+            std::exception_ptr exception) mutable { handleException(exception, *callback); });
 }
 
 // FileSource::FileSourceCallback //
