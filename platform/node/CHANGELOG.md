@@ -1,4 +1,7 @@
 
+# master
+* Add support for [image expression](https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-image). ([#15877](https://github.com/mapbox/mapbox-gl-native/pull/15877))
+
 # 5.0.0
 * No longer supporting source-compile fallback ([#15748](https://github.com/mapbox/mapbox-gl-native/pull/15748))
 * Add support for feature state APIs. ([#15480](https://github.com/mapbox/mapbox-gl-native/pull/15480))
