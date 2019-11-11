@@ -3,6 +3,8 @@ add_executable(
     expression-test/test_runner_common.cpp
     expression-test/test_runner_common.hpp
     platform/default/src/mbgl/render-test/main.cpp
+    render-test/file_source.cpp
+    render-test/file_source.hpp
     render-test/allocation_index.cpp
     render-test/allocation_index.hpp
     render-test/filesystem.hpp
