@@ -3,6 +3,7 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+- Added support for [image expression](https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-image) in core library. Runtime APIs for image expression will be implemented separately. [#15877](https://github.com/mapbox/mapbox-gl-native/pull/15877)
 
 ### Bug fixes
  - Fixed the rendering bug caused by redundant pending requests for already requested images [#15864](https://github.com/mapbox/mapbox-gl-native/pull/15864)
