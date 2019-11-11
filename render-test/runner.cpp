@@ -1035,7 +1035,8 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
 
         map.flyTo(mbgl::CameraOptions().withCenter(endPos).withZoom(endZoom), animationOptions);
 
-        for (; !transitionFinished; frames++) {
+        while (!transitionFinished) {
+            frames++;
             frontend.renderOnce(map);
             float frameTime = (float)frontend.getFrameTime();
             totalTime += frameTime;
