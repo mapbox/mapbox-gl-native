@@ -7,36 +7,37 @@
 #include "qt_conversion.hpp"
 #include "qt_geojson.hpp"
 
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/minmax.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/conversion/layer.hpp>
-#include <mbgl/style/conversion/source.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/network_status.hpp>
+#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/image.hpp>
-#include <mbgl/renderer/renderer.hpp>
-#include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/network_status.hpp>
-#include <mbgl/storage/resource_options.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
@@ -45,7 +46,6 @@
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/traits.hpp>
-#include <mbgl/actor/scheduler.hpp>
 
 #include <QGuiApplication>
 
@@ -1316,10 +1316,8 @@ void QMapboxGL::updateSource(const QString &id, const QVariantMap &params)
         return;
     }
 
-    if (sourceImage) {
-        if (params.contains("url")) {
-            sourceImage->setURL(params["url"].toString().toStdString());
-        }
+    if (sourceImage && params.contains("url")) {
+        sourceImage->setURL(params["url"].toString().toStdString());
     } else if (sourceGeoJSON && params.contains("data")) {
         Error error;
         auto result = convert<mbgl::GeoJSON>(params["data"], error);
