@@ -99,6 +99,7 @@ private:
     void handleError(const mapbox::sqlite::Exception&, const char* action);
     void handleError(const util::IOException&, const char* action);
     void handleError(const std::runtime_error& ex, const char* action);
+    void handleError(const char* action);
 
     void removeExisting();
     void removeOldCacheTable();
