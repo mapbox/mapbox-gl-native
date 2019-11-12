@@ -486,7 +486,7 @@ public class LineLayerTest extends BaseLayerTest {
     assertNull(layer.getLinePattern().getExpression());
 
     // Set and Get
-    Expression expression = string(Expression.get("undefined"));
+    Expression expression = image(string(Expression.get("undefined")));
     layer.setProperties(linePattern(expression));
     assertEquals(layer.getLinePattern().getExpression(), expression);
   }

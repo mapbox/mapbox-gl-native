@@ -319,7 +319,7 @@ public class FillLayerTest extends BaseLayerTest {
     assertNull(layer.getFillPattern().getExpression());
 
     // Set and Get
-    Expression expression = string(Expression.get("undefined"));
+    Expression expression = image(string(Expression.get("undefined")));
     layer.setProperties(fillPattern(expression));
     assertEquals(layer.getFillPattern().getExpression(), expression);
   }

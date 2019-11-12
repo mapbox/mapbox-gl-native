@@ -296,7 +296,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertEquals(layer.getIconImage().getValue(), propertyValue);
 
     layer.setProperties(iconImage("{token}"));
-    assertEquals(layer.getIconImage().getExpression(), Expression.toString(Expression.get("token")));
+    assertEquals(layer.getIconImage().getExpression(), image(Expression.toString(Expression.get("token"))));
   }
 
   @Test
@@ -307,7 +307,7 @@ public class SymbolLayerTest extends BaseLayerTest {
     assertNull(layer.getIconImage().getExpression());
 
     // Set and Get
-    Expression expression = string(Expression.get("undefined"));
+    Expression expression = image(string(Expression.get("undefined")));
     layer.setProperties(iconImage(expression));
     assertEquals(layer.getIconImage().getExpression(), expression);
   }
