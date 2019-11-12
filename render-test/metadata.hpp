@@ -100,14 +100,14 @@ struct GfxProbe {
     GfxProbe() = default;
     GfxProbe(const mbgl::gfx::RenderingStats&, const GfxProbe&);
 
-    int numDrawCalls;
-    int numTextures;
     int numBuffers;
+    int numDrawCalls;
     int numFrameBuffers;
+    int numTextures;
 
-    Memory memTextures;
     Memory memIndexBuffers;
     Memory memVertexBuffers;
+    Memory memTextures;
 };
 
 class TestMetrics {
