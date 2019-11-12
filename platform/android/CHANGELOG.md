@@ -14,6 +14,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Convert GeoJSON features to tiles in a background thread and thus unblock the UI thread on updating the GeoJsonSource [#15871](https://github.com/mapbox/mapbox-gl-native/pull/15871)
  - Convert GeoJSON features to tiles for the loaded source description in a background thread and thus unblock the UI thread [#15885](https://github.com/mapbox/mapbox-gl-native/pull/15885)
 
+### Features
+- Introduce `OfflineManager#packDatabase` and `OfflineRegion#deleteAndSkipPackDatabase` API in order to decouple offline storage vacuum and delete region operations and thus to gain performance benefits e.g. when several regions should be deleted in a row [#15899](https://github.com/mapbox/mapbox-gl-native/pull/15899)
+
 ## 8.5.0-alpha.2 - October 10, 2019
 [Changes](https://github.com/mapbox/mapbox-gl-native/compare/android-v8.5.0-alpha.1...android-v8.5.0-alpha.2) since [Mapbox Maps SDK for Android v8.5.0-alpha.1](https://github.com/mapbox/mapbox-gl-native/releases/tag/android-v8.5.0-alpha.1):
 
