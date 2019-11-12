@@ -511,22 +511,12 @@ commands:
         command: make darwin-check-public-symbols
 
 
-  conditionally-skip-firebase:
-    steps:
-    - run:
-        name: Check if Firebase should be skipped
-        command: |
-          SKIPPABLE_TAG=$( git log -1 | grep -ioE -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" || true )
-          if [ -n "${SKIPPABLE_TAG}" ]; then
-            echo "Skipping Firebase tests because commit message contained: '${SKIPPABLE_TAG}'"
-            echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
-          fi
   login-google-cloud-platform:
     steps:
     - run:
         name: Log in to Google Cloud Platform
         command: |
-          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" ]]; then
             echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             rm secret.json
@@ -794,13 +784,12 @@ jobs:
               make android-ui-test-<< parameters.abi >>
             fi
       - save-dependencies: { gradle: true }
-      - conditionally-skip-firebase
       - login-google-cloud-platform
       - run:
           name: Run instrumentation tests on Firebase
           no_output_timeout: 20m
           command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" ]]; then
               gcloud firebase test android models list
               gcloud firebase test android run --type instrumentation \
                 --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
