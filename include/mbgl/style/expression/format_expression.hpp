@@ -8,12 +8,16 @@ namespace style {
 namespace expression {
 
 struct FormatExpressionSection {
-    FormatExpressionSection(std::unique_ptr<Expression> text_,
-                            optional<std::unique_ptr<Expression>> fontScale_,
-                            optional<std::unique_ptr<Expression>> textFont_,
-                            optional<std::unique_ptr<Expression>> textColor_);
-    
-    std::shared_ptr<Expression> text;
+    explicit FormatExpressionSection(std::unique_ptr<Expression> content_);
+
+    void setTextSectionOptions(optional<std::unique_ptr<Expression>> fontScale_,
+                               optional<std::unique_ptr<Expression>> textFont_,
+                               optional<std::unique_ptr<Expression>> textColor_);
+
+    // Content can be expression that evaluates to String or Image.
+    std::shared_ptr<Expression> content;
+
+    // Text related section options.
     optional<std::shared_ptr<Expression>> fontScale;
     optional<std::shared_ptr<Expression>> textFont;
     optional<std::shared_ptr<Expression>> textColor;
