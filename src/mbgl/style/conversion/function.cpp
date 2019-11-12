@@ -42,9 +42,8 @@ bool hasTokens(const std::string& source) {
     
 std::unique_ptr<Expression> convertTokenStringToFormatExpression(const std::string& source) {
     auto textExpression = convertTokenStringToExpression(source);
-    std::vector<FormatExpressionSection> sections;
-    sections.emplace_back(std::move(textExpression), nullopt, nullopt, nullopt);
-    return std::make_unique<FormatExpression>(sections);
+    std::vector<FormatExpressionSection> sections{FormatExpressionSection(std::move(textExpression))};
+    return std::make_unique<FormatExpression>(std::move(sections));
 }
 
 std::unique_ptr<Expression> convertTokenStringToImageExpression(const std::string& source) {

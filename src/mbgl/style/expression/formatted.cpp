@@ -35,6 +35,16 @@ std::string Formatted::toString() const {
     return result;
 }
 
+bool Formatted::empty() const {
+    if (sections.empty()) {
+        return true;
+    }
+
+    return !std::any_of(sections.begin(), sections.end(), [](const FormattedSection& section) {
+        return !section.text.empty() || (section.image && !section.image->empty());
+    });
+}
+
 mbgl::Value Formatted::toObject() const {
     mapbox::base::ValueObject result;
     mapbox::base::ValueArray sectionValues;
@@ -58,6 +68,7 @@ mbgl::Value Formatted::toObject() const {
         } else {
             serializedSection.emplace("textColor", NullValue());
         }
+        serializedSection.emplace("image", section.image ? section.image->toValue() : NullValue());
         sectionValues.emplace_back(serializedSection);
     }
     result.emplace("sections", std::move(sectionValues));
@@ -76,14 +87,37 @@ optional<Formatted> Converter<Formatted>::operator()(const Convertible& value, E
     if (isArray(value)) {
         std::vector<FormattedSection> sections;
         for (std::size_t i = 0; i < arrayLength(value); ++i) {
-            Convertible section = arrayMember(value, i);
+            const Convertible& section = arrayMember(value, i);
             std::size_t sectionLength = arrayLength(section);
             if (sectionLength < 1) {
-                error.message = "Section has to contain a text and optional parameters.";
+                error.message = "Section has to contain a text and optional parameters or an image.";
                 return nullopt;
             }
 
-            optional<std::string> sectionText = toString(arrayMember(section, 0));
+            const Convertible& firstElement = arrayMember(section, 0);
+            if (isArray(firstElement)) {
+                if (arrayLength(firstElement) < 2) {
+                    error.message = "Image section has to contain image name.";
+                    return nullopt;
+                }
+
+                optional<std::string> imageOp = toString(arrayMember(firstElement, 0));
+                if (!imageOp || *imageOp != "image") {
+                    error.message = "Serialized image section has to contain 'image' operator.";
+                    return nullopt;
+                }
+
+                optional<std::string> imageArg = toString(arrayMember(firstElement, 1));
+                if (!imageArg) {
+                    error.message = "Serialized image section agument has to be of a String type.";
+                    return nullopt;
+                }
+
+                sections.emplace_back(Image(*imageArg));
+                continue;
+            }
+
+            optional<std::string> sectionText = toString(firstElement);
             if (!sectionText) {
                 error.message = "Section has to contain a text.";
                 return nullopt;
@@ -93,7 +127,7 @@ optional<Formatted> Converter<Formatted>::operator()(const Convertible& value, E
             optional<FontStack> textFont;
             optional<Color> textColor;
             if (sectionLength > 1) {
-                Convertible sectionParams = arrayMember(section, 1);
+                const Convertible& sectionParams = arrayMember(section, 1);
                 if (!isObject(sectionParams)) {
                     error.message = "Parameters have to be enclosed in an object.";
                     return nullopt;

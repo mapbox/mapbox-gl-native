@@ -149,13 +149,18 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
             static std::string formatOperator("format");
             serialized.emplace_back(formatOperator);
             for (const auto& section : formatted.sections) {
+                if (section.image) {
+                    serialized.emplace_back(std::vector<mbgl::Value>{std::string("image"), section.image->id()});
+                    continue;
+                }
+
                 serialized.emplace_back(section.text);
                 std::unordered_map<std::string, mbgl::Value> options;
                 
                 if (section.fontScale) {
                     options.emplace("font-scale", *section.fontScale);
                 }
-                
+
                 if (section.fontStack) {
                     std::vector<mbgl::Value> fontStack;
                     for (const auto& font : *section.fontStack) {
