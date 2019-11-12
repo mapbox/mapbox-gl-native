@@ -3,20 +3,22 @@
 #include <mbgl/test/stub_style_observer.hpp>
 #include <mbgl/test/stub_render_source_observer.hpp>
 
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/source_impl.hpp>
-#include <mbgl/style/sources/raster_source.hpp>
-#include <mbgl/style/sources/raster_dem_source.hpp>
-#include <mbgl/style/sources/vector_source.hpp>
-#include <mbgl/style/sources/geojson_source.hpp>
-#include <mbgl/style/sources/image_source.hpp>
-#include <mbgl/style/sources/custom_geometry_source.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/hillshade_layer_impl.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/raster_layer_impl.hpp>
+#include <mbgl/style/source_impl.hpp>
+#include <mbgl/style/sources/custom_geometry_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/sources/raster_dem_source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/sources/render_raster_dem_source.hpp>
@@ -905,4 +907,26 @@ TEST(Source, RenderTileSetSourceUpdate) {
 
     VectorSource uninitialized("source", "http://url");
     renderSource->update(uninitialized.baseImpl, layers, true, true, test.tileParameters);
+}
+
+TEST(Source, GeoJSONSourceTilesRemainAfterDataReset) {
+    SourceTest test;
+    GeoJSONSource source("source");
+    source.setGeoJSONData(GeoJSONData::create(
+        mapbox::geojson::parse(
+            R"({"geometry": {"type": "Point", "coordinates": [1.1, 1.1]}, "type": "Feature", "properties": {}})"),
+        {}));
+    RenderGeoJSONSource renderSource{staticImmutableCast<GeoJSONSource::Impl>(source.baseImpl)};
+
+    CircleLayer layer("id", "source");
+    Immutable<LayerProperties> layerProperties =
+        makeMutable<CircleLayerProperties>(staticImmutableCast<CircleLayer::Impl>(layer.baseImpl));
+    std::vector<Immutable<LayerProperties>> layers{layerProperties};
+
+    static_cast<RenderSource&>(renderSource).update(source.baseImpl, layers, true, true, test.tileParameters);
+    EXPECT_FALSE(renderSource.isLoaded()); // loaded == false, means that the source contains pending tiles.
+
+    source.setGeoJSONData(nullptr);
+    static_cast<RenderSource&>(renderSource).update(source.baseImpl, layers, true, true, test.tileParameters);
+    EXPECT_FALSE(renderSource.isLoaded()); // Tiles remain.
 }
