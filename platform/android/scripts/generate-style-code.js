@@ -179,9 +179,9 @@ global.defaultExpressionJava = function(property) {
         return 'number';
       case 'formatted':
         return 'format';
+      case 'resolvedImage':
+        return "image";
       case 'string':
-      case 'image':
-        return "string";
       case 'enum':
         return "string";
       case 'color':
