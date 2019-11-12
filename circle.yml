@@ -516,9 +516,9 @@ commands:
     - run:
         name: Check if Firebase should be skipped
         command: |
-          SKIPPABLE_TAG=$( git log -1 | grep -ioE -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" || true )
-          if [ -n "${SKIPPABLE_TAG}" ]; then
-            echo "Skipping Firebase tests because commit message contained: '${SKIPPABLE_TAG}'"
+          FIREBASE_TAG=$( git diff origin/$CIRCLE_TARGET_BRANCH... --stat | grep -ivE -e"ios|macos|darwin" || true )
+          if [ -z "${FIREBASE_TAG}" ]; then
+            echo "Skipping Firebase tests because commits changed only Darwin-specific paths."
             echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
           fi
   login-google-cloud-platform:
