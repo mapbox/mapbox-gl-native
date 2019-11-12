@@ -140,6 +140,7 @@ void unZipFile(JNIEnv* env, const std::string& zipFilePath, const std::string& d
         bool isDir = env->CallBooleanMethod(zEntry, zipIsDirectory);
 
         jobject f = env->NewObject(fileClass, fileCtor, destination, dir);
+        std::string fileName = jstring2string(env, (jstring)env->CallObjectMethod(f, fileGetName));
         if (isDir) {
             if (!(env->CallBooleanMethod(f, fileIsDirectory))) {
                 jmethodID mkdirs = env->GetMethodID(fileClass, "mkdirs", "()Z");
@@ -207,6 +208,20 @@ void android_main(struct android_app* app) {
         }
         argv.push_back(nullptr);
         (void)mbgl::runRenderTests(argv.size() - 1, argv.data());
+
+        jobject nativeActivity = app->activity->clazz;
+        jclass acl = env->GetObjectClass(nativeActivity);
+        jmethodID getClassLoader = env->GetMethodID(acl, "getClassLoader", "()Ljava/lang/ClassLoader;");
+        jobject cls = env->CallObjectMethod(nativeActivity, getClassLoader);
+        jclass classLoader = env->FindClass("java/lang/ClassLoader");
+        jmethodID findClass = env->GetMethodID(classLoader, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+        jstring strClassName = env->NewStringUTF("android.app.TestState");
+        jclass testStateClass = (jclass)(env->CallObjectMethod(cls, findClass, strClassName));
+        if (testStateClass != NULL) {
+            jfieldID id = env->GetStaticFieldID(testStateClass, "running", "Z");
+            env->SetStaticBooleanField(testStateClass, id, false);
+        }
+        env->DeleteLocalRef(strClassName);
     }
 
     app->activity->vm->DetachCurrentThread();
