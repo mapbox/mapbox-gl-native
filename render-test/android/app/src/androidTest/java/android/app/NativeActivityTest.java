@@ -1,9 +1,8 @@
 package android.app;
 
-
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,11 +12,13 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class NativeActivityTest {
 
-    @Rule
-    public ActivityTestRule<NativeActivity> mActivityTestRule = new ActivityTestRule<>(NativeActivity.class);
+  @Rule
+  public ActivityTestRule<NativeActivity> mActivityTestRule = new ActivityTestRule<>(NativeActivity.class);
 
-    @Test
-    public void nativeActivityTest() {
-        mActivityTestRule.launchActivity(null);
+  @Test(timeout = 50000000L)
+  public void runRenderTests() throws Exception {
+    while (TestState.running) {
+      Thread.sleep(1000L);
     }
+  }
 }
