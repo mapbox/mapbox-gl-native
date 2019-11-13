@@ -166,7 +166,9 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
 float determineAverageLineWidth(const TaggedString& logicalInput,
                                 const float spacing,
                                 float maxWidth,
-                                const GlyphMap& glyphMap) {
+                                const GlyphMap& glyphMap,
+                                const ImagePositions& /*imagePositions*/,
+                                float /*layoutTextSize*/) {
     float totalWidth = 0;
     
     for (std::size_t i = 0; i < logicalInput.length(); i++) {
@@ -279,7 +281,9 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
 std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
                                           const float spacing,
                                           float maxWidth,
-                                          const GlyphMap& glyphMap) {
+                                          const GlyphMap& glyphMap,
+                                          const ImagePositions& imagePositions,
+                                          float layoutTextSize) {
     if (!maxWidth) {
         return {};
     }
@@ -287,9 +291,10 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
     if (logicalInput.empty()) {
         return {};
     }
-    
-    const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth, glyphMap);
-    
+
+    const float targetWidth =
+        determineAverageLineWidth(logicalInput, spacing, maxWidth, glyphMap, imagePositions, layoutTextSize);
+
     std::list<PotentialBreak> potentialBreaks;
     float currentX = 0;
     // Find first occurance of zero width space (ZWSP) character.
@@ -332,6 +337,8 @@ void shapeLines(Shaping& shaping,
                 const style::TextJustifyType textJustify,
                 const WritingModeType writingMode,
                 const GlyphMap& glyphMap,
+                const ImagePositions& /*imagePositions*/,
+                float /*layoutTextSize*/,
                 bool allowVerticalPlacement) {
     float x = 0;
     float y = Shaping::yOffset;
@@ -425,27 +432,39 @@ const Shaping getShaping(const TaggedString& formattedString,
                          const WritingModeType writingMode,
                          BiDi& bidi,
                          const GlyphMap& glyphs,
+                         const ImagePositions& imagePositions,
+                         float layoutTextSize,
                          bool allowVerticalPlacement) {
     std::vector<TaggedString> reorderedLines;
     if (formattedString.sectionCount() == 1) {
-        auto untaggedLines = bidi.processText(formattedString.rawText(),
-                                              determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
+        auto untaggedLines = bidi.processText(
+            formattedString.rawText(),
+            determineLineBreaks(formattedString, spacing, maxWidth, glyphs, imagePositions, layoutTextSize));
         for (const auto& line : untaggedLines) {
             reorderedLines.emplace_back(line, formattedString.sectionAt(0));
         }
     } else {
-        auto processedLines = bidi.processStyledText(formattedString.getStyledText(),
-                                                     determineLineBreaks(formattedString, spacing, maxWidth, glyphs));
+        auto processedLines = bidi.processStyledText(
+            formattedString.getStyledText(),
+            determineLineBreaks(formattedString, spacing, maxWidth, glyphs, imagePositions, layoutTextSize));
         for (const auto& line : processedLines) {
             reorderedLines.emplace_back(line, formattedString.getSections());
         }
     }
     Shaping shaping(translate[0], translate[1], writingMode, reorderedLines.size());
-    shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
-               textJustify, writingMode, glyphs, allowVerticalPlacement);
-    
+    shapeLines(shaping,
+               reorderedLines,
+               spacing,
+               lineHeight,
+               textAnchor,
+               textJustify,
+               writingMode,
+               glyphs,
+               imagePositions,
+               layoutTextSize,
+               allowVerticalPlacement);
+
     return shaping;
 }
-
 
 } // namespace mbgl
