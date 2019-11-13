@@ -13,11 +13,14 @@ struct SectionOptions {
           fontStack(std::move(fontStack_)),
           textColor(std::move(textColor_))
     {}
-    
+
+    explicit SectionOptions(std::string imageID_) : scale(1.0), imageID(std::move(imageID_)) {}
+
     double scale;
     FontStackHash fontStackHash;
     FontStack fontStack;
     optional<Color> textColor;
+    optional<std::string> imageID;
 };
 
 /**
@@ -76,11 +79,13 @@ struct TaggedString {
     const StyledText& getStyledText() const {
         return styledText;
     }
-    
-    void addSection(const std::u16string& text,
-                    double scale,
-                    FontStack fontStack,
-                    optional<Color> textColor_ = nullopt);
+
+    void addTextSection(const std::u16string& text,
+                        double scale,
+                        FontStack fontStack,
+                        optional<Color> textColor_ = nullopt);
+
+    void addImageSection(const std::string& imageID);
 
     const SectionOptions& sectionAt(std::size_t index) const {
         return sections.at(index);
@@ -101,9 +106,15 @@ struct TaggedString {
     bool allowsVerticalWritingMode();
 
 private:
+    optional<char16_t> getNextImageSectionCharCode();
+
+private:
     StyledText styledText;
     std::vector<SectionOptions> sections;
     optional<bool> supportsVerticalWritingMode;
+    // Max number of images within a text is 6400 U+E000–U+F8FF
+    // that covers Basic Multilingual Plane Unicode Private Use Area (PUA).
+    char16_t imageSectionID = 0u;
 };
 
 } // namespace mbgl

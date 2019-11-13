@@ -11,9 +11,9 @@ TEST(TaggedString, Trim) {
     EXPECT_EQ(basic.rawText(), u"trim that and not this");
     
     TaggedString twoSections;
-    twoSections.addSection(u" \t\ntrim that", 1.5f, {});
-    twoSections.addSection(u" and not this  \n\t", 0.5f, {});
-    
+    twoSections.addTextSection(u" \t\ntrim that", 1.5f, {});
+    twoSections.addTextSection(u" and not this  \n\t", 0.5f, {});
+
     twoSections.trim();
     EXPECT_EQ(twoSections.rawText(), u"trim that and not this");
     
