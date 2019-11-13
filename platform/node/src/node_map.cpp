@@ -540,11 +540,12 @@ void NodeMap::renderFinished() {
         request->runInAsyncScope(target, callback, 1, argv);
     } else if (img.data) {
         auto image_size = img.bytes();
-        v8::Local<v8::Object> pixels = Nan::NewBuffer(reinterpret_cast<char *>(img.data.release()),
-                                                      image_size,
-                                                      [](char* buf, void*) {
-                                                          delete [] buf;
-                                                      }, nullptr).ToLocalChecked();
+        v8::Local<v8::Object> pixels = Nan::NewBuffer(
+                                           reinterpret_cast<char*>(img.data.release()),
+                                           image_size,
+                                           [](char* buf, void*) { delete[] buf; },
+                                           nullptr)
+                                           .ToLocalChecked();
         Nan::AdjustExternalMemory(image_size);
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
