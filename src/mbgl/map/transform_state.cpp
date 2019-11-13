@@ -104,12 +104,27 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
     }
 }
 
+void TransformState::updateMatrix() {
+    if(size.isEmpty()) {
+        return;
+    }
+   coordiMatrix = coordinatePointMatrix();
+   mat4 mat = coordiMatrix;
+
+   bool err = matrix::invert(invertedMatrix, mat);
+
+   if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+}
+
+void TransformState::setSize(const Size& size_) {
+    size = size_;
+}
+
 #pragma mark - Dimensions
 
 Size TransformState::getSize() const {
     return size;
 }
-
 #pragma mark - North Orientation
 
 NorthOrientation TransformState::getNorthOrientation() const {
@@ -278,11 +293,11 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
         return {};
     }
 
-    mat4 mat = coordinatePointMatrix();
+    // mat4 mat = coordinatePointMatrix();
     vec4 p;
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 c = {{ pt.x, pt.y, 0, 1 }};
-    matrix::transformMat4(p, c, mat);
+    matrix::transformMat4(p, c, coordiMatrix);
     return { p[0] / p[3], size.height - p[1] / p[3] };
 }
 
@@ -292,12 +307,12 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     }
 
     float targetZ = 0;
-    mat4 mat = coordinatePointMatrix();
+    // mat4 mat = coordinatePointMatrix();
 
-    mat4 inverted;
-    bool err = matrix::invert(inverted, mat);
+    // mat4 inverted;
+    // bool err = matrix::invert(inverted, mat);
 
-    if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+    // if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
 
     double flippedY = size.height - point.y;
 
@@ -309,8 +324,8 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     vec4 coord1;
     vec4 point0 = {{ point.x, flippedY, 0, 1 }};
     vec4 point1 = {{ point.x, flippedY, 1, 1 }};
-    matrix::transformMat4(coord0, point0, inverted);
-    matrix::transformMat4(coord1, point1, inverted);
+    matrix::transformMat4(coord0, point0, invertedMatrix);
+    matrix::transformMat4(coord1, point1, invertedMatrix);
 
     double w0 = coord0[3];
     double w1 = coord1[3];
@@ -435,11 +450,11 @@ float TransformState::maxPitchScaleFactor() const {
         return {};
     }
     auto latLng = screenCoordinateToLatLng({ 0, static_cast<float>(getSize().height) });
-    mat4 mat = coordinatePointMatrix();
+    // mat4 mat = coordinatePointMatrix();
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 p = {{ pt.x, pt.y, 0, 1 }};
     vec4 topPoint;
-    matrix::transformMat4(topPoint, p, mat);
+    matrix::transformMat4(topPoint, p, coordiMatrix);
     return topPoint[3] / getCameraToCenterDistance();
 }
 

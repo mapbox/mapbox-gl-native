@@ -20,8 +20,8 @@ class UnwrappedTileID;
 class TileCoordinate;
 
 class TransformState {
-    friend class Transform;
-    friend class RendererState;
+    // friend class Transform;
+    // friend class RendererState;
 
 public:
     TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
@@ -32,19 +32,25 @@ public:
 
     // Dimensions
     Size getSize() const;
+    void setSize(const Size& size_);
 
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
+    void setNorthOrientation(NorthOrientation val) {orientation = val;}
 
     // Constrain mode
     ConstrainMode getConstrainMode() const;
+    void setConstrainMode(ConstrainMode val) {constrainMode = val;}
 
     // Viewport mode
     ViewportMode getViewportMode() const;
+    void setViewportMode(ViewportMode val) {viewportMode = val;}
 
     CameraOptions getCameraOptions(optional<EdgeInsets>) const;
 
+    EdgeInsets getEdgeInsets() const {return edgeInsets;}
+    void setEdgeInsets(const EdgeInsets& val) {edgeInsets = val;}
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
     double pixel_x() const;
@@ -57,6 +63,7 @@ public:
 
     // Scale
     double getScale() const { return scale; }
+    void setScale(const double val ) {scale = val;}
 
     // Bounds
     void setLatLngBounds(LatLngBounds);
@@ -68,16 +75,29 @@ public:
 
     // Rotation
     float getBearing() const;
+    void setBearing(float val) {bearing = val;}
     float getFieldOfView() const;
     float getCameraToCenterDistance() const;
     float getPitch() const;
+    void setPitch(float val) {pitch = val;}
+
+    double getXSkew() const {return xSkew;}
+    void setXSkew(double val) {xSkew = val;}
+    double getYSkew() const {return ySkew;}
+    void setYSkew(double val) {ySkew = val;}
+    bool getAxonometric() const {return axonometric;}
+    void setAxonometric(bool val) {axonometric = val;}
 
     // State
     bool isChanging() const;
     bool isRotating() const;
+    void setRotating(bool val) {rotating = val;}
     bool isScaling() const;
+    void setScaling(bool val) {scaling = val;}
     bool isPanning() const;
+    void setPanning(bool val) {panning = val;}
     bool isGestureInProgress() const;
+    void setGestureInProgress(bool val) {gestureInProgress = val;}
 
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
@@ -95,6 +115,12 @@ public:
     float getCameraToTileDistance(const UnwrappedTileID&) const;
     float maxPitchScaleFactor() const;
 
+    void constrain() {constrain(scale, x, y);}
+    void moveLatLng(const LatLng&, const ScreenCoordinate&);
+
+    void setLatLngZoom(const LatLng &latLng, double zoom);
+
+    void updateMatrix();
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
@@ -119,8 +145,7 @@ private:
 
     /** Recenter the map so that the given coordinate is located at the given
         point on screen. */
-    void moveLatLng(const LatLng&, const ScreenCoordinate&);
-    void setLatLngZoom(const LatLng &latLng, double zoom);
+ 
     void setScalePoint(const double scale, const ScreenCoordinate& point);
 
 private:
@@ -152,6 +177,9 @@ private:
     // cache values for spherical mercator math
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     double Cc = Projection::worldSize(scale) / util::M2PI;
+
+    mat4 coordiMatrix;
+    mat4 invertedMatrix;
 };
 
 } // namespace mbgl
