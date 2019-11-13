@@ -541,11 +541,14 @@ void NodeMap::renderFinished() {
     } else if (img.data) {
         auto image_size = img.bytes();
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-                                           reinterpret_cast<char*>(img.data.release()),
+                                           reinterpret_cast<char*>(img.data.get()),
                                            image_size,
                                            [](char* buf, void*) { delete[] buf; },
                                            nullptr)
                                            .ToLocalChecked();
+        if (!pixels.IsEmpty()) {
+            img.data.release();
+        }
         Nan::AdjustExternalMemory(image_size);
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
