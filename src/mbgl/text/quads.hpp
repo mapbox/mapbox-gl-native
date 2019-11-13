@@ -1,8 +1,9 @@
 #pragma once
 
-#include <mbgl/text/glyph_atlas.hpp>
-#include <mbgl/style/types.hpp>
+#include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/style/types.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <vector>
@@ -50,7 +51,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const std::array<float, 2> textOffset,
                           const style::SymbolLayoutProperties::Evaluated&,
                           style::SymbolPlacementType placement,
-                          const GlyphPositions& positions,
+                          const ImageMap& imageMap,
                           bool allowVerticalPlacement);
 
 } // namespace mbgl

@@ -25,8 +25,9 @@ SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
                                                    const style::SymbolLayoutProperties::Evaluated& layout,
                                                    const style::SymbolPlacementType textPlacement,
                                                    const std::array<float, 2>& textOffset,
-                                                   const GlyphPositions& positions,
-						   bool allowVerticalPlacement) : line(std::move(line_)) {
+                                                   const ImageMap& imageMap,
+                                                   bool allowVerticalPlacement)
+    : line(std::move(line_)) {
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
         iconQuad = getIconQuad(*shapedIcon, getAnyShaping(shapedTextOrientations).writingMode);
@@ -38,11 +39,12 @@ SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
     bool singleLineInitialized = false;
     const auto initHorizontalGlyphQuads = [&] (SymbolQuads& quads, const Shaping& shaping) {
         if (!shapedTextOrientations.singleLine) {
-            quads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions, allowVerticalPlacement);
+            quads = getGlyphQuads(shaping, textOffset, layout, textPlacement, imageMap, allowVerticalPlacement);
             return;
         }
         if (!singleLineInitialized) {
-            rightJustifiedGlyphQuads = getGlyphQuads(shaping, textOffset, layout, textPlacement, positions, allowVerticalPlacement);
+            rightJustifiedGlyphQuads =
+                getGlyphQuads(shaping, textOffset, layout, textPlacement, imageMap, allowVerticalPlacement);
             singleLineInitialized = true;
         }
     };
@@ -60,7 +62,8 @@ SymbolInstanceSharedData::SymbolInstanceSharedData(GeometryCoordinates line_,
     }
 
     if (shapedTextOrientations.vertical) {
-        verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.vertical, textOffset, layout, textPlacement, positions, allowVerticalPlacement);
+        verticalGlyphQuads = getGlyphQuads(
+            shapedTextOrientations.vertical, textOffset, layout, textPlacement, imageMap, allowVerticalPlacement);
     }
 }
 

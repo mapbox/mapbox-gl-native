@@ -45,7 +45,10 @@ TEST(getIconQuads, style) {
     shapedText.bottom = 30.0f;
     shapedText.left = -60.0f;
     shapedText.right = 20.0f;
-    shapedText.positionedGlyphs.emplace_back(PositionedGlyph(32, 0.0f, 0.0f, false, 0, 1.0));
+    // shapedText.positionedGlyphs.emplace_back(PositionedGlyph(32, 0.0f, 0.0f, false, 0, 1.0));
+    shapedText.positionedLines.emplace_back();
+    shapedText.positionedLines.back().positionedGlyphs.emplace_back(
+        PositionedGlyph(32, 0.0f, 0.0f, false, 0, 1.0, /*texRect*/ {}, /*metrics*/ {}, /*imageID*/ nullopt));
 
     // none
     {

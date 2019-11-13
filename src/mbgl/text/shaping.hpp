@@ -1,10 +1,11 @@
 #pragma once
 
-#include <mbgl/text/glyph.hpp>
-#include <mbgl/text/tagged_string.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
-#include <mbgl/style/types.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/style/types.hpp>
+#include <mbgl/text/glyph.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/text/tagged_string.hpp>
 
 namespace mbgl {
 
@@ -68,7 +69,8 @@ const Shaping getShaping(const TaggedString& string,
                          const std::array<float, 2>& translate,
                          const WritingModeType,
                          BiDi& bidi,
-                         const GlyphMap& glyphs,
+                         const GlyphMap& glyphMap,
+                         const GlyphPositions& glyphPositions,
                          const ImagePositions& imagePositions,
                          float layoutTextSize,
                          bool allowVerticalPlacement);

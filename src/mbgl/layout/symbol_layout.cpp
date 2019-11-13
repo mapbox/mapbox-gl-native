@@ -340,8 +340,10 @@ std::array<float, 2> SymbolLayout::evaluateVariableOffset(style::SymbolAnchorTyp
     return result;
 }
 
-void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
-                           const ImageMap& imageMap, const ImagePositions& imagePositions) {
+void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
+                                  const GlyphPositions& glyphPositions,
+                                  const ImageMap& imageMap,
+                                  const ImagePositions& imagePositions) {
     const bool isPointPlacement = layout->get<SymbolPlacement>() == SymbolPlacementType::Point;
     const bool textAlongLine = layout->get<TextRotationAlignment>() == AlignmentType::Map && !isPointPlacement;
 
@@ -375,7 +377,8 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                     /* translate */ textOffset,
                     /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi,
-                    /* glyphs */ glyphMap,
+                    glyphMap,
+                    /* glyphs */ glyphPositions,
                     /* images */ imagePositions,
                     layoutTextSize,
                     allowVerticalPlacement);
@@ -430,7 +433,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                     Shaping shaping = applyShaping(*feature.formattedText, WritingModeType::Horizontal, SymbolAnchorType::Center, justification);
                     if (shaping) {
                         shapingForJustification = std::move(shaping);
-                        if (shapingForJustification.lineCount == 1u) {
+                        if (shapingForJustification.positionedLines.size() == 1u) {
                             shapedTextOrientations.singleLine = true;
                             break;
                         }
@@ -488,7 +491,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                        feature,
                        shapedTextOrientations,
                        std::move(shapedIcon),
-                       glyphPositions,
+                       imageMap,
                        textOffset,
                        layoutTextSize,
                        layoutIconSize,
@@ -505,7 +508,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                               const SymbolFeature& feature,
                               const ShapedTextOrientations& shapedTextOrientations,
                               optional<PositionedIcon> shapedIcon,
-                              const GlyphPositions& glyphPositions,
+                              const ImageMap& imageMap,
                               std::array<float, 2> textOffset,
                               float layoutTextSize,
                               float layoutIconSize,
@@ -585,10 +588,16 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
         }
     };
 
-    const auto createSymbolInstanceSharedData = [&] (GeometryCoordinates line) {
+    const auto createSymbolInstanceSharedData = [&](GeometryCoordinates line) {
         return std::make_shared<SymbolInstanceSharedData>(std::move(line),
-            shapedTextOrientations, shapedIcon, verticallyShapedIcon, evaluatedLayoutProperties,
-            textPlacement, textOffset, glyphPositions, allowVerticalPlacement);
+                                                          shapedTextOrientations,
+                                                          shapedIcon,
+                                                          verticallyShapedIcon,
+                                                          evaluatedLayoutProperties,
+                                                          textPlacement,
+                                                          textOffset,
+                                                          imageMap,
+                                                          allowVerticalPlacement);
     };
 
     const auto& type = feature.getType();
