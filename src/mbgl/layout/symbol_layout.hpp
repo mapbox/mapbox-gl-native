@@ -62,6 +62,8 @@ private:
                     optional<PositionedIcon> shapedIcon,
                     const GlyphPositions&,
                     std::array<float, 2> textOffset,
+                    float layoutTextSize,
+                    float layoutIconSize,
                     const SymbolContent iconType);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);

@@ -69,6 +69,8 @@ const Shaping getShaping(const TaggedString& string,
                          const WritingModeType,
                          BiDi& bidi,
                          const GlyphMap& glyphs,
+                         const ImagePositions& imagePositions,
+                         float layoutTextSize,
                          bool allowVerticalPlacement);
 
 } // namespace mbgl

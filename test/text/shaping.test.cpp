@@ -26,17 +26,21 @@ TEST(Shaping, ZWSP) {
         { FontStackHasher()(fontStack), {{u'中', std::move(immutableGlyph)}} }
     };
 
-    const auto testGetShaping = [&] (const TaggedString& string, unsigned maxWidthInChars) {
+    ImagePositions imagePositions;
+
+    const auto testGetShaping = [&](const TaggedString& string, unsigned maxWidthInChars) {
         return getShaping(string,
                           maxWidthInChars * ONE_EM,
-                          ONE_EM,       // lineHeight
+                          ONE_EM, // lineHeight
                           style::SymbolAnchorType::Center,
                           style::TextJustifyType::Center,
-                          0,            // spacing
+                          0,              // spacing
                           {{0.0f, 0.0f}}, // translate
                           WritingModeType::Horizontal,
                           bidi,
                           glyphs,
+                          imagePositions,
+                          16.0,
                           /*allowVerticalPlacement*/ false);
     };
 
