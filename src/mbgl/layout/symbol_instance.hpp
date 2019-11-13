@@ -23,14 +23,14 @@ struct ShapedTextOrientations {
 
 struct SymbolInstanceSharedData {
     SymbolInstanceSharedData(GeometryCoordinates line,
-                            const ShapedTextOrientations& shapedTextOrientations,
-                            const optional<PositionedIcon>& shapedIcon,
-                            const optional<PositionedIcon>& verticallyShapedIcon,
-                            const style::SymbolLayoutProperties::Evaluated& layout,
-                            const style::SymbolPlacementType textPlacement,
-                            const std::array<float, 2>& textOffset,
-                            const GlyphPositions& positions,
-                            bool allowVerticalPlacement);
+                             const ShapedTextOrientations& shapedTextOrientations,
+                             const optional<PositionedIcon>& shapedIcon,
+                             const optional<PositionedIcon>& verticallyShapedIcon,
+                             const style::SymbolLayoutProperties::Evaluated& layout,
+                             const style::SymbolPlacementType textPlacement,
+                             const std::array<float, 2>& textOffset,
+                             const ImageMap& imageMap,
+                             bool allowVerticalPlacement);
     bool empty() const;
     GeometryCoordinates line;
     // Note: When singleLine == true, only `rightJustifiedGlyphQuads` is populated.

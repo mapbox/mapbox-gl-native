@@ -10,13 +10,16 @@ using namespace mbgl;
 using namespace util;
 
 TEST(Shaping, ZWSP) {
+    GlyphPosition glyphPosition;
+    glyphPosition.metrics.width = 18;
+    glyphPosition.metrics.height = 18;
+    glyphPosition.metrics.left = 2;
+    glyphPosition.metrics.top = -8;
+    glyphPosition.metrics.advance = 21;
+
     Glyph glyph;
     glyph.id = u'中';
-    glyph.metrics.width = 18;
-    glyph.metrics.height = 18;
-    glyph.metrics.left = 2;
-    glyph.metrics.top = -8;
-    glyph.metrics.advance = 21;
+    glyph.metrics = glyphPosition.metrics;
 
     BiDi bidi;
     auto immutableGlyph = Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph)));
@@ -25,7 +28,7 @@ TEST(Shaping, ZWSP) {
     GlyphMap glyphs = {
         { FontStackHasher()(fontStack), {{u'中', std::move(immutableGlyph)}} }
     };
-
+    GlyphPositions glyphPositions = {{FontStackHasher()(fontStack), {{u'中', std::move(glyphPosition)}}}};
     ImagePositions imagePositions;
 
     const auto testGetShaping = [&](const TaggedString& string, unsigned maxWidthInChars) {
@@ -39,6 +42,7 @@ TEST(Shaping, ZWSP) {
                           WritingModeType::Horizontal,
                           bidi,
                           glyphs,
+                          glyphPositions,
                           imagePositions,
                           16.0,
                           /*allowVerticalPlacement*/ false);
@@ -51,7 +55,7 @@ TEST(Shaping, ZWSP) {
     {
         TaggedString string(u"中中\u200b中中\u200b中中\u200b中中中中中中\u200b中中", sectionOptions);
         auto shaping = testGetShaping(string, 5);
-        ASSERT_EQ(shaping.lineCount, 3);
+        ASSERT_EQ(shaping.positionedLines.size(), 3);
         ASSERT_EQ(shaping.top, -36);
         ASSERT_EQ(shaping.bottom, 36);
         ASSERT_EQ(shaping.left, -63);
@@ -65,7 +69,7 @@ TEST(Shaping, ZWSP) {
     {
         TaggedString string(u"中中\u200b中", sectionOptions);
         auto shaping = testGetShaping(string, 1);
-        ASSERT_EQ(shaping.lineCount, 2);
+        ASSERT_EQ(shaping.positionedLines.size(), 2);
         ASSERT_EQ(shaping.top, -24);
         ASSERT_EQ(shaping.bottom, 24);
         ASSERT_EQ(shaping.left, -21);
@@ -78,7 +82,7 @@ TEST(Shaping, ZWSP) {
     {
         TaggedString string(u"中中\u200b", sectionOptions);
         auto shaping = testGetShaping(string, 2);
-        ASSERT_EQ(shaping.lineCount, 1);
+        ASSERT_EQ(shaping.positionedLines.size(), 1);
         ASSERT_EQ(shaping.top, -12);
         ASSERT_EQ(shaping.bottom, 12);
         ASSERT_EQ(shaping.left, -21);
@@ -90,7 +94,7 @@ TEST(Shaping, ZWSP) {
     {
         TaggedString string(u"\u200b\u200b\u200b\u200b\u200b", sectionOptions);
         auto shaping = testGetShaping(string, 1);
-        ASSERT_EQ(shaping.lineCount, 5);
+        ASSERT_EQ(shaping.positionedLines.size(), 5);
         ASSERT_EQ(shaping.top, -60);
         ASSERT_EQ(shaping.bottom, 60);
         ASSERT_EQ(shaping.left, 0);
