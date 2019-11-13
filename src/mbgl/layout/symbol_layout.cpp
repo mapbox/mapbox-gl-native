@@ -146,19 +146,23 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
             ft.formattedText = TaggedString();
             for (const auto & section : formatted.sections) {
-                std::string u8string = section.text;
-                if (textTransform == TextTransformType::Uppercase) {
-                    u8string = platform::uppercase(u8string);
-                } else if (textTransform == TextTransformType::Lowercase) {
-                    u8string = platform::lowercase(u8string);
+                if (!section.image) {
+                    std::string u8string = section.text;
+                    if (textTransform == TextTransformType::Uppercase) {
+                        u8string = platform::uppercase(u8string);
+                    } else if (textTransform == TextTransformType::Lowercase) {
+                        u8string = platform::lowercase(u8string);
+                    }
+
+                    ft.formattedText->addTextSection(applyArabicShaping(util::convertUTF8ToUTF16(u8string)),
+                                                     section.fontScale ? *section.fontScale : 1.0,
+                                                     section.fontStack ? *section.fontStack : baseFontStack,
+                                                     section.textColor);
+                } else {
+                    layoutParameters.imageDependencies.emplace(section.image->id(), ImageType::Icon);
+                    ft.formattedText->addImageSection(section.image->id());
                 }
-
-                ft.formattedText->addSection(applyArabicShaping(util::convertUTF8ToUTF16(u8string)),
-                                             section.fontScale ? *section.fontScale : 1.0,
-                                             section.fontStack ? *section.fontStack : baseFontStack,
-                                             section.textColor);
             }
-
 
             const bool canVerticalizeText = layout->get<TextRotationAlignment>() == AlignmentType::Map
                                          && layout->get<SymbolPlacement>() != SymbolPlacementType::Point
@@ -166,7 +170,10 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
             // Loop through all characters of this text and collect unique codepoints.
             for (std::size_t j = 0; j < ft.formattedText->length(); j++) {
-                const auto& sectionFontStack = formatted.sections[ft.formattedText->getSectionIndex(j)].fontStack;
+                const auto& section = formatted.sections[ft.formattedText->getSectionIndex(j)];
+                if (section.image) continue;
+
+                const auto& sectionFontStack = section.fontStack;
                 GlyphIDs& dependencies =
                     layoutParameters.glyphDependencies[sectionFontStack ? *sectionFontStack : baseFontStack];
                 char16_t codePoint = ft.formattedText->getCharCodeAt(j);
