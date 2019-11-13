@@ -45,7 +45,7 @@ ScreenCoordinate RendererState::pixelForLatLng(const UpdateParameters& updatePar
     LatLng unwrappedLatLng = latLng.wrapped();
     unwrappedLatLng.unwrapForShortestPath(updateParameters.transformState.getLatLng());
     const ScreenCoordinate point = updateParameters.transformState.latLngToScreenCoordinate(latLng);
-    return ScreenCoordinate { point.x, updateParameters.transformState.getSize().height - point.y };
+    return ScreenCoordinate{point.x, updateParameters.transformState.getSize().height - point.y};
 }
 
 LatLng RendererState::latLngForPixel(const UpdateParameters& updateParameters, const ScreenCoordinate& point) {

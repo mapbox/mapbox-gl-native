@@ -125,7 +125,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 
     // Minimize rotation by taking the shorter path around the circle.
     bearing = _normalizeAngle(bearing, state.getBearing());
-    state.setBearing( _normalizeAngle(state.getBearing(), bearing));
+    state.setBearing(_normalizeAngle(state.getBearing(), bearing));
 
     const double startZoom = state.getZoom();
     const double startBearing = state.getBearing();
@@ -146,12 +146,10 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         }
         if (padding != startEdgeInsets) {
             // Interpolate edge insets
-            state.setEdgeInsets({
-                util::interpolate(startEdgeInsets.top(), padding.top(), t),
-                util::interpolate(startEdgeInsets.left(), padding.left(), t),
-                util::interpolate(startEdgeInsets.bottom(), padding.bottom(), t),
-                util::interpolate(startEdgeInsets.right(), padding.right(), t)
-            });
+            state.setEdgeInsets({util::interpolate(startEdgeInsets.top(), padding.top(), t),
+                                 util::interpolate(startEdgeInsets.left(), padding.left(), t),
+                                 util::interpolate(startEdgeInsets.bottom(), padding.bottom(), t),
+                                 util::interpolate(startEdgeInsets.right(), padding.right(), t)});
         }
         auto maxPitch = getMaxPitchForEdgeInsets(state.getEdgeInsets());
         if (pitch != startPitch || maxPitch < startPitch) {
@@ -292,7 +290,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     const double startScale = state.getScale();
     state.setPanning(true);
     state.setScaling(true);
-    state.setRotating( bearing != startBearing);
+    state.setRotating(bearing != startBearing);
     const EdgeInsets startEdgeInsets = state.getEdgeInsets();
 
     startTransition(camera, animation, [=](double k) {
@@ -320,12 +318,10 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         }
         if (padding != startEdgeInsets) {
             // Interpolate edge insets
-            state.setEdgeInsets({
-                util::interpolate(startEdgeInsets.top(), padding.top(), k),
-                util::interpolate(startEdgeInsets.left(), padding.left(), k),
-                util::interpolate(startEdgeInsets.bottom(), padding.bottom(), k),
-                util::interpolate(startEdgeInsets.right(), padding.right(), k)
-            });
+            state.setEdgeInsets({util::interpolate(startEdgeInsets.top(), padding.top(), k),
+                                 util::interpolate(startEdgeInsets.left(), padding.left(), k),
+                                 util::interpolate(startEdgeInsets.bottom(), padding.bottom(), k),
+                                 util::interpolate(startEdgeInsets.right(), padding.right(), k)});
         }
         auto maxPitch = getMaxPitchForEdgeInsets(state.getEdgeInsets());
         if (pitch != startPitch || maxPitch < startPitch) {
@@ -333,14 +329,14 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         }
     }, duration);
     state.updateMatrix();
-
 }
 
 #pragma mark - Position
 
 void Transform::moveBy(const ScreenCoordinate& offset, const AnimationOptions& animation) {
     ScreenCoordinate centerOffset = { offset.x, offset.y };
-    ScreenCoordinate pointOnScreen = state.getEdgeInsets().getCenter(state.getSize().width, state.getSize().height) - centerOffset;
+    ScreenCoordinate pointOnScreen =
+        state.getEdgeInsets().getCenter(state.getSize().width, state.getSize().height) - centerOffset;
     // Use unwrapped LatLng to carry information about moveBy direction.
     easeTo(CameraOptions().withCenter(screenCoordinateToLatLng(pointOnScreen, LatLng::Unwrapped)), animation);
 }
@@ -407,7 +403,7 @@ double Transform::getPitch() const {
 #pragma mark - North Orientation
 
 void Transform::setNorthOrientation(NorthOrientation orientation) {
-    state.setNorthOrientation( orientation);
+    state.setNorthOrientation(orientation);
     state.constrain();
     state.updateMatrix();
 }

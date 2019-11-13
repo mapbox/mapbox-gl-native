@@ -105,15 +105,15 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
 }
 
 void TransformState::updateMatrix() {
-    if(size.isEmpty()) {
+    if (size.isEmpty()) {
         return;
     }
-   coordiMatrix = coordinatePointMatrix();
-   mat4 mat = coordiMatrix;
+    coordiMatrix = coordinatePointMatrix();
+    mat4 mat = coordiMatrix;
 
-   bool err = matrix::invert(invertedMatrix, mat);
+    bool err = matrix::invert(invertedMatrix, mat);
 
-   if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+    if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
 }
 
 void TransformState::setSize(const Size& size_) {
@@ -307,12 +307,12 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     }
 
     float targetZ = 0;
-    // mat4 mat = coordinatePointMatrix();
+    mat4 mat = coordinatePointMatrix();
 
-    // mat4 inverted;
-    // bool err = matrix::invert(inverted, mat);
+    mat4 inverted;
+    bool err = matrix::invert(inverted, mat);
 
-    // if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+    if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
 
     double flippedY = size.height - point.y;
 
