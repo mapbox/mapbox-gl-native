@@ -367,7 +367,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
                 const Shaping result = getShaping(
                     /* string */ formattedText,
                     /* maxWidth: ems */
-                        isPointPlacement ? layout->evaluate<TextMaxWidth>(zoom, feature) * util::ONE_EM : 0.0f,
+                    isPointPlacement ? layout->evaluate<TextMaxWidth>(zoom, feature) * util::ONE_EM : 0.0f,
                     /* ems */ lineHeight,
                     textAnchor,
                     textJustify,

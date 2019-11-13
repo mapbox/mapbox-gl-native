@@ -163,27 +163,43 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     }
 }
 
+float getGlyphAdvance(char16_t codePoint,
+                      const SectionOptions& section,
+                      const GlyphMap& glyphMap,
+                      const ImagePositions& imagePositions,
+                      float layoutTextSize,
+                      float spacing) {
+    if (!section.imageID) {
+        auto glyphs = glyphMap.find(section.fontStackHash);
+        if (glyphs == glyphMap.end()) {
+            return 0.0;
+        }
+        auto it = glyphs->second.find(codePoint);
+        if (it == glyphs->second.end() || !it->second) {
+            return 0.0;
+        }
+        return (*it->second)->metrics.advance * section.scale + spacing;
+    } else {
+        auto image = imagePositions.find(*section.imageID);
+        if (image == imagePositions.end()) {
+            return 0.0;
+        }
+        return image->second.displaySize()[0] * section.scale * util::ONE_EM / layoutTextSize + spacing;
+    }
+}
+
 float determineAverageLineWidth(const TaggedString& logicalInput,
-                                const float spacing,
+                                float spacing,
                                 float maxWidth,
                                 const GlyphMap& glyphMap,
-                                const ImagePositions& /*imagePositions*/,
-                                float /*layoutTextSize*/) {
+                                const ImagePositions& imagePositions,
+                                float layoutTextSize) {
     float totalWidth = 0;
     
     for (std::size_t i = 0; i < logicalInput.length(); i++) {
         const SectionOptions& section = logicalInput.getSection(i);
         char16_t codePoint = logicalInput.getCharCodeAt(i);
-        auto glyphs = glyphMap.find(section.fontStackHash);
-        if (glyphs == glyphMap.end()) {
-            continue;
-        }
-        auto it = glyphs->second.find(codePoint);
-        if (it == glyphs->second.end() || !it->second) {
-            continue;
-        }
-        
-        totalWidth += (*it->second)->metrics.advance * section.scale + spacing;
+        totalWidth += getGlyphAdvance(codePoint, section, glyphMap, imagePositions, layoutTextSize, spacing);
     }
     
     int32_t targetLineCount = ::fmax(1, std::ceil(totalWidth / maxWidth));
@@ -303,20 +319,15 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
     for (std::size_t i = 0; i < logicalInput.length(); i++) {
         const SectionOptions& section = logicalInput.getSection(i);
         char16_t codePoint = logicalInput.getCharCodeAt(i);
-        auto glyphs = glyphMap.find(section.fontStackHash);
-        if (glyphs == glyphMap.end()) {
-            continue;
+        if (!util::i18n::isWhitespace(codePoint)) {
+            currentX += getGlyphAdvance(codePoint, section, glyphMap, imagePositions, layoutTextSize, spacing);
         }
-        auto it = glyphs->second.find(codePoint);
-        if (it != glyphs->second.end() && it->second && !util::i18n::isWhitespace(codePoint)) {
-            currentX += (*it->second)->metrics.advance * section.scale + spacing;
-        }
-        
+
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
         if (i < logicalInput.length() - 1) {
             const bool allowsIdeographicBreak = util::i18n::allowsIdeographicBreaking(codePoint);
-            if (allowsIdeographicBreak || util::i18n::allowsWordBreaking(codePoint)) {
+            if (section.imageID || allowsIdeographicBreak || util::i18n::allowsWordBreaking(codePoint)) {
                 const bool penalizableIdeographicBreak = allowsIdeographicBreak && hasServerSuggestedBreaks;
                 const std::size_t nextIndex = i + 1;
                 potentialBreaks.push_back(evaluateBreak(nextIndex, currentX, targetWidth, potentialBreaks,
