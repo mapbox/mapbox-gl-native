@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.style
 
 import android.graphics.PointF
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MotionEvent
 import android.view.View
 import com.mapbox.android.gestures.AndroidGesturesManager
@@ -93,10 +93,10 @@ class DraggableMarkerActivity : AppCompatActivity() {
           addMarker(it)
         } else {
           // Displaying marker info on marker click
-          Snackbar.make(
+          com.google.android.material.snackbar.Snackbar.make(
             mapView,
             "Marker's position: %.4f, %.4f".format(it.latitude, it.longitude),
-            Snackbar.LENGTH_LONG)
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
             .show()
         }
 
@@ -110,10 +110,10 @@ class DraggableMarkerActivity : AppCompatActivity() {
       draggableSymbolsManager?.addOnSymbolDragListener(object : DraggableSymbolsManager.OnSymbolDragListener {
         override fun onSymbolDragStarted(id: String) {
           draggedMarkerPositionTv.visibility = View.VISIBLE
-          Snackbar.make(
+          com.google.android.material.snackbar.Snackbar.make(
             mapView,
             "Marker drag started (%s)".format(id),
-            Snackbar.LENGTH_SHORT)
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT)
             .show()
         }
 
@@ -126,10 +126,10 @@ class DraggableMarkerActivity : AppCompatActivity() {
 
         override fun onSymbolDragFinished(id: String) {
           draggedMarkerPositionTv.visibility = View.GONE
-          Snackbar.make(
+          com.google.android.material.snackbar.Snackbar.make(
             mapView,
             "Marker drag finished (%s)".format(id),
-            Snackbar.LENGTH_SHORT)
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT)
             .show()
         }
       })

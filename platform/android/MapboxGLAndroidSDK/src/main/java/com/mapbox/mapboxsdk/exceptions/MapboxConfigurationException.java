@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.exceptions;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * A MapboxConfigurationException is thrown by MapboxMap when the SDK hasn't been properly initialised.

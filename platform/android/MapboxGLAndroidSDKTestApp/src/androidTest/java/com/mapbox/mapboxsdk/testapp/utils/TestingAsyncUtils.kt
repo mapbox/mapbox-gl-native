@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.utils
 
-import android.support.test.espresso.UiController
+import androidx.test.espresso.UiController
 import com.mapbox.mapboxsdk.maps.MapView
 
 object TestingAsyncUtils {

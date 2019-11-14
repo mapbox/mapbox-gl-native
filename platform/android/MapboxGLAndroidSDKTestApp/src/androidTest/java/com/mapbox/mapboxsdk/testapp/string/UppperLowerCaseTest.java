@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.string;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;

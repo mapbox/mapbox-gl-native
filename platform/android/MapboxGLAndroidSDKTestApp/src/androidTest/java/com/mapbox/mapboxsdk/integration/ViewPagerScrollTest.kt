@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.integration
 
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
-import android.support.test.uiautomator.UiSelector
+import androidx.test.filters.LargeTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.UiSelector
 import com.mapbox.mapboxsdk.testapp.activity.fragment.ViewPagerActivity
 import org.junit.Rule
 import org.junit.Test
@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 /**
  * Regression test that validates MapFragment integration with a ViewPager
  */
-@RunWith(AndroidJUnit4::class)
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class ViewPagerScrollTest : BaseIntegrationTest() {
 
   @get:Rule

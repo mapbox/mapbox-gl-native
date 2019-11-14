@@ -15,7 +15,7 @@
         app:mapbox_cameraTargetLng="-0.11968"
         app:mapbox_cameraZoom="15" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.appcompat.widget.RecyclerView
         android:id="@+id/alerts_recycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

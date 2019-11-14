@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.utils;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import org.junit.Test;
 import org.junit.runner.RunWith;

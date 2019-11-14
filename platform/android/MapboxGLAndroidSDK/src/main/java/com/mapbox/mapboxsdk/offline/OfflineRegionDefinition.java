@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.offline;
 
 import android.os.Parcelable;
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;

@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.snapshotter
 
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.rule.ActivityTestRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.Style
@@ -19,7 +19,7 @@ import org.junit.runner.RunWith
 /**
  * Integration test that validates if a snapshotter creation
  */
-@RunWith(AndroidJUnit4::class)
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 @Ignore("Ignored until https://github.com/mapbox/mapbox-gl-native/issues/11669 is resolved.")
 class MapSnapshotterTest {
 

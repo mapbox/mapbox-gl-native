@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.http;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;

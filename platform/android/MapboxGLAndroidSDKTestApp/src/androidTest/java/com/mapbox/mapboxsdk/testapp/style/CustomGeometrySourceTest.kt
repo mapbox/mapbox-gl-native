@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.style
 
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.matcher.ViewMatchers.isRoot
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource.THREAD_POOL_LIMIT
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource.THREAD_PREFIX
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke

@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 

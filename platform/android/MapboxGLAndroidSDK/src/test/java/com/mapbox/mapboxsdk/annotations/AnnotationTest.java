@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import org.junit.Before;

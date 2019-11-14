@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.storage
 
-import android.support.test.annotation.UiThreadTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.annotation.UiThreadTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
@@ -15,7 +15,7 @@ import org.junit.Test
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 open class FileSourceMapTest : AppCenter() {
 
   private lateinit var fileSourceTestUtils: FileSourceTestUtils

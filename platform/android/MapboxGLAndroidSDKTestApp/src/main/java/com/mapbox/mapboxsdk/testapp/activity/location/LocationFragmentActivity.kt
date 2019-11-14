@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.location
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,7 +79,7 @@ class LocationFragmentActivity : AppCompatActivity() {
     permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
   }
 
-  class LocationFragment : Fragment(), LocationEngineCallback<LocationEngineResult> {
+  class LocationFragment : androidx.fragment.app.Fragment(), LocationEngineCallback<LocationEngineResult> {
     companion object {
       const val TAG = "LFragment"
       fun newInstance(): LocationFragment {
@@ -159,7 +159,7 @@ class LocationFragmentActivity : AppCompatActivity() {
     }
   }
 
-  class EmptyFragment : Fragment() {
+  class EmptyFragment : androidx.fragment.app.Fragment() {
     companion object {
       const val TAG = "EmptyFragment"
       fun newInstance(): EmptyFragment {

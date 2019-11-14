@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.annotations.InfoWindow;

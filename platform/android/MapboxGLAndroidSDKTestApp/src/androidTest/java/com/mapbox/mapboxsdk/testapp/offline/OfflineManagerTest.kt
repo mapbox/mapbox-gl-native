@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.offline
 
 import android.content.Context
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.rule.ActivityTestRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.mapbox.mapboxsdk.AppCenter
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@RunWith(AndroidJUnit4::class)
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class OfflineManagerTest : AppCenter() {
 
   companion object {

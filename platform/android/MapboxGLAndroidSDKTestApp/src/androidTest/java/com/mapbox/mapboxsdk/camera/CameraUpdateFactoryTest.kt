@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.camera
 
 import android.graphics.PointF
-import android.support.test.annotation.UiThreadTest
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.annotation.UiThreadTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.testapp.activity.BaseTest
@@ -13,7 +13,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class CameraUpdateFactoryTest : BaseTest() {
 
   override fun getActivityClass(): Class<*> {

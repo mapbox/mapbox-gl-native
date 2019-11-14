@@ -3,9 +3,9 @@ package com.mapbox.mapboxsdk.maps;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;

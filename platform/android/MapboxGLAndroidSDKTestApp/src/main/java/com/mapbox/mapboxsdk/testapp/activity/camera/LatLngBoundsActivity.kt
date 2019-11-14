@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.camera
 
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.FeatureCollection.fromJson
@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.activity_latlngbounds.*
 class LatLngBoundsActivity : AppCompatActivity() {
 
   private lateinit var mapboxMap: MapboxMap
-  private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+  private lateinit var bottomSheetBehavior: com.google.android.material.bottomsheet.BottomSheetBehavior<*>
   private lateinit var bounds: LatLngBounds
 
   private val peekHeight by lazy {
@@ -80,13 +80,13 @@ class LatLngBoundsActivity : AppCompatActivity() {
       .withImage("icon", BitmapUtils.getDrawableFromRes(this@LatLngBoundsActivity, R.drawable.ic_android)!!)
     ) {
       initBottomSheet()
-      fab.setOnClickListener { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
+      fab.setOnClickListener { bottomSheetBehavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED }
     }
   }
 
   private fun initBottomSheet() {
-    bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-    bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+    bottomSheetBehavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet)
+    bottomSheetBehavior.setBottomSheetCallback(object : com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
       override fun onSlide(bottomSheet: View, slideOffset: Float) {
         val offset = convertSlideOffset(slideOffset)
         val bottomPadding = (peekHeight * offset).toInt()

@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
-import android.support.annotation.RawRes;
+import androidx.annotation.RawRes;
 import android.util.TypedValue;
 
 import java.io.BufferedReader;

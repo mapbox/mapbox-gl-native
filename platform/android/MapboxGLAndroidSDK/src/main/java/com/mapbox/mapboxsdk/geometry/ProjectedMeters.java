@@ -2,9 +2,9 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * ProjectedMeters is a projection of longitude, latitude points in Mercator meters.

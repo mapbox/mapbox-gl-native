@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/coordinator_layout"
@@ -14,7 +14,7 @@
         android:layout_marginBottom="0dp"
         app:mapbox_uiAttribution="false"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabStyles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,4 +27,4 @@
         app:backgroundTint="@color/accent"
         app:layout_anchorGravity="top"/>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

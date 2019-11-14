@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.FloatRange;
+import androidx.annotation.FloatRange;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;

@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.utils;
 
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.log.Logger;
 

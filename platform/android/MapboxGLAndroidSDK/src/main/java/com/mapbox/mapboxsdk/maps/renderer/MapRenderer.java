@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.maps.renderer;
 
 import android.content.Context;
-import android.support.annotation.CallSuper;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
+import androidx.annotation.CallSuper;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.log.Logger;

@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
-import android.support.annotation.RawRes;
-import android.support.test.espresso.ViewAction;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.annotation.RawRes;
+import androidx.test.espresso.ViewAction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import android.view.View;
 
 import com.mapbox.geojson.Feature;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static org.junit.Assert.assertEquals;
 
 /**

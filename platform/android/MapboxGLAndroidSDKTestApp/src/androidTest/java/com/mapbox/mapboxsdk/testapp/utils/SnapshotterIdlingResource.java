@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.utils;
 
-import android.support.test.espresso.IdlingResource;
+import androidx.test.espresso.IdlingResource;
 
 import com.mapbox.mapboxsdk.testapp.activity.render.RenderTestActivity;
 

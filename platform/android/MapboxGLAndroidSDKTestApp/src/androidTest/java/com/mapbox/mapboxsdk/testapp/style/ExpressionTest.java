@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;

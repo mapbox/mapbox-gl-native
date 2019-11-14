@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps
 
-import android.support.test.espresso.UiController
+import androidx.test.espresso.UiController
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke

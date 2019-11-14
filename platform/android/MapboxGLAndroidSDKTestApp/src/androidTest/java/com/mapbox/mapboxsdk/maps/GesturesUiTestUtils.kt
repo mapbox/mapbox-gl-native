@@ -2,11 +2,11 @@ package com.mapbox.mapboxsdk.maps
 
 import android.graphics.PointF
 import android.os.SystemClock
-import android.support.test.espresso.Espresso
-import android.support.test.espresso.InjectEventSecurityException
-import android.support.test.espresso.UiController
-import android.support.test.espresso.ViewAction
-import android.support.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.InjectEventSecurityException
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.matcher.ViewMatchers
 import android.view.MotionEvent
 import android.view.View
 import org.hamcrest.Matcher

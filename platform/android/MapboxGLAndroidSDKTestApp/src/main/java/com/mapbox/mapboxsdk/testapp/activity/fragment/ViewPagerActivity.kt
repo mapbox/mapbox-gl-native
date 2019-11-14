@@ -2,9 +2,9 @@ package com.mapbox.mapboxsdk.testapp.activity.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import android.support.v7.app.AppCompatActivity
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -38,13 +38,13 @@ class ViewPagerActivity : AppCompatActivity() {
     }
   }
 
-  internal class MapFragmentAdapter(private val context: Context, fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
+  internal class MapFragmentAdapter(private val context: Context, fragmentManager: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentStatePagerAdapter(fragmentManager) {
 
     override fun getCount(): Int {
       return NUM_ITEMS
     }
 
-    override fun getItem(position: Int): Fragment? {
+    override fun getItem(position: Int): androidx.fragment.app.Fragment? {
       val options = MapboxMapOptions.createFromAttributes(context)
       options.textureMode(true)
       options.camera(

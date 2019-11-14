@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.storage
 
 import android.os.Bundle
 import android.os.Looper
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AppCompatActivity
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_cache_management.*
@@ -72,6 +72,6 @@ class CacheManagementActivity : AppCompatActivity() {
     assert(Looper.myLooper() == Looper.getMainLooper())
 
     // show snackbar
-    Snackbar.make(container, message, Snackbar.LENGTH_SHORT).show()
+    com.google.android.material.snackbar.Snackbar.make(container, message, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
   }
 }

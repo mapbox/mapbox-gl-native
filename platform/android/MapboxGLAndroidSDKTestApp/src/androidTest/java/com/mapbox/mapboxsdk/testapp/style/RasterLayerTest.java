@@ -2,21 +2,18 @@
 
 package com.mapbox.mapboxsdk.testapp.style;
 
-import android.graphics.Color;
-import android.support.test.annotation.UiThreadTest;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.annotation.UiThreadTest;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.mapbox.mapboxsdk.maps.BaseLayerTest;
 import org.junit.Before;
 import timber.log.Timber;
 
-import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
 import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;

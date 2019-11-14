@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.turf
 
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.widget.SeekBar
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraPosition

@@ -3,13 +3,13 @@ package com.mapbox.mapboxsdk.testapp.activity.fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,11 +35,11 @@ class NestedViewPagerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recyclerview)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         recyclerView.adapter = ItemAdapter(this, LayoutInflater.from(this), supportFragmentManager)
     }
 
-    class ItemAdapter(private val context: Context, private val inflater: LayoutInflater, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    class ItemAdapter(private val context: Context, private val inflater: LayoutInflater, private val fragmentManager: androidx.fragment.app.FragmentManager) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
 
         private val items = listOf(
                 "one", "two", "three", ViewPagerItem(), "four", "five", "six", "seven", "eight", "nine", "ten",
@@ -54,9 +54,9 @@ class NestedViewPagerActivity : AppCompatActivity() {
             const val TYPE_TEXT = 1
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
             return if (viewType == TYPE_VIEWPAGER) {
-                val viewPager = inflater.inflate(R.layout.item_viewpager, parent, false) as ViewPager
+                val viewPager = inflater.inflate(R.layout.item_viewpager, parent, false) as androidx.viewpager.widget.ViewPager
                 mapHolder = ViewPagerHolder(context, viewPager, fragmentManager)
                 return mapHolder as ViewPagerHolder
             } else {
@@ -68,7 +68,7 @@ class NestedViewPagerActivity : AppCompatActivity() {
             return items.count()
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
             if (holder.itemViewType == TYPE_TEXT) {
                 val textHolder = holder as TextHolder
                 textHolder.bind(items[position] as String)
@@ -83,14 +83,14 @@ class NestedViewPagerActivity : AppCompatActivity() {
             }
         }
 
-        class TextHolder(val textView: TextView) : RecyclerView.ViewHolder(textView) {
+        class TextHolder(val textView: TextView) : androidx.recyclerview.widget.RecyclerView.ViewHolder(textView) {
             fun bind(item: String) {
                 textView.text = item
             }
         }
 
         class ViewPagerItem
-        class ViewPagerHolder(context: Context, private val viewPager: ViewPager, fragmentManager: FragmentManager) : RecyclerView.ViewHolder(viewPager) {
+        class ViewPagerHolder(context: Context, private val viewPager: androidx.viewpager.widget.ViewPager, fragmentManager: androidx.fragment.app.FragmentManager) : androidx.recyclerview.widget.RecyclerView.ViewHolder(viewPager) {
             init {
                 viewPager.adapter = MapPagerAdapter(context, fragmentManager)
                 viewPager.setOnTouchListener { view, motionEvent ->
@@ -102,9 +102,9 @@ class NestedViewPagerActivity : AppCompatActivity() {
             }
         }
 
-        class MapPagerAdapter(private val context: Context, fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
+        class MapPagerAdapter(private val context: Context, fm: androidx.fragment.app.FragmentManager?) : androidx.fragment.app.FragmentStatePagerAdapter(fm) {
 
-            override fun getItem(position: Int): Fragment {
+            override fun getItem(position: Int): androidx.fragment.app.Fragment {
                 val options = MapboxMapOptions.createFromAttributes(context)
                 options.textureMode(true)
                 options.doubleTapGesturesEnabled(false)
@@ -149,7 +149,7 @@ class NestedViewPagerActivity : AppCompatActivity() {
             }
         }
 
-        class EmptyFragment : Fragment() {
+        class EmptyFragment : androidx.fragment.app.Fragment() {
             companion object {
                 fun newInstance(): EmptyFragment {
                     return EmptyFragment()

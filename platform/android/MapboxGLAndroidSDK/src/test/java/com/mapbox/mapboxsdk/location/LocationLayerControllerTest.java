@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;

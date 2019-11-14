@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;

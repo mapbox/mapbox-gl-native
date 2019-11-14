@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps.renderer;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 /**
  * Can be used to schedule work on the map renderer

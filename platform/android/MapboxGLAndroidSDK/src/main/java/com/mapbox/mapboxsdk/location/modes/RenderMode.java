@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.location.modes;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.mapbox.mapboxsdk.location.CompassEngine;
 import com.mapbox.mapboxsdk.location.LocationComponent;

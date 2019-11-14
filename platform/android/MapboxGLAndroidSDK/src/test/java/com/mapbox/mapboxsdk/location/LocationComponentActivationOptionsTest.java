@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.location;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.maps.Style;

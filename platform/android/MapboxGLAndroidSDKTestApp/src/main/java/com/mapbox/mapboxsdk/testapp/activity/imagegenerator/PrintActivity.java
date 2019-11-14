@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.print.PrintHelper;
-import android.support.v7.app.AppCompatActivity;
+import androidx.print.PrintHelper;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
