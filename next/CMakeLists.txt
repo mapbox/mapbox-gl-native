@@ -441,6 +441,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/programs/gl/symbol_icon.cpp
     ${MBGL_ROOT}/src/mbgl/programs/gl/symbol_sdf_icon.cpp
     ${MBGL_ROOT}/src/mbgl/programs/gl/symbol_sdf_text.cpp
+    ${MBGL_ROOT}/src/mbgl/programs/gl/symbol_text_and_icon.cpp
     ${MBGL_ROOT}/src/mbgl/programs/heatmap_program.cpp
     ${MBGL_ROOT}/src/mbgl/programs/heatmap_program.hpp
     ${MBGL_ROOT}/src/mbgl/programs/heatmap_texture_program.cpp
@@ -467,6 +468,7 @@ add_library(
     ${MBGL_ROOT}/src/mbgl/programs/symbol_program.hpp
     ${MBGL_ROOT}/src/mbgl/programs/symbol_sdf_icon_program.hpp
     ${MBGL_ROOT}/src/mbgl/programs/symbol_sdf_text_program.hpp
+    ${MBGL_ROOT}/src/mbgl/programs/symbol_text_and_icon_program.hpp
     ${MBGL_ROOT}/src/mbgl/programs/textures.hpp
     ${MBGL_ROOT}/src/mbgl/programs/uniforms.hpp
     ${MBGL_ROOT}/src/mbgl/renderer/backend_scope.cpp

@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<CollisionBoxProgram> {
     static constexpr const char* name = "collision_box";
-    static constexpr const uint8_t hash[8] = { 0xcb, 0x6a, 0x9b, 0xd1, 0x1f, 0x31, 0xf8, 0x5b };
+    static constexpr const uint8_t hash[8] = {0xcb, 0x6a, 0x9b, 0xd1, 0x1f, 0x31, 0xf8, 0x5b};
     static constexpr const auto vertexOffset = 10000;
     static constexpr const auto fragmentOffset = 10679;
 };
@@ -93,4 +93,4 @@ void main() {
     }
 }
 */
-
+// clang-format on

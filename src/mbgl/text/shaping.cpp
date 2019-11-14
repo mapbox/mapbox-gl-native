@@ -429,6 +429,7 @@ void shapeLines(Shaping& shaping,
                 if (image == imagePositions.end()) {
                     continue;
                 }
+                shaping.iconsInText |= true;
                 const auto& displaySize = image->second.displaySize();
                 metrics.width = displaySize[0];
                 metrics.height = displaySize[1];

@@ -109,6 +109,7 @@ private:
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
     bool allowVerticalPlacement = false;
+    bool iconsInText = false;
     std::vector<style::TextWritingModeType> placementModes;
 
     style::TextSize::UnevaluatedType textSize;

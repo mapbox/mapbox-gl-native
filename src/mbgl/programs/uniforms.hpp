@@ -35,6 +35,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, gapwidth);
 MBGL_DEFINE_UNIFORM_SCALAR(float, offset);
 MBGL_DEFINE_UNIFORM_SCALAR(Size, world);
 MBGL_DEFINE_UNIFORM_SCALAR(Size, texsize);
+MBGL_DEFINE_UNIFORM_SCALAR(Size, texsize_icon);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(float, camera_to_center_distance);
 MBGL_DEFINE_UNIFORM_SCALAR(float, device_pixel_ratio);

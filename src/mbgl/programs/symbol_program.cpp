@@ -156,6 +156,33 @@ SymbolSDFProgram<Name, PaintProperties>::layoutUniformValues(const bool isText,
     );
 }
 
+SymbolTextAndIconProgram::LayoutUniformValues SymbolTextAndIconProgram::layoutUniformValues(
+    const bool hasVariablePacement,
+    const style::SymbolPropertyValues& values,
+    const Size& texsize,
+    const Size& texsize_icon,
+    const std::array<float, 2>& pixelsToGLUnits,
+    const float pixelRatio,
+    const bool alongLine,
+    const RenderTile& tile,
+    const TransformState& state,
+    const float symbolFadeChange,
+    const SymbolSDFPart part) {
+    return SymbolTextAndIconProgram::LayoutUniformValues(
+        SymbolSDFProgram<SymbolSDFTextProgram, style::TextPaintProperties>::layoutUniformValues(true,
+                                                                                                hasVariablePacement,
+                                                                                                values,
+                                                                                                texsize,
+                                                                                                pixelsToGLUnits,
+                                                                                                pixelRatio,
+                                                                                                alongLine,
+                                                                                                tile,
+                                                                                                state,
+                                                                                                symbolFadeChange,
+                                                                                                part)
+            .concat(gfx::UniformValues<SymbolTextAndIconProgramUniforms>(uniforms::texsize::Value(texsize_icon))));
+}
+
 template class SymbolSDFProgram<SymbolSDFIconProgram, style::IconPaintProperties>;
 template class SymbolSDFProgram<SymbolSDFTextProgram, style::TextPaintProperties>;
 

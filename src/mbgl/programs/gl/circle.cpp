@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<CircleProgram> {
     static constexpr const char* name = "circle";
-    static constexpr const uint8_t hash[8] = { 0x1d, 0x47, 0x35, 0xbb, 0x94, 0x3d, 0x93, 0xca };
+    static constexpr const uint8_t hash[8] = {0x1d, 0x47, 0x35, 0xbb, 0x94, 0x3d, 0x93, 0xca};
     static constexpr const auto vertexOffset = 2927;
     static constexpr const auto fragmentOffset = 6135;
 };
@@ -317,4 +317,4 @@ void main() {
 }
 
 */
-
+// clang-format on

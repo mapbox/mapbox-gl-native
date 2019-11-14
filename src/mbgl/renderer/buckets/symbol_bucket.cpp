@@ -24,7 +24,8 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
                            const std::vector<SymbolInstance>&& symbolInstances_,
                            float tilePixelRatio_,
                            bool allowVerticalPlacement_,
-                           std::vector<style::TextWritingModeType> placementModes_)
+                           std::vector<style::TextWritingModeType> placementModes_,
+                           bool iconsInText_)
     : layout(std::move(layout_)),
       bucketLeaderID(bucketName_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
@@ -33,6 +34,7 @@ SymbolBucket::SymbolBucket(Immutable<style::SymbolLayoutProperties::PossiblyEval
       placementChangesUploaded(false),
       dynamicUploaded(false),
       sortUploaded(false),
+      iconsInText(iconsInText_),
       justReloaded(false),
       hasVariablePlacement(false),
       symbolInstances(symbolInstances_),

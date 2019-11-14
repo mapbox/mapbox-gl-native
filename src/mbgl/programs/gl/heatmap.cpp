@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/heatmap_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<HeatmapProgram> {
     static constexpr const char* name = "heatmap";
-    static constexpr const uint8_t hash[8] = { 0xe5, 0xa4, 0x9c, 0x31, 0x01, 0xe5, 0x4a, 0xe0 };
+    static constexpr const uint8_t hash[8] = {0xe5, 0xa4, 0x9c, 0x31, 0x01, 0xe5, 0x4a, 0xe0};
     static constexpr const auto vertexOffset = 8026;
     static constexpr const auto fragmentOffset = 9074;
 };
@@ -159,4 +159,4 @@ void main() {
 }
 
 */
-
+// clang-format on

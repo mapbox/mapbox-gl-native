@@ -1,6 +1,6 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 // clang-format off
-#include <mbgl/programs/symbol_sdf_icon_program.hpp>
+#include <mbgl/programs/symbol_text_and_icon_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/gl/program.hpp>
@@ -13,15 +13,15 @@ template <typename>
 struct ShaderSource;
 
 template <>
-struct ShaderSource<SymbolSDFIconProgram> {
-    static constexpr const char* name = "symbol_sdf_icon";
-    static constexpr const uint8_t hash[8] = {0x8e, 0xbe, 0xa0, 0x1c, 0x9f, 0x81, 0x4d, 0x39};
-    static constexpr const auto vertexOffset = 53260;
-    static constexpr const auto fragmentOffset = 57227;
+struct ShaderSource<SymbolTextAndIconProgram> {
+    static constexpr const char* name = "symbol_text_and_icon";
+    static constexpr const uint8_t hash[8] = {0x7e, 0xbe, 0x72, 0x43, 0x55, 0x8e, 0xb5, 0xeb};
+    static constexpr const auto vertexOffset = 59063;
+    static constexpr const auto fragmentOffset = 63119;
 };
 
-constexpr const char* ShaderSource<SymbolSDFIconProgram>::name;
-constexpr const uint8_t ShaderSource<SymbolSDFIconProgram>::hash[8];
+constexpr const char* ShaderSource<SymbolTextAndIconProgram>::name;
+constexpr const uint8_t ShaderSource<SymbolTextAndIconProgram>::hash[8];
 
 } // namespace gl
 } // namespace programs
@@ -29,15 +29,15 @@ constexpr const uint8_t ShaderSource<SymbolSDFIconProgram>::hash[8];
 namespace gfx {
 
 template <>
-std::unique_ptr<gfx::Program<SymbolSDFIconProgram>>
+std::unique_ptr<gfx::Program<SymbolTextAndIconProgram>>
 Backend::Create<gfx::Backend::Type::OpenGL>(const ProgramParameters& programParameters) {
-    return std::make_unique<gl::Program<SymbolSDFIconProgram>>(programParameters);
+    return std::make_unique<gl::Program<SymbolTextAndIconProgram>>(programParameters);
 }
 
 } // namespace gfx
 } // namespace mbgl
 
-// Uncompressed source of symbol_sdf_icon.vertex.glsl:
+// Uncompressed source of symbol_text_and_icon.vertex.glsl:
 /*
 const float PI = 3.141592653589793;
 
@@ -68,9 +68,10 @@ uniform highp float u_aspect_ratio;
 uniform highp float u_camera_to_center_distance;
 uniform float u_fade_change;
 uniform vec2 u_texsize;
+uniform vec2 u_texsize_icon;
 
-varying vec2 v_data0;
-varying vec3 v_data1;
+varying vec4 v_data0;
+varying vec4 v_data1;
 
 
 #ifndef HAS_UNIFORM_u_fill_color
@@ -162,6 +163,8 @@ void main() {
     vec2 a_size = a_data.zw;
 
     float a_size_min = floor(a_size[0] * 0.5);
+    float is_sdf = a_size[0] - 2.0 * a_size_min;
+
     highp float segment_angle = -a_projected_pos[2];
     float size;
 
@@ -191,7 +194,7 @@ void main() {
 
     size *= perspective_ratio;
 
-    float fontScale = u_is_text ? size / 24.0 : size;
+    float fontScale = size / 24.0;
 
     highp float symbol_rotation = 0.0;
     if (u_rotate_symbol) {
@@ -218,24 +221,28 @@ void main() {
     float fade_change = fade_opacity[1] > 0.5 ? u_fade_change : -u_fade_change;
     float interpolated_fade_opacity = max(0.0, min(1.0, fade_opacity[0] + fade_change));
 
-    v_data0 = a_tex / u_texsize;
-    v_data1 = vec3(gamma_scale, size, interpolated_fade_opacity);
+    v_data0.xy = a_tex / u_texsize;
+    v_data0.zw = a_tex / u_texsize_icon;
+    v_data1 = vec4(gamma_scale, size, interpolated_fade_opacity, is_sdf);
 }
 
 */
 
-// Uncompressed source of symbol_sdf_icon.fragment.glsl:
+// Uncompressed source of symbol_text_and_icon.fragment.glsl:
 /*
 #define SDF_PX 8.0
 
+#define SDF 1.0
+#define ICON 0.0
+
 uniform bool u_is_halo;
 uniform sampler2D u_texture;
+uniform sampler2D u_texture_icon;
 uniform highp float u_gamma_scale;
 uniform lowp float u_device_pixel_ratio;
-uniform bool u_is_text;
 
-varying vec2 v_data0;
-varying vec3 v_data1;
+varying vec4 v_data0;
+varying vec4 v_data1;
 
 
 #ifndef HAS_UNIFORM_u_fill_color
@@ -300,14 +307,27 @@ void main() {
 #endif
 
 
-    float EDGE_GAMMA = 0.105 / u_device_pixel_ratio;
-
-    vec2 tex = v_data0.xy;
-    float gamma_scale = v_data1.x;
-    float size = v_data1.y;
     float fade_opacity = v_data1[2];
 
-    float fontScale = u_is_text ? size / 24.0 : size;
+    if (v_data1.w == ICON) {
+        vec2 tex_icon = v_data0.zw;
+        lowp float alpha = opacity * fade_opacity;
+        gl_FragColor = texture2D(u_texture_icon, tex_icon) * alpha;
+
+#ifdef OVERDRAW_INSPECTOR
+        gl_FragColor = vec4(1.0);
+#endif
+        return;
+    }
+
+    vec2 tex = v_data0.xy;
+
+    float EDGE_GAMMA = 0.105 / u_device_pixel_ratio;
+
+    float gamma_scale = v_data1.x;
+    float size = v_data1.y;
+
+    float fontScale = size / 24.0;
 
     lowp vec4 color = fill_color;
     highp float gamma = EDGE_GAMMA / (fontScale * u_gamma_scale);

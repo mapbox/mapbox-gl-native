@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/fill_outline_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillOutlineProgram> {
     static constexpr const char* name = "fill_outline";
-    static constexpr const uint8_t hash[8] = { 0x51, 0x25, 0x43, 0x9d, 0x41, 0x73, 0xe1, 0xbb };
+    static constexpr const uint8_t hash[8] = {0x51, 0x25, 0x43, 0x9d, 0x41, 0x73, 0xe1, 0xbb};
     static constexpr const auto vertexOffset = 13722;
     static constexpr const auto fragmentOffset = 14547;
 };
@@ -128,4 +128,4 @@ void main() {
 }
 
 */
-
+// clang-format on

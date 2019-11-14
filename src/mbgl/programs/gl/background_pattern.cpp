@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/background_pattern_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<BackgroundPatternProgram> {
     static constexpr const char* name = "background_pattern";
-    static constexpr const uint8_t hash[8] = { 0x70, 0x13, 0xc8, 0x7e, 0xba, 0x18, 0xf5, 0x19 };
+    static constexpr const uint8_t hash[8] = {0x70, 0x13, 0xc8, 0x7e, 0xba, 0x18, 0xf5, 0x19};
     static constexpr const auto vertexOffset = 1675;
     static constexpr const auto fragmentOffset = 2266;
 };
@@ -94,4 +94,4 @@ void main() {
 }
 
 */
-
+// clang-format on

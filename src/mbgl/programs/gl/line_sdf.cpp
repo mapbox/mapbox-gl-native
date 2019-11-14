@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/line_sdf_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LineSDFProgram> {
     static constexpr const char* name = "line_sdf";
-    static constexpr const uint8_t hash[8] = { 0x25, 0x94, 0x7f, 0xad, 0x84, 0xfe, 0x96, 0xad };
+    static constexpr const uint8_t hash[8] = {0x25, 0x94, 0x7f, 0xad, 0x84, 0xfe, 0x96, 0xad};
     static constexpr const auto vertexOffset = 43607;
     static constexpr const auto fragmentOffset = 47294;
 };
@@ -335,4 +335,4 @@ void main() {
 }
 
 */
-
+// clang-format on
