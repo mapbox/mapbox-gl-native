@@ -14,11 +14,14 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 
-
 #include <cmath>
 #include <array>
 
 namespace mbgl {
+
+const uint16_t MAX_GLYPH_ICON_SIZE = 255;
+const uint16_t SIZE_PACK_FACTOR = 128;
+const uint16_t MAX_PACKED_SIZE = MAX_GLYPH_ICON_SIZE * SIZE_PACK_FACTOR;
 
 namespace style {
 class SymbolPropertyValues;
@@ -197,26 +200,21 @@ public:
 class SymbolProgramBase {
 public:
     static gfx::Vertex<SymbolLayoutAttributes> layoutVertex(Point<float> labelAnchor,
-                         Point<float> o,
-                         float glyphOffsetY,
-                         uint16_t tx,
-                         uint16_t ty,
-                         const Range<float>& sizeData) {
+                                                            Point<float> o,
+                                                            float glyphOffsetY,
+                                                            uint16_t tx,
+                                                            uint16_t ty,
+                                                            const Range<float>& sizeData,
+                                                            bool isSDF) {
+        const uint16_t aSizeMin = (std::min(MAX_PACKED_SIZE, static_cast<uint16_t>(sizeData.min * SIZE_PACK_FACTOR)) << 1) + uint16_t(isSDF);
+        const uint16_t aSizeMax = std::min(MAX_PACKED_SIZE, static_cast<uint16_t>(sizeData.max * SIZE_PACK_FACTOR));
         return {
             // combining pos and offset to reduce number of vertex attributes passed to shader (8 max for some devices)
-            {{
-                static_cast<int16_t>(labelAnchor.x),
-                static_cast<int16_t>(labelAnchor.y),
-                static_cast<int16_t>(::round(o.x * 32)),  // use 1/32 pixels for placement
-                static_cast<int16_t>(::round((o.y + glyphOffsetY) * 32))
-            }},
-            {{
-                tx,
-                ty,
-                static_cast<uint16_t>(sizeData.min * 256),
-                static_cast<uint16_t>(sizeData.max * 256)
-            }}
-        };
+            {{static_cast<int16_t>(labelAnchor.x),
+              static_cast<int16_t>(labelAnchor.y),
+              static_cast<int16_t>(::round(o.x * 32)), // use 1/32 pixels for placement
+              static_cast<int16_t>(::round((o.y + glyphOffsetY) * 32))}},
+            {{tx, ty, aSizeMin, aSizeMax}}};
     }
 
     static gfx::Vertex<SymbolDynamicLayoutAttributes> dynamicLayoutVertex(Point<float> anchorPoint, float labelAngle) {

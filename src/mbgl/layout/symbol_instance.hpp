@@ -21,6 +21,8 @@ struct ShapedTextOrientations {
     bool singleLine = false;
 };
 
+enum class SymbolContent : uint8_t { None = 0, Text = 1 << 0, IconRGBA = 1 << 1, IconSDF = 1 << 2 };
+
 struct SymbolInstanceSharedData {
     SymbolInstanceSharedData(GeometryCoordinates line,
                              const ShapedTextOrientations& shapedTextOrientations,
@@ -30,6 +32,7 @@ struct SymbolInstanceSharedData {
                              const style::SymbolPlacementType textPlacement,
                              const std::array<float, 2>& textOffset,
                              const ImageMap& imageMap,
+                             SymbolContent iconType,
                              bool allowVerticalPlacement);
     bool empty() const;
     GeometryCoordinates line;
@@ -40,13 +43,6 @@ struct SymbolInstanceSharedData {
     SymbolQuads verticalGlyphQuads;
     optional<SymbolQuad> iconQuad;
     optional<SymbolQuad> verticalIconQuad;
-};
-
-enum class SymbolContent : uint8_t {
-    None = 0,
-    Text = 1 << 0,
-    IconRGBA = 1 << 1,
-    IconSDF = 1 << 2
 };
 
 class SymbolInstance {
