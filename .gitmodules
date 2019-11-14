@@ -76,3 +76,6 @@
 [submodule "vendor/googletest"]
 	path = vendor/googletest
 	url = https://github.com/google/googletest.git
+[submodule "platform/android/vendor/mapbox-navigation-android"]
+	path = platform/android/vendor/mapbox-navigation-android
+	url = git@github.com:mapbox/mapbox-navigation-android.git

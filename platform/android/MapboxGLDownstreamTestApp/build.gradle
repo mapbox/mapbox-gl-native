@@ -44,15 +44,24 @@ android {
 
 dependencies {
     api(project(':MapboxGLAndroidSDK'))
-    implementation("com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.40.0") {
+    implementation("com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.43.4-SNAPSHOT") {
         exclude group: 'com.mapbox.mapboxsdk', module: 'mapbox-android-sdk'
+        exclude group: 'com.mapbox.mapboxsdk', module: 'libnavigation-util'
         exclude group: 'com.mapbox.mapboxsdk', module: 'mapbox-android-navigation'
     }
-    implementation "com.mapbox.mapboxsdk:mapbox-android-navigation:0.40.0"
+    implementation("com.mapbox.mapboxsdk:mapbox-android-navigation:0.43.4-SNAPSHOT") {
+        exclude group: 'com.mapbox.mapboxsdk', module: 'libnavigation-base'
+        exclude group: 'com.mapbox.mapboxsdk', module: 'libnavigator'
+        exclude group: 'com.mapbox.mapboxsdk', module: 'libnavigation-util'
+    }
+    implementation(project(':base'))
+    implementation(project(':nav'))
+    implementation(project(':util'))
+    implementation('androidx.annotation:annotation:1.1.0')
 
     // Butter Knife
-    implementation "com.jakewharton:butterknife:8.8.1"
-    annotationProcessor "com.jakewharton:butterknife-compiler:8.8.1"
+    implementation "com.jakewharton:butterknife:10.1.0"
+    annotationProcessor "com.jakewharton:butterknife-compiler:10.1.0"
 
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'

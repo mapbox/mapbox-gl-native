@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ComponentNavigationActivity">
+        <activity android:name=".NavigationMapRouteActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -20,13 +20,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".NavigationSettingsActivity"
-            android:label="Settings">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NavigationLauncherActivity"/>
-        </activity>
     </application>
 
 </manifest>

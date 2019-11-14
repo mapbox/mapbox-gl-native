@@ -1,1 +1,6 @@
-include ':MapboxGLAndroidSDK', ':MapboxGLAndroidSDKTestApp', ':MapboxGLAndroidSDKLint', ':MapboxGLDownstreamTestApp'
+include ':MapboxGLAndroidSDK', ':MapboxGLAndroidSDKLint', ':MapboxGLDownstreamTestApp', ':base', ':nav', ':util'
+
+
+project(":base").projectDir = new File("vendor/mapbox-navigation-android/libnavigation-base")
+project(":nav").projectDir = new File("vendor/mapbox-navigation-android/libnavigator")
+project(":util").projectDir = new File("vendor/mapbox-navigation-android/libnavigation-util")
