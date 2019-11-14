@@ -100,7 +100,7 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
 } // namespace
 namespace mbgl {
 
-int runRenderTests(int argc, char** argv) {
+int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     bool recycleMap;
     bool shuffle;
     uint32_t seed;
@@ -198,6 +198,9 @@ int runRenderTests(int argc, char** argv) {
         }
 
         metadatas.push_back(std::move(metadata));
+        if (testStatus) {
+            testStatus();
+        }
     }
     const auto resultPath =
         manifest.getResultPath() + "/" + (testNames.empty() ? "render-tests" : testNames.front()) + "_index.html";
