@@ -108,9 +108,10 @@ namespace mbgl {
 namespace programs {
 namespace gl {
 
+// clang-format off
 constexpr const uint8_t compressedShaderSource[] = {
-    ${compressed}
-};
+    ${compressed}};
+// clang-format on
 
 const char* shaderSource() {
     static std::string decompressed = util::decompress(std::string(reinterpret_cast<const char*>(compressedShaderSource), sizeof(compressedShaderSource)));
@@ -132,7 +133,7 @@ namespace mbgl {
 namespace programs {
 namespace gl {
 
-constexpr const uint8_t preludeHash[8] = { ${offsets['prelude'].hash} };
+constexpr const uint8_t preludeHash[8] = {${offsets['prelude'].hash}};
 constexpr const auto vertexPreludeOffset = ${offsets['prelude'].vertex};
 constexpr const auto fragmentPreludeOffset = ${offsets['prelude'].fragment};
 
@@ -148,7 +149,7 @@ for (const key in offsets) {
     const { shaderName, ShaderName, originalKey } = offsets[key];
 
     writeIfModified(path.join(outputPath, 'gl', `${shaderName}.cpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/${shaderName}_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -164,7 +165,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<${ShaderName}Program> {
     static constexpr const char* name = "${shaderName}";
-    static constexpr const uint8_t hash[8] = { ${offsets[key].hash} };
+    static constexpr const uint8_t hash[8] = {${offsets[key].hash}};
     static constexpr const auto vertexOffset = ${offsets[key].vertex};
     static constexpr const auto fragmentOffset = ${offsets[key].fragment};
 };
@@ -195,6 +196,6 @@ ${shaders[originalKey].vertexSource}
 /*
 ${shaders[originalKey].fragmentSource}
 */
-
+// clang-format on
 `);
 }

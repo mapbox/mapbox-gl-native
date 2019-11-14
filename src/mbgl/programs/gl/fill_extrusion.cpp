@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<FillExtrusionProgram> {
     static constexpr const char* name = "fill_extrusion";
-    static constexpr const uint8_t hash[8] = { 0x9d, 0x76, 0x7f, 0xaa, 0x86, 0x57, 0x56, 0x96 };
+    static constexpr const uint8_t hash[8] = {0x9d, 0x76, 0x7f, 0xaa, 0x86, 0x57, 0x56, 0x96};
     static constexpr const auto vertexOffset = 21283;
     static constexpr const auto fragmentOffset = 23214;
 };
@@ -160,4 +160,4 @@ void main() {
 }
 
 */
-
+// clang-format on

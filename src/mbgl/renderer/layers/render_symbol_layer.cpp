@@ -188,43 +188,103 @@ void drawText(const DrawFn& draw,
     const auto& evaluated = getEvaluated<SymbolLayerProperties>(renderData.layerProperties);
     const auto& layout = *bucket.layout;
 
-    const gfx::TextureBinding textureBinding{ tile.getGlyphAtlasTexture().getResource(),
-                                              gfx::TextureFilterType::Linear };
-
     auto values = textPropertyValues(evaluated, layout);
     const auto& paintPropertyValues = RenderSymbolLayer::textPaintProperties(evaluated);
 
     const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
         layout.get<TextRotationAlignment>() == AlignmentType::Map;
 
-    const Size& texsize = tile.getGlyphAtlasTexture().size;
+    const Size& glyphTexSize = tile.getGlyphAtlasTexture().size;
+    const gfx::TextureBinding glyphTextureBinding{tile.getGlyphAtlasTexture().getResource(),
+                                                  gfx::TextureFilterType::Linear};
 
-    if (values.hasHalo) {
-        draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-            SymbolSDFTextProgram::layoutUniformValues(true, bucket.hasVariablePlacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
-            bucket.text,
-            textSegments,
-            bucket.textSizeBinder,
-            bucketPaintProperties.textBinders,
-            paintPropertyValues,
-            SymbolSDFTextProgram::TextureBindings{
-                textureBinding
-            },
-            "halo");
-    }
+    const bool transformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
+    const Size& iconTexSize = tile.getIconAtlasTexture().size;
+    const gfx::TextureBinding iconTextureBinding{tile.getIconAtlasTexture().getResource(),
+                                                 parameters.state.isChanging() || transformed
+                                                     ? gfx::TextureFilterType::Linear
+                                                     : gfx::TextureFilterType::Nearest};
 
-    if (values.hasFill) {
-        draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
-            SymbolSDFTextProgram::layoutUniformValues(true, bucket.hasVariablePlacement, values, texsize, parameters.pixelsToGLUnits, parameters.pixelRatio, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
-            bucket.text,
-            textSegments,
-            bucket.textSizeBinder,
-            bucketPaintProperties.textBinders,
-            paintPropertyValues,
-            SymbolSDFTextProgram::TextureBindings{
-                textureBinding
-            },
-            "fill");
+    const auto drawGlyphs = [&](auto& program, const auto& uniforms, const auto& textures, SymbolSDFPart part) {
+        draw(program,
+             uniforms,
+             bucket.text,
+             textSegments,
+             bucket.textSizeBinder,
+             bucketPaintProperties.textBinders,
+             paintPropertyValues,
+             textures,
+             (part == SymbolSDFPart::Halo) ? "halo" : "fill");
+    };
+
+    if (bucket.iconsInText) {
+        if (values.hasHalo) {
+            drawGlyphs(parameters.programs.getSymbolLayerPrograms().symbolTextAndIcon,
+                       SymbolTextAndIconProgram::layoutUniformValues(bucket.hasVariablePlacement,
+                                                                     values,
+                                                                     glyphTexSize,
+                                                                     iconTexSize,
+                                                                     parameters.pixelsToGLUnits,
+                                                                     parameters.pixelRatio,
+                                                                     alongLine,
+                                                                     tile,
+                                                                     parameters.state,
+                                                                     parameters.symbolFadeChange,
+                                                                     SymbolSDFPart::Halo),
+                       SymbolTextAndIconProgram::TextureBindings{glyphTextureBinding, iconTextureBinding},
+                       SymbolSDFPart::Halo);
+        }
+
+        if (values.hasFill) {
+            drawGlyphs(parameters.programs.getSymbolLayerPrograms().symbolTextAndIcon,
+                       SymbolTextAndIconProgram::layoutUniformValues(bucket.hasVariablePlacement,
+                                                                     values,
+                                                                     glyphTexSize,
+                                                                     iconTexSize,
+                                                                     parameters.pixelsToGLUnits,
+                                                                     parameters.pixelRatio,
+                                                                     alongLine,
+                                                                     tile,
+                                                                     parameters.state,
+                                                                     parameters.symbolFadeChange,
+                                                                     SymbolSDFPart::Fill),
+                       SymbolTextAndIconProgram::TextureBindings{glyphTextureBinding, iconTextureBinding},
+                       SymbolSDFPart::Fill);
+        }
+    } else {
+        if (values.hasHalo) {
+            drawGlyphs(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
+                       SymbolSDFTextProgram::layoutUniformValues(true,
+                                                                 bucket.hasVariablePlacement,
+                                                                 values,
+                                                                 glyphTexSize,
+                                                                 parameters.pixelsToGLUnits,
+                                                                 parameters.pixelRatio,
+                                                                 alongLine,
+                                                                 tile,
+                                                                 parameters.state,
+                                                                 parameters.symbolFadeChange,
+                                                                 SymbolSDFPart::Halo),
+                       SymbolSDFTextProgram::TextureBindings{glyphTextureBinding},
+                       SymbolSDFPart::Halo);
+        }
+
+        if (values.hasFill) {
+            drawGlyphs(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
+                       SymbolSDFTextProgram::layoutUniformValues(true,
+                                                                 bucket.hasVariablePlacement,
+                                                                 values,
+                                                                 glyphTexSize,
+                                                                 parameters.pixelsToGLUnits,
+                                                                 parameters.pixelRatio,
+                                                                 alongLine,
+                                                                 tile,
+                                                                 parameters.state,
+                                                                 parameters.symbolFadeChange,
+                                                                 SymbolSDFPart::Fill),
+                       SymbolSDFTextProgram::TextureBindings{glyphTextureBinding},
+                       SymbolSDFPart::Fill);
+        }
     }
 }
 

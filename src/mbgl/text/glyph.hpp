@@ -120,6 +120,7 @@ class Shaping {
     // The y offset *should* be part of the font metadata.
     static constexpr int32_t yOffset = -17;
     bool verticalizable = false;
+    bool iconsInText = false;
 };
 
 enum class WritingModeType : uint8_t {

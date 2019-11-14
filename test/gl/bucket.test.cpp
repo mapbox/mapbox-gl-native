@@ -125,7 +125,19 @@ TEST(Buckets, SymbolBucket) {
     std::vector<SymbolInstance> symbolInstances;
 
     gl::Context context{ backend };
-    SymbolBucket bucket { std::move(layout), {}, 16.0f, 1.0f, 0, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), 1.0f, false, {}};
+    SymbolBucket bucket{std::move(layout),
+                        {},
+                        16.0f,
+                        1.0f,
+                        0,
+                        iconsNeedLinear,
+                        sortFeaturesByY,
+                        bucketLeaderID,
+                        std::move(symbolInstances),
+                        1.0f,
+                        false,
+                        {},
+                        false /*iconsInText*/};
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasSdfIconData());
     ASSERT_FALSE(bucket.hasTextData());

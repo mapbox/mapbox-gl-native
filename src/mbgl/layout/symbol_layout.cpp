@@ -486,7 +486,9 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
         }
 
         // if either shapedText or icon position is present, add the feature
-        if (getDefaultHorizontalShaping(shapedTextOrientations) || shapedIcon) {
+        const Shaping& defaultShaping = getDefaultHorizontalShaping(shapedTextOrientations);
+        iconsInText = defaultShaping ? defaultShaping.iconsInText : false;
+        if (defaultShaping || shapedIcon) {
             addFeature(std::distance(features.begin(), it),
                        feature,
                        shapedTextOrientations,
@@ -711,10 +713,19 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
 }
 
 void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, LayerRenderData>& renderData, const bool firstLoad, const bool showCollisionBoxes) {
-    auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, iconsNeedLinear,
-                                                 sortFeaturesByY, bucketLeaderID, std::move(symbolInstances), tilePixelRatio,
+    auto bucket = std::make_shared<SymbolBucket>(layout,
+                                                 layerPaintProperties,
+                                                 textSize,
+                                                 iconSize,
+                                                 zoom,
+                                                 iconsNeedLinear,
+                                                 sortFeaturesByY,
+                                                 bucketLeaderID,
+                                                 std::move(symbolInstances),
+                                                 tilePixelRatio,
                                                  allowVerticalPlacement,
-                                                 std::move(placementModes));
+                                                 std::move(placementModes),
+                                                 iconsInText);
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
         const bool hasText = symbolInstance.hasText();

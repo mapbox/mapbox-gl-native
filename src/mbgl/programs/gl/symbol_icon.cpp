@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/symbol_icon_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,9 +15,9 @@ struct ShaderSource;
 template <>
 struct ShaderSource<SymbolIconProgram> {
     static constexpr const char* name = "symbol_icon";
-    static constexpr const uint8_t hash[8] = { 0xf3, 0x81, 0x62, 0xe8, 0x24, 0x49, 0xc6, 0x8f };
+    static constexpr const uint8_t hash[8] = {0x98, 0x20, 0xb6, 0xc1, 0x6d, 0x2e, 0x97, 0x8d};
     static constexpr const auto vertexOffset = 50247;
-    static constexpr const auto fragmentOffset = 52895;
+    static constexpr const auto fragmentOffset = 52855;
 };
 
 constexpr const char* ShaderSource<SymbolIconProgram>::name;
@@ -93,15 +93,14 @@ void main() {
     vec2 a_tex = a_data.xy;
     vec2 a_size = a_data.zw;
 
+    float a_size_min = floor(a_size[0] * 0.5);
     highp float segment_angle = -a_projected_pos[2];
-
     float size;
+
     if (!u_is_size_zoom_constant && !u_is_size_feature_constant) {
-        size = mix(a_size[0], a_size[1], u_size_t) / 256.0;
+        size = mix(a_size_min, a_size[1], u_size_t) / 128.0;
     } else if (u_is_size_zoom_constant && !u_is_size_feature_constant) {
-        size = a_size[0] / 256.0;
-    } else if (!u_is_size_zoom_constant && u_is_size_feature_constant) {
-        size = u_size;
+        size = a_size_min / 128.0;
     } else {
         size = u_size;
     }
@@ -178,4 +177,4 @@ void main() {
 }
 
 */
-
+// clang-format on

@@ -61,7 +61,8 @@ public:
                  const std::vector<SymbolInstance>&&,
                  const float tilePixelRatio,
                  bool allowVerticalPlacement,
-                 std::vector<style::TextWritingModeType> placementModes);
+                 std::vector<style::TextWritingModeType> placementModes,
+                 bool iconsInText);
     ~SymbolBucket() override;
 
     void upload(gfx::UploadPass&) override;
@@ -95,6 +96,7 @@ public:
     bool placementChangesUploaded : 1;
     bool dynamicUploaded : 1;
     bool sortUploaded : 1;
+    bool iconsInText : 1;
     // Set and used by placement.
     mutable bool justReloaded : 1;
     bool hasVariablePlacement : 1;

@@ -1,5 +1,5 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/line_gradient_program.hpp>
 #include <mbgl/programs/gl/preludes.hpp>
 #include <mbgl/programs/gl/shader_source.hpp>
@@ -15,7 +15,7 @@ struct ShaderSource;
 template <>
 struct ShaderSource<LineGradientProgram> {
     static constexpr const char* name = "line_gradient";
-    static constexpr const uint8_t hash[8] = { 0x3f, 0xba, 0xc6, 0x33, 0xcd, 0x86, 0xa2, 0xe8 };
+    static constexpr const uint8_t hash[8] = {0x3f, 0xba, 0xc6, 0x33, 0xcd, 0x86, 0xa2, 0xe8};
     static constexpr const auto vertexOffset = 34236;
     static constexpr const auto fragmentOffset = 37028;
 };
@@ -254,4 +254,4 @@ void main() {
 }
 
 */
-
+// clang-format on
