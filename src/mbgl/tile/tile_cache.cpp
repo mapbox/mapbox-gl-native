@@ -8,7 +8,7 @@ void TileCache::setSize(size_t size_) {
 
     while (orderedKeys.size() > size) {
         auto key = orderedKeys.front();
-        orderedKeys.pop_front();
+        orderedKeys.remove(key);
         tiles.erase(key);
     }
 
@@ -21,7 +21,7 @@ void TileCache::add(const OverscaledTileID& key, std::unique_ptr<Tile> tile) {
     }
 
     // insert new or query existing tile
-    if (tiles.emplace(key, std::move(tile)).second) {
+    if (!tiles.emplace(key, std::move(tile)).second) {
         // remove existing tile key
         orderedKeys.remove(key);
     }
