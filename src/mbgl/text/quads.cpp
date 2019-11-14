@@ -1,10 +1,11 @@
+#include <mbgl/geometry/anchor.hpp>
+#include <mbgl/layout/symbol_instance.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/geometry/anchor.hpp>
-#include <mbgl/style/layers/symbol_layer_properties.hpp>
-#include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/math.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <cassert>
@@ -13,8 +14,7 @@ namespace mbgl {
 
 using namespace style;
 
-SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
-                       WritingModeType writingMode) {
+SymbolQuad getIconQuad(const PositionedIcon& shapedIcon, WritingModeType writingMode, SymbolContent iconType) {
     const ImagePosition& image = shapedIcon.image();
 
     // If you have a 10px icon that isn't perfectly aligned to the pixel grid it will cover 11 actual
@@ -70,7 +70,7 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
         static_cast<uint16_t>(image.textureRect.h + border * 2)
     };
 
-    return SymbolQuad { tl, tr, bl, br, textureRect, writingMode, { 0.0f, 0.0f } };
+    return SymbolQuad{tl, tr, bl, br, textureRect, writingMode, {0.0f, 0.0f}, iconType == SymbolContent::IconSDF};
 }
 
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
@@ -96,6 +96,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
             const bool rotateVerticalGlyph = (alongLine || allowVerticalPlacement) && positionedGlyph.vertical;
             const float halfAdvance = positionedGlyph.metrics.advance * positionedGlyph.scale / 2.0;
             const Rect<uint16_t>& rect = positionedGlyph.rect;
+            bool isSDF = true;
 
             // Align images and scaled glyphs in the middle of a vertical line.
             if (allowVerticalPlacement && shapedText.verticalizable) {
@@ -111,6 +112,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
                 }
                 pixelRatio = image->second->pixelRatio;
                 rectBuffer = ImagePosition::padding / pixelRatio;
+                isSDF = image->second->sdf;
             }
 
             const Point<float> glyphOffset =
@@ -179,7 +181,8 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
                 br = util::matrixMultiply(matrix, br);
             }
 
-            quads.emplace_back(tl, tr, bl, br, rect, shapedText.writingMode, glyphOffset, positionedGlyph.sectionIndex);
+            quads.emplace_back(
+                tl, tr, bl, br, rect, shapedText.writingMode, glyphOffset, isSDF, positionedGlyph.sectionIndex);
         }
     }
 

@@ -597,6 +597,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                                                           textPlacement,
                                                           textOffset,
                                                           imageMap,
+                                                          iconType,
                                                           allowVerticalPlacement);
     };
 
@@ -864,10 +865,14 @@ size_t SymbolLayout::addSymbol(SymbolBucket::Buffer& buffer,
     uint16_t index = segment.vertexLength;
 
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point, tl, symbol.glyphOffset.y, tex.x, tex.y, sizeData));
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point, tr, symbol.glyphOffset.y, tex.x + tex.w, tex.y, sizeData));
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point, bl, symbol.glyphOffset.y, tex.x, tex.y + tex.h, sizeData));
-    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(labelAnchor.point, br, symbol.glyphOffset.y, tex.x + tex.w, tex.y + tex.h, sizeData));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
+        labelAnchor.point, tl, symbol.glyphOffset.y, tex.x, tex.y, sizeData, symbol.isSDF));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
+        labelAnchor.point, tr, symbol.glyphOffset.y, tex.x + tex.w, tex.y, sizeData, symbol.isSDF));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
+        labelAnchor.point, bl, symbol.glyphOffset.y, tex.x, tex.y + tex.h, sizeData, symbol.isSDF));
+    buffer.vertices.emplace_back(SymbolSDFIconProgram::layoutVertex(
+        labelAnchor.point, br, symbol.glyphOffset.y, tex.x + tex.w, tex.y + tex.h, sizeData, symbol.isSDF));
 
     // Dynamic/Opacity vertices are initialized so that the vertex count always agrees with
     // the layout vertex buffer, but they will always be updated before rendering happens
