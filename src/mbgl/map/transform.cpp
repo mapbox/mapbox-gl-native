@@ -56,8 +56,6 @@ void Transform::resize(const Size size) {
     observer.onCameraWillChange(MapObserver::CameraChangeMode::Immediate);
 
     state.setSize(size);
-    state.constrain();
-    state.updateMatrix();
 
     observer.onCameraDidChange(MapObserver::CameraChangeMode::Immediate);
 }
@@ -156,7 +154,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
             state.setPitch(std::min(maxPitch, util::interpolate(startPitch, pitch, t)));
         }
     }, duration);
-    state.updateMatrix();
 }
 
 /** This method implements an “optimal path” animation, as detailed in:
@@ -328,7 +325,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
             state.setPitch(std::min(maxPitch, util::interpolate(startPitch, pitch, k)));
         }
     }, duration);
-    state.updateMatrix();
 }
 
 #pragma mark - Position
@@ -404,8 +400,6 @@ double Transform::getPitch() const {
 
 void Transform::setNorthOrientation(NorthOrientation orientation) {
     state.setNorthOrientation(orientation);
-    state.constrain();
-    state.updateMatrix();
 }
 
 NorthOrientation Transform::getNorthOrientation() const {
@@ -416,8 +410,6 @@ NorthOrientation Transform::getNorthOrientation() const {
 
 void Transform::setConstrainMode(mbgl::ConstrainMode mode) {
     state.setConstrainMode(mode);
-    state.constrain();
-    state.updateMatrix();
 }
 
 ConstrainMode Transform::getConstrainMode() const {
@@ -440,7 +432,6 @@ void Transform::setProjectionMode(const ProjectionMode& options) {
     state.setAxonometric(options.axonometric.value_or(state.getAxonometric()));
     state.setXSkew(options.xSkew.value_or(state.getXSkew()));
     state.setYSkew(options.ySkew.value_or(state.getYSkew()));
-    state.updateMatrix();
 }
 
 ProjectionMode Transform::getProjectionMode() const {

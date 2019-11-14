@@ -20,9 +20,6 @@ class UnwrappedTileID;
 class TileCoordinate;
 
 class TransformState {
-    // friend class Transform;
-    // friend class RendererState;
-
 public:
     TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
 
@@ -37,11 +34,11 @@ public:
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
-    void setNorthOrientation(NorthOrientation val) { orientation = val; }
+    void setNorthOrientation(const NorthOrientation&);
 
     // Constrain mode
     ConstrainMode getConstrainMode() const;
-    void setConstrainMode(ConstrainMode val) { constrainMode = val; }
+    void setConstrainMode(const ConstrainMode&);
 
     // Viewport mode
     ViewportMode getViewportMode() const;
@@ -50,7 +47,7 @@ public:
     CameraOptions getCameraOptions(optional<EdgeInsets>) const;
 
     EdgeInsets getEdgeInsets() const { return edgeInsets; }
-    void setEdgeInsets(const EdgeInsets& val) { edgeInsets = val; }
+    void setEdgeInsets(const EdgeInsets&);
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
     double pixel_x() const;
@@ -75,16 +72,16 @@ public:
 
     // Rotation
     float getBearing() const;
-    void setBearing(float val) { bearing = val; }
+    void setBearing(float);
     float getFieldOfView() const;
     float getCameraToCenterDistance() const;
     float getPitch() const;
-    void setPitch(float val) { pitch = val; }
+    void setPitch(float);
 
     double getXSkew() const { return xSkew; }
-    void setXSkew(double val) { xSkew = val; }
+    void setXSkew(double val);
     double getYSkew() const { return ySkew; }
-    void setYSkew(double val) { ySkew = val; }
+    void setYSkew(double val);
     bool getAxonometric() const { return axonometric; }
     void setAxonometric(bool val) { axonometric = val; }
 
@@ -108,22 +105,19 @@ public:
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
 
-    bool valid() const {
-        return !size.isEmpty() && (scale >= min_scale && scale <= max_scale);
-    }
+    bool valid() const { return !size.isEmpty() && (scale >= min_scale && scale <= max_scale); }
 
     float getCameraToTileDistance(const UnwrappedTileID&) const;
     float maxPitchScaleFactor() const;
 
-    void constrain() { constrain(scale, x, y); }
     void moveLatLng(const LatLng&, const ScreenCoordinate&);
 
     void setLatLngZoom(const LatLng& latLng, double zoom);
 
-    void updateMatrix();
-
 private:
+    void updateMatrix();
     bool rotatedNorth() const;
+    void constrain();
     void constrain(double& scale, double& x, double& y) const;
 
     // Viewport center offset, from [size.width / 2, size.height / 2], defined

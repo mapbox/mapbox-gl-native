@@ -118,6 +118,8 @@ void TransformState::updateMatrix() {
 
 void TransformState::setSize(const Size& size_) {
     size = size_;
+    constrain();
+    updateMatrix();
 }
 
 #pragma mark - Dimensions
@@ -129,6 +131,11 @@ Size TransformState::getSize() const {
 
 NorthOrientation TransformState::getNorthOrientation() const {
     return orientation;
+}
+
+void TransformState::setNorthOrientation(const NorthOrientation& val) {
+    orientation = val;
+    constrain();
 }
 
 double TransformState::getNorthOrientationAngle() const {
@@ -149,6 +156,10 @@ ConstrainMode TransformState::getConstrainMode() const {
     return constrainMode;
 }
 
+void TransformState::setConstrainMode(const ConstrainMode& val) {
+    constrainMode = val;
+    constrain();
+}
 #pragma mark - ViewportMode
 
 ViewportMode TransformState::getViewportMode() const {
@@ -164,6 +175,15 @@ CameraOptions TransformState::getCameraOptions(optional<EdgeInsets> padding) con
         .withZoom(getZoom())
         .withBearing(-bearing * util::RAD2DEG)
         .withPitch(pitch * util::RAD2DEG);
+}
+
+#pragma mark - EdgeInsets
+
+void TransformState::setEdgeInsets(const EdgeInsets& val) {
+    if (edgeInsets != val) {
+        edgeInsets = val;
+        updateMatrix();
+    }
 }
 
 #pragma mark - Position
@@ -244,6 +264,13 @@ float TransformState::getBearing() const {
     return bearing;
 }
 
+void TransformState::setBearing(float val) {
+    if (bearing != val) {
+        bearing = val;
+        updateMatrix();
+    }
+}
+
 float TransformState::getFieldOfView() const {
     return fov;
 }
@@ -256,6 +283,26 @@ float TransformState::getPitch() const {
     return pitch;
 }
 
+void TransformState::setPitch(float val) {
+    if (pitch != val) {
+        pitch = val;
+        updateMatrix();
+    }
+}
+
+void TransformState::setXSkew(double val) {
+    if (xSkew != val) {
+        xSkew = val;
+        updateMatrix();
+    }
+}
+
+void TransformState::setYSkew(double val) {
+    if (ySkew != val) {
+        ySkew = val;
+        updateMatrix();
+    }
+}
 #pragma mark - State
 
 bool TransformState::isChanging() const {
@@ -293,7 +340,6 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
         return {};
     }
 
-    // mat4 mat = coordinatePointMatrix();
     vec4 p;
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 c = {{ pt.x, pt.y, 0, 1 }};
@@ -307,12 +353,6 @@ TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoor
     }
 
     float targetZ = 0;
-    mat4 mat = coordinatePointMatrix();
-
-    mat4 inverted;
-    bool err = matrix::invert(inverted, mat);
-
-    if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
 
     double flippedY = size.height - point.y;
 
@@ -371,6 +411,10 @@ bool TransformState::rotatedNorth() const {
     return (orientation == NO::Leftwards || orientation == NO::Rightwards);
 }
 
+void TransformState::constrain() {
+    constrain(scale, x, y);
+    updateMatrix();
+}
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     if (constrainMode == ConstrainMode::None) {
         return;
@@ -419,6 +463,7 @@ void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
         0.5 * Cc * std::log((1 + f) / (1 - f)),
     };
     setScalePoint(newScale, point);
+    updateMatrix();
 }
 
 void TransformState::setScalePoint(const double newScale, const ScreenCoordinate &point) {
@@ -450,7 +495,7 @@ float TransformState::maxPitchScaleFactor() const {
         return {};
     }
     auto latLng = screenCoordinateToLatLng({ 0, static_cast<float>(getSize().height) });
-    // mat4 mat = coordinatePointMatrix();
+
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 p = {{ pt.x, pt.y, 0, 1 }};
     vec4 topPoint;
