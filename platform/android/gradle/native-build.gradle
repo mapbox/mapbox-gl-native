@@ -1,3 +1,4 @@
+apply from: "../gradle/configuration.gradle"
 ext.nativeBuild = { nativeTargets ->
     android {
         defaultPublishConfig project.hasProperty("mapbox.buildtype") ? project.getProperty("mapbox.buildtype") : "debug"

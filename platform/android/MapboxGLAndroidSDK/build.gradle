@@ -1,10 +1,9 @@
 apply plugin: 'com.android.library'
-apply plugin: "com.jaredsburrows.license"
 apply plugin: 'kotlin-android'
-apply from: "${rootDir}/gradle/native-build.gradle"
+apply from: "../gradle/native-build.gradle"
+apply from: "../gradle/dependencies.gradle"
 
 dependencies {
-    lintChecks project(":MapboxGLAndroidSDKLint")
     api dependenciesList.mapboxAndroidTelemetry
     api dependenciesList.mapboxJavaGeoJSON
     api dependenciesList.mapboxAndroidGestures
@@ -78,13 +77,6 @@ android {
     }
 }
 
-licenseReport {
-    generateHtmlReport = false
-    generateJsonReport = true
-    copyHtmlReportToAssets = false
-    copyJsonReportToAssets = false
-}
-
 def static getGitRevision() {
     def cmd = "git rev-parse --short HEAD"
     def proc = cmd.execute()
@@ -96,10 +88,3 @@ configurations {
     all*.exclude group: 'commons-logging', module: 'commons-logging'
     all*.exclude group: 'commons-collections', module: 'commons-collections'
 }
-apply from: "${rootDir}/gradle/gradle-javadoc.gradle"
-apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
-apply from: "${rootDir}/gradle/gradle-dependencies-graph.gradle"
-apply from: "${rootDir}/gradle/gradle-update-vendor-modules.gradle"
-apply from: "${rootDir}/gradle/android-nitpick.gradle"
-apply from: "${rootDir}/gradle/gradle-bintray.gradle"
-apply from: "${rootDir}/gradle/jacoco-report.gradle"
