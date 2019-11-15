@@ -347,7 +347,13 @@ Immutable<std::vector<Immutable<Image::Impl>>> Style::Impl::getImageImpls() cons
 }
 
 Immutable<std::vector<Immutable<Source::Impl>>> Style::Impl::getSourceImpls() const {
-    return sources.getImpls();
+    auto impls = sources.getImpls();
+    mutate(impls, [&] (auto& impls_) {
+        std::sort(impls_.begin(), impls_.end(), [](const auto& a, const auto& b) {
+            return a->id < b->id;
+        });
+    });
+    return impls;
 }
 
 Immutable<std::vector<Immutable<Layer::Impl>>> Style::Impl::getLayerImpls() const {
