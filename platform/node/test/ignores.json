@@ -88,6 +88,5 @@
   "query-tests/fill-extrusion/sort-rotated": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/fill-extrusion/sort": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
   "query-tests/fill-extrusion/top-in": "https://github.com/mapbox/mapbox-gl-native/issues/13139",
-  "query-tests/regressions/mapbox-gl-js#7883": "https://github.com/mapbox/mapbox-gl-native/issues/14585",
-  "render-tests/fill-pattern/update-feature-state": "https://github.com/mapbox/mapbox-gl-native/issues/15895"
+  "query-tests/regressions/mapbox-gl-js#7883": "https://github.com/mapbox/mapbox-gl-native/issues/14585"
 }
