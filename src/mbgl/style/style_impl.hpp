@@ -106,8 +106,8 @@ private:
     std::unique_ptr<SpriteLoader> spriteLoader;
 
     std::string glyphURL;
-    Collection<style::Image> images;
-    Collection<Source> sources;
+    CollectionWithPersistentOrder<style::Image> images;
+    CollectionWithPersistentOrder<Source> sources;
     Collection<Layer> layers;
     TransitionOptions transitionOptions;
     std::unique_ptr<Light> light;
