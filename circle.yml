@@ -73,13 +73,11 @@ workflows:
             - next-sanity-checks
           config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=thread'
       - next-build-template:
-          name: next-FIXME-linux-memsan
+          name: next-FIXME-linux-valgrind
           executor_name: ubuntu-disco
           target_is_linux: true
-          requires:
-            - next-sanity-checks
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Sanitize -DMBGL_WITH_SANITIZER=memory'
-          test_params: '|| true'
+          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_CXX_FLAGS=-DSANITIZE'
+          test_params: '-j 4 -E "mbgl-node|gl-benchmark" -D ExperimentalMemCheck || true'
       - next-build-template:
           name: next-FIXME-linux-ubsan
           executor_name: ubuntu-disco
@@ -187,12 +185,11 @@ executors:
   ubuntu-disco:
     docker:
       # FIXME: Move the image to mbgl/
-      - image: tmpsantos/mbgl_ci:1.6
+      - image: tmpsantos/mbgl_ci:1.7
     resource_class: xlarge
     working_directory: /src
     environment:
       UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
-      MSAN_OPTIONS: poison_in_dtor=1
       ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
       QT_INSTALL_DOCS: /usr/share/qt5/doc
       QT_VERSION: 5
@@ -217,6 +214,7 @@ commands:
           command: |
             git submodule sync
             git submodule update --init --recursive
+            git gc
             npm install --ignore-scripts
             ulimit -c unlimited
   next-prepare-macos:
@@ -251,7 +249,6 @@ commands:
             ccache --zero-stats --max-size=2G
             cmake --build build -j 8 << parameters.build_params >>
             ccache --show-stats
-            git gc
   next-save:
     steps:
       - save_cache:
@@ -264,14 +261,17 @@ commands:
             - ~/.gradle
       - run:
           name: Collecting artifacts
-          when: on_fail
           command: |
+            mkdir -p /tmp/tests/clang-tidy
+            if [ -f clang-tidy.log ]; then cp clang-tidy.log /tmp/tests/clang-tidy; fi
             mkdir -p /tmp/tests/render
             if [ -f render-test/tests_index.html ]; then cp render-test/tests_index.html /tmp/tests/render; fi
             if [ -f render-test/render-tests_index.html ]; then cp render-test/render-tests_index.html /tmp/tests/render; fi
             if [ -f render-test/query-tests_index.html ]; then cp render-test/query-tests_index.html /tmp/tests/render; fi
             mkdir -p /tmp/tests/coredumps
             if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
+            mkdir -p /tmp/tests/valgrind
+            if ls build/Testing/Temporary/MemoryChecker.*.log 1> /dev/null 2>&1; then cp build/Testing/Temporary/MemoryChecker.*.log /tmp/tests/valgrind; fi
       - store_artifacts:
           path: /tmp/tests
           destination: tests
@@ -681,8 +681,6 @@ jobs:
           command: |
             run-clang-tidy-8 -quiet -j24 -p build $PWD/src/.*cpp $PWD/platform/.*cpp |tee clang-tidy.log
             grep -o \\[[a-z].*-.*[a-z]\] clang-tidy.log |sort |uniq -c |sort -n
-            mkdir -p /tmp/tests/clang-tidy
-            if [ -f clang-tidy.log ]; then cp clang-tidy.log /tmp/tests/clang-tidy; fi
       - next-save
   next-build-template:
     parameters:

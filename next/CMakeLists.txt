@@ -7,7 +7,12 @@ set(MBGL_ROOT ${PROJECT_SOURCE_DIR}/..)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER Core)
 
-enable_testing()
+set(
+    MEMORYCHECK_COMMAND_OPTIONS
+    "--leak-check=full --gen-suppressions=all --error-exitcode=1 --suppressions=${MBGL_ROOT}/scripts/valgrind.sup"
+)
+
+include(CTest)
 
 set(
     CMAKE_CONFIGURATION_TYPES

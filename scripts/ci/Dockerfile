@@ -9,7 +9,7 @@ WORKDIR /src
 COPY etc/apt/sources.list /etc/apt
 
 RUN set -eu \
-    && apt-get update\
+    && apt-get update \
     && apt-get dist-upgrade -y
 
 # CI requirements
@@ -38,6 +38,7 @@ RUN set -eu && apt-get install -y \
     pkg-config \
     python3-pip \
     software-properties-common \
+    valgrind \
     xvfb
 
 RUN pip3 install cmake-format==0.5.5
