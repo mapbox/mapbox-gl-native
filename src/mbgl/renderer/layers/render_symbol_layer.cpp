@@ -198,13 +198,6 @@ void drawText(const DrawFn& draw,
     const gfx::TextureBinding glyphTextureBinding{tile.getGlyphAtlasTexture().getResource(),
                                                   gfx::TextureFilterType::Linear};
 
-    const bool transformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
-    const Size& iconTexSize = tile.getIconAtlasTexture().size;
-    const gfx::TextureBinding iconTextureBinding{tile.getIconAtlasTexture().getResource(),
-                                                 parameters.state.isChanging() || transformed
-                                                     ? gfx::TextureFilterType::Linear
-                                                     : gfx::TextureFilterType::Nearest};
-
     const auto drawGlyphs = [&](auto& program, const auto& uniforms, const auto& textures, SymbolSDFPart part) {
         draw(program,
              uniforms,
@@ -218,6 +211,15 @@ void drawText(const DrawFn& draw,
     };
 
     if (bucket.iconsInText) {
+        const ZoomEvaluatedSize partiallyEvaluatedTextSize =
+            bucket.textSizeBinder->evaluateForZoom(parameters.state.getZoom());
+        const bool transformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
+        const Size& iconTexSize = tile.getIconAtlasTexture().size;
+        const gfx::TextureBinding iconTextureBinding{
+            tile.getIconAtlasTexture().getResource(),
+            parameters.state.isChanging() || transformed || !partiallyEvaluatedTextSize.isZoomConstant
+                ? gfx::TextureFilterType::Linear
+                : gfx::TextureFilterType::Nearest};
         if (values.hasHalo) {
             drawGlyphs(parameters.programs.getSymbolLayerPrograms().symbolTextAndIcon,
                        SymbolTextAndIconProgram::layoutUniformValues(bucket.hasVariablePlacement,
