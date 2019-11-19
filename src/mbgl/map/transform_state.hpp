@@ -114,10 +114,11 @@ public:
 
     void setLatLngZoom(const LatLng& latLng, double zoom);
 
-private:
-    void updateMatrix();
-    bool rotatedNorth() const;
     void constrain();
+    void updateMatrix();
+
+private:
+    bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
 
     // Viewport center offset, from [size.width / 2, size.height / 2], defined
@@ -173,7 +174,8 @@ private:
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     double Cc = Projection::worldSize(scale) / util::M2PI;
 
-    mat4 coordiMatrix;
+    bool matrixUpdated{false};
+    mat4 coordMatrix;
     mat4 invertedMatrix;
 };
 

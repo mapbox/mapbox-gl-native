@@ -75,7 +75,7 @@ class NativeMapViewTest : AppCenter() {
         val expected = BEARING_TEST
         nativeMapView.setBearing(expected, 0)
         val actual = nativeMapView.bearing
-        assertEquals("Bearing should match", expected, actual, DELTA)
+        assertEquals("Bearing should match", expected, actual, 0.00001)
     }
 
     @Test
@@ -123,7 +123,7 @@ class NativeMapViewTest : AppCenter() {
         val expected = PITCH_TEST
         nativeMapView.setPitch(expected, 0)
         val actual = nativeMapView.pitch
-        assertEquals("Pitch should match", expected, actual, DELTA)
+        assertEquals("Pitch should match", expected, actual, 0.00001)
     }
 
     @Test
@@ -167,8 +167,8 @@ class NativeMapViewTest : AppCenter() {
         val actual = nativeMapView.cameraPosition
         assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, DELTA)
         assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, DELTA)
-        assertEquals("Bearing should match", expected.bearing, actual.bearing, DELTA)
-        assertEquals("Pitch should match", expected.tilt, actual.tilt, DELTA)
+        assertEquals("Bearing should match", expected.bearing, actual.bearing, 0.00001)
+        assertEquals("Pitch should match", expected.tilt, actual.tilt, 0.00001)
         assertEquals("Zoom should match", expected.zoom, actual.zoom, DELTA)
         Assert.assertArrayEquals(expected.padding, actual.padding, DELTA)
     }

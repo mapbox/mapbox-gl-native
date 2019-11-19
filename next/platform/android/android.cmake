@@ -338,6 +338,47 @@ target_link_libraries(
         mbgl-render-test
 )
 
+add_custom_command(
+    TARGET mbgl-render-test-runner PRE_BUILD
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        copy
+        ${MBGL_ROOT}/render-test/android-manifest.json
+        ${MBGL_ROOT}/android-manifest.json
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        copy
+        ${MBGL_ROOT}/platform/node/test/ignores.json
+        ${MBGL_ROOT}/ignores/ignores.json
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        copy
+        ${MBGL_ROOT}/render-test/linux-ignores.json
+        ${MBGL_ROOT}/ignores/linux-ignores.json
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        tar
+        "cf"
+        "render-test/android/app/src/main/assets/data.zip"
+        --format=zip
+        --files-from=render-test/android/app/src/main/assets/to_zip.txt
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        remove_directory
+        ${MBGL_ROOT}/ignores
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        remove
+        ${MBGL_ROOT}/android-manifest.json
+    WORKING_DIRECTORY ${MBGL_ROOT}
+)
+
 # Android has no concept of MinSizeRel on android.toolchain.cmake and provides configurations tuned for binary size. We can push it a bit
 # more with code folding and LTO.
 set_target_properties(example-custom-layer PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")

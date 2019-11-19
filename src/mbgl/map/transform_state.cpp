@@ -108,17 +108,21 @@ void TransformState::updateMatrix() {
     if (size.isEmpty()) {
         return;
     }
-    coordiMatrix = coordinatePointMatrix();
-    mat4 mat = coordiMatrix;
+    if (matrixUpdated) return;
+    coordMatrix = coordinatePointMatrix();
+    mat4 mat = coordMatrix;
 
     bool err = matrix::invert(invertedMatrix, mat);
 
     if (err) throw std::runtime_error("failed to invert coordinatePointMatrix");
+    matrixUpdated = true;
 }
 
 void TransformState::setSize(const Size& size_) {
-    size = size_;
-    constrain();
+    if (size != size_) {
+        size = size_;
+        matrixUpdated = false;
+    }
     updateMatrix();
 }
 
@@ -134,8 +138,11 @@ NorthOrientation TransformState::getNorthOrientation() const {
 }
 
 void TransformState::setNorthOrientation(const NorthOrientation& val) {
-    orientation = val;
-    constrain();
+    if (orientation != val) {
+        orientation = val;
+        matrixUpdated = false;
+    }
+    updateMatrix();
 }
 
 double TransformState::getNorthOrientationAngle() const {
@@ -157,9 +164,13 @@ ConstrainMode TransformState::getConstrainMode() const {
 }
 
 void TransformState::setConstrainMode(const ConstrainMode& val) {
-    constrainMode = val;
-    constrain();
+    if (constrainMode != val) {
+        constrainMode = val;
+        matrixUpdated = false;
+    }
+    updateMatrix();
 }
+
 #pragma mark - ViewportMode
 
 ViewportMode TransformState::getViewportMode() const {
@@ -182,8 +193,9 @@ CameraOptions TransformState::getCameraOptions(optional<EdgeInsets> padding) con
 void TransformState::setEdgeInsets(const EdgeInsets& val) {
     if (edgeInsets != val) {
         edgeInsets = val;
-        updateMatrix();
+        matrixUpdated = false;
     }
+    updateMatrix();
 }
 
 #pragma mark - Position
@@ -267,8 +279,9 @@ float TransformState::getBearing() const {
 void TransformState::setBearing(float val) {
     if (bearing != val) {
         bearing = val;
-        updateMatrix();
+        matrixUpdated = false;
     }
+    updateMatrix();
 }
 
 float TransformState::getFieldOfView() const {
@@ -286,22 +299,25 @@ float TransformState::getPitch() const {
 void TransformState::setPitch(float val) {
     if (pitch != val) {
         pitch = val;
-        updateMatrix();
+        matrixUpdated = false;
     }
+    updateMatrix();
 }
 
 void TransformState::setXSkew(double val) {
     if (xSkew != val) {
         xSkew = val;
-        updateMatrix();
+        matrixUpdated = false;
     }
+    updateMatrix();
 }
 
 void TransformState::setYSkew(double val) {
     if (ySkew != val) {
         ySkew = val;
-        updateMatrix();
+        matrixUpdated = false;
     }
+    updateMatrix();
 }
 #pragma mark - State
 
@@ -343,8 +359,8 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
     vec4 p;
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 c = {{ pt.x, pt.y, 0, 1 }};
-    matrix::transformMat4(p, c, coordiMatrix);
-    return { p[0] / p[3], size.height - p[1] / p[3] };
+    matrix::transformMat4(p, c, coordMatrix);
+    return {p[0] / p[3], size.height - p[1] / p[3]};
 }
 
 TileCoordinate TransformState::screenCoordinateToTileCoordinate(const ScreenCoordinate& point, uint8_t atZoom) const {
@@ -403,7 +419,6 @@ mat4 TransformState::getPixelMatrix() const {
     return m;
 }
 
-
 #pragma mark - (private helper functions)
 
 bool TransformState::rotatedNorth() const {
@@ -413,8 +428,10 @@ bool TransformState::rotatedNorth() const {
 
 void TransformState::constrain() {
     constrain(scale, x, y);
+    matrixUpdated = false;
     updateMatrix();
 }
+
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     if (constrainMode == ConstrainMode::None) {
         return;
@@ -463,10 +480,11 @@ void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
         0.5 * Cc * std::log((1 + f) / (1 - f)),
     };
     setScalePoint(newScale, point);
+    matrixUpdated = false;
     updateMatrix();
 }
 
-void TransformState::setScalePoint(const double newScale, const ScreenCoordinate &point) {
+void TransformState::setScalePoint(const double newScale, const ScreenCoordinate& point) {
     double constrainedScale = newScale;
     ScreenCoordinate constrainedPoint = point;
     constrain(constrainedScale, constrainedPoint.x, constrainedPoint.y);
@@ -499,7 +517,7 @@ float TransformState::maxPitchScaleFactor() const {
     Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 p = {{ pt.x, pt.y, 0, 1 }};
     vec4 topPoint;
-    matrix::transformMat4(topPoint, p, coordiMatrix);
+    matrix::transformMat4(topPoint, p, coordMatrix);
     return topPoint[3] / getCameraToCenterDistance();
 }
 
