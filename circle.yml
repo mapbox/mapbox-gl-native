@@ -5,6 +5,7 @@ workflows:
   mbgl-next:
     jobs:
       - next-sanity-checks
+      - next-android-render-test-runner
       - next-build-template:
           name: next-android-armeabi-v7a-release
           executor_name: ubuntu-disco
@@ -650,6 +651,33 @@ commands:
           fi
 
 jobs:
+  next-android-render-test-runner:
+    executor: ubuntu-disco
+    steps:
+      - checkout
+      - next-prepare
+      - run:
+          name: Build RenderTestRunner APK
+          command: |
+            cd render-test/android
+            ./gradlew --parallel --max-workers=8 -Pmapbox.abis=arm64-v8a app:assembleDebug app:assembleDebugAndroidTest
+      - login-google-cloud-platform
+      - run:
+          name: Run RenderTestRunner Instrumentation Test on Firebase
+          no_output_timeout: 20m
+          command: |
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+              gcloud firebase test android models list
+              gcloud firebase test android run --type instrumentation \
+                --app render-test/android/app/build/outputs/apk/debug/app-debug.apk \
+                --test render-test/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+                --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
+                --directories-to-pull /sdcard --results-dir render-test-app-${CIRCLE_BUILD_NUM}
+              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html | tail -1)
+              mkdir -p /tmp/tests/render-test-app
+              gsutil cp $testResult /tmp/tests/render-test-app | true
+            fi
+      - next-save
   next-sanity-checks:
     executor: ubuntu-disco
     steps:
