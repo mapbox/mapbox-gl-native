@@ -38,6 +38,16 @@ test/fixtures/storage/assets.zip
 buck-out
 .buckd
 
+# Android RenderTestRunner
+render-test/android/.*
+render-test/android/app/build/
+render-test/android/app/src/main/assets/data.zip
+render-test/android/local.properties
+render-test/android/app/.*
+render-test/android/package.json
+render-test/android/app/app.iml
+render-test/android/android.iml
+
 # Generated file from npm/yarn
 package-lock.json
 
