@@ -667,6 +667,10 @@ jobs:
             scripts/generate-style-code.js
             git add -A && git diff --staged --exit-code
       - run:
+          name: Validation Scripts
+          command: |
+            scripts/nitpick/submodule-pin.js
+      - run:
           name: CMake Format
           command: |
             cmake-format -i $(find next -type f -name CMakeLists.txt -o -name '*.cmake')
