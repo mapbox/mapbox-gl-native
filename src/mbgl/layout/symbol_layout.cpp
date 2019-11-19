@@ -355,6 +355,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
         optional<PositionedIcon> shapedIcon;
         std::array<float, 2> textOffset{{0.0f, 0.0f}};
         const float layoutTextSize = layout->evaluate<TextSize>(zoom + 1, feature);
+        const float layoutTextSizeAtBucketZoomLevel = layout->evaluate<TextSize>(zoom, feature);
         const float layoutIconSize = layout->evaluate<IconSize>(zoom + 1, feature);
 
         // if feature has text, shape the text
@@ -381,6 +382,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap,
                     /* glyphs */ glyphPositions,
                     /* images */ imagePositions,
                     layoutTextSize,
+                    layoutTextSizeAtBucketZoomLevel,
                     allowVerticalPlacement);
 
                 return result;
