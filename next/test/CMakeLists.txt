@@ -77,6 +77,7 @@ add_library(
     ${MBGL_ROOT}/test/tile/geometry_tile_data.test.cpp
     ${MBGL_ROOT}/test/tile/raster_dem_tile.test.cpp
     ${MBGL_ROOT}/test/tile/raster_tile.test.cpp
+    ${MBGL_ROOT}/test/tile/tile_cache.test.cpp
     ${MBGL_ROOT}/test/tile/tile_coordinate.test.cpp
     ${MBGL_ROOT}/test/tile/tile_id.test.cpp
     ${MBGL_ROOT}/test/tile/vector_tile.test.cpp
