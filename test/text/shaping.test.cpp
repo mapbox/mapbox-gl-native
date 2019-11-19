@@ -25,6 +25,8 @@ TEST(Shaping, ZWSP) {
     auto immutableGlyph = Immutable<Glyph>(makeMutable<Glyph>(std::move(glyph)));
     const std::vector<std::string> fontStack{{"font-stack"}};
     const SectionOptions sectionOptions(1.0f, fontStack);
+    const float layoutTextSize = 16.0f;
+    const float layoutTextSizeAtBucketZoomLevel = 16.0f;
     GlyphMap glyphs = {
         { FontStackHasher()(fontStack), {{u'中', std::move(immutableGlyph)}} }
     };
@@ -44,7 +46,8 @@ TEST(Shaping, ZWSP) {
                           glyphs,
                           glyphPositions,
                           imagePositions,
-                          16.0,
+                          layoutTextSize,
+                          layoutTextSizeAtBucketZoomLevel,
                           /*allowVerticalPlacement*/ false);
     };
 

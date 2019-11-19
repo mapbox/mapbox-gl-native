@@ -73,6 +73,7 @@ const Shaping getShaping(const TaggedString& string,
                          const GlyphPositions& glyphPositions,
                          const ImagePositions& imagePositions,
                          float layoutTextSize,
+                         float layoutTextSizeAtBucketZoomLevel,
                          bool allowVerticalPlacement);
 
 } // namespace mbgl

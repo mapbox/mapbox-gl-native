@@ -532,6 +532,7 @@ const Shaping getShaping(const TaggedString& formattedString,
                          const GlyphPositions& glyphPositions,
                          const ImagePositions& imagePositions,
                          float layoutTextSize,
+                         float layoutTextSizeAtBucketZoomLevel,
                          bool allowVerticalPlacement) {
     assert(layoutTextSize);
     std::vector<TaggedString> reorderedLines;
@@ -561,7 +562,7 @@ const Shaping getShaping(const TaggedString& formattedString,
                glyphMap,
                glyphPositions,
                imagePositions,
-               layoutTextSize,
+               layoutTextSizeAtBucketZoomLevel,
                allowVerticalPlacement);
 
     return shaping;
