@@ -20,9 +20,6 @@ class UnwrappedTileID;
 class TileCoordinate;
 
 class TransformState {
-    friend class Transform;
-    friend class RendererState;
-
 public:
     TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
 
@@ -32,18 +29,26 @@ public:
 
     // Dimensions
     Size getSize() const;
+    void setSize(const Size& size_);
 
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
+    void setNorthOrientation(const NorthOrientation&);
 
     // Constrain mode
     ConstrainMode getConstrainMode() const;
+    void setConstrainMode(const ConstrainMode&);
 
     // Viewport mode
     ViewportMode getViewportMode() const;
+    void setViewportMode(ViewportMode val);
 
     CameraOptions getCameraOptions(optional<EdgeInsets>) const;
+
+    // EdgeInsects
+    EdgeInsets getEdgeInsets() const { return edgeInsets; }
+    void setEdgeInsets(const EdgeInsets&);
 
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
@@ -57,6 +62,7 @@ public:
 
     // Scale
     double getScale() const { return scale; }
+    void setScale(double val) { scale = val; }
 
     // Bounds
     void setLatLngBounds(LatLngBounds);
@@ -68,16 +74,29 @@ public:
 
     // Rotation
     float getBearing() const;
+    void setBearing(float);
     float getFieldOfView() const;
     float getCameraToCenterDistance() const;
     float getPitch() const;
+    void setPitch(float);
+
+    double getXSkew() const { return xSkew; }
+    void setXSkew(double val);
+    double getYSkew() const { return ySkew; }
+    void setYSkew(double val);
+    bool getAxonometric() const { return axonometric; }
+    void setAxonometric(bool val);
 
     // State
     bool isChanging() const;
     bool isRotating() const;
+    void setRotating(bool val) { rotating = val; }
     bool isScaling() const;
+    void setScaling(bool val) { scaling = val; }
     bool isPanning() const;
+    void setPanning(bool val) { panning = val; }
     bool isGestureInProgress() const;
+    void setGestureInProgress(bool val) { gestureInProgress = val; }
 
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
@@ -88,12 +107,17 @@ public:
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
 
-    bool valid() const {
-        return !size.isEmpty() && (scale >= min_scale && scale <= max_scale);
-    }
+    bool valid() const { return !size.isEmpty() && (scale >= min_scale && scale <= max_scale); }
 
     float getCameraToTileDistance(const UnwrappedTileID&) const;
     float maxPitchScaleFactor() const;
+
+    void moveLatLng(const LatLng&, const ScreenCoordinate&);
+
+    void setLatLngZoom(const LatLng& latLng, double zoom);
+
+    void constrain();
+    void updateMatrix();
 
 private:
     bool rotatedNorth() const;
@@ -119,8 +143,7 @@ private:
 
     /** Recenter the map so that the given coordinate is located at the given
         point on screen. */
-    void moveLatLng(const LatLng&, const ScreenCoordinate&);
-    void setLatLngZoom(const LatLng &latLng, double zoom);
+
     void setScalePoint(const double scale, const ScreenCoordinate& point);
 
 private:
@@ -152,6 +175,11 @@ private:
     // cache values for spherical mercator math
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     double Cc = Projection::worldSize(scale) / util::M2PI;
+
+    bool matrixUpdated{false};
+    mat4 projectionMatrix;
+    mat4 coordMatrix;
+    mat4 invertedMatrix;
 };
 
 } // namespace mbgl
