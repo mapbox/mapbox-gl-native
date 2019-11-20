@@ -3,6 +3,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/thread_pool.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
@@ -18,18 +19,16 @@ public:
         : impl(geoJSON, options) {
     }
 
-    mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
-        return impl.getTile(tileID.z, tileID.x, tileID.y).features;
+    void getTile(const CanonicalTileID& id, const std::function<void(TileFeatures)>& fn) final {
+        assert(fn);
+        // It's safe to pass `this` as scheduler will die earlier.
+        scheduler.scheduleAndReplyValue(
+            [id, this]() -> TileFeatures { return impl.getTile(id.z, id.x, id.y).features; }, fn);
     }
 
-    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) final {
-        return {};
-    }
+    Features getChildren(const std::uint32_t) final { return {}; }
 
-    mapbox::feature::feature_collection<double>
-    getLeaves(const std::uint32_t, const std::uint32_t, const std::uint32_t) final {
-        return {};
-    }
+    Features getLeaves(const std::uint32_t, const std::uint32_t, const std::uint32_t) final { return {}; }
 
     std::uint8_t getClusterExpansionZoom(std::uint32_t) final {
         return 0;
@@ -37,26 +36,22 @@ public:
 
 private:
     mapbox::geojsonvt::GeoJSONVT impl;
+    SequencedScheduler scheduler;
 };
 
 class SuperclusterData : public GeoJSONData {
 public:
-    SuperclusterData(const mapbox::feature::feature_collection<double>& features,
-                     const mapbox::supercluster::Options& options)
-        : impl(features, options) {
+    SuperclusterData(const Features& features, const mapbox::supercluster::Options& options)
+        : impl(features, options) {}
+
+    void getTile(const CanonicalTileID& id, const std::function<void(TileFeatures)>& fn) final {
+        assert(fn);
+        fn(impl.getTile(id.z, id.x, id.y));
     }
 
-    mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
-        return impl.getTile(tileID.z, tileID.x, tileID.y);
-    }
+    Features getChildren(const std::uint32_t cluster_id) final { return impl.getChildren(cluster_id); }
 
-    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t cluster_id) final {
-        return impl.getChildren(cluster_id);
-    }
-
-    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t cluster_id,
-                                                          const std::uint32_t limit,
-                                                          const std::uint32_t offset) final {
+    Features getLeaves(const std::uint32_t cluster_id, const std::uint32_t limit, const std::uint32_t offset) final {
         return impl.getLeaves(cluster_id, limit, offset);
     }
 
@@ -85,8 +80,7 @@ T evaluateFeature(const mapbox::feature::feature<double>& f,
 // static
 std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON, Immutable<GeoJSONOptions> options) {
     constexpr double scale = util::EXTENT / util::tileSize;
-    if (options->cluster && geoJSON.is<mapbox::feature::feature_collection<double>>() &&
-        !geoJSON.get<mapbox::feature::feature_collection<double>>().empty()) {
+    if (options->cluster && geoJSON.is<Features>() && !geoJSON.get<Features>().empty()) {
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options->clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
@@ -111,8 +105,7 @@ std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON, Immutab
                 toReturn[p.first] = evaluateFeature<Value>(*feature, p.second.second, accumulated);
             }
         };
-        return std::make_shared<SuperclusterData>(geoJSON.get<mapbox::feature::feature_collection<double>>(),
-                                                  clusterOptions);
+        return std::make_shared<SuperclusterData>(geoJSON.get<Features>(), clusterOptions);
     }
 
     mapbox::geojsonvt::Options vtOptions;

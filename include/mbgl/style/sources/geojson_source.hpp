@@ -39,17 +39,19 @@ struct GeoJSONOptions {
 };
 class GeoJSONData {
 public:
+    using TileFeatures = mapbox::feature::feature_collection<int16_t>;
+    using Features = mapbox::feature::feature_collection<double>;
     static std::shared_ptr<GeoJSONData> create(const GeoJSON&,
                                                Immutable<GeoJSONOptions> = GeoJSONOptions::defaultOptions());
 
     virtual ~GeoJSONData() = default;
-    virtual mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
+    virtual void getTile(const CanonicalTileID&, const std::function<void(TileFeatures)>&) = 0;
 
     // SuperclusterData
-    virtual mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) = 0;
-    virtual mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
-                                                                  const std::uint32_t limit = 10u,
-                                                                  const std::uint32_t offset = 0u) = 0;
+    virtual Features getChildren(const std::uint32_t) = 0;
+    virtual Features getLeaves(const std::uint32_t,
+                               const std::uint32_t limit = 10u,
+                               const std::uint32_t offset = 0u) = 0;
     virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
 };
 
