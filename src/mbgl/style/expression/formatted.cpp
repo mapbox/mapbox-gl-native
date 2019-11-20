@@ -17,9 +17,8 @@ bool Formatted::operator==(const Formatted& other) const {
     for (std::size_t i = 0; i < sections.size(); i++) {
         const auto& thisSection = sections.at(i);
         const auto& otherSection = other.sections.at(i);
-        if (thisSection.text != otherSection.text ||
-            thisSection.fontScale != otherSection.fontScale ||
-            thisSection.fontStack != otherSection.fontStack ||
+        if (thisSection.text != otherSection.text || thisSection.image != otherSection.image ||
+            thisSection.fontScale != otherSection.fontScale || thisSection.fontStack != otherSection.fontStack ||
             thisSection.textColor != otherSection.textColor) {
             return false;
         }
