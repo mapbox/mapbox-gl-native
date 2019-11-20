@@ -1,20 +1,29 @@
-#include <mbgl/tile/geojson_tile.hpp>
-#include <mbgl/tile/geojson_tile_data.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/tile/geojson_tile.hpp>
+#include <mbgl/tile/geojson_tile_data.hpp>
 namespace mbgl {
 
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
                          const TileParameters& parameters,
-                         mapbox::feature::feature_collection<int16_t> features)
+                         std::shared_ptr<style::GeoJSONData> data_)
     : GeometryTile(overscaledTileID, sourceID_, parameters) {
-    updateData(std::move(features));
+    updateData(std::move(data_));
 }
 
-void GeoJSONTile::updateData(mapbox::feature::feature_collection<int16_t> features, bool resetLayers) {
-    setData(std::make_unique<GeoJSONTileData>(std::move(features)), resetLayers);
+void GeoJSONTile::updateData(std::shared_ptr<style::GeoJSONData> data_, bool resetLayers) {
+    assert(data_);
+    data = std::move(data_);
+    data->getTile(id.canonical,
+                  [this, self = weakFactory.makeWeakPtr(), capturedData = data.get(), resetLayers](
+                      style::GeoJSONData::TileFeatures features) {
+                      if (!self) return;
+                      if (data.get() != capturedData) return;
+                      auto tileData = std::make_unique<GeoJSONTileData>(std::move(features));
+                      setData(std::move(tileData), resetLayers);
+                  });
 }
 
 void GeoJSONTile::querySourceFeatures(
