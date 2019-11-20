@@ -145,6 +145,8 @@ public:
 
                     if (offlineResponse->isUsable()) {
                         callback(*offlineResponse);
+                        // Set the priority of existing resource to low if it's expired but usable.
+                        resource.setPriority(Resource::Priority::Low);
                     }
                 }
             }
