@@ -158,7 +158,9 @@ public:
 
     void setOnlineStatus(const bool status) {
         online = status;
-        networkIsReachableAgain();
+        if (online) {
+            networkIsReachableAgain();
+        }
     }
 
     uint32_t getMaximumConcurrentRequests() const {
