@@ -180,6 +180,10 @@ public:
         onlineFileSource.setOnlineStatus(status);
     }
 
+    void setMaximumConcurrentRequests(uint32_t maximumConcurrentRequests_) {
+        onlineFileSource.setMaximumConcurrentRequests(maximumConcurrentRequests_);
+    }
+
     void put(const Resource& resource, const Response& response) {
         offlineDatabase->put(resource, response);
     }
@@ -373,6 +377,10 @@ void DefaultFileSource::setMaximumAmbientCacheSize(uint64_t size, std::function<
 
 void DefaultFileSource::setOnlineStatus(const bool status) {
     impl->actor().invoke(&Impl::setOnlineStatus, status);
+}
+
+void DefaultFileSource::setMaximumConcurrentRequests(uint32_t maximumConcurrentRequests_) {
+    impl->actor().invoke(&Impl::setMaximumConcurrentRequests, maximumConcurrentRequests_);
 }
 
 } // namespace mbgl
