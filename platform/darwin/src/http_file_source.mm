@@ -196,13 +196,20 @@ HTTPFileSource::HTTPFileSource()
 HTTPFileSource::~HTTPFileSource() = default;
 
 MGL_EXPORT
+BOOL isValidMapboxEndpoint(NSURL *url) {
+    return ([url.host isEqualToString:@"mapbox.com"] ||
+            [url.host hasSuffix:@".mapbox.com"] ||
+            [url.host isEqualToString:@"mapbox.cn"] ||
+            [url.host hasSuffix:@".mapbox.cn"]);
+}
+
+MGL_EXPORT
 NSURL *resourceURLWithAccountType(const Resource& resource, NSInteger accountType) {
     
     NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
     
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    if (accountType == 0 &&
-        ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
+    if (accountType == 0 && isValidMapboxEndpoint(url)) {
         NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
         NSMutableArray *queryItems = [NSMutableArray array];
 
