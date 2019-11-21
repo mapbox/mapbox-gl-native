@@ -98,7 +98,7 @@ struct ShaderSource;
 `);
 
 writeIfModified(path.join(outputPath, 'gl', 'shader_source.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-
+// clang-format off
 #include <mbgl/programs/gl/shader_source.hpp>
 #include <mbgl/util/compression.hpp>
 
@@ -108,10 +108,8 @@ namespace mbgl {
 namespace programs {
 namespace gl {
 
-// clang-format off
 constexpr const uint8_t compressedShaderSource[] = {
     ${compressed}};
-// clang-format on
 
 const char* shaderSource() {
     static std::string decompressed = util::decompress(std::string(reinterpret_cast<const char*>(compressedShaderSource), sizeof(compressedShaderSource)));
@@ -121,6 +119,7 @@ const char* shaderSource() {
 } // namespace gl
 } // namespace programs
 } // namespace mbgl
+// clang-format on
 `);
 
 writeIfModified(path.join(outputPath, 'gl', 'preludes.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
