@@ -78,8 +78,8 @@ TEST(Map, RendererState) {
     EXPECT_NEAR(options.center->latitude(), coordinate.latitude(), 1e-7);
     EXPECT_NEAR(options.center->longitude(), coordinate.longitude(), 1e-7);
     ASSERT_DOUBLE_EQ(*options.zoom, zoom);
-    EXPECT_NEAR(*options.pitch, pitchInDegrees, 1e-5);
-    EXPECT_NEAR(*options.bearing, bearingInDegrees, 1e-6);
+    ASSERT_DOUBLE_EQ(*options.pitch, pitchInDegrees);
+    EXPECT_NEAR(*options.bearing, bearingInDegrees, 1e-7);
 
     {
         const LatLng& latLng = test.frontend.latLngForPixel(ScreenCoordinate { 0, 0 });
@@ -186,8 +186,8 @@ TEST(Map, LatLngBoundsToCameraWithBearingAndPitch) {
     
     CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35, 20);
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
-    ASSERT_NEAR(*virtualCamera.zoom, 13.66272, 1e-5);
-    ASSERT_NEAR(*virtualCamera.pitch, 20.0, 1e-5);
+    EXPECT_NEAR(*virtualCamera.zoom, 13.66272, 1e-5);
+    ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
     EXPECT_NEAR(virtualCamera.bearing.value_or(0), 35.0, 1e-5);
 }
 
@@ -213,7 +213,7 @@ TEST(Map, LatLngsToCameraWithBearingAndPitch) {
     EXPECT_NEAR(virtualCamera.zoom.value_or(0), 3.04378, 1e-5);
     EXPECT_NEAR(virtualCamera.center->latitude(), 28.53718, 1e-5);
     EXPECT_NEAR(virtualCamera.center->longitude(), 74.31746, 1e-5);
-    EXPECT_NEAR(*virtualCamera.pitch, 20.0, 1e-6);
+    ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
 }
 
 

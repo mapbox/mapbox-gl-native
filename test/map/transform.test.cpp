@@ -67,7 +67,7 @@ TEST(Transform, InvalidBearing) {
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
-    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getBearing(), 1e-8);
+    ASSERT_DOUBLE_EQ(-2.0 * util::DEG2RAD, transform.getBearing());
 
     const double invalid = NAN;
 
@@ -75,7 +75,7 @@ TEST(Transform, InvalidBearing) {
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
-    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getBearing(), 1e-8);
+    ASSERT_DOUBLE_EQ(-2.0 * util::DEG2RAD, transform.getBearing());
 }
 
 TEST(Transform, IntegerZoom) {
@@ -251,7 +251,7 @@ TEST(Transform, Anchor) {
     ASSERT_NE(latLng.longitude(), transform.getLatLng().longitude());
 
     transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(10.0).withBearing(-45.0));
-    ASSERT_NEAR(M_PI_4, transform.getBearing(), 1e-7);
+    ASSERT_DOUBLE_EQ(M_PI_4, transform.getBearing());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
@@ -261,24 +261,24 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
     transform.jumpTo(CameraOptions().withBearing(45.0).withAnchor(anchorPoint));
-    ASSERT_NEAR(-45.0 * util::DEG2RAD, transform.getBearing(), 1e-7);
+    ASSERT_DOUBLE_EQ(-45.0 * util::DEG2RAD, transform.getBearing());
 
     // Anchor coordinates are imprecise because we are converting from an integer pixel.
     ASSERT_NEAR(anchorLatLng.latitude(), transform.getLatLng().latitude(), 0.5);
     ASSERT_NEAR(anchorLatLng.longitude(), transform.getLatLng().longitude(), 0.5);
 
     transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(10.0).withPitch(10.0));
-    ASSERT_NEAR(10.0 * util::DEG2RAD, transform.getPitch(), 1e-8);
+    ASSERT_DOUBLE_EQ(10.0 * util::DEG2RAD, transform.getPitch());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
     transform.jumpTo(CameraOptions().withPitch(15.0));
-    ASSERT_NEAR(15.0 * util::DEG2RAD, transform.getPitch(), 1e-7);
+    ASSERT_DOUBLE_EQ(15.0 * util::DEG2RAD, transform.getPitch());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
     transform.jumpTo(CameraOptions().withPitch(20.0).withAnchor(anchorPoint));
-    ASSERT_NEAR(20.0 * util::DEG2RAD, transform.getPitch(), 1e-7);
+    ASSERT_DOUBLE_EQ(20.0 * util::DEG2RAD, transform.getPitch());
 
     // Anchor coordinates are imprecise because we are converting from an integer pixel.
     ASSERT_NEAR(anchorLatLng.latitude(), transform.getLatLng().latitude(), 0.5);

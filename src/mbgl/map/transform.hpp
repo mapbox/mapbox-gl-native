@@ -114,10 +114,7 @@ private:
     MapObserver& observer;
     TransformState state;
 
-    void startTransition(const CameraOptions&,
-                         const AnimationOptions&,
-                         std::function<void(double)>,
-                         const Duration&);
+    void startTransition(const CameraOptions&, const AnimationOptions&, std::function<void(double)>, const Duration&);
 
     // We don't want to show horizon: limit max pitch based on edge insets.
     double getMaxPitchForEdgeInsets(const EdgeInsets &insets) const;

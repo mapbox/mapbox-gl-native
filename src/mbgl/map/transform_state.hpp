@@ -19,9 +19,81 @@ namespace mbgl {
 class UnwrappedTileID;
 class TileCoordinate;
 
+struct TransformStateProperties {
+    TransformStateProperties& withX(const optional<double>& val) {
+        x = val;
+        return *this;
+    }
+    TransformStateProperties& withY(const optional<double>& val) {
+        y = val;
+        return *this;
+    }
+    TransformStateProperties& withScale(const optional<double>& val) {
+        scale = val;
+        return *this;
+    }
+    TransformStateProperties& withBearing(const optional<double>& val) {
+        bearing = val;
+        return *this;
+    }
+    TransformStateProperties& withPitch(const optional<double>& val) {
+        pitch = val;
+        return *this;
+    }
+    TransformStateProperties& withXSkew(const optional<double>& val) {
+        xSkew = val;
+        return *this;
+    }
+    TransformStateProperties& withYSkew(const optional<double>& val) {
+        ySkew = val;
+        return *this;
+    }
+    TransformStateProperties& withAxonometric(const optional<bool>& val) {
+        axonometric = val;
+        return *this;
+    }
+    TransformStateProperties& withEdgeInsets(const optional<EdgeInsets>& val) {
+        edgeInsets = val;
+        return *this;
+    }
+    TransformStateProperties& withSize(const optional<Size>& val) {
+        size = val;
+        return *this;
+    }
+    TransformStateProperties& withConstrainMode(const optional<ConstrainMode>& val) {
+        constrain = val;
+        return *this;
+    }
+    TransformStateProperties& withNorthOrientation(const optional<NorthOrientation>& val) {
+        northOrientation = val;
+        return *this;
+    }
+    TransformStateProperties& withViewportMode(const optional<ViewportMode>& val) {
+        viewPortMode = val;
+        return *this;
+    }
+
+    optional<double> x;
+    optional<double> y;
+    optional<double> bearing;
+    optional<double> scale;
+    optional<double> fov;
+    optional<double> pitch;
+    optional<double> xSkew;
+    optional<double> ySkew;
+    optional<bool> axonometric;
+    optional<EdgeInsets> edgeInsets;
+    optional<Size> size;
+    optional<ConstrainMode> constrain;
+    optional<NorthOrientation> northOrientation;
+    optional<ViewportMode> viewPortMode;
+};
+
 class TransformState {
 public:
     TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
+
+    void setProperties(const TransformStateProperties& properties);
 
     // Matrix
     void matrixFor(mat4&, const UnwrappedTileID&) const;
@@ -34,11 +106,11 @@ public:
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
-    void setNorthOrientation(const NorthOrientation&);
+    void setNorthOrientation(const NorthOrientation);
 
     // Constrain mode
     ConstrainMode getConstrainMode() const;
-    void setConstrainMode(const ConstrainMode&);
+    void setConstrainMode(const ConstrainMode);
 
     // Viewport mode
     ViewportMode getViewportMode() const;
@@ -61,8 +133,14 @@ public:
     double getZoomFraction() const;
 
     // Scale
-    double getScale() const { return scale; }
-    void setScale(double val) { scale = val; }
+    double getScale() const;
+    void setScale(double);
+
+    // Positions
+    double getX() const;
+    void setX(double);
+    double getY() const;
+    void setY(double);
 
     // Bounds
     void setLatLngBounds(LatLngBounds);
@@ -73,19 +151,19 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    float getBearing() const;
-    void setBearing(float);
+    double getBearing() const;
+    void setBearing(double);
     float getFieldOfView() const;
     float getCameraToCenterDistance() const;
-    float getPitch() const;
-    void setPitch(float);
+    double getPitch() const;
+    void setPitch(double);
 
-    double getXSkew() const { return xSkew; }
-    void setXSkew(double val);
-    double getYSkew() const { return ySkew; }
-    void setYSkew(double val);
-    bool getAxonometric() const { return axonometric; }
-    void setAxonometric(bool val);
+    double getXSkew() const;
+    void setXSkew(double);
+    double getYSkew() const;
+    void setYSkew(double);
+    bool getAxonometric() const;
+    void setAxonometric(bool);
 
     // State
     bool isChanging() const;
@@ -112,16 +190,16 @@ public:
     float getCameraToTileDistance(const UnwrappedTileID&) const;
     float maxPitchScaleFactor() const;
 
+    /** Recenter the map so that the given coordinate is located at the given
+        point on screen. */
     void moveLatLng(const LatLng&, const ScreenCoordinate&);
-
     void setLatLngZoom(const LatLng& latLng, double zoom);
 
-    void constrain();
-    void updateMatrix();
+    void constrain(double& scale, double& x, double& y) const;
 
 private:
     bool rotatedNorth() const;
-    void constrain(double& scale, double& x, double& y) const;
+    void updateMatrix();
 
     // Viewport center offset, from [size.width / 2, size.height / 2], defined
     // by |edgeInsets| in screen coordinates, with top left origin.
@@ -140,9 +218,6 @@ private:
 
     mat4 coordinatePointMatrix() const;
     mat4 getPixelMatrix() const;
-
-    /** Recenter the map so that the given coordinate is located at the given
-        point on screen. */
 
     void setScalePoint(const double scale, const ScreenCoordinate& point);
 

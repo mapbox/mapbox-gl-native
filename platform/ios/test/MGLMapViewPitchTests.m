@@ -153,7 +153,7 @@
 
     // Set the map camera to a pitched state, perhaps from a previous gesture or camera movement.
     self.mapView.camera = [self.mapView cameraByTiltingToPitch:initialTilt];
-    XCTAssertEqualWithAccuracy(self.mapView.camera.pitch, initialTilt, 10e-6, @"Tilt should initially be set to %.f°.", initialTilt);
+    XCTAssertEqual(self.mapView.camera.pitch, initialTilt, @"Tilt should initially be set to %.f°.", initialTilt);
 
     // Initialize a tilt gesture.
     MockUIPanGestureRecognizer *gesture = [[MockUIPanGestureRecognizer alloc] initWithTarget:self.mapView action:nil];
