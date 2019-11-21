@@ -11,5 +11,6 @@ mapbox-gl-js/test/integration/geojson/
 mapbox-gl-js/test/integration/sprites/
 vendor/mapbox-gl-styles/styles/
 vendor/mapbox-gl-styles/sprites/
+vendor/mvt-fixtures/real-world/
 ignores/
 android-manifest.json
