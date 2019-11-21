@@ -34,6 +34,42 @@
 
 using namespace mbgl;
 
+namespace {
+static const std::string waitOp("wait");
+static const std::string sleepOp("sleep");
+static const std::string addImageOp("addImage");
+static const std::string updateImageOp("updateImage");
+static const std::string removeImageOp("removeImage");
+static const std::string setStyleOp("setStyle");
+static const std::string setCenterOp("setCenter");
+static const std::string setZoomOp("setZoom");
+static const std::string setBearingOp("setBearing");
+static const std::string setPitchOp("setPitch");
+static const std::string setFilterOp("setFilter");
+static const std::string setLayerZoomRangeOp("setLayerZoomRange");
+static const std::string setLightOp("setLight");
+static const std::string addLayerOp("addLayer");
+static const std::string removeLayerOp("removeLayer");
+static const std::string addSourceOp("addSource");
+static const std::string removeSourceOp("removeSource");
+static const std::string setPaintPropertyOp("setPaintProperty");
+static const std::string setLayoutPropertyOp("setLayoutProperty");
+static const std::string fileSizeProbeOp("probeFileSize");
+static const std::string memoryProbeOp("probeMemory");
+static const std::string memoryProbeStartOp("probeMemoryStart");
+static const std::string memoryProbeEndOp("probeMemoryEnd");
+static const std::string networkProbeOp("probeNetwork");
+static const std::string networkProbeStartOp("probeNetworkStart");
+static const std::string networkProbeEndOp("probeNetworkEnd");
+static const std::string setFeatureStateOp("setFeatureState");
+static const std::string getFeatureStateOp("getFeatureState");
+static const std::string removeFeatureStateOp("removeFeatureState");
+static const std::string panGestureOp("panGesture");
+static const std::string gfxProbeOp("probeGFX");
+static const std::string gfxProbeStartOp("probeGFXStart");
+static const std::string gfxProbeEndOp("probeGFXEnd");
+} // namespace
+
 GfxProbe::GfxProbe(const mbgl::gfx::RenderingStats& stats, const GfxProbe& prev)
     : numBuffers(stats.numBuffers),
       numDrawCalls(stats.numDrawCalls),
@@ -513,40 +549,6 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
     auto& frontend = maps[key]->frontend;
     auto& map = maps[key]->map;
     auto& observer = maps[key]->observer;
-
-    static const std::string waitOp("wait");
-    static const std::string sleepOp("sleep");
-    static const std::string addImageOp("addImage");
-    static const std::string updateImageOp("updateImage");
-    static const std::string removeImageOp("removeImage");
-    static const std::string setStyleOp("setStyle");
-    static const std::string setCenterOp("setCenter");
-    static const std::string setZoomOp("setZoom");
-    static const std::string setBearingOp("setBearing");
-    static const std::string setPitchOp("setPitch");
-    static const std::string setFilterOp("setFilter");
-    static const std::string setLayerZoomRangeOp("setLayerZoomRange");
-    static const std::string setLightOp("setLight");
-    static const std::string addLayerOp("addLayer");
-    static const std::string removeLayerOp("removeLayer");
-    static const std::string addSourceOp("addSource");
-    static const std::string removeSourceOp("removeSource");
-    static const std::string setPaintPropertyOp("setPaintProperty");
-    static const std::string setLayoutPropertyOp("setLayoutProperty");
-    static const std::string fileSizeProbeOp("probeFileSize");
-    static const std::string memoryProbeOp("probeMemory");
-    static const std::string memoryProbeStartOp("probeMemoryStart");
-    static const std::string memoryProbeEndOp("probeMemoryEnd");
-    static const std::string networkProbeOp("probeNetwork");
-    static const std::string networkProbeStartOp("probeNetworkStart");
-    static const std::string networkProbeEndOp("probeNetworkEnd");
-    static const std::string setFeatureStateOp("setFeatureState");
-    static const std::string getFeatureStateOp("getFeatureState");
-    static const std::string removeFeatureStateOp("removeFeatureState");
-    static const std::string panGestureOp("panGesture");
-    static const std::string gfxProbeOp("probeGFX");
-    static const std::string gfxProbeStartOp("probeGFXStart");
-    static const std::string gfxProbeEndOp("probeGFXEnd");
 
     if (operationArray[0].GetString() == waitOp) {
         // wait
@@ -1114,7 +1116,7 @@ TestRunner::Impl::Impl(const TestMetadata& metadata)
 
 TestRunner::Impl::~Impl() {}
 
-bool TestRunner::run(TestMetadata& metadata) {
+bool TestRunner::run(TestMetadata& metadata, const std::set<std::string>& injectedProbes) {
     AllocationIndex::setActive(false);
     AllocationIndex::reset();
     ProxyFileSource::setTrackingActive(false);
@@ -1129,6 +1131,13 @@ bool TestRunner::run(TestMetadata& metadata) {
     auto& frontend = maps[key]->frontend;
     auto& map = maps[key]->map;
 
+    RunContext ctx{};
+
+    // Run 'begin' probes provided via command line arguments.
+    if (!runInjectedProbesBegin(metadata, injectedProbes, ctx)) {
+        return false;
+    }
+
     frontend.setSize(metadata.size);
     map.setSize(metadata.size);
 
@@ -1138,21 +1147,22 @@ bool TestRunner::run(TestMetadata& metadata) {
     map.getStyle().loadJSON(serializeJsonValue(metadata.document));
     map.jumpTo(map.getStyle().getDefaultCamera());
 
-    RunContext ctx{};
+    if (!runOperations(key, metadata, ctx)) return false;
 
-    if (!runOperations(key, metadata, ctx)) {
-        return false;
-    }
-
-    mbgl::PremultipliedImage image;
+    HeadlessFrontend::RenderResult result;
     try {
-        if (metadata.outputsImage) image = frontend.render(map).image;
+        if (metadata.outputsImage) result = frontend.render(map);
     } catch (const std::exception&) {
         return false;
     }
 
+    // Run 'end' probes provided via command line arguments
+    if (!runInjectedProbesEnd(metadata, injectedProbes, ctx, result.stats)) {
+        return false;
+    }
+
     if (metadata.renderTest) {
-        return checkRenderTestResults(std::move(image), metadata);
+        return checkRenderTestResults(std::move(result.image), metadata);
     } else {
         std::vector<mbgl::Feature> features;
         assert(metadata.document["metadata"]["test"]["queryGeometry"].IsArray());
@@ -1162,8 +1172,108 @@ bool TestRunner::run(TestMetadata& metadata) {
         } else {
             features = frontend.getRenderer()->queryRenderedFeatures(metadata.queryGeometryBox, metadata.queryOptions);
         }
-        return checkQueryTestResults(std::move(image), std::move(features), metadata);
+        return checkQueryTestResults(std::move(result.image), std::move(features), metadata);
     }
+}
+
+using InjectedProbeMap = std::map<std::string, std::function<void(TestMetadata&, RunContext&)>>;
+bool runInjectedProbe(TestMetadata& metadata,
+                      const std::set<std::string>& probes,
+                      RunContext& ctx,
+                      const InjectedProbeMap& probeMap) {
+    for (const auto& probe : probes) {
+        auto it = probeMap.find(probe);
+        if (it == probeMap.end()) {
+            metadata.errorMessage = std::string("Unsupported operation: ") + probe;
+            return false;
+        }
+        it->second(metadata, ctx);
+    }
+    return true;
+}
+
+bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata, const std::set<std::string>& probes, RunContext& ctx) {
+    const std::string mark = " - default - start";
+    static const InjectedProbeMap beginInjectedProbeMap = {
+        {// Injected memory probe begin
+         memoryProbeOp,
+         [&mark](TestMetadata& metadata, RunContext&) {
+             assert(!AllocationIndex::isActive());
+             AllocationIndex::setActive(true);
+             metadata.metrics.memory.emplace(std::piecewise_construct,
+                                             std::forward_as_tuple(memoryProbeOp + mark),
+                                             std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
+                                                                   AllocationIndex::getAllocationsCount()));
+         }},
+        {// Injected gfx probe begin
+         gfxProbeOp,
+         [](TestMetadata&, RunContext& ctx) {
+             assert(!ctx.gfxProbeActive);
+             ctx.gfxProbeActive = true;
+             ctx.baselineGfxProbe = ctx.activeGfxProbe;
+         }},
+        {// Injected network probe begin
+         networkProbeOp,
+         [&mark](TestMetadata& metadata, RunContext&) {
+             assert(!ProxyFileSource::isTrackingActive());
+             ProxyFileSource::setTrackingActive(true);
+             metadata.metrics.network.emplace(
+                 std::piecewise_construct,
+                 std::forward_as_tuple(networkProbeOp + mark),
+                 std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
+         }}};
+
+    return runInjectedProbe(metadata, probes, ctx, beginInjectedProbeMap);
+}
+
+bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata,
+                                      const std::set<std::string>& probes,
+                                      RunContext& ctx,
+                                      mbgl::gfx::RenderingStats stats) {
+    const std::string mark = " - default - end";
+    static const InjectedProbeMap endInjectedProbeMap = {
+        {// Injected memory probe end
+         memoryProbeOp,
+         [&mark](TestMetadata& metadata, RunContext&) {
+             assert(AllocationIndex::isActive());
+             auto emplaced =
+                 metadata.metrics.memory.emplace(std::piecewise_construct,
+                                                 std::forward_as_tuple(memoryProbeOp + mark),
+                                                 std::forward_as_tuple(AllocationIndex::getAllocatedSizePeak(),
+                                                                       AllocationIndex::getAllocationsCount()));
+             assert(emplaced.second);
+             // TODO: Improve tolerance handling for memory tests.
+             emplaced.first->second.tolerance = 0.2f;
+             AllocationIndex::setActive(false);
+             AllocationIndex::reset();
+         }},
+        {// Injected gfx probe end
+         gfxProbeOp,
+         [&mark, &stats](TestMetadata& metadata, RunContext& ctx) {
+             assert(ctx.gfxProbeActive);
+             ctx.activeGfxProbe = GfxProbe(stats, ctx.activeGfxProbe);
+
+             // Compare memory allocations to the baseline probe
+             GfxProbe metricProbe = ctx.activeGfxProbe;
+             metricProbe.memIndexBuffers.peak -= ctx.baselineGfxProbe.memIndexBuffers.peak;
+             metricProbe.memVertexBuffers.peak -= ctx.baselineGfxProbe.memVertexBuffers.peak;
+             metricProbe.memTextures.peak -= ctx.baselineGfxProbe.memTextures.peak;
+             metadata.metrics.gfx.insert({gfxProbeOp + mark, metricProbe});
+
+             ctx.gfxProbeActive = false;
+         }},
+        {// Injected network probe end
+         networkProbeOp,
+         [&mark](TestMetadata& metadata, RunContext&) {
+             assert(ProxyFileSource::isTrackingActive());
+             metadata.metrics.network.emplace(
+                 std::piecewise_construct,
+                 std::forward_as_tuple(networkProbeOp + mark),
+                 std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
+             ProxyFileSource::setTrackingActive(false);
+         }}};
+
+    return runInjectedProbe(metadata, probes, ctx, endInjectedProbeMap);
 }
 
 void TestRunner::reset() {

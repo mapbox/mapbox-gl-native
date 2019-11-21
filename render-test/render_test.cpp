@@ -40,9 +40,13 @@ void operator delete(void* ptr, size_t) noexcept {
 #endif
 
 namespace {
-using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::vector<std::string>, std::string>;
+using ArgumentsTuple =
+    std::tuple<bool, bool, uint32_t, std::string, std::vector<std::string>, std::string, std::set<std::string>>;
 ArgumentsTuple parseArguments(int argc, char** argv) {
     args::ArgumentParser argumentParser("Mapbox GL Test Runner");
+
+    static const std::unordered_map<std::string, std::string> probeMap{
+        {"memory", "probeMemory"}, {"network", "probeNetwork"}, {"gfx", "probeGFX"}};
 
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {'h', "help"});
 
@@ -53,6 +57,12 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         argumentParser, "manifestPath", "Test manifest file path", {'p', "manifestPath"});
     args::ValueFlag<std::string> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
+    args::MapFlagList<std::string, std::string> probes(
+        argumentParser,
+        "probe",
+        "Probe to be injected into a test. Supported values are: [memory, gfx, network]",
+        {"probe"},
+        probeMap);
 
     try {
         argumentParser.ParseCLI(argc, argv);
@@ -86,6 +96,9 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         exit(4);
     }
 
+    const auto& probeValues = args::get(probes);
+    std::set<std::string> injectedProbes(probeValues.begin(), probeValues.end());
+
     auto testNames = testNameValues ? args::get(testNameValues) : std::vector<std::string>{};
     auto testFilter = testFilterValue ? args::get(testFilterValue) : std::string{};
     const auto shuffle = shuffleFlag ? args::get(shuffleFlag) : false;
@@ -95,7 +108,8 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
                           seed,
                           manifestPath.string(),
                           std::move(testNames),
-                          std::move(testFilter)};
+                          std::move(testFilter),
+                          std::move(injectedProbes)};
 }
 } // namespace
 namespace mbgl {
@@ -107,8 +121,10 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     std::string manifestPath;
     std::vector<std::string> testNames;
     std::string testFilter;
+    std::set<std::string> injectedProbes;
 
-    std::tie(recycleMap, shuffle, seed, manifestPath, testNames, testFilter) = parseArguments(argc, argv);
+    std::tie(recycleMap, shuffle, seed, manifestPath, testNames, testFilter, injectedProbes) =
+        parseArguments(argc, argv);
     auto manifestData = ManifestParser::parseManifest(manifestPath, testNames, testFilter);
     if (!manifestData) {
         exit(5);
@@ -159,7 +175,7 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
 
         bool errored = !metadata.errorMessage.empty();
         if (!errored) {
-            errored = !runner.run(metadata) || !metadata.errorMessage.empty();
+            errored = !runner.run(metadata, injectedProbes) || !metadata.errorMessage.empty();
         }
 
         bool passed =

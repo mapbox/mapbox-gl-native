@@ -15,7 +15,7 @@ struct TestMetadata;
 class TestRunner {
 public:
     explicit TestRunner(Manifest);
-    bool run(TestMetadata&);
+    bool run(TestMetadata&, const std::set<std::string>&);
     void reset();
 
     // Manifest
@@ -24,6 +24,9 @@ public:
 
 private:
     bool runOperations(const std::string& key, TestMetadata&, RunContext&);
+    bool runInjectedProbesBegin(TestMetadata&, const std::set<std::string>&, RunContext&);
+    bool runInjectedProbesEnd(TestMetadata&, const std::set<std::string>&, RunContext&, mbgl::gfx::RenderingStats);
+
     bool checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
                                std::vector<mbgl::Feature>&& features,
                                TestMetadata&);
