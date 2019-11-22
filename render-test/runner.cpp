@@ -247,6 +247,7 @@ bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
 bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, TestMetadata& metadata) {
     const std::string& base = metadata.paths.defaultExpectations();
     const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
+    const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
 
     if (metadata.outputsImage) {
         metadata.actual = mbgl::encodePNG(actualImage);
@@ -344,6 +345,7 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
     // In case no metrics.json is found, skip assigning the expectedMetrics to metadata, otherwise, take the first found
     // metrics.
     for (const auto& entry : expectedMetricsPaths) {
+        printf("-------expected metrics path is '%s'-----------------", entry.c_str());
         auto maybeExpectedMetrics = readExpectedMetrics(entry);
         if (maybeExpectedMetrics.isEmpty()) {
             metadata.errorMessage = "Failed to load expected metrics " + entry;
