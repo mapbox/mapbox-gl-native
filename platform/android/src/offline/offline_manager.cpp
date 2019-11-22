@@ -147,14 +147,17 @@ void OfflineManager::invalidateAmbientCache(jni::JNIEnv& env_, const jni::Object
             std::exception_ptr exception) mutable { handleException(exception, *callback); });
 }
 
-void OfflineManager::clearAmbientCache(jni::JNIEnv& env_, const jni::Object<FileSourceCallback>& callback_) {
+void OfflineManager::clearAmbientCache(jni::JNIEnv& env_,
+                                       jni::jboolean pack,
+                                       const jni::Object<FileSourceCallback>& callback_) {
     auto globalCallback = jni::NewGlobal<jni::EnvAttachingDeleter>(env_, callback_);
 
     fileSource->clearAmbientCache(
         [
             // Keep a shared ptr to a global reference of the callback so they are not GC'd in the meanwhile
             callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))](
-            std::exception_ptr exception) mutable { handleException(exception, *callback); });
+            std::exception_ptr exception) mutable { handleException(exception, *callback); },
+        pack);
 }
 
 void OfflineManager::setMaximumAmbientCacheSize(jni::JNIEnv& env_, const jni::jlong size_, const jni::Object<FileSourceCallback>& callback_) {

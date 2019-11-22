@@ -397,8 +397,9 @@ public class OfflineManager {
    * Erase resources from the ambient cache, freeing storage space.
    * <p>
    * Erases the ambient cache, freeing resources. This operation can be
-   * potentially slow because it will trigger a VACUUM on SQLite,
-   * forcing the database to move pages on the filesystem.
+   * potentially slow because it includes database file packing, i.e. it
+   * will trigger a VACUUM on SQLite, forcing the database to move pages
+   * on the filesystem.
    * </p>
    * <p>
    * Resources overlapping with offline regions will not be affected
@@ -409,7 +410,51 @@ public class OfflineManager {
    */
   public void clearAmbientCache(@Nullable final FileSourceCallback callback) {
     fileSource.activate();
-    nativeClearAmbientCache(new FileSourceCallback() {
+    nativeClearAmbientCache(true /*pack*/, new FileSourceCallback() {
+      @Override
+      public void onSuccess() {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onSuccess();
+            }
+          }
+        });
+      }
+
+      @Override
+      public void onError(@NonNull final String message) {
+        handler.post(new Runnable() {
+          @Override
+          public void run() {
+            fileSource.deactivate();
+            if (callback != null) {
+              callback.onError(message);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Same as {@link OfflineManager#clearAmbientCache} but skipping database file packing for performance reasons.
+   * <p>
+   * Database file packing can be done later with {@link OfflineManager#packDatabase}.
+   * This method is a useful optimization e.g. when several regions should be deleted in a row.
+   * </p>
+   * <p>
+   * Resources overlapping with offline regions will not be affected
+   * by this call.
+   * </p>
+   *
+   * @param callback the callback to be invoked when the ambient cache was cleared or when the operation erred.
+   */
+  public void clearAmbientCacheAndSkipPackDatabase(@Nullable final FileSourceCallback callback) {
+    fileSource.activate();
+    nativeClearAmbientCache(false /*pack*/, new FileSourceCallback() {
       @Override
       public void onSuccess() {
         handler.post(new Runnable() {
@@ -696,7 +741,7 @@ public class OfflineManager {
   private native void nativeInvalidateAmbientCache(@Nullable FileSourceCallback callback);
 
   @Keep
-  private native void nativeClearAmbientCache(@Nullable FileSourceCallback callback);
+  private native void nativeClearAmbientCache(boolean pack, @Nullable FileSourceCallback callback);
 
   @Keep
   private native void nativeSetMaximumAmbientCacheSize(long size, @Nullable FileSourceCallback callback);

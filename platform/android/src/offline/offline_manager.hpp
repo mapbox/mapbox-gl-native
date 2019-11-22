@@ -99,7 +99,7 @@ public:
 
     void invalidateAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
 
-    void clearAmbientCache(jni::JNIEnv&, const jni::Object<FileSourceCallback>& callback_);
+    void clearAmbientCache(jni::JNIEnv&, jni::jboolean pack, const jni::Object<FileSourceCallback>& callback_);
 
     void setMaximumAmbientCacheSize(jni::JNIEnv&, const jni::jlong size, const jni::Object<FileSourceCallback>& callback_);
 
