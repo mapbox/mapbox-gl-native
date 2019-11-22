@@ -212,14 +212,21 @@ public:
     /*
      * Erase resources from the ambient cache, freeing storage space.
      *
-     * Erases the ambient cache, freeing resources. This operation can be
-     * potentially slow because it will trigger a VACUUM on SQLite,
-     * forcing the database to move pages on the filesystem.
+     * Erases the ambient cache, freeing resources.
+     *
+     * If the |pack| argument is `true`, this operation includes database
+     * file packing. This operation can be potentially slow because it triggers
+     * a VACUUM on SQLite, forcing the database to move pages on the
+     * filesystem.
+     *
+     * If the |pack| argument is `false` the database file packing is skipped and the
+     * database file does not shrink after this operation completes. Database file
+     * packing can be done later with `packDatabase()`.
      *
      * Resources overlapping with offline regions will not be affected
      * by this call.
      */
-    void clearAmbientCache(std::function<void (std::exception_ptr)>);
+    void clearAmbientCache(std::function<void(std::exception_ptr)>, bool pack = true);
 
     /*
      * Sets the maximum size in bytes for the ambient cache.

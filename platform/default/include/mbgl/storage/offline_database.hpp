@@ -58,10 +58,10 @@ public:
     // lookup, it will not get downloaded again.
     std::exception_ptr invalidateAmbientCache();
 
-    // Clear the tile cache, freeing resources. This operation can be
-    // potentially slow because it will trigger a VACUUM on SQLite,
-    // forcing the database to move pages on the filesystem.
-    std::exception_ptr clearAmbientCache();
+    // Clear the tile cache, freeing resources. If |pack| is `true`,
+    // this operation can be slow because it will trigger a VACUUM on
+    // SQLite, forcing the database to move pages on the filesystem.
+    std::exception_ptr clearAmbientCache(bool pack = true);
 
     expected<OfflineRegions, std::exception_ptr> listRegions();
 

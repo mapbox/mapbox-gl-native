@@ -198,8 +198,8 @@ public:
         callback(offlineDatabase->invalidateAmbientCache());
     }
 
-    void clearAmbientCache(std::function<void (std::exception_ptr)> callback) {
-        callback(offlineDatabase->clearAmbientCache());
+    void clearAmbientCache(std::function<void(std::exception_ptr)> callback, bool pack) {
+        callback(offlineDatabase->clearAmbientCache(pack));
     }
 
     void setMaximumAmbientCacheSize(uint64_t size, std::function<void (std::exception_ptr)> callback) {
@@ -367,8 +367,8 @@ void DefaultFileSource::invalidateAmbientCache(std::function<void (std::exceptio
     impl->actor().invoke(&Impl::invalidateAmbientCache, std::move(callback));
 }
 
-void DefaultFileSource::clearAmbientCache(std::function<void(std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::clearAmbientCache, std::move(callback));
+void DefaultFileSource::clearAmbientCache(std::function<void(std::exception_ptr)> callback, bool pack) {
+    impl->actor().invoke(&Impl::clearAmbientCache, std::move(callback), pack);
 }
 
 void DefaultFileSource::setMaximumAmbientCacheSize(uint64_t size, std::function<void (std::exception_ptr)> callback) {

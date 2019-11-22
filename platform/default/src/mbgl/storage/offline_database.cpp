@@ -682,7 +682,7 @@ std::exception_ptr OfflineDatabase::invalidateAmbientCache() try {
     return std::current_exception();
 }
 
-std::exception_ptr OfflineDatabase::clearAmbientCache() try {
+std::exception_ptr OfflineDatabase::clearAmbientCache(bool pack) try {
     // clang-format off
     mapbox::sqlite::Query tileQuery{ getStatement(
         "DELETE FROM tiles "
@@ -705,7 +705,7 @@ std::exception_ptr OfflineDatabase::clearAmbientCache() try {
 
     resourceQuery.run();
 
-    vacuum();
+    if (pack) vacuum();
 
     return nullptr;
 } catch (...) {
