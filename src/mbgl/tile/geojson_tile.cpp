@@ -10,20 +10,21 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          const TileParameters& parameters,
                          std::shared_ptr<style::GeoJSONData> data_)
     : GeometryTile(overscaledTileID, sourceID_, parameters) {
-    updateData(std::move(data_));
+    updateData(std::move(data_), false /*needsRelayout*/);
 }
 
-void GeoJSONTile::updateData(std::shared_ptr<style::GeoJSONData> data_, bool resetLayers) {
+void GeoJSONTile::updateData(std::shared_ptr<style::GeoJSONData> data_, bool needsRelayout) {
     assert(data_);
     data = std::move(data_);
-    data->getTile(id.canonical,
-                  [this, self = weakFactory.makeWeakPtr(), capturedData = data.get(), resetLayers](
-                      style::GeoJSONData::TileFeatures features) {
-                      if (!self) return;
-                      if (data.get() != capturedData) return;
-                      auto tileData = std::make_unique<GeoJSONTileData>(std::move(features));
-                      setData(std::move(tileData), resetLayers);
-                  });
+    if (needsRelayout) reset();
+    data->getTile(
+        id.canonical,
+        [this, self = weakFactory.makeWeakPtr(), capturedData = data.get()](style::GeoJSONData::TileFeatures features) {
+            if (!self) return;
+            if (data.get() != capturedData) return;
+            auto tileData = std::make_unique<GeoJSONTileData>(std::move(features));
+            setData(std::move(tileData));
+        });
 }
 
 void GeoJSONTile::querySourceFeatures(
