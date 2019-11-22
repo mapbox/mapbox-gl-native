@@ -176,14 +176,23 @@ void GeometryTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_, bool resetLayers) {
+void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
     // state despite pending parse operations.
     pending = true;
 
     ++correlationID;
     worker.self().invoke(
-        &GeometryTileWorker::setData, std::move(data_), imageManager.getAvailableImages(), resetLayers, correlationID);
+        &GeometryTileWorker::setData, std::move(data_), imageManager.getAvailableImages(), correlationID);
+}
+
+void GeometryTile::reset() {
+    // Mark the tile as pending again if it was complete before to prevent signaling a complete
+    // state despite pending parse operations.
+    pending = true;
+
+    ++correlationID;
+    worker.self().invoke(&GeometryTileWorker::reset, correlationID);
 }
 
 std::unique_ptr<TileRenderData> GeometryTile::createRenderData() {

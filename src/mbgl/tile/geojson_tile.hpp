@@ -17,7 +17,7 @@ public:
                 const TileParameters&,
                 std::shared_ptr<style::GeoJSONData>);
 
-    void updateData(std::shared_ptr<style::GeoJSONData> data, bool resetLayers = false);
+    void updateData(std::shared_ptr<style::GeoJSONData> data, bool needsRelayout = false);
 
     void querySourceFeatures(
         std::vector<Feature>& result,
