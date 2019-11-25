@@ -245,6 +245,7 @@ bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
 bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, TestMetadata& metadata) {
     const std::string& base = metadata.paths.defaultExpectations();
     const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
+    const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
 
     if (metadata.outputsImage) {
         metadata.actual = mbgl::encodePNG(actualImage);
@@ -326,17 +327,24 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
     }
 #endif
 
-    mbgl::filesystem::path expectedMetricsPath;
-    for (auto rit = expectations.rbegin(); rit != expectations.rend(); ++rit) {
+    std::vector<std::string> expectedMetricsPaths;
+    for (auto rit = expectedMetrics.rbegin(); rit != expectedMetrics.rend(); ++rit) {
         if (mbgl::filesystem::exists(*rit)) {
-            if (metadata.expectedMetrics.isEmpty()) {
-                mbgl::filesystem::path maybeExpectedMetricsPath{*rit};
-                maybeExpectedMetricsPath.replace_filename("metrics.json");
-                metadata.expectedMetrics = readExpectedMetrics(maybeExpectedMetricsPath);
-            }
+            expectedMetricsPaths = readExpectedMetricEntries(*rit);
+            if (!expectedMetricsPaths.empty()) break;
         }
     }
 
+    for (const auto& entry : expectedMetricsPaths) {
+        auto maybeExpectedMetrics =readExpectedMetrics(entry);
+        if (maybeExpectedMetrics.isEmpty()) {
+            metadata.errorMessage = "Failed to load expected metrics " + entry;
+            return false;
+        }
+
+        metadata.expectedMetrics = maybeExpectedMetrics;
+    }
+    
     // Check file size metrics.
     for (const auto& expected : metadata.expectedMetrics.fileSize) {
         auto actual = metadata.metrics.fileSize.find(expected.first);
