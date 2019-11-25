@@ -1,4 +1,0 @@
-[*.{kt,kts}]
-indent_size=2
-insert_final_newline=false
-disabled_rules=no-wildcard-imports
