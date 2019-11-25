@@ -1,0 +1,6 @@
+{
+    "base_test_path":"../mapbox-gl-js/test/integration",
+    "ignore_paths":["../platform/node/test/ignores.json", "../render-test/linux-ignores.json"],
+    "vendor_path":"../vendor",
+    "asset_path": "../mapbox-gl-js/test/integration"
+}
