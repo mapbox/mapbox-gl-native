@@ -36,3 +36,5 @@ target_link_libraries(
 )
 
 set_property(TARGET mbgl-glfw PROPERTY FOLDER Executables)
+
+install(TARGETS mbgl-glfw RUNTIME DESTINATION bin)
