@@ -1,6 +1,9 @@
 # Changelog for the Mapbox Maps SDK for Android
-
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
+
+## Notice
+**Work on the Mapbox Maps SDK for Android is now happening at https://github.com/mapbox/mapbox-gl-native-android.**
+Please see the README at https://github.com/mapbox/mapbox-gl-native-android for the most up-to-date information on the Maps SDK for Android.
 
 ## master
 - Added support for [image expression](https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-image) in core library. Runtime APIs for image expression will be implemented separately. [#15877](https://github.com/mapbox/mapbox-gl-native/pull/15877)

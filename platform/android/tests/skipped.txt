@@ -1,9 +1,0 @@
-# Flaky
-# After map is rendered, main thread hangs in runloop::wake when data is written to pipe
-# Issue: https://github.com/mapbox/mapbox-gl-native/issues/13711
-Memory.Raster
-Memory.Vector
-
-# Exception is thrown when network status is changed to online
-# Issue: https://github.com/mapbox/mapbox-gl-native/issues/13711
-Map.Offline

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Mapbox Android SDK TestApp</string>
-    <string name="fps30">fps30</string>
-    <string name="fps60">fps60</string>
-</resources>
