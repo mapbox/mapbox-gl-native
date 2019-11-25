@@ -31,7 +31,7 @@
 #include <cassert>
 #include <utility>
 #include <sstream>
-#include <iostream>
+
 using namespace mbgl;
 
 namespace {
@@ -245,7 +245,6 @@ bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
 bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, TestMetadata& metadata) {
     const std::string& base = metadata.paths.defaultExpectations();
     const std::vector<mbgl::filesystem::path>& expectations = metadata.paths.expectations;
-    const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
 
     if (metadata.outputsImage) {
         metadata.actual = mbgl::encodePNG(actualImage);
@@ -316,18 +315,22 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             }
         }
     }
+    return checkProbingResults(metadata);
+}
 
+bool TestRunner::checkProbingResults(TestMetadata& metadata) {
+    if (metadata.metrics.isEmpty()) return true;
+    const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
 #if !TEST_READ_ONLY
     if (getenv("UPDATE_METRICS")) {
-        if (!metadata.metrics.isEmpty()) {
-            mbgl::filesystem::create_directories(expectations.back());
-            mbgl::util::write_file(expectations.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
-            return true;
-        }
+        mbgl::filesystem::create_directories(expectedMetrics.back());
+        mbgl::util::write_file(expectedMetrics.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
+        return true;
     }
 #endif
 
-    // Check the possible paths from reverse order, so that we will check the default test case path in the very end.
+    // Check the possible paths in reverse order, so that the default path with the test style will only be checked in
+    // the very end.
     std::vector<std::string> expectedMetricsPaths;
     for (auto rit = expectedMetrics.rbegin(); rit != expectedMetrics.rend(); ++rit) {
         if (mbgl::filesystem::exists(*rit)) {
@@ -336,13 +339,9 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         }
     }
 
-    for (auto rit = expectedMetrics.rbegin(); rit != expectedMetrics.rend(); ++rit) {
-        std::cout <<std::endl<<"the path is: "<< rit->string()<< std::endl<< std::endl;
-    }
-    // In case no metrics.json is found, we will skip assign the expectedMetrics to metadata,
-    // otherwise, taking the first found expectaions
+    // In case no metrics.json is found, skip assigning the expectedMetrics to metadata, otherwise, take the first found
+    // metrics.
     for (const auto& entry : expectedMetricsPaths) {
-        printf("-------expected metrics path is '%s'-----------------", entry.c_str());
         auto maybeExpectedMetrics = readExpectedMetrics(entry);
         if (maybeExpectedMetrics.isEmpty()) {
             metadata.errorMessage = "Failed to load expected metrics " + entry;

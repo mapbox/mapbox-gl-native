@@ -223,19 +223,21 @@ std::vector<std::pair<std::string, std::string>> parseIgnores(const std::vector<
     return ignores;
 }
 
-// testPath: absolut pull path that constains the style.json file for testing
-// testsRootPath: absolute base path that contains expectationsPaths and metricsPaths
-// expectatedPaths: absolute paths that constain all possible expected.png/metrics.json files for result checking
-std::vector<mbgl::filesystem::path> getTestExpectations(mbgl::filesystem::path testPath,
-                                                        const mbgl::filesystem::path& testsRootPath,
+// defaultExpectationPath: absolut path that constains the style.json file for testing
+// regex: Test case id regex that used for searching expectation
+// expectatedPaths: absolute paths that constain possible expected.png/metrics.json files for result checking
+std::vector<mbgl::filesystem::path> getTestExpectations(const mbgl::filesystem::path& defaultExpectationPath,
+                                                        const std::regex& regex,
                                                         std::vector<mbgl::filesystem::path> expectatedPaths) {
-    std::vector<mbgl::filesystem::path> expectations{std::move(testPath.remove_filename())};
-    const auto& defaultExpectedPath = expectations.front().string();
+    std::vector<mbgl::filesystem::path> expectations{defaultExpectationPath};
 
-    const std::regex regex{testsRootPath.string()};
-    for (const auto& path : expectatedPaths) {
-        expectations.emplace_back(std::regex_replace(defaultExpectedPath, regex, path.string()));
-        assert(!expectations.back().empty());
+    for (const auto& expectedPath : expectatedPaths) {
+        for (auto& path : mbgl::filesystem::recursive_directory_iterator(expectedPath)) {
+            if (std::regex_search(path.path().string(), regex)) {
+                expectations.emplace_back(std::move(mbgl::filesystem::path(path).remove_filename()));
+                break;
+            }
+        }
     }
 
     return expectations;
@@ -439,9 +441,15 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
             }
 
             if (testPath.path().filename() == "style.json") {
+                const auto defaultExpectationPath{std::move(mbgl::filesystem::path(testPath).remove_filename())};
+                static const auto rootLength = manifest.testRootPath.length();
+                auto testId = std::string(defaultExpectationPath.string());
+                testId = testId.substr(rootLength + 1, testId.length() - rootLength - 1);
+
+                const std::regex regex{testId};
                 testPaths.emplace_back(testPath,
-                                       getTestExpectations(testPath, path, expectationPaths),
-                                       getTestExpectations(testPath, path, expectedMetricPaths));
+                                       getTestExpectations(defaultExpectationPath, regex, expectationPaths),
+                                       getTestExpectations(defaultExpectationPath, regex, expectedMetricPaths));
             }
         }
     }
