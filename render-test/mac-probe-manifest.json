@@ -3,5 +3,6 @@
     "expectation_paths":["expected/render-tests", "tests/mac"],
     "ignore_paths":["../render-test/mac-ignores.json", "../render-test/tests/should-fail.json"],
     "vendor_path":"../vendor",
-    "asset_path": "../mapbox-gl-js/test/integration"
+    "asset_path": "../mapbox-gl-js/test/integration",
+    "metric_paths":["metrics/mac/"]
 }

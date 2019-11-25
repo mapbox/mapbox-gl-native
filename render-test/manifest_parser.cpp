@@ -224,7 +224,7 @@ std::vector<std::pair<std::string, std::string>> parseIgnores(const std::vector<
 }
 
 // testPath: absolut pull path that constains the style.json file for testing
-// testsRootPath: absolute base path that contains expectationsPaths and metricsPaths 
+// testsRootPath: absolute base path that contains expectationsPaths and metricsPaths
 // expectatedPaths: absolute paths that constain all possible expected.png/metrics.json files for result checking
 std::vector<mbgl::filesystem::path> getTestExpectations(mbgl::filesystem::path testPath,
                                                         const mbgl::filesystem::path& testsRootPath,
@@ -338,8 +338,9 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
     if (document.HasMember("metric_paths")) {
         const auto& metricPathValue = document["metric_paths"];
         if (!metricPathValue.IsArray()) {
-            mbgl::Log::Warning(
-                mbgl::Event::General, "Provided metric_paths inside the manifest file: %s is not a valid array", filePath.c_str());
+            mbgl::Log::Warning(mbgl::Event::General,
+                               "Provided metric_paths inside the manifest file: %s is not a valid array",
+                               filePath.c_str());
             return mbgl::nullopt;
         }
         for (const auto& value : metricPathValue.GetArray()) {
@@ -438,11 +439,12 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
             }
 
             if (testPath.path().filename() == "style.json") {
-                testPaths.emplace_back(testPath, getTestExpectations(testPath, path, expectationPaths), getTestExpectations(testPath, path, expectedMetricPaths));
+                testPaths.emplace_back(testPath,
+                                       getTestExpectations(testPath, path, expectationPaths),
+                                       getTestExpectations(testPath, path, expectedMetricPaths));
             }
         }
     }
-
 
     return mbgl::optional<Manifest>(manifest);
 }

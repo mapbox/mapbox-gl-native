@@ -31,7 +31,7 @@
 #include <cassert>
 #include <utility>
 #include <sstream>
-
+#include <iostream>
 using namespace mbgl;
 
 namespace {
@@ -327,6 +327,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
     }
 #endif
 
+    // Check the possible paths from reverse order, so that we will check the default test case path in the very end.
     std::vector<std::string> expectedMetricsPaths;
     for (auto rit = expectedMetrics.rbegin(); rit != expectedMetrics.rend(); ++rit) {
         if (mbgl::filesystem::exists(*rit)) {
@@ -335,16 +336,22 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         }
     }
 
+    for (auto rit = expectedMetrics.rbegin(); rit != expectedMetrics.rend(); ++rit) {
+        std::cout <<std::endl<<"the path is: "<< rit->string()<< std::endl<< std::endl;
+    }
+    // In case no metrics.json is found, we will skip assign the expectedMetrics to metadata,
+    // otherwise, taking the first found expectaions
     for (const auto& entry : expectedMetricsPaths) {
-        auto maybeExpectedMetrics =readExpectedMetrics(entry);
+        printf("-------expected metrics path is '%s'-----------------", entry.c_str());
+        auto maybeExpectedMetrics = readExpectedMetrics(entry);
         if (maybeExpectedMetrics.isEmpty()) {
             metadata.errorMessage = "Failed to load expected metrics " + entry;
             return false;
         }
-
         metadata.expectedMetrics = maybeExpectedMetrics;
+        break;
     }
-    
+
     // Check file size metrics.
     for (const auto& expected : metadata.expectedMetrics.fileSize) {
         auto actual = metadata.metrics.fileSize.find(expected.first);
