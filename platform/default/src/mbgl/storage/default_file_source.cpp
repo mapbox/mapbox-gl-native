@@ -82,9 +82,9 @@ public:
         }
     }
 
-    void deleteRegion(OfflineRegion&& region, std::function<void(std::exception_ptr)> callback, bool pack) {
+    void deleteRegion(OfflineRegion&& region, std::function<void(std::exception_ptr)> callback) {
         downloads.erase(region.getID());
-        callback(offlineDatabase->deleteRegion(std::move(region), pack));
+        callback(offlineDatabase->deleteRegion(std::move(region)));
     }
 
     void invalidateRegion(int64_t regionID, std::function<void (std::exception_ptr)> callback) {
@@ -208,6 +208,8 @@ public:
 
     void packDatabase(std::function<void(std::exception_ptr)> callback) { callback(offlineDatabase->pack()); }
 
+    void runPackDatabaseAutomatically(bool autopack) { offlineDatabase->runPackDatabaseAutomatically(autopack); }
+
 private:
     expected<OfflineDownload*, std::exception_ptr> getDownload(int64_t regionID) {
         auto it = downloads.find(regionID);
@@ -316,10 +318,8 @@ void DefaultFileSource::updateOfflineMetadata(const int64_t regionID,
     impl->actor().invoke(&Impl::updateMetadata, regionID, metadata, callback);
 }
 
-void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region,
-                                            std::function<void(std::exception_ptr)> callback,
-                                            bool pack) {
-    impl->actor().invoke(&Impl::deleteRegion, std::move(region), callback, pack);
+void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region, std::function<void(std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::deleteRegion, std::move(region), callback);
 }
 
 void DefaultFileSource::invalidateOfflineRegion(OfflineRegion& region,
@@ -361,6 +361,10 @@ void DefaultFileSource::resetDatabase(std::function<void (std::exception_ptr)> c
 
 void DefaultFileSource::packDatabase(std::function<void(std::exception_ptr)> callback) {
     impl->actor().invoke(&Impl::packDatabase, std::move(callback));
+}
+
+void DefaultFileSource::runPackDatabaseAutomatically(bool autopack) {
+    impl->actor().invoke(&Impl::runPackDatabaseAutomatically, autopack);
 }
 
 void DefaultFileSource::invalidateAmbientCache(std::function<void (std::exception_ptr)> callback) {
