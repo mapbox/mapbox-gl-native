@@ -168,6 +168,10 @@ void OfflineManager::setMaximumAmbientCacheSize(jni::JNIEnv& env_, const jni::jl
             std::exception_ptr exception) mutable { handleException(exception, *callback); });
 }
 
+void OfflineManager::runPackDatabaseAutomatically(jni::JNIEnv&, jboolean autopack) {
+    fileSource->runPackDatabaseAutomatically(autopack);
+}
+
 // FileSource::FileSourceCallback //
 
 void OfflineManager::FileSourceCallback::onSuccess(jni::JNIEnv& env,
@@ -211,6 +215,7 @@ void OfflineManager::registerNative(jni::JNIEnv& env) {
         METHOD(&OfflineManager::invalidateAmbientCache, "nativeInvalidateAmbientCache"),
         METHOD(&OfflineManager::clearAmbientCache, "nativeClearAmbientCache"),
         METHOD(&OfflineManager::setMaximumAmbientCacheSize, "nativeSetMaximumAmbientCacheSize"),
+        METHOD(&OfflineManager::runPackDatabaseAutomatically, "runPackDatabaseAutomatically"),
         METHOD(&OfflineManager::putResourceWithUrl, "putResourceWithUrl"));
 }
 
