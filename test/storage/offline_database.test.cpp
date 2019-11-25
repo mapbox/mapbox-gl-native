@@ -701,7 +701,8 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
         db.putRegionResources(region2->getID(), generateResources("mapbox://tile_2", "mapbox://style_2"), status);
         const size_t sizeWithTwoRegions = util::read_file(filename).size();
 
-        db.deleteRegion(std::move(*region1), false /*pack*/);
+        db.runPackDatabaseAutomatically(false);
+        db.deleteRegion(std::move(*region1));
 
         ASSERT_EQ(1u, db.listRegions().value().size());
         // Region is removed but the size of the database is the same.
@@ -711,7 +712,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
         // The size of the database has shrunk after pack().
         const size_t sizeWithOneRegion = util::read_file(filename).size();
         EXPECT_LT(sizeWithOneRegion, sizeWithTwoRegions);
-
+        db.runPackDatabaseAutomatically(true);
         db.deleteRegion(std::move(*region2));
         // The size of the database has shrunk right away.
         const size_t sizeWithoutRegions = util::read_file(filename).size();

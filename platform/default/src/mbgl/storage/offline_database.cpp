@@ -140,7 +140,7 @@ void OfflineDatabase::removeExisting() {
 void OfflineDatabase::removeOldCacheTable() {
     assert(db);
     db->exec("DROP TABLE IF EXISTS http_cache");
-    vacuum();
+    if (autopack) vacuum();
 }
 
 void OfflineDatabase::createSchema() {
@@ -694,7 +694,7 @@ std::exception_ptr OfflineDatabase::clearAmbientCache() try {
 
     resourceQuery.run();
 
-    vacuum();
+    if (autopack) vacuum();
 
     return nullptr;
 } catch (const mapbox::sqlite::Exception& ex) {
@@ -873,7 +873,7 @@ OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetad
     return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region, bool pack) try {
+std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
     {
         mapbox::sqlite::Query query{ getStatement("DELETE FROM regions WHERE id = ?") };
         query.bind(1, region.getID());
@@ -882,7 +882,7 @@ std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region, bool pa
 
     evict(0);
     assert(db);
-    if (pack) vacuum();
+    if (autopack) vacuum();
 
     // Ensure that the cached offlineTileCount value is recalculated.
     offlineMapboxTileCount = nullopt;
@@ -1229,7 +1229,7 @@ std::exception_ptr OfflineDatabase::setMaximumAmbientCacheSize(uint64_t size) {
 
         if (databaseSize > maximumAmbientCacheSize) {
             evict(0);
-            vacuum();
+            if (autopack) vacuum();
         }
 
         return nullptr;
