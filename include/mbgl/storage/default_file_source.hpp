@@ -121,20 +121,18 @@ public:
      * Eviction works by removing the least-recently requested resources not also required
      * by other regions, until the database shrinks below a certain size.
      *
-     * If the |pack| argument is `false` the database file packing is skipped and the
-     * database file does not shrink after this operation completes. Database file
-     * packing can be done later with `packDatabase()`. It is a useful optimization
-     * e.g. when several regions should be deleted in a row.
-     *
      * Note that this method takes ownership of the input, reflecting the fact that once
      * region deletion is initiated, it is not legal to perform further actions with the
      * region.
+     *
+     * Note that this operation can be potentially slow if packing the database occurs
+     * automatically (see runPackDatabaseAutomatically() and packDatabase()).
      *
      * When the operation is complete or encounters an error, the given callback will be
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    void deleteOfflineRegion(OfflineRegion&&, std::function<void(std::exception_ptr)>, bool pack = true);
+    void deleteOfflineRegion(OfflineRegion&&, std::function<void(std::exception_ptr)>);
 
     /*
      * Invalidate all the tiles from an offline region forcing Mapbox GL to revalidate
@@ -189,11 +187,24 @@ public:
     /*
      * Packs the existing database file into a minimal amount of disk space.
      *
+     * This operation has a performance impact as it will vacuum the database,
+     * forcing it to move pages on the filesystem.
+     *
      * When the operation is complete or encounters an error, the given callback will be
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
     void packDatabase(std::function<void(std::exception_ptr)> callback);
+
+    /*
+     * Sets whether packing the database file occurs automatically after an offline
+     * region is deleted (deleteOfflineRegion()) or the ambient cache is cleared
+     * (clearAmbientCache()).
+     * 
+     * By default, packing is enabled. If disabled, disk space will not be freed
+     * after resources are removed unless packDatabase() is explicitly called.
+     */
+    void runPackDatabaseAutomatically(bool);
 
     /*
      * Forces revalidation of the ambient cache.
@@ -212,9 +223,10 @@ public:
     /*
      * Erase resources from the ambient cache, freeing storage space.
      *
-     * Erases the ambient cache, freeing resources. This operation can be
-     * potentially slow because it will trigger a VACUUM on SQLite,
-     * forcing the database to move pages on the filesystem.
+     * Erases the ambient cache, freeing resources. 
+     * 
+     * Note that this operation can be potentially slow if packing the database
+     * occurs automatically (see runPackDatabaseAutomatically() and packDatabase()).
      *
      * Resources overlapping with offline regions will not be affected
      * by this call.

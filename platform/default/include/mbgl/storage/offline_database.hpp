@@ -74,7 +74,7 @@ public:
     expected<OfflineRegionMetadata, std::exception_ptr>
     updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
-    std::exception_ptr deleteRegion(OfflineRegion&&, bool pack = true);
+    std::exception_ptr deleteRegion(OfflineRegion&&);
     std::exception_ptr invalidateRegion(int64_t regionID);
 
     // Return value is (response, stored size)
@@ -94,6 +94,7 @@ public:
     bool exceedsOfflineMapboxTileCountLimit(const Resource&);
     void markUsedResources(int64_t regionID, const std::list<Resource>&);
     std::exception_ptr pack();
+    void runPackDatabaseAutomatically(bool autopack_) { autopack = autopack_; }
 
 private:
     void initialize();
@@ -149,6 +150,7 @@ private:
     optional<uint64_t> offlineMapboxTileCount;
 
     bool evict(uint64_t neededFreeSize);
+    bool autopack = true;
 };
 
 } // namespace mbgl
