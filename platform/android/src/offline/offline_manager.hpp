@@ -103,6 +103,8 @@ public:
 
     void setMaximumAmbientCacheSize(jni::JNIEnv&, const jni::jlong size, const jni::Object<FileSourceCallback>& callback_);
 
+    void runPackDatabaseAutomatically(jni::JNIEnv&, jboolean autopack);
+
 private:
     std::shared_ptr<mbgl::DefaultFileSource> fileSource;
 };

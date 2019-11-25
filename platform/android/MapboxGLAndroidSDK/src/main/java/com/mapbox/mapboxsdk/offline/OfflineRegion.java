@@ -388,6 +388,10 @@ public class OfflineRegion {
    * by other regions, until the database shrinks below a certain size.
    * </p>
    * <p>
+   * Note that this operation can be potentially slow if packing the database
+   * occurs automatically ({@link OfflineManager#runPackDatabaseAutomatically(boolean)}).
+   * </p>
+   * <p>
    * When the operation is complete or encounters an error, the given callback will be
    * executed on the main thread.
    * </p>
