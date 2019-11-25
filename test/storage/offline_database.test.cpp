@@ -733,6 +733,36 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DeleteRegion)) {
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Pack)) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+
+    OfflineDatabase db(filename);
+    size_t initialSize = util::read_file(filename).size();
+    db.runPackDatabaseAutomatically(false);
+
+    Response response;
+    response.data = randomString(.5 * 1024 * 1024);
+
+    for (unsigned i = 0; i < 50; ++i) {
+        const Resource tile = Resource::tile("mapbox://tile_" + std::to_string(i), 1, 0, 0, 0, Tileset::Scheme::XYZ);
+        db.put(tile, response);
+
+        const Resource style = Resource::style("mapbox://style_" + std::to_string(i));
+        db.put(style, response);
+    }
+    size_t populatedSize = util::read_file(filename).size();
+    ASSERT_GT(populatedSize, initialSize);
+
+    db.clearAmbientCache();
+    EXPECT_EQ(populatedSize, util::read_file(filename).size());
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    db.pack();
+    EXPECT_EQ(initialSize, util::read_file(filename).size());
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
 TEST(OfflineDatabase, MapboxTileLimitExceeded) {
     FixtureLog log;
 

@@ -200,7 +200,7 @@ public:
      * Sets whether packing the database file occurs automatically after an offline
      * region is deleted (deleteOfflineRegion()) or the ambient cache is cleared
      * (clearAmbientCache()).
-     * 
+     *
      * By default, packing is enabled. If disabled, disk space will not be freed
      * after resources are removed unless packDatabase() is explicitly called.
      */
@@ -223,8 +223,8 @@ public:
     /*
      * Erase resources from the ambient cache, freeing storage space.
      *
-     * Erases the ambient cache, freeing resources. 
-     * 
+     * Erases the ambient cache, freeing resources.
+     *
      * Note that this operation can be potentially slow if packing the database
      * occurs automatically (see runPackDatabaseAutomatically() and packDatabase()).
      *
