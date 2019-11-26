@@ -267,9 +267,7 @@ commands:
             mkdir -p /tmp/tests/clang-tidy
             if [ -f clang-tidy.log ]; then cp clang-tidy.log /tmp/tests/clang-tidy; fi
             mkdir -p /tmp/tests/render
-            if [ -f render-test/tests_index.html ]; then cp render-test/tests_index.html /tmp/tests/render; fi
-            if [ -f render-test/render-tests_index.html ]; then cp render-test/render-tests_index.html /tmp/tests/render; fi
-            if [ -f render-test/query-tests_index.html ]; then cp render-test/query-tests_index.html /tmp/tests/render; fi
+            if ls render-test/*.html 1> /dev/null 2>&1; then cp render-test/*.html /tmp/tests/render; fi
             mkdir -p /tmp/tests/coredumps
             if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
             mkdir -p /tmp/tests/valgrind

@@ -1162,10 +1162,17 @@ TestRunner::Impl::Impl(const TestMetadata& metadata)
 
 TestRunner::Impl::~Impl() {}
 
-bool TestRunner::run(TestMetadata& metadata, const std::set<std::string>& injectedProbes) {
+bool TestRunner::run(TestMetadata& metadata) {
     AllocationIndex::setActive(false);
     AllocationIndex::reset();
     ProxyFileSource::setTrackingActive(false);
+
+    RunContext ctx{};
+    // Run 'begin' probes provided via command line arguments.
+    if (!runInjectedProbesBegin(metadata, ctx)) {
+        return false;
+    }
+
     std::string key = mbgl::util::toString(uint32_t(metadata.mapMode))
         + "/" + mbgl::util::toString(metadata.pixelRatio)
         + "/" + mbgl::util::toString(uint32_t(metadata.crossSourceCollisions));
@@ -1176,13 +1183,6 @@ bool TestRunner::run(TestMetadata& metadata, const std::set<std::string>& inject
 
     auto& frontend = maps[key]->frontend;
     auto& map = maps[key]->map;
-
-    RunContext ctx{};
-
-    // Run 'begin' probes provided via command line arguments.
-    if (!runInjectedProbesBegin(metadata, injectedProbes, ctx)) {
-        return false;
-    }
 
     frontend.setSize(metadata.size);
     map.setSize(metadata.size);
@@ -1203,7 +1203,7 @@ bool TestRunner::run(TestMetadata& metadata, const std::set<std::string>& inject
     }
 
     // Run 'end' probes provided via command line arguments
-    if (!runInjectedProbesEnd(metadata, injectedProbes, ctx, result.stats)) {
+    if (!runInjectedProbesEnd(metadata, ctx, result.stats)) {
         return false;
     }
 
@@ -1238,7 +1238,7 @@ bool runInjectedProbe(TestMetadata& metadata,
     return true;
 }
 
-bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata, const std::set<std::string>& probes, RunContext& ctx) {
+bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata, RunContext& ctx) {
     const std::string mark = " - default - start";
     static const InjectedProbeMap beginInjectedProbeMap = {
         {// Injected memory probe begin
@@ -1269,11 +1269,10 @@ bool TestRunner::runInjectedProbesBegin(TestMetadata& metadata, const std::set<s
                  std::forward_as_tuple(ProxyFileSource::getRequestCount(), ProxyFileSource::getTransferredSize()));
          }}};
 
-    return runInjectedProbe(metadata, probes, ctx, beginInjectedProbeMap);
+    return runInjectedProbe(metadata, manifest.getProbes(), ctx, beginInjectedProbeMap);
 }
 
 bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata,
-                                      const std::set<std::string>& probes,
                                       RunContext& ctx,
                                       mbgl::gfx::RenderingStats stats) {
     const std::string mark = " - default - end";
@@ -1319,7 +1318,7 @@ bool TestRunner::runInjectedProbesEnd(TestMetadata& metadata,
              ProxyFileSource::setTrackingActive(false);
          }}};
 
-    return runInjectedProbe(metadata, probes, ctx, endInjectedProbeMap);
+    return runInjectedProbe(metadata, manifest.getProbes(), ctx, endInjectedProbeMap);
 }
 
 void TestRunner::reset() {

@@ -20,6 +20,7 @@ public:
     const std::string& getAssetPath() const;
     const std::string& getManifestPath() const;
     const std::string& getResultPath() const;
+    const std::set<std::string>& getProbes() const;
     void doShuffle(uint32_t seed);
 
     std::string localizeURL(const std::string& url) const;
@@ -48,6 +49,7 @@ private:
     std::string resultPath;
     std::vector<std::pair<std::string, std::string>> ignores;
     std::vector<TestPaths> testPaths;
+    std::set<std::string> probes;
 };
 
 class ManifestParser {

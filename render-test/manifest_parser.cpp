@@ -44,6 +44,10 @@ const std::string& Manifest::getResultPath() const {
     return resultPath;
 }
 
+const std::set<std::string>& Manifest::getProbes() const {
+    return probes;
+}
+
 void Manifest::doShuffle(uint32_t seed) {
     std::seed_seq sequence{seed};
     std::mt19937 shuffler(sequence);
@@ -387,6 +391,25 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
             }
         }
         manifest.ignores = parseIgnores(ignorePaths);
+    }
+
+    if (document.HasMember("probes")) {
+        const auto& probesValue = document["probes"];
+        if (!probesValue.IsArray()) {
+            mbgl::Log::Warning(mbgl::Event::General,
+                               "Provided probes inside the manifest file: %s is not a valid array",
+                               filePath.c_str());
+            return mbgl::nullopt;
+        }
+        for (const auto& value : probesValue.GetArray()) {
+            if (!value.IsString()) {
+                mbgl::Log::Warning(mbgl::Event::General,
+                                   "Invalid probe type is provoided inside the manifest file: %s",
+                                   filePath.c_str());
+                return mbgl::nullopt;
+            }
+            manifest.probes.emplace(value.GetString());
+        }
     }
 
     manifest.testRootPath = enbaleProbeTest ? probeTestPath.string() : baseTestPath.string();
