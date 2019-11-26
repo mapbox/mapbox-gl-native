@@ -10,33 +10,32 @@ workflows:
           name: next-android-armeabi-v7a-release
           executor_name: ubuntu-disco
           target_is_android: true
-          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=armeabi-v7a'
+          install: true
       - next-build-template:
           name: next-android-arm64-v8a-release
           executor_name: ubuntu-disco
           target_is_android: true
-          requires:
-            - next-android-armeabi-v7a-release
-          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=arm64-v8a'
+          install: true
       - next-build-template:
           name: next-android-x86-release
           executor_name: ubuntu-disco
           target_is_android: true
-          requires:
-            - next-android-armeabi-v7a-release
-          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
+          install: true
       - next-build-template:
           name: next-android-x86_64-release
           executor_name: ubuntu-disco
           target_is_android: true
-          requires:
-            - next-android-armeabi-v7a-release
-          config_params: '-G Ninja -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86_64'
+          install: true
       - next-build-template:
           name: next-linux-gcc8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8'
+          install: true
       - next-build-template:
           name: next-linux-gcc4.9-release
           executor_name: ubuntu-disco
@@ -57,7 +56,16 @@ workflows:
           name: next-linux-clang8-release
           executor_name: ubuntu-disco
           target_is_linux: true
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+          requires:
+            - next-android-armeabi-v7a-release
+            - next-android-arm64-v8a-release
+            - next-android-x86-release
+            - next-android-x86_64-release
+            - next-linux-gcc8-release
+            - next-macos-xcode11-release
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8'
+          install: true
+          binary_size_metrics: true
       - next-build-template:
           name: next-FIXME-linux-asan
           executor_name: ubuntu-disco
@@ -104,7 +112,8 @@ workflows:
           name: next-macos-xcode11-release
           executor_name: macos-11_0_0
           target_is_macos: true
-          config_params: '-G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          install: true
       - next-build-template:
           name: next-macos-xcode11-debug
           executor_name: macos-11_0_0
@@ -250,6 +259,41 @@ commands:
             ccache --zero-stats --max-size=2G
             cmake --build build -j 8 << parameters.build_params >>
             ccache --show-stats
+  next-install:
+    steps:
+      - run:
+          name: Install
+          command: |
+            cmake --build build --target install/strip
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - '*'
+  next-test:
+    parameters:
+      runtime_wrapper:
+        type: string
+      test_params:
+        type: string
+    steps:
+      - run:
+          name: Test
+          command: |
+            cd build
+            << parameters.runtime_wrapper >> ctest -V << parameters.test_params >>
+  next-metrics:
+    parameters:
+      step_name:
+        type: string
+      runtime_wrapper:
+        type: string
+      metrics_params:
+        type: string
+    steps:
+      - run:
+          name: << parameters.step_name >>
+          command: |
+            << parameters.runtime_wrapper >> build/mbgl-render-test-runner << parameters.metrics_params >>
   next-save:
     steps:
       - save_cache:
@@ -268,6 +312,8 @@ commands:
             if [ -f clang-tidy.log ]; then cp clang-tidy.log /tmp/tests/clang-tidy; fi
             mkdir -p /tmp/tests/render
             if ls render-test/*.html 1> /dev/null 2>&1; then cp render-test/*.html /tmp/tests/render; fi
+            mkdir -p /tmp/tests/metrics
+            if ls metrics/*.html 1> /dev/null 2>&1; then cp metrics/*.html /tmp/tests/metrics; fi
             mkdir -p /tmp/tests/coredumps
             if ls core* 1> /dev/null 2>&1; then cp core* /tmp/tests/coredumps; fi
             mkdir -p /tmp/tests/valgrind
@@ -275,18 +321,6 @@ commands:
       - store_artifacts:
           path: /tmp/tests
           destination: tests
-  next-test:
-    parameters:
-      test_wrapper:
-        type: string
-      test_params:
-        type: string
-    steps:
-      - run:
-          name: Test
-          command: |
-            cd build
-            << parameters.test_wrapper >> ctest -V << parameters.test_params >>
   npm-install:
     steps:
     - run:
@@ -736,6 +770,12 @@ jobs:
       target_is_macos:
         type: boolean
         default: false
+      install:
+        type: boolean
+        default: false
+      binary_size_metrics:
+        type: boolean
+        default: false
     executor: << parameters.executor_name >>
     steps:
       - checkout
@@ -755,7 +795,7 @@ jobs:
             - next-build:
                 build_params: << parameters.build_params >>
             - next-test:
-                test_wrapper: 'xvfb-run -s -noreset'
+                runtime_wrapper: 'xvfb-run -s -noreset'
                 test_params: << parameters.test_params >>
       - when:
           condition: << parameters.target_is_macos >>
@@ -766,8 +806,21 @@ jobs:
             - next-build:
                 build_params: << parameters.build_params >>
             - next-test:
-                test_wrapper: ''
+                runtime_wrapper: ''
                 test_params: << parameters.test_params >>
+      - when:
+          condition: << parameters.install >>
+          steps:
+            - next-install
+      - when:
+          condition: << parameters.binary_size_metrics >>
+          steps:
+            - attach_workspace:
+                at: workspace
+            - next-metrics:
+                step_name: 'Binary Size Metrics'
+                runtime_wrapper: 'xvfb-run -s -noreset'
+                metrics_params: '-p metrics/binary-size.json'
       - next-save
 
 # ------------------------------------------------------------------------------
