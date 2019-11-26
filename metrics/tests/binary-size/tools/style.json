@@ -1,0 +1,30 @@
+{
+  "version": 8,
+  "metadata": {
+    "test": {
+      "operations": [
+        ["probeFileSize", "linux-clang8-mbgl-glfw", "/src/workspace/next-linux-clang8-release/bin/mbgl-glfw", 0.01],
+        ["probeFileSize", "linux-clang8-mbgl-offline", "/src/workspace/next-linux-clang8-release/bin/mbgl-offline", 0.01],
+        ["probeFileSize", "linux-clang8-mbgl-render", "/src/workspace/next-linux-clang8-release/bin/mbgl-render", 0.01],
+        ["probeFileSize", "linux-gcc8-mbgl-glfw", "/src/workspace/next-linux-gcc8-release/bin/mbgl-glfw", 0.01],
+        ["probeFileSize", "linux-gcc8-mbgl-offline", "/src/workspace/next-linux-gcc8-release/bin/mbgl-offline", 0.01],
+        ["probeFileSize", "linux-gcc8-mbgl-render", "/src/workspace/next-linux-gcc8-release/bin/mbgl-render", 0.01],
+        ["probeFileSize", "macos-xcode11-mbgl-glfw", "/src/workspace/next-macos-xcode11-release/bin/mbgl-glfw", 0.01],
+        ["probeFileSize", "macos-xcode11-mbgl-offline", "/src/workspace/next-macos-xcode11-release/bin/mbgl-offline", 0.01],
+        ["probeFileSize", "macos-xcode11-mbgl-render", "/src/workspace/next-macos-xcode11-release/bin/mbgl-render", 0.01]
+      ],
+      "width": 64,
+      "height": 64
+    }
+  },
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "green"
+      }
+    }
+  ]
+}
