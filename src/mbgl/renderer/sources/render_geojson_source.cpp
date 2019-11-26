@@ -85,26 +85,24 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
     enabled = needsRendering;
 
     auto data_ = impl().getData().lock();
-    if (!data_) {
-        // In Continuous mode, keep the existing tiles if the new data_ is not
-        // yet available, thus providing smart style transitions without flickering.
-        // In other modes, allow clearing the tile pyramid first, before the early
-        // return in order to avoid render tests being flaky.
-        if (parameters.mode != MapMode::Continuous) tilePyramid.clearAll();
-        return;
-    }
-
     if (data.lock() != data_) {
         data = data_;
-        tilePyramid.reduceMemoryUse();
-        const uint8_t maxZ = impl().getZoomRange().max;
-        for (const auto& pair : tilePyramid.getTiles()) {
-            if (pair.first.canonical.z <= maxZ) {
-                static_cast<GeoJSONTile*>(pair.second.get())
-                    ->updateData(data_->getTile(pair.first.canonical), needsRelayout);
+        if (parameters.mode != MapMode::Continuous) {
+            // Clearing the tile pyramid in order to avoid render tests being flaky.
+            tilePyramid.clearAll();
+        } else if (data_) {
+            tilePyramid.reduceMemoryUse();
+            const uint8_t maxZ = impl().getZoomRange().max;
+            for (const auto& pair : tilePyramid.getTiles()) {
+                if (pair.first.canonical.z <= maxZ) {
+                    static_cast<GeoJSONTile*>(pair.second.get())
+                        ->updateData(data_->getTile(pair.first.canonical), needsRelayout);
+                }
             }
         }
     }
+
+    if (!data_) return;
 
     tilePyramid.update(layers,
                        needsRendering,
