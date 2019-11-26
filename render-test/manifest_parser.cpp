@@ -223,23 +223,16 @@ std::vector<std::pair<std::string, std::string>> parseIgnores(const std::vector<
     return ignores;
 }
 
-// defaultExpectationPath: absolut path that constains the style.json file for testing
-// regex: Test case id regex that used for searching expectation
+// defaultExpectationPath: absolute path that constains the style.json file for testing
+// testId: Test case id that used for composing expectation path
 // expectatedPaths: absolute paths that constain possible expected.png/metrics.json files for result checking
 std::vector<mbgl::filesystem::path> getTestExpectations(const mbgl::filesystem::path& defaultExpectationPath,
-                                                        const std::regex& regex,
+                                                        const std::string& testId,
                                                         std::vector<mbgl::filesystem::path> expectatedPaths) {
     std::vector<mbgl::filesystem::path> expectations{defaultExpectationPath};
-
     for (const auto& expectedPath : expectatedPaths) {
-        for (auto& path : mbgl::filesystem::recursive_directory_iterator(expectedPath)) {
-            if (std::regex_search(path.path().string(), regex)) {
-                expectations.emplace_back(std::move(mbgl::filesystem::path(path).remove_filename()));
-                break;
-            }
-        }
+        expectations.emplace_back(expectedPath / testId);
     }
-
     return expectations;
 }
 
@@ -336,26 +329,18 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
         }
         enbaleProbeTest = true;
     }
-    std::vector<mbgl::filesystem::path> expectedMetricPaths{};
-    if (document.HasMember("metric_paths")) {
-        const auto& metricPathValue = document["metric_paths"];
-        if (!metricPathValue.IsArray()) {
+    mbgl::filesystem::path expectedMetricPath;
+    if (document.HasMember("metric_path")) {
+        const auto& metricPathValue = document["metric_path"];
+        if (!metricPathValue.IsString()) {
             mbgl::Log::Warning(mbgl::Event::General,
-                               "Provided metric_paths inside the manifest file: %s is not a valid array",
+                               "Invalid metric_path is provoided inside the manifest file: %s",
                                filePath.c_str());
             return mbgl::nullopt;
         }
-        for (const auto& value : metricPathValue.GetArray()) {
-            if (!value.IsString()) {
-                mbgl::Log::Warning(mbgl::Event::General,
-                                   "Invalid expectation path item is provoided inside the manifest file: %s",
-                                   filePath.c_str());
-                return mbgl::nullopt;
-            }
-            expectedMetricPaths.emplace_back(getValidPath(manifest.manifestPath, value.GetString()));
-            if (expectedMetricPaths.back().empty()) {
-                return mbgl::nullopt;
-            }
+        expectedMetricPath = getValidPath(manifest.manifestPath, metricPathValue.GetString());
+        if (expectedMetricPath.empty()) {
+            return mbgl::nullopt;
         }
     }
     std::vector<mbgl::filesystem::path> expectationPaths{};
@@ -442,14 +427,13 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
 
             if (testPath.path().filename() == "style.json") {
                 const auto defaultExpectationPath{std::move(mbgl::filesystem::path(testPath).remove_filename())};
-                static const auto rootLength = manifest.testRootPath.length();
-                auto testId = std::string(defaultExpectationPath.string());
+                const auto rootLength = manifest.testRootPath.length();
+                auto testId = defaultExpectationPath.string();
                 testId = testId.substr(rootLength + 1, testId.length() - rootLength - 1);
 
-                const std::regex regex{testId};
                 testPaths.emplace_back(testPath,
-                                       getTestExpectations(defaultExpectationPath, regex, expectationPaths),
-                                       getTestExpectations(defaultExpectationPath, regex, expectedMetricPaths));
+                                       getTestExpectations(defaultExpectationPath, testId, expectationPaths),
+                                       getTestExpectations(defaultExpectationPath, testId, {expectedMetricPath}));
             }
         }
     }

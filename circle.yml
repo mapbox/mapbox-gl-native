@@ -262,6 +262,7 @@ commands:
             - ~/.gradle
       - run:
           name: Collecting artifacts
+          when: always
           command: |
             mkdir -p /tmp/tests/clang-tidy
             if [ -f clang-tidy.log ]; then cp clang-tidy.log /tmp/tests/clang-tidy; fi

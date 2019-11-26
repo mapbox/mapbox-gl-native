@@ -315,7 +315,7 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
             }
         }
     }
-    return checkProbingResults(metadata);
+    return true;
 }
 
 bool TestRunner::checkProbingResults(TestMetadata& metadata) {
@@ -351,195 +351,227 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
         break;
     }
 
+    if (metadata.expectedMetrics.isEmpty()) {
+        metadata.errorMessage = "Failed to find metric expectations for: " + metadata.paths.stylePath.string();
+        return false;
+    }
     // Check file size metrics.
-    for (const auto& expected : metadata.expectedMetrics.fileSize) {
-        auto actual = metadata.metrics.fileSize.find(expected.first);
-        if (actual == metadata.metrics.fileSize.end()) {
-            metadata.errorMessage = "Failed to find fileSize probe: " + expected.first;
-            return false;
-        }
-        if (actual->second.path != expected.second.path) {
-            std::stringstream ss;
-            ss << "Comparing different files at probe \"" << expected.first << "\": " << actual->second.path
-               << ", expected is " << expected.second.path << ".";
-            metadata.errorMessage = ss.str();
+    auto checkFileSize = [](TestMetadata& metadata) -> bool {
+        if (metadata.metrics.fileSize.empty()) return true;
+        for (const auto& expected : metadata.expectedMetrics.fileSize) {
+            auto actual = metadata.metrics.fileSize.find(expected.first);
+            if (actual == metadata.metrics.fileSize.end()) {
+                metadata.errorMessage = "Failed to find fileSize probe: " + expected.first;
+                return false;
+            }
+            if (actual->second.path != expected.second.path) {
+                std::stringstream ss;
+                ss << "Comparing different files at probe \"" << expected.first << "\": " << actual->second.path
+                   << ", expected is " << expected.second.path << ".";
+                metadata.errorMessage = ss.str();
 
-            return false;
-        }
+                return false;
+            }
 
-        auto result = checkValue(expected.second.size, actual->second.size, actual->second.tolerance);
-        if (!std::get<bool>(result)) {
-            std::stringstream ss;
-            ss << "File size does not match at probe \"" << expected.first << "\": " << actual->second.size
-               << ", expected is " << expected.second.size << ".";
+            auto result = checkValue(expected.second.size, actual->second.size, actual->second.tolerance);
+            if (!std::get<bool>(result)) {
+                std::stringstream ss;
+                ss << "File size does not match at probe \"" << expected.first << "\": " << actual->second.size
+                   << ", expected is " << expected.second.size << ".";
 
-            metadata.errorMessage = ss.str();
-            return false;
+                metadata.errorMessage = ss.str();
+                return false;
+            }
         }
-    }
+        return true;
+    };
+    auto checkMemory = [](TestMetadata& metadata) -> bool {
+        if (metadata.metrics.memory.empty()) return true;
 #if !defined(SANITIZE)
-    // Check memory metrics.
-    for (const auto& expected : metadata.expectedMetrics.memory) {
-        auto actual = metadata.metrics.memory.find(expected.first);
-        if (actual == metadata.metrics.memory.end()) {
-            metadata.errorMessage = "Failed to find memory probe: " + expected.first;
-            return false;
-        }
-        bool passed{false};
-        float delta{0.0f};
-        std::stringstream errorStream;
-        std::tie(passed, delta) = MemoryProbe::checkPeak(expected.second, actual->second);
-        if (!passed) {
-            errorStream << "Allocated memory peak size at probe \"" << expected.first << "\" is " << actual->second.peak
-                        << " bytes, expected is " << expected.second.peak << "±" << delta << " bytes.";
+        // Check memory metrics.
+        for (const auto& expected : metadata.expectedMetrics.memory) {
+            auto actual = metadata.metrics.memory.find(expected.first);
+            if (actual == metadata.metrics.memory.end()) {
+                metadata.errorMessage = "Failed to find memory probe: " + expected.first;
+                return false;
+            }
+            bool passed{false};
+            float delta{0.0f};
+            std::stringstream errorStream;
+            std::tie(passed, delta) = MemoryProbe::checkPeak(expected.second, actual->second);
+            if (!passed) {
+                errorStream << "Allocated memory peak size at probe \"" << expected.first << "\" is "
+                            << actual->second.peak << " bytes, expected is " << expected.second.peak << "±" << delta
+                            << " bytes.";
+            }
+
+            std::tie(passed, delta) = MemoryProbe::checkAllocations(expected.second, actual->second);
+            if (!passed) {
+                errorStream << "Number of allocations at probe \"" << expected.first << "\" is "
+                            << actual->second.allocations << ", expected is " << expected.second.allocations << "±"
+                            << std::round(delta) << " allocations.";
+            }
+
+            metadata.errorMessage = errorStream.str();
+            if (!metadata.errorMessage.empty()) return false;
         }
 
-        std::tie(passed, delta) = MemoryProbe::checkAllocations(expected.second, actual->second);
-        if (!passed) {
-            errorStream << "Number of allocations at probe \"" << expected.first << "\" is "
-                        << actual->second.allocations << ", expected is " << expected.second.allocations << "±"
-                        << std::round(delta) << " allocations.";
-        }
-
-        metadata.errorMessage = errorStream.str();
-        if (!metadata.errorMessage.empty()) return false;
-    }
+#endif // !defined(SANITIZE)
+        return true;
+    };
 
     // Check network metrics.
-    for (const auto& expected : metadata.expectedMetrics.network) {
-        auto actual = metadata.metrics.network.find(expected.first);
-        if (actual == metadata.metrics.network.end()) {
-            metadata.errorMessage = "Failed to find network probe: " + expected.first;
-            return false;
-        }
-        bool failed = false;
-        if (actual->second.requests != expected.second.requests) {
-            std::stringstream ss;
-            ss << "Number of requests at probe \"" << expected.first << "\" is " << actual->second.requests
-               << ", expected is " << expected.second.requests << ". ";
+    auto checkNetwork = [](TestMetadata& metadata) -> bool {
+        if (metadata.metrics.network.empty()) return true;
+#if !defined(SANITIZE)
+        for (const auto& expected : metadata.expectedMetrics.network) {
+            auto actual = metadata.metrics.network.find(expected.first);
+            if (actual == metadata.metrics.network.end()) {
+                metadata.errorMessage = "Failed to find network probe: " + expected.first;
+                return false;
+            }
+            bool failed = false;
+            if (actual->second.requests != expected.second.requests) {
+                std::stringstream ss;
+                ss << "Number of requests at probe \"" << expected.first << "\" is " << actual->second.requests
+                   << ", expected is " << expected.second.requests << ". ";
 
-            metadata.errorMessage = ss.str();
-            failed = true;
-        }
-        if (actual->second.transferred != expected.second.transferred) {
-            std::stringstream ss;
-            ss << "Transferred data at probe \"" << expected.first << "\" is " << actual->second.transferred
-               << " bytes, expected is " << expected.second.transferred << " bytes.";
+                metadata.errorMessage = ss.str();
+                failed = true;
+            }
+            if (actual->second.transferred != expected.second.transferred) {
+                std::stringstream ss;
+                ss << "Transferred data at probe \"" << expected.first << "\" is " << actual->second.transferred
+                   << " bytes, expected is " << expected.second.transferred << " bytes.";
 
-            metadata.errorMessage += ss.str();
-            failed = true;
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+            if (failed) {
+                return false;
+            }
         }
-        if (failed) {
-            return false;
-        }
-    }
 #endif // !defined(SANITIZE)
+        return true;
+    };
     // Check fps metrics
-    for (const auto& expected : metadata.expectedMetrics.fps) {
-        auto actual = metadata.metrics.fps.find(expected.first);
-        if (actual == metadata.metrics.fps.end()) {
-            metadata.errorMessage = "Failed to find fps probe: " + expected.first;
-            return false;
+    auto checkFps = [](TestMetadata& metadata) -> bool {
+        if (metadata.metrics.fps.empty()) return true;
+        for (const auto& expected : metadata.expectedMetrics.fps) {
+            auto actual = metadata.metrics.fps.find(expected.first);
+            if (actual == metadata.metrics.fps.end()) {
+                metadata.errorMessage = "Failed to find fps probe: " + expected.first;
+                return false;
+            }
+            auto result = checkValue(expected.second.average, actual->second.average, expected.second.tolerance);
+            if (!std::get<bool>(result)) {
+                std::stringstream ss;
+                ss << "Average fps at probe \"" << expected.first << "\" is " << actual->second.average
+                   << ", expected to be " << expected.second.average << " with tolerance of "
+                   << expected.second.tolerance;
+                metadata.errorMessage = ss.str();
+                return false;
+            }
+            result = checkValue(expected.second.minOnePc, actual->second.minOnePc, expected.second.tolerance);
+            if (!std::get<bool>(result)) {
+                std::stringstream ss;
+                ss << "Minimum(1%) fps at probe \"" << expected.first << "\" is " << actual->second.minOnePc
+                   << ", expected to be " << expected.second.minOnePc << " with tolerance of "
+                   << expected.second.tolerance;
+                metadata.errorMessage = ss.str();
+                return false;
+            }
         }
-        auto result = checkValue(expected.second.average, actual->second.average, expected.second.tolerance);
-        if (!std::get<bool>(result)) {
-            std::stringstream ss;
-            ss << "Average fps at probe \"" << expected.first << "\" is " << actual->second.average
-               << ", expected to be " << expected.second.average << " with tolerance of " << expected.second.tolerance;
-            metadata.errorMessage = ss.str();
-            return false;
-        }
-        result = checkValue(expected.second.minOnePc, actual->second.minOnePc, expected.second.tolerance);
-        if (!std::get<bool>(result)) {
-            std::stringstream ss;
-            ss << "Minimum(1%) fps at probe \"" << expected.first << "\" is " << actual->second.minOnePc
-               << ", expected to be " << expected.second.minOnePc << " with tolerance of " << expected.second.tolerance;
-            metadata.errorMessage = ss.str();
-            return false;
-        }
-    }
+        return true;
+    };
     // Check gfx metrics
-    for (const auto& expected : metadata.expectedMetrics.gfx) {
-        auto actual = metadata.metrics.gfx.find(expected.first);
-        if (actual == metadata.metrics.gfx.end()) {
-            metadata.errorMessage = "Failed to find gfx probe: " + expected.first;
-            return false;
+    auto checkGfx = [](TestMetadata& metadata) -> bool {
+        if (metadata.metrics.gfx.empty()) return true;
+        for (const auto& expected : metadata.expectedMetrics.gfx) {
+            auto actual = metadata.metrics.gfx.find(expected.first);
+            if (actual == metadata.metrics.gfx.end()) {
+                metadata.errorMessage = "Failed to find gfx probe: " + expected.first;
+                return false;
+            }
+
+            const auto& probeName = expected.first;
+            const auto& expectedValue = expected.second;
+            const auto& actualValue = actual->second;
+            bool failed = false;
+
+            if (expectedValue.numDrawCalls != actualValue.numDrawCalls) {
+                std::stringstream ss;
+                if (!metadata.errorMessage.empty()) ss << std::endl;
+                ss << "Number of draw calls at probe\"" << probeName << "\" is " << actualValue.numDrawCalls
+                   << ", expected is " << expectedValue.numDrawCalls;
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+
+            if (expectedValue.numTextures != actualValue.numTextures) {
+                std::stringstream ss;
+                if (!metadata.errorMessage.empty()) ss << std::endl;
+                ss << "Number of textures at probe \"" << probeName << "\" is " << actualValue.numTextures
+                   << ", expected is " << expectedValue.numTextures;
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+
+            if (expectedValue.numBuffers != actualValue.numBuffers) {
+                std::stringstream ss;
+                if (!metadata.errorMessage.empty()) ss << std::endl;
+                ss << "Number of vertex and index buffers at probe \"" << probeName << "\" is "
+                   << actualValue.numBuffers << ", expected is " << expectedValue.numBuffers;
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+
+            if (expectedValue.numFrameBuffers != actualValue.numFrameBuffers) {
+                std::stringstream ss;
+                if (!metadata.errorMessage.empty()) ss << std::endl;
+                ss << "Number of frame buffers at probe \"" << probeName << "\" is " << actualValue.numFrameBuffers
+                   << ", expected is " << expectedValue.numFrameBuffers;
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+
+            if (expectedValue.memTextures.peak != actualValue.memTextures.peak) {
+                std::stringstream ss;
+                if (!metadata.errorMessage.empty()) ss << std::endl;
+                ss << "Allocated texture memory peak size at probe \"" << probeName << "\" is "
+                   << actualValue.memTextures.peak << " bytes, expected is " << expectedValue.memTextures.peak
+                   << " bytes";
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+
+            if (expectedValue.memIndexBuffers.peak != actualValue.memIndexBuffers.peak) {
+                std::stringstream ss;
+                if (!metadata.errorMessage.empty()) ss << std::endl;
+                ss << "Allocated index buffer memory peak size at probe \"" << probeName << "\" is "
+                   << actualValue.memIndexBuffers.peak << " bytes, expected is " << expectedValue.memIndexBuffers.peak
+                   << " bytes";
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+
+            if (expectedValue.memVertexBuffers.peak != actualValue.memVertexBuffers.peak) {
+                std::stringstream ss;
+                if (!metadata.errorMessage.empty()) ss << std::endl;
+                ss << "Allocated vertex buffer memory peak size at probe \"" << probeName << "\" is "
+                   << actualValue.memVertexBuffers.peak << " bytes, expected is " << expectedValue.memVertexBuffers.peak
+                   << " bytes";
+                metadata.errorMessage += ss.str();
+                failed = true;
+            }
+
+            if (failed) return false;
         }
+        return true;
+    };
 
-        const auto& probeName = expected.first;
-        const auto& expectedValue = expected.second;
-        const auto& actualValue = actual->second;
-        bool failed = false;
-
-        if (expectedValue.numDrawCalls != actualValue.numDrawCalls) {
-            std::stringstream ss;
-            if (!metadata.errorMessage.empty()) ss << std::endl;
-            ss << "Number of draw calls at probe\"" << probeName << "\" is " << actualValue.numDrawCalls
-               << ", expected is " << expectedValue.numDrawCalls;
-            metadata.errorMessage += ss.str();
-            failed = true;
-        }
-
-        if (expectedValue.numTextures != actualValue.numTextures) {
-            std::stringstream ss;
-            if (!metadata.errorMessage.empty()) ss << std::endl;
-            ss << "Number of textures at probe \"" << probeName << "\" is " << actualValue.numTextures
-               << ", expected is " << expectedValue.numTextures;
-            metadata.errorMessage += ss.str();
-            failed = true;
-        }
-
-        if (expectedValue.numBuffers != actualValue.numBuffers) {
-            std::stringstream ss;
-            if (!metadata.errorMessage.empty()) ss << std::endl;
-            ss << "Number of vertex and index buffers at probe \"" << probeName << "\" is " << actualValue.numBuffers
-               << ", expected is " << expectedValue.numBuffers;
-            metadata.errorMessage += ss.str();
-            failed = true;
-        }
-
-        if (expectedValue.numFrameBuffers != actualValue.numFrameBuffers) {
-            std::stringstream ss;
-            if (!metadata.errorMessage.empty()) ss << std::endl;
-            ss << "Number of frame buffers at probe \"" << probeName << "\" is " << actualValue.numFrameBuffers
-               << ", expected is " << expectedValue.numFrameBuffers;
-            metadata.errorMessage += ss.str();
-            failed = true;
-        }
-
-        if (expectedValue.memTextures.peak != actualValue.memTextures.peak) {
-            std::stringstream ss;
-            if (!metadata.errorMessage.empty()) ss << std::endl;
-            ss << "Allocated texture memory peak size at probe \"" << probeName << "\" is "
-               << actualValue.memTextures.peak << " bytes, expected is " << expectedValue.memTextures.peak << " bytes";
-            metadata.errorMessage += ss.str();
-            failed = true;
-        }
-
-        if (expectedValue.memIndexBuffers.peak != actualValue.memIndexBuffers.peak) {
-            std::stringstream ss;
-            if (!metadata.errorMessage.empty()) ss << std::endl;
-            ss << "Allocated index buffer memory peak size at probe \"" << probeName << "\" is "
-               << actualValue.memIndexBuffers.peak << " bytes, expected is " << expectedValue.memIndexBuffers.peak
-               << " bytes";
-            metadata.errorMessage += ss.str();
-            failed = true;
-        }
-
-        if (expectedValue.memVertexBuffers.peak != actualValue.memVertexBuffers.peak) {
-            std::stringstream ss;
-            if (!metadata.errorMessage.empty()) ss << std::endl;
-            ss << "Allocated vertex buffer memory peak size at probe \"" << probeName << "\" is "
-               << actualValue.memVertexBuffers.peak << " bytes, expected is " << expectedValue.memVertexBuffers.peak
-               << " bytes";
-            metadata.errorMessage += ss.str();
-            failed = true;
-        }
-
-        if (failed) return false;
-    }
-
-    return true;
+    return checkFileSize(metadata) && checkMemory(metadata) && checkNetwork(metadata) && checkFps(metadata) &&
+           checkGfx(metadata);
 }
 
 bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, RunContext& ctx) {
@@ -1176,7 +1208,7 @@ bool TestRunner::run(TestMetadata& metadata, const std::set<std::string>& inject
     }
 
     if (metadata.renderTest) {
-        return checkRenderTestResults(std::move(result.image), metadata);
+        return checkRenderTestResults(std::move(result.image), metadata) && checkProbingResults(metadata);
     } else {
         std::vector<mbgl::Feature> features;
         assert(metadata.document["metadata"]["test"]["queryGeometry"].IsArray());
