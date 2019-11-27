@@ -1,0 +1,19 @@
+{
+    "file-size": [
+        [
+            "mbgl-glfw",
+            "/src/workspace/next-macos-xcode11-release/bin/mbgl-glfw",
+            5439932
+        ],
+        [
+            "mbgl-offline",
+            "/src/workspace/next-macos-xcode11-release/bin/mbgl-offline",
+            5334136
+        ],
+        [
+            "mbgl-render",
+            "/src/workspace/next-macos-xcode11-release/bin/mbgl-render",
+            5384420
+        ]
+    ]
+}
