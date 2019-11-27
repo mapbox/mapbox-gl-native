@@ -294,7 +294,7 @@ std::vector<std::string> readExpectedImageEntries(const mbgl::filesystem::path& 
 }
 
 std::vector<std::string> readExpectedMetricEntries(const mbgl::filesystem::path& base) {
-    static const std::regex regex(".*/metrics.*.json");
+    static const std::regex regex(".*/metrics.json");
     return readExpectedEntries(regex, base);
 }
 
