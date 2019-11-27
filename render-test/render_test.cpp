@@ -40,7 +40,30 @@ void operator delete(void* ptr, size_t) noexcept {
 #endif
 
 namespace {
-using ArgumentsTuple = std::tuple<bool, bool, uint32_t, std::string, std::vector<std::string>, std::string>;
+
+template <typename T>
+TestRunner::UpdateResults initUpdateResults(T& testUpdateResultsValue) {
+    if (!testUpdateResultsValue) {
+#if !TEST_READ_ONLY
+        if (getenv("UPDATE_DEFAULT")) return TestRunner::UpdateResults::DEFAULT;
+        if (getenv("UPDATE_PLATFORM")) return TestRunner::UpdateResults::PLATFORM;
+        if (getenv("UPDATE_METRICS")) return TestRunner::UpdateResults::METRICS;
+#endif
+        return TestRunner::UpdateResults::NO;
+    }
+    std::string str = args::get(testUpdateResultsValue);
+#if !TEST_READ_ONLY
+    if (str == "default") return TestRunner::UpdateResults::DEFAULT;
+    if (str == "platform") return TestRunner::UpdateResults::PLATFORM;
+    if (str == "metrics") return TestRunner::UpdateResults::METRICS;
+#endif
+    mbgl::Log::Warning(
+        mbgl::Event::General, "Unsupported update test results mode: \"%s\" will be ignored", str.c_str());
+    return TestRunner::UpdateResults::NO;
+}
+
+using ArgumentsTuple =
+    std::tuple<bool, bool, uint32_t, std::string, TestRunner::UpdateResults, std::vector<std::string>, std::string>;
 ArgumentsTuple parseArguments(int argc, char** argv) {
     args::ArgumentParser argumentParser("Mapbox GL Test Runner");
 
@@ -52,6 +75,11 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     args::ValueFlag<std::string> testPathValue(
         argumentParser, "manifestPath", "Test manifest file path", {'p', "manifestPath"});
     args::ValueFlag<std::string> testFilterValue(argumentParser, "filter", "Test filter regex", {'f', "filter"});
+    args::ValueFlag<std::string> testUpdateResultsValue(
+        argumentParser,
+        "update",
+        "Test results update mode. Supported values are: \"default\", \"platform\", \"metrics\"",
+        {'u', "update"});
     args::PositionalList<std::string> testNameValues(argumentParser, "URL", "Test name(s)");
 
     try {
@@ -90,10 +118,12 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
     auto testFilter = testFilterValue ? args::get(testFilterValue) : std::string{};
     const auto shuffle = shuffleFlag ? args::get(shuffleFlag) : false;
     const auto seed = seedValue ? args::get(seedValue) : 1u;
+    TestRunner::UpdateResults updateResults = initUpdateResults(testUpdateResultsValue);
     return ArgumentsTuple{recycleMapFlag ? args::get(recycleMapFlag) : false,
                           shuffle,
                           seed,
                           manifestPath.string(),
+                          updateResults,
                           std::move(testNames),
                           std::move(testFilter)};
 }
@@ -107,14 +137,16 @@ int runRenderTests(int argc, char** argv, std::function<void()> testStatus) {
     std::string manifestPath;
     std::vector<std::string> testNames;
     std::string testFilter;
+    TestRunner::UpdateResults updateResults;
 
-    std::tie(recycleMap, shuffle, seed, manifestPath, testNames, testFilter) = parseArguments(argc, argv);
+    std::tie(recycleMap, shuffle, seed, manifestPath, updateResults, testNames, testFilter) =
+        parseArguments(argc, argv);
     auto manifestData = ManifestParser::parseManifest(manifestPath, testNames, testFilter);
     if (!manifestData) {
         exit(5);
     }
     mbgl::util::RunLoop runLoop;
-    TestRunner runner(std::move(*manifestData));
+    TestRunner runner(std::move(*manifestData), updateResults);
     if (shuffle) {
         printf(ANSI_COLOR_YELLOW "Shuffle seed: %d" ANSI_COLOR_RESET "\n", seed);
         runner.doShuffle(seed);

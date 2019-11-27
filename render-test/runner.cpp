@@ -154,7 +154,8 @@ std::string simpleDiff(const Value& result, const Value& expected) {
     return diff.str();
 }
 
-TestRunner::TestRunner(Manifest manifest_) : manifest(std::move(manifest_)) {}
+TestRunner::TestRunner(Manifest manifest_, UpdateResults updateResults_)
+    : manifest(std::move(manifest_)), updateResults(updateResults_) {}
 
 const Manifest& TestRunner::getManifest() const {
     return manifest;
@@ -185,11 +186,11 @@ bool TestRunner::checkQueryTestResults(mbgl::PremultipliedImage&& actualImage,
     }
 
 #if !TEST_READ_ONLY
-    if (getenv("UPDATE_PLATFORM")) {
+    if (updateResults == UpdateResults::PLATFORM) {
         mbgl::filesystem::create_directories(expectations.back());
         mbgl::util::write_file(expectations.back().string() + "/expected.json", metadata.actualJson);
         return true;
-    } else if (getenv("UPDATE_DEFAULT")) {
+    } else if (updateResults == UpdateResults::DEFAULT) {
         mbgl::util::write_file(base + "/expected.json", metadata.actualJson);
         return true;
     }
@@ -255,11 +256,11 @@ bool TestRunner::checkRenderTestResults(mbgl::PremultipliedImage&& actualImage, 
         }
 
 #if !TEST_READ_ONLY
-        if (getenv("UPDATE_PLATFORM")) {
+        if (updateResults == UpdateResults::PLATFORM) {
             mbgl::filesystem::create_directories(expectations.back());
             mbgl::util::write_file(expectations.back().string() + "/expected.png", mbgl::encodePNG(actualImage));
             return true;
-        } else if (getenv("UPDATE_DEFAULT")) {
+        } else if (updateResults == UpdateResults::DEFAULT) {
             mbgl::util::write_file(base + "/expected.png", mbgl::encodePNG(actualImage));
             return true;
         }
@@ -322,7 +323,7 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
     if (metadata.metrics.isEmpty()) return true;
     const std::vector<mbgl::filesystem::path>& expectedMetrics = metadata.paths.expectedMetrics;
 #if !TEST_READ_ONLY
-    if (getenv("UPDATE_METRICS")) {
+    if (updateResults == UpdateResults::METRICS) {
         mbgl::filesystem::create_directories(expectedMetrics.back());
         mbgl::util::write_file(expectedMetrics.back().string() + "/metrics.json", serializeMetrics(metadata.metrics));
         return true;
