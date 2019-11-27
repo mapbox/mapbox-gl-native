@@ -275,21 +275,26 @@ std::string serializeMetrics(const TestMetrics& metrics) {
 
 namespace {
 std::vector<std::string> readExpectedEntries(const std::regex& regex, const mbgl::filesystem::path& base) {
-    std::vector<std::string> expectedImages;
+    std::vector<std::string> expectedEntries;
     for (const auto& entry : mbgl::filesystem::directory_iterator(base)) {
         if (entry.is_regular_file()) {
             const std::string path = entry.path().string();
             if (std::regex_match(path, regex)) {
-                expectedImages.emplace_back(std::move(path));
+                expectedEntries.emplace_back(std::move(path));
             }
         }
     }
-    return expectedImages;
+    return expectedEntries;
 }
 } // namespace
 
 std::vector<std::string> readExpectedImageEntries(const mbgl::filesystem::path& base) {
     static const std::regex regex(".*expected.*.png");
+    return readExpectedEntries(regex, base);
+}
+
+std::vector<std::string> readExpectedMetricEntries(const mbgl::filesystem::path& base) {
+    static const std::regex regex(".*metrics.*.json");
     return readExpectedEntries(regex, base);
 }
 

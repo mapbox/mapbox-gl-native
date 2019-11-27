@@ -31,6 +31,7 @@ private:
                                std::vector<mbgl::Feature>&& features,
                                TestMetadata&);
     bool checkRenderTestResults(mbgl::PremultipliedImage&& image, TestMetadata&);
+    bool checkProbingResults(TestMetadata&);
 
     struct Impl {
         Impl(const TestMetadata&);

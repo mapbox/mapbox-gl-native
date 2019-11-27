@@ -29,11 +29,16 @@ struct TestStatistics {
 
 struct TestPaths {
     TestPaths() = default;
-    TestPaths(mbgl::filesystem::path stylePath_, std::vector<mbgl::filesystem::path> expectations_)
-        : stylePath(std::move(stylePath_)), expectations(std::move(expectations_)) {}
+    TestPaths(mbgl::filesystem::path stylePath_,
+              std::vector<mbgl::filesystem::path> expectations_,
+              std::vector<mbgl::filesystem::path> expectedMetrics_)
+        : stylePath(std::move(stylePath_)),
+          expectations(std::move(expectations_)),
+          expectedMetrics(std::move(expectedMetrics_)) {}
 
     mbgl::filesystem::path stylePath;
     std::vector<mbgl::filesystem::path> expectations;
+    std::vector<mbgl::filesystem::path> expectedMetrics;
 
     std::string defaultExpectations() const {
         assert(!expectations.empty());
