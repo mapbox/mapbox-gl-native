@@ -14,7 +14,8 @@ struct TestMetadata;
 
 class TestRunner {
 public:
-    explicit TestRunner(Manifest);
+    enum class UpdateResults { NO, DEFAULT, PLATFORM, METRICS };
+    TestRunner(Manifest, UpdateResults);
     bool run(TestMetadata&);
     void reset();
 
@@ -43,4 +44,5 @@ private:
     };
     std::unordered_map<std::string, std::unique_ptr<Impl>> maps;
     Manifest manifest;
+    UpdateResults updateResults;
 };
