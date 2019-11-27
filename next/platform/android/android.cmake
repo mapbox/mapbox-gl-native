@@ -387,11 +387,11 @@ set_target_properties(mbgl-benchmark-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse
 set_target_properties(mbgl-render-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 set_target_properties(mbgl-test-runner PROPERTIES LINK_FLAGS_RELEASE "-fuse-ld=gold -O2 -flto -Wl,--icf=safe")
 
-target_compile_options(example-custom-layer PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
-target_compile_options(mapbox-gl PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
-target_compile_options(mbgl-core PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
-target_compile_options(mbgl-render-test-runner PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
-target_compile_options(mbgl-vendor-icu PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
-target_compile_options(mbgl-vendor-sqlite PRIVATE $<$<CONFIG:Release>:-Qunused-arguments -flto>)
+target_compile_options(example-custom-layer PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
+target_compile_options(mapbox-gl PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
+target_compile_options(mbgl-core PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
+target_compile_options(mbgl-render-test-runner PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
+target_compile_options(mbgl-vendor-icu PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
+target_compile_options(mbgl-vendor-sqlite PRIVATE $<$<CONFIG:Release>:-Oz -Qunused-arguments -flto>)
 
 install(TARGETS mapbox-gl LIBRARY DESTINATION lib)
