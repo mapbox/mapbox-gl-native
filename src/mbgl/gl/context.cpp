@@ -94,16 +94,16 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
         }
 
         // Block Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
+        // Block Adreno 4xx as it crashes in a driver when VBOs are destructed (Android 5.1.1)
         // Block ARM Mali-T720 (in some MT8163 chipsets) as it crashes on glBindVertexArray
         // Block ANGLE on Direct3D as the combination of Qt + Windows + ANGLE leads to crashes
-        if (renderer.find("Adreno (TM) 2") == std::string::npos
-            && renderer.find("Adreno (TM) 3") == std::string::npos
-            && (!(renderer.find("ANGLE") != std::string::npos
-                  && renderer.find("Direct3D") != std::string::npos))
-            && renderer.find("Mali-T720") == std::string::npos
-            && renderer.find("Sapphire 650") == std::string::npos
-            && !disableVAOExtension) {
-                vertexArray = std::make_unique<extension::VertexArray>(fn);
+        if (renderer.find("Adreno (TM) 2") == std::string::npos &&
+            renderer.find("Adreno (TM) 3") == std::string::npos &&
+            renderer.find("Adreno (TM) 4") == std::string::npos &&
+            (!(renderer.find("ANGLE") != std::string::npos && renderer.find("Direct3D") != std::string::npos)) &&
+            renderer.find("Mali-T720") == std::string::npos && renderer.find("Sapphire 650") == std::string::npos &&
+            !disableVAOExtension) {
+            vertexArray = std::make_unique<extension::VertexArray>(fn);
         }
 
 #if MBGL_USE_GLES2
