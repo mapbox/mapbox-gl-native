@@ -69,7 +69,20 @@ public:
     // Get the scheduler for asynchronous tasks. This method
     // will lazily initialize a shared worker pool when ran
     // from the first time.
+    // The scheduled tasks might run in parallel on different
+    // threads.
+    // TODO : Rename to GetPool()
     static std::shared_ptr<Scheduler> GetBackground();
+
+    // Get the *sequenced* scheduler for asynchronous tasks.
+    // Unlike the method above, the returned scheduler
+    // (once stored) represents a single thread, thus each
+    // newly scheduled task is guarantied to run after the
+    // previously scheduled one.
+    //
+    // Sequenced scheduler can be used for running tasks
+    // on the same thread-unsafe object.
+    static std::shared_ptr<Scheduler> GetSequenced();
 
 protected:
     template <typename TaskFn, typename ReplyFn>
