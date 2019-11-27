@@ -21,6 +21,7 @@ workflows:
       - next-build-template:
           name: next-android-x86-release
           executor_name: ubuntu-disco
+          target_is_android: true
           config_params: '-G Ninja -DCMAKE_INSTALL_PREFIX=workspace/$CIRCLE_JOB -DCMAKE_TOOLCHAIN_FILE=/opt/android/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_CCACHE=/usr/bin/ccache -DANDROID_ABI=x86'
           install: true
       - next-build-template:
@@ -189,10 +190,6 @@ workflows:
       - ios-sanitize-address-nightly
       - ios-static-analyzer-nightly
       - ios-static-analyzer-nightly-xcode10
-<<<<<<< HEAD
-
-=======
->>>>>>> [test-runner] Add pixel4 baseline metrics
 
 executors:
   ubuntu-disco:

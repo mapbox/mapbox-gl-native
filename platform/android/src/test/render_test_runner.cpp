@@ -253,8 +253,7 @@ void android_main(struct android_app* app) {
         unZipFile(env, zipFile, storagePath);
 
         std::string configFile = storagePath + "/android-manifest.json";
-        std::vector<std::string> arguments = {
-            "mbgl-render-test-runner", "-p", configFile, "--probe=network", "--probe=gfx"};
+        std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", configFile};
         std::vector<char*> argv;
         for (const auto& arg : arguments) {
             argv.push_back((char*)arg.data());
