@@ -25,3 +25,20 @@ TEST(TaggedString, Trim) {
     noTrim.trim();
     EXPECT_EQ(noTrim.rawText(), u"no trim!");
 }
+
+TEST(TaggedString, ImageSections) {
+    TaggedString string;
+    string.addImageSection("image_name");
+    EXPECT_EQ(string.rawText(), u"\uE000");
+    EXPECT_TRUE(string.getSection(0).imageID);
+    EXPECT_EQ(*string.getSection(0).imageID, "image_name");
+
+    TaggedString maxSections;
+    for (std::size_t i = 0; i < 6401; ++i) {
+        maxSections.addImageSection(util::toString(i));
+    }
+
+    EXPECT_EQ(maxSections.getSections().size(), 6400u);
+    EXPECT_EQ(maxSections.getCharCodeAt(0), u'\uE000');
+    EXPECT_EQ(maxSections.getCharCodeAt(6399), u'\uF8FF');
+}
