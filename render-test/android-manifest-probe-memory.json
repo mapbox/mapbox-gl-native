@@ -1,6 +1,6 @@
 {
     "base_test_path":"mapbox-gl-js/test/integration",
-    "expectation_paths":["render-test/expected"],
+    "expectation_paths":["render-test/expected", "render-test/expected/android"],
     "ignore_paths":["ignores/ignores.json", "ignores/linux-ignores.json"],
     "vendor_path":"vendor",
     "asset_path": "mapbox-gl-js/test/integration",
