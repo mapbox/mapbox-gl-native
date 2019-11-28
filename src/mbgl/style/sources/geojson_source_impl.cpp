@@ -91,24 +91,24 @@ std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON, Immutab
         clusterOptions.maxZoom = options->clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
         clusterOptions.radius = ::round(scale * options->clusterRadius);
-        Feature feature;
-        clusterOptions.map = [&, options](const PropertyMap& properties) -> PropertyMap {
+        auto feature = std::make_shared<Feature>();
+        clusterOptions.map = [feature, options](const PropertyMap& properties) -> PropertyMap {
             PropertyMap ret{};
             if (properties.empty()) return ret;
             for (const auto& p : options->clusterProperties) {
-                feature.properties = properties;
-                ret[p.first] = evaluateFeature<Value>(feature, p.second.first);
+                feature->properties = properties;
+                ret[p.first] = evaluateFeature<Value>(*feature, p.second.first);
             }
             return ret;
         };
-        clusterOptions.reduce = [&, options](PropertyMap& toReturn, const PropertyMap& toFill) {
+        clusterOptions.reduce = [feature, options](PropertyMap& toReturn, const PropertyMap& toFill) {
             for (const auto& p : options->clusterProperties) {
                 if (toFill.count(p.first) == 0) {
                     continue;
                 }
-                feature.properties = toFill;
+                feature->properties = toFill;
                 optional<Value> accumulated(toReturn[p.first]);
-                toReturn[p.first] = evaluateFeature<Value>(feature, p.second.second, accumulated);
+                toReturn[p.first] = evaluateFeature<Value>(*feature, p.second.second, accumulated);
             }
         };
         return std::make_shared<SuperclusterData>(geoJSON.get<mapbox::feature::feature_collection<double>>(),
