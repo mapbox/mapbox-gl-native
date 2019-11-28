@@ -12,6 +12,7 @@
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/compression.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -837,12 +838,25 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
         float tolerance = operationArray[3].GetDouble();
         mbgl::filesystem::path filePath(path);
 
+        bool compressed = false;
+        if (operationArray.Size() == 5) {
+            assert(operationArray[4].IsString());
+            assert(std::string(operationArray[4].GetString(), operationArray[4].GetStringLength()) == "compressed");
+            compressed = true;
+        }
+
         if (!filePath.is_absolute()) {
             filePath = metadata.paths.defaultExpectations() / filePath;
         }
 
         if (mbgl::filesystem::exists(filePath)) {
-            auto size = mbgl::filesystem::file_size(filePath);
+            size_t size = 0;
+            if (compressed) {
+                size = mbgl::util::compress(*mbgl::util::readFile(filePath)).size();
+            } else {
+                size = mbgl::filesystem::file_size(filePath);
+            }
+
             metadata.metrics.fileSize.emplace(std::piecewise_construct,
                                               std::forward_as_tuple(std::move(mark)),
                                               std::forward_as_tuple(std::move(path), size, tolerance));
