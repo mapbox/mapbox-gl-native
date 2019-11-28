@@ -3,7 +3,7 @@
   "metadata": {
     "test": {
       "operations": [
-        ["probeFileSize", "android-arm64-v8a", "/src/workspace/next-android-arm64-v8a-release/lib/libmapbox-gl.so", 0.01]
+        ["probeFileSize", "android-arm64-v8a", "/src/workspace/next-android-arm64-v8a-release/lib/libmapbox-gl.so", 0.01, "compressed"]
       ],
       "width": 64,
       "height": 64
