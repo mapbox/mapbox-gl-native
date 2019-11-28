@@ -26,14 +26,14 @@
                               MGLShapeSourceOptionLineDistanceMetrics: @YES};
 
     auto mbglOptions = MGLGeoJSONOptionsFromDictionary(options);
-    XCTAssertTrue(mbglOptions.cluster);
-    XCTAssertEqual(mbglOptions.clusterRadius, 42);
-    XCTAssertEqual(mbglOptions.clusterMaxZoom, 98);
-    XCTAssertEqual(mbglOptions.maxzoom, 99);
-    XCTAssertEqual(mbglOptions.buffer, 1976);
-    XCTAssertEqual(mbglOptions.tolerance, 0.42);
-    XCTAssertTrue(mbglOptions.lineMetrics);
-    XCTAssertTrue(!mbglOptions.clusterProperties.empty());
+    XCTAssertTrue(mbglOptions->cluster);
+    XCTAssertEqual(mbglOptions->clusterRadius, 42);
+    XCTAssertEqual(mbglOptions->clusterMaxZoom, 98);
+    XCTAssertEqual(mbglOptions->maxzoom, 99);
+    XCTAssertEqual(mbglOptions->buffer, 1976);
+    XCTAssertEqual(mbglOptions->tolerance, 0.42);
+    XCTAssertTrue(mbglOptions->lineMetrics);
+    XCTAssertTrue(!mbglOptions->clusterProperties.empty());
 
     options = @{MGLShapeSourceOptionClustered: @"number 1"};
     XCTAssertThrows(MGLGeoJSONOptionsFromDictionary(options));

@@ -83,26 +83,26 @@ T evaluateFeature(const mapbox::feature::feature<double>& f,
 }
 
 // static
-std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON, const GeoJSONOptions& options) {
+std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON, Immutable<GeoJSONOptions> options) {
     constexpr double scale = util::EXTENT / util::tileSize;
-    if (options.cluster && geoJSON.is<mapbox::feature::feature_collection<double>>() &&
+    if (options->cluster && geoJSON.is<mapbox::feature::feature_collection<double>>() &&
         !geoJSON.get<mapbox::feature::feature_collection<double>>().empty()) {
         mapbox::supercluster::Options clusterOptions;
-        clusterOptions.maxZoom = options.clusterMaxZoom;
+        clusterOptions.maxZoom = options->clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
-        clusterOptions.radius = ::round(scale * options.clusterRadius);
+        clusterOptions.radius = ::round(scale * options->clusterRadius);
         Feature feature;
-        clusterOptions.map = [&](const PropertyMap& properties) -> PropertyMap {
+        clusterOptions.map = [&, options](const PropertyMap& properties) -> PropertyMap {
             PropertyMap ret{};
             if (properties.empty()) return ret;
-            for (const auto& p : options.clusterProperties) {
+            for (const auto& p : options->clusterProperties) {
                 feature.properties = properties;
                 ret[p.first] = evaluateFeature<Value>(feature, p.second.first);
             }
             return ret;
         };
-        clusterOptions.reduce = [&](PropertyMap& toReturn, const PropertyMap& toFill) {
-            for (const auto& p : options.clusterProperties) {
+        clusterOptions.reduce = [&, options](PropertyMap& toReturn, const PropertyMap& toFill) {
+            for (const auto& p : options->clusterProperties) {
                 if (toFill.count(p.first) == 0) {
                     continue;
                 }
@@ -116,18 +116,16 @@ std::shared_ptr<GeoJSONData> GeoJSONData::create(const GeoJSON& geoJSON, const G
     }
 
     mapbox::geojsonvt::Options vtOptions;
-    vtOptions.maxZoom = options.maxzoom;
+    vtOptions.maxZoom = options->maxzoom;
     vtOptions.extent = util::EXTENT;
-    vtOptions.buffer = ::round(scale * options.buffer);
-    vtOptions.tolerance = scale * options.tolerance;
-    vtOptions.lineMetrics = options.lineMetrics;
+    vtOptions.buffer = ::round(scale * options->buffer);
+    vtOptions.tolerance = scale * options->tolerance;
+    vtOptions.lineMetrics = options->lineMetrics;
     return std::make_shared<GeoJSONVTData>(geoJSON, vtOptions);
 }
 
-GeoJSONSource::Impl::Impl(std::string id_, optional<GeoJSONOptions> options_)
-    : Source::Impl(SourceType::GeoJSON, std::move(id_)) {
-    options = options_ ? std::move(*options_) : GeoJSONOptions{};
-}
+GeoJSONSource::Impl::Impl(std::string id_, Immutable<GeoJSONOptions> options_)
+    : Source::Impl(SourceType::GeoJSON, std::move(id_)), options(std::move(options_)) {}
 
 GeoJSONSource::Impl::Impl(const GeoJSONSource::Impl& other, std::shared_ptr<GeoJSONData> data_)
     : Source::Impl(other), options(other.options), data(std::move(data_)) {}
@@ -135,7 +133,7 @@ GeoJSONSource::Impl::Impl(const GeoJSONSource::Impl& other, std::shared_ptr<GeoJ
 GeoJSONSource::Impl::~Impl() = default;
 
 Range<uint8_t> GeoJSONSource::Impl::getZoomRange() const {
-    return { options.minzoom, options.maxzoom };
+    return {options->minzoom, options->maxzoom};
 }
 
 std::weak_ptr<GeoJSONData> GeoJSONSource::Impl::getData() const {

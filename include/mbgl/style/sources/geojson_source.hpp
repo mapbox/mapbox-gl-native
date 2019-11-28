@@ -34,10 +34,13 @@ struct GeoJSONOptions {
                                         std::shared_ptr<mbgl::style::expression::Expression>>;
     using ClusterProperties = std::unordered_map<std::string, ClusterExpression>;
     ClusterProperties clusterProperties;
+
+    static Immutable<GeoJSONOptions> defaultOptions();
 };
 class GeoJSONData {
 public:
-    static std::shared_ptr<GeoJSONData> create(const GeoJSON&, const GeoJSONOptions&);
+    static std::shared_ptr<GeoJSONData> create(const GeoJSON&,
+                                               Immutable<GeoJSONOptions> = GeoJSONOptions::defaultOptions());
 
     virtual ~GeoJSONData() = default;
     virtual mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
@@ -52,7 +55,7 @@ public:
 
 class GeoJSONSource final : public Source {
 public:
-    GeoJSONSource(const std::string& id, optional<GeoJSONOptions> = nullopt);
+    GeoJSONSource(std::string id, Immutable<GeoJSONOptions> = GeoJSONOptions::defaultOptions());
     ~GeoJSONSource() final;
 
     void setURL(const std::string& url);

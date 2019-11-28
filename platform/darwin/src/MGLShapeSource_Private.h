@@ -1,6 +1,8 @@
 #import "MGLFoundation.h"
 #import "MGLShapeSource.h"
 
+#include <mbgl/util/immutable.hpp>
+
 NS_ASSUME_NONNULL_BEGIN
 
 namespace mbgl {
@@ -10,7 +12,7 @@ namespace mbgl {
 }
 
 MGL_EXPORT
-mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options);
+mbgl::Immutable<mbgl::style::GeoJSONOptions> MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options);
 
 @interface MGLShapeSource (Private)
 

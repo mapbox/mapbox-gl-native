@@ -12,8 +12,14 @@
 namespace mbgl {
 namespace style {
 
-GeoJSONSource::GeoJSONSource(const std::string& id, optional<GeoJSONOptions> options)
-    : Source(makeMutable<Impl>(id, options)) {}
+// static
+Immutable<GeoJSONOptions> GeoJSONOptions::defaultOptions() {
+    static Immutable<GeoJSONOptions> options = makeMutable<GeoJSONOptions>();
+    return options;
+}
+
+GeoJSONSource::GeoJSONSource(std::string id, Immutable<GeoJSONOptions> options)
+    : Source(makeMutable<Impl>(std::move(id), std::move(options))) {}
 
 GeoJSONSource::~GeoJSONSource() = default;
 
@@ -47,7 +53,7 @@ optional<std::string> GeoJSONSource::getURL() const {
 }
 
 const GeoJSONOptions& GeoJSONSource::getOptions() const {
-    return impl().getOptions();
+    return *impl().getOptions();
 }
 
 void GeoJSONSource::loadDescription(FileSource& fileSource) {
