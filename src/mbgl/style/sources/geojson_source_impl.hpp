@@ -13,18 +13,18 @@ namespace style {
 
 class GeoJSONSource::Impl : public Source::Impl {
 public:
-    Impl(std::string id, optional<GeoJSONOptions>);
+    Impl(std::string id, Immutable<GeoJSONOptions>);
     Impl(const GeoJSONSource::Impl&, std::shared_ptr<GeoJSONData>);
     ~Impl() final;
 
     Range<uint8_t> getZoomRange() const;
     std::weak_ptr<GeoJSONData> getData() const;
-    const GeoJSONOptions& getOptions() const { return options; }
+    const Immutable<GeoJSONOptions>& getOptions() const { return options; }
 
     optional<std::string> getAttribution() const final;
 
 private:
-    GeoJSONOptions options;
+    Immutable<GeoJSONOptions> options;
     std::shared_ptr<GeoJSONData> data;
 };
 

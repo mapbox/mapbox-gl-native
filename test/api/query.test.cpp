@@ -48,9 +48,9 @@ std::vector<Feature> getTopClusterFeature(QueryTest& test) {
     };
 
     LatLng coordinate{0, 0};
-    GeoJSONOptions options{};
-    options.cluster = true;
-    auto source = std::make_unique<GeoJSONSource>("cluster_source"s, options);
+    Mutable<GeoJSONOptions> options = makeMutable<GeoJSONOptions>();
+    options->cluster = true;
+    auto source = std::make_unique<GeoJSONSource>("cluster_source"s, std::move(options));
     source->setURL("http://url"s);
     source->loadDescription(*test.fileSource);
 

@@ -27,15 +27,15 @@ const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLevel = @"MGLShapeSour
 const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLShapeSourceOptionSimplificationTolerance";
 const MGLShapeSourceOption MGLShapeSourceOptionLineDistanceMetrics = @"MGLShapeSourceOptionLineDistanceMetrics";
 
-mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options) {
-    auto geoJSONOptions = mbgl::style::GeoJSONOptions();
+mbgl::Immutable<mbgl::style::GeoJSONOptions> MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options) {
+    auto geoJSONOptions = mbgl::makeMutable<mbgl::style::GeoJSONOptions>();
 
     if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionMaximumZoomLevel must be an NSNumber."];
         }
-        geoJSONOptions.minzoom = value.integerValue;
+        geoJSONOptions->minzoom = value.integerValue;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionMaximumZoomLevel]) {
@@ -43,7 +43,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionMaximumZoomLevel must be an NSNumber."];
         }
-        geoJSONOptions.maxzoom = value.integerValue;
+        geoJSONOptions->maxzoom = value.integerValue;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionBuffer]) {
@@ -51,7 +51,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionBuffer must be an NSNumber."];
         }
-        geoJSONOptions.buffer = value.integerValue;
+        geoJSONOptions->buffer = value.integerValue;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionSimplificationTolerance]) {
@@ -59,7 +59,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionSimplificationTolerance must be an NSNumber."];
         }
-        geoJSONOptions.tolerance = value.doubleValue;
+        geoJSONOptions->tolerance = value.doubleValue;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionClusterRadius]) {
@@ -67,7 +67,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionClusterRadius must be an NSNumber."];
         }
-        geoJSONOptions.clusterRadius = value.integerValue;
+        geoJSONOptions->clusterRadius = value.integerValue;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionMaximumZoomLevelForClustering]) {
@@ -75,7 +75,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionMaximumZoomLevelForClustering must be an NSNumber."];
         }
-        geoJSONOptions.clusterMaxZoom = value.integerValue;
+        geoJSONOptions->clusterMaxZoom = value.integerValue;
     }
 
     if (NSNumber *value = options[MGLShapeSourceOptionClustered]) {
@@ -83,7 +83,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionClustered must be an NSNumber."];
         }
-        geoJSONOptions.cluster = value.boolValue;
+        geoJSONOptions->cluster = value.boolValue;
     }
 
     if (NSDictionary *value = options[MGLShapeSourceOptionClusterProperties]) {
@@ -133,7 +133,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
             std::string keyString = std::string([key UTF8String]);
 
-            geoJSONOptions.clusterProperties.emplace(keyString, std::make_pair(std::move(map), std::move(reduce)));
+            geoJSONOptions->clusterProperties.emplace(keyString, std::make_pair(std::move(map), std::move(reduce)));
         }
     }
 
@@ -142,7 +142,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
             [NSException raise:NSInvalidArgumentException
                         format:@"MGLShapeSourceOptionLineDistanceMetrics must be an NSNumber."];
         }
-        geoJSONOptions.lineMetrics = value.boolValue;
+        geoJSONOptions->lineMetrics = value.boolValue;
     }
 
     return geoJSONOptions;
@@ -159,7 +159,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
 - (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NSDictionary<NSString *, id> *)options {
     auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
-    auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, std::move(geoJSONOptions));
     if (self = [super initWithPendingSource:std::move(source)]) {
         self.URL = url;
     }
@@ -168,7 +168,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
 - (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(NSDictionary<MGLShapeSourceOption, id> *)options {
     auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
-    auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, std::move(geoJSONOptions));
     if (self = [super initWithPendingSource:std::move(source)]) {
         if ([shape isMemberOfClass:[MGLShapeCollection class]]) {
             static dispatch_once_t onceToken;

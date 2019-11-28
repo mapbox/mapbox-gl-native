@@ -15,7 +15,7 @@ using GeoJSONDataCallback = std::function<void(std::shared_ptr<style::GeoJSONDat
 
 class FeatureConverter {
 public:
-    explicit FeatureConverter(style::GeoJSONOptions options_) : options(std::move(options_)) {}
+    explicit FeatureConverter(Immutable<style::GeoJSONOptions> options_) : options(std::move(options_)) {}
     void convertJson(std::shared_ptr<std::string>, ActorRef<GeoJSONDataCallback>);
 
     template <class JNIType>
@@ -23,7 +23,7 @@ public:
                        ActorRef<GeoJSONDataCallback>);
 
 private:
-    style::GeoJSONOptions options;
+    Immutable<style::GeoJSONOptions> options;
 };
 
 struct Update {

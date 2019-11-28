@@ -116,12 +116,12 @@ static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string&
         return nullopt;
     }
 
-    optional<GeoJSONOptions> options = convert<GeoJSONOptions>(value, error);
-    if (!options) {
-        return nullopt;
+    Immutable<GeoJSONOptions> options = GeoJSONOptions::defaultOptions();
+    if (optional<GeoJSONOptions> converted = convert<GeoJSONOptions>(value, error)) {
+        options = makeMutable<GeoJSONOptions>(std::move(*converted));
     }
 
-    auto result = std::make_unique<GeoJSONSource>(id, *options);
+    auto result = std::make_unique<GeoJSONSource>(id, std::move(options));
 
     if (isObject(*dataValue)) {
         optional<GeoJSON> geoJSON = convert<GeoJSON>(*dataValue, error);
