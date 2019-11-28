@@ -4,7 +4,7 @@ workflows:
   version: 2
   mbgl-next:
     jobs:
-      - next-sanity-checks
+      # - next-sanity-checks
       - next-android-render-test-runner
       - next-build-template:
           name: next-android-armeabi-v7a-release
