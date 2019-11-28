@@ -15,4 +15,5 @@ vendor/mvt-fixtures/real-world/
 ignores/
 render-test/metrics/android/
 render-test/expected/
-android-manifest.json
+android-manifest-probe-network-gfx.json
+android-manifest-probe-memory.json
