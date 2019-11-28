@@ -6,9 +6,19 @@
             169
         ],
         [
+            "image-compressed",
+            "expected.png",
+            167
+        ],
+        [
             "style",
             "style.json",
-            516
+            674
+        ],
+        [
+            "style-compressed",
+            "style.json",
+            256
         ]
     ]
 }
