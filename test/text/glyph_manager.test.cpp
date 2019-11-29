@@ -106,8 +106,8 @@ TEST(GlyphManager, LoadingSuccess) {
         ASSERT_EQ(range, GlyphRange(0, 255));
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
-        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
+    test.requestor.glyphsAvailable = [&](GlyphMap glyphs) {
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}})).glyphs;
 
         ASSERT_EQ(testPositions.size(), 3u);
         ASSERT_EQ(testPositions.count(u'a'), 1u);
@@ -223,8 +223,8 @@ TEST(GlyphManager, LoadLocalCJKGlyph) {
     
     test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
         EXPECT_EQ(glyphResponses, 0); // Local generation should prevent requesting any glyphs
-        
-        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
+
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}})).glyphs;
 
         ASSERT_EQ(testPositions.size(), 1u);
         ASSERT_EQ(testPositions.count(u'中'), 1u);
@@ -264,9 +264,9 @@ TEST(GlyphManager, LoadLocalCJKGlyphAfterLoadingRangeFromURL) {
         return response;
 
     };
-    
-    test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
-        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
+
+    test.requestor.glyphsAvailable = [&](GlyphMap glyphs) {
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}})).glyphs;
 
         if (firstGlyphResponse == true) {
             firstGlyphResponse = false;
@@ -325,8 +325,8 @@ TEST(GlyphManager, LoadingInvalid) {
         ASSERT_EQ(range, GlyphRange(0, 255));
     };
 
-    test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
-        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
+    test.requestor.glyphsAvailable = [&](GlyphMap glyphs) {
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}})).glyphs;
 
         ASSERT_EQ(testPositions.size(), 2u);
         ASSERT_FALSE(bool(testPositions.at(u'A')));

@@ -25,19 +25,16 @@ using GlyphIDs = std::set<GlyphID>;
 GlyphRange getGlyphRange(GlyphID glyph);
 
 struct GlyphMetrics {
-    uint32_t width = 0;
-    uint32_t height = 0;
+    uint32_t width = 0U;
+    uint32_t height = 0U;
     int32_t left = 0;
     int32_t top = 0;
-    uint32_t advance = 0;
+    uint32_t advance = 0U;
 };
 
 inline bool operator==(const GlyphMetrics& lhs, const GlyphMetrics& rhs) {
-    return lhs.width == rhs.width &&
-        lhs.height == rhs.height &&
-        lhs.left == rhs.left &&
-        lhs.top == rhs.top &&
-        lhs.advance == rhs.advance;
+    return lhs.width == rhs.width && lhs.height == rhs.height && lhs.left == rhs.left && lhs.top == rhs.top &&
+           lhs.advance == rhs.advance;
 }
 
 class Glyph {
@@ -55,7 +52,11 @@ public:
     GlyphMetrics metrics;
 };
 
-using Glyphs = std::map<GlyphID, optional<Immutable<Glyph>>>;
+struct Glyphs {
+    std::map<GlyphID, optional<Immutable<Glyph>>> glyphs{};
+    optional<int32_t> ascender{nullopt};
+    optional<int32_t> descender{nullopt};
+};
 using GlyphMap = std::map<FontStackHash, Glyphs>;
 
 class PositionedGlyph {
@@ -82,7 +83,7 @@ class Shaping {
     Shaping() = default;
     explicit Shaping(float x, float y, WritingModeType writingMode_, std::size_t lineCount_)
         : top(y), bottom(y), left(x), right(x), writingMode(writingMode_), lineCount(lineCount_) {}
-    std::vector<PositionedGlyph> positionedGlyphs;
+    std::unordered_map<uint32_t, std::vector<PositionedGlyph>> positionedGlyphs;
     float top = 0;
     float bottom = 0;
     float left = 0;
@@ -92,6 +93,7 @@ class Shaping {
     explicit operator bool() const { return !positionedGlyphs.empty(); }
     // The y offset *should* be part of the font metadata.
     static constexpr int32_t yOffset = -17;
+    bool hasBaseline{false};
 };
 
 enum class WritingModeType : uint8_t {

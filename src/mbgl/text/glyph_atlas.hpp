@@ -11,8 +11,13 @@ struct GlyphPosition {
     GlyphMetrics metrics;
 };
 
-using GlyphPositionMap = std::map<GlyphID, GlyphPosition>;
-using GlyphPositions = std::map<FontStackHash, GlyphPositionMap>;
+struct GlyphPositionData {
+    std::map<GlyphID, GlyphPosition> glyphPositionMap{};
+    optional<int32_t> ascender{nullopt};
+    optional<int32_t> descender{nullopt};
+};
+
+using GlyphPositions = std::map<FontStackHash, GlyphPositionData>;
 
 class GlyphAtlas {
 public:

@@ -89,9 +89,9 @@ void GlyphManager::processResponse(const Response& res, const FontStack& fontSta
 
     if (!res.noContent) {
         std::vector<Glyph> glyphs;
-
+        int32_t ascender{0}, descender{0};
         try {
-            glyphs = parseGlyphPBF(range, *res.data);
+            std::tie(glyphs, ascender, descender) = parseGlyphPBF(range, *res.data);
         } catch (...) {
             observer->onGlyphsError(fontStack, range, std::current_exception());
             return;
@@ -103,6 +103,10 @@ void GlyphManager::processResponse(const Response& res, const FontStack& fontSta
                 entry.glyphs.erase(id);
                 entry.glyphs.emplace(id, makeMutable<Glyph>(std::move(glyph)));
             }
+        }
+        if (ascender != 0 || descender != 0) {
+            entry.ascender = ascender;
+            entry.descender = descender;
         }
     }
 
@@ -134,18 +138,20 @@ void GlyphManager::notify(GlyphRequestor& requestor, const GlyphDependencies& gl
 
         Glyphs& glyphs = response[FontStackHasher()(fontStack)];
         Entry& entry = entries[fontStack];
+        glyphs.ascender = entry.ascender;
+        glyphs.descender = entry.descender;
 
         for (const auto& glyphID : glyphIDs) {
             auto it = entry.glyphs.find(glyphID);
             if (it != entry.glyphs.end()) {
-                glyphs.emplace(*it);
+                glyphs.glyphs.emplace(*it);
             } else {
-                glyphs.emplace(glyphID, std::experimental::nullopt);
+                glyphs.glyphs.emplace(glyphID, nullopt);
             }
         }
     }
 
-    requestor.onGlyphsAvailable(response);
+    requestor.onGlyphsAvailable(std::move(response));
 }
 
 void GlyphManager::removeRequestor(GlyphRequestor& requestor) {

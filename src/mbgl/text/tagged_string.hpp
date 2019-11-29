@@ -38,12 +38,12 @@ struct SectionOptions {
 struct TaggedString {
     TaggedString() = default;
 
-    TaggedString(std::u16string text_, SectionOptions options)
-        : styledText(std::move(text_),
-                     std::vector<uint8_t>(text_.size(), 0)) {
+    TaggedString(std::u16string text_, SectionOptions options) {
+        styledText.second = std::vector<uint8_t>(text_.size(), 0);
+        styledText.first = std::move(text_);
         sections.push_back(std::move(options));
     }
-    
+
     TaggedString(StyledText styledText_, std::vector<SectionOptions> sections_)
         : styledText(std::move(styledText_))
         , sections(std::move(sections_)) {
