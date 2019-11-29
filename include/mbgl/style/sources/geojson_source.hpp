@@ -14,7 +14,7 @@
 namespace mbgl {
 
 class AsyncRequest;
-
+class Scheduler;
 namespace style {
 
 struct GeoJSONOptions {
@@ -81,6 +81,7 @@ public:
 private:
     optional<std::string> url;
     std::unique_ptr<AsyncRequest> req;
+    std::shared_ptr<Scheduler> threadPool;
     mapbox::base::WeakPtrFactory<Source> weakFactory {this};
 };
 
