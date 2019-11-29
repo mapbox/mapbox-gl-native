@@ -19,7 +19,7 @@ Immutable<GeoJSONOptions> GeoJSONOptions::defaultOptions() {
 }
 
 GeoJSONSource::GeoJSONSource(std::string id, Immutable<GeoJSONOptions> options)
-    : Source(makeMutable<Impl>(std::move(id), std::move(options))) {}
+    : Source(makeMutable<Impl>(std::move(id), std::move(options))), threadPool(Scheduler::GetBackground()) {}
 
 GeoJSONSource::~GeoJSONSource() = default;
 
@@ -98,7 +98,7 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
                 loaded = true;
                 observer->onSourceLoaded(*this);
             };
-            Scheduler::GetBackground()->scheduleAndReplyValue(makeImplInBackground, onImplReady);
+            threadPool->scheduleAndReplyValue(makeImplInBackground, onImplReady);
         }
     });
 }
