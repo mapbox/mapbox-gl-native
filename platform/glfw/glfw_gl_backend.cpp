@@ -58,7 +58,7 @@ mbgl::gl::ProcAddress GLFWGLBackend::getExtensionFunctionPointer(const char* nam
 
 void GLFWGLBackend::updateAssumedState() {
     assumeFramebufferBinding(0);
-    assumeViewport(0, 0, size);
+    setViewport(0, 0, size);
 }
 
 mbgl::Size GLFWGLBackend::getSize() const {
