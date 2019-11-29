@@ -360,6 +360,7 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
     // Check file size metrics.
     auto checkFileSize = [](TestMetadata& metadata) -> bool {
         if (metadata.metrics.fileSize.empty()) return true;
+        bool passed = true;
         for (const auto& expected : metadata.expectedMetrics.fileSize) {
             auto actual = metadata.metrics.fileSize.find(expected.first);
             if (actual == metadata.metrics.fileSize.end()) {
@@ -378,14 +379,16 @@ bool TestRunner::checkProbingResults(TestMetadata& metadata) {
             auto result = checkValue(expected.second.size, actual->second.size, actual->second.tolerance);
             if (!std::get<bool>(result)) {
                 std::stringstream ss;
-                ss << "File size does not match at probe \"" << expected.first << "\": " << actual->second.size
-                   << ", expected is " << expected.second.size << ".";
+                ss << "File size does not match at probe \"" << expected.first << "\" for file \""
+                   << expected.second.path << "\": " << actual->second.size << ", expected is " << expected.second.size
+                   << ".";
 
-                metadata.errorMessage = ss.str();
-                return false;
+                metadata.errorMessage += metadata.errorMessage.empty() ? ss.str() : "\n" + ss.str();
+                passed = false;
+                continue;
             }
         }
-        return true;
+        return passed;
     };
     auto checkMemory = [](TestMetadata& metadata) -> bool {
         if (metadata.metrics.memory.empty()) return true;
