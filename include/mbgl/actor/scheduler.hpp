@@ -9,6 +9,23 @@ namespace mbgl {
 
 class Mailbox;
 
+// Using this type as a return type enforces the client to retain the returned object.
+// TODO:  Move to a separate file if/when other clients for this aux API turn up.
+template <typename T>
+class Pass {
+public:
+    Pass(T&& obj_) : obj(std::forward<T>(obj_)) {}
+    Pass(Pass&&) = default;
+    Pass(const Pass&) = delete;
+    operator T() && { return std::move(obj); }
+
+private:
+    T obj;
+};
+
+template <typename T>
+using PassRefPtr = Pass<std::shared_ptr<T>>;
+
 /*
     A `Scheduler` is responsible for coordinating the processing of messages by
     one or more actors via their mailboxes. It's an abstract interface. Currently,
@@ -72,7 +89,7 @@ public:
     // The scheduled tasks might run in parallel on different
     // threads.
     // TODO : Rename to GetPool()
-    static std::shared_ptr<Scheduler> GetBackground();
+    static PassRefPtr<Scheduler> GetBackground();
 
     // Get the *sequenced* scheduler for asynchronous tasks.
     // Unlike the method above, the returned scheduler
@@ -82,7 +99,7 @@ public:
     //
     // Sequenced scheduler can be used for running tasks
     // on the same thread-unsafe object.
-    static std::shared_ptr<Scheduler> GetSequenced();
+    static PassRefPtr<Scheduler> GetSequenced();
 
 protected:
     template <typename TaskFn, typename ReplyFn>

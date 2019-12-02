@@ -27,7 +27,7 @@ Scheduler* Scheduler::GetCurrent() {
 }
 
 // static
-std::shared_ptr<Scheduler> Scheduler::GetBackground() {
+PassRefPtr<Scheduler> Scheduler::GetBackground() {
     static std::weak_ptr<Scheduler> weak;
     static std::mutex mtx;
 
@@ -38,11 +38,11 @@ std::shared_ptr<Scheduler> Scheduler::GetBackground() {
         weak = scheduler = std::make_shared<ThreadPool>();
     }
 
-    return scheduler;
+    return PassRefPtr<Scheduler>(std::move(scheduler));
 }
 
 // static
-std::shared_ptr<Scheduler> Scheduler::GetSequenced() {
+PassRefPtr<Scheduler> Scheduler::GetSequenced() {
     const std::size_t kSchedulersCount = 10;
     static std::vector<std::weak_ptr<Scheduler>> weaks(kSchedulersCount);
     static std::mutex mtx;
@@ -65,7 +65,7 @@ std::shared_ptr<Scheduler> Scheduler::GetSequenced() {
         break;
     }
 
-    return result;
+    return PassRefPtr<Scheduler>(std::move(result));
 }
 
 } //namespace mbgl
