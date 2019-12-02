@@ -43,7 +43,9 @@ int main(int argc, char *argv[]) {
     args::Flag benchmarkFlag(argumentParser, "benchmark", "Toggle benchmark", {'b', "benchmark"});
     args::Flag offlineFlag(argumentParser, "offline", "Toggle offline", {'o', "offline"});
 
-    args::ValueFlag<std::string> backendValue(argumentParser, "Backend", "Rendering backend", {"backend"});
+    args::ValueFlag<std::string> testDirValue(
+        argumentParser, "directory", "Root directory for test generation", {"testDir"});
+    args::ValueFlag<std::string> backendValue(argumentParser, "backend", "Rendering backend", {"backend"});
     args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
     args::ValueFlag<std::string> cacheDBValue(argumentParser, "file", "Cache database file name", {'c', "cache"});
     args::ValueFlag<double> lonValue(argumentParser, "degrees", "Longitude", {'x', "lon"});
@@ -127,6 +129,8 @@ int main(int argc, char *argv[]) {
                    .withBearing(settings.bearing)
                    .withPitch(settings.pitch));
     map.setDebug(mbgl::MapDebugOptions(settings.debug));
+
+    if (testDirValue) view->setTestDirectory(args::get(testDirValue));
 
     view->setOnlineStatusCallback([&settings, fileSource]() {
         settings.online = !settings.online;

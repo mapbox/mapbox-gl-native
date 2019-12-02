@@ -12,6 +12,8 @@ target_sources(mbgl-glfw
     PRIVATE platform/glfw/glfw_renderer_frontend.cpp
     PRIVATE platform/glfw/settings_json.hpp
     PRIVATE platform/glfw/settings_json.cpp
+    PRIVATE platform/glfw/test_writer.hpp
+    PRIVATE platform/glfw/test_writer.cpp
 )
 
 target_include_directories(mbgl-glfw

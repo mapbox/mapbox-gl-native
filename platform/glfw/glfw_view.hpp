@@ -29,6 +29,8 @@ public:
 
     mbgl::gfx::RendererBackend& getRendererBackend();
 
+    void setTestDirectory(std::string dir) { testDirectory = std::move(dir); };
+
     // Callback called when the user presses the key mapped to style change.
     // The expected action is to set a new style, different to the current one.
     void setChangeStyleCallback(std::function<void()> callback);
@@ -104,6 +106,8 @@ private:
     mbgl::Map* map = nullptr;
     GLFWRendererFrontend* rendererFrontend = nullptr;
     std::unique_ptr<GLFWBackend> backend;
+
+    std::string testDirectory = ".";
 
     bool fullscreen = false;
     const bool benchmark = false;
