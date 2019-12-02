@@ -17,9 +17,7 @@ optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
     if (!isObject(*paintValue)) {
         return { { "paint must be an object" } };
     }
-    return eachMember(*paintValue, [&] (const std::string& k, const Convertible& v) {
-        return layer.setPaintProperty(k, v);
-    });
+    return eachMember(*paintValue, [&](const std::string& k, const Convertible& v) { return layer.setProperty(k, v); });
 }
 
 optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(const Convertible& value, Error& error) const {
@@ -83,9 +81,8 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
             error.message = "layout must be an object";
             return nullopt;
         }
-        optional<Error> error_ = eachMember(*layoutValue, [&] (const std::string& k, const Convertible& v) {
-            return layer->setLayoutProperty(k, v);
-        });
+        optional<Error> error_ = eachMember(
+            *layoutValue, [&](const std::string& k, const Convertible& v) { return layer->setProperty(k, v); });
         if (error_) {
             error = *error_;
             return nullopt;

@@ -169,56 +169,47 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"background-color-transition", toUint8(Property::BackgroundColorTransition)},
      {"background-opacity-transition", toUint8(Property::BackgroundOpacityTransition)},
      {"background-pattern-transition", toUint8(Property::BackgroundPatternTransition)}});
-
-constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::BackgroundPatternTransition);
 } // namespace
 
-optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+optional<Error> BackgroundLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
+    if (it == layerProperties.end()) {
+        if (name == "visibility") return setVisibility(value);
         return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
 
-        
     if (property == Property::BackgroundColor) {
         Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<Color>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setBackgroundColor(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::BackgroundOpacity) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setBackgroundOpacity(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::BackgroundPattern) {
         Error error;
-        optional<PropertyValue<expression::Image>> typedValue =
-            convert<PropertyValue<expression::Image>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<expression::Image>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setBackgroundPattern(*typedValue);
         return nullopt;
-        
     }
-    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -265,14 +256,6 @@ StyleProperty BackgroundLayer::getProperty(const std::string& name) const {
             return makeStyleProperty(getBackgroundPatternTransition());
     }
     return {};
-}
-
-optional<Error> BackgroundLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
-    }
-
-    return Error { "layer doesn't support this property" };
 }
 
 Mutable<Layer::Impl> BackgroundLayer::mutableBaseImpl() const {

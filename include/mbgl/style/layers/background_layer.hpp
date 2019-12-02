@@ -21,8 +21,7 @@ public:
     ~BackgroundLayer() final;
 
     // Dynamic properties
-    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
-    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) final;
 
     StyleProperty getProperty(const std::string& name) const final;
 

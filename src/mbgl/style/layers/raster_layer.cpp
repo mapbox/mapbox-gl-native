@@ -324,76 +324,72 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"raster-opacity-transition", toUint8(Property::RasterOpacityTransition)},
      {"raster-resampling-transition", toUint8(Property::RasterResamplingTransition)},
      {"raster-saturation-transition", toUint8(Property::RasterSaturationTransition)}});
-
-constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::RasterSaturationTransition);
 } // namespace
 
-optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+optional<Error> RasterLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
+    if (it == layerProperties.end()) {
+        if (name == "visibility") return setVisibility(value);
         return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
 
-        
-    if (property == Property::RasterBrightnessMax || property == Property::RasterBrightnessMin || property == Property::RasterContrast || property == Property::RasterFadeDuration || property == Property::RasterHueRotate || property == Property::RasterOpacity || property == Property::RasterSaturation) {
+    if (property == Property::RasterBrightnessMax || property == Property::RasterBrightnessMin ||
+        property == Property::RasterContrast || property == Property::RasterFadeDuration ||
+        property == Property::RasterHueRotate || property == Property::RasterOpacity ||
+        property == Property::RasterSaturation) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         if (property == Property::RasterBrightnessMax) {
             setRasterBrightnessMax(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterBrightnessMin) {
             setRasterBrightnessMin(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterContrast) {
             setRasterContrast(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterFadeDuration) {
             setRasterFadeDuration(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterHueRotate) {
             setRasterHueRotate(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterOpacity) {
             setRasterOpacity(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::RasterSaturation) {
             setRasterSaturation(*typedValue);
             return nullopt;
         }
-        
     }
-    
     if (property == Property::RasterResampling) {
         Error error;
-        optional<PropertyValue<RasterResamplingType>> typedValue =
-            convert<PropertyValue<RasterResamplingType>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<RasterResamplingType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setRasterResampling(*typedValue);
         return nullopt;
-        
     }
-    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -485,14 +481,6 @@ StyleProperty RasterLayer::getProperty(const std::string& name) const {
             return makeStyleProperty(getRasterSaturationTransition());
     }
     return {};
-}
-
-optional<Error> RasterLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
-    }
-
-    return Error { "layer doesn't support this property" };
 }
 
 Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {

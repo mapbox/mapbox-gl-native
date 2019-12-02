@@ -324,113 +324,94 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"fill-extrusion-translate-transition", toUint8(Property::FillExtrusionTranslateTransition)},
      {"fill-extrusion-translate-anchor-transition", toUint8(Property::FillExtrusionTranslateAnchorTransition)},
      {"fill-extrusion-vertical-gradient-transition", toUint8(Property::FillExtrusionVerticalGradientTransition)}});
-
-constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::FillExtrusionVerticalGradientTransition);
 } // namespace
 
-optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+optional<Error> FillExtrusionLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
+    if (it == layerProperties.end()) {
+        if (name == "visibility") return setVisibility(value);
         return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
 
-        
     if (property == Property::FillExtrusionBase || property == Property::FillExtrusionHeight) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-        
+
         if (property == Property::FillExtrusionBase) {
             setFillExtrusionBase(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::FillExtrusionHeight) {
             setFillExtrusionHeight(*typedValue);
             return nullopt;
         }
-        
     }
-    
     if (property == Property::FillExtrusionColor) {
         Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        const auto& typedValue = convert<PropertyValue<Color>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setFillExtrusionColor(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::FillExtrusionOpacity) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setFillExtrusionOpacity(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::FillExtrusionPattern) {
         Error error;
-        optional<PropertyValue<expression::Image>> typedValue =
-            convert<PropertyValue<expression::Image>>(value, error, true, false);
+        const auto& typedValue = convert<PropertyValue<expression::Image>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setFillExtrusionPattern(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::FillExtrusionTranslate) {
         Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue =
-            convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setFillExtrusionTranslate(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::FillExtrusionTranslateAnchor) {
         Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue =
-            convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setFillExtrusionTranslateAnchor(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::FillExtrusionVerticalGradient) {
         Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<bool>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setFillExtrusionVerticalGradient(*typedValue);
         return nullopt;
-        
     }
-    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -522,14 +503,6 @@ StyleProperty FillExtrusionLayer::getProperty(const std::string& name) const {
             return makeStyleProperty(getFillExtrusionVerticalGradientTransition());
     }
     return {};
-}
-
-optional<Error> FillExtrusionLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
-    }
-
-    return Error { "layer doesn't support this property" };
 }
 
 Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {

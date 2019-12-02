@@ -491,129 +491,147 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"line-join", toUint8(Property::LineJoin)},
      {"line-miter-limit", toUint8(Property::LineMiterLimit)},
      {"line-round-limit", toUint8(Property::LineRoundLimit)}});
-
-constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::LineWidthTransition);
 } // namespace
 
-optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+optional<Error> LineLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
+    if (it == layerProperties.end()) {
+        if (name == "visibility") return setVisibility(value);
         return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
 
-        
-    if (property == Property::LineBlur || property == Property::LineGapWidth || property == Property::LineOffset || property == Property::LineOpacity || property == Property::LineWidth) {
+    if (property == Property::LineBlur || property == Property::LineGapWidth || property == Property::LineOffset ||
+        property == Property::LineOpacity || property == Property::LineWidth) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-        
+
         if (property == Property::LineBlur) {
             setLineBlur(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::LineGapWidth) {
             setLineGapWidth(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::LineOffset) {
             setLineOffset(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::LineOpacity) {
             setLineOpacity(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::LineWidth) {
             setLineWidth(*typedValue);
             return nullopt;
         }
-        
     }
-    
     if (property == Property::LineColor) {
         Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        const auto& typedValue = convert<PropertyValue<Color>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setLineColor(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::LineDasharray) {
         Error error;
-        optional<PropertyValue<std::vector<float>>> typedValue =
-            convert<PropertyValue<std::vector<float>>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<std::vector<float>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setLineDasharray(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::LineGradient) {
         Error error;
-        optional<ColorRampPropertyValue> typedValue = convert<ColorRampPropertyValue>(value, error, false, false);
+        const auto& typedValue = convert<ColorRampPropertyValue>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setLineGradient(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::LinePattern) {
         Error error;
-        optional<PropertyValue<expression::Image>> typedValue =
-            convert<PropertyValue<expression::Image>>(value, error, true, false);
+        const auto& typedValue = convert<PropertyValue<expression::Image>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setLinePattern(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::LineTranslate) {
         Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue =
-            convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setLineTranslate(*typedValue);
         return nullopt;
-        
     }
-    
     if (property == Property::LineTranslateAnchor) {
         Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue =
-            convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setLineTranslateAnchor(*typedValue);
         return nullopt;
-        
     }
-    
+    if (property == Property::LineCap) {
+        Error error;
+        const auto& typedValue = convert<PropertyValue<LineCapType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineCap(*typedValue);
+        return nullopt;
+    }
+    if (property == Property::LineJoin) {
+        Error error;
+        const auto& typedValue = convert<PropertyValue<LineJoinType>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineJoin(*typedValue);
+        return nullopt;
+    }
+    if (property == Property::LineMiterLimit || property == Property::LineRoundLimit) {
+        Error error;
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        if (property == Property::LineMiterLimit) {
+            setLineMiterLimit(*typedValue);
+            return nullopt;
+        }
+
+        if (property == Property::LineRoundLimit) {
+            setLineRoundLimit(*typedValue);
+            return nullopt;
+        }
+    }
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -740,65 +758,6 @@ StyleProperty LineLayer::getProperty(const std::string& name) const {
             return makeStyleProperty(getLineRoundLimit());
     }
     return {};
-}
-
-optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
-    }
-    const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end() || it->second <= lastPaintPropertyIndex) {
-        return Error { "layer doesn't support this property" };
-    }
-
-    auto property = static_cast<Property>(it->second);
-
-        
-    if (property == Property::LineCap) {
-        Error error;
-        optional<PropertyValue<LineCapType>> typedValue = convert<PropertyValue<LineCapType>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-        
-        setLineCap(*typedValue);
-        return nullopt;
-        
-    }
-    
-    if (property == Property::LineJoin) {
-        Error error;
-        optional<PropertyValue<LineJoinType>> typedValue = convert<PropertyValue<LineJoinType>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-        
-        setLineJoin(*typedValue);
-        return nullopt;
-        
-    }
-    
-    if (property == Property::LineMiterLimit || property == Property::LineRoundLimit) {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-        
-        if (property == Property::LineMiterLimit) {
-            setLineMiterLimit(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::LineRoundLimit) {
-            setLineRoundLimit(*typedValue);
-            return nullopt;
-        }
-        
-    }
-    
-
-    return Error { "layer doesn't support this property" };
 }
 
 Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {
