@@ -671,7 +671,7 @@ jobs:
           when: always
           command: |
             if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
-              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html | tail -1)
+              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html)
               mkdir -p /tmp/tests/render-test-app
               gsutil cp $testResult /tmp/tests/render-test-app | true
             fi

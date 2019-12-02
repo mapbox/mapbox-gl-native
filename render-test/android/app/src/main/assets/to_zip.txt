@@ -12,7 +12,7 @@ mapbox-gl-js/test/integration/sprites/
 vendor/mapbox-gl-styles/styles/
 vendor/mapbox-gl-styles/sprites/
 vendor/mvt-fixtures/real-world/
-ignores/
+render-test/ignores/
 render-test/metrics/android/
 render-test/expected/
 android-manifest-probe-network-gfx.json

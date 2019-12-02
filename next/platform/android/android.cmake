@@ -357,13 +357,7 @@ add_custom_command(
         -E
         copy
         ${MBGL_ROOT}/platform/node/test/ignores.json
-        ${MBGL_ROOT}/ignores/ignores.json
-    COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy
-        ${MBGL_ROOT}/render-test/linux-ignores.json
-        ${MBGL_ROOT}/ignores/linux-ignores.json
+        ${MBGL_ROOT}/render-test/ignores/ignores.json
     COMMAND
         ${CMAKE_COMMAND}
         -E
@@ -372,11 +366,6 @@ add_custom_command(
         "render-test/android/app/src/main/assets/data.zip"
         --format=zip
         --files-from=render-test/android/app/src/main/assets/to_zip.txt
-    COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        remove_directory
-        ${MBGL_ROOT}/ignores
     COMMAND
         ${CMAKE_COMMAND}
         -E
