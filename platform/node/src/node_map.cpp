@@ -106,8 +106,8 @@ ParseError)JS").ToLocalChecked()).ToLocalChecked();
     Nan::SetPrototypeMethod(tpl, "addImage", AddImage);
     Nan::SetPrototypeMethod(tpl, "removeImage", RemoveImage);
     Nan::SetPrototypeMethod(tpl, "setLayerZoomRange", SetLayerZoomRange);
-    Nan::SetPrototypeMethod(tpl, "setLayoutProperty", SetLayoutProperty);
-    Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
+    Nan::SetPrototypeMethod(tpl, "setLayoutProperty", SetLayerProperty);
+    Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetLayerProperty);
     Nan::SetPrototypeMethod(tpl, "setFilter", SetFilter);
     Nan::SetPrototypeMethod(tpl, "setCenter", SetCenter);
     Nan::SetPrototypeMethod(tpl, "setZoom", SetZoom);
@@ -850,7 +850,7 @@ void NodeMap::SetLayerZoomRange(const Nan::FunctionCallbackInfo<v8::Value>& info
     layer->setMaxZoom(info[2]->NumberValue());
 }
 
-void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+void NodeMap::SetLayerProperty(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
@@ -874,39 +874,7 @@ void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info
         return Nan::ThrowTypeError("Second argument must be a string");
     }
 
-    mbgl::optional<Error> error = layer->setLayoutProperty(*Nan::Utf8String(info[1]), Convertible(info[2]));
-    if (error) {
-        return Nan::ThrowTypeError(error->message.c_str());
-    }
-
-    info.GetReturnValue().SetUndefined();
-}
-
-void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    using namespace mbgl::style;
-    using namespace mbgl::style::conversion;
-
-    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
-
-    if (info.Length() < 3) {
-        return Nan::ThrowTypeError("Three arguments required");
-    }
-
-    if (!info[0]->IsString()) {
-        return Nan::ThrowTypeError("First argument must be a string");
-    }
-
-    mbgl::style::Layer* layer = nodeMap->map->getStyle().getLayer(*Nan::Utf8String(info[0]));
-    if (!layer) {
-        return Nan::ThrowTypeError("layer not found");
-    }
-
-    if (!info[1]->IsString()) {
-        return Nan::ThrowTypeError("Second argument must be a string");
-    }
-
-    mbgl::optional<Error> error = layer->setPaintProperty(*Nan::Utf8String(info[1]), Convertible(info[2]));
+    mbgl::optional<Error> error = layer->setProperty(*Nan::Utf8String(info[1]), Convertible(info[2]));
     if (error) {
         return Nan::ThrowTypeError(error->message.c_str());
     }

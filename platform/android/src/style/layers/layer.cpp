@@ -91,18 +91,10 @@ namespace android {
         return layer;
     }
 
-    void Layer::setLayoutProperty(jni::JNIEnv& env, const jni::String& jname, const jni::Object<>& jvalue) {
+    void Layer::setProperty(jni::JNIEnv& env, const jni::String& jname, const jni::Object<>& jvalue) {
         // Convert and set property
-        optional<mbgl::style::conversion::Error> error = layer.setLayoutProperty(jni::Make<std::string>(env, jname), Value(env, jvalue));
-        if (error) {
-            mbgl::Log::Error(mbgl::Event::JNI, "Error setting property: " + jni::Make<std::string>(env, jname) + " " + error->message);
-            return;
-        }
-    }
-
-    void Layer::setPaintProperty(jni::JNIEnv& env, const jni::String& jname, const jni::Object<>& jvalue) {
-        // Convert and set property
-        optional<mbgl::style::conversion::Error> error = layer.setPaintProperty(jni::Make<std::string>(env, jname), Value(env, jvalue));
+        optional<mbgl::style::conversion::Error> error =
+            layer.setProperty(jni::Make<std::string>(env, jname), Value(env, jvalue));
         if (error) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting property: " + jni::Make<std::string>(env, jname) + " " + error->message);
             return;
@@ -176,10 +168,14 @@ namespace android {
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Layer>(env, javaClass, "nativePtr",
+        jni::RegisterNativePeer<Layer>(
+            env,
+            javaClass,
+            "nativePtr",
             METHOD(&Layer::getId, "nativeGetId"),
-            METHOD(&Layer::setLayoutProperty, "nativeSetLayoutProperty"),
-            METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),
+            METHOD(&Layer::setProperty,
+                   "nativeSetLayoutProperty"), // TODO : Export only nativeSetProperty() when #15970 lands.
+            METHOD(&Layer::setProperty, "nativeSetPaintProperty"),
             METHOD(&Layer::setFilter, "nativeSetFilter"),
             METHOD(&Layer::getFilter, "nativeGetFilter"),
             METHOD(&Layer::setSourceLayer, "nativeSetSourceLayer"),
@@ -189,9 +185,7 @@ namespace android {
             METHOD(&Layer::getMaxZoom, "nativeGetMaxZoom"),
             METHOD(&Layer::setMinZoom, "nativeSetMinZoom"),
             METHOD(&Layer::setMaxZoom, "nativeSetMaxZoom"),
-            METHOD(&Layer::getVisibility, "nativeGetVisibility")
-        );
-
+            METHOD(&Layer::getVisibility, "nativeGetVisibility"));
     }
 
 } // namespace android
