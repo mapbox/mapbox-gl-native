@@ -262,75 +262,67 @@ MAPBOX_ETERNAL_CONSTEXPR const auto layerProperties = mapbox::eternal::hash_map<
      {"hillshade-illumination-anchor-transition", toUint8(Property::HillshadeIlluminationAnchorTransition)},
      {"hillshade-illumination-direction-transition", toUint8(Property::HillshadeIlluminationDirectionTransition)},
      {"hillshade-shadow-color-transition", toUint8(Property::HillshadeShadowColorTransition)}});
-
-constexpr uint8_t lastPaintPropertyIndex = toUint8(Property::HillshadeShadowColorTransition);
 } // namespace
 
-optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+optional<Error> HillshadeLayer::setProperty(const std::string& name, const Convertible& value) {
     const auto it = layerProperties.find(name.c_str());
-    if (it == layerProperties.end() || it->second > lastPaintPropertyIndex) {
+    if (it == layerProperties.end()) {
+        if (name == "visibility") return setVisibility(value);
         return Error{"layer doesn't support this property"};
     }
 
     auto property = static_cast<Property>(it->second);
 
-        
-    if (property == Property::HillshadeAccentColor || property == Property::HillshadeHighlightColor || property == Property::HillshadeShadowColor) {
+    if (property == Property::HillshadeAccentColor || property == Property::HillshadeHighlightColor ||
+        property == Property::HillshadeShadowColor) {
         Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<Color>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         if (property == Property::HillshadeAccentColor) {
             setHillshadeAccentColor(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::HillshadeHighlightColor) {
             setHillshadeHighlightColor(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::HillshadeShadowColor) {
             setHillshadeShadowColor(*typedValue);
             return nullopt;
         }
-        
     }
-    
     if (property == Property::HillshadeExaggeration || property == Property::HillshadeIlluminationDirection) {
         Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         if (property == Property::HillshadeExaggeration) {
             setHillshadeExaggeration(*typedValue);
             return nullopt;
         }
-        
+
         if (property == Property::HillshadeIlluminationDirection) {
             setHillshadeIlluminationDirection(*typedValue);
             return nullopt;
         }
-        
     }
-    
     if (property == Property::HillshadeIlluminationAnchor) {
         Error error;
-        optional<PropertyValue<HillshadeIlluminationAnchorType>> typedValue =
-            convert<PropertyValue<HillshadeIlluminationAnchorType>>(value, error, false, false);
+        const auto& typedValue = convert<PropertyValue<HillshadeIlluminationAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-        
+
         setHillshadeIlluminationAnchor(*typedValue);
         return nullopt;
-        
     }
-    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -404,14 +396,6 @@ StyleProperty HillshadeLayer::getProperty(const std::string& name) const {
             return makeStyleProperty(getHillshadeShadowColorTransition());
     }
     return {};
-}
-
-optional<Error> HillshadeLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
-    if (name == "visibility") {
-        return Layer::setVisibility(value);
-    }
-
-    return Error { "layer doesn't support this property" };
 }
 
 Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {

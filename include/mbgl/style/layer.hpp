@@ -110,9 +110,7 @@ public:
     void setMaxZoom(float);
 
     // Dynamic properties
-    virtual optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) = 0;
-    virtual optional<conversion::Error> setPaintProperty(const std::string& name,
-                                                         const conversion::Convertible& value) = 0;
+    virtual optional<conversion::Error> setProperty(const std::string& name, const conversion::Convertible& value) = 0;
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
 
     virtual StyleProperty getProperty(const std::string&) const = 0;
