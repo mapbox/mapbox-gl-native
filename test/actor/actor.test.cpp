@@ -156,7 +156,7 @@ TEST(Actor, DestructionAllowedInReceiveOnSameThread) {
     };
 
     std::promise<void> callbackFiredPromise;
-    auto retainer = Scheduler::GetBackground();
+    std::shared_ptr<Scheduler> retainer = Scheduler::GetBackground();
     auto test = std::make_unique<Actor<Test>>(retainer);
 
     // Callback (triggered while mutex is locked in Mailbox::receive())

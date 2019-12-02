@@ -105,7 +105,7 @@ TEST(AsyncTask, RequestCoalescingMultithreaded) {
     unsigned count = 0, numThreads = 25;
     AsyncTask async([&count] { ++count; });
 
-    auto retainer = Scheduler::GetBackground();
+    std::shared_ptr<Scheduler> retainer = Scheduler::GetBackground();
     auto mailbox = std::make_shared<Mailbox>(*retainer);
 
     TestWorker worker(&async);
@@ -134,7 +134,7 @@ TEST(AsyncTask, ThreadSafety) {
 
     AsyncTask async([&count] { ++count; });
 
-    auto retainer = Scheduler::GetBackground();
+    std::shared_ptr<Scheduler> retainer = Scheduler::GetBackground();
     auto mailbox = std::make_shared<Mailbox>(*retainer);
 
     TestWorker worker(&async);
@@ -166,7 +166,7 @@ TEST(AsyncTask, scheduleAndReplyValue) {
         loop.stop();
     };
 
-    auto sheduler = Scheduler::GetBackground();
+    std::shared_ptr<Scheduler> sheduler = Scheduler::GetBackground();
     sheduler->scheduleAndReplyValue(runInBackground, onResult);
     loop.run();
 }
@@ -194,7 +194,7 @@ TEST(AsyncTask, SequencedScheduler) {
         loop.stop();
     };
 
-    auto sheduler = Scheduler::GetSequenced();
+    std::shared_ptr<Scheduler> sheduler = Scheduler::GetSequenced();
 
     sheduler->schedule(first);
     sheduler->schedule(second);
@@ -206,10 +206,10 @@ TEST(AsyncTask, MultipleSequencedSchedulers) {
     std::vector<std::shared_ptr<Scheduler>> shedulers;
 
     for (int i = 0; i < 10; ++i) {
-        auto scheduler = Scheduler::GetSequenced();
+        std::shared_ptr<Scheduler> scheduler = Scheduler::GetSequenced();
         EXPECT_TRUE(std::none_of(
             shedulers.begin(), shedulers.end(), [&scheduler](const auto &item) { return item == scheduler; }));
         shedulers.emplace_back(std::move(scheduler));
     }
-    EXPECT_EQ(shedulers.front(), Scheduler::GetSequenced());
+    EXPECT_EQ(shedulers.front(), std::shared_ptr<Scheduler>(Scheduler::GetSequenced()));
 }
