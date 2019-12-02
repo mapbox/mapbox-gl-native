@@ -793,8 +793,9 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
         assert(operationArray.Size() >= 2u);
         assert(operationArray[1].IsString());
         map.getStyle().removeSource(operationArray[1].GetString());
-    } else if (operationArray[0].GetString() == setPaintPropertyOp) {
-        // setPaintProperty
+    } else if (operationArray[0].GetString() == setLayoutPropertyOp ||
+               operationArray[0].GetString() == setPaintPropertyOp) {
+        // set{Paint|Layout}Property
         assert(operationArray.Size() >= 4u);
         assert(operationArray[1].IsString());
         assert(operationArray[2].IsString());
@@ -808,24 +809,7 @@ bool TestRunner::runOperations(const std::string& key, TestMetadata& metadata, R
             return false;
         } else {
             const mbgl::JSValue* propertyValue = &operationArray[3];
-            layer->setPaintProperty(propertyName, propertyValue);
-        }
-    } else if (operationArray[0].GetString() == setLayoutPropertyOp) {
-        // setLayoutProperty
-        assert(operationArray.Size() >= 4u);
-        assert(operationArray[1].IsString());
-        assert(operationArray[2].IsString());
-
-        const std::string layerName { operationArray[1].GetString(), operationArray[1].GetStringLength() };
-        const std::string propertyName { operationArray[2].GetString(), operationArray[2].GetStringLength() };
-
-        auto layer = map.getStyle().getLayer(layerName);
-        if (!layer) {
-            metadata.errorMessage = std::string("Layer not found: ")  + layerName;
-            return false;
-        } else {
-            const mbgl::JSValue* propertyValue = &operationArray[3];
-            layer->setLayoutProperty(propertyName, propertyValue);
+            layer->setProperty(propertyName, propertyValue);
         }
     } else if (operationArray[0].GetString() == fileSizeProbeOp) {
         // probeFileSize
