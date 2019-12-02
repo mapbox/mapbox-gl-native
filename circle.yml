@@ -707,7 +707,7 @@ jobs:
                 --device-ids flame --os-version-ids 29 --locales en --orientations portrait --timeout 20m \
                 --directories-to-pull /sdcard --results-dir render-test-app-${CIRCLE_BUILD_NUM} \
                 --no-record-video --no-performance-metrics
-              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html | tail -1)
+              testResult=$(gsutil ls gs://test-lab-186672a0qp5bq-ycr70axads3nc/render-test-app-${CIRCLE_BUILD_NUM}/**/*.html)
               mkdir -p /tmp/tests/render-test-app
               gsutil cp $testResult /tmp/tests/render-test-app | true
             fi

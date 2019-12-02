@@ -1,8 +1,10 @@
 {
     "base_test_path":"mapbox-gl-js/test/integration",
-    "expectation_paths":[],
+    "expectation_paths":["render-test/expected"],
     "ignore_paths":["ignores/ignores.json", "ignores/linux-ignores.json"],
     "vendor_path":"vendor",
     "asset_path": "mapbox-gl-js/test/integration",
-    "result_path": "/sdcard/"
+    "result_path":"/sdcard/",
+    "probes": ["probeGFX", "probeNetwork"],
+    "metric_path":"render-test/metrics/android"
 }

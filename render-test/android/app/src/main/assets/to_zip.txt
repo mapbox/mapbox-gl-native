@@ -13,4 +13,7 @@ vendor/mapbox-gl-styles/styles/
 vendor/mapbox-gl-styles/sprites/
 vendor/mvt-fixtures/real-world/
 ignores/
-android-manifest.json
+render-test/metrics/android/
+render-test/expected/
+android-manifest-probe-network-gfx.json
+android-manifest-probe-memory.json

@@ -344,8 +344,14 @@ add_custom_command(
         ${CMAKE_COMMAND}
         -E
         copy
-        ${MBGL_ROOT}/render-test/android-manifest.json
-        ${MBGL_ROOT}/android-manifest.json
+        ${MBGL_ROOT}/render-test/android-manifest-probe-memory.json
+        ${MBGL_ROOT}/android-manifest-probe-memory.json
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        copy
+        ${MBGL_ROOT}/render-test/android-manifest-probe-network-gfx.json
+        ${MBGL_ROOT}/android-manifest-probe-network-gfx.json
     COMMAND
         ${CMAKE_COMMAND}
         -E
@@ -362,7 +368,7 @@ add_custom_command(
         ${CMAKE_COMMAND}
         -E
         tar
-        "cf"
+        "chvf"
         "render-test/android/app/src/main/assets/data.zip"
         --format=zip
         --files-from=render-test/android/app/src/main/assets/to_zip.txt
@@ -375,7 +381,7 @@ add_custom_command(
         ${CMAKE_COMMAND}
         -E
         remove
-        ${MBGL_ROOT}/android-manifest.json
+        ${MBGL_ROOT}/android-manifest*
     WORKING_DIRECTORY ${MBGL_ROOT}
 )
 

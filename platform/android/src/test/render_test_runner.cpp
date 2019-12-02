@@ -252,26 +252,34 @@ void android_main(struct android_app* app) {
     } else {
         unZipFile(env, zipFile, storagePath);
 
-        std::string configFile = storagePath + "/android-manifest.json";
-        std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", configFile};
-        std::vector<char*> argv;
-        for (const auto& arg : arguments) {
-            argv.push_back((char*)arg.data());
-        }
-        argv.push_back(nullptr);
-
-        int finishedTestCount = 0;
-        std::function<void()> testStatus = [&]() {
-            ALooper_pollAll(0, &outFd, &outEvents, reinterpret_cast<void**>(&source));
-
-            if (source != nullptr) {
-                source->process(app, source);
+        auto runTestWithManifest = [&storagePath, &app, &outFd, &outEvents, &source](
+                                       const std::string manifest, const std::string filter = {}) -> bool {
+            const std::string configFile = storagePath + manifest;
+            std::vector<std::string> arguments = {"mbgl-render-test-runner", "-p", configFile, filter};
+            std::vector<char*> argv;
+            for (const auto& arg : arguments) {
+                argv.push_back(const_cast<char*>(arg.data()));
             }
+            argv.push_back(nullptr);
 
-            mbgl::Log::Info(mbgl::Event::General, "Current finished tests number is '%d' ", ++finishedTestCount);
+            int finishedTestCount = 0;
+            std::function<void()> testStatus = [&]() {
+                ALooper_pollAll(0, &outFd, &outEvents, reinterpret_cast<void**>(&source));
+
+                if (source != nullptr) {
+                    source->process(app, source);
+                }
+
+                mbgl::Log::Info(mbgl::Event::General, "Current finished tests number is '%d' ", ++finishedTestCount);
+            };
+            mbgl::Log::Info(
+                mbgl::Event::General, "Start running RenderTestRunner with manifest: '%s'", manifest.c_str());
+            bool result = mbgl::runRenderTests(argv.size() - 1, argv.data(), testStatus) == 0;
+            mbgl::Log::Info(mbgl::Event::General, "End running RenderTestRunner with manifest: '%s'", manifest.c_str());
+            return result;
         };
-
-        mbgl::runRenderTests(argv.size() - 1, argv.data(), testStatus);
+        runTestWithManifest("/android-manifest-probe-network-gfx.json");
+        runTestWithManifest("/android-manifest-probe-memory.json", "--filter=real-world");
         mbgl::Log::Info(mbgl::Event::General, "All tests are finished!");
         changeState(env, app);
     }
