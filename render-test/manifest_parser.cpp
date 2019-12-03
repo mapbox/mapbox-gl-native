@@ -257,7 +257,7 @@ mbgl::filesystem::path getValidPath(const std::string& manifestPath, const std::
 
 mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manifestPath,
                                                        const std::vector<std::string>& testNames,
-                                                       const std::string& testFilter) {
+                                                       std::string testFilter) {
     Manifest manifest;
     const auto filePath = mbgl::filesystem::path(manifestPath);
     manifest.manifestPath = manifestPath.substr(0, manifestPath.find(filePath.filename()));
@@ -410,6 +410,17 @@ mbgl::optional<Manifest> ManifestParser::parseManifest(const std::string& manife
             }
             manifest.probes.emplace(value.GetString());
         }
+    }
+
+    if (testFilter.empty() && document.HasMember("filter")) {
+        const auto& filterValue = document["filter"];
+        if (!filterValue.IsString()) {
+            mbgl::Log::Warning(
+                mbgl::Event::General, "Invalid filter is provoided inside the manifest file: %s", filePath.c_str());
+            return mbgl::nullopt;
+        }
+
+        testFilter = filterValue.GetString();
     }
 
     manifest.testRootPath = enbaleProbeTest ? probeTestPath.string() : baseTestPath.string();

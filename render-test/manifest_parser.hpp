@@ -56,5 +56,5 @@ class ManifestParser {
 public:
     static mbgl::optional<Manifest> parseManifest(const std::string& manifestPath,
                                                   const std::vector<std::string>& testNames,
-                                                  const std::string& testFilter);
+                                                  std::string testFilter);
 };

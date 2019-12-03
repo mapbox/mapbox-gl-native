@@ -147,11 +147,7 @@ else()
     )
     add_test(
         NAME mbgl-render-test-probe-memory
-        COMMAND
-            mbgl-render-test-runner
-            render-tests
-            --manifestPath=${MBGL_ROOT}/render-test/linux-manifest-probe-memory.json
-            --filter=real-world
+        COMMAND mbgl-render-test-runner render-tests --manifestPath=${MBGL_ROOT}/render-test/linux-manifest-probe-memory.json
     )
 endif()
 

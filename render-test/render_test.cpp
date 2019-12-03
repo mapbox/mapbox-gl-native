@@ -101,9 +101,6 @@ ArgumentsTuple parseArguments(int argc, char** argv) {
         mbgl::Log::Info(mbgl::Event::General, stream.str());
         mbgl::Log::Error(mbgl::Event::General, e.what());
         exit(2);
-    } catch (const std::regex_error& e) {
-        mbgl::Log::Error(mbgl::Event::General, "Invalid filter regular expression: %s", e.what());
-        exit(3);
     }
 
     mbgl::filesystem::path manifestPath{testPathValue ? args::get(testPathValue) : std::string{TEST_RUNNER_ROOT_PATH}};

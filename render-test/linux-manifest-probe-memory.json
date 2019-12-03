@@ -5,5 +5,6 @@
     "vendor_path":"../vendor",
     "asset_path": "../mapbox-gl-js/test/integration",
     "probes": ["probeMemory"],
-    "metric_path":"metrics/linux-gcc8"
+    "metric_path":"metrics/linux-gcc8",
+    "filter": "real-world"
 }
