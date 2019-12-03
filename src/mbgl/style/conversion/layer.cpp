@@ -95,7 +95,7 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
         return nullopt;
     }
 
-    return std::move(layer);
+    return layer;
 }
 
 } // namespace conversion

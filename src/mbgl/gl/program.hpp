@@ -74,7 +74,7 @@ public:
             };
             auto result = std::make_unique<Instance>(context, vertexSource, fragmentSource);
 
-            return std::move(result);
+            return result;
         }
 
         UniqueProgram program;
